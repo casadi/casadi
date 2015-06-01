@@ -1333,12 +1333,12 @@
 <tr><td>ma27_ignore_singularity</td><td>OT_STRING</td><td>no</td><td>Enables MA27's ability to solve a linear system even if the matrix is singular. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma27_la_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Real workspace memory for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma27_liw_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Integer workspace memory for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>2.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>10.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma27_pivtol</td><td>OT_REAL</td><td>1e-08</td><td>Pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma27_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma27_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma28_pivtol</td><td>OT_REAL</td><td>0.01</td><td>Pivot tolerance for linear solver MA28. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>no</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>yes</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma57_block_size</td><td>OT_INTEGER</td><td>16</td><td>Controls block size used by Level 3 BLAS in MA57BD (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma57_node_amalgamation</td><td>OT_INTEGER</td><td>16</td><td>Node amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma57_pivot_order</td><td>OT_INTEGER</td><td>5</td><td>Controls pivot order in MA57 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1346,39 +1346,12 @@
 <tr><td>ma57_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA57. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma57_pre_alloc</td><td>OT_REAL</td><td>1.05</td><td>Safety factor for work space memory allocation for the linear solver MA57. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma57_small_pivot_flag</td><td>OT_INTEGER</td><td>0</td><td>If set to 1, then when small entries defined by CNTL(2) are detected they are removed and the corresponding pivots placed at the end of the factorization.  This can be particularly efficient if the matrix is highly rank deficient. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_buffer_lpage</td><td>OT_INTEGER</td><td>4096</td><td>Number of scalars per MA77 buffer page (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_buffer_npage</td><td>OT_INTEGER</td><td>1600</td><td>Number of pages that make up MA77 buffer (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_file_size</td><td>OT_INTEGER</td><td>2097152</td><td>Target size of each temporary file for MA77, scalars per type (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_maxstore</td><td>OT_INTEGER</td><td>0</td><td>Maximum storage size for MA77 in-core mode (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_nemin</td><td>OT_INTEGER</td><td>8</td><td>Node Amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_order</td><td>OT_STRING</td><td>amd</td><td>Controls type of ordering used by HSL_MA77 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_print_level</td><td>OT_INTEGER</td><td>-1</td><td>Debug printing level for the linear solver MA77 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma86_nemin</td><td>OT_INTEGER</td><td>32</td><td>Node Amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma86_order</td><td>OT_STRING</td><td>amd</td><td>Controls type of ordering used by HSL_MA86 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>-1</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma86_scaling</td><td>OT_STRING</td><td>mc64</td><td>Controls scaling of matrix (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma86_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma86_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma86_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma86_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_nemin</td><td>OT_INTEGER</td><td>8</td><td>Node Amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_order</td><td>OT_STRING</td><td>auto</td><td>Controls type of ordering used by HSL_MA97 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA97 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_scaling</td><td>OT_STRING</td><td>dynamic</td><td>Specifies strategy for scaling in HSL_MA97 linear solver (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_scaling1</td><td>OT_STRING</td><td>mc64</td><td>First scaling. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_scaling2</td><td>OT_STRING</td><td>mc64</td><td>Second scaling. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_scaling3</td><td>OT_STRING</td><td>mc64</td><td>Third scaling. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_solve_blas3</td><td>OT_STRING</td><td>no</td><td>Controls if blas2 or blas3 routines are used for solve (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_switch1</td><td>OT_STRING</td><td>od_hd_reuse</td><td>First switch, determine when ma97_scaling1 is enabled. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_switch2</td><td>OT_STRING</td><td>never</td><td>Second switch, determine when ma97_scaling2 is enabled. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_switch3</td><td>OT_STRING</td><td>never</td><td>Third switch, determine when ma97_scaling3 is enabled. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>magic_steps</td><td>OT_STRING</td><td>no</td><td>Enables magic steps. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>max_cpu_time</td><td>OT_REAL</td><td>1000000.0</td><td>Maximum number of CPU seconds. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>max_filter_resets</td><td>OT_INTEGER</td><td>5</td><td>Maximal allowed number of filter resets (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1405,7 +1378,7 @@
 <tr><td>mu_target</td><td>OT_REAL</td><td>0.0</td><td>Desired value of complementarity. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>mult_diverg_feasibility_tol</td><td>OT_REAL</td><td>1e-07</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>mult_diverg_y_tol</td><td>OT_REAL</td><td>100000000.0</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>0.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>-1.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>mumps_mem_percent</td><td>OT_INTEGER</td><td>1000</td><td>Percentage increase in the estimated working space for MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>mumps_permuting_scaling</td><td>OT_INTEGER</td><td>7</td><td>Controls permuting and scaling in MUMPS (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>mumps_pivot_order</td><td>OT_INTEGER</td><td>7</td><td>Controls pivot order in MUMPS (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1428,7 +1401,7 @@
 <tr><td>num_linear_variables</td><td>OT_INTEGER</td><td>0</td><td>Number of linear variables (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>obj_max_inc</td><td>OT_REAL</td><td>5.0</td><td>Determines the upper bound on the acceptable increase of barrier objective function. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>obj_scaling_factor</td><td>OT_REAL</td><td>1.0</td><td>Scaling factor for the objective function. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>option_file_name</td><td>OT_STRING</td><td>ipopt.opt</td><td>File name of options file. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>option_file_name</td><td>OT_STRING</td><td></td><td>File name of options file (to overwrite default). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>output_file</td><td>OT_STRING</td><td></td><td>File name of desired output file (leave unset for no file output). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_iter_coarse_size</td><td>OT_INTEGER</td><td>5000</td><td>Maximum Size of Coarse Grid Matrix (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_iter_dropping_factor</td><td>OT_REAL</td><td>0.5</td><td>dropping value for incomplete factor (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1441,9 +1414,8 @@
 <tr><td>pardiso_matching_strategy</td><td>OT_STRING</td><td>complete+2x2</td><td>Matching strategy to be used by Pardiso (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_max_droptol_corrections</td><td>OT_INTEGER</td><td>4</td><td>Maximal number of decreases of drop tolerance during one solve. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_max_iter</td><td>OT_INTEGER</td><td>500</td><td>Maximum number of Krylov-Subspace Iteration (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_max_iterative_refinement_steps</td><td>OT_INTEGER</td><td>0</td><td>Limit on number of iterative refinement steps. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_msglvl</td><td>OT_INTEGER</td><td>0</td><td>Pardiso message level (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_order</td><td>OT_STRING</td><td>five</td><td>Controls the fill-in reduction ordering algorithm for the input matrix. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>pardiso_out_of_core_power</td><td>OT_INTEGER</td><td>0</td><td>Enables out-of-core variant of Pardiso (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_redo_symbolic_fact_only_if_inertia_wrong</td><td>OT_STRING</td><td>no</td><td>Toggle for handling case when elements were perturbed by Pardiso. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_repeated_perturbation_means_singular</td><td>OT_STRING</td><td>no</td><td>Interpretation of perturbed elements. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1463,8 +1435,6 @@
 <tr><td>piecewisepenalty_gamma_infeasi</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>piecewisepenalty_gamma_obj</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>point_perturbation_radius</td><td>OT_REAL</td><td>10.0</td><td>Maximal perturbation of an evaluation point. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>print_frequency_iter</td><td>OT_INTEGER</td><td>1</td><td>Determines at which iteration frequency the summarizing iteration output line should be printed. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>print_frequency_time</td><td>OT_REAL</td><td>0.0</td><td>Determines at which time frequency the summarizing iteration output line should be printed. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>print_info_string</td><td>OT_STRING</td><td>no</td><td>Enables printing of additional info string at end of iteration output. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td>5</td><td>Output verbosity level. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>print_options_documentation</td><td>OT_STRING</td><td>no</td><td>Switch to print all algorithmic options. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1647,12 +1617,12 @@
 <tr><td>ma27_ignore_singularity</td><td>OT_STRING</td><td>no</td><td>Enables MA27's ability to solve a linear system even if the matrix is singular. (see IPOPT documentation)</td></tr>
 <tr><td>ma27_la_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Real workspace memory for MA27. (see IPOPT documentation)</td></tr>
 <tr><td>ma27_liw_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Integer workspace memory for MA27. (see IPOPT documentation)</td></tr>
-<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>2.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td></tr>
+<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>10.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td></tr>
 <tr><td>ma27_pivtol</td><td>OT_REAL</td><td>1e-08</td><td>Pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td></tr>
 <tr><td>ma27_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td></tr>
 <tr><td>ma27_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td></tr>
 <tr><td>ma28_pivtol</td><td>OT_REAL</td><td>0.01</td><td>Pivot tolerance for linear solver MA28. (see IPOPT documentation)</td></tr>
-<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>no</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td></tr>
+<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>yes</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td></tr>
 <tr><td>ma57_block_size</td><td>OT_INTEGER</td><td>16</td><td>Controls block size used by Level 3 BLAS in MA57BD (see IPOPT documentation)</td></tr>
 <tr><td>ma57_node_amalgamation</td><td>OT_INTEGER</td><td>16</td><td>Node amalgamation parameter (see IPOPT documentation)</td></tr>
 <tr><td>ma57_pivot_order</td><td>OT_INTEGER</td><td>5</td><td>Controls pivot order in MA57 (see IPOPT documentation)</td></tr>
@@ -1660,39 +1630,12 @@
 <tr><td>ma57_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA57. (see IPOPT documentation)</td></tr>
 <tr><td>ma57_pre_alloc</td><td>OT_REAL</td><td>1.05</td><td>Safety factor for work space memory allocation for the linear solver MA57. (see IPOPT documentation)</td></tr>
 <tr><td>ma57_small_pivot_flag</td><td>OT_INTEGER</td><td>0</td><td>If set to 1, then when small entries defined by CNTL(2) are detected they are removed and the corresponding pivots placed at the end of the factorization.  This can be particularly efficient if the matrix is highly rank deficient. (see IPOPT documentation)</td></tr>
-<tr><td>ma77_buffer_lpage</td><td>OT_INTEGER</td><td>4096</td><td>Number of scalars per MA77 buffer page (see IPOPT documentation)</td></tr>
-<tr><td>ma77_buffer_npage</td><td>OT_INTEGER</td><td>1600</td><td>Number of pages that make up MA77 buffer (see IPOPT documentation)</td></tr>
-<tr><td>ma77_file_size</td><td>OT_INTEGER</td><td>2097152</td><td>Target size of each temporary file for MA77, scalars per type (see IPOPT documentation)</td></tr>
-<tr><td>ma77_maxstore</td><td>OT_INTEGER</td><td>0</td><td>Maximum storage size for MA77 in-core mode (see IPOPT documentation)</td></tr>
-<tr><td>ma77_nemin</td><td>OT_INTEGER</td><td>8</td><td>Node Amalgamation parameter (see IPOPT documentation)</td></tr>
-<tr><td>ma77_order</td><td>OT_STRING</td><td>amd</td><td>Controls type of ordering used by HSL_MA77 (see IPOPT documentation)</td></tr>
-<tr><td>ma77_print_level</td><td>OT_INTEGER</td><td>-1</td><td>Debug printing level for the linear solver MA77 (see IPOPT documentation)</td></tr>
-<tr><td>ma77_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma77_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma77_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma77_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td></tr>
 <tr><td>ma86_nemin</td><td>OT_INTEGER</td><td>32</td><td>Node Amalgamation parameter (see IPOPT documentation)</td></tr>
-<tr><td>ma86_order</td><td>OT_STRING</td><td>amd</td><td>Controls type of ordering used by HSL_MA86 (see IPOPT documentation)</td></tr>
-<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>-1</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td></tr>
-<tr><td>ma86_scaling</td><td>OT_STRING</td><td>mc64</td><td>Controls scaling of matrix (see IPOPT documentation)</td></tr>
+<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td></tr>
 <tr><td>ma86_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td></tr>
 <tr><td>ma86_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td></tr>
 <tr><td>ma86_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td></tr>
 <tr><td>ma86_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma97_nemin</td><td>OT_INTEGER</td><td>8</td><td>Node Amalgamation parameter (see IPOPT documentation)</td></tr>
-<tr><td>ma97_order</td><td>OT_STRING</td><td>auto</td><td>Controls type of ordering used by HSL_MA97 (see IPOPT documentation)</td></tr>
-<tr><td>ma97_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA97 (see IPOPT documentation)</td></tr>
-<tr><td>ma97_scaling</td><td>OT_STRING</td><td>dynamic</td><td>Specifies strategy for scaling in HSL_MA97 linear solver (see IPOPT documentation)</td></tr>
-<tr><td>ma97_scaling1</td><td>OT_STRING</td><td>mc64</td><td>First scaling. (see IPOPT documentation)</td></tr>
-<tr><td>ma97_scaling2</td><td>OT_STRING</td><td>mc64</td><td>Second scaling. (see IPOPT documentation)</td></tr>
-<tr><td>ma97_scaling3</td><td>OT_STRING</td><td>mc64</td><td>Third scaling. (see IPOPT documentation)</td></tr>
-<tr><td>ma97_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma97_solve_blas3</td><td>OT_STRING</td><td>no</td><td>Controls if blas2 or blas3 routines are used for solve (see IPOPT documentation)</td></tr>
-<tr><td>ma97_switch1</td><td>OT_STRING</td><td>od_hd_reuse</td><td>First switch, determine when ma97_scaling1 is enabled. (see IPOPT documentation)</td></tr>
-<tr><td>ma97_switch2</td><td>OT_STRING</td><td>never</td><td>Second switch, determine when ma97_scaling2 is enabled. (see IPOPT documentation)</td></tr>
-<tr><td>ma97_switch3</td><td>OT_STRING</td><td>never</td><td>Third switch, determine when ma97_scaling3 is enabled. (see IPOPT documentation)</td></tr>
-<tr><td>ma97_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma97_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td></tr>
 <tr><td>magic_steps</td><td>OT_STRING</td><td>no</td><td>Enables magic steps. (see IPOPT documentation)</td></tr>
 <tr><td>max_cpu_time</td><td>OT_REAL</td><td>1000000.0</td><td>Maximum number of CPU seconds. (see IPOPT documentation)</td></tr>
 <tr><td>max_filter_resets</td><td>OT_INTEGER</td><td>5</td><td>Maximal allowed number of filter resets (see IPOPT documentation)</td></tr>
@@ -1718,7 +1661,7 @@
 <tr><td>mu_target</td><td>OT_REAL</td><td>0.0</td><td>Desired value of complementarity. (see IPOPT documentation)</td></tr>
 <tr><td>mult_diverg_feasibility_tol</td><td>OT_REAL</td><td>1e-07</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td></tr>
 <tr><td>mult_diverg_y_tol</td><td>OT_REAL</td><td>100000000.0</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td></tr>
-<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>0.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td></tr>
+<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>-1.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td></tr>
 <tr><td>mumps_mem_percent</td><td>OT_INTEGER</td><td>1000</td><td>Percentage increase in the estimated working space for MUMPS. (see IPOPT documentation)</td></tr>
 <tr><td>mumps_permuting_scaling</td><td>OT_INTEGER</td><td>7</td><td>Controls permuting and scaling in MUMPS (see IPOPT documentation)</td></tr>
 <tr><td>mumps_pivot_order</td><td>OT_INTEGER</td><td>7</td><td>Controls pivot order in MUMPS (see IPOPT documentation)</td></tr>
@@ -1740,7 +1683,7 @@
 <tr><td>num_linear_variables</td><td>OT_INTEGER</td><td>0</td><td>Number of linear variables (see IPOPT documentation)</td></tr>
 <tr><td>obj_max_inc</td><td>OT_REAL</td><td>5.0</td><td>Determines the upper bound on the acceptable increase of barrier objective function. (see IPOPT documentation)</td></tr>
 <tr><td>obj_scaling_factor</td><td>OT_REAL</td><td>1.0</td><td>Scaling factor for the objective function. (see IPOPT documentation)</td></tr>
-<tr><td>option_file_name</td><td>OT_STRING</td><td>ipopt.opt</td><td>File name of options file. (see IPOPT documentation)</td></tr>
+<tr><td>option_file_name</td><td>OT_STRING</td><td></td><td>File name of options file (to overwrite default). (see IPOPT documentation)</td></tr>
 <tr><td>output_file</td><td>OT_STRING</td><td></td><td>File name of desired output file (leave unset for no file output). (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_iter_coarse_size</td><td>OT_INTEGER</td><td>5000</td><td>Maximum Size of Coarse Grid Matrix (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_iter_dropping_factor</td><td>OT_REAL</td><td>0.5</td><td>dropping value for incomplete factor (see IPOPT documentation)</td></tr>
@@ -1753,9 +1696,8 @@
 <tr><td>pardiso_matching_strategy</td><td>OT_STRING</td><td>complete+2x2</td><td>Matching strategy to be used by Pardiso (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_max_droptol_corrections</td><td>OT_INTEGER</td><td>4</td><td>Maximal number of decreases of drop tolerance during one solve. (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_max_iter</td><td>OT_INTEGER</td><td>500</td><td>Maximum number of Krylov-Subspace Iteration (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_max_iterative_refinement_steps</td><td>OT_INTEGER</td><td>0</td><td>Limit on number of iterative refinement steps. (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_msglvl</td><td>OT_INTEGER</td><td>0</td><td>Pardiso message level (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_order</td><td>OT_STRING</td><td>five</td><td>Controls the fill-in reduction ordering algorithm for the input matrix. (see IPOPT documentation)</td></tr>
+<tr><td>pardiso_out_of_core_power</td><td>OT_INTEGER</td><td>0</td><td>Enables out-of-core variant of Pardiso (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_redo_symbolic_fact_only_if_inertia_wrong</td><td>OT_STRING</td><td>no</td><td>Toggle for handling case when elements were perturbed by Pardiso. (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_repeated_perturbation_means_singular</td><td>OT_STRING</td><td>no</td><td>Interpretation of perturbed elements. (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td></tr>
@@ -1775,8 +1717,6 @@
 <tr><td>piecewisepenalty_gamma_infeasi</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
 <tr><td>piecewisepenalty_gamma_obj</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
 <tr><td>point_perturbation_radius</td><td>OT_REAL</td><td>10.0</td><td>Maximal perturbation of an evaluation point. (see IPOPT documentation)</td></tr>
-<tr><td>print_frequency_iter</td><td>OT_INTEGER</td><td>1</td><td>Determines at which iteration frequency the summarizing iteration output line should be printed. (see IPOPT documentation)</td></tr>
-<tr><td>print_frequency_time</td><td>OT_REAL</td><td>0.0</td><td>Determines at which time frequency the summarizing iteration output line should be printed. (see IPOPT documentation)</td></tr>
 <tr><td>print_info_string</td><td>OT_STRING</td><td>no</td><td>Enables printing of additional info string at end of iteration output. (see IPOPT documentation)</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td>5</td><td>Output verbosity level. (see IPOPT documentation)</td></tr>
 <tr><td>print_options_documentation</td><td>OT_STRING</td><td>no</td><td>Switch to print all algorithmic options. (see IPOPT documentation)</td></tr>
@@ -4318,140 +4258,10 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>AcceptTolFeas</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable feasibility</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>AcceptTolOpti</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable optimality</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>AlphaMinConst</td><td>OT_BOOLEAN</td><td>False</td><td>Use a constant lower bound on Armijo stepsize in Filter</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>Ares</td><td>OT_INTEGERVECTOR</td><td>[42, 41, 42, 43, 44, 41, 50]</td><td>Armijo recovery strategies. Vector of size 7</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ArmijoBeta</td><td>OT_REAL</td><td>0.712</td><td>Trial stepsize decrease factor for Armijo rule</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ArmijoMaxAlpha</td><td>OT_REAL</td><td>1.0</td><td>Initial alpha for Armijo rule</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ArmijoMinAlpha</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ArmijoMinAlphaRec</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule during recovery</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ArmijoSigma</td><td>OT_REAL</td><td>0.005</td><td>Scale factor for linearised descent check in Armijo rule</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>AutoQPRecovery</td><td>OT_BOOLEAN</td><td>True</td><td>Enable automatic QP recovery</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>BFGSmaxblockSize</td><td>OT_INTEGER</td><td>300</td><td>Block size parameter used by certain BFGS methods</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>BFGSmethod</td><td>OT_INTEGER</td><td>0</td><td>Choose BFGS method (0: dense, 1-3: block, 100+: sparse)</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>BFGSminblockSize</td><td>OT_INTEGER</td><td>300</td><td>Block size parameter used by certain BFGS methods</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>BFGSrestart</td><td>OT_INTEGER</td><td>50</td><td>Restart BFGS update after this many iterations</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>BettsFactor</td><td>OT_REAL</td><td>2.1</td><td>Update factor for Betts' Hessian regularisation</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>BettsPoint</td><td>OT_REAL</td><td>1.0</td><td>Smallest eigenvalue of the regularised Hessian</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>BoundTolFac</td><td>OT_REAL</td><td>1000.0</td><td>Factor in determining active constraints by KKT</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CheckFJ</td><td>OT_REAL</td><td>1e+12</td><td>Upper bound used by Fritz-John heuristic</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CheckStructureDF</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DF</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CheckStructureDG</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DG</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CheckStructureHM</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of HM</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CorStepBettsSum</td><td>OT_REAL</td><td>0.5</td><td>(experimental)</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CorStepConStop</td><td>OT_REAL</td><td>1e-06</td><td>(experimental)</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CorStepConvio</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CorStepMaxIter</td><td>OT_INTEGER</td><td>50</td><td>(experimental)</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CorStepMethod</td><td>OT_INTEGER</td><td>0</td><td>(experimental)</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CorStepMode</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CorStepPFactor</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CorStepPMax</td><td>OT_REAL</td><td>1000000.0</td><td>(experimental)</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CorStepRecoveryDX</td><td>OT_BOOLEAN</td><td>False</td><td>(experimental)</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CurvBCond</td><td>OT_REAL</td><td>0.02</td><td>Block BFGS curvature condition bound</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CurvBFac</td><td>OT_REAL</td><td>0.3</td><td>Block BFGS curvature condition regularisation factor</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CurvCond</td><td>OT_REAL</td><td>0.02</td><td>BFGS Curvature condition bound</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>CurvFac</td><td>OT_REAL</td><td>0.3</td><td>BFGS curvature condition regularisation factor</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>DebugMarker05</td><td>OT_INTEGER</td><td>42</td><td>Debug marker. Used to find memory alignment/padding issues</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>DebugMarker06</td><td>OT_INTEGER</td><td>42</td><td>Debug marker. Used to find memory alignment/padding issues</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FGtogether</td><td>OT_BOOLEAN</td><td>False</td><td>F and G cannot be evaluated separately</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FJandND</td><td>OT_BOOLEAN</td><td>False</td><td>Enable Fritz-John and non-differentiable check heuristics</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FeasibleDual</td><td>OT_BOOLEAN</td><td>False</td><td>Activate dual feasibility mode</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FeasibleInit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate initial feasibility mode</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FeasibleInitTol</td><td>OT_REAL</td><td>0.001</td><td>Feasibility tolerance for no-objective feasible mode</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FeasibleOnly</td><td>OT_BOOLEAN</td><td>False</td><td>Activate feasible-only mode</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FidifEps</td><td>OT_REAL</td><td>1e-05</td><td>Finite difference perturbation</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FidifHM</td><td>OT_BOOLEAN</td><td>False</td><td>Approximate Hessian by finite differences (otherwise BFGS)</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FilterBisecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FilterGammaCV</td><td>OT_REAL</td><td>7.5e-06</td><td>Constraint violation decrease factor in Filter acceptance check</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FilterGammaF</td><td>OT_REAL</td><td>1.1e-05</td><td>Objective decrease factor in Filter acceptance check</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FilterIntersecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FirstDifCentral</td><td>OT_BOOLEAN</td><td>True</td><td>Use central finite difference quotient for first derivatives</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FocusOnFeas</td><td>OT_BOOLEAN</td><td>True</td><td>Enable Focus-on-Feasibility mode</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>FocusOnFeasFactor</td><td>OT_REAL</td><td>1.36</td><td>Factor in Focus-on-Feasibility mode</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>GammaAlpha</td><td>OT_REAL</td><td>0.05</td><td>Safety factor for alphamin calculation by Filter</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>GroupMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring groups</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>IgnoreFilterCrit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate accelerating heuristics for Filter</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>IncBettsTau</td><td>OT_REAL</td><td>2.0</td><td>Increase factor for Betts' update dampening term</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>IncBettsTauMore</td><td>OT_REAL</td><td>100.0</td><td>Larger increase factor for Betts' update dampening term</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>IncreaseIWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated integer workspace requirement</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>IncreaseRWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated real workspace requirement</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>Infty</td><td>OT_REAL</td><td>1e+20</td><td>Upper bound for numbers to be regarded as finite</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>InftyUnbounded</td><td>OT_REAL</td><td>1e+20</td><td>Tolerance for unboundedness detection heuristic</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>InitialLMest</td><td>OT_BOOLEAN</td><td>True</td><td>Enable initial Lagrange multiplier estimate</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>KeepAcceptableSol</td><td>OT_BOOLEAN</td><td>True</td><td>Save acceptable solutions as fallback</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>LMestQPipComTol</td><td>OT_REAL</td><td>0.003</td><td>IP complementarity tolerance in initial multiplier estimate</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>LMestQPipResTol</td><td>OT_REAL</td><td>1.0</td><td>IP residual tolerance in initial multiplier estimate</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>LinMult</td><td>OT_BOOLEAN</td><td>False</td><td>Control Lagrange multiplier update</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>LogLevel</td><td>OT_INTEGER</td><td>0</td><td>Enable XML logfiles and writing interval</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>LogResult</td><td>OT_INTEGER</td><td>0</td><td>Enable XML result logging and detail level</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>LowPassAlphaF</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for objective values</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>LowPassAlphaG</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for constraint values</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>LowPassAlphaMerit</td><td>OT_REAL</td><td>0.1</td><td>Lowpass-filter update factor for merit function values</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>LowPassFilter</td><td>OT_BOOLEAN</td><td>True</td><td>Enable lowpass-filter termination criterion</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>MAPivotThreshold</td><td>OT_REAL</td><td>1e-06</td><td>Pivoting tolerance for MA solvers</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>MatrixCC</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>MaxCalls</td><td>OT_INTEGER</td><td>2147483647</td><td>Upper bound to Reverse Communication calls</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>MaxForce</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of Force recovery strategy steps</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>MaxGPart</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>MaxIter</td><td>OT_INTEGER</td><td>500</td><td>Upper bound on major iterations</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>MaxLScounter</td><td>OT_INTEGER</td><td>3</td><td>Control activation of Filter acceleration heuristics</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>MaxNorm</td><td>OT_BOOLEAN</td><td>True</td><td>Select max-norm instead of 1-norm in Filter</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>MeritFunction</td><td>OT_INTEGER</td><td>4</td><td>Select merit function and penalty update [0, 3..5]</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>MeritGradTol</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Threshold of meritfunction gradient for increasing Hessian regularisation</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>MinBettsTau</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Lower bound for Betts' update dampening term</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>MoreRelax</td><td>OT_BOOLEAN</td><td>False</td><td>Introduce one relaxation variable for every constraint</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>NLPmethod</td><td>OT_INTEGER</td><td>1</td><td>Select (1) Meritfunction or (3) Filter globalisation</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>NLPprint</td><td>OT_INTEGER</td><td>2</td><td>NLP print level [-1..4]</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>PairMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring pairgroups</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>PenUpdEpsBar</td><td>OT_REAL</td><td>0.9</td><td>Penalty update parameter factor for MeritFunction = 3</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>PenUpdEpsKFac</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter factor for MeritFunction = 4</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>PenUpdEpsKSequence</td><td>OT_INTEGER</td><td>2</td><td>Penalty update parameter</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>PenUpdMaxDeltaK</td><td>OT_REAL</td><td>11.0</td><td>Max penalty for MeritFunction = 4</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>PenUpdMaxFac</td><td>OT_REAL</td><td>100000000.0</td><td>Max factor for increasing penalty for MeritFunction = 4</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>PenUpdRBar</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter for MeritFunction = 3</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>PrecisionF</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of objective</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>PrecisionG</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of constraints</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>QPscaleParam</td><td>OT_REAL</td><td>0.0</td><td>(currently unused) Scaling factor for QP</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>QuadraticProblem</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ReduceBettsTau</td><td>OT_REAL</td><td>0.3</td><td>Decrease factor for Betts' update dampening term</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>RegStrategy</td><td>OT_INTEGER</td><td>1</td><td>Select Hessian regularisation strategy in Filter</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ReinitFilter</td><td>OT_BOOLEAN</td><td>False</td><td>Enables Filter-reinitialisation accelerating heuristic</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>RelaxMaxDelta</td><td>OT_REAL</td><td>0.92</td><td>Upper bound for accepting the constraint relaxation variable</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>RelaxMaxPen</td><td>OT_REAL</td><td>50000000.0</td><td>Upper bound on the constraint relaxation penalty</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>RelaxRho</td><td>OT_REAL</td><td>6.0</td><td>Update factor for the constraint relaxation penalty</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>RelaxStart</td><td>OT_REAL</td><td>1.0</td><td>Initial value of the constraint relaxation penalty</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>RestUntilFeas</td><td>OT_BOOLEAN</td><td>False</td><td>Do restoration until a feasible solution is found</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ScaleConIter</td><td>OT_BOOLEAN</td><td>False</td><td>Scale constraints in every iteration</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ScaleFacObj</td><td>OT_REAL</td><td>10.0</td><td>Value to scale large objective functions to</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ScaleFacQP</td><td>OT_REAL</td><td>10.0</td><td>Upper bound on resulting matrix norm for QP scaling</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ScaledFD</td><td>OT_BOOLEAN</td><td>True</td><td>Use a scaled perturbation for finite differences</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ScaledKKT</td><td>OT_BOOLEAN</td><td>True</td><td>Scale KKT conditions</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ScaledObj</td><td>OT_BOOLEAN</td><td>True</td><td>Scale the objective function</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>ScaledQP</td><td>OT_BOOLEAN</td><td>True</td><td>Scale some matrices handed to the QP</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>StartBettsTau</td><td>OT_REAL</td><td>0.1</td><td>Initial value for Betts' update dampening term</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>SwitchingDelta</td><td>OT_REAL</td><td>0.01</td><td>Filter switching condition parameter</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>SwitchingSCV</td><td>OT_REAL</td><td>1.1</td><td>Filter switching condition parameter</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>SwitchingSF</td><td>OT_REAL</td><td>2.3</td><td>Filter switching condition parameter</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>TakeQPSol</td><td>OT_BOOLEAN</td><td>False</td><td>Evaluate QP search direction regardless of convergence</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>Timeout</td><td>OT_REAL</td><td>300.0</td><td>Timeout in seconds</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>TolComp</td><td>OT_REAL</td><td>0.001</td><td>Complementarity tolerance</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>TolFeas</td><td>OT_REAL</td><td>1e-06</td><td>Feasibility tolerance</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>TolOpti</td><td>OT_REAL</td><td>1e-06</td><td>Optimality tolerance</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>TolWeakActive</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>TooBig</td><td>OT_BOOLEAN</td><td>True</td><td>Enable too-big termination heuristics</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>TooBigCV</td><td>OT_REAL</td><td>1e+25</td><td>Upper bound on constraint violation for too-big heuristic</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>TooBigKKT</td><td>OT_REAL</td><td>1e+30</td><td>Upper bound on KKT values for too-big heuristic</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>UserDF</td><td>OT_BOOLEAN</td><td>True</td><td>Objective gradient values supplied by caller</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>UserDG</td><td>OT_BOOLEAN</td><td>True</td><td>Jacobian values supplied by caller</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>UserHM</td><td>OT_BOOLEAN</td><td>True</td><td>Hessian values supplied by caller</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>UserHMstructure</td><td>OT_INTEGER</td><td>2</td><td>Enable automatic Hessian structure generation or checking</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>WeakActiveSet</td><td>OT_BOOLEAN</td><td>False</td><td>(experimental)</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>eps</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Machine epsilon</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOLEAN</td><td>false</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
@@ -4461,7 +4271,6 @@
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>internalParChanged</td><td>OT_INTEGER</td><td>0</td><td>Counter for changed parameters. Internal use only.</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>casadi::NlpSolverInternal</td></tr>
@@ -4469,36 +4278,36 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />Monitor functions (eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>casadi::FunctionInternal<br />casadi::WorhpInterface</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>Print information about execution time</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_ipBarrier</td><td>OT_REAL</td><td>7.8</td><td>IP barrier parameter.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_ipComTol</td><td>OT_REAL</td><td>2e-07</td><td>IP complementarity tolerance.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_ipFracBound</td><td>OT_REAL</td><td>0.88</td><td>IP fraction-to-the-boundary parameter.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_ipLsMethod</td><td>OT_STRING</td><td>None</td><td>Select the direct linear solver used by the IP method.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_ipMinAlpha</td><td>OT_REAL</td><td>1e-12</td><td>IP line search minimum step size.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_ipRelaxDiv</td><td>OT_REAL</td><td>2.0</td><td>The relaxation term is divided by this value if successful.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_ipRelaxMax</td><td>OT_REAL</td><td>1e-07</td><td>Maximum relaxation value.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_ipRelaxMin</td><td>OT_REAL</td><td>1e-07</td><td>Mimimum relaxation value.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_ipRelaxMult</td><td>OT_REAL</td><td>10.0</td><td>The relaxation term is multiplied by this value if unsuccessful.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_ipResTol</td><td>OT_REAL</td><td>5e-08</td><td>IP residuals tolerance.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_ipTryRelax</td><td>OT_BOOLEAN</td><td>True</td><td>Enable relaxation strategy when encountering an error.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_lsItMaxIter</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of iterations of the iterative linear solvers.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_lsItMethod</td><td>OT_STRING</td><td>None</td><td>Select the iterative linear solver.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_lsItPrecondMethod</td><td>OT_STRING</td><td>None</td><td>Select preconditioner for the iterative linear solver.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_lsRefineMaxIter</td><td>OT_INTEGER</td><td>10</td><td>Maximum number of iterative refinement steps of the direct linear solvers.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_lsScale</td><td>OT_BOOLEAN</td><td>True</td><td>Enables scaling on linear solver level.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_lsTol</td><td>OT_REAL</td><td>1e-12</td><td>Tolerance for the linear solver.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_lsTrySimple</td><td>OT_BOOLEAN</td><td>False</td><td>Some matrices can be solved without calling a linear equation solver.Currently only diagonal matrices are supported.Non-diagonal matrices will besolved with the chosen linear equation solver.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_maxIter</td><td>OT_INTEGER</td><td>80</td><td>Imposes an upper limit on the number of minor solver iterations,  i.e. for the quadratic subproblem solver.If the limit is reached before convergence, WORHP will activate QP recovery strategies to prevent a solver breakdown.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_method</td><td>OT_STRING</td><td>None</td><td>Select the solution method used by the QP solver.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_nsnBeta</td><td>OT_REAL</td><td>0.9</td><td>NSN stepsize decrease factor.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_nsnGradStep</td><td>OT_BOOLEAN</td><td>True</td><td>Enable gradient steps in the NSN method.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_nsnKKT</td><td>OT_REAL</td><td>1e-06</td><td>NSN KKT tolerance.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_nsnLsMethod</td><td>OT_STRING</td><td>None</td><td>Select the direct linear solver used by the NSN method.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_nsnMinAlpha</td><td>OT_REAL</td><td>1e-11</td><td>NSN line search minimum step size.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_nsnSigma</td><td>OT_REAL</td><td>0.01</td><td>NSN line search slope parameter.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_printLevel</td><td>OT_STRING</td><td>None</td><td>Controls the amount of QP solver output.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>False</td><td>Enable scaling on QP level.</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>True</td><td>Use strict termination criteria in IP method.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_ipBarrier</td><td>OT_REAL</td><td>worhp_p_.qp.ipBarrier</td><td>IP barrier parameter.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_ipComTol</td><td>OT_REAL</td><td>worhp_p_.qp.ipComTol</td><td>IP complementarity tolerance.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_ipFracBound</td><td>OT_REAL</td><td>worhp_p_.qp.ipFracBound</td><td>IP fraction-to-the-boundary parameter.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_ipLsMethod</td><td>OT_STRING</td><td>GenericType()</td><td>Select the direct linear solver used by the IP method. (LAPACK::0|MA57: only available if provided by the user:1|SuperLU::2|PARDISO: only available if provided by the user, subject to license availability:3|MUMPS: currently Linux platforms only:5|WSMP: subject to license availability:6|MA86: experimental, only available if provided by the user:7|MA97:experimental, only available if provided by the user:8)</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_ipMinAlpha</td><td>OT_REAL</td><td>worhp_p_.qp.ipMinAlpha</td><td>IP line search minimum step size.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_ipRelaxDiv</td><td>OT_REAL</td><td>worhp_p_.qp.ipRelaxDiv</td><td>The relaxation term is divided by this value if successful.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_ipRelaxMax</td><td>OT_REAL</td><td>worhp_p_.qp.ipRelaxMax</td><td>Maximum relaxation value.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_ipRelaxMin</td><td>OT_REAL</td><td>worhp_p_.qp.ipRelaxMin</td><td>Mimimum relaxation value.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_ipRelaxMult</td><td>OT_REAL</td><td>worhp_p_.qp.ipRelaxMult</td><td>The relaxation term is multiplied by this value if unsuccessful.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_ipResTol</td><td>OT_REAL</td><td>worhp_p_.qp.ipResTol</td><td>IP residuals tolerance.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_ipTryRelax</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.ipTryRelax</td><td>Enable relaxation strategy when encountering an error.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_lsItMaxIter</td><td>OT_INTEGER</td><td>worhp_p_.qp.lsItMaxIter</td><td>Maximum number of iterations of the iterative linear solvers.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_lsItMethod</td><td>OT_STRING</td><td>GenericType()</td><td>Select the iterative linear solver. (none:Deactivate; use a direct linear solver.:0|CGNR::1|CGNE::2|CGS::3|BiCGSTAB::4)</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_lsItPrecondMethod</td><td>OT_STRING</td><td>GenericType()</td><td>Select preconditioner for the iterative linear solver. (none:No preconditioner.:0|static:Static preconditioner (KKT-matrix with constant lower-right block).:1|full:Full KKT-matrix.:2)</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_lsRefineMaxIter</td><td>OT_INTEGER</td><td>worhp_p_.qp.lsRefineMaxIter</td><td>Maximum number of iterative refinement steps of the direct linear solvers.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_lsScale</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.lsScale</td><td>Enables scaling on linear solver level.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_lsTol</td><td>OT_REAL</td><td>worhp_p_.qp.lsTol</td><td>Tolerance for the linear solver.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_lsTrySimple</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.lsTrySimple</td><td>Some matrices can be solved without calling a linear equation solver.Currently only diagonal matrices are supported.Non-diagonal matrices will besolved with the chosen linear equation solver.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_maxIter</td><td>OT_INTEGER</td><td>worhp_p_.qp.maxIter</td><td>Imposes an upper limit on the number of minor solver iterations,  i.e. for the quadratic subproblem solver.If the limit is reached before convergence, WORHP will activate QP recovery strategies to prevent a solver breakdown.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_method</td><td>OT_STRING</td><td>GenericType()</td><td>Select the solution method used by the QP solver. (ip:Interior-Point method.:1|nsn:Nonsmooth-Newton method.:2|automatic: Prefer IP and fall back to NSN on error.:12)</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_nsnBeta</td><td>OT_REAL</td><td>worhp_p_.qp.nsnBeta</td><td>NSN stepsize decrease factor.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_nsnGradStep</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.nsnGradStep</td><td>Enable gradient steps in the NSN method.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_nsnKKT</td><td>OT_REAL</td><td>worhp_p_.qp.nsnKKT</td><td>NSN KKT tolerance.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_nsnLsMethod</td><td>OT_STRING</td><td>GenericType()</td><td>Select the direct linear solver used by the NSN method. (SuperLU::2|MA48: only available if provided by the user:4)</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_nsnMinAlpha</td><td>OT_REAL</td><td>worhp_p_.qp.nsnMinAlpha</td><td>NSN line search minimum step size.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_nsnSigma</td><td>OT_REAL</td><td>worhp_p_.qp.nsnSigma</td><td>NSN line search slope parameter.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_printLevel</td><td>OT_STRING</td><td>GenericType()</td><td>Controls the amount of QP solver output. (none:No output.:0|warn:Print warnings and errors.:1|iterations:Print iterations.:2)</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -4512,167 +4321,36 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
-<tr><td>AcceptTolFeas</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable feasibility</td></tr>
-<tr><td>AcceptTolOpti</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable optimality</td></tr>
-<tr><td>AlphaMinConst</td><td>OT_BOOLEAN</td><td>False</td><td>Use a constant lower bound on Armijo stepsize in Filter</td></tr>
-<tr><td>Ares</td><td>OT_INTEGERVECTOR</td><td>[42, 41, 42, 43, 44, 41, 50]</td><td>Armijo recovery strategies. Vector of size 7</td></tr>
-<tr><td>ArmijoBeta</td><td>OT_REAL</td><td>0.712</td><td>Trial stepsize decrease factor for Armijo rule</td></tr>
-<tr><td>ArmijoMaxAlpha</td><td>OT_REAL</td><td>1.0</td><td>Initial alpha for Armijo rule</td></tr>
-<tr><td>ArmijoMinAlpha</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule</td></tr>
-<tr><td>ArmijoMinAlphaRec</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule during recovery</td></tr>
-<tr><td>ArmijoSigma</td><td>OT_REAL</td><td>0.005</td><td>Scale factor for linearised descent check in Armijo rule</td></tr>
-<tr><td>AutoQPRecovery</td><td>OT_BOOLEAN</td><td>True</td><td>Enable automatic QP recovery</td></tr>
-<tr><td>BFGSmaxblockSize</td><td>OT_INTEGER</td><td>300</td><td>Block size parameter used by certain BFGS methods</td></tr>
-<tr><td>BFGSmethod</td><td>OT_INTEGER</td><td>0</td><td>Choose BFGS method (0: dense, 1-3: block, 100+: sparse)</td></tr>
-<tr><td>BFGSminblockSize</td><td>OT_INTEGER</td><td>300</td><td>Block size parameter used by certain BFGS methods</td></tr>
-<tr><td>BFGSrestart</td><td>OT_INTEGER</td><td>50</td><td>Restart BFGS update after this many iterations</td></tr>
-<tr><td>BettsFactor</td><td>OT_REAL</td><td>2.1</td><td>Update factor for Betts' Hessian regularisation</td></tr>
-<tr><td>BettsPoint</td><td>OT_REAL</td><td>1.0</td><td>Smallest eigenvalue of the regularised Hessian</td></tr>
-<tr><td>BoundTolFac</td><td>OT_REAL</td><td>1000.0</td><td>Factor in determining active constraints by KKT</td></tr>
-<tr><td>CheckFJ</td><td>OT_REAL</td><td>1e+12</td><td>Upper bound used by Fritz-John heuristic</td></tr>
-<tr><td>CheckStructureDF</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DF</td></tr>
-<tr><td>CheckStructureDG</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DG</td></tr>
-<tr><td>CheckStructureHM</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of HM</td></tr>
-<tr><td>CorStepBettsSum</td><td>OT_REAL</td><td>0.5</td><td>(experimental)</td></tr>
-<tr><td>CorStepConStop</td><td>OT_REAL</td><td>1e-06</td><td>(experimental)</td></tr>
-<tr><td>CorStepConvio</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td></tr>
-<tr><td>CorStepMaxIter</td><td>OT_INTEGER</td><td>50</td><td>(experimental)</td></tr>
-<tr><td>CorStepMethod</td><td>OT_INTEGER</td><td>0</td><td>(experimental)</td></tr>
-<tr><td>CorStepMode</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td></tr>
-<tr><td>CorStepPFactor</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td></tr>
-<tr><td>CorStepPMax</td><td>OT_REAL</td><td>1000000.0</td><td>(experimental)</td></tr>
-<tr><td>CorStepRecoveryDX</td><td>OT_BOOLEAN</td><td>False</td><td>(experimental)</td></tr>
-<tr><td>CurvBCond</td><td>OT_REAL</td><td>0.02</td><td>Block BFGS curvature condition bound</td></tr>
-<tr><td>CurvBFac</td><td>OT_REAL</td><td>0.3</td><td>Block BFGS curvature condition regularisation factor</td></tr>
-<tr><td>CurvCond</td><td>OT_REAL</td><td>0.02</td><td>BFGS Curvature condition bound</td></tr>
-<tr><td>CurvFac</td><td>OT_REAL</td><td>0.3</td><td>BFGS curvature condition regularisation factor</td></tr>
-<tr><td>DebugMarker05</td><td>OT_INTEGER</td><td>42</td><td>Debug marker. Used to find memory alignment/padding issues</td></tr>
-<tr><td>DebugMarker06</td><td>OT_INTEGER</td><td>42</td><td>Debug marker. Used to find memory alignment/padding issues</td></tr>
-<tr><td>FGtogether</td><td>OT_BOOLEAN</td><td>False</td><td>F and G cannot be evaluated separately</td></tr>
-<tr><td>FJandND</td><td>OT_BOOLEAN</td><td>False</td><td>Enable Fritz-John and non-differentiable check heuristics</td></tr>
-<tr><td>FeasibleDual</td><td>OT_BOOLEAN</td><td>False</td><td>Activate dual feasibility mode</td></tr>
-<tr><td>FeasibleInit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate initial feasibility mode</td></tr>
-<tr><td>FeasibleInitTol</td><td>OT_REAL</td><td>0.001</td><td>Feasibility tolerance for no-objective feasible mode</td></tr>
-<tr><td>FeasibleOnly</td><td>OT_BOOLEAN</td><td>False</td><td>Activate feasible-only mode</td></tr>
-<tr><td>FidifEps</td><td>OT_REAL</td><td>1e-05</td><td>Finite difference perturbation</td></tr>
-<tr><td>FidifHM</td><td>OT_BOOLEAN</td><td>False</td><td>Approximate Hessian by finite differences (otherwise BFGS)</td></tr>
-<tr><td>FilterBisecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td></tr>
-<tr><td>FilterGammaCV</td><td>OT_REAL</td><td>7.5e-06</td><td>Constraint violation decrease factor in Filter acceptance check</td></tr>
-<tr><td>FilterGammaF</td><td>OT_REAL</td><td>1.1e-05</td><td>Objective decrease factor in Filter acceptance check</td></tr>
-<tr><td>FilterIntersecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td></tr>
-<tr><td>FirstDifCentral</td><td>OT_BOOLEAN</td><td>True</td><td>Use central finite difference quotient for first derivatives</td></tr>
-<tr><td>FocusOnFeas</td><td>OT_BOOLEAN</td><td>True</td><td>Enable Focus-on-Feasibility mode</td></tr>
-<tr><td>FocusOnFeasFactor</td><td>OT_REAL</td><td>1.36</td><td>Factor in Focus-on-Feasibility mode</td></tr>
-<tr><td>GammaAlpha</td><td>OT_REAL</td><td>0.05</td><td>Safety factor for alphamin calculation by Filter</td></tr>
-<tr><td>GroupMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring groups</td></tr>
-<tr><td>IgnoreFilterCrit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate accelerating heuristics for Filter</td></tr>
-<tr><td>IncBettsTau</td><td>OT_REAL</td><td>2.0</td><td>Increase factor for Betts' update dampening term</td></tr>
-<tr><td>IncBettsTauMore</td><td>OT_REAL</td><td>100.0</td><td>Larger increase factor for Betts' update dampening term</td></tr>
-<tr><td>IncreaseIWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated integer workspace requirement</td></tr>
-<tr><td>IncreaseRWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated real workspace requirement</td></tr>
-<tr><td>Infty</td><td>OT_REAL</td><td>1e+20</td><td>Upper bound for numbers to be regarded as finite</td></tr>
-<tr><td>InftyUnbounded</td><td>OT_REAL</td><td>1e+20</td><td>Tolerance for unboundedness detection heuristic</td></tr>
-<tr><td>InitialLMest</td><td>OT_BOOLEAN</td><td>True</td><td>Enable initial Lagrange multiplier estimate</td></tr>
-<tr><td>KeepAcceptableSol</td><td>OT_BOOLEAN</td><td>True</td><td>Save acceptable solutions as fallback</td></tr>
-<tr><td>LMestQPipComTol</td><td>OT_REAL</td><td>0.003</td><td>IP complementarity tolerance in initial multiplier estimate</td></tr>
-<tr><td>LMestQPipResTol</td><td>OT_REAL</td><td>1.0</td><td>IP residual tolerance in initial multiplier estimate</td></tr>
-<tr><td>LinMult</td><td>OT_BOOLEAN</td><td>False</td><td>Control Lagrange multiplier update</td></tr>
-<tr><td>LogLevel</td><td>OT_INTEGER</td><td>0</td><td>Enable XML logfiles and writing interval</td></tr>
-<tr><td>LogResult</td><td>OT_INTEGER</td><td>0</td><td>Enable XML result logging and detail level</td></tr>
-<tr><td>LowPassAlphaF</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for objective values</td></tr>
-<tr><td>LowPassAlphaG</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for constraint values</td></tr>
-<tr><td>LowPassAlphaMerit</td><td>OT_REAL</td><td>0.1</td><td>Lowpass-filter update factor for merit function values</td></tr>
-<tr><td>LowPassFilter</td><td>OT_BOOLEAN</td><td>True</td><td>Enable lowpass-filter termination criterion</td></tr>
-<tr><td>MAPivotThreshold</td><td>OT_REAL</td><td>1e-06</td><td>Pivoting tolerance for MA solvers</td></tr>
-<tr><td>MatrixCC</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td></tr>
-<tr><td>MaxCalls</td><td>OT_INTEGER</td><td>2147483647</td><td>Upper bound to Reverse Communication calls</td></tr>
-<tr><td>MaxForce</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of Force recovery strategy steps</td></tr>
-<tr><td>MaxGPart</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td></tr>
-<tr><td>MaxIter</td><td>OT_INTEGER</td><td>500</td><td>Upper bound on major iterations</td></tr>
-<tr><td>MaxLScounter</td><td>OT_INTEGER</td><td>3</td><td>Control activation of Filter acceleration heuristics</td></tr>
-<tr><td>MaxNorm</td><td>OT_BOOLEAN</td><td>True</td><td>Select max-norm instead of 1-norm in Filter</td></tr>
-<tr><td>MeritFunction</td><td>OT_INTEGER</td><td>4</td><td>Select merit function and penalty update [0, 3..5]</td></tr>
-<tr><td>MeritGradTol</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Threshold of meritfunction gradient for increasing Hessian regularisation</td></tr>
-<tr><td>MinBettsTau</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Lower bound for Betts' update dampening term</td></tr>
-<tr><td>MoreRelax</td><td>OT_BOOLEAN</td><td>False</td><td>Introduce one relaxation variable for every constraint</td></tr>
-<tr><td>NLPmethod</td><td>OT_INTEGER</td><td>1</td><td>Select (1) Meritfunction or (3) Filter globalisation</td></tr>
-<tr><td>NLPprint</td><td>OT_INTEGER</td><td>2</td><td>NLP print level [-1..4]</td></tr>
-<tr><td>PairMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring pairgroups</td></tr>
-<tr><td>PenUpdEpsBar</td><td>OT_REAL</td><td>0.9</td><td>Penalty update parameter factor for MeritFunction = 3</td></tr>
-<tr><td>PenUpdEpsKFac</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter factor for MeritFunction = 4</td></tr>
-<tr><td>PenUpdEpsKSequence</td><td>OT_INTEGER</td><td>2</td><td>Penalty update parameter</td></tr>
-<tr><td>PenUpdMaxDeltaK</td><td>OT_REAL</td><td>11.0</td><td>Max penalty for MeritFunction = 4</td></tr>
-<tr><td>PenUpdMaxFac</td><td>OT_REAL</td><td>100000000.0</td><td>Max factor for increasing penalty for MeritFunction = 4</td></tr>
-<tr><td>PenUpdRBar</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter for MeritFunction = 3</td></tr>
-<tr><td>PrecisionF</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of objective</td></tr>
-<tr><td>PrecisionG</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of constraints</td></tr>
-<tr><td>QPscaleParam</td><td>OT_REAL</td><td>0.0</td><td>(currently unused) Scaling factor for QP</td></tr>
-<tr><td>QuadraticProblem</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td></tr>
-<tr><td>ReduceBettsTau</td><td>OT_REAL</td><td>0.3</td><td>Decrease factor for Betts' update dampening term</td></tr>
-<tr><td>RegStrategy</td><td>OT_INTEGER</td><td>1</td><td>Select Hessian regularisation strategy in Filter</td></tr>
-<tr><td>ReinitFilter</td><td>OT_BOOLEAN</td><td>False</td><td>Enables Filter-reinitialisation accelerating heuristic</td></tr>
-<tr><td>RelaxMaxDelta</td><td>OT_REAL</td><td>0.92</td><td>Upper bound for accepting the constraint relaxation variable</td></tr>
-<tr><td>RelaxMaxPen</td><td>OT_REAL</td><td>50000000.0</td><td>Upper bound on the constraint relaxation penalty</td></tr>
-<tr><td>RelaxRho</td><td>OT_REAL</td><td>6.0</td><td>Update factor for the constraint relaxation penalty</td></tr>
-<tr><td>RelaxStart</td><td>OT_REAL</td><td>1.0</td><td>Initial value of the constraint relaxation penalty</td></tr>
-<tr><td>RestUntilFeas</td><td>OT_BOOLEAN</td><td>False</td><td>Do restoration until a feasible solution is found</td></tr>
-<tr><td>ScaleConIter</td><td>OT_BOOLEAN</td><td>False</td><td>Scale constraints in every iteration</td></tr>
-<tr><td>ScaleFacObj</td><td>OT_REAL</td><td>10.0</td><td>Value to scale large objective functions to</td></tr>
-<tr><td>ScaleFacQP</td><td>OT_REAL</td><td>10.0</td><td>Upper bound on resulting matrix norm for QP scaling</td></tr>
-<tr><td>ScaledFD</td><td>OT_BOOLEAN</td><td>True</td><td>Use a scaled perturbation for finite differences</td></tr>
-<tr><td>ScaledKKT</td><td>OT_BOOLEAN</td><td>True</td><td>Scale KKT conditions</td></tr>
-<tr><td>ScaledObj</td><td>OT_BOOLEAN</td><td>True</td><td>Scale the objective function</td></tr>
-<tr><td>ScaledQP</td><td>OT_BOOLEAN</td><td>True</td><td>Scale some matrices handed to the QP</td></tr>
-<tr><td>StartBettsTau</td><td>OT_REAL</td><td>0.1</td><td>Initial value for Betts' update dampening term</td></tr>
-<tr><td>SwitchingDelta</td><td>OT_REAL</td><td>0.01</td><td>Filter switching condition parameter</td></tr>
-<tr><td>SwitchingSCV</td><td>OT_REAL</td><td>1.1</td><td>Filter switching condition parameter</td></tr>
-<tr><td>SwitchingSF</td><td>OT_REAL</td><td>2.3</td><td>Filter switching condition parameter</td></tr>
-<tr><td>TakeQPSol</td><td>OT_BOOLEAN</td><td>False</td><td>Evaluate QP search direction regardless of convergence</td></tr>
-<tr><td>Timeout</td><td>OT_REAL</td><td>300.0</td><td>Timeout in seconds</td></tr>
-<tr><td>TolComp</td><td>OT_REAL</td><td>0.001</td><td>Complementarity tolerance</td></tr>
-<tr><td>TolFeas</td><td>OT_REAL</td><td>1e-06</td><td>Feasibility tolerance</td></tr>
-<tr><td>TolOpti</td><td>OT_REAL</td><td>1e-06</td><td>Optimality tolerance</td></tr>
-<tr><td>TolWeakActive</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td></tr>
-<tr><td>TooBig</td><td>OT_BOOLEAN</td><td>True</td><td>Enable too-big termination heuristics</td></tr>
-<tr><td>TooBigCV</td><td>OT_REAL</td><td>1e+25</td><td>Upper bound on constraint violation for too-big heuristic</td></tr>
-<tr><td>TooBigKKT</td><td>OT_REAL</td><td>1e+30</td><td>Upper bound on KKT values for too-big heuristic</td></tr>
-<tr><td>UserDF</td><td>OT_BOOLEAN</td><td>True</td><td>Objective gradient values supplied by caller</td></tr>
-<tr><td>UserDG</td><td>OT_BOOLEAN</td><td>True</td><td>Jacobian values supplied by caller</td></tr>
-<tr><td>UserHM</td><td>OT_BOOLEAN</td><td>True</td><td>Hessian values supplied by caller</td></tr>
-<tr><td>UserHMstructure</td><td>OT_INTEGER</td><td>2</td><td>Enable automatic Hessian structure generation or checking</td></tr>
-<tr><td>WeakActiveSet</td><td>OT_BOOLEAN</td><td>False</td><td>(experimental)</td></tr>
-<tr><td>eps</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Machine epsilon</td></tr>
-<tr><td>internalParChanged</td><td>OT_INTEGER</td><td>0</td><td>Counter for changed parameters. Internal use only.</td></tr>
-<tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>Print information about execution time</td></tr>
-<tr><td>qp_ipBarrier</td><td>OT_REAL</td><td>7.8</td><td>IP barrier parameter.</td></tr>
-<tr><td>qp_ipComTol</td><td>OT_REAL</td><td>2e-07</td><td>IP complementarity tolerance.</td></tr>
-<tr><td>qp_ipFracBound</td><td>OT_REAL</td><td>0.88</td><td>IP fraction-to-the-boundary parameter.</td></tr>
-<tr><td>qp_ipLsMethod</td><td>OT_STRING</td><td>None</td><td>Select the direct linear solver used by the IP method.</td></tr>
-<tr><td>qp_ipMinAlpha</td><td>OT_REAL</td><td>1e-12</td><td>IP line search minimum step size.</td></tr>
-<tr><td>qp_ipRelaxDiv</td><td>OT_REAL</td><td>2.0</td><td>The relaxation term is divided by this value if successful.</td></tr>
-<tr><td>qp_ipRelaxMax</td><td>OT_REAL</td><td>1e-07</td><td>Maximum relaxation value.</td></tr>
-<tr><td>qp_ipRelaxMin</td><td>OT_REAL</td><td>1e-07</td><td>Mimimum relaxation value.</td></tr>
-<tr><td>qp_ipRelaxMult</td><td>OT_REAL</td><td>10.0</td><td>The relaxation term is multiplied by this value if unsuccessful.</td></tr>
-<tr><td>qp_ipResTol</td><td>OT_REAL</td><td>5e-08</td><td>IP residuals tolerance.</td></tr>
-<tr><td>qp_ipTryRelax</td><td>OT_BOOLEAN</td><td>True</td><td>Enable relaxation strategy when encountering an error.</td></tr>
-<tr><td>qp_lsItMaxIter</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of iterations of the iterative linear solvers.</td></tr>
-<tr><td>qp_lsItMethod</td><td>OT_STRING</td><td>None</td><td>Select the iterative linear solver.</td></tr>
-<tr><td>qp_lsItPrecondMethod</td><td>OT_STRING</td><td>None</td><td>Select preconditioner for the iterative linear solver.</td></tr>
-<tr><td>qp_lsRefineMaxIter</td><td>OT_INTEGER</td><td>10</td><td>Maximum number of iterative refinement steps of the direct linear solvers.</td></tr>
-<tr><td>qp_lsScale</td><td>OT_BOOLEAN</td><td>True</td><td>Enables scaling on linear solver level.</td></tr>
-<tr><td>qp_lsTol</td><td>OT_REAL</td><td>1e-12</td><td>Tolerance for the linear solver.</td></tr>
-<tr><td>qp_lsTrySimple</td><td>OT_BOOLEAN</td><td>False</td><td>Some matrices can be solved without calling a linear equation solver.Currently only diagonal matrices are supported.Non-diagonal matrices will besolved with the chosen linear equation solver.</td></tr>
-<tr><td>qp_maxIter</td><td>OT_INTEGER</td><td>80</td><td>Imposes an upper limit on the number of minor solver iterations,  i.e. for the quadratic subproblem solver.If the limit is reached before convergence, WORHP will activate QP recovery strategies to prevent a solver breakdown.</td></tr>
-<tr><td>qp_method</td><td>OT_STRING</td><td>None</td><td>Select the solution method used by the QP solver.</td></tr>
-<tr><td>qp_nsnBeta</td><td>OT_REAL</td><td>0.9</td><td>NSN stepsize decrease factor.</td></tr>
-<tr><td>qp_nsnGradStep</td><td>OT_BOOLEAN</td><td>True</td><td>Enable gradient steps in the NSN method.</td></tr>
-<tr><td>qp_nsnKKT</td><td>OT_REAL</td><td>1e-06</td><td>NSN KKT tolerance.</td></tr>
-<tr><td>qp_nsnLsMethod</td><td>OT_STRING</td><td>None</td><td>Select the direct linear solver used by the NSN method.</td></tr>
-<tr><td>qp_nsnMinAlpha</td><td>OT_REAL</td><td>1e-11</td><td>NSN line search minimum step size.</td></tr>
-<tr><td>qp_nsnSigma</td><td>OT_REAL</td><td>0.01</td><td>NSN line search slope parameter.</td></tr>
-<tr><td>qp_printLevel</td><td>OT_STRING</td><td>None</td><td>Controls the amount of QP solver output.</td></tr>
-<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>False</td><td>Enable scaling on QP level.</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>True</td><td>Use strict termination criteria in IP method.</td></tr>
+<tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td></tr>
+<tr><td>qp_ipBarrier</td><td>OT_REAL</td><td>worhp_p_.qp.ipBarrier</td><td>IP barrier parameter.</td></tr>
+<tr><td>qp_ipComTol</td><td>OT_REAL</td><td>worhp_p_.qp.ipComTol</td><td>IP complementarity tolerance.</td></tr>
+<tr><td>qp_ipFracBound</td><td>OT_REAL</td><td>worhp_p_.qp.ipFracBound</td><td>IP fraction-to-the-boundary parameter.</td></tr>
+<tr><td>qp_ipLsMethod</td><td>OT_STRING</td><td>GenericType()</td><td>Select the direct linear solver used by the IP method. (LAPACK::0|MA57: only available if provided by the user:1|SuperLU::2|PARDISO: only available if provided by the user, subject to license availability:3|MUMPS: currently Linux platforms only:5|WSMP: subject to license availability:6|MA86: experimental, only available if provided by the user:7|MA97:experimental, only available if provided by the user:8)</td></tr>
+<tr><td>qp_ipMinAlpha</td><td>OT_REAL</td><td>worhp_p_.qp.ipMinAlpha</td><td>IP line search minimum step size.</td></tr>
+<tr><td>qp_ipRelaxDiv</td><td>OT_REAL</td><td>worhp_p_.qp.ipRelaxDiv</td><td>The relaxation term is divided by this value if successful.</td></tr>
+<tr><td>qp_ipRelaxMax</td><td>OT_REAL</td><td>worhp_p_.qp.ipRelaxMax</td><td>Maximum relaxation value.</td></tr>
+<tr><td>qp_ipRelaxMin</td><td>OT_REAL</td><td>worhp_p_.qp.ipRelaxMin</td><td>Mimimum relaxation value.</td></tr>
+<tr><td>qp_ipRelaxMult</td><td>OT_REAL</td><td>worhp_p_.qp.ipRelaxMult</td><td>The relaxation term is multiplied by this value if unsuccessful.</td></tr>
+<tr><td>qp_ipResTol</td><td>OT_REAL</td><td>worhp_p_.qp.ipResTol</td><td>IP residuals tolerance.</td></tr>
+<tr><td>qp_ipTryRelax</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.ipTryRelax</td><td>Enable relaxation strategy when encountering an error.</td></tr>
+<tr><td>qp_lsItMaxIter</td><td>OT_INTEGER</td><td>worhp_p_.qp.lsItMaxIter</td><td>Maximum number of iterations of the iterative linear solvers.</td></tr>
+<tr><td>qp_lsItMethod</td><td>OT_STRING</td><td>GenericType()</td><td>Select the iterative linear solver. (none:Deactivate; use a direct linear solver.:0|CGNR::1|CGNE::2|CGS::3|BiCGSTAB::4)</td></tr>
+<tr><td>qp_lsItPrecondMethod</td><td>OT_STRING</td><td>GenericType()</td><td>Select preconditioner for the iterative linear solver. (none:No preconditioner.:0|static:Static preconditioner (KKT-matrix with constant lower-right block).:1|full:Full KKT-matrix.:2)</td></tr>
+<tr><td>qp_lsRefineMaxIter</td><td>OT_INTEGER</td><td>worhp_p_.qp.lsRefineMaxIter</td><td>Maximum number of iterative refinement steps of the direct linear solvers.</td></tr>
+<tr><td>qp_lsScale</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.lsScale</td><td>Enables scaling on linear solver level.</td></tr>
+<tr><td>qp_lsTol</td><td>OT_REAL</td><td>worhp_p_.qp.lsTol</td><td>Tolerance for the linear solver.</td></tr>
+<tr><td>qp_lsTrySimple</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.lsTrySimple</td><td>Some matrices can be solved without calling a linear equation solver.Currently only diagonal matrices are supported.Non-diagonal matrices will besolved with the chosen linear equation solver.</td></tr>
+<tr><td>qp_maxIter</td><td>OT_INTEGER</td><td>worhp_p_.qp.maxIter</td><td>Imposes an upper limit on the number of minor solver iterations,  i.e. for the quadratic subproblem solver.If the limit is reached before convergence, WORHP will activate QP recovery strategies to prevent a solver breakdown.</td></tr>
+<tr><td>qp_method</td><td>OT_STRING</td><td>GenericType()</td><td>Select the solution method used by the QP solver. (ip:Interior-Point method.:1|nsn:Nonsmooth-Newton method.:2|automatic: Prefer IP and fall back to NSN on error.:12)</td></tr>
+<tr><td>qp_nsnBeta</td><td>OT_REAL</td><td>worhp_p_.qp.nsnBeta</td><td>NSN stepsize decrease factor.</td></tr>
+<tr><td>qp_nsnGradStep</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.nsnGradStep</td><td>Enable gradient steps in the NSN method.</td></tr>
+<tr><td>qp_nsnKKT</td><td>OT_REAL</td><td>worhp_p_.qp.nsnKKT</td><td>NSN KKT tolerance.</td></tr>
+<tr><td>qp_nsnLsMethod</td><td>OT_STRING</td><td>GenericType()</td><td>Select the direct linear solver used by the NSN method. (SuperLU::2|MA48: only available if provided by the user:4)</td></tr>
+<tr><td>qp_nsnMinAlpha</td><td>OT_REAL</td><td>worhp_p_.qp.nsnMinAlpha</td><td>NSN line search minimum step size.</td></tr>
+<tr><td>qp_nsnSigma</td><td>OT_REAL</td><td>worhp_p_.qp.nsnSigma</td><td>NSN line search slope parameter.</td></tr>
+<tr><td>qp_printLevel</td><td>OT_STRING</td><td>GenericType()</td><td>Controls the amount of QP solver output. (none:No output.:0|warn:Print warnings and errors.:1|iterations:Print iterations.:2)</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td></tr>
+<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td></tr>
 </table>
 */
 /// \cond INTERNAL
