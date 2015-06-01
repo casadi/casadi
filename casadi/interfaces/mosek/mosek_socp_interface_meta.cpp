@@ -23,10 +23,10 @@
  */
 
 
-      #include "mosek_interface.hpp"
+      #include "mosek_socp_interface.hpp"
       #include <string>
 
-      const std::string casadi::MosekInterface::meta_doc=
+      const std::string casadi::MosekSocpInterface::meta_doc=
       "\n"
 "Interface to the SDP solver MOSEK Warning: The solver MOSEK is not good\n"
 "at handling linear equalities. There are several options if you notice\n"

@@ -23,7 +23,7 @@
  */
 
 
-#include "mosek_interface.hpp"
+#include "mosek_socp_interface.hpp"
 
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
@@ -41,9 +41,9 @@ namespace casadi {
   extern "C"
   int CASADI_SOCPSOLVER_MOSEK_EXPORT
   casadi_register_socpsolver_mosek(SocpSolverInternal::Plugin* plugin) {
-    plugin->creator = MosekInterface::creator;
+    plugin->creator = MosekSocpInterface::creator;
     plugin->name = "mosek";
-    plugin->doc = MosekInterface::meta_doc.c_str();
+    plugin->doc = MosekSocpInterface::meta_doc.c_str();
     plugin->version = 23;
     return 0;
   }
@@ -53,15 +53,15 @@ namespace casadi {
     SocpSolverInternal::registerPlugin(casadi_register_socpsolver_mosek);
   }
 
-  MosekInterface* MosekInterface::clone() const {
+  MosekSocpInterface* MosekSocpInterface::clone() const {
     // Return a deep copy
-    MosekInterface* node = new MosekInterface(st_);
+    MosekSocpInterface* node = new MosekSocpInterface(st_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  MosekInterface::MosekInterface(const std::vector<Sparsity> &st) : SocpSolverInternal(st) {
+  MosekSocpInterface::MosekSocpInterface(const std::vector<Sparsity> &st) : SocpSolverInternal(st) {
     // Introduce temporary task
     MSKenv_t temp_env;
     MSKtask_t temp_task;
@@ -110,25 +110,25 @@ namespace casadi {
     MSK_deleteenv(&temp_env);
   }
 
-  MosekInterface::~MosekInterface() {
+  MosekSocpInterface::~MosekSocpInterface() {
     if (is_init_) {
       MSK_deletetask(&mosek_task_);
       MSK_deleteenv(&mosek_env_);
     }
   }
 
-  const char* MosekInterface::terminationReason(int flag) {
+  const char* MosekSocpInterface::terminationReason(int flag) {
 
   }
 
-  const char* MosekInterface::solutionType(int flag) {
+  const char* MosekSocpInterface::solutionType(int flag) {
 
   }
 
-  void MosekInterface::init() {
+  void MosekSocpInterface::init() {
     // Initialize the base classes
     SocpSolverInternal::init();
-    log("MosekInterface::init", "Enter");
+    log("MosekSocpInterface::init", "Enter");
 	   
 	  // Create the MOSEK environment
 	  MSK_makeenv(&mosek_env_,NULL);
@@ -202,15 +202,9 @@ namespace casadi {
 
     // Start to construct base of dual_b_
     dual_b_ = input(SOCP_SOLVER_C).data();
-
-    // Start to construct base of dual_yi_
-    for (int i=m_;i<m_+N_;++i) dual_yi_.push_back(i);
-
-    // Start to construct base of dual_ti_
-    for (int i=0;i<m_;++i) dual_ti_.push_back(i);
   }
 
-  void MosekInterface::evaluate() {
+  void MosekSocpInterface::evaluate() {
     if (inputs_check_) checkInputs();
     if (print_problem_) printProblem();
 
@@ -255,7 +249,7 @@ namespace casadi {
 
     r = MSK_optimizetrm(mosek_task_,&trmcode);
 
-    casadi_assert_message(r==MSK_RES_OK, "MosekInterface failed");
+    casadi_assert_message(r==MSK_RES_OK, "MosekSocpInterface failed");
 
     MSK_solutionsummary(mosek_task_,MSK_STREAM_MSG);
 
@@ -313,149 +307,7 @@ namespace casadi {
 
   }
 
-  void MosekInterface::convertToDualSocp() {
-    /**
-
-    Convert Second Order Cone Programming (SOCP) problem in standard form to one in a conic form.
-
-    Dual:
-
-    max          c' x
-    x
-    subject to
-    || yi ||_2 <= ti  i = 1..m
-    A x + b == 0
-    lbx <= x
-     
-    Dimensions                       | Meaning in terms of primal variables
-    ------------------------------------------------------------------------------------------------------------
-    with x ( nx x 1)                 | [lag_ti' lag_yi' lag_lba' lag_uba' lag_lbx' lag_ubx']'
-    c dense ( nx x 1 )               | [-fi' hi' LBA' -UBA' LBX' -UBX']'
-    yi dense ( ni )                  | Lagrange multipliers for equality constraints: yi = Gi' x + hi
-    ti dense ( m )                   | Lagrange multipliers for equality constraint: ti = ei' x + fi
-    A  sparse ( n x nx )             | [-ei Gi -Alba' Auba' -Ilbx Iubx]
-    b  dense ( n x 1 )               | [c]
-    lbx dense ( nx x 1 )             | [-inf' 0']'
-    nx = m + N + nlba + nuba + nlbx + nubx
-
-    */
-
-    /*****************************************************************
-     * Define aliases                                                *
-     *****************************************************************/
-    DMatrix& primal_C           = input(SOCP_SOLVER_C);
-    DMatrix& primal_G           = input(SOCP_SOLVER_G);
-    DMatrix& primal_H           = input(SOCP_SOLVER_H);
-    DMatrix& primal_E           = input(SOCP_SOLVER_E);
-    DMatrix& primal_F           = input(SOCP_SOLVER_F);
-    DMatrix& primal_A           = input(SOCP_SOLVER_A);
-    DMatrix& primal_LBA         = input(SOCP_SOLVER_LBA);
-    DMatrix& primal_UBA         = input(SOCP_SOLVER_UBA);
-    DMatrix& primal_LBX         = input(SOCP_SOLVER_LBX);
-    DMatrix& primal_UBX         = input(SOCP_SOLVER_UBX);
-    const Sparsity& primal_A_sparse   = primal_A.sparsity();
-    const Sparsity& primal_G_sparse   = primal_G.sparsity();
-
-    /*****************************************************************
-     * Categorize number of optimization variables for dual problem  *
-     *****************************************************************/
-    
-    // Empty list of indices 
-    primal_idx_lba_.resize(0);
-    primal_idx_uba_.resize(0);
-    primal_idx_lbx_.resize(0);
-    primal_idx_ubx_.resize(0);
-
-    // Loop over linear equality constraints
-    for (int i=0;i<nc_;++i) {
-      if (primal_LBA.at(i) != -std::numeric_limits<double>::infinity()){
-        primal_idx_lba_.push_back(i);
-      }
-      if (primal_UBA.at(i) != std::numeric_limits<double>::infinity()){
-        primal_idx_uba_.push_back(i);
-      }
-    }
-
-    // Loop over simple bounds
-    for (int i=0;i<n_;++i) {
-      if (primal_LBX.at(i) != -std::numeric_limits<double>::infinity()){
-        primal_idx_lbx_.push_back(i);
-      }
-      if (primal_UBX.at(i) != std::numeric_limits<double>::infinity()){
-        primal_idx_ubx_.push_back(i);
-      }
-    }
-
-    /*****************************************************************
-     * Set up dual problem                                           *
-     *****************************************************************/
-
-    // c-vector: [fi' -hi' -LBA' UBA' -LBX' UBX']'
-    dual_c_.resize(m_+N_);
-    int start_idx = 0;
-    int end_idx = m_;
-    std::copy(primal_F.data().begin(),primal_F.data().end(),dual_c_.begin()+start_idx);
-    std::for_each(dual_c_.begin()+start_idx,dual_c_.begin()+end_idx,[](double& in){in=-in;});
-    start_idx = end_idx;
-    end_idx += N_;
-    std::copy(primal_H.data().begin(),primal_H.data().end(),dual_c_.begin()+start_idx);
-    for (int i : primal_idx_lba_) dual_c_.push_back(primal_LBA.data()[i]);
-    for (int i : primal_idx_uba_) dual_c_.push_back(-primal_UBA.data()[i]);
-    for (int i : primal_idx_lbx_) dual_c_.push_back(primal_LBX.data()[i]);
-    for (int i : primal_idx_ubx_) dual_c_.push_back(-primal_UBX.data()[i]);
-
-    // A-matrix: [-ei Gi -Alba' Auba' -Ilbx Iubx]
-    int begin_colind;
-    int end_colind;
-    dual_A_data_.resize(primal_E.size()+primal_G.size());
-    dual_A_row_.resize(primal_E.size()+primal_G.size());
-    dual_A_colind_.resize(m_+N_+1);
-
-    // TODO: replace T()-call by casadi_trans()
-    DMatrix primal_A_T = primal_A.T();
-    const Sparsity& primal_A_T_sparse = primal_A_T.sparsity();
-    start_idx = 0;
-    end_idx = primal_E.size();
-    std::copy(primal_E.data().begin(),primal_E.data().end(),dual_A_data_.begin()+start_idx);
-    std::for_each(dual_A_data_.begin()+start_idx,dual_A_data_.begin()+end_idx,[](double& in){in=-in;});
-    start_idx = end_idx;
-    end_idx += primal_G.size();
-    std::copy(primal_G.data().begin(),primal_G.data().end(),dual_A_data_.begin()+start_idx);
-    for (int i : primal_idx_lba_) {
-      begin_colind = primal_A_T_sparse.colind(i);
-      end_colind = primal_A_T_sparse.colind(i+1);
-      for (int ii=begin_colind; ii<end_colind;++ii){
-        dual_A_data_.push_back(-primal_A_T.data()[ii]);
-        dual_A_row_.push_back(primal_A_T_sparse.getRow()[ii]);
-      }
-      dual_A_colind_.push_back(dual_A_colind_.back()+end_colind-begin_colind);
-    }
-    for (int i : primal_idx_uba_) {
-      begin_colind = primal_A_T_sparse.colind(i);
-      end_colind = primal_A_T_sparse.colind(i+1);
-      for (int ii=begin_colind; ii<end_colind;++ii){
-        dual_A_data_.push_back(primal_A_T.data()[ii]);
-        dual_A_row_.push_back(primal_A_T_sparse.getRow()[ii]);
-      }
-      dual_A_colind_.push_back(dual_A_colind_.back()+end_colind-begin_colind);
-    }
-    for (int i : primal_idx_lbx_) {
-      dual_A_data_.push_back(-1);
-      dual_A_row_.push_back(i);
-      dual_A_colind_.push_back(dual_A_colind_.back()+1);
-    }
-    for (int i : primal_idx_ubx_) {
-      dual_A_data_.push_back(1);
-      dual_A_row_.push_back(i);
-      dual_A_colind_.push_back(dual_A_colind_.back()+1);
-    }
-
-    // b-vector
-    std::copy(primal_C.data().begin(),primal_C.data().end(),dual_b_.begin());
-
-  }
-
-  std::string MosekInterface::solutionStatus(MSKsolstae& solsta) {
+  std::string MosekSocpInterface::solutionStatus(MSKsolstae& solsta) {
     std::string solution_status;
     switch (solsta) {
       case MSK_SOL_STA_OPTIMAL:
@@ -485,7 +337,7 @@ namespace casadi {
     return solution_status;
   }
 
-  std::string MosekInterface::problemStatus(MSKprostae& prosta) {
+  std::string MosekSocpInterface::problemStatus(MSKprostae& prosta) {
     std::string problem_status;
     switch (prosta) {
       case MSK_PRO_STA_PRIM_AND_DUAL_FEAS:

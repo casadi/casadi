@@ -150,6 +150,123 @@ namespace casadi {
     }
   }
 
+  void SocpSolverInternal::convertToDualSocp() {
+
+    /*****************************************************************
+     * Define aliases                                                *
+     *****************************************************************/
+    DMatrix& primal_C           = input(SOCP_SOLVER_C);
+    DMatrix& primal_G           = input(SOCP_SOLVER_G);
+    DMatrix& primal_H           = input(SOCP_SOLVER_H);
+    DMatrix& primal_E           = input(SOCP_SOLVER_E);
+    DMatrix& primal_F           = input(SOCP_SOLVER_F);
+    DMatrix& primal_A           = input(SOCP_SOLVER_A);
+    DMatrix& primal_LBA         = input(SOCP_SOLVER_LBA);
+    DMatrix& primal_UBA         = input(SOCP_SOLVER_UBA);
+    DMatrix& primal_LBX         = input(SOCP_SOLVER_LBX);
+    DMatrix& primal_UBX         = input(SOCP_SOLVER_UBX);
+    const Sparsity& primal_A_sparse   = primal_A.sparsity();
+    const Sparsity& primal_G_sparse   = primal_G.sparsity();
+
+    /*****************************************************************
+     * Categorize number of optimization variables for dual problem  *
+     *****************************************************************/
+    
+    // Empty list of indices 
+    primal_idx_lba_.resize(0);
+    primal_idx_uba_.resize(0);
+    primal_idx_lbx_.resize(0);
+    primal_idx_ubx_.resize(0);
+
+    // Loop over linear equality constraints
+    for (int i=0;i<nc_;++i) {
+      if (primal_LBA.at(i) != -std::numeric_limits<double>::infinity()){
+        primal_idx_lba_.push_back(i);
+      }
+      if (primal_UBA.at(i) != std::numeric_limits<double>::infinity()){
+        primal_idx_uba_.push_back(i);
+      }
+    }
+
+    // Loop over simple bounds
+    for (int i=0;i<n_;++i) {
+      if (primal_LBX.at(i) != -std::numeric_limits<double>::infinity()){
+        primal_idx_lbx_.push_back(i);
+      }
+      if (primal_UBX.at(i) != std::numeric_limits<double>::infinity()){
+        primal_idx_ubx_.push_back(i);
+      }
+    }
+
+    /*****************************************************************
+     * Set up dual problem                                           *
+     *****************************************************************/
+
+    // c-vector: [fi' -hi' -LBA' UBA' -LBX' UBX']'
+    dual_c_.resize(m_+N_);
+    int start_idx = 0;
+    int end_idx = m_;
+    std::copy(primal_F.data().begin(),primal_F.data().end(),dual_c_.begin()+start_idx);
+    std::for_each(dual_c_.begin()+start_idx,dual_c_.begin()+end_idx,[](double& in){in=-in;});
+    start_idx = end_idx;
+    end_idx += N_;
+    std::copy(primal_H.data().begin(),primal_H.data().end(),dual_c_.begin()+start_idx);
+    for (int i : primal_idx_lba_) dual_c_.push_back(primal_LBA.data()[i]);
+    for (int i : primal_idx_uba_) dual_c_.push_back(-primal_UBA.data()[i]);
+    for (int i : primal_idx_lbx_) dual_c_.push_back(primal_LBX.data()[i]);
+    for (int i : primal_idx_ubx_) dual_c_.push_back(-primal_UBX.data()[i]);
+
+    // A-matrix: [-ei Gi -Alba' Auba' -Ilbx Iubx]
+    int begin_colind;
+    int end_colind;
+    dual_A_data_.resize(primal_E.size()+primal_G.size());
+    dual_A_row_.resize(primal_E.size()+primal_G.size());
+    dual_A_colind_.resize(m_+N_+1);
+
+    // TODO: replace T()-call by casadi_trans()
+    DMatrix primal_A_T = primal_A.T();
+    const Sparsity& primal_A_T_sparse = primal_A_T.sparsity();
+    start_idx = 0;
+    end_idx = primal_E.size();
+    std::copy(primal_E.data().begin(),primal_E.data().end(),dual_A_data_.begin()+start_idx);
+    std::for_each(dual_A_data_.begin()+start_idx,dual_A_data_.begin()+end_idx,[](double& in){in=-in;});
+    start_idx = end_idx;
+    end_idx += primal_G.size();
+    std::copy(primal_G.data().begin(),primal_G.data().end(),dual_A_data_.begin()+start_idx);
+    for (int i : primal_idx_lba_) {
+      begin_colind = primal_A_T_sparse.colind(i);
+      end_colind = primal_A_T_sparse.colind(i+1);
+      for (int ii=begin_colind; ii<end_colind;++ii){
+        dual_A_data_.push_back(-primal_A_T.data()[ii]);
+        dual_A_row_.push_back(primal_A_T_sparse.getRow()[ii]);
+      }
+      dual_A_colind_.push_back(dual_A_colind_.back()+end_colind-begin_colind);
+    }
+    for (int i : primal_idx_uba_) {
+      begin_colind = primal_A_T_sparse.colind(i);
+      end_colind = primal_A_T_sparse.colind(i+1);
+      for (int ii=begin_colind; ii<end_colind;++ii){
+        dual_A_data_.push_back(primal_A_T.data()[ii]);
+        dual_A_row_.push_back(primal_A_T_sparse.getRow()[ii]);
+      }
+      dual_A_colind_.push_back(dual_A_colind_.back()+end_colind-begin_colind);
+    }
+    for (int i : primal_idx_lbx_) {
+      dual_A_data_.push_back(-1);
+      dual_A_row_.push_back(i);
+      dual_A_colind_.push_back(dual_A_colind_.back()+1);
+    }
+    for (int i : primal_idx_ubx_) {
+      dual_A_data_.push_back(1);
+      dual_A_row_.push_back(i);
+      dual_A_colind_.push_back(dual_A_colind_.back()+1);
+    }
+
+    // b-vector
+    std::copy(primal_C.data().begin(),primal_C.data().end(),dual_b_.begin());
+
+  }
+
   std::map<std::string, SocpSolverInternal::Plugin> SocpSolverInternal::solvers_;
 
   const std::string SocpSolverInternal::infix_ = "socpsolver";

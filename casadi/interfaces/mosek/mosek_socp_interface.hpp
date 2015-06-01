@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_MOSEK_INTERFACE_HPP
-#define CASADI_MOSEK_INTERFACE_HPP
+#ifndef CASADI_MOSEK_SOCP_INTERFACE_HPP
+#define CASADI_MOSEK_SOCP_INTERFACE_HPP
 
 #include "casadi/core/function/socp_solver_internal.hpp"
 #include <casadi/interfaces/mosek/casadi_socpsolver_mosek_export.h>
@@ -48,21 +48,21 @@ namespace casadi {
    @copydoc SocpSolver_doc
    @copydoc plugin_SocpSolver_mosek
    * */
-  class CASADI_SOCPSOLVER_MOSEK_EXPORT MosekInterface : public SocpSolverInternal {
+  class CASADI_SOCPSOLVER_MOSEK_EXPORT MosekSocpInterface : public SocpSolverInternal {
   public:
 
     /** \brief Constructor */
-    explicit MosekInterface(const std::vector<Sparsity> &st);
+    explicit MosekSocpInterface(const std::vector<Sparsity> &st);
 
     /** \brief Clone */
-    virtual MosekInterface* clone() const;
+    virtual MosekSocpInterface* clone() const;
 
     /** \brief  Create a new SOCP Solver */
     static SocpSolverInternal* creator(const SOCPStructure& st)
-    { return new MosekInterface(st);}
+    { return new MosekSocpInterface(st);}
 
     /** \brief Destructor */
-    virtual ~MosekInterface();
+    virtual ~MosekSocpInterface();
 
     /** \brief Initialize */
     virtual void init();
@@ -80,29 +80,12 @@ namespace casadi {
     static const std::string meta_doc;
 
   private:
-    /** Generate dual of SOCP to obtain conic form required by Mosek */
-    void convertToDualSocp();
 
     /** Get solution status from MOSEK solsta value */
     std::string solutionStatus(MSKsolstae& solsta);
 
     /** Get problem status from MOSEK prosta value */
     std::string problemStatus(MSKprostae& prosta);
-
-    /** Dual problem data */
-    std::vector<double>  dual_c_;
-    std::vector<double>  dual_A_data_;
-    std::vector<int>     dual_A_row_;
-    std::vector<int>     dual_A_colind_;
-    std::vector<double>  dual_b_;
-    std::vector<double>  dual_yi_;
-    std::vector<double>  dual_ti_;
-
-    /** Indices of relevant bounds */
-    std::vector<int>  primal_idx_lba_;     // Indices of lower bounded linear inequality constraints (LBA != -inf)
-    std::vector<int>  primal_idx_uba_;     // Indices of upper bounded linear inequality constraints (UBA != inf)
-    std::vector<int>  primal_idx_lbx_;     // Indices of simple lower bounds  (LBX != -inf)
-    std::vector<int>  primal_idx_ubx_;     // Indices of simple upper bounds (UBX != inf)
 
     /** MOSEK variables */
     MSKenv_t   mosek_env_;
@@ -113,4 +96,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_MOSEK_INTERFACE_HPP
+#endif // CASADI_MOSEK_SOCP_INTERFACE_HPP
