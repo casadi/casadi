@@ -100,9 +100,9 @@ namespace casadi {
 #pragma omp parallel for
     for (int i=0; i<n_; ++i) {
       int n_in = fcn_.nIn(), n_out = fcn_.nOut();
-      const double* arg_i = arg + n_in*n_ + sz_arg*i;
+      const double** arg_i = arg + n_in*n_ + sz_arg*i;
       copy(arg+i*n_in, arg+(i+1)*n_in, arg_i);
-      double* res_i = res + n_out*n_ + sz_res*i;
+      double** res_i = res + n_out*n_ + sz_res*i;
       copy(res+i*n_out, res+(i+1)*n_out, res_i);
       int* iw_i = iw + i*sz_iw;
       double* w_i = w + i*sz_w;
