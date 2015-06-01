@@ -482,6 +482,9 @@ namespace casadi {
     /** \brief Export / Generate C code for the function */
     void generate(const std::string& fname, const Dictionary& opts=Dictionary());
 
+    /** \brief Export / Generate C code for the function */
+    void generate(const Dictionary& opts=Dictionary());
+
     /// \cond INTERNAL
     /** \brief  Access functions of the node */
     FunctionInternal* operator->();

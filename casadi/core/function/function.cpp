@@ -467,6 +467,10 @@ namespace casadi {
     (*this)->setDerReverse(fcn, nadj);
   }
 
+  void Function::generate(const Dictionary& opts) {
+    generate(getSanitizedName(), opts);
+  }
+
   void Function::generate(const string& fname, const Dictionary& opts) {
     CodeGenerator gen(opts);
     gen.add(*this, fname);
