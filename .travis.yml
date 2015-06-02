@@ -143,7 +143,7 @@ matrix:
         - git config --global push.default simple
         - git remote set-url origin git@github.com:casadi/casadi.git
         - ssh-agent bash -c 'ssh-add /home/travis/build/testbot/id_rsa_travis; git push origin HEAD:$TRAVIS_BRANCH'
-    - after_success:
+      after_success:
         - cd /home/travis/build/
         - git clone git@github.com:casadi/binaries.git
         - pushd binaries && git checkout run && popd
