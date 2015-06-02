@@ -103,7 +103,7 @@ matrix:
         - sudo add-apt-repository ppa:kedazo/doxygen-updates-precise -y
         - sudo apt-get update -q
         - sudo pip install texttable
-        - sudo apt-get install python-lxml doxygen -y
+        - sudo apt-get install graphviz python-lxml python-ipdb doxygen -y
         - pushd docs/api && cp /home/travis/build/testbot/docs.Makefile Makefile && make doxexport | grep -v "file loc from" && popd
         - git stash && git checkout $TRAVIS_BRANCH && git stash pop && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git fetch && git rebase -s origin/$TRAVIS_BRANCH && git push git@github.com:casadi/casadi.git $TRAVIS_BRANCH
     - compiler: clang
@@ -142,6 +142,13 @@ matrix:
         - git config --global push.default simple
         - git remote set-url origin git@github.com:casadi/casadi.git
         - ssh-agent bash -c 'ssh-add /home/travis/build/testbot/id_rsa_travis; git push origin HEAD:$TRAVIS_BRANCH'
+    - after_success:
+        - cd /home/travis/build/
+        - git clone git@github.com:casadi/binaries.git
+        - git checkout run
+        - pushd binaries/casadi && git checkout $TRAVIS_COMMIT && popd
+        - pushd binaries && git commit -a -m "automatic runner commit" && git push origin run && popd
+
     - os: osx
       env: TESTMODE=minimal
       compiler: clang
@@ -212,12 +219,6 @@ before_install:
   - sudo apt-get install -y binutils gcc g++ gfortran git cmake liblapack-dev ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libblas-dev liblapack-dev libslicot-dev libxml2-dev
 
 
-after_success:
-  - cd /home/travis/build/
-  - git clone git@github.com:casadi/binaries.git
-  - git checkout run
-  - pushd binaries/casadi && git checkout $TRAVIS_COMMIT && popd
-  - pushd binaries && git commit -a -m "automatic runner commit" && git push origin run && popd
 
 
 language: cpp
