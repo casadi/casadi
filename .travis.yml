@@ -145,7 +145,7 @@ matrix:
     - after_success:
         - cd /home/travis/build/
         - git clone git@github.com:casadi/binaries.git
-        - git checkout run
+        - pushd binaries && git checkout run && popd
         - pushd binaries/casadi && git checkout $TRAVIS_COMMIT && popd
         - pushd binaries && git commit -a -m "automatic runner commit" && git push origin run && popd
 
