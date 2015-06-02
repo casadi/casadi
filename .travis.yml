@@ -147,7 +147,7 @@ matrix:
         - cd /home/travis/build/
         - git clone git@github.com:casadi/binaries.git
         - pushd binaries && git checkout run && popd
-        - pushd binaries/casadi && git checkout $TRAVIS_COMMIT && popd
+        - pushd binaries/casadi && git fetch && git checkout $TRAVIS_COMMIT && popd
         - pushd binaries && git commit -a -m "automatic runner commit $TRAVIS_COMMIT" && git push origin run && popd
 
     - os: osx
