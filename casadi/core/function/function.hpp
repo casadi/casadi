@@ -304,11 +304,11 @@ namespace casadi {
                                bool always_inline=false, bool never_inline=false);
     std::vector<MX> operator()(const std::vector<MX>& arg,
                                bool always_inline=false, bool never_inline=false);
-    std::map<std::string, DMatrix> operator()(const std::map<std::string, DMatrix>& arg,
+    const std::map<std::string, DMatrix> operator()(const std::map<std::string, DMatrix>& arg,
                                               bool always_inline=false, bool never_inline=false);
-    std::map<std::string, SX> operator()(const std::map<std::string, SX>& arg,
+    const std::map<std::string, SX> operator()(const std::map<std::string, SX>& arg,
                  bool always_inline=false, bool never_inline=false);
-    std::map<std::string, MX> operator()(const std::map<std::string, MX>& arg,
+    const std::map<std::string, MX> operator()(const std::map<std::string, MX>& arg,
                                          bool always_inline=false, bool never_inline=false);
     ///@}
 
@@ -567,7 +567,7 @@ namespace casadi {
 #ifndef SWIG
     /** \brief Call using a map */
     template<typename M>
-      std::map<std::string, M> callMap(const std::map<std::string, M>& arg,
+    const std::map<std::string, M> callMap(const std::map<std::string, M>& arg,
                                        bool always_inline, bool never_inline);
 
     /** \brief Check if input arguments have correct length and dimensions */

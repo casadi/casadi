@@ -612,7 +612,7 @@ namespace casadi {
   }
 
   template<typename M>
-  std::map<std::string, M> Function::callMap(const std::map<std::string, M>& arg,
+  const std::map<std::string, M> Function::callMap(const std::map<std::string, M>& arg,
                                              bool always_inline, bool never_inline) {
     casadi_assert(isInit());
 
@@ -633,17 +633,17 @@ namespace casadi {
     return ret;
   }
 
-  std::map<std::string, DMatrix> Function::
+  const std::map<std::string, DMatrix> Function::
   operator()(const std::map<std::string, DMatrix>& arg, bool always_inline, bool never_inline) {
     return callMap(arg, always_inline, never_inline);
   }
 
-  std::map<std::string, SX> Function::
+  const std::map<std::string, SX> Function::
   operator()(const std::map<std::string, SX>& arg, bool always_inline, bool never_inline) {
     return callMap(arg, always_inline, never_inline);
   }
 
-  std::map<std::string, MX> Function::
+  const std::map<std::string, MX> Function::
   operator()(const std::map<std::string, MX>& arg, bool always_inline, bool never_inline) {
     return callMap(arg, always_inline, never_inline);
   }
