@@ -85,7 +85,10 @@ namespace casadi {
     /// Construct a GenericType given an opt_type
     static GenericType from_type(opt_type type);
 
+    /// C++ equivalent of Python's dict or MATLAB's struct
     typedef std::map<std::string, GenericType> Dict;
+
+    /// Typecast from dict
     GenericType(const Dict& dict);
 
     /// Creator functions
@@ -228,8 +231,70 @@ namespace casadi {
     opt_type type_;
   };
 
-  /// C++ version of Python's dictionary
+  /// C++ equivalent of Python's dict or MATLAB's struct
   typedef GenericType::Dict Dict;
+
+#ifndef SWIG
+  // Create dictionary with 1 element
+  inline Dict
+  make_dict(const std::string& n0, const GenericType& x0) {
+    Dict ret;
+    ret[n0]=x0;
+    return ret;
+  }
+
+  // Create dictionary with 2 elements
+  inline Dict make_dict(const std::string& n0, const GenericType& x0,
+                        const std::string& n1, const GenericType& x1) {
+    Dict ret=make_dict(n0, x0);
+    ret[n1]=x1;
+    return ret;
+  }
+
+  // Create dictionary with 3 elements
+  inline Dict make_dict(const std::string& n0, const GenericType& x0,
+                        const std::string& n1, const GenericType& x1,
+                        const std::string& n2, const GenericType& x2) {
+    Dict ret=make_dict(n0, x0, n1, x1);
+    ret[n2]=x2;
+    return ret;
+  }
+
+  // Create dictionary with 4 elements
+  inline Dict make_dict(const std::string& n0, const GenericType& x0,
+                        const std::string& n1, const GenericType& x1,
+                        const std::string& n2, const GenericType& x2,
+                        const std::string& n3, const GenericType& x3) {
+    Dict ret=make_dict(n0, x0, n1, x1, n2, x2);
+    ret[n3]=x3;
+    return ret;
+  }
+
+  // Create dictionary with 5 elements
+  inline Dict make_dict(const std::string& n0, const GenericType& x0,
+                        const std::string& n1, const GenericType& x1,
+                        const std::string& n2, const GenericType& x2,
+                        const std::string& n3, const GenericType& x3,
+                        const std::string& n4, const GenericType& x4) {
+    Dict ret=make_dict(n0, x0, n1, x1, n2, x2, n3, x3);
+    ret[n4]=x4;
+    return ret;
+  }
+
+  // Create dictionary with 6 elements
+  inline Dict make_dict(const std::string& n0, const GenericType& x0,
+                        const std::string& n1, const GenericType& x1,
+                        const std::string& n2, const GenericType& x2,
+                        const std::string& n3, const GenericType& x3,
+                        const std::string& n4, const GenericType& x4,
+                        const std::string& n5, const GenericType& x5) {
+    Dict ret=make_dict(n0, x0, n1, x1, n2, x2, n3, x3, n4, x4);
+    ret[n5]=x5;
+    return ret;
+  }
+
+#endif // SWIG
+
 
 } // namespace casadi
 
