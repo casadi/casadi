@@ -32,7 +32,7 @@
 using namespace std;
 namespace casadi {
 
-  CodeGenerator::CodeGenerator(const Dictionary& opts) {
+  CodeGenerator::CodeGenerator(const Dict& opts) {
     // Default options
     this->verbose = false;
     this->mex = false;
@@ -43,7 +43,7 @@ namespace casadi {
     this->with_header = false;
 
     // Read options
-    for (Dictionary::const_iterator it=opts.begin(); it!=opts.end(); ++it) {
+    for (Dict::const_iterator it=opts.begin(); it!=opts.end(); ++it) {
       if (it->first=="verbose") {
         this->verbose = it->second;
       } else if (it->first=="mex") {

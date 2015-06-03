@@ -65,7 +65,7 @@ namespace casadi {
               "a smaller system with dense rhs.");
     addOption("linear_solver",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linear_solver_options",    OT_DICT,   GenericType(),
               "Options to be passed to the linear solver.");
 
   }

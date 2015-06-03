@@ -57,7 +57,7 @@ namespace casadi {
     casadi_warning("The SQP method is under development");
     addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
-    addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
+    addOption("qp_solver_options", OT_DICT, GenericType(),
               "Options to be passed to the QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",
               "limited-memory|exact");
@@ -132,7 +132,7 @@ namespace casadi {
 
     // Set options if provided
     if (hasSetOption("qp_solver_options")) {
-      Dictionary qp_solver_options = getOption("qp_solver_options");
+      Dict qp_solver_options = getOption("qp_solver_options");
       qp_solver_.setOption(qp_solver_options);
     }
     qp_solver_.init();
@@ -233,7 +233,7 @@ namespace casadi {
     checkInitialBounds();
 
     if (gather_stats_) {
-      Dictionary iterations;
+      Dict iterations;
       iterations["inf_pr"] = std::vector<double>();
       iterations["inf_du"] = std::vector<double>();
       iterations["ls_trials"] = std::vector<double>();
@@ -319,7 +319,7 @@ namespace casadi {
       printIteration(cout, iter, fk_, pr_inf, gLag_norminf, dx_norminf, reg_, ls_iter, ls_success);
 
       if (gather_stats_) {
-        Dictionary & iterations = stats_["iterations"];
+        Dict & iterations = stats_["iterations"];
         static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(pr_inf);
         static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(gLag_norminf);
         static_cast<std::vector<double> &>(iterations["d_norm"]).push_back(dx_norminf);
@@ -337,7 +337,7 @@ namespace casadi {
         if (!output(NLP_SOLVER_LAM_X).isEmpty()) output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
         if (!output(NLP_SOLVER_G).isEmpty()) output(NLP_SOLVER_G).setNZ(gk_);
 
-        Dictionary iteration;
+        Dict iteration;
         iteration["iter"] = iter;
         iteration["inf_pr"] = pr_inf;
         iteration["inf_du"] = gLag_norminf;

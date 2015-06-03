@@ -72,22 +72,22 @@ namespace casadi {
               "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
 
     // For passing metadata to IPOPT
-    addOption("var_string_md",            OT_DICTIONARY, GenericType(),
+    addOption("var_string_md",            OT_DICT, GenericType(),
               "String metadata (a dictionary with lists of strings) "
               "about variables to be passed to IPOPT");
-    addOption("var_integer_md",           OT_DICTIONARY, GenericType(),
+    addOption("var_integer_md",           OT_DICT, GenericType(),
               "Integer metadata (a dictionary with lists of integers) "
               "about variables to be passed to IPOPT");
-    addOption("var_numeric_md",           OT_DICTIONARY, GenericType(),
+    addOption("var_numeric_md",           OT_DICT, GenericType(),
               "Numeric metadata (a dictionary with lists of reals) about "
               "variables to be passed to IPOPT");
-    addOption("con_string_md",            OT_DICTIONARY, GenericType(),
+    addOption("con_string_md",            OT_DICT, GenericType(),
               "String metadata (a dictionary with lists of strings) about "
               "constraints to be passed to IPOPT");
-    addOption("con_integer_md",           OT_DICTIONARY, GenericType(),
+    addOption("con_integer_md",           OT_DICT, GenericType(),
               "Integer metadata (a dictionary with lists of integers) "
               "about constraints to be passed to IPOPT");
-    addOption("con_numeric_md",           OT_DICTIONARY, GenericType(),
+    addOption("con_numeric_md",           OT_DICT, GenericType(),
               "Numeric metadata (a dictionary with lists of reals) about "
               "constraints to be passed to IPOPT");
 
@@ -319,7 +319,7 @@ namespace casadi {
 
 
     if (gather_stats_) {
-      Dictionary iterations;
+      Dict iterations;
       iterations["inf_pr"] = std::vector<double>();
       iterations["inf_du"] = std::vector<double>();
       iterations["mu"] = std::vector<double>();
@@ -472,7 +472,7 @@ namespace casadi {
     try {
       log("intermediate_callback started");
       if (gather_stats_) {
-        Dictionary & iterations = stats_["iterations"];
+        Dict & iterations = stats_["iterations"];
         static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(inf_pr);
         static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(inf_du);
         static_cast<std::vector<double> &>(iterations["mu"]).push_back(mu);
@@ -505,7 +505,7 @@ namespace casadi {
           }
         }
 
-        Dictionary iteration;
+        Dict iteration;
         iteration["iter"] = iter;
         iteration["inf_pr"] = inf_pr;
         iteration["inf_du"] = inf_du;
@@ -945,8 +945,8 @@ namespace casadi {
                                            map<string, vector<int> >& con_integer_md,
                                            map<string, vector<double> >& con_numeric_md) {
     if (hasSetOption("var_string_md")) {
-      Dictionary dict = getOption("var_string_md");
-      for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+      Dict dict = getOption("var_string_md");
+      for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<string> entry = it->second; // Get the entry
         // Check length for consistency
@@ -956,8 +956,8 @@ namespace casadi {
     }
 
     if (hasSetOption("var_integer_md")) {
-      Dictionary dict = getOption("var_integer_md");
-      for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+      Dict dict = getOption("var_integer_md");
+      for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<int> entry = it->second; // Get the entry
         // Check length for consistency
@@ -967,8 +967,8 @@ namespace casadi {
     }
 
     if (hasSetOption("var_numeric_md")) {
-      Dictionary dict = getOption("var_numeric_md");
-      for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+      Dict dict = getOption("var_numeric_md");
+      for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<double> entry = it->second; // Get the entry
         // Check length for consistency
@@ -978,8 +978,8 @@ namespace casadi {
     }
 
     if (hasSetOption("con_string_md")) {
-      Dictionary dict = getOption("con_string_md");
-      for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+      Dict dict = getOption("con_string_md");
+      for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<string> entry = it->second; // Get the entry
         // Check length for consistency
@@ -989,8 +989,8 @@ namespace casadi {
     }
 
     if (hasSetOption("con_integer_md")) {
-      Dictionary dict = getOption("con_integer_md");
-      for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+      Dict dict = getOption("con_integer_md");
+      for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<int> entry = it->second; // Get the entry
         // Check length for consistency
@@ -1000,8 +1000,8 @@ namespace casadi {
     }
 
     if (hasSetOption("con_numeric_md")) {
-      Dictionary dict = getOption("con_numeric_md");
-      for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+      Dict dict = getOption("con_numeric_md");
+      for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<double> entry = it->second; // Get the entry
         // Check length for consistency
@@ -1023,7 +1023,7 @@ namespace casadi {
                                         const map<string, vector<double> >& con_numeric_md) {
 
     if (!var_string_md.empty()) {
-      Dictionary dict;
+      Dict dict;
       for (map<string, vector<string> >::const_iterator it=var_string_md.begin();
           it!=var_string_md.end(); ++it) {
         dict[it->first] = it->second;
@@ -1032,7 +1032,7 @@ namespace casadi {
     }
 
     if (!var_integer_md.empty()) {
-      Dictionary dict;
+      Dict dict;
       for (map<string, vector<int> >::const_iterator it=var_integer_md.begin();
           it!=var_integer_md.end(); ++it) {
         dict[it->first] = it->second;
@@ -1041,7 +1041,7 @@ namespace casadi {
     }
 
     if (!var_numeric_md.empty()) {
-      Dictionary dict;
+      Dict dict;
       for (map<string, vector<double> >::const_iterator it=var_numeric_md.begin();
           it!=var_numeric_md.end(); ++it) {
         dict[it->first] = it->second;
@@ -1050,7 +1050,7 @@ namespace casadi {
     }
 
     if (!con_string_md.empty()) {
-      Dictionary dict;
+      Dict dict;
       for (map<string, vector<string> >::const_iterator it=con_string_md.begin();
           it!=con_string_md.end(); ++it) {
         dict[it->first] = it->second;
@@ -1059,7 +1059,7 @@ namespace casadi {
     }
 
     if (!con_integer_md.empty()) {
-      Dictionary dict;
+      Dict dict;
       for (map<string, vector<int> >::const_iterator it=con_integer_md.begin();
           it!=con_integer_md.end(); ++it) {
         dict[it->first] = it->second;
@@ -1068,7 +1068,7 @@ namespace casadi {
     }
 
     if (!con_numeric_md.empty()) {
-      Dictionary dict;
+      Dict dict;
       for (map<string, vector<double> >::const_iterator it=con_numeric_md.begin();
           it!=con_numeric_md.end(); ++it) {
         dict[it->first] = it->second;

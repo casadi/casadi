@@ -480,10 +480,10 @@ namespace casadi {
     ///@}
 
     /** \brief Export / Generate C code for the function */
-    void generate(const std::string& fname, const Dictionary& opts=Dictionary());
+    void generate(const std::string& fname, const Dict& opts=Dict());
 
     /** \brief Export / Generate C code for the function */
-    void generate(const Dictionary& opts=Dictionary());
+    void generate(const Dict& opts=Dict());
 
     /// \cond INTERNAL
     /** \brief  Access functions of the node */
@@ -497,7 +497,7 @@ namespace casadi {
     /// \endcond
 
     /// Get all statistics obtained at the end of the last evaluate call
-    const Dictionary& getStats() const;
+    const Dict& getStats() const;
 
     /// Get a single statistic obtained at the end of the last evaluate call
     GenericType getStat(const std::string& name) const;

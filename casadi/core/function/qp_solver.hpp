@@ -128,7 +128,7 @@ namespace casadi {
      *  \param st \structargument{QP}
      */
     QpSolver(const std::string& name, const std::string& solver,
-             const QPStructure& st, const Dictionary& opts=Dictionary());
+             const QPStructure& st, const Dict& opts=Dict());
 
     /** \brief Constructor (no initialization, to be deprecated)
      *  \param name \pluginargument{QpSolver}

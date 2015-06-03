@@ -186,7 +186,7 @@ namespace casadi {
      *  \param st \structargument{SDP}
      */
     SdpSolver(const std::string& name, const std::string& solver,
-              const SDPStructure& st, const Dictionary& opts=Dictionary());
+              const SDPStructure& st, const Dict& opts=Dict());
 
     /** \brief Constructor (to be deprecated)
      *  \param solver \pluginargument{SdpSolver}

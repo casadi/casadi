@@ -36,7 +36,7 @@ namespace casadi {
   class CASADI_EXPORT CodeGenerator {
   public:
     /// Constructor
-    CodeGenerator(const Dictionary& opts = Dictionary());
+    CodeGenerator(const Dict& opts = Dict());
 
     /// Add a function (name generated)
     void add(const Function& f);

@@ -109,7 +109,7 @@ namespace casadi {
      * \param st \structargument{LrDple}
      */
     LrDpleSolver(const std::string& name, const std::string& solver,
-                 const LrDpleStructure& st, const Dictionary& opts=Dictionary());
+                 const LrDpleStructure& st, const Dict& opts=Dict());
 
     /** \brief Constructor (no initialization, to be deprecated)
      * \param solver \pluginargument{LrDpleSolver}

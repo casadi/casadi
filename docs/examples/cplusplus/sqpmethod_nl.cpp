@@ -59,9 +59,9 @@ int main(int argc, char **argv){
 
   // Specify QP solver
   nlp_solver.setOption("qp_solver","nlp");
-  Dictionary qp_solver_options;
+  Dict qp_solver_options;
   qp_solver_options["nlp_solver"] = "ipopt"; 
-  Dictionary nlp_solver_options;
+  Dict nlp_solver_options;
   nlp_solver_options["print_level"] = 0;
   nlp_solver_options["print_time"] = 0;
   qp_solver_options["nlp_solver_options"] = nlp_solver_options;

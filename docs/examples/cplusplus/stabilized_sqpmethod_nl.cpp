@@ -81,7 +81,7 @@ int main(int argc, char **argv){
   /// Unstabilized SQIC Solver
   
   nlp_solver.setOption("stabilized_qp_solver","qp");
-  Dictionary stabilized_qp_solver_options;
+  Dict stabilized_qp_solver_options;
   stabilized_qp_solver_options["qp_solver"] = "sqic";
   nlp_solver.setOption("stabilized_qp_solver_options",stabilized_qp_solver_options);
   
@@ -94,11 +94,11 @@ int main(int argc, char **argv){
     
   /**
   nlp_solver.setOption("stabilized_qp_solver","qp");
-  Dictionary stabilized_qp_solver_options;
+  Dict stabilized_qp_solver_options;
   stabilized_qp_solver_options["qp_solver"] = "nlp";
-  Dictionary qp_solver_options;
+  Dict qp_solver_options;
   qp_solver_options["nlp_solver"]= "ipopt";
-  Dictionary nlp_solver_options;
+  Dict nlp_solver_options;
   nlp_solver_options["print_level"] = 0;
   nlp_solver_options["print_time"] = 0;
   nlp_solver_options["tol"] = 1e-16;

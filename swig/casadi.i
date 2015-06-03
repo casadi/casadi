@@ -677,7 +677,7 @@ using namespace casadi;
 %traits_swigtype(casadi::CustomEvaluate);
 %fragment(SWIG_Traits_frag(casadi::CustomEvaluate));
 
-%template(Dictionary) std::map<std::string,casadi::GenericType>;
+%template(Dict) std::map<std::string,casadi::GenericType>;
 
 %traits_swigtype(casadi::Function);
 %fragment(SWIG_Traits_frag(casadi::Function));
@@ -706,7 +706,7 @@ void dummy(std::vector< std::vector<double> > foo1,
            std::vector < std::vector < casadi::SX > > foo16,
            std::vector < std::vector < casadi::MX > > foo17,
            std::vector < std::vector < casadi::MX* > > foo17b,
-           casadi::Dictionary foo18,
+           casadi::Dict foo18,
            std::string& foo19,
            casadi::Matrix<int> foo20,
            casadi::CustomFunction foo24,
@@ -748,7 +748,7 @@ namespace std {
              std::vector < std::vector < casadi::SX > > foo16,
              std::vector < std::vector < casadi::MX > > foo17,
              std::vector < std::vector < casadi::MX* > > foo17b,
-             casadi::Dictionary foo18,
+             casadi::Dict foo18,
              std::string& foo19,
              casadi::Matrix<int> foo20,
              casadi::CustomFunction foo24,

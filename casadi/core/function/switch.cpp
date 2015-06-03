@@ -32,7 +32,7 @@ namespace casadi {
   }
 
   Switch::Switch(const std::string& name, const std::vector<Function>& f,
-                 const Function& f_def, const Dictionary& opts) {
+                 const Function& f_def, const Dict& opts) {
     assignNode(new SwitchInternal(f, f_def));
     setOption("name", name);
     setOption(opts);
@@ -40,7 +40,7 @@ namespace casadi {
   }
 
   Switch::Switch(const std::string& name, const Function& f_true,
-                 const Function& f_false, const Dictionary& opts) {
+                 const Function& f_false, const Dict& opts) {
     assignNode(new SwitchInternal(vector<Function>(1, f_false), f_true));
     setOption("name", name);
     setOption(opts);

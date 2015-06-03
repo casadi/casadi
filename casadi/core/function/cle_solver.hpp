@@ -103,7 +103,7 @@ namespace casadi {
      * \param st \structargument{Cle}
      */
     CleSolver(const std::string& name, const std::string& solver,
-              const CleStructure& st, const Dictionary& opts=Dictionary());
+              const CleStructure& st, const Dict& opts=Dict());
 
     /** \brief Constructor (no initialization, to be deprecated)
      * \param solver \pluginargument{CleSolver}

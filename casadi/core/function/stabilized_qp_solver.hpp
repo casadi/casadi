@@ -111,7 +111,7 @@ namespace casadi {
      *  \copydoc scheme_QPStruct
      */
     StabilizedQpSolver(const std::string& name, const std::string& solver,
-                       const QPStructure& st, const Dictionary& opts=Dictionary());
+                       const QPStructure& st, const Dict& opts=Dict());
 
     /** \brief Constructor (no initialization, to be deprecated)
      *  \param solver \pluginargument{StabilizedQpSolver}

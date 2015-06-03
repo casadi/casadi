@@ -117,12 +117,12 @@ SundialsInterface::SundialsInterface(const Function& f, const Function& g)
             "Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]");
   addOption("linear_solver",               OT_STRING,     GenericType(),
             "A custom linear solver creator function");
-  addOption("linear_solver_options",       OT_DICTIONARY,       GenericType(),
+  addOption("linear_solver_options",       OT_DICT,       GenericType(),
             "Options to be passed to the linear solver");
   addOption("linear_solverB",              OT_STRING,     GenericType(),
             "A custom linear solver creator function for backwards integration "
             "[default: equal to linear_solver]");
-  addOption("linear_solver_optionsB",      OT_DICTIONARY,       GenericType(),
+  addOption("linear_solver_optionsB",      OT_DICT,       GenericType(),
             "Options to be passed to the linear solver for backwards integration "
             "[default: equal to linear_solver_options]");
 }

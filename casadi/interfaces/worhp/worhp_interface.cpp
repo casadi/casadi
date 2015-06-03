@@ -441,7 +441,7 @@ namespace casadi {
     log("WorhpInterface::evaluate");
 
     if (gather_stats_) {
-      Dictionary iterations;
+      Dict iterations;
       iterations["iter_sqp"] = std::vector<int>();
       iterations["inf_pr"] = std::vector<double>();
       iterations["inf_du"] = std::vector<double>();
@@ -527,7 +527,7 @@ namespace casadi {
 
         if (!worhp_w_.FirstIteration) {
           if (gather_stats_) {
-            Dictionary & iterations = stats_["iterations"];
+            Dict & iterations = stats_["iterations"];
             static_cast<std::vector<int> &>(iterations["iter_sqp"]).push_back(worhp_w_.MinorIter);
             static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(worhp_w_.NormMax_CV);
             static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(worhp_w_.ScaledKKT);
@@ -551,7 +551,7 @@ namespace casadi {
             if (!output(NLP_SOLVER_LAM_G).isEmpty())
               output(NLP_SOLVER_LAM_G).setNZ(worhp_o_.Mu);
 
-            Dictionary iteration;
+            Dict iteration;
             iteration["iter"] = worhp_w_.MajorIter;
             iteration["iter_sqp"] = worhp_w_.MinorIter;
             iteration["inf_pr"] = worhp_w_.NormMax_CV;

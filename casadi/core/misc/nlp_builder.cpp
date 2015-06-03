@@ -30,7 +30,7 @@
 using namespace std;
 namespace casadi {
 
-void NlpBuilder::parseNL(const std::string& filename, const Dictionary& options) {
+void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
   // Note: The implementation of this function follows the
   // "Writing .nl Files" paper by David M. Gay (2005)
 
@@ -38,7 +38,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dictionary& options)
   bool verbose=false;
 
   // Read user options
-  for (Dictionary::const_iterator it=options.begin(); it!=options.end(); ++it) {
+  for (Dict::const_iterator it=options.begin(); it!=options.end(); ++it) {
     if (it->first.compare("verbose")==0) {
       verbose = it->second;
     } else {

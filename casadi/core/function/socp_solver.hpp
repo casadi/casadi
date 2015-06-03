@@ -130,7 +130,7 @@ namespace casadi {
      *  \param st \structargument{SOCP}
      */
     SocpSolver(const std::string& name, const std::string& solver,
-               const SOCPStructure& st, const Dictionary& opts=Dictionary());
+               const SOCPStructure& st, const Dict& opts=Dict());
 
     /** \brief Constructor (no initialization, to be deprecated)
      *  \param solver \pluginargument{SocpSolver}

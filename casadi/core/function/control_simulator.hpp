@@ -114,11 +114,11 @@ namespace casadi {
      * \param grid the major time grid
      */
     ControlSimulator(const std::string& name, const Function& dae, const Function& output_fcn,
-                     const Matrix<double>& grid, const Dictionary& opts=Dictionary());
+                     const Matrix<double>& grid, const Dict& opts=Dict());
 
     /// Output function equal to the state (new syntax, includes initialization)
     ControlSimulator(const std::string& name, const Function& dae,
-                     const Matrix<double>& grid, const Dictionary& opts=Dictionary());
+                     const Matrix<double>& grid, const Dict& opts=Dict());
 
     /** \brief Creates a piecewise simulator, no initialization (to be deprecated)
      * \param ffcn Continuous time dynamics, an casadi::Function with the following mapping:

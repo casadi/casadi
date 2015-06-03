@@ -68,7 +68,7 @@ namespace casadi {
   }
 
   DleSolver::DleSolver(const std::string& name, const std::string& solver,
-                       const DleStructure& st, const Dictionary& opts) {
+                       const DleStructure& st, const Dict& opts) {
     assignNode(DleInternal::instantiatePlugin(solver, st));
     setOption("name", name);
     setOption(opts);

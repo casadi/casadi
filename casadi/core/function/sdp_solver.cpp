@@ -52,7 +52,7 @@ namespace casadi {
   }
 
   SdpSolver::SdpSolver(const std::string& name, const std::string& solver,
-                       const SDPStructure& st, const Dictionary& opts) {
+                       const SDPStructure& st, const Dict& opts) {
     assignNode(SdpSolverInternal::instantiatePlugin(solver, st));
     setOption("name", name);
     setOption(opts);

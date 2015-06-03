@@ -98,19 +98,19 @@ int main(){
   NlpSolver solver("ipopt", nlp);
   
   // Mark the parameters amongst the constraints (see sIPOPT documentation)
-  Dictionary con_integer_md;
+  Dict con_integer_md;
   int sens_init_constr[] = {0,0,1,2};
   con_integer_md["sens_init_constr"] = vector<int>(sens_init_constr,sens_init_constr+4);
   solver.setOption("con_integer_md",con_integer_md);
   
   // Mark the parameters amongst the variables (see sIPOPT documentation)
-  Dictionary var_integer_md;
+  Dict var_integer_md;
   int sens_state_1[] = {0,0,0,1,2};
   var_integer_md["sens_state_1"] = vector<int>(sens_state_1,sens_state_1+5);
   solver.setOption("var_integer_md",var_integer_md);
 
   // Pass the perturbed values (see sIPOPT documentation)
-  Dictionary var_numeric_md;
+  Dict var_numeric_md;
   double sens_state_value_1[] = {0,0,0,p_b[0],p_b[1]};
   var_numeric_md["sens_state_value_1"] = vector<double>(sens_state_value_1,sens_state_value_1+5);
   solver.setOption("var_numeric_md",var_numeric_md);
@@ -150,7 +150,7 @@ int main(){
   cout << "----" << endl;
   
   cout << "Constraint multipliers" << endl;
-  Dictionary con_numeric_md = solver.getStat("con_numeric_md");
+  Dict con_numeric_md = solver.getStat("con_numeric_md");
   cout << "lambda = " << con_numeric_md["sens_sol_state_1"] << endl;
   cout << "----" << endl;
   

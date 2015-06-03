@@ -79,7 +79,7 @@ namespace casadi {
      *        one of the outputs (by default the first) is a residual.
      */
     ImplicitFunction(const std::string& name, const std::string& solver,
-                     const Function& f, const Dictionary& opts=Dictionary());
+                     const Function& f, const Dict& opts=Dict());
 
     /** \brief  Create an implicit function solver, no initialization (to be deprecated)
      * \param solver \pluginargument{ImplicitFunction}

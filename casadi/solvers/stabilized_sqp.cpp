@@ -57,7 +57,7 @@ namespace casadi {
     casadi_warning("The SQP method is under development");
     addOption("stabilized_qp_solver",         OT_STRING,   GenericType(),
               "The Stabilized QP solver to be used by the SQP method");
-    addOption("stabilized_qp_solver_options", OT_DICTIONARY, GenericType(),
+    addOption("stabilized_qp_solver_options", OT_DICT, GenericType(),
               "Options to be passed to the Stabilized QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",
               "limited-memory|exact");
@@ -180,7 +180,7 @@ namespace casadi {
 
     // Set options if provided
     if (hasSetOption("stabilized_qp_solver_options")) {
-      Dictionary stabilized_qp_solver_options = getOption("stabilized_qp_solver_options");
+      Dict stabilized_qp_solver_options = getOption("stabilized_qp_solver_options");
       stabilized_qp_solver_.setOption(stabilized_qp_solver_options);
     }
     stabilized_qp_solver_.init();

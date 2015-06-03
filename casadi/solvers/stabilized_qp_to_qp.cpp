@@ -50,7 +50,7 @@ namespace casadi {
       : StabilizedQpSolverInternal(st) {
     addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver used to solve the stabilized QPs.");
-    addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
+    addOption("qp_solver_options", OT_DICT, GenericType(),
               "Options to be passed to the QP solver instance");
   }
 
@@ -76,7 +76,7 @@ namespace casadi {
 
     // Pass options if provided
     if (hasSetOption("qp_solver_options")) {
-      Dictionary qp_solver_options = getOption("qp_solver_options");
+      Dict qp_solver_options = getOption("qp_solver_options");
       qp_solver_.setOption(qp_solver_options);
     }
 

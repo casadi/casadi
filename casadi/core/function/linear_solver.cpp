@@ -85,7 +85,7 @@ namespace casadi {
   }
 
   LinearSolver::LinearSolver(const std::string& name, const std::string& solver,
-                             const Sparsity& sp, int nrhs, const Dictionary& opts) {
+                             const Sparsity& sp, int nrhs, const Dict& opts) {
     if (solver=="none") {
       assignNode(new LinearSolverInternal(sp, nrhs));
     } else {

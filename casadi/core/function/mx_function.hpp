@@ -82,19 +82,19 @@ namespace casadi {
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     MXFunction(const std::string& name, const std::vector<MX>& arg,
-               const std::vector<MX>& res, const Dictionary& opts=Dictionary());
+               const std::vector<MX>& res, const Dict& opts=Dict());
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     MXFunction(const std::string& name, const MappedIO& arg,
-               const std::vector<MX>& res, const Dictionary& opts=Dictionary());
+               const std::vector<MX>& res, const Dict& opts=Dict());
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     MXFunction(const std::string& name, const std::vector<MX>& arg,
-               const MappedIO& res, const Dictionary& opts=Dictionary());
+               const MappedIO& res, const Dict& opts=Dict());
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     MXFunction(const std::string& name, const MappedIO& arg,
-               const MappedIO& res, const Dictionary& opts=Dictionary());
+               const MappedIO& res, const Dict& opts=Dict());
 
 #ifndef SWIG
 #ifdef USE_CXX11
@@ -102,19 +102,19 @@ namespace casadi {
     MXFunction(const std::string& name,
                std::initializer_list<MX> arg,
                std::initializer_list<MX> res,
-               const Dictionary& opts=Dictionary());
+               const Dict& opts=Dict());
 
     /** \brief Construct from vector & initializer list (new syntax, includes initialization) */
     MXFunction(const std::string& name,
                std::vector<MX> arg,
                std::initializer_list<MX> res,
-               const Dictionary& opts=Dictionary());
+               const Dict& opts=Dict());
 
     /** \brief Construct from initializer list & vector (new syntax, includes initialization) */
     MXFunction(const std::string& name,
                std::initializer_list<MX> arg,
                std::vector<MX> res,
-               const Dictionary& opts=Dictionary());
+               const Dict& opts=Dict());
 #endif // USE_CXX11
 #endif // SWIG
     /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
@@ -160,7 +160,7 @@ namespace casadi {
 
     /** \brief Called from constructor */
     void construct(const std::string& name, const std::vector<MX>& arg,
-                   const std::vector<MX>& res, const Dictionary& opts,
+                   const std::vector<MX>& res, const Dict& opts,
                    const std::vector<std::string>& ischeme=std::vector<std::string>(),
                    const std::vector<std::string>& oscheme=std::vector<std::string>());
 #endif // SWIG

@@ -85,7 +85,7 @@ namespace casadi {
 
     addOption("linear_solver",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linear_solver_options",    OT_DICT,   GenericType(),
               "Options to be passed to the linear solver.");
     addOption("psd_num_zero",             OT_REAL,         1e-12,
               "Numerical zero used in Periodic Schur decomposition with slicot."

@@ -33,11 +33,11 @@ namespace casadi {
   }
 
   Integrator::Integrator(const std::string& name, const std::string& solver, const Function& f,
-                         const Dictionary& opts) {
+                         const Dict& opts) {
     // Backwards DAE
     Function g;
-    Dictionary opts2 = opts;
-    Dictionary::const_iterator it=opts2.find("rdae");
+    Dict opts2 = opts;
+    Dict::const_iterator it=opts2.find("rdae");
     if (it!=opts2.end()) g = it->second;
     opts2.erase(it);
 

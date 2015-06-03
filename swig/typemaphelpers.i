@@ -524,7 +524,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           ) {
   int to_int(GUESTOBJECT *p, void *mv, int offs=0);
   int to_double(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_Dictionary(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_Dict(GUESTOBJECT *p, void *mv, int offs=0);
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs=0);
   int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs=0);
   int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs=0);
@@ -546,7 +546,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m);
 
   GUESTOBJECT * from_GenericType(const casadi::GenericType &a);
-  GUESTOBJECT * from_Dictionary(const casadi::GenericType::Dictionary &a);
+  GUESTOBJECT * from_Dict(const casadi::GenericType::Dict &a);
 
   swig_type_info * type_SX() { return $descriptor(casadi::Matrix<casadi::SXElement> *); }
   swig_type_info * type_DMatrix() { return $descriptor(casadi::Matrix<double> *); }

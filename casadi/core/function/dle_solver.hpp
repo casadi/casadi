@@ -99,7 +99,7 @@ namespace casadi {
      * \param st \structargument{Dle}
      */
     DleSolver(const std::string& name, const std::string& solver,
-              const DleStructure& st, const Dictionary& opts=Dictionary());
+              const DleStructure& st, const Dict& opts=Dict());
 
     /** \brief Constructor (no initialization, to be deprecated)
      * \param solver \pluginargument{DleSolver}

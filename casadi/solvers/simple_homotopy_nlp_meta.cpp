@@ -39,7 +39,7 @@
 "|                 |                 |                 | the Homotopy    |\n"
 "|                 |                 |                 | solver          |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"
-"| nlp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |\n"
+"| nlp_solver_opti | OT_DICT   | GenericType()   | Options to be   |\n"
 "| ons             |                 |                 | passed to the   |\n"
 "|                 |                 |                 | Homotopy solver |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"

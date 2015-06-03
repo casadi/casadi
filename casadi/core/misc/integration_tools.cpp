@@ -254,7 +254,7 @@ namespace casadi {
 
   MXFunction simpleIRK(Function f, int N, int order, const std::string& scheme,
                        const std::string& solver,
-                       const Dictionary& solver_options) {
+                       const Dict& solver_options) {
     // Initialize f, if needed
     f.init(false);
 
@@ -330,7 +330,7 @@ namespace casadi {
   }
 
   MXFunction simpleIntegrator(Function f, const std::string& integrator,
-                              const Dictionary& integrator_options) {
+                              const Dict& integrator_options) {
     // Initialize f, if needed
     f.init(false);
 

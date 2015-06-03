@@ -66,7 +66,7 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
     ///@}
 
     /// Parse an AMPL och PyOmo NL-file
-    void parseNL(const std::string& filename, const Dictionary& options = Dictionary());
+    void parseNL(const std::string& filename, const Dict& options = Dict());
 
     /// Print a description of the object
     void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;

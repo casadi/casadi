@@ -65,7 +65,7 @@ namespace casadi {
   void SXFunction::construct(const std::string& name,
                              const std::vector<SX>& arg,
                              const std::vector<SX>& res,
-                             const Dictionary& opts,
+                             const Dict& opts,
                              const std::vector<std::string>& ischeme,
                              const std::vector<std::string>& oscheme) {
     assignNode(new SXFunctionInternal(arg, res));
@@ -77,38 +77,38 @@ namespace casadi {
   }
 
   SXFunction::SXFunction(const std::string& name, const std::vector<SX>& arg,
-                         const std::vector<SX>& res, const Dictionary& opts) {
+                         const std::vector<SX>& res, const Dict& opts) {
     construct(name, arg, res, opts);
   }
 
   SXFunction::SXFunction(const std::string& name, const MappedIO& arg,
-                         const std::vector<SX>& res, const Dictionary& opts) {
+                         const std::vector<SX>& res, const Dict& opts) {
     construct(name, make_vector(arg), res, opts, arg.second);
   }
 
   SXFunction::SXFunction(const std::string& name, const std::vector<SX>& arg,
-                         const MappedIO& res, const Dictionary& opts) {
+                         const MappedIO& res, const Dict& opts) {
     construct(name, arg, make_vector(res), opts, std::vector<string>(), res.second);
   }
 
   SXFunction::SXFunction(const std::string& name, const MappedIO& arg,
-                         const MappedIO& res, const Dictionary& opts) {
+                         const MappedIO& res, const Dict& opts) {
     construct(name, make_vector(arg), make_vector(res), opts, arg.second, res.second);
   }
 
 #ifdef USE_CXX11
   SXFunction::SXFunction(const std::string& name, std::initializer_list<SX> arg,
-                         std::initializer_list<SX> res, const Dictionary& opts) {
+                         std::initializer_list<SX> res, const Dict& opts) {
     construct(name, vector<SX>(arg), vector<SX>(res), opts);
   }
 
   SXFunction::SXFunction(const std::string& name, std::vector<SX> arg,
-                         std::initializer_list<SX> res, const Dictionary& opts) {
+                         std::initializer_list<SX> res, const Dict& opts) {
     construct(name, arg, vector<SX>(res), opts);
   }
 
   SXFunction::SXFunction(const std::string& name, std::initializer_list<SX> arg,
-                         std::vector<SX> res, const Dictionary& opts) {
+                         std::vector<SX> res, const Dict& opts) {
     construct(name, vector<SX>(arg), res, opts);
   }
 #endif // USE_CXX11

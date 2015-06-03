@@ -994,10 +994,10 @@
 %exception  casadi::GenericType::is_a() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericType::toDictionary() const  {
+%exception  casadi::GenericType::toDict() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericType::toDictionary() {
+%exception  casadi::GenericType::toDict() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericType::toDoubleVector() const  {
@@ -3184,7 +3184,7 @@
 %exception  casadi::OptionsFunctionalityNode::repr(std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::OptionsFunctionalityNode::setOption(const Dictionary &dict, bool skipUnknown=false) {
+%exception  casadi::OptionsFunctionalityNode::setOption(const Dict &dict, bool skipUnknown=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OptionsFunctionalityNode::setOption(const std::string &str, const GenericType &val) {

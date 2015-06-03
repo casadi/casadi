@@ -76,7 +76,7 @@ int main(){
   NlpSolver solver("ipopt", nlp);
 
   // Mark the parameters amongst the variables (see sIPOPT documentation)
-  Dictionary var_integer_md;
+  Dict var_integer_md;
   int red_hessian[] = {0,1,2};
   var_integer_md["red_hessian"] = std::vector<int>(red_hessian,red_hessian+3);
   solver.setOption("var_integer_md",var_integer_md);

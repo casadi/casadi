@@ -62,7 +62,7 @@ namespace casadi {
 
     addOption("dple_solver",            OT_STRING, GenericType(),
               "User-defined DPLE solver class.");
-    addOption("dple",    OT_DICTIONARY,   GenericType(),
+    addOption("dple",    OT_DICT,   GenericType(),
               "Options to be passed to the DPLE solver.");
 
   }

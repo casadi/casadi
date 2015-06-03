@@ -347,13 +347,13 @@ namespace casadi {
     return monitors_.count(mod)>0;
   }
 
-  const Dictionary & FunctionInternal::getStats() const {
+  const Dict & FunctionInternal::getStats() const {
     return stats_;
   }
 
   GenericType FunctionInternal::getStat(const string & name) const {
     // Locate the statistic
-    Dictionary::const_iterator it = stats_.find(name);
+    Dict::const_iterator it = stats_.find(name);
 
     // Check if found
     if (it == stats_.end()) {

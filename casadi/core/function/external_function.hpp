@@ -47,13 +47,13 @@ class ExternalFunctionInternal;
     /** \brief  Load an external function 
      * File name is assumed to be ./<f_name>.so
      */
-    explicit ExternalFunction(const std::string& name, const Dictionary& opts=Dictionary());
+    explicit ExternalFunction(const std::string& name, const Dict& opts=Dict());
 
     /** \brief  Load an external function 
      * File name given
      */
     ExternalFunction(const std::string& name, const std::string& bin_name,
-                     const Dictionary& opts=Dictionary());
+                     const Dict& opts=Dict());
 
     /** \brief  Access functions of the node */
     ExternalFunctionInternal* operator->();

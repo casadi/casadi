@@ -91,7 +91,7 @@ namespace casadi {
     * \param solver \pluginargument{LinearSolver}
     */
     LinearSolver(const std::string& name, const std::string& solver,
-                 const Sparsity& sp, int nrhs=1, const Dictionary& opts=Dictionary());
+                 const Sparsity& sp, int nrhs=1, const Dict& opts=Dict());
 
     /** \brief Create a linear solver given a sparsity pattern
      * No initialization (to be deprecated)

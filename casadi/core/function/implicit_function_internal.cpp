@@ -39,7 +39,7 @@ namespace casadi {
   ImplicitFunctionInternal::ImplicitFunctionInternal(const Function& f) : f_(f) {
     addOption("linear_solver",            OT_STRING, "csparse",
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linear_solver_options",    OT_DICT,   GenericType(),
               "Options to be passed to the linear solver.");
     addOption("constraints",              OT_INTEGERVECTOR, GenericType(),
               "Constrain the unknowns. 0 (default): no constraint on ui, "
@@ -140,7 +140,7 @@ namespace casadi {
 
         // Pass options
         if (hasSetOption("linear_solver_options")) {
-          const Dictionary& linear_solver_options = getOption("linear_solver_options");
+          const Dict& linear_solver_options = getOption("linear_solver_options");
           linsol_.setOption(linear_solver_options);
         }
 

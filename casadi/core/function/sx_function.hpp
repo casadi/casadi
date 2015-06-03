@@ -78,38 +78,38 @@ namespace casadi {
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     SXFunction(const std::string& name, const std::vector<SX>& arg,
-               const std::vector<SX>& res, const Dictionary& opts=Dictionary());
+               const std::vector<SX>& res, const Dict& opts=Dict());
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     SXFunction(const std::string& name, const MappedIO& arg,
-               const std::vector<SX>& res, const Dictionary& opts=Dictionary());
+               const std::vector<SX>& res, const Dict& opts=Dict());
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     SXFunction(const std::string& name, const std::vector<SX>& arg,
-               const MappedIO& res, const Dictionary& opts=Dictionary());
+               const MappedIO& res, const Dict& opts=Dict());
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     SXFunction(const std::string& name, const MappedIO& arg,
-               const MappedIO& res, const Dictionary& opts=Dictionary());
+               const MappedIO& res, const Dict& opts=Dict());
 #ifndef SWIG
 #ifdef USE_CXX11
     /** \brief Construct from initializer lists (new syntax, includes initialization) */
     SXFunction(const std::string& name,
                std::initializer_list<SX> arg,
                std::initializer_list<SX> res,
-               const Dictionary& opts=Dictionary());
+               const Dict& opts=Dict());
 
     /** \brief Construct from vector & nitializer list (new syntax, includes initialization) */
     SXFunction(const std::string& name,
                std::vector<SX> arg,
                std::initializer_list<SX> res,
-               const Dictionary& opts=Dictionary());
+               const Dict& opts=Dict());
 
     /** \brief Construct from initializer list & vector (new syntax, includes initialization) */
     SXFunction(const std::string& name,
                std::initializer_list<SX> arg,
                std::vector<SX> res,
-               const Dictionary& opts=Dictionary());
+               const Dict& opts=Dict());
 #endif // USE_CXX11
 #endif // SWIG
 
@@ -221,7 +221,7 @@ namespace casadi {
 
     /** \brief Called from constructor */
     void construct(const std::string& name, const std::vector<SX>& arg,
-                   const std::vector<SX>& res, const Dictionary& opts,
+                   const std::vector<SX>& res, const Dict& opts,
                    const std::vector<std::string>& ischeme=std::vector<std::string>(),
                    const std::vector<std::string>& oscheme=std::vector<std::string>());
 #endif // SWIG

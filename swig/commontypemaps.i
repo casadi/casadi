@@ -213,8 +213,8 @@
       p = swig::from( a.toDoubleVector());
     }  else if (a.isStringVector()) {
       p = swig::from(a.toStringVector());
-    } else if (a.isDictionary()) {
-      p = from_Dictionary(a.toDictionary());
+    } else if (a.isDict()) {
+      p = from_Dict(a.toDict());
     } else if (a.isFunction()) {
       p = swig::from( a.toFunction());
     } else if (a.isNull()) {
@@ -239,11 +239,11 @@
   $result = ret;
 }
 
-%fragment("from"{Dictionary}, "header", fragment="fwd") {
-  GUESTOBJECT * from_Dictionary(const casadi::GenericType::Dictionary &a) {
+%fragment("from"{Dict}, "header", fragment="fwd") {
+  GUESTOBJECT * from_Dict(const casadi::GenericType::Dict &a) {
     PyObject *p = PyDict_New();
-    casadi::GenericType::Dictionary::const_iterator end = a.end();
-    for (casadi::GenericType::Dictionary::const_iterator it = a.begin(); it != end; ++it) {
+    casadi::GenericType::Dict::const_iterator end = a.end();
+    for (casadi::GenericType::Dict::const_iterator it = a.begin(); it != end; ++it) {
       PyObject * e = from_GenericType(it->second);
       if (!e) {
         Py_DECREF(p);
@@ -255,8 +255,8 @@
     return p;
   }
 }
-%typemap(out, noblock=1, fragment="from"{Dictionary}) const casadi::GenericType::Dictionary&  {
-  if(!($result = from_Dictionary(*$1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
+%typemap(out, noblock=1, fragment="from"{Dict}) const casadi::GenericType::Dict&  {
+  if(!($result = from_Dict(*$1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
 }
 #endif // SWIGPYTHON
 
@@ -617,7 +617,7 @@
       casadi::Function temp;
       if (!to_Function(p, &temp)) return false;
       if (m) *m = casadi::GenericType(temp);
-    } else if (to_Dictionary(p, 0) || to_DerivativeGenerator(p, 0) || to_Callback(p, 0)) {
+    } else if (to_Dict(p, 0) || to_DerivativeGenerator(p, 0) || to_Callback(p, 0)) {
       PyObject* gt = getCasadiObject("GenericType");
       if (!gt) return false;
 
@@ -648,15 +648,15 @@
  }
 
 #ifdef SWIGPYTHON
-%fragment("to"{Dictionary}, "header", fragment="fwd") {
-  int to_Dictionary(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::GenericType::Dictionary *m = static_cast<casadi::GenericType::Dictionary*>(mv);
+%fragment("to"{Dict}, "header", fragment="fwd") {
+  int to_Dict(GUESTOBJECT *p, void *mv, int offs) {
+    casadi::GenericType::Dict *m = static_cast<casadi::GenericType::Dict*>(mv);
     if (m) m += offs;
 #ifndef SWIGPYTHON
     return false;
 #else // SWIGPYTHON
-    casadi::GenericType::Dictionary *mp = 0;
-    if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::GenericType::Dictionary *), 0) != -1) {
+    casadi::GenericType::Dict *mp = 0;
+    if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::GenericType::Dict *), 0) != -1) {
       if (m) *m=*mp;
       return true;
     }
@@ -673,7 +673,7 @@
 #endif // SWIGPYTHON
   }
  }
-%casadi_typemaps_constref(Dictionary, PRECEDENCE_DICTIONARY, casadi::GenericType::Dictionary)
+%casadi_typemaps_constref(Dict, PRECEDENCE_DICTIONARY, casadi::GenericType::Dict)
 #endif
 
 %fragment("to"{SX}, "header", fragment="fwd") {

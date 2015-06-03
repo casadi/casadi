@@ -99,7 +99,7 @@ namespace casadi {
 
     g = diagcat(g_sdqp, g);
 
-    Dictionary opts;
+    Dict opts;
     opts["input_scheme"] = IOScheme("g_socp", "h_socp", "f_sdqp", "g_sdqp");
     opts["output_scheme"] = IOScheme("f", "g");
     mapping_ = MXFunction("mapping", make_vector(g_socp, h_socp, f_sdqp, g_sdqp),

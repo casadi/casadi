@@ -1904,14 +1904,14 @@ namespace casadi {
     return blockcat(blocks);
   }
 
-  MX MX::zz_solve(const MX& b, const std::string& lsolver, const Dictionary& dict) const {
+  MX MX::zz_solve(const MX& b, const std::string& lsolver, const Dict& dict) const {
     LinearSolver mysolver(lsolver, sparsity(), b.size2());
     mysolver.setOption(dict);
     mysolver.init();
     return mysolver.solve(*this, b, false);
   }
 
-  MX MX::zz_pinv(const std::string& lsolver, const Dictionary& dict) const {
+  MX MX::zz_pinv(const std::string& lsolver, const Dict& dict) const {
     if (size1()>=size2()) {
       return solve(mul(T(), *this), T(), lsolver, dict);
     } else {

@@ -62,11 +62,11 @@ public:
   *
   */
   Simulator(const std::string& name, const Integrator& integrator, const Function& output_fcn,
-            const Matrix<double>& grid, const Dictionary& opts=Dictionary());
+            const Matrix<double>& grid, const Dict& opts=Dict());
 
   /// Output function equal to the state (new syntax, includes initialization)
   Simulator(const std::string& name, const Integrator& integrator,
-            const Matrix<double>& grid, const Dictionary& opts=Dictionary());
+            const Matrix<double>& grid, const Dict& opts=Dict());
 
   /** \brief Constructor, no initialization (to be deprecated)
   * \param output_fcn output function which maps to n outputs.

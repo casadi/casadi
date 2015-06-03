@@ -39,7 +39,7 @@ using namespace std;
   CustomFunction::CustomFunction(const std::string& name, const CustomEvaluate &c_fcn,
                                  const std::vector<Sparsity>& inputscheme,
                                  const std::vector<Sparsity>& outputscheme,
-                                 const Dictionary& opts) {
+                                 const Dict& opts) {
     assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
     setOption("name", name);
     setOption(opts);

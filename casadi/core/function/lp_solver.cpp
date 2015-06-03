@@ -48,7 +48,7 @@ namespace casadi {
   }
 
   LpSolver::LpSolver(const std::string& name, const std::string& solver,
-                     const LPStructure& st, const Dictionary& opts) {
+                     const LPStructure& st, const Dict& opts) {
     assignNode(LpSolverInternal::instantiatePlugin(solver, st));
     setOption("name", name);
     setOption(opts);

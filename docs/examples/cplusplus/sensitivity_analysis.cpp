@@ -162,7 +162,7 @@ int main(){
         I.setOption("collocation_scheme","legendre");
 
         {
-          Dictionary kinsol_options;
+          Dict kinsol_options;
           kinsol_options["linear_solver"] = "csparse";
           I.setOption("implicit_solver_options",kinsol_options);
         }
@@ -176,7 +176,7 @@ int main(){
         I.setOption("collocation_scheme","legendre");
         I.setOption("implicit_solver", "kinsol");
         {
-          Dictionary kinsol_options;
+          Dict kinsol_options;
           kinsol_options["linear_solver"] = "csparse";
           I.setOption("implicit_solver_options",kinsol_options);
         }

@@ -44,11 +44,11 @@ namespace casadi {
 
     /** \brief Constructor (generic switch) */
     Switch(const std::string& name, const std::vector<Function>& f,
-           const Function& f_def, const Dictionary& opts=Dictionary());
+           const Function& f_def, const Dict& opts=Dict());
 
     /** \brief Constructor (if-else) */
     Switch(const std::string& name, const Function& f_true,
-           const Function& f_false, const Dictionary& opts=Dictionary());
+           const Function& f_false, const Dict& opts=Dict());
 
     /** \brief  Access functions of the node */
     SwitchInternal* operator->();

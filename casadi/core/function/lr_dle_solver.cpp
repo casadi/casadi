@@ -68,7 +68,7 @@ namespace casadi {
   }
 
   LrDleSolver::LrDleSolver(const std::string& name, const std::string& solver,
-                           const LrDleStructure& st, const Dictionary& opts) {
+                           const LrDleStructure& st, const Dict& opts) {
     assignNode(LrDleInternal::instantiatePlugin(solver, st));
     setOption("name", name);
     setOption(opts);

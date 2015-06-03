@@ -89,7 +89,7 @@
 "|                 |                 |                 | to be used by   |\n"
 "|                 |                 |                 | the SQP method  |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"
-"| qp_solver_optio | OT_DICTIONARY   | GenericType()   | Options to be   |\n"
+"| qp_solver_optio | OT_DICT   | GenericType()   | Options to be   |\n"
 "| ns              |                 |                 | passed to the   |\n"
 "|                 |                 |                 | QP solver       |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"

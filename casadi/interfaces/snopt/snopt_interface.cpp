@@ -506,7 +506,7 @@ namespace casadi {
     checkInitialBounds();
 
     if (gather_stats_) {
-      Dictionary iterations;
+      Dict iterations;
       iterations["inf_pr"] = std::vector<double>();
       iterations["inf_du"] = std::vector<double>();
       iterations["merit"] = std::vector<double>();
@@ -888,7 +888,7 @@ namespace casadi {
     try {
       n_iter_+=1;
       if (gather_stats_) {
-        Dictionary & iterations = stats_["iterations"];
+        Dict & iterations = stats_["iterations"];
         static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(prInf);
         static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(duInf);
         static_cast<std::vector<double> &>(iterations["merit"]).push_back(fMrt);

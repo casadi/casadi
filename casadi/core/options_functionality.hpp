@@ -80,7 +80,7 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
     The setOptions are only considered before the init function.
     If properties changes, the init function should be called again.
     */
-    void setOption(const Dictionary& dict, bool skipUnknown = false);
+    void setOption(const Dict& dict, bool skipUnknown = false);
 
     /** \brief  get an option value */
     GenericType getOption(const std::string &str) const;
@@ -98,7 +98,7 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
     void copyOptions(const OptionsFunctionality& obj, bool skipUnknown = false);
 
     /** \brief  Get the dictionary */
-    const Dictionary& dictionary() const;
+    const Dict& dictionary() const;
 
 /// @}
     /** \brief Get a list of all option names */
@@ -164,7 +164,7 @@ virtual ~OptionsFunctionalityNode();
   If properties changes, the init function should be called again.
   (Ticket #54)
   */
-  void setOption(const Dictionary& dict, bool skipUnknown = false);
+  void setOption(const Dict& dict, bool skipUnknown = false);
 
   /** \brief Get a list of all option names */
   std::vector<std::string> getOptionNames() const;
@@ -223,7 +223,7 @@ virtual ~OptionsFunctionalityNode();
   void copyOptions(const OptionsFunctionality& obj, bool skipUnknown = false);
 
   /** \brief  Get the dictionary */
-  const Dictionary& dictionary() const;
+  const Dict& dictionary() const;
 
   /** \brief Get the best suggestions for a misspelled word using a dictionary
   *
@@ -281,10 +281,10 @@ private:
   std::map<std::string, opt_type> allowed_options;
 
 /** \brief  User-set options */
-  Dictionary dictionary_;
+  Dict dictionary_;
 
 /** \brief  Option defaults */
-  Dictionary defaults_;
+  Dict defaults_;
 
 /** \brief  Description for the options */
   std::map<std::string, std::string> description_;

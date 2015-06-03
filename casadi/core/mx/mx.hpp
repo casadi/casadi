@@ -481,8 +481,8 @@ namespace casadi {
                                             const std::vector<MX>& boundary = std::vector<MX>());
     MX zz_kron(const MX& b) const;
     MX zz_solve(const MX& b, const std::string& lsolver,
-                const Dictionary& dict = Dictionary()) const;
-    MX zz_pinv(const std::string& lsolver, const Dictionary& dict = Dictionary()) const;
+                const Dict& dict = Dict()) const;
+    MX zz_pinv(const std::string& lsolver, const Dict& dict = Dict()) const;
     MX zz_nullspace() const;
     bool zz_isEqual(const MX& y, int depth=0) const;
 #ifndef SWIG

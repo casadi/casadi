@@ -38,7 +38,7 @@ namespace casadi {
       : FixedStepIntegrator(f, g) {
     addOption("implicit_solver",               OT_STRING,  GenericType(),
               "An implicit function solver");
-    addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(),
+    addOption("implicit_solver_options",       OT_DICT, GenericType(),
               "Options to be passed to the NLP Solver");
   }
 
@@ -67,7 +67,7 @@ namespace casadi {
 
     // Pass options
     if (hasSetOption("implicit_solver_options")) {
-      const Dictionary& implicit_solver_options = getOption("implicit_solver_options");
+      const Dict& implicit_solver_options = getOption("implicit_solver_options");
       implicit_solver_.setOption(implicit_solver_options);
     }
 
@@ -90,7 +90,7 @@ namespace casadi {
 
       // Pass options
       if (hasSetOption("implicit_solver_options")) {
-        const Dictionary& backward_implicit_solver_options = getOption("implicit_solver_options");
+        const Dict& backward_implicit_solver_options = getOption("implicit_solver_options");
         backward_implicit_solver_.setOption(backward_implicit_solver_options);
       }
 

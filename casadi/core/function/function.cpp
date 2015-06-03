@@ -171,7 +171,7 @@ namespace casadi {
     (*this)->monitors_.erase(mon);
   }
 
-  const Dictionary & Function::getStats() const {
+  const Dict & Function::getStats() const {
     return (*this)->getStats();
   }
 
@@ -467,11 +467,11 @@ namespace casadi {
     (*this)->setDerReverse(fcn, nadj);
   }
 
-  void Function::generate(const Dictionary& opts) {
+  void Function::generate(const Dict& opts) {
     generate(getSanitizedName(), opts);
   }
 
-  void Function::generate(const string& fname, const Dictionary& opts) {
+  void Function::generate(const string& fname, const Dict& opts) {
     CodeGenerator gen(opts);
     gen.add(*this, fname);
     gen.generate(fname);

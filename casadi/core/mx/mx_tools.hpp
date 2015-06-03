@@ -177,7 +177,7 @@ namespace casadi {
   */
   inline MX
   solve(const MX& A, const MX& b, const std::string& lsolver = "symbolicqr",
-        const Dictionary& dict = Dictionary()) { return A.zz_solve(b, lsolver, dict);}
+        const Dict& dict = Dict()) { return A.zz_solve(b, lsolver, dict);}
 
   /** \brief Computes the Moore-Penrose pseudo-inverse
   *
@@ -186,7 +186,7 @@ namespace casadi {
   *
   */
   inline MX pinv(const MX& A, const std::string& lsolver,
-                 const Dictionary& dict = Dictionary()) { return A.zz_pinv(lsolver, dict);}
+                 const Dict& dict = Dict()) { return A.zz_pinv(lsolver, dict);}
 
   /** \brief Find first nonzero
    * If failed, returns the number of rows

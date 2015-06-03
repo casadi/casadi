@@ -48,7 +48,7 @@ namespace casadi {
               "Beginning of the time horizon");
     addOption("tf",                       OT_REAL,        1.0,
               "End of the time horizon");
-    addOption("augmented_options",        OT_DICTIONARY,  GenericType(),
+    addOption("augmented_options",        OT_DICT,  GenericType(),
               "Options to be passed down to the augmented integrator, if one is constructed.");
     addOption("expand_augmented",         OT_BOOLEAN,     true,
               "If DAE callback functions are SXFunction, have augmented"

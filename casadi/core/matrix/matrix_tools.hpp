@@ -72,7 +72,7 @@ namespace casadi {
   */
   CASADI_EXPORT Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b,
                                           const std::string& lsolver,
-                                          const Dictionary& dict = Dictionary());
+                                          const Dict& dict = Dict());
 
 
   /** \brief Computes the Moore-Penrose pseudo-inverse
@@ -82,7 +82,7 @@ namespace casadi {
   *
   */
   CASADI_EXPORT Matrix<double> pinv(const Matrix<double>& A, const std::string& lsolver,
-                                    const Dictionary& dict = Dictionary());
+                                    const Dict& dict = Dict());
 /*
 @}
 */

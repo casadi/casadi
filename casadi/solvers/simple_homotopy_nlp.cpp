@@ -57,7 +57,7 @@ namespace casadi {
       : HomotopyNLPInternal(nlp) {
     addOption("nlp_solver",         OT_STRING,   GenericType(),
               "The NLP solver to be used by the Homotopy solver");
-    addOption("nlp_solver_options", OT_DICTIONARY, GenericType(),
+    addOption("nlp_solver_options", OT_DICT, GenericType(),
               "Options to be passed to the Homotopy solver");
 
     //addOption("max_step",            OT_REAL,      1.,

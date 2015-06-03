@@ -44,7 +44,7 @@ namespace casadi {
     OT_BOOLVECTOR,
     OT_REALVECTOR,
     OT_STRINGVECTOR,
-    OT_DICTIONARY,
+    OT_DICT,
     OT_DERIVATIVEGENERATOR,
     OT_FUNCTION,
     OT_CALLBACK,
@@ -85,8 +85,8 @@ namespace casadi {
     /// Construct a GenericType given an opt_type
     static GenericType from_type(opt_type type);
 
-    typedef std::map<std::string, GenericType> Dictionary;
-    GenericType(const Dictionary& dict);
+    typedef std::map<std::string, GenericType> Dict;
+    GenericType(const Dict& dict);
 
     /// Creator functions
     GenericType(const DerivativeGenerator& c);
@@ -151,7 +151,7 @@ namespace casadi {
     bool isSharedObject() const;
 
     //! \brief Is a shared object?
-    bool isDictionary() const;
+    bool isDict() const;
 
     //! \brief Is a shared object?
     bool isFunction() const;
@@ -194,12 +194,12 @@ namespace casadi {
     //! \brief Convert to shared object
     const SharedObject& toSharedObject() const;
 
-    //! \brief Convert to Dictionary
-    const Dictionary& toDictionary() const;
+    //! \brief Convert to Dict
+    const Dict& toDict() const;
 
     #ifndef SWIG
-    //! \brief Convert to Dictionary
-    Dictionary& toDictionary();
+    //! \brief Convert to Dict
+    Dict& toDict();
     #endif
 
     //! \brief Convert to shared object
@@ -229,7 +229,7 @@ namespace casadi {
   };
 
   /// C++ version of Python's dictionary
-  typedef GenericType::Dictionary Dictionary;
+  typedef GenericType::Dict Dict;
 
 } // namespace casadi
 

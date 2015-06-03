@@ -53,7 +53,7 @@ public:
   CustomFunction(const std::string& name, const CustomEvaluate &c_fcn,
                  const std::vector<Sparsity>& inputscheme,
                  const std::vector<Sparsity>& outputscheme,
-                 const Dictionary& opts=Dictionary());
+                 const Dict& opts=Dict());
 
   ///@{
   //typedef std::pair<std::map<std::string, Sparsity>, std::vector<std::string> > MappedIO;

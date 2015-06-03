@@ -93,7 +93,7 @@ namespace casadi {
   CASADI_EXPORT
   MXFunction simpleIRK(Function f, int N=10, int order=4, const std::string& scheme="radau",
                        const std::string& solver="newton",
-                       const Dictionary& solver_options = Dictionary());
+                       const Dict& solver_options = Dict());
 
   /** \brief Simplified wrapper for the Integrator class
    * Constructs an integrator using the same syntax as simpleRK and simpleIRK.
@@ -108,7 +108,7 @@ namespace casadi {
   */
   CASADI_EXPORT
   MXFunction simpleIntegrator(Function f, const std::string& integrator="cvodes",
-                              const Dictionary& integrator_options = Dictionary());
+                              const Dict& integrator_options = Dict());
 } // namespace casadi
 
 #endif // CASADI_INTEGRATION_TOOLS_HPP

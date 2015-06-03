@@ -142,7 +142,7 @@ namespace casadi {
     if (verbose())  cout << "SXFunctionInternal::hess: calculating gradient done " << endl;
 
     // Create function
-    Dictionary opts;
+    Dict opts;
     opts["verbose"] = getOption("verbose");
     SXFunction gfcn("gfcn", make_vector(inputv_.at(iind)),
                     make_vector(g), opts);

@@ -39,7 +39,7 @@ namespace casadi {
 
     addOption("sdp_solver",       OT_STRING, GenericType(),
               "The SdqpSolver used to solve the SDPs.");
-    addOption("sdp_solver_options",       OT_DICTIONARY, GenericType(),
+    addOption("sdp_solver_options",       OT_DICT, GenericType(),
               "Options to be passed to the SDPSOlver");
 
     casadi_assert_message(st_.size()==SDQP_STRUCT_NUM, "Problem structure mismatch");

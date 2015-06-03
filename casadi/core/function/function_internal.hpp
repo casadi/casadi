@@ -302,7 +302,7 @@ namespace casadi {
     int numelOut() const;
 
     /// Get all statistics obtained at the end of the last evaluate call
-    const Dictionary & getStats() const;
+    const Dict & getStats() const;
 
     /// Get single statistic obtained at the end of the last evaluate call
     GenericType getStat(const std::string & name) const;
@@ -551,8 +551,8 @@ namespace casadi {
     /// Set of module names which are extra monitored
     std::set<std::string> monitors_;
 
-    /** \brief  Dictionary of statistics (resulting from evaluate) */
-    Dictionary stats_;
+    /** \brief  Dict of statistics (resulting from evaluate) */
+    Dict stats_;
 
     /** \brief  Flag to indicate whether statistics must be gathered */
     bool gather_stats_;

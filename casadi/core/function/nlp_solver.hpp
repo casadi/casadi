@@ -217,7 +217,7 @@ namespace casadi {
        *
        *  \endparblock
        */
-      const Dictionary& opts=Dictionary()
+      const Dict& opts=Dict()
       ); // NOLINT(whitespace/parens)
 
     /// NLP solver factory, no initialization (to be deprecated)

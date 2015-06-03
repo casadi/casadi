@@ -54,9 +54,9 @@ namespace casadi {
               "construct a linearly spaced grid.");
     addOption("integrator",               OT_STRING, GenericType(),
               "An integrator creator function");
-    addOption("integrator_options",       OT_DICTIONARY, GenericType(),
+    addOption("integrator_options",       OT_DICT, GenericType(),
               "Options to be passed to the integrator");
-    addOption("simulator_options",       OT_DICTIONARY, GenericType(),
+    addOption("simulator_options",       OT_DICT, GenericType(),
               "Options to be passed to the simulator");
     addOption("control_interpolation",   OT_STRING,     "none", "none|nearest|linear");
     addOption("control_endpoint",        OT_BOOLEAN,       false,

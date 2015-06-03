@@ -85,7 +85,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>"radau"</td><td>Collocation scheme (radau|legendre)</td><td>casadi::CollocationIntegrator</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
@@ -93,7 +93,7 @@
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_solver</td><td>OT_STRING</td><td>GenericType()</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>3</td><td>Order of the interpolating polynomials</td><td>casadi::CollocationIntegrator</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
@@ -116,7 +116,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>"radau"</td><td>Collocation scheme (radau|legendre)</td></tr>
 <tr><td>implicit_solver</td><td>OT_STRING</td><td>GenericType()</td><td>An implicit function solver</td></tr>
-<tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>3</td><td>Order of the interpolating polynomials</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td></tr>
 </table>
@@ -172,13 +172,13 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>integrator</td><td>OT_STRING</td><td>GenericType()</td><td>An integrator creator function</td><td>casadi::ControlSimulatorInternal</td></tr>
-<tr><td>integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>casadi::ControlSimulatorInternal</td></tr>
+<tr><td>integrator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>minor_grid</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>The local grid used on each major interval, with time normalized to 1. By default, option 'nf' is used to construct a linearly spaced grid.</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>nf</td><td>OT_INTEGER</td><td>1</td><td>Number of minor grained integration steps per major interval. nf&gt;0 must hold. This option is not used when 'minor_grid' is provided.</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>simulator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the simulator</td><td>casadi::ControlSimulatorInternal</td></tr>
+<tr><td>simulator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the simulator</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -200,13 +200,13 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>integrator</td><td>OT_STRING</td><td>GenericType()</td><td>An integrator creator function</td><td>casadi::ControlSimulatorInternal</td></tr>
-<tr><td>integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>casadi::ControlSimulatorInternal</td></tr>
+<tr><td>integrator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>minor_grid</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>The local grid used on each major interval, with time normalized to 1. By default, option 'nf' is used to construct a linearly spaced grid.</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>nf</td><td>OT_INTEGER</td><td>1</td><td>Number of minor grained integration steps per major interval. nf&gt;0 must hold. This option is not used when 'minor_grid' is provided.</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>simulator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the simulator</td><td>casadi::ControlSimulatorInternal</td></tr>
+<tr><td>simulator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the simulator</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -342,7 +342,7 @@
 <tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable CVodes internal warning messages</td><td>casadi::CvodesInterface</td></tr>
@@ -365,8 +365,8 @@
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>"bdf"</td><td>Integrator scheme (bdf|adams)</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>GenericType()</td><td>(user_defined|dense|banded|iterative)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
@@ -423,8 +423,8 @@
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>"bdf"</td><td>Integrator scheme (bdf|adams)</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td></tr>
-<tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver</td></tr>
+<tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td></tr>
 <tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>GenericType()</td><td>(user_defined|dense|banded|iterative)</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td></tr>
@@ -828,7 +828,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
@@ -945,7 +945,7 @@
 <tr><td>abstolv</td><td>OT_REALVECTOR</td><td></td><td></td><td>casadi::IdasInterface</td></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>Use IDACalcIC to get consistent initial conditions.</td><td>casadi::IdasInterface</td></tr>
 <tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Use IDACalcIC to get consistent initial conditions for backwards system [default: equal to calc_ic].</td><td>casadi::IdasInterface</td></tr>
 <tr><td>cj_scaling</td><td>OT_BOOLEAN</td><td>false</td><td>IDAS scaling on cj for the user-defined linear solver module</td><td>casadi::IdasInterface</td></tr>
@@ -973,8 +973,8 @@
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>(gmres|bcgstab|tfqmr)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>GenericType()</td><td>(user_defined|dense|banded|iterative)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
@@ -1038,8 +1038,8 @@
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>(gmres|bcgstab|tfqmr)</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td></tr>
-<tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver</td></tr>
+<tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td></tr>
 <tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>GenericType()</td><td>(user_defined|dense|banded|iterative)</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td></tr>
@@ -1073,14 +1073,14 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_solver</td><td>OT_STRING</td><td>GenericType()</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
@@ -1114,7 +1114,7 @@
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for solving the linearized problem (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
@@ -1142,7 +1142,7 @@
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for solving the linearized problem (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
@@ -1159,7 +1159,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
@@ -1185,7 +1185,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
@@ -1242,9 +1242,9 @@
 <tr><td>chi_hat</td><td>OT_REAL</td><td>2.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>chi_tilde</td><td>OT_REAL</td><td>5.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>compl_inf_tol</td><td>OT_REAL</td><td>0.0001</td><td>Desired threshold for the complementarity conditions. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>con_integer_md</td><td>OT_DICTIONARY</td><td>None</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>con_numeric_md</td><td>OT_DICTIONARY</td><td>None</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>con_string_md</td><td>OT_DICTIONARY</td><td>None</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>con_integer_md</td><td>OT_DICT</td><td>None</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>con_numeric_md</td><td>OT_DICT</td><td>None</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>con_string_md</td><td>OT_DICT</td><td>None</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>constr_mult_init_max</td><td>OT_REAL</td><td>1000.0</td><td>Maximum allowed least-square guess of constraint multipliers. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>constr_mult_reset_threshold</td><td>OT_REAL</td><td>0.0</td><td>Threshold for resetting equality and inequality multipliers after restoration phase. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>constr_viol_tol</td><td>OT_REAL</td><td>0.0001</td><td>Desired threshold for the constraint violation. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1513,9 +1513,9 @@
 <tr><td>tiny_step_y_tol</td><td>OT_REAL</td><td>0.01</td><td>Tolerance for quitting because of numerically insignificant steps. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td>1e-08</td><td>Desired convergence tolerance (relative). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>var_integer_md</td><td>OT_DICTIONARY</td><td>None</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>var_numeric_md</td><td>OT_DICTIONARY</td><td>None</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>var_string_md</td><td>OT_DICTIONARY</td><td>None</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>var_integer_md</td><td>OT_DICT</td><td>None</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>var_numeric_md</td><td>OT_DICT</td><td>None</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>var_string_md</td><td>OT_DICT</td><td>None</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>vartheta</td><td>OT_REAL</td><td>0.5</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>warm_start_bound_frac</td><td>OT_REAL</td><td>0.001</td><td>same as bound_frac for the regular initializer. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1572,9 +1572,9 @@
 <tr><td>chi_hat</td><td>OT_REAL</td><td>2.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
 <tr><td>chi_tilde</td><td>OT_REAL</td><td>5.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
 <tr><td>compl_inf_tol</td><td>OT_REAL</td><td>0.0001</td><td>Desired threshold for the complementarity conditions. (see IPOPT documentation)</td></tr>
-<tr><td>con_integer_md</td><td>OT_DICTIONARY</td><td>None</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT</td></tr>
-<tr><td>con_numeric_md</td><td>OT_DICTIONARY</td><td>None</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td></tr>
-<tr><td>con_string_md</td><td>OT_DICTIONARY</td><td>None</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to IPOPT</td></tr>
+<tr><td>con_integer_md</td><td>OT_DICT</td><td>None</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT</td></tr>
+<tr><td>con_numeric_md</td><td>OT_DICT</td><td>None</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td></tr>
+<tr><td>con_string_md</td><td>OT_DICT</td><td>None</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to IPOPT</td></tr>
 <tr><td>constr_mult_init_max</td><td>OT_REAL</td><td>1000.0</td><td>Maximum allowed least-square guess of constraint multipliers. (see IPOPT documentation)</td></tr>
 <tr><td>constr_mult_reset_threshold</td><td>OT_REAL</td><td>0.0</td><td>Threshold for resetting equality and inequality multipliers after restoration phase. (see IPOPT documentation)</td></tr>
 <tr><td>constr_viol_tol</td><td>OT_REAL</td><td>0.0001</td><td>Desired threshold for the constraint violation. (see IPOPT documentation)</td></tr>
@@ -1823,9 +1823,9 @@
 <tr><td>tiny_step_tol</td><td>OT_REAL</td><td>2.22044604925e-15</td><td>Tolerance for detecting numerically insignificant steps. (see IPOPT documentation)</td></tr>
 <tr><td>tiny_step_y_tol</td><td>OT_REAL</td><td>0.01</td><td>Tolerance for quitting because of numerically insignificant steps. (see IPOPT documentation)</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td>1e-08</td><td>Desired convergence tolerance (relative). (see IPOPT documentation)</td></tr>
-<tr><td>var_integer_md</td><td>OT_DICTIONARY</td><td>None</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td></tr>
-<tr><td>var_numeric_md</td><td>OT_DICTIONARY</td><td>None</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td></tr>
-<tr><td>var_string_md</td><td>OT_DICTIONARY</td><td>None</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td></tr>
+<tr><td>var_integer_md</td><td>OT_DICT</td><td>None</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td></tr>
+<tr><td>var_numeric_md</td><td>OT_DICT</td><td>None</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td></tr>
+<tr><td>var_string_md</td><td>OT_DICT</td><td>None</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td></tr>
 <tr><td>vartheta</td><td>OT_REAL</td><td>0.5</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td></tr>
 <tr><td>warm_start_bound_frac</td><td>OT_REAL</td><td>0.001</td><td>same as bound_frac for the regular initializer. (see IPOPT documentation)</td></tr>
 <tr><td>warm_start_bound_push</td><td>OT_REAL</td><td>0.001</td><td>same as bound_push for the regular initializer. (see IPOPT documentation)</td></tr>
@@ -1867,7 +1867,7 @@
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for solving the linearized problem (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>dense|banded|iterative|user_defined</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td></td><td>casadi::KinsolInterface</td></tr>
 <tr><td>max_iter</td><td>OT_INTEGER</td><td>0</td><td>Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.</td><td>casadi::KinsolInterface</td></tr>
@@ -2431,7 +2431,7 @@
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>dple</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the DPLE solver.</td><td>casadi::LrDpleToLrDle</td></tr>
+<tr><td>dple</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the DPLE solver.</td><td>casadi::LrDpleToLrDle</td></tr>
 <tr><td>dple_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined DPLE solver class.</td><td>casadi::LrDpleToLrDle</td></tr>
 <tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::LrDleInternal</td></tr>
@@ -2453,7 +2453,7 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
-<tr><td>dple</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the DPLE solver.</td></tr>
+<tr><td>dple</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the DPLE solver.</td></tr>
 <tr><td>dple_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined DPLE solver class.</td></tr>
 </table>
 */
@@ -2521,7 +2521,7 @@
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for solving the linearized problem (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>max_iter</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of Newton iterations to perform before returning.</td><td>casadi::Newton</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(step|stepsize|J|F|normF)</td><td>casadi::FunctionInternal<br />casadi::Newton</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
@@ -2663,7 +2663,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>"radau"</td><td>Collocation scheme (radau|legendre)</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
@@ -2674,7 +2674,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>hotstart</td><td>OT_BOOLEAN</td><td>true</td><td>Initialize the trajectory at the previous solution</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>implicit_solver</td><td>OT_STRING</td><td>GenericType()</td><td>An implicit function solver</td><td>casadi::OldCollocationIntegrator</td></tr>
-<tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the implicit solver</td><td>casadi::OldCollocationIntegrator</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the implicit solver</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>3</td><td>Order of the interpolating polynomials</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
@@ -2683,7 +2683,7 @@
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>startup_integrator</td><td>OT_STRING</td><td>GenericType()</td><td>An ODE/DAE integrator that can be used to generate a startup trajectory</td><td>casadi::OldCollocationIntegrator</td></tr>
-<tr><td>startup_integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the startup integrator</td><td>casadi::OldCollocationIntegrator</td></tr>
+<tr><td>startup_integrator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the startup integrator</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -2702,11 +2702,11 @@
 <tr><td>expand_q</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the quadrature function in an SX graph</td></tr>
 <tr><td>hotstart</td><td>OT_BOOLEAN</td><td>true</td><td>Initialize the trajectory at the previous solution</td></tr>
 <tr><td>implicit_solver</td><td>OT_STRING</td><td>GenericType()</td><td>An implicit function solver</td></tr>
-<tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the implicit solver</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the implicit solver</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>3</td><td>Order of the interpolating polynomials</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td></tr>
 <tr><td>startup_integrator</td><td>OT_STRING</td><td>GenericType()</td><td>An ODE/DAE integrator that can be used to generate a startup trajectory</td></tr>
-<tr><td>startup_integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the startup integrator</td></tr>
+<tr><td>startup_integrator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the startup integrator</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -2783,7 +2783,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::PsdIndefDpleInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::PsdIndefDpleInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::PsdIndefDpleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
@@ -2801,7 +2801,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td></tr>
 <tr><td>psd_num_zero</td><td>OT_REAL</td><td>1e-12</td><td>Numerical zero used in Periodic Schur decomposition with slicot.This option is needed when your systems has Floquet multiplierszero or close to zero</td></tr>
 </table>
 */
@@ -2939,7 +2939,7 @@
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for solving the linearized problem (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
@@ -3117,7 +3117,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
@@ -3233,7 +3233,7 @@
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td><td>casadi::Scpgen</td></tr>
 <tr><td>print_x</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Which variables to print.</td><td>casadi::Scpgen</td></tr>
 <tr><td>qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QP solver to be used by the SQP method</td><td>casadi::Scpgen</td></tr>
-<tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QP solver</td><td>casadi::Scpgen</td></tr>
+<tr><td>qp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the QP solver</td><td>casadi::Scpgen</td></tr>
 <tr><td>reg_threshold</td><td>OT_REAL</td><td>1e-8</td><td>Threshold for the regularization.</td><td>casadi::Scpgen</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularize</td><td>OT_BOOLEAN</td><td>false</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Scpgen</td></tr>
@@ -3268,7 +3268,7 @@
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td></tr>
 <tr><td>print_x</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Which variables to print.</td></tr>
 <tr><td>qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QP solver to be used by the SQP method</td></tr>
-<tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QP solver</td></tr>
+<tr><td>qp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the QP solver</td></tr>
 <tr><td>reg_threshold</td><td>OT_REAL</td><td>1e-8</td><td>Threshold for the regularization.</td></tr>
 <tr><td>regularize</td><td>OT_BOOLEAN</td><td>false</td><td>Automatic regularization of Lagrange Hessian.</td></tr>
 <tr><td>tol_du</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion for dual infeasability</td></tr>
@@ -3343,7 +3343,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdqpSolver used to solve the SDPs.</td><td>casadi::SdqpSolverInternal</td></tr>
-<tr><td>sdp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpSolverInternal</td></tr>
+<tr><td>sdp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpSolverInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3366,7 +3366,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdqpSolver used to solve the SDPs.</td><td>casadi::SdqpSolverInternal</td></tr>
-<tr><td>sdp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpSolverInternal</td></tr>
+<tr><td>sdp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpSolverInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3389,7 +3389,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdqpSolver used to solve the SDPs.</td><td>casadi::SdqpSolverInternal</td></tr>
-<tr><td>sdp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpSolverInternal</td></tr>
+<tr><td>sdp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpSolverInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3421,7 +3421,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>nlp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The NLP solver to be used by the Homotopy solver</td><td>casadi::SimpleHomotopyNlp</td></tr>
-<tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the Homotopy solver</td><td>casadi::SimpleHomotopyNlp</td></tr>
+<tr><td>nlp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the Homotopy solver</td><td>casadi::SimpleHomotopyNlp</td></tr>
 <tr><td>num_steps</td><td>OT_INTEGER</td><td>10</td><td>Take this many steps to go from tau=0 to tau=1.</td><td>casadi::SimpleHomotopyNlp</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -3436,7 +3436,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
 <tr><td>nlp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The NLP solver to be used by the Homotopy solver</td></tr>
-<tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the Homotopy solver</td></tr>
+<tr><td>nlp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the Homotopy solver</td></tr>
 <tr><td>num_steps</td><td>OT_INTEGER</td><td>10</td><td>Take this many steps to go from tau=0 to tau=1.</td></tr>
 </table>
 */
@@ -3457,7 +3457,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::SimpleIndefCleInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::SimpleIndefCleInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::SimpleIndefCleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::CleInternal</td></tr>
@@ -3474,7 +3474,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -3495,7 +3495,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::SimpleIndefDleInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::SimpleIndefDleInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::SimpleIndefDleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DleInternal</td></tr>
@@ -3513,7 +3513,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
 <tr><td>compressed_solve</td><td>OT_BOOLEAN</td><td>true</td><td>When a system with sparse rhs arises, compress toa smaller system with dense rhs.</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -3534,7 +3534,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::SimpleIndefDpleInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::SimpleIndefDpleInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::SimpleIndefDpleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
@@ -3551,7 +3551,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -3912,7 +3912,7 @@
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QP solver to be used by the SQP method</td><td>casadi::Sqpmethod</td></tr>
-<tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QP solver</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>qp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the QP solver</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularize</td><td>OT_BOOLEAN</td><td>false</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>tol_du</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion for dual infeasability</td><td>casadi::Sqpmethod</td></tr>
@@ -3940,7 +3940,7 @@
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td></tr>
 <tr><td>qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QP solver to be used by the SQP method</td></tr>
-<tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QP solver</td></tr>
+<tr><td>qp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the QP solver</td></tr>
 <tr><td>regularize</td><td>OT_BOOLEAN</td><td>false</td><td>Automatic regularization of Lagrange Hessian.</td></tr>
 <tr><td>tol_du</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion for dual infeasability</td></tr>
 <tr><td>tol_pr</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion for primal infeasibility</td></tr>
@@ -4005,7 +4005,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QP solver used to solve the stabilized QPs.</td><td>casadi::StabilizedQpToQp</td></tr>
-<tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QP solver instance</td><td>casadi::StabilizedQpToQp</td></tr>
+<tr><td>qp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the QP solver instance</td><td>casadi::StabilizedQpToQp</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -4019,7 +4019,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
 <tr><td>qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QP solver used to solve the stabilized QPs.</td></tr>
-<tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QP solver instance</td></tr>
+<tr><td>qp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the QP solver instance</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -4103,7 +4103,7 @@
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularize</td><td>OT_BOOLEAN</td><td>false</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>stabilized_qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The Stabilized QP solver to be used by the SQP method</td><td>casadi::StabilizedSqp</td></tr>
-<tr><td>stabilized_qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the Stabilized QP solver</td><td>casadi::StabilizedSqp</td></tr>
+<tr><td>stabilized_qp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the Stabilized QP solver</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>tau0</td><td>OT_REAL</td><td>1e-2</td><td>Initial parameter for the merit function optimality threshold.</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>tol_du</td><td>OT_REAL</td><td>1e-5</td><td>Stopping criterion for dual infeasability</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>tol_pr</td><td>OT_REAL</td><td>1e-5</td><td>Stopping criterion for primal infeasibility</td><td>casadi::StabilizedSqp</td></tr>
@@ -4143,7 +4143,7 @@
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td></tr>
 <tr><td>regularize</td><td>OT_BOOLEAN</td><td>false</td><td>Automatic regularization of Lagrange Hessian.</td></tr>
 <tr><td>stabilized_qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The Stabilized QP solver to be used by the SQP method</td></tr>
-<tr><td>stabilized_qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the Stabilized QP solver</td></tr>
+<tr><td>stabilized_qp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the Stabilized QP solver</td></tr>
 <tr><td>tau0</td><td>OT_REAL</td><td>1e-2</td><td>Initial parameter for the merit function optimality threshold.</td></tr>
 <tr><td>tol_du</td><td>OT_REAL</td><td>1e-5</td><td>Stopping criterion for dual infeasability</td></tr>
 <tr><td>tol_pr</td><td>OT_REAL</td><td>1e-5</td><td>Stopping criterion for primal infeasibility</td></tr>
@@ -4161,7 +4161,7 @@
 <tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>casadi::SundialsInterface</td></tr>
@@ -4181,8 +4181,8 @@
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>(gmres|bcgstab|tfqmr)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>GenericType()</td><td>(user_defined|dense|banded|iterative)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>

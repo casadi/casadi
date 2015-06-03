@@ -71,7 +71,7 @@ namespace casadi {
   void MXFunction::construct(const std::string& name,
                              const std::vector<MX>& arg,
                              const std::vector<MX>& res,
-                             const Dictionary& opts,
+                             const Dict& opts,
                              const std::vector<std::string>& ischeme,
                              const std::vector<std::string>& oscheme) {
     assignNode(new MXFunctionInternal(arg, res));
@@ -83,38 +83,38 @@ namespace casadi {
   }
 
   MXFunction::MXFunction(const std::string& name, const std::vector<MX>& arg,
-                         const std::vector<MX>& res, const Dictionary& opts) {
+                         const std::vector<MX>& res, const Dict& opts) {
     construct(name, arg, res, opts);
   }
 
   MXFunction::MXFunction(const std::string& name, const MappedIO& arg,
-                         const std::vector<MX>& res, const Dictionary& opts) {
+                         const std::vector<MX>& res, const Dict& opts) {
     construct(name, make_vector(arg), res, opts, arg.second);
   }
 
   MXFunction::MXFunction(const std::string& name, const std::vector<MX>& arg,
-                         const MappedIO& res, const Dictionary& opts) {
+                         const MappedIO& res, const Dict& opts) {
     construct(name, arg, make_vector(res), opts, std::vector<string>(), res.second);
   }
 
   MXFunction::MXFunction(const std::string& name, const MappedIO& arg,
-                         const MappedIO& res, const Dictionary& opts) {
+                         const MappedIO& res, const Dict& opts) {
     construct(name, make_vector(arg), make_vector(res), opts, arg.second, res.second);
   }
 
 #ifdef USE_CXX11
   MXFunction::MXFunction(const std::string& name, std::initializer_list<MX> arg,
-                         std::initializer_list<MX> res, const Dictionary& opts) {
+                         std::initializer_list<MX> res, const Dict& opts) {
     construct(name, vector<MX>(arg), vector<MX>(res), opts);
   }
 
   MXFunction::MXFunction(const std::string& name, std::vector<MX> arg,
-                         std::initializer_list<MX> res, const Dictionary& opts) {
+                         std::initializer_list<MX> res, const Dict& opts) {
     construct(name, arg, vector<MX>(res), opts);
   }
 
   MXFunction::MXFunction(const std::string& name, std::initializer_list<MX> arg,
-                         std::vector<MX> res, const Dictionary& opts) {
+                         std::vector<MX> res, const Dict& opts) {
     construct(name, vector<MX>(arg), res, opts);
   }
 #endif // USE_CXX11

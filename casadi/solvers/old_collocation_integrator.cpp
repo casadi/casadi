@@ -63,7 +63,7 @@ namespace casadi {
               "Collocation scheme", "radau|legendre");
     addOption("implicit_solver",               OT_STRING,  GenericType(),
               "An implicit function solver");
-    addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(),
+    addOption("implicit_solver_options",       OT_DICT, GenericType(),
               "Options to be passed to the implicit solver");
     addOption("expand_f",                      OT_BOOLEAN,  false,
               "Expand the ODE/DAE residual function in an SX graph");
@@ -73,7 +73,7 @@ namespace casadi {
               "Initialize the trajectory at the previous solution");
     addOption("startup_integrator",            OT_STRING,  GenericType(),
               "An ODE/DAE integrator that can be used to generate a startup trajectory");
-    addOption("startup_integrator_options",    OT_DICTIONARY, GenericType(),
+    addOption("startup_integrator_options",    OT_DICT, GenericType(),
               "Options to be passed to the startup integrator");
     setOption("name", "unnamed_old_collocation_integrator");
   }
@@ -385,7 +385,7 @@ namespace casadi {
 
     // Pass options
     if (hasSetOption("implicit_solver_options")) {
-      const Dictionary& implicit_solver_options = getOption("implicit_solver_options");
+      const Dict& implicit_solver_options = getOption("implicit_solver_options");
       implicit_solver_.setOption(implicit_solver_options);
     }
 
@@ -409,7 +409,7 @@ namespace casadi {
       startup_integrator_.setOption("name", ss_startup_integrator.str());
 
       if (hasSetOption("startup_integrator_options")) {
-        const Dictionary& startup_integrator_options = getOption("startup_integrator_options");
+        const Dict& startup_integrator_options = getOption("startup_integrator_options");
         startup_integrator_.setOption(startup_integrator_options);
       }
 

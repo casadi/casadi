@@ -190,7 +190,7 @@ namespace casadi {
     * \endparblock
     */
     Integrator(const std::string& name, const std::string& solver, const Function& f,
-               const Dictionary& opts=Dictionary());
+               const Dict& opts=Dict());
 
     /** \brief  Integrator factory, no initialization (to be deprecated)
     *

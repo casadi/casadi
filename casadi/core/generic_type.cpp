@@ -46,7 +46,7 @@ namespace casadi {
   typedef GenericTypeInternal<std::vector<std::string> > StringVectorType;
   typedef GenericTypeInternal<SharedObject> SharedObjectType;
   typedef GenericTypeInternal<Function> FunctionType;
-  typedef GenericTypeInternal<Dictionary> DictionaryType;
+  typedef GenericTypeInternal<Dict> DictType;
 /// \endcond
 
 opt_type GenericType::getType() const {
@@ -105,8 +105,8 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_REALVECTOR";
       case OT_STRINGVECTOR:
               return "OT_STRINGVECTOR";
-      case OT_DICTIONARY:
-              return "OT_DICTIONARY";
+      case OT_DICT:
+              return "OT_DICT";
       case OT_DERIVATIVEGENERATOR:
               return "OT_DERIVATIVEGENERATOR";
       case OT_CALLBACK:
@@ -169,8 +169,8 @@ bool GenericType::isFunction() const {
   return is_a<Function>();
 }
 
-bool GenericType::isDictionary() const {
-  return is_a<Dictionary>();
+bool GenericType::isDict() const {
+  return is_a<Dict>();
 }
 
 
@@ -328,14 +328,14 @@ const SharedObject& GenericType::toSharedObject() const {
   return static_cast<const SharedObjectType*>(get())->d_;
 }
 
-const Dictionary& GenericType::toDictionary() const {
-  casadi_assert_message(isDictionary(), "type mismatch");
-  return static_cast<const DictionaryType*>(get())->d_;
+const Dict& GenericType::toDict() const {
+  casadi_assert_message(isDict(), "type mismatch");
+  return static_cast<const DictType*>(get())->d_;
 }
 
-Dictionary& GenericType::toDictionary() {
-  casadi_assert_message(isDictionary(), "type mismatch");
-  return static_cast<DictionaryType*>(get())->d_;
+Dict& GenericType::toDict() {
+  casadi_assert_message(isDict(), "type mismatch");
+  return static_cast<DictType*>(get())->d_;
 }
 
 const Function& GenericType::toFunction() const {
@@ -405,18 +405,18 @@ GenericType::operator const Callback &() const {
   return static_cast<const GenericTypeInternal<Callback>*>(get())->d_;
 }
 
-GenericType::GenericType(const Dictionary& dict) : type_(OT_DICTIONARY) {
-  assignNode(new GenericTypeInternal<Dictionary>(dict));
+GenericType::GenericType(const Dict& dict) : type_(OT_DICT) {
+  assignNode(new GenericTypeInternal<Dict>(dict));
 }
 
-GenericType::operator const GenericType::Dictionary& () const {
-  casadi_assert_message(is_a<Dictionary>(), "type mismatch");
-  return static_cast<const GenericTypeInternal<Dictionary>*>(get())->d_;
+GenericType::operator const GenericType::Dict& () const {
+  casadi_assert_message(is_a<Dict>(), "type mismatch");
+  return static_cast<const GenericTypeInternal<Dict>*>(get())->d_;
 }
 
-GenericType::operator GenericType::Dictionary& () {
-  casadi_assert_message(is_a<Dictionary>(), "type mismatch");
-  return static_cast<GenericTypeInternal<Dictionary>*>(get())->d_;
+GenericType::operator GenericType::Dict& () {
+  casadi_assert_message(is_a<Dict>(), "type mismatch");
+  return static_cast<GenericTypeInternal<Dict>*>(get())->d_;
 }
 
 //GenericType::operator void*() const {

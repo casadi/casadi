@@ -101,7 +101,7 @@ namespace casadi {
      * \param st \structargument{Dple}
      */
     DpleSolver(const std::string& name, const std::string& solver,
-               const DpleStructure& st, const Dictionary& opts=Dictionary());
+               const DpleStructure& st, const Dict& opts=Dict());
 
     /** \brief Constructor (no initialization, to be deprecated)
      * \param solver \pluginargument{DpleSolver}

@@ -124,7 +124,7 @@ double OptionsFunctionalityNode::getBestMatches(const std::string &name,
   return getBestMatches(name, dict, suggestions, amount);
 }
 
-void setAdaptorOptions(Dictionary& dict, const string &name, const Dictionary &op) {
+void setAdaptorOptions(Dict& dict, const string &name, const Dict &op) {
 
   // Find position of '.' separator
   std::string::size_type dotpos = name.find(".");
@@ -133,21 +133,21 @@ void setAdaptorOptions(Dictionary& dict, const string &name, const Dictionary &o
   std::string adaptor_name = name.substr(0, dotpos);
 
   // Check if adaptor name already occurs in the dictionary of options
-  Dictionary::const_iterator it = dict.find(adaptor_name);
+  Dict::const_iterator it = dict.find(adaptor_name);
 
   if (it == dict.end()) {
     // Create an empty dictionary if not
-    dict[adaptor_name] = Dictionary();
-  } else if (!dict[adaptor_name].isDictionary()) {
+    dict[adaptor_name] = Dict();
+  } else if (!dict[adaptor_name].isDict()) {
     // If an entry is found, make sure it is a dictionary
-    casadi_error("setAdaptorOptions: Dictionary expected, but got " << dict[adaptor_name] << ".");
+    casadi_error("setAdaptorOptions: Dict expected, but got " << dict[adaptor_name] << ".");
   }
 
   if (dotpos==std::string::npos) {
     // We reached the end of the dotted adaptor string
-    Dictionary& target = dict[adaptor_name];
+    Dict& target = dict[adaptor_name];
     // Merge the contents of the supplied dictionary
-    for (Dictionary::const_iterator it=op.begin(); it!=op.end(); ++it) {
+    for (Dict::const_iterator it=op.begin(); it!=op.end(); ++it) {
       target[it->first] = it->second;
     }
   } else {
@@ -162,7 +162,7 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
 
   // Check for adaptor-style options
   std::string::size_type dotpos = name.find(".");
-  if (dotpos != std::string::npos && op.isDictionary()) {
+  if (dotpos != std::string::npos && op.isDict()) {
     setAdaptorOptions(dictionary_, name, op);
     return;
   }
@@ -263,7 +263,7 @@ void OptionsFunctionalityNode::assert_exists(const std::string &name) const {
 GenericType OptionsFunctionalityNode::getOption(const string &name) const {
 
   // Locate the option
-  Dictionary::const_iterator it = dictionary_.find(name);
+  Dict::const_iterator it = dictionary_.find(name);
 
   // Check if found
   if (it == dictionary_.end()) {
@@ -398,7 +398,7 @@ void OptionsFunctionalityNode::printOption(const std::string &name, ostream &str
              << "] ";
 
       // Check if the option has been set, and print it's value if it is.
-      Dictionary::const_iterator dictionary_it=dictionary_.find(name);
+      Dict::const_iterator dictionary_it=dictionary_.find(name);
       if (dictionary_it==dictionary_.end())
         stream << "(not set)";
       else
@@ -446,7 +446,7 @@ bool OptionsFunctionalityNode::hasOption(const string &str) const {
 bool OptionsFunctionalityNode::hasSetOption(const string &str) const {
   if (!hasOption(str)) casadi_error("OptionsFunctionalityNode::hasSetOption: no such option '"
                                    << str << "'");
-  Dictionary::const_iterator it = dictionary_.find(str);
+  Dict::const_iterator it = dictionary_.find(str);
   return it != dictionary_.end();
 }
 
@@ -476,7 +476,7 @@ void OptionsFunctionality::setOption(const string &str, const GenericType& op) {
   (*this)->setOption(str, op);
 }
 
-void OptionsFunctionality::setOption(const Dictionary& dict, bool skipUnknown) {
+void OptionsFunctionality::setOption(const Dict& dict, bool skipUnknown) {
   (*this)->setOption(dict, skipUnknown);
 }
 
@@ -527,7 +527,7 @@ void OptionsFunctionality::copyOptions(const OptionsFunctionality& obj, bool ski
   (*this)->copyOptions(obj, skipUnknown);
 }
 
-const Dictionary& OptionsFunctionality::dictionary() const {
+const Dict& OptionsFunctionality::dictionary() const {
   return (*this)->dictionary();
 }
 
@@ -547,12 +547,12 @@ void OptionsFunctionality::setOptionByEnumValue(const std::string &name, int v) 
   return (*this)->setOptionByEnumValue(name, v);
 }
 
-const Dictionary& OptionsFunctionalityNode::dictionary() const {
+const Dict& OptionsFunctionalityNode::dictionary() const {
   return dictionary_;
 }
 
-void OptionsFunctionalityNode::setOption(const Dictionary& dict, bool skipUnknown) {
-  for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+void OptionsFunctionalityNode::setOption(const Dict& dict, bool skipUnknown) {
+  for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
     if (!skipUnknown || hasOption(it->first)) {
       setOption(it->first, it->second);
     }
@@ -594,7 +594,7 @@ opt_type OptionsFunctionalityNode::getOptionType(const std::string &name) const 
 
 GenericType OptionsFunctionalityNode::getOptionDefault(const std::string &name) const {
   assert_exists(name);
-  Dictionary::const_iterator it = defaults_.find(name);
+  Dict::const_iterator it = defaults_.find(name);
   if (it!=defaults_.end()) return it->second;
   return GenericType();
 }
