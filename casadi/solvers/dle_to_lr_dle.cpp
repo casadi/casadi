@@ -81,7 +81,7 @@ namespace casadi {
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
-    MX P = solver_(make_map("a", A, "v", V))["p"];
+    MX P = solver_(make_map("a", A, "v", V)).at("y");
 
     f_ = MXFunction(dleIn("a", A, "v", V),
                     dleOut("p", P));

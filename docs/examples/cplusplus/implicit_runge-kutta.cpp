@@ -116,7 +116,7 @@ int main(){
     }
     
     // Append collocation equations
-    MX f_j = f(make_map("x",X[j],"p",P))["ode"];
+    MX f_j = f(make_map("x",X[j],"p",P)).at("ode");
     V_eq.append(h*f_j - xp_j);
   }
 

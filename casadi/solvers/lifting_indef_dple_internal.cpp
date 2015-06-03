@@ -131,7 +131,7 @@ namespace casadi {
     // Initialize the NLP solver
     solver_.init();
 
-    MX Pf = solver_(make_map("a", A, "v" , V))["p"];
+    MX Pf = solver_(make_map("a", A, "v" , V)).at("p");
 
     std::vector<MX> Ps = diagsplit(Pf, n_);
 

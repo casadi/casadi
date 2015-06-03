@@ -87,7 +87,7 @@ namespace casadi {
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
-    MX P = solver_(make_map("a", A, "v", CVC))["p"];
+    MX P = solver_(make_map("a", A, "v", CVC)).at("p");
 
     std::vector<MX> HPH(Hs_.size(), 0);
     std::vector<MX> Hs = horzsplit(H, Hi_);

@@ -111,7 +111,7 @@ namespace casadi {
     solver_.init();
 
     std::vector<MX> Ps(K_);
-    Ps[0] = solver_(make_map("a", Ap, "v", R))["p"];
+    Ps[0] = solver_(make_map("a", Ap, "v", R)).at("p");
 
     for (int k=0;k<K_-1;++k) {
       Ps[k+1] = mul(mul(Ass[k], Ps[k]), Ass[k].T()) + Vss[k];

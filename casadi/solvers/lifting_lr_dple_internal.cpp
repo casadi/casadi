@@ -162,7 +162,7 @@ namespace casadi {
       v_in[LR_DLE_H] = Hs;
     }
 
-    MX Pf = solver_(make_map("a", A, "v", V, "c", C, "h", H))[solver_.outputName(0)];
+    MX Pf = solver_(make_map("a", A, "v", V, "c", C, "h", H)).at(solver_.outputName(0));
 
     std::vector<MX> Ps = with_H_ ? diagsplit(Pf, Hsi_) : diagsplit(Pf, n_);
 

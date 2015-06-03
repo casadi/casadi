@@ -372,7 +372,7 @@ namespace casadi {
     h = MX::sym("h");
 
     // State at end
-    MX xf = ifcn(make_map("x0", x0, "p", vertcat(h, vec(p))))["xf"];
+    MX xf = ifcn(make_map("x0", x0, "p", vertcat(h, vec(p)))).at("xf");
 
     // Form discrete-time dynamics
     MXFunction ret(make_vector(x0, p, h), make_vector(xf));
