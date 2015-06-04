@@ -62,22 +62,6 @@ namespace casadi {
     setOption("output_scheme", res.second);
   }
 
-  SXFunction::SXFunction(const vector<SX>& arg, const SXFunction::MappedIO2& res) {
-    assignNode(new SXFunctionInternal(arg, make_vector(res)));
-    setOption("output_scheme", res.second);
-  }
-
-  SXFunction::SXFunction(const MappedIO2& arg, const vector<SX>& res) {
-    assignNode(new SXFunctionInternal(make_vector(arg), res));
-    setOption("input_scheme", arg.second);
-  }
-
-  SXFunction::SXFunction(const MappedIO2& arg, const MappedIO2& res) {
-    assignNode(new SXFunctionInternal(make_vector(arg), make_vector(res)));
-    setOption("input_scheme", arg.second);
-    setOption("output_scheme", res.second);
-  }
-
   void SXFunction::construct(const std::string& name,
                              const std::vector<SX>& arg,
                              const std::vector<SX>& res,
@@ -109,21 +93,6 @@ namespace casadi {
 
   SXFunction::SXFunction(const std::string& name, const MappedIO& arg,
                          const MappedIO& res, const Dict& opts) {
-    construct(name, make_vector(arg), make_vector(res), opts, arg.second, res.second);
-  }
-
-  SXFunction::SXFunction(const std::string& name, const MappedIO2& arg,
-                         const std::vector<SX>& res, const Dict& opts) {
-    construct(name, make_vector(arg), res, opts, arg.second);
-  }
-
-  SXFunction::SXFunction(const std::string& name, const std::vector<SX>& arg,
-                         const MappedIO2& res, const Dict& opts) {
-    construct(name, arg, make_vector(res), opts, std::vector<string>(), res.second);
-  }
-
-  SXFunction::SXFunction(const std::string& name, const MappedIO2& arg,
-                         const MappedIO2& res, const Dict& opts) {
     construct(name, make_vector(arg), make_vector(res), opts, arg.second, res.second);
   }
 

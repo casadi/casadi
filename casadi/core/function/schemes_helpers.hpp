@@ -29,7 +29,6 @@
 #include <string>
 #include <utility>
 #include <map>
-#include "io_scheme_vector.hpp"
 namespace casadi {
 
 /// Input arguments of a \e cle solver

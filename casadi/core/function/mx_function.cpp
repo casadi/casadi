@@ -68,22 +68,6 @@ namespace casadi {
     setOption("output_scheme", res.second);
   }
 
-  MXFunction::MXFunction(const std::vector<MX>& arg, const MappedIO2& res) {
-    assignNode(new MXFunctionInternal(arg, make_vector(res)));
-    setOption("output_scheme", res.second);
-  }
-
-  MXFunction::MXFunction(const MappedIO2& arg, const std::vector<MX>& res) {
-    assignNode(new MXFunctionInternal(make_vector(arg), res));
-    setOption("input_scheme", arg.second);
-  }
-
-  MXFunction::MXFunction(const MappedIO2& arg, const MappedIO2& res) {
-    assignNode(new MXFunctionInternal(make_vector(arg), make_vector(res)));
-    setOption("input_scheme", arg.second);
-    setOption("output_scheme", res.second);
-  }
-
   void MXFunction::construct(const std::string& name,
                              const std::vector<MX>& arg,
                              const std::vector<MX>& res,
@@ -115,21 +99,6 @@ namespace casadi {
 
   MXFunction::MXFunction(const std::string& name, const MappedIO& arg,
                          const MappedIO& res, const Dict& opts) {
-    construct(name, make_vector(arg), make_vector(res), opts, arg.second, res.second);
-  }
-
-  MXFunction::MXFunction(const std::string& name, const MappedIO2& arg,
-                         const std::vector<MX>& res, const Dict& opts) {
-    construct(name, make_vector(arg), res, opts, arg.second);
-  }
-
-  MXFunction::MXFunction(const std::string& name, const std::vector<MX>& arg,
-                         const MappedIO2& res, const Dict& opts) {
-    construct(name, arg, make_vector(res), opts, std::vector<string>(), res.second);
-  }
-
-  MXFunction::MXFunction(const std::string& name, const MappedIO2& arg,
-                         const MappedIO2& res, const Dict& opts) {
     construct(name, make_vector(arg), make_vector(res), opts, arg.second, res.second);
   }
 

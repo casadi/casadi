@@ -1177,7 +1177,6 @@ def PyFunction(obj,inputs,outputs):
 
 %include "io_interface.i"
 %include "io_scheme.i"
-%include "io_scheme_vector.i"
 
 %include <casadi/core/function/function.hpp>
 %feature("copyctor", "0") casadi::CodeGenerator;

@@ -74,7 +74,6 @@ namespace casadi {
     explicit SXFunction(const Function &f);
 
     typedef std::pair<std::map<std::string, SX>, std::vector<std::string> > MappedIO;
-    typedef IOSchemeVector<SX> MappedIO2;
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     SXFunction(const std::string& name, const std::vector<SX>& arg,
@@ -91,18 +90,6 @@ namespace casadi {
     /** \brief Construct from vectors (new syntax, includes initialization) */
     SXFunction(const std::string& name, const MappedIO& arg,
                const MappedIO& res, const Dict& opts=Dict());
-
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    SXFunction(const std::string& name, const MappedIO2& arg,
-               const std::vector<SX>& res, const Dict& opts=Dict());
-
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    SXFunction(const std::string& name, const std::vector<SX>& arg,
-               const MappedIO2& res, const Dict& opts=Dict());
-
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    SXFunction(const std::string& name, const MappedIO2& arg,
-               const MappedIO2& res, const Dict& opts=Dict());
 #ifndef SWIG
 #ifdef USE_CXX11
     /** \brief Construct from initializer lists (new syntax, includes initialization) */
@@ -136,15 +123,6 @@ namespace casadi {
 
     /// Multiple input, multiple output, no initialization (to be deprecated)
     SXFunction(const MappedIO& arg, const MappedIO& res);
-
-    /// Multiple input, multiple  output, no initialization (to be deprecated)
-    SXFunction(const std::vector<SX>& arg, const MappedIO2& res);
-
-    /// Multiple input, multiple output, no initialization (to be deprecated)
-    SXFunction(const MappedIO2& arg, const std::vector<SX>& res);
-
-    /// Multiple input, multiple output, no initialization (to be deprecated)
-    SXFunction(const MappedIO2& arg, const MappedIO2& res);
 
 /// \cond INTERNAL
     /// Access functions of the node
