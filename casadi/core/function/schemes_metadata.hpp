@@ -74,7 +74,6 @@ enum InputOutputScheme {
   SCHEME_NlpSolverOutput,
   SCHEME_QcqpSolverInput,
   SCHEME_QcqpSolverOutput,
-  SCHEME_QCQPStruct,
   SCHEME_QpSolverInput,
   SCHEME_QpSolverOutput,
   SCHEME_SDPInput,

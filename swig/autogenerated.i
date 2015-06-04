@@ -1738,43 +1738,6 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qcqpStruct(**kwargs):
-  """
-  Helper function for 'QCQPStruct'
-
-  Usage:
-    arg = qcqpStruct(h=my_h, p=my_p, a=my_a)
-        all arguments optional
-  Structure specification of a QP
-  
-  Keyword arguments::
-
-    h -- The matrix is assumed to be symmetrical. [QCQP_STRUCT_H]
-    p -- triangular part is actually used. The matrix is assumed to be symmetrical. [QCQP_STRUCT_P]
-    a -- The matrix A: sparse, (nc x n) - product with x must be dense. [QCQP_STRUCT_A]
-  """
-  h = Sparsity()
-  if 'h' in kwargs:
-    h = kwargs['h']
-  p = Sparsity()
-  if 'p' in kwargs:
-    p = kwargs['p']
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  for k in kwargs.keys():
-    if not(k in ['h','p','a']):
-      raise Exception("Keyword error in qcqpStruct: '%s' is not recognized. Available keywords are: h, p, a" % k )
-  return IOSchemeVector([h,p,a], IOScheme(SCHEME_QCQPStruct))
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(qcqpStruct) qcqpStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
 def qpIn(**kwargs):
   """
   Helper function for 'QpSolverInput'

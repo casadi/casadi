@@ -68,7 +68,6 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_NlpSolverOutput: return "NlpSolverOutput";
     case SCHEME_QcqpSolverInput: return "QcqpSolverInput";
     case SCHEME_QcqpSolverOutput: return "QcqpSolverOutput";
-    case SCHEME_QCQPStruct: return "QCQPStruct";
     case SCHEME_QpSolverInput: return "QpSolverInput";
     case SCHEME_QpSolverOutput: return "QpSolverOutput";
     case SCHEME_SDPInput: return "SDPInput";
@@ -166,8 +165,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0";
     case SCHEME_QcqpSolverOutput:
       return "x, cost, lam_a, lam_x";
-    case SCHEME_QCQPStruct:
-      return "h, p, a";
     case SCHEME_QpSolverInput:
       return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0";
     case SCHEME_QpSolverOutput:
@@ -420,11 +417,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==1) return "cost";
       if (i==2) return "lam_a";
       if (i==3) return "lam_x";
-      break;
-    case SCHEME_QCQPStruct:
-      if (i==0) return "h";
-      if (i==1) return "p";
-      if (i==2) return "a";
       break;
     case SCHEME_QpSolverInput:
       if (i==0) return "h";
@@ -760,11 +752,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
       if (i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_QCQPStruct:
-      if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if (i==1) return "triangular part is actually used. The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if (i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_QpSolverInput:
       if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
       if (i==1) return "The vector g: dense,  (n x 1)";  // NOLINT(whitespace/line_length)
@@ -1099,11 +1086,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==2) return "QCQP_SOLVER_LAM_A";
       if (i==3) return "QCQP_SOLVER_LAM_X";
       break;
-    case SCHEME_QCQPStruct:
-      if (i==0) return "QCQP_STRUCT_H";
-      if (i==1) return "QCQP_STRUCT_P";
-      if (i==2) return "QCQP_STRUCT_A";
-      break;
     case SCHEME_QpSolverInput:
       if (i==0) return "QP_SOLVER_H";
       if (i==1) return "QP_SOLVER_G";
@@ -1334,9 +1316,6 @@ int getSchemeSize(InputOutputScheme scheme) {
       break;
     case SCHEME_QcqpSolverOutput:
       return 4;
-      break;
-    case SCHEME_QCQPStruct:
-      return 3;
       break;
     case SCHEME_QpSolverInput:
       return 9;
@@ -1602,11 +1581,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="cost") return 1;
       if (name=="lam_a") return 2;
       if (name=="lam_x") return 3;
-      break;
-    case SCHEME_QCQPStruct:
-      if (name=="h") return 0;
-      if (name=="p") return 1;
-      if (name=="a") return 2;
       break;
     case SCHEME_QpSolverInput:
       if (name=="h") return 0;
