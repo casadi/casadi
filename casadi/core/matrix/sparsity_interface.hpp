@@ -131,63 +131,47 @@ namespace casadi {
     template<typename T0>
       inline friend void assign_vector(T0& x0,
                                        const std::vector<MatType>& x) {
-      casadi_assert(x.size()==1);
-      x[0].get(x0);
+      x.at(0).get(x0);
     }
 
     // Assign 2 elements from a vector
     template<typename T0, typename T1>
       inline friend void assign_vector(T0& x0, T1& x1,
                                        const std::vector<MatType>& x) {
-      casadi_assert(x.size()==2);
-      x[0].get(x0);
-      x[1].get(x1);
+      assign_vector(x0, x);
+      x.at(1).get(x1);
     }
 
     // Assign 3 elements from a vector
     template<typename T0, typename T1, typename T2>
       inline friend void assign_vector(T0& x0, T1& x1, T2& x2,
                                        const std::vector<MatType>& x) {
-      casadi_assert(x.size()==3);
-      x[0].get(x0);
-      x[1].get(x1);
-      x[2].get(x2);
+      assign_vector(x0, x1, x);
+      x.at(2).get(x2);
     }
 
     // Assign 4 elements from a vector
     template<typename T0, typename T1, typename T2, typename T3>
       inline friend void assign_vector(T0& x0, T1& x1, T2& x2, T3& x3,
                                        const std::vector<MatType>& x) {
-      casadi_assert(x.size()==4);
-      x[0].get(x0);
-      x[1].get(x1);
-      x[2].get(x2);
-      x[3].get(x3);
+      assign_vector(x0, x1, x2, x);
+      x.at(3).get(x3);
     }
 
     // Assign 5 elements from a vector
     template<typename T0, typename T1, typename T2, typename T3, typename T4>
       inline friend void assign_vector(T0& x0, T1& x1, T2& x2, T3& x3, T4& x4,
                                        const std::vector<MatType>& x) {
-      casadi_assert(x.size()==5);
-      x[0].get(x0);
-      x[1].get(x1);
-      x[2].get(x2);
-      x[3].get(x3);
-      x[4].get(x4);
+      assign_vector(x0, x1, x2, x3, x);
+      x.at(4).get(x4);
     }
 
     // Assign 6 elements from a vector
     template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
       inline friend void assign_vector(T0& x0, T1& x1, T2& x2, T3& x3, T4& x4, T5& x5,
                                        const std::vector<MatType>& x) {
-      casadi_assert(x.size()==6);
-      x[0].get(x0);
-      x[1].get(x1);
-      x[2].get(x2);
-      x[3].get(x3);
-      x[4].get(x4);
-      x[5].get(x5);
+      assign_vector(x0, x1, x2, x3, x4, x);
+      x.at(5).get(x5);
     }
 
     // Create map with 1 element
@@ -253,7 +237,69 @@ namespace casadi {
       return ret;
     }
 
+    // Assign 1 element from a map
+    template<typename T0>
+    inline friend void assign_map(const std::string& n0, T0& x0,
+                                  const std::map<std::string, MatType>& x) {
+      x.at(n0).get(x0);
+    }
+
+    // Assign 2 elements from a map
+    template<typename T0, typename T1>
+      inline friend void assign_map(const std::string& n0, T0& x0,
+                                    const std::string& n1, T0& x1,
+                                    const std::vector<MatType>& x) {
+      assign_map(n0, x0, x);
+      x.at(n1).get(x1);
+    }
+
+    // Assign 3 elements from a map
+    template<typename T0, typename T1, typename T2>
+    inline friend void assign_map(const std::string& n0, T0& x0,
+                                  const std::string& n1, T0& x1,
+                                  const std::string& n2, T0& x2,
+                                  const std::vector<MatType>& x) {
+      assign_map(n0, x0, n1, x1, x);
+      x.at(n2).get(x2);
+    }
+
+    // Assign 4 elements from a map
+    template<typename T0, typename T1, typename T2, typename T3>
+      inline friend void assign_map(const std::string& n0, T0& x0,
+                                    const std::string& n1, T0& x1,
+                                    const std::string& n2, T0& x2,
+                                    const std::string& n3, T0& x3,
+                                    const std::vector<MatType>& x) {
+      assign_map(n0, x0, n1, x1, n2, x2, x);
+      x.at(n3).get(x3);
+    }
+
+    // Assign 5 elements from a map
+    template<typename T0, typename T1, typename T2, typename T3, typename T4>
+      inline friend void assign_map(const std::string& n0, T0& x0,
+                                    const std::string& n1, T0& x1,
+                                    const std::string& n2, T0& x2,
+                                    const std::string& n3, T0& x3,
+                                    const std::string& n4, T0& x4,
+                                    const std::vector<MatType>& x) {
+      assign_map(n0, x0, n1, x1, n2, x2, n3, x3, x);
+      x.at(n4).get(x4);
+    }
+
+    // Assign 6 elements from a map
+    template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
+      inline friend void assign_map(const std::string& n0, T0& x0,
+                                    const std::string& n1, T0& x1,
+                                    const std::string& n2, T0& x2,
+                                    const std::string& n3, T0& x3,
+                                    const std::string& n4, T0& x4,
+                                    const std::string& n5, T0& x5,
+                                    const std::vector<MatType>& x) {
+      assign_map(n0, x0, n1, x1, n2, x2, n3, x3, n4, x4, x);
+      x.at(n5).get(x5);
+    }
 #endif // SWIG
+
   public:
 
     /// \cond CLUTTER
