@@ -41,7 +41,6 @@ enum InputOutputScheme {
   SCHEME_ControlSimulatorInput,
   SCHEME_DLEInput,
   SCHEME_DLEOutput,
-  SCHEME_DleStruct,
   SCHEME_DPLEInput,
   SCHEME_DPLEOutput,
   SCHEME_DpleVecStruct,

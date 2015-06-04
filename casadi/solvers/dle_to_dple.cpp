@@ -54,8 +54,7 @@ namespace casadi {
     DleInternal::registerPlugin(casadi_register_dlesolver_dple);
   }
 
-  DleToDple::DleToDple(
-         const DleStructure& st) : DleInternal(st) {
+  DleToDple::DleToDple(const std::map<std::string, Sparsity>& st) : DleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_dle_to_dple"); // name of the function
@@ -104,7 +103,8 @@ namespace casadi {
 
   DleToDple* DleToDple::clone() const {
     // Return a deep copy
-    DleToDple* node = new DleToDple(st_);
+    DleToDple* node =
+      new DleToDple(make_map("a", st_[Dle_STRUCT_A], "v", st_[Dle_STRUCT_V]));
     node->setOption(dictionary());
     return node;
   }

@@ -104,7 +104,7 @@ namespace casadi {
     MX Ap = mul(Assr);
 
     // Create an dlesolver instance
-    solver_ = DleSolver(getOption(solvername()), dleStruct("a", Ap.sparsity(), "v", R.sparsity()));
+    solver_ = DleSolver(getOption(solvername()), make_map("a", Ap.sparsity(), "v", R.sparsity()));
     solver_.setOption(getOption(optionsname()));
 
     // Initialize the NLP solver

@@ -55,7 +55,7 @@ namespace casadi {
      *  \param[in] A  Sparsity of A
      *  \param[in] V  Sparsity of V
      */
-    DleToDple(const DleStructure& st);
+    DleToDple(const std::map<std::string, Sparsity>& st);
 
     /** \brief  Destructor */
     virtual ~DleToDple();
@@ -67,12 +67,14 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual DleToDple* create(const DleStructure& st) const {
-        return new DleToDple(st);}
+    virtual DleToDple* create(const std::map<std::string, Sparsity>& st) const {
+        return new DleToDple(st);
+    }
 
     /** \brief  Create a new DLE Solver */
-    static DleInternal* creator(const DleStructure& st)
-    { return new DleToDple(st);}
+    static DleInternal* creator(const std::map<std::string, Sparsity>& st) {
+      return new DleToDple(st);
+    }
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}

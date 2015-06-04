@@ -334,39 +334,6 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def dleStruct(**kwargs):
-  """
-  Helper function for 'DleStruct'
-
-  Usage:
-    arg = dleStruct(a=my_a, v=my_v)
-        all arguments optional
-  Structure specification of a DLE
-  
-  Keyword arguments::
-
-    a -- The matrix A [Dle_STRUCT_A]
-    v -- The matrix V [Dle_STRUCT_V]
-  """
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = Sparsity()
-  if 'v' in kwargs:
-    v = kwargs['v']
-  for k in kwargs.keys():
-    if not(k in ['a','v']):
-      raise Exception("Keyword error in dleStruct: '%s' is not recognized. Available keywords are: a, v" % k )
-  return IOSchemeVector([a,v], IOScheme(SCHEME_DleStruct))
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(dleStruct) dleStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
 def dpleIn(**kwargs):
   """
   Helper function for 'DPLEInput'

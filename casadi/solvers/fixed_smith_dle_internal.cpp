@@ -55,17 +55,13 @@ namespace casadi {
     DleInternal::registerPlugin(casadi_register_dlesolver_fixed_smith);
   }
 
-  FixedSmithDleInternal::FixedSmithDleInternal(
-      const DleStructure& st) :
-      DleInternal(st) {
+  FixedSmithDleInternal::FixedSmithDleInternal(const std::map<std::string, Sparsity>& st)
+    : DleInternal(st) {
 
-    // set default options
+    // Set default options
     setOption("name", "unnamed_fixed_smith_indef_dle_solver"); // name of the function
-
     addOption("iter", OT_INTEGER, 100,   "Number of Smith iterations");
-
     addOption("freq_doubling", OT_BOOLEAN, false,   "Use frequency doubling");
-
   }
 
   FixedSmithDleInternal::~FixedSmithDleInternal() {
@@ -123,7 +119,9 @@ namespace casadi {
 
   FixedSmithDleInternal* FixedSmithDleInternal::clone() const {
     // Return a deep copy
-    FixedSmithDleInternal* node = new FixedSmithDleInternal(st_);
+    FixedSmithDleInternal* node =
+      new FixedSmithDleInternal(make_map("a", st_[Dle_STRUCT_A],
+                                         "v", st_[Dle_STRUCT_V]));
     node->setOption(dictionary());
     return node;
   }

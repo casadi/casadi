@@ -35,7 +35,6 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_ControlSimulatorInput: return "ControlSimulatorInput";
     case SCHEME_DLEInput: return "DLEInput";
     case SCHEME_DLEOutput: return "DLEOutput";
-    case SCHEME_DleStruct: return "DleStruct";
     case SCHEME_DPLEInput: return "DPLEInput";
     case SCHEME_DPLEOutput: return "DPLEOutput";
     case SCHEME_DpleVecStruct: return "DpleVecStruct";
@@ -96,8 +95,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "a, v";
     case SCHEME_DLEOutput:
       return "p";
-    case SCHEME_DleStruct:
-      return "a, v";
     case SCHEME_DPLEInput:
       return "a, v";
     case SCHEME_DPLEOutput:
@@ -219,10 +216,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_DLEOutput:
       if (i==0) return "p";
-      break;
-    case SCHEME_DleStruct:
-      if (i==0) return "a";
-      if (i==1) return "v";
       break;
     case SCHEME_DPLEInput:
       if (i==0) return "a";
@@ -539,10 +532,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_DLEOutput:
       if (i==0) return "P matrix";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_DleStruct:
-      if (i==0) return "The matrix A";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The matrix V";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_DPLEInput:
       if (i==0) return "A matrices (horzcat when const_dim, diagcat otherwise)";  // NOLINT(whitespace/line_length)
       if (i==1) return "V matrices (horzcat when const_dim, diagcat otherwise)";  // NOLINT(whitespace/line_length)
@@ -858,10 +847,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
     case SCHEME_DLEOutput:
       if (i==0) return "DLE_P";
       break;
-    case SCHEME_DleStruct:
-      if (i==0) return "Dle_STRUCT_A";
-      if (i==1) return "Dle_STRUCT_V";
-      break;
     case SCHEME_DPLEInput:
       if (i==0) return "DPLE_A";
       if (i==1) return "DPLE_V";
@@ -1164,9 +1149,6 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_DLEOutput:
       return 1;
       break;
-    case SCHEME_DleStruct:
-      return 2;
-      break;
     case SCHEME_DPLEInput:
       return 2;
       break;
@@ -1329,10 +1311,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       break;
     case SCHEME_DLEOutput:
       if (name=="p") return 0;
-      break;
-    case SCHEME_DleStruct:
-      if (name=="a") return 0;
-      if (name=="v") return 1;
       break;
     case SCHEME_DPLEInput:
       if (name=="a") return 0;

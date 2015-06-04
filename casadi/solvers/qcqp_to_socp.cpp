@@ -50,9 +50,9 @@ namespace casadi {
   QcqpToSocp* QcqpToSocp::clone() const {
     // Return a deep copy
     QcqpToSocp* node =
-      new QcqpToSocp(make_map("h", st_[QCQP_SOLVER_H],
-                              "a", st_[QCQP_SOLVER_A],
-                              "p", st_[QCQP_SOLVER_P]));
+      new QcqpToSocp(make_map("h", st_[QCQP_STRUCT_H],
+                              "a", st_[QCQP_STRUCT_A],
+                              "p", st_[QCQP_STRUCT_P]));
     if (!node->is_init_)
       node->init();
     return node;

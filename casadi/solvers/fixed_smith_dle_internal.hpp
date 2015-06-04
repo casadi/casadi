@@ -101,7 +101,7 @@ namespace casadi {
     /** \brief  Constructor
      * \param st \structargument{Dle}
      */
-    FixedSmithDleInternal(const DleStructure& st);
+    FixedSmithDleInternal(const std::map<std::string, Sparsity>& st);
 
     /** \brief  Destructor */
     virtual ~FixedSmithDleInternal();
@@ -113,12 +113,13 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual FixedSmithDleInternal* create(const DleStructure& st) const {
+    virtual FixedSmithDleInternal* create(const std::map<std::string, Sparsity>& st) const {
         return new FixedSmithDleInternal(st);}
 
     /** \brief  Create a new DLE Solver */
-    static DleInternal* creator(const DleStructure& st)
-    { return new FixedSmithDleInternal(st);}
+    static DleInternal* creator(const std::map<std::string, Sparsity>& st) {
+      return new FixedSmithDleInternal(st);
+    }
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}

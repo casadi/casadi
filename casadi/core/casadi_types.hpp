@@ -42,7 +42,6 @@ namespace casadi {
   class Sparsity;
   class CodeGenerator;
   template<class T> class IOSchemeVector;
-  typedef IOSchemeVector<Sparsity> DleStructure;
   typedef IOSchemeVector<Sparsity> LrDleStructure;
   typedef IOSchemeVector<Sparsity> CleStructure;
   typedef IOSchemeVector< std::vector<Sparsity> > DpleStructure;

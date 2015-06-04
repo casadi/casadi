@@ -37,10 +37,9 @@ OUTPUTSCHEME(DLEOutput)
 using namespace std;
 namespace casadi {
 
-  DleInternal::DleInternal(const DleStructure& st,
-                             int nrhs,
-                             bool transp) :
-      st_(st), nrhs_(nrhs), transp_(transp) {
+  DleInternal::DleInternal(const std::map<std::string, Sparsity>& st,
+                           int nrhs, bool transp) :
+    nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -51,6 +50,17 @@ namespace casadi {
               "Throw an exception when it is detected that Product(A_i, i=N..1) "
               "has eigenvalues greater than 1-eps_unstable");
     addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
+
+    st_.resize(Dle_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[Dle_STRUCT_A]=i->second;
+      } else if (i->first=="v") {
+        st_[Dle_STRUCT_V]=i->second;
+      } else {
+        casadi_error("Unrecognized field in Dle structure: " << i->first);
+      }
+    }
 
     if (nrhs_==1) {
       ischeme_ = IOScheme(SCHEME_DLEInput);
@@ -93,7 +103,7 @@ namespace casadi {
     // Allocate outputs
     Sparsity P = LrDleInternal::getSparsity(lrdleStruct("a", A_, "v", V_));
 
-    Sparsity P2 = DleInternal::getSparsity(dleStruct("a", A_, "v", V_));
+    Sparsity P2 = DleInternal::getSparsity(make_map("a", A_, "v", V_));
 
     casadi_assert(P==P2);
     obuf_.resize(nrhs_);
@@ -106,13 +116,13 @@ namespace casadi {
   }
 
 
-  Sparsity DleInternal::getSparsity(const DleStructure& st) {
+  Sparsity DleInternal::getSparsity(const std::map<std::string, Sparsity>& st) {
 
     // Compute output sparsity by Smith iteration with frequency doubling
-    Sparsity A = st[Dle_STRUCT_A];
+    Sparsity A = st.at("a");
 
     int n = A.size1();
-    Sparsity V = st[Dle_STRUCT_V];
+    Sparsity V = st.at("v");
     Sparsity P = V;
     Sparsity Pprev(n, n);
 

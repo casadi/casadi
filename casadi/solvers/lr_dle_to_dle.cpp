@@ -83,7 +83,7 @@ namespace casadi {
 
     // Create an DleSolver instance
     solver_ = DleSolver(getOption(solvername()),
-                        dleStruct("a", A_, "v", CVC.sparsity()));
+                        make_map("a", A_, "v", CVC.sparsity()));
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 

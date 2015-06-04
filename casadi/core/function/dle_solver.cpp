@@ -68,18 +68,19 @@ namespace casadi {
   }
 
   DleSolver::DleSolver(const std::string& name, const std::string& solver,
-                       const DleStructure& st, const Dict& opts) {
+                       const std::map<std::string, Sparsity>& st, const Dict& opts) {
     assignNode(DleInternal::instantiatePlugin(solver, st));
     setOption("name", name);
     setOption(opts);
     init();
   }
 
-  DleSolver::DleSolver(const std::string& solver, const DleStructure& st) {
+  DleSolver::DleSolver(const std::string& solver,
+                       const std::map<std::string, Sparsity>& st) {
     assignNode(DleInternal::instantiatePlugin(solver, st));
   }
 
-  Sparsity DleSolver::getSparsity(const DleStructure& st) {
+  Sparsity DleSolver::getSparsity(const std::map<std::string, Sparsity>& st) {
     return DleInternal::getSparsity(st);
   }
 

@@ -55,8 +55,8 @@ namespace casadi {
     DleInternal::registerPlugin(casadi_register_dlesolver_simple);
   }
 
-  SimpleIndefDleInternal::SimpleIndefDleInternal(
-      const DleStructure& st) : DleInternal(st) {
+  SimpleIndefDleInternal::
+  SimpleIndefDleInternal(const std::map<std::string, Sparsity>& st) : DleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_simple_indef_dle_solver"); // name of the function
@@ -140,7 +140,9 @@ namespace casadi {
 
   SimpleIndefDleInternal* SimpleIndefDleInternal::clone() const {
     // Return a deep copy
-    SimpleIndefDleInternal* node = new SimpleIndefDleInternal(st_);
+    SimpleIndefDleInternal* node =
+      new SimpleIndefDleInternal(make_map("a", st_[Dle_STRUCT_A],
+                                          "v", st_[Dle_STRUCT_V]));
     node->setOption(dictionary());
     return node;
   }

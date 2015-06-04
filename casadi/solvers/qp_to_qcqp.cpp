@@ -50,7 +50,7 @@ namespace casadi {
   QpToQcqp* QpToQcqp::clone() const {
     // Return a deep copy
     QpToQcqp* node =
-      new QpToQcqp(make_map("h", st_[QP_SOLVER_H], "a", st_[QP_SOLVER_A]));
+      new QpToQcqp(make_map("h", st_[QP_STRUCT_H], "a", st_[QP_STRUCT_A]));
     if (!node->is_init_)
       node->init();
     return node;

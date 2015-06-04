@@ -125,7 +125,7 @@ namespace casadi {
 
     // Create an dlesolver instance
     solver_ = DleSolver(getOption(solvername()),
-                        dleStruct("a", A.sparsity(), "v", V.sparsity()));
+                        make_map("a", A.sparsity(), "v", V.sparsity()));
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
 
     // Initialize the NLP solver

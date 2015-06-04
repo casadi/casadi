@@ -52,7 +52,7 @@ namespace casadi {
   QpoasesInterface* QpoasesInterface::clone() const {
     // Return a deep copy
     QpoasesInterface* node =
-      new QpoasesInterface(make_map("h", st_[QP_SOLVER_H], "a", st_[QP_SOLVER_A]));
+      new QpoasesInterface(make_map("h", st_[QP_STRUCT_H], "a", st_[QP_STRUCT_A]));
     if (!node->is_init_)
       node->init();
     return node;
