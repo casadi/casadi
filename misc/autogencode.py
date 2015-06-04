@@ -173,14 +173,7 @@ class Enum:
     for name, doc, enum in self.entries:
       s+="    " + name + (" "*(maxlenname-len(name))) +  " -- " +  doc + " [" + enum + "]\n"
     s+='  """\n'
-    for name, doc, enum in self.entries:
-      s+="  %s = %s\n  if '%s' in kwargs:\n    %s = kwargs['%s']\n" % (name,"Sparsity()" if self.enum.endswith("Struct") and not self.enum.endswith("VecStruct") else "[]",name,name,name)
-    s+="""  for k in kwargs.keys():\n    if not(k in [%s]):\n      raise Exception("Keyword error in %s: '%%s' is not recognized. Available keywords are: %s" %% k )\n""" % (",".join(["'%s'" % name for name, doc, enum in self.entries]),self.name,", ".join([name for name, doc, enum in self.entries]))
-
-    s+="  return IOSchemeVector(["
-    for name, doc, enum in self.entries:
-      s+=name+","
-    s=s[:-1] + "], IOScheme(SCHEME_%s))\n" % self.enum
+    s+="  return (kwargs, [%s])\n" % ", ".join(["'"+i[0]+"'" for i in self.entries])
     return s
 
 class Input(Enum):
@@ -305,35 +298,6 @@ autogenmetadatahpp.write("CASADI_EXPORT int getSchemeSize(InputOutputScheme sche
 autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeName(InputOutputScheme scheme);\n")
 autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeEntryNames(InputOutputScheme scheme);\n")
 
-autogenpy.write("#ifdef SWIGPYTHON\n")
-autogenpy.write("%pythoncode %{\n")
-autogenpy.write("""
-def IOSchemeVector(arg,io_scheme):
-  try:
-    return IOSchemeVectorD(arg,io_scheme)
-  except:
-    pass
-  try:
-    return IOSchemeVectorSX(arg,io_scheme)
-  except:
-    pass
-  try:
-    return IOSchemeVectorMX(arg,io_scheme)
-  except:
-    pass
-  try:
-    arg = map(lambda x: sp_dense(0,0) if isinstance(x,list) and len(x)==0 else x,arg)
-    return IOSchemeVectorSparsity(arg,io_scheme)
-  except:
-    pass
-  try:
-    return IOSchemeVectorSparsityVector(arg,io_scheme)
-  except:
-    pass
-  raise TypeError("IOSchemeVector called with faulty arguments. Individual values must be SX, MX, Sparsity or [Sparsity].")
-""")
-autogenpy.write("%}\n")
-autogenpy.write("#endif //SWIGPYTHON\n")
 for p in schemes:
   print p.name
   autogencpp.write(p.cppcode())

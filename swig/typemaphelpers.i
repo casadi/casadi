@@ -544,6 +544,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   inline int to_Casadi(GUESTOBJECT *p, casadi::Matrix<casadi::SXElement>* m) { return to_SX(p, m);}
 
   template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m);
+  template<typename M> int to_PairMap(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> > *m);
 
   GUESTOBJECT * from_GenericType(const casadi::GenericType &a);
   GUESTOBJECT * from_Dict(const casadi::GenericType::Dict &a);

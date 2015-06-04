@@ -365,8 +365,7 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      #assert "SXFunction(scheme(SX),[SX] )" in e.message
-      assert "You have: SXFunction(scheme(SX))" in e.message
+      assert "You have: SXFunction((dict,[str]))" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
 
@@ -394,14 +393,6 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except TypeError as e:
       print e.message
-
-
-    try:
-      daeIn(x=x,p=[x])
-      self.assertTrue(False)
-    except TypeError as e:
-      print e.message
-      assert "You have: (x=SX, p=[SX])" in e.message
 
     try:
       x.reshape(2)

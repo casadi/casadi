@@ -147,10 +147,8 @@ class Integrationtests(casadiTestCase):
             ]:
       integrator.init()
 
-      solution = SXFunction([vertcat((q0,t0)),p,t],[vertcat([q0*exp(((t0+t)**3-t0**3)/(3*p)),t0+t])])
-      solution.setInputScheme(IOScheme(["x0","p","h"]))
-      solution.setOutputScheme(IOScheme(["xf"]))
-      solution.init()
+      opts = {'input_scheme':["x0","p","h"], 'output_scheme':["xf"]}
+      solution = SXFunction('solver', [vertcat((q0,t0)),p,t], [vertcat([q0*exp(((t0+t)**3-t0**3)/(3*p)),t0+t])], opts)
       
       for f in [solution,integrator]:
         f.setInput([0.3,0],"x0")
@@ -852,7 +850,7 @@ class Integrationtests(casadiTestCase):
     
     q0=MX.sym("q0")
     p=MX.sym("p")
-    Ji = MXFunction([q0,p],IOSchemeVector(J({'x0':q0,'p':p}), J.outputScheme()))
+    Ji = MXFunction([q0,p],(J({'x0':q0,'p':p}), J.outputScheme()))
     #Ji.setOption("ad_mode","reverse")
     Ji.init()
     H=Ji.jacobian(1)

@@ -29,34 +29,6 @@
 %include "casadi/core/function/schemes_helpers.hpp"
 #ifdef SWIGPYTHON
 %pythoncode %{
-
-def IOSchemeVector(arg,io_scheme):
-  try:
-    return IOSchemeVectorD(arg,io_scheme)
-  except:
-    pass
-  try:
-    return IOSchemeVectorSX(arg,io_scheme)
-  except:
-    pass
-  try:
-    return IOSchemeVectorMX(arg,io_scheme)
-  except:
-    pass
-  try:
-    arg = map(lambda x: sp_dense(0,0) if isinstance(x,list) and len(x)==0 else x,arg)
-    return IOSchemeVectorSparsity(arg,io_scheme)
-  except:
-    pass
-  try:
-    return IOSchemeVectorSparsityVector(arg,io_scheme)
-  except:
-    pass
-  raise TypeError("IOSchemeVector called with faulty arguments. Individual values must be SX, MX, Sparsity or [Sparsity].")
-%}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
 def cleIn(**kwargs):
   """
   Helper function for 'CLEInput'
@@ -71,16 +43,7 @@ def cleIn(**kwargs):
     a -- A matrix [CLE_A]
     v -- V matrix [CLE_V]
   """
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
-  for k in kwargs.keys():
-    if not(k in ['a','v']):
-      raise Exception("Keyword error in cleIn: '%s' is not recognized. Available keywords are: a, v" % k )
-  return IOSchemeVector([a,v], IOScheme(SCHEME_CLEInput))
+  return (kwargs, ['a', 'v'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -106,13 +69,7 @@ def cleOut(**kwargs):
 
     p -- Lyapunov matrix [CLE_P]
   """
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  for k in kwargs.keys():
-    if not(k in ['p']):
-      raise Exception("Keyword error in cleOut: '%s' is not recognized. Available keywords are: p" % k )
-  return IOSchemeVector([p], IOScheme(SCHEME_CLEOutput))
+  return (kwargs, ['p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -146,37 +103,7 @@ def controldaeIn(**kwargs):
     t0       -- Time at start of control interval (1-by-1) [CONTROL_DAE_T0]
     tf       -- Time at end of control interval (1-by-1) [CONTROL_DAE_TF]
   """
-  t = []
-  if 't' in kwargs:
-    t = kwargs['t']
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  z = []
-  if 'z' in kwargs:
-    z = kwargs['z']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  u = []
-  if 'u' in kwargs:
-    u = kwargs['u']
-  u_interp = []
-  if 'u_interp' in kwargs:
-    u_interp = kwargs['u_interp']
-  x_major = []
-  if 'x_major' in kwargs:
-    x_major = kwargs['x_major']
-  t0 = []
-  if 't0' in kwargs:
-    t0 = kwargs['t0']
-  tf = []
-  if 'tf' in kwargs:
-    tf = kwargs['tf']
-  for k in kwargs.keys():
-    if not(k in ['t','x','z','p','u','u_interp','x_major','t0','tf']):
-      raise Exception("Keyword error in controldaeIn: '%s' is not recognized. Available keywords are: t, x, z, p, u, u_interp, x_major, t0, tf" % k )
-  return IOSchemeVector([t,x,z,p,u,u_interp,x_major,t0,tf], IOScheme(SCHEME_ControlledDAEInput))
+  return (kwargs, ['t', 'x', 'z', 'p', 'u', 'u_interp', 'x_major', 't0', 'tf'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -204,19 +131,7 @@ def controlsimulatorIn(**kwargs):
     p  -- Parameters that are fixed over the entire horizon  (dimension np-by-1) [CONTROLSIMULATOR_P]
     u  -- Parameters that change over the integration intervals (dimension nu-by-(ns-1)) [CONTROLSIMULATOR_U]
   """
-  x0 = []
-  if 'x0' in kwargs:
-    x0 = kwargs['x0']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  u = []
-  if 'u' in kwargs:
-    u = kwargs['u']
-  for k in kwargs.keys():
-    if not(k in ['x0','p','u']):
-      raise Exception("Keyword error in controlsimulatorIn: '%s' is not recognized. Available keywords are: x0, p, u" % k )
-  return IOSchemeVector([x0,p,u], IOScheme(SCHEME_ControlSimulatorInput))
+  return (kwargs, ['x0', 'p', 'u'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -243,16 +158,7 @@ def dleIn(**kwargs):
     a -- A matrix [DLE_A]
     v -- V matrix [DLE_V]
   """
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
-  for k in kwargs.keys():
-    if not(k in ['a','v']):
-      raise Exception("Keyword error in dleIn: '%s' is not recognized. Available keywords are: a, v" % k )
-  return IOSchemeVector([a,v], IOScheme(SCHEME_DLEInput))
+  return (kwargs, ['a', 'v'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -278,13 +184,7 @@ def dleOut(**kwargs):
 
     p -- P matrix [DLE_P]
   """
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  for k in kwargs.keys():
-    if not(k in ['p']):
-      raise Exception("Keyword error in dleOut: '%s' is not recognized. Available keywords are: p" % k )
-  return IOSchemeVector([p], IOScheme(SCHEME_DLEOutput))
+  return (kwargs, ['p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -311,16 +211,7 @@ def dpleIn(**kwargs):
     a -- A matrices (horzcat when const_dim, diagcat otherwise) [DPLE_A]
     v -- V matrices (horzcat when const_dim, diagcat otherwise) [DPLE_V]
   """
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
-  for k in kwargs.keys():
-    if not(k in ['a','v']):
-      raise Exception("Keyword error in dpleIn: '%s' is not recognized. Available keywords are: a, v" % k )
-  return IOSchemeVector([a,v], IOScheme(SCHEME_DPLEInput))
+  return (kwargs, ['a', 'v'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -346,13 +237,7 @@ def dpleOut(**kwargs):
 
     p -- Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [DPLE_P]
   """
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  for k in kwargs.keys():
-    if not(k in ['p']):
-      raise Exception("Keyword error in dpleOut: '%s' is not recognized. Available keywords are: p" % k )
-  return IOSchemeVector([p], IOScheme(SCHEME_DPLEOutput))
+  return (kwargs, ['p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -380,19 +265,7 @@ def hnlpIn(**kwargs):
     p   -- Fixed parameter [HNL_P]
     tau -- Homotopy parameter [HNL_TAU]
   """
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  tau = []
-  if 'tau' in kwargs:
-    tau = kwargs['tau']
-  for k in kwargs.keys():
-    if not(k in ['x','p','tau']):
-      raise Exception("Keyword error in hnlpIn: '%s' is not recognized. Available keywords are: x, p, tau" % k )
-  return IOSchemeVector([x,p,tau], IOScheme(SCHEME_HNLPInput))
+  return (kwargs, ['x', 'p', 'tau'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -421,22 +294,7 @@ def daeIn(**kwargs):
     p -- Parameter [DAE_P]
     t -- Explicit time dependence [DAE_T]
   """
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  z = []
-  if 'z' in kwargs:
-    z = kwargs['z']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  t = []
-  if 't' in kwargs:
-    t = kwargs['t']
-  for k in kwargs.keys():
-    if not(k in ['x','z','p','t']):
-      raise Exception("Keyword error in daeIn: '%s' is not recognized. Available keywords are: x, z, p, t" % k )
-  return IOSchemeVector([x,z,p,t], IOScheme(SCHEME_DAEInput))
+  return (kwargs, ['x', 'z', 'p', 't'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -464,19 +322,7 @@ def daeOut(**kwargs):
     alg  -- Right hand side of algebraic equations [DAE_ALG]
     quad -- Right hand side of quadratures equations [DAE_QUAD]
   """
-  ode = []
-  if 'ode' in kwargs:
-    ode = kwargs['ode']
-  alg = []
-  if 'alg' in kwargs:
-    alg = kwargs['alg']
-  quad = []
-  if 'quad' in kwargs:
-    quad = kwargs['quad']
-  for k in kwargs.keys():
-    if not(k in ['ode','alg','quad']):
-      raise Exception("Keyword error in daeOut: '%s' is not recognized. Available keywords are: ode, alg, quad" % k )
-  return IOSchemeVector([ode,alg,quad], IOScheme(SCHEME_DAEOutput))
+  return (kwargs, ['ode', 'alg', 'quad'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -508,31 +354,7 @@ def rdaeIn(**kwargs):
     p  -- Parameter vector [RDAE_P]
     t  -- Explicit time dependence [RDAE_T]
   """
-  rx = []
-  if 'rx' in kwargs:
-    rx = kwargs['rx']
-  rz = []
-  if 'rz' in kwargs:
-    rz = kwargs['rz']
-  rp = []
-  if 'rp' in kwargs:
-    rp = kwargs['rp']
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  z = []
-  if 'z' in kwargs:
-    z = kwargs['z']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  t = []
-  if 't' in kwargs:
-    t = kwargs['t']
-  for k in kwargs.keys():
-    if not(k in ['rx','rz','rp','x','z','p','t']):
-      raise Exception("Keyword error in rdaeIn: '%s' is not recognized. Available keywords are: rx, rz, rp, x, z, p, t" % k )
-  return IOSchemeVector([rx,rz,rp,x,z,p,t], IOScheme(SCHEME_RDAEInput))
+  return (kwargs, ['rx', 'rz', 'rp', 'x', 'z', 'p', 't'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -560,19 +382,7 @@ def rdaeOut(**kwargs):
     alg  -- Right hand side of algebraic equations. [RDAE_ALG]
     quad -- Right hand side of quadratures. [RDAE_QUAD]
   """
-  ode = []
-  if 'ode' in kwargs:
-    ode = kwargs['ode']
-  alg = []
-  if 'alg' in kwargs:
-    alg = kwargs['alg']
-  quad = []
-  if 'quad' in kwargs:
-    quad = kwargs['quad']
-  for k in kwargs.keys():
-    if not(k in ['ode','alg','quad']):
-      raise Exception("Keyword error in rdaeOut: '%s' is not recognized. Available keywords are: ode, alg, quad" % k )
-  return IOSchemeVector([ode,alg,quad], IOScheme(SCHEME_RDAEOutput))
+  return (kwargs, ['ode', 'alg', 'quad'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -603,28 +413,7 @@ def integratorIn(**kwargs):
     rp  -- Backward parameter vector [INTEGRATOR_RP]
     rz0 -- Initial guess for the backwards algebraic variable [INTEGRATOR_RZ0]
   """
-  x0 = []
-  if 'x0' in kwargs:
-    x0 = kwargs['x0']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  z0 = []
-  if 'z0' in kwargs:
-    z0 = kwargs['z0']
-  rx0 = []
-  if 'rx0' in kwargs:
-    rx0 = kwargs['rx0']
-  rp = []
-  if 'rp' in kwargs:
-    rp = kwargs['rp']
-  rz0 = []
-  if 'rz0' in kwargs:
-    rz0 = kwargs['rz0']
-  for k in kwargs.keys():
-    if not(k in ['x0','p','z0','rx0','rp','rz0']):
-      raise Exception("Keyword error in integratorIn: '%s' is not recognized. Available keywords are: x0, p, z0, rx0, rp, rz0" % k )
-  return IOSchemeVector([x0,p,z0,rx0,rp,rz0], IOScheme(SCHEME_IntegratorInput))
+  return (kwargs, ['x0', 'p', 'z0', 'rx0', 'rp', 'rz0'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -655,28 +444,7 @@ def integratorOut(**kwargs):
     rqf -- Backward quadrature state at the initial time [INTEGRATOR_RQF]
     rzf -- Backward algebraic variable at the initial time [INTEGRATOR_RZF]
   """
-  xf = []
-  if 'xf' in kwargs:
-    xf = kwargs['xf']
-  qf = []
-  if 'qf' in kwargs:
-    qf = kwargs['qf']
-  zf = []
-  if 'zf' in kwargs:
-    zf = kwargs['zf']
-  rxf = []
-  if 'rxf' in kwargs:
-    rxf = kwargs['rxf']
-  rqf = []
-  if 'rqf' in kwargs:
-    rqf = kwargs['rqf']
-  rzf = []
-  if 'rzf' in kwargs:
-    rzf = kwargs['rzf']
-  for k in kwargs.keys():
-    if not(k in ['xf','qf','zf','rxf','rqf','rzf']):
-      raise Exception("Keyword error in integratorOut: '%s' is not recognized. Available keywords are: xf, qf, zf, rxf, rqf, rzf" % k )
-  return IOSchemeVector([xf,qf,zf,rxf,rqf,rzf], IOScheme(SCHEME_IntegratorOutput))
+  return (kwargs, ['xf', 'qf', 'zf', 'rxf', 'rqf', 'rzf'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -703,16 +471,7 @@ def linsolIn(**kwargs):
     A -- The square matrix A: sparse, (n x n). [LINSOL_A]
     B -- The right-hand-side matrix b: dense,  (n x m) [LINSOL_B]
   """
-  A = []
-  if 'A' in kwargs:
-    A = kwargs['A']
-  B = []
-  if 'B' in kwargs:
-    B = kwargs['B']
-  for k in kwargs.keys():
-    if not(k in ['A','B']):
-      raise Exception("Keyword error in linsolIn: '%s' is not recognized. Available keywords are: A, B" % k )
-  return IOSchemeVector([A,B], IOScheme(SCHEME_LinsolInput))
+  return (kwargs, ['A', 'B'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -738,13 +497,7 @@ def linsolOut(**kwargs):
 
     X -- Solution to the linear system of equations [LINSOL_X]
   """
-  X = []
-  if 'X' in kwargs:
-    X = kwargs['X']
-  for k in kwargs.keys():
-    if not(k in ['X']):
-      raise Exception("Keyword error in linsolOut: '%s' is not recognized. Available keywords are: X" % k )
-  return IOSchemeVector([X], IOScheme(SCHEME_LinsolOutput))
+  return (kwargs, ['X'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -775,28 +528,7 @@ def lpIn(**kwargs):
     lbx -- dense, (n x 1) [LP_SOLVER_LBX]
     ubx -- dense, (n x 1) [LP_SOLVER_UBX]
   """
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  for k in kwargs.keys():
-    if not(k in ['c','a','lba','uba','lbx','ubx']):
-      raise Exception("Keyword error in lpIn: '%s' is not recognized. Available keywords are: c, a, lba, uba, lbx, ubx" % k )
-  return IOSchemeVector([c,a,lba,uba,lbx,ubx], IOScheme(SCHEME_LpSolverInput))
+  return (kwargs, ['c', 'a', 'lba', 'uba', 'lbx', 'ubx'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -825,22 +557,7 @@ def lpOut(**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [LP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [LP_SOLVER_LAM_X]
   """
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  lam_a = []
-  if 'lam_a' in kwargs:
-    lam_a = kwargs['lam_a']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
-  for k in kwargs.keys():
-    if not(k in ['x','cost','lam_a','lam_x']):
-      raise Exception("Keyword error in lpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_LpSolverOutput))
+  return (kwargs, ['x', 'cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -869,22 +586,7 @@ def lrdleIn(**kwargs):
     c -- C matrix [LR_DLE_C]
     h -- H matrix: horizontal stack of all Hi [LR_DLE_H]
   """
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  for k in kwargs.keys():
-    if not(k in ['a','v','c','h']):
-      raise Exception("Keyword error in lrdleIn: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
-  return IOSchemeVector([a,v,c,h], IOScheme(SCHEME_LR_DLEInput))
+  return (kwargs, ['a', 'v', 'c', 'h'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -910,13 +612,7 @@ def lrdleOut(**kwargs):
 
     y -- Y matrix, block diagonal form [LR_DLE_Y]
   """
-  y = []
-  if 'y' in kwargs:
-    y = kwargs['y']
-  for k in kwargs.keys():
-    if not(k in ['y']):
-      raise Exception("Keyword error in lrdleOut: '%s' is not recognized. Available keywords are: y" % k )
-  return IOSchemeVector([y], IOScheme(SCHEME_LR_DLEOutput))
+  return (kwargs, ['y'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -945,22 +641,7 @@ def lrdpleIn(**kwargs):
     c -- C matrix [LR_DPLE_C]
     h -- H matrix: horizontal stack of all Hi [LR_DPLE_H]
   """
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  for k in kwargs.keys():
-    if not(k in ['a','v','c','h']):
-      raise Exception("Keyword error in lrdpleIn: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
-  return IOSchemeVector([a,v,c,h], IOScheme(SCHEME_LR_DPLEInput))
+  return (kwargs, ['a', 'v', 'c', 'h'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -986,13 +667,7 @@ def lrdpleOut(**kwargs):
 
     y -- Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [LR_DPLE_Y]
   """
-  y = []
-  if 'y' in kwargs:
-    y = kwargs['y']
-  for k in kwargs.keys():
-    if not(k in ['y']):
-      raise Exception("Keyword error in lrdpleOut: '%s' is not recognized. Available keywords are: y" % k )
-  return IOSchemeVector([y], IOScheme(SCHEME_LR_DPLEOutput))
+  return (kwargs, ['y'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1019,16 +694,7 @@ def nlpIn(**kwargs):
     x -- Decision variable [NL_X]
     p -- Fixed parameter [NL_P]
   """
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  for k in kwargs.keys():
-    if not(k in ['x','p']):
-      raise Exception("Keyword error in nlpIn: '%s' is not recognized. Available keywords are: x, p" % k )
-  return IOSchemeVector([x,p], IOScheme(SCHEME_NLPInput))
+  return (kwargs, ['x', 'p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1055,16 +721,7 @@ def nlpOut(**kwargs):
     f -- Objective function [NL_F]
     g -- Constraint function [NL_G]
   """
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  for k in kwargs.keys():
-    if not(k in ['f','g']):
-      raise Exception("Keyword error in nlpOut: '%s' is not recognized. Available keywords are: f, g" % k )
-  return IOSchemeVector([f,g], IOScheme(SCHEME_NLPOutput))
+  return (kwargs, ['f', 'g'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1091,16 +748,7 @@ def gradFIn(**kwargs):
     x -- Decision variable [GRADF_X]
     p -- Fixed parameter [GRADF_P]
   """
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  for k in kwargs.keys():
-    if not(k in ['x','p']):
-      raise Exception("Keyword error in gradFIn: '%s' is not recognized. Available keywords are: x, p" % k )
-  return IOSchemeVector([x,p], IOScheme(SCHEME_GradFInput))
+  return (kwargs, ['x', 'p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1128,19 +776,7 @@ def gradFOut(**kwargs):
     f    -- Objective function [GRADF_F]
     g    -- Constraint function [GRADF_G]
   """
-  grad = []
-  if 'grad' in kwargs:
-    grad = kwargs['grad']
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  for k in kwargs.keys():
-    if not(k in ['grad','f','g']):
-      raise Exception("Keyword error in gradFOut: '%s' is not recognized. Available keywords are: grad, f, g" % k )
-  return IOSchemeVector([grad,f,g], IOScheme(SCHEME_GradFOutput))
+  return (kwargs, ['grad', 'f', 'g'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1167,16 +803,7 @@ def jacGIn(**kwargs):
     x -- Decision variable [JACG_X]
     p -- Fixed parameter [JACG_P]
   """
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  for k in kwargs.keys():
-    if not(k in ['x','p']):
-      raise Exception("Keyword error in jacGIn: '%s' is not recognized. Available keywords are: x, p" % k )
-  return IOSchemeVector([x,p], IOScheme(SCHEME_JacGInput))
+  return (kwargs, ['x', 'p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1204,19 +831,7 @@ def jacGOut(**kwargs):
     f   -- Objective function [JACG_F]
     g   -- Constraint function [JACG_G]
   """
-  jac = []
-  if 'jac' in kwargs:
-    jac = kwargs['jac']
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  for k in kwargs.keys():
-    if not(k in ['jac','f','g']):
-      raise Exception("Keyword error in jacGOut: '%s' is not recognized. Available keywords are: jac, f, g" % k )
-  return IOSchemeVector([jac,f,g], IOScheme(SCHEME_JacGOutput))
+  return (kwargs, ['jac', 'f', 'g'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1245,22 +860,7 @@ def hessLagIn(**kwargs):
     lam_f -- NLP solver might use to scale the objective. [HESSLAG_LAM_F]
     lam_g -- Multiplier for g [HESSLAG_LAM_G]
   """
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  lam_f = []
-  if 'lam_f' in kwargs:
-    lam_f = kwargs['lam_f']
-  lam_g = []
-  if 'lam_g' in kwargs:
-    lam_g = kwargs['lam_g']
-  for k in kwargs.keys():
-    if not(k in ['x','p','lam_f','lam_g']):
-      raise Exception("Keyword error in hessLagIn: '%s' is not recognized. Available keywords are: x, p, lam_f, lam_g" % k )
-  return IOSchemeVector([x,p,lam_f,lam_g], IOScheme(SCHEME_HessLagInput))
+  return (kwargs, ['x', 'p', 'lam_f', 'lam_g'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1290,25 +890,7 @@ def hessLagOut(**kwargs):
     grad_x -- Gradient of the Lagrangian with respect to x [HESSLAG_GRAD_X]
     grad_p -- Gradient of the Lagrangian with respect to p [HESSLAG_GRAD_P]
   """
-  hess = []
-  if 'hess' in kwargs:
-    hess = kwargs['hess']
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  grad_x = []
-  if 'grad_x' in kwargs:
-    grad_x = kwargs['grad_x']
-  grad_p = []
-  if 'grad_p' in kwargs:
-    grad_p = kwargs['grad_p']
-  for k in kwargs.keys():
-    if not(k in ['hess','f','g','grad_x','grad_p']):
-      raise Exception("Keyword error in hessLagOut: '%s' is not recognized. Available keywords are: hess, f, g, grad_x, grad_p" % k )
-  return IOSchemeVector([hess,f,g,grad_x,grad_p], IOScheme(SCHEME_HessLagOutput))
+  return (kwargs, ['hess', 'f', 'g', 'grad_x', 'grad_p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1341,34 +923,7 @@ def nlpSolverIn(**kwargs):
     lam_x0 -- Lagrange multipliers for bounds on X, initial guess (nx x 1) [NLP_SOLVER_LAM_X0]
     lam_g0 -- Lagrange multipliers for bounds on G, initial guess (ng x 1) [NLP_SOLVER_LAM_G0]
   """
-  x0 = []
-  if 'x0' in kwargs:
-    x0 = kwargs['x0']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  lbg = []
-  if 'lbg' in kwargs:
-    lbg = kwargs['lbg']
-  ubg = []
-  if 'ubg' in kwargs:
-    ubg = kwargs['ubg']
-  lam_x0 = []
-  if 'lam_x0' in kwargs:
-    lam_x0 = kwargs['lam_x0']
-  lam_g0 = []
-  if 'lam_g0' in kwargs:
-    lam_g0 = kwargs['lam_g0']
-  for k in kwargs.keys():
-    if not(k in ['x0','p','lbx','ubx','lbg','ubg','lam_x0','lam_g0']):
-      raise Exception("Keyword error in nlpSolverIn: '%s' is not recognized. Available keywords are: x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0" % k )
-  return IOSchemeVector([x0,p,lbx,ubx,lbg,ubg,lam_x0,lam_g0], IOScheme(SCHEME_NlpSolverInput))
+  return (kwargs, ['x0', 'p', 'lbx', 'ubx', 'lbg', 'ubg', 'lam_x0', 'lam_g0'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1399,28 +954,7 @@ def nlpSolverOut(**kwargs):
     lam_g -- Lagrange multipliers for bounds on G at the solution (ng x 1) [NLP_SOLVER_LAM_G]
     lam_p -- Lagrange multipliers for bounds on P at the solution (np x 1) [NLP_SOLVER_LAM_P]
   """
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
-  lam_g = []
-  if 'lam_g' in kwargs:
-    lam_g = kwargs['lam_g']
-  lam_p = []
-  if 'lam_p' in kwargs:
-    lam_p = kwargs['lam_p']
-  for k in kwargs.keys():
-    if not(k in ['x','f','g','lam_x','lam_g','lam_p']):
-      raise Exception("Keyword error in nlpSolverOut: '%s' is not recognized. Available keywords are: x, f, g, lam_x, lam_g, lam_p" % k )
-  return IOSchemeVector([x,f,g,lam_x,lam_g,lam_p], IOScheme(SCHEME_NlpSolverOutput))
+  return (kwargs, ['x', 'f', 'g', 'lam_x', 'lam_g', 'lam_p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1457,46 +991,7 @@ def qcqpIn(**kwargs):
     x0     -- dense, (n x 1) [QCQP_SOLVER_X0]
     lam_x0 -- dense [QCQP_SOLVER_LAM_X0]
   """
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  q = []
-  if 'q' in kwargs:
-    q = kwargs['q']
-  r = []
-  if 'r' in kwargs:
-    r = kwargs['r']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  x0 = []
-  if 'x0' in kwargs:
-    x0 = kwargs['x0']
-  lam_x0 = []
-  if 'lam_x0' in kwargs:
-    lam_x0 = kwargs['lam_x0']
-  for k in kwargs.keys():
-    if not(k in ['h','g','p','q','r','a','lba','uba','lbx','ubx','x0','lam_x0']):
-      raise Exception("Keyword error in qcqpIn: '%s' is not recognized. Available keywords are: h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0" % k )
-  return IOSchemeVector([h,g,p,q,r,a,lba,uba,lbx,ubx,x0,lam_x0], IOScheme(SCHEME_QcqpSolverInput))
+  return (kwargs, ['h', 'g', 'p', 'q', 'r', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1525,22 +1020,7 @@ def qcqpOut(**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [QCQP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [QCQP_SOLVER_LAM_X]
   """
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  lam_a = []
-  if 'lam_a' in kwargs:
-    lam_a = kwargs['lam_a']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
-  for k in kwargs.keys():
-    if not(k in ['x','cost','lam_a','lam_x']):
-      raise Exception("Keyword error in qcqpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_QcqpSolverOutput))
+  return (kwargs, ['x', 'cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1574,37 +1054,7 @@ def qpIn(**kwargs):
     x0     -- dense, (n x 1) [QP_SOLVER_X0]
     lam_x0 -- dense [QP_SOLVER_LAM_X0]
   """
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  x0 = []
-  if 'x0' in kwargs:
-    x0 = kwargs['x0']
-  lam_x0 = []
-  if 'lam_x0' in kwargs:
-    lam_x0 = kwargs['lam_x0']
-  for k in kwargs.keys():
-    if not(k in ['h','g','a','lba','uba','lbx','ubx','x0','lam_x0']):
-      raise Exception("Keyword error in qpIn: '%s' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x0, lam_x0" % k )
-  return IOSchemeVector([h,g,a,lba,uba,lbx,ubx,x0,lam_x0], IOScheme(SCHEME_QpSolverInput))
+  return (kwargs, ['h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1633,22 +1083,7 @@ def qpOut(**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [QP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [QP_SOLVER_LAM_X]
   """
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  lam_a = []
-  if 'lam_a' in kwargs:
-    lam_a = kwargs['lam_a']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
-  for k in kwargs.keys():
-    if not(k in ['x','cost','lam_a','lam_x']):
-      raise Exception("Keyword error in qpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_QpSolverOutput))
+  return (kwargs, ['x', 'cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1681,34 +1116,7 @@ def sdpIn(**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SDP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SDP_SOLVER_UBX]
   """
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  for k in kwargs.keys():
-    if not(k in ['f','c','g','a','lba','uba','lbx','ubx']):
-      raise Exception("Keyword error in sdpIn: '%s' is not recognized. Available keywords are: f, c, g, a, lba, uba, lbx, ubx" % k )
-  return IOSchemeVector([f,c,g,a,lba,uba,lbx,ubx], IOScheme(SCHEME_SDPInput))
+  return (kwargs, ['f', 'c', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1740,31 +1148,7 @@ def sdpOut(**kwargs):
     lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDP_SOLVER_LAM_A]
     lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDP_SOLVER_LAM_X]
   """
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  dual = []
-  if 'dual' in kwargs:
-    dual = kwargs['dual']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  dual_cost = []
-  if 'dual_cost' in kwargs:
-    dual_cost = kwargs['dual_cost']
-  lam_a = []
-  if 'lam_a' in kwargs:
-    lam_a = kwargs['lam_a']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
-  for k in kwargs.keys():
-    if not(k in ['x','p','dual','cost','dual_cost','lam_a','lam_x']):
-      raise Exception("Keyword error in sdpOut: '%s' is not recognized. Available keywords are: x, p, dual, cost, dual_cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,p,dual,cost,dual_cost,lam_a,lam_x], IOScheme(SCHEME_SDPOutput))
+  return (kwargs, ['x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1798,37 +1182,7 @@ def sdqpIn(**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SDQP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SDQP_SOLVER_UBX]
   """
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  for k in kwargs.keys():
-    if not(k in ['h','c','f','g','a','lba','uba','lbx','ubx']):
-      raise Exception("Keyword error in sdqpIn: '%s' is not recognized. Available keywords are: h, c, f, g, a, lba, uba, lbx, ubx" % k )
-  return IOSchemeVector([h,c,f,g,a,lba,uba,lbx,ubx], IOScheme(SCHEME_SDQPInput))
+  return (kwargs, ['h', 'c', 'f', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1860,31 +1214,7 @@ def sdqpOut(**kwargs):
     lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDQP_SOLVER_LAM_A]
     lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDQP_SOLVER_LAM_X]
   """
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  dual = []
-  if 'dual' in kwargs:
-    dual = kwargs['dual']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  dual_cost = []
-  if 'dual_cost' in kwargs:
-    dual_cost = kwargs['dual_cost']
-  lam_a = []
-  if 'lam_a' in kwargs:
-    lam_a = kwargs['lam_a']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
-  for k in kwargs.keys():
-    if not(k in ['x','p','dual','cost','dual_cost','lam_a','lam_x']):
-      raise Exception("Keyword error in sdqpOut: '%s' is not recognized. Available keywords are: x, p, dual, cost, dual_cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,p,dual,cost,dual_cost,lam_a,lam_x], IOScheme(SCHEME_SDQPOutput))
+  return (kwargs, ['x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1919,40 +1249,7 @@ def socpIn(**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SOCP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SOCP_SOLVER_UBX]
   """
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  e = []
-  if 'e' in kwargs:
-    e = kwargs['e']
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  for k in kwargs.keys():
-    if not(k in ['g','h','e','f','c','a','lba','uba','lbx','ubx']):
-      raise Exception("Keyword error in socpIn: '%s' is not recognized. Available keywords are: g, h, e, f, c, a, lba, uba, lbx, ubx" % k )
-  return IOSchemeVector([g,h,e,f,c,a,lba,uba,lbx,ubx], IOScheme(SCHEME_SOCPInput))
+  return (kwargs, ['g', 'h', 'e', 'f', 'c', 'a', 'lba', 'uba', 'lbx', 'ubx'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1981,22 +1278,7 @@ def socpOut(**kwargs):
     lam_a -- The dual solution corresponding to the linear constraints  (nc x 1) [SOCP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds  (n x 1) [SOCP_SOLVER_LAM_X]
   """
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  lam_a = []
-  if 'lam_a' in kwargs:
-    lam_a = kwargs['lam_a']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
-  for k in kwargs.keys():
-    if not(k in ['x','cost','lam_a','lam_x']):
-      raise Exception("Keyword error in socpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_SOCPOutput))
+  return (kwargs, ['x', 'cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2033,46 +1315,7 @@ def stabilizedQpIn(**kwargs):
     muE    -- dense (nc x 1) [STABILIZED_QP_SOLVER_MUE]
     mu     -- dense (nc x 1) [STABILIZED_QP_SOLVER_MU]
   """
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  x0 = []
-  if 'x0' in kwargs:
-    x0 = kwargs['x0']
-  lam_x0 = []
-  if 'lam_x0' in kwargs:
-    lam_x0 = kwargs['lam_x0']
-  muR = []
-  if 'muR' in kwargs:
-    muR = kwargs['muR']
-  muE = []
-  if 'muE' in kwargs:
-    muE = kwargs['muE']
-  mu = []
-  if 'mu' in kwargs:
-    mu = kwargs['mu']
-  for k in kwargs.keys():
-    if not(k in ['h','g','a','lba','uba','lbx','ubx','x0','lam_x0','muR','muE','mu']):
-      raise Exception("Keyword error in stabilizedQpIn: '%s' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu" % k )
-  return IOSchemeVector([h,g,a,lba,uba,lbx,ubx,x0,lam_x0,muR,muE,mu], IOScheme(SCHEME_StabilizedQpSolverInput))
+  return (kwargs, ['h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0', 'muR', 'muE', 'mu'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
