@@ -72,7 +72,6 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_QCQPStruct: return "QCQPStruct";
     case SCHEME_QpSolverInput: return "QpSolverInput";
     case SCHEME_QpSolverOutput: return "QpSolverOutput";
-    case SCHEME_QPStruct: return "QPStruct";
     case SCHEME_SDPInput: return "SDPInput";
     case SCHEME_SDPOutput: return "SDPOutput";
     case SCHEME_SDPStruct: return "SDPStruct";
@@ -176,8 +175,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0";
     case SCHEME_QpSolverOutput:
       return "x, cost, lam_a, lam_x";
-    case SCHEME_QPStruct:
-      return "h, a";
     case SCHEME_SDPInput:
       return "f, c, g, a, lba, uba, lbx, ubx";
     case SCHEME_SDPOutput:
@@ -451,10 +448,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==1) return "cost";
       if (i==2) return "lam_a";
       if (i==3) return "lam_x";
-      break;
-    case SCHEME_QPStruct:
-      if (i==0) return "h";
-      if (i==1) return "a";
       break;
     case SCHEME_SDPInput:
       if (i==0) return "f";
@@ -798,10 +791,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
       if (i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_QPStruct:
-      if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_SDPInput:
       if (i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
       if (i==1) return "The vector c: ( n x 1)";  // NOLINT(whitespace/line_length)
@@ -1144,10 +1133,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==2) return "QP_SOLVER_LAM_A";
       if (i==3) return "QP_SOLVER_LAM_X";
       break;
-    case SCHEME_QPStruct:
-      if (i==0) return "QP_STRUCT_H";
-      if (i==1) return "QP_STRUCT_A";
-      break;
     case SCHEME_SDPInput:
       if (i==0) return "SDP_SOLVER_F";
       if (i==1) return "SDP_SOLVER_C";
@@ -1373,9 +1358,6 @@ int getSchemeSize(InputOutputScheme scheme) {
       break;
     case SCHEME_QpSolverOutput:
       return 4;
-      break;
-    case SCHEME_QPStruct:
-      return 2;
       break;
     case SCHEME_SDPInput:
       return 8;
@@ -1660,10 +1642,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="cost") return 1;
       if (name=="lam_a") return 2;
       if (name=="lam_x") return 3;
-      break;
-    case SCHEME_QPStruct:
-      if (name=="h") return 0;
-      if (name=="a") return 1;
       break;
     case SCHEME_SDPInput:
       if (name=="f") return 0;

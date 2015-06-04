@@ -46,7 +46,7 @@ namespace casadi {
     StabilizedQpSolverInternal::registerPlugin(casadi_register_stabilizedqpsolver_qp);
   }
 
-  StabilizedQpToQp::StabilizedQpToQp(const std::vector<Sparsity> &st)
+  StabilizedQpToQp::StabilizedQpToQp(const std::map<std::string, Sparsity> &st)
       : StabilizedQpSolverInternal(st) {
     addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver used to solve the stabilized QPs.");

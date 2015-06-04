@@ -54,14 +54,16 @@ namespace casadi {
   }
 
   StabilizedQpSolver::StabilizedQpSolver(const std::string& name, const std::string& solver,
-                                         const QPStructure& st, const Dict& opts) {
+                                         const std::map<std::string, Sparsity>& st,
+                                         const Dict& opts) {
     assignNode(StabilizedQpSolverInternal::instantiatePlugin(solver, st));
     setOption("name", name);
     setOption(opts);
     init();
   }
 
-  StabilizedQpSolver::StabilizedQpSolver(const std::string& solver, const QPStructure& st) {
+  StabilizedQpSolver::StabilizedQpSolver(const std::string& solver,
+                                         const std::map<std::string, Sparsity>& st) {
     assignNode(StabilizedQpSolverInternal::instantiatePlugin(solver, st));
   }
 

@@ -52,7 +52,7 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_cplex);
   }
 
-  CplexInterface::CplexInterface(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
+  CplexInterface::CplexInterface(const std::map<std::string, Sparsity>& st) : QpSolverInternal(st) {
     // Options available
     addOption("qp_method",    OT_STRING, "automatic", "Determines which CPLEX algorithm to use.",
               "automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover");
@@ -319,7 +319,8 @@ namespace casadi {
 
   CplexInterface* CplexInterface::clone() const {
     // Return a deepcopy
-    CplexInterface* node = new CplexInterface(st_);
+    CplexInterface* node =
+      new CplexInterface(make_map("h", st_[QP_SOLVER_H], "a", st_[QP_SOLVER_A]));
     if (!node->is_init_)
       node->init();
     return node;

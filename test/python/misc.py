@@ -404,13 +404,6 @@ class Misctests(casadiTestCase):
       assert "You have: (x=SX, p=[SX])" in e.message
 
     try:
-      QpSolver("qp",123)
-      self.assertTrue(False)
-    except NotImplementedError as e:
-      print e.message
-      assert "QpSolver(str,QPStructure)" in e.message
-
-    try:
       x.reshape(2)
       self.assertTrue(False)
     except NotImplementedError as e:

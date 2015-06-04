@@ -54,13 +54,14 @@ namespace casadi {
 
   StabilizedSqicInterface* StabilizedSqicInterface::clone() const {
     // Return a deep copy
-    StabilizedSqicInterface* node = new StabilizedSqicInterface(st_);
+    StabilizedSqicInterface* node =
+      new StabilizedSqicInterface(make_map("h", st_[QP_SOLVER_H], "a", st_[QP_SOLVER_A]));
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  StabilizedSqicInterface::StabilizedSqicInterface(const std::vector<Sparsity>& st)
+  StabilizedSqicInterface::StabilizedSqicInterface(const std::map<std::string, Sparsity>& st)
     : StabilizedQpSolverInternal(st) {
     is_init_ = false;
   }

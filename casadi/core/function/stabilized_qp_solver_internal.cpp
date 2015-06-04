@@ -33,10 +33,20 @@ using namespace std;
 namespace casadi {
 
   // Constructor
-  StabilizedQpSolverInternal::StabilizedQpSolverInternal(const std::vector<Sparsity> &st)
-      : st_(st) {
+  StabilizedQpSolverInternal::
+  StabilizedQpSolverInternal(const std::map<std::string, Sparsity> &st) {
+    st_.resize(QP_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[QP_STRUCT_A]=i->second;
+      } else if (i->first=="h") {
+        st_[QP_STRUCT_H]=i->second;
+      } else {
+        casadi_error("Unrecognized field in QP structure: " << i->first);
+      }
+    }
+
     // Get structure
-    casadi_assert_message(st_.size()==QP_STRUCT_NUM, "Problem structure mismatch");
     const Sparsity& A = st_[QP_STRUCT_A];
     const Sparsity& H = st_[QP_STRUCT_H];
 

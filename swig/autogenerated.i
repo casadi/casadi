@@ -1912,39 +1912,6 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qpStruct(**kwargs):
-  """
-  Helper function for 'QPStruct'
-
-  Usage:
-    arg = qpStruct(h=my_h, a=my_a)
-        all arguments optional
-  Structure specification of a QP
-  
-  Keyword arguments::
-
-    h -- The matrix is assumed to be symmetrical. [QP_STRUCT_H]
-    a -- The matrix A: sparse, (nc x n) - product with x must be dense. [QP_STRUCT_A]
-  """
-  h = Sparsity()
-  if 'h' in kwargs:
-    h = kwargs['h']
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  for k in kwargs.keys():
-    if not(k in ['h','a']):
-      raise Exception("Keyword error in qpStruct: '%s' is not recognized. Available keywords are: h, a" % k )
-  return IOSchemeVector([h,a], IOScheme(SCHEME_QPStruct))
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(qpStruct) qpStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
 def sdpIn(**kwargs):
   """
   Helper function for 'SDPInput'

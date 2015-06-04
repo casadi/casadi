@@ -57,11 +57,12 @@ namespace casadi {
     virtual OoqpInterface* clone() const { return new OoqpInterface(*this);}
 
     /** \brief  Create a new Solver */
-    explicit OoqpInterface(const std::vector<Sparsity>& st);
+    explicit OoqpInterface(const std::map<std::string, Sparsity>& st);
 
     /** \brief  Create a new QP Solver */
-    static QpSolverInternal* creator(const QPStructure& st)
-    { return new OoqpInterface(st);}
+    static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
+      return new OoqpInterface(st);
+    }
 
     /** \brief  Destructor */
     virtual ~OoqpInterface();

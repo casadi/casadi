@@ -53,11 +53,12 @@ namespace casadi {
     virtual StabilizedSqicInterface* clone() const;
 
     /** \brief  Create a new QP Solver */
-    static StabilizedQpSolverInternal* creator(const QPStructure& st)
-    { return new StabilizedSqicInterface(st);}
+    static StabilizedQpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
+      return new StabilizedSqicInterface(st);
+    }
 
     /** \brief  Create a new Solver */
-    explicit StabilizedSqicInterface(const std::vector<Sparsity>& st);
+    explicit StabilizedSqicInterface(const std::map<std::string, Sparsity>& st);
 
     /** \brief  Destructor */
     virtual ~StabilizedSqicInterface();

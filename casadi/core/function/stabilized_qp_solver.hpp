@@ -111,14 +111,14 @@ namespace casadi {
      *  \copydoc scheme_QPStruct
      */
     StabilizedQpSolver(const std::string& name, const std::string& solver,
-                       const QPStructure& st, const Dict& opts=Dict());
+                       const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
     /** \brief Constructor (no initialization, to be deprecated)
      *  \param solver \pluginargument{StabilizedQpSolver}
      *  \param st Problem structure
      *  \copydoc scheme_QPStruct
      */
-    StabilizedQpSolver(const std::string& solver, const QPStructure& st);
+    StabilizedQpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
 
     /// Access functions of the node
     StabilizedQpSolverInternal* operator->();

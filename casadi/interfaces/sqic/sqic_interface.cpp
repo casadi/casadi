@@ -61,7 +61,7 @@ namespace casadi {
     return node;
   }
 
-  SqicInterface::SqicInterface(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
+  SqicInterface::SqicInterface(const std::map<std::string, Sparsity>& st) : QpSolverInternal(st) {
     is_init_ = false;
   }
 
