@@ -48,7 +48,7 @@ class QcqpSolverTests(casadiTestCase):
     UBX = DMatrix([ inf, -inf ])
     
     for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
-      solver = QcqpSolver(qcqpsolver,qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
+      solver = QcqpSolver(qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()})
       solver.setOption(qcqp_options)
       solver.init()
 
@@ -81,7 +81,7 @@ class QcqpSolverTests(casadiTestCase):
     for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
       self.message("qcqpsolver: " + str(qcqpsolver))
 
-      solver = QcqpSolver(qcqpsolver,qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
+      solver = QcqpSolver(qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()})
       solver.setOption(qcqp_options)
       solver.init()
 
@@ -121,7 +121,7 @@ class QcqpSolverTests(casadiTestCase):
     for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
       self.message("qcqpsolver: " + str(qcqpsolver))
 
-      solver = QcqpSolver(qcqpsolver,qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
+      solver = QcqpSolver(qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()})
       solver.setOption(qcqp_options)
       solver.init()
 

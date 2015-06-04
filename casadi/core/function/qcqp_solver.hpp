@@ -100,19 +100,6 @@ namespace casadi {
     QCQP_SOLVER_LAM_X,
     QCQP_SOLVER_NUM_OUT};
 
-
-  /// Structure specification of a QP [qcqpStruct]
-  enum QCQPStruct {
-    /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
-    /// The matrix is assumed to be symmetrical. [h]
-    QCQP_STRUCT_H,
-    /// The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower
-    /// triangular part is actually used. The matrix is assumed to be symmetrical. [p]
-    QCQP_STRUCT_P,
-    /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
-    QCQP_STRUCT_A,
-    QCQP_STRUCT_NUM};
-
   // Forward declaration of internal class
   class QcqpSolverInternal;
 
@@ -138,13 +125,13 @@ namespace casadi {
      *  \param st \structargument{QCQP}
      */
     QcqpSolver(const std::string& name, const std::string& solver,
-               const QCQPStructure& st, const Dict& opts=Dict());
+               const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
     /** \brief Constructor (no initialization, to be deprecated)
      *  \param solver \pluginargument{QcqpSolver}
      *  \param st \structargument{QCQP}
      */
-    QcqpSolver(const std::string& solver, const QCQPStructure& st);
+    QcqpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
 
     /// Access functions of the node
     QcqpSolverInternal* operator->();

@@ -48,14 +48,15 @@ namespace casadi {
   }
 
   QcqpSolver::QcqpSolver(const std::string& name, const std::string& solver,
-                         const QCQPStructure& st, const Dict& opts) {
+                         const std::map<std::string, Sparsity>& st, const Dict& opts) {
     assignNode(QcqpSolverInternal::instantiatePlugin(solver, st));
     setOption("name", name);
     setOption(opts);
     init();
   }
 
-  QcqpSolver::QcqpSolver(const std::string& solver, const QCQPStructure& st) {
+  QcqpSolver::QcqpSolver(const std::string& solver,
+                         const std::map<std::string, Sparsity>& st) {
     assignNode(QcqpSolverInternal::instantiatePlugin(solver, st));
   }
 
