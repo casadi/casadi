@@ -49,13 +49,14 @@ namespace casadi {
 
   QpToNlp* QpToNlp::clone() const {
     // Return a deep copy
-    QpToNlp* node = new QpToNlp(st_);
+    QpToNlp* node =
+      new QpToNlp(make_map("h", st_[QP_SOLVER_H], "a", st_[QP_SOLVER_A]));
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  QpToNlp::QpToNlp(const std::vector<Sparsity> &st) : QpSolverInternal(st) {
+  QpToNlp::QpToNlp(const std::map<std::string, Sparsity> &st) : QpSolverInternal(st) {
     Adaptor<QpToNlp, NlpSolverInternal>::addOptions();
   }
 

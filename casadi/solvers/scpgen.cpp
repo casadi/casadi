@@ -594,7 +594,7 @@ namespace casadi {
     // Allocate a QP solver
     std::string qp_solver_name = getOption("qp_solver");
     qp_solver_ = QpSolver(qp_solver_name,
-                          qpStruct("h", qpH_.sparsity(), "a", qpA_.sparsity()));
+                          make_map("h", qpH_.sparsity(), "a", qpA_.sparsity()));
 
     // Set options if provided
     if (hasSetOption("qp_solver_options")) {

@@ -93,16 +93,6 @@ namespace casadi {
     QP_SOLVER_LAM_X,
     QP_SOLVER_NUM_OUT};
 
-
-  /// Structure specification of a QP [qpStruct]
-  enum QPStruct {
-    /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
-    /// The matrix is assumed to be symmetrical. [h]
-    QP_STRUCT_H,
-    /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
-    QP_STRUCT_A,
-    QP_STRUCT_NUM};
-
   // Forward declaration of internal class
   class QpSolverInternal;
 
@@ -128,13 +118,13 @@ namespace casadi {
      *  \param st \structargument{QP}
      */
     QpSolver(const std::string& name, const std::string& solver,
-             const QPStructure& st, const Dict& opts=Dict());
+             const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
     /** \brief Constructor (no initialization, to be deprecated)
      *  \param name \pluginargument{QpSolver}
      *  \param st \structargument{QP}
      */
-    QpSolver(const std::string& solver, const QPStructure& st);
+    QpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
 
     /// Access functions of the node
     QpSolverInternal* operator->();

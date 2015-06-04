@@ -32,6 +32,14 @@
 
 /// \cond INTERNAL
 namespace casadi {
+  /// Structure specification of a QP
+  enum QPStruct {
+    /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
+    /// The matrix is assumed to be symmetrical.
+    QP_STRUCT_H,
+    /// The matrix A: sparse, (nc x n) - product with x must be dense.
+    QP_STRUCT_A,
+    QP_STRUCT_NUM};
 
   /// Internal class
   class CASADI_EXPORT
@@ -40,7 +48,7 @@ namespace casadi {
   public:
 
     // Constructor
-    QpSolverInternal(const std::vector<Sparsity> &st);
+    QpSolverInternal(const std::map<std::string, Sparsity> &st);
 
     // Destructor
     virtual ~QpSolverInternal() = 0;
@@ -64,7 +72,7 @@ namespace casadi {
     virtual void generateNativeCode(std::ostream& file) const;
 
     // Creator function for internal class
-    typedef QpSolverInternal* (*Creator)(const QPStructure& st);
+    typedef QpSolverInternal* (*Creator)(const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
     struct Exposed{ };

@@ -59,11 +59,12 @@ public:
   virtual QpToNlp* clone() const;
 
   /** \brief  Create a new QP Solver */
-  static QpSolverInternal* creator(const QPStructure& st)
-  { return new QpToNlp(make_vector(st));}
+  static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
+    return new QpToNlp(st);
+  }
 
   /** \brief  Create a new Solver */
-  explicit QpToNlp(const std::vector<Sparsity> &st);
+  explicit QpToNlp(const std::map<std::string, Sparsity> &st);
 
   /** \brief  Destructor */
   virtual ~QpToNlp();

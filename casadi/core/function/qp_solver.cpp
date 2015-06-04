@@ -58,12 +58,12 @@ namespace casadi {
     (*this)->generateNativeCode(file);
   }
 
-  QpSolver::QpSolver(const std::string& solver, const QPStructure& st) {
+  QpSolver::QpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st) {
     assignNode(QpSolverInternal::instantiatePlugin(solver, st));
   }
 
   QpSolver::QpSolver(const std::string& name, const std::string& solver,
-                     const QPStructure& st, const Dict& opts) {
+                     const std::map<std::string, Sparsity>& st, const Dict& opts) {
     assignNode(QpSolverInternal::instantiatePlugin(solver, st));
     setOption("name", name);
     setOption(opts);

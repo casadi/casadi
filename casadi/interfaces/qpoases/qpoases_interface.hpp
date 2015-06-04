@@ -58,11 +58,12 @@ public:
   virtual QpoasesInterface* clone() const;
 
   /** \brief  Create a new QP Solver */
-  static QpSolverInternal* creator(const QPStructure& st)
-  { return new QpoasesInterface(make_vector(st));}
+  static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
+    return new QpoasesInterface(st);
+  }
 
   /** \brief  Create a new Solver */
-  explicit QpoasesInterface(const std::vector<Sparsity>& st);
+  explicit QpoasesInterface(const std::map<std::string, Sparsity>& st);
 
   /** \brief  Destructor */
   virtual ~QpoasesInterface();

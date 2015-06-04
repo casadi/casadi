@@ -409,14 +409,7 @@ class Misctests(casadiTestCase):
     except NotImplementedError as e:
       print e.message
       assert "QpSolver(str,QPStructure)" in e.message
-      
-    try:
-      SXFunction(qpStruct(a=12),[x])
-      self.assertTrue(False)
-    except TypeError as e:
-      print e.message
-      assert "You have: (a=int)" in e.message
-  
+
     try:
       x.reshape(2)
       self.assertTrue(False)

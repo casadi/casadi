@@ -771,6 +771,7 @@
 %template() std::map<std::string, casadi::MX >;
 %template() std::map<std::string, casadi::Matrix<casadi::SXElement> >;
 %template() std::map<std::string, casadi::Matrix<double> >;
+%template() std::map<std::string, casadi::Sparsity >;
 
 /* Map conversion from dictionaries (default routines handle opposite direction) */
 %define %typemaps_map(xName, xPrec, xType...)

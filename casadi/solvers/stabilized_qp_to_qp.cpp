@@ -72,7 +72,7 @@ namespace casadi {
     Sparsity A_sparsity_qp = horzcat(st_[QP_STRUCT_A], Sparsity::diag(nc_));
     std::string qp_solver_name = getOption("qp_solver");
     qp_solver_ = QpSolver(qp_solver_name,
-                          qpStruct("h", H_sparsity_qp, "a", A_sparsity_qp));
+                          make_map("h", H_sparsity_qp, "a", A_sparsity_qp));
 
     // Pass options if provided
     if (hasSetOption("qp_solver_options")) {

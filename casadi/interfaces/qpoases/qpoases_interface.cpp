@@ -51,13 +51,15 @@ namespace casadi {
 
   QpoasesInterface* QpoasesInterface::clone() const {
     // Return a deep copy
-    QpoasesInterface* node = new QpoasesInterface(st_);
+    QpoasesInterface* node =
+      new QpoasesInterface(make_map("h", st_[QP_SOLVER_H], "a", st_[QP_SOLVER_A]));
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  QpoasesInterface::QpoasesInterface(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
+  QpoasesInterface::QpoasesInterface(const std::map<std::string, Sparsity>& st)
+    : QpSolverInternal(st) {
     addOption("nWSR",                   OT_INTEGER,     GenericType(),
               "The maximum number of working set recalculations to be performed during "
               "the initial homotopy. Default is 5(nx + nc)");
