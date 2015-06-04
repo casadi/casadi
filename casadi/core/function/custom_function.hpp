@@ -56,8 +56,8 @@ public:
                  const Dict& opts=Dict());
 
   ///@{
-  //typedef std::pair<std::map<std::string, Sparsity>, std::vector<std::string> > MappedIO;
-  typedef IOSchemeVector<Sparsity> MappedIO;
+  typedef std::pair<std::map<std::string, Sparsity>, std::vector<std::string> > MappedIO;
+  typedef IOSchemeVector<Sparsity> MappedIO2;
 
   /** \brief Constructor (no initialization, to be deprecated) */
   CustomFunction(const CustomEvaluate &c_fcn,
@@ -75,6 +75,18 @@ public:
   CustomFunction(const CustomEvaluate &c_fcn,
                  const MappedIO& inputscheme,
                  const MappedIO& outputscheme);
+
+  CustomFunction(const CustomEvaluate &c_fcn,
+                 const MappedIO2& inputscheme,
+                 const std::vector<Sparsity>& outputscheme);
+
+  CustomFunction(const CustomEvaluate &c_fcn,
+                 const std::vector<Sparsity>& inputscheme,
+                 const MappedIO2& outputscheme);
+
+  CustomFunction(const CustomEvaluate &c_fcn,
+                 const MappedIO2& inputscheme,
+                 const MappedIO2& outputscheme);
   ///@}
 
   /** \brief  Access functions of the node */
