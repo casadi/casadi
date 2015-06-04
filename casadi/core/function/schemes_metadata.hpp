@@ -31,8 +31,7 @@
 #include <map>
 #include "../casadi_exception.hpp"
 namespace casadi {
-template <class T>
-class IOSchemeVector;class Sparsity;
+class Sparsity;
 enum InputOutputScheme {
   SCHEME_CLEInput,
   SCHEME_CLEOutput,
