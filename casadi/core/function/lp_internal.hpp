@@ -32,6 +32,12 @@
 
 /// \cond INTERNAL
 
+/// Structure specification of an LP
+enum LPStruct {
+  /// The matrix A: sparse
+  LP_STRUCT_A,
+  LP_STRUCT_NUM};
+
 namespace casadi {
 
   /// Internal class
@@ -41,7 +47,7 @@ namespace casadi {
   public:
 
     // Constructor
-    LpSolverInternal(const std::vector<Sparsity> &st);
+    LpSolverInternal(const std::map<std::string, Sparsity> &st);
 
     // Destructor
     virtual ~LpSolverInternal() = 0;
@@ -59,7 +65,7 @@ namespace casadi {
     virtual void checkInputs() const;
 
     // Creator function for internal class
-    typedef LpSolverInternal* (*Creator)(const LPStructure& st);
+    typedef LpSolverInternal* (*Creator)(const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
     struct Exposed{ };

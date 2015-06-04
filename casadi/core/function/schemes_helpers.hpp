@@ -574,26 +574,6 @@ IOSchemeVector<M> lpOut(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_LpSolverOutput));
 }
-/// Structure specification of an LP
-///
-/// \copydoc scheme_LPStruct
-template<class M>
-IOSchemeVector<M> lpStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M()) {
-  std::vector<M> ret(1);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LPStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in LPStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "a");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-  return IOSchemeVector<M>(ret, IOScheme(SCHEME_LPStruct));
-}
 /// Input arguments of a \e dle solver
 ///
 /// \copydoc scheme_LR_DLEInput

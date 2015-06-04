@@ -956,35 +956,6 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lpStruct(**kwargs):
-  """
-  Helper function for 'LPStruct'
-
-  Usage:
-    arg = lpStruct(a=my_a)
-        all arguments optional
-  Structure specification of an LP
-  
-  Keyword arguments::
-
-    a -- The matrix A: sparse [LP_STRUCT_A]
-  """
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  for k in kwargs.keys():
-    if not(k in ['a']):
-      raise Exception("Keyword error in lpStruct: '%s' is not recognized. Available keywords are: a" % k )
-  return IOSchemeVector([a], IOScheme(SCHEME_LPStruct))
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(lpStruct) lpStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
 def lrdleIn(**kwargs):
   """
   Helper function for 'LR_DLEInput'

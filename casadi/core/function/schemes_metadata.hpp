@@ -56,7 +56,6 @@ enum InputOutputScheme {
   SCHEME_LinsolOutput,
   SCHEME_LpSolverInput,
   SCHEME_LpSolverOutput,
-  SCHEME_LPStruct,
   SCHEME_LR_DLEInput,
   SCHEME_LR_DLEOutput,
   SCHEME_LrDleStruct,

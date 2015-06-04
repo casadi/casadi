@@ -85,12 +85,6 @@ namespace casadi {
     LP_SOLVER_LAM_X,
     LP_SOLVER_NUM_OUT};
 
-  /// Structure specification of an LP [lpStruct]
-  enum LPStruct {
-    /// The matrix A: sparse [a]
-    LP_STRUCT_A,
-    LP_STRUCT_NUM};
-
   // Forward declaration of internal class
   class LpSolverInternal;
 
@@ -116,13 +110,13 @@ namespace casadi {
      *  \param st \structargument{LP}
      */
     LpSolver(const std::string& name, const std::string& solver,
-             const LPStructure& st, const Dict& opts=Dict());
+             const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
     /** \brief Constructor, no initialization (to be deprecated)
      *  \param solver \pluginargument{LpSolver}
      *  \param st \structargument{LP}
      */
-    LpSolver(const std::string& solver, const LPStructure& st);
+    LpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
 
     /// Access functions of the node
     LpSolverInternal* operator->();

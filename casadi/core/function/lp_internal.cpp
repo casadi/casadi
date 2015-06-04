@@ -33,8 +33,15 @@ using namespace std;
 namespace casadi {
 
   // Constructor
-  LpSolverInternal::LpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
-    casadi_assert_message(st_.size()==LP_STRUCT_NUM, "Problem structure mismatch");
+  LpSolverInternal::LpSolverInternal(const std::map<std::string, Sparsity> &st) {
+    st_.resize(LP_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[LP_STRUCT_A]=i->second;
+      } else {
+        casadi_error("Unrecognized field in LP structure: " << i->first);
+      }
+    }
 
     const Sparsity& A = st_[LP_STRUCT_A];
 

@@ -50,7 +50,6 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_LinsolOutput: return "LinsolOutput";
     case SCHEME_LpSolverInput: return "LpSolverInput";
     case SCHEME_LpSolverOutput: return "LpSolverOutput";
-    case SCHEME_LPStruct: return "LPStruct";
     case SCHEME_LR_DLEInput: return "LR_DLEInput";
     case SCHEME_LR_DLEOutput: return "LR_DLEOutput";
     case SCHEME_LrDleStruct: return "LrDleStruct";
@@ -131,8 +130,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "c, a, lba, uba, lbx, ubx";
     case SCHEME_LpSolverOutput:
       return "x, cost, lam_a, lam_x";
-    case SCHEME_LPStruct:
-      return "a";
     case SCHEME_LR_DLEInput:
       return "a, v, c, h";
     case SCHEME_LR_DLEOutput:
@@ -316,9 +313,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==1) return "cost";
       if (i==2) return "lam_a";
       if (i==3) return "lam_x";
-      break;
-    case SCHEME_LPStruct:
-      if (i==0) return "a";
       break;
     case SCHEME_LR_DLEInput:
       if (i==0) return "a";
@@ -659,9 +653,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
       if (i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_LPStruct:
-      if (i==0) return "The matrix A: sparse";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_LR_DLEInput:
       if (i==0) return "A matrix";  // NOLINT(whitespace/line_length)
       if (i==1) return "V matrix";  // NOLINT(whitespace/line_length)
@@ -1001,9 +992,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==2) return "LP_SOLVER_LAM_A";
       if (i==3) return "LP_SOLVER_LAM_X";
       break;
-    case SCHEME_LPStruct:
-      if (i==0) return "LP_STRUCT_A";
-      break;
     case SCHEME_LR_DLEInput:
       if (i==0) return "LR_DLE_A";
       if (i==1) return "LR_DLE_V";
@@ -1293,9 +1281,6 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_LpSolverOutput:
       return 4;
       break;
-    case SCHEME_LPStruct:
-      return 1;
-      break;
     case SCHEME_LR_DLEInput:
       return 4;
       break;
@@ -1510,9 +1495,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="cost") return 1;
       if (name=="lam_a") return 2;
       if (name=="lam_x") return 3;
-      break;
-    case SCHEME_LPStruct:
-      if (name=="a") return 0;
       break;
     case SCHEME_LR_DLEInput:
       if (name=="a") return 0;

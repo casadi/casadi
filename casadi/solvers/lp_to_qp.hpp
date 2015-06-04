@@ -54,7 +54,7 @@ class CASADI_LPSOLVER_QP_EXPORT LpToQp : public LpSolverInternal,
 public:
 
   /** \brief  Create a new Solver */
-  explicit LpToQp(const std::vector<Sparsity> &st);
+  explicit LpToQp(const std::map<std::string, Sparsity>& st);
 
   /** \brief  Destructor */
   virtual ~LpToQp();
@@ -63,8 +63,9 @@ public:
   virtual LpToQp* clone() const;
 
   /** \brief  Create a new QP Solver */
-  static LpSolverInternal* creator(const LPStructure& st)
-  { return new LpToQp(make_vector(st));}
+  static LpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
+    return new LpToQp(st);
+  }
 
   /** \brief  Initialize */
   virtual void init();
