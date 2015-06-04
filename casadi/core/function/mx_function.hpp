@@ -77,8 +77,8 @@ namespace casadi {
     /** \brief  Attempt to form an MXFunction out of an Function */
     explicit MXFunction(const Function& function);
 
-    //typedef std::pair<std::map<std::string, MX>, std::vector<std::string> > MappedIO;
-    typedef IOSchemeVector<MX> MappedIO;
+    typedef std::pair<std::map<std::string, MX>, std::vector<std::string> > MappedIO;
+    typedef IOSchemeVector<MX> MappedIO2;
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     MXFunction(const std::string& name, const std::vector<MX>& arg,
@@ -95,6 +95,18 @@ namespace casadi {
     /** \brief Construct from vectors (new syntax, includes initialization) */
     MXFunction(const std::string& name, const MappedIO& arg,
                const MappedIO& res, const Dict& opts=Dict());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    MXFunction(const std::string& name, const MappedIO2& arg,
+               const std::vector<MX>& res, const Dict& opts=Dict());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    MXFunction(const std::string& name, const std::vector<MX>& arg,
+               const MappedIO2& res, const Dict& opts=Dict());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    MXFunction(const std::string& name, const MappedIO2& arg,
+               const MappedIO2& res, const Dict& opts=Dict());
 
 #ifndef SWIG
 #ifdef USE_CXX11
@@ -128,6 +140,15 @@ namespace casadi {
 
     /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
     MXFunction(const MappedIO& arg, const MappedIO& res);
+
+    /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
+    MXFunction(const std::vector<MX>& arg, const MappedIO2& res);
+
+    /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
+    MXFunction(const MappedIO2& arg, const std::vector<MX>& res);
+
+    /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
+    MXFunction(const MappedIO2& arg, const MappedIO2& res);
 
     /// \cond INTERNAL
     /** \brief  Access functions of the node */

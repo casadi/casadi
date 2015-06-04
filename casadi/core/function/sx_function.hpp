@@ -73,8 +73,8 @@ namespace casadi {
     /// Expand an Function
     explicit SXFunction(const Function &f);
 
-    //typedef std::pair<std::map<std::string, SX>, std::vector<std::string> > MappedIO;
-    typedef IOSchemeVector<SX> MappedIO;
+    typedef std::pair<std::map<std::string, SX>, std::vector<std::string> > MappedIO;
+    typedef IOSchemeVector<SX> MappedIO2;
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     SXFunction(const std::string& name, const std::vector<SX>& arg,
@@ -91,6 +91,18 @@ namespace casadi {
     /** \brief Construct from vectors (new syntax, includes initialization) */
     SXFunction(const std::string& name, const MappedIO& arg,
                const MappedIO& res, const Dict& opts=Dict());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    SXFunction(const std::string& name, const MappedIO2& arg,
+               const std::vector<SX>& res, const Dict& opts=Dict());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    SXFunction(const std::string& name, const std::vector<SX>& arg,
+               const MappedIO2& res, const Dict& opts=Dict());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    SXFunction(const std::string& name, const MappedIO2& arg,
+               const MappedIO2& res, const Dict& opts=Dict());
 #ifndef SWIG
 #ifdef USE_CXX11
     /** \brief Construct from initializer lists (new syntax, includes initialization) */
@@ -122,31 +134,17 @@ namespace casadi {
     /// Multiple input, multiple output, no initialization (to be deprecated)
     SXFunction(const MappedIO& arg, const std::vector<SX>& res);
 
-    /** \brief Multiple input, multiple output, no initialization (to be deprecated)
-    
-    \doctest
-    X = SX.sym("X")
-    f = SXFunction(daeIn(x=X),daeOut(ode=X**2))
-    f.init()
-    print f
-    \doctestout
-     Inputs (DAEInput: 4):
-      0. (DAE_X aka 'x')   1-by-1 (dense)
-      1. (DAE_Z aka 'z')   0-by-0 (dense)
-      2. (DAE_P aka 'p')   0-by-0 (dense)
-      3. (DAE_T aka 't')   0-by-0 (dense)
-     Outputs (DAEOutput: 3):
-      0. (DAE_ODE aka 'ode')   1-by-1 (dense)
-      1. (DAE_ALG aka 'alg')   0-by-0 (dense)
-      2. (DAE_QUAD aka 'quad')   0-by-0 (dense)
-    @0 = input[0][0];
-    @0 = sq(@0);
-    output[0][0] = @0;
-    <BLANKLINE>
-    \enddoctest
-    
-    */
+    /// Multiple input, multiple output, no initialization (to be deprecated)
     SXFunction(const MappedIO& arg, const MappedIO& res);
+
+    /// Multiple input, multiple  output, no initialization (to be deprecated)
+    SXFunction(const std::vector<SX>& arg, const MappedIO2& res);
+
+    /// Multiple input, multiple output, no initialization (to be deprecated)
+    SXFunction(const MappedIO2& arg, const std::vector<SX>& res);
+
+    /// Multiple input, multiple output, no initialization (to be deprecated)
+    SXFunction(const MappedIO2& arg, const MappedIO2& res);
 
 /// \cond INTERNAL
     /// Access functions of the node
