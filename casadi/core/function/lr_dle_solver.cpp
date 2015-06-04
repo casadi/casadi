@@ -68,7 +68,7 @@ namespace casadi {
   }
 
   LrDleSolver::LrDleSolver(const std::string& name, const std::string& solver,
-                           const LrDleStructure& st, const Dict& opts) {
+                           const std::map<std::string, Sparsity>& st, const Dict& opts) {
     assignNode(LrDleInternal::instantiatePlugin(solver, st));
     setOption("name", name);
     setOption(opts);
@@ -76,11 +76,12 @@ namespace casadi {
   }
 
   LrDleSolver::LrDleSolver(const std::string& solver,
-                         const LrDleStructure& st) {
+                           const std::map<std::string, Sparsity>& st) {
     assignNode(LrDleInternal::instantiatePlugin(solver, st));
   }
 
-  Sparsity LrDleSolver::getSparsity(const LrDleStructure& st, const std::vector<int> &Hs) {
+  Sparsity LrDleSolver::getSparsity(const std::map<std::string, Sparsity>& st,
+                                    const std::vector<int> &Hs) {
     return LrDleInternal::getSparsity(st, Hs);
   }
 

@@ -999,47 +999,6 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lrdleStruct(**kwargs):
-  """
-  Helper function for 'LrDleStruct'
-
-  Usage:
-    arg = lrdleStruct(a=my_a, v=my_v, c=my_c, h=my_h)
-        all arguments optional
-  Structure specification of a DLE
-  
-  Keyword arguments::
-
-    a -- The matrix A [LR_DLE_STRUCT_A]
-    v -- The matrix V [LR_DLE_STRUCT_V]
-    c -- The matrix C (defaults to unity) [LR_DLE_STRUCT_C]
-    h -- H matrix: horizontal stack of all Hi [LR_DLE_STRUCT_H]
-  """
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = Sparsity()
-  if 'v' in kwargs:
-    v = kwargs['v']
-  c = Sparsity()
-  if 'c' in kwargs:
-    c = kwargs['c']
-  h = Sparsity()
-  if 'h' in kwargs:
-    h = kwargs['h']
-  for k in kwargs.keys():
-    if not(k in ['a','v','c','h']):
-      raise Exception("Keyword error in lrdleStruct: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
-  return IOSchemeVector([a,v,c,h], IOScheme(SCHEME_LrDleStruct))
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(lrdleStruct) lrdleStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
 def lrdpleIn(**kwargs):
   """
   Helper function for 'LR_DPLEInput'

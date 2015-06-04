@@ -144,10 +144,10 @@ namespace casadi {
 
     // Create an LrDleSolver instance
     solver_ = LrDleSolver(getOption(solvername()),
-                          lrdleStruct("a", A.sparsity(),
-                                      "v", V.sparsity(),
-                                      "c", C.sparsity(),
-                                      "h", H.sparsity()));
+                          make_map("a", A.sparsity(),
+                                   "v", V.sparsity(),
+                                   "c", C.sparsity(),
+                                   "h", H.sparsity()));
     solver_.setOption("Hs", Hss_);
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();

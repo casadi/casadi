@@ -76,7 +76,7 @@ namespace casadi {
 
     // Create an LrDleSolver instance
     solver_ = LrDleSolver(getOption(solvername()),
-                          lrdleStruct("a", A_, "v", V_));
+                          make_map("a", A_, "v", V_));
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 

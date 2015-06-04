@@ -101,7 +101,7 @@ namespace casadi {
     }
 
     // Allocate outputs
-    Sparsity P = LrDleInternal::getSparsity(lrdleStruct("a", A_, "v", V_));
+    Sparsity P = LrDleInternal::getSparsity(make_map("a", A_, "v", V_));
 
     Sparsity P2 = DleInternal::getSparsity(make_map("a", A_, "v", V_));
 
@@ -119,10 +119,11 @@ namespace casadi {
   Sparsity DleInternal::getSparsity(const std::map<std::string, Sparsity>& st) {
 
     // Compute output sparsity by Smith iteration with frequency doubling
-    Sparsity A = st.at("a");
+    Sparsity A, V;
+    if (st.count("a")) A = st.at("a");
 
     int n = A.size1();
-    Sparsity V = st.at("v");
+    if (st.count("v")) V = st.at("v");
     Sparsity P = V;
     Sparsity Pprev(n, n);
 

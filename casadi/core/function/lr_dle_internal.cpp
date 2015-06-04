@@ -37,10 +37,10 @@ OUTPUTSCHEME(LR_DLEOutput)
 using namespace std;
 namespace casadi {
 
-  LrDleInternal::LrDleInternal(const LrDleStructure& st,
+  LrDleInternal::LrDleInternal(const std::map<std::string, Sparsity>& st,
                              int nrhs,
                              bool transp) :
-      st_(st), nrhs_(nrhs), transp_(transp) {
+    nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -51,6 +51,21 @@ namespace casadi {
               "Throw an exception when it is detected that Product(A_i, i=N..1) "
               "has eigenvalues greater than 1-eps_unstable");
     addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
+
+    st_.resize(LR_DLE_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[LR_DLE_STRUCT_A]=i->second;
+      } else if (i->first=="v") {
+        st_[LR_DLE_STRUCT_V]=i->second;
+      } else if (i->first=="c") {
+        st_[LR_DLE_STRUCT_C]=i->second;
+      } else if (i->first=="h") {
+        st_[LR_DLE_STRUCT_H]=i->second;
+      } else {
+        casadi_error("Unrecognized field in LR DLE structure: " << i->first);
+      }
+    }
 
 
     if (nrhs_==1) {
@@ -155,7 +170,11 @@ namespace casadi {
 
     obuf_.resize(nrhs_*LR_DLE_NUM_OUT);
 
-    Sparsity Pnew = getSparsity(st_, Hs_);
+    Sparsity Pnew = getSparsity(make_map("a", st_[LR_DLE_STRUCT_A],
+                                         "v", st_[LR_DLE_STRUCT_V],
+                                         "c", st_[LR_DLE_STRUCT_C],
+                                         "h", st_[LR_DLE_STRUCT_H]),
+                                Hs_);
 
     for (int i=0;i<nrhs_;++i) {
       output(i) = DMatrix::zeros(Pnew);
@@ -181,18 +200,20 @@ namespace casadi {
 
   }
 
-  Sparsity LrDleInternal::getSparsity(const LrDleStructure& st, const std::vector<int> &Hs) {
+  Sparsity LrDleInternal::getSparsity(const std::map<std::string, Sparsity>& st,
+                                      const std::vector<int> &Hs) {
 
     // Compute output sparsity by Smith iteration with frequency doubling
-    Sparsity A = st[LR_DLE_STRUCT_A];
+    Sparsity A, V, C, H;
+    if (st.count("a")) A = st.at("a");
 
     int n = A.size1();
-    Sparsity V = st[LR_DLE_STRUCT_V];
-    Sparsity C = st[LR_DLE_STRUCT_C];
+    if (st.count("v")) V = st.at("v");
+    if (st.count("c")) C = st.at("c");
 
     if (C.isNull() || C.isEmpty()) C = Sparsity::diag(n);
 
-    Sparsity H = st[LR_DLE_STRUCT_H];
+    if (st.count("h")) H = st.at("h");
     bool with_H = !(H.isNull() || H.isEmpty());
     if (H.isNull() || H.isEmpty()) {
       H = Sparsity::diag(n);

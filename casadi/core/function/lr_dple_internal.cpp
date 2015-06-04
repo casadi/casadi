@@ -268,7 +268,7 @@ namespace casadi {
       }
     }
 
-    Sparsity res = LrDleInternal::getSparsity(lrdleStruct("a", A, "v", V, "c", C, "h", H), Hs_agg);
+    Sparsity res = LrDleInternal::getSparsity(make_map("a", A, "v", V, "c", C, "h", H), Hs_agg);
 
     if (with_H) {
       return diagsplit(res, Hi);

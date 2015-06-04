@@ -347,7 +347,7 @@ class ControlTests(casadiTestCase):
         
         for Solver, options in lrdlesolvers:
           print Solver
-          g = LrDleSolver(Solver,lrdleStruct(a=A.sparsity(),c=C.sparsity(),v=Vs.sparsity(),h=H.sparsity()))
+          g = LrDleSolver(Solver,{'a':A.sparsity(),'c':C.sparsity(),'v':Vs.sparsity(),'h':H.sparsity()})
           g.setOption("Hs",h  if with_H else [])
           g.setOption(options)
           g.init()

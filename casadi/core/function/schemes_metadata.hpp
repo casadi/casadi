@@ -57,7 +57,6 @@ enum InputOutputScheme {
   SCHEME_LpSolverOutput,
   SCHEME_LR_DLEInput,
   SCHEME_LR_DLEOutput,
-  SCHEME_LrDleStruct,
   SCHEME_LR_DPLEInput,
   SCHEME_LR_DPLEOutput,
   SCHEME_LrDpleVecStruct,

@@ -55,8 +55,7 @@ namespace casadi {
     LrDleInternal::registerPlugin(casadi_register_lrdlesolver_dle);
   }
 
-  LrDleToDle::LrDleToDle(
-         const LrDleStructure& st) : LrDleInternal(st) {
+  LrDleToDle::LrDleToDle(const std::map<std::string, Sparsity>& st) : LrDleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_lr_dle_to_dle"); // name of the function
@@ -124,7 +123,11 @@ namespace casadi {
 
   LrDleToDle* LrDleToDle::clone() const {
     // Return a deep copy
-    LrDleToDle* node = new LrDleToDle(st_);
+    LrDleToDle* node =
+      new LrDleToDle(make_map("a", st_[LR_DLE_STRUCT_A],
+                              "v", st_[LR_DLE_STRUCT_V],
+                              "c", st_[LR_DLE_STRUCT_C],
+                              "h", st_[LR_DLE_STRUCT_H]));
     node->setOption(dictionary());
     return node;
   }
