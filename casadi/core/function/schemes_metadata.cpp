@@ -72,7 +72,6 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_QpSolverOutput: return "QpSolverOutput";
     case SCHEME_SDPInput: return "SDPInput";
     case SCHEME_SDPOutput: return "SDPOutput";
-    case SCHEME_SDPStruct: return "SDPStruct";
     case SCHEME_SDQPInput: return "SDQPInput";
     case SCHEME_SDQPOutput: return "SDQPOutput";
     case SCHEME_SDQPStruct: return "SDQPStruct";
@@ -172,8 +171,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "f, c, g, a, lba, uba, lbx, ubx";
     case SCHEME_SDPOutput:
       return "x, p, dual, cost, dual_cost, lam_a, lam_x";
-    case SCHEME_SDPStruct:
-      return "f, g, a";
     case SCHEME_SDQPInput:
       return "h, c, f, g, a, lba, uba, lbx, ubx";
     case SCHEME_SDQPOutput:
@@ -450,11 +447,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==4) return "dual_cost";
       if (i==5) return "lam_a";
       if (i==6) return "lam_x";
-      break;
-    case SCHEME_SDPStruct:
-      if (i==0) return "f";
-      if (i==1) return "g";
-      if (i==2) return "a";
       break;
     case SCHEME_SDQPInput:
       if (i==0) return "h";
@@ -781,11 +773,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==5) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
       if (i==6) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_SDPStruct:
-      if (i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
-      if (i==2) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_SDQPInput:
       if (i==0) return "The matrix H: sparse ( n x n)";  // NOLINT(whitespace/line_length)
       if (i==1) return "The vector c: ( n x 1)";  // NOLINT(whitespace/line_length)
@@ -1111,11 +1098,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==5) return "SDP_SOLVER_LAM_A";
       if (i==6) return "SDP_SOLVER_LAM_X";
       break;
-    case SCHEME_SDPStruct:
-      if (i==0) return "SDP_STRUCT_F";
-      if (i==1) return "SDP_STRUCT_G";
-      if (i==2) return "SDP_STRUCT_A";
-      break;
     case SCHEME_SDQPInput:
       if (i==0) return "SDQP_SOLVER_H";
       if (i==1) return "SDQP_SOLVER_C";
@@ -1313,9 +1295,6 @@ int getSchemeSize(InputOutputScheme scheme) {
       break;
     case SCHEME_SDPOutput:
       return 7;
-      break;
-    case SCHEME_SDPStruct:
-      return 3;
       break;
     case SCHEME_SDQPInput:
       return 9;
@@ -1599,11 +1578,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="dual_cost") return 4;
       if (name=="lam_a") return 5;
       if (name=="lam_x") return 6;
-      break;
-    case SCHEME_SDPStruct:
-      if (name=="f") return 0;
-      if (name=="g") return 1;
-      if (name=="a") return 2;
       break;
     case SCHEME_SDQPInput:
       if (name=="h") return 0;

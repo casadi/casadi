@@ -56,14 +56,15 @@ namespace casadi {
   public:
 
     /** \brief Constructor */
-    explicit DsdpInterface(const std::vector<Sparsity> &st);
+    explicit DsdpInterface(const std::map<std::string, Sparsity> &st);
 
     /** \brief Clone */
     virtual DsdpInterface* clone() const;
 
     /** \brief  Create a new SDP Solver */
-    static SdpSolverInternal* creator(const SDPStructure& st)
-    { return new DsdpInterface(make_vector(st));}
+    static SdpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
+      return new DsdpInterface(st);
+    }
 
     /** \brief Destructor */
     virtual ~DsdpInterface();

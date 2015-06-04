@@ -63,7 +63,7 @@ namespace casadi {
     virtual SocpToSdp* clone() const;
 
     /** \brief  Create a new SOCP Solver */
-    static SocpSolverInternal* creator(const std::map<std::string, Sparsity>& st){
+    static SocpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
       return new SocpToSdp(st);
     }
 

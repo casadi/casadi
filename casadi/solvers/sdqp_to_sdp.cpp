@@ -107,10 +107,10 @@ namespace casadi {
 
     // Create an SdpSolver instance
     solver_ = SdpSolver(getOption(solvername()),
-                        sdpStruct("g", mapping_.output("g").sparsity(),
-                                  "f", mapping_.output("f").sparsity(),
-                                  "a", horzcat(input(SDQP_SOLVER_A).sparsity(),
-                                               Sparsity(nc_, 1))));
+                        make_map("g", mapping_.output("g").sparsity(),
+                                 "f", mapping_.output("f").sparsity(),
+                                 "a", horzcat(input(SDQP_SOLVER_A).sparsity(),
+                                              Sparsity(nc_, 1))));
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 

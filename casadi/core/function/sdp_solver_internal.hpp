@@ -33,6 +33,15 @@
 
 /// \cond INTERNAL
 namespace casadi {
+  /// Structure specification of an SDP
+  enum SDPStruct {
+    /// The horizontal stack of all matrices F_i: ( m x nm)
+    SDP_STRUCT_F,
+    /// The matrix G: ( m x m)
+    SDP_STRUCT_G,
+    /// The matrix A: ( nc x n)
+    SDP_STRUCT_A,
+    SDP_STRUCT_NUM};
 
   /// Internal class
   class CASADI_EXPORT
@@ -41,7 +50,7 @@ namespace casadi {
   public:
 
     // Constructor
-    SdpSolverInternal(const std::vector<Sparsity>& st);
+    SdpSolverInternal(const std::map<std::string, Sparsity>& st);
 
     // Destructor
     virtual ~SdpSolverInternal() = 0;
@@ -65,7 +74,7 @@ namespace casadi {
     void printProblem(std::ostream &stream=std::cout) const;
 
     // Creator function for internal class
-    typedef SdpSolverInternal* (*Creator)(const SDPStructure& st);
+    typedef SdpSolverInternal* (*Creator)(const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
     struct Exposed{ };

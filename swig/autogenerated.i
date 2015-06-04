@@ -1962,43 +1962,6 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def sdpStruct(**kwargs):
-  """
-  Helper function for 'SDPStruct'
-
-  Usage:
-    arg = sdpStruct(f=my_f, g=my_g, a=my_a)
-        all arguments optional
-  Structure specification of an SDP
-  
-  Keyword arguments::
-
-    f -- The horizontal stack of all matrices F_i: ( m x nm) [SDP_STRUCT_F]
-    g -- The matrix G: ( m x m) [SDP_STRUCT_G]
-    a -- The matrix A: ( nc x n) [SDP_STRUCT_A]
-  """
-  f = Sparsity()
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = Sparsity()
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  for k in kwargs.keys():
-    if not(k in ['f','g','a']):
-      raise Exception("Keyword error in sdpStruct: '%s' is not recognized. Available keywords are: f, g, a" % k )
-  return IOSchemeVector([f,g,a], IOScheme(SCHEME_SDPStruct))
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(sdpStruct) sdpStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
 def sdqpIn(**kwargs):
   """
   Helper function for 'SDQPInput'

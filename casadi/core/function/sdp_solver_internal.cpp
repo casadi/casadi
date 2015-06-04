@@ -35,7 +35,7 @@ using namespace std;
 namespace casadi {
 
 // Constructor
-SdpSolverInternal::SdpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
+SdpSolverInternal::SdpSolverInternal(const std::map<std::string, Sparsity> &st) {
   addOption("calc_p", OT_BOOLEAN, true,
             "Indicate if the P-part of primal solution should be allocated and calculated. "
             "You may want to avoid calculating this variable for problems with n large, "
@@ -45,7 +45,18 @@ SdpSolverInternal::SdpSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
             "as is always dense (m x m).");
   addOption("print_problem", OT_BOOLEAN, false, "Print out problem statement for debugging.");
 
-  casadi_assert_message(st_.size()==SDP_STRUCT_NUM, "Problem structure mismatch");
+  st_.resize(SDP_STRUCT_NUM);
+  for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+    if (i->first=="a") {
+      st_[SDP_STRUCT_A]=i->second;
+    } else if (i->first=="g") {
+      st_[SDP_STRUCT_G]=i->second;
+    } else if (i->first=="f") {
+      st_[SDP_STRUCT_F]=i->second;
+    } else {
+      casadi_error("Unrecognized field in SDP structure: " << i->first);
+    }
+  }
 
   const Sparsity& A = st_[SDP_STRUCT_A];
   const Sparsity& G = st_[SDP_STRUCT_G];

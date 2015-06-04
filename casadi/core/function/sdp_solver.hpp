@@ -151,16 +151,6 @@ namespace casadi {
     SDP_SOLVER_LAM_X,
     SDP_SOLVER_NUM_OUT};
 
-  /// Structure specification of an SDP [sdpStruct]
-  enum SDPStruct {
-    /// The horizontal stack of all matrices F_i: ( m x nm) [f]
-    SDP_STRUCT_F,
-    /// The matrix G: ( m x m) [g]
-    SDP_STRUCT_G,
-    /// The matrix A: ( nc x n) [a]
-    SDP_STRUCT_A,
-    SDP_STRUCT_NUM};
-
   // Forward declaration of internal class
   class SdpSolverInternal;
 
@@ -186,13 +176,13 @@ namespace casadi {
      *  \param st \structargument{SDP}
      */
     SdpSolver(const std::string& name, const std::string& solver,
-              const SDPStructure& st, const Dict& opts=Dict());
+              const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
     /** \brief Constructor (to be deprecated)
      *  \param solver \pluginargument{SdpSolver}
      *  \param st \structargument{SDP}
      */
-    SdpSolver(const std::string& solver, const SDPStructure& st);
+    SdpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
 
     /// Access functions of the node
     SdpSolverInternal* operator->();

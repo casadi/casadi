@@ -173,9 +173,9 @@ namespace casadi {
 
     // Create an SdpSolver instance
     solver_ = SdpSolver(getOption(solvername()),
-                        sdpStruct("a", input(SOCP_SOLVER_A).sparsity(),
-                                  "f", mapping_.output(0).sparsity(),
-                                  "g", mapping_.output(1).sparsity()));
+                        make_map("a", input(SOCP_SOLVER_A).sparsity(),
+                                 "f", mapping_.output(0).sparsity(),
+                                 "g", mapping_.output(1).sparsity()));
     solver_.setSOCPOptions();
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();

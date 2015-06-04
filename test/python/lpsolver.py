@@ -41,14 +41,6 @@ if NlpSolver.hasPlugin("ipopt"):
 if QpSolver.hasPlugin("ooqp"):
   lpsolvers.append(("qp.ooqp",{},False))
 
-# try:  
-#   QpSolver.loadPlugin("dsdp")
-#   def SDPLpSolver(st):
-#     return DSdpSolver(sdpStruct(a=st["a"],f=Sparsity(0,0),g=Sparsity(0,0)))
-#   lpsolvers.append((SDPLpSolver,{},False))
-# except:
-#  pass
-
 print lpsolvers
 
 class LpSolverTests(casadiTestCase):
