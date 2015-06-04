@@ -125,43 +125,6 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def cleStruct(**kwargs):
-  """
-  Helper function for 'CleStruct'
-
-  Usage:
-    arg = cleStruct(a=my_a, v=my_v, c=my_c)
-        all arguments optional
-  Structure specification of a CLE
-  
-  Keyword arguments::
-
-    a -- The matrix A [Cle_STRUCT_A]
-    v -- The matrix V [Cle_STRUCT_V]
-    c -- The matrix C (defaults to unity) [Cle_STRUCT_C]
-  """
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = Sparsity()
-  if 'v' in kwargs:
-    v = kwargs['v']
-  c = Sparsity()
-  if 'c' in kwargs:
-    c = kwargs['c']
-  for k in kwargs.keys():
-    if not(k in ['a','v','c']):
-      raise Exception("Keyword error in cleStruct: '%s' is not recognized. Available keywords are: a, v, c" % k )
-  return IOSchemeVector([a,v,c], IOScheme(SCHEME_CleStruct))
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(cleStruct) cleStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
 def controldaeIn(**kwargs):
   """
   Helper function for 'ControlledDAEInput'

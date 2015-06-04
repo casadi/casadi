@@ -36,7 +36,6 @@ class IOSchemeVector;class Sparsity;
 enum InputOutputScheme {
   SCHEME_CLEInput,
   SCHEME_CLEOutput,
-  SCHEME_CleStruct,
   SCHEME_ControlledDAEInput,
   SCHEME_ControlSimulatorInput,
   SCHEME_DLEInput,

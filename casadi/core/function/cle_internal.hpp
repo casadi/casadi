@@ -35,6 +35,16 @@
 
 namespace casadi {
 
+  /// Structure specification of a CLE
+  enum CleStruct {
+    /// The matrix A
+    Cle_STRUCT_A,
+    /// The matrix V
+    Cle_STRUCT_V,
+    /// The matrix C (defaults to unity)
+    Cle_STRUCT_C,
+    Cle_STRUCT_NUM};
+
   /** \brief Internal storage for CleSolver related data
 
       @copydoc CLE_doc
@@ -48,8 +58,8 @@ namespace casadi {
     /** \brief  Constructor
      *  \param st \structargument{Cle}
      */
-    CleInternal(const CleStructure& st,
-                 int nrhs=1, bool transp=false);
+    CleInternal(const std::map<std::string, Sparsity>& st,
+                int nrhs=1, bool transp=false);
 
     /** \brief  Destructor */
     virtual ~CleInternal()=0;
@@ -61,7 +71,7 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual CleInternal* create(const CleStructure& st) const = 0;
+    virtual CleInternal* create(const std::map<std::string, Sparsity>& st) const = 0;
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -73,7 +83,7 @@ namespace casadi {
     virtual void init();
 
     /// Structure of Cle
-    CleStructure st_;
+    std::vector<Sparsity> st_;
 
     /// Sparsities of A
     Sparsity A_;
@@ -97,7 +107,7 @@ namespace casadi {
     bool transp_;
 
     // Creator function for internal class
-    typedef CleInternal* (*Creator)(const CleStructure& st);
+    typedef CleInternal* (*Creator)(const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
     struct Exposed{ };

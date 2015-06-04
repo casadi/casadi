@@ -445,7 +445,7 @@ class ControlTests(casadiTestCase):
           V_ = mul(v,v.T)
           
           
-          solver = CleSolver(Solver,cleStruct(a=Sparsity.dense(n,n),v=Sparsity.dense(n,n)))
+          solver = CleSolver(Solver,{'a':Sparsity.dense(n,n),'v':Sparsity.dense(n,n)})
           solver.setOption(options)
           solver.init()
           solver.setInput(A_,"a")

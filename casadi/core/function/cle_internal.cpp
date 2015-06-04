@@ -37,10 +37,9 @@ OUTPUTSCHEME(CLEOutput)
 using namespace std;
 namespace casadi {
 
-  CleInternal::CleInternal(const CleStructure& st,
-                             int nrhs,
-                             bool transp) :
-      st_(st), nrhs_(nrhs), transp_(transp) {
+  CleInternal::CleInternal(const std::map<std::string, Sparsity>& st,
+                           int nrhs, bool transp) :
+    nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -51,6 +50,19 @@ namespace casadi {
               "Throw an exception when it is detected that Product(A_i, i=N..1) "
               "has eigenvalues greater than 1-eps_unstable");
     addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
+
+    st_.resize(Cle_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[Cle_STRUCT_A]=i->second;
+      } else if (i->first=="v") {
+        st_[Cle_STRUCT_V]=i->second;
+      } else if (i->first=="c") {
+        st_[Cle_STRUCT_C]=i->second;
+      } else {
+        casadi_error("Unrecognized field in Cle structure: " << i->first);
+      }
+    }
 
     if (nrhs_==1) {
       ischeme_ = IOScheme(SCHEME_CLEInput);

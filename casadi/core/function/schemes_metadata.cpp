@@ -30,7 +30,6 @@ std::string getSchemeName(InputOutputScheme scheme) {
   switch (scheme) {
     case SCHEME_CLEInput: return "CLEInput";
     case SCHEME_CLEOutput: return "CLEOutput";
-    case SCHEME_CleStruct: return "CleStruct";
     case SCHEME_ControlledDAEInput: return "ControlledDAEInput";
     case SCHEME_ControlSimulatorInput: return "ControlSimulatorInput";
     case SCHEME_DLEInput: return "DLEInput";
@@ -84,8 +83,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "a, v";
     case SCHEME_CLEOutput:
       return "p";
-    case SCHEME_CleStruct:
-      return "a, v, c";
     case SCHEME_ControlledDAEInput:
       return "t, x, z, p, u, u_interp, x_major, t0, tf";
     case SCHEME_ControlSimulatorInput:
@@ -185,11 +182,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_CLEOutput:
       if (i==0) return "p";
-      break;
-    case SCHEME_CleStruct:
-      if (i==0) return "a";
-      if (i==1) return "v";
-      if (i==2) return "c";
       break;
     case SCHEME_ControlledDAEInput:
       if (i==0) return "t";
@@ -495,11 +487,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_CLEOutput:
       if (i==0) return "Lyapunov matrix";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_CleStruct:
-      if (i==0) return "The matrix A";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The matrix V";  // NOLINT(whitespace/line_length)
-      if (i==2) return "The matrix C (defaults to unity)";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_ControlledDAEInput:
       if (i==0) return "Global physical time. (1-by-1)";  // NOLINT(whitespace/line_length)
       if (i==1) return "non-zeros as DAEOutput:DAE_RES";  // NOLINT(whitespace/line_length)
@@ -803,11 +790,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_CLEOutput:
       if (i==0) return "CLE_P";
-      break;
-    case SCHEME_CleStruct:
-      if (i==0) return "Cle_STRUCT_A";
-      if (i==1) return "Cle_STRUCT_V";
-      if (i==2) return "Cle_STRUCT_C";
       break;
     case SCHEME_ControlledDAEInput:
       if (i==0) return "CONTROL_DAE_T";
@@ -1113,9 +1095,6 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_CLEOutput:
       return 1;
       break;
-    case SCHEME_CleStruct:
-      return 3;
-      break;
     case SCHEME_ControlledDAEInput:
       return 9;
       break;
@@ -1259,11 +1238,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       break;
     case SCHEME_CLEOutput:
       if (name=="p") return 0;
-      break;
-    case SCHEME_CleStruct:
-      if (name=="a") return 0;
-      if (name=="v") return 1;
-      if (name=="c") return 2;
       break;
     case SCHEME_ControlledDAEInput:
       if (name=="t") return 0;

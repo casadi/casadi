@@ -52,7 +52,7 @@ namespace casadi {
     /** \brief  Constructor
      * \param st \structargument{Cle}
      */
-    SimpleIndefCleInternal(const CleStructure& st);
+    SimpleIndefCleInternal(const std::map<std::string, Sparsity>& st);
 
     /** \brief  Destructor */
     virtual ~SimpleIndefCleInternal();
@@ -64,12 +64,14 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual SimpleIndefCleInternal* create(const CleStructure& st) const {
-        return new SimpleIndefCleInternal(st);}
+    virtual SimpleIndefCleInternal* create(const std::map<std::string, Sparsity>& st) const {
+      return new SimpleIndefCleInternal(st);
+    }
 
     /** \brief  Create a new CLE Solver */
-    static CleInternal* creator(const CleStructure& st)
-    { return new SimpleIndefCleInternal(st);}
+    static CleInternal* creator(const std::map<std::string, Sparsity>& st) {
+      return new SimpleIndefCleInternal(st);
+    }
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}

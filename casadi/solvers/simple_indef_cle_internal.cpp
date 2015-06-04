@@ -55,8 +55,8 @@ namespace casadi {
     CleInternal::registerPlugin(casadi_register_clesolver_simple);
   }
 
-  SimpleIndefCleInternal::SimpleIndefCleInternal(
-      const CleStructure& st) : CleInternal(st) {
+  SimpleIndefCleInternal::
+  SimpleIndefCleInternal(const std::map<std::string, Sparsity>& st) : CleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_simple_indef_cle_solver"); // name of the function
@@ -127,7 +127,10 @@ namespace casadi {
 
   SimpleIndefCleInternal* SimpleIndefCleInternal::clone() const {
     // Return a deep copy
-    SimpleIndefCleInternal* node = new SimpleIndefCleInternal(st_);
+    SimpleIndefCleInternal* node =
+      new SimpleIndefCleInternal(make_map("a", st_[Cle_STRUCT_A],
+                                          "v", st_[Cle_STRUCT_V],
+                                          "c", st_[Cle_STRUCT_C]));
     node->setOption(dictionary());
     return node;
   }
