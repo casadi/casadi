@@ -1350,28 +1350,6 @@ IOSchemeVector<M> socpOut(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_SOCPOutput));
 }
-/// Structure specification of an SOCP
-///
-/// \copydoc scheme_SOCPStruct
-template<class M>
-IOSchemeVector<M> socpStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
-  std::vector<M> ret(2);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_SOCPStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in SOCPStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "g, a");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-  return IOSchemeVector<M>(ret, IOScheme(SCHEME_SOCPStruct));
-}
 /// Input arguments of a QP problem
 ///
 /// \copydoc scheme_StabilizedQpSolverInput

@@ -60,7 +60,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,{'g':G.sparsity(),'a':A.sparsity()})
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
@@ -99,7 +99,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,{'g':G.sparsity(),'a':A.sparsity()})
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
@@ -139,7 +139,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,{'g':G.sparsity(),'a':A.sparsity()})
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
@@ -183,7 +183,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,{'g':G.sparsity(),'a':A.sparsity()})
       solver.setOption(socp_options)
       solver.setOption("ni",[2,2])
       solver.init()
@@ -223,7 +223,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,{'g':G.sparsity(),'a':A.sparsity()})
       solver.setOption(socp_options)
       solver.setOption("ni",[2,3])
       solver.init()

@@ -51,13 +51,15 @@ namespace casadi {
 
   SocpToSdp* SocpToSdp::clone() const {
     // Return a deep copy
-    SocpToSdp* node = new SocpToSdp(st_);
+    SocpToSdp* node =
+      new SocpToSdp(make_map("g", st_[SOCP_SOLVER_G], "a", st_[SOCP_SOLVER_A]));
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  SocpToSdp::SocpToSdp(const std::vector<Sparsity> &st) : SocpSolverInternal(st) {
+  SocpToSdp::SocpToSdp(const std::map<std::string, Sparsity> &st)
+    : SocpSolverInternal(st) {
     Adaptor<SocpToSdp, SdpSolverInternal>::addOptions();
   }
 

@@ -36,7 +36,18 @@ using namespace std;
 namespace casadi {
 
   // Constructor
-  SocpSolverInternal::SocpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
+  SocpSolverInternal::SocpSolverInternal(const std::map<std::string, Sparsity> &st) {
+    st_.resize(SOCP_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[SOCP_STRUCT_A]=i->second;
+      } else if (i->first=="g") {
+        st_[SOCP_STRUCT_G]=i->second;
+      } else {
+        casadi_error("Unrecognized field in SOCP structure: " << i->first);
+      }
+    }
+
     addOption("ni", OT_INTEGERVECTOR, GenericType(),
               "Provide the size of each SOC constraint. Must sum up to N.");
     addOption("print_problem", OT_BOOLEAN, false, "Print out problem statement for debugging.");

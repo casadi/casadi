@@ -44,14 +44,15 @@ namespace casadi {
   }
 
   SocpSolver::SocpSolver(const std::string& name, const std::string& solver,
-                         const SOCPStructure& st, const Dict& opts) {
+                         const std::map<std::string, Sparsity>& st, const Dict& opts) {
     assignNode(SocpSolverInternal::instantiatePlugin(solver, st));
     setOption("name", name);
     setOption(opts);
     init();
   }
 
-  SocpSolver::SocpSolver(const std::string& solver, const SOCPStructure& st) {
+  SocpSolver::SocpSolver(const std::string& solver,
+                         const std::map<std::string, Sparsity>& st) {
     assignNode(SocpSolverInternal::instantiatePlugin(solver, st));
   }
 

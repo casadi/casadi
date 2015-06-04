@@ -97,14 +97,6 @@ namespace casadi {
     SOCP_SOLVER_LAM_X,
     SOCP_SOLVER_NUM_OUT};
 
-  /// Structure specification of an SOCP [socpStruct]
-  enum SOCPStruct {
-    /// The horizontal stack of all matrices Gi: ( n x N) [g]
-    SOCP_STRUCT_G,
-    /// The matrix A: ( nc x n) [a]
-    SOCP_STRUCT_A,
-    SOCP_STRUCT_NUM};
-
   // Forward declaration of internal class
   class SocpSolverInternal;
 
@@ -130,13 +122,13 @@ namespace casadi {
      *  \param st \structargument{SOCP}
      */
     SocpSolver(const std::string& name, const std::string& solver,
-               const SOCPStructure& st, const Dict& opts=Dict());
+               const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
     /** \brief Constructor (no initialization, to be deprecated)
      *  \param solver \pluginargument{SocpSolver}
      *  \param st \structargument{SOCP}
      */
-    SocpSolver(const std::string& solver, const SOCPStructure& st);
+    SocpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
 
     /// Access functions of the node
     SocpSolverInternal* operator->();

@@ -33,6 +33,13 @@
 /// \cond INTERNAL
 
 namespace casadi {
+  /// Structure specification of an SOCP
+  enum SOCPStruct {
+    /// The horizontal stack of all matrices Gi: ( n x N)
+    SOCP_STRUCT_G,
+    /// The matrix A: ( nc x n)
+    SOCP_STRUCT_A,
+    SOCP_STRUCT_NUM};
 
   /// Internal class
   class CASADI_EXPORT
@@ -41,7 +48,7 @@ namespace casadi {
   public:
 
     // Constructor
-    SocpSolverInternal(const std::vector<Sparsity>& st);
+    SocpSolverInternal(const std::map<std::string, Sparsity>& st);
 
     // Destructor
     virtual ~SocpSolverInternal() = 0;
@@ -62,7 +69,7 @@ namespace casadi {
     void printProblem(std::ostream &stream=std::cout) const;
 
     // Creator function for internal class
-    typedef SocpSolverInternal* (*Creator)(const SOCPStructure& st);
+    typedef SocpSolverInternal* (*Creator)(const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
     struct Exposed{ };

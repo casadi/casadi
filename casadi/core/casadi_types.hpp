@@ -43,7 +43,6 @@ namespace casadi {
   class CodeGenerator;
   template<class T> class IOSchemeVector;
   typedef IOSchemeVector<Sparsity> SDPStructure;
-  typedef IOSchemeVector<Sparsity> SOCPStructure;
   typedef IOSchemeVector<Sparsity> SDQPStructure;
   typedef IOSchemeVector<Sparsity> DleStructure;
   typedef IOSchemeVector<Sparsity> LrDleStructure;

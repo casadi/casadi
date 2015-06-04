@@ -2272,39 +2272,6 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def socpStruct(**kwargs):
-  """
-  Helper function for 'SOCPStruct'
-
-  Usage:
-    arg = socpStruct(g=my_g, a=my_a)
-        all arguments optional
-  Structure specification of an SOCP
-  
-  Keyword arguments::
-
-    g -- The horizontal stack of all matrices Gi: ( n x N) [SOCP_STRUCT_G]
-    a -- The matrix A: ( nc x n) [SOCP_STRUCT_A]
-  """
-  g = Sparsity()
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  for k in kwargs.keys():
-    if not(k in ['g','a']):
-      raise Exception("Keyword error in socpStruct: '%s' is not recognized. Available keywords are: g, a" % k )
-  return IOSchemeVector([g,a], IOScheme(SCHEME_SOCPStruct))
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(socpStruct) socpStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
 def stabilizedQpIn(**kwargs):
   """
   Helper function for 'StabilizedQpSolverInput'
