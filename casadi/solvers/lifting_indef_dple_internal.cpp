@@ -56,8 +56,9 @@ namespace casadi {
     DpleInternal::registerPlugin(casadi_register_dplesolver_lifting);
   }
 
-  LiftingIndefDpleInternal::LiftingIndefDpleInternal(
-      const DpleStructure & st) : DpleInternal(st) {
+  LiftingIndefDpleInternal::LiftingIndefDpleInternal(const std::map<std::string,
+                                                     std::vector<Sparsity> > & st)
+    : DpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_lifting_indef_dple_solver"); // name of the function
@@ -167,7 +168,10 @@ namespace casadi {
 
   LiftingIndefDpleInternal* LiftingIndefDpleInternal::clone() const {
     // Return a deep copy
-    LiftingIndefDpleInternal* node = new LiftingIndefDpleInternal(st_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[Dple_STRUCT_A];
+    tmp["v"] = st_[Dple_STRUCT_V];
+    LiftingIndefDpleInternal* node = new LiftingIndefDpleInternal(tmp);
     node->setOption(dictionary());
     return node;
   }

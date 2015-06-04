@@ -71,9 +71,10 @@ namespace casadi {
     DleInternal::init();
 
     // Create a DpleSolver instance
-    solver_ = DpleSolver(getOption(solvername()),
-                         dpleStruct("a", std::vector<Sparsity>(1, A_),
-                                    "v", std::vector<Sparsity>(1, V_)));
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = std::vector<Sparsity>(1, A_);
+    tmp["v"] = std::vector<Sparsity>(1, V_);
+    solver_ = DpleSolver(getOption(solvername()), tmp);
     solver_.setOption(getOption(optionsname()));
     solver_.init();
   }

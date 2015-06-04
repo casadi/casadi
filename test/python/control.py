@@ -258,7 +258,7 @@ class ControlTests(casadiTestCase):
         for Solver, options in lrdplesolvers:
           print Solver, options
           print "c", [i.sparsity() for i in Cs_]
-          g = LrDpleSolver(Solver,lrdpleStruct(a=[i.sparsity() for i in As_],c=[i.sparsity() for i in Cs_],v=[ i.sparsity() for i in Vs_],h=[i.sparsity() for i in Hs_]if with_H else [])  )
+          g = LrDpleSolver(Solver,{'a':[i.sparsity() for i in As_],'c':[i.sparsity() for i in Cs_],'v':[ i.sparsity() for i in Vs_],'h':[i.sparsity() for i in Hs_]if with_H else []})
           
           print g.dictionary()
           g.setOption("Hs",[h]*K)
@@ -496,7 +496,7 @@ class ControlTests(casadiTestCase):
           V_ = [mul(v,v.T) for v in [DMatrix(numpy.random.random((n,n))) for i in range(K)]]
           
           
-          solver = DpleSolver(Solver,dpleStruct(a=[Sparsity.dense(n,n) for i in range(K)],v=[Sparsity.dense(n,n) for i in range(K)]))
+          solver = DpleSolver(Solver,{'a':[Sparsity.dense(n,n) for i in range(K)],'v':[Sparsity.dense(n,n) for i in range(K)]})
           solver.setOption(options)
           solver.init()
           solver.setInput(horzcat(A_),"a")
@@ -571,7 +571,7 @@ class ControlTests(casadiTestCase):
           V_ = [mul(v,v.T) for v in [DMatrix(numpy.random.random((n,n))) for i in range(K)]]
           
           
-          solver = DpleSolver(Solver,dpleStruct(a=[Sparsity.dense(n,n) for i in range(K)],v=[Sparsity.dense(n,n) for i in range(K)]))
+          solver = DpleSolver(Solver,{'a':[Sparsity.dense(n,n) for i in range(K)],'v':[Sparsity.dense(n,n) for i in range(K)]})
           solver.setOption(options)
           solver.init()
           solver.setInput(horzcat(A_),"a")

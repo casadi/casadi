@@ -38,10 +38,9 @@ OUTPUTSCHEME(DPLEOutput)
 using namespace std;
 namespace casadi {
 
-  DpleInternal::DpleInternal(const DpleStructure & st,
-                             int nrhs,
-                             bool transp) :
-      st_(st), nrhs_(nrhs), transp_(transp) {
+  DpleInternal::DpleInternal(const std::map<std::string, std::vector<Sparsity> > &st,
+                             int nrhs, bool transp) :
+    nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -53,6 +52,18 @@ namespace casadi {
               "Throw an exception when it is detected that Product(A_i, i=N..1) "
               "has eigenvalues greater than 1-eps_unstable");
     addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
+
+    st_.resize(Dple_STRUCT_NUM);
+    for (std::map<std::string, std::vector<Sparsity> >::const_iterator i=st.begin();
+         i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[Dple_STRUCT_A]=i->second;
+      } else if (i->first=="v") {
+        st_[Dple_STRUCT_V]=i->second;
+      } else {
+        casadi_error("Unrecognized field in Dple structure: " << i->first);
+      }
+    }
 
     if (nrhs_==1) {
       ischeme_ = IOScheme(SCHEME_DPLEInput);
@@ -113,7 +124,10 @@ namespace casadi {
     }
 
     // Allocate outputs
-    std::vector<Sparsity> P = LrDpleInternal::getSparsity(lrdpleStruct("a", A_, "v", V_));
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = A_;
+    tmp["v"] = V_;
+    std::vector<Sparsity> P = LrDpleInternal::getSparsity(tmp);
     obuf_.resize(nrhs_);
     for (int i=0;i<nrhs_;++i) {
       if (const_dim_) {

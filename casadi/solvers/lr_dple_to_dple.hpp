@@ -57,7 +57,7 @@ namespace casadi {
     /** \brief  Constructor
      * \param st \structargument{LrDple}
      */
-    LrDpleToDple(const LrDpleStructure & st);
+    LrDpleToDple(const std::map<std::string, std::vector<Sparsity> > & st);
 
     /** \brief  Destructor */
     virtual ~LrDpleToDple();
@@ -69,12 +69,15 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual LrDpleToDple* create(const LrDpleStructure& st) const {
-        return new LrDpleToDple(st);}
+    virtual LrDpleToDple* create(const std::map<std::string,
+                                 std::vector<Sparsity> >& st) const {
+      return new LrDpleToDple(st);
+    }
 
     /** \brief  Create a new DLE Solver */
-    static LrDpleInternal* creator(const LrDpleStructure& st)
-    { return new LrDpleToDple(st);}
+    static LrDpleInternal* creator(const std::map<std::string, std::vector<Sparsity> >& st) {
+      return new LrDpleToDple(st);
+    }
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}

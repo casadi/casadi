@@ -54,15 +54,13 @@ namespace casadi {
     DpleInternal::registerPlugin(casadi_register_dplesolver_lrdple);
   }
 
-  DpleToLrDple::DpleToLrDple(
-         const DpleStructure& st) :
-          DpleInternal(st) {
+  DpleToLrDple::DpleToLrDple(const std::map<std::string, std::vector<Sparsity> >& st)
+    : DpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_dple_to_lr_dple"); // name of the function
 
     Adaptor<DpleToLrDple, LrDpleInternal>::addOptions();
-
   }
 
   DpleToLrDple::~DpleToLrDple() {
@@ -84,11 +82,12 @@ namespace casadi {
     int K = A_.size();
 
     // Create an LrDpleSolver instance
-    solver_ = LrDpleSolver(getOption(solvername()),
-                           lrdpleStruct("a", make_vector(st_)[DPLE_A],
-                                        "v", make_vector(st_)[DPLE_V],
-                                        "c", std::vector<Sparsity>(K, C.sparsity()),
-                                        "h", std::vector<Sparsity>(K, H.sparsity())));
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[DPLE_A];
+    tmp["v"] = st_[DPLE_V];
+    tmp["c"] = std::vector<Sparsity>(K, C.sparsity());
+    tmp["h"] = std::vector<Sparsity>(K, H.sparsity());
+    solver_ = LrDpleSolver(getOption(solvername()), tmp);
     solver_.setOption("Hs", std::vector< std::vector<int> >(K, std::vector<int>(1, n)));
     solver_.setOption(getOption(optionsname()));
     solver_.init();
@@ -122,7 +121,10 @@ namespace casadi {
 
   DpleToLrDple* DpleToLrDple::clone() const {
     // Return a deep copy
-    DpleToLrDple* node = new DpleToLrDple(st_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[Dple_STRUCT_A];
+    tmp["v"] = st_[Dple_STRUCT_V];
+    DpleToLrDple* node = new DpleToLrDple(tmp);
     node->setOption(dictionary());
     return node;
   }

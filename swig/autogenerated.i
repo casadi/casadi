@@ -365,39 +365,6 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def dpleStruct(**kwargs):
-  """
-  Helper function for 'DpleVecStruct'
-
-  Usage:
-    arg = dpleStruct(a=my_a, v=my_v)
-        all arguments optional
-  Structure specification of a DPLE
-  
-  Keyword arguments::
-
-    a -- Sparsities for A_i, block diagonal form [Dple_STRUCT_A]
-    v -- Sparsities for V_i, block diagonal form [Dple_STRUCT_V]
-  """
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
-  for k in kwargs.keys():
-    if not(k in ['a','v']):
-      raise Exception("Keyword error in dpleStruct: '%s' is not recognized. Available keywords are: a, v" % k )
-  return IOSchemeVector([a,v], IOScheme(SCHEME_DpleVecStruct))
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(dpleStruct) dpleStruct< std::vector<casadi::Sparsity> >;
-}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
 def hnlpIn(**kwargs):
   """
   Helper function for 'HNLPInput'
@@ -1034,47 +1001,6 @@ namespace casadi {
 %template(lrdpleOut) lrdpleOut<casadi::MX>;
 %template(lrdpleOut) lrdpleOut<casadi::Matrix<double> >;
 %template(lrdpleOut) lrdpleOut<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
-def lrdpleStruct(**kwargs):
-  """
-  Helper function for 'LrDpleVecStruct'
-
-  Usage:
-    arg = lrdpleStruct(a=my_a, v=my_v, c=my_c, h=my_h)
-        all arguments optional
-  Structure specification of a DPLE
-  
-  Keyword arguments::
-
-    a -- Sparsities for A_i, block diagonal form [LR_Dple_STRUCT_A]
-    v -- Sparsities for V_i, block diagonal form [LR_Dple_STRUCT_V]
-    c -- Sparsities for C_i (defaults to unity), block diagonal form [LR_Dple_STRUCT_C]
-    h -- Sparsities for H_i (defaults to unity), block diagonal form [LR_Dple_STRUCT_H]
-  """
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  for k in kwargs.keys():
-    if not(k in ['a','v','c','h']):
-      raise Exception("Keyword error in lrdpleStruct: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
-  return IOSchemeVector([a,v,c,h], IOScheme(SCHEME_LrDpleVecStruct))
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(lrdpleStruct) lrdpleStruct< std::vector<casadi::Sparsity> >;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON

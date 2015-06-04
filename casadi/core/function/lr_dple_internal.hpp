@@ -35,6 +35,18 @@
 
 namespace casadi {
 
+  /// Structure specification of a DPLE
+  enum LrDpleVecStruct {
+    /// Sparsities for A_i, block diagonal form
+    LR_Dple_STRUCT_A,
+    /// Sparsities for V_i, block diagonal form
+    LR_Dple_STRUCT_V,
+    /// Sparsities for C_i (defaults to unity), block diagonal form
+    LR_Dple_STRUCT_C,
+    /// Sparsities for H_i (defaults to unity), block diagonal form
+    LR_Dple_STRUCT_H,
+    LR_Dple_STRUCT_NUM};
+
   /** \brief Internal storage for LrDpleSolver related data
 
       @copydoc DPLE_doc
@@ -48,8 +60,8 @@ namespace casadi {
     /** \brief  Constructor
      * \param st \structargument{Dple}
      */
-    LrDpleInternal(const LrDpleStructure & st,
-                 int nrhs=1, bool transp=false);
+    LrDpleInternal(const std::map<std::string, std::vector<Sparsity> > & st,
+                   int nrhs=1, bool transp=false);
 
     /** \brief  Destructor */
     virtual ~LrDpleInternal()=0;
@@ -61,7 +73,8 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual LrDpleInternal* create(const LrDpleStructure & st) const = 0;
+    virtual LrDpleInternal* create(const std::map<std::string,
+                                   std::vector<Sparsity> > & st) const = 0;
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -73,7 +86,7 @@ namespace casadi {
     virtual void init();
 
     /// Structure of Dple
-    LrDpleStructure st_;
+    std::vector<std::vector<Sparsity> > st_;
 
     /// List of sparsities of A_i
     std::vector< Sparsity > A_;
@@ -124,8 +137,8 @@ namespace casadi {
     bool with_H_;
 
     // Creator function for internal class
-    typedef LrDpleInternal* (*Creator)(const LrDpleStructure & st);
-
+    typedef LrDpleInternal* (*Creator)(const std::map<std::string,
+                                       std::vector<Sparsity> > & st);
     // No static functions exposed
     struct Exposed{ };
 
@@ -139,10 +152,10 @@ namespace casadi {
     static std::string shortname() { return "lrdple";}
 
     /// Get the resulting sparsity
-    static std::vector<Sparsity> getSparsity(
-      const LrDpleStructure& st,
-      const std::vector< std::vector<int> > &Hs = std::vector< std::vector<int> >());
-
+    static std::vector<Sparsity>
+      getSparsity(const std::map<std::string, std::vector<Sparsity> >& st,
+                  const std::vector< std::vector<int> > &Hs
+                  = std::vector< std::vector<int> >());
   };
 
 } // namespace casadi

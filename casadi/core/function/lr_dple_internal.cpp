@@ -38,10 +38,9 @@ OUTPUTSCHEME(LR_DPLEOutput)
 using namespace std;
 namespace casadi {
 
-  LrDpleInternal::LrDpleInternal(const LrDpleStructure & st,
-                             int nrhs,
-                             bool transp) :
-      st_(st), nrhs_(nrhs), transp_(transp) {
+  LrDpleInternal::LrDpleInternal(const std::map<std::string, std::vector<Sparsity> > &st,
+                                 int nrhs, bool transp) :
+    nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -55,6 +54,22 @@ namespace casadi {
               "Throw an exception when it is detected that Product(A_i, i=N..1) "
               "has eigenvalues greater than 1-eps_unstable");
     addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
+
+    st_.resize(LR_Dple_STRUCT_NUM);
+    for (std::map<std::string, std::vector<Sparsity> >::const_iterator i=st.begin();
+         i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[LR_Dple_STRUCT_A]=i->second;
+      } else if (i->first=="v") {
+        st_[LR_Dple_STRUCT_V]=i->second;
+      } else if (i->first=="c") {
+        st_[LR_Dple_STRUCT_C]=i->second;
+      } else if (i->first=="h") {
+        st_[LR_Dple_STRUCT_H]=i->second;
+      } else {
+        casadi_error("Unrecognized field in LR Dple structure: " << i->first);
+      }
+    }
 
     if (nrhs_==1) {
       ischeme_ = IOScheme(SCHEME_LR_DPLEInput);
@@ -198,7 +213,12 @@ namespace casadi {
     }*/
 
     // Allocate outputs
-    std::vector<Sparsity> P = getSparsity(st_, Hs_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[LR_Dple_STRUCT_A];
+    tmp["v"] = st_[LR_Dple_STRUCT_V];
+    tmp["c"] = st_[LR_Dple_STRUCT_C];
+    tmp["h"] = st_[LR_Dple_STRUCT_H];
+    std::vector<Sparsity> P = getSparsity(tmp, Hs_);
     obuf_.resize(nrhs_*LR_DPLE_NUM_OUT);
     for (int i=0;i<nrhs_;++i) {
       if (const_dim_) {
@@ -221,16 +241,17 @@ namespace casadi {
   const std::string LrDpleInternal::infix_ = "lrdplesolver";
 
 
-  std::vector<Sparsity> LrDpleInternal::getSparsity(
-    const LrDpleStructure& st, const std::vector< std::vector<int> > &Hs_) {
-
+  std::vector<Sparsity>
+  LrDpleInternal::getSparsity(const std::map<std::string, std::vector<Sparsity> >& st,
+                              const std::vector< std::vector<int> > &Hs_) {
     // Chop-up the arguments
-    std::vector<Sparsity> As = st[LR_Dple_STRUCT_A];
-    std::vector<Sparsity> Vs = st[LR_Dple_STRUCT_V];
-    std::vector<Sparsity> Cs = st[LR_Dple_STRUCT_C];
-    std::vector<Sparsity> Hs = st[LR_Dple_STRUCT_H];
+    std::vector<Sparsity> As, Vs, Cs, Hs;
+    if (st.count("a")) As = st.at("a");
+    if (st.count("v")) Vs = st.at("v");
+    if (st.count("c")) Cs = st.at("c");
+    if (st.count("h")) Hs = st.at("h");
 
-    bool with_H = !st[LR_Dple_STRUCT_H].empty();
+    bool with_H = !Hs.empty();
 
     int K = As.size();
 
@@ -248,7 +269,7 @@ namespace casadi {
     Sparsity V = diagcat(Vs.back(), diagcat(vector_slice(Vs, range(Vs.size()-1))));
     Sparsity C;
 
-    if (!st[LR_Dple_STRUCT_C].empty()) {
+    if (!Cs.empty()) {
       C = diagcat(Cs.back(), diagcat(vector_slice(Cs, range(Cs.size()-1))));
     }
     Sparsity H;

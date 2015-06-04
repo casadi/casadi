@@ -56,8 +56,9 @@ namespace casadi {
     LrDpleInternal::registerPlugin(casadi_register_lrdplesolver_lifting);
   }
 
-  LiftingLrDpleInternal::LiftingLrDpleInternal(
-      const LrDpleStructure & st) : LrDpleInternal(st) {
+  LiftingLrDpleInternal::LiftingLrDpleInternal(const std::map<std::string,
+                                               std::vector<Sparsity> > & st)
+    : LrDpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_lifting_lr_dple_solver"); // name of the function
@@ -200,7 +201,12 @@ namespace casadi {
 
   LiftingLrDpleInternal* LiftingLrDpleInternal::clone() const {
     // Return a deep copy
-    LiftingLrDpleInternal* node = new LiftingLrDpleInternal(st_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[LR_Dple_STRUCT_A];
+    tmp["v"] = st_[LR_Dple_STRUCT_V];
+    tmp["c"] = st_[LR_Dple_STRUCT_C];
+    tmp["h"] = st_[LR_Dple_STRUCT_H];
+    LiftingLrDpleInternal* node = new LiftingLrDpleInternal(tmp);
     node->setOption(dictionary());
     return node;
   }

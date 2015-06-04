@@ -55,15 +55,13 @@ namespace casadi {
     LrDpleInternal::registerPlugin(casadi_register_lrdplesolver_dple);
   }
 
-  LrDpleToDple::LrDpleToDple(
-         const LrDpleStructure& st) :
-          LrDpleInternal(st) {
+  LrDpleToDple::LrDpleToDple(const std::map<std::string, std::vector<Sparsity> >& st) :
+    LrDpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_lr_dple_to_dple"); // name of the function
 
     Adaptor<LrDpleToDple, DpleInternal>::addOptions();
-
   }
 
   LrDpleToDple::~LrDpleToDple() {
@@ -99,8 +97,10 @@ namespace casadi {
     }
 
     // Create an dplesolver instance
-    solver_ = DpleSolver(getOption(solvername()),
-                         dpleStruct("a", A_, "v", Vsp));
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = A_;
+    tmp["v"] = Vsp;
+    solver_ = DpleSolver(getOption(solvername()), tmp);
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
@@ -147,7 +147,12 @@ namespace casadi {
 
   LrDpleToDple* LrDpleToDple::clone() const {
     // Return a deep copy
-    LrDpleToDple* node = new LrDpleToDple(st_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[LR_Dple_STRUCT_A];
+    tmp["v"] = st_[LR_Dple_STRUCT_V];
+    tmp["c"] = st_[LR_Dple_STRUCT_C];
+    tmp["h"] = st_[LR_Dple_STRUCT_H];
+    LrDpleToDple* node = new LrDpleToDple(tmp);
     node->setOption(dictionary());
     return node;
   }

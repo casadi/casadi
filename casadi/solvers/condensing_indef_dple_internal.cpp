@@ -56,8 +56,9 @@ namespace casadi {
     DpleInternal::registerPlugin(casadi_register_dplesolver_condensing);
   }
 
-  CondensingIndefDpleInternal::CondensingIndefDpleInternal(
-      const DpleStructure& st) : DpleInternal(st) {
+  CondensingIndefDpleInternal::
+  CondensingIndefDpleInternal(const std::map<std::string, std::vector<Sparsity> >& st)
+    : DpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_condensing_indef_dple_solver"); // name of the function
@@ -145,7 +146,10 @@ namespace casadi {
 
   CondensingIndefDpleInternal* CondensingIndefDpleInternal::clone() const {
     // Return a deep copy
-    CondensingIndefDpleInternal* node = new CondensingIndefDpleInternal(st_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[Dple_STRUCT_A];
+    tmp["v"] = st_[Dple_STRUCT_V];
+    CondensingIndefDpleInternal* node = new CondensingIndefDpleInternal(tmp);
     node->setOption(dictionary());
     return node;
   }

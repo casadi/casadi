@@ -41,9 +41,6 @@ namespace casadi {
   class Function;
   class Sparsity;
   class CodeGenerator;
-  template<class T> class IOSchemeVector;
-  typedef IOSchemeVector< std::vector<Sparsity> > DpleStructure;
-  typedef IOSchemeVector< std::vector<Sparsity> > LrDpleStructure;
   class NlpSolver;
   class LinearSolver;
   class Integrator;

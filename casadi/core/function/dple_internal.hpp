@@ -36,6 +36,14 @@
 
 namespace casadi {
 
+  /// Structure specification of a DPLE
+  enum DpleVecStruct {
+    /// Sparsities for A_i, block diagonal form
+    Dple_STRUCT_A,
+    /// Sparsities for V_i, block diagonal form
+    Dple_STRUCT_V,
+    Dple_STRUCT_NUM};
+
   /** \brief Internal storage for DpleSolver related data
 
       @copydoc DPLE_doc
@@ -49,7 +57,7 @@ namespace casadi {
     /** \brief  Constructor
      * \param st \structargument{Dple}
      */
-    DpleInternal(const DpleStructure & st,
+    DpleInternal(const std::map<std::string, std::vector<Sparsity> > &st,
                  int nrhs=1, bool transp=false);
 
     /** \brief  Destructor */
@@ -62,7 +70,8 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual DpleInternal* create(const DpleStructure & st) const = 0;
+    virtual DpleInternal* create(const std::map<std::string,
+                                 std::vector<Sparsity> > & st) const = 0;
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -74,7 +83,7 @@ namespace casadi {
     virtual void init();
 
     /// Structure of Dple
-    DpleStructure st_;
+    std::vector<std::vector<Sparsity> > st_;
 
     /// List of sparsities of A_i
     std::vector< Sparsity > A_;
@@ -104,7 +113,8 @@ namespace casadi {
     bool transp_;
 
     // Creator function for internal class
-    typedef DpleInternal* (*Creator)(const DpleStructure & st);
+    typedef DpleInternal* (*Creator)(const std::map<std::string,
+                                     std::vector<Sparsity> > & st);
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
@@ -129,10 +139,8 @@ namespace casadi {
     static std::string shortname() { return "dple";}
 
     /// Get the resulting sparsity
-    static std::vector<Sparsity> getSparsity(
-      const DpleStructure& st);
-
-
+    static std::vector<Sparsity>
+      getSparsity(const std::map<std::string, std::vector<Sparsity> >& st);
   };
 
 } // namespace casadi

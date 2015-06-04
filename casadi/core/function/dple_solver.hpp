@@ -66,14 +66,6 @@ namespace casadi {
     DPLE_NUM_OUT
   };
 
-  /// Structure specification of a DPLE [dpleStruct]
-  enum DpleVecStruct {
-    /// Sparsities for A_i, block diagonal form [a]
-    Dple_STRUCT_A,
-    /// Sparsities for V_i, block diagonal form [v]
-    Dple_STRUCT_V,
-    Dple_STRUCT_NUM};
-
   /// Forward declaration of internal class
   class DpleInternal;
 
@@ -101,13 +93,15 @@ namespace casadi {
      * \param st \structargument{Dple}
      */
     DpleSolver(const std::string& name, const std::string& solver,
-               const DpleStructure& st, const Dict& opts=Dict());
+               const std::map<std::string, std::vector<Sparsity> >& st,
+               const Dict& opts=Dict());
 
     /** \brief Constructor (no initialization, to be deprecated)
      * \param solver \pluginargument{DpleSolver}
      * \param st \structargument{Dple}
      */
-    DpleSolver(const std::string& solver, const DpleStructure& st);
+    DpleSolver(const std::string& solver,
+               const std::map<std::string, std::vector<Sparsity> >& st);
 
     /// Print solver statistics
     void printStats(std::ostream &stream=CASADI_COUT) const;
