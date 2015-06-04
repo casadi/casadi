@@ -61,7 +61,7 @@ namespace casadi {
     /** \brief  Constructor
      * \param st \structargument{Dple}
      */
-    PsdIndefDpleInternal(const DpleStructure & st,
+    PsdIndefDpleInternal(const std::map<std::string, std::vector<Sparsity> > & st,
                          int nrhs=1, bool transp=false);
 
     /** \brief  Destructor */
@@ -74,12 +74,15 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual PsdIndefDpleInternal* create(const DpleStructure & st) const
-    { return new PsdIndefDpleInternal(st); }
+    virtual PsdIndefDpleInternal* create(const std::map<std::string,
+                                         std::vector<Sparsity> > & st) const {
+      return new PsdIndefDpleInternal(st);
+    }
 
     /** \brief  Create a new DPLE Solver */
-    static DpleInternal* creator(const DpleStructure & st)
-    { return new PsdIndefDpleInternal(st);}
+    static DpleInternal* creator(const std::map<std::string, std::vector<Sparsity> > & st) {
+      return new PsdIndefDpleInternal(st);
+    }
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}

@@ -72,10 +72,9 @@ namespace casadi {
     DpleInternal::registerPlugin(casadi_register_dplesolver_slicot);
   }
 
-  PsdIndefDpleInternal::PsdIndefDpleInternal(const DpleStructure & st,
-                                             int nrhs,
-                                             bool transp)
-      : DpleInternal(st, nrhs, transp) {
+  PsdIndefDpleInternal::
+  PsdIndefDpleInternal(const std::map<std::string, std::vector<Sparsity> > & st,
+                       int nrhs, bool transp) : DpleInternal(st, nrhs, transp) {
 
     // set default options
     setOption("name", "unnamed_psd_indef_dple_solver"); // name of the function
@@ -1068,7 +1067,10 @@ namespace casadi {
 
   PsdIndefDpleInternal* PsdIndefDpleInternal::clone() const {
     // Return a deep copy
-    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(st_, nrhs_, transp_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[Dple_STRUCT_A];
+    tmp["v"] = st_[Dple_STRUCT_V];
+    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(tmp, nrhs_, transp_);
     node->setOption(dictionary());
     return node;
   }
