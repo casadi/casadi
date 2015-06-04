@@ -91,7 +91,7 @@ namespace casadi {
   ExternalFunctionInternal*
   ExternalFunctionInternal::create(const std::string& bin_name, const std::string& f_name) {
     // Structure with info about the library to be passed to the constructor
-    LibInfo li = {bin_name, f_name};
+    LibInfo li = {bin_name, f_name, 0, 0, 0, 0, 0};
 
     // Load the dll and get the handle
     li.handle = getHandle(bin_name);
@@ -110,8 +110,6 @@ namespace casadi {
 
     // Initialize and get the number of inputs and outputs
     int f_type=0;
-    li.sz_arg=0;
-    li.sz_res=0;
     int flag = init(&f_type, &li.n_in, &li.n_out, &li.sz_arg, &li.sz_res);
     if (flag) {
       freeHandle(li.handle);
