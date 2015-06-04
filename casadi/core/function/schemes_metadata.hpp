@@ -80,7 +80,6 @@ enum InputOutputScheme {
   SCHEME_SDPOutput,
   SCHEME_SDQPInput,
   SCHEME_SDQPOutput,
-  SCHEME_SDQPStruct,
   SCHEME_SOCPInput,
   SCHEME_SOCPOutput,
   SCHEME_StabilizedQpSolverInput };

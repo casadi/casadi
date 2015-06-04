@@ -2082,47 +2082,6 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def sdqpStruct(**kwargs):
-  """
-  Helper function for 'SDQPStruct'
-
-  Usage:
-    arg = sdqpStruct(h=my_h, f=my_f, g=my_g, a=my_a)
-        all arguments optional
-  Structure specification of an SDQP
-  
-  Keyword arguments::
-
-    h -- The matrix H: sparse ( n x n) [SDQP_STRUCT_H]
-    f -- The horizontal stack of all matrices F_i: ( m x nm) [SDQP_STRUCT_F]
-    g -- The matrix G: ( m x m) [SDQP_STRUCT_G]
-    a -- The matrix A: ( nc x n) [SDQP_STRUCT_A]
-  """
-  h = Sparsity()
-  if 'h' in kwargs:
-    h = kwargs['h']
-  f = Sparsity()
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = Sparsity()
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  for k in kwargs.keys():
-    if not(k in ['h','f','g','a']):
-      raise Exception("Keyword error in sdqpStruct: '%s' is not recognized. Available keywords are: h, f, g, a" % k )
-  return IOSchemeVector([h,f,g,a], IOScheme(SCHEME_SDQPStruct))
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(sdqpStruct) sdqpStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
 def socpIn(**kwargs):
   """
   Helper function for 'SOCPInput'

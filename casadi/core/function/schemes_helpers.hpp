@@ -1236,32 +1236,6 @@ IOSchemeVector<M> sdqpOut(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_SDQPOutput));
 }
-/// Structure specification of an SDQP
-///
-/// \copydoc scheme_SDQPStruct
-template<class M>
-IOSchemeVector<M> sdqpStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M()) {
-  std::vector<M> ret(4);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_SDQPStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in SDQPStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "h, f, g, a");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-  return IOSchemeVector<M>(ret, IOScheme(SCHEME_SDQPStruct));
-}
 /// Input arguments of a SOCP problem
 ///
 /// \copydoc scheme_SOCPInput

@@ -48,14 +48,15 @@ namespace casadi {
   }
 
   SdqpSolver::SdqpSolver(const std::string& name, const std::string& solver,
-                         const SDQPStructure& st, const Dict& opts) {
+                         const std::map<std::string, Sparsity>& st, const Dict& opts) {
     assignNode(SdqpSolverInternal::instantiatePlugin(solver, st));
     setOption("name", name);
     setOption(opts);
     init();
   }
 
-  SdqpSolver::SdqpSolver(const std::string& solver, const SDQPStructure& st) {
+  SdqpSolver::SdqpSolver(const std::string& solver,
+                         const std::map<std::string, Sparsity>& st) {
     assignNode(SdqpSolverInternal::instantiatePlugin(solver, st));
   }
 

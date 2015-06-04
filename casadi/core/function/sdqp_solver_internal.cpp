@@ -35,14 +35,27 @@ using namespace std;
 namespace casadi {
 
   // Constructor
-  SdqpSolverInternal::SdqpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
+  SdqpSolverInternal::SdqpSolverInternal(const std::map<std::string, Sparsity> &st) {
 
     addOption("sdp_solver",       OT_STRING, GenericType(),
               "The SdqpSolver used to solve the SDPs.");
     addOption("sdp_solver_options",       OT_DICT, GenericType(),
               "Options to be passed to the SDPSOlver");
 
-    casadi_assert_message(st_.size()==SDQP_STRUCT_NUM, "Problem structure mismatch");
+    st_.resize(SDQP_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[SDQP_STRUCT_A]=i->second;
+      } else if (i->first=="g") {
+        st_[SDQP_STRUCT_G]=i->second;
+      } else if (i->first=="f") {
+        st_[SDQP_STRUCT_F]=i->second;
+      } else if (i->first=="h") {
+        st_[SDQP_STRUCT_H]=i->second;
+      } else {
+        casadi_error("Unrecognized field in SDQP structure: " << i->first);
+      }
+    }
 
     const Sparsity& A = st_[SDQP_STRUCT_A];
     const Sparsity& G = st_[SDQP_STRUCT_G];

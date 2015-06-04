@@ -50,7 +50,7 @@ namespace casadi {
     SdqpSolverInternal::registerPlugin(casadi_register_sdqpsolver_sdp);
   }
 
-  SdqpToSdp::SdqpToSdp(const std::vector<Sparsity> &st) : SdqpSolverInternal(st) {
+  SdqpToSdp::SdqpToSdp(const std::map<std::string, Sparsity> &st) : SdqpSolverInternal(st) {
     Adaptor<SdqpToSdp, SdpSolverInternal>::addOptions();
   }
 

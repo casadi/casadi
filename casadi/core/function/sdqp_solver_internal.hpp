@@ -34,6 +34,18 @@
 
 namespace casadi {
 
+  /// Structure specification of an SDQP
+  enum SDQPStruct {
+    /// The matrix H: sparse ( n x n)
+    SDQP_STRUCT_H,
+    /// The horizontal stack of all matrices F_i: ( m x nm)
+    SDQP_STRUCT_F,
+    /// The matrix G: ( m x m)
+    SDQP_STRUCT_G,
+    /// The matrix A: ( nc x n)
+    SDQP_STRUCT_A,
+    SDQP_STRUCT_NUM};
+
   /// Internal class
   class CASADI_EXPORT
   SdqpSolverInternal : public FunctionInternal,
@@ -41,7 +53,7 @@ namespace casadi {
   public:
 
     // Constructor
-    SdqpSolverInternal(const std::vector<Sparsity>& st);
+    SdqpSolverInternal(const std::map<std::string, Sparsity>& st);
 
     // Destructor
     virtual ~SdqpSolverInternal() = 0;
@@ -62,7 +74,7 @@ namespace casadi {
     void printProblem(std::ostream &stream=std::cout) const;
 
     // Creator function for internal class
-    typedef SdqpSolverInternal* (*Creator)(const SDQPStructure& st);
+    typedef SdqpSolverInternal* (*Creator)(const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
     struct Exposed{ };

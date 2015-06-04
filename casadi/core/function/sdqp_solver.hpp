@@ -77,18 +77,6 @@ namespace casadi {
     SDQP_SOLVER_LAM_X,
     SDQP_SOLVER_NUM_OUT};
 
-  /// Structure specification of an SDQP [sdqpStruct]
-  enum SDQPStruct {
-    /// The matrix H: sparse ( n x n) [h]
-    SDQP_STRUCT_H,
-    /// The horizontal stack of all matrices F_i: ( m x nm) [f]
-    SDQP_STRUCT_F,
-    /// The matrix G: ( m x m) [g]
-    SDQP_STRUCT_G,
-    /// The matrix A: ( nc x n) [a]
-    SDQP_STRUCT_A,
-    SDQP_STRUCT_NUM};
-
   // Forward declaration of internal class
   class SdqpSolverInternal;
 
@@ -114,13 +102,13 @@ namespace casadi {
      *  \param st \structargument{SDQP}
      */
     SdqpSolver(const std::string& name, const std::string& solver,
-               const SDQPStructure& st, const Dict& opts=Dict());
+               const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
     /** \brief Constructor (no initialization, to be deprecated)
      *  \param solver \pluginargument{SdqpSolver}
      *  \param st \structargument{SDQP}
      */
-    SdqpSolver(const std::string& solver, const SDQPStructure& st);
+    SdqpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
 
     /// Access functions of the node
     SdqpSolverInternal* operator->();
