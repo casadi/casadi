@@ -333,27 +333,22 @@ namespace std {
 %include "std_map.i"
 #endif
 
-%template(StringVector) std::vector<std::string>;
-
-%template(BVector)             std::vector<bool> ;
-%template(BVectorVector)       std::vector<std::vector<bool> > ;
-%template(BVectorVectorVector) std::vector< std::vector<std::vector<bool> > > ;
-
-%template(UCharVector)         std::vector<unsigned char>;
-
-%template(IVector)             std::vector<int>;
-%template(IVectorVector)       std::vector<std::vector<int> > ;
-%template(IVectorVectorVector) std::vector< std::vector<std::vector<int> > > ;
-
-%template(DVector)             std::vector<double>;
-%template(DVectorVector)       std::vector<std::vector<double> > ;
-%template(DVectorVectorVector) std::vector< std::vector<std::vector<double> > > ;
+%template() std::vector<std::string>;
+%template() std::vector<bool> ;
+%template() std::vector<std::vector<bool> > ;
+%template() std::vector< std::vector<std::vector<bool> > > ;
+%template() std::vector<unsigned char>;
+%template() std::vector<int>;
+%template() std::vector<std::vector<int> > ;
+%template() std::vector< std::vector<std::vector<int> > > ;
+%template() std::vector<double>;
+%template() std::vector<std::vector<double> > ;
+%template() std::vector< std::vector<std::vector<double> > > ;
 
 #ifndef SWIGMATLAB
-%template(Pair_Int_Int) std::pair<int,int>;
-%template(VectorPair_Int_Int) std::vector< std::pair<int,int> >;
+%template() std::pair<int,int>;
+%template() std::vector< std::pair<int,int> >;
 #endif // SWIGMATLAB
-
 
 // The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
 // nor the std::stringstream class, since these are included _after_ std::vector in the C++ generated wrapper code
@@ -1343,17 +1338,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #define PRECEDENCE_GENERICTYPE 22
 #define PRECEDENCE_DICTIONARY 21
 
-%template(SparsityVector) std::vector< casadi::Sparsity > ;
-%template(SparsityVectorVector) std::vector< std::vector< casadi::Sparsity> > ;
-%template(SXVector) std::vector<casadi::Matrix<casadi::SXElement> > ;
-%template(SXVectorVector) std::vector< std::vector<casadi::Matrix<casadi::SXElement> > > ;
-%template(MXVector) std::vector<casadi::MX>;
-%template(MXVectorVector) std::vector< std::vector<casadi::MX> >;
-%template(IMatrixVector) std::vector<casadi::Matrix<int> > ;
-%template(DMatrixVector) std::vector<casadi::Matrix<double> > ;
-%template(DMatrixVectorVector) std::vector< std::vector<casadi::Matrix<double> > > ;
-%template(IMatrixVectorVector) std::vector< std::vector<casadi::Matrix<int> > > ;
-
+%template() std::vector< casadi::Sparsity > ;
+%template() std::vector< std::vector< casadi::Sparsity> > ;
+%template() std::vector<casadi::Matrix<casadi::SXElement> > ;
+%template() std::vector< std::vector<casadi::Matrix<casadi::SXElement> > > ;
+%template() std::vector<casadi::MX>;
+%template() std::vector< std::vector<casadi::MX> >;
+%template() std::vector<casadi::Matrix<int> > ;
+%template() std::vector<casadi::Matrix<double> > ;
+%template() std::vector< std::vector<casadi::Matrix<double> > > ;
+%template() std::vector< std::vector<casadi::Matrix<int> > > ;
 
 %fragment("to"{int}, "header", fragment="fwd") {
   int to_int(GUESTOBJECT *p, void *mv, int offs) {
@@ -2451,7 +2445,7 @@ using namespace casadi;
 %traits_swigtype(casadi::CustomEvaluate);
 %fragment(SWIG_Traits_frag(casadi::CustomEvaluate));
 
-%template(Dict) std::map<std::string,casadi::GenericType>;
+%template() std::map<std::string,casadi::GenericType>;
 
 %traits_swigtype(casadi::Function);
 %fragment(SWIG_Traits_frag(casadi::Function));
@@ -3601,7 +3595,7 @@ def PyFunction(obj,inputs,outputs):
 %include <casadi/core/function/function.hpp>
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/function/code_generator.hpp>
-%template(Pair_Function_Function) std::pair<casadi::Function,casadi::Function>;
+%template() std::pair<casadi::Function,casadi::Function>;
 
 %include <casadi/core/matrix/matrix_tools.hpp>
 
@@ -3731,7 +3725,7 @@ GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
 %include <casadi/core/function/linear_solver.hpp>
 %include <casadi/core/function/implicit_function.hpp>
 %include <casadi/core/function/integrator.hpp>
-%template(IntegratorVector) std::vector<casadi::Integrator>;
+%template() std::vector<casadi::Integrator>;
 %include <casadi/core/function/simulator.hpp>
 %include <casadi/core/function/control_simulator.hpp>
 %include <casadi/core/function/nlp_solver.hpp>
