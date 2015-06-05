@@ -138,20 +138,18 @@ def _swig_repr(self):
 // STL
 #ifdef SWIGXML
 namespace std {
-
-template<class T>
-class vector {};
-
-template<class A,class B>
-class pair {};
-
-template<class A,class B>
-class map {};
-
+  template<class T> class vector {};
+  template<class A, class B> class pair {};
+  template<class A, class B> class map {};
 }
-#else
+#elif !defined(SWIGPYTHON)
+%include "std_string.i"
+%include "std_vector.i"
+%include "std_pair.i"
+%include "std_map.i"
+#else // SWIGPYTHON
+ /* TODO(@jaeandersson): Not maintainable, refactor */
 
-#ifdef SWIGPYTHON
 %fragment("StdSequenceTraits","header",
 	  fragment="StdTraits",
 	  fragment="SwigPySequence_Cont")
@@ -278,12 +276,9 @@ namespace swig {
     };
   }
 %}
-#endif
 
 
 %include "std_string.i"
-
-#ifdef SWIGPYTHON
 
 %{
 #include <vector>
@@ -324,14 +319,11 @@ namespace std {
     %typemap_traits_ptr(SWIG_TYPECHECK_VECTOR, std::vector<_Tp, _Alloc >);
   
   };
-
 }
-#else
-%include "std_vector.i"
-#endif
+
 %include "std_pair.i"
 %include "std_map.i"
-#endif
+#endif // SWIGPYTHON
 
 %template() std::vector<std::string>;
 %template() std::vector<bool> ;
