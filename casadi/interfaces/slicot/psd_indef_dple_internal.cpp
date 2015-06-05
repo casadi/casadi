@@ -892,7 +892,10 @@ namespace casadi {
     }
 
     // Prepare a solver for forward seeds
-    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(st_, nfwd, transp_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[Dple_STRUCT_A];
+    tmp["v"] = st_[Dple_STRUCT_V];
+    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(tmp, nfwd, transp_);
     node->setOption(dictionary());
 
     DpleSolver f;
@@ -996,7 +999,10 @@ namespace casadi {
     }
 
     // Prepare a solver for adjoint seeds
-    PsdIndefDpleInternal* node2 = new PsdIndefDpleInternal(st_, nadj, !transp_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[Dple_STRUCT_A];
+    tmp["v"] = st_[Dple_STRUCT_V];
+    PsdIndefDpleInternal* node2 = new PsdIndefDpleInternal(tmp, nadj, !transp_);
     node2->setOption(dictionary());
 
     DpleSolver b;
