@@ -160,14 +160,16 @@ namespace casadi {
       }
 
     // Set cone constraints (fixed)
-    int largest_cone = *std::max_element(ni_.begin(),ni_.end());
-    int submem [largest_cone];
-    int sum_ni = 0;
-    for (int i=0;i<m_;++i) {
-      submem [0] = i;
-      for(int ii=0;ii<ni_[i];++ii) submem[ii+1] = m_ + sum_ni + ii;
-      MSK_appendcone(mosek_task_,MSK_CT_QUAD,0.0,ni_[i]+1,submem);
-      sum_ni += ni_[i];
+    if (m_ > 0){
+      int largest_cone = *std::max_element(ni_.begin(),ni_.end());
+      int submem [largest_cone];
+      int sum_ni = 0;
+      for (int i=0;i<m_;++i) {
+        submem [0] = i;
+        for(int ii=0;ii<ni_[i];++ii) submem[ii+1] = m_ + sum_ni + ii;
+        MSK_appendcone(mosek_task_,MSK_CT_QUAD,0.0,ni_[i]+1,submem);
+        sum_ni += ni_[i];
+      }
     }
 
     // Pre-allocate memory for vector indices of relevant bounds
