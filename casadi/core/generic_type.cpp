@@ -44,7 +44,6 @@ namespace casadi {
   typedef GenericTypeInternal<std::vector<int> > IntVectorType;
   typedef GenericTypeInternal<std::vector< std::vector<int> > > IntVectorVectorType;
   typedef GenericTypeInternal<std::vector<std::string> > StringVectorType;
-  typedef GenericTypeInternal<SharedObject> SharedObjectType;
   typedef GenericTypeInternal<Function> FunctionType;
   typedef GenericTypeInternal<Dict> DictType;
 /// \endcond
@@ -161,10 +160,6 @@ bool GenericType::isStringVector() const {
   return is_a<vector<string> >();
 }
 
-bool GenericType::isSharedObject() const {
-  return is_a<SharedObject>();
-}
-
 bool GenericType::isFunction() const {
   return is_a<Function>();
 }
@@ -227,15 +222,6 @@ GenericType::GenericType(const string& s) : type_(OT_STRING) {
 
 GenericType::GenericType(const char s[])  : type_(OT_STRING) {
   assignNode(new StringType(s));
-}
-
-//GenericType::GenericType(const GenericType& obj) {
-//  type_ = obj.type_;
-//  assignNode(new SharedObjectType(obj));
-//}
-
-GenericType::GenericType(const SharedObject& obj) : type_(OT_UNKNOWN) {
-  assignNode(new SharedObjectType(obj));
 }
 
 GenericType::GenericType(const Function& f) : type_(OT_FUNCTION) {
@@ -321,11 +307,6 @@ vector<double>& GenericType::toDoubleVector() {
 const vector<string>& GenericType::toStringVector() const {
   casadi_assert_message(isStringVector(), "type mismatch");
   return static_cast<const StringVectorType*>(get())->d_;
-}
-
-const SharedObject& GenericType::toSharedObject() const {
-  casadi_assert_message(isSharedObject(), "type mismatch");
-  return static_cast<const SharedObjectType*>(get())->d_;
 }
 
 const Dict& GenericType::toDict() const {

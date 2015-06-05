@@ -56,8 +56,14 @@ namespace casadi {
   \date 2010
   Return type when getting an option, can be converted into bool, int, string, vector, etc */
   class CASADI_EXPORT GenericType : public SharedObject {
-    public:
+  public:
+    /// C++ equivalent of Python's dict or MATLAB's struct
+    typedef std::map<std::string, GenericType> Dict;
+
+    /// Default constructor
     GenericType();
+
+    /// Constructors (implicit type conversion)
     GenericType(bool b);
     GenericType(int i);
     GenericType(double d);
@@ -69,9 +75,9 @@ namespace casadi {
     GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
     GenericType(const Function& f);
-    GenericType(const SharedObject& obj);
-    //GenericType(const GenericType& obj);
-
+    GenericType(const DerivativeGenerator& c);
+    GenericType(const Callback& c);
+    GenericType(const Dict& dict);
     #ifndef SWIG
     GenericType(void* ptr);
     #endif // SWIG
@@ -85,16 +91,6 @@ namespace casadi {
     /// Construct a GenericType given an opt_type
     static GenericType from_type(opt_type type);
 
-    /// C++ equivalent of Python's dict or MATLAB's struct
-    typedef std::map<std::string, GenericType> Dict;
-
-    /// Typecast from dict
-    GenericType(const Dict& dict);
-
-    /// Creator functions
-    GenericType(const DerivativeGenerator& c);
-    GenericType(const Callback& c);
-
     /// Implicit typecasting
     #ifndef SWIG
     operator bool() const { return toBool();}
@@ -106,14 +102,11 @@ namespace casadi {
     operator const std::vector<double>& () const { return toDoubleVector();}
     operator const std::vector<std::string>& () const { return toStringVector();}
     operator const Function& () const { return toFunction();}
-    //operator void*() const;
     operator const std::map<std::string, GenericType>& () const;
-
     operator std::vector<int>& () { return toIntVector();}
     operator std::vector< std::vector<int> >& () { return toIntVectorVector();}
     operator std::vector<double>& () { return toDoubleVector();}
     operator std::map<std::string, GenericType>& ();
-
     operator const DerivativeGenerator& () const;
     operator const Callback& () const;
     #endif // SWIG
@@ -149,9 +142,6 @@ namespace casadi {
 
     //! \brief Is a vector of strings
     bool isStringVector() const;
-
-    //! \brief Is a shared object?
-    bool isSharedObject() const;
 
     //! \brief Is a shared object?
     bool isDict() const;
@@ -193,9 +183,6 @@ namespace casadi {
 
     //! \brief Convert to vector of strings
     const std::vector<std::string>& toStringVector() const;
-
-    //! \brief Convert to shared object
-    const SharedObject& toSharedObject() const;
 
     //! \brief Convert to Dict
     const Dict& toDict() const;
