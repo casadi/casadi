@@ -2148,20 +2148,77 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %typemaps_pairmap(PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
 
 %fragment("to"{DMatrix}, "header", fragment="fwd,make_vector", fragment="to"{double}) {
+  // Traits specialization for DMatrix
+  namespace casadi {
+    template <> struct traits_casptr<DMatrix> {
+      static bool casptr(GUESTOBJECT *p, DMatrix** m) {
+        // Treat Null
+        if (is_null(p)) return false;
+
+        // DMatrix already?
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                      $descriptor(casadi::Matrix<double>*), 0))) {
+          return true;
+        }
+
+        // Object is an IMatrix
+        {
+          // Pointer to object
+          IMatrix *m2;
+          if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                        $descriptor(casadi::Matrix<int>*), 0))) {
+            if (m) **m=*m2;
+            return true;
+          }
+        }
+
+        // First convert to double
+        {
+          double tmp;
+          if (SWIG_IsOK(SWIG_AsVal_double(p, m ? &tmp : 0))) {
+            if (m) **m=tmp;
+            return true;
+          }
+        }
+
+        // First convert to integer
+        {
+          int tmp;
+          if (SWIG_IsOK(SWIG_AsVal_int(p, m ? &tmp : 0))) {
+            if (m) **m=tmp;
+            return true;
+          }
+        }
+
+#ifdef SWIGPYTHON
+        // User-supplied conversion
+        if (false && PyObject_HasAttrString(p,"__DMatrix__")) {
+          PyObject *cr = PyObject_CallMethod(p, "__DMatrix__", 0);
+          if (!cr) return false;
+          // Call recursively
+          int flag = casptr(cr, m);
+          Py_DECREF(cr);
+          return flag;
+        }
+#endif // SWIGPYTHON
+
+        // No match
+        return false;
+      }
+    };
+  } // namespace casadi
+
   int to_DMatrix(GUESTOBJECT *p, void *mv, int offs) {
     casadi::DMatrix *m = static_cast<casadi::DMatrix*>(mv);
     if (m) m += offs;
-    // Use operator=
-    if (TRY_COPY(p, casadi::DMatrix, type_DMatrix(), m)) return true;
-    if (TRY_COPY(p, casadi::IMatrix, type_IMatrix(), m)) return true;
-    // If double
-    {
-      double t;
-      if (to_double(p, &t)) {
-        if (m) *m = t;
-        return true;
-      }
+
+    // Call refactored version
+    casadi::DMatrix *m_orig = m;
+    if (casptr(p, m ? &m : 0)) {
+      if (m!=m_orig) *m_orig=*m;
+      return true;
     }
+
 #ifdef SWIGPYTHON
     // Object has __DMatrix__ method
     if (PyObject_HasAttrString(p,"__DMatrix__")) {
@@ -2238,19 +2295,18 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       if (!narray || !is_array(narray) || array_numdims(narray)!=1) goto cleanup;
       array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
       if (!array) goto cleanup;
-		    
+
       // Construct the 'row' vector needed for initialising the correct sparsity
       row = PyObject_GetAttrString(p,"indices"); // need's to be decref'ed
       if (!row || !is_array(row) || array_numdims(row)!=1) goto cleanup;
       array_row = obj_to_array_contiguous_allow_conversion(row,NPY_INT,&row_is_new_object);
       if (!array_row) goto cleanup;
-    
+
       // Construct the 'colind' vector needed for initialising the correct sparsity
       colind = PyObject_GetAttrString(p,"indptr"); // need's to be decref'ed
       if (!colind || !is_array(colind) || array_numdims(colind)!=1) goto cleanup;
       array_colind = obj_to_array_contiguous_allow_conversion(colind,NPY_INT,&colind_is_new_object);
       if (!array_colind) goto cleanup;
-    
       {
         int size=array_size(array,0); // number on non-zeros
         double* d=(double*) array_data(array);
@@ -2364,7 +2420,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       }
     };
   } // namespace casadi
-
 
 
   int to_IMatrix(GUESTOBJECT *p, void *mv, int offs) {
