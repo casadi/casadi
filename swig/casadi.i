@@ -2316,19 +2316,69 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_typemaps_vector(MX, PRECEDENCE_MXVector, casadi::MX)
 
 %fragment("to"{IMatrix}, "header", fragment="fwd,make_vector") {
+  // Traits specialization for IMatrix
+  namespace casadi {
+    template <> struct traits_casptr<IMatrix> {
+      static bool casptr(GUESTOBJECT *p, IMatrix** m) {
+        // Treat Null
+        if (is_null(p)) return false;
+
+        // IMatrix already?
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                      $descriptor(casadi::Matrix<int>*), 0))) {
+          return true;
+        }
+
+        // First convert to integer
+        {
+          int tmp;
+          if (SWIG_IsOK(SWIG_AsVal_int(p, m ? &tmp : 0))) {
+            if (m) **m=tmp;
+            return true;
+          }
+        }
+
+#ifdef SWIGPYTHON
+        // User-supplied conversion
+        if (false && PyObject_HasAttrString(p,"__IMatrix__")) {
+          PyObject *cr = PyObject_CallMethod(p, "__IMatrix__", 0);
+          if (!cr) return false;
+          // Call recursively
+          int flag = casptr(cr, m);
+          Py_DECREF(cr);
+          return flag;
+        }
+#endif // SWIGPYTHON
+
+        // First convert to DMatrix and check if all entries integers
+        if (false) {
+          DMatrix tmp;
+          if (to_DMatrix(p, &tmp) && tmp.isInteger()) {
+            if (m) **m=IMatrix(tmp.sparsity(), tmp.nonzeros_int());
+            return true;
+          }
+        }
+
+        // No match
+        return false;
+      }
+    };
+  } // namespace casadi
+
+
+
   int to_IMatrix(GUESTOBJECT *p, void *mv, int offs) {
     casadi::IMatrix *m = static_cast<casadi::IMatrix*>(mv);
     // Use operator=
     if (m) m += offs;
-    if (TRY_COPY(p, casadi::IMatrix, type_IMatrix(), m)) return true;
-    // If scalar
-    {
-      int t;
-      if (to_int(p, &t)) {
-        if (m) *m = t;
-        return true;
-      }
+
+    // Call refactored version
+    casadi::IMatrix *m_orig = m;
+    if (casptr(p, m ? &m : 0)) {
+      if (m!=m_orig) *m_orig=*m;
+      return true;
     }
+
 #ifdef SWIGPYTHON
     // Numpy arrays will be cast to dense Matrix<int>
     if (is_array(p)) {
