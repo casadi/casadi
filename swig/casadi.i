@@ -30,6 +30,41 @@
 #include <casadi/casadi.hpp>
 %}
 
+// Order in typemap matching: Lower value means will be checked first
+%define PRECEDENCE_IVector 92 %enddef
+%define PRECEDENCE_IVectorVector 92 %enddef
+%define PRECEDENCE_PAIR_SLICE_SLICE 93 %enddef
+%define PRECEDENCE_SLICE 94 %enddef
+%define PRECEDENCE_PAIR_IVector_IVector 96 %enddef
+%define PRECEDENCE_IMatrix 97 %enddef
+%define PRECEDENCE_IMatrixVector 98 %enddef
+%define PRECEDENCE_IMatrixVectorVector 98 %enddef
+%define PRECEDENCE_DVector 99 %enddef
+%define PRECEDENCE_DMatrix 100 %enddef
+%define PRECEDENCE_DMatrixVector 101 %enddef
+%define PRECEDENCE_DMatrixVectorVector 101 %enddef
+%define PRECEDENCE_SX 103 %enddef
+%define PRECEDENCE_SXVector 103 %enddef
+%define PRECEDENCE_SXVectorVector 103 %enddef
+%define PRECEDENCE_MX 104 %enddef
+%define PRECEDENCE_MXVector 105 %enddef
+%define PRECEDENCE_MXVectorVector 106 %enddef
+%define PRECEDENCE_CREATOR 150 %enddef
+%define PRECEDENCE_DERIVATIVEGENERATOR 21 %enddef
+%define PRECEDENCE_CUSTOMEVALUATE 21 %enddef
+%define PRECEDENCE_CALLBACK 21 %enddef
+%define PRECEDENCE_GENERICTYPE 22 %enddef
+%define PRECEDENCE_DICT 21 %enddef
+
+  /// Data structure in the target language holding data
+#ifdef SWIGPYTHON
+#define GUESTOBJECT PyObject
+#elif defined(SWIGMATLAB)
+#define GUESTOBJECT mxArray
+#else
+#define GUESTOBJECT void
+#endif
+
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
 // for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
@@ -627,14 +662,6 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 
 /// Generic typemap structure
 
-  /// Data structure in the target language holding data
-#ifdef SWIGPYTHON
-#define GUESTOBJECT PyObject
-#elif defined(SWIGMATLAB)
-#define GUESTOBJECT mxArray
-#else
-#define GUESTOBJECT void
-#endif
 
 /// Check if Python object is of type T
 %fragment("is_a", "header") {
@@ -1298,38 +1325,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %}
 #endif
 
-// Lower value means wil be checked first
-#define PRECEDENCE_IVector 92
-#define PRECEDENCE_IVectorVector 92
-#define PRECEDENCE_PAIR_SLICE_SLICE 93
-#define PRECEDENCE_SLICE 94
-#define PRECEDENCE_PAIR_IVector_IVector 96
-
-#define PRECEDENCE_IMatrix 97
-#define PRECEDENCE_IMatrixVector 98
-#define PRECEDENCE_IMatrixVectorVector 98
-
-#define PRECEDENCE_DVector 99
-
-#define PRECEDENCE_DMatrix 100
-#define PRECEDENCE_DMatrixVector 101
-#define PRECEDENCE_DMatrixVectorVector 101
-
-#define PRECEDENCE_SX 103
-#define PRECEDENCE_SXVector 103
-#define PRECEDENCE_SXVectorVector 103
-#define PRECEDENCE_MX 104
-#define PRECEDENCE_MXVector 105
-#define PRECEDENCE_MXVectorVector 106
-
-#define PRECEDENCE_CREATOR 150
-#define PRECEDENCE_DERIVATIVEGENERATOR 21
-#define PRECEDENCE_CUSTOMEVALUATE 21
-#define PRECEDENCE_CALLBACK 21
-
-#define PRECEDENCE_GENERICTYPE 22
-#define PRECEDENCE_DICTIONARY 21
-
 %template() std::vector< casadi::Sparsity > ;
 %template() std::vector< std::vector< casadi::Sparsity> > ;
 %template() std::vector<casadi::Matrix<casadi::SXElement> > ;
@@ -1975,7 +1970,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif // SWIGPYTHON
   }
  }
-%casadi_typemaps_constref(Dict, PRECEDENCE_DICTIONARY, casadi::GenericType::Dict)
+%casadi_typemaps_constref(Dict, PRECEDENCE_DICT, casadi::GenericType::Dict)
 #endif
 
 %fragment("to"{SX}, "header", fragment="fwd") {
