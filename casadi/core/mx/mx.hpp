@@ -546,9 +546,10 @@ namespace casadi {
   MX GenericMatrix<MX>::sym(const std::string& name, const Sparsity& sp);
 
   ///@{
-  /// Some typedefs
+  /// Readability typedefs
   typedef std::vector<MX> MXVector;
-  typedef std::vector< std::vector<MX> > MXVectorVector;
+  typedef std::vector<MXVector> MXVectorVector;
+  typedef std::map<std::string, MX> MXDict;
   ///@}
 
 } // namespace casadi

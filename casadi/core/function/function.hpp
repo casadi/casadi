@@ -304,12 +304,12 @@ namespace casadi {
                                bool always_inline=false, bool never_inline=false);
     std::vector<MX> operator()(const std::vector<MX>& arg,
                                bool always_inline=false, bool never_inline=false);
-    const std::map<std::string, DMatrix> operator()(const std::map<std::string, DMatrix>& arg,
-                                              bool always_inline=false, bool never_inline=false);
-    const std::map<std::string, SX> operator()(const std::map<std::string, SX>& arg,
-                 bool always_inline=false, bool never_inline=false);
-    const std::map<std::string, MX> operator()(const std::map<std::string, MX>& arg,
-                                         bool always_inline=false, bool never_inline=false);
+    const DMatrixDict operator()(const DMatrixDict& arg,
+                                 bool always_inline=false, bool never_inline=false);
+    const SXDict operator()(const SXDict& arg,
+                            bool always_inline=false, bool never_inline=false);
+    const MXDict operator()(const MXDict& arg,
+                            bool always_inline=false, bool never_inline=false);
     ///@}
 
 #ifndef SWIG

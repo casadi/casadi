@@ -73,23 +73,21 @@ namespace casadi {
     /// Expand an Function
     explicit SXFunction(const Function &f);
 
-    typedef std::pair<std::map<std::string, SX>, std::vector<std::string> > MappedIO;
-
     /** \brief Construct from vectors (new syntax, includes initialization) */
     SXFunction(const std::string& name, const std::vector<SX>& arg,
                const std::vector<SX>& res, const Dict& opts=Dict());
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
-    SXFunction(const std::string& name, const MappedIO& arg,
+    SXFunction(const std::string& name, const std::pair< SXDict, std::vector<std::string> >& arg,
                const std::vector<SX>& res, const Dict& opts=Dict());
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     SXFunction(const std::string& name, const std::vector<SX>& arg,
-               const MappedIO& res, const Dict& opts=Dict());
+               const std::pair< SXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
-    SXFunction(const std::string& name, const MappedIO& arg,
-               const MappedIO& res, const Dict& opts=Dict());
+    SXFunction(const std::string& name, const std::pair< SXDict, std::vector<std::string> >& arg,
+               const std::pair< SXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
 #ifndef SWIG
 #ifdef USE_CXX11
     /** \brief Construct from initializer lists (new syntax, includes initialization) */
@@ -113,16 +111,20 @@ namespace casadi {
 #endif // SWIG
 
     /// Multiple input, multiple output, no initialization (to be deprecated)
-    SXFunction(const std::vector<SX>& arg, const std::vector<SX>& res);
+    SXFunction(const std::vector<SX>& arg,
+               const std::vector<SX>& res);
 
     /// Multiple input, multiple  output, no initialization (to be deprecated)
-    SXFunction(const std::vector<SX>& arg, const MappedIO& res);
+    SXFunction(const std::vector<SX>& arg,
+               const std::pair< SXDict, std::vector<std::string> >& res);
 
     /// Multiple input, multiple output, no initialization (to be deprecated)
-    SXFunction(const MappedIO& arg, const std::vector<SX>& res);
+    SXFunction(const std::pair< SXDict, std::vector<std::string> >& arg,
+               const std::vector<SX>& res);
 
     /// Multiple input, multiple output, no initialization (to be deprecated)
-    SXFunction(const MappedIO& arg, const MappedIO& res);
+    SXFunction(const std::pair< SXDict, std::vector<std::string> >& arg,
+               const std::pair< SXDict, std::vector<std::string> >& res);
 
 /// \cond INTERNAL
     /// Access functions of the node

@@ -46,17 +46,20 @@ namespace casadi {
     assignNode(new SXFunctionInternal(arg, res));
   }
 
-  SXFunction::SXFunction(const vector<SX>& arg, const SXFunction::MappedIO& res) {
+  SXFunction::SXFunction(const vector<SX>& arg,
+                         const pair<SXDict, vector<string> >& res) {
     assignNode(new SXFunctionInternal(arg, make_vector(res)));
     setOption("output_scheme", res.second);
   }
 
-  SXFunction::SXFunction(const MappedIO& arg, const vector<SX>& res) {
+  SXFunction::SXFunction(const pair<SXDict, vector<string> >& arg,
+                         const vector<SX>& res) {
     assignNode(new SXFunctionInternal(make_vector(arg), res));
     setOption("input_scheme", arg.second);
   }
 
-  SXFunction::SXFunction(const MappedIO& arg, const MappedIO& res) {
+  SXFunction::SXFunction(const pair<SXDict, vector<string> >& arg,
+                         const pair<SXDict, vector<string> >& res) {
     assignNode(new SXFunctionInternal(make_vector(arg), make_vector(res)));
     setOption("input_scheme", arg.second);
     setOption("output_scheme", res.second);
@@ -81,18 +84,18 @@ namespace casadi {
     construct(name, arg, res, opts);
   }
 
-  SXFunction::SXFunction(const std::string& name, const MappedIO& arg,
+  SXFunction::SXFunction(const std::string& name, const pair<SXDict, vector<string> >& arg,
                          const std::vector<SX>& res, const Dict& opts) {
     construct(name, make_vector(arg), res, opts, arg.second);
   }
 
   SXFunction::SXFunction(const std::string& name, const std::vector<SX>& arg,
-                         const MappedIO& res, const Dict& opts) {
+                         const pair<SXDict, vector<string> >& res, const Dict& opts) {
     construct(name, arg, make_vector(res), opts, std::vector<string>(), res.second);
   }
 
-  SXFunction::SXFunction(const std::string& name, const MappedIO& arg,
-                         const MappedIO& res, const Dict& opts) {
+  SXFunction::SXFunction(const std::string& name, const pair<SXDict, vector<string> >& arg,
+                         const pair<SXDict, vector<string> >& res, const Dict& opts) {
     construct(name, make_vector(arg), make_vector(res), opts, arg.second, res.second);
   }
 

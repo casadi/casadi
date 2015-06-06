@@ -52,17 +52,20 @@ namespace casadi {
     assignNode(new MXFunctionInternal(arg, res));
   }
 
-  MXFunction::MXFunction(const std::vector<MX>& arg, const MappedIO& res) {
+  MXFunction::MXFunction(const std::vector<MX>& arg,
+                         const pair<MXDict, vector<string> >& res) {
     assignNode(new MXFunctionInternal(arg, make_vector(res)));
     setOption("output_scheme", res.second);
   }
 
-  MXFunction::MXFunction(const MappedIO& arg, const std::vector<MX>& res) {
+  MXFunction::MXFunction(const pair<MXDict, vector<string> >& arg,
+                         const std::vector<MX>& res) {
     assignNode(new MXFunctionInternal(make_vector(arg), res));
     setOption("input_scheme", arg.second);
   }
 
-  MXFunction::MXFunction(const MappedIO& arg, const MappedIO& res) {
+  MXFunction::MXFunction(const pair<MXDict, vector<string> >& arg,
+                         const pair<MXDict, vector<string> >& res) {
     assignNode(new MXFunctionInternal(make_vector(arg), make_vector(res)));
     setOption("input_scheme", arg.second);
     setOption("output_scheme", res.second);
@@ -87,18 +90,18 @@ namespace casadi {
     construct(name, arg, res, opts);
   }
 
-  MXFunction::MXFunction(const std::string& name, const MappedIO& arg,
+  MXFunction::MXFunction(const std::string& name, const pair<MXDict, vector<string> >& arg,
                          const std::vector<MX>& res, const Dict& opts) {
     construct(name, make_vector(arg), res, opts, arg.second);
   }
 
   MXFunction::MXFunction(const std::string& name, const std::vector<MX>& arg,
-                         const MappedIO& res, const Dict& opts) {
+                         const pair<MXDict, vector<string> >& res, const Dict& opts) {
     construct(name, arg, make_vector(res), opts, std::vector<string>(), res.second);
   }
 
-  MXFunction::MXFunction(const std::string& name, const MappedIO& arg,
-                         const MappedIO& res, const Dict& opts) {
+  MXFunction::MXFunction(const std::string& name, const pair<MXDict, vector<string> >& arg,
+                         const pair<MXDict, vector<string> >& res, const Dict& opts) {
     construct(name, make_vector(arg), make_vector(res), opts, arg.second, res.second);
   }
 

@@ -1078,6 +1078,11 @@ namespace casadi {
   /** Sparsity format for getting and setting inputs and outputs */
   enum SparsityType {SP_SPARSE, SP_SPARSESYM, SP_DENSE, SP_DENSESYM, SP_DENSETRANS};
 
+  ///@{
+  /// Readability typedefs
+  typedef std::map<std::string, Sparsity> SparsityDict;
+  ///@}
+
 } // namespace casadi
 
 #endif // CASADI_SPARSITY_HPP

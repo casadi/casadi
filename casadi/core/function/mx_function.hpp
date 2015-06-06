@@ -77,23 +77,21 @@ namespace casadi {
     /** \brief  Attempt to form an MXFunction out of an Function */
     explicit MXFunction(const Function& function);
 
-    typedef std::pair<std::map<std::string, MX>, std::vector<std::string> > MappedIO;
-
     /** \brief Construct from vectors (new syntax, includes initialization) */
     MXFunction(const std::string& name, const std::vector<MX>& arg,
                const std::vector<MX>& res, const Dict& opts=Dict());
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
-    MXFunction(const std::string& name, const MappedIO& arg,
+    MXFunction(const std::string& name, const std::pair< MXDict, std::vector<std::string> >& arg,
                const std::vector<MX>& res, const Dict& opts=Dict());
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     MXFunction(const std::string& name, const std::vector<MX>& arg,
-               const MappedIO& res, const Dict& opts=Dict());
+               const std::pair< MXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
-    MXFunction(const std::string& name, const MappedIO& arg,
-               const MappedIO& res, const Dict& opts=Dict());
+    MXFunction(const std::string& name, const std::pair< MXDict, std::vector<std::string> >& arg,
+               const std::pair< MXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
 
 #ifndef SWIG
 #ifdef USE_CXX11
@@ -117,16 +115,20 @@ namespace casadi {
 #endif // USE_CXX11
 #endif // SWIG
     /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
-    MXFunction(const std::vector<MX>& arg, const std::vector<MX>& res);
+    MXFunction(const std::vector<MX>& arg,
+               const std::vector<MX>& res);
 
     /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
-    MXFunction(const std::vector<MX>& arg, const MappedIO& res);
+    MXFunction(const std::vector<MX>& arg,
+               const std::pair< MXDict, std::vector<std::string> >& res);
 
     /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
-    MXFunction(const MappedIO& arg, const std::vector<MX>& res);
+    MXFunction(const std::pair< MXDict, std::vector<std::string> >& arg,
+               const std::vector<MX>& res);
 
     /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
-    MXFunction(const MappedIO& arg, const MappedIO& res);
+    MXFunction(const std::pair< MXDict, std::vector<std::string> >& arg,
+               const std::pair< MXDict, std::vector<std::string> >& res);
 
     /// \cond INTERNAL
     /** \brief  Access functions of the node */

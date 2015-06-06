@@ -885,17 +885,14 @@ namespace casadi {
   template<> bool Matrix<int>::isSlice(bool ind1) const;
   template<> Slice Matrix<int>::toSlice(bool ind1) const;
 
-  // Typedefs initializations
+  ///@{
+  /// Readability typedefs
   typedef Matrix<int> IMatrix;
   typedef Matrix<double> DMatrix;
-  typedef std::vector<Matrix<double> > DMatrixVector;
-  typedef std::vector< std::vector<Matrix<double> > > DMatrixVectorVector;
-
-  /// \cond INTERNAL
-  typedef DMatrix* DMatrixPtr;
-  typedef std::vector<DMatrixPtr> DMatrixPtrV;
-  typedef std::vector<DMatrixPtrV> DMatrixPtrVV;
-  /// \endcond
+  typedef std::vector<DMatrix> DMatrixVector;
+  typedef std::vector<DMatrixVector> DMatrixVectorVector;
+  typedef std::map<std::string, DMatrix> DMatrixDict;
+  ///@}
 } // namespace casadi
 
 #ifdef casadi_implementation

@@ -612,8 +612,8 @@ namespace casadi {
   }
 
   template<typename M>
-  const std::map<std::string, M> Function::callMap(const std::map<std::string, M>& arg,
-                                             bool always_inline, bool never_inline) {
+  const std::map<std::string, M>
+  Function::callMap(const std::map<std::string, M>& arg, bool always_inline, bool never_inline) {
     casadi_assert(isInit());
 
     // Order inputs
@@ -633,18 +633,18 @@ namespace casadi {
     return ret;
   }
 
-  const std::map<std::string, DMatrix> Function::
-  operator()(const std::map<std::string, DMatrix>& arg, bool always_inline, bool never_inline) {
+  const DMatrixDict Function::operator()(const DMatrixDict& arg, bool always_inline,
+                                         bool never_inline) {
     return callMap(arg, always_inline, never_inline);
   }
 
-  const std::map<std::string, SX> Function::
-  operator()(const std::map<std::string, SX>& arg, bool always_inline, bool never_inline) {
+  const SXDict Function::operator()(const SXDict& arg, bool always_inline,
+                                    bool never_inline) {
     return callMap(arg, always_inline, never_inline);
   }
 
-  const std::map<std::string, MX> Function::
-  operator()(const std::map<std::string, MX>& arg, bool always_inline, bool never_inline) {
+  const MXDict Function::operator()(const MXDict& arg, bool always_inline,
+                                    bool never_inline) {
     return callMap(arg, always_inline, never_inline);
   }
 

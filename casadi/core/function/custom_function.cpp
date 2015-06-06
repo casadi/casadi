@@ -52,21 +52,21 @@ using namespace std;
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
-                                 const MappedIO& inputscheme,
+                                 const pair<SparsityDict, vector<string> >& inputscheme,
                                  const vector<Sparsity>& outputscheme) {
     assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme), outputscheme));
     setOption("input_scheme", inputscheme.second);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity> &inputscheme,
-                                 const MappedIO &outputscheme) {
+                                 const pair<SparsityDict, vector<string> > &outputscheme) {
     assignNode(new CustomFunctionInternal(c_fcn, inputscheme, make_vector(outputscheme)));
     setOption("output_scheme", outputscheme.second);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
-                                 const MappedIO &inputscheme,
-                                 const MappedIO &outputscheme) {
+                                 const pair<SparsityDict, vector<string> > &inputscheme,
+                                 const pair<SparsityDict, vector<string> > &outputscheme) {
     assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme),
                                           make_vector(outputscheme)));
     setOption("input_scheme", inputscheme.second);

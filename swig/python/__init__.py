@@ -92,10 +92,12 @@ import re
 
 
 def pythonify(s):
-
   s = s.replace("C/C++ prototypes","Python usages")
   s = s.replace("casadi::","")
   s = s.replace("std::string","str")
+  s = s.replace("SXDict","dict")
+  s = s.replace("MXDict","dict")
+  s = s.replace("Dict","dict")
   s = s.replace(" const &","")
   s = re.sub("(const )?Matrix< SXElement >( &)?",r"SX",s)
   s = re.sub("(const )?GenericMatrix< ?(\w+) *>( ?&)?",r"\2 ",s)
@@ -110,6 +112,7 @@ def pythonify(s):
   s = re.sub(r"StructIOSchemeVector(< ?([\w\[\] ]+) ?>)?",r"Structure",s)
   s = re.sub(r"IOSchemeVector< ?(\w+) ?>",r"scheme(\1)",s)
   s = re.sub(r"\b(\w+)(< \w+ >)?::\1",r"\1",s)
+  s = s.replace("std::pair< dict,[str] >","(dict,[str])")
   s = s.replace("casadi::","")
   s = s.replace("IOInterface< Function >","Function")
   s = s.replace("::",".")
