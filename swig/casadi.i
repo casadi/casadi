@@ -58,11 +58,17 @@
 
   /// Data structure in the target language holding data
 #ifdef SWIGPYTHON
+%{
 #define GUESTOBJECT PyObject
+%}
 #elif defined(SWIGMATLAB)
+%{
 #define GUESTOBJECT mxArray
+%}
 #else
+%{
 #define GUESTOBJECT void
+%}
 #endif
 
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
@@ -359,6 +365,7 @@ namespace std {
 %include "std_pair.i"
 %include "std_map.i"
 #endif // SWIGPYTHON
+
 
 %template() std::vector<std::string>;
 %template() std::vector<bool> ;
@@ -1147,6 +1154,24 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           ,fragment="get_sparsity,get_nnz"
 #endif // SWIGMATLAB
           ) {
+  namespace casadi {
+    // Traits for CasADi typemaps
+    template <typename Type> struct traits_casptr {};
+
+    /* Convert a pointer in interfaced language to C++
+     * Input: GUESTOBJECT pointer p
+     * Output: Pointer to pointer: At input, pointer to pointer to temporary
+     * The routine will either:
+     *   - Do nothing, if 0
+     *   - Change the pointer
+     *   - Change the temporary object
+     * Returns true upon success, else false
+     */
+    template <typename Type> bool casptr(GUESTOBJECT *p, Type** m) {
+      return traits_casptr<Type>::casptr(p, m);
+    }
+  } // namespace casadi
+
   int to_int(GUESTOBJECT *p, void *mv, int offs=0);
   int to_double(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Dict(GUESTOBJECT *p, void *mv, int offs=0);
@@ -1337,12 +1362,24 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %template() std::vector< std::vector<casadi::Matrix<int> > > ;
 
 %fragment("to"{int}, "header", fragment="fwd") {
+  // Traits specialization for int
+  namespace casadi {
+    template <> struct traits_casptr<int> {
+      static bool casptr(GUESTOBJECT *p, int** m) {
+        // Standard typemaps
+        if (SWIG_IsOK(SWIG_AsVal_int(p, m ? *m : 0))) return true;
+        // No match
+        return false;
+      }
+    };
+  } // namespace casadi
+
   int to_int(GUESTOBJECT *p, void *mv, int offs) {
     int *m = static_cast<int*>(mv);
     if (m) m += offs;
 
-    // Check if built-in int
-    if (SWIG_IsOK(SWIG_AsVal_int(p, m))) return true;
+    // Refactored code
+    if (casadi::casptr(p, m ? &m : 0)) return true;
 
     // Scalar IMatrix
     if (is_a(p, type_IMatrix())) {
@@ -1395,12 +1432,24 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_typemaps(int, SWIG_TYPECHECK_INTEGER, int)
 
 %fragment("to"{double}, "header", fragment="fwd") {
+  // Traits specialization for double
+  namespace casadi {
+    template <> struct traits_casptr<double> {
+      static bool casptr(GUESTOBJECT *p, double** m) {
+        // Standard typemaps
+        if (SWIG_IsOK(SWIG_AsVal_double(p, m ? *m : 0))) return true;
+        // No match
+        return false;
+      }
+    };
+  } // namespace casadi
+
   int to_double(GUESTOBJECT *p, void *mv, int offs) {
     double *m = static_cast<double*>(mv);
     if (m) m += offs;
 
-    // Check if built-in double
-    if (SWIG_IsOK(SWIG_AsVal_double(p, m))) return true;
+    // Refactored code
+    if (casadi::casptr(p, m ? &m : 0)) return true;
 
     // Scalar DMatrix
     if (is_a(p, type_DMatrix())) {
