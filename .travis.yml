@@ -166,10 +166,8 @@ matrix:
       os: linux
       script:
         - pushd /home/travis/build/
-        - testbot/recipes/fetch.sh matlab2014b.tar.gz
-        - mkdir matlab && tar -xvf matlab2014b.tar.gz -C matlab > /dev/null
-        - testbot/recipes/fetch.sh toolbox-matlab.tar.gz
-        - tar -xvf toolbox-matlab.tar.gz -C matlab > /dev/null
+        - testbot/recipes/fetch.sh matlabR2014b.tar.gz
+        - mkdir matlab && tar -xvf matlabR2014b.tar.gz -C matlab > /dev/null
         - ls -al /home/travis/build/
         - popd
         - mkdir build
