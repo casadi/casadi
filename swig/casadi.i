@@ -1155,9 +1155,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif // SWIGMATLAB
           ) {
   namespace casadi {
-    // Traits for CasADi typemaps
-    template <typename Type> struct traits_casptr {};
-
     /* Convert a pointer in interfaced language to C++
      * Input: GUESTOBJECT pointer p
      * Output: Pointer to pointer: At input, pointer to pointer to temporary
@@ -1167,9 +1164,15 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
      *   - Change the temporary object
      * Returns true upon success, else false
      */
-    template <typename Type> bool casptr(GUESTOBJECT *p, Type** m) {
-      return traits_casptr<Type>::casptr(p, m);
-    }
+    bool casptr(GUESTOBJECT *p, int** m);
+    bool casptr(GUESTOBJECT *p, double** m);
+    bool casptr(GUESTOBJECT *p, std::string** m);
+    bool casptr(GUESTOBJECT *p, MX** m);
+    bool casptr(GUESTOBJECT *p, GenericType** m);
+    bool casptr(GUESTOBJECT *p, GenericType::Dict** m);
+    bool casptr(GUESTOBJECT *p, SX** m);
+    bool casptr(GUESTOBJECT *p, DMatrix** m);
+    bool casptr(GUESTOBJECT *p, IMatrix** m);
   } // namespace casadi
 
   int to_int(GUESTOBJECT *p, void *mv, int offs=0);
@@ -1360,14 +1363,12 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{int}, "header", fragment="fwd") {
   // Traits specialization for int
   namespace casadi {
-    template <> struct traits_casptr<int> {
-      static bool casptr(GUESTOBJECT *p, int** m) {
-        // Standard typemaps
-        if (SWIG_IsOK(SWIG_AsVal_int(p, m ? *m : 0))) return true;
-        // No match
-        return false;
-      }
-    };
+    bool casptr(GUESTOBJECT *p, int** m) {
+      // Standard typemaps
+      if (SWIG_IsOK(SWIG_AsVal_int(p, m ? *m : 0))) return true;
+      // No match
+      return false;
+    }
   } // namespace casadi
 
   int to_int(GUESTOBJECT *p, void *mv, int offs) {
@@ -1430,14 +1431,12 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{double}, "header", fragment="fwd") {
   // Traits specialization for double
   namespace casadi {
-    template <> struct traits_casptr<double> {
-      static bool casptr(GUESTOBJECT *p, double** m) {
-        // Standard typemaps
-        if (SWIG_IsOK(SWIG_AsVal_double(p, m ? *m : 0))) return true;
-        // No match
-        return false;
-      }
-    };
+    bool casptr(GUESTOBJECT *p, double** m) {
+      // Standard typemaps
+      if (SWIG_IsOK(SWIG_AsVal_double(p, m ? *m : 0))) return true;
+      // No match
+      return false;
+    }
   } // namespace casadi
 
   int to_double(GUESTOBJECT *p, void *mv, int offs) {
@@ -1577,29 +1576,27 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{string}, "header", fragment="fwd") {
   // Traits specialization for string
   namespace casadi {
-    template <> struct traits_casptr<std::string> {
-      static bool casptr(GUESTOBJECT *p, std::string** m) {
-        // Treat Null
-        if (is_null(p)) return false;
+    bool casptr(GUESTOBJECT *p, std::string** m) {
+      // Treat Null
+      if (is_null(p)) return false;
 
-        // String already?
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                      $descriptor(std::string*), 0))) {
-          return true;
-        }
+      // String already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(std::string*), 0))) {
+        return true;
+      }
 
 #ifdef SWIGPYTHON
-        if (PyString_Check(p)) {
-          if (m) (*m)->clear();
-          if (m) (*m)->append(PyString_AsString(p));
-          return true;
-        }
+      if (PyString_Check(p)) {
+        if (m) (*m)->clear();
+        if (m) (*m)->append(PyString_AsString(p));
+        return true;
+      }
 #endif // SWIGPYTHON
 
-        // No match
-        return false;
-      }
-    };
+      // No match
+      return false;
+    }
   } // namespace casadi
 
   int to_string(GUESTOBJECT *p, void *mv, int offs) {
@@ -1926,106 +1923,104 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           fragment="to"{IVector}, fragment="to"{DVector}, fragment="to"{Function}) {
   // Traits specialization for GenericType
   namespace casadi {
-    template <> struct traits_casptr<GenericType> {
-      static bool casptr(GUESTOBJECT *p, GenericType** m) {
+    bool casptr(GUESTOBJECT *p, GenericType** m) {
 #ifdef SWIGPYTHON
-        if (p==Py_None) {
-          if (m) **m=GenericType();
-          return true;
-        }
+      if (p==Py_None) {
+        if (m) **m=GenericType();
+        return true;
+      }
 #endif // SWIGPYTHON
 
-        // Treat Null
-        if (is_null(p)) return false;
+      // Treat Null
+      if (is_null(p)) return false;
 
-        // Dict already?
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                      $descriptor(casadi::GenericType*), 0))) {
-          return true;
-        }
+      // Dict already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::GenericType*), 0))) {
+        return true;
+      }
 
 #ifdef SWIGPYTHON
-        if (PyBool_Check(p)) {
-          if (m) **m=GenericType((bool) PyInt_AsLong(p));
-        } else if (PyInt_Check(p)) {
-          if (m) **m=GenericType((int) PyInt_AsLong(p));
-        } else if (PyFloat_Check(p)) {
-          if (m) **m=GenericType(PyFloat_AsDouble(p));
-        } else if (to_string(p, 0)) {
-          std::string temp;
-          if (!to_string(p, &temp)) return false;
-          if (m) **m = GenericType(temp);
-        } else if (to_IVector(p, 0)) {
-          std::vector<int> temp;
-          if (!to_IVector(p, &temp)) return false;
-          if (m) **m = GenericType(temp);
-        } else if (to_DVector(p, 0)) {
-          std::vector<double> temp;
-          if (!to_DVector(p, &temp)) return false;
-          if (m) **m = GenericType(temp);
-        } else if (make_vector(p, static_cast<std::vector<std::string>*>(0), to_string)) {
-          std::vector<std::string> temp;
-          if (!make_vector(p, &temp, to_string)) return false;
-          if (m) **m = GenericType(temp);
-        } else if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
-          PyObject *c = PyObject_GetAttrString(p,"creator");
-          if (!c) return false;
-          PyObject* gt = getCasadiObject("GenericType");
-          if (!gt) return false;
+      if (PyBool_Check(p)) {
+        if (m) **m=GenericType((bool) PyInt_AsLong(p));
+      } else if (PyInt_Check(p)) {
+        if (m) **m=GenericType((int) PyInt_AsLong(p));
+      } else if (PyFloat_Check(p)) {
+        if (m) **m=GenericType(PyFloat_AsDouble(p));
+      } else if (to_string(p, 0)) {
+        std::string temp;
+        if (!to_string(p, &temp)) return false;
+        if (m) **m = GenericType(temp);
+      } else if (to_IVector(p, 0)) {
+        std::vector<int> temp;
+        if (!to_IVector(p, &temp)) return false;
+        if (m) **m = GenericType(temp);
+      } else if (to_DVector(p, 0)) {
+        std::vector<double> temp;
+        if (!to_DVector(p, &temp)) return false;
+        if (m) **m = GenericType(temp);
+      } else if (make_vector(p, static_cast<std::vector<std::string>*>(0), to_string)) {
+        std::vector<std::string> temp;
+        if (!make_vector(p, &temp, to_string)) return false;
+        if (m) **m = GenericType(temp);
+      } else if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
+        PyObject *c = PyObject_GetAttrString(p,"creator");
+        if (!c) return false;
+        PyObject* gt = getCasadiObject("GenericType");
+        if (!gt) return false;
 
-          PyObject* args = PyTuple_New(1);
-          PyTuple_SetItem(args,0,c);
+        PyObject* args = PyTuple_New(1);
+        PyTuple_SetItem(args,0,c);
     
-          PyObject* g = PyObject_CallObject(gt,args);
+        PyObject* g = PyObject_CallObject(gt,args);
     
-          Py_DECREF(args);
-          Py_DECREF(gt);
+        Py_DECREF(args);
+        Py_DECREF(gt);
     
-          if (g) {
-            int result = to_GenericType(g, m ? *m : 0);
-            Py_DECREF(g);
-            return result;
-          }
-          if (!g) {
-            PyErr_Clear();
-            return false;
-          }
-        } else if (to_Function(p, 0)) {
-          Function temp;
-          if (!to_Function(p, &temp)) return false;
-          if (m) **m = GenericType(temp);
-        } else if (to_Dict(p, 0) || to_DerivativeGenerator(p, 0) || to_Callback(p, 0)) {
-          PyObject* gt = getCasadiObject("GenericType");
-          if (!gt) return false;
-
-          PyObject* args = PyTuple_New(1);
-          Py_INCREF(p); // Needed because PyTuple_SetItem steals the reference
-          PyTuple_SetItem(args,0,p);
-    
-          PyObject* g = PyObject_CallObject(gt,args);
-    
-          Py_DECREF(args);
-          Py_DECREF(gt);
-    
-          if (g) {
-            int result = to_GenericType(g, m ? *m : 0);
-            Py_DECREF(g);
-            return result;
-          }
-          if (!g) {
-            PyErr_Clear();
-            return false;
-          }
-        } else {
+        if (g) {
+          int result = to_GenericType(g, m ? *m : 0);
+          Py_DECREF(g);
+          return result;
+        }
+        if (!g) {
+          PyErr_Clear();
           return false;
         }
-        return true;
-#endif // SWIGPYTHON
+      } else if (to_Function(p, 0)) {
+        Function temp;
+        if (!to_Function(p, &temp)) return false;
+        if (m) **m = GenericType(temp);
+      } else if (to_Dict(p, 0) || to_DerivativeGenerator(p, 0) || to_Callback(p, 0)) {
+        PyObject* gt = getCasadiObject("GenericType");
+        if (!gt) return false;
 
-        // No match
+        PyObject* args = PyTuple_New(1);
+        Py_INCREF(p); // Needed because PyTuple_SetItem steals the reference
+        PyTuple_SetItem(args,0,p);
+    
+        PyObject* g = PyObject_CallObject(gt,args);
+    
+        Py_DECREF(args);
+        Py_DECREF(gt);
+    
+        if (g) {
+          int result = to_GenericType(g, m ? *m : 0);
+          Py_DECREF(g);
+          return result;
+        }
+        if (!g) {
+          PyErr_Clear();
+          return false;
+        }
+      } else {
         return false;
       }
-    };
+      return true;
+#endif // SWIGPYTHON
+
+      // No match
+      return false;
+    }
   } // namespace casadi
 
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs) {
@@ -2048,35 +2043,33 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{Dict}, "header", fragment="fwd") {
   // Traits specialization for Dict
   namespace casadi {
-    template <> struct traits_casptr<GenericType::Dict> {
-      static bool casptr(GUESTOBJECT *p, GenericType::Dict** m) {
-        // Treat Null
-        if (is_null(p)) return false;
+    bool casptr(GUESTOBJECT *p, GenericType::Dict** m) {
+      // Treat Null
+      if (is_null(p)) return false;
 
-        // Dict already?
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                      $descriptor(casadi::GenericType::Dict*), 0))) {
-          return true;
-        }
+      // Dict already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::GenericType::Dict*), 0))) {
+        return true;
+      }
 
 #ifdef SWIGPYTHON
-        if (PyDict_Check(p)) {
-          PyObject *key, *value;
-          Py_ssize_t pos = 0;
-          GenericType gt;
-          while (PyDict_Next(p, &pos, &key, &value)) {
-            if (!PyString_Check(key)) return false;
-            if (!to_GenericType(value, &gt)) return false;
-            if (m) (**m)[std::string(PyString_AsString(key))] = gt;
-          }
-          return true;
+      if (PyDict_Check(p)) {
+        PyObject *key, *value;
+        Py_ssize_t pos = 0;
+        GenericType gt;
+        while (PyDict_Next(p, &pos, &key, &value)) {
+          if (!PyString_Check(key)) return false;
+          if (!to_GenericType(value, &gt)) return false;
+          if (m) (**m)[std::string(PyString_AsString(key))] = gt;
         }
+        return true;
+      }
 #endif // SWIGPYTHON
 
-        // No match
-        return false;
-      }
-    };
+      // No match
+      return false;
+    }
   } // namespace casadi
 
   int to_Dict(GUESTOBJECT *p, void *mv, int offs) {
@@ -2100,107 +2093,105 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{SX}, "header", fragment="fwd") {
   // Traits specialization for SX
   namespace casadi {
-    template <> struct traits_casptr<SX> {
-      static bool casptr(GUESTOBJECT *p, SX** m) {
-        // Treat Null
-        if (is_null(p)) return false;
+    bool casptr(GUESTOBJECT *p, SX** m) {
+      // Treat Null
+      if (is_null(p)) return false;
 
-        // SX already?
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                      $descriptor(casadi::Matrix<casadi::SXElement>*), 0))) {
+      // SX already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::Matrix<casadi::SXElement>*), 0))) {
+        return true;
+      }
+
+      // Object is an DMatrix
+      {
+        // Pointer to object
+        DMatrix *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                      $descriptor(casadi::Matrix<double>*), 0))) {
+          if (m) **m=*m2;
           return true;
         }
+      }
 
-        // Object is an DMatrix
-        {
-          // Pointer to object
-          DMatrix *m2;
-          if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                        $descriptor(casadi::Matrix<double>*), 0))) {
-            if (m) **m=*m2;
-            return true;
-          }
+      // Object is an IMatrix
+      {
+        // Pointer to object
+        IMatrix *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                      $descriptor(casadi::Matrix<int>*), 0))) {
+          if (m) **m=*m2;
+          return true;
         }
+      }
 
-        // Object is an IMatrix
-        {
-          // Pointer to object
-          IMatrix *m2;
-          if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                        $descriptor(casadi::Matrix<int>*), 0))) {
-            if (m) **m=*m2;
-            return true;
-          }
+      // First convert to double
+      if (false) {
+        double tmp;
+        if (SWIG_IsOK(SWIG_AsVal_double(p, m ? &tmp : 0))) {
+          if (m) **m=tmp;
+          return true;
         }
+      }
 
-        // First convert to double
-        if (false) {
-          double tmp;
-          if (SWIG_IsOK(SWIG_AsVal_double(p, m ? &tmp : 0))) {
-            if (m) **m=tmp;
-            return true;
-          }
+      // First convert to integer
+      if (false) {
+        int tmp;
+        if (SWIG_IsOK(SWIG_AsVal_int(p, m ? &tmp : 0))) {
+          if (m) **m=tmp;
+          return true;
         }
+      }
 
-        // First convert to integer
-        if (false) {
-          int tmp;
-          if (SWIG_IsOK(SWIG_AsVal_int(p, m ? &tmp : 0))) {
-            if (m) **m=tmp;
-            return true;
-          }
+      // Try first converting to a temporary DMatrix
+      {
+        DMatrix tmp, *mt=&tmp;
+        if(casadi::casptr(p, m ? &mt : 0)) {
+          if (m) **m = *mt;
+          return true;
         }
-
-        // Try first converting to a temporary DMatrix
-        {
-          DMatrix tmp, *mt=&tmp;
-          if(casadi::casptr(p, m ? &mt : 0)) {
-            if (m) **m = *mt;
-            return true;
-          }
-        }
+      }
 
 #ifdef SWIGPYTHON
-        // Numpy arrays will be cast to dense SX
-        if (is_array(p)) {
-          if (array_type(p) != NPY_OBJECT) return false;
-          if (array_numdims(p)>2 || array_numdims(p)<1) return false;
-          int nrows = array_size(p,0); // 1D array is cast into column vector
-          int ncols  = array_numdims(p)==2 ? array_size(p,1) : 1;
-          PyArrayIterObject* it = (PyArrayIterObject*)PyArray_IterNew(p);
-          casadi::SX mT;
-          if (m) mT = casadi::SX::zeros(ncols, nrows);
-          int k=0;
-          casadi::SX tmp;
-          PyObject *pe;
-          while (it->index < it->size) { 
-            pe = *((PyObject**) PyArray_ITER_DATA(it));
-            if (!to_SX(pe, &tmp) || !tmp.isScalar()) {
-              Py_DECREF(it);
-              return false;
-            }
-            if (m) mT(k++) = tmp;
-            PyArray_ITER_NEXT(it);
+      // Numpy arrays will be cast to dense SX
+      if (is_array(p)) {
+        if (array_type(p) != NPY_OBJECT) return false;
+        if (array_numdims(p)>2 || array_numdims(p)<1) return false;
+        int nrows = array_size(p,0); // 1D array is cast into column vector
+        int ncols  = array_numdims(p)==2 ? array_size(p,1) : 1;
+        PyArrayIterObject* it = (PyArrayIterObject*)PyArray_IterNew(p);
+        casadi::SX mT;
+        if (m) mT = casadi::SX::zeros(ncols, nrows);
+        int k=0;
+        casadi::SX tmp;
+        PyObject *pe;
+        while (it->index < it->size) { 
+          pe = *((PyObject**) PyArray_ITER_DATA(it));
+          if (!to_SX(pe, &tmp) || !tmp.isScalar()) {
+            Py_DECREF(it);
+            return false;
           }
-          Py_DECREF(it);
-          if (m) **m = mT.T();
-          return true;
+          if (m) mT(k++) = tmp;
+          PyArray_ITER_NEXT(it);
         }
-        // Object has __SX__ method
-        if (PyObject_HasAttrString(p,"__SX__")) {
-          char cmd[] = "__SX__";
-          PyObject *cr = PyObject_CallMethod(p, cmd, 0);
-          if (!cr) return false;
-          int flag = casptr(cr, m);
-          Py_DECREF(cr);
-          return flag;
-        }
+        Py_DECREF(it);
+        if (m) **m = mT.T();
+        return true;
+      }
+      // Object has __SX__ method
+      if (PyObject_HasAttrString(p,"__SX__")) {
+        char cmd[] = "__SX__";
+        PyObject *cr = PyObject_CallMethod(p, cmd, 0);
+        if (!cr) return false;
+        int flag = casptr(cr, m);
+        Py_DECREF(cr);
+        return flag;
+      }
 #endif // SWIGPYTHON
 
-        // No match
-        return false;
-      }
-    };
+      // No match
+      return false;
+    }
   } // namespace casadi
 
   int to_SX(GUESTOBJECT *p, void *mv, int offs) {
@@ -2225,52 +2216,50 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{MX}, "header", fragment="fwd") {
   // Traits specialization for MX
   namespace casadi {
-    template <> struct traits_casptr<MX> {
-      static bool casptr(GUESTOBJECT *p, MX** m) {
-        // Treat Null
-        if (is_null(p)) return false;
+    bool casptr(GUESTOBJECT *p, MX** m) {
+      // Treat Null
+      if (is_null(p)) return false;
 
-        // MX already?
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                      $descriptor(casadi::MX*), 0))) {
+      // MX already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::MX*), 0))) {
+        return true;
+      }
+
+      // Object is an DMatrix
+      {
+        // Pointer to object
+        DMatrix *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                      $descriptor(casadi::Matrix<double>*), 0))) {
+          if (m) **m=*m2;
           return true;
         }
+      }
 
-        // Object is an DMatrix
-        {
-          // Pointer to object
-          DMatrix *m2;
-          if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                        $descriptor(casadi::Matrix<double>*), 0))) {
-            if (m) **m=*m2;
-            return true;
-          }
+      // Try first converting to a temporary DMatrix
+      {
+        DMatrix tmp, *mt=&tmp;
+        if(casadi::casptr(p, m ? &mt : 0)) {
+          if (m) **m = *mt;
+          return true;
         }
-
-        // Try first converting to a temporary DMatrix
-        {
-          DMatrix tmp, *mt=&tmp;
-          if(casadi::casptr(p, m ? &mt : 0)) {
-            if (m) **m = *mt;
-            return true;
-          }
-        }
+      }
 
 #ifdef SWIGPYTHON
-        if (PyObject_HasAttrString(p,"__MX__")) {
-          char cmd[] = "__MX__";
-          PyObject *cr = PyObject_CallMethod(p, cmd, 0);
-          if (!cr) return false;
-          int flag = casptr(cr, m);
-          Py_DECREF(cr);
-          return flag;
-        }
+      if (PyObject_HasAttrString(p,"__MX__")) {
+        char cmd[] = "__MX__";
+        PyObject *cr = PyObject_CallMethod(p, cmd, 0);
+        if (!cr) return false;
+        int flag = casptr(cr, m);
+        Py_DECREF(cr);
+        return flag;
+      }
 #endif // SWIGPYTHON
 
-        // No match
-        return false;
-      }
-    };
+      // No match
+      return false;
+    }
   } // namespace casadi
 
   int to_MX(GUESTOBJECT *p, void *mv, int offs) {
@@ -2330,216 +2319,214 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{DMatrix}, "header", fragment="fwd,make_vector", fragment="to"{double}) {
   // Traits specialization for DMatrix
   namespace casadi {
-    template <> struct traits_casptr<DMatrix> {
-      static bool casptr(GUESTOBJECT *p, DMatrix** m) {
-        // Treat Null
-        if (is_null(p)) return false;
+    bool casptr(GUESTOBJECT *p, DMatrix** m) {
+      // Treat Null
+      if (is_null(p)) return false;
 
-        // DMatrix already?
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                      $descriptor(casadi::Matrix<double>*), 0))) {
+      // DMatrix already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::Matrix<double>*), 0))) {
+        return true;
+      }
+
+      // Object is an IMatrix
+      {
+        // Pointer to object
+        IMatrix *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                      $descriptor(casadi::Matrix<int>*), 0))) {
+          if (m) **m=*m2;
           return true;
         }
+      }
 
-        // Object is an IMatrix
-        {
-          // Pointer to object
-          IMatrix *m2;
-          if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                        $descriptor(casadi::Matrix<int>*), 0))) {
-            if (m) **m=*m2;
-            return true;
-          }
+      // First convert to double
+      {
+        double tmp;
+        if (SWIG_IsOK(SWIG_AsVal_double(p, m ? &tmp : 0))) {
+          if (m) **m=tmp;
+          return true;
         }
+      }
 
-        // First convert to double
-        {
-          double tmp;
-          if (SWIG_IsOK(SWIG_AsVal_double(p, m ? &tmp : 0))) {
-            if (m) **m=tmp;
-            return true;
-          }
+      // First convert to integer
+      {
+        int tmp;
+        if (SWIG_IsOK(SWIG_AsVal_int(p, m ? &tmp : 0))) {
+          if (m) **m=tmp;
+          return true;
         }
+      }
 
-        // First convert to integer
-        {
-          int tmp;
-          if (SWIG_IsOK(SWIG_AsVal_int(p, m ? &tmp : 0))) {
-            if (m) **m=tmp;
-            return true;
-          }
+      // First convert to a vector<double>
+      if (false) {
+        std::vector<double> tmp, *tmp_ptr=m ? &tmp : 0;
+        if (SWIG_IsOK(swig::asval(p, tmp_ptr))) {
+          if (m) **m = tmp.empty() ? DMatrix() : DMatrix(tmp);
+          return true;
         }
-
-        // First convert to a vector<double>
-        if (false) {
-          std::vector<double> tmp, *tmp_ptr=m ? &tmp : 0;
-          if (SWIG_IsOK(swig::asval(p, tmp_ptr))) {
-            if (m) **m = tmp.empty() ? DMatrix() : DMatrix(tmp);
-            return true;
-          }
-        }
+      }
 
 #ifdef SWIGPYTHON
-    // Object has __DMatrix__ method
-    if (PyObject_HasAttrString(p,"__DMatrix__")) {
-      char name[] = "__DMatrix__";
-      PyObject *cr = PyObject_CallMethod(p, name, 0);
-      if (!cr) return false;
-      int result = to_DMatrix(cr, m ? *m : 0);
-      Py_DECREF(cr);
-      return result;
-    }
-    // Numpy arrays will be cast to dense Matrix<double>
-    if (is_array(p)) { 
-      if (array_numdims(p)==0) {
-        double d;
-        int result = to_double(p, &d);
-        if (!result) return result;
-        if (m) **m = casadi::Matrix<double>(d);
+      // Object has __DMatrix__ method
+      if (PyObject_HasAttrString(p,"__DMatrix__")) {
+        char name[] = "__DMatrix__";
+        PyObject *cr = PyObject_CallMethod(p, name, 0);
+        if (!cr) return false;
+        int result = to_DMatrix(cr, m ? *m : 0);
+        Py_DECREF(cr);
         return result;
       }
-      if (array_numdims(p)>2 || array_numdims(p)<1) {
-        return false;
-      }
-      int nrows = array_size(p,0); // 1D array is cast into column vector
-      int ncols  = 1;
-      if (array_numdims(p)==2) ncols=array_size(p,1); 
-      int size=nrows*ncols; // number of elements in the dense matrix
-      if (!array_is_native(p)) return false;
-      // Make sure we have a contigous array with double datatype
-      int array_is_new_object;
-      PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
-      if (!array) return false;
+      // Numpy arrays will be cast to dense Matrix<double>
+      if (is_array(p)) { 
+        if (array_numdims(p)==0) {
+          double d;
+          int result = to_double(p, &d);
+          if (!result) return result;
+          if (m) **m = casadi::Matrix<double>(d);
+          return result;
+        }
+        if (array_numdims(p)>2 || array_numdims(p)<1) {
+          return false;
+        }
+        int nrows = array_size(p,0); // 1D array is cast into column vector
+        int ncols  = 1;
+        if (array_numdims(p)==2) ncols=array_size(p,1); 
+        int size=nrows*ncols; // number of elements in the dense matrix
+        if (!array_is_native(p)) return false;
+        // Make sure we have a contigous array with double datatype
+        int array_is_new_object;
+        PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
+        if (!array) return false;
     
-      double* d=(double*) array_data(array);
-      std::vector<double> v(d,d+size);
-    
-      if (m) {
-        **m = casadi::Matrix<double>::zeros(nrows,ncols);
-        (*m)->set(d, true);
-      }
-           
-      // Free memory
-      if (array_is_new_object) Py_DECREF(array); 
-      return true;
-    }
-    // scipy's csc_matrix will be cast to sparse DMatrix
-    if(PyObjectHasClassName(p, "csc_matrix")) {
-    
-      // Get the dimensions of the csc_matrix
-      PyObject * shape = PyObject_GetAttrString( p, "shape"); // need's to be decref'ed
-      if (!shape) return false;
-      if(!PyTuple_Check(shape) || PyTuple_Size(shape)!=2) {
-        Py_DECREF(shape);
-        return false;
-      }
-      int nrows=PyInt_AsLong(PyTuple_GetItem(shape,0));
-      int ncols=PyInt_AsLong(PyTuple_GetItem(shape,1));
-      Py_DECREF(shape);
-  
-      bool ret= false;
-    
-      PyObject * narray=0;
-      PyObject * row=0;
-      PyObject * colind=0;
-      PyArrayObject* array=0;
-      PyArrayObject* array_row=0;
-      PyArrayObject* array_colind=0;
-    
-      int array_is_new_object=0;
-      int row_is_new_object=0;
-      int colind_is_new_object=0;
-    
-      // Fetch data
-      narray=PyObject_GetAttrString( p, "data"); // need's to be decref'ed
-      if (!narray || !is_array(narray) || array_numdims(narray)!=1) goto cleanup;
-      array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
-      if (!array) goto cleanup;
-
-      // Construct the 'row' vector needed for initialising the correct sparsity
-      row = PyObject_GetAttrString(p,"indices"); // need's to be decref'ed
-      if (!row || !is_array(row) || array_numdims(row)!=1) goto cleanup;
-      array_row = obj_to_array_contiguous_allow_conversion(row,NPY_INT,&row_is_new_object);
-      if (!array_row) goto cleanup;
-
-      // Construct the 'colind' vector needed for initialising the correct sparsity
-      colind = PyObject_GetAttrString(p,"indptr"); // need's to be decref'ed
-      if (!colind || !is_array(colind) || array_numdims(colind)!=1) goto cleanup;
-      array_colind = obj_to_array_contiguous_allow_conversion(colind,NPY_INT,&colind_is_new_object);
-      if (!array_colind) goto cleanup;
-      {
-        int size=array_size(array,0); // number on non-zeros
         double* d=(double*) array_data(array);
         std::vector<double> v(d,d+size);
-      
-        int* rowd=(int*) array_data(array_row);
-        std::vector<int> rowv(rowd,rowd+size);
-      
-        int* colindd=(int*) array_data(array_colind);
-        std::vector<int> colindv(colindd,colindd+(ncols+1));
-      
-        if (m) **m = casadi::Matrix<double>(casadi::Sparsity(nrows,ncols,colindv,rowv), v, false);
-      
-        ret = true;
-      }
     
-    cleanup: // yes that's right; goto.
-      // Rather that than a pyramid of conditional memory-deallocation
-      // TODO(jaeandersson): Create a helper struct and put the below in the destructor
-      if (array_is_new_object && array) Py_DECREF(array);
-      if (narray) Py_DECREF(narray);
-      if (row_is_new_object && array_row) Py_DECREF(array_row);
-      if (row) Py_DECREF(row);
-      if (colind_is_new_object && array_colind) Py_DECREF(array_colind);
-      if (colind) Py_DECREF(colind);
-      return ret;
-    }
-    if(PyObject_HasAttrString(p,"tocsc")) {
-      char name[] = "tocsc";
-      PyObject *cr = PyObject_CallMethod(p, name,0);
-      if (!cr) return false;
-      int result = to_DMatrix(cr, m ? *m : 0);
-      Py_DECREF(cr);
-      return result;
-    }
-
-
-    /* { */
-    /*   std::vector<double> tmp, *tmp_ptr=m ? &tmp : 0; */
-    /*   if (SWIG_IsOK(swig::asval(p, tmp_ptr))) { */
-    /*     if (m) *m = tmp.empty() ? DMatrix() : DMatrix(tmp); */
-    /*     return true; */
-    /*   } */
-    /* } */
-
-
-    {
-      std::vector <double> t;
-      int res = make_vector(p, &t, to_double);
-      if (t.size()>0) {
-        if (m) **m = casadi::Matrix<double>(t);
-      } else {
-        if (m) **m = casadi::Matrix<double>(0,0);
+        if (m) {
+          **m = casadi::Matrix<double>::zeros(nrows,ncols);
+          (*m)->set(d, true);
+        }
+           
+        // Free memory
+        if (array_is_new_object) Py_DECREF(array); 
+        return true;
       }
-      return res;
-    }
+      // scipy's csc_matrix will be cast to sparse DMatrix
+      if(PyObjectHasClassName(p, "csc_matrix")) {
+    
+        // Get the dimensions of the csc_matrix
+        PyObject * shape = PyObject_GetAttrString( p, "shape"); // need's to be decref'ed
+        if (!shape) return false;
+        if(!PyTuple_Check(shape) || PyTuple_Size(shape)!=2) {
+          Py_DECREF(shape);
+          return false;
+        }
+        int nrows=PyInt_AsLong(PyTuple_GetItem(shape,0));
+        int ncols=PyInt_AsLong(PyTuple_GetItem(shape,1));
+        Py_DECREF(shape);
+  
+        bool ret= false;
+    
+        PyObject * narray=0;
+        PyObject * row=0;
+        PyObject * colind=0;
+        PyArrayObject* array=0;
+        PyArrayObject* array_row=0;
+        PyArrayObject* array_colind=0;
+    
+        int array_is_new_object=0;
+        int row_is_new_object=0;
+        int colind_is_new_object=0;
+    
+        // Fetch data
+        narray=PyObject_GetAttrString( p, "data"); // need's to be decref'ed
+        if (!narray || !is_array(narray) || array_numdims(narray)!=1) goto cleanup;
+        array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
+        if (!array) goto cleanup;
+
+        // Construct the 'row' vector needed for initialising the correct sparsity
+        row = PyObject_GetAttrString(p,"indices"); // need's to be decref'ed
+        if (!row || !is_array(row) || array_numdims(row)!=1) goto cleanup;
+        array_row = obj_to_array_contiguous_allow_conversion(row,NPY_INT,&row_is_new_object);
+        if (!array_row) goto cleanup;
+
+        // Construct the 'colind' vector needed for initialising the correct sparsity
+        colind = PyObject_GetAttrString(p,"indptr"); // need's to be decref'ed
+        if (!colind || !is_array(colind) || array_numdims(colind)!=1) goto cleanup;
+        array_colind = obj_to_array_contiguous_allow_conversion(colind,NPY_INT,&colind_is_new_object);
+        if (!array_colind) goto cleanup;
+        {
+          int size=array_size(array,0); // number on non-zeros
+          double* d=(double*) array_data(array);
+          std::vector<double> v(d,d+size);
+      
+          int* rowd=(int*) array_data(array_row);
+          std::vector<int> rowv(rowd,rowd+size);
+      
+          int* colindd=(int*) array_data(array_colind);
+          std::vector<int> colindv(colindd,colindd+(ncols+1));
+      
+          if (m) **m = casadi::Matrix<double>(casadi::Sparsity(nrows,ncols,colindv,rowv), v, false);
+      
+          ret = true;
+        }
+    
+      cleanup: // yes that's right; goto.
+        // Rather that than a pyramid of conditional memory-deallocation
+        // TODO(jaeandersson): Create a helper struct and put the below in the destructor
+        if (array_is_new_object && array) Py_DECREF(array);
+        if (narray) Py_DECREF(narray);
+        if (row_is_new_object && array_row) Py_DECREF(array_row);
+        if (row) Py_DECREF(row);
+        if (colind_is_new_object && array_colind) Py_DECREF(array_colind);
+        if (colind) Py_DECREF(colind);
+        return ret;
+      }
+      if(PyObject_HasAttrString(p,"tocsc")) {
+        char name[] = "tocsc";
+        PyObject *cr = PyObject_CallMethod(p, name,0);
+        if (!cr) return false;
+        int result = to_DMatrix(cr, m ? *m : 0);
+        Py_DECREF(cr);
+        return result;
+      }
+
+
+      /* { */
+      /*   std::vector<double> tmp, *tmp_ptr=m ? &tmp : 0; */
+      /*   if (SWIG_IsOK(swig::asval(p, tmp_ptr))) { */
+      /*     if (m) *m = tmp.empty() ? DMatrix() : DMatrix(tmp); */
+      /*     return true; */
+      /*   } */
+      /* } */
+
+
+      {
+        std::vector <double> t;
+        int res = make_vector(p, &t, to_double);
+        if (t.size()>0) {
+          if (m) **m = casadi::Matrix<double>(t);
+        } else {
+          if (m) **m = casadi::Matrix<double>(0,0);
+        }
+        return res;
+      }
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
-    // MATLAB double matrix (sparse or dense)
-    if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
-      if (m) {
-        **m = casadi::DMatrix(getSparsity(p));
-        double* data = static_cast<double*>(mxGetData(p));
-        (*m)->setNZ(data);
+      // MATLAB double matrix (sparse or dense)
+      if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
+        if (m) {
+          **m = casadi::DMatrix(getSparsity(p));
+          double* data = static_cast<double*>(mxGetData(p));
+          (*m)->setNZ(data);
+        }
+        return true;
       }
-      return true;
-    }
 #endif // SWIGMATLAB
 
-        // No match
-        return false;
-      }
-    };
+      // No match
+      return false;
+    }
   } // namespace casadi
 
   int to_DMatrix(GUESTOBJECT *p, void *mv, int offs) {
@@ -2563,146 +2550,144 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{IMatrix}, "header", fragment="fwd,make_vector") {
   // Traits specialization for IMatrix
   namespace casadi {
-    template <> struct traits_casptr<IMatrix> {
-      static bool casptr(GUESTOBJECT *p, IMatrix** m) {
-        // Treat Null
-        if (is_null(p)) return false;
+    bool casptr(GUESTOBJECT *p, IMatrix** m) {
+      // Treat Null
+      if (is_null(p)) return false;
 
-        // IMatrix already?
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                      $descriptor(casadi::Matrix<int>*), 0))) {
+      // IMatrix already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::Matrix<int>*), 0))) {
+        return true;
+      }
+
+      // First convert to integer
+      {
+        int tmp;
+        if (SWIG_IsOK(SWIG_AsVal_int(p, m ? &tmp : 0))) {
+          if (m) **m=tmp;
           return true;
         }
-
-        // First convert to integer
-        {
-          int tmp;
-          if (SWIG_IsOK(SWIG_AsVal_int(p, m ? &tmp : 0))) {
-            if (m) **m=tmp;
-            return true;
-          }
-        }
+      }
 
 #ifdef SWIGPYTHON
-        // User-supplied conversion
-        if (false && PyObject_HasAttrString(p,"__IMatrix__")) {
-          char cmd[] = "__IMatrix__";
-          PyObject *cr = PyObject_CallMethod(p, cmd, 0);
-          if (!cr) return false;
-          // Call recursively
-          int flag = casptr(cr, m);
-          Py_DECREF(cr);
-          return flag;
-        }
+      // User-supplied conversion
+      if (false && PyObject_HasAttrString(p,"__IMatrix__")) {
+        char cmd[] = "__IMatrix__";
+        PyObject *cr = PyObject_CallMethod(p, cmd, 0);
+        if (!cr) return false;
+        // Call recursively
+        int flag = casptr(cr, m);
+        Py_DECREF(cr);
+        return flag;
+      }
 #endif // SWIGPYTHON
 
-        // First convert to DMatrix and check if all entries integers
-        if (false) {
-          DMatrix tmp;
-          if (to_DMatrix(p, &tmp) && tmp.isInteger()) {
-            if (m) **m=IMatrix(tmp.sparsity(), tmp.nonzeros_int());
-            return true;
-          }
+      // First convert to DMatrix and check if all entries integers
+      if (false) {
+        DMatrix tmp;
+        if (to_DMatrix(p, &tmp) && tmp.isInteger()) {
+          if (m) **m=IMatrix(tmp.sparsity(), tmp.nonzeros_int());
+          return true;
         }
+      }
 
 #ifdef SWIGPYTHON
-        // Numpy arrays will be cast to dense Matrix<int>
-        if (is_array(p)) {
-          if (array_numdims(p)==0) {
-            int d;
-            int result = to_int(p, &d);
-            if (!result) return result;
-            if (m) **m = casadi::Matrix<int>(d);
-            return result;
-          }
-          if (array_numdims(p)>2 || array_numdims(p)<1) return false;
-          int nrows = array_size(p,0); // 1D array is cast into column vector
-          int ncols  = 1;
-          if (array_numdims(p)==2) ncols=array_size(p,1); 
-          if (!array_is_native(p)) return false;
-          // Make sure we have a contigous array with int datatype
-          int array_is_new_object=0;
-          PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
-          if (!array) { // Trying LONG
+      // Numpy arrays will be cast to dense Matrix<int>
+      if (is_array(p)) {
+        if (array_numdims(p)==0) {
+          int d;
+          int result = to_int(p, &d);
+          if (!result) return result;
+          if (m) **m = casadi::Matrix<int>(d);
+          return result;
+        }
+        if (array_numdims(p)>2 || array_numdims(p)<1) return false;
+        int nrows = array_size(p,0); // 1D array is cast into column vector
+        int ncols  = 1;
+        if (array_numdims(p)==2) ncols=array_size(p,1); 
+        if (!array_is_native(p)) return false;
+        // Make sure we have a contigous array with int datatype
+        int array_is_new_object=0;
+        PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
+        if (!array) { // Trying LONG
+          PyErr_Clear();
+          array = obj_to_array_contiguous_allow_conversion(p,NPY_LONG,&array_is_new_object);
+          if (!array) {
             PyErr_Clear();
-            array = obj_to_array_contiguous_allow_conversion(p,NPY_LONG,&array_is_new_object);
-            if (!array) {
-              PyErr_Clear();
-              return false;
-            }
-            long* temp=(long*) array_data(array);
-            if (m) {
-              **m = casadi::Matrix<int>::zeros(ncols,nrows);
-              for (int k=0;k<nrows*ncols;k++) (*m)->data()[k]=temp[k];
-              **m = (*m)->T();                  
-            }
-            // Free memory
-            if (array_is_new_object) Py_DECREF(array);
-            return true;
+            return false;
           }
-    
+          long* temp=(long*) array_data(array);
           if (m) {
-            int* d= static_cast<int*>(array_data(array));
-            **m = casadi::Matrix<int>::zeros(nrows, ncols);
-            for (int rr=0; rr<nrows; ++rr) {
-              for (int cc=0; cc<ncols; ++cc) {
-                (**m)(rr, cc) = *d++;
-              }
-            }
+            **m = casadi::Matrix<int>::zeros(ncols,nrows);
+            for (int k=0;k<nrows*ncols;k++) (*m)->data()[k]=temp[k];
+            **m = (*m)->T();                  
           }
-           
           // Free memory
           if (array_is_new_object) Py_DECREF(array);
           return true;
         }
-        if (PyObject_HasAttrString(p,"__IMatrix__")) {
-          char cmd[] = "__IMatrix__";
-          PyObject *cr = PyObject_CallMethod(p, cmd, 0);
-          if (!cr) return false;
-          int result = to_IMatrix(cr, m ? *m : 0);
-          Py_DECREF(cr);
-          return result;
+    
+        if (m) {
+          int* d= static_cast<int*>(array_data(array));
+          **m = casadi::Matrix<int>::zeros(nrows, ncols);
+          for (int rr=0; rr<nrows; ++rr) {
+            for (int cc=0; cc<ncols; ++cc) {
+              (**m)(rr, cc) = *d++;
+            }
+          }
         }
-        {
-          std::vector <int> t;
-          int res = make_vector(p, &t, to_int);
-          if (m) **m = casadi::Matrix<int>(t);
-          return res;
-        }
+           
+        // Free memory
+        if (array_is_new_object) Py_DECREF(array);
         return true;
+      }
+      if (PyObject_HasAttrString(p,"__IMatrix__")) {
+        char cmd[] = "__IMatrix__";
+        PyObject *cr = PyObject_CallMethod(p, cmd, 0);
+        if (!cr) return false;
+        int result = to_IMatrix(cr, m ? *m : 0);
+        Py_DECREF(cr);
+        return result;
+      }
+      {
+        std::vector <int> t;
+        int res = make_vector(p, &t, to_int);
+        if (m) **m = casadi::Matrix<int>(t);
+        return res;
+      }
+      return true;
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
-        // In MATLAB, it is common to use floating point values to represent integers
-        if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
-          double* data = static_cast<double*>(mxGetData(p));
+      // In MATLAB, it is common to use floating point values to represent integers
+      if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
+        double* data = static_cast<double*>(mxGetData(p));
 
-          // Check if all integers
-          bool all_integers=true;
-          size_t sz = getNNZ(p);
-          for (size_t i=0; i<sz; ++i) {
-            if (data[i] != int(data[i])) {
-              all_integers = false;
-              break;
-            }
-          }
-
-          // If successful
-          if (all_integers) {
-            if (m) {
-              **m = casadi::IMatrix(getSparsity(p));
-              for (size_t i=0; i<sz; ++i) {
-                (*m)->at(i) = int(data[i]);
-              }
-            }
-            return true;
+        // Check if all integers
+        bool all_integers=true;
+        size_t sz = getNNZ(p);
+        for (size_t i=0; i<sz; ++i) {
+          if (data[i] != int(data[i])) {
+            all_integers = false;
+            break;
           }
         }
+
+        // If successful
+        if (all_integers) {
+          if (m) {
+            **m = casadi::IMatrix(getSparsity(p));
+            for (size_t i=0; i<sz; ++i) {
+              (*m)->at(i) = int(data[i]);
+            }
+          }
+          return true;
+        }
+      }
 #endif // SWIGMATLAB
 
-        // No match
-        return false;
-      }
-    };
+      // No match
+      return false;
+    }
   } // namespace casadi
 
 
