@@ -1189,10 +1189,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   int to_string(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Function(GUESTOBJECT *p, void *mv, int offs=0);
 
-  inline int to_Casadi(GUESTOBJECT *p, casadi::MX* m) { return to_MX(p, m);}
-  inline int to_Casadi(GUESTOBJECT *p, casadi::Matrix<double>* m) { return to_DMatrix(p, m);}
-  inline int to_Casadi(GUESTOBJECT *p, casadi::Matrix<casadi::SXElement>* m) { return to_SX(p, m);}
-
   template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m);
   template<typename M> int to_PairMap(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> > *m);
 
@@ -1646,10 +1642,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       while (PyDict_Next(p, &pos, &key, &value)) {
         if (!PyString_Check(key)) return false;
         if (m) {
-          M& v=(*m)[std::string(PyString_AsString(key))];
-          if (!to_Casadi(value, &v)) return false;
+          M *v=&(*m)[std::string(PyString_AsString(key))], *v2=v;
+          if (!casadi::casptr(value, &v)) return false;
+          if (v!=v2) *v2=*v; // if only pointer changed
         } else {
-          if (!to_Casadi(value, static_cast<M*>(0))) return false;
+          if (!casadi::casptr(value, static_cast<M**>(0))) return false;
         }
       }
       return true;
