@@ -2019,28 +2019,52 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 #ifdef SWIGPYTHON
 %fragment("to"{Dict}, "header", fragment="fwd") {
+  // Traits specialization for Dict
+  namespace casadi {
+    template <> struct traits_casptr<GenericType::Dict> {
+      static bool casptr(GUESTOBJECT *p, GenericType::Dict** m) {
+        // Treat Null
+        if (is_null(p)) return false;
+
+        // Dict already?
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                      $descriptor(casadi::GenericType::Dict*), 0))) {
+          return true;
+        }
+
+#ifdef SWIGPYTHON
+        if (PyDict_Check(p)) {
+          PyObject *key, *value;
+          Py_ssize_t pos = 0;
+          GenericType gt;
+          while (PyDict_Next(p, &pos, &key, &value)) {
+            if (!PyString_Check(key)) return false;
+            if (!to_GenericType(value, &gt)) return false;
+            if (m) (**m)[std::string(PyString_AsString(key))] = gt;
+          }
+          return true;
+        }
+#endif // SWIGPYTHON
+
+        // No match
+        return false;
+      }
+    };
+  } // namespace casadi
+
   int to_Dict(GUESTOBJECT *p, void *mv, int offs) {
     casadi::GenericType::Dict *m = static_cast<casadi::GenericType::Dict*>(mv);
     if (m) m += offs;
-#ifndef SWIGPYTHON
-    return false;
-#else // SWIGPYTHON
-    casadi::GenericType::Dict *mp = 0;
-    if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::GenericType::Dict *), 0) != -1) {
-      if (m) *m=*mp;
+
+    // Call refactored version
+    casadi::GenericType::Dict *m_orig = m;
+    if (casptr(p, m ? &m : 0)) {
+      if (m!=m_orig) *m_orig=*m;
       return true;
     }
-    if (!PyDict_Check(p)) return false;
-    PyObject *key, *value;
-    Py_ssize_t pos = 0;
-    casadi::GenericType gt;
-    while (PyDict_Next(p, &pos, &key, &value)) {
-      if (!PyString_Check(key)) return false;
-      if (!to_GenericType(value, &gt)) return false;
-      if (m) (*m)[std::string(PyString_AsString(key))] = gt;
-    }
-    return true;
-#endif // SWIGPYTHON
+
+    // Failure if reached this point
+    return false;
   }
  }
 %casadi_typemaps_constref(Dict, PRECEDENCE_DICT, casadi::GenericType::Dict)
@@ -2754,7 +2778,7 @@ void dummy(std::vector< std::vector<double> > foo1,
            std::vector < std::vector < casadi::SX > > foo16,
            std::vector < std::vector < casadi::MX > > foo17,
            std::vector < std::vector < casadi::MX* > > foo17b,
-           casadi::Dict foo18,
+           casadi::GenericType::Dict foo18,
            std::string& foo19,
            casadi::Matrix<int> foo20,
            casadi::CustomFunction foo24,
@@ -2796,7 +2820,7 @@ namespace std {
              std::vector < std::vector < casadi::SX > > foo16,
              std::vector < std::vector < casadi::MX > > foo17,
              std::vector < std::vector < casadi::MX* > > foo17b,
-             casadi::Dict foo18,
+             casadi::GenericType::Dict foo18,
              std::string& foo19,
              casadi::Matrix<int> foo20,
              casadi::CustomFunction foo24,
