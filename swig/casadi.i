@@ -2608,6 +2608,100 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           }
         }
 
+#ifdef SWIGPYTHON
+        // Numpy arrays will be cast to dense Matrix<int>
+        if (is_array(p)) {
+          if (array_numdims(p)==0) {
+            int d;
+            int result = to_int(p, &d);
+            if (!result) return result;
+            if (m) **m = casadi::Matrix<int>(d);
+            return result;
+          }
+          if (array_numdims(p)>2 || array_numdims(p)<1) return false;
+          int nrows = array_size(p,0); // 1D array is cast into column vector
+          int ncols  = 1;
+          if (array_numdims(p)==2) ncols=array_size(p,1); 
+          if (!array_is_native(p)) return false;
+          // Make sure we have a contigous array with int datatype
+          int array_is_new_object=0;
+          PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
+          if (!array) { // Trying LONG
+            PyErr_Clear();
+            array = obj_to_array_contiguous_allow_conversion(p,NPY_LONG,&array_is_new_object);
+            if (!array) {
+              PyErr_Clear();
+              return false;
+            }
+            long* temp=(long*) array_data(array);
+            if (m) {
+              **m = casadi::Matrix<int>::zeros(ncols,nrows);
+              for (int k=0;k<nrows*ncols;k++) (*m)->data()[k]=temp[k];
+              **m = (*m)->T();                  
+            }
+            // Free memory
+            if (array_is_new_object) Py_DECREF(array);
+            return true;
+          }
+    
+          if (m) {
+            int* d= static_cast<int*>(array_data(array));
+            **m = casadi::Matrix<int>::zeros(nrows, ncols);
+            for (int rr=0; rr<nrows; ++rr) {
+              for (int cc=0; cc<ncols; ++cc) {
+                (**m)(rr, cc) = *d++;
+              }
+            }
+          }
+           
+          // Free memory
+          if (array_is_new_object) Py_DECREF(array);
+          return true;
+        }
+        if (PyObject_HasAttrString(p,"__IMatrix__")) {
+          char cmd[] = "__IMatrix__";
+          PyObject *cr = PyObject_CallMethod(p, cmd, 0);
+          if (!cr) return false;
+          int result = to_IMatrix(cr, m ? *m : 0);
+          Py_DECREF(cr);
+          return result;
+        }
+        {
+          std::vector <int> t;
+          int res = make_vector(p, &t, to_int);
+          if (m) **m = casadi::Matrix<int>(t);
+          return res;
+        }
+        return true;
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+        // In MATLAB, it is common to use floating point values to represent integers
+        if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
+          double* data = static_cast<double*>(mxGetData(p));
+
+          // Check if all integers
+          bool all_integers=true;
+          size_t sz = getNNZ(p);
+          for (size_t i=0; i<sz; ++i) {
+            if (data[i] != int(data[i])) {
+              all_integers = false;
+              break;
+            }
+          }
+
+          // If successful
+          if (all_integers) {
+            if (m) {
+              **m = casadi::IMatrix(getSparsity(p));
+              for (size_t i=0; i<sz; ++i) {
+                (*m)->at(i) = int(data[i]);
+              }
+            }
+            return true;
+          }
+        }
+#endif // SWIGMATLAB
+
         // No match
         return false;
       }
@@ -2627,99 +2721,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return true;
     }
 
-#ifdef SWIGPYTHON
-    // Numpy arrays will be cast to dense Matrix<int>
-    if (is_array(p)) {
-      if (array_numdims(p)==0) {
-        int d;
-        int result = to_int(p, &d);
-        if (!result) return result;
-        if (m) *m = casadi::Matrix<int>(d);
-        return result;
-      }
-      if (array_numdims(p)>2 || array_numdims(p)<1) return false;
-      int nrows = array_size(p,0); // 1D array is cast into column vector
-      int ncols  = 1;
-      if (array_numdims(p)==2) ncols=array_size(p,1); 
-      if (!array_is_native(p)) return false;
-      // Make sure we have a contigous array with int datatype
-      int array_is_new_object=0;
-      PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
-      if (!array) { // Trying LONG
-        PyErr_Clear();
-        array = obj_to_array_contiguous_allow_conversion(p,NPY_LONG,&array_is_new_object);
-        if (!array) {
-          PyErr_Clear();
-          return false;
-        }
-        long* temp=(long*) array_data(array);
-        if (m) {
-          *m = casadi::Matrix<int>::zeros(ncols,nrows);
-          for (int k=0;k<nrows*ncols;k++) m->data()[k]=temp[k];
-          *m = m->T();                  
-        }
-        // Free memory
-        if (array_is_new_object) Py_DECREF(array);
-        return true;
-      }
-    
-      if (m) {
-        int* d= static_cast<int*>(array_data(array));
-        *m = casadi::Matrix<int>::zeros(nrows, ncols);
-        for (int rr=0; rr<nrows; ++rr) {
-          for (int cc=0; cc<ncols; ++cc) {
-            (*m)(rr, cc) = *d++;
-          }
-        }
-      }
-           
-      // Free memory
-      if (array_is_new_object) Py_DECREF(array);
-      return true;
-    }
-    if (PyObject_HasAttrString(p,"__IMatrix__")) {
-      char name[] = "__IMatrix__";
-      PyObject *cr = PyObject_CallMethod(p, name,0);
-      if (!cr) { return false; }
-      int result = to_IMatrix(cr, m);
-      Py_DECREF(cr);
-      return result;
-    }
-    {
-      std::vector <int> t;
-      int res = make_vector(p, &t, to_int);
-      if (m) *m = casadi::Matrix<int>(t);
-      return res;
-    }
-    return true;
-#endif // SWIGPYTHON
-#ifdef SWIGMATLAB
-    // In MATLAB, it is common to use floating point values to represent integers
-    if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
-      double* data = static_cast<double*>(mxGetData(p));
-
-      // Check if all integers
-      bool all_integers=true;
-      size_t sz = getNNZ(p);
-      for (size_t i=0; i<sz; ++i) {
-        if (data[i] != int(data[i])) {
-          all_integers = false;
-          break;
-        }
-      }
-
-      // If successful
-      if (all_integers) {
-        if (m) {
-          *m = casadi::IMatrix(getSparsity(p));
-          for (size_t i=0; i<sz; ++i) {
-            m->at(i) = int(data[i]);
-          }
-        }
-        return true;
-      }
-    }
-#endif // SWIGMATLAB
     return false;
   }
  }
