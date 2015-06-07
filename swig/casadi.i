@@ -1927,93 +1927,123 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 %fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string},
           fragment="to"{IVector}, fragment="to"{DVector}, fragment="to"{Function}) {
+  // Traits specialization for GenericType
+  namespace casadi {
+    template <> struct traits_casptr<GenericType> {
+      static bool casptr(GUESTOBJECT *p, GenericType** m) {
+#ifdef SWIGPYTHON
+        if (p==Py_None) {
+          if (m) **m=GenericType();
+          return true;
+        }
+#endif // SWIGPYTHON
+
+        // Treat Null
+        if (is_null(p)) return false;
+
+        // Dict already?
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                      $descriptor(casadi::GenericType*), 0))) {
+          return true;
+        }
+
+#ifdef SWIGPYTHON
+        if (PyBool_Check(p)) {
+          if (m) **m=GenericType((bool) PyInt_AsLong(p));
+        } else if (PyInt_Check(p)) {
+          if (m) **m=GenericType((int) PyInt_AsLong(p));
+        } else if (PyFloat_Check(p)) {
+          if (m) **m=GenericType(PyFloat_AsDouble(p));
+        } else if (to_string(p, 0)) {
+          std::string temp;
+          if (!to_string(p, &temp)) return false;
+          if (m) **m = GenericType(temp);
+        } else if (to_IVector(p, 0)) {
+          std::vector<int> temp;
+          if (!to_IVector(p, &temp)) return false;
+          if (m) **m = GenericType(temp);
+        } else if (to_DVector(p, 0)) {
+          std::vector<double> temp;
+          if (!to_DVector(p, &temp)) return false;
+          if (m) **m = GenericType(temp);
+        } else if (make_vector(p, static_cast<std::vector<std::string>*>(0), to_string)) {
+          std::vector<std::string> temp;
+          if (!make_vector(p, &temp, to_string)) return false;
+          if (m) **m = GenericType(temp);
+        } else if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
+          PyObject *c = PyObject_GetAttrString(p,"creator");
+          if (!c) return false;
+          PyObject* gt = getCasadiObject("GenericType");
+          if (!gt) return false;
+
+          PyObject* args = PyTuple_New(1);
+          PyTuple_SetItem(args,0,c);
+    
+          PyObject* g = PyObject_CallObject(gt,args);
+    
+          Py_DECREF(args);
+          Py_DECREF(gt);
+    
+          if (g) {
+            int result = to_GenericType(g, m ? *m : 0);
+            Py_DECREF(g);
+            return result;
+          }
+          if (!g) {
+            PyErr_Clear();
+            return false;
+          }
+        } else if (to_Function(p, 0)) {
+          Function temp;
+          if (!to_Function(p, &temp)) return false;
+          if (m) **m = GenericType(temp);
+        } else if (to_Dict(p, 0) || to_DerivativeGenerator(p, 0) || to_Callback(p, 0)) {
+          PyObject* gt = getCasadiObject("GenericType");
+          if (!gt) return false;
+
+          PyObject* args = PyTuple_New(1);
+          Py_INCREF(p); // Needed because PyTuple_SetItem steals the reference
+          PyTuple_SetItem(args,0,p);
+    
+          PyObject* g = PyObject_CallObject(gt,args);
+    
+          Py_DECREF(args);
+          Py_DECREF(gt);
+    
+          if (g) {
+            int result = to_GenericType(g, m ? *m : 0);
+            Py_DECREF(g);
+            return result;
+          }
+          if (!g) {
+            PyErr_Clear();
+            return false;
+          }
+        } else {
+          return false;
+        }
+        return true;
+#endif // SWIGPYTHON
+
+        // No match
+        return false;
+      }
+    };
+  } // namespace casadi
+
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs) {
     casadi::GenericType *m = static_cast<casadi::GenericType*>(mv);
     if (m) m += offs;
-#ifndef SWIGPYTHON
-    return false;
-#else // SWIGPYTHON
-    casadi::GenericType *mp = 0;
-    if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::GenericType *), 0) != -1) {
-      if (m) *m=*mp;
+
+    // Call refactored version
+    casadi::GenericType *m_orig = m;
+    if (casptr(p, m ? &m : 0)) {
+      if (m!=m_orig) *m_orig=*m;
       return true;
     }
-    if (p==Py_None) {
-      if (m) *m=casadi::GenericType();
-    } else if (PyBool_Check(p)) {
-      if (m) *m=casadi::GenericType((bool) PyInt_AsLong(p));
-    } else if (PyInt_Check(p)) {
-      if (m) *m=casadi::GenericType((int) PyInt_AsLong(p));
-    } else if (PyFloat_Check(p)) {
-      if (m) *m=casadi::GenericType(PyFloat_AsDouble(p));
-    } else if (to_string(p, 0)) {
-      std::string temp;
-      if (!to_string(p, &temp)) return false;
-      if (m) *m = casadi::GenericType(temp);
-    } else if (to_IVector(p, 0)) {
-      std::vector<int> temp;
-      if (!to_IVector(p, &temp)) return false;
-      if (m) *m = casadi::GenericType(temp);
-    } else if (to_DVector(p, 0)) {
-      std::vector<double> temp;
-      if (!to_DVector(p, &temp)) return false;
-      if (m) *m = casadi::GenericType(temp);
-    } else if (make_vector(p, static_cast<std::vector<std::string>*>(0), to_string)) {
-      std::vector<std::string> temp;
-      if (!make_vector(p, &temp, to_string)) return false;
-      if (m) *m = casadi::GenericType(temp);
-    } else if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
-      PyObject *c = PyObject_GetAttrString(p,"creator");
-      if (!c) return false;
-      PyObject* gt = getCasadiObject("GenericType");
-      if (!gt) return false;
 
-      PyObject* args = PyTuple_New(1);
-      PyTuple_SetItem(args,0,c);
-    
-      PyObject* g = PyObject_CallObject(gt,args);
-    
-      Py_DECREF(args);
-      Py_DECREF(gt);
-    
-      if (g) {
-        int result = to_GenericType(g, m);
-        Py_DECREF(g);
-        return result;
-      }
-      if (!g) { PyErr_Clear();  return false;}
-    
-    } else if (to_Function(p, 0)) {
-      casadi::Function temp;
-      if (!to_Function(p, &temp)) return false;
-      if (m) *m = casadi::GenericType(temp);
-    } else if (to_Dict(p, 0) || to_DerivativeGenerator(p, 0) || to_Callback(p, 0)) {
-      PyObject* gt = getCasadiObject("GenericType");
-      if (!gt) return false;
-
-      PyObject* args = PyTuple_New(1);
-      Py_INCREF(p); // Needed because PyTuple_SetItem steals the reference
-      PyTuple_SetItem(args,0,p);
-    
-      PyObject* g = PyObject_CallObject(gt,args);
-    
-      Py_DECREF(args);
-      Py_DECREF(gt);
-    
-      if (g) {
-        int result = to_GenericType(g, m);
-        Py_DECREF(g);
-        return result;
-      }
-      if (!g) {
-        PyErr_Clear();
-        return false;
-      }
-    } else {
-      return false;
-    }
-    return true;
-#endif // SWIGPYTHON
+    // Failure if reached this point
+    return false;
   }
  }
 
