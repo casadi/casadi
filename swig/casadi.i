@@ -2148,30 +2148,68 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_typemaps_vector2(SX, PRECEDENCE_SXVectorVector, casadi::Matrix<casadi::SXElement>)
 
 %fragment("to"{MX}, "header", fragment="fwd") {
+  // Traits specialization for SX
+  namespace casadi {
+    template <> struct traits_casptr<MX> {
+      static bool casptr(GUESTOBJECT *p, MX** m) {
+        // Treat Null
+        if (is_null(p)) return false;
+
+        // MX already?
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                      $descriptor(casadi::MX*), 0))) {
+          return true;
+        }
+
+        // Object is an DMatrix
+        {
+          // Pointer to object
+          DMatrix *m2;
+          if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                        $descriptor(casadi::Matrix<double>*), 0))) {
+            if (m) **m=*m2;
+            return true;
+          }
+        }
+
+        // Try first converting to a temporary DMatrix
+        {
+          DMatrix tmp, *mt=&tmp;
+          if(casadi::casptr(p, m ? &mt : 0)) {
+            if (m) **m = *mt;
+            return true;
+          }
+        }
+
+#ifdef SWIGPYTHON
+        if (PyObject_HasAttrString(p,"__MX__")) {
+          char cmd[] = "__MX__";
+          PyObject *cr = PyObject_CallMethod(p, cmd, 0);
+          if (!cr) return false;
+          int flag = casptr(cr, m);
+          Py_DECREF(cr);
+          return flag;
+        }
+#endif // SWIGPYTHON
+
+        // No match
+        return false;
+      }
+    };
+  } // namespace casadi
+
+
   int to_MX(GUESTOBJECT *p, void *mv, int offs) {
     MX *m = static_cast<MX*>(mv);
     if (m) m += offs;
-    // Use operator=
-    if (TRY_COPY(p, casadi::MX, type_MX(), m)) return true;
-    if (TRY_COPY(p, casadi::DMatrix, type_DMatrix(), m)) return true;
-    // Try first converting to a temporary DMatrix
-    {
-      casadi::DMatrix mt;
-      if(to_DMatrix(p, m ? &mt : 0)) {
-        if (m) *m = mt;
-        return true;
-      }
+
+    // Call refactored version
+    casadi::MX *m_orig = m;
+    if (casptr(p, m ? &m : 0)) {
+      if (m!=m_orig) *m_orig=*m;
+      return true;
     }
-#ifdef SWIGPYTHON
-    if (PyObject_HasAttrString(p,"__MX__")) {
-      char name[] = "__MX__";
-      PyObject *cr = PyObject_CallMethod(p, name,0);
-      if (!cr) return false;
-      int result = to_MX(cr, m);
-      Py_DECREF(cr);
-      return result;
-    }
-#endif // SWIGPYTHON
+
     // Failure if reached this point
     return false;
   }
