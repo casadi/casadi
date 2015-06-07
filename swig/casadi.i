@@ -1579,20 +1579,44 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif // SWIGPYTHON
 
 %fragment("to"{string}, "header", fragment="fwd") {
+  // Traits specialization for string
+  namespace casadi {
+    template <> struct traits_casptr<std::string> {
+      static bool casptr(GUESTOBJECT *p, std::string** m) {
+        // Treat Null
+        if (is_null(p)) return false;
+
+        // String already?
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                      $descriptor(std::string*), 0))) {
+          return true;
+        }
+
+#ifdef SWIGPYTHON
+        if (PyString_Check(p)) {
+          if (m) (*m)->clear();
+          if (m) (*m)->append(PyString_AsString(p));
+          return true;
+        }
+#endif // SWIGPYTHON
+
+        // No match
+        return false;
+      }
+    };
+  } // namespace casadi
+
   int to_string(GUESTOBJECT *p, void *mv, int offs) {
     std::string *m = static_cast<std::string*>(mv);
     if (m) m += offs;
-#ifdef SWIGPYTHON
-    std::string *mp = 0;
-    if (!is_null(p) && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(std::string *), 0) != -1) {
-      if (m) *m=*mp;
+
+    // Call refactored version
+    std::string *m_orig = m;
+    if (casptr(p, m ? &m : 0)) {
+      if (m!=m_orig) *m_orig=*m;
       return true;
     }
-    if (!PyString_Check(p)) return false;
-    if (m) m->clear();
-    if (m) m->append(PyString_AsString(p));
-    return true;
-#endif // SWIGPYTHON
+
     return false;
   }
 }
@@ -2148,7 +2172,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_typemaps_vector2(SX, PRECEDENCE_SXVectorVector, casadi::Matrix<casadi::SXElement>)
 
 %fragment("to"{MX}, "header", fragment="fwd") {
-  // Traits specialization for SX
+  // Traits specialization for MX
   namespace casadi {
     template <> struct traits_casptr<MX> {
       static bool casptr(GUESTOBJECT *p, MX** m) {
@@ -2197,7 +2221,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       }
     };
   } // namespace casadi
-
 
   int to_MX(GUESTOBJECT *p, void *mv, int offs) {
     MX *m = static_cast<MX*>(mv);
