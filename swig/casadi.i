@@ -2023,54 +2023,122 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif
 
 %fragment("to"{SX}, "header", fragment="fwd") {
+  // Traits specialization for SX
+  namespace casadi {
+    template <> struct traits_casptr<SX> {
+      static bool casptr(GUESTOBJECT *p, SX** m) {
+        // Treat Null
+        if (is_null(p)) return false;
+
+        // SX already?
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                      $descriptor(casadi::Matrix<casadi::SXElement>*), 0))) {
+          return true;
+        }
+
+        // Object is an DMatrix
+        {
+          // Pointer to object
+          DMatrix *m2;
+          if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                        $descriptor(casadi::Matrix<double>*), 0))) {
+            if (m) **m=*m2;
+            return true;
+          }
+        }
+
+        // Object is an IMatrix
+        {
+          // Pointer to object
+          IMatrix *m2;
+          if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                        $descriptor(casadi::Matrix<int>*), 0))) {
+            if (m) **m=*m2;
+            return true;
+          }
+        }
+
+        // First convert to double
+        if (false) {
+          double tmp;
+          if (SWIG_IsOK(SWIG_AsVal_double(p, m ? &tmp : 0))) {
+            if (m) **m=tmp;
+            return true;
+          }
+        }
+
+        // First convert to integer
+        if (false) {
+          int tmp;
+          if (SWIG_IsOK(SWIG_AsVal_int(p, m ? &tmp : 0))) {
+            if (m) **m=tmp;
+            return true;
+          }
+        }
+
+        // Try first converting to a temporary DMatrix
+        {
+          DMatrix tmp, *mt=&tmp;
+          if(casadi::casptr(p, m ? &mt : 0)) {
+            if (m) **m = *mt;
+            return true;
+          }
+        }
+
+#ifdef SWIGPYTHON
+        // Numpy arrays will be cast to dense SX
+        if (is_array(p)) {
+          if (array_type(p) != NPY_OBJECT) return false;
+          if (array_numdims(p)>2 || array_numdims(p)<1) return false;
+          int nrows = array_size(p,0); // 1D array is cast into column vector
+          int ncols  = array_numdims(p)==2 ? array_size(p,1) : 1;
+          PyArrayIterObject* it = (PyArrayIterObject*)PyArray_IterNew(p);
+          casadi::SX mT;
+          if (m) mT = casadi::SX::zeros(ncols, nrows);
+          int k=0;
+          casadi::SX tmp;
+          PyObject *pe;
+          while (it->index < it->size) { 
+            pe = *((PyObject**) PyArray_ITER_DATA(it));
+            if (!to_SX(pe, &tmp) || !tmp.isScalar()) {
+              Py_DECREF(it);
+              return false;
+            }
+            if (m) mT(k++) = tmp;
+            PyArray_ITER_NEXT(it);
+          }
+          Py_DECREF(it);
+          if (m) **m = mT.T();
+          return true;
+        }
+        // Object has __SX__ method
+        if (PyObject_HasAttrString(p,"__SX__")) {
+          char cmd[] = "__SX__";
+          PyObject *cr = PyObject_CallMethod(p, cmd, 0);
+          if (!cr) return false;
+          int flag = casptr(cr, m);
+          Py_DECREF(cr);
+          return flag;
+        }
+#endif // SWIGPYTHON
+
+        // No match
+        return false;
+      }
+    };
+  } // namespace casadi
+
   int to_SX(GUESTOBJECT *p, void *mv, int offs) {
     casadi::SX *m = static_cast<casadi::SX*>(mv);
     if (m) m += offs;
-    // Use operator=
-    if (TRY_COPY(p, casadi::SX, type_SX(), m)) return true;
-    if (TRY_COPY(p, casadi::DMatrix, type_DMatrix(), m)) return true;
-    if (TRY_COPY(p, casadi::IMatrix, type_IMatrix(), m)) return true;
-    // Try first converting to a temporary DMatrix
-    {
-      casadi::DMatrix mt;
-      if(to_DMatrix(p, m ? &mt : 0)) {
-        if (m) *m = mt;
-        return true;
-      }
-    }
-#ifdef SWIGPYTHON
-    // Numpy arrays will be cast to dense SX
-    if (is_array(p)) {
-      if (array_type(p) != NPY_OBJECT) return false;
-      if (array_numdims(p)>2 || array_numdims(p)<1) return false;
-      int nrows = array_size(p,0); // 1D array is cast into column vector
-      int ncols  = array_numdims(p)==2 ? array_size(p,1) : 1;
-      PyArrayIterObject* it = (PyArrayIterObject*)PyArray_IterNew(p);
-      casadi::SX mT;
-      if (m) mT = casadi::SX::zeros(ncols, nrows);
-      int k=0;
-      casadi::SX tmp;
-      PyObject *pe;
-      while (it->index < it->size) { 
-        pe = *((PyObject**) PyArray_ITER_DATA(it));
-        if (!to_SX(pe, &tmp) || !tmp.isScalar()) { Py_DECREF(it); return false; }
-        if (m) mT(k++) = tmp;
-        PyArray_ITER_NEXT(it);
-      }
-      Py_DECREF(it);
-      if (m) *m = mT.T();
+
+    // Call refactored version
+    casadi::SX *m_orig = m;
+    if (casptr(p, m ? &m : 0)) {
+      if (m!=m_orig) *m_orig=*m;
       return true;
     }
-    // Object has __SX__ method
-    if (PyObject_HasAttrString(p,"__SX__")) {
-      char name[] = "__SX__";
-      PyObject *cr = PyObject_CallMethod(p, name, 0);
-      if (!cr) return false;
-      int result = to_SX(cr, m);
-      Py_DECREF(cr);
-      return result;
-    }
-#endif // SWIGPYTHON
+
     return false;
   }
  }
