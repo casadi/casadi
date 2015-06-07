@@ -2190,34 +2190,14 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           }
         }
 
-#ifdef SWIGPYTHON
-        // User-supplied conversion
-        if (false && PyObject_HasAttrString(p,"__DMatrix__")) {
-          PyObject *cr = PyObject_CallMethod(p, "__DMatrix__", 0);
-          if (!cr) return false;
-          // Call recursively
-          int flag = casptr(cr, m);
-          Py_DECREF(cr);
-          return flag;
+        // First convert to a vector<double>
+        if (false) {
+          std::vector<double> tmp, *tmp_ptr=m ? &tmp : 0;
+          if (SWIG_IsOK(swig::asval(p, tmp_ptr))) {
+            if (m) **m = tmp.empty() ? DMatrix() : DMatrix(tmp);
+            return true;
+          }
         }
-#endif // SWIGPYTHON
-
-        // No match
-        return false;
-      }
-    };
-  } // namespace casadi
-
-  int to_DMatrix(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::DMatrix *m = static_cast<casadi::DMatrix*>(mv);
-    if (m) m += offs;
-
-    // Call refactored version
-    casadi::DMatrix *m_orig = m;
-    if (casptr(p, m ? &m : 0)) {
-      if (m!=m_orig) *m_orig=*m;
-      return true;
-    }
 
 #ifdef SWIGPYTHON
     // Object has __DMatrix__ method
@@ -2225,7 +2205,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       char name[] = "__DMatrix__";
       PyObject *cr = PyObject_CallMethod(p, name, 0);
       if (!cr) return false;
-      int result = to_DMatrix(cr, m);
+      int result = to_DMatrix(cr, m ? *m : 0);
       Py_DECREF(cr);
       return result;
     }
@@ -2235,7 +2215,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         double d;
         int result = to_double(p, &d);
         if (!result) return result;
-        if (m) *m = casadi::Matrix<double>(d);
+        if (m) **m = casadi::Matrix<double>(d);
         return result;
       }
       if (array_numdims(p)>2 || array_numdims(p)<1) {
@@ -2255,8 +2235,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       std::vector<double> v(d,d+size);
     
       if (m) {
-        *m = casadi::Matrix<double>::zeros(nrows,ncols);
-        m->set(d, true);
+        **m = casadi::Matrix<double>::zeros(nrows,ncols);
+        (*m)->set(d, true);
       }
            
       // Free memory
@@ -2318,7 +2298,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         int* colindd=(int*) array_data(array_colind);
         std::vector<int> colindv(colindd,colindd+(ncols+1));
       
-        if (m) *m = casadi::Matrix<double>(casadi::Sparsity(nrows,ncols,colindv,rowv), v, false);
+        if (m) **m = casadi::Matrix<double>(casadi::Sparsity(nrows,ncols,colindv,rowv), v, false);
       
         ret = true;
       }
@@ -2338,17 +2318,28 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       char name[] = "tocsc";
       PyObject *cr = PyObject_CallMethod(p, name,0);
       if (!cr) return false;
-      int result = to_DMatrix(cr, m);
+      int result = to_DMatrix(cr, m ? *m : 0);
       Py_DECREF(cr);
       return result;
     }
+
+
+    /* { */
+    /*   std::vector<double> tmp, *tmp_ptr=m ? &tmp : 0; */
+    /*   if (SWIG_IsOK(swig::asval(p, tmp_ptr))) { */
+    /*     if (m) *m = tmp.empty() ? DMatrix() : DMatrix(tmp); */
+    /*     return true; */
+    /*   } */
+    /* } */
+
+
     {
       std::vector <double> t;
       int res = make_vector(p, &t, to_double);
       if (t.size()>0) {
-        if (m) *m = casadi::Matrix<double>(t);
+        if (m) **m = casadi::Matrix<double>(t);
       } else {
-        if (m) *m = casadi::Matrix<double>(0,0);
+        if (m) **m = casadi::Matrix<double>(0,0);
       }
       return res;
     }
@@ -2357,13 +2348,31 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     // MATLAB double matrix (sparse or dense)
     if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
       if (m) {
-        *m = casadi::DMatrix(getSparsity(p));
+        **m = casadi::DMatrix(getSparsity(p));
         double* data = static_cast<double*>(mxGetData(p));
-        m->setNZ(data);
+        (*m)->setNZ(data);
       }
       return true;
     }
 #endif // SWIGMATLAB
+
+        // No match
+        return false;
+      }
+    };
+  } // namespace casadi
+
+  int to_DMatrix(GUESTOBJECT *p, void *mv, int offs) {
+    casadi::DMatrix *m = static_cast<casadi::DMatrix*>(mv);
+    if (m) m += offs;
+
+    // Call refactored version
+    casadi::DMatrix *m_orig = m;
+    if (casptr(p, m ? &m : 0)) {
+      if (m!=m_orig) *m_orig=*m;
+      return true;
+    }
+
     return false;
   }
 }
@@ -2397,7 +2406,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #ifdef SWIGPYTHON
         // User-supplied conversion
         if (false && PyObject_HasAttrString(p,"__IMatrix__")) {
-          PyObject *cr = PyObject_CallMethod(p, "__IMatrix__", 0);
+          char cmd[] = "__IMatrix__";
+          PyObject *cr = PyObject_CallMethod(p, cmd, 0);
           if (!cr) return false;
           // Call recursively
           int flag = casptr(cr, m);
