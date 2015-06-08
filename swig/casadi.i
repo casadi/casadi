@@ -71,6 +71,31 @@
 %}
 #endif
 
+/* Convert a pointer in interfaced language to C++
+ * Input: GUESTOBJECT pointer p
+ * Output: Pointer to pointer: At input, pointer to pointer to temporary
+ * The routine will either:
+ *   - Do nothing, if 0
+ *   - Change the pointer
+ *   - Change the temporary object
+ * Returns true upon success, else false
+ */
+%header %{
+  namespace casadi {
+    bool casptr(GUESTOBJECT *p, int** m);
+    bool casptr(GUESTOBJECT *p, double** m);
+    bool casptr(GUESTOBJECT *p, std::string** m);
+    bool casptr(GUESTOBJECT *p, MX** m);
+    bool casptr(GUESTOBJECT *p, GenericType** m);
+    bool casptr(GUESTOBJECT *p, GenericType::Dict** m);
+    bool casptr(GUESTOBJECT *p, SX** m);
+    bool casptr(GUESTOBJECT *p, DMatrix** m);
+    bool casptr(GUESTOBJECT *p, IMatrix** m);
+    template<typename M> bool casptr(GUESTOBJECT *p, std::vector<M>** m);
+    template<typename M> bool casptr(GUESTOBJECT *p, std::map<std::string, M>** m);
+  } // namespace casadi
+%}
+
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
 // for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
@@ -758,8 +783,89 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
  }
 
 %fragment("make_vector", "header", fragment="vector_size,to_vector") {
+  namespace casadi {
+    template<typename M> bool casptr(GUESTOBJECT *p, std::vector<M>** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+#ifdef SWIGPYTHON
+      // Python sequence
+      if (PyList_Check(p) || PyTuple_Check(p)) {
+
+        // Iterator to the sequence
+        PyObject *it = PyObject_GetIter(p);
+        if (!it) {
+          PyErr_Clear();
+          return false;
+        }
+      
+        // Get size
+        Py_ssize_t sz = PySequence_Size(p);
+        if (sz==-1) {
+          PyErr_Clear();
+          return false;
+        }
+
+        // Allocate elements
+        if (m) (**m).resize(sz);
+
+        // Iterate over sequence
+        for (Py_ssize_t i=0; i!=sz; ++i) {
+          PyObject *pe=PyIter_Next(it);
+          // Convert element
+          M *m_i = m ? &(**m).at(i) : 0, *m_i2=m_i;
+          if (!casptr(pe, m_i ? &m_i : 0)) {
+            // Failure
+            Py_DECREF(pe);
+            Py_DECREF(it);
+            return false;
+          }
+          if (m_i!=m_i2) *m_i2=*m_i; // If only pointer changed
+          Py_DECREF(pe);
+        }
+        Py_DECREF(it);
+        return true;
+      }
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+      // Cell arrays (only row vectors)
+      if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
+        // Get size
+        int sz = mxGetN(p);
+
+        // Allocate elements
+        if (m) (**m).resize(sz);
+
+        // Loop over elements
+        for (int i=0; i<sz; ++i) {
+          // Get element
+          mxArray* pe = mxGetCell(p, i);
+          if (pe==0) return false;
+
+          // Convert element
+          M *m_i = m ? &(**m).at(i) : 0, *m_i2=m_i;
+          if (!casptr(pe, m_i ? &m_i : 0)) {
+            return false;
+          }
+          if (m_i!=m_i2) *m_i2=*m_i; // If only pointer changed
+        }
+        return true;
+      }
+#endif // SWIGMATLAB
+      // No match
+      return false;
+    }
+  } // namespace casadi
+
   template<typename T>
   bool make_vector(GUESTOBJECT * p, std::vector<T>* m, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
+    // Call refactored version
+    std::vector<T> *m_orig = m;
+    if (casadi::casptr(p, m ? &m : 0)) {
+      if (m!=m_orig) *m_orig=*m;
+      return true;
+    }
+
+    // Legacy
     int sz = vector_size(p);
     if (sz<0) return false;
     if (m) m->resize(sz);
@@ -1138,27 +1244,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           ,fragment="get_sparsity,get_nnz"
 #endif // SWIGMATLAB
           ) {
-  namespace casadi {
-    /* Convert a pointer in interfaced language to C++
-     * Input: GUESTOBJECT pointer p
-     * Output: Pointer to pointer: At input, pointer to pointer to temporary
-     * The routine will either:
-     *   - Do nothing, if 0
-     *   - Change the pointer
-     *   - Change the temporary object
-     * Returns true upon success, else false
-     */
-    bool casptr(GUESTOBJECT *p, int** m);
-    bool casptr(GUESTOBJECT *p, double** m);
-    bool casptr(GUESTOBJECT *p, std::string** m);
-    bool casptr(GUESTOBJECT *p, MX** m);
-    bool casptr(GUESTOBJECT *p, GenericType** m);
-    bool casptr(GUESTOBJECT *p, GenericType::Dict** m);
-    bool casptr(GUESTOBJECT *p, SX** m);
-    bool casptr(GUESTOBJECT *p, DMatrix** m);
-    bool casptr(GUESTOBJECT *p, IMatrix** m);
-    template<typename M>  bool casptr(GUESTOBJECT *p, std::map<std::string, M>** m);
-  } // namespace casadi
 
   int to_int(GUESTOBJECT *p, void *mv, int offs=0);
   int to_double(GUESTOBJECT *p, void *mv, int offs=0);
