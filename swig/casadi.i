@@ -95,6 +95,10 @@
     bool to_ptr(GUESTOBJECT *p, SX** m);
     bool to_ptr(GUESTOBJECT *p, DMatrix** m);
     bool to_ptr(GUESTOBJECT *p, IMatrix** m);
+    bool to_ptr(GUESTOBJECT *p, Slice** m);
+    bool to_ptr(GUESTOBJECT *p, Callback** m);
+    bool to_ptr(GUESTOBJECT *p, DerivativeGenerator** m);
+    bool to_ptr(GUESTOBJECT *p, CustomEvaluate** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
 
@@ -1868,27 +1872,46 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
 #endif // SWIGPYTHON
 
-  int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
+  namespace casadi {
+    bool to_ptr(GUESTOBJECT *p, DerivativeGenerator** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // DerivativeGenerator already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::DerivativeGenerator*), 0))) {
+        return true;
+      }
+
+#ifdef SWIGPYTHON
+      PyObject* return_type = getReturnType(p);
+      if (!return_type) return false;
+      PyObject* function = getCasadiObject("Function");
+      if (!function) {
+        Py_DECREF(return_type);
+        return false;
+      }
+      bool res = PyClass_IsSubclass(return_type,function);
+      Py_DECREF(return_type);
+      Py_DECREF(function);
+      if (res) {
+        if (m) **m = casadi::DerivativeGeneratorPython(p);
+        return true;
+      }
+#endif // SWIGPYTHON
+
+      // No match
+      return false;
+    }
+  } // namespace casadi
+
+int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
     casadi::DerivativeGenerator *m = static_cast<casadi::DerivativeGenerator*>(mv);
     if (m) m += offs;
-    casadi::DerivativeGenerator *mp = 0;
-    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::DerivativeGenerator *), 0) != -1) {
-      if (m) *m=*mp;
-      return true;
-    }
-#ifdef SWIGPYTHON
-    PyObject* return_type = getReturnType(p);
-    if (!return_type) return false;
-    PyObject* function = getCasadiObject("Function");
-    if (!function) { Py_DECREF(return_type); return false; }
-    bool res = PyClass_IsSubclass(return_type,function);
-    Py_DECREF(return_type);
-    Py_DECREF(function);
-    if (res) {
-      if (m) *m = casadi::DerivativeGeneratorPython(p);
-      return true;
-    }
-#endif // SWIGPYTHON
+
+    // Call refactored version
+    if (to_val(p, m)) return true;
+
     return false;
   }
  }
