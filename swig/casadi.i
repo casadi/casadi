@@ -101,6 +101,7 @@
     bool to_ptr(GUESTOBJECT *p, CustomEvaluate** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> >** m);
 
     // Same as the above, but with pointer instead of pointer to pointer
     template<typename M> bool to_val(GUESTOBJECT *p, M* m) {
@@ -916,9 +917,9 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
  }
 
 %define %casadi_in_typemap_constref2(xName, xType...)
-%typemap(in, noblock=1, fragment="to"{xName}) const xType & (xType m) {
-  if (!to_##xName($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
+%typemap(in, noblock=1) const xType & (xType m) {
   $1 = &m;
+  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
 }
 %enddef
 
@@ -1696,41 +1697,40 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
 
   template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m) {
-    // Call refactored version
-    std::map<std::string, M> *m_orig=m;
-    if (casadi::to_ptr(p, m ? &m : 0)) {
-      if (m!=m_orig) *m_orig=*m;
-      return true;
-    }
-
-    return false;
+    return casadi::to_val(p, m);
   }
  }
 
 %fragment("to"{PairMap}, "header", fragment="fwd") {
-  template<typename M> int to_PairMap(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> > *m) {
+  namespace casadi {
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> >** m) {
 #ifdef SWIGPYTHON
-    if (PyTuple_Check(p) && PyTuple_Size(p)==2) {
-      // Convert map
-      GUESTOBJECT *p_first = PyTuple_GetItem(p,0);
-      std::map<std::string, M> *m_first=0;
-      if (m) m_first=&m->first;
-      if (!to_Map(p_first, m_first)) return false;
-      // Convert vector of strings
-      GUESTOBJECT *p_second = PyTuple_GetItem(p,1);
-      if (!PyList_Check(p_second)) return false;
-      Py_ssize_t n = PyList_Size(p_second);
-      if (m) m->second.resize(n);
-      for (Py_ssize_t i=0; i!=n; ++i) {
-        GUESTOBJECT *s_i = PyList_GetItem(p_second, i);
-        if (!PyString_Check(s_i)) return false;
-        if (m) m->second.at(i) = std::string(PyString_AsString(s_i));
+      if (PyTuple_Check(p) && PyTuple_Size(p)==2) {
+        // Convert map
+        GUESTOBJECT *p_first = PyTuple_GetItem(p, 0);
+        std::map<std::string, M> *m_first=0;
+        if (m) m_first=&(*m)->first;
+        if (!to_Map(p_first, m_first)) return false;
+        // Convert vector of strings
+        GUESTOBJECT *p_second = PyTuple_GetItem(p, 1);
+        if (!PyList_Check(p_second)) return false;
+        Py_ssize_t n = PyList_Size(p_second);
+        if (m) (*m)->second.resize(n);
+        for (Py_ssize_t i=0; i!=n; ++i) {
+          GUESTOBJECT *s_i = PyList_GetItem(p_second, i);
+          if (!PyString_Check(s_i)) return false;
+          if (m) (*m)->second.at(i) = std::string(PyString_AsString(s_i));
+        }
+        // Success
+        return true;
       }
-      // Success
-      return true;
-    }
 #endif // SWIGPYTHON
-    return false;
+      return false;
+    }
+  } // namespace casadi
+
+  template<typename M> int to_PairMap(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> > *m) {
+    return casadi::to_val(p, m);
   }
  }
 
