@@ -103,9 +103,10 @@ matrix:
         - sudo add-apt-repository ppa:kedazo/doxygen-updates-precise -y
         - sudo apt-get update -q
         - sudo pip install texttable
-        - sudo apt-get install python-lxml doxygen -y
-        - pushd docs/api && make doxexport | grep -v "file loc from" && popd
-        #- git stash && git checkout $TRAVIS_BRANCH && git stash pop && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git fetch && git rebase -s origin/$TRAVIS_BRANCH && git push
+        - sudo pip install --allow-unverified pydot pydot==1.0.28
+        - sudo apt-get install graphviz python-lxml python-ipdb python-docutils doxygen -y
+        - pushd docs/api && cp /home/travis/build/testbot/docs.Makefile Makefile && make doxexport | grep -v "file loc from" && popd
+        - git stash && git pull origin $TRAVIS_BRANCH && git stash pop && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git push git@github.com:casadi/casadi.git $TRAVIS_BRANCH
     - compiler: clang
       os: linux
       env: TESTMODE=minimal
@@ -142,6 +143,13 @@ matrix:
         - git config --global push.default simple
         - git remote set-url origin git@github.com:casadi/casadi.git
         - ssh-agent bash -c 'ssh-add /home/travis/build/testbot/id_rsa_travis; git push origin HEAD:$TRAVIS_BRANCH'
+      after_success:
+        - cd /home/travis/build/
+        - git clone git@github.com:casadi/binaries.git
+        - pushd binaries && git checkout run && git submodule init && git submodule update&& popd
+        - pushd binaries/casadi && git checkout $TRAVIS_COMMIT && popd
+        - pushd binaries && git commit -a -m "automatic runner commit $TRAVIS_COMMIT" && git push origin run && popd
+
     - os: osx
       env: TESTMODE=minimal
       compiler: clang
@@ -166,8 +174,10 @@ matrix:
       os: linux
       script:
         - pushd /home/travis/build/
-        - testbot/recipes/fetch.sh matlabR2014b.tar.gz
-        - mkdir matlab && tar -xvf matlabR2014b.tar.gz -C matlab > /dev/null
+        - testbot/recipes/fetch.sh matlab2014b.tar.gz
+        - mkdir matlab && tar -xvf matlab2014b.tar.gz -C matlab > /dev/null
+        - testbot/recipes/fetch.sh toolbox-matlab.tar.gz
+        - tar -xvf toolbox-matlab.tar.gz -C matlab > /dev/null
         - ls -al /home/travis/build/
         - popd
         - mkdir build
@@ -208,5 +218,9 @@ before_install:
   - sudo add-apt-repository ppa:baltix-members/ppa -y #  for libslicot-dev
   - sudo apt-get update -qq
   - sudo apt-get install -y binutils gcc g++ gfortran git cmake liblapack-dev ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libblas-dev liblapack-dev libslicot-dev libxml2-dev
+  - sudo pip install github3.py
+ 
+after_failure:
+  - pushd /home/travis/build/testbot/ && python -c "from github3 import login;from testbotcredentials import TestBotCredentials;tbc = TestBotCredentials();login(*tbc.github).repository('casadi','casadi').create_comment(sha='$TRAVIS_COMMIT',body='Failure reported by [travis](https://travis-ci.org/casadi/casadi/jobs/$TRAVIS_JOB_ID) in $TRAVIS_COMMIT_RANGE -- $TRAVIS_TEST_RESULT')" && popd
 
 language: cpp
