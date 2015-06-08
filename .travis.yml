@@ -12,6 +12,7 @@ env:
     - SNOPT=/home/travis/build/snopt7
     - MATLABPATH=/home/travis/build/matlab-install
     - MATLAB_ROOT=/home/travis/build/matlab
+    - MATLABRELEASE=R2014b
 
 before_script:
   - set -e
@@ -174,8 +175,8 @@ matrix:
       os: linux
       script:
         - pushd /home/travis/build/
-        - testbot/recipes/fetch.sh matlab2014b.tar.gz
-        - mkdir matlab && tar -xvf matlab2014b.tar.gz -C matlab > /dev/null
+        - testbot/recipes/fetch.sh matlab$MATLABRELEASE.tar.gz
+        - mkdir matlab && tar -xvf matlab$MATLABRELEASE.tar.gz -C matlab > /dev/null
         - testbot/recipes/fetch.sh toolbox-matlab.tar.gz
         - tar -xvf toolbox-matlab.tar.gz -C matlab > /dev/null
         - ls -al /home/travis/build/
@@ -189,8 +190,8 @@ matrix:
         - source /home/travis/build/testbot/restricted/env.sh
         - sudo bash -c "echo '127.0.0.1	$FLEX_SERVER' >> /etc/hosts;echo '127.0.0.1	$FLEX_HOSTNAME' >> /etc/hosts"
         - sudo hostname $FLEX_HOSTNAME
-        - mkdir -p ~/.matlab/R2014b_licenses/
-        - echo -e "SERVER $FLEX_SERVER ANY 1715\nUSE_SERVER" > ~/.matlab/R2014b_licenses/license.lic
+        - mkdir -p ~/.matlab/${MATLABRELEASE}_licenses/
+        - echo -e "SERVER $FLEX_SERVER ANY 1715\nUSE_SERVER" > ~/.matlab/${$MATLABRELEASE}_licenses/license.lic
         - ssh-keyscan $GATE_SERVER >> ~/.ssh/known_hosts
         - ssh -i /home/travis/build/testbot/id_rsa_travis $USER_GATE@$GATE_SERVER -L 1701:$FLEX_SERVER:1701 -L 1719:$FLEX_SERVER:1719 -L 1718:$FLEX_SERVER:1718 -L 2015:$FLEX_SERVER:2015 -L 1815:$FLEX_SERVER:1815 -L 1715:$FLEX_SERVER:1715 -N &
         - sleep 3
