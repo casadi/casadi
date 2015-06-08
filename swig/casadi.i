@@ -975,36 +975,6 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
  }
 %enddef
 
-%define %casadi_typecheck_typemap_vector(xName, xPrec, xType...)
-%typemap(typecheck, noblock=1, precedence=xPrec) const std::vector< xType > & {
-  $1 = casadi::to_ptr($input, static_cast<std::vector< xType >**>(0));
- }
-%enddef
-
-%fragment("conv_genericmatrix", "header", fragment="is_a") {
-template<typename T>
-bool conv_genericmatrix(GUESTOBJECT *p, casadi::GenericMatrix< T >* &ptr, T &m,
-                        swig_type_info *type, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
-  if (is_null(p) || SWIG_ConvertPtr(p, (void **) &ptr, type, 0) == -1) {
-    if (!f(p, &m, 0)) return false;
-    ptr = &m;
-  }
-  return true;
- }
-}
-
-%define %casadi_in_typemap_genericmatrix(xName, xType...) 
-%typemap(in, noblock=1, fragment="conv_genericmatrix") const casadi::GenericMatrix< xType > & (xType m) {
-  if (!conv_genericmatrix($input, $1, m, $descriptor(xType *), to_##xName)) SWIG_exception_fail(SWIG_TypeError, "Input type conversion failure ($1_type)");
- }
-%enddef
-
-%define %casadi_typecheck_typemap_genericmatrix(xName, xPrec, xType...)
-%typemap(typecheck, noblock=1, precedence=xPrec, fragment="is_a") const casadi::GenericMatrix< xType > & {
-  $1 = is_a($input, $descriptor(xType *)) || to_##xName($input, 0);
- }
-%enddef
-
 %define %casadi_typemaps(xName, xPrec, xType...)
 %casadi_in_typemap(xName, xType)
 %casadi_freearg_typemap(xType)
@@ -1015,12 +985,6 @@ bool conv_genericmatrix(GUESTOBJECT *p, casadi::GenericMatrix< T >* &ptr, T &m,
 %casadi_in_typemap_constref(xName, xType)
 %casadi_freearg_typemap(const xType&)
 %casadi_typecheck_typemap_constref(xName, xPrec, xType)
-%enddef
-
-%define %casadi_typemaps_genericmatrix(xName, xPrec, xType...)
-%casadi_in_typemap_genericmatrix(xName, xType)
-%casadi_freearg_typemap(const casadi::GenericMatrix< xType >  &)
-%casadi_typecheck_typemap_genericmatrix(xName, xPrec, xType)
 %enddef
 
 #ifdef SWIGPYTHON
@@ -1202,7 +1166,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 // Forward declarations
 %fragment("fwd", "header",
-          fragment="vector_size,to_vector,make_vector,conv_constref,conv_genericmatrix"
+          fragment="vector_size,to_vector,make_vector,conv_constref"
 #ifdef SWIGMATLAB
           ,fragment="get_sparsity,get_nnz"
 #endif // SWIGMATLAB
@@ -2331,7 +2295,6 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
   }
  }
 %casadi_typemaps_constref(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
-%casadi_typemaps_genericmatrix(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
 %casadi_input_typemaps([SX], PRECEDENCE_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
 %casadi_input_typemaps([[SX]], PRECEDENCE_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
 
@@ -2400,7 +2363,6 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
   }
  }
 %casadi_typemaps_constref(MX, PRECEDENCE_MX, casadi::MX)
-%casadi_typemaps_genericmatrix(MX, PRECEDENCE_MX, casadi::MX)
 
  /* Maps are treated as dictionaries in the target language
     First instantiate the templates (no proxy classes needed)
@@ -2666,7 +2628,6 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
   }
 }
 %casadi_typemaps_constref(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
-%casadi_typemaps_genericmatrix(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
 %casadi_input_typemaps([MX], PRECEDENCE_MXVector, std::vector<casadi::MX>)
 
 
@@ -2836,7 +2797,6 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
 %casadi_input_typemaps([[DMatrix]], PRECEDENCE_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
 
 %casadi_typemaps_constref(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
-%casadi_typemaps_genericmatrix(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
 %casadi_input_typemaps([IMatrix], PRECEDENCE_IMatrixVector, std::vector< casadi::Matrix<int> >)
 %casadi_input_typemaps([[IMatrix]], PRECEDENCE_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
 
