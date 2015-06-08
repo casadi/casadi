@@ -1374,44 +1374,36 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     bool casptr(GUESTOBJECT *p, int** m) {
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal_int(p, m ? *m : 0))) return true;
-      // No match
-      return false;
-    }
-  } // namespace casadi
 
-  int to_int(GUESTOBJECT *p, void *mv, int offs) {
-    int *m = static_cast<int*>(mv);
-    if (m) m += offs;
-
-    // Refactored code
-    if (casadi::casptr(p, m ? &m : 0)) return true;
-
-    // Scalar IMatrix
-    if (is_a(p, type_IMatrix())) {
-      casadi::Matrix<int> *temp;
-      SWIG_ConvertPtr(p, (void **) &temp, type_IMatrix(), 0 );
-      if (temp->isScalar(true)) {
-        if (m) *m = temp->getIntValue();
-        return true;
+      // Scalar IMatrix
+      {
+        // Pointer to object
+        IMatrix *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                      $descriptor(casadi::Matrix<int>*), 0))) {
+          if (m2->isScalar(true)) {
+            if (m) **m = m2->getIntValue();
+            return true;
+          }
+        }
       }
-      return false;
-    }
+
 #ifdef SWIGPYTHON
     // Object has __int__ attribute
     if (PyObject_HasAttrString(p,"dtype")) {
-      PyObject *r = PyObject_GetAttrString(p,"dtype");
+      PyObject *r = PyObject_GetAttrString(p, "dtype");
       if (!PyObject_HasAttrString(r,"kind")) {
         Py_DECREF(r);
         return false;
       }
-      PyObject *k = PyObject_GetAttrString(r,"kind");
+      PyObject *k = PyObject_GetAttrString(r, "kind");
       if (!PyObject_HasAttrString(p,"__int__")) {
         Py_DECREF(k);
         Py_DECREF(r);
         return false;
       }
-      char name[] = "__int__";
-      PyObject *mm = PyObject_CallMethod(p, name,0);
+      char cmd[] = "__int__";
+      PyObject *mm = PyObject_CallMethod(p, cmd, 0);
       if (!mm) {
         PyErr_Clear();
         Py_DECREF(k);
@@ -1423,12 +1415,29 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       Py_DECREF(k);
       Py_DECREF(r);
       if (result) {
-        if (m) *m = PyLong_AsLong(mm);
+        if (m) **m = PyLong_AsLong(mm);
       }
       Py_DECREF(mm);
       return result;
     }
 #endif //SWIGPYTHON
+
+      // No match
+      return false;
+    }
+  } // namespace casadi
+
+  int to_int(GUESTOBJECT *p, void *mv, int offs) {
+    int *m = static_cast<int*>(mv);
+    if (m) m += offs;
+
+    // Call refactored version
+    int *m_orig = m;
+    if (casptr(p, m ? &m : 0)) {
+      if (m!=m_orig) *m_orig=*m;
+      return true;
+    }
+
     // Failure if reached this point
     return false;
   }
@@ -1442,6 +1451,65 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     bool casptr(GUESTOBJECT *p, double** m) {
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal_double(p, m ? *m : 0))) return true;
+
+      // Scalar DMatrix
+      {
+        // Pointer to object
+        DMatrix *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                      $descriptor(casadi::Matrix<double>*), 0))) {
+          if (m2->isScalar(true)) {
+            if (m) **m = m2->getValue();
+            return true;
+          }
+        }
+      }
+
+      // Scalar IMatrix
+      {
+        // Pointer to object
+        IMatrix *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                      $descriptor(casadi::Matrix<int>*), 0))) {
+          if (m2->isScalar(true)) {
+            if (m) **m = m2->getIntValue();
+            return true;
+          }
+        }
+      }
+
+#ifdef SWIGPYTHON
+      // Has dtype attribute
+      if (PyObject_HasAttrString(p, "dtype")) {
+        PyObject *r = PyObject_GetAttrString(p, "dtype");
+        if (!PyObject_HasAttrString(r, "kind")) {
+          Py_DECREF(r);
+          return false;
+        }
+        PyObject *k = PyObject_GetAttrString(r, "kind");
+        if (!PyObject_HasAttrString(p, "__float__")) {
+          Py_DECREF(k);
+          Py_DECREF(r);
+          return false;
+        }
+        char cmd[] = "__float__";
+        PyObject *mm = PyObject_CallMethod(p, cmd, 0);
+        if (!mm) {
+          PyErr_Clear();
+          Py_DECREF(k);
+          Py_DECREF(r);
+          return false;
+        }
+        char *kk = PyString_AsString(k);
+        bool result = kk[0]=='f' || kk[0]=='i';
+        Py_DECREF(k);
+        Py_DECREF(r); 
+        if (result && m) **m = PyFloat_AsDouble(mm);
+        Py_DECREF(mm);
+        return result;
+      }
+#endif //SWIGPYTHON
+
       // No match
       return false;
     }
@@ -1451,61 +1519,13 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     double *m = static_cast<double*>(mv);
     if (m) m += offs;
 
-    // Refactored code
-    if (casadi::casptr(p, m ? &m : 0)) return true;
-
-    // Scalar DMatrix
-    if (is_a(p, type_DMatrix())) {
-      casadi::Matrix<double> *ptr;
-      SWIG_ConvertPtr(p, (void **) &ptr, type_DMatrix(), 0 );
-      if (ptr->isScalar(true)) {
-        if (m) *m = ptr->getValue();
-        return true;
-      }
-      return false;
+    // Call refactored version
+    double *m_orig = m;
+    if (casptr(p, m ? &m : 0)) {
+      if (m!=m_orig) *m_orig=*m;
+      return true;
     }
 
-    // Scalar IMatrix
-    if (is_a(p, type_IMatrix())) {
-      casadi::Matrix<int> *ptr;
-      SWIG_ConvertPtr(p, (void **) &ptr, type_IMatrix(), 0 );
-      if (ptr->isScalar(true)) {
-        if (m) *m = ptr->getIntValue();
-        return true;
-      }
-      return false;
-    }
-#ifdef SWIGPYTHON
-    // Has dtype attribute
-    if (PyObject_HasAttrString(p,"dtype")) {
-      PyObject *r = PyObject_GetAttrString(p,"dtype");
-      if (!PyObject_HasAttrString(r,"kind")) {
-        Py_DECREF(r);
-        return false;
-      }
-      PyObject *k = PyObject_GetAttrString(r,"kind");
-      if (!PyObject_HasAttrString(p,"__float__")) {
-        Py_DECREF(k);
-        Py_DECREF(r);
-        return false;
-      }
-      char name[] = "__float__";
-      PyObject *mm = PyObject_CallMethod(p, name,NULL);
-      if (!mm) {
-        PyErr_Clear();
-        Py_DECREF(k);
-        Py_DECREF(r);
-        return false;
-      }
-      char *kk = PyString_AsString(k);
-      bool result = kk[0]=='f' || kk[0]=='i';
-      Py_DECREF(k);
-      Py_DECREF(r); 
-      if (result && m) *m = PyFloat_AsDouble(mm);
-      Py_DECREF(mm);
-      return result;
-    }
-#endif //SWIGPYTHON
     // Failure if reached this point
     return false;
   }
