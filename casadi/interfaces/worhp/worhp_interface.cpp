@@ -681,10 +681,10 @@ namespace casadi {
       Function& hessLag = this->hessLag();
 
       // Pass input
-      hessLag.setInput(x, HESSLAG_X);
+      hessLag.setInputNZ(x, HESSLAG_X);
       hessLag.setInput(input(NLP_SOLVER_P), HESSLAG_P);
       hessLag.setInput(obj_factor, HESSLAG_LAM_F);
-      hessLag.setInput(lambda, HESSLAG_LAM_G);
+      hessLag.setInputNZ(lambda, HESSLAG_LAM_G);
 
       // Evaluate
       hessLag.evaluate();
@@ -757,7 +757,7 @@ namespace casadi {
       double time1 = clock();
 
       // Pass the argument to the function
-      jacG.setInput(x, JACG_X);
+      jacG.setInputNZ(x, JACG_X);
       jacG.setInput(input(NLP_SOLVER_P), JACG_P);
 
       // Evaluate the function
@@ -792,7 +792,7 @@ namespace casadi {
       double time1 = clock();
 
       // Pass the argument to the function
-      nlp_.setInput(x, NL_X);
+      nlp_.setInputNZ(x, NL_X);
       nlp_.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate the function
@@ -829,7 +829,7 @@ namespace casadi {
 
       if (worhp_o_.m>0) {
         // Pass the argument to the function
-        nlp_.setInput(x, NL_X);
+        nlp_.setInputNZ(x, NL_X);
         nlp_.setInput(input(NLP_SOLVER_P), NL_P);
 
         // Evaluate the function and tape
@@ -865,7 +865,7 @@ namespace casadi {
       double time1 = clock();
 
       // Pass the argument to the function
-      gradF_.setInput(x, NL_X);
+      gradF_.setInputNZ(x, NL_X);
       gradF_.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate, adjoint mode

@@ -353,7 +353,7 @@ namespace casadi {
 
   void KnitroInterface::evalfc(const double* x, double& obj, double *c) {
     // Pass the argument to the function
-    nlp_.setInput(x, NL_X);
+    nlp_.setInputNZ(x, NL_X);
     nlp_.setInput(input(NLP_SOLVER_P), NL_P);
 
     // Evaluate the function
@@ -376,7 +376,7 @@ namespace casadi {
 
   void KnitroInterface::evalga(const double* x, double* objGrad, double* jac) {
     // Pass the argument to the function
-    gradF_.setInput(x, NL_X);
+    gradF_.setInputNZ(x, NL_X);
     gradF_.setInput(input(NLP_SOLVER_P), NL_P);
 
     // Evaluate the function using adjoint mode AD
@@ -393,7 +393,7 @@ namespace casadi {
 
     if (!jacG_.isNull()) {
       // Pass the argument to the Jacobian function
-      jacG_.setInput(x, NL_X);
+      jacG_.setInputNZ(x, NL_X);
       jacG_.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate the Jacobian function
@@ -412,10 +412,10 @@ namespace casadi {
 
   void KnitroInterface::evalh(const double* x, const double* lambda, double* hessian) {
     // Pass the argument to the function
-    hessLag_.setInput(x, NL_X);
+    hessLag_.setInputNZ(x, NL_X);
     hessLag_.setInput(input(NLP_SOLVER_P), NL_P);
     hessLag_.setInput(1.0, NL_NUM_IN+NL_F);
-    hessLag_.setInput(lambda, NL_NUM_IN+NL_G);
+    hessLag_.setInputNZ(lambda, NL_NUM_IN+NL_G);
 
     // Evaluate
     hessLag_.evaluate();

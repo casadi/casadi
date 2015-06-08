@@ -196,7 +196,7 @@ namespace casadi {
 
     // Solve for all right hand sides
     for (int i=0; i<nrhs; ++i) {
-      solv.setInput(x, 2);
+      solv.setInputNZ(x, 2);
       solv.evaluate();
       solv.getOutput(x);
       x += solv.output().nnz();

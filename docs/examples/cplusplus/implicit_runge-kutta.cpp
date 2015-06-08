@@ -182,7 +182,7 @@ int main(){
     Function dintegrator = integrator.derivative(2,1);
 
     // Pass arguments
-    dintegrator.setInput(x0_val,"der_x0");
+    dintegrator.setInputNZ(x0_val,"der_x0");
     dintegrator.setInput(p_val,"der_p");
   
     // Forward sensitivity analysis, first direction: seed p
@@ -191,12 +191,12 @@ int main(){
   
     // Forward sensitivity analysis, second direction: seed x0[0]
     double x0_seed[] = {1,0,0};
-    dintegrator.setInput(x0_seed,"fwd1_x0");
+    dintegrator.setInputNZ(x0_seed,"fwd1_x0");
     dintegrator.setInput(0.0,"fwd1_p");
   
     // Adjoint sensitivity analysis, seed xf[2]
     double xf_seed[] = {0,0,1};
-    dintegrator.setInput(xf_seed,"adj0_xf");
+    dintegrator.setInputNZ(xf_seed,"adj0_xf");
 
     // Integrate
     dintegrator.evaluate();

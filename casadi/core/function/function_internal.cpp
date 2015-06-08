@@ -1279,7 +1279,7 @@ namespace casadi {
     // Pass the inputs to the function
     for (int i=0; i<num_in; ++i) {
       if (arg[i] != 0) {
-        setInput(arg[i], i);
+        setInputNZ(arg[i], i);
       } else {
         setInput(0., i);
       }

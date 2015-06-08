@@ -301,7 +301,7 @@ namespace casadi {
     }
 
     // Get the solution
-    setOutput(NV_DATA_S(u_), iout_);
+    setOutputNZ(NV_DATA_S(u_), iout_);
 
     // Evaluate auxiliary outputs
     if (nOut()>0) {
@@ -325,7 +325,7 @@ namespace casadi {
     time1_ = clock();
 
     // Pass inputs
-    f_.setInput(NV_DATA_S(u), iin_);
+    f_.setInputNZ(NV_DATA_S(u), iin_);
     for (int i=0; i<nIn(); ++i)
       if (i!=iin_) f_.setInput(input(i), i);
 
@@ -401,7 +401,7 @@ namespace casadi {
     time1_ = clock();
 
     // Pass inputs to the Jacobian function
-    jac_.setInput(NV_DATA_S(u), iin_);
+    jac_.setInputNZ(NV_DATA_S(u), iin_);
     for (int i=0; i<nIn(); ++i)
       if (i!=iin_) jac_.setInput(input(i), i);
 
@@ -460,7 +460,7 @@ namespace casadi {
     time1_ = clock();
 
     // Pass inputs to the Jacobian function
-    jac_.setInput(NV_DATA_S(u), iin_);
+    jac_.setInputNZ(NV_DATA_S(u), iin_);
     for (int i=0; i<nIn(); ++i)
       if (i!=iin_) jac_.setInput(input(i), i);
 
@@ -509,12 +509,12 @@ namespace casadi {
     time1_ = clock();
 
     // Pass inputs
-    f_fwd_.setInput(NV_DATA_S(u), iin_);
+    f_fwd_.setInputNZ(NV_DATA_S(u), iin_);
     for (int i=0; i<nIn(); ++i)
       if (i!=iin_) f_fwd_.setInput(input(i), i);
 
     // Pass input seeds
-    f_fwd_.setInput(NV_DATA_S(v), nIn()+iin_);
+    f_fwd_.setInputNZ(NV_DATA_S(v), nIn()+iin_);
     for (int i=0; i<nIn(); ++i)
       if (i!=iin_) f_fwd_.setInput(0.0, nIn()+i);
 
@@ -548,7 +548,7 @@ namespace casadi {
     time1_ = clock();
 
     // Pass inputs
-    jac_.setInput(NV_DATA_S(u), iin_);
+    jac_.setInputNZ(NV_DATA_S(u), iin_);
     for (int i=0; i<nIn(); ++i)
       if (i!=iin_) jac_.setInput(input(i), i);
 

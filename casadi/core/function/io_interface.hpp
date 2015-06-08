@@ -182,6 +182,28 @@ namespace casadi {
 /// \endcond
 
 
+#define SETTERS_NZ_NEW(T) \
+    void setInput(T val, int iind=0); \
+    void setOutput(T val, int oind=0); \
+    void setOutput(T val, const std::string &oname); \
+    void setInputNZ(T val, int iind=0) { \
+      self().assertInit(); \
+      try { \
+        self().input(iind).setNZ(val); \
+      } catch(std::exception& e) { \
+        casadi_error(e.what() << "Occurred at iind = " << iind << "."); \
+      } \
+    } \
+    void setOutputNZ(T val, int oind=0) { \
+      self().assertInit(); self().output(oind).setNZ(val); \
+    } \
+    void setInputNZ(T val, const std::string &iname) { \
+      setInputNZ(val, self().inputIndex(iname)); \
+    } \
+    void setOutputNZ(T val, const std::string &oname) { \
+      setOutputNZ(val, self().outputIndex(oname)); \
+    }
+
 #define SETTERS_NZ(T)                                                              \
     void setInput(T val, int iind=0)                                            \
     { self().assertInit();                                              \
@@ -219,7 +241,7 @@ namespace casadi {
 #ifndef DOXYGENPROC
     SETTERS_SUB(double) // NOLINT(readability/casting) - false positive
 #ifndef SWIG
-    SETTERS_NZ(const double*)
+    SETTERS_NZ_NEW(const double*)
 #endif // SWIG
     SETTERS_NZ(const std::vector<double>&)
     SETTERS_SUB(const Matrix<double>&)

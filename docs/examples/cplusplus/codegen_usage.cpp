@@ -187,7 +187,7 @@ void usage_cplusplus(){
 
   // Use like any other CasADi function (note that derivatives are not supported)
   double x_val[] = {1,2,3,4};
-  ff.setInput(x_val,0);
+  ff.setInputNZ(x_val,0);
   double y_val = 5;
   ff.setInput(y_val,1);
 

@@ -55,7 +55,7 @@ namespace casadi {
   void Solve<Tr>::evalD(const double** arg, double** res,
                         int* iw, double* w) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-    linear_solver_.setInput(arg[1], LINSOL_A);
+    linear_solver_.setInputNZ(arg[1], LINSOL_A);
     linear_solver_.prepare();
     linear_solver_.solve(res[0], dep(0).size2(), Tr);
   }

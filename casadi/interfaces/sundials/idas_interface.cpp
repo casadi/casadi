@@ -506,9 +506,9 @@ namespace casadi {
     time1 = clock();
 
     // Pass input
-    f_.setInput(&t, DAE_T);
-    f_.setInput(xz, DAE_X);
-    f_.setInput(xz+nx_, DAE_Z);
+    f_.setInputNZ(&t, DAE_T);
+    f_.setInputNZ(xz, DAE_X);
+    f_.setInputNZ(xz+nx_, DAE_Z);
     f_.setInput(input(INTEGRATOR_P), DAE_P);
 
     if (monitored("res")) {
@@ -583,14 +583,14 @@ namespace casadi {
     time1 = clock();
 
     // Pass input
-    f_fwd_.setInput(&t,                  DAE_T);
-    f_fwd_.setInput(xz,                  DAE_X);
-    f_fwd_.setInput(xz+nx_,              DAE_Z);
+    f_fwd_.setInputNZ(&t,                  DAE_T);
+    f_fwd_.setInputNZ(xz,                  DAE_X);
+    f_fwd_.setInputNZ(xz+nx_,              DAE_Z);
     f_fwd_.setInput(input(INTEGRATOR_P), DAE_P);
 
     // Pass seeds of the state vectors
-    f_fwd_.setInput(v,      DAE_NUM_IN + DAE_X);
-    f_fwd_.setInput(v+nx_,  DAE_NUM_IN + DAE_Z);
+    f_fwd_.setInputNZ(v,      DAE_NUM_IN + DAE_X);
+    f_fwd_.setInputNZ(v+nx_,  DAE_NUM_IN + DAE_Z);
 
     // Evaluate the AD forward algorithm
     f_fwd_.evaluate();
@@ -632,13 +632,13 @@ namespace casadi {
     time1 = clock();
 
     // Pass input
-    g_fwd_.setInput(&t,                  RDAE_T);
-    g_fwd_.setInput(xz,                  RDAE_X);
-    g_fwd_.setInput(xz+nx_,              RDAE_Z);
+    g_fwd_.setInputNZ(&t,                  RDAE_T);
+    g_fwd_.setInputNZ(xz,                  RDAE_X);
+    g_fwd_.setInputNZ(xz+nx_,              RDAE_Z);
     g_fwd_.setInput(input(INTEGRATOR_P), RDAE_P);
 
-    g_fwd_.setInput(xzB,                 RDAE_RX);
-    g_fwd_.setInput(xzB+nrx_,            RDAE_RZ);
+    g_fwd_.setInputNZ(xzB,                 RDAE_RX);
+    g_fwd_.setInputNZ(xzB+nrx_,            RDAE_RZ);
     g_fwd_.setInput(input(INTEGRATOR_RP), RDAE_RP);
 
     // Pass seeds of the state vectors
@@ -646,8 +646,8 @@ namespace casadi {
     g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_X);
     g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_Z);
     g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_P);
-    g_fwd_.setInput(vB,     RDAE_NUM_IN + RDAE_RX);
-    g_fwd_.setInput(vB+nx_, RDAE_NUM_IN + RDAE_RZ);
+    g_fwd_.setInputNZ(vB,     RDAE_NUM_IN + RDAE_RX);
+    g_fwd_.setInputNZ(vB+nx_, RDAE_NUM_IN + RDAE_RZ);
     g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_RP);
 
     if (monitored("jtimesB")) {
@@ -690,8 +690,8 @@ namespace casadi {
     }
 
     if (monitored("jtimesB")) {
-      g_fwd_.setOutput(JvB,     RDAE_NUM_OUT + RDAE_ODE);
-      g_fwd_.setOutput(JvB+nx_, RDAE_NUM_OUT + RDAE_ALG);
+      g_fwd_.setOutputNZ(JvB,     RDAE_NUM_OUT + RDAE_ODE);
+      g_fwd_.setOutputNZ(JvB+nx_, RDAE_NUM_OUT + RDAE_ALG);
       cout << "res fwdSens(RDAE_ODE)    = " << g_fwd_.output(RDAE_NUM_OUT + RDAE_ODE) << endl;
       cout << "res fwdSens(RDAE_ALG)    = " << g_fwd_.output(RDAE_NUM_OUT + RDAE_ALG) << endl;
     }
@@ -731,9 +731,9 @@ namespace casadi {
     casadi_error("Commented out, #884, #794.");
 
     // // Pass input
-    // f_.setInput(&t, DAE_T);
-    // f_.setInput(xz, DAE_X);
-    // f_.setInput(xz+nx_, DAE_Z);
+    // f_.setInputNZ(&t, DAE_T);
+    // f_.setInputNZ(xz, DAE_X);
+    // f_.setInputNZ(xz+nx_, DAE_Z);
     // f_.setInput(input(INTEGRATOR_P), DAE_P);
 
     // // Calculate the forward sensitivities, nfdir_f_ directions at a time
@@ -1178,9 +1178,9 @@ namespace casadi {
   void IdasInterface::rhsQ(double t, const double* xz, const double* xzdot, double* rhsQ) {
     log("IdasInterface::rhsQ", "begin");
     // Pass input
-    f_.setInput(&t, DAE_T);
-    f_.setInput(xz, DAE_X);
-    f_.setInput(xz+nx_, DAE_Z);
+    f_.setInputNZ(&t, DAE_T);
+    f_.setInputNZ(xz, DAE_X);
+    f_.setInputNZ(xz+nx_, DAE_Z);
     f_.setInput(input(INTEGRATOR_P), DAE_P);
 
     // Evaluate
@@ -1202,9 +1202,9 @@ namespace casadi {
     casadi_error("Commented out, #884, #794.");
 
     // // Pass input
-    //  f_.setInput(&t, DAE_T);
-    //  f_.setInput(NV_DATA_S(xz), DAE_X);
-    //  f_.setInput(NV_DATA_S(xz)+nx_, DAE_Z);
+    //  f_.setInputNZ(&t, DAE_T);
+    //  f_.setInputNZ(NV_DATA_S(xz), DAE_X);
+    //  f_.setInputNZ(NV_DATA_S(xz)+nx_, DAE_Z);
     //  f_.setInput(input(INTEGRATOR_P), DAE_P);
 
     //  // Pass forward seeds
@@ -1242,13 +1242,13 @@ namespace casadi {
     log("IdasInterface::resB", "begin");
 
     // Pass inputs
-    g_.setInput(&t, RDAE_T);
-    g_.setInput(xz, RDAE_X);
-    g_.setInput(xz+nx_, RDAE_Z);
+    g_.setInputNZ(&t, RDAE_T);
+    g_.setInputNZ(xz, RDAE_X);
+    g_.setInputNZ(xz+nx_, RDAE_Z);
     g_.setInput(input(INTEGRATOR_P), RDAE_P);
     g_.setInput(input(INTEGRATOR_RP), RDAE_RP);
-    g_.setInput(xzA, RDAE_RX);
-    g_.setInput(xzA+nrx_, RDAE_RZ);
+    g_.setInputNZ(xzA, RDAE_RX);
+    g_.setInputNZ(xzA+nrx_, RDAE_RZ);
 
     if (monitored("resB")) {
       cout << "RDAE_T    = " << t << endl;
@@ -1288,8 +1288,8 @@ namespace casadi {
     }
 
     if (monitored("resB")) {
-      g_.setOutput(rrA, RDAE_ODE);
-      g_.setOutput(rrA+nrx_, RDAE_ALG);
+      g_.setOutputNZ(rrA, RDAE_ODE);
+      g_.setOutputNZ(rrA+nrx_, RDAE_ALG);
       cout << "res ODE    = " << g_.output(RDAE_ODE) << endl;
       cout << "res ALG    = " << g_.output(RDAE_ALG) << endl;
     }
@@ -1316,13 +1316,13 @@ namespace casadi {
     log("IdasInterface::rhsQB", "begin");
 
     // Pass inputs
-    g_.setInput(&t, RDAE_T);
-    g_.setInput(xz, RDAE_X);
-    g_.setInput(xz+nx_, RDAE_Z);
+    g_.setInputNZ(&t, RDAE_T);
+    g_.setInputNZ(xz, RDAE_X);
+    g_.setInputNZ(xz+nx_, RDAE_Z);
     g_.setInput(input(INTEGRATOR_P), RDAE_P);
     g_.setInput(input(INTEGRATOR_RP), RDAE_RP);
-    g_.setInput(xzA, RDAE_RX);
-    g_.setInput(xzA+nrx_, RDAE_RZ);
+    g_.setInputNZ(xzA, RDAE_RX);
+    g_.setInputNZ(xzA+nrx_, RDAE_RZ);
 
     // Evaluate
     g_.evaluate();
@@ -1370,9 +1370,9 @@ namespace casadi {
     time1 = clock();
 
     // Pass input to the Jacobian function
-    jac_.setInput(&t, DAE_T);
-    jac_.setInput(NV_DATA_S(xz), DAE_X);
-    jac_.setInput(NV_DATA_S(xz)+nx_, DAE_Z);
+    jac_.setInputNZ(&t, DAE_T);
+    jac_.setInputNZ(NV_DATA_S(xz), DAE_X);
+    jac_.setInputNZ(NV_DATA_S(xz)+nx_, DAE_Z);
     jac_.setInput(input(INTEGRATOR_P), DAE_P);
     jac_.setInput(cj, DAE_NUM_IN);
 
@@ -1426,13 +1426,13 @@ namespace casadi {
     time1 = clock();
 
     // Pass input to the Jacobian function
-    jacB_.setInput(&t, RDAE_T);
-    jacB_.setInput(NV_DATA_S(xz), RDAE_X);
-    jacB_.setInput(NV_DATA_S(xz)+nx_, RDAE_Z);
+    jacB_.setInputNZ(&t, RDAE_T);
+    jacB_.setInputNZ(NV_DATA_S(xz), RDAE_X);
+    jacB_.setInputNZ(NV_DATA_S(xz)+nx_, RDAE_Z);
     jacB_.setInput(input(INTEGRATOR_P), RDAE_P);
     jacB_.setInput(input(INTEGRATOR_RP), RDAE_RP);
-    jacB_.setInput(NV_DATA_S(xzB), RDAE_RX);
-    jacB_.setInput(NV_DATA_S(xzB)+nrx_, RDAE_RZ);
+    jacB_.setInputNZ(NV_DATA_S(xzB), RDAE_RX);
+    jacB_.setInputNZ(NV_DATA_S(xzB)+nrx_, RDAE_RZ);
     jacB_.setInput(cjB, RDAE_NUM_IN);
 
     if (monitored("djacB")) {
@@ -1510,9 +1510,9 @@ namespace casadi {
     time1 = clock();
 
     // Pass input to the jacobian function
-    jac_.setInput(&t, DAE_T);
-    jac_.setInput(NV_DATA_S(xz), DAE_X);
-    jac_.setInput(NV_DATA_S(xz)+nx_, DAE_Z);
+    jac_.setInputNZ(&t, DAE_T);
+    jac_.setInputNZ(NV_DATA_S(xz), DAE_X);
+    jac_.setInputNZ(NV_DATA_S(xz)+nx_, DAE_Z);
     jac_.setInput(input(INTEGRATOR_P), DAE_P);
     jac_.setInput(cj, DAE_NUM_IN);
 
@@ -1568,13 +1568,13 @@ namespace casadi {
     time1 = clock();
 
     // Pass input to the Jacobian function
-    jacB_.setInput(&t, RDAE_T);
-    jacB_.setInput(NV_DATA_S(xz), RDAE_X);
-    jacB_.setInput(NV_DATA_S(xz)+nx_, RDAE_Z);
+    jacB_.setInputNZ(&t, RDAE_T);
+    jacB_.setInputNZ(NV_DATA_S(xz), RDAE_X);
+    jacB_.setInputNZ(NV_DATA_S(xz)+nx_, RDAE_Z);
     jacB_.setInput(input(INTEGRATOR_P), RDAE_P);
     jacB_.setInput(input(INTEGRATOR_RP), RDAE_RP);
-    jacB_.setInput(NV_DATA_S(xzB), RDAE_RX);
-    jacB_.setInput(NV_DATA_S(xzB)+nrx_, RDAE_RZ);
+    jacB_.setInputNZ(NV_DATA_S(xzB), RDAE_RX);
+    jacB_.setInputNZ(NV_DATA_S(xzB)+nrx_, RDAE_RZ);
     jacB_.setInput(cjB, RDAE_NUM_IN);
 
     if (monitored("bjacB")) {
@@ -1785,9 +1785,9 @@ namespace casadi {
     time1 = clock();
 
     // Pass input to the jacobian function
-    jac_.setInput(&t, DAE_T);
-    jac_.setInput(NV_DATA_S(xz), DAE_X);
-    jac_.setInput(NV_DATA_S(xz)+nx_, DAE_Z);
+    jac_.setInputNZ(&t, DAE_T);
+    jac_.setInputNZ(NV_DATA_S(xz), DAE_X);
+    jac_.setInputNZ(NV_DATA_S(xz)+nx_, DAE_Z);
     jac_.setInput(input(INTEGRATOR_P), DAE_P);
     jac_.setInput(cj, DAE_NUM_IN);
 
@@ -1835,13 +1835,13 @@ namespace casadi {
     time1 = clock();
 
     // Pass input to the Jacobian function
-    jacB_.setInput(&t, RDAE_T);
-    jacB_.setInput(NV_DATA_S(xz), RDAE_X);
-    jacB_.setInput(NV_DATA_S(xz)+nx_, RDAE_Z);
+    jacB_.setInputNZ(&t, RDAE_T);
+    jacB_.setInputNZ(NV_DATA_S(xz), RDAE_X);
+    jacB_.setInputNZ(NV_DATA_S(xz)+nx_, RDAE_Z);
     jacB_.setInput(input(INTEGRATOR_P), RDAE_P);
     jacB_.setInput(input(INTEGRATOR_RP), RDAE_RP);
-    jacB_.setInput(NV_DATA_S(xzB), RDAE_RX);
-    jacB_.setInput(NV_DATA_S(xzB)+nrx_, RDAE_RZ);
+    jacB_.setInputNZ(NV_DATA_S(xzB), RDAE_RX);
+    jacB_.setInputNZ(NV_DATA_S(xzB)+nrx_, RDAE_RZ);
     jacB_.setInput(cjB, RDAE_NUM_IN);
 
     if (monitored("psetupB")) {
