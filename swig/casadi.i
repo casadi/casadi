@@ -959,13 +959,6 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
  }
 %enddef
 
-%define %casadi_in_typemap_vector(xName,xType...)
-%typemap(in, noblock=1) const std::vector< xType > & (std::vector< xType > m) {
-  $1=&m;
-  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to std::vector<xName>.");
- }
-%enddef
-
 %define %casadi_freearg_typemap(xType...)
 %typemap(freearg, noblock=1) xType {}
 %enddef
@@ -1022,12 +1015,6 @@ bool conv_genericmatrix(GUESTOBJECT *p, casadi::GenericMatrix< T >* &ptr, T &m,
 %casadi_in_typemap_constref(xName, xType)
 %casadi_freearg_typemap(const xType&)
 %casadi_typecheck_typemap_constref(xName, xPrec, xType)
-%enddef
-
-%define %casadi_typemaps_vector(xName, xPrec, xType...)
-%casadi_in_typemap_vector(xName, xType)
-%casadi_freearg_typemap(const std::vector< xType >&)
-%casadi_typecheck_typemap_vector(xName, xPrec, xType)
 %enddef
 
 %define %casadi_typemaps_genericmatrix(xName, xPrec, xType...)
@@ -2345,7 +2332,7 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
  }
 %casadi_typemaps_constref(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
 %casadi_typemaps_genericmatrix(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
-%casadi_typemaps_vector(SX, PRECEDENCE_SXVector, casadi::Matrix<casadi::SXElement>)
+%casadi_input_typemaps([SX], PRECEDENCE_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
 %casadi_input_typemaps([[SX]], PRECEDENCE_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
 
 %fragment("to"{MX}, "header", fragment="fwd") {
@@ -2680,7 +2667,8 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
 }
 %casadi_typemaps_constref(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
 %casadi_typemaps_genericmatrix(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
-%casadi_typemaps_vector(MX, PRECEDENCE_MXVector, casadi::MX)
+%casadi_input_typemaps([MX], PRECEDENCE_MXVector, std::vector<casadi::MX>)
+
 
 %fragment("to"{IMatrix}, "header", fragment="fwd,make_vector") {
   // Traits specialization for IMatrix
@@ -2841,17 +2829,18 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
     return false;
   }
  }
-%casadi_typemaps_constref(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
-%casadi_typemaps_genericmatrix(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
+
 %casadi_input_typemaps([[MX]], PRECEDENCE_MXVectorVector, std::vector<std::vector<casadi::MX> >)
 
-%casadi_typemaps_vector(DMatrix, PRECEDENCE_DMatrixVector, casadi::Matrix<double>)
+%casadi_input_typemaps([DMatrix], PRECEDENCE_DMatrixVector, std::vector< casadi::Matrix<double> >)
 %casadi_input_typemaps([[DMatrix]], PRECEDENCE_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
 
-%casadi_typemaps_vector(IMatrix, PRECEDENCE_IMatrixVector, casadi::Matrix<int>)
+%casadi_typemaps_constref(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
+%casadi_typemaps_genericmatrix(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
+%casadi_input_typemaps([IMatrix], PRECEDENCE_IMatrixVector, std::vector< casadi::Matrix<int> >)
 %casadi_input_typemaps([[IMatrix]], PRECEDENCE_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
 
-%casadi_typemaps_vector(IVector, PRECEDENCE_IVectorVector, std::vector<int>)
+%casadi_input_typemaps([[int]], PRECEDENCE_IVectorVector, std::vector<std::vector<int> >)
 
 %define %my_value_output_typemaps(Type,...)
 %value_output_typemap(%arg(swig::from), %arg(SWIG_Traits_frag(Type)), %arg(Type));
@@ -3313,7 +3302,7 @@ VECTOR_TOOLS_TEMPLATES(double)
 %include <casadi/core/generic_type.hpp>
 
 %casadi_typemaps_constref(GenericType, PRECEDENCE_GENERICTYPE, casadi::GenericType)
-%casadi_typemaps_vector(GenericType, PRECEDENCE_GENERICTYPE, casadi::GenericType)
+%casadi_input_typemaps([GenericType], PRECEDENCE_GENERICTYPE, std::vector<casadi::GenericType>)
 
 %include <casadi/core/options_functionality.hpp>
 
