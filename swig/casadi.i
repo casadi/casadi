@@ -1173,6 +1173,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     bool casptr(GUESTOBJECT *p, SX** m);
     bool casptr(GUESTOBJECT *p, DMatrix** m);
     bool casptr(GUESTOBJECT *p, IMatrix** m);
+    template<typename M>  bool casptr(GUESTOBJECT *p, std::map<std::string, M>** m);
   } // namespace casadi
 
   int to_int(GUESTOBJECT *p, void *mv, int offs=0);
@@ -1631,24 +1632,37 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 }
 
 %fragment("to"{Map}, "header", fragment="fwd") {
-  template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m) {
+  namespace casadi {
+    template<typename M> bool casptr(GUESTOBJECT *p, std::map<std::string, M>** m) {
 #ifdef SWIGPYTHON
-    if (PyDict_Check(p)) {
-      PyObject *key, *value;
-      Py_ssize_t pos = 0;
-      while (PyDict_Next(p, &pos, &key, &value)) {
-        if (!PyString_Check(key)) return false;
-        if (m) {
-          M *v=&(*m)[std::string(PyString_AsString(key))], *v2=v;
-          if (!casadi::casptr(value, &v)) return false;
-          if (v!=v2) *v2=*v; // if only pointer changed
-        } else {
-          if (!casadi::casptr(value, static_cast<M**>(0))) return false;
+      if (PyDict_Check(p)) {
+        PyObject *key, *value;
+        Py_ssize_t pos = 0;
+        while (PyDict_Next(p, &pos, &key, &value)) {
+          if (!PyString_Check(key)) return false;
+          if (m) {
+            M *v=&(**m)[std::string(PyString_AsString(key))], *v2=v;
+            if (!casadi::casptr(value, &v)) return false;
+            if (v!=v2) *v2=*v; // if only pointer changed
+          } else {
+            if (!casadi::casptr(value, static_cast<M**>(0))) return false;
+          }
         }
+        return true;
       }
+#endif // SWIGPYTHON
+      return false;
+    }
+  } // namespace casadi
+
+  template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m) {
+    // Call refactored version
+    std::map<std::string, M> *m_orig=m;
+    if (casadi::casptr(p, m ? &m : 0)) {
+      if (m!=m_orig) *m_orig=*m;
       return true;
     }
-#endif // SWIGPYTHON
+
     return false;
   }
  }
@@ -2493,9 +2507,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 
       /* { */
-      /*   std::vector<double> tmp, *tmp_ptr=m ? &tmp : 0; */
-      /*   if (SWIG_IsOK(swig::asval(p, tmp_ptr))) { */
-      /*     if (m) *m = tmp.empty() ? DMatrix() : DMatrix(tmp); */
+      /*   std::vector<double> tmp, *mp=m ? &tmp : 0; */
+      /*   if (SWIG_IsOK(swig::asptr(p, mp ? &mp : 0))) { */
+      /*     if (m) **m = mp->empty() ? DMatrix() : DMatrix(*mp); */
       /*     return true; */
       /*   } */
       /* } */
