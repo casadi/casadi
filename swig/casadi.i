@@ -3333,29 +3333,25 @@ namespace casadi{
 
 %include <casadi/core/matrix/slice.hpp>
 
-namespace casadi{
-
-#ifndef SWIGXML
-
 %fragment("to"{Slice}, "header", fragment="fwd") {
-   int to_Slice(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::Slice *m = static_cast<casadi::Slice*>(mv);
-    if (m) m += offs;
-    // CasADi-Slice already
-    if (is_a(p, $descriptor(casadi::Slice *))) {
-      casadi::Slice *mp;
-      if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Slice *), 0) == -1)
-        return false;
-      if(m) *m = *mp;
-      return true;
-    }
+  namespace casadi {
+    bool to_ptr(GUESTOBJECT *p, Slice** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // Callback already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::Slice*), 0))) {
+        return true;
+      }
+
 #ifdef SWIGPYTHON
     // Python int
     if (PyInt_Check(p)) {
       if (m) {
-        m->start_ = PyInt_AsLong(p);
-        m->stop_ = m->start_+1;
-        if (m->stop_==0) m->stop_ = std::numeric_limits<int>::max();
+        (**m).start_ = PyInt_AsLong(p);
+        (**m).stop_ = (**m).start_+1;
+        if ((**m).stop_==0) (**m).stop_ = std::numeric_limits<int>::max();
       }
       return true;
     }
@@ -3363,11 +3359,11 @@ namespace casadi{
     if (PySlice_Check(p)) {
       PySliceObject *r = (PySliceObject*)(p);
       if (m) {
-        m->start_ = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min()) 
+        (**m).start_ = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min()) 
           ? std::numeric_limits<int>::min() : PyInt_AsLong(r->start);
-        m->stop_  = (r->stop ==Py_None || PyInt_AsLong(r->stop)> std::numeric_limits<int>::max())
+        (**m).stop_  = (r->stop ==Py_None || PyInt_AsLong(r->stop)> std::numeric_limits<int>::max())
           ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop);
-        if(r->step !=Py_None) m->step_  = PyInt_AsLong(r->step);
+        if(r->step !=Py_None) (**m).step_  = PyInt_AsLong(r->step);
       }
       return true;
     }
@@ -3377,20 +3373,29 @@ namespace casadi{
       char ch;
       if(mxGetString(p, &ch,(mwSize)sizeof(&ch))) return SWIG_TypeError;
       if (ch==':') {
-        if (m) *m = casadi::Slice();
+        if (m) **m = casadi::Slice();
         return true;
       }
     }
 #endif // SWIGMATLAB
-    // Failure if reached this point
+
+      // No match
+      return false;
+    }
+  } // namespace casadi
+
+  int to_Slice(GUESTOBJECT *p, void *mv, int offs) {
+    casadi::Slice *m = static_cast<casadi::Slice*>(mv);
+    if (m) m += offs;
+
+    // Call refactored version
+    if (to_val(p, m)) return true;
+
     return false;
   }
-}
+ }
 %casadi_typemaps_constref(Slice, PRECEDENCE_SLICE, casadi::Slice)
 
-#endif // SWIGXML
-
-} // namespace casadi
 %include <casadi/core/matrix/generic_expression_tools.hpp>
 
 // map the template name to the instantiated name
