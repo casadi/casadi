@@ -1837,8 +1837,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %my_creator_typemap(PRECEDENCE_CREATOR, casadi::implicitFunctionCreator);
 %my_creator_typemap(PRECEDENCE_CREATOR, casadi::linearSolverCreator);
 
-#ifdef SWIGPYTHON
 %fragment("to"{DerivativeGenerator}, "header", fragment="fwd", fragment="to"{Function}) {
+#ifdef SWIGPYTHON
   namespace casadi {
     Function DerivativeGeneratorPythonInternal::call(Function& fcn, int ndir, void* user_data) {
       casadi_assert(p_!=0);
@@ -1866,6 +1866,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       }
     }
   } // namespace casadi
+#endif // SWIGPYTHON
 
   int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
     casadi::DerivativeGenerator *m = static_cast<casadi::DerivativeGenerator*>(mv);
@@ -1875,6 +1876,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       if (m) *m=*mp;
       return true;
     }
+#ifdef SWIGPYTHON
     PyObject* return_type = getReturnType(p);
     if (!return_type) return false;
     PyObject* function = getCasadiObject("Function");
@@ -1886,12 +1888,14 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       if (m) *m = casadi::DerivativeGeneratorPython(p);
       return true;
     }
+#endif // SWIGPYTHON
     return false;
   }
  }
 %casadi_typemaps_constref(DerivativeGenerator, PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
 
 %fragment("to"{CustomEvaluate}, "header", fragment="fwd") {
+#ifdef SWIGPYTHON
   namespace casadi {
     void CustomEvaluatePythonInternal::call(CustomFunction& fcn, void* user_data) {
       casadi_assert(p_!=0);
@@ -1907,6 +1911,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       Py_DECREF(r);
     }
   } // namespace casadi
+#endif // SWIGPYTHON
 
   int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs) {
     casadi::CustomEvaluate *m = static_cast<casadi::CustomEvaluate*>(mv);
@@ -1916,6 +1921,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       if (m) *m=*mp;
       return true;
     }
+#ifdef SWIGPYTHON
     PyObject* return_type = getReturnType(p);
     bool res = (return_type==Py_None) || !return_type;
     if (return_type) Py_DECREF(return_type);
@@ -1923,11 +1929,14 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       if (m) *m = casadi::CustomEvaluatePython(p);
     }
     return res;
+#endif // SWIGPYTHON
+    return false;
   }
  }
 %casadi_typemaps_constref(CustomEvaluate, PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
 
 %fragment("to"{Callback}, "header", fragment="fwd") {
+#ifdef SWIGPYTHON
   namespace casadi {
     int CallbackPythonInternal::call(Function& fcn, void* user_data) {
       casadi_assert(p_!=0);
@@ -1946,10 +1955,13 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return ret;
     }  
   } // namespace casadi
+#endif // SWIGPYTHON
 
   int to_Callback(GUESTOBJECT *p, void *mv, int offs) {
     casadi::Callback *m = static_cast<casadi::Callback*>(mv);
     if (m) m += offs;
+
+#ifdef SWIGPYTHON
     casadi::Callback *mp = 0;
     if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Callback *), 0) != -1) {
       if (m) *m=*mp;
@@ -1963,11 +1975,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       if (m) *m = casadi::CallbackPython(p);
       return true;
     }
+#endif // SWIGPYTHON
     return false;
   }
  }
 %casadi_typemaps_constref(Callback, PRECEDENCE_CALLBACK, casadi::Callback)
-#endif
 
 %fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string},
           fragment="to"{IVector}, fragment="to"{DVector}, fragment="to"{Function}) {
@@ -2089,7 +2101,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   }
  }
 
-#ifdef SWIGPYTHON
 %fragment("to"{Dict}, "header", fragment="fwd") {
   // Traits specialization for Dict
   namespace casadi {
@@ -2138,7 +2149,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   }
  }
 %casadi_typemaps_constref(Dict, PRECEDENCE_DICT, casadi::GenericType::Dict)
-#endif
 
 %fragment("to"{SX}, "header", fragment="fwd") {
   // Traits specialization for SX
