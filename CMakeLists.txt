@@ -482,7 +482,7 @@ add_feature_info(slicot-interface SLICOT_FOUND "Interface to the controls librar
 if(WITH_WORHP)
   find_package(WORHP)
 endif()
-add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp (requires LibXml2, wsmp, metis, blas, lapack).")
+add_feature_info(worhp-interface WORHP_FOUND "Interface to the NLP solver Worhp (requires gfortran, gomp).")
 
 
 if(WITH_PROFILING)
