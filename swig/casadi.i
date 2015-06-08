@@ -1936,23 +1936,38 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
   } // namespace casadi
 #endif // SWIGPYTHON
 
+  namespace casadi {
+    bool to_ptr(GUESTOBJECT *p, CustomEvaluate** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // Callback already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::CustomEvaluate*), 0))) {
+        return true;
+      }
+
+#ifdef SWIGPYTHON
+      PyObject* return_type = getReturnType(p);
+      bool res = (return_type==Py_None) || !return_type;
+      if (return_type) Py_DECREF(return_type);
+      if (res) {
+        if (m) **m = casadi::CustomEvaluatePython(p);
+      }
+      return res;
+#endif // SWIGPYTHON
+      // No match
+      return false;
+    }
+  } // namespace casadi
+
   int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs) {
     casadi::CustomEvaluate *m = static_cast<casadi::CustomEvaluate*>(mv);
     if (m) m += offs;
-    casadi::CustomEvaluate *mp = 0;
-    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::CustomEvaluate *), 0) != -1) {
-      if (m) *m=*mp;
-      return true;
-    }
-#ifdef SWIGPYTHON
-    PyObject* return_type = getReturnType(p);
-    bool res = (return_type==Py_None) || !return_type;
-    if (return_type) Py_DECREF(return_type);
-    if (res) {
-      if (m) *m = casadi::CustomEvaluatePython(p);
-    }
-    return res;
-#endif // SWIGPYTHON
+
+    // Call refactored version
+    if (to_val(p, m)) return true;
+
     return false;
   }
  }
