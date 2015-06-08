@@ -1290,7 +1290,7 @@ namespace casadi {
 
     // Get the outputs
     for (int i=0; i<num_out; ++i) {
-      if (res[i] != 0) getOutput(res[i], i);
+      if (res[i] != 0) getOutputNZ(res[i], i);
     }
   }
 

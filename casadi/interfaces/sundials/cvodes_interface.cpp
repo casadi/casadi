@@ -393,7 +393,7 @@ namespace casadi {
     }
 
     // Get results
-    f_.getOutput(xdot);
+    f_.getOutputNZ(xdot);
 
     // Log time
     time2 = clock();
@@ -843,7 +843,7 @@ namespace casadi {
     f_.evaluate();
 
     // Get results
-    f_.getOutput(qdot, DAE_QUAD);
+    f_.getOutputNZ(qdot, DAE_QUAD);
   }
 
   void CvodesInterface::rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
@@ -913,7 +913,7 @@ namespace casadi {
     g_.evaluate();
 
     // Save to output
-    g_.getOutput(rxdot, RDAE_ODE);
+    g_.getOutputNZ(rxdot, RDAE_ODE);
 
     if (monitor_rhsB_) {
       cout << "xdotB = " << g_.output(RDAE_ODE) << endl;
@@ -959,7 +959,7 @@ namespace casadi {
     // double *rxdot_data = NV_DATA_S(rxdot);
 
     // // Get the backward right hand side
-    // g_.getOutput(rxdot_data, RDAE_ODE); rxdot_data += nrx_;
+    // g_.getOutputNZ(rxdot_data, RDAE_ODE); rxdot_data += nrx_;
 
     // // Get forward sensitivities
     // for (int dir=0; dir<nfdir_; ++dir) {
@@ -1030,7 +1030,7 @@ namespace casadi {
     g_.evaluate();
 
     // Save to output
-    g_.getOutput(rqdot, RDAE_QUAD);
+    g_.getOutputNZ(rqdot, RDAE_QUAD);
 
     if (monitor_rhsB_) {
       cout << "qdotB = " << g_.output(RDAE_QUAD) << endl;
@@ -1092,7 +1092,7 @@ namespace casadi {
     f_fwd_.evaluate();
 
     // Get the output seeds
-    f_fwd_.getOutput(NV_DATA_S(Jv), DAE_NUM_OUT + DAE_ODE);
+    f_fwd_.getOutputNZ(NV_DATA_S(Jv), DAE_NUM_OUT + DAE_ODE);
 
     // Log time duration
     time2 = clock();
@@ -1125,7 +1125,7 @@ namespace casadi {
     g_fwd_.evaluate();
 
     // Get the output seeds
-    g_fwd_.getOutput(NV_DATA_S(JvB), RDAE_NUM_OUT + RDAE_ODE);
+    g_fwd_.getOutputNZ(NV_DATA_S(JvB), RDAE_NUM_OUT + RDAE_ODE);
 
     // Log time duration
     time2 = clock();

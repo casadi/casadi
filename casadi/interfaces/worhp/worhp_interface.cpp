@@ -836,7 +836,7 @@ namespace casadi {
         nlp_.evaluate();
 
         // Ge the result
-        nlp_.getOutput(g, NL_G);
+        nlp_.getOutputNZ(g, NL_G);
 
         // Printing
         if (monitored("eval_g")) {

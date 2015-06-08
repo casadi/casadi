@@ -522,8 +522,8 @@ namespace casadi {
     f_.evaluate();
 
     // Get results
-    f_.getOutput(r, DAE_ODE);
-    f_.getOutput(r+nx_, DAE_ALG);
+    f_.getOutputNZ(r, DAE_ODE);
+    f_.getOutputNZ(r+nx_, DAE_ALG);
 
     if (monitored("res")) {
       cout << "ODE rhs  = " << f_.output(DAE_ODE) << endl;
@@ -596,8 +596,8 @@ namespace casadi {
     f_fwd_.evaluate();
 
     // Get the output seeds
-    f_fwd_.getOutput(Jv,    DAE_NUM_OUT + DAE_ODE);
-    f_fwd_.getOutput(Jv+nx_, DAE_NUM_OUT + DAE_ALG);
+    f_fwd_.getOutputNZ(Jv,    DAE_NUM_OUT + DAE_ODE);
+    f_fwd_.getOutputNZ(Jv+nx_, DAE_NUM_OUT + DAE_ALG);
 
     // Subtract state derivative to get residual
     for (int i=0; i<nx_; ++i) {
@@ -681,8 +681,8 @@ namespace casadi {
     }
 
     // Get the output seeds
-    g_fwd_.getOutput(JvB,     RDAE_NUM_OUT + RDAE_ODE);
-    g_fwd_.getOutput(JvB+nx_, RDAE_NUM_OUT + RDAE_ALG);
+    g_fwd_.getOutputNZ(JvB,     RDAE_NUM_OUT + RDAE_ODE);
+    g_fwd_.getOutputNZ(JvB+nx_, RDAE_NUM_OUT + RDAE_ALG);
 
     // Subtract state derivative to get residual
     for (int i=0; i<nrx_; ++i) {
@@ -1187,7 +1187,7 @@ namespace casadi {
     f_.evaluate();
 
     // Get results
-    f_.getOutput(rhsQ, DAE_QUAD);
+    f_.getOutputNZ(rhsQ, DAE_QUAD);
     log("IdasInterface::rhsQ", "end");
   }
 
@@ -1274,8 +1274,8 @@ namespace casadi {
     g_.evaluate();
 
     // Save to output
-    g_.getOutput(rrA, RDAE_ODE);
-    g_.getOutput(rrA+nrx_, RDAE_ALG);
+    g_.getOutputNZ(rrA, RDAE_ODE);
+    g_.getOutputNZ(rrA+nrx_, RDAE_ALG);
 
     if (monitored("resB")) {
       cout << "RDAE_ODE    = " << g_.output(RDAE_ODE) << endl;
@@ -1328,7 +1328,7 @@ namespace casadi {
     g_.evaluate();
 
     // Save to output
-    g_.getOutput(qdotA, RDAE_QUAD);
+    g_.getOutputNZ(qdotA, RDAE_QUAD);
 
     if (monitored("rhsQB")) {
       cout << "RDAE_T    = " << t << endl;

@@ -198,7 +198,7 @@ namespace casadi {
     for (int i=0; i<nrhs; ++i) {
       solv.setInputNZ(x, 2);
       solv.evaluate();
-      solv.getOutput(x);
+      solv.getOutputNZ(x);
       x += solv.output().nnz();
     }
   }

@@ -183,59 +183,64 @@ namespace casadi {
 
 
 #define SETTERS_NZ_NEW(T) \
-    void setInput(T val, int iind=0); \
-    void setOutput(T val, int oind=0); \
-    void setOutput(T val, const std::string &oname); \
-    void setInputNZ(T val, int iind=0) { \
-      self().assertInit(); \
-      try { \
-        self().input(iind).setNZ(val); \
-      } catch(std::exception& e) { \
+    void setInput(T val, int iind=0);                                   \
+    void setOutput(T val, int oind=0);                                  \
+    void setInput(T val, const std::string &iname);                     \
+    void setOutput(T val, const std::string &oname);                    \
+    void setInputNZ(T val, int iind=0) {                                \
+      self().assertInit();                                              \
+      try {                                                             \
+        self().input(iind).setNZ(val);                                  \
+      } catch(std::exception& e) {                                      \
         casadi_error(e.what() << "Occurred at iind = " << iind << "."); \
-      } \
-    } \
-    void setOutputNZ(T val, int oind=0) { \
-      self().assertInit(); self().output(oind).setNZ(val); \
-    } \
-    void setInputNZ(T val, const std::string &iname) { \
-      setInputNZ(val, self().inputIndex(iname)); \
-    } \
-    void setOutputNZ(T val, const std::string &oname) { \
-      setOutputNZ(val, self().outputIndex(oname)); \
+      }                                                                 \
+    }                                                                   \
+    void setOutputNZ(T val, int oind=0) {                               \
+      self().assertInit(); self().output(oind).setNZ(val);              \
+    }                                                                   \
+    void setInputNZ(T val, const std::string &iname) {                  \
+      setInputNZ(val, self().inputIndex(iname));                        \
+    }                                                                   \
+    void setOutputNZ(T val, const std::string &oname) {                 \
+      setOutputNZ(val, self().outputIndex(oname));                      \
     }
 
-#define SETTERS_NZ(T)                                                              \
-    void setInput(T val, int iind=0)                                            \
-    { self().assertInit();                                              \
-      try { self().input(iind).setNZ(val); }                             \
-      catch(std::exception& e) {                                                \
-        casadi_error(e.what() << "Occurred at iind = " << iind << ".");         \
-      }                                                                         \
-    }                                                                           \
-    void setOutput(T val, int oind=0)                                           \
-    { self().assertInit(); self().output(oind).setNZ(val); }             \
-    void setInput(T val, const std::string &iname) {                              \
-      setInput(val, self().inputIndex(iname));                     \
-    }                                                                            \
-    void setOutput(T val, const std::string &oname) {                            \
-      setOutput(val, self().outputIndex(oname));                   \
-    }                                                                           \
+#define SETTERS_NZ(T)                                                   \
+    void setInput(T val, int iind=0) {                                  \
+      self().assertInit();                                              \
+      try {                                                             \
+        self().input(iind).setNZ(val);                                  \
+      }  catch(std::exception& e) {                                     \
+        casadi_error(e.what() << "Occurred at iind = " << iind << "."); \
+      }                                                                 \
+    }                                                                   \
+    void setOutput(T val, int oind=0) {                                 \
+      self().assertInit(); self().output(oind).setNZ(val);              \
+    }                                                                   \
+    void setInput(T val, const std::string &iname) {                    \
+      setInput(val, self().inputIndex(iname));                          \
+    }                                                                   \
+    void setOutput(T val, const std::string &oname) {                   \
+      setOutput(val, self().outputIndex(oname));                        \
+    }                                                                   \
 
-#define SETTERS_SUB(T)                                                          \
-    void setInput(T val, int iind=0)                                            \
-    { self().assertInit();                                               \
-      try { self().input(iind).set(val); }                                             \
-      catch(std::exception& e) {                                                \
-        casadi_error(e.what() << "Occurred at iind = " << iind << ".");         \
-      }                                                                         \
-    }                                                                           \
-    void setOutput(T val, int oind=0)                                           \
-    { self().assertInit(); self().output(oind).set(val); }               \
-    void setInput(T val, const std::string &iname) {                            \
-      setInput(val, self().inputIndex(iname));                     \
-    }                                                                            \
-    void setOutput(T val, const std::string &oname) {                            \
-      setOutput(val, self().outputIndex(oname));                   \
+#define SETTERS_SUB(T)                                                  \
+    void setInput(T val, int iind=0) {                                  \
+      self().assertInit();                                              \
+      try {                                                             \
+        self().input(iind).set(val);                                    \
+      } catch(std::exception& e) {                                      \
+        casadi_error(e.what() << "Occurred at iind = " << iind << "."); \
+      }                                                                 \
+    }                                                                   \
+    void setOutput(T val, int oind=0) {                                 \
+      self().assertInit(); self().output(oind).set(val);                \
+    }                                                                   \
+    void setInput(T val, const std::string &iname) {                    \
+      setInput(val, self().inputIndex(iname));                          \
+    }                                                                   \
+    void setOutput(T val, const std::string &oname) {                   \
+      setOutput(val, self().outputIndex(oname));                        \
     }
 
 #ifndef DOXYGENPROC
@@ -250,34 +255,58 @@ namespace casadi {
 #undef SETTERS_NZ
 #undef SETTERS_SUB
 
-#define GETTERS_NZ(T)                                                             \
-    void getInput(T val, int iind=0) const                                     \
-    { self().assertInit(); self().input(iind).getNZ(val);}  \
-    void getOutput(T val, int oind=0) const                                    \
-    { self().assertInit(); self().output(oind).getNZ(val);} \
-    void getInput(T val, const std::string &iname) const {                      \
-      getInput(val, self().inputIndex(iname)); \
-    }                                                                            \
-    void getOutput(T val, const std::string &oname) const {                     \
-      getOutput(val, self().outputIndex(oname)); \
-    }
+#define GETTERS_NZ_NEW(T)                                       \
+      void getInput(T val, int iind=0) const;                   \
+      void getOutput(T val, int oind=0) const;                  \
+      void getInput(T val, const std::string &iname) const;     \
+      void getOutput(T val, const std::string &oname) const;    \
+      void getInputNZ(T val, int iind=0) const {                \
+        self().assertInit(); self().input(iind).getNZ(val);     \
+      }                                                         \
+      void getOutputNZ(T val, int oind=0) const {               \
+        self().assertInit(); self().output(oind).getNZ(val);    \
+      }                                                         \
+      void getInputNZ(T val, const std::string &iname) const {  \
+        getInputNZ(val, self().inputIndex(iname));              \
+      }                                                         \
+      void getOutputNZ(T val, const std::string &oname) const { \
+        getOutputNZ(val, self().outputIndex(oname));            \
+      }
 
-#define GETTERS_SUB(T)                                                             \
-    void getInput(T val, int iind=0) const                                     \
-    { self().assertInit(); self().input(iind).get(val);}  \
-    void getOutput(T val, int oind=0) const                                    \
-    { self().assertInit(); self().output(oind).get(val);} \
-    void getInput(T val, const std::string &iname) const {                      \
-      getInput(val, self().inputIndex(iname)); \
-    }                                                                            \
-    void getOutput(T val, const std::string &oname) const {                      \
-      getOutput(val, self().outputIndex(oname)); \
-    }
+#define GETTERS_NZ(T)                                           \
+      void getInput(T val, int iind=0) const {                  \
+        self().assertInit(); self().input(iind).getNZ(val);     \
+      }                                                         \
+      void getOutput(T val, int oind=0) const {                 \
+        self().assertInit(); self().output(oind).getNZ(val);    \
+      }                                                         \
+      void getInput(T val, const std::string &iname) const {    \
+        getInput(val, self().inputIndex(iname));                \
+      }                                                         \
+      void getOutput(T val, const std::string &oname) const {   \
+        getOutput(val, self().outputIndex(oname));              \
+      }
+
+#define GETTERS_SUB(T)                                                  \
+      void getInput(T val, int iind=0) const {                          \
+        self().assertInit(); self().input(iind).get(val);               \
+      }                                                                 \
+      void getOutput(T val, int oind=0) const {                         \
+        self().assertInit(); self().output(oind).get(val);              \
+      }                                                                 \
+      void getInput(T val, const std::string &iname) const {            \
+        getInput(val, self().inputIndex(iname));                        \
+      }                                                                 \
+      void getOutput(T val, const std::string &oname) const {           \
+        getOutput(val, self().outputIndex(oname));                      \
+      }
 
 #ifndef DOXYGENPROC
 #ifndef SWIG
 GETTERS_SUB(double&)
-GETTERS_NZ(double*) // NOLINT(readability/casting) - false positive
+#ifndef SWIG
+GETTERS_NZ_NEW(double*) // NOLINT(readability/casting) - false positive
+#endif // SWIG
 GETTERS_NZ(std::vector<double>&)
 GETTERS_SUB(Matrix<double>&)
 #endif // SWIG

@@ -337,7 +337,7 @@ namespace casadi {
     }
 
     // Get results
-    f_.getOutput(NV_DATA_S(fval), iout_);
+    f_.getOutputNZ(NV_DATA_S(fval), iout_);
 
     // Get a referebce to the nonzeros of the function
     const vector<double>& fdata = f_.output(iout_).data();
@@ -522,7 +522,7 @@ namespace casadi {
     f_fwd_.evaluate();
 
     // Get the output seeds
-    f_fwd_.getOutput(NV_DATA_S(Jv), nOut());
+    f_fwd_.getOutputNZ(NV_DATA_S(Jv), nOut());
 
     // Log time duration
     time2_ = clock();
