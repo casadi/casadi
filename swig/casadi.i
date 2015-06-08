@@ -86,17 +86,27 @@
      *   - Change the temporary object
      * Returns true upon success, else false
      */
-    bool casptr(GUESTOBJECT *p, int** m);
-    bool casptr(GUESTOBJECT *p, double** m);
-    bool casptr(GUESTOBJECT *p, std::string** m);
-    bool casptr(GUESTOBJECT *p, MX** m);
-    bool casptr(GUESTOBJECT *p, GenericType** m);
-    bool casptr(GUESTOBJECT *p, GenericType::Dict** m);
-    bool casptr(GUESTOBJECT *p, SX** m);
-    bool casptr(GUESTOBJECT *p, DMatrix** m);
-    bool casptr(GUESTOBJECT *p, IMatrix** m);
-    template<typename M> bool casptr(GUESTOBJECT *p, std::vector<M>** m);
-    template<typename M> bool casptr(GUESTOBJECT *p, std::map<std::string, M>** m);
+    bool to_ptr(GUESTOBJECT *p, int** m);
+    bool to_ptr(GUESTOBJECT *p, double** m);
+    bool to_ptr(GUESTOBJECT *p, std::string** m);
+    bool to_ptr(GUESTOBJECT *p, MX** m);
+    bool to_ptr(GUESTOBJECT *p, GenericType** m);
+    bool to_ptr(GUESTOBJECT *p, GenericType::Dict** m);
+    bool to_ptr(GUESTOBJECT *p, SX** m);
+    bool to_ptr(GUESTOBJECT *p, DMatrix** m);
+    bool to_ptr(GUESTOBJECT *p, IMatrix** m);
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
+
+    // Same as the above, but with pointer instead of pointer to pointer
+    template<typename M> bool to_val(GUESTOBJECT *p, M* m) {
+      // Copy the pointer
+      M *m2 = m;
+      bool ret = to_ptr(p, m ? &m2 : 0);
+      // If pointer changed, copy the object
+      if (m!=m2) *m=*m2;
+      return ret;
+    }
 
     // Implementations
 
@@ -111,7 +121,7 @@
     }
 
     // Convert to std::vector
-    template<typename M> bool casptr(GUESTOBJECT *p, std::vector<M>** m) {
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m) {
       // Treat Null
       if (is_null(p)) return false;
 #ifdef SWIGPYTHON
@@ -140,7 +150,7 @@
           PyObject *pe=PyIter_Next(it);
           // Convert element
           M *m_i = m ? &(**m).at(i) : 0, *m_i2=m_i;
-          if (!casptr(pe, m_i ? &m_i : 0)) {
+          if (!to_ptr(pe, m_i ? &m_i : 0)) {
             // Failure
             Py_DECREF(pe);
             Py_DECREF(it);
@@ -170,7 +180,7 @@
 
           // Convert element
           M *m_i = m ? &(**m).at(i) : 0, *m_i2=m_i;
-          if (!casptr(pe, m_i ? &m_i : 0)) {
+          if (!to_ptr(pe, m_i ? &m_i : 0)) {
             return false;
           }
           if (m_i!=m_i2) *m_i2=*m_i; // If only pointer changed
@@ -865,7 +875,7 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
   bool make_vector(GUESTOBJECT * p, std::vector<T>* m, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
     // Call refactored version
     std::vector<T> *m_orig = m;
-    if (casadi::casptr(p, m ? &m : 0)) {
+    if (casadi::to_ptr(p, m ? &m : 0)) {
       if (m!=m_orig) *m_orig=*m;
       return true;
     }
@@ -880,10 +890,9 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
  }
 
 %define %casadi_in_typemap(xName, xType...)
-%typemap(in, noblock=1, fragment="to"{xName}) xType (xType m) {
-  if (!to_##xName($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
-  $1 = m;
-}
+%typemap(in, noblock=1) xType {
+  if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to xName.");
+ }
 %enddef
 
 %fragment("conv_constref", "header", fragment="is_a") {
@@ -918,7 +927,7 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 %define %casadi_in_typemap_vector(xName,xType...)
 %typemap(in, noblock=1) const std::vector< xType > & (std::vector< xType > m) {
   $1=&m;
-  if (!casadi::casptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to std::vector<xName>.");
+  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to std::vector<xName>.");
  }
 %enddef
 
@@ -940,7 +949,7 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 
 %define %casadi_typecheck_typemap_vector(xName, xPrec, xType...)
 %typemap(typecheck, noblock=1, precedence=xPrec) const std::vector< xType > & {
-  $1 = casadi::casptr($input, static_cast<std::vector< xType >**>(0));
+  $1 = casadi::to_ptr($input, static_cast<std::vector< xType >**>(0));
  }
 %enddef
 
@@ -1371,7 +1380,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{int}, "header", fragment="fwd") {
   // Traits specialization for int
   namespace casadi {
-    bool casptr(GUESTOBJECT *p, int** m) {
+    bool to_ptr(GUESTOBJECT *p, int** m) {
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal_int(p, m ? *m : 0))) return true;
 
@@ -1433,7 +1442,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
     // Call refactored version
     int *m_orig = m;
-    if (casptr(p, m ? &m : 0)) {
+    if (to_ptr(p, m ? &m : 0)) {
       if (m!=m_orig) *m_orig=*m;
       return true;
     }
@@ -1448,7 +1457,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{double}, "header", fragment="fwd") {
   // Traits specialization for double
   namespace casadi {
-    bool casptr(GUESTOBJECT *p, double** m) {
+    bool to_ptr(GUESTOBJECT *p, double** m) {
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal_double(p, m ? *m : 0))) return true;
 
@@ -1521,7 +1530,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
     // Call refactored version
     double *m_orig = m;
-    if (casptr(p, m ? &m : 0)) {
+    if (to_ptr(p, m ? &m : 0)) {
       if (m!=m_orig) *m_orig=*m;
       return true;
     }
@@ -1604,7 +1613,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{string}, "header", fragment="fwd") {
   // Traits specialization for string
   namespace casadi {
-    bool casptr(GUESTOBJECT *p, std::string** m) {
+    bool to_ptr(GUESTOBJECT *p, std::string** m) {
       // Treat Null
       if (is_null(p)) return false;
 
@@ -1633,7 +1642,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
     // Call refactored version
     std::string *m_orig = m;
-    if (casptr(p, m ? &m : 0)) {
+    if (to_ptr(p, m ? &m : 0)) {
       if (m!=m_orig) *m_orig=*m;
       return true;
     }
@@ -1660,7 +1669,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 %fragment("to"{Map}, "header", fragment="fwd") {
   namespace casadi {
-    template<typename M> bool casptr(GUESTOBJECT *p, std::map<std::string, M>** m) {
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m) {
 #ifdef SWIGPYTHON
       if (PyDict_Check(p)) {
         PyObject *key, *value;
@@ -1669,10 +1678,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           if (!PyString_Check(key)) return false;
           if (m) {
             M *v=&(**m)[std::string(PyString_AsString(key))], *v2=v;
-            if (!casadi::casptr(value, &v)) return false;
+            if (!casadi::to_ptr(value, &v)) return false;
             if (v!=v2) *v2=*v; // if only pointer changed
           } else {
-            if (!casadi::casptr(value, static_cast<M**>(0))) return false;
+            if (!casadi::to_ptr(value, static_cast<M**>(0))) return false;
           }
         }
         return true;
@@ -1685,7 +1694,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m) {
     // Call refactored version
     std::map<std::string, M> *m_orig=m;
-    if (casadi::casptr(p, m ? &m : 0)) {
+    if (casadi::to_ptr(p, m ? &m : 0)) {
       if (m!=m_orig) *m_orig=*m;
       return true;
     }
@@ -1964,7 +1973,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           fragment="to"{IVector}, fragment="to"{DVector}, fragment="to"{Function}) {
   // Traits specialization for GenericType
   namespace casadi {
-    bool casptr(GUESTOBJECT *p, GenericType** m) {
+    bool to_ptr(GUESTOBJECT *p, GenericType** m) {
 #ifdef SWIGPYTHON
       if (p==Py_None) {
         if (m) **m=GenericType();
@@ -2070,7 +2079,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
     // Call refactored version
     casadi::GenericType *m_orig = m;
-    if (casptr(p, m ? &m : 0)) {
+    if (to_ptr(p, m ? &m : 0)) {
       if (m!=m_orig) *m_orig=*m;
       return true;
     }
@@ -2084,7 +2093,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{Dict}, "header", fragment="fwd") {
   // Traits specialization for Dict
   namespace casadi {
-    bool casptr(GUESTOBJECT *p, GenericType::Dict** m) {
+    bool to_ptr(GUESTOBJECT *p, GenericType::Dict** m) {
       // Treat Null
       if (is_null(p)) return false;
 
@@ -2119,7 +2128,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
     // Call refactored version
     casadi::GenericType::Dict *m_orig = m;
-    if (casptr(p, m ? &m : 0)) {
+    if (to_ptr(p, m ? &m : 0)) {
       if (m!=m_orig) *m_orig=*m;
       return true;
     }
@@ -2134,7 +2143,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{SX}, "header", fragment="fwd") {
   // Traits specialization for SX
   namespace casadi {
-    bool casptr(GUESTOBJECT *p, SX** m) {
+    bool to_ptr(GUESTOBJECT *p, SX** m) {
       // Treat Null
       if (is_null(p)) return false;
 
@@ -2187,7 +2196,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // Try first converting to a temporary DMatrix
       {
         DMatrix tmp, *mt=&tmp;
-        if(casadi::casptr(p, m ? &mt : 0)) {
+        if(casadi::to_ptr(p, m ? &mt : 0)) {
           if (m) **m = *mt;
           return true;
         }
@@ -2224,7 +2233,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         char cmd[] = "__SX__";
         PyObject *cr = PyObject_CallMethod(p, cmd, 0);
         if (!cr) return false;
-        int flag = casptr(cr, m);
+        int flag = to_ptr(cr, m);
         Py_DECREF(cr);
         return flag;
       }
@@ -2241,7 +2250,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
     // Call refactored version
     casadi::SX *m_orig = m;
-    if (casptr(p, m ? &m : 0)) {
+    if (to_ptr(p, m ? &m : 0)) {
       if (m!=m_orig) *m_orig=*m;
       return true;
     }
@@ -2257,7 +2266,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{MX}, "header", fragment="fwd") {
   // Traits specialization for MX
   namespace casadi {
-    bool casptr(GUESTOBJECT *p, MX** m) {
+    bool to_ptr(GUESTOBJECT *p, MX** m) {
       // Treat Null
       if (is_null(p)) return false;
 
@@ -2281,7 +2290,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // Try first converting to a temporary DMatrix
       {
         DMatrix tmp, *mt=&tmp;
-        if(casadi::casptr(p, m ? &mt : 0)) {
+        if(casadi::to_ptr(p, m ? &mt : 0)) {
           if (m) **m = *mt;
           return true;
         }
@@ -2292,7 +2301,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         char cmd[] = "__MX__";
         PyObject *cr = PyObject_CallMethod(p, cmd, 0);
         if (!cr) return false;
-        int flag = casptr(cr, m);
+        int flag = to_ptr(cr, m);
         Py_DECREF(cr);
         return flag;
       }
@@ -2309,7 +2318,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
     // Call refactored version
     casadi::MX *m_orig = m;
-    if (casptr(p, m ? &m : 0)) {
+    if (to_ptr(p, m ? &m : 0)) {
       if (m!=m_orig) *m_orig=*m;
       return true;
     }
@@ -2360,7 +2369,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{DMatrix}, "header", fragment="fwd,make_vector", fragment="to"{double}) {
   // Traits specialization for DMatrix
   namespace casadi {
-    bool casptr(GUESTOBJECT *p, DMatrix** m) {
+    bool to_ptr(GUESTOBJECT *p, DMatrix** m) {
       // Treat Null
       if (is_null(p)) return false;
 
@@ -2576,7 +2585,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
     // Call refactored version
     casadi::DMatrix *m_orig = m;
-    if (casptr(p, m ? &m : 0)) {
+    if (to_ptr(p, m ? &m : 0)) {
       if (m!=m_orig) *m_orig=*m;
       return true;
     }
@@ -2591,7 +2600,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{IMatrix}, "header", fragment="fwd,make_vector") {
   // Traits specialization for IMatrix
   namespace casadi {
-    bool casptr(GUESTOBJECT *p, IMatrix** m) {
+    bool to_ptr(GUESTOBJECT *p, IMatrix** m) {
       // Treat Null
       if (is_null(p)) return false;
 
@@ -2617,7 +2626,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         PyObject *cr = PyObject_CallMethod(p, cmd, 0);
         if (!cr) return false;
         // Call recursively
-        int flag = casptr(cr, m);
+        int flag = to_ptr(cr, m);
         Py_DECREF(cr);
         return flag;
       }
@@ -2739,7 +2748,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
     // Call refactored version
     casadi::IMatrix *m_orig = m;
-    if (casptr(p, m ? &m : 0)) {
+    if (to_ptr(p, m ? &m : 0)) {
       if (m!=m_orig) *m_orig=*m;
       return true;
     }
