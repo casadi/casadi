@@ -1361,6 +1361,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   // Traits specialization for int
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, int** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal_int(p, m ? *m : 0))) return true;
 
@@ -1436,6 +1439,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   // Traits specialization for double
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, double** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal_double(p, m ? *m : 0))) return true;
 
