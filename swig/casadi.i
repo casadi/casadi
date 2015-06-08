@@ -199,6 +199,36 @@
   } // namespace casadi
 %}
 
+ // Define all input typemaps
+%define %casadi_input_typemaps(xName, xPrec, xType...)
+ // Pass input by value, check if matches
+%typemap(typecheck, noblock=1, precedence=xPrec) xType {
+  $1 = casadi::to_ptr($input, static_cast< xType **>(0));
+ }
+
+ // Pass input by value, convert argument
+%typemap(in, noblock=1) xType {
+  if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to xName.");
+ }
+
+ // Pass input by value, cleanup
+%typemap(freearg, noblock=1) xType {}
+
+ // Pass input by reference, check if matches
+%typemap(typecheck, noblock=1, precedence=xPrec) const xType& {
+  $1 = casadi::to_ptr($input, static_cast< xType **>(0));
+ }
+
+ // Pass input by reference, convert argument
+%typemap(in, noblock=1) const xType & (xType m) {
+  $1 = &m;
+  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
+}
+
+ // Pass input by reference, cleanup
+%typemap(freearg, noblock=1) const xType & {}
+%enddef
+
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
 // for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
@@ -1457,7 +1487,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   }
  }
 
-%casadi_typemaps(int, SWIG_TYPECHECK_INTEGER, int)
+%casadi_input_typemaps(int, SWIG_TYPECHECK_INTEGER, int)
 
 %fragment("to"{double}, "header", fragment="fwd") {
   // Traits specialization for double
@@ -1545,8 +1575,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   }
  }
 
-%casadi_typemaps(double, SWIG_TYPECHECK_DOUBLE, double)
-%casadi_typemaps_constref(double, SWIG_TYPECHECK_DOUBLE, double)
+%casadi_input_typemaps(double, SWIG_TYPECHECK_DOUBLE, double)
 
 #ifdef SWIGPYTHON
 %fragment("from"{GenericType}, "header", fragment="fwd") {
