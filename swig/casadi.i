@@ -71,17 +71,21 @@
 %}
 #endif
 
-/* Convert a pointer in interfaced language to C++
- * Input: GUESTOBJECT pointer p
- * Output: Pointer to pointer: At input, pointer to pointer to temporary
- * The routine will either:
- *   - Do nothing, if 0
- *   - Change the pointer
- *   - Change the temporary object
- * Returns true upon success, else false
- */
 %header %{
+
   namespace casadi {
+    /* Check if Null or None */
+    bool is_null(GUESTOBJECT *p);
+
+    /* Convert a pointer in interfaced language to C++
+     * Input: GUESTOBJECT pointer p
+     * Output: Pointer to pointer: At input, pointer to pointer to temporary
+     * The routine will either:
+     *   - Do nothing, if 0
+     *   - Change the pointer
+     *   - Change the temporary object
+     * Returns true upon success, else false
+     */
     bool casptr(GUESTOBJECT *p, int** m);
     bool casptr(GUESTOBJECT *p, double** m);
     bool casptr(GUESTOBJECT *p, std::string** m);
@@ -93,6 +97,90 @@
     bool casptr(GUESTOBJECT *p, IMatrix** m);
     template<typename M> bool casptr(GUESTOBJECT *p, std::vector<M>** m);
     template<typename M> bool casptr(GUESTOBJECT *p, std::map<std::string, M>** m);
+
+    // Implementations
+
+    bool is_null(GUESTOBJECT *p) {
+#ifdef SWIGPYTHON
+      if (p == Py_None) return true;
+#endif
+#ifdef SWIGMATLAB
+      if (p == 0) return true;
+#endif
+      return false;
+    }
+
+    // Convert to std::vector
+    template<typename M> bool casptr(GUESTOBJECT *p, std::vector<M>** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+#ifdef SWIGPYTHON
+      // Python sequence
+      if (PyList_Check(p) || PyTuple_Check(p)) {
+
+        // Iterator to the sequence
+        PyObject *it = PyObject_GetIter(p);
+        if (!it) {
+          PyErr_Clear();
+          return false;
+        }
+      
+        // Get size
+        Py_ssize_t sz = PySequence_Size(p);
+        if (sz==-1) {
+          PyErr_Clear();
+          return false;
+        }
+
+        // Allocate elements
+        if (m) (**m).resize(sz);
+
+        // Iterate over sequence
+        for (Py_ssize_t i=0; i!=sz; ++i) {
+          PyObject *pe=PyIter_Next(it);
+          // Convert element
+          M *m_i = m ? &(**m).at(i) : 0, *m_i2=m_i;
+          if (!casptr(pe, m_i ? &m_i : 0)) {
+            // Failure
+            Py_DECREF(pe);
+            Py_DECREF(it);
+            return false;
+          }
+          if (m_i!=m_i2) *m_i2=*m_i; // If only pointer changed
+          Py_DECREF(pe);
+        }
+        Py_DECREF(it);
+        return true;
+      }
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+      // Cell arrays (only row vectors)
+      if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
+        // Get size
+        int sz = mxGetN(p);
+
+        // Allocate elements
+        if (m) (**m).resize(sz);
+
+        // Loop over elements
+        for (int i=0; i<sz; ++i) {
+          // Get element
+          mxArray* pe = mxGetCell(p, i);
+          if (pe==0) return false;
+
+          // Convert element
+          M *m_i = m ? &(**m).at(i) : 0, *m_i2=m_i;
+          if (!casptr(pe, m_i ? &m_i : 0)) {
+            return false;
+          }
+          if (m_i!=m_i2) *m_i2=*m_i; // If only pointer changed
+        }
+        return true;
+      }
+#endif // SWIGMATLAB
+      // No match
+      return false;
+    }
   } // namespace casadi
 %}
 
@@ -697,16 +785,6 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 
 /// Check if Python object is of type T
 %fragment("is_a", "header") {
-  bool is_null(GUESTOBJECT *p) {
-#ifdef SWIGPYTHON
-    if (p == Py_None) return true;
-#endif
-#ifdef SWIGMATLAB
-    if (p == 0) return true;
-#endif
-    return false;
-  }
-
   bool is_a(GUESTOBJECT *p, swig_type_info *type) {
     void *dummy = 0;
     return !is_null(p) && SWIG_ConvertPtr(p, &dummy, type, 0) >= 0;
@@ -783,79 +861,6 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
  }
 
 %fragment("make_vector", "header", fragment="vector_size,to_vector") {
-  namespace casadi {
-    template<typename M> bool casptr(GUESTOBJECT *p, std::vector<M>** m) {
-      // Treat Null
-      if (is_null(p)) return false;
-#ifdef SWIGPYTHON
-      // Python sequence
-      if (PyList_Check(p) || PyTuple_Check(p)) {
-
-        // Iterator to the sequence
-        PyObject *it = PyObject_GetIter(p);
-        if (!it) {
-          PyErr_Clear();
-          return false;
-        }
-      
-        // Get size
-        Py_ssize_t sz = PySequence_Size(p);
-        if (sz==-1) {
-          PyErr_Clear();
-          return false;
-        }
-
-        // Allocate elements
-        if (m) (**m).resize(sz);
-
-        // Iterate over sequence
-        for (Py_ssize_t i=0; i!=sz; ++i) {
-          PyObject *pe=PyIter_Next(it);
-          // Convert element
-          M *m_i = m ? &(**m).at(i) : 0, *m_i2=m_i;
-          if (!casptr(pe, m_i ? &m_i : 0)) {
-            // Failure
-            Py_DECREF(pe);
-            Py_DECREF(it);
-            return false;
-          }
-          if (m_i!=m_i2) *m_i2=*m_i; // If only pointer changed
-          Py_DECREF(pe);
-        }
-        Py_DECREF(it);
-        return true;
-      }
-#endif // SWIGPYTHON
-#ifdef SWIGMATLAB
-      // Cell arrays (only row vectors)
-      if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
-        // Get size
-        int sz = mxGetN(p);
-
-        // Allocate elements
-        if (m) (**m).resize(sz);
-
-        // Loop over elements
-        for (int i=0; i<sz; ++i) {
-          // Get element
-          mxArray* pe = mxGetCell(p, i);
-          if (pe==0) return false;
-
-          // Convert element
-          M *m_i = m ? &(**m).at(i) : 0, *m_i2=m_i;
-          if (!casptr(pe, m_i ? &m_i : 0)) {
-            return false;
-          }
-          if (m_i!=m_i2) *m_i2=*m_i; // If only pointer changed
-        }
-        return true;
-      }
-#endif // SWIGMATLAB
-      // No match
-      return false;
-    }
-  } // namespace casadi
-
   template<typename T>
   bool make_vector(GUESTOBJECT * p, std::vector<T>* m, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
     // Call refactored version
@@ -943,20 +948,10 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
  }
 %enddef
 
-%fragment("conv_vector", "header", fragment="make_vector") {
-  template<typename T>
-  bool conv_vector(GUESTOBJECT *p, std::vector<T>* &ptr, std::vector<T> &m, swig_type_info *type, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
-    if (SWIG_ConvertPtr(p, (void **) &ptr, type, 0) == -1) {
-      if (!make_vector(p, &m, f)) return false;
-      ptr = &m;
-    }
-    return true;
-  }
- }
-
 %define %casadi_in_typemap_vector(xName,xType...)
-%typemap(in, noblock=1, fragment="to"{xName}) const std::vector< xType > & (std::vector< xType > m) {
-  if (!conv_vector($input, $1, m, $1_descriptor, to_##xName)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to std::vector<xName>.");
+%typemap(in, noblock=1) const std::vector< xType > & (std::vector< xType > m) {
+  $1=&m;
+  if (!casadi::casptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to std::vector<xName>.");
  }
 %enddef
 
@@ -995,8 +990,8 @@ bool conv_vector2(GUESTOBJECT *p, std::vector< std::vector<T> >* &ptr, std::vect
 %enddef
 
 %define %casadi_typecheck_typemap_vector(xName, xPrec, xType...)
-%typemap(typecheck, noblock=1, precedence=xPrec, fragment="is_a,to_vector") const std::vector< xType > & {
-  $1 = is_a($input,$1_descriptor) || make_vector< xType >($input, 0, to_##xName);
+%typemap(typecheck, noblock=1, precedence=xPrec) const std::vector< xType > & {
+  $1 = casadi::casptr($input, static_cast<std::vector< xType >**>(0));
  }
 %enddef
 
@@ -1239,7 +1234,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 // Forward declarations
 %fragment("fwd", "header",
-          fragment="vector_size,to_vector,make_vector,make_vector2,conv_constref,conv_vector,conv_vector2,conv_genericmatrix"
+          fragment="vector_size,to_vector,make_vector,make_vector2,conv_constref,conv_vector2,conv_genericmatrix"
 #ifdef SWIGMATLAB
           ,fragment="get_sparsity,get_nnz"
 #endif // SWIGMATLAB
