@@ -1995,25 +1995,40 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
   } // namespace casadi
 #endif // SWIGPYTHON
 
+  namespace casadi {
+    bool to_ptr(GUESTOBJECT *p, Callback** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // Callback already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::Callback*), 0))) {
+        return true;
+      }
+
+#ifdef SWIGPYTHON
+      PyObject* return_type = getReturnType(p);
+      if (!return_type) return false;
+      bool res = PyType_IsSubtype((PyTypeObject *)return_type, &PyInt_Type)
+        || PyType_IsSubtype((PyTypeObject *)return_type, &PyLong_Type);
+      Py_DECREF(return_type);
+      if (res) {
+        if (m) **m = casadi::CallbackPython(p);
+        return true;
+      }
+#endif // SWIGPYTHON
+      // No match
+      return false;
+    }
+  } // namespace casadi
+
   int to_Callback(GUESTOBJECT *p, void *mv, int offs) {
     casadi::Callback *m = static_cast<casadi::Callback*>(mv);
     if (m) m += offs;
 
-#ifdef SWIGPYTHON
-    casadi::Callback *mp = 0;
-    if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Callback *), 0) != -1) {
-      if (m) *m=*mp;
-      return true;
-    }
-    PyObject* return_type = getReturnType(p);
-    if (!return_type) return false;
-    bool res = PyType_IsSubtype((PyTypeObject *)return_type,&PyInt_Type) || PyType_IsSubtype((PyTypeObject *)return_type,&PyLong_Type);
-    Py_DECREF(return_type);
-    if (res) {
-      if (m) *m = casadi::CallbackPython(p);
-      return true;
-    }
-#endif // SWIGPYTHON
+    // Call refactored version
+    if (to_val(p, m)) return true;
+
     return false;
   }
  }
