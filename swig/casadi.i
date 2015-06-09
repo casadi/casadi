@@ -2461,14 +2461,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 %template() std::vector< casadi::Sparsity > ;
 %template() std::vector< std::vector< casadi::Sparsity> > ;
-%template() std::vector<casadi::Matrix<casadi::SXElement> > ;
-%template() std::vector< std::vector<casadi::Matrix<casadi::SXElement> > > ;
-%template() std::vector<casadi::MX>;
-%template() std::vector< std::vector<casadi::MX> >;
-%template() std::vector<casadi::Matrix<int> > ;
-%template() std::vector<casadi::Matrix<double> > ;
-%template() std::vector< std::vector<casadi::Matrix<double> > > ;
-%template() std::vector< std::vector<casadi::Matrix<int> > > ;
 %casadi_input_typemaps("int", SWIG_TYPECHECK_INTEGER, int)
 %casadi_input_typemaps("double", SWIG_TYPECHECK_DOUBLE, double)
 %casadi_input_typemaps("[int]", PRECEDENCE_IVector, std::vector<int>)
@@ -2480,31 +2472,33 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_input_typemaps("Callback", PRECEDENCE_CALLBACK, casadi::Callback)
 %casadi_input_typemaps("Dict", PRECEDENCE_DICT, casadi::GenericType::Dict)
 %casadi_input_typemaps_old(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
-%casadi_input_typemaps("[SX]", PRECEDENCE_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
-%casadi_input_typemaps("[[SX]]", PRECEDENCE_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
+%casadi_template("[SX]", PRECEDENCE_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
+%casadi_template("[[SX]]", PRECEDENCE_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
 %casadi_input_typemaps_old(MX, PRECEDENCE_MX, casadi::MX)
-
 %template() std::map<std::string, casadi::Sparsity >;
 %template() std::map<std::string, std::vector<casadi::Sparsity > >;
-
 %casadi_template("str:MX", PRECEDENCE_MX, std::map<std::string, casadi::MX>)
 %casadi_template("str:DMatrix", PRECEDENCE_DMatrix, std::map<std::string, casadi::Matrix<double> >)
 %casadi_template("str:SX", PRECEDENCE_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
-
 %template() std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >;
-
 %casadi_template("(str:MX,[str])", PRECEDENCE_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
 %casadi_template("(str:DMatrix,[str])", PRECEDENCE_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
 %casadi_template("(str:SX,[str])", PRECEDENCE_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
 %casadi_input_typemaps_old(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
-%casadi_input_typemaps("[MX]", PRECEDENCE_MXVector, std::vector<casadi::MX>)
-%casadi_input_typemaps("[[MX]]", PRECEDENCE_MXVectorVector, std::vector<std::vector<casadi::MX> >)
-%casadi_input_typemaps("[DMatrix]", PRECEDENCE_DMatrixVector, std::vector< casadi::Matrix<double> >)
-%casadi_input_typemaps("[[DMatrix]]", PRECEDENCE_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
+%casadi_template("[MX]", PRECEDENCE_MXVector, std::vector<casadi::MX>)
+%casadi_template("[[MX]]", PRECEDENCE_MXVectorVector, std::vector<std::vector<casadi::MX> >)
+%casadi_template("[DMatrix]", PRECEDENCE_DMatrixVector, std::vector< casadi::Matrix<double> >)
+%casadi_template("[[DMatrix]]", PRECEDENCE_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
 %casadi_input_typemaps_old(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
-%casadi_input_typemaps("[IMatrix]", PRECEDENCE_IMatrixVector, std::vector< casadi::Matrix<int> >)
-%casadi_input_typemaps("[[IMatrix]]", PRECEDENCE_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
+%casadi_template("[IMatrix]", PRECEDENCE_IMatrixVector, std::vector< casadi::Matrix<int> >)
+%casadi_template("[[IMatrix]]", PRECEDENCE_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
 %casadi_input_typemaps("[[int]]", PRECEDENCE_IVectorVector, std::vector<std::vector<int> >)
+%casadi_input_typemaps("GenericType", PRECEDENCE_GENERICTYPE, casadi::GenericType)
+%casadi_input_typemaps("[GenericType]", PRECEDENCE_GENERICTYPE, std::vector<casadi::GenericType>)
+%casadi_input_typemaps("Slice", PRECEDENCE_SLICE, casadi::Slice)
+%template() std::pair<casadi::Function,casadi::Function>;
+%template() std::pair<casadi::MX, std::vector<casadi::MX> >;
+%template() std::vector<casadi::Integrator>;
 
 %define %my_value_output_typemaps(Type,...)
 %value_output_typemap(%arg(swig::from), %arg(SWIG_Traits_frag(Type)), %arg(Type));
@@ -2958,10 +2952,6 @@ VECTOR_TOOLS_TEMPLATES(double)
 %include <casadi/core/weak_ref.hpp>
 %include <casadi/core/casadi_types.hpp>
 %include <casadi/core/generic_type.hpp>
-
-%casadi_input_typemaps("GenericType", PRECEDENCE_GENERICTYPE, casadi::GenericType)
-%casadi_input_typemaps("[GenericType]", PRECEDENCE_GENERICTYPE, std::vector<casadi::GenericType>)
-
 %include <casadi/core/options_functionality.hpp>
 
 namespace casadi {
@@ -3004,9 +2994,6 @@ namespace casadi{
 #endif // SWIGPYTHON
 
 %include <casadi/core/matrix/slice.hpp>
-
-%casadi_input_typemaps("Slice", PRECEDENCE_SLICE, casadi::Slice)
-
 %include <casadi/core/matrix/generic_expression_tools.hpp>
 
 // map the template name to the instantiated name
@@ -3491,8 +3478,6 @@ namespace casadi {
 
 %include <casadi/core/mx/mx.hpp>
 
-// Template instantiations
-%template(Pair_MX_MXVector) std::pair<casadi::MX, std::vector<casadi::MX> >;
 
 %extend casadi::MX{
   
@@ -3641,8 +3626,6 @@ def PyFunction(obj,inputs,outputs):
 %include <casadi/core/function/function.hpp>
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/function/code_generator.hpp>
-%template() std::pair<casadi::Function,casadi::Function>;
-
 %include <casadi/core/matrix/matrix_tools.hpp>
 
 // map the template name to the instantiated name
@@ -3765,13 +3748,11 @@ GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
 
 %include <casadi/core/sx/sx_tools.hpp>
 %include <casadi/core/mx/mx_tools.hpp>
-
 %include <casadi/core/function/sx_function.hpp>
 %include <casadi/core/function/mx_function.hpp>
 %include <casadi/core/function/linear_solver.hpp>
 %include <casadi/core/function/implicit_function.hpp>
 %include <casadi/core/function/integrator.hpp>
-%template() std::vector<casadi::Integrator>;
 %include <casadi/core/function/simulator.hpp>
 %include <casadi/core/function/control_simulator.hpp>
 %include <casadi/core/function/nlp_solver.hpp>
