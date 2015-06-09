@@ -229,6 +229,11 @@
 %typemap(freearg, noblock=1) const xType & {}
 %enddef
 
+%define %casadi_template(xName, xPrec, xType...)
+%template() xType;
+%casadi_input_typemaps(xName, xPrec, xType)
+%enddef
+
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
 // for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
@@ -346,6 +351,7 @@ namespace std {
 %include "std_vector.i"
 %include "std_pair.i"
 %include "std_map.i"
+%include "typemaps.i"
 #else // SWIGPYTHON
  /* TODO(@jaeandersson): Not maintainable, refactor */
 
@@ -522,20 +528,18 @@ namespace std {
 
 %include "std_pair.i"
 %include "std_map.i"
+%include "typemaps.i"
 #endif // SWIGPYTHON
 
 
 %template() std::vector<std::string>;
 %template() std::vector<bool> ;
 %template() std::vector<std::vector<bool> > ;
-%template() std::vector< std::vector<std::vector<bool> > > ;
 %template() std::vector<unsigned char>;
 %template() std::vector<int>;
 %template() std::vector<std::vector<int> > ;
-%template() std::vector< std::vector<std::vector<int> > > ;
 %template() std::vector<double>;
 %template() std::vector<std::vector<double> > ;
-%template() std::vector< std::vector<std::vector<double> > > ;
 
 #ifndef SWIGMATLAB
 %template() std::pair<int,int>;
@@ -820,13 +824,6 @@ returntype __rmpower__(argtype) const{ return argCast(b).zz_mpower(selfCast(*$se
 returntype __pow__ (argtype) const { return pow(selfCast(*$self), argCast(b));}
 returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 %enddef
-
-#ifndef SWIGXML
-%include "typemaps.i"
-#endif
-
-/// Generic typemap structure
-
 
 /// Check if Python object is of type T
 %fragment("is_a", "header") {
@@ -2147,27 +2144,18 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 %casadi_input_typemaps_old(MX, PRECEDENCE_MX, casadi::MX)
 
- /* Maps are treated as dictionaries in the target language
-    First instantiate the templates (no proxy classes needed)
-  */
-%template() std::map<std::string, casadi::MX >;
-%template() std::map<std::string, casadi::Matrix<casadi::SXElement> >;
-%template() std::map<std::string, casadi::Matrix<double> >;
 %template() std::map<std::string, casadi::Sparsity >;
 %template() std::map<std::string, std::vector<casadi::Sparsity > >;
 
-%casadi_input_typemaps("str:MX", PRECEDENCE_MX, std::map<std::string, casadi::MX>)
-%casadi_input_typemaps("str:DMatrix", PRECEDENCE_DMatrix, std::map<std::string, casadi::Matrix<double> >)
-%casadi_input_typemaps("str:SX", PRECEDENCE_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
+%casadi_template("str:MX", PRECEDENCE_MX, std::map<std::string, casadi::MX>)
+%casadi_template("str:DMatrix", PRECEDENCE_DMatrix, std::map<std::string, casadi::Matrix<double> >)
+%casadi_template("str:SX", PRECEDENCE_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
 
-%template() std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >;
-%template() std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >;
-%template() std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >;
 %template() std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >;
 
-%casadi_input_typemaps("(str:MX,[str])", PRECEDENCE_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
-%casadi_input_typemaps("(str:DMatrix,[str])", PRECEDENCE_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
-%casadi_input_typemaps("(str:SX,[str])", PRECEDENCE_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
+%casadi_template("(str:MX,[str])", PRECEDENCE_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
+%casadi_template("(str:DMatrix,[str])", PRECEDENCE_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
+%casadi_template("(str:SX,[str])", PRECEDENCE_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
 
 %fragment("to"{DMatrix}, "header", fragment="fwd,make_vector", fragment="to"{double}) {
   // Traits specialization for DMatrix
@@ -2958,10 +2946,6 @@ class NZproxy:
 #ifndef SWIGPYTHON
 %define %matrix_convertors
 %enddef
-#endif
-
-#ifndef SWIGXML
-%include "typemaps.i"
 #endif
 
 %include <casadi/core/printable_object.hpp>
