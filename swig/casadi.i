@@ -906,22 +906,6 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
  }
 
 %fragment("make_vector", "header", fragment="vector_size,to_vector") {
-  template<typename T>
-  bool make_vector(GUESTOBJECT * p, std::vector<T>* m, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
-    // Call refactored version
-    std::vector<T> *m_orig = m;
-    if (casadi::to_ptr(p, m ? &m : 0)) {
-      if (m!=m_orig) *m_orig=*m;
-      return true;
-    }
-
-    // Legacy
-    int sz = vector_size(p);
-    if (sz<0) return false;
-    if (m) m->resize(sz);
-    if (sz>0 && !to_vector(p, m ? &m->front() : 0, f)) return false;
-    return true;
-  }
  }
 
 %define %casadi_in_typemap(xName, xType...)
@@ -1884,7 +1868,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         Py_DECREF(array); 
       return true;
     }
-    return make_vector(p, m, to_double);
+    return to_val(p, m);
 #endif // SWIGPYTHON
     return false;
   }
@@ -2655,7 +2639,7 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
 
       {
         std::vector <double> t;
-        int res = make_vector(p, &t, to_double);
+        int res = to_val(p, &t);
         if (t.size()>0) {
           if (m) **m = casadi::Matrix<double>(t);
         } else {
@@ -2803,7 +2787,7 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
       }
       {
         std::vector <int> t;
-        int res = make_vector(p, &t, to_int);
+        int res = to_val(p, &t);
         if (m) **m = casadi::Matrix<int>(t);
         return res;
       }
