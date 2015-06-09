@@ -676,48 +676,6 @@ returntype __pow__ (argtype) const { return pow(selfCast(*$self), argCast(b));}
 returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 %enddef
 
-/// Check if Python object is of type T
-%fragment("is_a", "header") {
-  bool is_a(GUESTOBJECT *p, swig_type_info *type) {
-    void *dummy = 0;
-    return !is_null(p) && SWIG_ConvertPtr(p, &dummy, type, 0) >= 0;
-  }
-}
-
-%fragment("vector_size", "header", fragment="is_a") {
-  int vector_size(GUESTOBJECT * p) {
-#ifdef SWIGPYTHON
-    if (PySequence_Check(p)
-        && !PyString_Check(p)
-        && !is_a(p, $descriptor(casadi::SX*))
-        && !is_a(p, $descriptor(casadi::MX*))
-        && !is_a(p, $descriptor(casadi::Matrix<int>*))
-        && !is_a(p, $descriptor(casadi::Matrix<double>*))
-        && !PyObject_HasAttrString(p,"__DMatrix__")
-        && !PyObject_HasAttrString(p,"__SX__")
-        && !PyObject_HasAttrString(p,"__MX__")) {
-      return PySequence_Size(p);
-    } else {
-      return -1;
-    }
-#endif // SWIGPYTHON
-#ifdef SWIGMATLAB
-    if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
-      return mxGetN(p);
-    } else {
-      return -1;
-    }
-#endif // SWIGMATLAB
-    return -1;
-  }
- }
-
-%fragment("to_vector", "header") {
- }
-
-%fragment("make_vector", "header", fragment="vector_size,to_vector") {
- }
-
 %fragment("conv_constref", "header", fragment="is_a") {
   template<typename T>
   bool conv_constref(GUESTOBJECT *p, T* &ptr, T &m, swig_type_info *type, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
@@ -868,7 +826,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 // Forward declarations
 %fragment("fwd", "header",
-          fragment="vector_size,to_vector,make_vector,conv_constref"
+          fragment="conv_constref"
 #ifdef SWIGMATLAB
           ,fragment="get_sparsity,get_nnz"
 #endif // SWIGMATLAB
@@ -882,11 +840,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
   GUESTOBJECT * from_GenericType(const casadi::GenericType &a);
   GUESTOBJECT * from_Dict(const casadi::GenericType::Dict &a);
-
-  swig_type_info * type_SX() { return $descriptor(casadi::Matrix<casadi::SXElement> *); }
-  swig_type_info * type_DMatrix() { return $descriptor(casadi::Matrix<double> *); }
-  swig_type_info * type_IMatrix() { return $descriptor(casadi::Matrix<int> *); }
-  swig_type_info * type_MX() { return $descriptor(casadi::MX *); }
 }
 
 #ifdef SWIGPYTHON
