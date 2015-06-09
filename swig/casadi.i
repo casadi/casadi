@@ -1080,7 +1080,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif // SWIGMATLAB
           ) {
 
-  int to_double(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Dict(GUESTOBJECT *p, void *mv, int offs=0);
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs=0);
   int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs=0);
@@ -1398,23 +1397,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
   } // namespace casadi
-
-  int to_double(GUESTOBJECT *p, void *mv, int offs) {
-    double *m = static_cast<double*>(mv);
-    if (m) m += offs;
-
-    // Call refactored version
-    double *m_orig = m;
-    if (to_ptr(p, m ? &m : 0)) {
-      if (m!=m_orig) *m_orig=*m;
-      return true;
-    }
-
-    // Failure if reached this point
-    return false;
-  }
  }
-
 
 
 %casadi_input_typemaps(int, SWIG_TYPECHECK_INTEGER, int)
@@ -2422,7 +2405,7 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
       if (is_array(p)) { 
         if (array_numdims(p)==0) {
           double d;
-          int result = to_double(p, &d);
+          int result = to_val(p, &d);
           if (!result) return result;
           if (m) **m = casadi::Matrix<double>(d);
           return result;
