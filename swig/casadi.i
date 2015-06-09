@@ -208,7 +208,7 @@
 
  // Pass input by value, convert argument
 %typemap(in, noblock=1, fragment="casadi_impl") xType {
-  if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to xName.");
+  if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to " xName ".");
  }
 
  // Pass input by value, cleanup
@@ -222,7 +222,7 @@
  // Pass input by reference, convert argument
 %typemap(in, noblock=1, fragment="casadi_impl") const xType & (xType m) {
   $1 = &m;
-  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
+  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to " xName " .");
 }
 
  // Pass input by reference, cleanup
@@ -1389,8 +1389,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 
 
-%casadi_input_typemaps(int, SWIG_TYPECHECK_INTEGER, int)
-%casadi_input_typemaps(double, SWIG_TYPECHECK_DOUBLE, double)
+%casadi_input_typemaps("int", SWIG_TYPECHECK_INTEGER, int)
+%casadi_input_typemaps("double", SWIG_TYPECHECK_DOUBLE, double)
 
 #ifdef SWIGPYTHON
 %fragment("from"{GenericType}, "header", fragment="fwd") {
@@ -1966,7 +1966,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
  }
 
-%casadi_input_typemaps([int], PRECEDENCE_IVector, std::vector<int>)
+%casadi_input_typemaps("[int]", PRECEDENCE_IVector, std::vector<int>)
 
 %fragment("to"{DVector}, "header", fragment="fwd,make_vector", fragment="to"{double}) {
   int to_DVector(GUESTOBJECT *p, void *mv, int offs) {
@@ -2014,10 +2014,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_typemaps_constref(DVector, PRECEDENCE_DVector, std::vector<double>)
 #endif
 
-%casadi_input_typemaps(DerivativeGenerator, PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
-%casadi_input_typemaps(CustomEvaluate, PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
-%casadi_input_typemaps(Callback, PRECEDENCE_CALLBACK, casadi::Callback)
-%casadi_input_typemaps(Dict, PRECEDENCE_DICT, casadi::GenericType::Dict)
+%casadi_input_typemaps("DerivativeGenerator", PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
+%casadi_input_typemaps("CustomEvaluate", PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
+%casadi_input_typemaps("Callback", PRECEDENCE_CALLBACK, casadi::Callback)
+%casadi_input_typemaps("Dict", PRECEDENCE_DICT, casadi::GenericType::Dict)
 
 %fragment("to"{SX}, "header", fragment="fwd") {
   // Traits specialization for SX
@@ -2138,8 +2138,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   }
  }
 %casadi_typemaps_constref(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
-%casadi_input_typemaps([SX], PRECEDENCE_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
-%casadi_input_typemaps([[SX]], PRECEDENCE_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
+%casadi_input_typemaps("[SX]", PRECEDENCE_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
+%casadi_input_typemaps("[[SX]]", PRECEDENCE_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
 
 %fragment("to"{MX}, "header", fragment="fwd") {
   // Traits specialization for MX
@@ -2216,18 +2216,18 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %template() std::map<std::string, casadi::Sparsity >;
 %template() std::map<std::string, std::vector<casadi::Sparsity > >;
 
-%casadi_input_typemaps(str:MX, PRECEDENCE_MX, std::map<std::string, casadi::MX>)
-%casadi_input_typemaps(str:DMatrix, PRECEDENCE_DMatrix, std::map<std::string, casadi::Matrix<double> >)
-%casadi_input_typemaps(str:SX, PRECEDENCE_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
+%casadi_input_typemaps("str:MX", PRECEDENCE_MX, std::map<std::string, casadi::MX>)
+%casadi_input_typemaps("str:DMatrix", PRECEDENCE_DMatrix, std::map<std::string, casadi::Matrix<double> >)
+%casadi_input_typemaps("str:SX", PRECEDENCE_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
 
 %template() std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >;
 %template() std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >;
 %template() std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >;
 %template() std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >;
 
-%casadi_input_typemaps(str:MX_[str], PRECEDENCE_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
-%casadi_input_typemaps(str:DMatrix_[str], PRECEDENCE_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
-%casadi_input_typemaps(str:SX_[str], PRECEDENCE_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
+%casadi_input_typemaps("(str:MX,[str])", PRECEDENCE_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
+%casadi_input_typemaps("(str:DMatrix,[str])", PRECEDENCE_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
+%casadi_input_typemaps("(str:SX,[str])", PRECEDENCE_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
 
 %fragment("to"{DMatrix}, "header", fragment="fwd,make_vector", fragment="to"{double}) {
   // Traits specialization for DMatrix
@@ -2457,7 +2457,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   }
 }
 %casadi_typemaps_constref(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
-%casadi_input_typemaps([MX], PRECEDENCE_MXVector, std::vector<casadi::MX>)
+%casadi_input_typemaps("[MX]", PRECEDENCE_MXVector, std::vector<casadi::MX>)
 
 
 %fragment("to"{IMatrix}, "header", fragment="fwd,make_vector", fragment="to"{int}) {
@@ -2620,16 +2620,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   }
  }
 
-%casadi_input_typemaps([[MX]], PRECEDENCE_MXVectorVector, std::vector<std::vector<casadi::MX> >)
+%casadi_input_typemaps("[[MX]]", PRECEDENCE_MXVectorVector, std::vector<std::vector<casadi::MX> >)
 
-%casadi_input_typemaps([DMatrix], PRECEDENCE_DMatrixVector, std::vector< casadi::Matrix<double> >)
-%casadi_input_typemaps([[DMatrix]], PRECEDENCE_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
+%casadi_input_typemaps("[DMatrix]", PRECEDENCE_DMatrixVector, std::vector< casadi::Matrix<double> >)
+%casadi_input_typemaps("[[DMatrix]]", PRECEDENCE_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
 
 %casadi_typemaps_constref(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
-%casadi_input_typemaps([IMatrix], PRECEDENCE_IMatrixVector, std::vector< casadi::Matrix<int> >)
-%casadi_input_typemaps([[IMatrix]], PRECEDENCE_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
+%casadi_input_typemaps("[IMatrix]", PRECEDENCE_IMatrixVector, std::vector< casadi::Matrix<int> >)
+%casadi_input_typemaps("[[IMatrix]]", PRECEDENCE_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
 
-%casadi_input_typemaps([[int]], PRECEDENCE_IVectorVector, std::vector<std::vector<int> >)
+%casadi_input_typemaps("[[int]]", PRECEDENCE_IVectorVector, std::vector<std::vector<int> >)
 
 %define %my_value_output_typemaps(Type,...)
 %value_output_typemap(%arg(swig::from), %arg(SWIG_Traits_frag(Type)), %arg(Type));
@@ -3090,8 +3090,8 @@ VECTOR_TOOLS_TEMPLATES(double)
 %include <casadi/core/casadi_types.hpp>
 %include <casadi/core/generic_type.hpp>
 
-%casadi_input_typemaps(GenericType, PRECEDENCE_GENERICTYPE, casadi::GenericType)
-%casadi_input_typemaps([GenericType], PRECEDENCE_GENERICTYPE, std::vector<casadi::GenericType>)
+%casadi_input_typemaps("GenericType", PRECEDENCE_GENERICTYPE, casadi::GenericType)
+%casadi_input_typemaps("[GenericType]", PRECEDENCE_GENERICTYPE, std::vector<casadi::GenericType>)
 
 %include <casadi/core/options_functionality.hpp>
 
@@ -3136,7 +3136,7 @@ namespace casadi{
 
 %include <casadi/core/matrix/slice.hpp>
 
-%casadi_input_typemaps(Slice, PRECEDENCE_SLICE, casadi::Slice)
+%casadi_input_typemaps("Slice", PRECEDENCE_SLICE, casadi::Slice)
 
 %include <casadi/core/matrix/generic_expression_tools.hpp>
 
