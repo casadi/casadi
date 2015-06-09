@@ -1082,7 +1082,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
   int to_Dict(GUESTOBJECT *p, void *mv, int offs=0);
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs=0);
   int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Callback(GUESTOBJECT *p, void *mv, int offs=0);
   int to_DVector(GUESTOBJECT *p, void *mv, int offs=0);
@@ -1092,7 +1091,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   int to_IMatrix(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Slice(GUESTOBJECT *p, void *mv, int offs=0);
   int to_string(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_Function(GUESTOBJECT *p, void *mv, int offs=0);
 
   template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m);
   template<typename M> int to_PairMap(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> > *m);
@@ -1510,32 +1508,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   }
 }
 
-%fragment("to"{Function}, "header", fragment="fwd") {
-  namespace casadi {
-    bool to_ptr(GUESTOBJECT *p, Function** m) {
-      // Treat Null
-      if (is_null(p)) return false;
-
-      casadi::Function *t = 0;
-      int res = swig::asptr(p, &t);
-      if(SWIG_CheckState(res) && t) {
-        if(m) **m=*t;
-        if (SWIG_IsNewObj(res)) delete t;
-        return true;
-      } else {
-        return false;
-      }
-    }
-  } // namespace casadi
-
-
-  int to_Function(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::Function *m = static_cast<casadi::Function*>(mv);
-    if (m) m += offs;
-    return casadi::to_val(p, m);
-  }
- }
-
 %fragment("to"{Map}, "header", fragment="fwd") {
   namespace casadi {
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m) {
@@ -1716,9 +1688,82 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // No match
       return false;
     }
+
+    bool to_ptr(GUESTOBJECT *p, Function** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      casadi::Function *t = 0;
+      int res = swig::asptr(p, &t);
+      if(SWIG_CheckState(res) && t) {
+        if(m) **m=*t;
+        if (SWIG_IsNewObj(res)) delete t;
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+#ifdef SWIGPYTHON
+    Function DerivativeGeneratorPythonInternal::call(Function& fcn, int ndir, void* user_data) {
+      casadi_assert(p_!=0);
+      PyObject * ndir_py = PyInt_FromLong(ndir);
+      PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))),
+                                             $descriptor(casadi::Function *), SWIG_POINTER_OWN |  0 );
+      if(!fcn_py) {
+        Py_DECREF(ndir_py);
+        throw CasadiException("DerivativeGeneratorPythonInternal: failed to convert Function to python");
+      }
+      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, ndir_py, NULL);
+      Py_DECREF(ndir_py);
+      Py_DECREF(fcn_py);
+      if (r) {
+        Function ret;  
+        if(!to_val(r, &ret)) {
+          Py_DECREF(r);
+          throw CasadiException("DerivativeGeneratorPythonInternal: return type was not Function.");
+        }
+        Py_DECREF(r);
+        return ret;
+      } else {
+        PyErr_Print();
+        throw CasadiException("DerivativeGeneratorPythonInternal: python method execution raised an Error.");
+      }
+    }
+#endif // SWIGPYTHON
+
+    bool to_ptr(GUESTOBJECT *p, DerivativeGenerator** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // DerivativeGenerator already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::DerivativeGenerator*), 0))) {
+        return true;
+      }
+
+#ifdef SWIGPYTHON
+      PyObject* return_type = getReturnType(p);
+      if (!return_type) return false;
+      PyObject* function = getCasadiObject("Function");
+      if (!function) {
+        Py_DECREF(return_type);
+        return false;
+      }
+      bool res = PyClass_IsSubclass(return_type,function);
+      Py_DECREF(return_type);
+      Py_DECREF(function);
+      if (res) {
+        if (m) **m = casadi::DerivativeGeneratorPython(p);
+        return true;
+      }
+#endif // SWIGPYTHON
+
+      // No match
+      return false;
+    }
   } // namespace casadi
  }
-
 
 %casadi_input_typemaps([int], PRECEDENCE_IVector, std::vector<int>)
 
@@ -1769,81 +1814,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_typemaps_constref(DVector, PRECEDENCE_DVector, std::vector<double>)
 #endif
 
-%fragment("to"{DerivativeGenerator}, "header", fragment="fwd", fragment="to"{Function}) {
-#ifdef SWIGPYTHON
-  namespace casadi {
-    Function DerivativeGeneratorPythonInternal::call(Function& fcn, int ndir, void* user_data) {
-      casadi_assert(p_!=0);
-      PyObject * ndir_py = PyInt_FromLong(ndir);
-      PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))),
-                                             $descriptor(casadi::Function *), SWIG_POINTER_OWN |  0 );
-      if(!fcn_py) {
-        Py_DECREF(ndir_py);
-        throw CasadiException("DerivativeGeneratorPythonInternal: failed to convert Function to python");
-      }
-      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, ndir_py, NULL);
-      Py_DECREF(ndir_py);
-      Py_DECREF(fcn_py);
-      if (r) {
-        Function ret;  
-        if(!to_Function(r, &ret)) {
-          Py_DECREF(r);
-          throw CasadiException("DerivativeGeneratorPythonInternal: return type was not Function.");
-        }
-        Py_DECREF(r);
-        return ret;
-      } else {
-        PyErr_Print();
-        throw CasadiException("DerivativeGeneratorPythonInternal: python method execution raised an Error.");
-      }
-    }
-  } // namespace casadi
-#endif // SWIGPYTHON
-
-  namespace casadi {
-    bool to_ptr(GUESTOBJECT *p, DerivativeGenerator** m) {
-      // Treat Null
-      if (is_null(p)) return false;
-
-      // DerivativeGenerator already?
-      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                    $descriptor(casadi::DerivativeGenerator*), 0))) {
-        return true;
-      }
-
-#ifdef SWIGPYTHON
-      PyObject* return_type = getReturnType(p);
-      if (!return_type) return false;
-      PyObject* function = getCasadiObject("Function");
-      if (!function) {
-        Py_DECREF(return_type);
-        return false;
-      }
-      bool res = PyClass_IsSubclass(return_type,function);
-      Py_DECREF(return_type);
-      Py_DECREF(function);
-      if (res) {
-        if (m) **m = casadi::DerivativeGeneratorPython(p);
-        return true;
-      }
-#endif // SWIGPYTHON
-
-      // No match
-      return false;
-    }
-  } // namespace casadi
-
-int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::DerivativeGenerator *m = static_cast<casadi::DerivativeGenerator*>(mv);
-    if (m) m += offs;
-
-    // Call refactored version
-    if (to_val(p, m)) return true;
-
-    return false;
-  }
- }
-%casadi_typemaps_constref(DerivativeGenerator, PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
+%casadi_input_typemaps(DerivativeGenerator, PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
 
 %fragment("to"{CustomEvaluate}, "header", fragment="fwd") {
 #ifdef SWIGPYTHON
@@ -1962,8 +1933,7 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
  }
 %casadi_typemaps_constref(Callback, PRECEDENCE_CALLBACK, casadi::Callback)
 
-%fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string},
-          fragment="to"{DVector}, fragment="to"{Function}) {
+%fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string}) {
   // Traits specialization for GenericType
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, GenericType** m) {
@@ -2018,7 +1988,7 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
           PyErr_Clear();
           return false;
         }
-      } else if (to_Dict(p, 0) || to_DerivativeGenerator(p, 0) || to_Callback(p, 0)) {
+      } else if (to_Dict(p, 0) || to_ptr(p, static_cast<DerivativeGenerator**>(0)) || to_Callback(p, 0)) {
         PyObject* gt = getCasadiObject("GenericType");
         if (!gt) return false;
 
