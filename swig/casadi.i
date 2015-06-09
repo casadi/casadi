@@ -1085,7 +1085,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   int to_MX(GUESTOBJECT *p, void *mv, int offs=0);
   int to_DMatrix(GUESTOBJECT *p, void *mv, int offs=0);
   int to_IMatrix(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_Slice(GUESTOBJECT *p, void *mv, int offs=0);
 
   template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m);
   template<typename M> int to_PairMap(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> > *m);
@@ -1936,11 +1935,58 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // No match
       return false;
     }
+
+    bool to_ptr(GUESTOBJECT *p, Slice** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // Callback already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::Slice*), 0))) {
+        return true;
+      }
+
+#ifdef SWIGPYTHON
+      // Python int
+      if (PyInt_Check(p)) {
+        if (m) {
+          (**m).start_ = PyInt_AsLong(p);
+          (**m).stop_ = (**m).start_+1;
+          if ((**m).stop_==0) (**m).stop_ = std::numeric_limits<int>::max();
+        }
+        return true;
+      }
+      // Python slice
+      if (PySlice_Check(p)) {
+        PySliceObject *r = (PySliceObject*)(p);
+        if (m) {
+          (**m).start_ = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min()) 
+            ? std::numeric_limits<int>::min() : PyInt_AsLong(r->start);
+          (**m).stop_  = (r->stop ==Py_None || PyInt_AsLong(r->stop)> std::numeric_limits<int>::max())
+            ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop);
+          if(r->step !=Py_None) (**m).step_  = PyInt_AsLong(r->step);
+        }
+        return true;
+      }
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+      if (mxIsChar(p) && mxGetM(p)==1 && mxGetN(p)==1) {
+        char ch;
+        if(mxGetString(p, &ch,(mwSize)sizeof(&ch))) return SWIG_TypeError;
+        if (ch==':') {
+          if (m) **m = casadi::Slice();
+          return true;
+        }
+      }
+#endif // SWIGMATLAB
+
+      // No match
+      return false;
+    }
   } // namespace casadi
  }
 
 %casadi_input_typemaps([int], PRECEDENCE_IVector, std::vector<int>)
-
 
 %fragment("to"{DVector}, "header", fragment="fwd,make_vector", fragment="to"{double}) {
   int to_DVector(GUESTOBJECT *p, void *mv, int offs) {
@@ -3124,68 +3170,7 @@ namespace casadi{
 
 %include <casadi/core/matrix/slice.hpp>
 
-%fragment("to"{Slice}, "header", fragment="fwd") {
-  namespace casadi {
-    bool to_ptr(GUESTOBJECT *p, Slice** m) {
-      // Treat Null
-      if (is_null(p)) return false;
-
-      // Callback already?
-      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                    $descriptor(casadi::Slice*), 0))) {
-        return true;
-      }
-
-#ifdef SWIGPYTHON
-    // Python int
-    if (PyInt_Check(p)) {
-      if (m) {
-        (**m).start_ = PyInt_AsLong(p);
-        (**m).stop_ = (**m).start_+1;
-        if ((**m).stop_==0) (**m).stop_ = std::numeric_limits<int>::max();
-      }
-      return true;
-    }
-    // Python slice
-    if (PySlice_Check(p)) {
-      PySliceObject *r = (PySliceObject*)(p);
-      if (m) {
-        (**m).start_ = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min()) 
-          ? std::numeric_limits<int>::min() : PyInt_AsLong(r->start);
-        (**m).stop_  = (r->stop ==Py_None || PyInt_AsLong(r->stop)> std::numeric_limits<int>::max())
-          ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop);
-        if(r->step !=Py_None) (**m).step_  = PyInt_AsLong(r->step);
-      }
-      return true;
-    }
-#endif // SWIGPYTHON
-#ifdef SWIGMATLAB
-    if (mxIsChar(p) && mxGetM(p)==1 && mxGetN(p)==1) {
-      char ch;
-      if(mxGetString(p, &ch,(mwSize)sizeof(&ch))) return SWIG_TypeError;
-      if (ch==':') {
-        if (m) **m = casadi::Slice();
-        return true;
-      }
-    }
-#endif // SWIGMATLAB
-
-      // No match
-      return false;
-    }
-  } // namespace casadi
-
-  int to_Slice(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::Slice *m = static_cast<casadi::Slice*>(mv);
-    if (m) m += offs;
-
-    // Call refactored version
-    if (to_val(p, m)) return true;
-
-    return false;
-  }
- }
-%casadi_typemaps_constref(Slice, PRECEDENCE_SLICE, casadi::Slice)
+%casadi_input_typemaps(Slice, PRECEDENCE_SLICE, casadi::Slice)
 
 %include <casadi/core/matrix/generic_expression_tools.hpp>
 
