@@ -2285,10 +2285,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 
   int to_ptr2(GUESTOBJECT *p, casadi::IMatrix **m) {
-    if (is_null(p)) {
-      if (m) **m=casadi::IMatrix();
-      return true;
-    }
+    if (is_null(p)) return false;
     return to_val(p, m ? *m : 0);
   }
  }
