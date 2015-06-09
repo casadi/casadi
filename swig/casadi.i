@@ -677,18 +677,13 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 %enddef
 
 %fragment("conv_constref", "header") {
-  template<typename T>
-  bool conv_constref(GUESTOBJECT *p, T* &ptr, T &m, swig_type_info *type, int (*f)(GUESTOBJECT *p, T **mv)) {
+  template<typename T> bool conv_constref(GUESTOBJECT *p, T* &ptr, T &m, swig_type_info *type) {
+    ptr = &m;
     if (is_null(p)) {
-      ptr = &m;
       m = T();
       return true;
-    } else if (SWIG_IsOK(SWIG_ConvertPtr(p, (void **)&ptr, type, 0))) {
-      return true;
     } else {
-      ptr = &m;
-      if (!to_ptr2(p, &ptr)) return false;
-      return true;
+      return to_ptr2(p, &ptr);
     }
   }
  }
@@ -2300,7 +2295,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 // Legacy - to be removed
 %define %casadi_input_typemaps_old(xName, xPrec, xType...)
 %typemap(in, noblock=1, fragment="to"{xName}) const xType & (xType m) {
-  if (!conv_constref($input, $1, m, $1_descriptor, to_ptr2)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
+  if (!conv_constref($input, $1, m, $1_descriptor)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
  }
 %typemap(freearg, noblock=1) const xType& {}
 %typemap(typecheck, noblock=1, fragment="to"{xName}, precedence=xPrec) const xType& {
