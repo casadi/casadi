@@ -102,7 +102,7 @@
     bool to_ptr(GUESTOBJECT *p, Function** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
-    template<typename M> bool to_ptr(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> >** m);
+    template<typename M1, typename M2> bool to_ptr(GUESTOBJECT *p, std::pair<M1, M2>** m);
 
     // Same as the above, but with pointer instead of pointer to pointer
     template<typename M> bool to_val(GUESTOBJECT *p, M* m) {
@@ -1939,28 +1939,17 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
 
-    template<typename M> bool to_ptr(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> >** m) {
+    template<typename M1, typename M2> bool to_ptr(GUESTOBJECT *p, std::pair<M1, M2>** m) {
 #ifdef SWIGPYTHON
       if (PyTuple_Check(p) && PyTuple_Size(p)==2) {
-        // Convert map
         GUESTOBJECT *p_first = PyTuple_GetItem(p, 0);
-        std::map<std::string, M> *m_first=0;
-        if (m) m_first=&(*m)->first;
-        if (!to_val(p_first, m_first)) return false;
-        // Convert vector of strings
         GUESTOBJECT *p_second = PyTuple_GetItem(p, 1);
-        if (!PyList_Check(p_second)) return false;
-        Py_ssize_t n = PyList_Size(p_second);
-        if (m) (*m)->second.resize(n);
-        for (Py_ssize_t i=0; i!=n; ++i) {
-          GUESTOBJECT *s_i = PyList_GetItem(p_second, i);
-          if (!PyString_Check(s_i)) return false;
-          if (m) (*m)->second.at(i) = std::string(PyString_AsString(s_i));
-        }
-        // Success
-        return true;
+        bool ret = to_val(p_first, m ? &(**m).first : 0)
+          && to_val(p_second, m ? &(**m).second : 0);
+        return ret;
       }
-#endif // SWIGPYTHON
+#endif // SWIGPYTHON      
+      // No match
       return false;
     }
   } // namespace casadi
