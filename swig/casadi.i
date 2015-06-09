@@ -1080,7 +1080,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif // SWIGMATLAB
           ) {
 
-  int to_int(GUESTOBJECT *p, void *mv, int offs=0);
   int to_double(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Dict(GUESTOBJECT *p, void *mv, int offs=0);
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs=0);
@@ -1325,21 +1324,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
   } // namespace casadi
-
-  int to_int(GUESTOBJECT *p, void *mv, int offs) {
-    int *m = static_cast<int*>(mv);
-    if (m) m += offs;
-
-    // Call refactored version
-    int *m_orig = m;
-    if (to_ptr(p, m ? &m : 0)) {
-      if (m!=m_orig) *m_orig=*m;
-      return true;
-    }
-
-    // Failure if reached this point
-    return false;
-  }
  }
 
 %fragment("to"{double}, "header", fragment="fwd") {
@@ -1949,7 +1933,7 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
         throw CasadiException("CallbackPythonInternal: python method execution raised an Error.");
       }
       int ret = 0;
-      if (to_int(r, 0)) to_int(r, &ret);
+      if (to_val(r, static_cast<int*>(0))) to_val(r, &ret);
       Py_DECREF(r);
       return ret;
     }  
@@ -2653,7 +2637,7 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
       if (is_array(p)) {
         if (array_numdims(p)==0) {
           int d;
-          int result = to_int(p, &d);
+          int result = to_val(p, &d);
           if (!result) return result;
           if (m) **m = casadi::Matrix<int>(d);
           return result;
