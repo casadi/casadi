@@ -1080,15 +1080,12 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif // SWIGMATLAB
           ) {
 
-  int to_Dict(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_GenericType(GUESTOBJECT *p, void *mv, int offs=0);
   int to_DVector(GUESTOBJECT *p, void *mv, int offs=0);
   int to_SX(GUESTOBJECT *p, void *mv, int offs=0);
   int to_MX(GUESTOBJECT *p, void *mv, int offs=0);
   int to_DMatrix(GUESTOBJECT *p, void *mv, int offs=0);
   int to_IMatrix(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Slice(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_string(GUESTOBJECT *p, void *mv, int offs=0);
 
   template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m);
   template<typename M> int to_PairMap(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> > *m);
@@ -1466,46 +1463,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 }
 #endif // SWIGPYTHON
 
-%fragment("to"{string}, "header", fragment="fwd") {
-  namespace casadi {
-    bool to_ptr(GUESTOBJECT *p, std::string** m) {
-      // Treat Null
-      if (is_null(p)) return false;
-
-      // String already?
-      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                    $descriptor(std::string*), 0))) {
-        return true;
-      }
-
-#ifdef SWIGPYTHON
-      if (PyString_Check(p)) {
-        if (m) (*m)->clear();
-        if (m) (*m)->append(PyString_AsString(p));
-        return true;
-      }
-#endif // SWIGPYTHON
-
-      // No match
-      return false;
-    }
-  } // namespace casadi
-
-  int to_string(GUESTOBJECT *p, void *mv, int offs) {
-    std::string *m = static_cast<std::string*>(mv);
-    if (m) m += offs;
-
-    // Call refactored version
-    std::string *m_orig = m;
-    if (to_ptr(p, m ? &m : 0)) {
-      if (m!=m_orig) *m_orig=*m;
-      return true;
-    }
-
-    return false;
-  }
-}
-
 %fragment("to"{Map}, "header", fragment="fwd") {
   namespace casadi {
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m) {
@@ -1843,6 +1800,142 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // No match
       return false;
     }
+
+    bool to_ptr(GUESTOBJECT *p, GenericType::Dict** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // Dict already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::GenericType::Dict*), 0))) {
+        return true;
+      }
+
+#ifdef SWIGPYTHON
+      if (PyDict_Check(p)) {
+        PyObject *key, *value;
+        Py_ssize_t pos = 0;
+        GenericType gt;
+        while (PyDict_Next(p, &pos, &key, &value)) {
+          if (!PyString_Check(key)) return false;
+          if (!to_val(value, &gt)) return false;
+          if (m) (**m)[std::string(PyString_AsString(key))] = gt;
+        }
+        return true;
+      }
+#endif // SWIGPYTHON
+
+      // No match
+      return false;
+    }
+
+    bool to_ptr(GUESTOBJECT *p, GenericType** m) {
+#ifdef SWIGPYTHON
+      if (p==Py_None) {
+        if (m) **m=GenericType();
+        return true;
+      }
+#endif // SWIGPYTHON
+
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // GenericType already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::GenericType*), 0))) {
+        return true;
+      }
+
+      // Try to convert to different types
+      if (to_generic<int>(p, m)
+          || to_generic<double>(p, m)
+          || to_generic<std::string>(p, m)
+          || to_generic<std::vector<int> >(p, m)
+          || to_generic<std::vector<double> >(p, m)
+          || to_generic<std::vector<std::string> >(p, m)
+          || to_generic<casadi::Function>(p, m)) {
+        return true;
+      }
+
+#ifdef SWIGPYTHON
+      if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
+        PyObject *c = PyObject_GetAttrString(p,"creator");
+        if (!c) return false;
+        PyObject* gt = getCasadiObject("GenericType");
+        if (!gt) return false;
+
+        PyObject* args = PyTuple_New(1);
+        PyTuple_SetItem(args,0,c);
+    
+        PyObject* g = PyObject_CallObject(gt,args);
+    
+        Py_DECREF(args);
+        Py_DECREF(gt);
+    
+        if (g) {
+          int result = to_ptr(g, m);
+          Py_DECREF(g);
+          return result;
+        }
+        if (!g) {
+          PyErr_Clear();
+          return false;
+        }
+      } else if (to_ptr(p, static_cast<GenericType::Dict**>(0))
+                 || to_ptr(p, static_cast<DerivativeGenerator**>(0))
+                 || to_ptr(p, static_cast<Callback**>(0))) {
+        PyObject* gt = getCasadiObject("GenericType");
+        if (!gt) return false;
+
+        PyObject* args = PyTuple_New(1);
+        Py_INCREF(p); // Needed because PyTuple_SetItem steals the reference
+        PyTuple_SetItem(args,0,p);
+    
+        PyObject* g = PyObject_CallObject(gt,args);
+    
+        Py_DECREF(args);
+        Py_DECREF(gt);
+    
+        if (g) {
+          int result = to_val(g, m ? *m : 0);
+          Py_DECREF(g);
+          return result;
+        }
+        if (!g) {
+          PyErr_Clear();
+          return false;
+        }
+      } else {
+        return false;
+      }
+      return true;
+#endif // SWIGPYTHON
+
+      // No match
+      return false;
+    }
+
+    bool to_ptr(GUESTOBJECT *p, std::string** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // String already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(std::string*), 0))) {
+        return true;
+      }
+
+#ifdef SWIGPYTHON
+      if (PyString_Check(p)) {
+        if (m) (*m)->clear();
+        if (m) (*m)->append(PyString_AsString(p));
+        return true;
+      }
+#endif // SWIGPYTHON
+
+      // No match
+      return false;
+    }
   } // namespace casadi
  }
 
@@ -1898,161 +1991,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_input_typemaps(DerivativeGenerator, PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
 %casadi_input_typemaps(CustomEvaluate, PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
 %casadi_input_typemaps(Callback, PRECEDENCE_CALLBACK, casadi::Callback)
-
-%fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string}) {
-  // Traits specialization for GenericType
-  namespace casadi {
-    bool to_ptr(GUESTOBJECT *p, GenericType** m) {
-#ifdef SWIGPYTHON
-      if (p==Py_None) {
-        if (m) **m=GenericType();
-        return true;
-      }
-#endif // SWIGPYTHON
-
-      // Treat Null
-      if (is_null(p)) return false;
-
-      // GenericType already?
-      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                    $descriptor(casadi::GenericType*), 0))) {
-        return true;
-      }
-
-      // Try to convert to different types
-      if (to_generic<int>(p, m)
-          || to_generic<double>(p, m)
-          || to_generic<std::string>(p, m)
-          || to_generic<std::vector<int> >(p, m)
-          || to_generic<std::vector<double> >(p, m)
-          || to_generic<std::vector<std::string> >(p, m)
-          || to_generic<casadi::Function>(p, m)) {
-        return true;
-      }
-
-#ifdef SWIGPYTHON
-      if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
-        PyObject *c = PyObject_GetAttrString(p,"creator");
-        if (!c) return false;
-        PyObject* gt = getCasadiObject("GenericType");
-        if (!gt) return false;
-
-        PyObject* args = PyTuple_New(1);
-        PyTuple_SetItem(args,0,c);
-    
-        PyObject* g = PyObject_CallObject(gt,args);
-    
-        Py_DECREF(args);
-        Py_DECREF(gt);
-    
-        if (g) {
-          int result = to_ptr(g, m);
-          Py_DECREF(g);
-          return result;
-        }
-        if (!g) {
-          PyErr_Clear();
-          return false;
-        }
-      } else if (to_Dict(p, 0)
-                 || to_ptr(p, static_cast<DerivativeGenerator**>(0))
-                 || to_ptr(p, static_cast<Callback**>(0))) {
-        PyObject* gt = getCasadiObject("GenericType");
-        if (!gt) return false;
-
-        PyObject* args = PyTuple_New(1);
-        Py_INCREF(p); // Needed because PyTuple_SetItem steals the reference
-        PyTuple_SetItem(args,0,p);
-    
-        PyObject* g = PyObject_CallObject(gt,args);
-    
-        Py_DECREF(args);
-        Py_DECREF(gt);
-    
-        if (g) {
-          int result = to_GenericType(g, m ? *m : 0);
-          Py_DECREF(g);
-          return result;
-        }
-        if (!g) {
-          PyErr_Clear();
-          return false;
-        }
-      } else {
-        return false;
-      }
-      return true;
-#endif // SWIGPYTHON
-
-      // No match
-      return false;
-    }
-  } // namespace casadi
-
-  int to_GenericType(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::GenericType *m = static_cast<casadi::GenericType*>(mv);
-    if (m) m += offs;
-
-    // Call refactored version
-    casadi::GenericType *m_orig = m;
-    if (to_ptr(p, m ? &m : 0)) {
-      if (m!=m_orig) *m_orig=*m;
-      return true;
-    }
-
-    // Failure if reached this point
-    return false;
-  }
- }
-
-%fragment("to"{Dict}, "header", fragment="fwd") {
-  // Traits specialization for Dict
-  namespace casadi {
-    bool to_ptr(GUESTOBJECT *p, GenericType::Dict** m) {
-      // Treat Null
-      if (is_null(p)) return false;
-
-      // Dict already?
-      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                    $descriptor(casadi::GenericType::Dict*), 0))) {
-        return true;
-      }
-
-#ifdef SWIGPYTHON
-      if (PyDict_Check(p)) {
-        PyObject *key, *value;
-        Py_ssize_t pos = 0;
-        GenericType gt;
-        while (PyDict_Next(p, &pos, &key, &value)) {
-          if (!PyString_Check(key)) return false;
-          if (!to_GenericType(value, &gt)) return false;
-          if (m) (**m)[std::string(PyString_AsString(key))] = gt;
-        }
-        return true;
-      }
-#endif // SWIGPYTHON
-
-      // No match
-      return false;
-    }
-  } // namespace casadi
-
-  int to_Dict(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::GenericType::Dict *m = static_cast<casadi::GenericType::Dict*>(mv);
-    if (m) m += offs;
-
-    // Call refactored version
-    casadi::GenericType::Dict *m_orig = m;
-    if (to_ptr(p, m ? &m : 0)) {
-      if (m!=m_orig) *m_orig=*m;
-      return true;
-    }
-
-    // Failure if reached this point
-    return false;
-  }
- }
-%casadi_typemaps_constref(Dict, PRECEDENCE_DICT, casadi::GenericType::Dict)
+%casadi_input_typemaps(Dict, PRECEDENCE_DICT, casadi::GenericType::Dict)
 
 %fragment("to"{SX}, "header", fragment="fwd") {
   // Traits specialization for SX
@@ -3139,7 +3078,7 @@ VECTOR_TOOLS_TEMPLATES(double)
 %include <casadi/core/casadi_types.hpp>
 %include <casadi/core/generic_type.hpp>
 
-%casadi_typemaps_constref(GenericType, PRECEDENCE_GENERICTYPE, casadi::GenericType)
+%casadi_input_typemaps(GenericType, PRECEDENCE_GENERICTYPE, casadi::GenericType)
 %casadi_input_typemaps([GenericType], PRECEDENCE_GENERICTYPE, std::vector<casadi::GenericType>)
 
 %include <casadi/core/options_functionality.hpp>
