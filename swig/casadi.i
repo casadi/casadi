@@ -676,18 +676,6 @@ returntype __pow__ (argtype) const { return pow(selfCast(*$self), argCast(b));}
 returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 %enddef
 
-%fragment("conv_constref", "header") {
-  template<typename T> bool conv_constref(GUESTOBJECT *p, T* &ptr, T &m, swig_type_info *type) {
-    ptr = &m;
-    if (is_null(p)) {
-      m = T();
-      return true;
-    } else {
-      return to_ptr2(p, &ptr);
-    }
-  }
- }
-
 #ifdef SWIGPYTHON
 %inline%{
 // Indicates that self is derived from parent.
@@ -821,8 +809,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %}
 
 // Forward declarations
-%fragment("fwd", "header",
-          fragment="conv_constref"
+%fragment("fwd", "header"
 #ifdef SWIGMATLAB
           ,fragment="get_sparsity,get_nnz"
 #endif // SWIGMATLAB
@@ -1772,6 +1759,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 %fragment("to"{DVector}, "header", fragment="fwd", fragment="to"{double}) {
   int to_ptr2(GUESTOBJECT *p, std::vector<double> **m) {
+    if (is_null(p)) {
+      if (m) **m=std::vector<double>();
+      return true;
+    }
+
 #ifdef SWIGPYTHON
     std::vector< double > *mp = 0;
     if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(std::vector<double> *), 0) != -1) {
@@ -1897,6 +1889,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
 
   int to_ptr2(GUESTOBJECT *p, casadi::SX **m) {
+    if (is_null(p)) {
+      if (m) **m=casadi::SX();
+      return true;
+    }
     return to_val(p, m ? *m : 0);
   }
  }
@@ -1951,6 +1947,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
 
   int to_ptr2(GUESTOBJECT *p, MX **m) {
+    if (is_null(p)) {
+      if (m) **m=casadi::MX();
+      return true;
+    }
     return to_val(p, m ? *m : 0);
   }
  }
@@ -2160,6 +2160,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
 
   int to_ptr2(GUESTOBJECT *p, casadi::DMatrix **m) {
+    if (is_null(p)) {
+      if (m) **m=casadi::DMatrix();
+      return true;
+    }
     return to_val(p, m ? *m : 0);
   }
 }
@@ -2288,6 +2292,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 
   int to_ptr2(GUESTOBJECT *p, casadi::IMatrix **m) {
+    if (is_null(p)) {
+      if (m) **m=casadi::IMatrix();
+      return true;
+    }
     return to_val(p, m ? *m : 0);
   }
  }
@@ -2295,7 +2303,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 // Legacy - to be removed
 %define %casadi_input_typemaps_old(xName, xPrec, xType...)
 %typemap(in, noblock=1, fragment="to"{xName}) const xType & (xType m) {
-  if (!conv_constref($input, $1, m, $1_descriptor)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
+  $1 = &m;
+  if (!to_ptr2($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
  }
 %typemap(freearg, noblock=1) const xType& {}
 %typemap(typecheck, noblock=1, fragment="to"{xName}, precedence=xPrec) const xType& {
