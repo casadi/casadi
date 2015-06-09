@@ -99,6 +99,7 @@
     bool to_ptr(GUESTOBJECT *p, Callback** m);
     bool to_ptr(GUESTOBJECT *p, DerivativeGenerator** m);
     bool to_ptr(GUESTOBJECT *p, CustomEvaluate** m);
+    bool to_ptr(GUESTOBJECT *p, Function** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> >** m);
@@ -111,6 +112,19 @@
       // If pointer changed, copy the object
       if (m!=m2) *m=*m2;
       return ret;
+    }
+
+    // Same as to_ptr, but with GenericType
+    template<typename M> bool to_generic(GUESTOBJECT *p, GenericType** m) {
+      if (m) {
+        // Temporary
+        M tmp, *tmp_ptr=&tmp;
+        bool ret = to_ptr(p, &tmp_ptr);
+        **m = GenericType(*tmp_ptr);
+        return ret;
+      } else {
+        return to_ptr(p, static_cast<M**>(0));
+      }
     }
 
     // Implementations
@@ -1595,7 +1609,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif // SWIGPYTHON
 
 %fragment("to"{string}, "header", fragment="fwd") {
-  // Traits specialization for string
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, std::string** m) {
       // Treat Null
@@ -1636,20 +1649,30 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 }
 
 %fragment("to"{Function}, "header", fragment="fwd") {
+  namespace casadi {
+    bool to_ptr(GUESTOBJECT *p, Function** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      casadi::Function *t = 0;
+      int res = swig::asptr(p, &t);
+      if(SWIG_CheckState(res) && t) {
+        if(m) **m=*t;
+        if (SWIG_IsNewObj(res)) delete t;
+        return true;
+      } else {
+        return false;
+      }
+    }
+  } // namespace casadi
+
+
   int to_Function(GUESTOBJECT *p, void *mv, int offs) {
     casadi::Function *m = static_cast<casadi::Function*>(mv);
     if (m) m += offs;
-    casadi::Function *t = 0;
-    int res = swig::asptr(p, &t);
-    if(SWIG_CheckState(res) && t) {
-      if(m) *m=*t;
-      if (SWIG_IsNewObj(res)) delete t;
-      return true;
-    } else {
-      return false;
-    }
+    return casadi::to_val(p, m);
   }
-}
+ }
 
 %fragment("to"{Map}, "header", fragment="fwd") {
   namespace casadi {
@@ -1967,7 +1990,7 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
         throw CasadiException("CallbackPythonInternal: python method execution raised an Error.");
       }
       int ret = 0;
-      if ( to_int(r, 0)) to_int(r, &ret);
+      if (to_int(r, 0)) to_int(r, &ret);
       Py_DECREF(r);
       return ret;
     }  
@@ -2028,36 +2051,25 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
       // Treat Null
       if (is_null(p)) return false;
 
-      // Dict already?
+      // GenericType already?
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
                                     $descriptor(casadi::GenericType*), 0))) {
         return true;
       }
 
+      // Try to convert to different types
+      if (to_generic<int>(p, m)
+          || to_generic<double>(p, m)
+          || to_generic<std::string>(p, m)
+          || to_generic<std::vector<int> >(p, m)
+          || to_generic<std::vector<double> >(p, m)
+          || to_generic<std::vector<std::string> >(p, m)
+          || to_generic<casadi::Function>(p, m)) {
+        return true;
+      }
+
 #ifdef SWIGPYTHON
-      if (PyBool_Check(p)) {
-        if (m) **m=GenericType((bool) PyInt_AsLong(p));
-      } else if (PyInt_Check(p)) {
-        if (m) **m=GenericType((int) PyInt_AsLong(p));
-      } else if (PyFloat_Check(p)) {
-        if (m) **m=GenericType(PyFloat_AsDouble(p));
-      } else if (to_string(p, 0)) {
-        std::string temp;
-        if (!to_string(p, &temp)) return false;
-        if (m) **m = GenericType(temp);
-      } else if (to_IVector(p, 0)) {
-        std::vector<int> temp;
-        if (!to_IVector(p, &temp)) return false;
-        if (m) **m = GenericType(temp);
-      } else if (to_DVector(p, 0)) {
-        std::vector<double> temp;
-        if (!to_DVector(p, &temp)) return false;
-        if (m) **m = GenericType(temp);
-      } else if (make_vector(p, static_cast<std::vector<std::string>*>(0), to_string)) {
-        std::vector<std::string> temp;
-        if (!make_vector(p, &temp, to_string)) return false;
-        if (m) **m = GenericType(temp);
-      } else if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
+      if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
         PyObject *c = PyObject_GetAttrString(p,"creator");
         if (!c) return false;
         PyObject* gt = getCasadiObject("GenericType");
@@ -2072,7 +2084,7 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
         Py_DECREF(gt);
     
         if (g) {
-          int result = to_GenericType(g, m ? *m : 0);
+          int result = to_ptr(g, m);
           Py_DECREF(g);
           return result;
         }
@@ -2080,10 +2092,6 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
           PyErr_Clear();
           return false;
         }
-      } else if (to_Function(p, 0)) {
-        Function temp;
-        if (!to_Function(p, &temp)) return false;
-        if (m) **m = GenericType(temp);
       } else if (to_Dict(p, 0) || to_DerivativeGenerator(p, 0) || to_Callback(p, 0)) {
         PyObject* gt = getCasadiObject("GenericType");
         if (!gt) return false;
