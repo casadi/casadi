@@ -865,44 +865,6 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
  }
 
 %fragment("to_vector", "header") {
-  int to_vector(GUESTOBJECT * p, void *mv, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
-#ifdef SWIGPYTHON
-    PyObject *it = PyObject_GetIter(p);
-    if (!it) {
-      PyErr_Clear();
-      return false;
-    }
-    PyObject *pe;
-    int size = PySequence_Size(p);
-    if (size==-1) {
-      PyErr_Clear();
-      return false;
-    }
-    int i=0;
-    while ((pe = PyIter_Next(it))) {
-      // Iterate over the sequence inside the sequence
-      if (!f(pe, mv, i++)) {
-        Py_DECREF(pe);
-        Py_DECREF(it);
-        return false;
-      }
-      Py_DECREF(pe);
-    }
-    Py_DECREF(it);
-    return true;
-#endif // SWIGPYTHON
-#ifdef SWIGMATLAB
-    if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
-      int sz = mxGetN(p);
-      for (int i=0; i<sz; ++i) {
-        GUESTOBJECT *pi = mxGetCell(p, i);
-        if (pi==0 || !f(pi, mv, i)) return false;
-      }
-      return true;
-    }
-#endif // SWIGMATLAB
-    return false;
-  }
  }
 
 %fragment("make_vector", "header", fragment="vector_size,to_vector") {
@@ -970,44 +932,6 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 %casadi_freearg_typemap(const xType&)
 %casadi_typecheck_typemap_constref(xName, xPrec, xType)
 %enddef
-
-#ifdef SWIGPYTHON
-
-%define %my_creator_typemap(Precedence,Type...)
-
-%typemap(in) Type {
-  int res = SWIG_ConvertFunctionPtr($input, (void**)(&$1), $descriptor);
-  if (!SWIG_IsOK(res)) {
-    if (PyType_Check($input) && PyObject_HasAttrString($input,"creator")) {
-      PyObject *c = PyObject_GetAttrString($input,"creator");
-      res = SWIG_ConvertFunctionPtr(c, (void**)(&$1), $descriptor);
-      Py_DECREF(c);
-    }
-    if (!SWIG_IsOK(res)) {
-      %argument_fail(res,"$type",$symname, $argnum); 
-    }
-  }
-}
-
-%typemap(typecheck,precedence=Precedence) Type { 
-  void *ptr = 0;
-  int res = SWIG_ConvertFunctionPtr($input, &ptr, $descriptor);
-  $1 = SWIG_CheckState(res);
-  if (!$1 && PyType_Check($input) && PyObject_HasAttrString($input,"creator")) {
-    PyObject *c = PyObject_GetAttrString($input,"creator");
-    res = SWIG_ConvertFunctionPtr(c, &ptr, $descriptor);
-    $1 = SWIG_CheckState(res);
-    Py_DECREF(c);
-  };
-}
-%enddef
-
-#else // SWIGPYTHON
-%define %my_creator_typemap(Precedence,Type...)
-%enddef
-#endif // SWIGPYTHON
-
-
 
 // Create an output typemap for a const ref such that a copy is made
 %define %outputConstRefCopy(Type)
@@ -1877,9 +1801,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #ifdef SWIGPYTHON
 %casadi_typemaps_constref(DVector, PRECEDENCE_DVector, std::vector<double>)
 #endif
-
-%my_creator_typemap(PRECEDENCE_CREATOR, casadi::implicitFunctionCreator);
-%my_creator_typemap(PRECEDENCE_CREATOR, casadi::linearSolverCreator);
 
 %fragment("to"{DerivativeGenerator}, "header", fragment="fwd", fragment="to"{Function}) {
 #ifdef SWIGPYTHON
