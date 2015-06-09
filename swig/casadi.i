@@ -71,8 +71,7 @@
 %}
 #endif
 
-%header %{
-
+%fragment("casadi_decl", "header") {
   namespace casadi {
     /* Check if Null or None */
     bool is_null(GUESTOBJECT *p);
@@ -105,134 +104,12 @@
     template<typename M1, typename M2> bool to_ptr(GUESTOBJECT *p, std::pair<M1, M2>** m);
 
     // Same as the above, but with pointer instead of pointer to pointer
-    template<typename M> bool to_val(GUESTOBJECT *p, M* m) {
-      // Copy the pointer
-      M *m2 = m;
-      bool ret = to_ptr(p, m ? &m2 : 0);
-      // If pointer changed, copy the object
-      if (m!=m2) *m=*m2;
-      return ret;
-    }
-
-    // Same as to_ptr, but with GenericType
-    template<typename M> bool to_generic(GUESTOBJECT *p, GenericType** m) {
-      if (m) {
-        // Temporary
-        M tmp, *tmp_ptr=&tmp;
-        bool ret = to_ptr(p, &tmp_ptr);
-        **m = GenericType(*tmp_ptr);
-        return ret;
-      } else {
-        return to_ptr(p, static_cast<M**>(0));
-      }
-    }
-
-    // Traits for assign vector
-    template<typename E, typename M> struct traits_assign_vector {
-      inline static bool assign(E* d, int sz, std::vector<M>** m) {
-        // Not allowed by default
-        return false;
-      }
-    };
-
-    // int-to-int
-    template<> struct traits_assign_vector<int, int> {
-      inline static bool assign(int* d, int sz, std::vector<int>** m) {
-        if (m) **m = std::vector<int>(d, d+sz);
-        return true;
-      }
-    };
-
-    // long-to-int
-    template<> struct traits_assign_vector<long, int> {
-      inline static bool assign(long* d, int sz, std::vector<int>** m) {
-        if (m) **m = std::vector<int>(d, d+sz);
-        return true;
-      }
-    };
-
-    // long-to-double
-    template<> struct traits_assign_vector<long, double> {
-      inline static bool assign(long* d, int sz, std::vector<double>** m) {
-        if (m) **m = std::vector<double>(d, d+sz);
-        return true;
-      }
-    };
-
-    // int-to-double
-    template<> struct traits_assign_vector<int, double> {
-      inline static bool assign(int* d, int sz, std::vector<double>** m) {
-        if (m) **m = std::vector<double>(d, d+sz);
-        return true;
-      }
-    };
-
-    // double-to-double
-    template<> struct traits_assign_vector<double, double> {
-      inline static bool assign(double* d, int sz, std::vector<double>** m) {
-        if (m) **m = std::vector<double>(d, d+sz);
-        return true;
-      }
-    };
+    template<typename M> bool to_val(GUESTOBJECT *p, M* m);
 
     // Assign to a vector, if conversion is allowed
-    template<typename E, typename M> bool assign_vector(E* d, int sz, std::vector<M>** m) {
-      return traits_assign_vector<E, M>::assign(d, sz, m);
-    }
-  } // namespace casadi
-%}
-
-    // Implementations
-%{
-  namespace casadi {
-
-    bool is_null(GUESTOBJECT *p) {
-#ifdef SWIGPYTHON
-      if (p == Py_None) return true;
-#endif
-#ifdef SWIGMATLAB
-      if (p == 0) return true;
-#endif
-      return false;
-    }
-
-  } // namespace casadi
-%}
-
- // Define all input typemaps
-%define %casadi_input_typemaps(xName, xPrec, xType...)
- // Pass input by value, check if matches
-%typemap(typecheck, noblock=1, precedence=xPrec, fragment="casadi_impl") xType {
-  $1 = casadi::to_ptr($input, static_cast< xType **>(0));
+    template<typename E, typename M> bool assign_vector(E* d, int sz, std::vector<M>** m);
+  }
  }
-
- // Pass input by value, convert argument
-%typemap(in, noblock=1, fragment="casadi_impl") xType {
-  if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to " xName ".");
- }
-
- // Pass input by value, cleanup
-%typemap(freearg, noblock=1) xType {}
-
- // Pass input by reference, check if matches
-%typemap(typecheck, noblock=1, precedence=xPrec, fragment="casadi_impl") const xType& {
-  $1 = casadi::to_ptr($input, static_cast< xType **>(0));
- }
-
- // Pass input by reference, convert argument
-%typemap(in, noblock=1, fragment="casadi_impl") const xType & (xType m) {
-  $1 = &m;
-  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to " xName " .");
-}
-
- // Pass input by reference, cleanup
-%typemap(freearg, noblock=1) const xType & {}
-%enddef
-
-%define %casadi_template(xName, xPrec, xType...)
-%template() xType;
-%casadi_input_typemaps(xName, xPrec, xType)
-%enddef
 
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
 // for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
@@ -867,12 +744,6 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 %fragment("make_vector", "header", fragment="vector_size,to_vector") {
  }
 
-%define %casadi_in_typemap(xName, xType...)
-%typemap(in, noblock=1) xType {
-  if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to xName.");
- }
-%enddef
-
 %fragment("conv_constref", "header", fragment="is_a") {
   template<typename T>
   bool conv_constref(GUESTOBJECT *p, T* &ptr, T &m, swig_type_info *type, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
@@ -897,6 +768,41 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 %typemap(typecheck, noblock=1, fragment="to"{xName}, precedence=xPrec) const xType& {
   $1 = to_##xName($input, static_cast< xType *>(0));
  }
+%enddef
+
+ // Define all input typemaps
+%define %casadi_input_typemaps(xName, xPrec, xType...)
+ // Pass input by value, check if matches
+%typemap(typecheck, noblock=1, precedence=xPrec, fragment="casadi_impl") xType {
+  $1 = casadi::to_ptr($input, static_cast< xType **>(0));
+ }
+
+ // Pass input by value, convert argument
+%typemap(in, noblock=1, fragment="casadi_impl") xType {
+  if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to " xName ".");
+ }
+
+ // Pass input by value, cleanup
+%typemap(freearg, noblock=1) xType {}
+
+ // Pass input by reference, check if matches
+%typemap(typecheck, noblock=1, precedence=xPrec, fragment="casadi_impl") const xType& {
+  $1 = casadi::to_ptr($input, static_cast< xType **>(0));
+ }
+
+ // Pass input by reference, convert argument
+%typemap(in, noblock=1, fragment="casadi_impl") const xType & (xType m) {
+  $1 = &m;
+  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to " xName " .");
+}
+
+ // Pass input by reference, cleanup
+%typemap(freearg, noblock=1) const xType & {}
+%enddef
+
+%define %casadi_template(xName, xPrec, xType...)
+%template() xType;
+%casadi_input_typemaps(xName, xPrec, xType)
 %enddef
 
 // Create an output typemap for a const ref such that a copy is made
@@ -1425,8 +1331,94 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 }
 #endif // SWIGPYTHON
 
-%fragment("casadi_impl", "header") {
+ %fragment("casadi_impl", "header", fragment="casadi_decl") {
   namespace casadi {
+
+    template<typename M> bool to_val(GUESTOBJECT *p, M* m) {
+      // Copy the pointer
+      M *m2 = m;
+      bool ret = to_ptr(p, m ? &m2 : 0);
+      // If pointer changed, copy the object
+      if (m!=m2) *m=*m2;
+      return ret;
+    }
+
+    // Same as to_ptr, but with GenericType
+    template<typename M> bool to_generic(GUESTOBJECT *p, GenericType** m) {
+      if (m) {
+        // Temporary
+        M tmp, *tmp_ptr=&tmp;
+        bool ret = to_ptr(p, &tmp_ptr);
+        **m = GenericType(*tmp_ptr);
+        return ret;
+      } else {
+        return to_ptr(p, static_cast<M**>(0));
+      }
+    }
+
+    // Traits for assign vector
+    template<typename E, typename M> struct traits_assign_vector {
+      inline static bool assign(E* d, int sz, std::vector<M>** m) {
+        // Not allowed by default
+        return false;
+      }
+    };
+
+    // int-to-int
+    template<> struct traits_assign_vector<int, int> {
+      inline static bool assign(int* d, int sz, std::vector<int>** m) {
+        if (m) **m = std::vector<int>(d, d+sz);
+        return true;
+      }
+    };
+
+    // long-to-int
+    template<> struct traits_assign_vector<long, int> {
+      inline static bool assign(long* d, int sz, std::vector<int>** m) {
+        if (m) **m = std::vector<int>(d, d+sz);
+        return true;
+      }
+    };
+
+    // long-to-double
+    template<> struct traits_assign_vector<long, double> {
+      inline static bool assign(long* d, int sz, std::vector<double>** m) {
+        if (m) **m = std::vector<double>(d, d+sz);
+        return true;
+      }
+    };
+
+    // int-to-double
+    template<> struct traits_assign_vector<int, double> {
+      inline static bool assign(int* d, int sz, std::vector<double>** m) {
+        if (m) **m = std::vector<double>(d, d+sz);
+        return true;
+      }
+    };
+
+    // double-to-double
+    template<> struct traits_assign_vector<double, double> {
+      inline static bool assign(double* d, int sz, std::vector<double>** m) {
+        if (m) **m = std::vector<double>(d, d+sz);
+        return true;
+      }
+    };
+
+    // Assign to a vector, if conversion is allowed
+    template<typename E, typename M> bool assign_vector(E* d, int sz, std::vector<M>** m) {
+      return traits_assign_vector<E, M>::assign(d, sz, m);
+    }
+
+    bool is_null(GUESTOBJECT *p) {
+#ifdef SWIGPYTHON
+      if (p == Py_None) return true;
+#endif
+#ifdef SWIGMATLAB
+      if (p == 0) return true;
+#endif
+      return false;
+    }
+
     // Convert to std::vector
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m) {
       // Treat Null
