@@ -1888,10 +1888,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
 
   int to_ptr2(GUESTOBJECT *p, casadi::SX **m) {
-    if (is_null(p)) {
-      if (m) **m=casadi::SX();
-      return true;
-    }
+    if (is_null(p))  return false;
     return to_val(p, m ? *m : 0);
   }
  }
