@@ -1083,7 +1083,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   int to_Dict(GUESTOBJECT *p, void *mv, int offs=0);
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs=0);
   int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_Callback(GUESTOBJECT *p, void *mv, int offs=0);
   int to_DVector(GUESTOBJECT *p, void *mv, int offs=0);
   int to_SX(GUESTOBJECT *p, void *mv, int offs=0);
   int to_MX(GUESTOBJECT *p, void *mv, int offs=0);
@@ -1762,6 +1761,50 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // No match
       return false;
     }
+
+#ifdef SWIGPYTHON
+    int CallbackPythonInternal::call(Function& fcn, void* user_data) {
+      casadi_assert(p_!=0);
+      PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))),
+                                             $descriptor(casadi::CustomFunction *), SWIG_POINTER_OWN |  0 );
+      if(!fcn_py) throw CasadiException("CallbackPythonInternal: failed to convert CustomFunction to python");
+      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, NULL);
+      Py_DECREF(fcn_py);
+      if (!r) {
+        PyErr_Print();
+        throw CasadiException("CallbackPythonInternal: python method execution raised an Error.");
+      }
+      int ret = 0;
+      if (to_val(r, static_cast<int*>(0))) to_val(r, &ret);
+      Py_DECREF(r);
+      return ret;
+    }  
+#endif // SWIGPYTHON
+
+    bool to_ptr(GUESTOBJECT *p, Callback** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // Callback already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::Callback*), 0))) {
+        return true;
+      }
+
+#ifdef SWIGPYTHON
+      PyObject* return_type = getReturnType(p);
+      if (!return_type) return false;
+      bool res = PyType_IsSubtype((PyTypeObject *)return_type, &PyInt_Type)
+        || PyType_IsSubtype((PyTypeObject *)return_type, &PyLong_Type);
+      Py_DECREF(return_type);
+      if (res) {
+        if (m) **m = casadi::CallbackPython(p);
+        return true;
+      }
+#endif // SWIGPYTHON
+      // No match
+      return false;
+    }
   } // namespace casadi
  }
 
@@ -1872,66 +1915,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 %casadi_typemaps_constref(CustomEvaluate, PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
 
-%fragment("to"{Callback}, "header", fragment="fwd", fragment="to"{int}) {
-#ifdef SWIGPYTHON
-  namespace casadi {
-    int CallbackPythonInternal::call(Function& fcn, void* user_data) {
-      casadi_assert(p_!=0);
-      PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))),
-                                             $descriptor(casadi::CustomFunction *), SWIG_POINTER_OWN |  0 );
-      if(!fcn_py) throw CasadiException("CallbackPythonInternal: failed to convert CustomFunction to python");
-      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, NULL);
-      Py_DECREF(fcn_py);
-      if (!r) {
-        PyErr_Print();
-        throw CasadiException("CallbackPythonInternal: python method execution raised an Error.");
-      }
-      int ret = 0;
-      if (to_val(r, static_cast<int*>(0))) to_val(r, &ret);
-      Py_DECREF(r);
-      return ret;
-    }  
-  } // namespace casadi
-#endif // SWIGPYTHON
-
-  namespace casadi {
-    bool to_ptr(GUESTOBJECT *p, Callback** m) {
-      // Treat Null
-      if (is_null(p)) return false;
-
-      // Callback already?
-      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                    $descriptor(casadi::Callback*), 0))) {
-        return true;
-      }
-
-#ifdef SWIGPYTHON
-      PyObject* return_type = getReturnType(p);
-      if (!return_type) return false;
-      bool res = PyType_IsSubtype((PyTypeObject *)return_type, &PyInt_Type)
-        || PyType_IsSubtype((PyTypeObject *)return_type, &PyLong_Type);
-      Py_DECREF(return_type);
-      if (res) {
-        if (m) **m = casadi::CallbackPython(p);
-        return true;
-      }
-#endif // SWIGPYTHON
-      // No match
-      return false;
-    }
-  } // namespace casadi
-
-  int to_Callback(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::Callback *m = static_cast<casadi::Callback*>(mv);
-    if (m) m += offs;
-
-    // Call refactored version
-    if (to_val(p, m)) return true;
-
-    return false;
-  }
- }
-%casadi_typemaps_constref(Callback, PRECEDENCE_CALLBACK, casadi::Callback)
+%casadi_input_typemaps(Callback, PRECEDENCE_CALLBACK, casadi::Callback)
 
 %fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string}) {
   // Traits specialization for GenericType
@@ -1988,7 +1972,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           PyErr_Clear();
           return false;
         }
-      } else if (to_Dict(p, 0) || to_ptr(p, static_cast<DerivativeGenerator**>(0)) || to_Callback(p, 0)) {
+      } else if (to_Dict(p, 0)
+                 || to_ptr(p, static_cast<DerivativeGenerator**>(0))
+                 || to_ptr(p, static_cast<Callback**>(0))) {
         PyObject* gt = getCasadiObject("GenericType");
         if (!gt) return false;
 
