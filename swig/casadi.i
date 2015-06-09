@@ -1082,7 +1082,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
   int to_Dict(GUESTOBJECT *p, void *mv, int offs=0);
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs=0);
   int to_DVector(GUESTOBJECT *p, void *mv, int offs=0);
   int to_SX(GUESTOBJECT *p, void *mv, int offs=0);
   int to_MX(GUESTOBJECT *p, void *mv, int offs=0);
@@ -1805,6 +1804,45 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // No match
       return false;
     }
+
+#ifdef SWIGPYTHON
+    void CustomEvaluatePythonInternal::call(CustomFunction& fcn, void* user_data) {
+      casadi_assert(p_!=0);
+      PyObject * fcn_py = SWIG_NewPointerObj((new CustomFunction(static_cast< const CustomFunction& >(fcn))),
+                                             $descriptor(casadi::CustomFunction *), SWIG_POINTER_OWN |  0 );
+      if(!fcn_py) throw CasadiException("CustomEvaluatePythonInternal: failed to convert CustomFunction to python");
+      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, NULL);
+      Py_DECREF(fcn_py);
+      if (!r) {
+        PyErr_Print();
+        throw CasadiException("CustomEvaluatePythonInternal: Python method execution raised an Error.");
+      }
+      Py_DECREF(r);
+    }
+#endif // SWIGPYTHON
+
+    bool to_ptr(GUESTOBJECT *p, CustomEvaluate** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // Callback already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::CustomEvaluate*), 0))) {
+        return true;
+      }
+
+#ifdef SWIGPYTHON
+      PyObject* return_type = getReturnType(p);
+      bool res = (return_type==Py_None) || !return_type;
+      if (return_type) Py_DECREF(return_type);
+      if (res) {
+        if (m) **m = casadi::CustomEvaluatePython(p);
+      }
+      return res;
+#endif // SWIGPYTHON
+      // No match
+      return false;
+    }
   } // namespace casadi
  }
 
@@ -1858,63 +1896,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif
 
 %casadi_input_typemaps(DerivativeGenerator, PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
-
-%fragment("to"{CustomEvaluate}, "header", fragment="fwd") {
-#ifdef SWIGPYTHON
-  namespace casadi {
-    void CustomEvaluatePythonInternal::call(CustomFunction& fcn, void* user_data) {
-      casadi_assert(p_!=0);
-      PyObject * fcn_py = SWIG_NewPointerObj((new CustomFunction(static_cast< const CustomFunction& >(fcn))),
-                                             $descriptor(casadi::CustomFunction *), SWIG_POINTER_OWN |  0 );
-      if(!fcn_py) throw CasadiException("CustomEvaluatePythonInternal: failed to convert CustomFunction to python");
-      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, NULL);
-      Py_DECREF(fcn_py);
-      if (!r) {
-        PyErr_Print();
-        throw CasadiException("CustomEvaluatePythonInternal: Python method execution raised an Error.");
-      }
-      Py_DECREF(r);
-    }
-  } // namespace casadi
-#endif // SWIGPYTHON
-
-  namespace casadi {
-    bool to_ptr(GUESTOBJECT *p, CustomEvaluate** m) {
-      // Treat Null
-      if (is_null(p)) return false;
-
-      // Callback already?
-      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                    $descriptor(casadi::CustomEvaluate*), 0))) {
-        return true;
-      }
-
-#ifdef SWIGPYTHON
-      PyObject* return_type = getReturnType(p);
-      bool res = (return_type==Py_None) || !return_type;
-      if (return_type) Py_DECREF(return_type);
-      if (res) {
-        if (m) **m = casadi::CustomEvaluatePython(p);
-      }
-      return res;
-#endif // SWIGPYTHON
-      // No match
-      return false;
-    }
-  } // namespace casadi
-
-  int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::CustomEvaluate *m = static_cast<casadi::CustomEvaluate*>(mv);
-    if (m) m += offs;
-
-    // Call refactored version
-    if (to_val(p, m)) return true;
-
-    return false;
-  }
- }
-%casadi_typemaps_constref(CustomEvaluate, PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
-
+%casadi_input_typemaps(CustomEvaluate, PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
 %casadi_input_typemaps(Callback, PRECEDENCE_CALLBACK, casadi::Callback)
 
 %fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string}) {
