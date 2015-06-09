@@ -258,7 +258,7 @@ namespace casadi {
     void get(double& val) const;
     void get(double* val, bool tr=false) const;
 #endif // SWIG
-    void get(std::vector<double>& SWIG_OUTPUT(m), bool tr=false) const;
+    void get(std::vector<double>& SWIG_OUTPUT(m)) const;
     ///@}
 
     ///@{

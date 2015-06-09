@@ -609,11 +609,8 @@ class typemaptests(casadiTestCase):
     B = matrix([[4.0,5],[6,7]])
     
     w.set(A)
-    B = np.array(w.get(True)).reshape(B.shape)
-    
-    self.checkarray(B,A,"get")
-    
-    B = np.array(w.get(False)).reshape(B.shape)
+
+    B = np.array(w.get()).reshape(B.shape)
     
     self.checkarray(B.T,A,"get")
     
