@@ -676,19 +676,20 @@ returntype __pow__ (argtype) const { return pow(selfCast(*$self), argCast(b));}
 returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 %enddef
 
-%fragment("conv_constref", "header", fragment="is_a") {
+%fragment("conv_constref", "header") {
   template<typename T>
-  bool conv_constref(GUESTOBJECT *p, T* &ptr, T &m, swig_type_info *type, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
+  bool conv_constref(GUESTOBJECT *p, T* &ptr, T &m, swig_type_info *type, int (*f)(GUESTOBJECT *p, void *mv)) {
     if (is_null(p)) {
       m = T();
       ptr = &m;
       return true;
-    }
-    if (!is_null(p) && SWIG_ConvertPtr(p, (void **)&ptr, type, 0) == -1) {
-      if (!f(p, &m, 0)) return false;
+    } else if (SWIG_IsOK(SWIG_ConvertPtr(p, (void **)&ptr, type, 0))) {
+      return true;
+    } else {
+      if (!f(p, &m)) return false;
       ptr = &m;
+      return true;
     }
-    return true;
   }
  }
 
@@ -832,11 +833,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif // SWIGMATLAB
           ) {
 
-  int to_DVector(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_SX(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_MX(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_DMatrix(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_IMatrix(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_DVector(GUESTOBJECT *p, void *mv);
+  int to_SX(GUESTOBJECT *p, void *mv);
+  int to_MX(GUESTOBJECT *p, void *mv);
+  int to_DMatrix(GUESTOBJECT *p, void *mv);
+  int to_IMatrix(GUESTOBJECT *p, void *mv);
 
   GUESTOBJECT * from_GenericType(const casadi::GenericType &a);
   GUESTOBJECT * from_Dict(const casadi::GenericType::Dict &a);
@@ -1774,10 +1775,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 
 
-%fragment("to"{DVector}, "header", fragment="fwd,make_vector", fragment="to"{double}) {
-  int to_DVector(GUESTOBJECT *p, void *mv, int offs) {
+%fragment("to"{DVector}, "header", fragment="fwd", fragment="to"{double}) {
+  int to_DVector(GUESTOBJECT *p, void *mv) {
     std::vector<double> *m = static_cast<std::vector<double>*>(mv);
-    if (m) m += offs;
 #ifdef SWIGPYTHON
     std::vector< double > *mp = 0;
     if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(std::vector<double> *), 0) != -1) {
@@ -1902,9 +1902,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     }
   } // namespace casadi
 
-  int to_SX(GUESTOBJECT *p, void *mv, int offs) {
+  int to_SX(GUESTOBJECT *p, void *mv) {
     casadi::SX *m = static_cast<casadi::SX*>(mv);
-    if (m) m += offs;
 
     // Call refactored version
     casadi::SX *m_orig = m;
@@ -1966,9 +1965,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     }
   } // namespace casadi
 
-  int to_MX(GUESTOBJECT *p, void *mv, int offs) {
+  int to_MX(GUESTOBJECT *p, void *mv) {
     MX *m = static_cast<MX*>(mv);
-    if (m) m += offs;
 
     // Call refactored version
     casadi::MX *m_orig = m;
@@ -1982,7 +1980,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   }
  }
 
-%fragment("to"{DMatrix}, "header", fragment="fwd,make_vector", fragment="to"{double}) {
+%fragment("to"{DMatrix}, "header", fragment="fwd", fragment="to"{double}) {
   // Traits specialization for DMatrix
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, DMatrix** m) {
@@ -2186,9 +2184,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     }
   } // namespace casadi
 
-  int to_DMatrix(GUESTOBJECT *p, void *mv, int offs) {
+  int to_DMatrix(GUESTOBJECT *p, void *mv) {
     casadi::DMatrix *m = static_cast<casadi::DMatrix*>(mv);
-    if (m) m += offs;
 
     // Call refactored version
     casadi::DMatrix *m_orig = m;
@@ -2202,7 +2199,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 }
 
 
-%fragment("to"{IMatrix}, "header", fragment="fwd,make_vector", fragment="to"{int}) {
+%fragment("to"{IMatrix}, "header", fragment="fwd", fragment="to"{int}) {
   // Traits specialization for IMatrix
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, IMatrix** m) {
@@ -2324,10 +2321,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
 
 
-  int to_IMatrix(GUESTOBJECT *p, void *mv, int offs) {
+  int to_IMatrix(GUESTOBJECT *p, void *mv) {
     casadi::IMatrix *m = static_cast<casadi::IMatrix*>(mv);
-    // Use operator=
-    if (m) m += offs;
 
     // Call refactored version
     casadi::IMatrix *m_orig = m;
