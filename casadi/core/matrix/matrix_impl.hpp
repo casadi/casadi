@@ -2921,9 +2921,9 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::get(std::vector<double>& val, bool tr) const {
+  void Matrix<DataType>::get(std::vector<double>& val) const {
     val.resize(this->numel());
-    get(getPtr(val), tr);
+    get(getPtr(val), false);
   }
 
   template<typename DataType>

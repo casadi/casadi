@@ -244,9 +244,10 @@ namespace casadi {
     }
 
     // Copy A to a row-major dense vector
-    const double* a=0;
+    const double* a = 0;
     if (nc_>0) {
-      input(QP_SOLVER_A).get(a_data_, true);
+      double* a_mutable = getPtr(a_data_);
+      input(QP_SOLVER_A).get(a_mutable, true);
       a = getPtr(a_data_);
     }
 
