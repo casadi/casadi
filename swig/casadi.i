@@ -680,15 +680,14 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
   template<typename T>
   bool conv_constref(GUESTOBJECT *p, T* &ptr, T &m, swig_type_info *type, int (*f)(GUESTOBJECT *p, T **mv)) {
     if (is_null(p)) {
-      m = T();
       ptr = &m;
+      m = T();
       return true;
     } else if (SWIG_IsOK(SWIG_ConvertPtr(p, (void **)&ptr, type, 0))) {
       return true;
     } else {
-      T* m2= &m;
-      if (!f(p, &m2)) return false;
       ptr = &m;
+      if (!to_ptr2(p, &ptr)) return false;
       return true;
     }
   }
