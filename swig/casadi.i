@@ -127,7 +127,64 @@
       }
     }
 
+    // Traits for assign vector
+    template<typename E, typename M> struct traits_assign_vector {
+      inline static bool assign(E* d, int sz, std::vector<M>** m) {
+        // Not allowed by default
+        return false;
+      }
+    };
+
+    // int-to-int
+    template<> struct traits_assign_vector<int, int> {
+      inline static bool assign(int* d, int sz, std::vector<int>** m) {
+        if (m) **m = std::vector<int>(d, d+sz);
+        return true;
+      }
+    };
+
+    // long-to-int
+    template<> struct traits_assign_vector<long, int> {
+      inline static bool assign(long* d, int sz, std::vector<int>** m) {
+        if (m) **m = std::vector<int>(d, d+sz);
+        return true;
+      }
+    };
+
+    // long-to-double
+    template<> struct traits_assign_vector<long, double> {
+      inline static bool assign(long* d, int sz, std::vector<double>** m) {
+        if (m) **m = std::vector<double>(d, d+sz);
+        return true;
+      }
+    };
+
+    // int-to-double
+    template<> struct traits_assign_vector<int, double> {
+      inline static bool assign(int* d, int sz, std::vector<double>** m) {
+        if (m) **m = std::vector<double>(d, d+sz);
+        return true;
+      }
+    };
+
+    // double-to-double
+    template<> struct traits_assign_vector<double, double> {
+      inline static bool assign(double* d, int sz, std::vector<double>** m) {
+        if (m) **m = std::vector<double>(d, d+sz);
+        return true;
+      }
+    };
+
+    // Assign to a vector, if conversion is allowed
+    template<typename E, typename M> bool assign_vector(E* d, int sz, std::vector<M>** m) {
+      return traits_assign_vector<E, M>::assign(d, sz, m);
+    }
+  } // namespace casadi
+%}
+
     // Implementations
+%{
+  namespace casadi {
 
     bool is_null(GUESTOBJECT *p) {
 #ifdef SWIGPYTHON
@@ -139,89 +196,18 @@
       return false;
     }
 
-    // Convert to std::vector
-    template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m) {
-      // Treat Null
-      if (is_null(p)) return false;
-#ifdef SWIGPYTHON
-      // Python sequence
-      if (PyList_Check(p) || PyTuple_Check(p)) {
-
-        // Iterator to the sequence
-        PyObject *it = PyObject_GetIter(p);
-        if (!it) {
-          PyErr_Clear();
-          return false;
-        }
-      
-        // Get size
-        Py_ssize_t sz = PySequence_Size(p);
-        if (sz==-1) {
-          PyErr_Clear();
-          return false;
-        }
-
-        // Allocate elements
-        if (m) (**m).resize(sz);
-
-        // Iterate over sequence
-        for (Py_ssize_t i=0; i!=sz; ++i) {
-          PyObject *pe=PyIter_Next(it);
-          // Convert element
-          M *m_i = m ? &(**m).at(i) : 0, *m_i2=m_i;
-          if (!to_ptr(pe, m_i ? &m_i : 0)) {
-            // Failure
-            Py_DECREF(pe);
-            Py_DECREF(it);
-            return false;
-          }
-          if (m_i!=m_i2) *m_i2=*m_i; // If only pointer changed
-          Py_DECREF(pe);
-        }
-        Py_DECREF(it);
-        return true;
-      }
-#endif // SWIGPYTHON
-#ifdef SWIGMATLAB
-      // Cell arrays (only row vectors)
-      if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
-        // Get size
-        int sz = mxGetN(p);
-
-        // Allocate elements
-        if (m) (**m).resize(sz);
-
-        // Loop over elements
-        for (int i=0; i<sz; ++i) {
-          // Get element
-          mxArray* pe = mxGetCell(p, i);
-          if (pe==0) return false;
-
-          // Convert element
-          M *m_i = m ? &(**m).at(i) : 0, *m_i2=m_i;
-          if (!to_ptr(pe, m_i ? &m_i : 0)) {
-            return false;
-          }
-          if (m_i!=m_i2) *m_i2=*m_i; // If only pointer changed
-        }
-        return true;
-      }
-#endif // SWIGMATLAB
-      // No match
-      return false;
-    }
   } // namespace casadi
 %}
 
  // Define all input typemaps
 %define %casadi_input_typemaps(xName, xPrec, xType...)
  // Pass input by value, check if matches
-%typemap(typecheck, noblock=1, precedence=xPrec) xType {
+%typemap(typecheck, noblock=1, precedence=xPrec, fragment="casadi_impl") xType {
   $1 = casadi::to_ptr($input, static_cast< xType **>(0));
  }
 
  // Pass input by value, convert argument
-%typemap(in, noblock=1) xType {
+%typemap(in, noblock=1, fragment="casadi_impl") xType {
   if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to xName.");
  }
 
@@ -229,12 +215,12 @@
 %typemap(freearg, noblock=1) xType {}
 
  // Pass input by reference, check if matches
-%typemap(typecheck, noblock=1, precedence=xPrec) const xType& {
+%typemap(typecheck, noblock=1, precedence=xPrec, fragment="casadi_impl") const xType& {
   $1 = casadi::to_ptr($input, static_cast< xType **>(0));
  }
 
  // Pass input by reference, convert argument
-%typemap(in, noblock=1) const xType & (xType m) {
+%typemap(in, noblock=1, fragment="casadi_impl") const xType & (xType m) {
   $1 = &m;
   if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
 }
@@ -1194,7 +1180,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Callback(GUESTOBJECT *p, void *mv, int offs=0);
   int to_DVector(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_IVector(GUESTOBJECT *p, void *mv, int offs=0);
   int to_SX(GUESTOBJECT *p, void *mv, int offs=0);
   int to_MX(GUESTOBJECT *p, void *mv, int offs=0);
   int to_DMatrix(GUESTOBJECT *p, void *mv, int offs=0);
@@ -1538,6 +1523,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   }
  }
 
+
+
 %casadi_input_typemaps(int, SWIG_TYPECHECK_INTEGER, int)
 %casadi_input_typemaps(double, SWIG_TYPECHECK_DOUBLE, double)
 
@@ -1737,62 +1724,129 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 
 
-%fragment("to"{IVector}, "header", fragment="fwd,make_vector", fragment="to"{int}) {
-  int to_IVector(GUESTOBJECT *p, void *mv, int offs) {
-    std::vector<int> *m = static_cast<std::vector<int>*>(mv);
-    if (m) m += offs;
+%fragment("casadi_impl", "header") {
+  namespace casadi {
+    // Convert to std::vector
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m) {
+      // Treat Null
+      if (is_null(p)) return false;
 #ifdef SWIGPYTHON
-    std::vector< int > *mp = 0;
-    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(std::vector<int> *), 0) != -1) {
-      if (m) *m=*mp;
-      return true;
-    } else if (is_array(p)) {
-      if (!(array_numdims(p)==1 && array_type(p)!=NPY_OBJECT)) {
-        //SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array must be 1D and of a numeric type");
-        return false;
-      }
-      int size = array_size(p,0);
-      if (!array_is_native(p)) {
-        //SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array byte order should be native.");
-        return false;
-      }
+      // 1D numpy array
+      if (is_array(p) && array_numdims(p)==1 && array_type(p)!=NPY_OBJECT && array_is_native(p)) {
+        int sz = array_size(p,0);
       
-      // Make sure we have a contigous array with int datatype
-      int array_is_new_object;
-      PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
-      if (!array) { // Trying LONG
-        array = obj_to_array_contiguous_allow_conversion(p,NPY_LONG,&array_is_new_object);
-        if (!array) { 
-          //PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "std::vector<int>: no luck converting numpy array to int. Better don't use unsigned datatypes.");
+        // Make sure we have a contigous array with int datatype
+        int array_is_new_object;
+        PyArrayObject* array;
+
+        // Trying NPY_INT
+        if (assign_vector<int, M>(0, 0, 0)) {
+          array = obj_to_array_contiguous_allow_conversion(p, NPY_INT, &array_is_new_object);
+          if (array) {
+            int *d = reinterpret_cast<int*>(array_data(array));
+            int flag = assign_vector(d, sz, m);
+            if (array_is_new_object) Py_DECREF(array); 
+            return flag;
+          }
+        }
+
+        // Trying NPY_LONG
+        if (assign_vector<long, M>(0, 0, 0)) {
+          array = obj_to_array_contiguous_allow_conversion(p, NPY_LONG, &array_is_new_object);
+          if (array) {
+            long* d= reinterpret_cast<long*>(array_data(array));
+            int flag = assign_vector(d, sz, m);
+            if (array_is_new_object) Py_DECREF(array); 
+            return flag;
+          }
+        }
+
+        // Trying NPY_DOUBLE
+        if (assign_vector<double, M>(0, 0, 0)) {
+          array = obj_to_array_contiguous_allow_conversion(p, NPY_DOUBLE, &array_is_new_object);
+          if (array) {
+            double* d= reinterpret_cast<double*>(array_data(array));
+            int flag = assign_vector(d, sz, m);
+            if (array_is_new_object) Py_DECREF(array); 
+            return flag;
+          }
+        }
+
+        // No match
+        return false;
+      }
+      // Python sequence
+      if (PyList_Check(p) || PyTuple_Check(p)) {
+
+        // Iterator to the sequence
+        PyObject *it = PyObject_GetIter(p);
+        if (!it) {
+          PyErr_Clear();
           return false;
         }
-        long* temp=(long*) array_data(array);
-        if (m) {
-          m->resize(size);
-          for (int k=0; k<size; k++) (*m)[k]=temp[k];
+      
+        // Get size
+        Py_ssize_t sz = PySequence_Size(p);
+        if (sz==-1) {
+          PyErr_Clear();
+          return false;
+        }
+
+        // Allocate elements
+        if (m) (**m).resize(sz);
+
+        // Iterate over sequence
+        for (Py_ssize_t i=0; i!=sz; ++i) {
+          PyObject *pe=PyIter_Next(it);
+          // Convert element
+          M *m_i = m ? &(**m).at(i) : 0, *m_i2=m_i;
+          if (!to_ptr(pe, m_i ? &m_i : 0)) {
+            // Failure
+            Py_DECREF(pe);
+            Py_DECREF(it);
+            return false;
+          }
+          if (m_i!=m_i2) *m_i2=*m_i; // If only pointer changed
+          Py_DECREF(pe);
+        }
+        Py_DECREF(it);
+        return true;
+      }
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+      // Cell arrays (only row vectors)
+      if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
+        // Get size
+        int sz = mxGetN(p);
+
+        // Allocate elements
+        if (m) (**m).resize(sz);
+
+        // Loop over elements
+        for (int i=0; i<sz; ++i) {
+          // Get element
+          mxArray* pe = mxGetCell(p, i);
+          if (pe==0) return false;
+
+          // Convert element
+          M *m_i = m ? &(**m).at(i) : 0, *m_i2=m_i;
+          if (!to_ptr(pe, m_i ? &m_i : 0)) {
+            return false;
+          }
+          if (m_i!=m_i2) *m_i2=*m_i; // If only pointer changed
         }
         return true;
       }
-      int *d=(int*) array_data(array);
-
-      if (m) m->assign( d, d+size );
-
-                  
-      // Free memory
-      if (array_is_new_object)
-        Py_DECREF(array); 
-      return true;
+#endif // SWIGMATLAB
+      // No match
+      return false;
     }
-    return make_vector(p, m, to_int);
-#endif // SWIGPYTHON
-    return false;
-  }
-}
+  } // namespace casadi
+ }
 
-// TODO: Remove completely?
-#ifdef SWIGPYTHON
-%casadi_typemaps_constref(IVector, PRECEDENCE_IVector, std::vector<int>)
-#endif
+
+%casadi_input_typemaps([int], PRECEDENCE_IVector, std::vector<int>)
+
 
 %fragment("to"{DVector}, "header", fragment="fwd,make_vector", fragment="to"{double}) {
   int to_DVector(GUESTOBJECT *p, void *mv, int offs) {
@@ -1975,7 +2029,7 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
  }
 %casadi_typemaps_constref(CustomEvaluate, PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
 
-%fragment("to"{Callback}, "header", fragment="fwd") {
+%fragment("to"{Callback}, "header", fragment="fwd", fragment="to"{int}) {
 #ifdef SWIGPYTHON
   namespace casadi {
     int CallbackPythonInternal::call(Function& fcn, void* user_data) {
@@ -2037,7 +2091,7 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
 %casadi_typemaps_constref(Callback, PRECEDENCE_CALLBACK, casadi::Callback)
 
 %fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string},
-          fragment="to"{IVector}, fragment="to"{DVector}, fragment="to"{Function}) {
+          fragment="to"{DVector}, fragment="to"{Function}) {
   // Traits specialization for GenericType
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, GenericType** m) {
@@ -2645,7 +2699,7 @@ int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
 %casadi_input_typemaps([MX], PRECEDENCE_MXVector, std::vector<casadi::MX>)
 
 
-%fragment("to"{IMatrix}, "header", fragment="fwd,make_vector") {
+%fragment("to"{IMatrix}, "header", fragment="fwd,make_vector", fragment="to"{int}) {
   // Traits specialization for IMatrix
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, IMatrix** m) {
