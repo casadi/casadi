@@ -892,45 +892,14 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
   }
  }
 
-%define %casadi_in_typemap_constref2(xName, xType...)
-%typemap(in, noblock=1) const xType & (xType m) {
-  $1 = &m;
-  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
-}
-%enddef
-
-%define %casadi_in_typemap_constref(xName, xType...)
+%define %casadi_input_typemaps_old(xName, xPrec, xType...)
 %typemap(in, noblock=1, fragment="to"{xName}) const xType & (xType m) {
   if (!conv_constref($input, $1, m, $1_descriptor, to_##xName)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
  }
-%enddef
-
-%define %casadi_freearg_typemap(xType...)
-%typemap(freearg, noblock=1) xType {}
-%enddef
-
-%define %casadi_typecheck_typemap(xName, xPrec, xType...)
-%typemap(typecheck, noblock=1, fragment="to"{xName}, precedence=xPrec) xType {
-  $1 = to_##xName($input, static_cast< xType *>(0));
- }
-%enddef
-
-%define %casadi_typecheck_typemap_constref(xName, xPrec, xType...)
+%typemap(freearg, noblock=1) const xType& {}
 %typemap(typecheck, noblock=1, fragment="to"{xName}, precedence=xPrec) const xType& {
   $1 = to_##xName($input, static_cast< xType *>(0));
  }
-%enddef
-
-%define %casadi_typemaps(xName, xPrec, xType...)
-%casadi_in_typemap(xName, xType)
-%casadi_freearg_typemap(xType)
-%casadi_typecheck_typemap(xName, xPrec, xType)
-%enddef
-
-%define %casadi_typemaps_constref(xName, xPrec, xType...)
-%casadi_in_typemap_constref(xName, xType)
-%casadi_freearg_typemap(const xType&)
-%casadi_typecheck_typemap_constref(xName, xPrec, xType)
 %enddef
 
 // Create an output typemap for a const ref such that a copy is made
@@ -2000,7 +1969,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 // TODO: Remove completely?
 #ifdef SWIGPYTHON
-%casadi_typemaps_constref(DVector, PRECEDENCE_DVector, std::vector<double>)
+%casadi_input_typemaps_old(DVector, PRECEDENCE_DVector, std::vector<double>)
 #endif
 
 %casadi_input_typemaps("DerivativeGenerator", PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
@@ -2039,24 +2008,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
                                       $descriptor(casadi::Matrix<int>*), 0))) {
           if (m) **m=*m2;
-          return true;
-        }
-      }
-
-      // First convert to double
-      if (false) {
-        double tmp;
-        if (SWIG_IsOK(SWIG_AsVal_double(p, m ? &tmp : 0))) {
-          if (m) **m=tmp;
-          return true;
-        }
-      }
-
-      // First convert to integer
-      if (false) {
-        int tmp;
-        if (SWIG_IsOK(SWIG_AsVal_int(p, m ? &tmp : 0))) {
-          if (m) **m=tmp;
           return true;
         }
       }
@@ -2126,7 +2077,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     return false;
   }
  }
-%casadi_typemaps_constref(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
+%casadi_input_typemaps_old(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
 %casadi_input_typemaps("[SX]", PRECEDENCE_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
 %casadi_input_typemaps("[[SX]]", PRECEDENCE_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
 
@@ -2194,7 +2145,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     return false;
   }
  }
-%casadi_typemaps_constref(MX, PRECEDENCE_MX, casadi::MX)
+%casadi_input_typemaps_old(MX, PRECEDENCE_MX, casadi::MX)
 
  /* Maps are treated as dictionaries in the target language
     First instantiate the templates (no proxy classes needed)
@@ -2260,22 +2211,13 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         }
       }
 
-      // First convert to a vector<double>
-      if (false) {
-        std::vector<double> tmp, *tmp_ptr=m ? &tmp : 0;
-        if (SWIG_IsOK(swig::asval(p, tmp_ptr))) {
-          if (m) **m = tmp.empty() ? DMatrix() : DMatrix(tmp);
-          return true;
-        }
-      }
-
 #ifdef SWIGPYTHON
       // Object has __DMatrix__ method
       if (PyObject_HasAttrString(p,"__DMatrix__")) {
         char name[] = "__DMatrix__";
         PyObject *cr = PyObject_CallMethod(p, name, 0);
         if (!cr) return false;
-        int result = to_DMatrix(cr, m ? *m : 0);
+        int result = to_val(cr, m ? *m : 0);
         Py_DECREF(cr);
         return result;
       }
@@ -2388,7 +2330,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         char name[] = "tocsc";
         PyObject *cr = PyObject_CallMethod(p, name,0);
         if (!cr) return false;
-        int result = to_DMatrix(cr, m ? *m : 0);
+        int result = to_val(cr, m ? *m : 0);
         Py_DECREF(cr);
         return result;
       }
@@ -2445,7 +2387,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     return false;
   }
 }
-%casadi_typemaps_constref(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
+%casadi_input_typemaps_old(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
 %casadi_input_typemaps("[MX]", PRECEDENCE_MXVector, std::vector<casadi::MX>)
 
 
@@ -2467,28 +2409,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         int tmp;
         if (SWIG_IsOK(SWIG_AsVal_int(p, m ? &tmp : 0))) {
           if (m) **m=tmp;
-          return true;
-        }
-      }
-
-#ifdef SWIGPYTHON
-      // User-supplied conversion
-      if (false && PyObject_HasAttrString(p,"__IMatrix__")) {
-        char cmd[] = "__IMatrix__";
-        PyObject *cr = PyObject_CallMethod(p, cmd, 0);
-        if (!cr) return false;
-        // Call recursively
-        int flag = to_ptr(cr, m);
-        Py_DECREF(cr);
-        return flag;
-      }
-#endif // SWIGPYTHON
-
-      // First convert to DMatrix and check if all entries integers
-      if (false) {
-        DMatrix tmp;
-        if (to_DMatrix(p, &tmp) && tmp.isInteger()) {
-          if (m) **m=IMatrix(tmp.sparsity(), tmp.nonzeros_int());
           return true;
         }
       }
@@ -2547,7 +2467,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         char cmd[] = "__IMatrix__";
         PyObject *cr = PyObject_CallMethod(p, cmd, 0);
         if (!cr) return false;
-        int result = to_IMatrix(cr, m ? *m : 0);
+        int result = to_val(cr, m ? *m : 0);
         Py_DECREF(cr);
         return result;
       }
@@ -2610,14 +2530,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 
 %casadi_input_typemaps("[[MX]]", PRECEDENCE_MXVectorVector, std::vector<std::vector<casadi::MX> >)
-
 %casadi_input_typemaps("[DMatrix]", PRECEDENCE_DMatrixVector, std::vector< casadi::Matrix<double> >)
 %casadi_input_typemaps("[[DMatrix]]", PRECEDENCE_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
-
-%casadi_typemaps_constref(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
+%casadi_input_typemaps_old(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
 %casadi_input_typemaps("[IMatrix]", PRECEDENCE_IMatrixVector, std::vector< casadi::Matrix<int> >)
 %casadi_input_typemaps("[[IMatrix]]", PRECEDENCE_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
-
 %casadi_input_typemaps("[[int]]", PRECEDENCE_IVectorVector, std::vector<std::vector<int> >)
 
 %define %my_value_output_typemaps(Type,...)
@@ -2633,10 +2550,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 #ifdef SWIGPYTHON
 %outputRefOwn(casadi::Sparsity)
-
 %outputRefNew(std::vector< int >)
 %outputRefNew(std::vector< double >)
-
 %outputRefOwn(casadi::Matrix< double >)
 %outputRefOwn(casadi::Matrix< casadi::SXElement >)
 #endif // SWIGPYTHON
