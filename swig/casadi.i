@@ -1086,9 +1086,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   int to_DMatrix(GUESTOBJECT *p, void *mv, int offs=0);
   int to_IMatrix(GUESTOBJECT *p, void *mv, int offs=0);
 
-  template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m);
-  template<typename M> int to_PairMap(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> > *m);
-
   GUESTOBJECT * from_GenericType(const casadi::GenericType &a);
   GUESTOBJECT * from_Dict(const casadi::GenericType::Dict &a);
 
@@ -1461,69 +1458,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   if(!($result = from_Dict(*$1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
 }
 #endif // SWIGPYTHON
-
-%fragment("to"{Map}, "header", fragment="fwd") {
-  namespace casadi {
-    template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m) {
-#ifdef SWIGPYTHON
-      if (PyDict_Check(p)) {
-        PyObject *key, *value;
-        Py_ssize_t pos = 0;
-        while (PyDict_Next(p, &pos, &key, &value)) {
-          if (!PyString_Check(key)) return false;
-          if (m) {
-            M *v=&(**m)[std::string(PyString_AsString(key))], *v2=v;
-            if (!casadi::to_ptr(value, &v)) return false;
-            if (v!=v2) *v2=*v; // if only pointer changed
-          } else {
-            if (!casadi::to_ptr(value, static_cast<M**>(0))) return false;
-          }
-        }
-        return true;
-      }
-#endif // SWIGPYTHON
-      return false;
-    }
-  } // namespace casadi
-
-  template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m) {
-    return casadi::to_val(p, m);
-  }
- }
-
-%fragment("to"{PairMap}, "header", fragment="fwd") {
-  namespace casadi {
-    template<typename M> bool to_ptr(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> >** m) {
-#ifdef SWIGPYTHON
-      if (PyTuple_Check(p) && PyTuple_Size(p)==2) {
-        // Convert map
-        GUESTOBJECT *p_first = PyTuple_GetItem(p, 0);
-        std::map<std::string, M> *m_first=0;
-        if (m) m_first=&(*m)->first;
-        if (!to_Map(p_first, m_first)) return false;
-        // Convert vector of strings
-        GUESTOBJECT *p_second = PyTuple_GetItem(p, 1);
-        if (!PyList_Check(p_second)) return false;
-        Py_ssize_t n = PyList_Size(p_second);
-        if (m) (*m)->second.resize(n);
-        for (Py_ssize_t i=0; i!=n; ++i) {
-          GUESTOBJECT *s_i = PyList_GetItem(p_second, i);
-          if (!PyString_Check(s_i)) return false;
-          if (m) (*m)->second.at(i) = std::string(PyString_AsString(s_i));
-        }
-        // Success
-        return true;
-      }
-#endif // SWIGPYTHON
-      return false;
-    }
-  } // namespace casadi
-
-  template<typename M> int to_PairMap(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> > *m) {
-    return casadi::to_val(p, m);
-  }
- }
-
 
 %fragment("casadi_impl", "header") {
   namespace casadi {
@@ -1983,6 +1917,52 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // No match
       return false;
     }
+
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m) {
+#ifdef SWIGPYTHON
+      if (PyDict_Check(p)) {
+        PyObject *key, *value;
+        Py_ssize_t pos = 0;
+        while (PyDict_Next(p, &pos, &key, &value)) {
+          if (!PyString_Check(key)) return false;
+          if (m) {
+            M *v=&(**m)[std::string(PyString_AsString(key))], *v2=v;
+            if (!casadi::to_ptr(value, &v)) return false;
+            if (v!=v2) *v2=*v; // if only pointer changed
+          } else {
+            if (!casadi::to_ptr(value, static_cast<M**>(0))) return false;
+          }
+        }
+        return true;
+      }
+#endif // SWIGPYTHON
+      return false;
+    }
+
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::pair<std::map<std::string, M>, std::vector<std::string> >** m) {
+#ifdef SWIGPYTHON
+      if (PyTuple_Check(p) && PyTuple_Size(p)==2) {
+        // Convert map
+        GUESTOBJECT *p_first = PyTuple_GetItem(p, 0);
+        std::map<std::string, M> *m_first=0;
+        if (m) m_first=&(*m)->first;
+        if (!to_val(p_first, m_first)) return false;
+        // Convert vector of strings
+        GUESTOBJECT *p_second = PyTuple_GetItem(p, 1);
+        if (!PyList_Check(p_second)) return false;
+        Py_ssize_t n = PyList_Size(p_second);
+        if (m) (*m)->second.resize(n);
+        for (Py_ssize_t i=0; i!=n; ++i) {
+          GUESTOBJECT *s_i = PyList_GetItem(p_second, i);
+          if (!PyString_Check(s_i)) return false;
+          if (m) (*m)->second.at(i) = std::string(PyString_AsString(s_i));
+        }
+        // Success
+        return true;
+      }
+#endif // SWIGPYTHON
+      return false;
+    }
   } // namespace casadi
  }
 
@@ -2236,32 +2216,18 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %template() std::map<std::string, casadi::Sparsity >;
 %template() std::map<std::string, std::vector<casadi::Sparsity > >;
 
-/* Map conversion from dictionaries (default routines handle opposite direction) */
-%define %typemaps_map(xName, xPrec, xType...)
-%casadi_typecheck_typemap_constref(Map, xPrec, std::map<std::string, xType >)
-%casadi_in_typemap_constref2(Map, std::map<std::string, xType >)
-%casadi_freearg_typemap(const std::map<std::string, xType >&)
-%enddef
-%typemaps_map(Map, PRECEDENCE_MX, casadi::MX)
-%typemaps_map(Map, PRECEDENCE_DMatrix, casadi::Matrix<double>)
-%typemaps_map(Map, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
+%casadi_input_typemaps(str:MX, PRECEDENCE_MX, std::map<std::string, casadi::MX>)
+%casadi_input_typemaps(str:DMatrix, PRECEDENCE_DMatrix, std::map<std::string, casadi::Matrix<double> >)
+%casadi_input_typemaps(str:SX, PRECEDENCE_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
 
- /* Pair of above maps and vector of strings
-  */
 %template() std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >;
 %template() std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >;
 %template() std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >;
 %template() std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >;
 
-/* Pair of Map conversion from dictionaries (default routines handle opposite direction) */
-%define %typemaps_pairmap(xPrec, xType...)
-%casadi_typecheck_typemap_constref(PairMap, xPrec, std::pair<std::map<std::string, xType >, std::vector<std::string> >)
-%casadi_in_typemap_constref2(PairMap, std::pair<std::map<std::string, xType >, std::vector<std::string> >)
-%casadi_freearg_typemap(const std::pair<std::map<std::string, xType >, std::vector<std::string> >&)
-%enddef
-%typemaps_pairmap(PRECEDENCE_MX, casadi::MX)
-%typemaps_pairmap(PRECEDENCE_DMatrix, casadi::Matrix<double>)
-%typemaps_pairmap(PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
+%casadi_input_typemaps(str:MX_[str], PRECEDENCE_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
+%casadi_input_typemaps(str:DMatrix_[str], PRECEDENCE_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
+%casadi_input_typemaps(str:SX_[str], PRECEDENCE_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
 
 %fragment("to"{DMatrix}, "header", fragment="fwd,make_vector", fragment="to"{double}) {
   // Traits specialization for DMatrix
