@@ -1760,8 +1760,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("to"{DVector}, "header", fragment="fwd", fragment="to"{double}) {
   int to_ptr2(GUESTOBJECT *p, std::vector<double> **m) {
     if (is_null(p)) {
-      if (m) **m=std::vector<double>();
-      return true;
+      return false;
     }
 
 #ifdef SWIGPYTHON
