@@ -2272,14 +2272,14 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %enddef
 
  // Define all input typemaps
-%define %casadi_input_typemaps(xName, xPrec, xType...)
+%define %casadi_input_typemaps(xFrag, xName, xPrec, xType...)
  // Pass input by value, check if matches
-%typemap(typecheck, noblock=1, precedence=xPrec, fragment="casadi_impl") xType {
+%typemap(typecheck, noblock=1, precedence=xPrec, fragment=xFrag) xType {
   $1 = casadi::to_ptr($input, static_cast< xType **>(0));
  }
 
  // Pass input by value, convert argument
-%typemap(in, noblock=1, fragment="casadi_impl") xType {
+%typemap(in, noblock=1, fragment=xFrag) xType {
   if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to " xName ".");
  }
 
@@ -2287,12 +2287,12 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %typemap(freearg, noblock=1) xType {}
 
  // Pass input by reference, check if matches
-%typemap(typecheck, noblock=1, precedence=xPrec, fragment="casadi_impl") const xType& {
+%typemap(typecheck, noblock=1, precedence=xPrec, fragment=xFrag) const xType& {
   $1 = casadi::to_ptr($input, static_cast< xType **>(0));
  }
 
  // Pass input by reference, convert argument
-%typemap(in, noblock=1, fragment="casadi_impl") const xType & (xType m) {
+%typemap(in, noblock=1, fragment=xFrag) const xType & (xType m) {
   $1 = &m;
   if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to " xName " .");
 }
@@ -2301,9 +2301,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %typemap(freearg, noblock=1) const xType & {}
 %enddef
 
-%define %casadi_template(xName, xPrec, xType...)
+%define %casadi_template(xFrag, xName, xPrec, xType...)
 %template() xType;
-%casadi_input_typemaps(xName, xPrec, xType)
+%casadi_input_typemaps(xFrag, xName, xPrec, xType)
 %enddef
 
 // Order in typemap matching: Lower value means will be checked first
@@ -2334,41 +2334,41 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 %template() std::vector< casadi::Sparsity > ;
 %template() std::vector< std::vector< casadi::Sparsity> > ;
-%casadi_input_typemaps("int", SWIG_TYPECHECK_INTEGER, int)
-%casadi_input_typemaps("double", SWIG_TYPECHECK_DOUBLE, double)
-%casadi_input_typemaps("[int]", PRECEDENCE_IVector, std::vector<int>)
+%casadi_input_typemaps("casadi_impl", "int", SWIG_TYPECHECK_INTEGER, int)
+%casadi_input_typemaps("casadi_impl", "double", SWIG_TYPECHECK_DOUBLE, double)
+%casadi_input_typemaps("casadi_impl", "[int]", PRECEDENCE_IVector, std::vector<int>)
 #ifdef SWIGPYTHON
 %casadi_input_typemaps_old(DVector, PRECEDENCE_DVector, std::vector<double>)
 #endif
-%casadi_input_typemaps("DerivativeGenerator", PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
-%casadi_input_typemaps("CustomEvaluate", PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
-%casadi_input_typemaps("Callback", PRECEDENCE_CALLBACK, casadi::Callback)
-%casadi_input_typemaps("Dict", PRECEDENCE_DICT, casadi::GenericType::Dict)
+%casadi_input_typemaps("casadi_impl", "DerivativeGenerator", PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
+%casadi_input_typemaps("casadi_impl", "CustomEvaluate", PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
+%casadi_input_typemaps("casadi_impl", "Callback", PRECEDENCE_CALLBACK, casadi::Callback)
+%casadi_input_typemaps("casadi_impl", "Dict", PRECEDENCE_DICT, casadi::GenericType::Dict)
 %casadi_input_typemaps_old(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
-%casadi_template("[SX]", PRECEDENCE_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
-%casadi_template("[[SX]]", PRECEDENCE_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
+%casadi_template("casadi_impl", "[SX]", PRECEDENCE_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
+%casadi_template("casadi_impl", "[[SX]]", PRECEDENCE_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
 %casadi_input_typemaps_old(MX, PRECEDENCE_MX, casadi::MX)
 %template() std::map<std::string, casadi::Sparsity >;
 %template() std::map<std::string, std::vector<casadi::Sparsity > >;
-%casadi_template("str:MX", PRECEDENCE_MX, std::map<std::string, casadi::MX>)
-%casadi_template("str:DMatrix", PRECEDENCE_DMatrix, std::map<std::string, casadi::Matrix<double> >)
-%casadi_template("str:SX", PRECEDENCE_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
+%casadi_template("casadi_impl", "str:MX", PRECEDENCE_MX, std::map<std::string, casadi::MX>)
+%casadi_template("casadi_impl", "str:DMatrix", PRECEDENCE_DMatrix, std::map<std::string, casadi::Matrix<double> >)
+%casadi_template("casadi_impl", "str:SX", PRECEDENCE_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
 %template() std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >;
-%casadi_template("(str:MX,[str])", PRECEDENCE_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
-%casadi_template("(str:DMatrix,[str])", PRECEDENCE_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
-%casadi_template("(str:SX,[str])", PRECEDENCE_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
+%casadi_template("casadi_impl", "(str:MX,[str])", PRECEDENCE_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
+%casadi_template("casadi_impl", "(str:DMatrix,[str])", PRECEDENCE_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
+%casadi_template("casadi_impl", "(str:SX,[str])", PRECEDENCE_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
 %casadi_input_typemaps_old(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
-%casadi_template("[MX]", PRECEDENCE_MXVector, std::vector<casadi::MX>)
-%casadi_template("[[MX]]", PRECEDENCE_MXVectorVector, std::vector<std::vector<casadi::MX> >)
-%casadi_template("[DMatrix]", PRECEDENCE_DMatrixVector, std::vector< casadi::Matrix<double> >)
-%casadi_template("[[DMatrix]]", PRECEDENCE_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
+%casadi_template("casadi_impl", "[MX]", PRECEDENCE_MXVector, std::vector<casadi::MX>)
+%casadi_template("casadi_impl", "[[MX]]", PRECEDENCE_MXVectorVector, std::vector<std::vector<casadi::MX> >)
+%casadi_template("casadi_impl", "[DMatrix]", PRECEDENCE_DMatrixVector, std::vector< casadi::Matrix<double> >)
+%casadi_template("casadi_impl", "[[DMatrix]]", PRECEDENCE_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
 %casadi_input_typemaps_old(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
-%casadi_template("[IMatrix]", PRECEDENCE_IMatrixVector, std::vector< casadi::Matrix<int> >)
-%casadi_template("[[IMatrix]]", PRECEDENCE_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
-%casadi_input_typemaps("[[int]]", PRECEDENCE_IVectorVector, std::vector<std::vector<int> >)
-%casadi_input_typemaps("GenericType", PRECEDENCE_GENERICTYPE, casadi::GenericType)
-%casadi_input_typemaps("[GenericType]", PRECEDENCE_GENERICTYPE, std::vector<casadi::GenericType>)
-%casadi_input_typemaps("Slice", PRECEDENCE_SLICE, casadi::Slice)
+%casadi_template("casadi_impl", "[IMatrix]", PRECEDENCE_IMatrixVector, std::vector< casadi::Matrix<int> >)
+%casadi_template("casadi_impl", "[[IMatrix]]", PRECEDENCE_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
+%casadi_input_typemaps("casadi_impl", "[[int]]", PRECEDENCE_IVectorVector, std::vector<std::vector<int> >)
+%casadi_input_typemaps("casadi_impl", "GenericType", PRECEDENCE_GENERICTYPE, casadi::GenericType)
+%casadi_input_typemaps("casadi_impl", "[GenericType]", PRECEDENCE_GENERICTYPE, std::vector<casadi::GenericType>)
+%casadi_input_typemaps("casadi_impl", "Slice", PRECEDENCE_SLICE, casadi::Slice)
 %template() std::pair<casadi::Function,casadi::Function>;
 %template() std::pair<casadi::MX, std::vector<casadi::MX> >;
 %template() std::vector<casadi::Integrator>;
