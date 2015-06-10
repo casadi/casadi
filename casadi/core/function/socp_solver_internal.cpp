@@ -171,8 +171,8 @@ namespace casadi {
     /*****************************************************************
      * Categorize number of optimization variables for dual problem  *
      *****************************************************************/
-    
-    // Empty list of indices 
+
+    // Empty list of indices
     primal_idx_lba_.resize(0);
     primal_idx_uba_.resize(0);
     primal_idx_lbx_.resize(0);
@@ -180,20 +180,20 @@ namespace casadi {
 
     // Loop over linear equality constraints
     for (int i=0;i<nc_;++i) {
-      if (primal_LBA.at(i) != -std::numeric_limits<double>::infinity()){
+      if (primal_LBA.at(i) != -std::numeric_limits<double>::infinity()) {
         primal_idx_lba_.push_back(i);
       }
-      if (primal_UBA.at(i) != std::numeric_limits<double>::infinity()){
+      if (primal_UBA.at(i) != std::numeric_limits<double>::infinity()) {
         primal_idx_uba_.push_back(i);
       }
     }
 
     // Loop over simple bounds
     for (int i=0;i<n_;++i) {
-      if (primal_LBX.at(i) != -std::numeric_limits<double>::infinity()){
+      if (primal_LBX.at(i) != -std::numeric_limits<double>::infinity()) {
         primal_idx_lbx_.push_back(i);
       }
-      if (primal_UBX.at(i) != std::numeric_limits<double>::infinity()){
+      if (primal_UBX.at(i) != std::numeric_limits<double>::infinity()) {
         primal_idx_ubx_.push_back(i);
       }
     }
@@ -206,11 +206,11 @@ namespace casadi {
     dual_c_.resize(m_+N_);
     int start_idx = 0;
     int end_idx = m_;
-    std::copy(primal_F.data().begin(),primal_F.data().end(),dual_c_.begin()+start_idx);
-    std::for_each(dual_c_.begin()+start_idx,dual_c_.begin()+end_idx,[](double& in){in=-in;});
+    std::copy(primal_F.data().begin(), primal_F.data().end(), dual_c_.begin()+start_idx);
+    std::for_each(dual_c_.begin()+start_idx, dual_c_.begin()+end_idx, [](double& in){in=-in;});
     start_idx = end_idx;
     end_idx += N_;
-    std::copy(primal_H.data().begin(),primal_H.data().end(),dual_c_.begin()+start_idx);
+    std::copy(primal_H.data().begin(), primal_H.data().end(), dual_c_.begin()+start_idx);
     for (int i : primal_idx_lba_) dual_c_.push_back(primal_LBA.data()[i]);
     for (int i : primal_idx_uba_) dual_c_.push_back(-primal_UBA.data()[i]);
     for (int i : primal_idx_lbx_) dual_c_.push_back(primal_LBX.data()[i]);
@@ -223,20 +223,22 @@ namespace casadi {
     dual_A_row_.resize(primal_E.size()+primal_G.size());
     dual_A_colind_.resize(m_+N_+1);
 
-    // TODO: replace T()-call by casadi_trans()
+    // TODO(jgillis): replace T()-call by casadi_trans()
     DMatrix primal_A_T = primal_A.T();
     const Sparsity& primal_A_T_sparse = primal_A_T.sparsity();
     start_idx = 0;
     end_idx = primal_E.size();
-    std::copy(primal_E.data().begin(),primal_E.data().end(),dual_A_data_.begin()+start_idx);
-    std::for_each(dual_A_data_.begin()+start_idx,dual_A_data_.begin()+end_idx,[](double& in){in=-in;});
+    std::copy(primal_E.data().begin(), primal_E.data().end(), dual_A_data_.begin()+start_idx);
+    std::for_each(
+      dual_A_data_.begin()+start_idx,
+      dual_A_data_.begin()+end_idx, [](double& in){in=-in;});
     start_idx = end_idx;
     end_idx += primal_G.size();
-    std::copy(primal_G.data().begin(),primal_G.data().end(),dual_A_data_.begin()+start_idx);
+    std::copy(primal_G.data().begin(), primal_G.data().end(), dual_A_data_.begin()+start_idx);
     for (int i : primal_idx_lba_) {
       begin_colind = primal_A_T_sparse.colind(i);
       end_colind = primal_A_T_sparse.colind(i+1);
-      for (int ii=begin_colind; ii<end_colind;++ii){
+      for (int ii=begin_colind; ii<end_colind;++ii) {
         dual_A_data_.push_back(-primal_A_T.data()[ii]);
         dual_A_row_.push_back(primal_A_T_sparse.getRow()[ii]);
       }
@@ -245,7 +247,7 @@ namespace casadi {
     for (int i : primal_idx_uba_) {
       begin_colind = primal_A_T_sparse.colind(i);
       end_colind = primal_A_T_sparse.colind(i+1);
-      for (int ii=begin_colind; ii<end_colind;++ii){
+      for (int ii=begin_colind; ii<end_colind;++ii) {
         dual_A_data_.push_back(primal_A_T.data()[ii]);
         dual_A_row_.push_back(primal_A_T_sparse.getRow()[ii]);
       }
@@ -263,7 +265,7 @@ namespace casadi {
     }
 
     // b-vector
-    std::copy(primal_C.data().begin(),primal_C.data().end(),dual_b_.begin());
+    std::copy(primal_C.data().begin(), primal_C.data().end(), dual_b_.begin());
 
   }
 

@@ -137,17 +137,19 @@ namespace casadi {
     /// Vector of affine terms in linear inequality constraint in dual SOCP
     std::vector<double>  dual_b_;
 
-    /// Indices of lower bounded linear inequality constraints (LBA != -inf), used to set up dual SOCP variables
-    std::vector<int>  primal_idx_lba_;     
+    /** Indices of lower bounded linear inequality constraints (LBA != -inf),
+    used to set up dual SOCP variables */
+    std::vector<int>  primal_idx_lba_;
 
-    /// Indices of upper bounded linear inequality constraints (UBA != inf), used to set up dual SOCP variables
-    std::vector<int>  primal_idx_uba_;  
+    /** Indices of upper bounded linear inequality constraints (UBA != inf),
+    used to set up dual SOCP variables */
+    std::vector<int>  primal_idx_uba_;
 
-    /// Indices of simple lower bounds  (LBX != -inf), used to set up dual SOCP variables 
+    /// Indices of simple lower bounds  (LBX != -inf), used to set up dual SOCP variables
     std::vector<int>  primal_idx_lbx_;
 
-    /// Indices of simple upper bounds (UBX != inf), used to set up dual SOCP variables     
-    std::vector<int>  primal_idx_ubx_;     
+    /// Indices of simple upper bounds (UBX != inf), used to set up dual SOCP variables
+    std::vector<int>  primal_idx_ubx_;
 };
 
 

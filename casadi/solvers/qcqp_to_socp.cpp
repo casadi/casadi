@@ -198,12 +198,12 @@ namespace casadi {
     socp_e_colind.push_back(0);
     for (int i=0;i<nq_+1;++i) socp_e_colind.push_back(1);
     socp_e_row.push_back(n_);
-    Sparsity socp_e(n_+1,nq_+1,socp_e_colind,socp_e_row);
+    Sparsity socp_e(n_+1, nq_+1, socp_e_colind, socp_e_row);
 
     // Create an SocpSolver instance
     solver_ = SocpSolver(getOption(solvername()),
                          socpStruct("g", horzcat(socp_g),
-                                    "e", socp_e, 
+                                    "e", socp_e,
                                     "a", horzcat(input(QCQP_SOLVER_A).sparsity(),
                                                  Sparsity(nc_, 1))));
     //solver_.setQCQPOptions();
