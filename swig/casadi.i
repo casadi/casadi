@@ -815,12 +815,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif // SWIGMATLAB
           ) {
 
-  int to_ptr2(GUESTOBJECT *p, std::vector<double> **m);
-  int to_ptr2(GUESTOBJECT *p, casadi::SX **m);
-  int to_ptr2(GUESTOBJECT *p, casadi::MX **m);
-  int to_ptr2(GUESTOBJECT *p, casadi::DMatrix **m);
-  int to_ptr2(GUESTOBJECT *p, casadi::IMatrix **m);
-
   GUESTOBJECT * from_GenericType(const casadi::GenericType &a);
   GUESTOBJECT * from_Dict(const casadi::GenericType::Dict &a);
 }
@@ -1758,45 +1752,47 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 
 %fragment("to"{DVector}, "header", fragment="fwd", fragment="to"{double}) {
-  int to_ptr2(GUESTOBJECT *p, std::vector<double> **m) {
-    if (is_null(p)) return false;
+  namespace casadi {
+    int to_ptr(GUESTOBJECT *p, std::vector<double> **m) {
+      if (is_null(p)) return false;
 
 #ifdef SWIGPYTHON
-    std::vector< double > *mp = 0;
-    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(std::vector<double> *), 0) != -1) {
-      if (m) **m=*mp;
-      return true;
-    } else if (is_array(p)) {
-      if (!(array_numdims(p)==1 && array_type(p)!=NPY_OBJECT)) {
-        return false;
-        //SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array must be 1D and of a numeric type");
-      }
-      int size = array_size(p,0);
-      if (!array_is_native(p)) {
-        return false;
-        //SWIG_Error_return(SWIG_TypeError, "std::vector<double>: array byte order should be native.");
-      }
-      // Make sure we have a contigous array with double datatype
-      int array_is_new_object;
-      PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
-      if (!array) { 
-        //PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double");
-        return false;
-      }
-      double* d=(double*) array_data(array);
+      std::vector< double > *mp = 0;
+      if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(std::vector<double> *), 0) != -1) {
+        if (m) **m=*mp;
+        return true;
+      } else if (is_array(p)) {
+        if (!(array_numdims(p)==1 && array_type(p)!=NPY_OBJECT)) {
+          return false;
+          //SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array must be 1D and of a numeric type");
+        }
+        int size = array_size(p,0);
+        if (!array_is_native(p)) {
+          return false;
+          //SWIG_Error_return(SWIG_TypeError, "std::vector<double>: array byte order should be native.");
+        }
+        // Make sure we have a contigous array with double datatype
+        int array_is_new_object;
+        PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
+        if (!array) { 
+          //PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double");
+          return false;
+        }
+        double* d=(double*) array_data(array);
     
-      if (m) (*m)->assign( d, d+size );
+        if (m) (*m)->assign( d, d+size );
     
                   
-      // Free memory
-      if (array_is_new_object)
-        Py_DECREF(array); 
-      return true;
-    }
-    return to_val(p, m ? *m : 0);
+        // Free memory
+        if (array_is_new_object)
+          Py_DECREF(array); 
+        return true;
+      }
+      return to_val(p, m ? *m : 0);
 #endif // SWIGPYTHON
-    return false;
-  }
+      return false;
+    }
+  } // namespace casadi
  }
 
 %fragment("to"{SX}, "header", fragment="fwd") {
@@ -1885,10 +1881,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
   } // namespace casadi
-
-  int to_ptr2(GUESTOBJECT *p, casadi::SX **m) {
-    return to_ptr(p, m);
-  }
  }
 
 %fragment("to"{MX}, "header", fragment="fwd") {
@@ -1939,10 +1931,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
   } // namespace casadi
-
-  int to_ptr2(GUESTOBJECT *p, MX **m) {
-    return to_ptr(p, m);
-  }
  }
 
 %fragment("to"{DMatrix}, "header", fragment="fwd", fragment="to"{double}) {
@@ -2148,10 +2136,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
   } // namespace casadi
-
-  int to_ptr2(GUESTOBJECT *p, casadi::DMatrix **m) {
-    return to_ptr(p, m);
-  }
 }
 
 
@@ -2275,22 +2259,17 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
   } // namespace casadi
-
-
-  int to_ptr2(GUESTOBJECT *p, casadi::IMatrix **m) {
-    return to_ptr(p, m);
-  }
  }
 
 // Legacy - to be removed
 %define %casadi_input_typemaps_old(xName, xPrec, xType...)
 %typemap(in, noblock=1, fragment="to"{xName}) const xType & (xType m) {
   $1 = &m;
-  if (!to_ptr2($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
+  if (!to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
  }
 %typemap(freearg, noblock=1) const xType& {}
 %typemap(typecheck, noblock=1, fragment="to"{xName}, precedence=xPrec) const xType& {
-  $1 = to_ptr2($input, static_cast< xType **>(0));
+  $1 = to_ptr($input, static_cast< xType **>(0));
  }
 %enddef
 
