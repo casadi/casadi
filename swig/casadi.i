@@ -1759,9 +1759,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 %fragment("to"{DVector}, "header", fragment="fwd", fragment="to"{double}) {
   int to_ptr2(GUESTOBJECT *p, std::vector<double> **m) {
-    if (is_null(p)) {
-      return false;
-    }
+    if (is_null(p)) return false;
 
 #ifdef SWIGPYTHON
     std::vector< double > *mp = 0;
@@ -1856,15 +1854,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         casadi::SX mT;
         if (m) mT = casadi::SX::zeros(ncols, nrows);
         int k=0;
-        casadi::SX tmp, *tmp2=&tmp;
+        casadi::SX tmp, *tmp2;
         PyObject *pe;
         while (it->index < it->size) { 
           pe = *((PyObject**) PyArray_ITER_DATA(it));
-          if (!to_ptr2(pe, &tmp2) || !tmp.isScalar()) {
+          tmp2=&tmp;
+          if (!to_ptr(pe, &tmp2) || !tmp2->isScalar()) {
             Py_DECREF(it);
             return false;
           }
-          if (m) mT(k++) = tmp;
+          if (m) mT(k++) = *tmp2;
           PyArray_ITER_NEXT(it);
         }
         Py_DECREF(it);
@@ -2153,10 +2152,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
 
   int to_ptr2(GUESTOBJECT *p, casadi::DMatrix **m) {
-    if (is_null(p)) {
-      if (m) **m=casadi::DMatrix();
-      return true;
-    }
+    if (is_null(p)) return false;
     return to_val(p, m ? *m : 0);
   }
 }
