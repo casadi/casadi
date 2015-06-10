@@ -45,7 +45,56 @@
 %}
 #endif
 
-%fragment("casadi_decl", "header") {
+#ifdef SWIGMATLAB
+// Get sparsity pattern
+%fragment("get_sparsity", "header") {
+  Sparsity getSparsity(const mxArray* p) {
+    // Get sparsity pattern
+    size_t nrow = mxGetM(p);
+    size_t ncol = mxGetN(p);
+
+    if (mxIsSparse(p)) {
+      // Sparse storage in MATLAB
+      mwIndex *Jc = mxGetJc(p);
+      mwIndex *Ir = mxGetIr(p);
+
+      // Store in vectors
+      std::vector<int> colind(ncol+1);
+      std::copy(Jc, Jc+colind.size(), colind.begin());
+      std::vector<int> row(colind.back());
+      std::copy(Ir, Ir+row.size(), row.begin());
+
+      // Create pattern and return
+      return casadi::Sparsity(nrow, ncol, colind, row);
+    } else {
+      return casadi::Sparsity::dense(nrow, ncol);
+    }
+  }
+ }
+
+// Number of nonzeros
+%fragment("get_nnz", "header") {
+  size_t getNNZ(const mxArray* p) {
+    // Dimensions
+    size_t nrow = mxGetM(p);
+    size_t ncol = mxGetN(p);
+    if (mxIsSparse(p)) {
+      // Sparse storage in MATLAB
+      mwIndex *Jc = mxGetJc(p);
+      return Jc[ncol];
+    } else {
+      return nrow*ncol;
+    }
+  }
+}
+#endif // SWIGMATLAB
+
+%fragment("casadi_decl", "header"
+#ifdef SWIGMATLAB
+          ,fragment="get_sparsity,get_nnz"
+#endif // SWIGMATLAB
+          ) {
+
   namespace casadi {
     /* Check if Null or None */
     bool is_null(GUESTOBJECT *p);
@@ -82,7 +131,11 @@
 
     // Assign to a vector, if conversion is allowed
     template<typename E, typename M> bool assign_vector(E* d, int sz, std::vector<M>** m);
-  }
+
+  } // namespace CasADi
+
+  GUESTOBJECT * from_GenericType(const casadi::GenericType &a);
+  GUESTOBJECT * from_Dict(const casadi::GenericType::Dict &a);
  }
 
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
@@ -760,64 +813,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %}
 #endif // SWIGPYTHON
 
-#ifdef SWIGMATLAB
-// Get sparsity pattern
-%fragment("get_sparsity", "header") {
-  Sparsity getSparsity(const mxArray* p) {
-    // Get sparsity pattern
-    size_t nrow = mxGetM(p);
-    size_t ncol = mxGetN(p);
-
-    if (mxIsSparse(p)) {
-      // Sparse storage in MATLAB
-      mwIndex *Jc = mxGetJc(p);
-      mwIndex *Ir = mxGetIr(p);
-
-      // Store in vectors
-      std::vector<int> colind(ncol+1);
-      std::copy(Jc, Jc+colind.size(), colind.begin());
-      std::vector<int> row(colind.back());
-      std::copy(Ir, Ir+row.size(), row.begin());
-
-      // Create pattern and return
-      return casadi::Sparsity(nrow, ncol, colind, row);
-    } else {
-      return casadi::Sparsity::dense(nrow, ncol);
-    }
-  }
- }
-
-// Number of nonzeros
-%fragment("get_nnz", "header") {
-  size_t getNNZ(const mxArray* p) {
-    // Dimensions
-    size_t nrow = mxGetM(p);
-    size_t ncol = mxGetN(p);
-    if (mxIsSparse(p)) {
-      // Sparse storage in MATLAB
-      mwIndex *Jc = mxGetJc(p);
-      return Jc[ncol];
-    } else {
-      return nrow*ncol;
-    }
-  }
-}
-#endif // SWIGMATLAB
-
 %{
 #define SWIG_Error_return(code, msg)  { std::cerr << "Error occured in CasADi SWIG interface code:" << std::endl << "  "<< msg << std::endl;SWIG_Error(code, msg); return 0; }
 %}
-
-// Forward declarations
-%fragment("fwd", "header"
-#ifdef SWIGMATLAB
-          ,fragment="get_sparsity,get_nnz"
-#endif // SWIGMATLAB
-          ) {
-
-  GUESTOBJECT * from_GenericType(const casadi::GenericType &a);
-  GUESTOBJECT * from_Dict(const casadi::GenericType::Dict &a);
-}
 
 #ifdef SWIGPYTHON
 %{
@@ -964,7 +962,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %}
 #endif
 
-%fragment("to"{int}, "header", fragment="fwd") {
+%fragment("to"{int}, "header", fragment="casadi_decl") {
   // Traits specialization for int
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, int** m) {
@@ -1027,7 +1025,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
  }
 
-%fragment("to"{double}, "header", fragment="fwd") {
+%fragment("to"{double}, "header", fragment="casadi_decl") {
   // Traits specialization for double
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, double** m) {
@@ -1102,7 +1100,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 
 #ifdef SWIGPYTHON
-%fragment("from"{GenericType}, "header", fragment="fwd") {
+%fragment("from"{GenericType}, "header", fragment="casadi_decl") {
   GUESTOBJECT * from_GenericType(const casadi::GenericType &a) {
     GUESTOBJECT *p = 0;
     if (a.isBool()) {
@@ -1147,7 +1145,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   $result = ret;
 }
 
-%fragment("from"{Dict}, "header", fragment="fwd") {
+%fragment("from"{Dict}, "header", fragment="casadi_decl") {
   GUESTOBJECT * from_Dict(const casadi::GenericType::Dict &a) {
     PyObject *p = PyDict_New();
     casadi::GenericType::Dict::const_iterator end = a.end();
@@ -1751,7 +1749,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 
 
-%fragment("to"{DVector}, "header", fragment="fwd", fragment="to"{double}) {
+%fragment("to"{DVector}, "header", fragment="casadi_decl", fragment="to"{double}) {
   namespace casadi {
     int to_ptr(GUESTOBJECT *p, std::vector<double> **m) {
       if (is_null(p)) return false;
@@ -1795,7 +1793,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
  }
 
-%fragment("to"{SX}, "header", fragment="fwd") {
+%fragment("to"{SX}, "header", fragment="casadi_decl") {
   // Traits specialization for SX
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, SX** m) {
@@ -1883,7 +1881,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
  }
 
-%fragment("to"{MX}, "header", fragment="fwd") {
+%fragment("to"{MX}, "header", fragment="casadi_decl") {
   // Traits specialization for MX
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, MX** m) {
@@ -1933,7 +1931,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
  }
 
-%fragment("to"{DMatrix}, "header", fragment="fwd", fragment="to"{double}) {
+%fragment("to"{DMatrix}, "header", fragment="casadi_decl", fragment="to"{double}) {
   // Traits specialization for DMatrix
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, DMatrix** m) {
@@ -2139,7 +2137,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 }
 
 
-%fragment("to"{IMatrix}, "header", fragment="fwd", fragment="to"{int}) {
+%fragment("to"{IMatrix}, "header", fragment="casadi_decl", fragment="to"{int}) {
   // Traits specialization for IMatrix
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, IMatrix** m) {
