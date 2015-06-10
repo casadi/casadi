@@ -34,7 +34,7 @@ using namespace std;
 namespace casadi {
 
   // Stream printer for MOSEK
-  static void MSKAPI printstr(void *handle, MSKCONST char str[]){
+  static void MSKAPI printstr(void *handle, MSKCONST char str[]) {
     std::cout << str;
   }
 
@@ -65,41 +65,41 @@ namespace casadi {
     // Introduce temporary task
     MSKenv_t temp_env;
     MSKtask_t temp_task;
-    MSK_makeenv(&temp_env,NULL);
-    MSK_maketask(temp_env,0,0,&temp_task);
-    
+    MSK_makeenv(&temp_env, NULL);
+    MSK_maketask(temp_env, 0, 0, &temp_task);
+
     // Some variables needed to harvest parameters
     int num_param;
     int str_len;
-    char str_buffer [100] = "";
+    char str_buffer[100] = "";
     double dou_buffer;
     int int_buffer;
 
     // Harvest string parameters MOSEK
-    MSK_getparammax(temp_task,MSK_PAR_STR_TYPE,&num_param);
+    MSK_getparammax(temp_task, MSK_PAR_STR_TYPE, &num_param);
     for (int i=0;i<num_param;++i) {
-      MSK_getparamname(temp_task,MSK_PAR_STR_TYPE,i,str_buffer);
+      MSK_getparamname(temp_task, MSK_PAR_STR_TYPE, i, str_buffer);
       std::string par_name(str_buffer);
-      MSK_getnastrparam(temp_task,str_buffer,100,&str_len,str_buffer);
+      MSK_getnastrparam(temp_task, str_buffer, 100, &str_len, str_buffer);
       std::string par_value(str_buffer);
       addOption(par_name, OT_STRING, par_value, "Consult MOSEK manual.");
     }
 
     // Harvest double parameters for MOSEK
-    MSK_getparammax(temp_task,MSK_PAR_DOU_TYPE,&num_param);
+    MSK_getparammax(temp_task, MSK_PAR_DOU_TYPE, &num_param);
     for (int i=0;i<num_param;++i) {
-      MSK_getparamname(temp_task,MSK_PAR_DOU_TYPE,i,str_buffer);
+      MSK_getparamname(temp_task, MSK_PAR_DOU_TYPE, i, str_buffer);
       std::string par_name(str_buffer);
-      MSK_getnadouparam(temp_task,str_buffer,&dou_buffer);
+      MSK_getnadouparam(temp_task, str_buffer, &dou_buffer);
       addOption(par_name, OT_REAL, dou_buffer, "Consult MOSEK manual.");
     }
 
     // Harvest integer parameters for MOSEK, passed as string to accept enumeration options
-    MSK_getparammax(temp_task,MSK_PAR_INT_TYPE,&num_param);
+    MSK_getparammax(temp_task, MSK_PAR_INT_TYPE, &num_param);
     for (int i=0;i<num_param;++i) {
-      MSK_getparamname(temp_task,MSK_PAR_INT_TYPE,i,str_buffer);
+      MSK_getparamname(temp_task, MSK_PAR_INT_TYPE, i, str_buffer);
       std::string par_name(str_buffer);
-      MSK_getnaintparam(temp_task,str_buffer,&int_buffer);
+      MSK_getnaintparam(temp_task, str_buffer, &int_buffer);
       std::stringstream ss;
       ss << int_buffer;
       std::string par_value_str = ss.str();
@@ -129,23 +129,23 @@ namespace casadi {
     // Initialize the base classes
     SocpSolverInternal::init();
     log("MosekSocpInterface::init", "Enter");
-	   
-	  // Create the MOSEK environment
-	  MSK_makeenv(&mosek_env_,NULL);
+
+    // Create the MOSEK environment
+    MSK_makeenv(&mosek_env_, NULL);
     // Create empty MOSEK task
-    MSK_maketask(mosek_env_,n_,m_+N_,&mosek_task_);
+    MSK_maketask(mosek_env_, n_, m_+N_, &mosek_task_);
     // Link MOSEK task to stream printer
-    MSK_linkfunctotaskstream(mosek_task_,MSK_STREAM_LOG,NULL,printstr);
+    MSK_linkfunctotaskstream(mosek_task_, MSK_STREAM_LOG, NULL, printstr);
     // Pre-allocate memory for MOSEK
-    MSK_putmaxnumvar(mosek_task_,m_+N_+2*nc_+2*n_);
+    MSK_putmaxnumvar(mosek_task_, m_+N_+2*nc_+2*n_);
     // Append variables and constraints
-    MSK_appendcons(mosek_task_,n_);
-    MSK_appendvars(mosek_task_,m_+N_);
+    MSK_appendcons(mosek_task_, n_);
+    MSK_appendvars(mosek_task_, m_+N_);
     // Set that we desire to minimize SOCP
     MSK_putobjsense(mosek_task_, MSK_OBJECTIVE_SENSE_MAXIMIZE);
     // Set known variable bounds
-    for (int i=0;i<m_+N_;++i){
-      MSK_putvarbound(mosek_task_,i,MSK_BK_FR,-MSK_INFINITY,+MSK_INFINITY);
+    for (int i=0;i<m_+N_;++i) {
+      MSK_putvarbound(mosek_task_, i, MSK_BK_FR, -MSK_INFINITY, +MSK_INFINITY);
     }
 
     // Pass all the options to mosek
@@ -156,18 +156,19 @@ namespace casadi {
         std::stringstream ss;
         ss << op;
         std::string optionAsString = ss.str();
-        MSK_putparam(mosek_task_,(*it).c_str(), optionAsString.c_str());
+        MSK_putparam(mosek_task_, (*it).c_str(), optionAsString.c_str());
       }
 
     // Set cone constraints (fixed)
-    if (m_ > 0){
-      int largest_cone = *std::max_element(ni_.begin(),ni_.end());
-      int submem [largest_cone];
+    if (m_ > 0) {
+      int largest_cone = *std::max_element(ni_.begin(), ni_.end());
+      std::vector<int> submem;
+      submem.resize(largest_cone);
       int sum_ni = 0;
       for (int i=0;i<m_;++i) {
-        submem [0] = i;
-        for(int ii=0;ii<ni_[i];++ii) submem[ii+1] = m_ + sum_ni + ii;
-        MSK_appendcone(mosek_task_,MSK_CT_QUAD,0.0,ni_[i]+1,submem);
+        submem[0] = i;
+        for (int ii=0;ii<ni_[i];++ii) submem[ii+1] = m_ + sum_ni + ii;
+        MSK_appendcone(mosek_task_, MSK_CT_QUAD, 0.0, ni_[i]+1, &submem[0]);
         sum_ni += ni_[i];
       }
     }
@@ -194,10 +195,11 @@ namespace casadi {
     dual_A_v.push_back(input(SOCP_SOLVER_G));
     dual_A_DMatrix = horzcat(dual_A_v);
     dual_A_data_ = dual_A_DMatrix.data();
-    dual_A_row_ = dual_A_DMatrix.sparsity().getRow(); 
-    dual_A_colind_ = dual_A_DMatrix.sparsity().getColind(); 
+    dual_A_row_ = dual_A_DMatrix.sparsity().getRow();
+    dual_A_colind_ = dual_A_DMatrix.sparsity().getColind();
     // Reserve memory for maximum size of dual_A_
-    int sizeof_A = input(SOCP_SOLVER_E).size()+input(SOCP_SOLVER_G).size()+2*input(SOCP_SOLVER_A).size()+2*n_;
+    int sizeof_A = input(SOCP_SOLVER_E).size() + input(SOCP_SOLVER_G).size() +
+                     2*input(SOCP_SOLVER_A).size()+2*n_;
     dual_A_data_.reserve(sizeof_A);
     dual_A_row_.reserve(sizeof_A);
     dual_A_colind_.reserve(m_+N_+2*nc_+2*n_+1);
@@ -215,24 +217,29 @@ namespace casadi {
 
     // Remove or append variables
     int numvar_old;
-    MSK_getnumvar(mosek_task_,&numvar_old);
-    int numvar_new = m_ + N_ + primal_idx_lba_.size() + primal_idx_uba_.size() + primal_idx_lbx_.size() + primal_idx_ubx_.size();
+    MSK_getnumvar(mosek_task_, &numvar_old);
+    int numvar_new = m_ + N_ + primal_idx_lba_.size() + primal_idx_uba_.size() +
+                       primal_idx_lbx_.size() + primal_idx_ubx_.size();
     int num_vars_to_remove = numvar_old - numvar_new;
-    if (num_vars_to_remove < 0){
-      MSK_appendvars(mosek_task_,-num_vars_to_remove);
-    } else if (num_vars_to_remove > 0){
-      int vars_to_remove [num_vars_to_remove];
-      for (int i=0;i<num_vars_to_remove;++i) vars_to_remove[i] = numvar_new + num_vars_to_remove - i - 1;
-      MSK_removevars(mosek_task_,num_vars_to_remove,vars_to_remove);      
+    if (num_vars_to_remove < 0) {
+      MSK_appendvars(mosek_task_, -num_vars_to_remove);
+    } else if (num_vars_to_remove > 0) {
+      std::vector<int> vars_to_remove;
+      vars_to_remove.resize(num_vars_to_remove);
+      for (int i=0;i<num_vars_to_remove;++i) {
+        vars_to_remove[i] = numvar_new + num_vars_to_remove - i - 1;
+      }
+      MSK_removevars(mosek_task_, num_vars_to_remove, &vars_to_remove[0]);
     }
 
     // Add objective function
-    int subj [numvar_new];
+    std::vector<int> subj;
+    subj.resize(numvar_new);
     double* c_val = &dual_c_[0];
-    for (int i=0;i<numvar_new;++i) subj [i] = i;
-    MSK_putclist(mosek_task_,numvar_new,subj,c_val);
+    for (int i=0;i<numvar_new;++i) subj[i] = i;
+    MSK_putclist(mosek_task_, numvar_new, &subj[0], c_val);
     for (int i=m_+N_;i<numvar_new;++i) {
-      MSK_putvarbound(mosek_task_,i,MSK_BK_LO,0.0,+MSK_INFINITY);
+      MSK_putvarbound(mosek_task_, i, MSK_BK_LO, 0.0, +MSK_INFINITY);
     }
 
     // Add equality constraints
@@ -240,39 +247,42 @@ namespace casadi {
     int* ptre = &dual_A_colind_[1];
     int* asub = &dual_A_row_[0];
     double* aval = &dual_A_data_[0];
-    MSK_putacollist(mosek_task_,numvar_new,subj,ptrb,ptre,asub,aval);
+    MSK_putacollist(mosek_task_, numvar_new, &subj[0], ptrb, ptre, asub, aval);
     for (int i=0;i<n_;++i) {
-      MSK_putconbound(mosek_task_,i,MSK_BK_FX,-dual_b_[i],-dual_b_[i]);
+      MSK_putconbound(mosek_task_, i, MSK_BK_FX, -dual_b_[i], -dual_b_[i]);
     }
 
     // Solve SOCP
     MSKrescodee r;
     MSKrescodee trmcode;
 
-    r = MSK_optimizetrm(mosek_task_,&trmcode);
+    r = MSK_optimizetrm(mosek_task_, &trmcode);
 
     casadi_assert_message(r==MSK_RES_OK, "MosekSocpInterface failed");
 
-    MSK_solutionsummary(mosek_task_,MSK_STREAM_MSG);
+    MSK_solutionsummary(mosek_task_, MSK_STREAM_MSG);
 
     // Extract solution from MOSEK
     double primal_objective;
     double dual_objective;
     double* primal_solution = &output(SOCP_SOLVER_X).data()[0];
-    double dual_solution [numvar_new];
-    MSK_getdualobj(mosek_task_,MSK_SOL_ITR,&primal_objective);
-    MSK_getprimalobj(mosek_task_,MSK_SOL_ITR,&dual_objective);
-    MSK_gety(mosek_task_,MSK_SOL_ITR,primal_solution);
-    MSK_getxx(mosek_task_,MSK_SOL_ITR,dual_solution);
+    std::vector<double> dual_solution;
+    dual_solution.resize(numvar_new);
+    MSK_getdualobj(mosek_task_, MSK_SOL_ITR, &primal_objective);
+    MSK_getprimalobj(mosek_task_, MSK_SOL_ITR, &dual_objective);
+    MSK_gety(mosek_task_, MSK_SOL_ITR, primal_solution);
+    MSK_getxx(mosek_task_, MSK_SOL_ITR, &dual_solution[0]);
     output(SOCP_SOLVER_COST).set(primal_objective);
     output(SOCP_SOLVER_DUAL_COST).set(dual_objective);
     // Change sign of primal solution
-    std::for_each(output(SOCP_SOLVER_X).data().begin(),output(SOCP_SOLVER_X).data().end(),[](double& in){in=-in;});
+    std::for_each(output(SOCP_SOLVER_X).data().begin(), output(SOCP_SOLVER_X).data().end(),
+                    [](double& in){in=-in;});
     // Interpret dual solution
-    std::copy(dual_solution,dual_solution+m_,output(SOCP_SOLVER_LAM_CONE).data().begin());
+    std::copy(dual_solution.begin(), dual_solution.begin()+m_,
+                output(SOCP_SOLVER_LAM_CONE).data().begin());
     // Fill lagrange multipliers on A*x and x with zeros
-    std::fill(output(SOCP_SOLVER_LAM_A).begin(),output(SOCP_SOLVER_LAM_A).end(),0);
-    std::fill(output(SOCP_SOLVER_LAM_X).begin(),output(SOCP_SOLVER_LAM_X).end(),0);
+    std::fill(output(SOCP_SOLVER_LAM_A).begin(), output(SOCP_SOLVER_LAM_A).end(), 0);
+    std::fill(output(SOCP_SOLVER_LAM_X).begin(), output(SOCP_SOLVER_LAM_X).end(), 0);
     // Cycle through solution vector to attain Lagrange multipliers
     int idx = m_+N_;
     for (int i : primal_idx_lba_) {
@@ -280,8 +290,8 @@ namespace casadi {
       idx += 1;
     }
     for (int i : primal_idx_uba_) {
-      if (std::abs(output(SOCP_SOLVER_LAM_A).data()[i]) < dual_solution[idx]) 
-                                              output(SOCP_SOLVER_LAM_A).data()[i] = dual_solution[idx];
+      if (std::abs(output(SOCP_SOLVER_LAM_A).data()[i]) < dual_solution[idx])
+            output(SOCP_SOLVER_LAM_A).data()[i] = dual_solution[idx];
       idx += 1;
     }
     for (int i : primal_idx_lbx_) {
@@ -289,20 +299,20 @@ namespace casadi {
       idx += 1;
     }
     for (int i : primal_idx_ubx_) {
-      if (std::abs(output(SOCP_SOLVER_LAM_X).data()[i]) < dual_solution[idx]) 
-                                              output(SOCP_SOLVER_LAM_X).data()[i] = dual_solution[idx];
+      if (std::abs(output(SOCP_SOLVER_LAM_X).data()[i]) < dual_solution[idx])
+            output(SOCP_SOLVER_LAM_X).data()[i] = dual_solution[idx];
       idx += 1;
     }
 
     // Solution status
     MSKsolstae solsta;
-    MSK_getsolsta(mosek_task_,MSK_SOL_ITR,&solsta);
+    MSK_getsolsta(mosek_task_, MSK_SOL_ITR, &solsta);
     stats_["solution_status"] = solutionStatus(solsta);
 
     // Problem status
     MSKprostae prosta;
-    MSK_getprosta(mosek_task_,MSK_SOL_ITR,&prosta);
-    stats_["problem_status"] = problemStatus(prosta);    
+    MSK_getprosta(mosek_task_, MSK_SOL_ITR, &prosta);
+    stats_["problem_status"] = problemStatus(prosta);
 
     // Termination reason
     stats_["termination_reason"] = trmcode;
