@@ -1887,8 +1887,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
 
   int to_ptr2(GUESTOBJECT *p, casadi::SX **m) {
-    if (is_null(p))  return false;
-    return to_val(p, m ? *m : 0);
+    return to_ptr(p, m);
   }
  }
 
@@ -1942,8 +1941,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
 
   int to_ptr2(GUESTOBJECT *p, MX **m) {
-    if (is_null(p)) return false;
-    return to_val(p, m ? *m : 0);
+    return to_ptr(p, m);
   }
  }
 
@@ -2152,8 +2150,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
 
   int to_ptr2(GUESTOBJECT *p, casadi::DMatrix **m) {
-    if (is_null(p)) return false;
-    return to_val(p, m ? *m : 0);
+    return to_ptr(p, m);
   }
 }
 
@@ -2281,8 +2278,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 
   int to_ptr2(GUESTOBJECT *p, casadi::IMatrix **m) {
-    if (is_null(p)) return false;
-    return to_val(p, m ? *m : 0);
+    return to_ptr(p, m);
   }
  }
 
