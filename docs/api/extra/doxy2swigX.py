@@ -75,6 +75,20 @@ class Doxy2SWIG_X(Doxy2SWIG):
     self.groupdoc = kwargs["groupdoc"]
     del kwargs["groupdoc"]
     Doxy2SWIG.__init__(self,*args, **kwargs)
+    
+
+    # skip sharedobjectnode stuff
+    for e in self.xmldoc.getElementsByTagName("compounddef"):
+      for e2 in e.getElementsByTagName("inheritancegraph"):
+        for e3 in e2.getElementsByTagName("node"):
+          for e4 in e3.getElementsByTagName("label"):
+            if "Node" in e4.firstChild.data:
+              print "skipped"
+              try:
+                self.xmldoc.removeChild(e)
+              except:
+                pass
+
     self.docstringmap = {}
     self.active_docstring = None
     self.add_text_counter = 0
@@ -166,11 +180,20 @@ class Doxy2SWIG_X(Doxy2SWIG):
       self.multi = 1
       comps = node.getElementsByTagName('compound')
       for c in comps:
-          refid = c.attributes['refid'].value
-          if "Internal" in refid: continue
+          refid = c.attributes['refid'].value          
+          if c.attributes['kind'].value in ["example","struct","group","source","dir","file"]: continue
+          filters = ["internal","interface","node"]
+          filtered = False          
+          for f in filters:
+            if f in refid or f.capitalize() in refid: filtered = True
+          if filtered: continue
+
+          print c.attributes['refid'].value, c.attributes['kind'].value
+
           fname = refid + '.xml'
           if not os.path.exists(fname):
               fname = os.path.join(self.my_dir,  fname)
+          if fname.endswith("cpp.xml"): continue
           if not self.quiet:
               print "parsing file: %s"%fname
           p = Doxy2SWIG_X(fname, self.include_function_definition, self.quiet,internal=self.internal,deprecated=self.deprecated,merge=self.merge,groupdoc=self.groupdoc)

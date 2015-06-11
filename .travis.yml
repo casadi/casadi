@@ -107,7 +107,10 @@ matrix:
         - sudo pip install --allow-unverified pydot pydot==1.0.28
         - sudo apt-get install graphviz python-lxml python-ipdb python-docutils doxygen -y
         - pushd docs/api && cp /home/travis/build/testbot/docs.Makefile Makefile && make doxexport | grep -v "file loc from" && popd
-        - git stash && git pull origin $TRAVIS_BRANCH && git stash pop && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git push git@github.com:casadi/casadi.git $TRAVIS_BRANCH
+        
+        # Let's verify that we can still compile
+        - pushd build && make && popd
+        - git stash && git checkout $TRAVIS_BRANCH && git pull origin $TRAVIS_BRANCH && git stash pop || allowfail 1 && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git push git@github.com:casadi/casadi.git $TRAVIS_BRANCH
     - compiler: clang
       os: linux
       env: TESTMODE=minimal
@@ -124,6 +127,7 @@ matrix:
       os: linux
       env: TESTMODE=quick
       script:
+        - ls $MOSEKLM_LICENSE_FILE
         - sudo add-apt-repository ppa:webupd8team/java -y
         - sudo apt-get update -q
         - sudo echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
@@ -201,6 +205,7 @@ branches:
 before_install:
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
   - pushd testbot && recipes/setup.sh && popd
+  - source testbot/shellhelpers
   - sudo apt-get install p7zip-full -y
   - travis_retry testbot/recipes/fetch.sh libhsl.tar.gz && mkdir libhsl && tar -xvf libhsl.tar.gz -C libhsl
   - travis_retry testbot/recipes/fetch.sh snopt7.tar.gz && mkdir snopt7 && tar -xvf snopt7.tar.gz -C snopt7
