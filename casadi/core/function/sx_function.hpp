@@ -172,25 +172,28 @@ namespace casadi {
     SX hess(int iind=0, int oind=0);
     SX hess(const std::string& iname, int oind=0) { return hess(inputIndex(iname), oind); }
     SX hess(int iind, const std::string& oname) { return hess(iind, outputIndex(oname)); }
-    SX hess(const std::string& iname, const std::string& oname)
-    { return hess(inputIndex(iname), outputIndex(oname)); }
+    SX hess(const std::string& iname, const std::string& oname) {
+      return hess(inputIndex(iname), outputIndex(oname));
+    }
     ///@}
 
     /** \brief Get function input */
-    const SX& inputExpr(int iind) const;
-    const SX& inputExpr(const std::string& iname) const
-    { return inputExpr(inputIndex(iname)); }
+    const SX inputExpr(int iind) const;
+    const SX inputExpr(const std::string& iname) const {
+      return inputExpr(inputIndex(iname));
+    }
 
     /** \brief Get function output */
-    const SX& outputExpr(int oind) const;
-    const SX& outputExpr(const std::string& oname) const
-    { return outputExpr(outputIndex(oname)); }
+    const SX outputExpr(int oind) const;
+    const SX outputExpr(const std::string& oname) const {
+      return outputExpr(outputIndex(oname));
+    }
 
     /** \brief Get all function inputs */
-    const std::vector<SX>& inputExpr() const;
+    const std::vector<SX> inputExpr() const;
 
     /** \brief Get all function outputs */
-    const std::vector<SX> & outputExpr() const;
+    const std::vector<SX> outputExpr() const;
 
 /// \cond INTERNAL
 #ifndef SWIG
