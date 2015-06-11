@@ -322,7 +322,7 @@ for i in range(1,40):
     break
   
 # Obtain the solution of the ricatti equation
-P_ = integrator.output().reshape((ns,ns))
+P_ = integrator.getOutput().reshape((ns,ns))
 print "P=", P_
 
 [D,V] = linalg.eig(P_)

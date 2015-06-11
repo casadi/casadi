@@ -129,6 +129,7 @@ namespace casadi {
     /** \brief Get output scheme description by index */
     std::string outputDescription(int ind) const;
 
+#ifndef SWIG
     /// \cond UNSAFE
     /** \brief [UNSAFE] Obtain reference to inputs
      * \sa getInput, setInput
@@ -137,9 +138,6 @@ namespace casadi {
     /// Access input argument
     const Matrix<double>& input(int i=0) const;
     const Matrix<double>& input(const std::string &iname) const;
-#ifdef SWIG
-    %rename(inputRef) input;
-#endif
     Matrix<double>& input(int i=0);
     Matrix<double>& input(const std::string &iname);
     ///@}
@@ -151,13 +149,11 @@ namespace casadi {
     /// Access output argument
     const Matrix<double>& output(int i=0) const;
     const Matrix<double>& output(const std::string &oname) const;
-#ifdef SWIG
-    %rename(outputRef) output;
-#endif
     Matrix<double>& output(int i=0);
     Matrix<double>& output(const std::string &oname);
     ///@}
     /// \endcond
+#endif
 
     /** \brief Get the number of function inputs */
     int nIn() const;

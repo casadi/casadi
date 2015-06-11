@@ -103,7 +103,7 @@ for f in f_test:
   for r in range(nrep):
     f.evaluate()
   t2 = time.time()
-  print "result = ", f.output().nonzeros()
+  print "result = ", f.getOutput().nonzeros()
   dt = (t2-t1)/nrep
   print "time = ", dt*1e3, " ms"
   

@@ -789,10 +789,10 @@ class Toolstests(casadiTestCase):
 
       f.evaluate()
 
-      self.checkarray(f.output(0),DMatrix([3]))
-      self.checkarray(f.output(1),DMatrix([1,3,5]).T)
-      self.checkarray(f.output(2),DMatrix([4,6]).T)
-      self.checkarray(f.output(3),DMatrix([1,2]))
+      self.checkarray(f.getOutput(0),DMatrix([3]))
+      self.checkarray(f.getOutput(1),DMatrix([1,3,5]).T)
+      self.checkarray(f.getOutput(2),DMatrix([4,6]).T)
+      self.checkarray(f.getOutput(3),DMatrix([1,2]))
    
   def test_empty_bug(self):
     

@@ -321,7 +321,7 @@ class Functiontests(casadiTestCase):
       f.init()
       J = f.hessian()
       J.init()
-      sp2 = J.output().sparsity()
+      sp2 = J.getOutput().sparsity()
       self.checkarray(sp.row(),sp2.row())
       self.checkarray(sp.colind(),sp2.colind())
       
@@ -411,23 +411,14 @@ class Functiontests(casadiTestCase):
     a = f.getOutput()
     b = f.getOutput(0)
     c = f.getOutput("ode")
-    ar = f.output()
-    br = f.output(0)
-    cr = f.output("ode")
     self.checkarray(a,DMatrix([1,2]))
     self.checkarray(b,DMatrix([1,2]))
     self.checkarray(c,DMatrix([1,2]))
-    self.checkarray(ar,DMatrix([1,2]))
-    self.checkarray(br,DMatrix([1,2]))
-    self.checkarray(cr,DMatrix([1,2]))
     f.setInput([3,4])
     f.evaluate()
     self.checkarray(a,DMatrix([1,2]))
     self.checkarray(b,DMatrix([1,2]))
     self.checkarray(c,DMatrix([1,2]))
-    self.checkarray(ar,DMatrix([3,4]))
-    self.checkarray(br,DMatrix([3,4]))
-    self.checkarray(cr,DMatrix([3,4]))
     
   def test_customIO(self):
     
@@ -436,12 +427,12 @@ class Functiontests(casadiTestCase):
     
     f.setInput(12,0)
     f.evaluate()
-    self.checkarray(DMatrix([144]),f.output("foo"))
-    self.checkarray(DMatrix([12]),f.output("bar"))
+    self.checkarray(DMatrix([144]),f.getOutput("foo"))
+    self.checkarray(DMatrix([12]),f.getOutput("bar"))
 
     
     with self.assertRaises(Exception):
-      f.output("baz")
+      f.getOutput("baz")
       
     ret = f({'0':SX(12)})
     self.checkarray(ret["foo"],DMatrix([144]))
@@ -490,8 +481,8 @@ class Functiontests(casadiTestCase):
           z.set(z2)
           
         def getDerForward(self,f,nfwd):
-          inputs = [f.input(i).sparsity() for i in range(f.nIn())]
-          outputs = [f.output(i).sparsity() for i in range(f.nOut())]
+          inputs = [f.getInput(i).sparsity() for i in range(f.nIn())]
+          outputs = [f.getOutput(i).sparsity() for i in range(f.nOut())]
           
           sself = self
 
@@ -502,8 +493,8 @@ class Functiontests(casadiTestCase):
           return FunDer
 
         def getDerReverse(self,f,nadj):
-          inputs = [f.input(i).sparsity() for i in range(f.nIn())]
-          outputs = [f.output(i).sparsity() for i in range(f.nOut())]
+          inputs = [f.getInput(i).sparsity() for i in range(f.nIn())]
+          outputs = [f.getOutput(i).sparsity() for i in range(f.nOut())]
           
           sself = self
 
@@ -996,7 +987,7 @@ class Functiontests(casadiTestCase):
     J.init()
     J.evaluate()
     
-    self.assertEqual(J.output().nnz(),4)
+    self.assertEqual(J.getOutput().nnz(),4)
     
     f = MXFunction([x],[x])
     f.init()
@@ -1006,7 +997,7 @@ class Functiontests(casadiTestCase):
     J.init()
     J.evaluate()
     
-    self.assertEqual(J.output().nnz(),16)
+    self.assertEqual(J.getOutput().nnz(),16)
       
   def test_setjacobian(self):
     x = MX.sym("x")
@@ -1023,8 +1014,8 @@ class Functiontests(casadiTestCase):
     def fun(f):
       # sin(x0+3*y)
 
-      x = f.input(0)
-      y = f.input(1)
+      x = f.getInput(0)
+      y = f.getInput(1)
       
       f.setOutput(sin(x+3*y))
       
@@ -1043,9 +1034,9 @@ class Functiontests(casadiTestCase):
     Fun.setInput(0.2,0)
     Fun.setInput(0.7,1)
     
-    print Fun.input(0),Fun.input(1)
+    print Fun.getInput(0),Fun.getInput(1)
     
-    print g.input(0),g.input(1)
+    print g.getInput(0),g.getInput(1)
     
     self.checkfunction(Fun,g,fwd=False,adj=False,indirect=False)
 

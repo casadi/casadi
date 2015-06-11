@@ -260,12 +260,12 @@ class typemaptests(casadiTestCase):
 
         f=function([z],[r])
         f.init()
-        f.setInput(dummy[0:f.input().nnz()])
+        f.setInput(dummy[0:f.getInput().nnz()])
         f.evaluate()
         
         f_=function([z],[z])
         f_.init()
-        f_.setInput(dummy[0:f.input().nnz()])
+        f_.setInput(dummy[0:f.getInput().nnz()])
         f_.evaluate()
         
 
@@ -276,14 +276,14 @@ class typemaptests(casadiTestCase):
         
         f=function([z,s],[r])
         f.init()
-        f.setInput(dummy[0:f.input(0).nnz()],0)
-        f.setInput(dummy2[0:f.input(1).nnz()],1)
+        f.setInput(dummy[0:f.getInput(0).nnz()],0)
+        f.setInput(dummy2[0:f.getInput(1).nnz()],1)
         f.evaluate()
         
         f_=function([z,s],[z,s])
         f_.init()
-        f_.setInput(dummy[0:f.input(0).nnz()],0)
-        f_.setInput(dummy2[0:f.input(1).nnz()],1)
+        f_.setInput(dummy[0:f.getInput(0).nnz()],0)
+        f_.setInput(dummy2[0:f.getInput(1).nnz()],1)
         f_.evaluate()
 
         self.checkarray(fun(f_.getOutput(0),f_.getOutput(1)),f.getOutput(),"operation"+str(f_.getOutput(0))+","+str(f_.getOutput(1))+":"+str(f.getOutput()))
@@ -847,7 +847,7 @@ class typemaptests(casadiTestCase):
       f = SXFunction([],[a])
       f.init()
       f.evaluate()
-      return f.output()
+      return f.getOutput()
       
     for i in [SX(1),1,1.0]:
       a = numpy.array([[1,2],[3,4]])

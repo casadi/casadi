@@ -178,7 +178,7 @@ nlp_solver.setInput(initialisation_state,"x0")
 
 nlp_solver.evaluate()
 # Get the solution
-solution = shooting(nlp_solver.output("x"))
+solution = shooting(nlp_solver.getOutput("x"))
 estimated_X[:,0:N] = solution["X",horzcat]
 estimated_W[:,0:N-1] = solution["W",horzcat]
 

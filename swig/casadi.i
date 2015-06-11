@@ -3423,7 +3423,9 @@ def pyfunction(inputs,outputs):
 def PyFunction(obj,inputs,outputs):
     @pyevaluate
     def fcustom(f):
-      obj.evaluate([f.input(i) for i in range(f.nIn())],[f.output(i) for i in range(f.nOut())])
+      res = [f.getOutput(i) for i in range(f.nOut())]
+      obj.evaluate([f.getInput(i) for i in range(f.nIn())],res)
+      for i in range(f.nOut()): f.setOutput(res[i], i)
       
     Fun = CustomFunction(fcustom,inputs,outputs)
     Fun.setOption("name","CustomFunction")
@@ -3447,13 +3449,15 @@ def PyFunction(obj,inputs,outputs):
         
         @pyevaluate
         def der(f2):
-          all_inputs = [f2.input(i) for i in range(f2.nIn())]
-          all_outputs = [f2.output(i) for i in range(f2.nOut())]
+          all_inputs = [f2.getInput(i) for i in range(f2.nIn())]
+          all_outputs = [f2.getOutput(i) for i in range(f2.nOut())]
           inputs=all_inputs[:num_in]
           outputs=all_inputs[num_in:num_in+num_out]
           fwd_seeds=zip(*[iter(all_inputs[num_in+num_out:])]*num_in)
           fwd_sens=zip(*[iter(all_outputs)]*num_out)
           obj.fwd(inputs,outputs,fwd_seeds,fwd_sens)
+          for i in range(f2.nOut()): f2.setOutput(all_outputs[i], i)
+
           
         DerFun = CustomFunction(der,inputs+outputs+nfwd*inputs,nfwd*outputs)
         DerFun.setOption("name","CustomFunction_derivative")
@@ -3470,13 +3474,14 @@ def PyFunction(obj,inputs,outputs):
         
         @pyevaluate
         def der(f2):
-          all_inputs = [f2.input(i) for i in range(f2.nIn())]
-          all_outputs = [f2.output(i) for i in range(f2.nOut())]
+          all_inputs = [f2.getInput(i) for i in range(f2.nIn())]
+          all_outputs = [f2.getOutput(i) for i in range(f2.nOut())]
           inputs=all_inputs[:num_in]
           outputs=all_inputs[num_in:num_in+num_out]
           adj_seeds=zip(*[iter(all_inputs[num_in+num_out:])]*num_out)
           adj_sens=zip(*[iter(all_outputs)]*num_in)
           obj.adj(inputs,outputs,adj_seeds,adj_sens)
+          for i in range(f2.nOut()): f2.setOutput(all_outputs[i],i)
           
         DerFun = CustomFunction(der,inputs+outputs+nadj*outputs,nadj*inputs)
         DerFun.setOption("name","CustomFunction_derivative")
