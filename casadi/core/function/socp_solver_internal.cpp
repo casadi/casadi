@@ -206,15 +206,27 @@ namespace casadi {
     dual_c_.resize(m_+N_);
     int start_idx = 0;
     int end_idx = m_;
-    std::copy(primal_F.data().begin(), primal_F.data().end(), dual_c_.begin()+start_idx);
-    std::for_each(dual_c_.begin()+start_idx, dual_c_.begin()+end_idx, [](double& in){in=-in;});
+    std::transform(primal_F.data().begin(), primal_F.data().end(), dual_c_.begin()+start_idx,
+      std::negate<double>());
     start_idx = end_idx;
     end_idx += N_;
     std::copy(primal_H.data().begin(), primal_H.data().end(), dual_c_.begin()+start_idx);
-    for (int i : primal_idx_lba_) dual_c_.push_back(primal_LBA.data()[i]);
-    for (int i : primal_idx_uba_) dual_c_.push_back(-primal_UBA.data()[i]);
-    for (int i : primal_idx_lbx_) dual_c_.push_back(primal_LBX.data()[i]);
-    for (int i : primal_idx_ubx_) dual_c_.push_back(-primal_UBX.data()[i]);
+    for (int k=0;k<primal_idx_lba_.size();++k) {
+      int i = primal_idx_lba_[k];
+      dual_c_.push_back(primal_LBA.data()[i]);
+    }
+    for (int k=0;k<primal_idx_uba_.size();++k) {
+      int i = primal_idx_uba_[k];
+      dual_c_.push_back(-primal_UBA.data()[i]);
+    }
+    for (int k=0;k<primal_idx_lbx_.size();++k) {
+      int i = primal_idx_lbx_[k];
+      dual_c_.push_back(primal_LBX.data()[i]);
+    }
+    for (int k=0;k<primal_idx_ubx_.size();++k) {
+      int i = primal_idx_ubx_[k];
+      dual_c_.push_back(-primal_UBX.data()[i]);
+    }
 
     // A-matrix: [-ei Gi -Alba' Auba' -Ilbx Iubx]
     int begin_colind;
@@ -229,13 +241,14 @@ namespace casadi {
     start_idx = 0;
     end_idx = primal_E.size();
     std::copy(primal_E.data().begin(), primal_E.data().end(), dual_A_data_.begin()+start_idx);
-    std::for_each(
-      dual_A_data_.begin()+start_idx,
-      dual_A_data_.begin()+end_idx, [](double& in){in=-in;});
+    std::transform(
+      primal_E.data().begin(), primal_E.data().end(),
+      dual_A_data_.begin()+start_idx, std::negate<double>());
     start_idx = end_idx;
     end_idx += primal_G.size();
     std::copy(primal_G.data().begin(), primal_G.data().end(), dual_A_data_.begin()+start_idx);
-    for (int i : primal_idx_lba_) {
+    for (int k=0;k<primal_idx_lba_.size();++k) {
+      int i = primal_idx_lba_[k];
       begin_colind = primal_A_T_sparse.colind(i);
       end_colind = primal_A_T_sparse.colind(i+1);
       for (int ii=begin_colind; ii<end_colind;++ii) {
@@ -244,7 +257,8 @@ namespace casadi {
       }
       dual_A_colind_.push_back(dual_A_colind_.back()+end_colind-begin_colind);
     }
-    for (int i : primal_idx_uba_) {
+    for (int k=0;k<primal_idx_uba_.size();++k) {
+      int i = primal_idx_uba_[k];
       begin_colind = primal_A_T_sparse.colind(i);
       end_colind = primal_A_T_sparse.colind(i+1);
       for (int ii=begin_colind; ii<end_colind;++ii) {
@@ -253,12 +267,14 @@ namespace casadi {
       }
       dual_A_colind_.push_back(dual_A_colind_.back()+end_colind-begin_colind);
     }
-    for (int i : primal_idx_lbx_) {
+    for (int k=0;k<primal_idx_lbx_.size();++k) {
+      int i = primal_idx_lbx_[k];
       dual_A_data_.push_back(-1);
       dual_A_row_.push_back(i);
       dual_A_colind_.push_back(dual_A_colind_.back()+1);
     }
-    for (int i : primal_idx_ubx_) {
+    for (int k=0;k<primal_idx_ubx_.size();++k) {
+      int i = primal_idx_ubx_[k];
       dual_A_data_.push_back(1);
       dual_A_row_.push_back(i);
       dual_A_colind_.push_back(dual_A_colind_.back()+1);
