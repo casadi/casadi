@@ -962,7 +962,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %}
 #endif
 
-%fragment("to"{int}, "header", fragment="casadi_decl") {
+%fragment("casadi_int", "header", fragment="casadi_decl") {
   // Traits specialization for int
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, int** m) {
@@ -1025,7 +1025,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
  }
 
-%fragment("to"{double}, "header", fragment="casadi_decl") {
+%fragment("casadi_double", "header", fragment="casadi_decl") {
   // Traits specialization for double
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, double** m) {
@@ -1749,7 +1749,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 
 
-%fragment("to"{DVector}, "header", fragment="casadi_decl", fragment="to"{double}) {
+%fragment("casadi_dvector", "header", fragment="casadi_decl", fragment="casadi_double") {
   namespace casadi {
     int to_ptr(GUESTOBJECT *p, std::vector<double> **m) {
       if (is_null(p)) return false;
@@ -1793,7 +1793,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
  }
 
-%fragment("to"{SX}, "header", fragment="casadi_decl") {
+%fragment("casadi_sx", "header", fragment="casadi_decl") {
   // Traits specialization for SX
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, SX** m) {
@@ -1881,7 +1881,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
  }
 
-%fragment("to"{MX}, "header", fragment="casadi_decl") {
+%fragment("casadi_mx", "header", fragment="casadi_decl") {
   // Traits specialization for MX
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, MX** m) {
@@ -1931,7 +1931,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
  }
 
-%fragment("to"{DMatrix}, "header", fragment="casadi_decl", fragment="to"{double}) {
+%fragment("casadi_dmatrix", "header", fragment="casadi_decl", fragment="casadi_double") {
   // Traits specialization for DMatrix
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, DMatrix** m) {
@@ -2137,7 +2137,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 }
 
 
-%fragment("to"{IMatrix}, "header", fragment="casadi_decl", fragment="to"{int}) {
+%fragment("casadi_imatrix", "header", fragment="casadi_decl", fragment="casadi_int") {
   // Traits specialization for IMatrix
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, IMatrix** m) {
@@ -2260,13 +2260,13 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 
 // Legacy - to be removed
-%define %casadi_input_typemaps_old(xName, xPrec, xType...)
-%typemap(in, noblock=1, fragment="to"{xName}) const xType & (xType m) {
+%define %casadi_input_typemaps_old(xFrag, xName, xPrec, xType...)
+%typemap(in, noblock=1, fragment=xFrag) const xType & (xType m) {
   $1 = &m;
   if (!to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
  }
 %typemap(freearg, noblock=1) const xType& {}
-%typemap(typecheck, noblock=1, fragment="to"{xName}, precedence=xPrec) const xType& {
+%typemap(typecheck, noblock=1, fragment=xFrag, precedence=xPrec) const xType& {
   $1 = to_ptr($input, static_cast< xType **>(0));
  }
 %enddef
@@ -2338,16 +2338,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_input_typemaps("casadi_impl", "double", SWIG_TYPECHECK_DOUBLE, double)
 %casadi_input_typemaps("casadi_impl", "[int]", PRECEDENCE_IVector, std::vector<int>)
 #ifdef SWIGPYTHON
-%casadi_input_typemaps_old(DVector, PRECEDENCE_DVector, std::vector<double>)
+%casadi_input_typemaps_old("casadi_dvector", DVector, PRECEDENCE_DVector, std::vector<double>)
 #endif
 %casadi_input_typemaps("casadi_impl", "DerivativeGenerator", PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
 %casadi_input_typemaps("casadi_impl", "CustomEvaluate", PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
 %casadi_input_typemaps("casadi_impl", "Callback", PRECEDENCE_CALLBACK, casadi::Callback)
 %casadi_input_typemaps("casadi_impl", "Dict", PRECEDENCE_DICT, casadi::GenericType::Dict)
-%casadi_input_typemaps_old(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
+%casadi_input_typemaps_old("casadi_sx", SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
 %casadi_template("casadi_impl", "[SX]", PRECEDENCE_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
 %casadi_template("casadi_impl", "[[SX]]", PRECEDENCE_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
-%casadi_input_typemaps_old(MX, PRECEDENCE_MX, casadi::MX)
+%casadi_input_typemaps_old("casadi_mx", MX, PRECEDENCE_MX, casadi::MX)
 %template() std::map<std::string, casadi::Sparsity >;
 %template() std::map<std::string, std::vector<casadi::Sparsity > >;
 %casadi_template("casadi_impl", "str:MX", PRECEDENCE_MX, std::map<std::string, casadi::MX>)
@@ -2357,12 +2357,12 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_template("casadi_impl", "(str:MX,[str])", PRECEDENCE_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
 %casadi_template("casadi_impl", "(str:DMatrix,[str])", PRECEDENCE_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
 %casadi_template("casadi_impl", "(str:SX,[str])", PRECEDENCE_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
-%casadi_input_typemaps_old(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
+%casadi_input_typemaps_old("casadi_dmatrix", DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
 %casadi_template("casadi_impl", "[MX]", PRECEDENCE_MXVector, std::vector<casadi::MX>)
 %casadi_template("casadi_impl", "[[MX]]", PRECEDENCE_MXVectorVector, std::vector<std::vector<casadi::MX> >)
 %casadi_template("casadi_impl", "[DMatrix]", PRECEDENCE_DMatrixVector, std::vector< casadi::Matrix<double> >)
 %casadi_template("casadi_impl", "[[DMatrix]]", PRECEDENCE_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
-%casadi_input_typemaps_old(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
+%casadi_input_typemaps_old("casadi_imatrix", IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
 %casadi_template("casadi_impl", "[IMatrix]", PRECEDENCE_IMatrixVector, std::vector< casadi::Matrix<int> >)
 %casadi_template("casadi_impl", "[[IMatrix]]", PRECEDENCE_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
 %casadi_input_typemaps("casadi_impl", "[[int]]", PRECEDENCE_IVectorVector, std::vector<std::vector<int> >)
