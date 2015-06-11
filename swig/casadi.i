@@ -234,6 +234,9 @@ def _swig_repr(self):
 
 %naturalvar;
 
+// Make data members read-only
+%immutable;
+
 // Make sure that a copy constructor is created
 %copyctor;
 
