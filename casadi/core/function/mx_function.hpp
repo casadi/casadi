@@ -139,20 +139,22 @@ namespace casadi {
     /// \endcond
 
     /** \brief Get function input */
-    const MX& inputExpr(int ind) const;
-    const MX& inputExpr(const std::string & iname) const
-    { return inputExpr(inputIndex(iname)); }
+    const MX inputExpr(int ind) const;
+    const MX inputExpr(const std::string & iname) const {
+      return inputExpr(inputIndex(iname));
+    }
 
     /** \brief Get function output */
-    const MX& outputExpr(int ind) const;
-    const MX& outputExpr(const std::string & oname) const
-    { return outputExpr(outputIndex(oname)); }
+    const MX outputExpr(int ind) const;
+    const MX outputExpr(const std::string & oname) const {
+      return outputExpr(outputIndex(oname));
+    }
 
     /** \brief Get all function inputs */
-    const std::vector<MX>& inputExpr() const;
+    const std::vector<MX> inputExpr() const;
 
     /** \brief Get all function outputs */
-    const std::vector<MX> & outputExpr() const;
+    const std::vector<MX> outputExpr() const;
 
     /// \cond INTERNAL
 #ifndef SWIG
