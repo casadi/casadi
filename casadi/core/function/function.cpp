@@ -179,7 +179,7 @@ namespace casadi {
     return (*this)->getStat(name);
   }
 
-  Sparsity& Function::jacSparsity(int iind, int oind, bool compact, bool symmetric) {
+  const Sparsity Function::jacSparsity(int iind, int oind, bool compact, bool symmetric) {
     return (*this)->jacSparsity(iind, oind, compact, symmetric);
   }
 
