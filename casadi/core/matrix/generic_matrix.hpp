@@ -156,7 +156,7 @@ namespace casadi {
     std::vector<int> find(bool ind1=SWIG_IND1) const { return sparsity().find(ind1);}
 
     /** \brief Get the sparsity pattern */
-    const Sparsity& sparsity() const;
+    SWIG_CONSTREF(Sparsity) sparsity() const;
 
 #ifndef SWIG
     /// \cond INTERNAL
