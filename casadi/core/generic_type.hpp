@@ -159,16 +159,16 @@ namespace casadi {
     double toDouble() const;
 
     //! \brief Convert to string
-    const std::string& toString() const;
+    SWIG_CONSTREF(std::string) toString() const;
 
     //! \brief Convert to vector of ints
-    const std::vector<int>& toIntVector() const;
+    SWIG_CONSTREF(std::vector<int>) toIntVector() const;
 
     //! \brief Convert to vector of ints
-    const std::vector< std::vector<int> >& toIntVectorVector() const;
+    SWIG_CONSTREF(std::vector< std::vector<int> >) toIntVectorVector() const;
 
     //! \brief Convert to vector of doubles
-    const std::vector<double>& toDoubleVector() const;
+    SWIG_CONSTREF(std::vector<double>) toDoubleVector() const;
 
     #ifndef SWIG
     //! \brief Convert to vector of ints
@@ -182,7 +182,7 @@ namespace casadi {
     #endif
 
     //! \brief Convert to vector of strings
-    const std::vector<std::string>& toStringVector() const;
+    SWIG_CONSTREF(std::vector<std::string>) toStringVector() const;
 
     //! \brief Convert to Dict
     const Dict& toDict() const;

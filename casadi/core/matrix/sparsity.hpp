@@ -33,20 +33,6 @@
 #include <list>
 #include <limits>
 
-#ifdef SWIG
-#define SWIG_OUTPUT(arg) OUTPUT
-#define SWIG_INOUT(arg) INOUT
-#ifdef SWIGMATLAB
-#define SWIG_IND1 true
-#else // SWIGMATLAB
-#define SWIG_IND1 false
-#endif // SWIGMATLAB
-#else // SWIG
-#define SWIG_OUTPUT(arg) arg
-#define SWIG_INOUT(arg) arg
-#define SWIG_IND1 false
-#endif // SWIG
-
 // Cashing requires a multimap (preferably a hash map)
 #ifdef USE_CXX11
 // Using C++11 unordered_multimap (hash map)
