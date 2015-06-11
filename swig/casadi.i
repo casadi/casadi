@@ -132,10 +132,11 @@
     // Assign to a vector, if conversion is allowed
     template<typename E, typename M> bool assign_vector(E* d, int sz, std::vector<M>** m);
 
-  } // namespace CasADi
+    /* Convert result from CasADi to interfaced language */    
+    GUESTOBJECT* from_ref(const casadi::GenericType &a);
+    GUESTOBJECT* from_ref(const casadi::GenericType::Dict &a);
 
-  GUESTOBJECT * from_GenericType(const casadi::GenericType &a);
-  GUESTOBJECT * from_Dict(const casadi::GenericType::Dict &a);
+  } // namespace CasADi
  }
 
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
@@ -1101,37 +1102,39 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 #ifdef SWIGPYTHON
 %fragment("from"{GenericType}, "header", fragment="casadi_decl") {
-  GUESTOBJECT * from_GenericType(const casadi::GenericType &a) {
-    GUESTOBJECT *p = 0;
-    if (a.isBool()) {
-      p=PyBool_FromLong(a.toBool());
-    } else if (a.isInt()) {
-      p=PyInt_FromLong(a.toInt());
-    } else if (a.isDouble()) {
-      p=PyFloat_FromDouble(a.toDouble());
-    } else if (a.isString()) {
-      p=PyString_FromString(a.toString().c_str());
-    } else if (a.isIntVector()) {
-      p = swig::from(a.toIntVector());
-    } else if (a.isIntVectorVector()) {
-      p = swig::from(a.toIntVectorVector());
-    } else if (a.isDoubleVector()) {
-      p = swig::from( a.toDoubleVector());
-    }  else if (a.isStringVector()) {
-      p = swig::from(a.toStringVector());
-    } else if (a.isDict()) {
-      p = from_Dict(a.toDict());
-    } else if (a.isFunction()) {
-      p = swig::from( a.toFunction());
-    } else if (a.isNull()) {
-      p = Py_None;
+  namespace casadi {
+    GUESTOBJECT * from_ref(const GenericType &a) {
+      GUESTOBJECT *p = 0;
+      if (a.isBool()) {
+        p=PyBool_FromLong(a.toBool());
+      } else if (a.isInt()) {
+        p=PyInt_FromLong(a.toInt());
+      } else if (a.isDouble()) {
+        p=PyFloat_FromDouble(a.toDouble());
+      } else if (a.isString()) {
+        p=PyString_FromString(a.toString().c_str());
+      } else if (a.isIntVector()) {
+        p = swig::from(a.toIntVector());
+      } else if (a.isIntVectorVector()) {
+        p = swig::from(a.toIntVectorVector());
+      } else if (a.isDoubleVector()) {
+        p = swig::from( a.toDoubleVector());
+      }  else if (a.isStringVector()) {
+        p = swig::from(a.toStringVector());
+      } else if (a.isDict()) {
+        p = from_ref(a.toDict());
+      } else if (a.isFunction()) {
+        p = swig::from( a.toFunction());
+      } else if (a.isNull()) {
+        p = Py_None;
+      }
+      return p;
     }
-    return p;
-  }
-}
+  } // namespace casadi
+ }
 
 %typemap(out, noblock=1, fragment="from"{GenericType}) casadi::GenericType {
-  if(!($result = from_GenericType($1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
+  if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
 }
 
 %typemap(out, fragment="from"{GenericType}) std::vector< casadi::GenericType > {
@@ -1139,30 +1142,32 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   std::vector< casadi::GenericType > & in = $1;
   for (int k=0 ; k < in.size(); ++k) {
     PyObject* rete;
-    if (!(rete = from_GenericType(in[k]))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
+    if (!(rete = casadi::from_ref(in[k]))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
     PyList_Append(ret, rete);
   }
   $result = ret;
 }
 
 %fragment("from"{Dict}, "header", fragment="casadi_decl") {
-  GUESTOBJECT * from_Dict(const casadi::GenericType::Dict &a) {
-    PyObject *p = PyDict_New();
-    casadi::GenericType::Dict::const_iterator end = a.end();
-    for (casadi::GenericType::Dict::const_iterator it = a.begin(); it != end; ++it) {
-      PyObject * e = from_GenericType(it->second);
-      if (!e) {
-        Py_DECREF(p);
-        return 0;
+  namespace casadi {
+    GUESTOBJECT * from_ref(const GenericType::Dict &a) {
+      PyObject *p = PyDict_New();
+      GenericType::Dict::const_iterator end = a.end();
+      for (GenericType::Dict::const_iterator it = a.begin(); it != end; ++it) {
+        PyObject * e = from_ref(it->second);
+        if (!e) {
+          Py_DECREF(p);
+          return 0;
+        }
+        PyDict_SetItemString(p,(it->first).c_str(),e);
+        Py_DECREF(e);
       }
-      PyDict_SetItemString(p,(it->first).c_str(),e);
-      Py_DECREF(e);
+      return p;
     }
-    return p;
-  }
+  } // namespace casadi
 }
 %typemap(out, noblock=1, fragment="from"{Dict}) const casadi::GenericType::Dict&  {
-  if(!($result = from_Dict(*$1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
+  if(!($result = casadi::from_ref(*$1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
 }
 #endif // SWIGPYTHON
 
