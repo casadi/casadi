@@ -158,10 +158,12 @@ namespace casadi {
     /** \brief Get the sparsity pattern */
     const Sparsity& sparsity() const;
 
+#ifndef SWIG
     /// \cond INTERNAL
     /** \brief Access the sparsity, make a copy if there are multiple references to it */
     Sparsity& sparsityRef();
     /// \endcond
+#endif // SWIG
 
     /// \cond CLUTTER
     /**  @{  */
