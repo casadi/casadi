@@ -128,6 +128,9 @@
     // Same as the above, but with pointer instead of pointer to pointer
     template<typename M> bool to_val(GUESTOBJECT *p, M* m);
 
+    // Check if conversion is possible
+    template<typename M> bool can_convert(GUESTOBJECT *p) { return to_ptr(p, static_cast<M**>(0));}
+
     // Assign to a vector, if conversion is allowed
     template<typename E, typename M> bool assign_vector(E* d, int sz, std::vector<M>** m);
 
@@ -656,16 +659,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         }
       }
 
-      // Scalar DMatrix holding integer
-      {
-        DMatrix *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<double>*), 0))
-            && m2->isScalar() && m2->isInteger()) {
-          if (m) **m = m2->getIntValue();
-          return true;
-        }
-      }
-
       // No match
       return false;
     }
@@ -673,7 +666,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 
 %fragment("casadi_double", "header", fragment="casadi_decl") {
-  // Traits specialization for double
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, double** m) {
       // Treat Null
@@ -684,61 +676,23 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
       // Scalar DMatrix
       {
-        // Pointer to object
         DMatrix *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                      $descriptor(casadi::Matrix<double>*), 0))) {
-          if (m2->isScalar(true)) {
-            if (m) **m = m2->getValue();
-            return true;
-          }
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<double>*), 0))
+            && m2->isScalar()) {
+          if (m) **m = m2->getValue();
+          return true;
         }
       }
 
       // Scalar IMatrix
       {
-        // Pointer to object
         IMatrix *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                      $descriptor(casadi::Matrix<int>*), 0))) {
-          if (m2->isScalar(true)) {
-            if (m) **m = m2->getIntValue();
-            return true;
-          }
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<int>*), 0))
+            && m2->isScalar()) {
+          if (m) **m = m2->getValue();
+          return true;
         }
       }
-
-#ifdef SWIGPYTHON
-      // Has dtype attribute
-      if (PyObject_HasAttrString(p, "dtype")) {
-        PyObject *r = PyObject_GetAttrString(p, "dtype");
-        if (!PyObject_HasAttrString(r, "kind")) {
-          Py_DECREF(r);
-          return false;
-        }
-        PyObject *k = PyObject_GetAttrString(r, "kind");
-        if (!PyObject_HasAttrString(p, "__float__")) {
-          Py_DECREF(k);
-          Py_DECREF(r);
-          return false;
-        }
-        char cmd[] = "__float__";
-        PyObject *mm = PyObject_CallMethod(p, cmd, 0);
-        if (!mm) {
-          PyErr_Clear();
-          Py_DECREF(k);
-          Py_DECREF(r);
-          return false;
-        }
-        char *kk = PyString_AsString(k);
-        bool result = kk[0]=='f' || kk[0]=='i';
-        Py_DECREF(k);
-        Py_DECREF(r); 
-        if (result && m) **m = PyFloat_AsDouble(mm);
-        Py_DECREF(mm);
-        return result;
-      }
-#endif //SWIGPYTHON
 
       // No match
       return false;
@@ -1578,19 +1532,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         }
       }
 
-      // First convert to double
+      // First convert to scalar
       {
         double tmp;
-        if (SWIG_IsOK(SWIG_AsVal_double(p, m ? &tmp : 0))) {
-          if (m) **m=tmp;
-          return true;
-        }
-      }
-
-      // First convert to integer
-      {
-        int tmp;
-        if (SWIG_IsOK(SWIG_AsVal_int(p, m ? &tmp : 0))) {
+        if (to_val(p, &tmp)) {
           if (m) **m=tmp;
           return true;
         }
@@ -1607,39 +1552,47 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         return result;
       }
       // Numpy arrays will be cast to dense Matrix<double>
-      if (is_array(p)) { 
-        if (array_numdims(p)==0) {
-          double d;
-          int result = to_val(p, &d);
-          if (!result) return result;
-          if (m) **m = casadi::Matrix<double>(d);
-          return result;
-        }
-        if (array_numdims(p)>2 || array_numdims(p)<1) {
+      if (is_array(p)) {
+        int array_is_new_object;
+        PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p, NPY_DOUBLE, &array_is_new_object);
+        if (!array) return false;
+        int nrow, ncol;
+        switch (array_numdims(p)) {
+        case 0:
+          // Scalar
+          nrow=ncol=1;
+          break;
+        case 1:
+          // Vector
+          nrow=array_size(p, 0);
+          ncol=1;
+          break;
+        case 2:
+          // Matrix
+          nrow=array_size(p, 0); 
+          ncol=array_size(p, 1); 
+          break;
+        default:
+          // More than two dimension unsupported
+          if (array_is_new_object) Py_DECREF(array); 
           return false;
         }
-        int nrows = array_size(p,0); // 1D array is cast into column vector
-        int ncols  = 1;
-        if (array_numdims(p)==2) ncols=array_size(p,1); 
-        int size=nrows*ncols; // number of elements in the dense matrix
-        if (!array_is_native(p)) return false;
-        // Make sure we have a contigous array with double datatype
-        int array_is_new_object;
-        PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
-        if (!array) return false;
-    
-        double* d=(double*) array_data(array);
-        std::vector<double> v(d,d+size);
-    
         if (m) {
-          **m = casadi::Matrix<double>::zeros(nrows,ncols);
-          (*m)->set(d, true);
+          **m = casadi::Matrix<double>::zeros(nrow, ncol);
+          casadi::Matrix<double>::iterator it=(*m)->begin();
+          double* d = reinterpret_cast<double*>(array_data(array));
+          for (int cc=0; cc<ncol; ++cc) {
+            for (int rr=0; rr<nrow; ++rr) {
+              *it++ = d[cc+rr*ncol];
+            }
+          }
         }
            
         // Free memory
         if (array_is_new_object) Py_DECREF(array); 
         return true;
       }
+
       // scipy's csc_matrix will be cast to sparse DMatrix
       if(PyObjectHasClassName(p, "csc_matrix")) {
     
@@ -1743,6 +1696,15 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       }
 #endif // SWIGMATLAB
 
+      // First convert to IMatrix
+      if (can_convert<IMatrix>(p)) {
+        IMatrix tmp;
+        if (to_val(p, &tmp)) {
+          if (m) **m=tmp;
+          return true;
+        }
+      }
+
       // No match
       return false;
     }
@@ -1775,53 +1737,62 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #ifdef SWIGPYTHON
       // Numpy arrays will be cast to dense Matrix<int>
       if (is_array(p)) {
-        if (array_numdims(p)==0) {
-          int d;
-          int result = to_val(p, &d);
-          if (!result) return result;
-          if (m) **m = casadi::Matrix<int>(d);
-          return result;
-        }
-        if (array_numdims(p)>2 || array_numdims(p)<1) return false;
-        int nrows = array_size(p,0); // 1D array is cast into column vector
-        int ncols  = 1;
-        if (array_numdims(p)==2) ncols=array_size(p,1); 
-        if (!array_is_native(p)) return false;
-        // Make sure we have a contigous array with int datatype
-        int array_is_new_object=0;
-        PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
-        if (!array) { // Trying LONG
+        int array_is_new_object;
+        bool is_long=false;
+        PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p, NPY_INT, &array_is_new_object);
+        if (!array) {
+          // Trying NPY_LONG
+          is_long=true;
           PyErr_Clear();
-          array = obj_to_array_contiguous_allow_conversion(p,NPY_LONG,&array_is_new_object);
-          if (!array) {
-            PyErr_Clear();
-            return false;
-          }
-          long* temp=(long*) array_data(array);
-          if (m) {
-            **m = casadi::Matrix<int>::zeros(ncols,nrows);
-            for (int k=0;k<nrows*ncols;k++) (*m)->data()[k]=temp[k];
-            **m = (*m)->T();                  
-          }
-          // Free memory
-          if (array_is_new_object) Py_DECREF(array);
-          return true;
+          array = obj_to_array_contiguous_allow_conversion(p, NPY_LONG, &array_is_new_object);
         }
-    
+        if (!array) return false;
+        int nrow, ncol;
+        switch (array_numdims(p)) {
+        case 0:
+          // Scalar
+          nrow=ncol=1;
+          break;
+        case 1:
+          // Vector
+          nrow=array_size(p, 0);
+          ncol=1;
+          break;
+        case 2:
+          // Matrix
+          nrow=array_size(p, 0); 
+          ncol=array_size(p, 1); 
+          break;
+        default:
+          // More than two dimension unsupported
+          if (array_is_new_object) Py_DECREF(array); 
+          return false;
+        }
         if (m) {
-          int* d= static_cast<int*>(array_data(array));
-          **m = casadi::Matrix<int>::zeros(nrows, ncols);
-          for (int rr=0; rr<nrows; ++rr) {
-            for (int cc=0; cc<ncols; ++cc) {
-              (**m)(rr, cc) = *d++;
+          **m = casadi::Matrix<int>::zeros(nrow, ncol);
+          casadi::Matrix<int>::iterator it=(*m)->begin();
+          if (is_long) {
+            long* d = reinterpret_cast<long*>(array_data(array));
+            for (int cc=0; cc<ncol; ++cc) {
+              for (int rr=0; rr<nrow; ++rr) {
+                *it++ = d[cc+rr*ncol];
+              }
+            }
+          } else {
+            int* d = reinterpret_cast<int*>(array_data(array));
+            for (int cc=0; cc<ncol; ++cc) {
+              for (int rr=0; rr<nrow; ++rr) {
+                *it++ = d[cc+rr*ncol];
+              }
             }
           }
         }
-           
+
         // Free memory
-        if (array_is_new_object) Py_DECREF(array);
+        if (array_is_new_object) Py_DECREF(array); 
         return true;
       }
+
       if (PyObject_HasAttrString(p,"__IMatrix__")) {
         char cmd[] = "__IMatrix__";
         PyObject *cr = PyObject_CallMethod(p, cmd, 0);
@@ -1830,6 +1801,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         Py_DECREF(cr);
         return result;
       }
+
       {
         std::vector <int> t;
         int res = to_val(p, &t);

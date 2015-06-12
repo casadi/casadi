@@ -424,8 +424,7 @@ class typemaptests(casadiTestCase):
       "list" : goallist,
       "tuple" : tuple(goallist),
       "array1ddouble" : array(goallist,dtype=double),
-      "array1dint" : array(goallist),
-      "mixed" : [1,DMatrix(2),array(3)]
+      "array1dint" : array(goallist)
     }
     w=DMatrix(goal)
     self.checkarray(w,goal,"Constructor")
