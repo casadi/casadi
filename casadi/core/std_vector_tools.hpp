@@ -745,26 +745,6 @@ namespace casadi {
   }
 
 } // namespace casadi
-
-//#endif
 #endif // SWIG
-
-#ifdef SWIG
-
-// map the template name to the instantiated name
-#define VTT_INST(T, function_name) \
-%template(function_name) casadi::function_name<T>;
-
-// Define template instantiations
-#define VECTOR_TOOLS_TEMPLATES(T) \
-VTT_INST(T, isIncreasing) \
-VTT_INST(T, isDecreasing) \
-VTT_INST(T, isNonIncreasing) \
-VTT_INST(T, isNonDecreasing) \
-VTT_INST(T, isMonotone) \
-VTT_INST(T, isStrictlyMonotone) \
-VTT_INST(T, isRegular) \
-
-#endif //SWIG
 
 #endif // CASADI_STD_VECTOR_TOOLS_HPP

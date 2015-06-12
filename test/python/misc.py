@@ -239,52 +239,7 @@ class Misctests(casadiTestCase):
     self.assertEqual(d,"OT_STRINGVECTOR")
 
     #d = i.getOptionAllowed(n)
-    
-  def test_monotonicity(self):
-    self.message("monotonicity tests")
-    l = []
-    self.assertTrue(isIncreasing(l))
-    self.assertTrue(isDecreasing(l))
-    self.assertTrue(isNonIncreasing(l))
-    self.assertTrue(isNonDecreasing(l))
-    self.assertTrue(isMonotone(l))
-    self.assertTrue(isStrictlyMonotone(l))
-    l = [-3]
-    self.assertTrue(isIncreasing(l))
-    self.assertTrue(isDecreasing(l))
-    self.assertTrue(isNonIncreasing(l))
-    self.assertTrue(isNonDecreasing(l))
-    self.assertTrue(isMonotone(l))
-    self.assertTrue(isStrictlyMonotone(l))
-    for l in [ [3,5], [-Inf,5], [3,Inf] , [-Inf,Inf] ]:
-      self.assertTrue(isIncreasing(l))
-      self.assertFalse(isDecreasing(l))
-      self.assertFalse(isNonIncreasing(l))
-      self.assertTrue(isNonDecreasing(l))
-      self.assertTrue(isMonotone(l))
-      self.assertTrue(isStrictlyMonotone(l))
-    l = [5,3]
-    self.assertFalse(isIncreasing(l))
-    self.assertTrue(isDecreasing(l))
-    self.assertTrue(isNonIncreasing(l))
-    self.assertFalse(isNonDecreasing(l))
-    self.assertTrue(isMonotone(l))
-    self.assertTrue(isStrictlyMonotone(l))
-    for l in [ [5,5], [-Inf,-Inf], [Inf,Inf] ]:
-      self.assertFalse(isIncreasing(l))
-      self.assertFalse(isDecreasing(l))
-      self.assertTrue(isNonIncreasing(l))
-      self.assertTrue(isNonDecreasing(l))
-      self.assertTrue(isMonotone(l))
-      self.assertFalse(isStrictlyMonotone(l))
-    for l in [ [3,2,5], [1,NaN,2], [NaN] ] :
-      self.assertFalse(isIncreasing(l))
-      self.assertFalse(isDecreasing(l))
-      self.assertFalse(isNonIncreasing(l))
-      self.assertFalse(isNonDecreasing(l))
-      self.assertFalse(isMonotone(l))
-      self.assertFalse(isStrictlyMonotone(l))
-    
+        
   def test_regression418(self):
     self.message("Segfault regression check")
     f = ControlSimulator()
