@@ -353,8 +353,9 @@ integrator = Integrator("cvodes", dae)
 integrator.setOption("reltol",1e-16)
 integrator.setOption("stop_at_end",False)
 integrator.init()
-integrator.setInput(vec(P_),"x0")
-integrator.input("x0")[0] += 1e-9 # Put a tiny perturbation
+x0_pert = vec(P_)
+x0_pert[0] += 1e-9 # Put a tiny perturbation
+integrator.setInput(x0_pert,"x0")
 integrator.reset()
 integrator.integrate(0)
 
