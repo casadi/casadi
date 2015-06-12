@@ -215,8 +215,8 @@ class Fun:
     z.set(z2)
     
   def getDerForward(self,f,nfwd):
-    inputs = [f.input(i).sparsity() for i in range(f.nIn())]
-    outputs = [f.output(i).sparsity() for i in range(f.nOut())]
+    inputs = [f.getInput(i).sparsity() for i in range(f.nIn())]
+    outputs = [f.getOutput(i).sparsity() for i in range(f.nOut())]
     
     sself = self
 
@@ -227,8 +227,8 @@ class Fun:
     return FunDer
 
   def getDerReverse(self,f,nadj):
-    inputs = [f.input(i).sparsity() for i in range(f.nIn())]
-    outputs = [f.output(i).sparsity() for i in range(f.nOut())]
+    inputs = [f.getInput(i).sparsity() for i in range(f.nIn())]
+    outputs = [f.getOutput(i).sparsity() for i in range(f.nOut())]
     
     sself = self
 

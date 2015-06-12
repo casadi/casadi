@@ -37,7 +37,7 @@ f.init()
 f.setInput(5)
 f.evaluate()
 
-print f.output()
+print f.getOutput()
 
 #! For some mysterious reason we get NaN here
 

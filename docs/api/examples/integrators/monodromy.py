@@ -118,7 +118,7 @@ print Ji
 # jacsim.evaluate()
 
 # #! For each of the 500 intervals, we have a 2-by-2 matrix as output
-# print "jacsim.output().shape = ", jacsim.output().shape
+# print "jacsim.getOutput().shape = ", jacsim.getOutput().shape
 
 # #! Show only the last 3 intervals.
 # print jacsim.getOutput()[-3*2:,:]
@@ -148,7 +148,7 @@ print Ji
 # jaccsim.evaluate()
 
 # #! For each of the 500 intervals, we have a 2-by-2 matrix as output
-# print "jaccsim.output().shape = ", jaccsim.output().shape
+# print "jaccsim.getOutput().shape = ", jaccsim.getOutput().shape
 
 # #! Show only the last 3 intervals.
 # print jaccsim.getOutput()[-3*2:,:]
