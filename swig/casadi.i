@@ -2094,91 +2094,13 @@ using namespace casadi;
 
 %traits_swigtype(casadi::Function);
 %fragment(SWIG_Traits_frag(casadi::Function));
-
 #endif
-
-
-// These dummy things would go away when we properly use fragments
-// %traits_swigtype
-
-%{
-namespace std {
-void dummy(std::vector< std::vector<double> > foo1,
-           std::vector<double> &foo2,
-           std::vector<casadi::MX> &foo3,
-           casadi::MX foo4,
-           casadi::Matrix<double> foo5,
-           casadi::Sparsity foo6,
-           casadi::SX foo9,
-           casadi::GenericType foo10,
-           std::vector < casadi::Matrix<double> > foo11,
-           std::vector < std::vector < casadi::Matrix<double> > > foo12,
-           std::vector < casadi::Matrix<int> > foo13,
-           std::vector < std::vector < casadi::Matrix<int> > > foo14,
-           std::vector < casadi::SX > foo15,
-           std::vector < std::vector < casadi::SX > > foo16,
-           std::vector < std::vector < casadi::MX > > foo17,
-           std::vector < std::vector < casadi::MX* > > foo17b,
-           casadi::GenericType::Dict foo18,
-           std::string& foo19,
-           casadi::Matrix<int> foo20,
-           casadi::CustomFunction foo24,
-           casadi::Function foo25,
-           int &bar,
-           double &baz) {}
-
-
-#ifdef SWIGPYTHON
-void dummy2(
-  casadi::DerivativeGenerator foo1,
-  casadi::Callback foo2,
-  casadi::CustomEvaluate foo3
-  ) {}
-#endif// SWIGPYTHON
-};
-%}
 
 #ifdef SWIGPYTHON
 %pythoncode %{
 import _casadi
 %}
 #endif // SWIGPYTHON
-
-namespace std {
-  void dummy(std::vector< std::vector<double> > foo1,
-             std::vector<double> &foo2,
-             std::vector<casadi::MX> &foo3,
-             casadi::MX foo4,
-             casadi::Matrix<double> foo5,
-             casadi::Sparsity foo6,
-             casadi::SX foo9,
-             casadi::GenericType foo10,
-             std::vector < casadi::Matrix<double> > foo11,
-             std::vector < std::vector < casadi::Matrix<double> > > foo12,
-             std::vector < casadi::Matrix<int> > foo13,
-             std::vector < std::vector < casadi::Matrix<int> > > foo14,
-             std::vector < casadi::SX > foo15,
-             std::vector < std::vector < casadi::SX > > foo16,
-             std::vector < std::vector < casadi::MX > > foo17,
-             std::vector < std::vector < casadi::MX* > > foo17b,
-             casadi::GenericType::Dict foo18,
-             std::string& foo19,
-             casadi::Matrix<int> foo20,
-             casadi::CustomFunction foo24,
-             casadi::Function foo25,
-             int &bar,
-             double &baz);
-
-
-#ifdef SWIGPYTHON
-void dummy2(
-  casadi::DerivativeGenerator foo1,
-  casadi::Callback foo2,
-  casadi::CustomEvaluate foo3
-  ) {}
-#endif
-
-};
 
 %include <casadi/core/function/schemes_metadata.hpp>
 
