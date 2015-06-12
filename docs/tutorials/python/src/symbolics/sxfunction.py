@@ -140,7 +140,7 @@ df = f.derivative(1,0)
 df.setInput([2,3],0)
 df.setInput([7,6],1)
 df.evaluate()
-print df.output(1) # v
+print df.getOutput(1) # v
 
 #! Functions with matrix valued input
 #! ----------------------------------
