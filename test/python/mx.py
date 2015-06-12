@@ -2249,34 +2249,34 @@ class MXtests(casadiTestCase):
       return f.getOutput()
 
     self.checkarray(evalvertcat(vertsplit(x)),x_)
-    self.checkarray(evalvertcat(vertsplit(x)+[y]),vertcat([x_,y_]))
-    self.checkarray(evalvertcat([z]+vertsplit(x)+[y] + vertsplit(x)+[z]),vertcat([z_,x_,y_,x_,z_]))
+    self.checkarray(evalvertcat(vertsplit(x)+(y,)),vertcat([x_,y_]))
+    self.checkarray(evalvertcat((z,)+vertsplit(x)+(y,) + vertsplit(x)+(z,)),vertcat([z_,x_,y_,x_,z_]))
     self.checkarray(evalvertcat(vertsplit(x)[:-1]),x_[:-1])
-    self.checkarray(evalvertcat(vertsplit(x)[:-1]+[y]),vertcat([x_[:-1],y_]))
-    self.checkarray(evalvertcat([z]+vertsplit(x)[:-1]+[y] + vertsplit(x)[:-1]+[z]),vertcat([z_,x_[:-1],y_,x_[:-1],z_]))
+    self.checkarray(evalvertcat(vertsplit(x)[:-1]+(y,)),vertcat([x_[:-1],y_]))
+    self.checkarray(evalvertcat((z,)+vertsplit(x)[:-1]+(y,) + vertsplit(x)[:-1]+(z,)),vertcat([z_,x_[:-1],y_,x_[:-1],z_]))
     self.checkarray(evalvertcat(vertsplit(x)[1:]),x_[1:])
-    self.checkarray(evalvertcat(vertsplit(x)[1:]+[y]),vertcat([x_[1:],y_]))
-    self.checkarray(evalvertcat([z]+vertsplit(x)[1:]+[y] + vertsplit(x)[1:]+[z]),vertcat([z_,x_[1:],y_,x_[1:],z_]))
+    self.checkarray(evalvertcat(vertsplit(x)[1:]+(y,)),vertcat([x_[1:],y_]))
+    self.checkarray(evalvertcat((z,)+vertsplit(x)[1:]+(y,) + vertsplit(x)[1:]+(z,)),vertcat([z_,x_[1:],y_,x_[1:],z_]))
     g = vertsplit(x)[5:]+vertsplit(x)[:5]
     self.checkarray(evalvertcat(g),vertcat([x_[5:],x_[:5]]))
-    self.checkarray(evalvertcat(g+[y]),vertcat([x_[5:],x_[:5],y_]))
-    self.checkarray(evalvertcat([z]+g+[y] + g+[z]),vertcat([z_,x_[5:],x_[:5],y_,x_[5:],x_[:5],z_]))
+    self.checkarray(evalvertcat(g+(y,)),vertcat([x_[5:],x_[:5],y_]))
+    self.checkarray(evalvertcat((z,)+g+(y,) + g+(z,)),vertcat([z_,x_[5:],x_[:5],y_,x_[5:],x_[:5],z_]))
     
     import __builtin__
 
 
     w = vertsplit(x,2)
-    r = __builtin__.sum([vertsplit(i) for i in w],[])
+    r = __builtin__.sum([list(vertsplit(i)) for i in w],[])
     
     self.checkarray(evalvertcat(r),x_)
 
     w = vertsplit(x,2)
-    r = __builtin__.sum([vertsplit(i)+[y] for i in w],[])
+    r = __builtin__.sum([list(vertsplit(i))+[y] for i in w],[])
     print "vertcat:", r
     print "result:", vertcat(r)
 
     w = vertsplit(x,2)
-    r = __builtin__.sum([vertsplit(i) for i in w],[])
+    r = __builtin__.sum([list(vertsplit(i)) for i in w],[])
     print "vertcat:", r
     print "result:", vertcat(r+[y])
     
@@ -2300,34 +2300,34 @@ class MXtests(casadiTestCase):
       return f.getOutput()
 
     self.checkarray(evalhorzcat(horzsplit(x)),x_)
-    self.checkarray(evalhorzcat(horzsplit(x)+[y]),horzcat([x_,y_]))
-    self.checkarray(evalhorzcat([z]+horzsplit(x)+[y] + horzsplit(x)+[z]),horzcat([z_,x_,y_,x_,z_]))
+    self.checkarray(evalhorzcat(horzsplit(x)+(y,)),horzcat([x_,y_]))
+    self.checkarray(evalhorzcat((z,)+horzsplit(x)+(y,) + horzsplit(x)+(z,)),horzcat([z_,x_,y_,x_,z_]))
     self.checkarray(evalhorzcat(horzsplit(x)[:-1]),x_[0,:-1])
-    self.checkarray(evalhorzcat(horzsplit(x)[:-1]+[y]),horzcat([x_[0,:-1],y_]))
-    self.checkarray(evalhorzcat([z]+horzsplit(x)[:-1]+[y] + horzsplit(x)[:-1]+[z]),horzcat([z_,x_[0,:-1],y_,x_[0,:-1],z_]))
+    self.checkarray(evalhorzcat(horzsplit(x)[:-1]+(y,)),horzcat([x_[0,:-1],y_]))
+    self.checkarray(evalhorzcat((z,)+horzsplit(x)[:-1]+(y,) + horzsplit(x)[:-1]+(z,)),horzcat([z_,x_[0,:-1],y_,x_[0,:-1],z_]))
     self.checkarray(evalhorzcat(horzsplit(x)[1:]),x_[0,1:])
-    self.checkarray(evalhorzcat(horzsplit(x)[1:]+[y]),horzcat([x_[0,1:],y_]))
-    self.checkarray(evalhorzcat([z]+horzsplit(x)[1:]+[y] + horzsplit(x)[1:]+[z]),horzcat([z_,x_[0,1:],y_,x_[0,1:],z_]))
+    self.checkarray(evalhorzcat(horzsplit(x)[1:]+(y,)),horzcat([x_[0,1:],y_]))
+    self.checkarray(evalhorzcat((z,)+horzsplit(x)[1:]+(y,) + horzsplit(x)[1:]+(z,)),horzcat([z_,x_[0,1:],y_,x_[0,1:],z_]))
     g = horzsplit(x)[5:]+horzsplit(x)[:5]
     self.checkarray(evalhorzcat(g),horzcat([x_[0,5:],x_[0,:5]]))
-    self.checkarray(evalhorzcat(g+[y]),horzcat([x_[0,5:],x_[0,:5],y_]))
-    self.checkarray(evalhorzcat([z]+g+[y] + g+[z]),horzcat([z_,x_[0,5:],x_[0,:5],y_,x_[0,5:],x_[0,:5],z_]))
+    self.checkarray(evalhorzcat(g+(y,)),horzcat([x_[0,5:],x_[0,:5],y_]))
+    self.checkarray(evalhorzcat((z,)+g+(y,) + g+(z,)),horzcat([z_,x_[0,5:],x_[0,:5],y_,x_[0,5:],x_[0,:5],z_]))
     
     import __builtin__
 
 
     w = horzsplit(x,2)
-    r = __builtin__.sum([horzsplit(i) for i in w],[])
+    r = __builtin__.sum([list(horzsplit(i)) for i in w],[])
     
     self.checkarray(evalhorzcat(r),x_)
 
     w = horzsplit(x,2)
-    r = __builtin__.sum([horzsplit(i)+[y] for i in w],[])
+    r = __builtin__.sum([list(horzsplit(i))+[y] for i in w],[])
     print "vertcat:", r
     print "result:", horzcat(r)
 
     w = horzsplit(x,2)
-    r = __builtin__.sum([horzsplit(i) for i in w],[])
+    r = __builtin__.sum([list(horzsplit(i)) for i in w],[])
     print "vertcat:", r
     print "result:", horzcat(r+[y])
 
@@ -2611,7 +2611,7 @@ class MXtests(casadiTestCase):
     for c in [MX,SX,DMatrix]:
       x0 = c.zeros(10,0)
       
-      x1s = vertsplit(x0, [0,5,10])
+      x1s = list(vertsplit(x0, [0,5,10]))
       
       for x in x1s:
         self.checkarray(x.shape,(5,0))
@@ -2634,7 +2634,7 @@ class MXtests(casadiTestCase):
       x2 = horzcat(x1s)
       self.checkarray(x2.shape,(0,10))
       
-      x2 = horzcat([c.zeros(0,0)] + x1s + [c.zeros(0,0)])
+      x2 = horzcat((c.zeros(0,0),) + x1s + (c.zeros(0,0),))
       self.checkarray(x2.shape,(0,10))
  
     for c in [MX,SX,DMatrix]:
@@ -2648,19 +2648,19 @@ class MXtests(casadiTestCase):
       x2 = diagcat(x1s)
       self.checkarray(x2.shape,(10,0))
       
-      x2 = diagcat([c.zeros(0,0)] + x1s + [c.zeros(0,0)])
+      x2 = diagcat((c.zeros(0,0),) + x1s + (c.zeros(0,0),))
       self.checkarray(x2.shape,(10,0))
 
       x2 = diagcat(x1st)
       self.checkarray(x2.shape,(0,10))
       
-      x2 = diagcat([c.zeros(0,0)] + x1st + [c.zeros(0,0)])
+      x2 = diagcat((c.zeros(0,0),) + x1st + (c.zeros(0,0),))
       self.checkarray(x2.shape,(0,10))
       
       x2 = diagcat(x1s+x1st)
       self.checkarray(x2.shape,(10,10))
       
-      x2 = diagcat([c.zeros(0,0)] + x1s+x1st + [c.zeros(0,0)])
+      x2 = diagcat((c.zeros(0,0),) + x1s+x1st + (c.zeros(0,0),))
       self.checkarray(x2.shape,(10,10))
   def test_empty_symm_jac(self):
 

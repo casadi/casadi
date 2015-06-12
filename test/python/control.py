@@ -608,7 +608,7 @@ class ControlTests(casadiTestCase):
         A = [DMatrix(numpy.random.random((n,n))) for i in range(K)]
         T,Z,er,ec = DpleSolver.periodic_schur('slicot',A)
         def sigma(a):
-          return a[1:] + [a[0]]
+          return a[1:] + (a[0],)
               
         for z,zp,a,t in zip(Z,sigma(Z),A,T):
           self.checkarray(mul([z.T,a,zp]),t,digits=7)
