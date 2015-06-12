@@ -735,75 +735,6 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 
 #ifdef SWIGPYTHON
 %inline%{
-// Indicates that self is derived from parent.
-// by setting a special attribute __swigref_parent__
-void PySetParent(PyObject* self, PyObject* parent) {
-  Py_INCREF(parent);
-  PyObject_SetAttrString(self,"__swigref_parent__",parent);
-}
-
-// Look for the __swigref_parent__ attribute and DECREF the parent if there is one
-void PyDECREFParent(PyObject* self) {
-  if (!PyObject_HasAttrString(self,"__swigref_parent__")) return;
-  
-  PyObject* parent = PyObject_GetAttrString(self,"__swigref_parent__");
-  if (!parent) return;
-  Py_DECREF(parent); // Once for PyObject_GetAttrString
-  if (!parent) return;
-  if (parent!=Py_None) {
-    Py_DECREF(parent); // Once for the actual DECREF
-  }
-}
-
-%}
-#endif //SWIGPYTHON
-
-// Create an output typemap for a ref such that ownership is implied
-// The following text is obsolete:
-// We make use of SWIG_POINTER_OWN to ensure that the "delete_*" routine is called, where we have put another hook via %unrefobject.
-// We do not really imply that this SWIG objects owns the pointer
-// We are actually abusing the term SWIG_POINTER_OWN: a non-const ref is usually created with SWIG_NewPointerObj(..., 0 |  0 )
-%define %outputRefOwn(Type)
-%typemap(out, noblock=1) Type & {
-  $result = SWIG_NewPointerObj($1, $descriptor(Type*), 0 |  0 );
-  PySetParent($result, obj0);
-}
-%typemap(out, noblock=1) const Type & {
-   $result = swig::from(static_cast< Type * >($1));
-   PySetParent($result, obj0);
-}
-%extend Type {
-%pythoncode%{
-    def __del__(self):
-      if not(_casadi is None):
-         _casadi.PyDECREFParent(self)
-
-%}
-
-}
-%enddef
-
-// Convert reference output to a new data structure
-%define %outputRefNew(Type)
-%typemap(out, noblock=1) Type & {
-   $result = swig::from(static_cast< Type >(*$1));
-}
-%typemap(out, noblock=1) const Type & {
-   $result = swig::from(static_cast< Type >(*$1));
-}
-%extend Type {
-%pythoncode%{
-    def __del__(self):
-      if not(_casadi is None):
-         _casadi.PyDECREFParent(self)
-
-%}
-
-}
-%enddef
-
-#ifdef SWIGPYTHON
-%inline%{
 /** Check PyObjects by class name */
 bool PyObjectHasClassName(PyObject* p, const char * name) {
   PyObject * classo = PyObject_GetAttrString( p, "__class__");
@@ -2391,14 +2322,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %my_value_output_typemaps(casadi::Matrix< int >);
 %my_value_output_typemaps(casadi::MX);
 %my_value_output_typemaps(casadi::Sparsity);
-
-#ifdef SWIGPYTHON
-%outputRefOwn(casadi::Sparsity)
-%outputRefNew(std::vector< int >)
-%outputRefNew(std::vector< double >)
-%outputRefOwn(casadi::Matrix< double >)
-%outputRefOwn(casadi::Matrix< casadi::SXElement >)
-#endif // SWIGPYTHON
 
 %{
 using namespace casadi;
