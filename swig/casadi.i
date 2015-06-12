@@ -638,7 +638,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif
 
 %fragment("casadi_int", "header", fragment="casadi_decl") {
-  // Traits specialization for int
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, int** m) {
       // Treat Null
@@ -649,50 +648,23 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
       // Scalar IMatrix
       {
-        // Pointer to object
         IMatrix *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                      $descriptor(casadi::Matrix<int>*), 0))) {
-          if (m2->isScalar(true)) {
-            if (m) **m = m2->getIntValue();
-            return true;
-          }
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<int>*), 0))
+            && m2->isScalar()) {
+          if (m) **m = m2->getIntValue();
+          return true;
         }
       }
 
-#ifdef SWIGPYTHON
-    // Object has __int__ attribute
-    if (PyObject_HasAttrString(p,"dtype")) {
-      PyObject *r = PyObject_GetAttrString(p, "dtype");
-      if (!PyObject_HasAttrString(r,"kind")) {
-        Py_DECREF(r);
-        return false;
+      // Scalar DMatrix holding integer
+      {
+        DMatrix *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<double>*), 0))
+            && m2->isScalar() && m2->isInteger()) {
+          if (m) **m = m2->getIntValue();
+          return true;
+        }
       }
-      PyObject *k = PyObject_GetAttrString(r, "kind");
-      if (!PyObject_HasAttrString(p,"__int__")) {
-        Py_DECREF(k);
-        Py_DECREF(r);
-        return false;
-      }
-      char cmd[] = "__int__";
-      PyObject *mm = PyObject_CallMethod(p, cmd, 0);
-      if (!mm) {
-        PyErr_Clear();
-        Py_DECREF(k);
-        Py_DECREF(r);
-        return false;
-      }
-      char *kk = PyString_AsString(k);
-      bool result =  kk[0]=='i';
-      Py_DECREF(k);
-      Py_DECREF(r);
-      if (result) {
-        if (m) **m = PyLong_AsLong(mm);
-      }
-      Py_DECREF(mm);
-      return result;
-    }
-#endif //SWIGPYTHON
 
       // No match
       return false;
