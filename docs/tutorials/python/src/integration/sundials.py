@@ -107,7 +107,7 @@ integrator.reset()
 #! Define a convenience function to acces x(t)
 def out(t):
 	integrator.integrate(t)
-	return integrator.output().toArray()
+	return integrator.getOutput().toArray()
 
 sol = array([out(t) for t in ts]).squeeze()
 	
@@ -126,7 +126,7 @@ sim.setInput([x0,y0],"x0")
 sim.setInput(0,"p")
 sim.evaluate()
 
-sol2 = sim.output().toArray().T
+sol2 = sim.getOutput().toArray().T
 #! sol and sol2 are exactly the same
 print linalg.norm(sol-sol2)
 
@@ -139,7 +139,7 @@ print linalg.norm(sol-sol2)
 def out(dx0):
 	integrator.setInput([x0+dx0,y0],"x0")
 	integrator.evaluate()
-	return integrator.output().toArray()
+	return integrator.getOutput().toArray()
 dx0=numpy.linspace(-2,2,100)
 
 out = array([out(dx) for dx in dx0]).squeeze()
@@ -171,10 +171,10 @@ show()
 def out(t):
 	dintegrator.setInput([1,0],"fwd0_x0")
         dintegrator.evaluate()
-	A=dintegrator.output("fwd0_xf").toArray()
+	A=dintegrator.getOutput("fwd0_xf").toArray()
 	dintegrator.setInput([0,1],"fwd0_x0")
 	dintegrator.evaluate()
-	B=dintegrator.output("fwd0_xf").toArray()
+	B=dintegrator.getOutput("fwd0_xf").toArray()
 	return array([A,B]).squeeze().T
 
 circle = array([[sin(x),cos(x)] for x in numpy.linspace(0,2*pi,100)]).T
@@ -199,7 +199,7 @@ show()
 #J.setInput([x0,y0],"x0")
 #J.setInput(0,"p")
 #J.evaluate()
-#print J.output().toArray()
+#print J.getOutput().toArray()
 
 #! The figure reveals that perturbations perpendicular to the phase space trajectory shrink.
 
@@ -223,7 +223,7 @@ f.init()
 def out(u):
 	f.setInput(u)
 	f.evaluate()
-	return f.output().toArray()
+	return f.getOutput().toArray()
 
 print out(0)
 print out(1)
