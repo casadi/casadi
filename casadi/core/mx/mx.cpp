@@ -335,11 +335,10 @@ namespace casadi {
     }
 
     // Construct new sparsity pattern
-    std::vector<int> new_row, new_col, nz(rr.data());
+    std::vector<int> new_row=sparsity().getRow(), new_col=sparsity().getCol(), nz(rr.data());
     new_row.reserve(sz+rrsz);
     new_col.reserve(sz+rrsz);
     nz.reserve(rrsz);
-    sparsity().getTriplet(new_row, new_col);
     for (std::vector<int>::iterator i=nz.begin(); i!=nz.end(); ++i) {
       if (ind1) (*i)--;
       if (*i<0) *i += nel;

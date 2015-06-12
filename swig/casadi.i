@@ -448,6 +448,7 @@ namespace std {
 %template() std::vector<std::vector<int> > ;
 %template() std::vector<double>;
 %template() std::vector<std::vector<double> > ;
+%template() std::pair<std::vector<int>, std::vector<int> >;
 
 #ifndef SWIGMATLAB
 %template() std::pair<int,int>;
