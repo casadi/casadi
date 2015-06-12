@@ -113,7 +113,6 @@
     bool to_ptr(GUESTOBJECT *p, std::string** m);
     bool to_ptr(GUESTOBJECT *p, MX** m);
     bool to_ptr(GUESTOBJECT *p, GenericType** m);
-    bool to_ptr(GUESTOBJECT *p, GenericType::Dict** m);
     bool to_ptr(GUESTOBJECT *p, SX** m);
     bool to_ptr(GUESTOBJECT *p, DMatrix** m);
     bool to_ptr(GUESTOBJECT *p, IMatrix** m);
@@ -1203,34 +1202,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       }
       return res;
 #endif // SWIGPYTHON
-      // No match
-      return false;
-    }
-
-    bool to_ptr(GUESTOBJECT *p, GenericType::Dict** m) {
-      // Treat Null
-      if (is_null(p)) return false;
-
-      // Dict already?
-      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                    $descriptor(casadi::GenericType::Dict*), 0))) {
-        return true;
-      }
-
-#ifdef SWIGPYTHON
-      if (PyDict_Check(p)) {
-        PyObject *key, *value;
-        Py_ssize_t pos = 0;
-        GenericType gt;
-        while (PyDict_Next(p, &pos, &key, &value)) {
-          if (!PyString_Check(key)) return false;
-          if (!to_val(value, &gt)) return false;
-          if (m) (**m)[std::string(PyString_AsString(key))] = gt;
-        }
-        return true;
-      }
-#endif // SWIGPYTHON
-
       // No match
       return false;
     }
