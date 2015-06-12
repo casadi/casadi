@@ -134,7 +134,7 @@
 
     /* Convert result from CasADi to interfaced language */    
     GUESTOBJECT* from_ref(const casadi::GenericType &a);
-    GUESTOBJECT* from_ref(const casadi::GenericType::Dict &a);
+    template<typename M> GUESTOBJECT* from_ref(const std::map<std::string, M> &a);
 
   } // namespace CasADi
  }
@@ -823,25 +823,25 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   $result = ret;
 }
 
-%fragment("from"{Dict}, "header", fragment="casadi_decl") {
+%fragment("from"{Map}, "header", fragment="casadi_decl") {
   namespace casadi {
-    GUESTOBJECT * from_ref(const GenericType::Dict &a) {
+    template<typename M> GUESTOBJECT* from_ref(const std::map<std::string, M> &a) {
       PyObject *p = PyDict_New();
-      GenericType::Dict::const_iterator end = a.end();
-      for (GenericType::Dict::const_iterator it = a.begin(); it != end; ++it) {
+      for (typename std::map<std::string, M>::const_iterator it=a.begin(); it!=a.end(); ++it) {
         PyObject * e = from_ref(it->second);
         if (!e) {
           Py_DECREF(p);
           return 0;
         }
-        PyDict_SetItemString(p,(it->first).c_str(),e);
+        PyDict_SetItemString(p, it->first.c_str(), e);
         Py_DECREF(e);
       }
       return p;
     }
   } // namespace casadi
 }
-%typemap(out, noblock=1, fragment="from"{Dict}) const casadi::GenericType::Dict&  {
+
+%typemap(out, noblock=1, fragment="from"{Map}) const casadi::GenericType::Dict&  {
   if(!($result = casadi::from_ref(*$1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
 }
 #endif // SWIGPYTHON
