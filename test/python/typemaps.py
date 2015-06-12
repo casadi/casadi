@@ -625,7 +625,7 @@ class typemaptests(casadiTestCase):
     
     w.set(A[0,:])
     self.checkarray(w,A[0,:],"set")
-    w.get(B[0,:])
+    B[0,:] = w
     self.checkarray(B[0,:],A[0,:],"get")
     
     w = DMatrix([[0],[0]])
@@ -633,13 +633,13 @@ class typemaptests(casadiTestCase):
 
     w.set(A[:,0])
     self.checkarray(w,A[:,0],"set")
-    w.get(B[:,0])
+    B[:,0] = w
     self.checkarray(B[:,0],A[:,0],"get")
     
     w = DMatrix([[1,2],[3,4]])
     A = zeros((8,7))
     B = zeros((8,7))
-    w.get(A[2:7:3,:7:4])
+    A[2:7:3,:7:4] = w
     B[2:7:3,:7:4] = w
     self.checkarray(A,B,"get")
     

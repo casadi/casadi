@@ -96,9 +96,6 @@ namespace casadi {
     /** \brief Get the second dimension (i.e. number of columns) */
     int size2() const;
 
-    /** \brief Get the number if non-zeros for a given sparsity pattern */
-    int size(SparsityType sp) const;
-
     /** \brief Get string representation of dimensions.
         The representation is (nrow x ncol = numel | size)
     */
@@ -530,21 +527,6 @@ namespace casadi {
   template<typename MatType>
   bool GenericMatrix<MatType>::isScalar(bool scalar_and_dense) const {
     return sparsity().isScalar(scalar_and_dense);
-  }
-
-  template<typename MatType>
-  int GenericMatrix<MatType>::size(SparsityType sp) const {
-    if (sp==SP_SPARSE) {
-      return nnz();
-    } else if (sp==SP_SPARSESYM) {
-      return sizeU();
-    } else if (sp==SP_DENSE) {
-      return numel();
-    } else if (sp==SP_DENSESYM) {
-      return (numel()+size2())/2;
-    } else {
-      throw CasadiException("Matrix<T>::size(Sparsity): unknown sparsity");
-    }
   }
 
 #endif

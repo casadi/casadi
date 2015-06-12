@@ -683,12 +683,8 @@ namespace casadi {
     /** \brief Get an owning reference to the sparsity pattern */
     Sparsity getSparsity() const { return sparsity();}
 
-    /// \cond INTERNAL
-    /** \brief  Get the non-zero elements, strided array */
-    void get(double* val, int len, int stride1, int stride2, SparsityType sp) const;
-    void getNZ(double* val, int len, int stride1, int stride2) const;
-
 #ifndef SWIG
+    /// \cond INTERNAL
     /** Bitwise set, reinterpreting the data as a bvec_t array */
     void setZeroBV();
 
@@ -716,8 +712,8 @@ namespace casadi {
         ldres: The leading dimension in res
         res:   The number of superdiagonals */
     void getBand(int kl, int ku, int ldres, DataType *res) const;
-#endif
 /// \endcond
+#endif
 
     /* \brief Construct a sparse matrix from triplet form
      * Default matrix size is max(col) x max(row)

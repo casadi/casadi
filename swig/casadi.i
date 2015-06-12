@@ -1777,16 +1777,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         return result;
       }
 
-
-      /* { */
-      /*   std::vector<double> tmp, *mp=m ? &tmp : 0; */
-      /*   if (SWIG_IsOK(swig::asptr(p, mp ? &mp : 0))) { */
-      /*     if (m) **m = mp->empty() ? DMatrix() : DMatrix(*mp); */
-      /*     return true; */
-      /*   } */
-      /* } */
-
-
       {
         std::vector <double> t;
         int res = to_val(p, &t);
@@ -2491,121 +2481,6 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
 %template(GenSX)             casadi::GenericMatrix<casadi::Matrix<casadi::SXElement> >;
 %template(GenMX)             casadi::GenericMatrix<casadi::MX>;
 
-namespace casadi{
-
-#ifdef SWIGPYTHON
-
-/**
-
-Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype double)   - DENSE
-         1D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype double)   - SPARSE
-         2D scipy.csc_matrix
-*/
-
-  %typemap(in,numinputs=1) (double * val,int len,int stride1, int stride2,SparsityType sp)  {
-    PyObject* p = $input;
-    $3 = 0;
-    $4 = 0;
-    if (is_array(p)) {
-      if (!(array_is_native(p) && array_type(p)==NPY_DOUBLE))
-        SWIG_exception_fail(SWIG_TypeError, "Array should be native & of datatype double");
-			  
-      if (!(array_is_contiguous(p))) {
-        if (PyArray_CHKFLAGS((PyArrayObject *) p,NPY_ALIGNED)) {
-          $3 = PyArray_STRIDE((PyArrayObject *) p,0)/sizeof(double);
-          $4 = PyArray_STRIDE((PyArrayObject *) p,1)/sizeof(double);
-        } else {
-          SWIG_exception_fail(SWIG_TypeError, "Array should be contiguous or aligned");
-        }
-      }
-	    
-      if (!(array_size(p,0)==arg1->size1() && array_size(p,1)==arg1->size2()) ) {
-        std::stringstream s;
-        s << "SWIG::typemap(in) (double *val,int len,SparsityType sp) " << std::endl;
-        s << "Array is not of correct shape.";
-        s << "Expecting shape (" << arg1->size1() << "," << arg1->size2() << ")" << ", but got shape ("
-          << array_size(p,0) << "," << array_size(p,1) <<") instead.";
-        const std::string tmp(s.str());
-        const char* cstr = tmp.c_str();
-        SWIG_exception_fail(SWIG_TypeError,  cstr);
-      }
-      $5 = casadi::SP_DENSETRANS;
-      $2 = array_size(p,0)*array_size(p,1);
-      $1 = (double*) array_data(p);
-    } else if (PyObjectHasClassName(p,"csc_matrix")) {
-      $5 = casadi::SP_SPARSE;
-      PyObject * narray=PyObject_GetAttrString( p, "data"); // narray needs to be decref'ed
-      if (!(array_is_contiguous(narray) && array_is_native(narray) && array_type(narray)==NPY_DOUBLE))
-        SWIG_exception_fail(SWIG_TypeError, "csc_matrix should be contiguous, native & of datatype double");
-      $2 = array_size(narray,0);
-      if (!(array_size(narray,0)==arg1->nnz() ) ) {
-        std::stringstream s;
-        s << "SWIG::typemap(in) (double *val,int len,SparsityType sp) " << std::endl;
-        s << "csc_matrix does not have correct number of non-zero elements.";
-        s << "Expecting " << arg1->nnz() << " non-zeros, but got " << array_size(narray,0) << " instead.";
-        const std::string tmp(s.str());
-        const char* cstr = tmp.c_str();
-        Py_DECREF(narray);
-        SWIG_exception_fail(SWIG_TypeError,  cstr);
-      }
-      $1 = (double*) array_data(narray);
-      Py_DECREF(narray);
-    } else {
-      SWIG_exception_fail(SWIG_TypeError, "Unrecognised object");
-    }
-  }
-
-%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) (double * val,int len,int stride1, int stride2,SparsityType sp) {
-  PyObject* p = $input;
-  if (((is_array(p) && array_numdims(p) == 2)  && array_type(p)!=NPY_OBJECT) || PyObjectHasClassName(p,"csc_matrix")) {
-    $1=1;
-  } else {
-    $1=0;
-  }
-}
-
-%typemap(in,numinputs=1) (double * val,int len,int stride1, int stride2)  {
-    PyObject* p = $input;
-    $3 = 0;
-    $4 = 0;
-    if (!(array_is_native(p) && array_type(p)==NPY_DOUBLE))
-      SWIG_exception_fail(SWIG_TypeError, "Array should be native & of datatype double");
-			  
-    if (!(array_is_contiguous(p))) {
-      if (PyArray_CHKFLAGS((PyArrayObject *) p,NPY_ALIGNED)) {
-        $3 = PyArray_STRIDE((PyArrayObject *) p,0)/sizeof(double);
-        $4 = PyArray_STRIDE((PyArrayObject *) p,1)/sizeof(double);
-      } else {
-        SWIG_exception_fail(SWIG_TypeError, "Array should be contiguous or aligned");
-      }
-    }
-	    
-    if (!(array_size(p,0)==arg1->nnz()) ) {
-      std::stringstream s;
-      s << "SWIG::typemap(in) (double *val,int len,SparsityType sp) " << std::endl;
-      s << "Array is not of correct size. Should match number of non-zero elements.";
-      s << "Expecting " << array_size(p,0) << " non-zeros, but got " << arg1->nnz() <<" instead.";
-      const std::string tmp(s.str());
-      const char* cstr = tmp.c_str();
-      SWIG_exception_fail(SWIG_TypeError,  cstr);
-    }
-    $2 = array_size(p,0);
-    $1 = (double*) array_data(p);
-  }
-
-%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) (double * val,int len,int stride1, int stride2) {
-  PyObject* p = $input;
-  if ((is_array(p) && array_numdims(p) == 1) && array_type(p)!=NPY_OBJECT) {
-    $1=1;
-  } else {
-    $1=0;
-  }
-}
-
-#endif // SWIGPYTHON
-
-} // namespace casadi
-
 %include <casadi/core/matrix/generic_expression.hpp>
 
 %template(ExpIMatrix)        casadi::GenericExpression<casadi::Matrix<int> >;
@@ -2919,27 +2794,18 @@ namespace casadi {
 
 #ifdef SWIGPYTHON
 #include <arrayobject.h>
-
-// Template instantiations
 %template()    std::vector<PyObject*>;
-
-
 #endif // SWIGPYTHON
 
-
-%template(SX)             casadi::Matrix<casadi::SXElement>;
-
+%template(SX) casadi::Matrix<casadi::SXElement>;
 %extend casadi::Matrix<casadi::SXElement> {
    %template(SX) Matrix<int>;
    %template(SX) Matrix<double>;
 };
 
-
 %include <casadi/core/mx/mx.hpp>
 
-
 %extend casadi::MX{
-  
   %matrix_helpers(casadi::MX)
   
   #ifdef SWIGPYTHON
@@ -3083,7 +2949,6 @@ def PyFunction(obj,inputs,outputs):
 }
 
 %include <casadi/core/function/io_scheme.hpp>
-
 %include <casadi/core/function/function.hpp>
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/function/code_generator.hpp>
