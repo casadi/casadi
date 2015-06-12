@@ -277,79 +277,6 @@ namespace std {
 %template() std::vector< std::pair<int,int> >;
 #endif // SWIGMATLAB
 
-// The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
-// nor the std::stringstream class, since these are included _after_ std::vector in the C++ generated wrapper code
-%extend std::vector<double>{  
-  std::string SWIG_REPR(){
-    char buffer[32];
-    std::string ret;
-    ret += "[";
-    for(int i=0; i<$self->size(); ++i){
-      if(i!=0) ret += ",";
-
-      // Print to buffer and append
-      snprintf(buffer, 32, "%g", $self->at(i));
-      ret += buffer;
-    }
-    ret += "]";
-    return ret;
-  }
-  std::string SWIG_STR(){
-    char buffer[32];
-    std::string ret;
-    
-    // Add dimension
-    snprintf(buffer, 32, "[%lu]", (unsigned long) $self->size());
-    ret += buffer; 
-    ret += "(";
-    for(int i=0; i<$self->size(); ++i){
-      if(i!=0) ret += ",";
-
-      // Print to buffer and append
-      snprintf(buffer, 32, "%g", $self->at(i));
-      ret += buffer;
-    }
-    ret += ")";
-    return ret;
-  }
-};
-
-// The same workaround for vector<double>
-%extend std::vector<int>{  
-  std::string SWIG_REPR(){
-    char buffer[32];
-    std::string ret;
-    ret += "[";
-    for(int i=0; i<$self->size(); ++i){
-      if(i!=0) ret += ",";
-
-      // Print to buffer and append
-      snprintf(buffer, 32, "%d", $self->at(i));
-      ret += buffer;
-    }
-    ret += "]";
-    return ret;
-  }
-  std::string SWIG_STR(){
-    char buffer[32];
-    std::string ret;
-    
-    // Add dimension
-    snprintf(buffer, 32, "[%lu]", (unsigned long) $self->size());
-    ret += buffer; 
-    ret += "(";
-    for(int i=0; i<$self->size(); ++i){
-      if(i!=0) ret += ",";
-
-      // Print to buffer and append
-      snprintf(buffer, 32, "%d", $self->at(i));
-      ret += buffer;
-    }
-    ret += ")";
-    return ret;
-  }
-};
-
 %define DEPRECATED_MSG(MSG)
 if (deprecated("$decl",MSG)) SWIG_fail;
 %enddef
@@ -390,15 +317,6 @@ int internal(const std::string & c) {
 
 #ifndef SWIGXML
 %{
-// TODO(jgillis): remove after internal.i was updated
-#define CATCH_OR_RETHROW \
-  catch (const std::exception& e) { \
-    if (casadi::CasadiOptions::catch_errors_swig) { \
-      SWIG_exception(SWIG_RuntimeError, e.what()); \
-    } else { \
-      throw e; \
-    } \
-  }
 #define CATCH_OR_NOT(...) \
 if (casadi::CasadiOptions::catch_errors_swig) { \
   try { \
@@ -2570,12 +2488,6 @@ class NZproxy:
 
 VECTOR_TOOLS_TEMPLATES(int)
 VECTOR_TOOLS_TEMPLATES(double)
-%define VECTOR_REPR(type)
-%extend std::vector< type >{
-  std::string SWIG_REPR(){ return casadi::getRepresentation(*$self); }
-  std::string SWIG_STR(){ return casadi::getDescription(*$self); }
-};
-%enddef
 %include <casadi/core/weak_ref.hpp>
 %include <casadi/core/casadi_types.hpp>
 %include <casadi/core/generic_type.hpp>
@@ -3009,8 +2921,6 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
 
 #endif // SWIGPYTHON
 
-VECTOR_REPR(casadi::Matrix<casadi::SXElement>)
-
 #ifdef SWIGPYTHON
 %pythoncode %{
 
@@ -3130,9 +3040,6 @@ namespace casadi {
   binopsrFull(casadi::MX)
 #endif // SWIGPYTHON
 };
-
-VECTOR_REPR(casadi::MX)
-VECTOR_REPR(std::vector<casadi::MX>)
 
 #ifdef SWIGPYTHON
 %pythoncode %{
