@@ -2,6 +2,8 @@ env:
   global: 
     - IPOPT_DEFAULT_LINEAR_SOLVER=ma57
     - LD_LIBRARY_PATH=/home/travis/build/libhsl
+    - MOSEK=/home/travis/build/mosek
+    - MOSEKLM_LICENSE_FILE=/home/travis/build/testbot/restricted/mosek.lic
     - secure: KvMG4VORV7Ja09shvmsMpiaRMoWqupR76dKxOd7W28I//F4YDIn5ZZefM4aoXsmRgs4G9YqloU8JjVpHutZARmKn2drUwHVMA+96iKb9eDODwZaKXgFYsrQIX5c/OgO8ZpsXynD2daqH3bMK8Mjz1+4fjbFToPFXHggxqQuHm1U=
 compiler: 
 - gcc
@@ -10,6 +12,7 @@ before_install:
 - pushd ../../ && git clone https://github.com/casadi/testbot.git
 - pushd testbot && recipes/setup.sh && popd
 - travis_retry testbot/recipes/fetch.sh libhsl.tar.gz && mkdir libhsl && tar -xvf libhsl.tar.gz -C libhsl
+- travis_retry testbot/recipes/fetch.sh mosek7.tar.bz2 && tar -xvf mosek7.tar.bz2
 - mkdir -p /home/travis/build/casadi/testbot
 - ls -al
 - travis_retry testbot/recipes/fetch.sh swig.tar.gz && mkdir swig && tar -xvf swig.tar.gz -C swig
@@ -21,7 +24,7 @@ before_install:
 install: 
 - mkdir build
 - cd build
-- cmake -D WITH_PYTHON=ON ..
+- cmake -DWITH_PYTHON=ON -DWITH_MOSEK=ON ..
 - make
 - sudo make install
 python: 
