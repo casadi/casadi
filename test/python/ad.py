@@ -148,7 +148,7 @@ class ADtests(casadiTestCase):
             self.message("evalSX on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
             f.init()
-            f.setInput(n)
+            f.setInputNZ(n)
             f.evaluate()
             r = f.getOutput()
             J = self.jacobians[inputtype][outputtype](*n)
@@ -169,7 +169,7 @@ class ADtests(casadiTestCase):
             fe = SXFunction([y],res)
             fe.init()
             
-            fe.setInput(n)
+            fe.setInputNZ(n)
             fe.evaluate()
             
             self.checkarray(r,fe.getOutput())
@@ -177,14 +177,14 @@ class ADtests(casadiTestCase):
             for sens,seed in zip(fwdsens,fseeds):
               fe = SXFunction([y],[sens])
               fe.init()
-              fe.setInput(n)
+              fe.setInputNZ(n)
               fe.evaluate()
               self.checkarray(c.vec(fe.getOutput()),mul(J,c.vec(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = SXFunction([y],[sens])
               fe.init()
-              fe.setInput(n)
+              fe.setInputNZ(n)
               fe.evaluate()
               self.checkarray(c.vec(fe.getOutput()),mul(J.T,c.vec(seed)),"AD") 
               
@@ -197,7 +197,7 @@ class ADtests(casadiTestCase):
             self.message("evalMX on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f.init()
-            f.setInput(n)
+            f.setInputNZ(n)
             f.evaluate()
             r = f.getOutput()
             J = self.jacobians[inputtype][outputtype](*n)
@@ -218,7 +218,7 @@ class ADtests(casadiTestCase):
             fe = MXFunction([y],res)
             fe.init()
             
-            fe.setInput(n)
+            fe.setInputNZ(n)
             fe.evaluate()
             
             self.checkarray(r,fe.getOutput())
@@ -226,14 +226,14 @@ class ADtests(casadiTestCase):
             for sens,seed in zip(fwdsens,fseeds):
               fe = MXFunction([y],[sens])
               fe.init()
-              fe.setInput(n)
+              fe.setInputNZ(n)
               fe.evaluate()
               self.checkarray(c.vec(fe.getOutput()),mul(J,c.vec(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = MXFunction([y],[sens])
               fe.init()
-              fe.setInput(n)
+              fe.setInputNZ(n)
               fe.evaluate()
               self.checkarray(c.vec(fe.getOutput()),mul(J.T,c.vec(seed)),"AD") 
 
@@ -296,7 +296,7 @@ class ADtests(casadiTestCase):
             self.message("evalSX on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f.init()
-            f.setInput(n)
+            f.setInputNZ(n)
             f.evaluate()
             r = f.getOutput()
   
@@ -310,7 +310,7 @@ class ADtests(casadiTestCase):
             fe = SXFunction([y],res)
             fe.init()
             
-            fe.setInput(n)
+            fe.setInputNZ(n)
             fe.evaluate()
             
             self.checkarray(r,fe.getOutput())
@@ -329,7 +329,7 @@ class ADtests(casadiTestCase):
               f.init()
               Jf=f.jacobian(0,0)
               Jf.init()
-              Jf.setInput(n)
+              Jf.setInputNZ(n)
               Jf.evaluate()
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(Jf.getOutput()),J,"Jacobian\n Mode: %s\n Input: %s %s\n Output: %s %s"% (mode, inputshape, inputtype, outputshape, outputtype))
@@ -351,7 +351,7 @@ class ADtests(casadiTestCase):
               ]
             )
             Jf.init()
-            Jf.setInput(n)
+            Jf.setInputNZ(n)
             Jf.evaluate()
             J = self.jacobians[inputtype][outputtype](*n)
             self.checkarray(array(Jf.getOutput()),J,"jacobian")
@@ -382,7 +382,7 @@ class ADtests(casadiTestCase):
               f.init()
               Jf=f.jacobian(0,0)
               Jf.init()
-              Jf.setInput(n)
+              Jf.setInputNZ(n)
               Jf.evaluate()
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(Jf.getOutput(),J,"Jacobian\n Mode: %s\n Input: %s %s\n Output: %s %s"% (mode, inputshape, inputtype, outputshape, outputtype))
@@ -401,7 +401,7 @@ class ADtests(casadiTestCase):
               f.init()
               Jf=f.jacobian(0,0)
               Jf.init()
-              Jf.setInput(n)
+              Jf.setInputNZ(n)
               Jf.evaluate()
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(Jf.getOutput()),J,"jacobian")
@@ -446,7 +446,7 @@ class ADtests(casadiTestCase):
     f.init()
     J=f.jacobian(0,0)
     J.init()
-    J.setInput([2,7])
+    J.setInputNZ([2,7])
     J.evaluate()
 
     self.assertEqual(f.getOutput().size1(),3,"Jacobian shape bug")
@@ -466,7 +466,7 @@ class ADtests(casadiTestCase):
     f.init()
     J=f.jacobian(0,0)
     J.init()
-    J.setInput([2,7])
+    J.setInputNZ([2,7])
     J.evaluate()
 
     f=SXFunction([inp],[vertcat([x+y,x,y])])

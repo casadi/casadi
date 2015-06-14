@@ -198,7 +198,7 @@ class ImplicitFunctiontests(casadiTestCase):
       
       trial = MXFunction([X],[R])
       trial.init()
-      trial.setInput([abs(cos(i)) for i in range(x.nnz())])
+      trial.setInputNZ([abs(cos(i)) for i in range(x.nnz())])
       trial.evaluate()
 
       f.setInput(trial.getOutput(),0)

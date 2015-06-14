@@ -785,7 +785,7 @@ class Toolstests(casadiTestCase):
 
       f = F([J],[J["x","v"], J["x",:] , J["y",["v","w"]],  J[:,"u"] ])
       f.init()
-      f.setInput(range(1,7))
+      f.setInputNZ(range(1,7))
 
       f.evaluate()
 

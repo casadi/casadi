@@ -324,7 +324,7 @@ class Sparsitytests(casadiTestCase):
     
     f = MXFunction([b],[c])
     f.init()
-    f.setInput(range(1,len(nza)+1))
+    f.setInputNZ(range(1,len(nza)+1))
     f.evaluate()
     
     self.checkarray(DMatrix(f.getOutput().nonzeros()),DMatrix([1,0,0,7,0]),"sparsity index")

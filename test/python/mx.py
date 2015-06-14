@@ -353,7 +353,7 @@ class MXtests(casadiTestCase):
     self.assertEqual(f.nOut(),1,"MXFunction fails to indicate correct number of outputs")
     f.init()
     L=[1,2,3,4,5,6]
-    f.setInput(L,0)
+    f.setInputNZ(L,0)
     f.evaluate()
     zt = f.getOutput(0).toArray()
     self.assertEqual(zt.shape[0],2,"Output of MXFunction is of wrong shape.")
@@ -382,7 +382,7 @@ class MXtests(casadiTestCase):
     self.assertEqual(f.nOut(),1,"MXFunction fails to indicate correct number of outputs")
     f.init()
     L=[1,2,3,4,5,6]
-    f.setInput(L,0)
+    f.setInputNZ(L,0)
     f.evaluate()
     zt = f.getOutput(0).toArray()
     
@@ -434,7 +434,7 @@ class MXtests(casadiTestCase):
     self.assertEqual(f.nOut(),1,"MXFunction fails to indicate correct number of outputs")
     f.init()
     L=[1,2,3,4,5,6]
-    f.setInput(L,0)
+    f.setInputNZ(L,0)
     f.evaluate()
     zt = f.getOutput(0).toArray()
     for i in range(len(L)):
@@ -548,9 +548,9 @@ class MXtests(casadiTestCase):
     f.init()
     g.init()
     n=[1,2,3,4,5,6]
-    f.setInput(n)
+    f.setInputNZ(n)
     f.evaluate()
-    g.setInput(n)
+    g.setInputNZ(n)
     g.evaluate()
     checkarray(self,6*f.getOutput().toArray(),g.getOutput().toArray(),"slicing(trans)")
     
@@ -679,7 +679,7 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([X],[Y])
     f.init()
-    f.setInput([1,2,3,4])
+    f.setInputNZ([1,2,3,4])
     f.evaluate()
     
     self.checkarray(f.getOutput(),array([[1,3],[2,2],[4,4]]),"IMatrix indexing")
@@ -689,7 +689,7 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([X],[Y])
     f.init()
-    f.setInput([1,2,3,4])
+    f.setInputNZ([1,2,3,4])
     f.evaluate()
     
     self.checkarray(f.getOutput(),array([[9,8],[2,4]]),"IMatrix indexing assignment")
@@ -764,7 +764,7 @@ class MXtests(casadiTestCase):
     z.erase([1,2,3],[2,4,6,7])
     f = MXFunction([y],[z])
     f.init()
-    f.setInput([1]*56)
+    f.setInputNZ([1]*56)
     e = f.getOutput()
     self.checkarray(f.getOutput(),e,"erase")
     self.message(":sparse")
@@ -1579,7 +1579,7 @@ class MXtests(casadiTestCase):
     x = MX.sym("x",Sparsity.lower(3))
     f = MXFunction([x],[tril2symm(x)])
     f.init()
-    f.setInput(range(6))
+    f.setInputNZ(range(6))
     f.evaluate()
     self.checkarray(f.getOutput(),DMatrix([[0,1,2],[1,3,4],[2,4,5]]))
     
@@ -1692,7 +1692,7 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([a],v)
     f.init()
-    f.setInput(range(5*6/2))
+    f.setInputNZ(range(5*6/2))
 
     f.evaluate()
     v = [f.getOutput(i) for i in range(len(v))]
@@ -1706,7 +1706,7 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([a],v)
     f.init()
-    f.setInput(range(5*6/2))
+    f.setInputNZ(range(5*6/2))
 
     f.evaluate()
     v = [f.getOutput(i) for i in range(len(v))]
@@ -1722,7 +1722,7 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([a],v)
     f.init()
-    f.setInput(range(5*6/2))
+    f.setInputNZ(range(5*6/2))
 
     f.evaluate()
     v = [f.getOutput(i) for i in range(len(v))]
@@ -1736,7 +1736,7 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([a],v)
     f.init()
-    f.setInput(range(5*6/2))
+    f.setInputNZ(range(5*6/2))
 
     f.evaluate()
     V = [f.getOutput(i) for i in range(len(v))]
@@ -1753,7 +1753,7 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([a],v)
     f.init()
-    f.setInput(range(5*6/2))
+    f.setInputNZ(range(5*6/2))
 
     f.evaluate()
     v = [f.getOutput(i) for i in range(len(v))]
@@ -1766,7 +1766,7 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([a],v)
     f.init()
-    f.setInput(range(5*6/2))
+    f.setInputNZ(range(5*6/2))
 
     f.evaluate()
     v = [f.getOutput(i) for i in range(len(v))]
@@ -1781,7 +1781,7 @@ class MXtests(casadiTestCase):
 
     f = MXFunction([a],v)
     f.init()
-    f.setInput(range(5*6/2))
+    f.setInputNZ(range(5*6/2))
 
     f.evaluate()
     v = [f.getOutput(i) for i in range(len(v))]
@@ -1794,7 +1794,7 @@ class MXtests(casadiTestCase):
     v = horzsplit(a,[0,0,3,a.size2()])
     f = MXFunction([a],v)
     f.init()
-    f.setInput(range(5*6/2))
+    f.setInputNZ(range(5*6/2))
 
     f.evaluate()
     V = [f.getOutput(i) for i in range(len(v))]
@@ -1812,7 +1812,7 @@ class MXtests(casadiTestCase):
     fs = [MXFunction([a],vr) for vr in v]
     for f in fs:
       f.init()
-      f.setInput(range(5*6/2))
+      f.setInputNZ(range(5*6/2))
 
       f.evaluate()
     v = [[fs[i].getOutput(j) for j in range(3)] for i in range(3)]
@@ -2112,7 +2112,7 @@ class MXtests(casadiTestCase):
     f = MXFunction([x],[y])
     f.init()
     
-    f.setInput(range(1,4*3/2+1))
+    f.setInputNZ(range(1,4*3/2+1))
     f.evaluate()
     
     self.checkarray(f.getOutput(),DMatrix([[1,0,0],[0,4,0],[0,0,6]]))

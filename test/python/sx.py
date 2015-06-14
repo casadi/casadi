@@ -1013,7 +1013,7 @@ class SXtests(casadiTestCase):
     
     f = SXFunction([x],[e])
     f.init()
-    f.setInput(range(1,8))
+    f.setInputNZ(range(1,8))
     f.getInput().printDense()
     f.evaluate()
     self.checkarray(f.getOutput(),DMatrix([1,-0.29150,10.29150]),digits=5)
@@ -1030,7 +1030,7 @@ class SXtests(casadiTestCase):
     
     f = SXFunction([x],[e])
     f.init()
-    f.setInput(range(1,7))
+    f.setInputNZ(range(1,7))
     f.getInput().printDense()
     f.evaluate()
     self.checkarray(f.getOutput(),DMatrix([1,3,6]),digits=5)
