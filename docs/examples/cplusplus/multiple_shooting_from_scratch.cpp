@@ -171,9 +171,9 @@ int main(){
   nlp_solver.init();
     
   // Initial guess and bounds on variables
-  nlp_solver.setInput(v_init,"x0");
-  nlp_solver.setInput(v_min,"lbx");
-  nlp_solver.setInput(v_max,"ubx");
+  nlp_solver.setInputNZ(v_init,"x0");
+  nlp_solver.setInputNZ(v_min,"lbx");
+  nlp_solver.setInputNZ(v_max,"ubx");
   
   // All nonlinear constraints are equality constraints
   nlp_solver.setInput(0.,"lbg");

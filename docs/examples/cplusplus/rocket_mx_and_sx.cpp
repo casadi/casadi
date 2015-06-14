@@ -117,16 +117,16 @@ int main(){
     Umax[i] =  10;
     Usol[i] = 0.4;
   }
-  solver.setInput(Umin,"lbx");
-  solver.setInput(Umax,"ubx");
-  solver.setInput(Usol,"x0");
+  solver.setInputNZ(Umin,"lbx");
+  solver.setInputNZ(Umax,"ubx");
+  solver.setInputNZ(Usol,"x0");
 
   // Bounds on g
   vector<double> Gmin(2), Gmax(2);
   Gmin[0] = Gmax[0] = 10;
   Gmin[1] = Gmax[1] =  0;
-  solver.setInput(Gmin,"lbg");
-  solver.setInput(Gmax,"ubg");
+  solver.setInputNZ(Gmin,"lbg");
+  solver.setInputNZ(Gmax,"ubg");
 
   // Solve the problem
   solver.evaluate();

@@ -182,11 +182,13 @@ namespace casadi {
 /// \endcond
 
 
-#define SETTERS_NZ_NEW(T) \
+#define SETTERS_SUB_DUMMY(T) \
     void setInput(T val, int iind=0);                                   \
     void setOutput(T val, int oind=0);                                  \
     void setInput(T val, const std::string &iname);                     \
-    void setOutput(T val, const std::string &oname);                    \
+    void setOutput(T val, const std::string &oname);
+
+#define SETTERS_NZ(T) \
     void setInputNZ(T val, int iind=0) {                                \
       self().assertInit();                                              \
       try {                                                             \
@@ -204,25 +206,6 @@ namespace casadi {
     void setOutputNZ(T val, const std::string &oname) {                 \
       setOutputNZ(val, self().outputIndex(oname));                      \
     }
-
-#define SETTERS_NZ(T)                                                   \
-    void setInput(T val, int iind=0) {                                  \
-      self().assertInit();                                              \
-      try {                                                             \
-        self().input(iind).setNZ(val);                                  \
-      }  catch(std::exception& e) {                                     \
-        casadi_error(e.what() << "Occurred at iind = " << iind << "."); \
-      }                                                                 \
-    }                                                                   \
-    void setOutput(T val, int oind=0) {                                 \
-      self().assertInit(); self().output(oind).setNZ(val);              \
-    }                                                                   \
-    void setInput(T val, const std::string &iname) {                    \
-      setInput(val, self().inputIndex(iname));                          \
-    }                                                                   \
-    void setOutput(T val, const std::string &oname) {                   \
-      setOutput(val, self().outputIndex(oname));                        \
-    }                                                                   \
 
 #define SETTERS_SUB(T)                                                  \
     void setInput(T val, int iind=0) {                                  \
@@ -244,16 +227,18 @@ namespace casadi {
     }
 
 #ifndef DOXYGENPROC
-    SETTERS_SUB(double) // NOLINT(readability/casting) - false positive
 #ifndef SWIG
-    SETTERS_NZ_NEW(const double*)
+    SETTERS_SUB_DUMMY(const double*)
+    SETTERS_SUB_DUMMY(const std::vector<double>&)
+    SETTERS_NZ(const double*)
 #endif // SWIG
-    SETTERS_NZ(const std::vector<double>&)
     SETTERS_SUB(const Matrix<double>&)
+    SETTERS_NZ(const Matrix<double>&)
 #endif // DOXYGENPROC
 
 #undef SETTERS_NZ
 #undef SETTERS_SUB
+#undef SETTERS_SUB_DUMMY
 
 #define GETTERS_NZ_NEW(T)                                       \
       void getInput(T val, int iind=0) const;                   \

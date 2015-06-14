@@ -96,12 +96,12 @@ int main(){
   solver.init();
   
   // Solve NLP
-  solver.setInput( x0, "x0");
-  solver.setInput( p0, "p");
-  solver.setInput(lbx, "lbx");
-  solver.setInput(ubx, "ubx");
-  solver.setInput(lbg, "lbg");
-  solver.setInput(ubg, "ubg");
+  solver.setInputNZ( x0, "x0");
+  solver.setInputNZ( p0, "p");
+  solver.setInputNZ(lbx, "lbx");
+  solver.setInputNZ(ubx, "ubx");
+  solver.setInputNZ(lbg, "lbg");
+  solver.setInputNZ(ubg, "ubg");
   solver.evaluate();
   
   // Print the solution
@@ -114,7 +114,7 @@ int main(){
   
   // Change the parameter and resolve
   p0[0] = 4.5;
-  solver.setInput( p0, "p");
+  solver.setInputNZ( p0, "p");
   solver.evaluate();
   
   // Print the new solution

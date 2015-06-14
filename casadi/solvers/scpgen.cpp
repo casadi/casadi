@@ -684,7 +684,7 @@ namespace casadi {
 
     if (v_.size()>0) {
       // Initialize lifted variables using the generated function
-      vinit_fcn_.setInput(x_init_, 0);
+      vinit_fcn_.setInputNZ(x_init_, 0);
       vinit_fcn_.setInput(input(NLP_SOLVER_P), 1);
       vinit_fcn_.evaluate();
       for (int i=0; i<v_.size(); ++i) {
@@ -929,16 +929,16 @@ namespace casadi {
     mat_fcn_.setInput(input(NLP_SOLVER_P), mod_p_);
 
     // Pass primal step/variables
-    mat_fcn_.setInput(x_opt_, mod_x_);
+    mat_fcn_.setInputNZ(x_opt_, mod_x_);
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      mat_fcn_.setInput(it->res, it->mod_var);
+      mat_fcn_.setInputNZ(it->res, it->mod_var);
     }
 
     // Pass dual steps/variables
     if (!gauss_newton_) {
-      mat_fcn_.setInput(g_lam_, mod_g_lam_);
+      mat_fcn_.setInputNZ(g_lam_, mod_g_lam_);
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        mat_fcn_.setInput(it->resL, it->mod_lam);
+        mat_fcn_.setInputNZ(it->resL, it->mod_lam);
       }
     }
 
@@ -988,16 +988,16 @@ namespace casadi {
     res_fcn_.setInput(input(NLP_SOLVER_P), res_p_);
 
     // Pass primal variables to the residual function for initial evaluation
-    res_fcn_.setInput(x_opt_, res_x_);
+    res_fcn_.setInputNZ(x_opt_, res_x_);
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      res_fcn_.setInput(it->opt, it->res_var);
+      res_fcn_.setInputNZ(it->opt, it->res_var);
     }
 
     // Pass dual variables to the residual function for initial evaluation
     if (!gauss_newton_) {
       res_fcn_.setInput(0.0, res_g_lam_);
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        res_fcn_.setInput(it->lam, it->res_lam);
+        res_fcn_.setInputNZ(it->lam, it->res_lam);
       }
     }
 
@@ -1040,16 +1040,16 @@ namespace casadi {
     vec_fcn_.setInput(input(NLP_SOLVER_P), mod_p_);
 
     // Pass primal step/variables
-    vec_fcn_.setInput(x_opt_, mod_x_);
+    vec_fcn_.setInputNZ(x_opt_, mod_x_);
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      vec_fcn_.setInput(it->res, it->mod_var);
+      vec_fcn_.setInputNZ(it->res, it->mod_var);
     }
 
     // Pass dual steps/variables
     if (!gauss_newton_) {
       vec_fcn_.setInput(0.0, mod_g_lam_);
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        vec_fcn_.setInput(it->resL, it->mod_lam);
+        vec_fcn_.setInputNZ(it->resL, it->mod_lam);
       }
     }
 
@@ -1109,7 +1109,7 @@ namespace casadi {
 
     // Solve the QP
     qp_solver_.setInput(qpH_, QP_SOLVER_H);
-    qp_solver_.setInput(gf_, QP_SOLVER_G);
+    qp_solver_.setInputNZ(gf_, QP_SOLVER_G);
     qp_solver_.setInput(qpA_, QP_SOLVER_A);
     std::transform(x_lb_.begin(), x_lb_.end(), x_opt_.begin(),
                    qp_solver_.input(QP_SOLVER_LBX).begin(), std::minus<double>());
@@ -1264,18 +1264,18 @@ namespace casadi {
     exp_fcn_.setInput(input(NLP_SOLVER_P), mod_p_);
 
     // Pass primal step/variables
-    exp_fcn_.setInput(x_step_, mod_du_);
-    exp_fcn_.setInput(x_opt_, mod_x_);
+    exp_fcn_.setInputNZ(x_step_, mod_du_);
+    exp_fcn_.setInputNZ(x_opt_, mod_x_);
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      exp_fcn_.setInput(it->res, it->mod_var);
+      exp_fcn_.setInputNZ(it->res, it->mod_var);
     }
 
     // Pass dual step/variables
     if (!gauss_newton_) {
-      exp_fcn_.setInput(g_dlam_, mod_dlam_g_);
-      exp_fcn_.setInput(g_lam_, mod_g_lam_);
+      exp_fcn_.setInputNZ(g_dlam_, mod_dlam_g_);
+      exp_fcn_.setInputNZ(g_lam_, mod_g_lam_);
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        exp_fcn_.setInput(it->resL, it->mod_lam);
+        exp_fcn_.setInputNZ(it->resL, it->mod_lam);
       }
     }
 

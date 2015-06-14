@@ -71,8 +71,8 @@ int main(int argc, char *argv[])
   bool tr = false;
 
   // Solve
-  linear_solver.setInput(val,"A");
-  linear_solver.setInput(rhs,"B");
+  linear_solver.setInputNZ(val,"A");
+  linear_solver.setInputNZ(rhs,"B");
   linear_solver.prepare();
   linear_solver.solve(tr);
   
@@ -87,8 +87,8 @@ int main(int argc, char *argv[])
   F.init();
 
   // Solve
-  F.setInput(val,"A");
-  F.setInput(rhs,"B");
+  F.setInputNZ(val,"A");
+  F.setInputNZ(rhs,"B");
   F.evaluate();
   
   // Print the solution
@@ -105,8 +105,8 @@ int main(int argc, char *argv[])
   // Jacobian
   Function J = F.jacobian("B","X");  
   J.init();
-  J.setInput(val,"A");
-  J.setInput(rhs,"B");
+  J.setInputNZ(val,"A");
+  J.setInputNZ(rhs,"B");
   J.evaluate();
   cout << "solution (dx/db) = " << J.output() << endl;
   DMatrix J_analytic = inv(J.input("A"));

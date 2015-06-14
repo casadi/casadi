@@ -2790,6 +2790,17 @@ namespace casadi {
     return ret;
   }
 
+
+  template<typename DataType>
+  void Matrix<DataType>::setNZ(const Matrix<DataType>& val) {
+    setNZ(val, false, Slice());
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::getNZ(Matrix<DataType>& val) const {
+    getNZ(val, false, Slice());
+  }
+
   template<typename DataType>
   void Matrix<DataType>::set(double val) {
     std::fill(this->begin(), this->end(), val);

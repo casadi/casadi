@@ -92,9 +92,9 @@ int main(){
     umax[i] =  10;
     uinit[i] = 0.4;
   }
-  solver.setInput(umin,"lbx");
-  solver.setInput(umax,"ubx");
-  solver.setInput(uinit,"x0");
+  solver.setInputNZ(umin,"lbx");
+  solver.setInputNZ(umax,"ubx");
+  solver.setInputNZ(uinit,"x0");
   
   // Bounds on g
   vector<double> gmin(2), gmax(2);
@@ -103,8 +103,8 @@ int main(){
   gmin.resize(2+nu, -numeric_limits<double>::infinity());
   gmax.resize(2+nu, 1.1);
   
-  solver.setInput(gmin,"lbg");
-  solver.setInput(gmax,"ubg");
+  solver.setInputNZ(gmin,"lbg");
+  solver.setInputNZ(gmax,"ubg");
 
   // Solve the problem
   solver.evaluate();

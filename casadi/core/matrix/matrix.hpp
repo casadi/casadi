@@ -303,6 +303,14 @@ namespace casadi {
     }
     ///@}
 
+#ifndef SWIG
+    /** \brief Set all the nonzeros without changing sparsity pattern */
+    void setNZ(const Matrix<DataType>& val);
+
+    /** \brief Get all the nonzeros without changing sparsity pattern */
+    void getNZ(Matrix<DataType>& val) const;
+#endif // SWIG
+
     ///@{
     /** \brief Set the elements numerically */
     void setNZ(double val);

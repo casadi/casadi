@@ -786,10 +786,10 @@ namespace casadi {
 
         // Pass to BFGS update function
         bfgs_.setInput(Bk_, BFGS_BK);
-        bfgs_.setInput(x_, BFGS_X);
-        bfgs_.setInput(x_old_, BFGS_X_OLD);
-        bfgs_.setInput(gLag_, BFGS_GLAG);
-        bfgs_.setInput(gLag_old_, BFGS_GLAG_OLD);
+        bfgs_.setInputNZ(x_, BFGS_X);
+        bfgs_.setInputNZ(x_old_, BFGS_X_OLD);
+        bfgs_.setInputNZ(gLag_, BFGS_GLAG);
+        bfgs_.setInputNZ(gLag_old_, BFGS_GLAG_OLD);
 
         // Update the Hessian approximation
         bfgs_.evaluate();
@@ -943,10 +943,10 @@ namespace casadi {
       Function& hessLag = this->hessLag();
 
       // Pass the argument to the function
-      hessLag.setInput(x, HESSLAG_X);
+      hessLag.setInputNZ(x, HESSLAG_X);
       hessLag.setInput(input(NLP_SOLVER_P), HESSLAG_P);
       hessLag.setInput(sigma, HESSLAG_LAM_F);
-      hessLag.setInput(lambda, HESSLAG_LAM_G);
+      hessLag.setInputNZ(lambda, HESSLAG_LAM_G);
 
       // Evaluate
       hessLag.evaluate();
@@ -981,7 +981,7 @@ namespace casadi {
       if (ng_==0) return;
 
       // Pass the argument to the function
-      nlp_.setInput(x, NL_X);
+      nlp_.setInputNZ(x, NL_X);
       nlp_.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate the function and tape
@@ -1011,7 +1011,7 @@ namespace casadi {
       Function& jacG = this->jacG();
 
       // Pass the argument to the function
-      jacG.setInput(x, NL_X);
+      jacG.setInputNZ(x, NL_X);
       jacG.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate the function
@@ -1040,7 +1040,7 @@ namespace casadi {
       Function& gradF = this->gradF();
 
       // Pass the argument to the function
-      gradF.setInput(x, NL_X);
+      gradF.setInputNZ(x, NL_X);
       gradF.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate, adjoint mode
@@ -1069,7 +1069,7 @@ namespace casadi {
   void StabilizedSqp::eval_f(const std::vector<double>& x, double& f) {
     try {
       // Pass the argument to the function
-      nlp_.setInput(x, NL_X);
+      nlp_.setInputNZ(x, NL_X);
       nlp_.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate the function
@@ -1104,26 +1104,26 @@ namespace casadi {
 
     // Pass data to QP solver
     stabilized_qp_solver_.setInput(H, STABILIZED_QP_SOLVER_H);
-    stabilized_qp_solver_.setInput(g, STABILIZED_QP_SOLVER_G);
-    stabilized_qp_solver_.setInput(mu, STABILIZED_QP_SOLVER_MU);
-    stabilized_qp_solver_.setInput(muE, STABILIZED_QP_SOLVER_MUE);
+    stabilized_qp_solver_.setInputNZ(g, STABILIZED_QP_SOLVER_G);
+    stabilized_qp_solver_.setInputNZ(mu, STABILIZED_QP_SOLVER_MU);
+    stabilized_qp_solver_.setInputNZ(muE, STABILIZED_QP_SOLVER_MUE);
     stabilized_qp_solver_.setInput(muR, STABILIZED_QP_SOLVER_MUR);
 
     // Hot-starting if possible
-    stabilized_qp_solver_.setInput(x_opt, STABILIZED_QP_SOLVER_X0);
+    stabilized_qp_solver_.setInputNZ(x_opt, STABILIZED_QP_SOLVER_X0);
 
     //TODO(Joel): Fix hot-starting of dual variables
     //qp_solver_.setInput(lambda_A_opt, QP_SOLVER_LAMBDA_INIT);
 
     // Pass simple bounds
-    stabilized_qp_solver_.setInput(lbx, STABILIZED_QP_SOLVER_LBX);
-    stabilized_qp_solver_.setInput(ubx, STABILIZED_QP_SOLVER_UBX);
+    stabilized_qp_solver_.setInputNZ(lbx, STABILIZED_QP_SOLVER_LBX);
+    stabilized_qp_solver_.setInputNZ(ubx, STABILIZED_QP_SOLVER_UBX);
 
     // Pass linear bounds
     if (ng_>0) {
       stabilized_qp_solver_.setInput(A, STABILIZED_QP_SOLVER_A);
-      stabilized_qp_solver_.setInput(lbA, STABILIZED_QP_SOLVER_LBA);
-      stabilized_qp_solver_.setInput(ubA, STABILIZED_QP_SOLVER_UBA);
+      stabilized_qp_solver_.setInputNZ(lbA, STABILIZED_QP_SOLVER_LBA);
+      stabilized_qp_solver_.setInputNZ(ubA, STABILIZED_QP_SOLVER_UBA);
     }
 
     if (monitored("qp")) {
