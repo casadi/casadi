@@ -1902,7 +1902,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_input_typemaps("casadi_impl", "CustomEvaluate", PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
 %casadi_input_typemaps("casadi_impl", "Callback", PRECEDENCE_CALLBACK, casadi::Callback)
 %casadi_input_typemaps("casadi_impl", "Dict", PRECEDENCE_DICT, casadi::GenericType::Dict)
-%casadi_input_typemaps_old("casadi_sx", SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
+%casadi_input_typemaps("casadi_sx", "SX", PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
 %casadi_template("casadi_impl", "[SX]", PRECEDENCE_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
 %casadi_template("casadi_impl", "[[SX]]", PRECEDENCE_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
 %casadi_input_typemaps_old("casadi_mx", MX, PRECEDENCE_MX, casadi::MX)
