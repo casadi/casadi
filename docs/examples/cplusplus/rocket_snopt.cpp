@@ -93,9 +93,9 @@ int main(){
     umax[i] =  10;
     uinit[i] = 0.4;
   }
-  solver.setInput(umin,"lbx");
-  solver.setInput(umax,"ubx");
-  solver.setInput(uinit,"x0");
+  solver.setInputNZ(umin,"lbx");
+  solver.setInputNZ(umax,"ubx");
+  solver.setInputNZ(uinit,"x0");
 
   // Bounds on g
   vector<double> gmin(2), gmax(2);
@@ -104,8 +104,8 @@ int main(){
   gmin.resize(2+nu, -numeric_limits<double>::infinity());
   gmax.resize(2+nu, 1.1);
 
-  solver.setInput(gmin,"lbg");
-  solver.setInput(gmax,"ubg");
+  solver.setInputNZ(gmin,"lbg");
+  solver.setInputNZ(gmax,"ubg");
 
   // Solve the problem
   solver.evaluate();
@@ -117,17 +117,17 @@ int main(){
 
   // Print the optimal solution
   vector<double> uopt(nu);
-  solver.getOutput(uopt,"x");
+  solver.getOutputNZ(uopt,"x");
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory
   vector<double> sopt(nu), vopt(nu), mopt(nu);
   SXFunction xfcn("xfcn", make_vector(u), make_vector(s_traj, v_traj, m_traj));
-  xfcn.setInput(uopt);
+  xfcn.setInputNZ(uopt);
   xfcn.evaluate();
-  xfcn.getOutput(sopt,0);
-  xfcn.getOutput(vopt,1);
-  xfcn.getOutput(mopt,2);
+  xfcn.getOutputNZ(sopt,0);
+  xfcn.getOutputNZ(vopt,1);
+  xfcn.getOutputNZ(mopt,2);
   cout << "position: " << sopt << endl;
   cout << "velocity: " << vopt << endl;
   cout << "mass:     " << mopt << endl;
