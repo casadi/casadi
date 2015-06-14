@@ -230,7 +230,7 @@ namespace casadi {
 #ifndef SWIG
     SETTERS_SUB_DUMMY(const double*)
     SETTERS_SUB_DUMMY(const std::vector<double>&)
-    SETTERS_NZ(const double*)
+    SETTERS_NZ(const double*) // NOLINT(readability/casting) - false positive
 #endif // SWIG
     SETTERS_SUB(const Matrix<double>&)
     SETTERS_NZ(const Matrix<double>&)
@@ -240,11 +240,7 @@ namespace casadi {
 #undef SETTERS_SUB
 #undef SETTERS_SUB_DUMMY
 
-#define GETTERS_NZ_NEW(T)                                       \
-      void getInput(T val, int iind=0) const;                   \
-      void getOutput(T val, int oind=0) const;                  \
-      void getInput(T val, const std::string &iname) const;     \
-      void getOutput(T val, const std::string &oname) const;    \
+#define GETTERS_NZ(T)                                           \
       void getInputNZ(T val, int iind=0) const {                \
         self().assertInit(); self().input(iind).getNZ(val);     \
       }                                                         \
@@ -256,20 +252,6 @@ namespace casadi {
       }                                                         \
       void getOutputNZ(T val, const std::string &oname) const { \
         getOutputNZ(val, self().outputIndex(oname));            \
-      }
-
-#define GETTERS_NZ(T)                                           \
-      void getInput(T val, int iind=0) const {                  \
-        self().assertInit(); self().input(iind).getNZ(val);     \
-      }                                                         \
-      void getOutput(T val, int oind=0) const {                 \
-        self().assertInit(); self().output(oind).getNZ(val);    \
-      }                                                         \
-      void getInput(T val, const std::string &iname) const {    \
-        getInput(val, self().inputIndex(iname));                \
-      }                                                         \
-      void getOutput(T val, const std::string &oname) const {   \
-        getOutput(val, self().outputIndex(oname));              \
       }
 
 #define GETTERS_SUB(T)                                                  \
@@ -290,9 +272,9 @@ namespace casadi {
 #ifndef SWIG
 GETTERS_SUB(double&)
 #ifndef SWIG
-GETTERS_NZ_NEW(double*) // NOLINT(readability/casting) - false positive
-#endif // SWIG
+GETTERS_NZ(double*) // NOLINT(readability/casting) - false positive
 GETTERS_NZ(std::vector<double>&)
+#endif // SWIG
 GETTERS_SUB(Matrix<double>&)
 #endif // SWIG
 #endif // DOXYGENPROC

@@ -921,9 +921,9 @@ namespace casadi {
     qp_solver_.evaluate();
 
     // Get the optimal solution
-    qp_solver_.getOutput(x_opt, QP_SOLVER_X);
-    qp_solver_.getOutput(lambda_x_opt, QP_SOLVER_LAM_X);
-    qp_solver_.getOutput(lambda_A_opt, QP_SOLVER_LAM_A);
+    qp_solver_.getOutputNZ(x_opt, QP_SOLVER_X);
+    qp_solver_.getOutputNZ(lambda_x_opt, QP_SOLVER_LAM_X);
+    qp_solver_.getOutputNZ(lambda_A_opt, QP_SOLVER_LAM_A);
     if (monitored("dx")) {
       cout << "dx = " << x_opt << endl;
     }

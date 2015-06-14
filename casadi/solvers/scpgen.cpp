@@ -688,7 +688,7 @@ namespace casadi {
       vinit_fcn_.setInput(input(NLP_SOLVER_P), 1);
       vinit_fcn_.evaluate();
       for (int i=0; i<v_.size(); ++i) {
-        vinit_fcn_.getOutput(v_[i].init, i);
+        vinit_fcn_.getOutputNZ(v_[i].init, i);
       }
     }
     if (verbose_) {
@@ -1009,19 +1009,19 @@ namespace casadi {
 
     // Get objective gradient
     if (gauss_newton_) {
-      res_fcn_.getOutput(b_gn_, res_gl_);
+      res_fcn_.getOutputNZ(b_gn_, res_gl_);
     } else {
-      res_fcn_.getOutput(gf_, res_gl_);
+      res_fcn_.getOutputNZ(gf_, res_gl_);
     }
 
     // Get constraints
-    res_fcn_.getOutput(g_, res_g_);
+    res_fcn_.getOutputNZ(g_, res_g_);
 
     // Get residuals
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      res_fcn_.getOutput(it->res,  it->res_d);
+      res_fcn_.getOutputNZ(it->res,  it->res_d);
       if (!gauss_newton_) {
-        res_fcn_.getOutput(it->resL, it->res_lam_d);
+        res_fcn_.getOutputNZ(it->resL, it->res_lam_d);
       }
     }
 

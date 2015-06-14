@@ -116,7 +116,7 @@ int main(){
 
   // Print the optimal solution
   vector<double> uopt(nu);
-  solver.getOutput(uopt,"x");
+  solver.getOutputNZ(uopt,"x");
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory

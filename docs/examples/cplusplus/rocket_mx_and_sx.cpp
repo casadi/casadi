@@ -132,7 +132,7 @@ int main(){
   solver.evaluate();
 
   // Get the solution
-  solver.getOutput(Usol,"x");
+  solver.getOutputNZ(Usol,"x");
   cout << "optimal solution: " << Usol << endl;
 
   return 0;
