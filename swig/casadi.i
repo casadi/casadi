@@ -89,6 +89,10 @@
     GUESTOBJECT* from_ptr(const casadi::GenericType *a);
     template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a);
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a);
+    GUESTOBJECT* from_ptr(const bool *a);
+    GUESTOBJECT* from_ptr(const int *a);
+    GUESTOBJECT* from_ptr(const double *a);
+    GUESTOBJECT* from_ptr(const std::string *a);
 
 #ifdef SWIGMATLAB
     // Get sparsity pattern
@@ -622,6 +626,20 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // No match
       return false;
     }
+
+    GUESTOBJECT * from_ptr(const bool *a) {
+#ifdef SWIGPYTHON
+      return PyBool_FromLong(*a);
+#endif // SWIGPYTHON
+      return 0;
+    }
+
+    GUESTOBJECT * from_ptr(const int *a) {
+#ifdef SWIGPYTHON
+      return PyInt_FromLong(*a);
+#endif // SWIGPYTHON
+      return 0;
+    }
   } // namespace casadi
  }
 
@@ -656,6 +674,13 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
       // No match
       return false;
+    }
+
+    GUESTOBJECT * from_ptr(const double *a) {
+#ifdef SWIGPYTHON
+      return PyFloat_FromDouble(*a);
+#endif // SWIGPYTHON
+      return 0;
     }
   } // namespace casadi
  }
@@ -1176,15 +1201,17 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     }
 
     GUESTOBJECT * from_ptr(const GenericType *a) {
-#ifdef SWIGPYTHON
       if (a->isBool()) {
-        return PyBool_FromLong(a->toBool());
+        bool tmp=a->toBool();
+        return from_ptr(&tmp);
       } else if (a->isInt()) {
-        return PyInt_FromLong(a->toInt());
+        int tmp=a->toInt();
+        return from_ptr(&tmp);
       } else if (a->isDouble()) {
-        return PyFloat_FromDouble(a->toDouble());
+        double tmp=a->toDouble();
+        return from_ptr(&tmp);
       } else if (a->isString()) {
-        return PyString_FromString(a->toString().c_str());
+        return from_ptr(&a->toString());
       } else if (a->isIntVector()) {
         return from_ptr(&a->toIntVector());
       } else if (a->isIntVectorVector()) {
@@ -1197,7 +1224,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         return from_ptr(&a->toDict());
       } else if (a->isFunction()) {
         return from_ptr(&a->toFunction());
-      } else if (a->isNull()) {
+      }
+#ifdef SWIGPYTHON
+      if (a->isNull()) {
         return Py_None;
       }
 #endif // SWIGPYTHON
@@ -1231,7 +1260,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     }
 
     GUESTOBJECT* from_ptr(const std::string *a) {
-      return swig::from(*a);
+#ifdef SWIGPYTHON
+      return PyString_FromString(a->c_str());
+#endif // SWIGPYTHON
+      return 0;
     }
   } // namespace casadi
 }
