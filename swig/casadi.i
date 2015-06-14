@@ -1905,7 +1905,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_input_typemaps("casadi_sx", "SX", PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
 %casadi_template("casadi_impl", "[SX]", PRECEDENCE_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
 %casadi_template("casadi_impl", "[[SX]]", PRECEDENCE_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
-%casadi_input_typemaps_old("casadi_mx", MX, PRECEDENCE_MX, casadi::MX)
+%casadi_input_typemaps("casadi_mx", "MX", PRECEDENCE_MX, casadi::MX)
 %template() std::map<std::string, casadi::Sparsity >;
 %template() std::map<std::string, std::vector<casadi::Sparsity > >;
 %casadi_template("casadi_impl", "str:MX", PRECEDENCE_MX, std::map<std::string, casadi::MX>)
