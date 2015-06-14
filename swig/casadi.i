@@ -45,56 +45,7 @@
 %}
 #endif
 
-#ifdef SWIGMATLAB
-// Get sparsity pattern
-%fragment("get_sparsity", "header") {
-  Sparsity getSparsity(const mxArray* p) {
-    // Get sparsity pattern
-    size_t nrow = mxGetM(p);
-    size_t ncol = mxGetN(p);
-
-    if (mxIsSparse(p)) {
-      // Sparse storage in MATLAB
-      mwIndex *Jc = mxGetJc(p);
-      mwIndex *Ir = mxGetIr(p);
-
-      // Store in vectors
-      std::vector<int> colind(ncol+1);
-      std::copy(Jc, Jc+colind.size(), colind.begin());
-      std::vector<int> row(colind.back());
-      std::copy(Ir, Ir+row.size(), row.begin());
-
-      // Create pattern and return
-      return casadi::Sparsity(nrow, ncol, colind, row);
-    } else {
-      return casadi::Sparsity::dense(nrow, ncol);
-    }
-  }
- }
-
-// Number of nonzeros
-%fragment("get_nnz", "header") {
-  size_t getNNZ(const mxArray* p) {
-    // Dimensions
-    size_t nrow = mxGetM(p);
-    size_t ncol = mxGetN(p);
-    if (mxIsSparse(p)) {
-      // Sparse storage in MATLAB
-      mwIndex *Jc = mxGetJc(p);
-      return Jc[ncol];
-    } else {
-      return nrow*ncol;
-    }
-  }
-}
-#endif // SWIGMATLAB
-
-%fragment("casadi_decl", "header"
-#ifdef SWIGMATLAB
-          ,fragment="get_sparsity,get_nnz"
-#endif // SWIGMATLAB
-          ) {
-
+%fragment("casadi_decl", "header") {
   namespace casadi {
     /* Check if Null or None */
     bool is_null(GUESTOBJECT *p);
@@ -137,6 +88,14 @@
     /* Convert result from CasADi to interfaced language */    
     GUESTOBJECT* from_ref(const casadi::GenericType &a);
     template<typename M> GUESTOBJECT* from_ref(const std::map<std::string, M> &a);
+
+#ifdef SWIGMATLAB
+    // Get sparsity pattern
+    Sparsity getSparsity(const mxArray* p);
+
+    // Number of nonzeros
+    size_t getNNZ(const mxArray* p);
+#endif // SWIGMATLAB
 
   } // namespace CasADi
  }
@@ -857,8 +816,46 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif
       return false;
     }
+
+#ifdef SWIGMATLAB
+    Sparsity getSparsity(const mxArray* p) {
+      // Get sparsity pattern
+      size_t nrow = mxGetM(p);
+      size_t ncol = mxGetN(p);
+
+      if (mxIsSparse(p)) {
+        // Sparse storage in MATLAB
+        mwIndex *Jc = mxGetJc(p);
+        mwIndex *Ir = mxGetIr(p);
+
+        // Store in vectors
+        std::vector<int> colind(ncol+1);
+        std::copy(Jc, Jc+colind.size(), colind.begin());
+        std::vector<int> row(colind.back());
+        std::copy(Ir, Ir+row.size(), row.begin());
+
+        // Create pattern and return
+        return Sparsity(nrow, ncol, colind, row);
+      } else {
+        return Sparsity::dense(nrow, ncol);
+      }
+    }
+
+    size_t getNNZ(const mxArray* p) {
+      // Dimensions
+      size_t nrow = mxGetM(p);
+      size_t ncol = mxGetN(p);
+      if (mxIsSparse(p)) {
+        // Sparse storage in MATLAB
+        mwIndex *Jc = mxGetJc(p);
+        return Jc[ncol];
+      } else {
+        return nrow*ncol;
+      }
+    }
+#endif // SWIGMATLAB
   } // namespace casadi
-}
+ }
 
 %fragment("casadi_vector", "header", fragment="casadi_aux") {
   namespace casadi {
