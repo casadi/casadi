@@ -1896,66 +1896,66 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %enddef
 
 // Order in typemap matching: Lower value means will be checked first
-%define PRECEDENCE_IVector 92 %enddef
-%define PRECEDENCE_IVectorVector 92 %enddef
-%define PRECEDENCE_PAIR_SLICE_SLICE 93 %enddef
-%define PRECEDENCE_SLICE 94 %enddef
-%define PRECEDENCE_PAIR_IVector_IVector 96 %enddef
-%define PRECEDENCE_IMatrix 97 %enddef
-%define PRECEDENCE_IMatrixVector 98 %enddef
-%define PRECEDENCE_IMatrixVectorVector 98 %enddef
-%define PRECEDENCE_DVector 99 %enddef
-%define PRECEDENCE_DMatrix 100 %enddef
-%define PRECEDENCE_DMatrixVector 101 %enddef
-%define PRECEDENCE_DMatrixVectorVector 101 %enddef
-%define PRECEDENCE_SX 103 %enddef
-%define PRECEDENCE_SXVector 103 %enddef
-%define PRECEDENCE_SXVectorVector 103 %enddef
-%define PRECEDENCE_MX 104 %enddef
-%define PRECEDENCE_MXVector 105 %enddef
-%define PRECEDENCE_MXVectorVector 106 %enddef
-%define PRECEDENCE_CREATOR 150 %enddef
-%define PRECEDENCE_DERIVATIVEGENERATOR 21 %enddef
-%define PRECEDENCE_CUSTOMEVALUATE 21 %enddef
-%define PRECEDENCE_CALLBACK 21 %enddef
-%define PRECEDENCE_GENERICTYPE 22 %enddef
-%define PRECEDENCE_DICT 21 %enddef
+%define PREC_IVector 92 %enddef
+%define PREC_IVectorVector 92 %enddef
+%define PREC_PAIR_SLICE_SLICE 93 %enddef
+%define PREC_SLICE 94 %enddef
+%define PREC_PAIR_IVector_IVector 96 %enddef
+%define PREC_IMatrix 97 %enddef
+%define PREC_IMatrixVector 98 %enddef
+%define PREC_IMatrixVectorVector 98 %enddef
+%define PREC_DVector 99 %enddef
+%define PREC_DMatrix 100 %enddef
+%define PREC_DMatrixVector 101 %enddef
+%define PREC_DMatrixVectorVector 101 %enddef
+%define PREC_SX 103 %enddef
+%define PREC_SXVector 103 %enddef
+%define PREC_SXVectorVector 103 %enddef
+%define PREC_MX 104 %enddef
+%define PREC_MXVector 105 %enddef
+%define PREC_MXVectorVector 106 %enddef
+%define PREC_CREATOR 150 %enddef
+%define PREC_DERIVATIVEGENERATOR 21 %enddef
+%define PREC_CUSTOMEVALUATE 21 %enddef
+%define PREC_CALLBACK 21 %enddef
+%define PREC_GENERICTYPE 22 %enddef
+%define PREC_DICT 21 %enddef
 
 %template() std::vector< casadi::Sparsity > ;
 %template() std::vector< std::vector< casadi::Sparsity> > ;
 %casadi_input_typemaps("int", SWIG_TYPECHECK_INTEGER, int)
 %casadi_input_typemaps("double", SWIG_TYPECHECK_DOUBLE, double)
-%casadi_input_typemaps("[int]", PRECEDENCE_IVector, std::vector<int>)
+%casadi_input_typemaps("[int]", PREC_IVector, std::vector<int>)
 %casadi_input_typemaps("[double]", SWIG_TYPECHECK_DOUBLE, std::vector<double>)
-%casadi_input_typemaps("DerivativeGenerator", PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
-%casadi_input_typemaps("CustomEvaluate", PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
-%casadi_input_typemaps("Callback", PRECEDENCE_CALLBACK, casadi::Callback)
-%casadi_input_typemaps("Dict", PRECEDENCE_DICT, casadi::GenericType::Dict)
-%casadi_input_typemaps("SX", PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
-%casadi_template("[SX]", PRECEDENCE_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
-%casadi_template("[[SX]]", PRECEDENCE_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
-%casadi_input_typemaps("MX", PRECEDENCE_MX, casadi::MX)
+%casadi_input_typemaps("DerivativeGenerator", PREC_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
+%casadi_input_typemaps("CustomEvaluate", PREC_CUSTOMEVALUATE, casadi::CustomEvaluate)
+%casadi_input_typemaps("Callback", PREC_CALLBACK, casadi::Callback)
+%casadi_input_typemaps("Dict", PREC_DICT, casadi::GenericType::Dict)
+%casadi_input_typemaps("SX", PREC_SX, casadi::Matrix<casadi::SXElement>)
+%casadi_template("[SX]", PREC_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
+%casadi_template("[[SX]]", PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
+%casadi_input_typemaps("MX", PREC_MX, casadi::MX)
 %template() std::map<std::string, casadi::Sparsity >;
 %template() std::map<std::string, std::vector<casadi::Sparsity > >;
-%casadi_template("str:MX", PRECEDENCE_MX, std::map<std::string, casadi::MX>)
-%casadi_template("str:DMatrix", PRECEDENCE_DMatrix, std::map<std::string, casadi::Matrix<double> >)
-%casadi_template("str:SX", PRECEDENCE_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
+%casadi_template("str:MX", PREC_MX, std::map<std::string, casadi::MX>)
+%casadi_template("str:DMatrix", PREC_DMatrix, std::map<std::string, casadi::Matrix<double> >)
+%casadi_template("str:SX", PREC_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
 %template() std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >;
-%casadi_template("(str:MX,[str])", PRECEDENCE_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
-%casadi_template("(str:DMatrix,[str])", PRECEDENCE_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
-%casadi_template("(str:SX,[str])", PRECEDENCE_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
-%casadi_input_typemaps("DMatrix", PRECEDENCE_DMatrix, casadi::Matrix<double>)
-%casadi_template("[MX]", PRECEDENCE_MXVector, std::vector<casadi::MX>)
-%casadi_template("[[MX]]", PRECEDENCE_MXVectorVector, std::vector<std::vector<casadi::MX> >)
-%casadi_template("[DMatrix]", PRECEDENCE_DMatrixVector, std::vector< casadi::Matrix<double> >)
-%casadi_template("[[DMatrix]]", PRECEDENCE_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
-%casadi_input_typemaps("IMatrix", PRECEDENCE_IMatrix, casadi::Matrix<int>)
-%casadi_template("[IMatrix]", PRECEDENCE_IMatrixVector, std::vector< casadi::Matrix<int> >)
-%casadi_template("[[IMatrix]]", PRECEDENCE_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
-%casadi_input_typemaps("[[int]]", PRECEDENCE_IVectorVector, std::vector<std::vector<int> >)
-%casadi_input_typemaps("GenericType", PRECEDENCE_GENERICTYPE, casadi::GenericType)
-%casadi_input_typemaps("[GenericType]", PRECEDENCE_GENERICTYPE, std::vector<casadi::GenericType>)
-%casadi_input_typemaps("Slice", PRECEDENCE_SLICE, casadi::Slice)
+%casadi_template("(str:MX,[str])", PREC_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
+%casadi_template("(str:DMatrix,[str])", PREC_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
+%casadi_template("(str:SX,[str])", PREC_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
+%casadi_input_typemaps("DMatrix", PREC_DMatrix, casadi::Matrix<double>)
+%casadi_template("[MX]", PREC_MXVector, std::vector<casadi::MX>)
+%casadi_template("[[MX]]", PREC_MXVectorVector, std::vector<std::vector<casadi::MX> >)
+%casadi_template("[DMatrix]", PREC_DMatrixVector, std::vector< casadi::Matrix<double> >)
+%casadi_template("[[DMatrix]]", PREC_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
+%casadi_input_typemaps("IMatrix", PREC_IMatrix, casadi::Matrix<int>)
+%casadi_template("[IMatrix]", PREC_IMatrixVector, std::vector< casadi::Matrix<int> >)
+%casadi_template("[[IMatrix]]", PREC_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
+%casadi_input_typemaps("[[int]]", PREC_IVectorVector, std::vector<std::vector<int> >)
+%casadi_input_typemaps("GenericType", PREC_GENERICTYPE, casadi::GenericType)
+%casadi_input_typemaps("[GenericType]", PREC_GENERICTYPE, std::vector<casadi::GenericType>)
+%casadi_input_typemaps("Slice", PREC_SLICE, casadi::Slice)
 %template() std::pair<casadi::Function,casadi::Function>;
 %template() std::pair<casadi::MX, std::vector<casadi::MX> >;
 %template() std::vector<casadi::Integrator>;
