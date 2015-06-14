@@ -472,17 +472,45 @@ namespace casadi {
     try {
       log("intermediate_callback started");
       if (gather_stats_) {
-        Dict & iterations = stats_["iterations"];
-        static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(inf_pr);
-        static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(inf_du);
-        static_cast<std::vector<double> &>(iterations["mu"]).push_back(mu);
-        static_cast<std::vector<double> &>(iterations["d_norm"]).push_back(d_norm);
-        static_cast<std::vector<double> &>(
-          iterations["regularization_size"]).push_back(regularization_size);
-        static_cast<std::vector<double> &>(iterations["alpha_pr"]).push_back(alpha_pr);
-        static_cast<std::vector<double> &>(iterations["alpha_du"]).push_back(alpha_du);
-        static_cast<std::vector<int> &>(iterations["ls_trials"]).push_back(ls_trials);
-        static_cast<std::vector<double> &>(iterations["obj"]).push_back(obj_value);
+        Dict iterations = stats_["iterations"];
+
+        std::vector<double> tmp=iterations["inf_pr"];
+        tmp.push_back(inf_pr);
+        iterations["inf_pr"] = tmp;
+
+        tmp=iterations["inf_du"];
+        tmp.push_back(inf_du);
+        iterations["inf_du"] = tmp;
+
+        tmp=iterations["mu"];
+        tmp.push_back(mu);
+        iterations["mu"] = tmp;
+
+        tmp=iterations["d_norm"];
+        tmp.push_back(d_norm);
+        iterations["d_norm"] = tmp;
+
+        tmp=iterations["regularization_size"];
+        tmp.push_back(regularization_size);
+        iterations["regularization_size"] = tmp;
+
+        tmp=iterations["alpha_pr"];
+        tmp.push_back(alpha_pr);
+        iterations["alpha_pr"] = tmp;
+
+        tmp=iterations["alpha_du"];
+        tmp.push_back(alpha_du);
+        iterations["alpha_du"] = tmp;
+
+        std::vector<int> tmp2=iterations["ls_trials"];
+        tmp2.push_back(ls_trials);
+        iterations["ls_trials"] = tmp2;
+
+        tmp=iterations["obj"];
+        tmp.push_back(obj_value);
+        iterations["obj"] = tmp;
+
+        stats_["iterations"] = iterations;
       }
       double time1 = clock();
       if (!callback_.isNull()) {

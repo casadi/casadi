@@ -103,10 +103,6 @@ namespace casadi {
     operator const std::vector<std::string>& () const { return toStringVector();}
     operator const Function& () const { return toFunction();}
     operator const std::map<std::string, GenericType>& () const;
-    operator std::vector<int>& () { return toIntVector();}
-    operator std::vector< std::vector<int> >& () { return toIntVectorVector();}
-    operator std::vector<double>& () { return toDoubleVector();}
-    operator std::map<std::string, GenericType>& ();
     operator const DerivativeGenerator& () const;
     operator const Callback& () const;
     #endif // SWIG
@@ -170,27 +166,11 @@ namespace casadi {
     //! \brief Convert to vector of doubles
     SWIG_CONSTREF(std::vector<double>) toDoubleVector() const;
 
-    #ifndef SWIG
-    //! \brief Convert to vector of ints
-    std::vector<int>& toIntVector();
-
-    //! \brief Convert to vector of ints
-    std::vector< std::vector<int> >& toIntVectorVector();
-
-    //! \brief Convert to vector of doubles
-    std::vector<double>& toDoubleVector();
-    #endif
-
     //! \brief Convert to vector of strings
     SWIG_CONSTREF(std::vector<std::string>) toStringVector() const;
 
     //! \brief Convert to Dict
     const Dict& toDict() const;
-
-    #ifndef SWIG
-    //! \brief Convert to Dict
-    Dict& toDict();
-    #endif
 
     //! \brief Convert to shared object
     const Function& toFunction() const;

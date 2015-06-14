@@ -319,12 +319,28 @@ namespace casadi {
       printIteration(cout, iter, fk_, pr_inf, gLag_norminf, dx_norminf, reg_, ls_iter, ls_success);
 
       if (gather_stats_) {
-        Dict & iterations = stats_["iterations"];
-        static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(pr_inf);
-        static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(gLag_norminf);
-        static_cast<std::vector<double> &>(iterations["d_norm"]).push_back(dx_norminf);
-        static_cast<std::vector<double> &>(iterations["ls_trials"]).push_back(ls_iter);
-        static_cast<std::vector<double> &>(iterations["obj"]).push_back(fk_);
+        Dict iterations = stats_["iterations"];
+        std::vector<double> tmp=iterations["inf_pr"];
+        tmp.push_back(pr_inf);
+        iterations["inf_pr"] = tmp;
+
+        tmp=iterations["inf_du"];
+        tmp.push_back(gLag_norminf);
+        iterations["inf_du"] = tmp;
+
+        tmp=iterations["d_norm"];
+        tmp.push_back(dx_norminf);
+        iterations["d_norm"] = tmp;
+
+        std::vector<int> tmp2=iterations["ls_trials"];
+        tmp2.push_back(ls_iter);
+        iterations["ls_trials"] = tmp2;
+
+        tmp=iterations["obj"];
+        tmp.push_back(fk_);
+        iterations["obj"] = tmp;
+
+        stats_["iterations"] = iterations;
       }
 
       // Call callback function if present

@@ -145,16 +145,18 @@ void setAdaptorOptions(Dict& dict, const string &name, const Dict &op) {
 
   if (dotpos==std::string::npos) {
     // We reached the end of the dotted adaptor string
-    Dict& target = dict[adaptor_name];
+    Dict target = dict[adaptor_name];
     // Merge the contents of the supplied dictionary
     for (Dict::const_iterator it=op.begin(); it!=op.end(); ++it) {
       target[it->first] = it->second;
     }
+    dict[adaptor_name] = target;
   } else {
     // Descend one level down
-    setAdaptorOptions(dict[adaptor_name], name.substr(dotpos+1), op);
+    Dict dict_adaptor = dict[adaptor_name];
+    setAdaptorOptions(dict_adaptor, name.substr(dotpos+1), op);
+    dict[adaptor_name] = dict_adaptor;
   }
-
 }
 
 
