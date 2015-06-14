@@ -1326,45 +1326,20 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 
 
-%fragment("casadi_dvector", "header", fragment="casadi_decl", fragment="casadi_double") {
+%fragment("casadi_dvector", "header", fragment="casadi_decl", fragment="casadi_dmatrix") {
   namespace casadi {
     int to_ptr(GUESTOBJECT *p, std::vector<double> **m) {
+      // Treat Null
       if (is_null(p)) return false;
 
-#ifdef SWIGPYTHON
-      std::vector< double > *mp = 0;
-      if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(std::vector<double> *), 0) != -1) {
-        if (m) **m=*mp;
-        return true;
-      } else if (is_array(p)) {
-        if (!(array_numdims(p)==1 && array_type(p)!=NPY_OBJECT)) {
-          return false;
-          //SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array must be 1D and of a numeric type");
-        }
-        int size = array_size(p,0);
-        if (!array_is_native(p)) {
-          return false;
-          //SWIG_Error_return(SWIG_TypeError, "std::vector<double>: array byte order should be native.");
-        }
-        // Make sure we have a contigous array with double datatype
-        int array_is_new_object;
-        PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
-        if (!array) { 
-          //PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double");
-          return false;
-        }
-        double* d=(double*) array_data(array);
-    
-        if (m) (*m)->assign( d, d+size );
-    
-                  
-        // Free memory
-        if (array_is_new_object)
-          Py_DECREF(array); 
+      // Convert to DMatrix
+      DMatrix tmp, *tmp_ptr=&tmp;
+      if (to_ptr(p, &tmp_ptr) && tmp_ptr->isVector()) {
+        if (m) tmp_ptr->get(**m);
         return true;
       }
-      return to_val(p, m ? *m : 0);
-#endif // SWIGPYTHON
+
+      // No match
       return false;
     }
   } // namespace casadi
@@ -1922,9 +1897,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_input_typemaps("casadi_impl", "int", SWIG_TYPECHECK_INTEGER, int)
 %casadi_input_typemaps("casadi_impl", "double", SWIG_TYPECHECK_DOUBLE, double)
 %casadi_input_typemaps("casadi_impl", "[int]", PRECEDENCE_IVector, std::vector<int>)
-#ifdef SWIGPYTHON
-%casadi_input_typemaps_old("casadi_dvector", DVector, PRECEDENCE_DVector, std::vector<double>)
-#endif
+%casadi_input_typemaps("casadi_dvector", "[double]", SWIG_TYPECHECK_DOUBLE, std::vector<double>)
 %casadi_input_typemaps("casadi_impl", "DerivativeGenerator", PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
 %casadi_input_typemaps("casadi_impl", "CustomEvaluate", PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
 %casadi_input_typemaps("casadi_impl", "Callback", PRECEDENCE_CALLBACK, casadi::Callback)
