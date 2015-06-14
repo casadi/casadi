@@ -105,7 +105,7 @@ public:
   #endif // WITH_SIPOPT
 
   /// All IPOPT options
-  std::map<std::string, opt_type> ops_;
+  std::map<std::string, TypeID> ops_;
 
   // Ipopt callback functions
   bool eval_f(int n, const double* x, bool new_x, double& obj_value);

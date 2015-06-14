@@ -36,23 +36,23 @@ using namespace std;
 namespace casadi {
 
   /// \cond INTERNAL
-  typedef GenericTypeInternal<std::string> StringType;
-  typedef GenericTypeInternal<double> DoubleType;
-  typedef GenericTypeInternal<int> IntType;
-  typedef GenericTypeInternal<bool> BoolType;
-  typedef GenericTypeInternal<std::vector<double> > DoubleVectorType;
-  typedef GenericTypeInternal<std::vector<int> > IntVectorType;
-  typedef GenericTypeInternal<std::vector< std::vector<int> > > IntVectorVectorType;
-  typedef GenericTypeInternal<std::vector<std::string> > StringVectorType;
-  typedef GenericTypeInternal<Function> FunctionType;
-  typedef GenericTypeInternal<Dict> DictType;
+  typedef GenericTypeInternal<OT_STRING, std::string> StringType;
+  typedef GenericTypeInternal<OT_REAL, double> DoubleType;
+  typedef GenericTypeInternal<OT_INTEGER, int> IntType;
+  typedef GenericTypeInternal<OT_BOOLEAN, bool> BoolType;
+  typedef GenericTypeInternal<OT_REALVECTOR, std::vector<double> > DoubleVectorType;
+  typedef GenericTypeInternal<OT_INTEGERVECTOR, std::vector<int> > IntVectorType;
+  typedef GenericTypeInternal<OT_INTEGERVECTORVECTOR,
+                              std::vector< std::vector<int> > > IntVectorVectorType;
+  typedef GenericTypeInternal<OT_STRINGVECTOR, std::vector<std::string> > StringVectorType;
+  typedef GenericTypeInternal<OT_FUNCTION, Function> FunctionType;
+  typedef GenericTypeInternal<OT_DICT, Dict> DictType;
+  typedef GenericTypeInternal<OT_VOIDPTR, void*> VoidPointerType;
+  typedef GenericTypeInternal<OT_CALLBACK, Callback> CallbackType;
+  typedef GenericTypeInternal<OT_DERIVATIVEGENERATOR, DerivativeGenerator> DerivativeGeneratorType;
   /// \endcond
 
-  opt_type GenericType::getType() const {
-    return type_;
-  }
-
-  bool GenericType::can_cast_to(opt_type other) const {
+  bool GenericType::can_cast_to(TypeID other) const {
     switch (other) {
     case OT_BOOLEAN:
       return isBool() || isInt() || isDouble();
@@ -63,11 +63,11 @@ namespace casadi {
     case OT_INTEGERVECTOR: case OT_REALVECTOR:
       return isDoubleVector() || isIntVector();
     default:
-      return type_ == other;
+      return getType() == other;
     }
   }
 
-  GenericType GenericType::from_type(opt_type type) {
+  GenericType GenericType::from_type(TypeID type) {
     switch (type) {
     case OT_INTEGERVECTOR:
       return std::vector<int>();
@@ -84,7 +84,7 @@ namespace casadi {
     }
   }
 
-  std::string GenericType::get_type_description(const opt_type &type) {
+  std::string GenericType::get_type_description(TypeID type) {
     switch (type) {
     case OT_BOOLEAN:
       return "OT_BOOLEAN";
@@ -122,19 +122,19 @@ namespace casadi {
 
 
   bool GenericType::isBool() const {
-    return is_a<bool>();
+    return getType()==OT_BOOLEAN;
   }
 
   bool GenericType::isInt() const {
-    return is_a<int>();
+    return getType()==OT_INTEGER;
   }
 
   bool GenericType::isDouble() const {
-    return is_a<double>();
+    return getType()==OT_REAL;
   }
 
   bool GenericType::isString() const {
-    return is_a<string>();
+    return getType()==OT_STRING;
   }
 
   bool GenericType::isEmptyVector() const {
@@ -145,27 +145,27 @@ namespace casadi {
   }
 
   bool GenericType::isIntVector() const {
-    return is_a<vector<int> >();
+    return getType()==OT_INTEGERVECTOR;
   }
 
   bool GenericType::isIntVectorVector() const {
-    return is_a<vector<vector<int> > >();
+    return getType()==OT_INTEGERVECTORVECTOR;
   }
 
   bool GenericType::isDoubleVector() const {
-    return is_a<vector<double> >();
+    return getType()==OT_REALVECTOR;
   }
 
   bool GenericType::isStringVector() const {
-    return is_a<vector<string> >();
+    return getType()==OT_STRINGVECTOR;
   }
 
   bool GenericType::isFunction() const {
-    return is_a<Function>();
+    return getType()==OT_FUNCTION;
   }
 
   bool GenericType::isDict() const {
-    return is_a<Dict>();
+    return getType()==OT_DICT;
   }
 
   GenericType::GenericType() {
@@ -180,58 +180,58 @@ namespace casadi {
     return stream;
   }
 
-  GenericType::GenericType(bool b) : type_(OT_BOOLEAN) {
+  GenericType::GenericType(bool b) {
     assignNode(new BoolType(b));
   }
 
-  GenericType::GenericType(int i) : type_(OT_INTEGER) {
+  GenericType::GenericType(int i) {
     assignNode(new IntType(i));
   }
 
-  GenericType::GenericType(double d) : type_(OT_REAL) {
+  GenericType::GenericType(double d) {
     assignNode(new DoubleType(d));
   }
 
-  GenericType::GenericType(const vector<int>& iv) : type_(OT_INTEGERVECTOR) {
+  GenericType::GenericType(const vector<int>& iv) {
     assignNode(new IntVectorType(iv));
   }
 
-  GenericType::GenericType(const vector<vector<int> >& ivv) : type_(OT_INTEGERVECTORVECTOR) {
+  GenericType::GenericType(const vector<vector<int> >& ivv) {
     assignNode(new IntVectorVectorType(ivv));
   }
 
-  GenericType::GenericType(const vector<bool>& b_vec) : type_(OT_BOOLVECTOR) {
+  GenericType::GenericType(const vector<bool>& b_vec) {
     vector<int> i_vec(b_vec.size());
     copy(b_vec.begin(), b_vec.end(), i_vec.begin());
     assignNode(new IntVectorType(i_vec));
   }
 
-  GenericType::GenericType(const vector<double>& dv) : type_(OT_REALVECTOR) {
+  GenericType::GenericType(const vector<double>& dv) {
     assignNode(new DoubleVectorType(dv));
   }
 
-  GenericType::GenericType(const vector<string>& sv) : type_(OT_STRINGVECTOR) {
+  GenericType::GenericType(const vector<string>& sv) {
     assignNode(new StringVectorType(sv));
   }
 
-  GenericType::GenericType(const string& s) : type_(OT_STRING) {
+  GenericType::GenericType(const string& s) {
     assignNode(new StringType(s));
   }
 
-  GenericType::GenericType(const char s[])  : type_(OT_STRING) {
+  GenericType::GenericType(const char s[]) {
     assignNode(new StringType(s));
   }
 
-  GenericType::GenericType(const Function& f) : type_(OT_FUNCTION) {
+  GenericType::GenericType(const Function& f) {
     assignNode(new FunctionType(f));
   }
 
-  GenericType::GenericType(const DerivativeGenerator& f) : type_(OT_DERIVATIVEGENERATOR) {
-    assignNode(new GenericTypeInternal<DerivativeGenerator>(f));
+  GenericType::GenericType(const DerivativeGenerator& f) {
+    assignNode(new GenericTypeInternal<OT_DERIVATIVEGENERATOR, DerivativeGenerator>(f));
   }
 
-  GenericType::GenericType(const Callback& f) : type_(OT_CALLBACK) {
-    assignNode(new GenericTypeInternal<Callback>(f));
+  GenericType::GenericType(const Callback& f) {
+    assignNode(new CallbackType(f));
   }
 
   bool GenericType::toBool() const {
@@ -355,32 +355,39 @@ namespace casadi {
   }
 
   GenericType::operator const DerivativeGenerator &() const {
-    casadi_assert_message(is_a<DerivativeGenerator>(), "type mismatch");
-    return static_cast<const GenericTypeInternal<DerivativeGenerator>*>(get())->d_;
+    casadi_assert_message(getType()==OT_DERIVATIVEGENERATOR, "type mismatch");
+    return static_cast<const DerivativeGeneratorType*>(get())->d_;
   }
 
   GenericType::operator const Callback &() const {
-    casadi_assert_message(is_a<Callback>(), "type mismatch");
-    return static_cast<const GenericTypeInternal<Callback>*>(get())->d_;
+    casadi_assert_message(getType()==OT_CALLBACK, "type mismatch");
+    return static_cast<const CallbackType*>(get())->d_;
   }
 
-  GenericType::GenericType(const Dict& dict) : type_(OT_DICT) {
-    assignNode(new GenericTypeInternal<Dict>(dict));
+  GenericType::GenericType(const Dict& dict) {
+    assignNode(new DictType(dict));
   }
 
   GenericType::operator const GenericType::Dict& () const {
-    casadi_assert_message(is_a<Dict>(), "type mismatch");
-    return static_cast<const GenericTypeInternal<Dict>*>(get())->d_;
+    casadi_assert_message(getType()==OT_DICT, "type mismatch");
+    return static_cast<const DictType*>(get())->d_;
   }
 
   void * GenericType::toVoidPointer() const {
-    casadi_assert_message(is_a<void*>(), "type mismatch");
-    return static_cast<const GenericTypeInternal<void*>*>(get())->d_;
+    casadi_assert_message(getType()==OT_VOIDPTR, "type mismatch");
+    return static_cast<const VoidPointerType*>(get())->d_;
   }
 
-  GenericType::GenericType(void* ptr) : type_(OT_VOIDPTR) {
-    assignNode(new GenericTypeInternal<void*>(ptr));
+  GenericType::GenericType(void* ptr) {
+    assignNode(new VoidPointerType(ptr));
   }
 
+  TypeID GenericType::getType() const {
+    if (isNull()) {
+      return OT_NULL;
+    } else {
+      return static_cast<const GenericTypeBase*>(get())->getType();
+    }
+  }
 
 } // namespace casadi

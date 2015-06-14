@@ -34,7 +34,8 @@
 namespace casadi {
 
   /** \brief  Types of options */
-  enum opt_type {
+  enum TypeID {
+    OT_NULL,
     OT_BOOLEAN,
     OT_INTEGER,
     OT_REAL,
@@ -83,13 +84,13 @@ namespace casadi {
     #endif // SWIG
 
     /// Get a description of a type
-    static std::string get_type_description(const opt_type &type);
+    static std::string get_type_description(TypeID type);
 
     /// Get a description of the object's type
-    std::string get_description() const { return get_type_description(type_); }
+    std::string get_description() const { return get_type_description(getType()); }
 
-    /// Construct a GenericType given an opt_type
-    static GenericType from_type(opt_type type);
+    /// Construct a GenericType given an TypeID
+    static GenericType from_type(TypeID type);
 
     /// Implicit typecasting
     #ifndef SWIG
@@ -107,10 +108,11 @@ namespace casadi {
     operator const Callback& () const;
     #endif // SWIG
 
-    opt_type getType() const;
+    // Get type of object
+    TypeID getType() const;
 
-    bool can_cast_to(opt_type other) const;
-    bool can_cast_to(const GenericType& other) const { return can_cast_to(other.type_) ;}
+    bool can_cast_to(TypeID other) const;
+    bool can_cast_to(const GenericType& other) const { return can_cast_to(other.getType()) ;}
 
     //! \brief Is boolean?
     bool isBool() const;
@@ -185,17 +187,8 @@ namespace casadi {
     #ifndef SWIG
     //! \brief Print
     CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream,
-                                                           const GenericType& ref);
+                                                  const GenericType& ref);
     #endif
-
-    /// Check if it is of a certain type (implementation in generic_type_internal.hpp)
-    #ifndef SWIG
-    template<typename T>
-    bool is_a() const;
-    #endif // SWIG
-
-   private:
-    opt_type type_;
   };
 
   /// C++ equivalent of Python's dict or MATLAB's struct

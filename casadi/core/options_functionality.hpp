@@ -108,7 +108,7 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
     std::string getOptionDescription(const std::string &str) const;
 
     /** \brief Get the type of a certain option */
-    opt_type getOptionType(const std::string &str) const;
+    TypeID getOptionType(const std::string &str) const;
 
     /** \brief Get the type name of a certain option */
     std::string getOptionTypeName(const std::string &str) const;
@@ -173,7 +173,7 @@ virtual ~OptionsFunctionalityNode();
   std::string getOptionDescription(const std::string &str) const;
 
   /** \brief Get the type of a certain option */
-  opt_type getOptionType(const std::string &str) const;
+  TypeID getOptionType(const std::string &str) const;
 
   /** \brief Get the type name of a certain option */
   std::string getOptionTypeName(const std::string &str) const;
@@ -249,7 +249,7 @@ virtual ~OptionsFunctionalityNode();
 
 
   void addOption(
-    const std::string &str, const opt_type& type,
+    const std::string &str, const TypeID& type,
     const GenericType &def_val=GenericType(), const std::string& desc="n/a",
     const std::vector<GenericType> &allowed_vals = std::vector<GenericType>(),
     bool inherit = false, std::vector<int> enum_values= std::vector<int>(),
@@ -263,7 +263,7 @@ virtual ~OptionsFunctionalityNode();
   *    "foo:5:description_foo|bar:6:description_bar|" -> same as above, but specifies documentation
   *
   **/
-  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val,
+  void addOption(const std::string &str, const TypeID& type, const GenericType &def_val,
                  const std::string& desc, const std::string &allowed_vals, bool inherit = false);
 
 protected:
@@ -278,7 +278,7 @@ void setDefault(const std::string &str, const GenericType &def_val);
 private:
 
 /** \brief  Allowed options  */
-  std::map<std::string, opt_type> allowed_options;
+  std::map<std::string, TypeID> allowed_options;
 
 /** \brief  User-set options */
   Dict dictionary_;

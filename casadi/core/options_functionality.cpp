@@ -115,7 +115,7 @@ double OptionsFunctionalityNode::getBestMatches(const std::string &name,
   std::vector< std::string> dict;
 
   // Fill it by looping over the allowed_options map
-  for (map<string, opt_type>::const_iterator it=allowed_options.begin();
+  for (map<string, TypeID>::const_iterator it=allowed_options.begin();
        it!=allowed_options.end();it++) {
     dict.push_back(it->first);
   }
@@ -247,7 +247,7 @@ GenericType OptionsFunctionality::getOption(const string &name) const {
 
 void OptionsFunctionalityNode::assert_exists(const std::string &name) const {
   // First check if the option exists
-  map<string, opt_type>::const_iterator it = allowed_options.find(name);
+  map<string, TypeID>::const_iterator it = allowed_options.find(name);
   if (it == allowed_options.end()) {
     stringstream ss;
     ss << "Unknown option: " << name << endl;
@@ -289,7 +289,7 @@ GenericType OptionsFunctionalityNode::getOption(const string &name) const {
   return GenericType(it->second);
 }
 
-void OptionsFunctionalityNode::addOption(const string &name, const opt_type& type,
+void OptionsFunctionalityNode::addOption(const string &name, const TypeID& type,
                                          const GenericType &def_val, const string& desc,
                                          const std::string &allowed_vals, bool inherit) {
 
@@ -326,7 +326,7 @@ void OptionsFunctionalityNode::addOption(const string &name, const opt_type& typ
 
 
 void OptionsFunctionalityNode::addOption(
-    const string &name, const opt_type& type, const GenericType &def_val,
+    const string &name, const TypeID& type, const GenericType &def_val,
     const string& desc, const std::vector<GenericType> &allowed_vals,
     bool inherit, std::vector<int> enum_values,
     std::vector<std::string> enum_descr) {
@@ -391,7 +391,7 @@ void OptionsFunctionalityNode::addOption(
 }
 
 void OptionsFunctionalityNode::printOption(const std::string &name, ostream &stream) const {
-   map<std::string, opt_type>::const_iterator allowed_option_it = allowed_options.find(name);
+   map<std::string, TypeID>::const_iterator allowed_option_it = allowed_options.find(name);
    if (allowed_option_it!=allowed_options.end()) {
 
       // First print out the datatype
@@ -434,7 +434,7 @@ void OptionsFunctionalityNode::printOption(const std::string &name, ostream &str
 
 void OptionsFunctionalityNode::printOptions(ostream &stream) const {
   stream << "\"Option name\" [type] = value" << endl;
-  for (map<string, opt_type>::const_iterator it=allowed_options.begin();
+  for (map<string, TypeID>::const_iterator it=allowed_options.begin();
       it!=allowed_options.end(); ++it) {
     printOption(it->first, stream);
   }
@@ -491,7 +491,7 @@ std::string OptionsFunctionality::getOptionDescription(const std::string &str) c
 }
 
 
-opt_type OptionsFunctionality::getOptionType(const std::string &str) const {
+TypeID OptionsFunctionality::getOptionType(const std::string &str) const {
  return (*this)->getOptionType(str);
 }
 
@@ -571,7 +571,7 @@ void OptionsFunctionalityNode::repr(ostream &stream) const {
 
 std::vector<std::string> OptionsFunctionalityNode::getOptionNames() const {
   std::vector<std::string> names;
-  for (map<string, opt_type>::const_iterator it=allowed_options.begin();
+  for (map<string, TypeID>::const_iterator it=allowed_options.begin();
       it!=allowed_options.end(); ++it) {
     names.push_back(it->first);
   }
@@ -586,9 +586,9 @@ std::string OptionsFunctionalityNode::getOptionDescription(const std::string &na
   return "N/A";
 }
 
-opt_type OptionsFunctionalityNode::getOptionType(const std::string &name) const {
+TypeID OptionsFunctionalityNode::getOptionType(const std::string &name) const {
   assert_exists(name);
-  map<string, opt_type>::const_iterator it = allowed_options.find(name);
+  map<string, TypeID>::const_iterator it = allowed_options.find(name);
   if (it!=allowed_options.end()) return it->second;
   return OT_UNKNOWN;
 }

@@ -93,7 +93,7 @@ namespace casadi {
     Control   worhp_c_;
 
     std::map<int, std::string> status_;
-    std::map<std::string, opt_type> ops_;
+    std::map<std::string, TypeID> ops_;
 
     // Worhp callback functions
     bool eval_f(const double* x, double scale, double& obj_value);

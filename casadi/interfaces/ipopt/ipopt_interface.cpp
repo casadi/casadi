@@ -125,7 +125,7 @@ namespace casadi {
 
       // Get the type
       Ipopt::RegisteredOptionType ipopt_type = it->second->Type();
-      opt_type casadi_type;
+      TypeID casadi_type;
 
       // Map Ipopt option category to a CasADi options type
       switch (ipopt_type) {
@@ -247,7 +247,7 @@ namespace casadi {
     bool ret = true;
 
     // Pass all the options to ipopt
-    for (map<string, opt_type>::const_iterator it=ops_.begin(); it!=ops_.end(); ++it)
+    for (map<string, TypeID>::const_iterator it=ops_.begin(); it!=ops_.end(); ++it)
       if (hasSetOption(it->first)) {
         GenericType op = getOption(it->first);
         switch (it->second) {
