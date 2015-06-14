@@ -490,6 +490,7 @@ class MXtests(casadiTestCase):
     checkMXoperations3(self,lambda x: horzcat([x]),lambda x: x,'horzcat(snippet)')
     checkMXoperations3(self,lambda x: horzcat([x,x*2]),lambda x: hstack((x,x*2)),'horzcat(snippet,snippet)')
     
+  @known_bug()  # Test refactoring, cf. #1436
   def test_MXslicingnew(self):
     self.message("MX slicing new")
 

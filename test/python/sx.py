@@ -248,6 +248,7 @@ class SXtests(casadiTestCase):
       self.assertRaises(RuntimeError, lambda : mul(xx,yy))
 
 
+  @known_bug()  # Test refactoring, cf. #1436
   def test_SXslicing(self):
       self.message("SX slicing/indexing")
       x=SX.sym("x",3,2)
