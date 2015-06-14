@@ -88,6 +88,7 @@
     /* Convert result from CasADi to interfaced language */    
     GUESTOBJECT* from_ref(const casadi::GenericType &a);
     template<typename M> GUESTOBJECT* from_ref(const std::map<std::string, M> &a);
+    template<typename M> GUESTOBJECT* from_ref(const std::vector<M> &a);
 
 #ifdef SWIGMATLAB
     // Get sparsity pattern
@@ -902,6 +903,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // No match
       return false;
     }
+
+    template<typename M> GUESTOBJECT* from_ref(const std::vector<M> &a) {
+      return swig::from(a);
+    }
   } // namespace casadi
 }
 
@@ -920,6 +925,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       } else {
         return false;
       }
+    }
+
+    GUESTOBJECT* from_ref(const Function &a) {
+      return swig::from(a);
     }
   } // namespace casadi
 }
@@ -1168,31 +1177,29 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
     GUESTOBJECT * from_ref(const GenericType &a) {
 #ifdef SWIGPYTHON
-      GUESTOBJECT *p = 0;
       if (a.isBool()) {
-        p=PyBool_FromLong(a.toBool());
+        return PyBool_FromLong(a.toBool());
       } else if (a.isInt()) {
-        p=PyInt_FromLong(a.toInt());
+        return PyInt_FromLong(a.toInt());
       } else if (a.isDouble()) {
-        p=PyFloat_FromDouble(a.toDouble());
+        return PyFloat_FromDouble(a.toDouble());
       } else if (a.isString()) {
-        p=PyString_FromString(a.toString().c_str());
+        return PyString_FromString(a.toString().c_str());
       } else if (a.isIntVector()) {
-        p = swig::from(a.toIntVector());
+        return from_ref(a.toIntVector());
       } else if (a.isIntVectorVector()) {
-        p = swig::from(a.toIntVectorVector());
+        return from_ref(a.toIntVectorVector());
       } else if (a.isDoubleVector()) {
-        p = swig::from( a.toDoubleVector());
+        return from_ref( a.toDoubleVector());
       }  else if (a.isStringVector()) {
-        p = swig::from(a.toStringVector());
+        return from_ref(a.toStringVector());
       } else if (a.isDict()) {
-        p = from_ref(a.toDict());
+        return from_ref(a.toDict());
       } else if (a.isFunction()) {
-        p = swig::from( a.toFunction());
+        return from_ref(a.toFunction());
       } else if (a.isNull()) {
-        p = Py_None;
+        return Py_None;
       }
-      return p;
 #endif // SWIGPYTHON
       return 0;
     }
@@ -1221,6 +1228,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
       // No match
       return false;
+    }
+
+    GUESTOBJECT* from_ref(const std::string &a) {
+      return swig::from(a);      
     }
   } // namespace casadi
 }
