@@ -52,10 +52,10 @@ namespace casadi {
     OT_VOIDPTR,
     OT_UNKNOWN};
 
-  /** \brief Generic data type
-  \author Joel Andersson
-  \date 2010
-  Return type when getting an option, can be converted into bool, int, string, vector, etc */
+  /** \brief Generic data type, can hold different types such as bool, int, string etc.
+      \author Joel Andersson
+      \date 2010
+  */
   class CASADI_EXPORT GenericType : public SharedObject {
   public:
     /// C++ equivalent of Python's dict or MATLAB's struct
@@ -172,11 +172,11 @@ namespace casadi {
     bool operator==(const GenericType& op2) const;
     bool operator!=(const GenericType& op2) const;
 
-    #ifndef SWIG
+#ifndef SWIG
     //! \brief Print
     CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream,
                                                   const GenericType& ref);
-    #endif
+#endif // SWIG
   };
 
   /// C++ equivalent of Python's dict or MATLAB's struct
