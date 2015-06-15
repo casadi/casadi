@@ -164,8 +164,20 @@ namespace casadi {
     return getType()==OT_FUNCTION;
   }
 
+  bool GenericType::isVoidPointer() const {
+    return getType()==OT_VOIDPTR;
+  }
+
   bool GenericType::isDict() const {
     return getType()==OT_DICT;
+  }
+
+  bool GenericType::isCallback() const {
+    return getType()==OT_CALLBACK;
+  }
+
+  bool GenericType::isDerivativeGenerator() const {
+    return getType()==OT_DERIVATIVEGENERATOR;
   }
 
   GenericType::GenericType() {
@@ -234,9 +246,71 @@ namespace casadi {
     assignNode(new CallbackType(f));
   }
 
+  const bool& GenericType::asBool() const {
+    casadi_assert(isBool());
+    return static_cast<const BoolType*>(get())->d_;
+  }
+
+  const int& GenericType::asInt() const {
+    casadi_assert(isInt());
+    return static_cast<const IntType*>(get())->d_;
+  }
+
+  const double& GenericType::asDouble() const {
+    casadi_assert(isDouble());
+    return static_cast<const DoubleType*>(get())->d_;
+  }
+
+  const std::string& GenericType::asString() const {
+    casadi_assert(isString());
+    return static_cast<const StringType*>(get())->d_;
+  }
+
+  const std::vector<int>& GenericType::asIntVector() const {
+    casadi_assert(isIntVector());
+    return static_cast<const IntVectorType*>(get())->d_;
+  }
+
+  const std::vector<std::vector<int> >& GenericType::asIntVectorVector() const {
+    return static_cast<const IntVectorVectorType*>(get())->d_;
+  }
+
+  const std::vector<double>& GenericType::asDoubleVector() const {
+    return static_cast<const DoubleVectorType*>(get())->d_;
+  }
+
+  const std::vector<std::string>& GenericType::asStringVector() const {
+    return static_cast<const StringVectorType*>(get())->d_;
+  }
+
+  const GenericType::Dict& GenericType::asDict() const {
+    casadi_assert(isDict());
+    return static_cast<const DictType*>(get())->d_;
+  }
+
+  const Function& GenericType::asFunction() const {
+    casadi_assert(isFunction());
+    return static_cast<const FunctionType*>(get())->d_;
+  }
+
+  void* const & GenericType::asVoidPointer() const {
+    casadi_assert(isVoidPointer());
+    return static_cast<const VoidPointerType*>(get())->d_;
+  }
+
+  const DerivativeGenerator& GenericType::asDerivativeGenerator() const {
+    casadi_assert(isDerivativeGenerator());
+    return static_cast<const DerivativeGeneratorType*>(get())->d_;
+  }
+
+  const Callback& GenericType::asCallback() const {
+    casadi_assert(isCallback());
+    return static_cast<const CallbackType*>(get())->d_;
+  }
+
   bool GenericType::toBool() const {
     if (isBool()) {
-      return static_cast<const BoolType*>(get())->d_;
+      return asBool();
     } else if (isInt()) {
       return static_cast<bool>(toInt());
     } else {
@@ -254,7 +328,7 @@ namespace casadi {
       return static_cast<int>(toBool());
     } else {
       casadi_assert_message(isInt(), "type mismatch");
-      return static_cast<const IntType*>(get())->d_;
+      return asInt();
     }
   }
 
@@ -263,43 +337,43 @@ namespace casadi {
       return static_cast<double>(toInt());
     } else {
       casadi_assert_message(isDouble(), "type mismatch");
-      return static_cast<const DoubleType*>(get())->d_;
+      return asDouble();
     }
   }
 
-  const string& GenericType::toString() const {
+  string GenericType::toString() const {
     casadi_assert_message(isString(), "type mismatch");
-    return static_cast<const StringType*>(get())->d_;
+    return asString();
   }
 
-  const vector<int>& GenericType::toIntVector() const {
+  vector<int> GenericType::toIntVector() const {
     casadi_assert_message(isIntVector(), "type mismatch");
-    return static_cast<const IntVectorType*>(get())->d_;
+    return asIntVector();
   }
 
-  const vector<vector<int> >& GenericType::toIntVectorVector() const {
+  vector<vector<int> > GenericType::toIntVectorVector() const {
     casadi_assert_message(isIntVectorVector(), "type mismatch");
-    return static_cast<const IntVectorVectorType*>(get())->d_;
+    return asIntVectorVector();
   }
 
-  const vector<double>& GenericType::toDoubleVector() const {
+  vector<double> GenericType::toDoubleVector() const {
     casadi_assert_message(isDoubleVector(), "type mismatch");
-    return static_cast<const DoubleVectorType*>(get())->d_;
+    return asDoubleVector();
   }
 
-  const vector<string>& GenericType::toStringVector() const {
+  vector<string> GenericType::toStringVector() const {
     casadi_assert_message(isStringVector(), "type mismatch");
-    return static_cast<const StringVectorType*>(get())->d_;
+    return asStringVector();
   }
 
-  const Dict& GenericType::toDict() const {
+  Dict GenericType::toDict() const {
     casadi_assert_message(isDict(), "type mismatch");
-    return static_cast<const DictType*>(get())->d_;
+    return asDict();
   }
 
-  const Function& GenericType::toFunction() const {
+  Function GenericType::toFunction() const {
     casadi_assert_message(isFunction(), "type mismatch");
-    return static_cast<const FunctionType*>(get())->d_;
+    return asFunction();
   }
 
   bool GenericType::operator==(const GenericType& op2) const {
@@ -354,28 +428,13 @@ namespace casadi {
     return true;
   }
 
-  GenericType::operator const DerivativeGenerator &() const {
-    casadi_assert_message(getType()==OT_DERIVATIVEGENERATOR, "type mismatch");
-    return static_cast<const DerivativeGeneratorType*>(get())->d_;
-  }
-
-  GenericType::operator const Callback &() const {
-    casadi_assert_message(getType()==OT_CALLBACK, "type mismatch");
-    return static_cast<const CallbackType*>(get())->d_;
-  }
-
   GenericType::GenericType(const Dict& dict) {
     assignNode(new DictType(dict));
   }
 
-  GenericType::operator const GenericType::Dict& () const {
-    casadi_assert_message(getType()==OT_DICT, "type mismatch");
-    return static_cast<const DictType*>(get())->d_;
-  }
-
-  void * GenericType::toVoidPointer() const {
+  void* GenericType::toVoidPointer() const {
     casadi_assert_message(getType()==OT_VOIDPTR, "type mismatch");
-    return static_cast<const VoidPointerType*>(get())->d_;
+    return asVoidPointer();
   }
 
   GenericType::GenericType(void* ptr) {

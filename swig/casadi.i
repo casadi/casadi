@@ -85,7 +85,7 @@
     // Assign to a vector, if conversion is allowed
     template<typename E, typename M> bool assign_vector(E* d, int sz, std::vector<M>** m);
 
-    /* Convert result from CasADi to interfaced language */    
+    /* Convert result from CasADi to interfaced language */
     GUESTOBJECT* from_ptr(const casadi::GenericType *a);
     template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a);
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a);
@@ -1201,36 +1201,22 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     }
 
     GUESTOBJECT * from_ptr(const GenericType *a) {
-      if (a->isBool()) {
-        bool tmp=a->toBool();
-        return from_ptr(&tmp);
-      } else if (a->isInt()) {
-        int tmp=a->toInt();
-        return from_ptr(&tmp);
-      } else if (a->isDouble()) {
-        double tmp=a->toDouble();
-        return from_ptr(&tmp);
-      } else if (a->isString()) {
-        return from_ptr(&a->toString());
-      } else if (a->isIntVector()) {
-        return from_ptr(&a->toIntVector());
-      } else if (a->isIntVectorVector()) {
-        return from_ptr(&a->toIntVectorVector());
-      } else if (a->isDoubleVector()) {
-        return from_ptr(&a->toDoubleVector());
-      }  else if (a->isStringVector()) {
-        return from_ptr(&a->toStringVector());
-      } else if (a->isDict()) {
-        return from_ptr(&a->toDict());
-      } else if (a->isFunction()) {
-        return from_ptr(&a->toFunction());
-      }
+      switch (a->getType()) {
+      case OT_BOOLEAN: return from_ptr(&a->asBool());
+      case OT_INTEGER: return from_ptr(&a->asInt());
+      case OT_REAL: return from_ptr(&a->asDouble());
+      case OT_STRING: return from_ptr(&a->asString());
+      case OT_INTEGERVECTOR: return from_ptr(&a->asIntVector());
+      case OT_INTEGERVECTORVECTOR: return from_ptr(&a->asIntVectorVector());
+      case OT_REALVECTOR: return from_ptr(&a->asDoubleVector());
+      case OT_STRINGVECTOR: return from_ptr(&a->asStringVector());
+      case OT_DICT: return from_ptr(&a->asDict());
+      case OT_FUNCTION: return from_ptr(&a->asFunction());
 #ifdef SWIGPYTHON
-      if (a->isNull()) {
-        return Py_None;
-      }
+      case OT_NULL: return Py_None;
 #endif // SWIGPYTHON
-      return 0;
+      default: return 0;
+      }
     }
   } // namespace casadi
 }

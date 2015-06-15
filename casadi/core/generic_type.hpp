@@ -92,20 +92,22 @@ namespace casadi {
     /// Construct a GenericType given an TypeID
     static GenericType from_type(TypeID type);
 
-    /// Implicit typecasting
     #ifndef SWIG
+    ///@{
+    /// Implicit typecasting
     operator bool() const { return toBool();}
     operator int() const { return toInt();}
     operator double() const { return toDouble();}
-    operator const std::string& () const { return toString();}
-    operator const std::vector<int>& () const { return toIntVector();}
-    operator const std::vector<std::vector<int> >& () const { return toIntVectorVector();}
-    operator const std::vector<double>& () const { return toDoubleVector();}
-    operator const std::vector<std::string>& () const { return toStringVector();}
-    operator const Function& () const { return toFunction();}
-    operator const std::map<std::string, GenericType>& () const;
-    operator const DerivativeGenerator& () const;
-    operator const Callback& () const;
+    operator const std::string& () const { return asString();}
+    operator const std::vector<int>& () const { return asIntVector();}
+    operator const std::vector<std::vector<int> >& () const { return asIntVectorVector();}
+    operator const std::vector<double>& () const { return asDoubleVector();}
+    operator const std::vector<std::string>& () const { return asStringVector();}
+    operator const Function& () const { return asFunction();}
+    operator const Dict& () const { return asDict();}
+    operator const DerivativeGenerator& () const { return asDerivativeGenerator();}
+    operator const Callback& () const { return asCallback();}
+    ///@}
     #endif // SWIG
 
     // Get type of object
@@ -114,71 +116,57 @@ namespace casadi {
     bool can_cast_to(TypeID other) const;
     bool can_cast_to(const GenericType& other) const { return can_cast_to(other.getType()) ;}
 
-    //! \brief Is boolean?
+    ///@{
+    /** \brief Check if a particular type */
     bool isBool() const;
-
-    //! \brief Is an integer?
     bool isInt() const;
-
-    //! \brief Is a double?
     bool isDouble() const;
-
-    //! \brief Is a string?
     bool isString() const;
-
-    //! \brief Is an empty vector?
     bool isEmptyVector() const;
-
-    //! \brief Is a vector of ints?
     bool isIntVector() const;
-
-    //! \brief Is a vector of vector of ints?
     bool isIntVectorVector() const;
-
-    //! \brief Is a vector of doubles?
     bool isDoubleVector() const;
-
-    //! \brief Is a vector of strings
     bool isStringVector() const;
-
-    //! \brief Is a shared object?
     bool isDict() const;
-
-    //! \brief Is a shared object?
     bool isFunction() const;
+    bool isVoidPointer() const;
+    bool isCallback() const;
+    bool isDerivativeGenerator() const;
+    ///@}
 
-    //! \brief Convert to boolean
+#ifndef SWIG
+    ///@{
+    /** \brief Cast to the internal type */
+    const bool& asBool() const;
+    const int& asInt() const;
+    const double& asDouble() const;
+    const std::string& asString() const;
+    const std::vector<int>& asIntVector() const;
+    const std::vector<std::vector<int> >& asIntVectorVector() const;
+    const std::vector<double>& asDoubleVector() const;
+    const std::vector<std::string>& asStringVector() const;
+    const Dict& asDict() const;
+    const Function& asFunction() const;
+    void* const & asVoidPointer() const;
+    const DerivativeGenerator& asDerivativeGenerator() const;
+    const Callback& asCallback() const;
+    ///@}
+#endif // SWIG
+
+    ///@{
+    //! \brief Convert to a type
     bool toBool() const;
-
-    //! \brief Convert to int
     int toInt() const;
-
-    //! \brief Convert to double
     double toDouble() const;
-
-    //! \brief Convert to string
-    SWIG_CONSTREF(std::string) toString() const;
-
-    //! \brief Convert to vector of ints
-    SWIG_CONSTREF(std::vector<int>) toIntVector() const;
-
-    //! \brief Convert to vector of ints
-    SWIG_CONSTREF(std::vector< std::vector<int> >) toIntVectorVector() const;
-
-    //! \brief Convert to vector of doubles
-    SWIG_CONSTREF(std::vector<double>) toDoubleVector() const;
-
-    //! \brief Convert to vector of strings
-    SWIG_CONSTREF(std::vector<std::string>) toStringVector() const;
-
-    //! \brief Convert to Dict
-    const Dict& toDict() const;
-
-    //! \brief Convert to shared object
-    const Function& toFunction() const;
-
-    //! \brief Convert to void pointer
-    void * toVoidPointer() const;
+    std::string toString() const;
+    std::vector<int> toIntVector() const;
+    std::vector< std::vector<int> > toIntVectorVector() const;
+    std::vector<double> toDoubleVector() const;
+    std::vector<std::string> toStringVector() const;
+    Dict toDict() const;
+    Function toFunction() const;
+    void* toVoidPointer() const;
+    ///@}
 
     //! \brief Equality
     bool operator==(const GenericType& op2) const;
