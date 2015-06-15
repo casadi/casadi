@@ -45,67 +45,6 @@
 %}
 #endif
 
-%fragment("casadi_decl", "header") {
-  namespace casadi {
-    /* Check if Null or None */
-    bool is_null(GUESTOBJECT *p);
-
-    /* Convert a pointer in interfaced language to C++
-     * Input: GUESTOBJECT pointer p
-     * Output: Pointer to pointer: At input, pointer to pointer to temporary
-     * The routine will either:
-     *   - Do nothing, if 0
-     *   - Change the pointer
-     *   - Change the temporary object
-     * Returns true upon success, else false
-     */
-    bool to_ptr(GUESTOBJECT *p, int** m);
-    bool to_ptr(GUESTOBJECT *p, double** m);
-    bool to_ptr(GUESTOBJECT *p, std::string** m);
-    bool to_ptr(GUESTOBJECT *p, MX** m);
-    bool to_ptr(GUESTOBJECT *p, GenericType** m);
-    bool to_ptr(GUESTOBJECT *p, SX** m);
-    bool to_ptr(GUESTOBJECT *p, Sparsity** m);
-    bool to_ptr(GUESTOBJECT *p, DMatrix** m);
-    bool to_ptr(GUESTOBJECT *p, IMatrix** m);
-    bool to_ptr(GUESTOBJECT *p, Slice** m);
-    bool to_ptr(GUESTOBJECT *p, Callback** m);
-    bool to_ptr(GUESTOBJECT *p, DerivativeGenerator** m);
-    bool to_ptr(GUESTOBJECT *p, CustomEvaluate** m);
-    bool to_ptr(GUESTOBJECT *p, Function** m);
-    template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
-    template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
-    template<typename M1, typename M2> bool to_ptr(GUESTOBJECT *p, std::pair<M1, M2>** m);
-
-    // Same as the above, but with pointer instead of pointer to pointer
-    template<typename M> bool to_val(GUESTOBJECT *p, M* m);
-
-    // Check if conversion is possible
-    template<typename M> bool can_convert(GUESTOBJECT *p) { return to_ptr(p, static_cast<M**>(0));}
-
-    // Assign to a vector, if conversion is allowed
-    template<typename E, typename M> bool assign_vector(E* d, int sz, std::vector<M>** m);
-
-    /* Convert result from CasADi to interfaced language */
-    GUESTOBJECT* from_ptr(const casadi::GenericType *a);
-    template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a);
-    template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a);
-    GUESTOBJECT* from_ptr(const bool *a);
-    GUESTOBJECT* from_ptr(const int *a);
-    GUESTOBJECT* from_ptr(const double *a);
-    GUESTOBJECT* from_ptr(const std::string *a);
-
-#ifdef SWIGMATLAB
-    // Get sparsity pattern
-    Sparsity getSparsity(const mxArray* p);
-
-    // Number of nonzeros
-    size_t getNNZ(const mxArray* p);
-#endif // SWIGMATLAB
-
-  } // namespace CasADi
- }
-
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
 // for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
@@ -590,85 +529,65 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %}
 #endif
 
-%fragment("casadi_int", "header", fragment="casadi_decl") {
+%fragment("casadi_decl", "header") {
   namespace casadi {
-    bool to_ptr(GUESTOBJECT *p, int** m) {
-      // Treat Null
-      if (is_null(p)) return false;
+    /* Check if Null or None */
+    bool is_null(GUESTOBJECT *p);
 
-      // Standard typemaps
-      if (SWIG_IsOK(SWIG_AsVal_int(p, m ? *m : 0))) return true;
+    /* Convert a pointer in interfaced language to C++
+     * Input: GUESTOBJECT pointer p
+     * Output: Pointer to pointer: At input, pointer to pointer to temporary
+     * The routine will either:
+     *   - Do nothing, if 0
+     *   - Change the pointer
+     *   - Change the temporary object
+     * Returns true upon success, else false
+     */
+    bool to_ptr(GUESTOBJECT *p, int** m);
+    bool to_ptr(GUESTOBJECT *p, double** m);
+    bool to_ptr(GUESTOBJECT *p, std::string** m);
+    bool to_ptr(GUESTOBJECT *p, MX** m);
+    bool to_ptr(GUESTOBJECT *p, GenericType** m);
+    bool to_ptr(GUESTOBJECT *p, SX** m);
+    bool to_ptr(GUESTOBJECT *p, Sparsity** m);
+    bool to_ptr(GUESTOBJECT *p, DMatrix** m);
+    bool to_ptr(GUESTOBJECT *p, IMatrix** m);
+    bool to_ptr(GUESTOBJECT *p, Slice** m);
+    bool to_ptr(GUESTOBJECT *p, Callback** m);
+    bool to_ptr(GUESTOBJECT *p, DerivativeGenerator** m);
+    bool to_ptr(GUESTOBJECT *p, CustomEvaluate** m);
+    bool to_ptr(GUESTOBJECT *p, Function** m);
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
+    template<typename M1, typename M2> bool to_ptr(GUESTOBJECT *p, std::pair<M1, M2>** m);
 
-      // Scalar IMatrix
-      {
-        IMatrix *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<int>*), 0))
-            && m2->isScalar()) {
-          if (m) **m = m2->getIntValue();
-          return true;
-        }
-      }
+    // Same as the above, but with pointer instead of pointer to pointer
+    template<typename M> bool to_val(GUESTOBJECT *p, M* m);
 
-      // No match
-      return false;
-    }
+    // Check if conversion is possible
+    template<typename M> bool can_convert(GUESTOBJECT *p) { return to_ptr(p, static_cast<M**>(0));}
 
-    GUESTOBJECT * from_ptr(const bool *a) {
-#ifdef SWIGPYTHON
-      return PyBool_FromLong(*a);
-#endif // SWIGPYTHON
-      return 0;
-    }
+    // Assign to a vector, if conversion is allowed
+    template<typename E, typename M> bool assign_vector(E* d, int sz, std::vector<M>** m);
 
-    GUESTOBJECT * from_ptr(const int *a) {
-#ifdef SWIGPYTHON
-      return PyInt_FromLong(*a);
-#endif // SWIGPYTHON
-      return 0;
-    }
-  } // namespace casadi
- }
+    /* Convert result from CasADi to interfaced language */
+    GUESTOBJECT* from_ptr(const casadi::GenericType *a);
+    template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a);
+    template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a);
+    GUESTOBJECT* from_ptr(const bool *a);
+    GUESTOBJECT* from_ptr(const int *a);
+    GUESTOBJECT* from_ptr(const double *a);
+    GUESTOBJECT* from_ptr(const std::string *a);
 
-%fragment("casadi_double", "header", fragment="casadi_decl") {
-  namespace casadi {
-    bool to_ptr(GUESTOBJECT *p, double** m) {
-      // Treat Null
-      if (is_null(p)) return false;
+#ifdef SWIGMATLAB
+    // Get sparsity pattern
+    Sparsity getSparsity(const mxArray* p);
 
-      // Standard typemaps
-      if (SWIG_IsOK(SWIG_AsVal_double(p, m ? *m : 0))) return true;
+    // Number of nonzeros
+    size_t getNNZ(const mxArray* p);
+#endif // SWIGMATLAB
 
-      // Scalar DMatrix
-      {
-        DMatrix *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<double>*), 0))
-            && m2->isScalar()) {
-          if (m) **m = m2->getValue();
-          return true;
-        }
-      }
-
-      // Scalar IMatrix
-      {
-        IMatrix *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<int>*), 0))
-            && m2->isScalar()) {
-          if (m) **m = m2->getValue();
-          return true;
-        }
-      }
-
-      // No match
-      return false;
-    }
-
-    GUESTOBJECT * from_ptr(const double *a) {
-#ifdef SWIGPYTHON
-      return PyFloat_FromDouble(*a);
-#endif // SWIGPYTHON
-      return 0;
-    }
-  } // namespace casadi
+  } // namespace CasADi
  }
 
 %fragment("casadi_aux", "header", fragment="casadi_decl") {
@@ -797,6 +716,88 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif // SWIGMATLAB
   } // namespace casadi
  }
+
+%fragment("casadi_int", "header", fragment="casadi_aux", fragment=SWIG_AsVal_frag(int)) {
+  namespace casadi {
+    bool to_ptr(GUESTOBJECT *p, int** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // Standard typemaps
+      if (SWIG_IsOK(SWIG_AsVal(int)(p, m ? *m : 0))) return true;
+
+      // Scalar IMatrix
+      {
+        IMatrix *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<int>*), 0))
+            && m2->isScalar()) {
+          if (m) **m = m2->getIntValue();
+          return true;
+        }
+      }
+
+      // No match
+      return false;
+    }
+
+    GUESTOBJECT * from_ptr(const bool *a) {
+#ifdef SWIGPYTHON
+      return PyBool_FromLong(*a);
+#endif // SWIGPYTHON
+      return 0;
+    }
+
+    GUESTOBJECT * from_ptr(const int *a) {
+#ifdef SWIGPYTHON
+      return PyInt_FromLong(*a);
+#endif // SWIGPYTHON
+      return 0;
+    }
+  } // namespace casadi
+ }
+
+%fragment("casadi_double", "header", fragment="casadi_aux", fragment=SWIG_AsVal_frag(double)) {
+  namespace casadi {
+    bool to_ptr(GUESTOBJECT *p, double** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // Standard typemaps
+      if (SWIG_IsOK(SWIG_AsVal(double)(p, m ? *m : 0))) return true;
+
+      // Scalar DMatrix
+      {
+        DMatrix *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<double>*), 0))
+            && m2->isScalar()) {
+          if (m) **m = m2->getValue();
+          return true;
+        }
+      }
+
+      // Scalar IMatrix
+      {
+        IMatrix *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<int>*), 0))
+            && m2->isScalar()) {
+          if (m) **m = m2->getValue();
+          return true;
+        }
+      }
+
+      // No match
+      return false;
+    }
+
+    GUESTOBJECT * from_ptr(const double *a) {
+#ifdef SWIGPYTHON
+      return PyFloat_FromDouble(*a);
+#endif // SWIGPYTHON
+      return 0;
+    }
+  } // namespace casadi
+ }
+
 
 %fragment("casadi_vector", "header", fragment="casadi_aux") {
   namespace casadi {
@@ -1732,8 +1733,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
 }
 
-%fragment("casadi_imatrix", "header", fragment="casadi_aux") {
-  // Traits specialization for IMatrix
+%fragment("casadi_imatrix", "header", fragment="casadi_aux", fragment=SWIG_AsVal_frag(int)) {
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, IMatrix** m) {
       // Treat Null
@@ -1748,7 +1748,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // First convert to integer
       {
         int tmp;
-        if (SWIG_IsOK(SWIG_AsVal_int(p, m ? &tmp : 0))) {
+        if (SWIG_IsOK(SWIG_AsVal(int)(p, m ? &tmp : 0))) {
           if (m) **m=tmp;
           return true;
         }
