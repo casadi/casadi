@@ -888,15 +888,15 @@ namespace casadi {
     try {
       n_iter_+=1;
       if (gather_stats_) {
-        Dict & iterations = stats_["iterations"];
-        static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(prInf);
-        static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(duInf);
-        static_cast<std::vector<double> &>(iterations["merit"]).push_back(fMrt);
-        static_cast<std::vector<double> &>(iterations["step_size"]).push_back(step);
-        static_cast<std::vector<double> &>(iterations["pen_norm"]).push_back(PenNrm);
-        static_cast<std::vector<double> &>(iterations["cond_H"]).push_back(condHz);
-        static_cast<std::vector<int> &>(
-        iterations["qp_num_iter"]).push_back(nMinor);
+        Dict iterations = stats_["iterations"];
+        append_to_vec(iterations["inf_pr"], static_cast<double>(prInf));
+        append_to_vec(iterations["inf_du"], static_cast<double>(duInf));
+        append_to_vec(iterations["merit"], static_cast<double>(fMrt));
+        append_to_vec(iterations["step_size"], static_cast<double>(step));
+        append_to_vec(iterations["pen_norm"], static_cast<double>(PenNrm));
+        append_to_vec(iterations["cond_H"], static_cast<double>(condHz));
+        append_to_vec(iterations["qp_num_iter"], static_cast<int>(nMinor));
+        stats_["iterations"] = iterations;
       }
       if (!callback_.isNull()) {
         double time0 = clock();

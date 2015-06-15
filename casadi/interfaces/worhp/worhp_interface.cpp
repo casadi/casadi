@@ -527,13 +527,13 @@ namespace casadi {
 
         if (!worhp_w_.FirstIteration) {
           if (gather_stats_) {
-            Dict & iterations = stats_["iterations"];
-            static_cast<std::vector<int> &>(iterations["iter_sqp"]).push_back(worhp_w_.MinorIter);
-            static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(worhp_w_.NormMax_CV);
-            static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(worhp_w_.ScaledKKT);
-            static_cast<std::vector<double> &>(iterations["obj"]).push_back(worhp_o_.F);
-            static_cast<std::vector<double> &>(
-              iterations["alpha_pr"]).push_back(worhp_w_.ArmijoAlpha);
+            Dict iterations = stats_["iterations"];
+            append_to_vec(iterations["iter_sqp"], static_cast<int>(worhp_w_.MinorIter));
+            append_to_vec(iterations["inf_pr"], static_cast<double>(worhp_w_.NormMax_CV));
+            append_to_vec(iterations["inf_du"], static_cast<double>(worhp_w_.ScaledKKT));
+            append_to_vec(iterations["obj"], static_cast<double>(worhp_o_.F));
+            append_to_vec(iterations["alpha_pr"], static_cast<double>(worhp_w_.ArmijoAlpha));
+            stats_["iterations"] = iterations;
           }
 
           if (!callback_.isNull()) {

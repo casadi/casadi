@@ -165,6 +165,13 @@ namespace casadi {
     /// Read options from parameter xml
     virtual void setOptionsFromFile(const std::string & file);
 
+    /// WORKAROUND: Add an element to an std::vector stored in a GenericType:
+    template<typename Type> static void append_to_vec(GenericType& t, Type el) {
+      std::vector<Type> v = t;
+      v.push_back(el);
+      t = v;
+    }
+
   };
 
 } // namespace casadi

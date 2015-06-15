@@ -473,43 +473,15 @@ namespace casadi {
       log("intermediate_callback started");
       if (gather_stats_) {
         Dict iterations = stats_["iterations"];
-
-        std::vector<double> tmp=iterations["inf_pr"];
-        tmp.push_back(inf_pr);
-        iterations["inf_pr"] = tmp;
-
-        tmp=iterations["inf_du"];
-        tmp.push_back(inf_du);
-        iterations["inf_du"] = tmp;
-
-        tmp=iterations["mu"];
-        tmp.push_back(mu);
-        iterations["mu"] = tmp;
-
-        tmp=iterations["d_norm"];
-        tmp.push_back(d_norm);
-        iterations["d_norm"] = tmp;
-
-        tmp=iterations["regularization_size"];
-        tmp.push_back(regularization_size);
-        iterations["regularization_size"] = tmp;
-
-        tmp=iterations["alpha_pr"];
-        tmp.push_back(alpha_pr);
-        iterations["alpha_pr"] = tmp;
-
-        tmp=iterations["alpha_du"];
-        tmp.push_back(alpha_du);
-        iterations["alpha_du"] = tmp;
-
-        std::vector<int> tmp2=iterations["ls_trials"];
-        tmp2.push_back(ls_trials);
-        iterations["ls_trials"] = tmp2;
-
-        tmp=iterations["obj"];
-        tmp.push_back(obj_value);
-        iterations["obj"] = tmp;
-
+        append_to_vec(iterations["inf_pr"], inf_pr);
+        append_to_vec(iterations["inf_du"], inf_du);
+        append_to_vec(iterations["mu"], mu);
+        append_to_vec(iterations["d_norm"], d_norm);
+        append_to_vec(iterations["regularization_size"], regularization_size);
+        append_to_vec(iterations["alpha_pr"], alpha_pr);
+        append_to_vec(iterations["alpha_du"], alpha_du);
+        append_to_vec(iterations["ls_trials"], ls_trials);
+        append_to_vec(iterations["obj"], obj_value);
         stats_["iterations"] = iterations;
       }
       double time1 = clock();
