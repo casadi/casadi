@@ -1706,6 +1706,10 @@ Solving the Discrete Lyapunov Equations with a regular LinearSolver
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: cle_solver.hpp ";
 
@@ -3158,6 +3162,11 @@ Joris Gillis
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: control_simulator.hpp ";
 
@@ -5026,6 +5035,11 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: custom_function.hpp ";
 
@@ -8043,6 +8057,10 @@ Solving the Discrete Lyapunov Equations with a regular LinearSolver
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: dle_solver.hpp ";
 
@@ -9824,6 +9842,10 @@ Solving the Discrete Periodic Lyapunov Equations with a regular LinearSolver
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: dple_solver.hpp ";
 
@@ -11973,6 +11995,11 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: external_function.hpp ";
 
 %feature("docstring")  casadi::Function::fullJacobian() "
@@ -13864,6 +13891,11 @@ Joel Andersson
 +---------+--------------------------+
 | outputs | casadi::FunctionInternal |
 +---------+--------------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: function.hpp ";
 
@@ -17309,6 +17341,10 @@ simple
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: homotopy_nlp_solver.hpp ";
 
@@ -18527,6 +18563,10 @@ Implements simple newton iterations to solve an implicit function.
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: implicit_function.hpp ";
 
@@ -21315,6 +21355,10 @@ The method is still under development
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: integrator.hpp ";
 
@@ -23851,6 +23895,10 @@ reordering without partial pivoting
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: linear_solver.hpp ";
 
@@ -25701,6 +25749,10 @@ Solve LPs using a QpSolver
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: lp_solver.hpp ";
 
@@ -28211,6 +28263,10 @@ discrete Lyapunov solver
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: lr_dle_solver.hpp ";
 
@@ -30089,6 +30145,10 @@ Lyapunov Equations Solver
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: lr_dple_solver.hpp ";
 
@@ -34955,6 +35015,11 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: mx_function.hpp ";
 
@@ -41216,6 +41281,10 @@ Stabilized Sequential Quadratic Programming method.
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: nlp_solver.hpp ";
 
@@ -43188,6 +43257,11 @@ basis Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: nullspace.hpp ";
 
 %feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
@@ -43648,6 +43722,11 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: options_functionality.hpp ";
 
@@ -44892,6 +44971,11 @@ Joel Andersson
 | task_starttime  | casadi::ParallelizerInternal |
 +-----------------+------------------------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: parallelizer.hpp ";
 
 %feature("docstring")  casadi::Function::derReverse(int nadj) "
@@ -45824,6 +45908,10 @@ epigraph reformulation and e==0 for all other quadratic constraints.
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: qcqp_solver.hpp ";
 
@@ -48810,6 +48898,10 @@ Solve QP using a QcqpSolver
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: qp_solver.hpp ";
 
@@ -52486,6 +52578,10 @@ manually switch to another SDP Solver
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: sdp_solver.hpp ";
 
@@ -54069,6 +54165,10 @@ singular value decomposition to implement that.
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: sdqp_solver.hpp ";
 
@@ -56210,6 +56310,11 @@ Joel Andersson
 +---------+---------------------------+
 | step    | casadi::SimulatorInternal |
 +---------+---------------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: simulator.hpp ";
 
@@ -58749,6 +58854,10 @@ Solve SOCPs using an SdpSolver
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: socp_solver.hpp ";
 
@@ -61802,6 +61911,10 @@ Solved a stabilized QP using a standard QP solver
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: stabilized_qp_solver.hpp ";
 
@@ -64880,6 +64993,11 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: sx_function.hpp ";
 
 %feature("docstring")  casadi::Function::setJacobian(const Function &jac,
@@ -65844,6 +65962,10 @@ C++ includes: wrapper.hpp ";
 XML parser Can be used for parsing XML files into CasADi data structures.
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: xml_file.hpp ";
 
