@@ -146,13 +146,9 @@ namespace casadi {
     return (*this)->outputv_;
   }
 
-  const std::vector<MXAlgEl>& MXFunction::algorithm() const {
-    return (*this)->algorithm_;
-  }
-
   int MXFunction::countNodes() const {
     assertInit();
-    return algorithm().size();
+    return (*this)->algorithm_.size();
   }
 
   MX MXFunction::jac(int iind, int oind, bool compact, bool symmetric) {
@@ -173,10 +169,6 @@ namespace casadi {
 
   std::vector<MX> MXFunction::getFree() const {
     return (*this)->free_vars_;
-  }
-
-  int MXFunction::getWorkSize() const {
-    return (*this)->workloc_.size()-1;
   }
 
   void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn) {

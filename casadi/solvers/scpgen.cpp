@@ -331,7 +331,7 @@ namespace casadi {
     MXFunction res_fcn(res_fcn_in, res_fcn_out);
     res_fcn.init();
     if (verbose_) {
-      cout << "Generated residual function ( " << res_fcn.getAlgorithmSize() << " nodes)." << endl;
+      cout << "Generated residual function ( " << res_fcn.countNodes() << " nodes)." << endl;
     }
 
     // Declare difference vector d and substitute out p and v
@@ -489,7 +489,7 @@ namespace casadi {
     vec_fcn.setOption("name", "vec_fcn");
     vec_fcn.init();
     if (verbose_) {
-      cout << "Generated linearization function ( " << vec_fcn.getAlgorithmSize()
+      cout << "Generated linearization function ( " << vec_fcn.countNodes()
            << " nodes)." << endl;
     }
 
@@ -541,7 +541,7 @@ namespace casadi {
     exp_fcn.setOption("name", "exp_fcn");
     exp_fcn.init();
     if (verbose_) {
-      cout << "Generated step expansion function ( " << exp_fcn.getAlgorithmSize() << " nodes)."
+      cout << "Generated step expansion function ( " << exp_fcn.countNodes() << " nodes)."
            << endl;
     }
 

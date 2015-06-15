@@ -39,6 +39,23 @@
 
 namespace casadi {
 
+#ifndef SWIG
+  /** \brief  An element of the algorithm, namely an MX node */
+  struct MXAlgEl {
+    /// Operator index
+    int op;
+
+    /// Data associated with the operation
+    MX data;
+
+    /// Work vector indices of the arguments
+    std::vector<int> arg;
+
+    /// Work vector indices of the results
+    std::vector<int> res;
+  };
+#endif // SWIG
+
   /** \brief  Internal node class for MXFunction
       \author Joel Andersson
       \date 2010-2015

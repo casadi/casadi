@@ -1496,7 +1496,7 @@ namespace casadi {
 
     // Get references to the internal data structures
     std::vector<MXAlgEl>& algorithm = f->algorithm_;
-    vector<MX> work(f.getWorkSize());
+    vector<MX> work(f->workloc_.size()-1);
     vector<MX> oarg, ores;
 
     for (vector<MXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it) {
@@ -1579,8 +1579,8 @@ namespace casadi {
     f.init();
 
     // Get references to the internal data structures
-    const vector<MXAlgEl>& algorithm = f.algorithm();
-    vector<MX> swork(f.getWorkSize());
+    const vector<MXAlgEl>& algorithm = f->algorithm_;
+    vector<MX> swork(f->workloc_.size()-1);
 
     // A boolean vector indicated whoch nodes are tainted by substitutions
     vector<bool> tainted(swork.size());
@@ -1682,8 +1682,8 @@ namespace casadi {
     f.init();
 
     // Get references to the internal data structures
-    const vector<MXAlgEl>& algorithm = f.algorithm();
-    vector<MX> work(f.getWorkSize());
+    const vector<MXAlgEl>& algorithm = f->algorithm_;
+    vector<MX> work(f->workloc_.size()-1);
 
     // Count how many times an expression has been used
     vector<int> usecount(work.size(), 0);

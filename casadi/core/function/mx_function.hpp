@@ -31,34 +31,6 @@
 #include "../mx/mx.hpp"
 #include "sx_function.hpp"
 
-/// \cond INTERNAL
-
-namespace casadi {
-
-  /** \brief  An element of the algorithm, namely an MX node */
-  struct MXAlgEl {
-    /// Operator index
-    int op;
-
-    /// Data associated with the operation
-    MX data;
-
-    /// Work vector indices of the arguments
-    std::vector<int> arg;
-
-    /// Work vector indices of the results
-    std::vector<int> res;
-  };
-
-} // namespace casadi
-
-#ifdef SWIG
-// Template instantiation
-%template(MXAlgElVector) std::vector<casadi::MXAlgEl>;
-#endif // SWIG
-
-/// \endcond
-
 namespace casadi {
 
   /** \brief  Forward declaration of internal class */
@@ -158,9 +130,6 @@ namespace casadi {
 
     /// \cond INTERNAL
 #ifndef SWIG
-    /** \brief Access the algorithm directly */
-    const std::vector<MXAlgEl>& algorithm() const;
-
     /** \brief Called from constructor */
     void construct(const std::string& name, const std::vector<MX>& arg,
                    const std::vector<MX>& res, const Dict& opts,
@@ -168,12 +137,6 @@ namespace casadi {
                    const std::vector<std::string>& oscheme=std::vector<std::string>());
 #endif // SWIG
     /// \endcond
-
-    /** \brief Get the number of atomic operations */
-    int getAlgorithmSize() const { return algorithm().size();}
-
-    /** \brief Get the length of the work vector */
-    int getWorkSize() const;
 
     /** \brief Number of nodes in the algorithm */
     int countNodes() const;
