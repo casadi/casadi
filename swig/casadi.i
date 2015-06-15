@@ -1922,6 +1922,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 
 // Order in typemap matching: Lower value means will be checked first
+%define PREC_DERIVATIVEGENERATOR 21 %enddef
+%define PREC_CUSTOMEVALUATE 21 %enddef
+%define PREC_CALLBACK 21 %enddef
+%define PREC_GENERICTYPE 22 %enddef
+%define PREC_DICT 21 %enddef
 %define PREC_IVector 92 %enddef
 %define PREC_IVectorVector 92 %enddef
 %define PREC_PAIR_SLICE_SLICE 93 %enddef
@@ -1941,11 +1946,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %define PREC_MXVector 105 %enddef
 %define PREC_MXVectorVector 106 %enddef
 %define PREC_CREATOR 150 %enddef
-%define PREC_DERIVATIVEGENERATOR 21 %enddef
-%define PREC_CUSTOMEVALUATE 21 %enddef
-%define PREC_CALLBACK 21 %enddef
-%define PREC_GENERICTYPE 22 %enddef
-%define PREC_DICT 21 %enddef
+%define PREC_FUNCTION 200 %enddef
 
 %template() std::vector< casadi::Sparsity > ;
 %template() std::vector< std::vector< casadi::Sparsity> > ;
@@ -1985,6 +1986,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %template() std::pair<casadi::Function,casadi::Function>;
 %template() std::pair<casadi::MX, std::vector<casadi::MX> >;
 %template() std::vector<casadi::Integrator>;
+%casadi_input_typemaps("Function", PREC_FUNCTION, casadi::Function)
 
 %define %my_value_output_typemaps(Type,...)
 %value_output_typemap(%arg(swig::from), %arg(SWIG_Traits_frag(Type)), %arg(Type));
