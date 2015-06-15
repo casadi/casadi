@@ -1965,41 +1965,38 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %template() std::vector< std::pair<int,int> >;
 #endif // SWIGMATLAB
 
+%casadi_input_typemaps("str", PREC_STRING, std::string)
+%casadi_template("[str]", PREC_STRING, std::vector<std::string>)
+%casadi_input_typemaps("Sparsity", PREC_SPARSITY, casadi::Sparsity)
 %casadi_template("[Sparsity]", PREC_SPARSITY, std::vector< casadi::Sparsity>)
 %casadi_template("[[Sparsity]]", PREC_SPARSITY, std::vector<std::vector< casadi::Sparsity> >)
+%casadi_template("str:Sparsity", PREC_SPARSITY, std::map<std::string, casadi::Sparsity >)
+%casadi_template("str:[Sparsity]", PREC_SPARSITY, std::map<std::string, std::vector<casadi::Sparsity > >)
+%casadi_template("(str:Sparsity,[str])", PREC_SPARSITY, std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >)
 %casadi_input_typemaps("int", SWIG_TYPECHECK_INTEGER, int)
 %casadi_template("[int]", PREC_IVector, std::vector<int>)
-%casadi_template("[[int]]", PREC_IVector, std::vector<std::vector<int> >)
+%casadi_template("[[int]]", PREC_IVectorVector, std::vector<std::vector<int> >)
 %casadi_input_typemaps("double", SWIG_TYPECHECK_DOUBLE, double)
 %casadi_template("[double]", SWIG_TYPECHECK_DOUBLE, std::vector<double>)
 %casadi_template("[[double]]", SWIG_TYPECHECK_DOUBLE, std::vector<std::vector<double> >)
-%casadi_template("[str]", PREC_STRING, std::vector<std::string>)
-%casadi_input_typemaps("DerivativeGenerator", PREC_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
-%casadi_input_typemaps("CustomEvaluate", PREC_CUSTOMEVALUATE, casadi::CustomEvaluate)
-%casadi_input_typemaps("Callback", PREC_CALLBACK, casadi::Callback)
-%casadi_input_typemaps("Dict", PREC_DICT, casadi::GenericType::Dict)
 %casadi_input_typemaps("SX", PREC_SX, casadi::Matrix<casadi::SXElement>)
 %casadi_template("[SX]", PREC_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
 %casadi_template("[[SX]]", PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
-%casadi_input_typemaps("MX", PREC_MX, casadi::MX)
-%casadi_template("str:Sparsity", PREC_SPARSITY, std::map<std::string, casadi::Sparsity >)
-%casadi_template("str:[Sparsity]", PREC_SPARSITY, std::map<std::string, std::vector<casadi::Sparsity > >)
-%casadi_template("str:MX", PREC_MX, std::map<std::string, casadi::MX>)
-%casadi_template("str:DMatrix", PREC_DMatrix, std::map<std::string, casadi::Matrix<double> >)
 %casadi_template("str:SX", PREC_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
-%casadi_template("(str:Sparsity,[str])", PREC_SPARSITY, std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >)
-%casadi_template("(str:MX,[str])", PREC_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
-%casadi_template("(str:DMatrix,[str])", PREC_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
 %casadi_template("(str:SX,[str])", PREC_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
-%casadi_input_typemaps("DMatrix", PREC_DMatrix, casadi::Matrix<double>)
+%casadi_input_typemaps("MX", PREC_MX, casadi::MX)
 %casadi_template("[MX]", PREC_MXVector, std::vector<casadi::MX>)
 %casadi_template("[[MX]]", PREC_MXVectorVector, std::vector<std::vector<casadi::MX> >)
+%casadi_template("str:MX", PREC_MX, std::map<std::string, casadi::MX>)
+%casadi_template("(str:MX,[str])", PREC_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
+%casadi_input_typemaps("DMatrix", PREC_DMatrix, casadi::Matrix<double>)
 %casadi_template("[DMatrix]", PREC_DMatrixVector, std::vector< casadi::Matrix<double> >)
 %casadi_template("[[DMatrix]]", PREC_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
+%casadi_template("str:DMatrix", PREC_DMatrix, std::map<std::string, casadi::Matrix<double> >)
+%casadi_template("(str:DMatrix,[str])", PREC_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
 %casadi_input_typemaps("IMatrix", PREC_IMatrix, casadi::Matrix<int>)
 %casadi_template("[IMatrix]", PREC_IMatrixVector, std::vector< casadi::Matrix<int> >)
 %casadi_template("[[IMatrix]]", PREC_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
-%casadi_input_typemaps("[[int]]", PREC_IVectorVector, std::vector<std::vector<int> >)
 %casadi_input_typemaps("GenericType", PREC_GENERICTYPE, casadi::GenericType)
 %casadi_input_typemaps("[GenericType]", PREC_GENERICTYPE, std::vector<casadi::GenericType>)
 %casadi_input_typemaps("Slice", PREC_SLICE, casadi::Slice)
@@ -2007,7 +2004,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %template() std::pair<casadi::MX, std::vector<casadi::MX> >;
 %casadi_input_typemaps("Function", PREC_FUNCTION, casadi::Function)
 %casadi_template("[Function]", PREC_FUNCTION, std::vector<casadi::Function>)
-%casadi_input_typemaps("str", PREC_STRING, std::string)
+%casadi_input_typemaps("DerivativeGenerator", PREC_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
+%casadi_input_typemaps("CustomEvaluate", PREC_CUSTOMEVALUATE, casadi::CustomEvaluate)
+%casadi_input_typemaps("Callback", PREC_CALLBACK, casadi::Callback)
+%casadi_template("Dict", PREC_DICT, std::map<std::string,casadi::GenericType>)
 
 %define %my_value_output_typemaps(Type,...)
 %value_output_typemap(%arg(swig::from), %arg(SWIG_Traits_frag(Type)), %arg(Type));
@@ -2045,8 +2045,6 @@ using namespace casadi;
 %fragment(SWIG_Traits_frag(casadi::Callback));
 %traits_swigtype(casadi::CustomEvaluate);
 %fragment(SWIG_Traits_frag(casadi::CustomEvaluate));
-
-%template() std::map<std::string,casadi::GenericType>;
 
 %traits_swigtype(casadi::Function);
 %fragment(SWIG_Traits_frag(casadi::Function));
