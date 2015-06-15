@@ -228,21 +228,6 @@ namespace std {
 %include "typemaps.i"
 #endif // SWIGXML
 
-%template() std::vector<std::string>;
-%template() std::vector<bool> ;
-%template() std::vector<std::vector<bool> > ;
-%template() std::vector<unsigned char>;
-%template() std::vector<int>;
-%template() std::vector<std::vector<int> > ;
-%template() std::vector<double>;
-%template() std::vector<std::vector<double> > ;
-%template() std::pair<std::vector<int>, std::vector<int> >;
-
-#ifndef SWIGMATLAB
-%template() std::pair<int,int>;
-%template() std::vector< std::pair<int,int> >;
-#endif // SWIGMATLAB
-
 %define DEPRECATED_MSG(MSG)
 if (deprecated("$decl",MSG)) SWIG_fail;
 %enddef
@@ -1946,7 +1931,23 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %define PREC_MXVector 105 %enddef
 %define PREC_MXVectorVector 106 %enddef
 %define PREC_CREATOR 150 %enddef
+%define PREC_STRING 180 %enddef
 %define PREC_FUNCTION 200 %enddef
+
+%template() std::vector<std::string>;
+%template() std::vector<bool> ;
+%template() std::vector<std::vector<bool> > ;
+%template() std::vector<unsigned char>;
+%template() std::vector<int>;
+%template() std::vector<std::vector<int> > ;
+%template() std::vector<double>;
+%template() std::vector<std::vector<double> > ;
+%template() std::pair<std::vector<int>, std::vector<int> >;
+
+#ifndef SWIGMATLAB
+%template() std::pair<int,int>;
+%template() std::vector< std::pair<int,int> >;
+#endif // SWIGMATLAB
 
 %template() std::vector< casadi::Sparsity > ;
 %template() std::vector< std::vector< casadi::Sparsity> > ;
@@ -1987,6 +1988,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %template() std::pair<casadi::MX, std::vector<casadi::MX> >;
 %template() std::vector<casadi::Integrator>;
 %casadi_input_typemaps("Function", PREC_FUNCTION, casadi::Function)
+%casadi_template("[Function]", PREC_FUNCTION, std::vector<casadi::Function>)
+%casadi_input_typemaps("str", PREC_STRING, std::string)
 
 %define %my_value_output_typemaps(Type,...)
 %value_output_typemap(%arg(swig::from), %arg(SWIG_Traits_frag(Type)), %arg(Type));

@@ -329,9 +329,7 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except TypeError as e:
       print e.message
-      assert "type 'str' expected" in e.message
-      assert "NlpSolver.loadPlugin" in e.message
-      assert "You have: NlpSolver.loadPlugin(int)" in e.message
+      assert "Failed to convert input to str" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
 

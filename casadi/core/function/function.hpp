@@ -667,10 +667,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#ifdef SWIG
-// Template instantiations
-%template(FunctionVector)             std::vector<casadi::Function>;
-#endif // SWIG
-
-
 #endif // CASADI_FUNCTION_HPP
