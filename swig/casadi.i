@@ -129,6 +129,30 @@ def _swig_repr(self):
 %}
 #endif // WITH_SWIGPYTHON
 
+#ifdef SWIGMATLAB
+%matlabsetup %{
+
+% On Linux, matlab loading casadiMATLAB_wrap does not obey
+% LD_LIBRARY_PATH as set from within matlab (suing setenv),
+% only if it is set by the sehll calling matlab.
+%
+% This limitation makes it hard to have an everything-in-one-folder  + addpath approach to
+% Matlab binaries. To still have this approach, we can explicitly load the library upfront
+
+disect_path = strsplit(mfilename('fullpath'),filesep);
+libpath = strjoin(disect_path(1:end-1),filesep);
+
+try
+  loadlibrary([libpath,filesep,'libcasadi']);
+catch
+  % If this fails, we are probably on Windows where this trick is not needed
+end
+
+setenv('CASADIPATH',[ getenv('CASADIPATH') pathsep libpath]);
+
+%}
+#endif
+
 #ifdef SWIGPYTHON
 %include "doc_merged.i"
 #else

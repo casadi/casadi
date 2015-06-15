@@ -18,4 +18,5 @@ set_target_properties(casadiMATLAB_wrap PROPERTIES PREFIX "" SUFFIX .${MATLAB_ME
 # Install the generated front-end to ${CMAKE_INSTALL_PREFIX}/matlab_tb
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/+casadi DESTINATION ${CMAKE_INSTALL_PREFIX}/matlab_tb)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigRef.m DESTINATION ${CMAKE_INSTALL_PREFIX}/matlab_tb)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/casadisetup.m DESTINATION ${CMAKE_INSTALL_PREFIX}/matlab_tb)
 install(TARGETS casadiMATLAB_wrap DESTINATION ${CMAKE_INSTALL_PREFIX}/matlab_tb)
