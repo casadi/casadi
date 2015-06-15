@@ -1986,7 +1986,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_input_typemaps("Slice", PREC_SLICE, casadi::Slice)
 %template() std::pair<casadi::Function,casadi::Function>;
 %template() std::pair<casadi::MX, std::vector<casadi::MX> >;
-%template() std::vector<casadi::Integrator>;
 %casadi_input_typemaps("Function", PREC_FUNCTION, casadi::Function)
 %casadi_template("[Function]", PREC_FUNCTION, std::vector<casadi::Function>)
 %casadi_input_typemaps("str", PREC_STRING, std::string)

@@ -100,11 +100,4 @@ namespace casadi {
 
 } // namespace casadi
 
-
-#ifdef SWIG
-%template(Pair_Slice_Int) std::pair<casadi::Slice, int>;
-%template(Pair_Int_Slice) std::pair<int, casadi::Slice>;
-%template(Pair_Slice_Slice) std::pair<casadi::Slice, casadi::Slice>;
-#endif // SWIG
-
 #endif // CASADI_SLICE_HPP
