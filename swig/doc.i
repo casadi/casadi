@@ -39786,134 +39786,818 @@ WORHP interface
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
-| print_time      | OT_BOOLEAN      | true            | Print           |
+| AcceptTolFeas   | OT_REAL         | 0.001           | Tolerance for   |
+|                 |                 |                 | acceptable      |
+|                 |                 |                 | feasibility     |
++-----------------+-----------------+-----------------+-----------------+
+| AcceptTolOpti   | OT_REAL         | 0.001           | Tolerance for   |
+|                 |                 |                 | acceptable      |
+|                 |                 |                 | optimality      |
++-----------------+-----------------+-----------------+-----------------+
+| AlphaMinConst   | OT_BOOLEAN      | False           | Use a constant  |
+|                 |                 |                 | lower bound on  |
+|                 |                 |                 | Armijo stepsize |
+|                 |                 |                 | in Filter       |
++-----------------+-----------------+-----------------+-----------------+
+| Ares            | OT_INTEGERVECTO | [42, 41, 42,    | Armijo recovery |
+|                 | R               | 43, 44, 41, 50] | strategies.     |
+|                 |                 |                 | Vector of size  |
+|                 |                 |                 | 7               |
++-----------------+-----------------+-----------------+-----------------+
+| ArmijoBeta      | OT_REAL         | 0.712           | Trial stepsize  |
+|                 |                 |                 | decrease factor |
+|                 |                 |                 | for Armijo rule |
++-----------------+-----------------+-----------------+-----------------+
+| ArmijoMaxAlpha  | OT_REAL         | 1               | Initial alpha   |
+|                 |                 |                 | for Armijo rule |
++-----------------+-----------------+-----------------+-----------------+
+| ArmijoMinAlpha  | OT_REAL         | 0.000           | Lower bound on  |
+|                 |                 |                 | alpha for       |
+|                 |                 |                 | Armijo rule     |
++-----------------+-----------------+-----------------+-----------------+
+| ArmijoMinAlphaR | OT_REAL         | 0.000           | Lower bound on  |
+| ec              |                 |                 | alpha for       |
+|                 |                 |                 | Armijo rule     |
+|                 |                 |                 | during recovery |
++-----------------+-----------------+-----------------+-----------------+
+| ArmijoSigma     | OT_REAL         | 0.005           | Scale factor    |
+|                 |                 |                 | for linearised  |
+|                 |                 |                 | descent check   |
+|                 |                 |                 | in Armijo rule  |
++-----------------+-----------------+-----------------+-----------------+
+| AutoQPRecovery  | OT_BOOLEAN      | True            | Enable          |
+|                 |                 |                 | automatic QP    |
+|                 |                 |                 | recovery        |
++-----------------+-----------------+-----------------+-----------------+
+| BFGSmaxblockSiz | OT_INTEGER      | 300             | Block size      |
+| e               |                 |                 | parameter used  |
+|                 |                 |                 | by certain BFGS |
+|                 |                 |                 | methods         |
++-----------------+-----------------+-----------------+-----------------+
+| BFGSmethod      | OT_INTEGER      | 0               | Choose BFGS     |
+|                 |                 |                 | method (0:      |
+|                 |                 |                 | dense, 1-3:     |
+|                 |                 |                 | block, 100+:    |
+|                 |                 |                 | sparse)         |
++-----------------+-----------------+-----------------+-----------------+
+| BFGSminblockSiz | OT_INTEGER      | 300             | Block size      |
+| e               |                 |                 | parameter used  |
+|                 |                 |                 | by certain BFGS |
+|                 |                 |                 | methods         |
++-----------------+-----------------+-----------------+-----------------+
+| BFGSrestart     | OT_INTEGER      | 50              | Restart BFGS    |
+|                 |                 |                 | update after    |
+|                 |                 |                 | this many       |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| BettsFactor     | OT_REAL         | 2.100           | Update factor   |
+|                 |                 |                 | for Betts'      |
+|                 |                 |                 | Hessian         |
+|                 |                 |                 | regularisation  |
++-----------------+-----------------+-----------------+-----------------+
+| BettsPoint      | OT_REAL         | 1               | Smallest        |
+|                 |                 |                 | eigenvalue of   |
+|                 |                 |                 | the regularised |
+|                 |                 |                 | Hessian         |
++-----------------+-----------------+-----------------+-----------------+
+| BoundTolFac     | OT_REAL         | 1000            | Factor in       |
+|                 |                 |                 | determining     |
+|                 |                 |                 | active          |
+|                 |                 |                 | constraints by  |
+|                 |                 |                 | KKT             |
++-----------------+-----------------+-----------------+-----------------+
+| CheckFJ         | OT_REAL         | 1.000e+12       | Upper bound     |
+|                 |                 |                 | used by Fritz-  |
+|                 |                 |                 | John heuristic  |
++-----------------+-----------------+-----------------+-----------------+
+| CheckStructureD | OT_BOOLEAN      | True            | Enable          |
+| F               |                 |                 | structural      |
+|                 |                 |                 | checking of DF  |
++-----------------+-----------------+-----------------+-----------------+
+| CheckStructureD | OT_BOOLEAN      | True            | Enable          |
+| G               |                 |                 | structural      |
+|                 |                 |                 | checking of DG  |
++-----------------+-----------------+-----------------+-----------------+
+| CheckStructureH | OT_BOOLEAN      | True            | Enable          |
+| M               |                 |                 | structural      |
+|                 |                 |                 | checking of HM  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepBettsSum | OT_REAL         | 0.500           | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepConStop  | OT_REAL         | 0.000           | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepConvio   | OT_REAL         | 1               | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepMaxIter  | OT_INTEGER      | 50              | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepMethod   | OT_INTEGER      | 0               | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepMode     | OT_INTEGER      | 1               | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepPFactor  | OT_REAL         | 1               | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepPMax     | OT_REAL         | 1000000         | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepRecovery | OT_BOOLEAN      | False           | (experimental)  |
+| DX              |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| CurvBCond       | OT_REAL         | 0.020           | Block BFGS      |
+|                 |                 |                 | curvature       |
+|                 |                 |                 | condition bound |
++-----------------+-----------------+-----------------+-----------------+
+| CurvBFac        | OT_REAL         | 0.300           | Block BFGS      |
+|                 |                 |                 | curvature       |
+|                 |                 |                 | condition       |
+|                 |                 |                 | regularisation  |
+|                 |                 |                 | factor          |
++-----------------+-----------------+-----------------+-----------------+
+| CurvCond        | OT_REAL         | 0.020           | BFGS Curvature  |
+|                 |                 |                 | condition bound |
++-----------------+-----------------+-----------------+-----------------+
+| CurvFac         | OT_REAL         | 0.300           | BFGS curvature  |
+|                 |                 |                 | condition       |
+|                 |                 |                 | regularisation  |
+|                 |                 |                 | factor          |
++-----------------+-----------------+-----------------+-----------------+
+| DebugMarker05   | OT_INTEGER      | 42              | Debug marker.   |
+|                 |                 |                 | Used to find    |
+|                 |                 |                 | memory alignmen |
+|                 |                 |                 | t/padding       |
+|                 |                 |                 | issues          |
++-----------------+-----------------+-----------------+-----------------+
+| DebugMarker06   | OT_INTEGER      | 42              | Debug marker.   |
+|                 |                 |                 | Used to find    |
+|                 |                 |                 | memory alignmen |
+|                 |                 |                 | t/padding       |
+|                 |                 |                 | issues          |
++-----------------+-----------------+-----------------+-----------------+
+| FGtogether      | OT_BOOLEAN      | False           | F and G cannot  |
+|                 |                 |                 | be evaluated    |
+|                 |                 |                 | separately      |
++-----------------+-----------------+-----------------+-----------------+
+| FJandND         | OT_BOOLEAN      | False           | Enable Fritz-   |
+|                 |                 |                 | John and non-   |
+|                 |                 |                 | differentiable  |
+|                 |                 |                 | check           |
+|                 |                 |                 | heuristics      |
++-----------------+-----------------+-----------------+-----------------+
+| FeasibleDual    | OT_BOOLEAN      | False           | Activate dual   |
+|                 |                 |                 | feasibility     |
+|                 |                 |                 | mode            |
++-----------------+-----------------+-----------------+-----------------+
+| FeasibleInit    | OT_BOOLEAN      | False           | Activate        |
+|                 |                 |                 | initial         |
+|                 |                 |                 | feasibility     |
+|                 |                 |                 | mode            |
++-----------------+-----------------+-----------------+-----------------+
+| FeasibleInitTol | OT_REAL         | 0.001           | Feasibility     |
+|                 |                 |                 | tolerance for   |
+|                 |                 |                 | no-objective    |
+|                 |                 |                 | feasible mode   |
++-----------------+-----------------+-----------------+-----------------+
+| FeasibleOnly    | OT_BOOLEAN      | False           | Activate        |
+|                 |                 |                 | feasible-only   |
+|                 |                 |                 | mode            |
++-----------------+-----------------+-----------------+-----------------+
+| FidifEps        | OT_REAL         | 0.000           | Finite          |
+|                 |                 |                 | difference      |
+|                 |                 |                 | perturbation    |
++-----------------+-----------------+-----------------+-----------------+
+| FidifHM         | OT_BOOLEAN      | False           | Approximate     |
+|                 |                 |                 | Hessian by      |
+|                 |                 |                 | finite          |
+|                 |                 |                 | differences     |
+|                 |                 |                 | (otherwise      |
+|                 |                 |                 | BFGS)           |
++-----------------+-----------------+-----------------+-----------------+
+| FilterBisecAlph | OT_BOOLEAN      | True            | Filter          |
+| a               |                 |                 | heuristic to    |
+|                 |                 |                 | save Armijo     |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| FilterGammaCV   | OT_REAL         | 0.000           | Constraint      |
+|                 |                 |                 | violation       |
+|                 |                 |                 | decrease factor |
+|                 |                 |                 | in Filter       |
+|                 |                 |                 | acceptance      |
+|                 |                 |                 | check           |
++-----------------+-----------------+-----------------+-----------------+
+| FilterGammaF    | OT_REAL         | 0.000           | Objective       |
+|                 |                 |                 | decrease factor |
+|                 |                 |                 | in Filter       |
+|                 |                 |                 | acceptance      |
+|                 |                 |                 | check           |
++-----------------+-----------------+-----------------+-----------------+
+| FilterIntersecA | OT_BOOLEAN      | True            | Filter          |
+| lpha            |                 |                 | heuristic to    |
+|                 |                 |                 | save Armijo     |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| FirstDifCentral | OT_BOOLEAN      | True            | Use central     |
+|                 |                 |                 | finite          |
+|                 |                 |                 | difference      |
+|                 |                 |                 | quotient for    |
+|                 |                 |                 | first           |
+|                 |                 |                 | derivatives     |
++-----------------+-----------------+-----------------+-----------------+
+| FocusOnFeas     | OT_BOOLEAN      | True            | Enable Focus-   |
+|                 |                 |                 | on-Feasibility  |
+|                 |                 |                 | mode            |
++-----------------+-----------------+-----------------+-----------------+
+| FocusOnFeasFact | OT_REAL         | 1.360           | Factor in       |
+| or              |                 |                 | Focus-on-       |
+|                 |                 |                 | Feasibility     |
+|                 |                 |                 | mode            |
++-----------------+-----------------+-----------------+-----------------+
+| GammaAlpha      | OT_REAL         | 0.050           | Safety factor   |
+|                 |                 |                 | for alphamin    |
+|                 |                 |                 | calculation by  |
+|                 |                 |                 | Filter          |
++-----------------+-----------------+-----------------+-----------------+
+| GroupMethod     | OT_INTEGER      | 1               | Select method   |
+|                 |                 |                 | to determine    |
+|                 |                 |                 | graph colouring |
+|                 |                 |                 | groups          |
++-----------------+-----------------+-----------------+-----------------+
+| IgnoreFilterCri | OT_BOOLEAN      | False           | Activate        |
+| t               |                 |                 | accelerating    |
+|                 |                 |                 | heuristics for  |
+|                 |                 |                 | Filter          |
++-----------------+-----------------+-----------------+-----------------+
+| IncBettsTau     | OT_REAL         | 2               | Increase factor |
+|                 |                 |                 | for Betts'      |
+|                 |                 |                 | update          |
+|                 |                 |                 | dampening term  |
++-----------------+-----------------+-----------------+-----------------+
+| IncBettsTauMore | OT_REAL         | 100             | Larger increase |
+|                 |                 |                 | factor for      |
+|                 |                 |                 | Betts' update   |
+|                 |                 |                 | dampening term  |
++-----------------+-----------------+-----------------+-----------------+
+| IncreaseIWS     | OT_REAL         | 1               | Increase factor |
+|                 |                 |                 | for estimated   |
+|                 |                 |                 | integer         |
+|                 |                 |                 | workspace       |
+|                 |                 |                 | requirement     |
++-----------------+-----------------+-----------------+-----------------+
+| IncreaseRWS     | OT_REAL         | 1               | Increase factor |
+|                 |                 |                 | for estimated   |
+|                 |                 |                 | real workspace  |
+|                 |                 |                 | requirement     |
++-----------------+-----------------+-----------------+-----------------+
+| Infty           | OT_REAL         | 1.000e+20       | Upper bound for |
+|                 |                 |                 | numbers to be   |
+|                 |                 |                 | regarded as     |
+|                 |                 |                 | finite          |
++-----------------+-----------------+-----------------+-----------------+
+| InftyUnbounded  | OT_REAL         | 1.000e+20       | Tolerance for   |
+|                 |                 |                 | unboundedness   |
+|                 |                 |                 | detection       |
+|                 |                 |                 | heuristic       |
++-----------------+-----------------+-----------------+-----------------+
+| InitialLMest    | OT_BOOLEAN      | True            | Enable initial  |
+|                 |                 |                 | Lagrange        |
+|                 |                 |                 | multiplier      |
+|                 |                 |                 | estimate        |
++-----------------+-----------------+-----------------+-----------------+
+| KeepAcceptableS | OT_BOOLEAN      | True            | Save acceptable |
+| ol              |                 |                 | solutions as    |
+|                 |                 |                 | fallback        |
++-----------------+-----------------+-----------------+-----------------+
+| LMestQPipComTol | OT_REAL         | 0.003           | IP              |
+|                 |                 |                 | complementarity |
+|                 |                 |                 | tolerance in    |
+|                 |                 |                 | initial         |
+|                 |                 |                 | multiplier      |
+|                 |                 |                 | estimate        |
++-----------------+-----------------+-----------------+-----------------+
+| LMestQPipResTol | OT_REAL         | 1               | IP residual     |
+|                 |                 |                 | tolerance in    |
+|                 |                 |                 | initial         |
+|                 |                 |                 | multiplier      |
+|                 |                 |                 | estimate        |
++-----------------+-----------------+-----------------+-----------------+
+| LinMult         | OT_BOOLEAN      | False           | Control         |
+|                 |                 |                 | Lagrange        |
+|                 |                 |                 | multiplier      |
+|                 |                 |                 | update          |
++-----------------+-----------------+-----------------+-----------------+
+| LogLevel        | OT_INTEGER      | 0               | Enable XML      |
+|                 |                 |                 | logfiles and    |
+|                 |                 |                 | writing         |
+|                 |                 |                 | interval        |
++-----------------+-----------------+-----------------+-----------------+
+| LogResult       | OT_INTEGER      | 0               | Enable XML      |
+|                 |                 |                 | result logging  |
+|                 |                 |                 | and detail      |
+|                 |                 |                 | level           |
++-----------------+-----------------+-----------------+-----------------+
+| LowPassAlphaF   | OT_REAL         | 0.950           | Lowpass-filter  |
+|                 |                 |                 | update factor   |
+|                 |                 |                 | for objective   |
+|                 |                 |                 | values          |
++-----------------+-----------------+-----------------+-----------------+
+| LowPassAlphaG   | OT_REAL         | 0.950           | Lowpass-filter  |
+|                 |                 |                 | update factor   |
+|                 |                 |                 | for constraint  |
+|                 |                 |                 | values          |
++-----------------+-----------------+-----------------+-----------------+
+| LowPassAlphaMer | OT_REAL         | 0.100           | Lowpass-filter  |
+| it              |                 |                 | update factor   |
+|                 |                 |                 | for merit       |
+|                 |                 |                 | function values |
++-----------------+-----------------+-----------------+-----------------+
+| LowPassFilter   | OT_BOOLEAN      | True            | Enable lowpass- |
+|                 |                 |                 | filter          |
+|                 |                 |                 | termination     |
+|                 |                 |                 | criterion       |
++-----------------+-----------------+-----------------+-----------------+
+| MA97blas3       | OT_BOOLEAN      | False           | Use BLAS level  |
+|                 |                 |                 | 3 (dgemm) in    |
+|                 |                 |                 | MA97            |
++-----------------+-----------------+-----------------+-----------------+
+| MA97mf          | OT_BOOLEAN      | False           | Use             |
+|                 |                 |                 | multifrontal-   |
+|                 |                 |                 | style forward   |
+|                 |                 |                 | solve of MA97   |
++-----------------+-----------------+-----------------+-----------------+
+| MA97nemin       | OT_INTEGER      | 8               | Node            |
+|                 |                 |                 | amalgation,     |
+|                 |                 |                 | controls        |
+|                 |                 |                 | merging in      |
+|                 |                 |                 | elimination     |
+|                 |                 |                 | tree by MA97    |
++-----------------+-----------------+-----------------+-----------------+
+| MA97ordering    | OT_INTEGER      | 5               | Ordering used   |
+|                 |                 |                 | by MA97         |
++-----------------+-----------------+-----------------+-----------------+
+| MA97print       | OT_INTEGER      | -1              | Print level     |
+|                 |                 |                 | used by MA97    |
++-----------------+-----------------+-----------------+-----------------+
+| MA97scaling     | OT_INTEGER      | 0               | Scaling used by |
+|                 |                 |                 | MA97            |
++-----------------+-----------------+-----------------+-----------------+
+| MA97small       | OT_REAL         | 0.000           | Any pivot whose |
+|                 |                 |                 | modulus is less |
+|                 |                 |                 | than this is    |
+|                 |                 |                 | treated as zero |
+|                 |                 |                 | by MA97         |
++-----------------+-----------------+-----------------+-----------------+
+| MA97u           | OT_REAL         | 0.010           | Relative pivot  |
+|                 |                 |                 | tolerance of    |
+|                 |                 |                 | MA97            |
++-----------------+-----------------+-----------------+-----------------+
+| MatrixCC        | OT_BOOLEAN      | False           | Not to be       |
+|                 |                 |                 | included into a |
+|                 |                 |                 | parameter file! |
++-----------------+-----------------+-----------------+-----------------+
+| MaxCalls        | OT_INTEGER      | 2.147e+09       | Upper bound to  |
+|                 |                 |                 | Reverse         |
+|                 |                 |                 | Communication   |
+|                 |                 |                 | calls           |
++-----------------+-----------------+-----------------+-----------------+
+| MaxForce        | OT_INTEGER      | 1000            | Maximum number  |
+|                 |                 |                 | of Force        |
+|                 |                 |                 | recovery        |
+|                 |                 |                 | strategy steps  |
++-----------------+-----------------+-----------------+-----------------+
+| MaxGPart        | OT_INTEGER      | 1               | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| MaxIter         | OT_INTEGER      | 500             | Upper bound on  |
+|                 |                 |                 | major           |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| MaxLScounter    | OT_INTEGER      | 3               | Control         |
+|                 |                 |                 | activation of   |
+|                 |                 |                 | Filter          |
+|                 |                 |                 | acceleration    |
+|                 |                 |                 | heuristics      |
++-----------------+-----------------+-----------------+-----------------+
+| MaxNorm         | OT_BOOLEAN      | True            | Select max-norm |
+|                 |                 |                 | instead of      |
+|                 |                 |                 | 1-norm in       |
+|                 |                 |                 | Filter          |
++-----------------+-----------------+-----------------+-----------------+
+| MeritFunction   | OT_INTEGER      | 4               | Select merit    |
+|                 |                 |                 | function and    |
+|                 |                 |                 | penalty update  |
+|                 |                 |                 | [0, 3..5]       |
++-----------------+-----------------+-----------------+-----------------+
+| MeritGradTol    | OT_REAL         | 0.000           | Threshold of    |
+|                 |                 |                 | meritfunction   |
+|                 |                 |                 | gradient for    |
+|                 |                 |                 | increasing      |
+|                 |                 |                 | Hessian         |
+|                 |                 |                 | regularisation  |
++-----------------+-----------------+-----------------+-----------------+
+| MinBettsTau     | OT_REAL         | 0.000           | Lower bound for |
+|                 |                 |                 | Betts' update   |
+|                 |                 |                 | dampening term  |
++-----------------+-----------------+-----------------+-----------------+
+| MoreRelax       | OT_BOOLEAN      | False           | Introduce one   |
+|                 |                 |                 | relaxation      |
+|                 |                 |                 | variable for    |
+|                 |                 |                 | every           |
+|                 |                 |                 | constraint      |
++-----------------+-----------------+-----------------+-----------------+
+| NLPmethod       | OT_INTEGER      | 1               | Select (1)      |
+|                 |                 |                 | Meritfunction   |
+|                 |                 |                 | or (3) Filter   |
+|                 |                 |                 | globalisation   |
++-----------------+-----------------+-----------------+-----------------+
+| NLPprint        | OT_INTEGER      | 2               | NLP print level |
+|                 |                 |                 | [-1..4]         |
++-----------------+-----------------+-----------------+-----------------+
+| PairMethod      | OT_INTEGER      | 1               | Select method   |
+|                 |                 |                 | to determine    |
+|                 |                 |                 | graph colouring |
+|                 |                 |                 | pairgroups      |
++-----------------+-----------------+-----------------+-----------------+
+| PenUpdEpsBar    | OT_REAL         | 0.900           | Penalty update  |
+|                 |                 |                 | parameter       |
+|                 |                 |                 | factor for      |
+|                 |                 |                 | MeritFunction = |
+|                 |                 |                 | 3               |
++-----------------+-----------------+-----------------+-----------------+
+| PenUpdEpsKFac   | OT_REAL         | 2               | Penalty update  |
+|                 |                 |                 | parameter       |
+|                 |                 |                 | factor for      |
+|                 |                 |                 | MeritFunction = |
+|                 |                 |                 | 4               |
++-----------------+-----------------+-----------------+-----------------+
+| PenUpdEpsKSeque | OT_INTEGER      | 2               | Penalty update  |
+| nce             |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| PenUpdMaxDeltaK | OT_REAL         | 11              | Max penalty for |
+|                 |                 |                 | MeritFunction = |
+|                 |                 |                 | 4               |
++-----------------+-----------------+-----------------+-----------------+
+| PenUpdMaxFac    | OT_REAL         | 100000000       | Max factor for  |
+|                 |                 |                 | increasing      |
+|                 |                 |                 | penalty for     |
+|                 |                 |                 | MeritFunction = |
+|                 |                 |                 | 4               |
++-----------------+-----------------+-----------------+-----------------+
+| PenUpdRBar      | OT_REAL         | 2               | Penalty update  |
+|                 |                 |                 | parameter for   |
+|                 |                 |                 | MeritFunction = |
+|                 |                 |                 | 3               |
++-----------------+-----------------+-----------------+-----------------+
+| PrecisionF      | OT_REAL         | 0.000           | (currently      |
+|                 |                 |                 | unused)         |
+|                 |                 |                 | Relative        |
+|                 |                 |                 | precision of    |
+|                 |                 |                 | objective       |
++-----------------+-----------------+-----------------+-----------------+
+| PrecisionG      | OT_REAL         | 0.000           | (currently      |
+|                 |                 |                 | unused)         |
+|                 |                 |                 | Relative        |
+|                 |                 |                 | precision of    |
+|                 |                 |                 | constraints     |
++-----------------+-----------------+-----------------+-----------------+
+| QPscaleParam    | OT_REAL         | 0               | (currently      |
+|                 |                 |                 | unused) Scaling |
+|                 |                 |                 | factor for QP   |
++-----------------+-----------------+-----------------+-----------------+
+| QuadraticProble | OT_BOOLEAN      | False           | Not to be       |
+| m               |                 |                 | included into a |
+|                 |                 |                 | parameter file! |
++-----------------+-----------------+-----------------+-----------------+
+| ReduceBettsTau  | OT_REAL         | 0.300           | Decrease factor |
+|                 |                 |                 | for Betts'      |
+|                 |                 |                 | update          |
+|                 |                 |                 | dampening term  |
++-----------------+-----------------+-----------------+-----------------+
+| RefineFeasibili | OT_INTEGER      | 0               | 0 -             |
+| ty              |                 |                 | Deactivated, 1  |
+|                 |                 |                 | - After first   |
+|                 |                 |                 | feasible        |
+|                 |                 |                 | iterate, 2 -    |
+|                 |                 |                 | Always on,      |
+|                 |                 |                 | Activates       |
+|                 |                 |                 | iterative       |
+|                 |                 |                 | refinement due  |
+|                 |                 |                 | to perturbation |
+|                 |                 |                 | in constraints  |
+|                 |                 |                 | using           |
+|                 |                 |                 | parametric      |
+|                 |                 |                 | sensitivities   |
++-----------------+-----------------+-----------------+-----------------+
+| RefineMaxHMReg  | OT_REAL         | 1000            | Maximum allowed |
+|                 |                 |                 | regularisation  |
+|                 |                 |                 | of the hessian  |
+|                 |                 |                 | CAUTION         |
+|                 |                 |                 | absolute value  |
++-----------------+-----------------+-----------------+-----------------+
+| RefineMaxRelax  | OT_REAL         | 0.750           | Maximum allowed |
+|                 |                 |                 | relaxation to   |
+|                 |                 |                 | apply           |
+|                 |                 |                 | feasibility     |
+|                 |                 |                 | refinement      |
++-----------------+-----------------+-----------------+-----------------+
+| RefineOnlyOnAlp | OT_BOOLEAN      | True            | Activates new   |
+| ha              |                 |                 | iterative       |
+|                 |                 |                 | refinement of   |
+|                 |                 |                 | constraints     |
+|                 |                 |                 | only when       |
+|                 |                 |                 | Armijo alpha    |
+|                 |                 |                 | equals one      |
++-----------------+-----------------+-----------------+-----------------+
+| RefineStartTol  | OT_REAL         | 0.000           | Start tolerance |
+|                 |                 |                 | for successful  |
+|                 |                 |                 | termination of  |
+|                 |                 |                 | iterative       |
+|                 |                 |                 | refinement due  |
+|                 |                 |                 | to perturbation |
+|                 |                 |                 | in constraints  |
++-----------------+-----------------+-----------------+-----------------+
+| RegStrategy     | OT_INTEGER      | 1               | Select Hessian  |
+|                 |                 |                 | regularisation  |
+|                 |                 |                 | strategy in     |
+|                 |                 |                 | Filter          |
++-----------------+-----------------+-----------------+-----------------+
+| ReinitFilter    | OT_BOOLEAN      | False           | Enables Filter- |
+|                 |                 |                 | reinitialisatio |
+|                 |                 |                 | n accelerating  |
+|                 |                 |                 | heuristic       |
++-----------------+-----------------+-----------------+-----------------+
+| RelaxMaxDelta   | OT_REAL         | 0.920           | Upper bound for |
+|                 |                 |                 | accepting the   |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | relaxation      |
+|                 |                 |                 | variable        |
++-----------------+-----------------+-----------------+-----------------+
+| RelaxMaxPen     | OT_REAL         | 50000000        | Upper bound on  |
+|                 |                 |                 | the constraint  |
+|                 |                 |                 | relaxation      |
+|                 |                 |                 | penalty         |
++-----------------+-----------------+-----------------+-----------------+
+| RelaxRho        | OT_REAL         | 6               | Update factor   |
+|                 |                 |                 | for the         |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | relaxation      |
+|                 |                 |                 | penalty         |
++-----------------+-----------------+-----------------+-----------------+
+| RelaxStart      | OT_REAL         | 1               | Initial value   |
+|                 |                 |                 | of the          |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | relaxation      |
+|                 |                 |                 | penalty         |
++-----------------+-----------------+-----------------+-----------------+
+| RestUntilFeas   | OT_BOOLEAN      | False           | Do restoration  |
+|                 |                 |                 | until a         |
+|                 |                 |                 | feasible        |
+|                 |                 |                 | solution is     |
+|                 |                 |                 | found           |
++-----------------+-----------------+-----------------+-----------------+
+| ScaleConIter    | OT_BOOLEAN      | False           | Scale           |
+|                 |                 |                 | constraints in  |
+|                 |                 |                 | every iteration |
++-----------------+-----------------+-----------------+-----------------+
+| ScaleFacObj     | OT_REAL         | 10              | Value to scale  |
+|                 |                 |                 | large objective |
+|                 |                 |                 | functions to    |
++-----------------+-----------------+-----------------+-----------------+
+| ScaleFacQP      | OT_REAL         | 10              | Upper bound on  |
+|                 |                 |                 | resulting       |
+|                 |                 |                 | matrix norm for |
+|                 |                 |                 | QP scaling      |
++-----------------+-----------------+-----------------+-----------------+
+| ScaledFD        | OT_BOOLEAN      | True            | Use a scaled    |
+|                 |                 |                 | perturbation    |
+|                 |                 |                 | for finite      |
+|                 |                 |                 | differences     |
++-----------------+-----------------+-----------------+-----------------+
+| ScaledKKT       | OT_BOOLEAN      | True            | Scale KKT       |
+|                 |                 |                 | conditions      |
++-----------------+-----------------+-----------------+-----------------+
+| ScaledObj       | OT_BOOLEAN      | True            | Scale the       |
+|                 |                 |                 | objective       |
+|                 |                 |                 | function        |
++-----------------+-----------------+-----------------+-----------------+
+| ScaledQP        | OT_BOOLEAN      | True            | Scale some      |
+|                 |                 |                 | matrices handed |
+|                 |                 |                 | to the QP       |
++-----------------+-----------------+-----------------+-----------------+
+| StartBettsTau   | OT_REAL         | 0.100           | Initial value   |
+|                 |                 |                 | for Betts'      |
+|                 |                 |                 | update          |
+|                 |                 |                 | dampening term  |
++-----------------+-----------------+-----------------+-----------------+
+| SteffensenOnRef | OT_BOOLEAN      | False           | Use Steffensen  |
+| ine             |                 |                 | Extrapolation   |
+|                 |                 |                 | during          |
+|                 |                 |                 | Feasibility     |
+|                 |                 |                 | Refinement      |
++-----------------+-----------------+-----------------+-----------------+
+| SwitchingDelta  | OT_REAL         | 0.010           | Filter          |
+|                 |                 |                 | switching       |
+|                 |                 |                 | condition       |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| SwitchingSCV    | OT_REAL         | 1.100           | Filter          |
+|                 |                 |                 | switching       |
+|                 |                 |                 | condition       |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| SwitchingSF     | OT_REAL         | 2.300           | Filter          |
+|                 |                 |                 | switching       |
+|                 |                 |                 | condition       |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| TakeQPSol       | OT_BOOLEAN      | False           | Evaluate QP     |
+|                 |                 |                 | search          |
+|                 |                 |                 | direction       |
+|                 |                 |                 | regardless of   |
+|                 |                 |                 | convergence     |
++-----------------+-----------------+-----------------+-----------------+
+| Timeout         | OT_REAL         | 300             | Timeout in      |
+|                 |                 |                 | seconds         |
++-----------------+-----------------+-----------------+-----------------+
+| TolComp         | OT_REAL         | 0.001           | Complementarity |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| TolFeas         | OT_REAL         | 0.000           | Feasibility     |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| TolOpti         | OT_REAL         | 0.000           | Optimality      |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| TolWeakActive   | OT_REAL         | 1               | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| TooBig          | OT_BOOLEAN      | True            | Enable too-big  |
+|                 |                 |                 | termination     |
+|                 |                 |                 | heuristics      |
++-----------------+-----------------+-----------------+-----------------+
+| TooBigCV        | OT_REAL         | 1.000e+25       | Upper bound on  |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | violation for   |
+|                 |                 |                 | too-big         |
+|                 |                 |                 | heuristic       |
++-----------------+-----------------+-----------------+-----------------+
+| TooBigKKT       | OT_REAL         | 1.000e+30       | Upper bound on  |
+|                 |                 |                 | KKT values for  |
+|                 |                 |                 | too-big         |
+|                 |                 |                 | heuristic       |
++-----------------+-----------------+-----------------+-----------------+
+| UpdateMu        | OT_BOOLEAN      | True            | Activates       |
+|                 |                 |                 | update of       |
+|                 |                 |                 | lagrange        |
+|                 |                 |                 | multipliers     |
+|                 |                 |                 | during          |
+|                 |                 |                 | correction step |
++-----------------+-----------------+-----------------+-----------------+
+| UseZen          | OT_BOOLEAN      | False           | Run Zen module  |
+|                 |                 |                 | after           |
+|                 |                 |                 | successful      |
+|                 |                 |                 | termination     |
++-----------------+-----------------+-----------------+-----------------+
+| UserDF          | OT_BOOLEAN      | True            | Objective       |
+|                 |                 |                 | gradient values |
+|                 |                 |                 | supplied by     |
+|                 |                 |                 | caller          |
++-----------------+-----------------+-----------------+-----------------+
+| UserDG          | OT_BOOLEAN      | True            | Jacobian values |
+|                 |                 |                 | supplied by     |
+|                 |                 |                 | caller          |
++-----------------+-----------------+-----------------+-----------------+
+| UserHM          | OT_BOOLEAN      | True            | Hessian values  |
+|                 |                 |                 | supplied by     |
+|                 |                 |                 | caller          |
++-----------------+-----------------+-----------------+-----------------+
+| UserHMstructure | OT_INTEGER      | 2               | Enable          |
+|                 |                 |                 | automatic       |
+|                 |                 |                 | Hessian         |
+|                 |                 |                 | structure       |
+|                 |                 |                 | generation or   |
+|                 |                 |                 | checking        |
++-----------------+-----------------+-----------------+-----------------+
+| UserZenDGp      | OT_BOOLEAN      | False           | Hessian values  |
+|                 |                 |                 | supplied by     |
+|                 |                 |                 | caller          |
++-----------------+-----------------+-----------------+-----------------+
+| UserZenDLp      | OT_BOOLEAN      | False           | Gradient values |
+|                 |                 |                 | supplied by     |
+|                 |                 |                 | caller          |
++-----------------+-----------------+-----------------+-----------------+
+| UserZenDLpp     | OT_BOOLEAN      | False           | Hessian values  |
+|                 |                 |                 | supplied by     |
+|                 |                 |                 | caller          |
++-----------------+-----------------+-----------------+-----------------+
+| UserZenDLxp     | OT_BOOLEAN      | False           | Hessian values  |
+|                 |                 |                 | supplied by     |
+|                 |                 |                 | caller          |
++-----------------+-----------------+-----------------+-----------------+
+| WeakActiveSet   | OT_BOOLEAN      | False           | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| ZenCheckMaxPert | OT_BOOLEAN      | False           | Check maximum   |
+|                 |                 |                 | of secure       |
+|                 |                 |                 | perturbation    |
+|                 |                 |                 | when updating   |
+|                 |                 |                 | solution        |
++-----------------+-----------------+-----------------+-----------------+
+| ZenFDnewMethod  | OT_BOOLEAN      | True            |                 |
++-----------------+-----------------+-----------------+-----------------+
+| ZenRenewLU      | OT_BOOLEAN      | False           | false: use LU   |
+|                 |                 |                 | from last QP    |
+|                 |                 |                 | step; true:     |
+|                 |                 |                 | renew LU        |
+|                 |                 |                 | decomposition.  |
++-----------------+-----------------+-----------------+-----------------+
+| eps             | OT_REAL         | 0.000           | Machine epsilon |
++-----------------+-----------------+-----------------+-----------------+
+| internalParChan | OT_INTEGER      | 0               | Counter for     |
+| ged             |                 |                 | changed         |
+|                 |                 |                 | parameters.     |
+|                 |                 |                 | Internal use    |
+|                 |                 |                 | only.           |
++-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOLEAN      | True            | Print           |
 |                 |                 |                 | information     |
 |                 |                 |                 | about execution |
 |                 |                 |                 | time            |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipBarrier    | OT_REAL         | worhp_p_.qp.ipB | IP barrier      |
-|                 |                 | arrier          | parameter.      |
-+-----------------+-----------------+-----------------+-----------------+
-| qp_ipComTol     | OT_REAL         | worhp_p_.qp.ipC | IP              |
-|                 |                 | omTol           | complementarity |
-|                 |                 |                 | tolerance.      |
-+-----------------+-----------------+-----------------+-----------------+
-| qp_ipFracBound  | OT_REAL         | worhp_p_.qp.ipF | IP fraction-to- |
-|                 |                 | racBound        | the-boundary    |
+| qp_ipBarrier    | OT_REAL         | 7.800           | IP barrier      |
 |                 |                 |                 | parameter.      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipLsMethod   | OT_STRING       | GenericType()   | Select the      |
+| qp_ipComTol     | OT_REAL         | 0.000           | IP              |
+|                 |                 |                 | complementarity |
+|                 |                 |                 | tolerance.      |
++-----------------+-----------------+-----------------+-----------------+
+| qp_ipFracBound  | OT_REAL         | 0.880           | IP fraction-to- |
+|                 |                 |                 | the-boundary    |
+|                 |                 |                 | parameter.      |
++-----------------+-----------------+-----------------+-----------------+
+| qp_ipLsMethod   | OT_STRING       | None            | Select the      |
 |                 |                 |                 | direct linear   |
 |                 |                 |                 | solver used by  |
 |                 |                 |                 | the IP method.  |
-|                 |                 |                 | (LAPACK::0|MA57 |
-|                 |                 |                 | : only          |
-|                 |                 |                 | available if    |
-|                 |                 |                 | provided by the |
-|                 |                 |                 | user:1|SuperLU: |
-|                 |                 |                 | :2|PARDISO:     |
-|                 |                 |                 | only available  |
-|                 |                 |                 | if provided by  |
-|                 |                 |                 | the user,       |
-|                 |                 |                 | subject to      |
-|                 |                 |                 | license availab |
-|                 |                 |                 | ility:3|MUMPS:  |
-|                 |                 |                 | currently Linux |
-|                 |                 |                 | platforms       |
-|                 |                 |                 | only:5|WSMP:    |
-|                 |                 |                 | subject to      |
-|                 |                 |                 | license availab |
-|                 |                 |                 | ility:6|MA86:   |
-|                 |                 |                 | experimental,   |
-|                 |                 |                 | only available  |
-|                 |                 |                 | if provided by  |
-|                 |                 |                 | the user:7|MA97 |
-|                 |                 |                 | :experimental,  |
-|                 |                 |                 | only available  |
-|                 |                 |                 | if provided by  |
-|                 |                 |                 | the user:8)     |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipMinAlpha   | OT_REAL         | worhp_p_.qp.ipM | IP line search  |
-|                 |                 | inAlpha         | minimum step    |
+| qp_ipMinAlpha   | OT_REAL         | 0.000           | IP line search  |
+|                 |                 |                 | minimum step    |
 |                 |                 |                 | size.           |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipRelaxDiv   | OT_REAL         | worhp_p_.qp.ipR | The relaxation  |
-|                 |                 | elaxDiv         | term is divided |
+| qp_ipRelaxDiv   | OT_REAL         | 2               | The relaxation  |
+|                 |                 |                 | term is divided |
 |                 |                 |                 | by this value   |
 |                 |                 |                 | if successful.  |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipRelaxMax   | OT_REAL         | worhp_p_.qp.ipR | Maximum         |
-|                 |                 | elaxMax         | relaxation      |
+| qp_ipRelaxMax   | OT_REAL         | 0.000           | Maximum         |
+|                 |                 |                 | relaxation      |
 |                 |                 |                 | value.          |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipRelaxMin   | OT_REAL         | worhp_p_.qp.ipR | Mimimum         |
-|                 |                 | elaxMin         | relaxation      |
+| qp_ipRelaxMin   | OT_REAL         | 0.000           | Mimimum         |
+|                 |                 |                 | relaxation      |
 |                 |                 |                 | value.          |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipRelaxMult  | OT_REAL         | worhp_p_.qp.ipR | The relaxation  |
-|                 |                 | elaxMult        | term is         |
+| qp_ipRelaxMult  | OT_REAL         | 10              | The relaxation  |
+|                 |                 |                 | term is         |
 |                 |                 |                 | multiplied by   |
 |                 |                 |                 | this value if   |
 |                 |                 |                 | unsuccessful.   |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipResTol     | OT_REAL         | worhp_p_.qp.ipR | IP residuals    |
-|                 |                 | esTol           | tolerance.      |
+| qp_ipResTol     | OT_REAL         | 0.000           | IP residuals    |
+|                 |                 |                 | tolerance.      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipTryRelax   | OT_BOOLEAN      | worhp_p_.qp.ipT | Enable          |
-|                 |                 | ryRelax         | relaxation      |
+| qp_ipTryRelax   | OT_BOOLEAN      | True            | Enable          |
+|                 |                 |                 | relaxation      |
 |                 |                 |                 | strategy when   |
 |                 |                 |                 | encountering an |
 |                 |                 |                 | error.          |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsItMaxIter  | OT_INTEGER      | worhp_p_.qp.lsI | Maximum number  |
-|                 |                 | tMaxIter        | of iterations   |
+| qp_lsItMaxIter  | OT_INTEGER      | 1000            | Maximum number  |
+|                 |                 |                 | of iterations   |
 |                 |                 |                 | of the          |
 |                 |                 |                 | iterative       |
 |                 |                 |                 | linear solvers. |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsItMethod   | OT_STRING       | GenericType()   | Select the      |
+| qp_lsItMethod   | OT_STRING       | None            | Select the      |
 |                 |                 |                 | iterative       |
 |                 |                 |                 | linear solver.  |
-|                 |                 |                 | (none:Deactivat |
-|                 |                 |                 | e; use a direct |
-|                 |                 |                 | linear solver.: |
-|                 |                 |                 | 0|CGNR::1|CGNE: |
-|                 |                 |                 | :2|CGS::3|BiCGS |
-|                 |                 |                 | TAB::4)         |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsItPrecondM | OT_STRING       | GenericType()   | Select          |
+| qp_lsItPrecondM | OT_STRING       | None            | Select          |
 | ethod           |                 |                 | preconditioner  |
 |                 |                 |                 | for the         |
 |                 |                 |                 | iterative       |
 |                 |                 |                 | linear solver.  |
-|                 |                 |                 | (none:No precon |
-|                 |                 |                 | ditioner.:0|sta |
-|                 |                 |                 | tic:Static      |
-|                 |                 |                 | preconditioner  |
-|                 |                 |                 | (KKT-matrix     |
-|                 |                 |                 | with constant   |
-|                 |                 |                 | lower-right blo |
-|                 |                 |                 | ck).:1|full:Ful |
-|                 |                 |                 | l KKT-          |
-|                 |                 |                 | matrix.:2)      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsRefineMaxI | OT_INTEGER      | worhp_p_.qp.lsR | Maximum number  |
-| ter             |                 | efineMaxIter    | of iterative    |
+| qp_lsRefineMaxI | OT_INTEGER      | 10              | Maximum number  |
+| ter             |                 |                 | of iterative    |
 |                 |                 |                 | refinement      |
 |                 |                 |                 | steps of the    |
 |                 |                 |                 | direct linear   |
 |                 |                 |                 | solvers.        |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsScale      | OT_BOOLEAN      | worhp_p_.qp.lsS | Enables scaling |
-|                 |                 | cale            | on linear       |
+| qp_lsScale      | OT_BOOLEAN      | True            | Enables scaling |
+|                 |                 |                 | on linear       |
 |                 |                 |                 | solver level.   |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsTol        | OT_REAL         | worhp_p_.qp.lsT | Tolerance for   |
-|                 |                 | ol              | the linear      |
+| qp_lsTol        | OT_REAL         | 0.000           | Tolerance for   |
+|                 |                 |                 | the linear      |
 |                 |                 |                 | solver.         |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsTrySimple  | OT_BOOLEAN      | worhp_p_.qp.lsT | Some matrices   |
-|                 |                 | rySimple        | can be solved   |
+| qp_lsTrySimple  | OT_BOOLEAN      | False           | Some matrices   |
+|                 |                 |                 | can be solved   |
 |                 |                 |                 | without calling |
 |                 |                 |                 | a linear        |
 |                 |                 |                 | equation solver |
@@ -39928,8 +40612,8 @@ WORHP interface
 |                 |                 |                 | linear equation |
 |                 |                 |                 | solver.         |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_maxIter      | OT_INTEGER      | worhp_p_.qp.max | Imposes an      |
-|                 |                 | Iter            | upper limit on  |
+| qp_maxIter      | OT_INTEGER      | 80              | Imposes an      |
+|                 |                 |                 | upper limit on  |
 |                 |                 |                 | the number of   |
 |                 |                 |                 | minor solver    |
 |                 |                 |                 | iterations,     |
@@ -39948,64 +40632,44 @@ WORHP interface
 |                 |                 |                 | solver          |
 |                 |                 |                 | breakdown.      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_method       | OT_STRING       | GenericType()   | Select the      |
+| qp_method       | OT_STRING       | None            | Select the      |
 |                 |                 |                 | solution method |
 |                 |                 |                 | used by the QP  |
-|                 |                 |                 | solver. (ip     |
-|                 |                 |                 | :Interior-Point |
-|                 |                 |                 | method.:1|nsn   |
-|                 |                 |                 | :Nonsmooth-     |
-|                 |                 |                 | Newton method.: |
-|                 |                 |                 | 2|automatic:    |
-|                 |                 |                 | Prefer IP and   |
-|                 |                 |                 | fall back to    |
-|                 |                 |                 | NSN on          |
-|                 |                 |                 | error.:12)      |
+|                 |                 |                 | solver.         |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_nsnBeta      | OT_REAL         | worhp_p_.qp.nsn | NSN stepsize    |
-|                 |                 | Beta            | decrease        |
+| qp_nsnBeta      | OT_REAL         | 0.900           | NSN stepsize    |
+|                 |                 |                 | decrease        |
 |                 |                 |                 | factor.         |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_nsnGradStep  | OT_BOOLEAN      | worhp_p_.qp.nsn | Enable gradient |
-|                 |                 | GradStep        | steps in the    |
+| qp_nsnGradStep  | OT_BOOLEAN      | True            | Enable gradient |
+|                 |                 |                 | steps in the    |
 |                 |                 |                 | NSN method.     |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_nsnKKT       | OT_REAL         | worhp_p_.qp.nsn | NSN KKT         |
-|                 |                 | KKT             | tolerance.      |
+| qp_nsnKKT       | OT_REAL         | 0.000           | NSN KKT         |
+|                 |                 |                 | tolerance.      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_nsnLsMethod  | OT_STRING       | GenericType()   | Select the      |
+| qp_nsnLsMethod  | OT_STRING       | None            | Select the      |
 |                 |                 |                 | direct linear   |
 |                 |                 |                 | solver used by  |
 |                 |                 |                 | the NSN method. |
-|                 |                 |                 | (SuperLU::2|MA4 |
-|                 |                 |                 | 8: only         |
-|                 |                 |                 | available if    |
-|                 |                 |                 | provided by the |
-|                 |                 |                 | user:4)         |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_nsnMinAlpha  | OT_REAL         | worhp_p_.qp.nsn | NSN line search |
-|                 |                 | MinAlpha        | minimum step    |
+| qp_nsnMinAlpha  | OT_REAL         | 0.000           | NSN line search |
+|                 |                 |                 | minimum step    |
 |                 |                 |                 | size.           |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_nsnSigma     | OT_REAL         | worhp_p_.qp.nsn | NSN line search |
-|                 |                 | Sigma           | slope           |
+| qp_nsnSigma     | OT_REAL         | 0.010           | NSN line search |
+|                 |                 |                 | slope           |
 |                 |                 |                 | parameter.      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_printLevel   | OT_STRING       | GenericType()   | Controls the    |
+| qp_printLevel   | OT_STRING       | None            | Controls the    |
 |                 |                 |                 | amount of QP    |
 |                 |                 |                 | solver output.  |
-|                 |                 |                 | (none:No output |
-|                 |                 |                 | .:0|warn:Print  |
-|                 |                 |                 | warnings and er |
-|                 |                 |                 | rors.:1|iterati |
-|                 |                 |                 | ons:Print       |
-|                 |                 |                 | iterations.:2)  |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_scaleIntern  | OT_BOOLEAN      | worhp_p_.qp.sca | Enable scaling  |
-|                 |                 | leIntern        | on QP level.    |
+| qp_scaleIntern  | OT_BOOLEAN      | False           | Enable scaling  |
+|                 |                 |                 | on QP level.    |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_strict       | OT_BOOLEAN      | worhp_p_.qp.str | Use strict      |
-|                 |                 | ict             | termination     |
+| qp_strict       | OT_BOOLEAN      | True            | Use strict      |
+|                 |                 |                 | termination     |
 |                 |                 |                 | criteria in IP  |
 |                 |                 |                 | method.         |
 +-----------------+-----------------+-----------------+-----------------+
