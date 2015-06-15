@@ -163,7 +163,7 @@ namespace casadi {
     if (m_ > 0) {
       int largest_cone = *std::max_element(ni_.begin(), ni_.end());
       std::vector<int> submem;
-      submem.resize(largest_cone);
+      submem.resize(largest_cone+1);
       int sum_ni = 0;
       for (int i=0;i<m_;++i) {
         submem[0] = i;
