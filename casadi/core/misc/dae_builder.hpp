@@ -309,10 +309,10 @@ namespace casadi {
     MX addLinearCombination(const std::string& name,
                             const std::vector<std::string>& f_out);
 
-    /// Generate code for a particular function
-    MXFunction function(const std::string& fname,
-                        const std::vector<std::string>& s_in,
-                        const std::vector<std::string>& s_out) const;
+    /// Construct a function object
+    MXFunction create(const std::string& fname,
+                      const std::vector<std::string>& s_in,
+                      const std::vector<std::string>& s_out) const;
     ///@}
 
     /// Get variable expression by name

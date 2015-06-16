@@ -1718,9 +1718,9 @@ namespace casadi {
     return ret;
   }
 
-  MXFunction DaeBuilder::function(const std::string& fname,
-                                  const std::vector<std::string>& s_in,
-                                  const std::vector<std::string>& s_out) const {
+  MXFunction DaeBuilder::create(const std::string& fname,
+                                const std::vector<std::string>& s_in,
+                                const std::vector<std::string>& s_out) const {
     // Collect function inputs
     vector<MX> ret_in(s_in.size());
     std::vector<bool> input_used(DAE_BUILDER_NUM_IN, false);
