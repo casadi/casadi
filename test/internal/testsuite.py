@@ -225,9 +225,11 @@ class TestSuite:
 
     inp = None
     if callable(self.inputs):
-      self.inputs = self.inputs(dir,fn)
-    if fn in self.inputs:
-      inp = self.inputs[fn]
+      inputs = self.inputs(dir,fn)
+    else:
+      inputs = self.inputs
+    if fn in inputs:
+      inp = inputs[fn]
       
           
     alarm(60*60) # 1 hour
