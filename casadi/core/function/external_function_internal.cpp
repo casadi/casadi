@@ -292,5 +292,67 @@ namespace casadi {
     if (row) *row=row_scalar;
     return 0;
   }
+
+  bool ExternalFunctionInternal::hasFullJacobian() const {
+    // Init function for Jacobian?
+    initPtr jac_init;
+    getSym(jac_init, handle_, f_name_ + "_jac_init");
+    return jac_init!=0;
+  }
+
+  Function ExternalFunctionInternal::getFullJacobian() {
+    return ExternalFunction(f_name_ + "_jac", bin_name_);
+  }
+
+  Function ExternalFunctionInternal::getDerForward(int nfwd) {
+    // Consistency check
+    int n=1;
+    while (n<nfwd) n*=2;
+    if (n!=nfwd || nfwd>numDerForward()) {
+      casadi_error("Internal error: Refactoring needed, cf. #1055");
+    }
+    // Create external function
+    stringstream ss;
+    ss << "fwd" << nfwd << "_" << f_name_;
+    return ExternalFunction(ss.str(), bin_name_);
+  }
+
+  int ExternalFunctionInternal::numDerForward() const {
+    // Will try 64, 32, 16, 8, 4, 2, 1 directions
+    initPtr fwd_init;
+    for (int i=64; i>0; i/=2) {
+      stringstream ss;
+      ss << "fwd" << i << "_" << f_name_;
+      getSym(fwd_init, handle_, ss.str());
+      if (fwd_init!=0) return i;
+    }
+    return 0;
+  }
+
+  Function ExternalFunctionInternal::getDerReverse(int nadj) {
+    // Consistency check
+    int n=1;
+    while (n<nadj) n*=2;
+    if (n!=nadj || nadj>numDerReverse()) {
+      casadi_error("Internal error: Refactoring needed, cf. #1055");
+    }
+    // Create external function
+    stringstream ss;
+    ss << "adj" << nadj << "_" << f_name_;
+    return ExternalFunction(ss.str(), bin_name_);
+  }
+
+  int ExternalFunctionInternal::numDerReverse() const {
+    // Will try 64, 32, 16, 8, 4, 2, 1 directions
+    initPtr adj_init;
+    for (int i=64; i>0; i/=2) {
+      stringstream ss;
+      ss << "adj" << i << "_" << f_name_;
+      getSym(adj_init, handle_, ss.str());
+      if (adj_init!=0) return i;
+    }
+    return 0;
+  }
+
 } // namespace casadi
 

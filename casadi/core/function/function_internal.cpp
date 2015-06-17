@@ -2560,9 +2560,12 @@ namespace casadi {
       return name;
   }
 
+  bool FunctionInternal::hasFullJacobian() const {
+    return full_jacobian_.alive() || hasSetOption("full_jacobian");
+  }
+
   bool FunctionInternal::hasDerivative() const {
-    return numDerForward()>0 || numDerReverse()>0 ||
-      full_jacobian_.alive() || hasSetOption("full_jacobian");
+    return numDerForward()>0 || numDerReverse()>0 || hasFullJacobian();
   }
 
   bool FunctionInternal::fwdViaJac(int nfwd) {

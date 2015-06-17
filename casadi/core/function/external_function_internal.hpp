@@ -57,6 +57,24 @@ namespace casadi {
 
     /** \brief  Initialize */
     virtual void init();
+
+    ///@{
+    /** \brief Forward mode derivatives */
+    virtual Function getDerForward(int nfwd);
+    virtual int numDerForward() const;
+    ///@}
+
+    ///@{
+    /** \brief Reverse mode derivatives */
+    virtual Function getDerReverse(int nadj);
+    virtual int numDerReverse() const;
+    ///@}
+
+    ///@{
+    /** \brief Full Jacobian */
+    virtual bool hasFullJacobian() const;
+    virtual Function getFullJacobian();
+    ///@}
   protected:
 
     /** \brief Function pointer for initialization of external */

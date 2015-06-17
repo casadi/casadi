@@ -185,6 +185,7 @@ namespace casadi {
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     Function fullJacobian();
+    virtual bool hasFullJacobian() const;
     virtual Function getFullJacobian();
     ///@}
 
