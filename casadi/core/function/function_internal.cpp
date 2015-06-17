@@ -1181,7 +1181,7 @@ namespace casadi {
 
     // Get seed matrices by graph coloring
     if (symmetric) {
-      casadi_assert(hasDerForward());
+      casadi_assert(numDerForward()>0);
 
       // Star coloring if symmetric
       log("FunctionInternal::getPartition starColoring");
@@ -1190,7 +1190,7 @@ namespace casadi {
                  << A.size1() << " without coloring).");
 
     } else {
-      casadi_assert(hasDerForward() || hasDerReverse());
+      casadi_assert(numDerForward()>0 || numDerReverse()>0);
       // Get weighting factor
       double w = adWeight();
 
@@ -1532,7 +1532,7 @@ namespace casadi {
       ret = dergen(this_, nfwd, user_data_);
       // Fails for ImplicitFunction
     } else {
-      casadi_assert(hasDerForward());
+      casadi_assert(numDerForward()>0);
       ret = getDerForward(nfwd);
     }
 
@@ -1638,7 +1638,7 @@ namespace casadi {
       Function this_ = shared_from_this<Function>();
       ret = dergen(this_, nadj, user_data_);
     } else {
-      casadi_assert(hasDerReverse());
+      casadi_assert(numDerReverse()>0);
       ret = getDerReverse(nadj);
     }
 
@@ -1887,7 +1887,7 @@ namespace casadi {
   }
 
   Function FunctionInternal::getFullJacobian() {
-    casadi_assert(hasDerForward() || hasDerReverse());
+    casadi_assert(numDerForward()>0 || numDerReverse()>0);
 
     // Number inputs and outputs
     int n_in = nIn();
@@ -2561,12 +2561,12 @@ namespace casadi {
   }
 
   bool FunctionInternal::hasDerivative() const {
-    return hasDerForward() || hasDerReverse() ||
+    return numDerForward()>0 || numDerReverse()>0 ||
       full_jacobian_.alive() || hasSetOption("full_jacobian");
   }
 
   bool FunctionInternal::fwdViaJac(int nfwd) {
-    if (!hasDerForward()) return true;
+    if (numDerForward()==0) return true;
 
     // Jacobian calculation penalty factor
     const int jac_penalty = 2;
@@ -2576,14 +2576,14 @@ namespace casadi {
 
     // Heuristic 2: Jac calculated via reverse mode likely cheaper
     double w = adWeight();
-    if (hasDerReverse() && jac_penalty*(1-w)*nnzOut()<w*nfwd)
+    if (numDerReverse()>0 && jac_penalty*(1-w)*nnzOut()<w*nfwd)
       return true;
 
     return false;
   }
 
   bool FunctionInternal::adjViaJac(int nadj) {
-    if (!hasDerReverse()) return true;
+    if (numDerReverse()==0) return true;
 
     // Jacobian calculation penalty factor
     const int jac_penalty = 2;
@@ -2593,7 +2593,7 @@ namespace casadi {
 
     // Heuristic 2: Jac calculated via forward mode likely cheaper
     double w = adWeight();
-    if (hasDerForward() && jac_penalty*w*nnzIn()<(1-w)*nadj)
+    if (numDerForward()>0 && jac_penalty*w*nnzIn()<(1-w)*nadj)
       return true;
 
     return false;
@@ -2894,10 +2894,10 @@ namespace casadi {
 
   double FunctionInternal::adWeight() {
     // If reverse mode derivatives unavailable, use forward
-    if (!hasDerReverse()) return 0;
+    if (numDerReverse()==0) return 0;
 
     // If forward mode derivatives unavailable, use reverse
-    if (!hasDerForward()) return 1;
+    if (numDerForward()==0) return 1;
 
     // A user-provided option overrides default value
     if (hasSetOption("ad_weight")) return getOption("ad_weight");

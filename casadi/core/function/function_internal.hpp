@@ -196,7 +196,7 @@ namespace casadi {
      */
     Function derForward(int nfwd);
     virtual Function getDerForward(int nfwd);
-    virtual bool hasDerForward() const { return hasSetOption("custom_forward");}
+    virtual int numDerForward() const { return hasSetOption("custom_forward") ? 64 : 0;}
     void setDerForward(const Function& fcn, int nfwd);
     ///@}
 
@@ -208,7 +208,7 @@ namespace casadi {
      */
     Function derReverse(int nadj);
     virtual Function getDerReverse(int nadj);
-    virtual bool hasDerReverse() const { return hasSetOption("custom_reverse");}
+    virtual int numDerReverse() const { return hasSetOption("custom_reverse") ? 64 : 0;}
     void setDerReverse(const Function& fcn, int nadj);
     ///@}
 
