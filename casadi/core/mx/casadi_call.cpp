@@ -62,7 +62,8 @@ namespace casadi {
     // Number inputs and outputs
     int num_in = fcn.nIn();
     casadi_assert_message(arg.size()==num_in, "Argument list length (" << arg.size()
-                          << ") does not match number of inputs (" << num_in << ")");
+                          << ") does not match number of inputs (" << num_in << ")"
+                          << " for function " << fcn.getOption("name"));
 
     // Create arguments of the right dimensions and sparsity
     vector<MX> arg1(num_in);

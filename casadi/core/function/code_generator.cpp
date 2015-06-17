@@ -222,7 +222,7 @@ namespace casadi {
   }
 
   std::string CodeGenerator::workel(int n) const {
-    casadi_assert(n>=0);
+    if (n<0) return "0";
     stringstream s;
     if (this->codegen_scalars) s << "*";
     s << "w" << n;

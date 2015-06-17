@@ -1538,7 +1538,7 @@ namespace casadi {
 
     // Give it a suitable name
     stringstream ss;
-    ss << "derForward_" << getOption("name") << "_" << nfwd;
+    ss << "fwd" << nfwd << "_" << getOption("name");
     ret.setOption("name", ss.str());
 
     // Get the number of inputs and outputs
@@ -1644,7 +1644,7 @@ namespace casadi {
 
     // Give it a suitable name
     stringstream ss;
-    ss << "derReverse_" << getOption("name") << "_" << nadj;
+    ss << "adj" << nadj << "_" << getOption("name");
     ret.setOption("name", ss.str());
 
     // Get the number of inputs and outputs
@@ -1992,7 +1992,9 @@ namespace casadi {
 
       // Collect output arguments
       for (int i=0; i<res.size(); ++i) {
-        g.body << "  " << g.workel(res[i]) << "=w[" << (arg.size()+i) << "];" << endl;
+        if (res[i]>=0) {
+          g.body << "  " << g.workel(res[i]) << "=w[" << (arg.size()+i) << "];" << endl;
+        }
       }
     } else {
 
