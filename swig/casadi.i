@@ -161,11 +161,7 @@ namespace std {
   template<class A, class B> class map {};
 }
 #else // SWIGXML
-%include "std_string.i"
-%include "std_vector.i"
-%include "std_pair.i"
-%include "std_map.i"
-%include "typemaps.i"
+%include "stl.i"
 #endif // SWIGXML
 
 %define DEPRECATED_MSG(MSG)
@@ -586,7 +582,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     GUESTOBJECT* from_ptr(const Function *a);
 
     // Same as the above, but with reference instead of pointer
-    template<typename M> GUESTOBJECT* from_val(const M& m) { return from_ptr(&m);}
+    template<typename M> GUESTOBJECT* from_ref(const M& m) { return from_ptr(&m);}
 #ifdef SWIGMATLAB
     // Get sparsity pattern
     Sparsity getSparsity(const mxArray* p);
@@ -926,20 +922,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
 #ifdef SWIGPYTHON
-#if 1
-      return swig::from(*a);
-#else
-      PyObject* ret = PyList_New(0);
-      for (int k=0; k < a->size(); ++k) {
-        PyObject* el = from_val(a->at(k));
+      PyObject* ret = PyTuple_New(a->size());
+      for (int k=0; k<a->size(); ++k) {
+        PyObject* el = from_ref(a->at(k));
         if (!el) {
           Py_DECREF(ret);
           return 0;
         }
-        PyList_Append(ret, el);
+        PyTuple_SetItem(ret, k, el);
       }
       return ret;
-#endif
 #elif defined SWIGMATLAB
       return swig::from(*a);
 #else
@@ -1377,6 +1369,21 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 #endif // SWIGPYTHON      
       // No match
       return false;
+    }
+
+    template<typename M1, typename M2> GUESTOBJECT* from_ptr(const std::pair<M1, M2>* a) {
+      GUESTOBJECT* a_first = from_ref(a->first);
+      if (!a_first) return 0;
+      GUESTOBJECT* a_second = from_ref(a->second);
+      if (!a_second) return 0;
+#ifdef SWIGPYTHON
+      PyObject* ret = PyTuple_New(2);
+      PyTuple_SetItem(ret, 0, a_first);
+      PyTuple_SetItem(ret, 1, a_second);
+      return ret;
+#else
+      return 0;
+#endif // SWIGPYTHON      
     }
   } // namespace casadi
  }
@@ -1946,25 +1953,29 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
  // Define all output typemaps
 %define %casadi_output_typemaps(xType,...)
-%value_output_typemap(%arg(casadi::from_val), %arg("casadi_all"), %arg(xType));
+%value_output_typemap(%arg(casadi::from_ref), %arg("casadi_all"), %arg(xType));
 %enddef
 
  // legacy
 %define %casadi_output_typemaps_old(xName, xType...)
 %typemap(out, noblock=1, fragment="casadi_all") xType, const xType {
-  if(!($result = casadi::from_val($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
+  if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
 }
 
 %typemap(out, noblock=1, fragment="casadi_all") const xType& {
   if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
 }
+
+%typemap(argout,noblock=1,fragment="casadi_all") xType &OUTPUT {
+  %append_output(casadi::from_ptr($1));
+ }
 %enddef
 
  // Define all typemaps for a template instantiation without proxy classes
 %define %casadi_template(xName, xPrec, xType...)
 %template() xType;
 %casadi_input_typemaps(xName, xPrec, xType)
-%casadi_output_typemaps(%arg(xType))
+%casadi_output_typemaps_old(xName, %arg(xType))
 %enddef
 
  // Define all input and ouput typemaps
@@ -2099,7 +2110,6 @@ using namespace casadi;
 %fragment(SWIG_Traits_frag(casadi::Callback));
 %traits_swigtype(casadi::CustomEvaluate);
 %fragment(SWIG_Traits_frag(casadi::CustomEvaluate));
-
 %traits_swigtype(casadi::Function);
 %fragment(SWIG_Traits_frag(casadi::Function));
 #endif
