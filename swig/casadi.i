@@ -1924,12 +1924,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %typemap(freearg, noblock=1) const xType & {}
 %enddef
 
- // Define all typemaps for a template instantiation without proxy classes
-%define %casadi_template(xName, xPrec, xType...)
-%template() xType;
-%casadi_input_typemaps(xName, xPrec, xType)
-%enddef
-
  // Define all output typemaps
 %define %casadi_output_typemaps(xType,...)
 %value_output_typemap(%arg(casadi::from_val), %arg("casadi_all"), %arg(xType));
@@ -1944,6 +1938,13 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %typemap(out, noblock=1, fragment="casadi_all") const xType& {
   if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
 }
+%enddef
+
+ // Define all typemaps for a template instantiation without proxy classes
+%define %casadi_template(xName, xPrec, xType...)
+%template() xType;
+%casadi_input_typemaps(xName, xPrec, xType)
+%casadi_output_typemaps(%arg(xType))
 %enddef
 
  // Define all input and ouput typemaps
@@ -2012,7 +2013,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %template() std::vector< std::pair<int,int> >;
 #endif // SWIGMATLAB
 
-%casadi_input_typemaps("str", PREC_STRING, std::string)
+%casadi_typemaps("str", PREC_STRING, std::string)
 %casadi_template("[str]", PREC_STRING, std::vector<std::string>)
 %casadi_typemaps("Sparsity", PREC_SPARSITY, casadi::Sparsity)
 %casadi_template("[Sparsity]", PREC_SPARSITY, std::vector< casadi::Sparsity>)
