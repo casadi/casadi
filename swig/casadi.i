@@ -2440,7 +2440,12 @@ namespace casadi{
 } // namespace casadi
 #endif // SWIGPYTHON
 
+/* There is no reason to expose the Slice class to e.g. Python or MATLAB. Only if an interfaced language
+   lacks a slice type, the type should be exposed here */
+// #if !(defined(SWIGPYTHON) || defined(SWIGMATLAB))
 %include <casadi/core/matrix/slice.hpp>
+ //#endif
+
 %include <casadi/core/matrix/generic_expression_tools.hpp>
 
 // map the template name to the instantiated name
