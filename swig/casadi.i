@@ -578,7 +578,14 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     GUESTOBJECT* from_ptr(const int *a);
     GUESTOBJECT* from_ptr(const double *a);
     GUESTOBJECT* from_ptr(const std::string *a);
+    GUESTOBJECT* from_ptr(const Sparsity *a);
+    GUESTOBJECT* from_ptr(const IMatrix *a);
+    GUESTOBJECT* from_ptr(const DMatrix *a);
+    GUESTOBJECT* from_ptr(const MX *a);
+    GUESTOBJECT* from_ptr(const SX *a);
 
+    // Same as the above, but with reference instead of pointer
+    template<typename M> GUESTOBJECT* from_val(const M& m) { return from_ptr(&m);}
 #ifdef SWIGMATLAB
     // Get sparsity pattern
     Sparsity getSparsity(const mxArray* p);
@@ -940,7 +947,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     }
 
     GUESTOBJECT* from_ptr(const Function *a) {
-      return swig::from(*a);
+      return SWIG_NewPointerObj(new Function(*a), $descriptor(casadi::Function *), SWIG_POINTER_OWN);
     }
   } // namespace casadi
 }
@@ -1459,6 +1466,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // No match
       return false;
     }
+
+    GUESTOBJECT* from_ptr(const SX *a) {
+      return SWIG_NewPointerObj(new SX(*a), $descriptor(casadi::Matrix<casadi::SXElement> *), SWIG_POINTER_OWN);
+    }
   } // namespace casadi
  }
 
@@ -1508,6 +1519,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
       // No match
       return false;
+    }
+
+    GUESTOBJECT* from_ptr(const MX *a) {
+      return SWIG_NewPointerObj(new MX(*a), $descriptor(casadi::MX*), SWIG_POINTER_OWN);
     }
   } // namespace casadi
  }
@@ -1712,6 +1727,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // No match
       return false;
     }
+
+    GUESTOBJECT* from_ptr(const DMatrix *a) {
+      return SWIG_NewPointerObj(new DMatrix(*a), $descriptor(casadi::Matrix<double>*), SWIG_POINTER_OWN);
+    }
   } // namespace casadi
 }
 
@@ -1729,6 +1748,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
       // No match
       return false;
+    }
+
+    GUESTOBJECT* from_ptr(const Sparsity *a) {
+      return SWIG_NewPointerObj(new Sparsity(*a), $descriptor(casadi::Sparsity*), SWIG_POINTER_OWN);
     }
   } // namespace casadi
 }
@@ -1861,6 +1884,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // No match
       return false;
     }
+
+    GUESTOBJECT* from_ptr(const IMatrix *a) {
+      return SWIG_NewPointerObj(new IMatrix(*a), $descriptor(casadi::Matrix<int>*), SWIG_POINTER_OWN);
+    }
   } // namespace casadi
  }
 
@@ -1890,7 +1917,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  // Pass input by reference, convert argument
 %typemap(in, noblock=1, fragment="casadi_all") const xType & (xType m) {
   $1 = &m;
-  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to " xName " .");
+  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to " xName ".");
  }
 
  // Pass input by reference, cleanup
@@ -1902,11 +1929,19 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_input_typemaps(xName, xPrec, xType)
 %enddef
 
+%define %casadi_output_typemaps(xName, xType...)
+%typemap(out, noblock=1, fragment="casadi_all") xType, const xType {
+  if(!($result = casadi::from_ptr(&$1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
+}
+
+%typemap(out, noblock=1, fragment="casadi_all") const xType& {
+  if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
+}
+%enddef
+
 
 #ifdef SWIGPYTHON
-%typemap(out, noblock=1, fragment="casadi_all") casadi::GenericType {
-  if(!($result = casadi::from_ptr(&$1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
-}
+%casadi_output_typemaps("GenericType", casadi::GenericType)
 
 %typemap(out, fragment="casadi_all") std::vector< casadi::GenericType > {
   PyObject* ret = PyList_New(0);
@@ -2010,15 +2045,22 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_template("Dict", PREC_DICT, std::map<std::string,casadi::GenericType>)
 
 %define %my_value_output_typemaps(Type,...)
-%value_output_typemap(%arg(swig::from), %arg(SWIG_Traits_frag(Type)), %arg(Type));
+%value_output_typemap(%arg(casadi::from_val), %arg("casadi_all"), %arg(Type));
 %enddef
 
 // These make OUTPUT behave like expected for non std container types
-%my_value_output_typemaps(casadi::Matrix< casadi::SXElement >);
-%my_value_output_typemaps(casadi::Matrix< double >);
-%my_value_output_typemaps(casadi::Matrix< int >);
-%my_value_output_typemaps(casadi::MX);
-%my_value_output_typemaps(casadi::Sparsity);
+%my_value_output_typemaps(casadi::Matrix< casadi::SXElement >)
+%my_value_output_typemaps(casadi::Matrix< double >)
+%my_value_output_typemaps(casadi::Matrix< int >)
+%my_value_output_typemaps(casadi::MX)
+%my_value_output_typemaps(casadi::Sparsity)
+
+
+ //%casadi_output_typemaps("SX", casadi::Matrix<casadi::SXElement>)
+/* %casadi_output_typemaps("DMatrix", casadi::Matrix<double>) */
+/* %casadi_output_typemaps("IMatrix", casadi::Matrix<int>) */
+/* %casadi_output_typemaps("MX", casadi::MX) */
+/* %casadi_output_typemaps("Sparsity", casadi::Sparsity) */
 
 %{
 using namespace casadi;
