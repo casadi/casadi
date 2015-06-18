@@ -925,7 +925,26 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     }
 
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
+#ifdef SWIGPYTHON
+#if 1
       return swig::from(*a);
+#else
+      PyObject* ret = PyList_New(0);
+      for (int k=0; k < a->size(); ++k) {
+        PyObject* el = from_val(a->at(k));
+        if (!el) {
+          Py_DECREF(ret);
+          return 0;
+        }
+        PyList_Append(ret, el);
+      }
+      return ret;
+#endif
+#elif defined SWIGMATLAB
+      return swig::from(*a);
+#else
+      return 0;
+#endif
     }
   } // namespace casadi
 }
