@@ -166,25 +166,13 @@
 %exception  casadi::GenericType::is_a() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericType::toDictionary() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::GenericType::toDictionary() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::GenericType::toDoubleVector() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericType::toDoubleVector() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericType::toIntVector() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::GenericType::toIntVector() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::GenericType::toIntVectorVector() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericType::toIntVectorVector() {
@@ -748,9 +736,6 @@
 %exception  casadi::Sparsity::colind() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Sparsity::find(bool ind1=SWIG_IND1) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Sparsity::find(std::vector< int > &loc, bool ind1=false) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -835,16 +820,13 @@
 %exception  casadi::atanh(double x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::casadi_load_linearsolver_csparsecholesky() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::check_exposed(T t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::collocationInterpolators(const std::vector< double > &tau_root, std::vector< std::vector< double > > &C, std::vector< double > &D) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::collocationPointsL(int order, const std::string &scheme) {
+%exception  casadi::collocationPointsL(int order, const std::string &scheme="radau") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::constpow(const T &x, const T &n) {
@@ -1021,6 +1003,15 @@
 %exception  casadi::sign(double x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::slicot_periodic_schur(const std::vector< Matrix< double > > &a, std::vector< Matrix< double > > &t, std::vector< Matrix< double > > &z, std::vector< double > &eig_real, std::vector< double > &eig_imag, double num_zero) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::slicot_periodic_schur(int n, int K, const std::vector< double > &a, std::vector< double > &t, std::vector< double > &z, std::vector< double > &dwork, std::vector< double > &eig_real, std::vector< double > &eig_imag, double num_zero=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::slicot_periodic_schur(int n, int K, const std::vector< double > &a, std::vector< double > &t, std::vector< double > &z, std::vector< double > &eig_real, std::vector< double > &eig_imag, double num_zero=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::sort(const std::vector< T > &values, std::vector< T > &sorted_values, std::vector< int > &indices, bool invert_indices=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1136,9 +1127,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::DpleVecStructIOSchemeVector< M >::DpleVecStructIOSchemeVector(const std::vector< M > &t) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::EmptySparsity::EmptySparsity() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::GradFInputIOSchemeVector< M >::GradFInputIOSchemeVector(const std::vector< M > &t) {
@@ -1322,12 +1310,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::SXFunction::SXFunction(const std::vector< std::vector< SXElement > > &arg, const std::vector< std::vector< SXElement > > &res) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::ScalarSparseSparsity::ScalarSparseSparsity() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::ScalarSparsity::ScalarSparsity() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::SharedObject::SharedObject() {
