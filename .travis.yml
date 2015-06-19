@@ -178,9 +178,10 @@ matrix:
     - compiler: gcc
       os: linux
       script:
+	- sudo apt-get install pv
         - pushd /home/travis/build/
         - testbot/recipes/fetch.sh matlab$MATLABRELEASE.tar.gz
-        - mkdir matlab && tar -xvf matlab$MATLABRELEASE.tar.gz -C matlab > /dev/null
+        - mkdir matlab && tar -xvf matlab$MATLABRELEASE.tar.gz -C matlab | pv -r > /dev/null
         - ls -al /home/travis/build/
         - popd
         - mkdir build
