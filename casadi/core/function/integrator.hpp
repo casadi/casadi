@@ -61,6 +61,7 @@
     \endverbatim
 */
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of an ODE/DAE function [daeIn]
   enum DAEInput {
@@ -155,6 +156,7 @@ namespace casadi {
     /// Number of output arguments of an integrator
     INTEGRATOR_NUM_OUT
   };
+#endif // SWIG
 
   /// Forward declaration of internal class
   class IntegratorInternal;

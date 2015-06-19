@@ -299,7 +299,7 @@ class Simulatortests(casadiTestCase):
     #sim.setInput([num['p']],1)
     #sim.evaluate()
 
-    #self.checkarray(sim.getOutput(),DMatrix.zeros(sim.output().shape),"INTEGRATOR_XPF unsupported",digits=9)
+    #self.checkarray(sim.getOutput(),DMatrix.zeros(sim.output().shape),"'xpf' unsupported",digits=9)
     #self.checkarray(sim.getOutput(),DMatrix((q0*t**2*exp(t**3/(3*p)))/p),"Evaluation output mismatch",digits=9)
 
   def test_controlsim_inputs(self):

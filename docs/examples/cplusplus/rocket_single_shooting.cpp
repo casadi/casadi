@@ -135,13 +135,8 @@ int main(){
   // Integrate over all intervals
   MX X=X0;
   for(int k=0; k<nu; ++k){
-    // Assemble the input
-    vector<MX> input(INTEGRATOR_NUM_IN);
-    input[INTEGRATOR_X0] = X;
-    input[INTEGRATOR_P] = U[k];
-
     // Integrate
-    X = integrator(input).at(0);
+    X = integrator(make_map("x0", X, "p", U[k])).at("xf");
 
     // Lift X
     if(lifted_newton){

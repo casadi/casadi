@@ -145,19 +145,14 @@ int main(){
 
   // Loop over shooting nodes
   for(int k=0; k<ns; ++k){
-    // Input to the integrator
-    vector<MX> int_in(INTEGRATOR_NUM_IN);
-    int_in[INTEGRATOR_P] = U[k];
-    int_in[INTEGRATOR_X0] = X[k];
-
     // Create an evaluation node
-    vector<MX> I_out = integrator(int_in);
+    map<string, MX> I_out = integrator(make_map("x0", X[k], "p", U[k]));
 
     // Save continuity constraints
-    g.push_back( I_out[INTEGRATOR_XF] - X[k+1] );
+    g.push_back( I_out.at("xf") - X[k+1] );
     
     // Add objective function contribution
-    J += I_out[INTEGRATOR_QF];
+    J += I_out.at("qf");
   }
   
   // NLP 

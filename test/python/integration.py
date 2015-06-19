@@ -273,9 +273,8 @@ class Integrationtests(casadiTestCase):
                 integrator.init()
                 for ff in [fs,integrator]:
                   for k,v in point.items():
-                    i = getattr(casadi,('integrator_'+k).upper())
-                    if not ff.getInput(i).isEmpty():
-                      ff.setInput(v,i)
+                    if not ff.getInput(k).isEmpty():
+                      ff.setInput(v,k)
 
                 integrator.evaluate()
                 fs.evaluate()
@@ -386,9 +385,8 @@ class Integrationtests(casadiTestCase):
               
               for ff in [fs,integrator]:
                 for k,v in point.items():
-                  i = getattr(casadi,('integrator_'+k).upper())
-                  if not ff.getInput(i).isEmpty():
-                    ff.setInput(v,i)
+                  if not ff.getInput(k).isEmpty():
+                    ff.setInput(v,k)
 
               integrator.evaluate()
               
@@ -574,9 +572,8 @@ class Integrationtests(casadiTestCase):
        
             for ff in [fs,integrator]:
               for k,v in point.items():
-                i = getattr(casadi,('integrator_'+k).upper())
-                if not ff.getInput(i).isEmpty():
-                  ff.setInput(v,i)
+                if not ff.getInput(k).isEmpty():
+                  ff.setInput(v,k)
             integrator.evaluate()
             
             self.checkfunction(integrator,fs,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
@@ -988,11 +985,11 @@ class Integrationtests(casadiTestCase):
     qe.setInput(A,0)
     qe.setInput(vec(B),1)
     qe.evaluate()
-    self.checkarray(dot(Be,A)/1e3,qe.getOutput()/1e3,"jacobian(INTEGRATOR_X0,INTEGRATOR_XF)")
+    self.checkarray(dot(Be,A)/1e3,qe.getOutput()/1e3,"jacobian('x0','xf')")
     qeJ.setInput(A,0)
     qeJ.setInput(vec(B),1)
     qeJ.evaluate()
-    self.checkarray(qeJ.getOutput()/1e3,Be/1e3,"jacobian(INTEGRATOR_X0,INTEGRATOR_XF)")
+    self.checkarray(qeJ.getOutput()/1e3,Be/1e3,"jacobian('x0','xf')")
     
     
     qeJ2.setInput(A,0)
