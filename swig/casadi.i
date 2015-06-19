@@ -580,6 +580,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     GUESTOBJECT* from_ptr(const MX *a);
     GUESTOBJECT* from_ptr(const SX *a);
     GUESTOBJECT* from_ptr(const Function *a);
+    GUESTOBJECT* from_ptr(const Slice *a);
 
     // Same as the above, but with reference instead of pointer
     template<typename M> GUESTOBJECT* from_ref(const M& m) { return from_ptr(&m);}
@@ -1310,6 +1311,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
 
+    GUESTOBJECT* from_ptr(const Slice *a) {
+      return SWIG_NewPointerObj(new Slice(*a), $descriptor(casadi::Slice *), SWIG_POINTER_OWN);
+    }
+
   } // namespace casadi
 }
 
@@ -1951,13 +1956,12 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %typemap(freearg, noblock=1) const xType & {}
 %enddef
 
- // Define all output typemaps
-%define %casadi_output_typemaps(xType,...)
+%define %casadi_output_typemaps2(xName, xType,...)
 %value_output_typemap(%arg(casadi::from_ref), %arg("casadi_all"), %arg(xType));
 %enddef
 
- // legacy
-%define %casadi_output_typemaps_old(xName, xType...)
+ // Define all output typemaps
+%define %casadi_output_typemaps(xName, xType...)
 %typemap(out, noblock=1, fragment="casadi_all") xType, const xType {
   if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
 }
@@ -1975,28 +1979,23 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %define %casadi_template(xName, xPrec, xType...)
 %template() xType;
 %casadi_input_typemaps(xName, xPrec, xType)
-%casadi_output_typemaps_old(xName, %arg(xType))
+%casadi_output_typemaps(xName, %arg(xType))
+%enddef
+
+ // Define all input and ouput typemaps
+%define %casadi_typemaps2(xName, xPrec, xType...)
+%casadi_input_typemaps(xName, xPrec, xType)
+%casadi_output_typemaps2(xName, xType)
 %enddef
 
  // Define all input and ouput typemaps
 %define %casadi_typemaps(xName, xPrec, xType...)
 %casadi_input_typemaps(xName, xPrec, xType)
-%casadi_output_typemaps(xType)
+%casadi_output_typemaps(xName, xType)
 %enddef
 
 #ifdef SWIGPYTHON
-%casadi_output_typemaps_old("GenericType", casadi::GenericType)
-
-%typemap(out, fragment="casadi_all") std::vector< casadi::GenericType > {
-  PyObject* ret = PyList_New(0);
-  std::vector< casadi::GenericType > & in = $1;
-  for (int k=0 ; k < in.size(); ++k) {
-    PyObject* rete;
-    if (!(rete = casadi::from_ptr(&in[k]))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
-    PyList_Append(ret, rete);
-  }
-  $result = ret;
-}
+%casadi_output_typemaps("GenericType", casadi::GenericType)
 
 %typemap(out, noblock=1, fragment="casadi_all") const casadi::GenericType::Dict&  {
   if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
@@ -2044,41 +2043,41 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %template() std::vector< std::pair<int,int> >;
 #endif // SWIGMATLAB
 
-%casadi_typemaps("str", PREC_STRING, std::string)
+%casadi_typemaps2("str", PREC_STRING, std::string)
 %casadi_template("[str]", PREC_STRING, std::vector<std::string>)
-%casadi_typemaps("Sparsity", PREC_SPARSITY, casadi::Sparsity)
+%casadi_typemaps2("Sparsity", PREC_SPARSITY, casadi::Sparsity)
 %casadi_template("[Sparsity]", PREC_SPARSITY, std::vector< casadi::Sparsity>)
 %casadi_template("[[Sparsity]]", PREC_SPARSITY, std::vector<std::vector< casadi::Sparsity> >)
 %casadi_template("str:Sparsity", PREC_SPARSITY, std::map<std::string, casadi::Sparsity >)
 %casadi_template("str:[Sparsity]", PREC_SPARSITY, std::map<std::string, std::vector<casadi::Sparsity > >)
 %casadi_template("(str:Sparsity,[str])", PREC_SPARSITY, std::pair<std::map<std::string, casadi::Sparsity >, std::vector<std::string> >)
-%casadi_typemaps("int", SWIG_TYPECHECK_INTEGER, int)
+%casadi_typemaps2("int", SWIG_TYPECHECK_INTEGER, int)
 %casadi_template("[int]", PREC_IVector, std::vector<int>)
 %casadi_template("[[int]]", PREC_IVectorVector, std::vector<std::vector<int> >)
-%casadi_typemaps("double", SWIG_TYPECHECK_DOUBLE, double)
+%casadi_typemaps2("double", SWIG_TYPECHECK_DOUBLE, double)
 %casadi_template("[double]", SWIG_TYPECHECK_DOUBLE, std::vector<double>)
 %casadi_template("[[double]]", SWIG_TYPECHECK_DOUBLE, std::vector<std::vector<double> >)
-%casadi_typemaps("SX", PREC_SX, casadi::Matrix<casadi::SXElement>)
+%casadi_typemaps2("SX", PREC_SX, casadi::Matrix<casadi::SXElement>)
 %casadi_template("[SX]", PREC_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
 %casadi_template("[[SX]]", PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
 %casadi_template("str:SX", PREC_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
 %casadi_template("(str:SX,[str])", PREC_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
-%casadi_typemaps("MX", PREC_MX, casadi::MX)
+%casadi_typemaps2("MX", PREC_MX, casadi::MX)
 %casadi_template("[MX]", PREC_MXVector, std::vector<casadi::MX>)
 %casadi_template("[[MX]]", PREC_MXVectorVector, std::vector<std::vector<casadi::MX> >)
 %casadi_template("str:MX", PREC_MX, std::map<std::string, casadi::MX>)
 %casadi_template("(str:MX,[str])", PREC_MX, std::pair<std::map<std::string, casadi::MX >, std::vector<std::string> >)
-%casadi_typemaps("DMatrix", PREC_DMatrix, casadi::Matrix<double>)
+%casadi_typemaps2("DMatrix", PREC_DMatrix, casadi::Matrix<double>)
 %casadi_template("[DMatrix]", PREC_DMatrixVector, std::vector< casadi::Matrix<double> >)
 %casadi_template("[[DMatrix]]", PREC_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
 %casadi_template("str:DMatrix", PREC_DMatrix, std::map<std::string, casadi::Matrix<double> >)
 %casadi_template("(str:DMatrix,[str])", PREC_DMatrix, std::pair<std::map<std::string, casadi::Matrix<double> >, std::vector<std::string> >)
-%casadi_typemaps("IMatrix", PREC_IMatrix, casadi::Matrix<int>)
+%casadi_typemaps2("IMatrix", PREC_IMatrix, casadi::Matrix<int>)
 %casadi_template("[IMatrix]", PREC_IMatrixVector, std::vector< casadi::Matrix<int> >)
 %casadi_template("[[IMatrix]]", PREC_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
 %casadi_input_typemaps("GenericType", PREC_GENERICTYPE, casadi::GenericType)
-%casadi_typemaps("Slice", PREC_SLICE, casadi::Slice)
-%casadi_typemaps("Function", PREC_FUNCTION, casadi::Function)
+%casadi_typemaps2("Slice", PREC_SLICE, casadi::Slice)
+%casadi_typemaps2("Function", PREC_FUNCTION, casadi::Function)
 %casadi_template("[Function]", PREC_FUNCTION, std::vector<casadi::Function>)
 %casadi_template("(Function,Function)", PREC_FUNCTION, std::pair<casadi::Function,casadi::Function>)
 %casadi_input_typemaps("DerivativeGenerator", PREC_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
