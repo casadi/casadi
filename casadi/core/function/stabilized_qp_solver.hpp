@@ -55,6 +55,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a QP problem [stabilizedQpIn]
   enum StabilizedQpSolverInput {
@@ -84,6 +85,7 @@ namespace casadi {
     /// dense (nc x 1) [mu]
     STABILIZED_QP_SOLVER_MU,
     STABILIZED_QP_SOLVER_NUM_IN};
+#endif // SWIG
 
   // Forward declaration of internal class
   class StabilizedQpSolverInternal;
