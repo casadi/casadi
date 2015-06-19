@@ -923,17 +923,17 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
 #ifdef SWIGPYTHON
-      PyObject* ret = PyTuple_New(a->size());
+      PyObject* ret = PyList_New(a->size());
       for (int k=0; k<a->size(); ++k) {
         PyObject* el = from_ref(a->at(k));
         if (!el) {
           Py_DECREF(ret);
           return 0;
         }
-        PyTuple_SetItem(ret, k, el);
+        PyList_SetItem(ret, k, el);
       }
       return ret;
-#elif defined SWIGMATLAB
+#elif defined(SWIGMATLAB)
       return swig::from(*a);
 #else
       return 0;
