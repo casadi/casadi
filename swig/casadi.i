@@ -747,7 +747,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   } // namespace casadi
   }
 
-%fragment("casadi_int", "header", fragment="casadi_aux", fragment=SWIG_AsVal_frag(int)) {
+%fragment("casadi_int", "header", fragment="casadi_aux", fragment=SWIG_AsVal_frag(int), fragment=SWIG_AsVal_frag(long)) {
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, int** m) {
       // Treat Null
@@ -755,6 +755,18 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal(int)(p, m ? *m : 0))) return true;
+
+      // long within int bounds
+      {
+        long tmp;
+        if (SWIG_IsOK(SWIG_AsVal(long)(p, &tmp))) {
+          // Check if within bounds
+          if (tmp>=std::numeric_limits<int>::min() && tmp<=std::numeric_limits<int>::max()) {
+            if (m) **m = static_cast<int>(tmp);
+            return true;
+          }
+        }
+      }
 
       // Scalar IMatrix
       {
