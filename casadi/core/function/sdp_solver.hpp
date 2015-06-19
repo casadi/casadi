@@ -112,6 +112,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a SDP problem [sdpIn]
   enum SDPInput {
@@ -150,6 +151,7 @@ namespace casadi {
     /// The dual solution corresponding to simple bounds  (n x 1) [lam_x]
     SDP_SOLVER_LAM_X,
     SDP_SOLVER_NUM_OUT};
+#endif // SWIG
 
   // Forward declaration of internal class
   class SdpSolverInternal;

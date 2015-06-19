@@ -51,6 +51,7 @@
 
 */
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a \e dle solver [lrdleIn]
   enum LR_DLEInput {
@@ -71,6 +72,7 @@ namespace casadi {
     LR_DLE_Y,
     LR_DLE_NUM_OUT
   };
+#endif // SWIG
 
   /// Forward declaration of internal class
   class LrDleInternal;

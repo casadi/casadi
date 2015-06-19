@@ -48,6 +48,7 @@
 
 */
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a \e dple solver [dpleIn]
   enum DPLEInput {
@@ -65,6 +66,7 @@ namespace casadi {
     /// Number of arguments.
     DPLE_NUM_OUT
   };
+#endif // SWIG
 
   /// Forward declaration of internal class
   class DpleInternal;

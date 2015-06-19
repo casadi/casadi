@@ -56,6 +56,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a LP problem [lpIn]
   enum LpSolverInput {
@@ -84,6 +85,7 @@ namespace casadi {
     /// The dual solution corresponding to simple bounds [lam_x]
     LP_SOLVER_LAM_X,
     LP_SOLVER_NUM_OUT};
+#endif // SWIG
 
   // Forward declaration of internal class
   class LpSolverInternal;

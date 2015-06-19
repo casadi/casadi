@@ -36,6 +36,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a SDQP problem [sdqpIn]
   enum SDQPInput {
@@ -76,6 +77,7 @@ namespace casadi {
     /// The dual solution corresponding to simple bounds  (n x 1) [lam_x]
     SDQP_SOLVER_LAM_X,
     SDQP_SOLVER_NUM_OUT};
+#endif // SWIG
 
   // Forward declaration of internal class
   class SdqpSolverInternal;

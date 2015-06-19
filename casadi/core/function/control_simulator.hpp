@@ -29,6 +29,7 @@
 #include "integrator.hpp"
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of an ODE/DAE function [controldaeIn]
   enum ControlledDAEInput {
@@ -66,6 +67,7 @@ namespace casadi {
     CONTROLSIMULATOR_U,
     /// Number of input arguments of a piecewise simulator
     CONTROLSIMULATOR_NUM_IN};
+#endif // SWIG
 
   // Forward declaration of internal class
   class ControlSimulatorInternal;

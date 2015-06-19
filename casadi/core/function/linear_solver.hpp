@@ -50,6 +50,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a linear solver [linsolIn]
   enum LinsolInput {
@@ -64,6 +65,7 @@ namespace casadi {
     /// Solution to the linear system of equations [X]
     LINSOL_X,
     LINSOL_NUM_OUT};
+#endif // SWIG
 
   // Forward declaration of internal class
   class LinearSolverInternal;

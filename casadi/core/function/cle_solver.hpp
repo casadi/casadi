@@ -47,6 +47,7 @@
 
 */
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a \e cle solver [cleIn]
   enum CLEInput {
@@ -64,6 +65,7 @@ namespace casadi {
     /// Number of arguments.
     CLE_NUM_OUT
   };
+#endif // SWIG
 
   /// Forward declaration of internal class
   class CleInternal;

@@ -60,6 +60,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a SOCP problem [socpIn]
   enum SOCPInput {
@@ -96,6 +97,7 @@ namespace casadi {
     /// The dual solution corresponding to simple bounds  (n x 1) [lam_x]
     SOCP_SOLVER_LAM_X,
     SOCP_SOLVER_NUM_OUT};
+#endif // SWIG
 
   // Forward declaration of internal class
   class SocpSolverInternal;

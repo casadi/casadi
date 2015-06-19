@@ -57,6 +57,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a QP problem [qcqpIn]
   enum QcqpSolverInput {
@@ -99,6 +100,7 @@ namespace casadi {
     /// The dual solution corresponding to simple bounds [lam_x]
     QCQP_SOLVER_LAM_X,
     QCQP_SOLVER_NUM_OUT};
+#endif // SWIG
 
   // Forward declaration of internal class
   class QcqpSolverInternal;
