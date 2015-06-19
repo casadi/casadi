@@ -159,11 +159,3 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
 )
-
-# For DLL-based systems, rpath is not available,
-# so copy the dlls to the same directory as the .pyd files
-file(GLOB dlls "${PROJECT_BINARY_DIR}/lib/*.dll")
-install(FILES ${dlls}
-  DESTINATION "${PYTHON_PREFIX}/casadi"
-  COMPONENT install_python
-)

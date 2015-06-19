@@ -82,6 +82,7 @@ option(WITH_JSON "Compile the JSON front-end" OFF)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside Python front-end" OFF)
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
 option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" OFF)
+option(WITH_SELFCONTAINED "Make the install directory self-contained" OFF)
 
 # static on windows, shared on linux/osx by default
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -157,6 +158,10 @@ endif()
 ############################################################
 ######################## rpath #############################
 ############################################################
+
+if(WITH_SELFCONTAINED)
+set(CMAKE_INSTALL_RPATH "$ORIGIN")
+else()
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
@@ -175,7 +180,7 @@ list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib"
 if("${isSystemDir}" STREQUAL "-1")
    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib/casadi")
 endif("${isSystemDir}" STREQUAL "-1")
-
+endif()
 
 
 # For code optimization
