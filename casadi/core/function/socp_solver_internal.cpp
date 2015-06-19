@@ -28,6 +28,7 @@
 #include "sx_function.hpp"
 #include "../sx/sx_tools.hpp"
 #include <numeric>
+#include <functional>
 
 INPUTSCHEME(SOCPInput)
 OUTPUTSCHEME(SOCPOutput)
