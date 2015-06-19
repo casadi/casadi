@@ -940,6 +940,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           (**m).reserve(sz);
         }
 
+        // Temporary
+        M tmp;
+
         // Loop over elements
         for (int i=0; i<sz; ++i) {
           // Get element
@@ -962,7 +965,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
 #ifdef SWIGPYTHON
+      // std::vector maps to Python list
       PyObject* ret = PyList_New(a->size());
+      if (!ret) return 0;
       for (int k=0; k<a->size(); ++k) {
         PyObject* el = from_ref(a->at(k));
         if (!el) {
@@ -973,7 +978,15 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       }
       return ret;
 #elif defined(SWIGMATLAB)
-      return swig::from(*a);
+      // std::vector maps to MATLAB cell array
+      mxArray* ret = mxCreateCellMatrix(1, a->size());
+      if (!ret) return 0;
+      for (int k=0; k<a->size(); ++k) {
+        mxArray* el = from_ref(a->at(k));
+        if (!el) return 0;
+        mxSetCell(ret, k, el);
+      }
+      return ret;
 #else
       return 0;
 #endif
@@ -1996,17 +2009,17 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
  // Return-by-value
 %typemap(out, noblock=1, fragment="casadi_all") xType, const xType {
-  if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
+  if(!($result = casadi::from_ref(static_cast<const xType &>($1)))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
 }
 
 // Return a const-ref behaves like return-by-value
 %typemap(out, noblock=1, fragment="casadi_all") const xType& {
-  if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
+  if(!($result = casadi::from_ptr(static_cast<const xType *>($1)))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
 }
 
 // Inputs marked OUTPUT are also returned by the function
 %typemap(argout,noblock=1,fragment="casadi_all") xType &OUTPUT {
-  %append_output(casadi::from_ptr($1));
+  %append_output(casadi::from_ptr(static_cast<xType *>($1)));
  }
 
 // Corresponding input typemap
