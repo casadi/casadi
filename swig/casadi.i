@@ -2091,8 +2091,6 @@ using namespace casadi;
 #endif // SWIGMATLAB
 
 #ifndef SWIGXML
-%traits_swigtype(casadi::Callback);
-%fragment(SWIG_Traits_frag(casadi::Callback));
 %traits_swigtype(casadi::CustomEvaluate);
 %fragment(SWIG_Traits_frag(casadi::CustomEvaluate));
 #endif
