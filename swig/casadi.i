@@ -2090,11 +2090,6 @@ using namespace casadi;
 }
 #endif // SWIGMATLAB
 
-#ifndef SWIGXML
-%traits_swigtype(casadi::CustomEvaluate);
-%fragment(SWIG_Traits_frag(casadi::CustomEvaluate));
-#endif
-
 #ifdef SWIGPYTHON
 %pythoncode %{
 import _casadi
