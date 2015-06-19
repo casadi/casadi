@@ -2662,20 +2662,24 @@ SOCPOutputIOSchemeVector<M> socpOut(
     const std::string &arg_s0 ="", const M &arg_m0 =M(),
     const std::string &arg_s1 ="", const M &arg_m1 =M(),
     const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M()) {
-  std::vector<M> ret(4);
+    const std::string &arg_s3 ="", const M &arg_m3 =M(),
+    const std::string &arg_s4 ="", const M &arg_m4 =M(),
+    const std::string &arg_s5 ="", const M &arg_m5 =M()) {
+  std::vector<M> ret(6);
   std::map<std::string, M> arg;
   if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
   if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
   if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
   if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SOCPOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in SOCPOutput: '" << it->first
         << "' is not recognized. Available keywords are: "
-        "x, cost, lam_a, lam_x");  // NOLINT(whitespace/line_length)
+        "x, cost, dual_cost, lam_a, lam_x, lam_cone");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
   return SOCPOutputIOSchemeVector<M>(ret);
@@ -2685,12 +2689,16 @@ std::vector<M> socpOut(const std::vector<M>& args,
     const std::string &arg_s0="",
     const std::string &arg_s1="",
     const std::string &arg_s2="",
-    const std::string &arg_s3="") {
+    const std::string &arg_s3="",
+    const std::string &arg_s4="",
+    const std::string &arg_s5="") {
   std::vector<M> ret;
   if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s0))); // NOLINT(whitespace/line_length)
   if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s1))); // NOLINT(whitespace/line_length)
   if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s2))); // NOLINT(whitespace/line_length)
   if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s5))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -2710,18 +2718,20 @@ class CASADI_EXPORT SOCPStructIOSchemeVector : public IOSchemeVector<M> {
 template<class M>
 SOCPStructIOSchemeVector<M> socpStruct(
     const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
-  std::vector<M> ret(2);
+    const std::string &arg_s1 ="", const M &arg_m1 =M(),
+    const std::string &arg_s2 ="", const M &arg_m2 =M()) {
+  std::vector<M> ret(3);
   std::map<std::string, M> arg;
   if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
   if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SOCPStruct, it->first);
     if (n==-1)
       casadi_error("Keyword error in SOCPStruct: '" << it->first
         << "' is not recognized. Available keywords are: "
-        "g, a");  // NOLINT(whitespace/line_length)
+        "g, e, a");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
   return SOCPStructIOSchemeVector<M>(ret);
@@ -2729,10 +2739,12 @@ SOCPStructIOSchemeVector<M> socpStruct(
 template<class M>
 std::vector<M> socpStruct(const std::vector<M>& args,
     const std::string &arg_s0="",
-    const std::string &arg_s1="") {
+    const std::string &arg_s1="",
+    const std::string &arg_s2="") {
   std::vector<M> ret;
   if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct, arg_s0))); // NOLINT(whitespace/line_length)
   if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct, arg_s2))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
