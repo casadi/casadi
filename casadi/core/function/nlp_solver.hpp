@@ -49,6 +49,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of an NLP function [nlpIn]
   enum NLPInput {
@@ -182,6 +183,7 @@ namespace casadi {
     NLP_SOLVER_LAM_P,
     NLP_SOLVER_NUM_OUT
   };
+#endif // SWIG
 
   class NlpSolverInternal;
 
