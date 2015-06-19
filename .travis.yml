@@ -108,7 +108,7 @@ matrix:
         - sudo pip install texttable
         - sudo pip install --allow-unverified pydot pydot==1.0.28
         - sudo apt-get install graphviz python-lxml python-ipdb python-docutils doxygen -y
-        - pushd docs/api && cp /home/travis/build/testbot/docs.Makefile Makefile && make doxexport | grep -v "file loc from" && popd
+        - pushd docs/api && make doxexport | grep -v "file loc from" && popd
         
         # Let's verify that we can still compile
         - pushd build && make && popd

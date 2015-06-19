@@ -310,8 +310,8 @@ class Doxy2SWIG_X(Doxy2SWIG):
       tmp = node.parentNode.parentNode.parentNode
       compdef = tmp.getElementsByTagName('compounddef')[0]
       cdef_kind = compdef.attributes['kind'].value
-      
-      if prot == 'public':
+      location = node.getElementsByTagName('location')[0].attributes['file'].value
+      if prot == 'public' and not location.endswith('cpp'):
           first = self.get_specific_nodes(node, ('definition', 'name','argsstring'))
           name = first['name'].firstChild.data
           if name[:8] == 'operator': # Don't handle operators yet.
