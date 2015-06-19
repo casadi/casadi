@@ -1962,17 +1962,27 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
  // Define all output typemaps
 %define %casadi_output_typemaps(xName, xType...)
+
+ // Return-by-value
 %typemap(out, noblock=1, fragment="casadi_all") xType, const xType {
   if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
 }
 
+// Return a const-ref behaves like return-by-value
 %typemap(out, noblock=1, fragment="casadi_all") const xType& {
   if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
 }
 
+// Inputs marked OUTPUT are also returned
 %typemap(argout,noblock=1,fragment="casadi_all") xType &OUTPUT {
   %append_output(casadi::from_ptr($1));
  }
+
+// Corresponding input typemap
+%typemap(in, numinputs=0) xType &OUTPUT (xType temp) {
+ $1 = &temp;
+}
+
 %enddef
 
  // Define all typemaps for a template instantiation without proxy classes
@@ -2053,7 +2063,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_template("[[SX]]", PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
 %casadi_template("str:SX", PREC_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
 %casadi_template("(str:SX,[str])", PREC_SX, std::pair<std::map<std::string, casadi::Matrix<casadi::SXElement> >, std::vector<std::string> >)
-%casadi_typemaps2("MX", PREC_MX, casadi::MX)
+%casadi_typemaps("MX", PREC_MX, casadi::MX)
 %casadi_template("[MX]", PREC_MXVector, std::vector<casadi::MX>)
 %casadi_template("[[MX]]", PREC_MXVectorVector, std::vector<std::vector<casadi::MX> >)
 %casadi_template("str:MX", PREC_MX, std::map<std::string, casadi::MX>)
