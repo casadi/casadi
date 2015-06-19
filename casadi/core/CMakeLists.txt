@@ -7,7 +7,9 @@ add_definitions(-DSHARED_LIBRARY_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 # Look for plugins in the installation directory
 file(TO_NATIVE_PATH ${PLUGIN_INSTALL_PATH} PLUGIN_EXTRA_SEARCH_PATH)
 string(REPLACE "\\" "\\\\" PLUGIN_EXTRA_SEARCH_PATH ${PLUGIN_EXTRA_SEARCH_PATH})
+if(NOT WITH_SELFCONTAINED)
 add_definitions(-DPLUGIN_EXTRA_SEARCH_PATH="${PLUGIN_EXTRA_SEARCH_PATH}")
+endif()
 
 add_subdirectory(runtime)
 

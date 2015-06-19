@@ -18,14 +18,11 @@ set(QPOASES_LIBRARIES ${QPOASES_LIBRARIES})
 file(GLOB SRC src/*.cpp)
 file(GLOB EXTRAS_SRC src/extras/*.cpp)
 
-if(ENABLE_STATIC)
-add_library(casadi_qpoases STATIC ${SRC} ${EXTRAS_SRC})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_qpoases SHARED ${SRC} ${EXTRAS_SRC})
-endif()
+casadi_external_library(casadi_qpoases ${SRC} ${EXTRAS_SRC})
+
 target_link_libraries(casadi_qpoases ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
-install(TARGETS casadi_qpoases
-  LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH}
-  ARCHIVE DESTINATION ${PLUGIN_INSTALL_PATH}
-)
+
+install(DIRECTORY include
+  DESTINATION include/casadi/external_packages/qpOASES
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE)

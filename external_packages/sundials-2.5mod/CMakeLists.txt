@@ -136,14 +136,4 @@ set(SUNDIALS_SOURCES
   kinsol/kinsol_sptfqmr.c
 )
 
-if(ENABLE_STATIC)
-add_library(casadi_sundials STATIC ${SUNDIALS_INCLUDES} ${SUNDIALS_SOURCES})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_sundials SHARED ${SUNDIALS_INCLUDES} ${SUNDIALS_SOURCES})
-endif()
-install(TARGETS casadi_sundials
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
-set_target_properties(casadi_sundials PROPERTIES SOVERSION ${PACKAGE_SO_VERSION})
+casadi_external_library(casadi_sundials ${SUNDIALS_INCLUDES} ${SUNDIALS_SOURCES})

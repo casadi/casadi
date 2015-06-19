@@ -132,23 +132,12 @@ def _swig_repr(self):
 #ifdef SWIGMATLAB
 %matlabsetup %{
 
-% On Linux, matlab loading casadiMATLAB_wrap does not obey
-% LD_LIBRARY_PATH as set from within matlab (suing setenv),
-% only if it is set by the sehll calling matlab.
-%
-% This limitation makes it hard to have an everything-in-one-folder  + addpath approach to
-% Matlab binaries. To still have this approach, we can explicitly load the library upfront
-
 disect_path = strsplit(mfilename('fullpath'),filesep);
 libpath = strjoin(disect_path(1:end-1),filesep);
 
-try
-  loadlibrary([libpath,filesep,'libcasadi']);
-catch
-  % If this fails, we are probably on Windows where this trick is not needed
-end
+import casadi.*
 
-setenv('CASADIPATH',[ getenv('CASADIPATH') pathsep libpath]);
+CasadiOptions.setCasadiPath(libpath);
 
 %}
 #endif
@@ -2182,6 +2171,16 @@ using namespace casadi;
 
 #ifdef SWIGPYTHON
 %pythoncode %{
+if __name__ != "casadi.casadi":
+  raise Exception("""
+            CasADi is not running from its package context.
+
+            You probably specified the wrong casadi directory.
+
+            When setting PYTHONPATH or sys.path.append,
+            take care not to add a trailing '/casadi'.
+                        
+        """)
 import _casadi
 %}
 #endif // SWIGPYTHON

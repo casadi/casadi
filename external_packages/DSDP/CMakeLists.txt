@@ -13,25 +13,11 @@ file(GLOB DSDP_SRC "src/bounds/*.c"  "src/bounds/*.h" "src/lp/*.c" "src/lp/*.h" 
 
 set(DSDP_LIBRARIES ${DSDP_LIBRARIES})
 
-if(ENABLE_STATIC)
-add_library(casadi_dsdp STATIC ${DSDP_SRC})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_dsdp SHARED ${DSDP_SRC})
-endif()
+casadi_external_library(casadi_dsdp ${DSDP_SRC})
+
 target_link_libraries(casadi_dsdp ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
-install(TARGETS casadi_dsdp
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
+
 install(DIRECTORY include
   DESTINATION include/casadi/external_packages/DSDP
   FILES_MATCHING PATTERN "*.h"
   PATTERN ".svn" EXCLUDE)
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-set_target_properties(
-  casadi_dsdp
-PROPERTIES
-  SOVERSION ${PACKAGE_SO_VERSION}
-)
-endif()

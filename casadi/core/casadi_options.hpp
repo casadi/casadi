@@ -79,6 +79,8 @@ namespace casadi {
 
       static bool allowed_internal_api;
 
+      static std::string casadipath;
+
 #endif //SWIG
       // Setter and getter for catch_errors_swig
       static void setCatchErrorsSwig(bool flag) { catch_errors_swig = flag; }
@@ -105,6 +107,9 @@ namespace casadi {
 
       static void setAllowedInternalAPI(bool flag) { allowed_internal_api= flag; }
       static bool getAllowedInternalAPI() { return allowed_internal_api; }
+
+      static void setCasadiPath(const std::string & path) { casadipath = path; }
+      static std::string getCasadiPath() { return casadipath; }
   };
 
 } // namespace casadi

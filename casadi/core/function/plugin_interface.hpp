@@ -24,6 +24,7 @@
 #define CASADI_PLUGIN_INTERFACE_HPP
 
 #include "../function/function_internal.hpp"
+#include "../casadi_options.hpp"
 #include "wrapper.hpp"
 #include "adaptor.hpp"
 
@@ -179,6 +180,13 @@ namespace casadi {
     const std::string filesep("/");
     #endif
 
+    // Search path: global casadipath option
+    std::stringstream casadipaths(CasadiOptions::getCasadiPath());
+    std::string casadipath;
+    while (std::getline(casadipaths, casadipath, pathsep)) {
+      search_paths.push_back(casadipath);
+    }
+
     // Search path: CASADIPATH env variable
     char* pLIBDIR;
     pLIBDIR = getenv("CASADIPATH");
@@ -187,28 +195,35 @@ namespace casadi {
       std::stringstream casadipaths(pLIBDIR);
       std::string casadipath;
       while (std::getline(casadipaths, casadipath, pathsep)) {
-        search_paths.push_back(casadipath + filesep + lib);
+        search_paths.push_back(casadipath);
       }
     }
 
     // Search path: bare
-    search_paths.push_back(lib);
+    search_paths.push_back("");
 
     // Search path : PLUGIN_EXTRA_SEARCH_PATH
     #ifdef PLUGIN_EXTRA_SEARCH_PATH
     search_paths.push_back(
-      std::string("") + PLUGIN_EXTRA_SEARCH_PATH + filesep + lib);
+      std::string("") + PLUGIN_EXTRA_SEARCH_PATH);
     #endif // PLUGIN_EXTRA_SEARCH_PATH
 
     // Search path : current directory
-    search_paths.push_back("." + filesep + lib);
+    search_paths.push_back(".");
 
     // Prepare error string
     std::stringstream errors;
     errors << "PluginInterface::loadPlugin: Cannot load shared library '"
            << lib << "': " << std::endl;
-    errors << "   (You may set CASADIPATH env variable with locations"
-           << "to search for plugin libraries.)";
+    errors << "   (\n"
+           << "    Searched directories: 1. casadipath from CasadiOptions\n"
+           << "                          2. CASADIPATH env var\n"
+           << "                          3. PATH env var (Windows)\n"
+           << "                          4. LD_LIBRARY_PATH env var (Linux)\n"
+           << "    A library may be 'not found' even if the file exists:\n"
+           << "          * library is not compatible (different compiler/bitness)\n"
+           << "          * the dependencies are not found\n"
+           << "   )";
 
     // Alocate a handle pointer
 #ifdef _WIN32
@@ -231,14 +246,17 @@ namespace casadi {
     for (int i=0;i<search_paths.size();++i) {
       searchpath = search_paths[i];
 #ifdef _WIN32
-      handle = LoadLibrary(TEXT(searchpath.c_str()));
+      SetDllDirectory(TEXT(searchpath.c_str()));
+      handle = LoadLibrary(TEXT(lib.c_str()));
+      SetDllDirectory(NULL);
 #else // _WIN32
-      handle = dlopen(searchpath.c_str(), flag);
+      std::string name = searchpath.size()==0 ? lib : searchpath + filesep + lib;
+      handle = dlopen(name.c_str(), flag);
 #endif // _WIN32
       if (handle) {
         break;
       } else {
-        errors << std::endl << "  Tried " << searchpath << ":";
+        errors << std::endl << "  Tried '" << searchpath << "' :";
 #ifdef _WIN32
         errors << std::endl << "    Error code (WIN32): " << STRING(GetLastError());
 #else // _WIN32
@@ -263,7 +281,6 @@ namespace casadi {
 
     // Create a temporary struct
     Plugin plugin = pluginFromRegFcn(reg);
-
     // Register the plugin
     if (register_plugin) {
       registerPlugin(plugin);
