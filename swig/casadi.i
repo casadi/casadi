@@ -948,15 +948,14 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // Treat Null
       if (is_null(p)) return false;
 
-      casadi::Function *t = 0;
-      int res = swig::asptr(p, &t);
-      if(SWIG_CheckState(res) && t) {
-        if(m) **m=*t;
-        if (SWIG_IsNewObj(res)) delete t;
+      // GenericType already?
+      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
+                                    $descriptor(casadi::Function*), 0))) {
         return true;
-      } else {
-        return false;
       }
+
+      // No match
+      return false;
     }
 
     GUESTOBJECT* from_ptr(const Function *a) {
@@ -1414,7 +1413,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 
 %fragment("casadi_sx", "header", fragment="casadi_aux") {
-  // Traits specialization for SX
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, SX** m) {
       // Treat Null
@@ -1506,7 +1504,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 
 %fragment("casadi_mx", "header", fragment="casadi_decl") {
-  // Traits specialization for MX
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, MX** m) {
       // Treat Null
@@ -1560,7 +1557,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  }
 
 %fragment("casadi_dmatrix", "header", fragment="casadi_aux") {
-  // Traits specialization for DMatrix
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, DMatrix** m) {
       // Treat Null
@@ -2101,8 +2097,6 @@ using namespace casadi;
 %fragment(SWIG_Traits_frag(casadi::Callback));
 %traits_swigtype(casadi::CustomEvaluate);
 %fragment(SWIG_Traits_frag(casadi::CustomEvaluate));
-%traits_swigtype(casadi::Function);
-%fragment(SWIG_Traits_frag(casadi::Function));
 #endif
 
 #ifdef SWIGPYTHON
