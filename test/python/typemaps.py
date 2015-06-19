@@ -913,7 +913,7 @@ class typemaptests(casadiTestCase):
     sol = Integrator("idas",ode);
     a = sol.getOptionAllowed("linear_solver_type")
     
-    self.assertTrue(isinstance(a,list))
+    self.assertTrue(isinstance(a,tuple))
     for i in a:
       self.assertTrue(isinstance(i,str))
 

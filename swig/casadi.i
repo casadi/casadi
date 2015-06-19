@@ -1994,15 +1994,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_output_typemaps(xName, xType)
 %enddef
 
-#ifdef SWIGPYTHON
-%casadi_output_typemaps("GenericType", casadi::GenericType)
-
-%typemap(out, noblock=1, fragment="casadi_all") const casadi::GenericType::Dict&  {
-  if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
-}
-#endif // SWIGPYTHON
-
-
 // Order in typemap matching: Lower value means will be checked first
 %define PREC_DERIVATIVEGENERATOR 21 %enddef
 %define PREC_CUSTOMEVALUATE 21 %enddef
@@ -2075,15 +2066,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_typemaps2("IMatrix", PREC_IMatrix, casadi::Matrix<int>)
 %casadi_template("[IMatrix]", PREC_IMatrixVector, std::vector< casadi::Matrix<int> >)
 %casadi_template("[[IMatrix]]", PREC_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
-%casadi_input_typemaps("GenericType", PREC_GENERICTYPE, casadi::GenericType)
+%casadi_typemaps("GenericType", PREC_GENERICTYPE, casadi::GenericType)
+%casadi_template("[GenericType]", PREC_GENERICTYPE, std::vector<casadi::GenericType>)
 %casadi_typemaps2("Slice", PREC_SLICE, casadi::Slice)
 %casadi_typemaps2("Function", PREC_FUNCTION, casadi::Function)
 %casadi_template("[Function]", PREC_FUNCTION, std::vector<casadi::Function>)
-%casadi_template("(Function,Function)", PREC_FUNCTION, std::pair<casadi::Function,casadi::Function>)
+%casadi_template("(Function,Function)", PREC_FUNCTION, std::pair<casadi::Function, casadi::Function>)
 %casadi_input_typemaps("DerivativeGenerator", PREC_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
 %casadi_input_typemaps("CustomEvaluate", PREC_CUSTOMEVALUATE, casadi::CustomEvaluate)
 %casadi_input_typemaps("Callback", PREC_CALLBACK, casadi::Callback)
-%casadi_template("Dict", PREC_DICT, std::map<std::string,casadi::GenericType>)
+%casadi_template("Dict", PREC_DICT, std::map<std::string, casadi::GenericType>)
 %{
 using namespace casadi;
 %}
