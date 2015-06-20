@@ -322,16 +322,18 @@ namespace casadi {
     return (*this)->getRow();
   }
 
-  std::pair<std::vector<int>, std::vector<int> > Sparsity::getCCS() const {
-    return make_pair(getColind(), getRow());
+  void Sparsity::getCCS(std::vector<int>& colind, std::vector<int>& row) const {
+    colind = getColind();
+    row = getRow();
   }
 
-  std::pair<std::vector<int>, std::vector<int> > Sparsity::getCRS() const {
-    return T().getCCS();
+  void Sparsity::getCRS(std::vector<int>& rowind, std::vector<int>& col) const {
+    T().getCCS(rowind, col);
   }
 
-  std::pair<std::vector<int>, std::vector<int> > Sparsity::getTriplet() const {
-    return make_pair(getCol(), getRow());
+  void Sparsity::getTriplet(std::vector<int>& row, std::vector<int>& col) const {
+    row = getRow();
+    col = getCol();
   }
 
   Sparsity Sparsity::transpose(std::vector<int>& mapping, bool invert_mapping) const {

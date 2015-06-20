@@ -368,13 +368,16 @@ namespace casadi {
     std::vector<int> getUpperNZ() const;
 
     /// Get the sparsity in compressed column storage (CCS) format
-    std::pair<std::vector<int>, std::vector<int> > getCCS() const;
+    void getCCS(std::vector<int>& SWIG_OUTPUT(colind),
+                std::vector<int>& SWIG_OUTPUT(row)) const;
 
     /// Get the sparsity in compressed row storage (CRS) format
-    std::pair<std::vector<int>, std::vector<int> > getCRS() const;
+    void getCRS(std::vector<int>& SWIG_OUTPUT(rowind),
+                std::vector<int>& SWIG_OUTPUT(col)) const;
 
     /// Get the sparsity in sparse triplet format
-    std::pair<std::vector<int>, std::vector<int> > getTriplet() const;
+    void getTriplet(std::vector<int>& SWIG_OUTPUT(row),
+                    std::vector<int>& SWIG_OUTPUT(col)) const;
 
     /** \brief Get a submatrix
      *

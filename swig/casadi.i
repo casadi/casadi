@@ -2203,7 +2203,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_template("Dict", PREC_DICT, std::map<std::string, casadi::GenericType>)
 
 %template() std::vector<unsigned char>;
-%template() std::pair<std::vector<int>, std::vector<int> >;
 
 #ifndef SWIGMATLAB
 %template() std::pair<int,int>;
