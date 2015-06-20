@@ -149,9 +149,6 @@ namespace casadi {
     return SX::zz_substituteInPlace(v, vdef, ex, reverse);
   }
 
-  /** \brief  Get the sparsity pattern of a matrix */
-  inline SX spy(const SX& A) { return A.zz_spy();}
-
   /** \brief Get all symbols contained in the supplied expression
    * Get all symbols on which the supplied expression depends
    * \see SXFunction::getFree()

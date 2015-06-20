@@ -360,7 +360,6 @@ namespace casadi {
                                            std::vector<SX >& vdef,
                                            std::vector<SX >& ex,
                                            bool reverse);
-  template<> SX SX::zz_spy() const;
   template<> bool SX::zz_dependsOn(const SX &arg) const;
   template<> std::vector<SX > SX::zz_symvar() const;
   template<> SX SX::zz_jacobian(const SX &arg) const;

@@ -2633,12 +2633,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_spy() const {
-    throw CasadiException("\"spy\" not defined for instantiation");
-    return Matrix<DataType>();
-  }
-
-  template<typename DataType>
   bool Matrix<DataType>::zz_dependsOn(const Matrix<DataType> &arg) const {
     throw CasadiException("\"dependsOn\" not defined for instantiation");
     return false;

@@ -1352,16 +1352,6 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_spy() const {
-    SX s = SX(size1(), size2());
-    for (int i=0; i<size2(); ++i)
-      for (int j=0; j<size1(); ++j)
-        if (!(*this)(j, i).toScalar()->isZero())
-          s(j, i) = 1;
-    return s;
-  }
-
-  template<>
   bool SX::zz_dependsOn(const SX &arg) const {
     if (nnz()==0) return false;
 

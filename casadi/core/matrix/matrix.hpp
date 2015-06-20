@@ -441,7 +441,6 @@ namespace casadi {
                                      std::vector<Matrix<DataType> >& SWIG_INOUT(vdef),
                                      std::vector<Matrix<DataType> >& SWIG_INOUT(ex),
                                      bool reverse=false);
-    Matrix<DataType> zz_spy() const;
     bool zz_dependsOn(const Matrix<DataType> &arg) const;
     std::vector<Matrix<DataType> > zz_symvar() const;
     Matrix<DataType> zz_jacobian(const Matrix<DataType> &arg) const;
