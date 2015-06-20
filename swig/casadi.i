@@ -2159,6 +2159,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to " xName ".");
  }
 
+ // ... also for dynamic dispatch
+%typemap(typecheck, noblock=1, fragment="casadi_all") xType& INOUT {
+  $1 = casadi::to_ptr($input, static_cast< xType **>(0));
+ }
+
 %enddef
 
  // Define all typemaps for a template instantiation without proxy classes
