@@ -175,9 +175,6 @@ namespace casadi {
    */
   inline SX getSymbols(const SX& e) { return e.zz_getSymbols().front();}
 
-  /** \brief Get all the free variables in an expression */
-  inline SX getFree(const SX& ex) { return getSymbols(ex);}
-
   ///@{
   /** \brief Calculate jacobian via source code transformation
 
