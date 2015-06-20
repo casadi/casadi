@@ -98,6 +98,58 @@ namespace casadi {
 
     /// Indicates whether problem is printed before solving
     bool print_problem_;
+
+    /** \brief Convert Second Order Cone Programming (SOCP) problem in standard form to one in a conic form.
+    \verbatim
+    Dual:
+
+    max          c' x
+    x
+    subject to
+    || yi ||_2 <= ti  i = 1..m
+    A x + b == 0
+    lbx <= x
+     
+    Dimensions                       | Meaning in terms of primal variables
+    ------------------------------------------------------------------------------------------------------------
+    with x ( nx x 1)                 | [lag_ti' lag_yi' lag_lba' lag_uba' lag_lbx' lag_ubx']'
+    c dense ( nx x 1 )               | [-fi' hi' LBA' -UBA' LBX' -UBX']'
+    yi dense ( ni )                  | Lagrange multipliers for equality constraints: yi = Gi' x + hi
+    ti dense ( m )                   | Lagrange multipliers for equality constraint: ti = ei' x + fi
+    A  sparse ( n x nx )             | [-ei Gi -Alba' Auba' -Ilbx Iubx]
+    b  dense ( n x 1 )               | [c]
+    lbx dense ( nx x 1 )             | [-inf' 0']'
+    nx = m + N + nlba + nuba + nlbx + nubx
+    \endverbatim
+    */
+    void convertToDualSocp();
+
+    /// Linear objective in dual SOCP
+    std::vector<double>  dual_c_;
+
+    /// Sparse representation linear inequality constraints in dual SOCP
+    /// @{
+    std::vector<double>  dual_A_data_;
+    std::vector<int>     dual_A_row_;
+    std::vector<int>     dual_A_colind_;
+    /// @}
+
+    /// Vector of affine terms in linear inequality constraint in dual SOCP
+    std::vector<double>  dual_b_;
+
+    /** Indices of lower bounded linear inequality constraints (LBA != -inf),
+    used to set up dual SOCP variables */
+    std::vector<int>  primal_idx_lba_;
+
+    /** Indices of upper bounded linear inequality constraints (UBA != inf),
+    used to set up dual SOCP variables */
+    std::vector<int>  primal_idx_uba_;
+
+    /// Indices of simple lower bounds  (LBX != -inf), used to set up dual SOCP variables
+    std::vector<int>  primal_idx_lbx_;
+
+    /// Indices of simple upper bounds (UBX != inf), used to set up dual SOCP variables
+    std::vector<int>  primal_idx_ubx_;
 };
 
 

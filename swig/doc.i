@@ -10187,903 +10187,6 @@ representation of the object.
 ";
 
 
-// File: classcasadi_1_1EmptySparsity.xml
-
-
-/*  Check if two sparsity patterns are identical  */
-
-/*  Size and element counting  */ %feature("docstring")
-casadi::Sparsity::nnz() const  " [INTERNAL]  Get the number of (structural)
-non-zeros.
-
-See:   numel()
-
-";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(bool
-clone_members=true) " [INTERNAL]  Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
-";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
-SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-" [INTERNAL]  Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
-";
-
-%feature("docstring")  casadi::Sparsity::reserve(int nnz, int ncol) "
-[INTERNAL]  DEPRECATED: Reserve space.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_norm_0_mul(const Sparsity &B)
-const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternUnion(const Sparsity &y,
-std::vector< unsigned char > &output_mapping) const  " [INTERNAL]  Union of
-two sparsity patterns.
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternUnion(const Sparsity &y)
-const  " [INTERNAL]  Union of two sparsity patterns.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_mtimes(const Sparsity &y) const
-" [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_mtimes(const Sparsity &Y, const
-Sparsity &Z) const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::compress() const  " [INTERNAL]
-Compress a sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::makeDense(std::vector< int >
-&mapping) const  " [INTERNAL]  Make a patten dense.
-
-";
-
-%feature("docstring")  casadi::Sparsity::enlarge(int nrow, int ncol, const
-std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false) "
-[INTERNAL]  Enlarge matrix Make the matrix larger by inserting empty rows
-and columns, keeping the existing non-zeros.
-
-For the matrices A to B A(m, n) length(jj)=m , length(ii)=n B(nrow, ncol)
-
-A=enlarge(m, n, ii, jj) makes sure that
-
-B[jj, ii] == A
-
-";
-
-%feature("docstring")  casadi::Sparsity::getUpperNZ() const  " [INTERNAL]
-Get nonzeros in upper triangular part.
-
-";
-
-%feature("docstring")  casadi::Sparsity::set(T *data, const T *val_data,
-const Sparsity &val_sp) const  " [INTERNAL]  Assign the nonzero entries of
-one sparsity pattern to the nonzero entries of another sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::set(DataType *data, const DataType
-*val_data, const Sparsity &val_sp) const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::isEmpty(bool both=false) const  "
-[INTERNAL]  Check if the sparsity is empty.
-
-A sparsity is considered empty if one of the dimensions is zero (or
-optionally both dimensions)
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternInverse() const  "
-[INTERNAL]  Take the inverse of a sparsity pattern; flip zeros and non-
-zeros.
-
-";
-
-%feature("docstring")  casadi::Sparsity::removeDuplicates(std::vector< int >
-&mapping) " [INTERNAL]  Remove duplicate entries.
-
-The same indices will be removed from the mapping vector, which must have
-the same length as the number of nonzeros
-
-";
-
-%feature("docstring")  casadi::Sparsity::appendColumns(const Sparsity &sp) "
-[INTERNAL]  Append another sparsity patten horizontally.
-
-";
-
-%feature("docstring")  casadi::Sparsity::diag(int nrow) " [INTERNAL]  Create
-diagonal sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::diag(int nrow, int ncol) "
-[INTERNAL]  Create diagonal sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::diag(const std::pair< int, int >
-&rc) " [INTERNAL]  Create diagonal sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sub(const std::vector< int > &rr,
-const std::vector< int > &cc, std::vector< int > &output_mapping, bool
-ind1=false) const  " [INTERNAL]  Get a submatrix.
-
-Returns the sparsity of the submatrix, with a mapping such that submatrix[k]
-= originalmatrix[mapping[k]]
-
-";
-
-%feature("docstring")  casadi::Sparsity::sub(const std::vector< int > &rr,
-const Sparsity &sp, std::vector< int > &output_mapping, bool ind1=false)
-const  " [INTERNAL]  Get a set of elements.
-
-Returns the sparsity of the corresponding elements, with a mapping such that
-submatrix[k] = originalmatrix[mapping[k]]
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_reshape(int nrow, int ncol)
-const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_reshape(const Sparsity &sp)
-const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")
-casadi::Sparsity::stronglyConnectedComponents(std::vector< int >
-&output_index, std::vector< int > &output_offset) const  " [INTERNAL]  Find
-the strongly connected components of the bigraph defined by the sparsity
-pattern of a square matrix.
-
-See Direct Methods for Sparse Linear Systems by Davis (2006). Returns:
-Number of components
-
-Offset for each components (length: 1 + number of components)
-
-Indices for each components, component i has indices index[offset[i]], ...,
-index[offset[i+1]]
-
-In the case that the matrix is symmetric, the result has a particular
-interpretation: Given a symmetric matrix A and n =
-A.stronglyConnectedComponents(p, r)
-
-=> A[p, p] will appear block-diagonal with n blocks and with the indices of
-the block boundaries to be found in r.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_kron(const Sparsity &b) const  "
-[INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::T() const  " [INTERNAL]   Transpose
-the matrix.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isReshape(const Sparsity &y) const
-" [INTERNAL]  Check if the sparsity is a reshape of another.
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity  >::zz_repmat(int
-n, int m=1) const " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::addNZ(int rr, int cc) " [INTERNAL]
-Get the index of a non-zero element Add the element if it does not exist and
-copy object if it's not unique.
-
-";
-
-%feature("docstring")  casadi::Sparsity::scalar(bool dense_scalar=true) "
-[INTERNAL]  Create a scalar sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
-Get the reference count.
-
-";
-
-%feature("docstring")  casadi::Sparsity::spyMatlab(const std::string &mfile)
-const  " [INTERNAL]  Generate a script for Matlab or Octave which visualizes
-the sparsity using the spy command.
-
-";
-
-%feature("docstring")  casadi::Sparsity::starColoring2(int ordering=1, int
-cutoff=std::numeric_limits< int >::max()) const  " [INTERNAL]  Perform a
-star coloring of a symmetric matrix: A new greedy distance-2 coloring
-algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A.
-POTHEN) Ordering options: None (0), largest first (1)
-
-";
-
-%feature("docstring")  casadi::Sparsity::isDiagonal() const  " [INTERNAL]
-Is diagonal?
-
-";
-
-%feature("docstring")  casadi::Sparsity::hash() const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::isDense() const  " [INTERNAL]  Is
-dense?
-
-";
-
-%feature("docstring")  casadi::Sparsity::bandwidthL() const  " [INTERNAL]
-Lower half-bandwidth.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_blockcat(const std::vector<
-std::vector< Sparsity > > &v) " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_vertcat(const std::vector<
-Sparsity > &sp) " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::printCompact(std::ostream
-&stream=CASADI_COUT) const  " [INTERNAL]  Print a compact description of the
-sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isEqual(const Sparsity &y) const  "
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::isEqual(int nrow, int ncol, const
-std::vector< int > &colind, const std::vector< int > &row) const  "
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::isEqual(int nrow, int ncol, const
-int *colind, const int *row) const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::bandwidthU() const  " [INTERNAL]
-Upper half-bandwidth.
-
-";
-
-%feature("docstring")  casadi::Sparsity::compressed(const std::vector< int >
-&v) " [INTERNAL]  Create from a single vector containing the pattern in
-compressed column storage format: The format: The first two entries are the
-number of rows (nrow) and columns (ncol) The next ncol+1 entries are the
-column offsets (colind). Note that the last element, colind[ncol], gives the
-number of nonzeros The last colind[ncol] entries are the row indices
-
-";
-
-%feature("docstring")  casadi::Sparsity::compressed(const int *v) "
-[INTERNAL]  Create from a single vector containing the pattern in compressed
-column storage format: The format: The first two entries are the number of
-rows (nrow) and columns (ncol) The next ncol+1 entries are the column
-offsets (colind). Note that the last element, colind[ncol], gives the number
-of nonzeros The last colind[ncol] entries are the row indices
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_vertsplit(const std::vector< int
-> &output_offset) const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::size2() const  " [INTERNAL]  Get
-the number of columns.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getCRS(std::vector< int >
-&output_rowind, std::vector< int > &output_col) const  " [INTERNAL]  Get the
-sparsity in compressed row storage (CRS) format.
-
-";
-
-%feature("docstring")  casadi::Sparsity::size1() const  " [INTERNAL]  Get
-the number of rows.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  " [INTERNAL]
-Is initialized?
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=CASADI_COUT, bool trailing_newline=true) const  " [INTERNAL]  Print
-a description of the object.
-
-";
-
-%feature("docstring")  casadi::Sparsity::unit(int n, int el) " [INTERNAL]
-Create the sparsity pattern for a unit vector of length n and a nonzero on
-position el.
-
-";
-
-%feature("docstring")  casadi::Sparsity::transpose(std::vector< int >
-&mapping, bool invert_mapping=false) const  " [INTERNAL]   Transpose the
-matrix and get the reordering of the non-zero entries.
-
-Parameters:
------------
-
-mapping:  the non-zeros of the original matrix for each non-zero of the new
-matrix
-
-";
-
-%feature("docstring")  casadi::Sparsity::eliminationTree(bool ata=false)
-const  " [INTERNAL]  Calculate the elimination tree See Direct Methods for
-Sparse Linear Systems by Davis (2006). If the parameter ata is false, the
-algorithm is equivalent to Matlab's etree(A), except that the indices are
-zero- based. If ata is true, the algorithm is equivalent to Matlab's
-etree(A, 'row').
-
-";
-
-%feature("docstring") casadi::EmptySparsity "[INTERNAL] ";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const " [INTERNAL]  Return a string with a
-representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Sparsity::getNZ(int rr, int cc) const  "
-[INTERNAL]  Get the index of an existing non-zero element return -1 if the
-element does not exist.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getNZ(const std::vector< int > &rr,
-const std::vector< int > &cc) const  " [INTERNAL]  Get a set of non-zero
-element return -1 if the element does not exist.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getNZ(std::vector< int >
-&SWIG_INOUT(indices)) const  " [INTERNAL]  Get the nonzero index for a set
-of elements The index vector is used both for input and outputs and must be
-sorted by increasing nonzero index, i.e. column-wise. Elements not found in
-the sparsity pattern are set to -1.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_horzcat(const std::vector<
-Sparsity > &sp) " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::depthFirstSearch(int j, int top,
-std::vector< int > &xi, std::vector< int > &pstack, const std::vector< int >
-&pinv, std::vector< bool > &marked) const  " [INTERNAL]  Depth-first search
-on the adjacency graph of the sparsity See Direct Methods for Sparse Linear
-Systems by Davis (2006).
-
-";
-
-%feature("docstring")  casadi::Sparsity::starColoring(int ordering=1, int
-cutoff=std::numeric_limits< int >::max()) const  " [INTERNAL]  Perform a
-star coloring of a symmetric matrix: A greedy distance-2 coloring algorithm
-(Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) Ordering options:
-None (0), largest first (1)
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternProduct(const Sparsity &y)
-const  " [INTERNAL]   Sparsity pattern for a matrix-matrix product Returns
-the sparsity pattern resulting from multiplying the pattern with another
-pattern y from the right.
-
-";
-
-%feature("docstring")  casadi::Sparsity::append(const Sparsity &sp) "
-[INTERNAL]  Append another sparsity patten vertically (NOTE: only efficient
-if vector)
-
-";
-
-%feature("docstring")  casadi::Sparsity::getTriplet(std::vector< int >
-&output_row, std::vector< int > &output_col) const  " [INTERNAL]  Get the
-sparsity in sparse triplet format.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const " [INTERNAL]  Return a string with a description
-(for SWIG)
-
-";
-
-%feature("docstring")  casadi::Sparsity::isSquare() const  " [INTERNAL]  Is
-square?
-
-";
-
-%feature("docstring")  casadi::Sparsity::erase(const std::vector< int > &rr,
-const std::vector< int > &cc, bool ind1=false) " [INTERNAL]  Erase rows
-and/or columns of a matrix.
-
-";
-
-%feature("docstring")  casadi::Sparsity::erase(const std::vector< int > &rr,
-bool ind1=false) " [INTERNAL]  Erase elements of a matrix.
-
-";
-
-%feature("docstring")  casadi::Sparsity::bor(T *data, const T *val_data,
-const Sparsity &val_sp) const  " [INTERNAL]  Bitwise or of the nonzero
-entries of one sparsity pattern and the nonzero entries of another sparsity
-pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::bor(DataType *data, const DataType
-*val_data, const Sparsity &val_sp) const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
-Deep copy.
-
-";
-
-%feature("docstring")  casadi::Sparsity::colind() const  " [INTERNAL]  Get a
-reference to the colindex of all column element (see class description)
-
-";
-
-%feature("docstring")  casadi::Sparsity::colind(int cc) const  " [INTERNAL]
-Get a reference to the colindex of column cc (see class description)
-
-";
-
-%feature("docstring")  casadi::Sparsity::size() const  " [INTERNAL]
-DEPRECATED: Alias for nnz.
-
-See:   nnz()
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternCombine(const Sparsity &y,
-bool f0x_is_zero, bool fx0_is_zero, std::vector< unsigned char >
-&output_mapping) const  " [INTERNAL]  Combine two sparsity patterns Returns
-the new sparsity pattern as well as a mapping with the same length as the
-number of non-zero elements The mapping matrix contains the arguments for
-each nonzero, the first bit indicates if the first argument is nonzero, the
-second bit indicates if the second argument is nonzero (note that none of,
-one of or both of the arguments can be nonzero)
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternCombine(const Sparsity &y,
-bool f0x_is_zero, bool fx0_is_zero) const  " [INTERNAL]  Combine two
-sparsity patterns Returns the new sparsity pattern as well as a mapping with
-the same length as the number of non-zero elements The mapping matrix
-contains the arguments for each nonzero, the first bit indicates if the
-first argument is nonzero, the second bit indicates if the second argument
-is nonzero (note that none of, one of or both of the arguments can be
-nonzero)
-
-";
-
-%feature("docstring")  casadi::Sparsity::row() const  " [INTERNAL]  Get a
-reference to row-vector, containing rows for all non-zero elements (see
-class description)
-
-";
-
-%feature("docstring")  casadi::Sparsity::row(int el) const  " [INTERNAL]
-Get the row of a non-zero element.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_tril(bool includeDiagonal=true)
-const  " [INTERNAL]  Get lower triangular part.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sizeU() const  " [INTERNAL]  Number
-of non-zeros in the upper triangular half, i.e. the number of elements (i,
-j) with j>=i.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getRow() const  " [INTERNAL]  Get
-the row for each non-zero entry Together with the column-vector, this vector
-gives the sparsity of the matrix in sparse triplet format, and together with
-the colind vector, one obtains the sparsity in column compressed format.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_triu(bool includeDiagonal=true)
-const  " [INTERNAL]  Get upper triangular part
-
-";
-
-%feature("docstring")  casadi::Sparsity::sizeL() const  " [INTERNAL]  Number
-of non-zeros in the lower triangular half, i.e. the number of elements (i,
-j) with j<=i.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sizeD() const  " [INTERNAL]  Number
-of non-zeros on the diagonal, i.e. the number of elements (i, j) with j==i.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isVector(bool row_or_col=false)
-const  " [INTERNAL]  Check if the pattern is a column vector (i.e.
-size2()==1) Optionally, checks if either row or column vector.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getColind() const  " [INTERNAL]
-Get the column index for each column Together with the row-vector, one
-obtains the sparsity pattern in the column compressed format.
-
-";
-
-%feature("docstring")  casadi::Sparsity::numel() const  " [INTERNAL]  The
-total number of elements, including structural zeros, i.e. size2()*size1()
-
-See:   nnz()
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")  casadi::Sparsity::getDiag(std::vector< int >
-&output_mapping) const  " [INTERNAL]  Get the diagonal of the matrix/create
-a diagonal matrix (mapping will contain the nonzero mapping) When the input
-is square, the diagonal elements are returned. If the input is vector-like,
-a diagonal matrix is constructed with it.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
-a const pointer to the node.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
-pointer to the node.
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity  >::zz_vec()
-const " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::sparse(int nrow, int ncol=1) "
-[INTERNAL]  Create a sparse (empty) rectangular sparsity pattern DEPRECATED:
-Use Sparse(nrow, ncol) instead.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sparse(const std::pair< int, int >
-&rc) " [INTERNAL]  Create a sparse (empty) rectangular sparsity pattern
-DEPRECATED: Use Sparse(nrow, ncol) instead.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  " [INTERNAL]
-Is a null pointer?
-
-";
-
-%feature("docstring")
-casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
-Assign the node to a node class pointer without reference counting.
-
-improper use will cause memory leaks!
-
-";
-
-%feature("docstring")  casadi::Sparsity::unidirectionalColoring(const
-Sparsity &AT=Sparsity(), int cutoff=std::numeric_limits< int >::max()) const
-" [INTERNAL]  Perform a unidirectional coloring: A greedy distance-2
-coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternIntersection(const Sparsity
-&y, std::vector< unsigned char > &output_mapping) const  " [INTERNAL]
-Intersection of two sparsity patterns Returns the new sparsity pattern as
-well as a mapping with the same length as the number of non-zero elements
-The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if
-it is from the second and 3 (i.e. 1 | 2) if from both.
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternIntersection(const Sparsity
-&y) const  " [INTERNAL]  Intersection of two sparsity patterns Returns the
-new sparsity pattern as well as a mapping with the same length as the number
-of non-zero elements The value is 1 if the non-zero comes from the first
-(i.e. this) object, 2 if it is from the second and 3 (i.e. 1 | 2) if from
-both.
-
-";
-
-%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
-%feature("docstring")  casadi::Sparsity::dimString() const  " [INTERNAL]
-Get the dimension as a string.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sanityCheck(bool complete=false)
-const  " [INTERNAL]  Check if the dimensions and colind, row vectors are
-compatible.
-
-Parameters:
------------
-
-complete:  set to true to also check elementwise throws an error as possible
-result
-
-";
-
-%feature("docstring")  casadi::Sparsity::reCache() "[INTERNAL]  Check if
-there is an identical copy of the sparsity pattern in the cache, and if so,
-make a shallow copy of that one.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_diagsplit(const std::vector< int
-> &offset1, const std::vector< int > &offset2) const  " [INTERNAL]  Accessed
-by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isTril() const  " [INTERNAL]  Is
-lower triangular?
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-[INTERNAL]  Initialize or re-initialize the object:
-
-more documentation in the node class ( SharedObjectNode and derived classes)
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_sprank() const  " [INTERNAL]
-Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::dulmageMendelsohn(std::vector< int
-> &output_rowperm, std::vector< int > &output_colperm, std::vector< int >
-&output_rowblock, std::vector< int > &output_colblock, std::vector< int >
-&output_coarse_rowblock, std::vector< int > &output_coarse_colblock, int
-seed=0) const  " [INTERNAL]  Compute the Dulmage-Mendelsohn decomposition
-See Direct Methods for Sparse Linear Systems by Davis (2006).
-
-Dulmage-Mendelsohn will try to bring your matrix into lower block-
-triangular (LBT) form. It will not care about the distance of off- diagonal
-elements to the diagonal: there is no guarantee you will get a block-
-diagonal matrix if you supply a randomly permuted block- diagonal matrix.
-
-If your matrix is symmetrical, this method is of limited use; permutation
-can make it non-symmetric.
-
-See:   stronglyConnectedComponents
-
-";
-
-%feature("docstring")  casadi::Sparsity::resize(int nrow, int ncol) "
-[INTERNAL]  Resize.
-
-";
-
-%feature("docstring")  casadi::Sparsity::largestFirstOrdering() const  "
-[INTERNAL]  Order the cols by decreasing degree.
-
-";
-
-%feature("docstring")  casadi::Sparsity::spy(std::ostream
-&stream=CASADI_COUT) const  " [INTERNAL]  Print a textual representation of
-sparsity.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_vecNZ() const  " [INTERNAL]
-Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isSingular() const  " [INTERNAL]
-Check whether the sparsity-pattern indicates structural singularity.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getCCS(std::vector< int >
-&output_colind, std::vector< int > &output_row) const  " [INTERNAL]  Get the
-sparsity in compressed column storage (CCS) format.
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=CASADI_COUT, bool trailing_newline=true) const  " [INTERNAL]  Print
-a representation of the object.
-
-";
-
-%feature("docstring") casadi::EmptySparsity::EmptySparsity() "[INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::enlargeColumns(int ncol, const
-std::vector< int > &cc, bool ind1=false) " [INTERNAL]  Enlarge the matrix
-along the second dimension (i.e. insert columns)
-
-";
-
-%feature("docstring")  casadi::Sparsity::isScalar(bool
-scalar_and_dense=false) const  " [INTERNAL]  Is scalar?
-
-";
-
-%feature("docstring")  casadi::Sparsity::rowsSequential(bool strictly=true)
-const  " [INTERNAL]  Do the rows appear sequentially on each column.
-
-Parameters:
------------
-
-strictly:  if true, then do not allow multiple entries
-
-";
-
-%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
-[INTERNAL]  Swap content with another instance.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isTranspose(const Sparsity &y)
-const  " [INTERNAL]  Check if the sparsity is the transpose of another.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isSymmetric() const  " [INTERNAL]
-Is symmetric?
-
-";
-
-%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
-*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity
->::zz_blocksplit(const std::vector< int > &vert_offset, const std::vector<
-int > &horz_offset) const " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::hasNZ(int rr, int cc) const  "
-[INTERNAL]  Returns true if the pattern has a non-zero at location rr, cc.
-
-";
-
-%feature("docstring")  casadi::Sparsity::shape() const  " [INTERNAL]  Get
-the shape.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_horzsplit(const std::vector< int
-> &output_offset) const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=CASADI_COUT) const  " [INTERNAL]  Print the pointer to the internal
-class
-
-";
-
-%feature("docstring")  casadi::Sparsity::pmult(const std::vector< int > &p,
-bool permute_rows=true, bool permute_cols=true, bool
-invert_permutation=false) const  " [INTERNAL]  Permute rows and/or columns
-Multiply the sparsity with a permutation matrix from the left and/or from
-the right P * A * trans(P), A * trans(P) or A * trans(P) with P defined by
-an index vector containing the row for each col. As an alternative, P can be
-transposed (inverted).
-
-";
-
-%feature("docstring")  casadi::Sparsity::getCol() const  " [INTERNAL]  Get
-the column for each non-zero entry Together with the row-vector, this vector
-gives the sparsity of the matrix in sparse triplet format, i.e. the column
-and row for each non-zero elements.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isTriu() const  " [INTERNAL]  Is
-upper triangular?
-
-";
-
-%feature("docstring")  casadi::Sparsity::enlargeRows(int nrow, const
-std::vector< int > &rr, bool ind1=false) " [INTERNAL]  Enlarge the matrix
-along the first dimension (i.e. insert rows)
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_diagcat(const std::vector<
-Sparsity > &v) " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::dense(int nrow, int ncol=1) "
-[INTERNAL]  Create a dense rectangular sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::dense(const std::pair< int, int >
-&rc) " [INTERNAL]  Create a dense rectangular sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getLowerNZ() const  " [INTERNAL]
-Get nonzeros in lower triangular part.
-
-";
-
-%feature("docstring")  casadi::Sparsity::add(T *data, const T *val_data,
-const Sparsity &val_sp) const  " [INTERNAL]  Add the nonzero entries of one
-sparsity pattern to the nonzero entries of another sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::add(DataType *data, const DataType
-*val_data, const Sparsity &val_sp) const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::find(bool ind1=SWIG_IND1) const  "
-[INTERNAL]  Get the location of all non-zero elements as they would appear
-in a Dense matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5
-structural non-zeros.
-
-k = A.find() A[k] will contain the elements of A that are non-zero in B
-
-";
-
-%feature("docstring")  casadi::Sparsity::find(std::vector< int > &loc, bool
-ind1=false) const  " [INTERNAL]  Get the location of all nonzero elements
-(inplace version)
-
-";
-
-
 // File: classcasadi_1_1ExternalFunction.xml
 
 
@@ -14742,12 +13845,6 @@ symbolic primitives.
 %feature("docstring")  casadi::GenericMatrix< MX >::sym(const std::string
 &name, const Sparsity &sp) " ";
 
-%feature("docstring")  casadi::GenericMatrix< MX >::sym(const std::string
-&name, const Sparsity &sp) " ";
-
-%feature("docstring")  casadi::GenericMatrix< SX >::sym(const std::string
-&name, const Sparsity &sp) " ";
-
 %feature("docstring")  casadi::GenericMatrix< SX >::sym(const std::string
 &name, const Sparsity &sp) " ";
 
@@ -15294,7 +14391,8 @@ reference to the object.
 ";
 
 %feature("docstring")  casadi::GenericType::toIntVectorVector() const  "
-[INTERNAL]  Convert to vector of ints.
+
+Convert to vector of ints.
 
 ";
 
@@ -15473,7 +14571,8 @@ Is a shared object?
 ";
 
 %feature("docstring")  casadi::GenericType::toDoubleVector() const  "
-[INTERNAL]  Convert to vector of doubles.
+
+Convert to vector of doubles.
 
 ";
 
@@ -15593,7 +14692,8 @@ Is a vector of ints?
 ";
 
 %feature("docstring")  casadi::GenericType::toIntVector() const  "
-[INTERNAL]  Convert to vector of ints.
+
+Convert to vector of ints.
 
 ";
 
@@ -15609,7 +14709,8 @@ Convert to double.
 ";
 
 %feature("docstring")  casadi::GenericType::toDictionary() const  "
-[INTERNAL]  Convert to Dictionary.
+
+Convert to Dictionary.
 
 ";
 
@@ -22575,8 +21676,7 @@ d_norm, Number regularization_size, Number alpha_du, Number alpha_pr, Index
 ls_trials, const IpoptData *ip_data, IpoptCalculatedQuantities *ip_cq) "
 [INTERNAL]  This method is called at every iteration
 
-Code copied from TNLPAdapter::FinalizeSolution See also:http://list.coin-
-or.org/pipermail/ipopt/2010-July/002078.html ";
+";
 
 %feature("docstring") casadi::IpoptUserClass::IpoptUserClass(IpoptInterface
 *ipoptInterface) " [INTERNAL] ";
@@ -30869,8 +29969,6 @@ Convert to Slice (only for IMatrix)
 
 %feature("docstring")  casadi::Matrix< int >::toSlice(bool ind1) const " ";
 
-%feature("docstring")  casadi::Matrix< int >::toSlice(bool ind1) const " ";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::find(bool ind1=SWIG_IND1) const "
 
@@ -31031,8 +30129,6 @@ const  "
 Is the Matrix a Slice (only for IMatrix)
 
 ";
-
-%feature("docstring")  casadi::Matrix< int >::isSlice(bool ind1) const " ";
 
 %feature("docstring")  casadi::Matrix< int >::isSlice(bool ind1) const " ";
 
@@ -32052,8 +31148,6 @@ Functions called by the corresponding friend functions MATLAB naming
 Returns the truth value of a Matrix.
 
 ";
-
-%feature("docstring") casadi::Matrix::__nonzero__ "";
 
 %feature("docstring") casadi::Matrix::__nonzero__ "[INTERNAL] ";
 
@@ -33437,8 +32531,6 @@ zero element, with bounds checking.
 
 %feature("docstring")  casadi::MX::at(int k) " [INTERNAL]  Access a non-zero
 element, with bounds checking.
-
-Access a non-zero element.
 
 ";
 
@@ -49883,1800 +48975,6 @@ representation of the object.
 // File: classcasadi_1_1RkIntegrator.xml
 
 
-// File: classcasadi_1_1ScalarSparseSparsity.xml
-
-
-/*  Check if two sparsity patterns are identical  */
-
-/*  Size and element counting  */ %feature("docstring")
-casadi::Sparsity::unit(int n, int el) " [INTERNAL]  Create the sparsity
-pattern for a unit vector of length n and a nonzero on position el.
-
-";
-
-%feature("docstring")  casadi::Sparsity::unidirectionalColoring(const
-Sparsity &AT=Sparsity(), int cutoff=std::numeric_limits< int >::max()) const
-" [INTERNAL]  Perform a unidirectional coloring: A greedy distance-2
-coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
-
-";
-
-%feature("docstring")  casadi::Sparsity::transpose(std::vector< int >
-&mapping, bool invert_mapping=false) const  " [INTERNAL]   Transpose the
-matrix and get the reordering of the non-zero entries.
-
-Parameters:
------------
-
-mapping:  the non-zeros of the original matrix for each non-zero of the new
-matrix
-
-";
-
-%feature("docstring")  casadi::Sparsity::eliminationTree(bool ata=false)
-const  " [INTERNAL]  Calculate the elimination tree See Direct Methods for
-Sparse Linear Systems by Davis (2006). If the parameter ata is false, the
-algorithm is equivalent to Matlab's etree(A), except that the indices are
-zero- based. If ata is true, the algorithm is equivalent to Matlab's
-etree(A, 'row').
-
-";
-
-%feature("docstring")  casadi::Sparsity::starColoring(int ordering=1, int
-cutoff=std::numeric_limits< int >::max()) const  " [INTERNAL]  Perform a
-star coloring of a symmetric matrix: A greedy distance-2 coloring algorithm
-(Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) Ordering options:
-None (0), largest first (1)
-
-";
-
-%feature("docstring")  casadi::Sparsity::isSymmetric() const  " [INTERNAL]
-Is symmetric?
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternProduct(const Sparsity &y)
-const  " [INTERNAL]   Sparsity pattern for a matrix-matrix product Returns
-the sparsity pattern resulting from multiplying the pattern with another
-pattern y from the right.
-
-";
-
-%feature("docstring")  casadi::Sparsity::find(bool ind1=SWIG_IND1) const  "
-[INTERNAL]  Get the location of all non-zero elements as they would appear
-in a Dense matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5
-structural non-zeros.
-
-k = A.find() A[k] will contain the elements of A that are non-zero in B
-
-";
-
-%feature("docstring")  casadi::Sparsity::find(std::vector< int > &loc, bool
-ind1=false) const  " [INTERNAL]  Get the location of all nonzero elements
-(inplace version)
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity  >::zz_repmat(int
-n, int m=1) const " [INTERNAL] ";
-
-%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
-Get the reference count.
-
-";
-
-%feature("docstring")  casadi::Sparsity::makeDense(std::vector< int >
-&mapping) const  " [INTERNAL]  Make a patten dense.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getCCS(std::vector< int >
-&output_colind, std::vector< int > &output_row) const  " [INTERNAL]  Get the
-sparsity in compressed column storage (CCS) format.
-
-";
-
-%feature("docstring")  casadi::Sparsity::compressed(const std::vector< int >
-&v) " [INTERNAL]  Create from a single vector containing the pattern in
-compressed column storage format: The format: The first two entries are the
-number of rows (nrow) and columns (ncol) The next ncol+1 entries are the
-column offsets (colind). Note that the last element, colind[ncol], gives the
-number of nonzeros The last colind[ncol] entries are the row indices
-
-";
-
-%feature("docstring")  casadi::Sparsity::compressed(const int *v) "
-[INTERNAL]  Create from a single vector containing the pattern in compressed
-column storage format: The format: The first two entries are the number of
-rows (nrow) and columns (ncol) The next ncol+1 entries are the column
-offsets (colind). Note that the last element, colind[ncol], gives the number
-of nonzeros The last colind[ncol] entries are the row indices
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_mtimes(const Sparsity &y) const
-" [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_mtimes(const Sparsity &Y, const
-Sparsity &Z) const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isVector(bool row_or_col=false)
-const  " [INTERNAL]  Check if the pattern is a column vector (i.e.
-size2()==1) Optionally, checks if either row or column vector.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-[INTERNAL]  Initialize or re-initialize the object:
-
-more documentation in the node class ( SharedObjectNode and derived classes)
-
-";
-
-%feature("docstring") casadi::ScalarSparseSparsity "[INTERNAL] ";
-
-%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
-*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
-
-";
-
-%feature("docstring")  casadi::Sparsity::removeDuplicates(std::vector< int >
-&mapping) " [INTERNAL]  Remove duplicate entries.
-
-The same indices will be removed from the mapping vector, which must have
-the same length as the number of nonzeros
-
-";
-
-%feature("docstring")  casadi::Sparsity::isDiagonal() const  " [INTERNAL]
-Is diagonal?
-
-";
-
-%feature("docstring")  casadi::Sparsity::dimString() const  " [INTERNAL]
-Get the dimension as a string.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternUnion(const Sparsity &y,
-std::vector< unsigned char > &output_mapping) const  " [INTERNAL]  Union of
-two sparsity patterns.
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternUnion(const Sparsity &y)
-const  " [INTERNAL]  Union of two sparsity patterns.
-
-";
-
-%feature("docstring")  casadi::Sparsity::starColoring2(int ordering=1, int
-cutoff=std::numeric_limits< int >::max()) const  " [INTERNAL]  Perform a
-star coloring of a symmetric matrix: A new greedy distance-2 coloring
-algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A.
-POTHEN) Ordering options: None (0), largest first (1)
-
-";
-
-%feature("docstring")  casadi::Sparsity::getUpperNZ() const  " [INTERNAL]
-Get nonzeros in upper triangular part.
-
-";
-
-%feature("docstring")  casadi::Sparsity::depthFirstSearch(int j, int top,
-std::vector< int > &xi, std::vector< int > &pstack, const std::vector< int >
-&pinv, std::vector< bool > &marked) const  " [INTERNAL]  Depth-first search
-on the adjacency graph of the sparsity See Direct Methods for Sparse Linear
-Systems by Davis (2006).
-
-";
-
-%feature("docstring")  casadi::Sparsity::size() const  " [INTERNAL]
-DEPRECATED: Alias for nnz.
-
-See:   nnz()
-
-";
-
-%feature("docstring")  casadi::Sparsity::printCompact(std::ostream
-&stream=CASADI_COUT) const  " [INTERNAL]  Print a compact description of the
-sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::enlargeColumns(int ncol, const
-std::vector< int > &cc, bool ind1=false) " [INTERNAL]  Enlarge the matrix
-along the second dimension (i.e. insert columns)
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_diagsplit(const std::vector< int
-> &offset1, const std::vector< int > &offset2) const  " [INTERNAL]  Accessed
-by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::enlarge(int nrow, int ncol, const
-std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false) "
-[INTERNAL]  Enlarge matrix Make the matrix larger by inserting empty rows
-and columns, keeping the existing non-zeros.
-
-For the matrices A to B A(m, n) length(jj)=m , length(ii)=n B(nrow, ncol)
-
-A=enlarge(m, n, ii, jj) makes sure that
-
-B[jj, ii] == A
-
-";
-
-%feature("docstring")  casadi::Sparsity::getColind() const  " [INTERNAL]
-Get the column index for each column Together with the row-vector, one
-obtains the sparsity pattern in the column compressed format.
-
-";
-
-%feature("docstring")  casadi::Sparsity::spyMatlab(const std::string &mfile)
-const  " [INTERNAL]  Generate a script for Matlab or Octave which visualizes
-the sparsity using the spy command.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_vertcat(const std::vector<
-Sparsity > &sp) " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isTriu() const  " [INTERNAL]  Is
-upper triangular?
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity  >::zz_vec()
-const " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::scalar(bool dense_scalar=true) "
-[INTERNAL]  Create a scalar sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isTril() const  " [INTERNAL]  Is
-lower triangular?
-
-";
-
-%feature("docstring")  casadi::Sparsity::resize(int nrow, int ncol) "
-[INTERNAL]  Resize.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_vertsplit(const std::vector< int
-> &output_offset) const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::spy(std::ostream
-&stream=CASADI_COUT) const  " [INTERNAL]  Print a textual representation of
-sparsity.
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternIntersection(const Sparsity
-&y, std::vector< unsigned char > &output_mapping) const  " [INTERNAL]
-Intersection of two sparsity patterns Returns the new sparsity pattern as
-well as a mapping with the same length as the number of non-zero elements
-The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if
-it is from the second and 3 (i.e. 1 | 2) if from both.
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternIntersection(const Sparsity
-&y) const  " [INTERNAL]  Intersection of two sparsity patterns Returns the
-new sparsity pattern as well as a mapping with the same length as the number
-of non-zero elements The value is 1 if the non-zero comes from the first
-(i.e. this) object, 2 if it is from the second and 3 (i.e. 1 | 2) if from
-both.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isEmpty(bool both=false) const  "
-[INTERNAL]  Check if the sparsity is empty.
-
-A sparsity is considered empty if one of the dimensions is zero (or
-optionally both dimensions)
-
-";
-
-%feature("docstring")  casadi::Sparsity::nnz() const  " [INTERNAL]  Get the
-number of (structural) non-zeros.
-
-See:   numel()
-
-";
-
-%feature("docstring")  casadi::Sparsity::appendColumns(const Sparsity &sp) "
-[INTERNAL]  Append another sparsity patten horizontally.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sizeL() const  " [INTERNAL]  Number
-of non-zeros in the lower triangular half, i.e. the number of elements (i,
-j) with j<=i.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_triu(bool includeDiagonal=true)
-const  " [INTERNAL]  Get upper triangular part
-
-";
-
-%feature("docstring")  casadi::Sparsity::erase(const std::vector< int > &rr,
-const std::vector< int > &cc, bool ind1=false) " [INTERNAL]  Erase rows
-and/or columns of a matrix.
-
-";
-
-%feature("docstring")  casadi::Sparsity::erase(const std::vector< int > &rr,
-bool ind1=false) " [INTERNAL]  Erase elements of a matrix.
-
-";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(bool
-clone_members=true) " [INTERNAL]  Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
-";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
-SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-" [INTERNAL]  Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_tril(bool includeDiagonal=true)
-const  " [INTERNAL]  Get lower triangular part.
-
-";
-
-%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
-Deep copy.
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity
->::zz_blocksplit(const std::vector< int > &vert_offset, const std::vector<
-int > &horz_offset) const " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::colind() const  " [INTERNAL]  Get a
-reference to the colindex of all column element (see class description)
-
-";
-
-%feature("docstring")  casadi::Sparsity::colind(int cc) const  " [INTERNAL]
-Get a reference to the colindex of column cc (see class description)
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_norm_0_mul(const Sparsity &B)
-const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=CASADI_COUT, bool trailing_newline=true) const  " [INTERNAL]  Print
-a representation of the object.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_diagcat(const std::vector<
-Sparsity > &v) " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
-[INTERNAL]  Swap content with another instance.
-
-";
-
-%feature("docstring")  casadi::Sparsity::size2() const  " [INTERNAL]  Get
-the number of columns.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getCRS(std::vector< int >
-&output_rowind, std::vector< int > &output_col) const  " [INTERNAL]  Get the
-sparsity in compressed row storage (CRS) format.
-
-";
-
-%feature("docstring")  casadi::Sparsity::size1() const  " [INTERNAL]  Get
-the number of rows.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_horzcat(const std::vector<
-Sparsity > &sp) " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const " [INTERNAL]  Return a string with a description
-(for SWIG)
-
-";
-
-%feature("docstring")  casadi::Sparsity::isScalar(bool
-scalar_and_dense=false) const  " [INTERNAL]  Is scalar?
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const " [INTERNAL]  Return a string with a
-representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Sparsity::enlargeRows(int nrow, const
-std::vector< int > &rr, bool ind1=false) " [INTERNAL]  Enlarge the matrix
-along the first dimension (i.e. insert rows)
-
-";
-
-%feature("docstring")  casadi::Sparsity::getLowerNZ() const  " [INTERNAL]
-Get nonzeros in lower triangular part.
-
-";
-
-%feature("docstring")  casadi::Sparsity::append(const Sparsity &sp) "
-[INTERNAL]  Append another sparsity patten vertically (NOTE: only efficient
-if vector)
-
-";
-
-%feature("docstring")  casadi::Sparsity::isEqual(const Sparsity &y) const  "
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::isEqual(int nrow, int ncol, const
-std::vector< int > &colind, const std::vector< int > &row) const  "
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::isEqual(int nrow, int ncol, const
-int *colind, const int *row) const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=CASADI_COUT) const  " [INTERNAL]  Print the pointer to the internal
-class
-
-";
-
-%feature("docstring")  casadi::Sparsity::isSquare() const  " [INTERNAL]  Is
-square?
-
-";
-
-%feature("docstring") casadi::ScalarSparseSparsity::ScalarSparseSparsity() "[INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::largestFirstOrdering() const  "
-[INTERNAL]  Order the cols by decreasing degree.
-
-";
-
-%feature("docstring")  casadi::Sparsity::hasNZ(int rr, int cc) const  "
-[INTERNAL]  Returns true if the pattern has a non-zero at location rr, cc.
-
-";
-
-%feature("docstring")  casadi::Sparsity::dulmageMendelsohn(std::vector< int
-> &output_rowperm, std::vector< int > &output_colperm, std::vector< int >
-&output_rowblock, std::vector< int > &output_colblock, std::vector< int >
-&output_coarse_rowblock, std::vector< int > &output_coarse_colblock, int
-seed=0) const  " [INTERNAL]  Compute the Dulmage-Mendelsohn decomposition
-See Direct Methods for Sparse Linear Systems by Davis (2006).
-
-Dulmage-Mendelsohn will try to bring your matrix into lower block-
-triangular (LBT) form. It will not care about the distance of off- diagonal
-elements to the diagonal: there is no guarantee you will get a block-
-diagonal matrix if you supply a randomly permuted block- diagonal matrix.
-
-If your matrix is symmetrical, this method is of limited use; permutation
-can make it non-symmetric.
-
-See:   stronglyConnectedComponents
-
-";
-
-%feature("docstring")  casadi::Sparsity::isTranspose(const Sparsity &y)
-const  " [INTERNAL]  Check if the sparsity is the transpose of another.
-
-";
-
-%feature("docstring")  casadi::Sparsity::dense(int nrow, int ncol=1) "
-[INTERNAL]  Create a dense rectangular sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::dense(const std::pair< int, int >
-&rc) " [INTERNAL]  Create a dense rectangular sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getDiag(std::vector< int >
-&output_mapping) const  " [INTERNAL]  Get the diagonal of the matrix/create
-a diagonal matrix (mapping will contain the nonzero mapping) When the input
-is square, the diagonal elements are returned. If the input is vector-like,
-a diagonal matrix is constructed with it.
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternCombine(const Sparsity &y,
-bool f0x_is_zero, bool fx0_is_zero, std::vector< unsigned char >
-&output_mapping) const  " [INTERNAL]  Combine two sparsity patterns Returns
-the new sparsity pattern as well as a mapping with the same length as the
-number of non-zero elements The mapping matrix contains the arguments for
-each nonzero, the first bit indicates if the first argument is nonzero, the
-second bit indicates if the second argument is nonzero (note that none of,
-one of or both of the arguments can be nonzero)
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternCombine(const Sparsity &y,
-bool f0x_is_zero, bool fx0_is_zero) const  " [INTERNAL]  Combine two
-sparsity patterns Returns the new sparsity pattern as well as a mapping with
-the same length as the number of non-zero elements The mapping matrix
-contains the arguments for each nonzero, the first bit indicates if the
-first argument is nonzero, the second bit indicates if the second argument
-is nonzero (note that none of, one of or both of the arguments can be
-nonzero)
-
-";
-
-%feature("docstring")  casadi::Sparsity::sub(const std::vector< int > &rr,
-const std::vector< int > &cc, std::vector< int > &output_mapping, bool
-ind1=false) const  " [INTERNAL]  Get a submatrix.
-
-Returns the sparsity of the submatrix, with a mapping such that submatrix[k]
-= originalmatrix[mapping[k]]
-
-";
-
-%feature("docstring")  casadi::Sparsity::sub(const std::vector< int > &rr,
-const Sparsity &sp, std::vector< int > &output_mapping, bool ind1=false)
-const  " [INTERNAL]  Get a set of elements.
-
-Returns the sparsity of the corresponding elements, with a mapping such that
-submatrix[k] = originalmatrix[mapping[k]]
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_kron(const Sparsity &b) const  "
-[INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::pmult(const std::vector< int > &p,
-bool permute_rows=true, bool permute_cols=true, bool
-invert_permutation=false) const  " [INTERNAL]  Permute rows and/or columns
-Multiply the sparsity with a permutation matrix from the left and/or from
-the right P * A * trans(P), A * trans(P) or A * trans(P) with P defined by
-an index vector containing the row for each col. As an alternative, P can be
-transposed (inverted).
-
-";
-
-%feature("docstring")  casadi::Sparsity::sizeU() const  " [INTERNAL]  Number
-of non-zeros in the upper triangular half, i.e. the number of elements (i,
-j) with j>=i.
-
-";
-
-%feature("docstring")  casadi::Sparsity::hash() const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::rowsSequential(bool strictly=true)
-const  " [INTERNAL]  Do the rows appear sequentially on each column.
-
-Parameters:
------------
-
-strictly:  if true, then do not allow multiple entries
-
-";
-
-%feature("docstring")  casadi::Sparsity::sparse(int nrow, int ncol=1) "
-[INTERNAL]  Create a sparse (empty) rectangular sparsity pattern DEPRECATED:
-Use Sparse(nrow, ncol) instead.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sparse(const std::pair< int, int >
-&rc) " [INTERNAL]  Create a sparse (empty) rectangular sparsity pattern
-DEPRECATED: Use Sparse(nrow, ncol) instead.
-
-";
-
-%feature("docstring")  casadi::Sparsity::numel() const  " [INTERNAL]  The
-total number of elements, including structural zeros, i.e. size2()*size1()
-
-See:   nnz()
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_reshape(int nrow, int ncol)
-const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_reshape(const Sparsity &sp)
-const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isDense() const  " [INTERNAL]  Is
-dense?
-
-";
-
-%feature("docstring")  casadi::Sparsity::isSingular() const  " [INTERNAL]
-Check whether the sparsity-pattern indicates structural singularity.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isReshape(const Sparsity &y) const
-" [INTERNAL]  Check if the sparsity is a reshape of another.
-
-";
-
-%feature("docstring")
-casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
-Assign the node to a node class pointer without reference counting.
-
-improper use will cause memory leaks!
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  " [INTERNAL]
-Is initialized?
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=CASADI_COUT, bool trailing_newline=true) const  " [INTERNAL]  Print
-a description of the object.
-
-";
-
-%feature("docstring")  casadi::Sparsity::reCache() "[INTERNAL]  Check if
-there is an identical copy of the sparsity pattern in the cache, and if so,
-make a shallow copy of that one.
-
-";
-
-%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getCol() const  " [INTERNAL]  Get
-the column for each non-zero entry Together with the row-vector, this vector
-gives the sparsity of the matrix in sparse triplet format, i.e. the column
-and row for each non-zero elements.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getRow() const  " [INTERNAL]  Get
-the row for each non-zero entry Together with the column-vector, this vector
-gives the sparsity of the matrix in sparse triplet format, and together with
-the colind vector, one obtains the sparsity in column compressed format.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sanityCheck(bool complete=false)
-const  " [INTERNAL]  Check if the dimensions and colind, row vectors are
-compatible.
-
-Parameters:
------------
-
-complete:  set to true to also check elementwise throws an error as possible
-result
-
-";
-
-%feature("docstring")
-casadi::Sparsity::stronglyConnectedComponents(std::vector< int >
-&output_index, std::vector< int > &output_offset) const  " [INTERNAL]  Find
-the strongly connected components of the bigraph defined by the sparsity
-pattern of a square matrix.
-
-See Direct Methods for Sparse Linear Systems by Davis (2006). Returns:
-Number of components
-
-Offset for each components (length: 1 + number of components)
-
-Indices for each components, component i has indices index[offset[i]], ...,
-index[offset[i+1]]
-
-In the case that the matrix is symmetric, the result has a particular
-interpretation: Given a symmetric matrix A and n =
-A.stronglyConnectedComponents(p, r)
-
-=> A[p, p] will appear block-diagonal with n blocks and with the indices of
-the block boundaries to be found in r.
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternInverse() const  "
-[INTERNAL]  Take the inverse of a sparsity pattern; flip zeros and non-
-zeros.
-
-";
-
-%feature("docstring")  casadi::Sparsity::shape() const  " [INTERNAL]  Get
-the shape.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
-a const pointer to the node.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
-pointer to the node.
-
-";
-
-%feature("docstring")  casadi::Sparsity::bor(T *data, const T *val_data,
-const Sparsity &val_sp) const  " [INTERNAL]  Bitwise or of the nonzero
-entries of one sparsity pattern and the nonzero entries of another sparsity
-pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::bor(DataType *data, const DataType
-*val_data, const Sparsity &val_sp) const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::zz_blockcat(const std::vector<
-std::vector< Sparsity > > &v) " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_vecNZ() const  " [INTERNAL]
-Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  " [INTERNAL]
-Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::Sparsity::bandwidthU() const  " [INTERNAL]
-Upper half-bandwidth.
-
-";
-
-%feature("docstring")  casadi::Sparsity::reserve(int nnz, int ncol) "
-[INTERNAL]  DEPRECATED: Reserve space.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_horzsplit(const std::vector< int
-> &output_offset) const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::row() const  " [INTERNAL]  Get a
-reference to row-vector, containing rows for all non-zero elements (see
-class description)
-
-";
-
-%feature("docstring")  casadi::Sparsity::row(int el) const  " [INTERNAL]
-Get the row of a non-zero element.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getNZ(int rr, int cc) const  "
-[INTERNAL]  Get the index of an existing non-zero element return -1 if the
-element does not exist.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getNZ(const std::vector< int > &rr,
-const std::vector< int > &cc) const  " [INTERNAL]  Get a set of non-zero
-element return -1 if the element does not exist.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getNZ(std::vector< int >
-&SWIG_INOUT(indices)) const  " [INTERNAL]  Get the nonzero index for a set
-of elements The index vector is used both for input and outputs and must be
-sorted by increasing nonzero index, i.e. column-wise. Elements not found in
-the sparsity pattern are set to -1.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sizeD() const  " [INTERNAL]  Number
-of non-zeros on the diagonal, i.e. the number of elements (i, j) with j==i.
-
-";
-
-%feature("docstring")  casadi::Sparsity::diag(int nrow) " [INTERNAL]  Create
-diagonal sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::diag(int nrow, int ncol) "
-[INTERNAL]  Create diagonal sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::diag(const std::pair< int, int >
-&rc) " [INTERNAL]  Create diagonal sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_sprank() const  " [INTERNAL]
-Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::bandwidthL() const  " [INTERNAL]
-Lower half-bandwidth.
-
-";
-
-%feature("docstring")  casadi::Sparsity::addNZ(int rr, int cc) " [INTERNAL]
-Get the index of a non-zero element Add the element if it does not exist and
-copy object if it's not unique.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getTriplet(std::vector< int >
-&output_row, std::vector< int > &output_col) const  " [INTERNAL]  Get the
-sparsity in sparse triplet format.
-
-";
-
-%feature("docstring")  casadi::Sparsity::T() const  " [INTERNAL]   Transpose
-the matrix.
-
-";
-
-%feature("docstring")  casadi::Sparsity::add(T *data, const T *val_data,
-const Sparsity &val_sp) const  " [INTERNAL]  Add the nonzero entries of one
-sparsity pattern to the nonzero entries of another sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::add(DataType *data, const DataType
-*val_data, const Sparsity &val_sp) const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::compress() const  " [INTERNAL]
-Compress a sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::set(T *data, const T *val_data,
-const Sparsity &val_sp) const  " [INTERNAL]  Assign the nonzero entries of
-one sparsity pattern to the nonzero entries of another sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::set(DataType *data, const DataType
-*val_data, const Sparsity &val_sp) const  " [INTERNAL] ";
-
-
-// File: classcasadi_1_1ScalarSparsity.xml
-
-
-/*  Check if two sparsity patterns are identical  */
-
-/*  Size and element counting  */ %feature("docstring")
-casadi::Sparsity::zz_reshape(int nrow, int ncol) const  " [INTERNAL]
-Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_reshape(const Sparsity &sp)
-const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::transpose(std::vector< int >
-&mapping, bool invert_mapping=false) const  " [INTERNAL]   Transpose the
-matrix and get the reordering of the non-zero entries.
-
-Parameters:
------------
-
-mapping:  the non-zeros of the original matrix for each non-zero of the new
-matrix
-
-";
-
-%feature("docstring")  casadi::Sparsity::bandwidthU() const  " [INTERNAL]
-Upper half-bandwidth.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isDiagonal() const  " [INTERNAL]
-Is diagonal?
-
-";
-
-%feature("docstring")  casadi::Sparsity::dimString() const  " [INTERNAL]
-Get the dimension as a string.
-
-";
-
-%feature("docstring")  casadi::Sparsity::largestFirstOrdering() const  "
-[INTERNAL]  Order the cols by decreasing degree.
-
-";
-
-%feature("docstring")  casadi::Sparsity::row() const  " [INTERNAL]  Get a
-reference to row-vector, containing rows for all non-zero elements (see
-class description)
-
-";
-
-%feature("docstring")  casadi::Sparsity::row(int el) const  " [INTERNAL]
-Get the row of a non-zero element.
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=CASADI_COUT, bool trailing_newline=true) const  " [INTERNAL]  Print
-a representation of the object.
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity  >::zz_repmat(int
-n, int m=1) const " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::reCache() "[INTERNAL]  Check if
-there is an identical copy of the sparsity pattern in the cache, and if so,
-make a shallow copy of that one.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isSymmetric() const  " [INTERNAL]
-Is symmetric?
-
-";
-
-%feature("docstring")
-casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
-Assign the node to a node class pointer without reference counting.
-
-improper use will cause memory leaks!
-
-";
-
-%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
-[INTERNAL]  Swap content with another instance.
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=CASADI_COUT, bool trailing_newline=true) const  " [INTERNAL]  Print
-a description of the object.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getNZ(int rr, int cc) const  "
-[INTERNAL]  Get the index of an existing non-zero element return -1 if the
-element does not exist.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getNZ(const std::vector< int > &rr,
-const std::vector< int > &cc) const  " [INTERNAL]  Get a set of non-zero
-element return -1 if the element does not exist.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getNZ(std::vector< int >
-&SWIG_INOUT(indices)) const  " [INTERNAL]  Get the nonzero index for a set
-of elements The index vector is used both for input and outputs and must be
-sorted by increasing nonzero index, i.e. column-wise. Elements not found in
-the sparsity pattern are set to -1.
-
-";
-
-%feature("docstring")  casadi::Sparsity::reserve(int nnz, int ncol) "
-[INTERNAL]  DEPRECATED: Reserve space.
-
-";
-
-%feature("docstring")  casadi::Sparsity::colind() const  " [INTERNAL]  Get a
-reference to the colindex of all column element (see class description)
-
-";
-
-%feature("docstring")  casadi::Sparsity::colind(int cc) const  " [INTERNAL]
-Get a reference to the colindex of column cc (see class description)
-
-";
-
-%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternCombine(const Sparsity &y,
-bool f0x_is_zero, bool fx0_is_zero, std::vector< unsigned char >
-&output_mapping) const  " [INTERNAL]  Combine two sparsity patterns Returns
-the new sparsity pattern as well as a mapping with the same length as the
-number of non-zero elements The mapping matrix contains the arguments for
-each nonzero, the first bit indicates if the first argument is nonzero, the
-second bit indicates if the second argument is nonzero (note that none of,
-one of or both of the arguments can be nonzero)
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternCombine(const Sparsity &y,
-bool f0x_is_zero, bool fx0_is_zero) const  " [INTERNAL]  Combine two
-sparsity patterns Returns the new sparsity pattern as well as a mapping with
-the same length as the number of non-zero elements The mapping matrix
-contains the arguments for each nonzero, the first bit indicates if the
-first argument is nonzero, the second bit indicates if the second argument
-is nonzero (note that none of, one of or both of the arguments can be
-nonzero)
-
-";
-
-%feature("docstring")  casadi::Sparsity::resize(int nrow, int ncol) "
-[INTERNAL]  Resize.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isSquare() const  " [INTERNAL]  Is
-square?
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  " [INTERNAL]
-Is initialized?
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternProduct(const Sparsity &y)
-const  " [INTERNAL]   Sparsity pattern for a matrix-matrix product Returns
-the sparsity pattern resulting from multiplying the pattern with another
-pattern y from the right.
-
-";
-
-%feature("docstring")  casadi::Sparsity::spy(std::ostream
-&stream=CASADI_COUT) const  " [INTERNAL]  Print a textual representation of
-sparsity.
-
-";
-
-%feature("docstring")  casadi::Sparsity::add(T *data, const T *val_data,
-const Sparsity &val_sp) const  " [INTERNAL]  Add the nonzero entries of one
-sparsity pattern to the nonzero entries of another sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::add(DataType *data, const DataType
-*val_data, const Sparsity &val_sp) const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::zz_vertsplit(const std::vector< int
-> &output_offset) const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const " [INTERNAL]  Return a string with a description
-(for SWIG)
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternInverse() const  "
-[INTERNAL]  Take the inverse of a sparsity pattern; flip zeros and non-
-zeros.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getCol() const  " [INTERNAL]  Get
-the column for each non-zero entry Together with the row-vector, this vector
-gives the sparsity of the matrix in sparse triplet format, i.e. the column
-and row for each non-zero elements.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getTriplet(std::vector< int >
-&output_row, std::vector< int > &output_col) const  " [INTERNAL]  Get the
-sparsity in sparse triplet format.
-
-";
-
-%feature("docstring")  casadi::Sparsity::spyMatlab(const std::string &mfile)
-const  " [INTERNAL]  Generate a script for Matlab or Octave which visualizes
-the sparsity using the spy command.
-
-";
-
-%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
-Get the reference count.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getUpperNZ() const  " [INTERNAL]
-Get nonzeros in upper triangular part.
-
-";
-
-%feature("docstring")  casadi::Sparsity::bandwidthL() const  " [INTERNAL]
-Lower half-bandwidth.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-[INTERNAL]  Initialize or re-initialize the object:
-
-more documentation in the node class ( SharedObjectNode and derived classes)
-
-";
-
-%feature("docstring")  casadi::Sparsity::set(T *data, const T *val_data,
-const Sparsity &val_sp) const  " [INTERNAL]  Assign the nonzero entries of
-one sparsity pattern to the nonzero entries of another sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::set(DataType *data, const DataType
-*val_data, const Sparsity &val_sp) const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::getLowerNZ() const  " [INTERNAL]
-Get nonzeros in lower triangular part.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_vecNZ() const  " [INTERNAL]
-Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::erase(const std::vector< int > &rr,
-const std::vector< int > &cc, bool ind1=false) " [INTERNAL]  Erase rows
-and/or columns of a matrix.
-
-";
-
-%feature("docstring")  casadi::Sparsity::erase(const std::vector< int > &rr,
-bool ind1=false) " [INTERNAL]  Erase elements of a matrix.
-
-";
-
-%feature("docstring")  casadi::Sparsity::addNZ(int rr, int cc) " [INTERNAL]
-Get the index of a non-zero element Add the element if it does not exist and
-copy object if it's not unique.
-
-";
-
-%feature("docstring")  casadi::Sparsity::compress() const  " [INTERNAL]
-Compress a sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sub(const std::vector< int > &rr,
-const std::vector< int > &cc, std::vector< int > &output_mapping, bool
-ind1=false) const  " [INTERNAL]  Get a submatrix.
-
-Returns the sparsity of the submatrix, with a mapping such that submatrix[k]
-= originalmatrix[mapping[k]]
-
-";
-
-%feature("docstring")  casadi::Sparsity::sub(const std::vector< int > &rr,
-const Sparsity &sp, std::vector< int > &output_mapping, bool ind1=false)
-const  " [INTERNAL]  Get a set of elements.
-
-Returns the sparsity of the corresponding elements, with a mapping such that
-submatrix[k] = originalmatrix[mapping[k]]
-
-";
-
-%feature("docstring") casadi::ScalarSparsity "[INTERNAL] ";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(bool
-clone_members=true) " [INTERNAL]  Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
-";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
-SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-" [INTERNAL]  Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_kron(const Sparsity &b) const  "
-[INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isEqual(const Sparsity &y) const  "
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::isEqual(int nrow, int ncol, const
-std::vector< int > &colind, const std::vector< int > &row) const  "
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::isEqual(int nrow, int ncol, const
-int *colind, const int *row) const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::makeDense(std::vector< int >
-&mapping) const  " [INTERNAL]  Make a patten dense.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
-*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_diagsplit(const std::vector< int
-> &offset1, const std::vector< int > &offset2) const  " [INTERNAL]  Accessed
-by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getColind() const  " [INTERNAL]
-Get the column index for each column Together with the row-vector, one
-obtains the sparsity pattern in the column compressed format.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getRow() const  " [INTERNAL]  Get
-the row for each non-zero entry Together with the column-vector, this vector
-gives the sparsity of the matrix in sparse triplet format, and together with
-the colind vector, one obtains the sparsity in column compressed format.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getDiag(std::vector< int >
-&output_mapping) const  " [INTERNAL]  Get the diagonal of the matrix/create
-a diagonal matrix (mapping will contain the nonzero mapping) When the input
-is square, the diagonal elements are returned. If the input is vector-like,
-a diagonal matrix is constructed with it.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isScalar(bool
-scalar_and_dense=false) const  " [INTERNAL]  Is scalar?
-
-";
-
-%feature("docstring")  casadi::Sparsity::bor(T *data, const T *val_data,
-const Sparsity &val_sp) const  " [INTERNAL]  Bitwise or of the nonzero
-entries of one sparsity pattern and the nonzero entries of another sparsity
-pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::bor(DataType *data, const DataType
-*val_data, const Sparsity &val_sp) const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::isVector(bool row_or_col=false)
-const  " [INTERNAL]  Check if the pattern is a column vector (i.e.
-size2()==1) Optionally, checks if either row or column vector.
-
-";
-
-%feature("docstring") casadi::ScalarSparsity::ScalarSparsity() "[INTERNAL]
-";
-
-%feature("docstring")  casadi::Sparsity::zz_vertcat(const std::vector<
-Sparsity > &sp) " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_sprank() const  " [INTERNAL]
-Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::compressed(const std::vector< int >
-&v) " [INTERNAL]  Create from a single vector containing the pattern in
-compressed column storage format: The format: The first two entries are the
-number of rows (nrow) and columns (ncol) The next ncol+1 entries are the
-column offsets (colind). Note that the last element, colind[ncol], gives the
-number of nonzeros The last colind[ncol] entries are the row indices
-
-";
-
-%feature("docstring")  casadi::Sparsity::compressed(const int *v) "
-[INTERNAL]  Create from a single vector containing the pattern in compressed
-column storage format: The format: The first two entries are the number of
-rows (nrow) and columns (ncol) The next ncol+1 entries are the column
-offsets (colind). Note that the last element, colind[ncol], gives the number
-of nonzeros The last colind[ncol] entries are the row indices
-
-";
-
-%feature("docstring")  casadi::Sparsity::enlargeColumns(int ncol, const
-std::vector< int > &cc, bool ind1=false) " [INTERNAL]  Enlarge the matrix
-along the second dimension (i.e. insert columns)
-
-";
-
-%feature("docstring")  casadi::Sparsity::shape() const  " [INTERNAL]  Get
-the shape.
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity
->::zz_blocksplit(const std::vector< int > &vert_offset, const std::vector<
-int > &horz_offset) const " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::dense(int nrow, int ncol=1) "
-[INTERNAL]  Create a dense rectangular sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::dense(const std::pair< int, int >
-&rc) " [INTERNAL]  Create a dense rectangular sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::diag(int nrow) " [INTERNAL]  Create
-diagonal sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::diag(int nrow, int ncol) "
-[INTERNAL]  Create diagonal sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::diag(const std::pair< int, int >
-&rc) " [INTERNAL]  Create diagonal sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity  >::zz_vec()
-const " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::unit(int n, int el) " [INTERNAL]
-Create the sparsity pattern for a unit vector of length n and a nonzero on
-position el.
-
-";
-
-%feature("docstring")  casadi::Sparsity::eliminationTree(bool ata=false)
-const  " [INTERNAL]  Calculate the elimination tree See Direct Methods for
-Sparse Linear Systems by Davis (2006). If the parameter ata is false, the
-algorithm is equivalent to Matlab's etree(A), except that the indices are
-zero- based. If ata is true, the algorithm is equivalent to Matlab's
-etree(A, 'row').
-
-";
-
-%feature("docstring")  casadi::Sparsity::numel() const  " [INTERNAL]  The
-total number of elements, including structural zeros, i.e. size2()*size1()
-
-See:   nnz()
-
-";
-
-%feature("docstring")  casadi::Sparsity::pmult(const std::vector< int > &p,
-bool permute_rows=true, bool permute_cols=true, bool
-invert_permutation=false) const  " [INTERNAL]  Permute rows and/or columns
-Multiply the sparsity with a permutation matrix from the left and/or from
-the right P * A * trans(P), A * trans(P) or A * trans(P) with P defined by
-an index vector containing the row for each col. As an alternative, P can be
-transposed (inverted).
-
-";
-
-%feature("docstring")  casadi::Sparsity::appendColumns(const Sparsity &sp) "
-[INTERNAL]  Append another sparsity patten horizontally.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_mtimes(const Sparsity &y) const
-" [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_mtimes(const Sparsity &Y, const
-Sparsity &Z) const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getCCS(std::vector< int >
-&output_colind, std::vector< int > &output_row) const  " [INTERNAL]  Get the
-sparsity in compressed column storage (CCS) format.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  " [INTERNAL]
-Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::Sparsity::starColoring(int ordering=1, int
-cutoff=std::numeric_limits< int >::max()) const  " [INTERNAL]  Perform a
-star coloring of a symmetric matrix: A greedy distance-2 coloring algorithm
-(Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) Ordering options:
-None (0), largest first (1)
-
-";
-
-%feature("docstring")  casadi::Sparsity::getCRS(std::vector< int >
-&output_rowind, std::vector< int > &output_col) const  " [INTERNAL]  Get the
-sparsity in compressed row storage (CRS) format.
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternIntersection(const Sparsity
-&y, std::vector< unsigned char > &output_mapping) const  " [INTERNAL]
-Intersection of two sparsity patterns Returns the new sparsity pattern as
-well as a mapping with the same length as the number of non-zero elements
-The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if
-it is from the second and 3 (i.e. 1 | 2) if from both.
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternIntersection(const Sparsity
-&y) const  " [INTERNAL]  Intersection of two sparsity patterns Returns the
-new sparsity pattern as well as a mapping with the same length as the number
-of non-zero elements The value is 1 if the non-zero comes from the first
-(i.e. this) object, 2 if it is from the second and 3 (i.e. 1 | 2) if from
-both.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isReshape(const Sparsity &y) const
-" [INTERNAL]  Check if the sparsity is a reshape of another.
-
-";
-
-%feature("docstring")  casadi::Sparsity::T() const  " [INTERNAL]   Transpose
-the matrix.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_tril(bool includeDiagonal=true)
-const  " [INTERNAL]  Get lower triangular part.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_horzcat(const std::vector<
-Sparsity > &sp) " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_triu(bool includeDiagonal=true)
-const  " [INTERNAL]  Get upper triangular part
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_norm_0_mul(const Sparsity &B)
-const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::rowsSequential(bool strictly=true)
-const  " [INTERNAL]  Do the rows appear sequentially on each column.
-
-Parameters:
------------
-
-strictly:  if true, then do not allow multiple entries
-
-";
-
-%feature("docstring")  casadi::Sparsity::isTranspose(const Sparsity &y)
-const  " [INTERNAL]  Check if the sparsity is the transpose of another.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
-a const pointer to the node.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
-pointer to the node.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_diagcat(const std::vector<
-Sparsity > &v) " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const " [INTERNAL]  Return a string with a
-representation (for SWIG)
-
-";
-
-%feature("docstring")
-casadi::Sparsity::stronglyConnectedComponents(std::vector< int >
-&output_index, std::vector< int > &output_offset) const  " [INTERNAL]  Find
-the strongly connected components of the bigraph defined by the sparsity
-pattern of a square matrix.
-
-See Direct Methods for Sparse Linear Systems by Davis (2006). Returns:
-Number of components
-
-Offset for each components (length: 1 + number of components)
-
-Indices for each components, component i has indices index[offset[i]], ...,
-index[offset[i+1]]
-
-In the case that the matrix is symmetric, the result has a particular
-interpretation: Given a symmetric matrix A and n =
-A.stronglyConnectedComponents(p, r)
-
-=> A[p, p] will appear block-diagonal with n blocks and with the indices of
-the block boundaries to be found in r.
-
-";
-
-%feature("docstring")  casadi::Sparsity::enlargeRows(int nrow, const
-std::vector< int > &rr, bool ind1=false) " [INTERNAL]  Enlarge the matrix
-along the first dimension (i.e. insert rows)
-
-";
-
-%feature("docstring")  casadi::Sparsity::find(bool ind1=SWIG_IND1) const  "
-[INTERNAL]  Get the location of all non-zero elements as they would appear
-in a Dense matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5
-structural non-zeros.
-
-k = A.find() A[k] will contain the elements of A that are non-zero in B
-
-";
-
-%feature("docstring")  casadi::Sparsity::find(std::vector< int > &loc, bool
-ind1=false) const  " [INTERNAL]  Get the location of all nonzero elements
-(inplace version)
-
-";
-
-%feature("docstring")  casadi::Sparsity::hash() const  " [INTERNAL] ";
-
-%feature("docstring")  casadi::Sparsity::isEmpty(bool both=false) const  "
-[INTERNAL]  Check if the sparsity is empty.
-
-A sparsity is considered empty if one of the dimensions is zero (or
-optionally both dimensions)
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
-Deep copy.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sizeD() const  " [INTERNAL]  Number
-of non-zeros on the diagonal, i.e. the number of elements (i, j) with j==i.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sizeL() const  " [INTERNAL]  Number
-of non-zeros in the lower triangular half, i.e. the number of elements (i,
-j) with j<=i.
-
-";
-
-%feature("docstring")  casadi::Sparsity::printCompact(std::ostream
-&stream=CASADI_COUT) const  " [INTERNAL]  Print a compact description of the
-sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sizeU() const  " [INTERNAL]  Number
-of non-zeros in the upper triangular half, i.e. the number of elements (i,
-j) with j>=i.
-
-";
-
-%feature("docstring")  casadi::Sparsity::unidirectionalColoring(const
-Sparsity &AT=Sparsity(), int cutoff=std::numeric_limits< int >::max()) const
-" [INTERNAL]  Perform a unidirectional coloring: A greedy distance-2
-coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_horzsplit(const std::vector< int
-> &output_offset) const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sparse(int nrow, int ncol=1) "
-[INTERNAL]  Create a sparse (empty) rectangular sparsity pattern DEPRECATED:
-Use Sparse(nrow, ncol) instead.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sparse(const std::pair< int, int >
-&rc) " [INTERNAL]  Create a sparse (empty) rectangular sparsity pattern
-DEPRECATED: Use Sparse(nrow, ncol) instead.
-
-";
-
-%feature("docstring")  casadi::Sparsity::hasNZ(int rr, int cc) const  "
-[INTERNAL]  Returns true if the pattern has a non-zero at location rr, cc.
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternUnion(const Sparsity &y,
-std::vector< unsigned char > &output_mapping) const  " [INTERNAL]  Union of
-two sparsity patterns.
-
-";
-
-%feature("docstring")  casadi::Sparsity::patternUnion(const Sparsity &y)
-const  " [INTERNAL]  Union of two sparsity patterns.
-
-";
-
-%feature("docstring")  casadi::Sparsity::scalar(bool dense_scalar=true) "
-[INTERNAL]  Create a scalar sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::depthFirstSearch(int j, int top,
-std::vector< int > &xi, std::vector< int > &pstack, const std::vector< int >
-&pinv, std::vector< bool > &marked) const  " [INTERNAL]  Depth-first search
-on the adjacency graph of the sparsity See Direct Methods for Sparse Linear
-Systems by Davis (2006).
-
-";
-
-%feature("docstring")  casadi::Sparsity::dulmageMendelsohn(std::vector< int
-> &output_rowperm, std::vector< int > &output_colperm, std::vector< int >
-&output_rowblock, std::vector< int > &output_colblock, std::vector< int >
-&output_coarse_rowblock, std::vector< int > &output_coarse_colblock, int
-seed=0) const  " [INTERNAL]  Compute the Dulmage-Mendelsohn decomposition
-See Direct Methods for Sparse Linear Systems by Davis (2006).
-
-Dulmage-Mendelsohn will try to bring your matrix into lower block-
-triangular (LBT) form. It will not care about the distance of off- diagonal
-elements to the diagonal: there is no guarantee you will get a block-
-diagonal matrix if you supply a randomly permuted block- diagonal matrix.
-
-If your matrix is symmetrical, this method is of limited use; permutation
-can make it non-symmetric.
-
-See:   stronglyConnectedComponents
-
-";
-
-%feature("docstring")  casadi::Sparsity::isSingular() const  " [INTERNAL]
-Check whether the sparsity-pattern indicates structural singularity.
-
-";
-
-%feature("docstring")  casadi::Sparsity::nnz() const  " [INTERNAL]  Get the
-number of (structural) non-zeros.
-
-See:   numel()
-
-";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=CASADI_COUT) const  " [INTERNAL]  Print the pointer to the internal
-class
-
-";
-
-%feature("docstring")  casadi::Sparsity::enlarge(int nrow, int ncol, const
-std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false) "
-[INTERNAL]  Enlarge matrix Make the matrix larger by inserting empty rows
-and columns, keeping the existing non-zeros.
-
-For the matrices A to B A(m, n) length(jj)=m , length(ii)=n B(nrow, ncol)
-
-A=enlarge(m, n, ii, jj) makes sure that
-
-B[jj, ii] == A
-
-";
-
-%feature("docstring")  casadi::Sparsity::isDense() const  " [INTERNAL]  Is
-dense?
-
-";
-
-%feature("docstring")  casadi::Sparsity::size() const  " [INTERNAL]
-DEPRECATED: Alias for nnz.
-
-See:   nnz()
-
-";
-
-%feature("docstring")  casadi::Sparsity::removeDuplicates(std::vector< int >
-&mapping) " [INTERNAL]  Remove duplicate entries.
-
-The same indices will be removed from the mapping vector, which must have
-the same length as the number of nonzeros
-
-";
-
-%feature("docstring")  casadi::Sparsity::isTril() const  " [INTERNAL]  Is
-lower triangular?
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_blockcat(const std::vector<
-std::vector< Sparsity > > &v) " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::starColoring2(int ordering=1, int
-cutoff=std::numeric_limits< int >::max()) const  " [INTERNAL]  Perform a
-star coloring of a symmetric matrix: A new greedy distance-2 coloring
-algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A.
-POTHEN) Ordering options: None (0), largest first (1)
-
-";
-
-%feature("docstring")  casadi::Sparsity::isTriu() const  " [INTERNAL]  Is
-upper triangular?
-
-";
-
-%feature("docstring")  casadi::Sparsity::size1() const  " [INTERNAL]  Get
-the number of rows.
-
-";
-
-%feature("docstring")  casadi::Sparsity::size2() const  " [INTERNAL]  Get
-the number of columns.
-
-";
-
-%feature("docstring")  casadi::Sparsity::sanityCheck(bool complete=false)
-const  " [INTERNAL]  Check if the dimensions and colind, row vectors are
-compatible.
-
-Parameters:
------------
-
-complete:  set to true to also check elementwise throws an error as possible
-result
-
-";
-
-%feature("docstring")  casadi::Sparsity::append(const Sparsity &sp) "
-[INTERNAL]  Append another sparsity patten vertically (NOTE: only efficient
-if vector)
-
-";
-
-
 // File: classcasadi_1_1Scpgen.xml
 
 
@@ -58456,6 +55754,8 @@ name:
 
 Name of a solver. It might be one of:
 
+- mosek
+
 - sdp
 
 Note: some of the plugins in this list might not be available on your
@@ -58465,7 +55765,7 @@ SocpSolver.doc(\"myextraplugin\")
 
 st:
 
-Problem structure.>Struct scheme: casadi::SOCPStruct ( = 2) [socpStruct]
+Problem structure.>Struct scheme: casadi::SOCPStruct ( = 3) [socpStruct]
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
@@ -58473,6 +55773,10 @@ Problem structure.>Struct scheme: casadi::SOCPStruct ( = 2) [socpStruct]
 | SOCP_STRUCT_G          | g                      | The horizontal stack   |
 |                        |                        | of all matrices Gi: (  |
 |                        |                        | n x N) .               |
++------------------------+------------------------+------------------------+
+| SOCP_STRUCT_E          | e                      | The horizontal stack   |
+|                        |                        | of all vectors ei: ( n |
+|                        |                        | x m) .                 |
 +------------------------+------------------------+------------------------+
 | SOCP_STRUCT_A          | a                      | The matrix A: ( nc x   |
 |                        |                        | n) .                   |
@@ -58569,10 +55873,10 @@ Primal:
   LBX <= x   <= UBX
   
   with x ( n x 1)
-  c ( n x 1 )
+  c   dense ( n x 1 )
   Gi  sparse (n x ni)
   hi  dense (ni x 1)
-  ei  dense (n x 1)
+  ei  sparse (n x 1)
   fi  dense (1 x 1)
   N = Sum_i^m ni
   A sparse (nc x n)
@@ -58599,9 +55903,9 @@ General information
 |                        |                        | all vectors hi: ( N x  |
 |                        |                        | 1) .                   |
 +------------------------+------------------------+------------------------+
-| SOCP_SOLVER_E          | e                      | The vertical stack of  |
-|                        |                        | all vectors ei: ( nm x |
-|                        |                        | 1) .                   |
+| SOCP_SOLVER_E          | e                      | The horizontal stack   |
+|                        |                        | of all vectors ei: ( n |
+|                        |                        | x m) .                 |
 +------------------------+------------------------+------------------------+
 | SOCP_SOLVER_F          | f                      | The vertical stack of  |
 |                        |                        | all scalars fi: ( m x  |
@@ -58626,7 +55930,7 @@ General information
 |                        |                        | x 1 ) .                |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::SOCPOutput (SOCP_SOLVER_NUM_OUT = 4) [socpOut]
+>Output scheme: casadi::SOCPOutput (SOCP_SOLVER_NUM_OUT = 6) [socpOut]
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
@@ -58637,6 +55941,9 @@ General information
 | SOCP_SOLVER_COST       | cost                   | The primal optimal     |
 |                        |                        | cost (1 x 1) .         |
 +------------------------+------------------------+------------------------+
+| SOCP_SOLVER_DUAL_COST  | dual_cost              | The dual optimal cost  |
+|                        |                        | (1 x 1) .              |
++------------------------+------------------------+------------------------+
 | SOCP_SOLVER_LAM_A      | lam_a                  | The dual solution      |
 |                        |                        | corresponding to the   |
 |                        |                        | linear constraints (nc |
@@ -58646,6 +55953,11 @@ General information
 |                        |                        | corresponding to       |
 |                        |                        | simple bounds (n x 1)  |
 |                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| SOCP_SOLVER_LAM_CONE   | lam_cone               | The dual solution      |
+|                        |                        | correspoding to cone   |
+|                        |                        | (2-norm) constraints   |
+|                        |                        | (m x 1) .              |
 +------------------------+------------------------+------------------------+
 
 >List of available options
@@ -58816,12 +56128,1018 @@ List of plugins
 
 
 
+- mosek
+
 - sdp
 
 Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 SocpSolver.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+mosek
+-----
+
+
+
+Interface to the SOCP solver MOSEK
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| MSK_DPAR_ANA_SO | OT_REAL         | 0.000           | Consult MOSEK   |
+| L_INFEAS_TOL    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_BASIS_ | OT_REAL         | 0.000           | Consult MOSEK   |
+| REL_TOL_S       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_BASIS_ | OT_REAL         | 0.000           | Consult MOSEK   |
+| TOL_S           |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_BASIS_ | OT_REAL         | 0.000           | Consult MOSEK   |
+| TOL_X           |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_CHECK_ | OT_REAL         | 0.000           | Consult MOSEK   |
+| CONVEXITY_REL_T |                 |                 | manual.         |
+| OL              |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_DATA_T | OT_REAL         | 0.000           | Consult MOSEK   |
+| OL_AIJ          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_DATA_T | OT_REAL         | 1.000e+20       | Consult MOSEK   |
+| OL_AIJ_HUGE     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_DATA_T | OT_REAL         | 1.000e+10       | Consult MOSEK   |
+| OL_AIJ_LARGE    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_DATA_T | OT_REAL         | 1.000e+16       | Consult MOSEK   |
+| OL_BOUND_INF    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_DATA_T | OT_REAL         | 100000000       | Consult MOSEK   |
+| OL_BOUND_WRN    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_DATA_T | OT_REAL         | 100000000       | Consult MOSEK   |
+| OL_CJ_LARGE     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_DATA_T | OT_REAL         | 1.000e+16       | Consult MOSEK   |
+| OL_C_HUGE       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_DATA_T | OT_REAL         | 0.000           | Consult MOSEK   |
+| OL_QIJ          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_DATA_T | OT_REAL         | 0.000           | Consult MOSEK   |
+| OL_X            |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_FEASRE | OT_REAL         | 0.000           | Consult MOSEK   |
+| PAIR_TOL        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _CO_TOL_DFEAS   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _CO_TOL_INFEAS  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _CO_TOL_MU_RED  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 1000            | Consult MOSEK   |
+| _CO_TOL_NEAR_RE |                 |                 | manual.         |
+| L               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _CO_TOL_PFEAS   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _CO_TOL_REL_GAP |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _NL_MERIT_BAL   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _NL_TOL_DFEAS   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _NL_TOL_MU_RED  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 1000            | Consult MOSEK   |
+| _NL_TOL_NEAR_RE |                 |                 | manual.         |
+| L               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _NL_TOL_PFEAS   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _NL_TOL_REL_GAP |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.995           | Consult MOSEK   |
+| _NL_TOL_REL_STE |                 |                 | manual.         |
+| P               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _TOL_DFEAS      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 1               | Consult MOSEK   |
+| _TOL_DSAFE      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _TOL_INFEAS     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _TOL_MU_RED     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _TOL_PATH       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _TOL_PFEAS      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 1               | Consult MOSEK   |
+| _TOL_PSAFE      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _TOL_REL_GAP    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 1.000           | Consult MOSEK   |
+| _TOL_REL_STEP   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_INTPNT | OT_REAL         | 0.000           | Consult MOSEK   |
+| _TOL_STEP_SIZE  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_LOWER_ | OT_REAL         | -1.000e+30      | Consult MOSEK   |
+| OBJ_CUT         |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_LOWER_ | OT_REAL         | -5.000e+29      | Consult MOSEK   |
+| OBJ_CUT_FINITE_ |                 |                 | manual.         |
+| TRH             |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_DI | OT_REAL         | -1              | Consult MOSEK   |
+| SABLE_TERM_TIME |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_HE | OT_REAL         | -1              | Consult MOSEK   |
+| URISTIC_TIME    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_MA | OT_REAL         | -1              | Consult MOSEK   |
+| X_TIME          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_MA | OT_REAL         | 60              | Consult MOSEK   |
+| X_TIME_APRX_OPT |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_NE | OT_REAL         | 0               | Consult MOSEK   |
+| AR_TOL_ABS_GAP  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_NE | OT_REAL         | 0.001           | Consult MOSEK   |
+| AR_TOL_REL_GAP  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_RE | OT_REAL         | 0.750           | Consult MOSEK   |
+| L_ADD_CUT_LIMIT |                 |                 | manual.         |
+| ED              |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_RE | OT_REAL         | 0.000           | Consult MOSEK   |
+| L_GAP_CONST     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_TO | OT_REAL         | 0               | Consult MOSEK   |
+| L_ABS_GAP       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_TO | OT_REAL         | 0.000           | Consult MOSEK   |
+| L_ABS_RELAX_INT |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_TO | OT_REAL         | 0.000           | Consult MOSEK   |
+| L_FEAS          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_TO | OT_REAL         | 0               | Consult MOSEK   |
+| L_MAX_CUT_FRAC_ |                 |                 | manual.         |
+| RHS             |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_TO | OT_REAL         | 0               | Consult MOSEK   |
+| L_MIN_CUT_FRAC_ |                 |                 | manual.         |
+| RHS             |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_TO | OT_REAL         | 0               | Consult MOSEK   |
+| L_REL_DUAL_BOUN |                 |                 | manual.         |
+| D_IMPROVEMENT   |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_TO | OT_REAL         | 0.000           | Consult MOSEK   |
+| L_REL_GAP       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_TO | OT_REAL         | 0.000           | Consult MOSEK   |
+| L_REL_RELAX_INT |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_MIO_TO | OT_REAL         | 0.000           | Consult MOSEK   |
+| L_X             |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_NONCON | OT_REAL         | 0.000           | Consult MOSEK   |
+| VEX_TOL_FEAS    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_NONCON | OT_REAL         | 0.000           | Consult MOSEK   |
+| VEX_TOL_OPT     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_OPTIMI | OT_REAL         | -1              | Consult MOSEK   |
+| ZER_MAX_TIME    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_PRESOL | OT_REAL         | 0.000           | Consult MOSEK   |
+| VE_TOL_ABS_LIND |                 |                 | manual.         |
+| EP              |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_PRESOL | OT_REAL         | 0.000           | Consult MOSEK   |
+| VE_TOL_AIJ      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_PRESOL | OT_REAL         | 0.000           | Consult MOSEK   |
+| VE_TOL_REL_LIND |                 |                 | manual.         |
+| EP              |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_PRESOL | OT_REAL         | 0.000           | Consult MOSEK   |
+| VE_TOL_S        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_PRESOL | OT_REAL         | 0.000           | Consult MOSEK   |
+| VE_TOL_X        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_QCQO_R | OT_REAL         | 0.000           | Consult MOSEK   |
+| EFORMULATE_REL_ |                 |                 | manual.         |
+| DROP_TOL        |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_SIMPLE | OT_REAL         | 0.000           | Consult MOSEK   |
+| X_ABS_TOL_PIV   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_SIM_LU | OT_REAL         | 0.010           | Consult MOSEK   |
+| _TOL_REL_PIV    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_UPPER_ | OT_REAL         | 1.000e+30       | Consult MOSEK   |
+| OBJ_CUT         |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_DPAR_UPPER_ | OT_REAL         | 5.000e+29       | Consult MOSEK   |
+| OBJ_CUT_FINITE_ |                 |                 | manual.         |
+| TRH             |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_ALLOC_ | OT_STRING       | 5000            | Consult MOSEK   |
+| ADD_QNZ         |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_ANA_SO | OT_STRING       | 1               | Consult MOSEK   |
+| L_BASIS         |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_ANA_SO | OT_STRING       | 0               | Consult MOSEK   |
+| L_PRINT_VIOLATE |                 |                 | manual.         |
+| D               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_AUTO_S | OT_STRING       | 0               | Consult MOSEK   |
+| ORT_A_BEFORE_OP |                 |                 | manual.         |
+| T               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_AUTO_U | OT_STRING       | 0               | Consult MOSEK   |
+| PDATE_SOL_INFO  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_BASIS_ | OT_STRING       | 0               | Consult MOSEK   |
+| SOLVE_USE_PLUS_ |                 |                 | manual.         |
+| ONE             |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_BI_CLE | OT_STRING       | 0               | Consult MOSEK   |
+| AN_OPTIMIZER    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_BI_IGN | OT_STRING       | 0               | Consult MOSEK   |
+| ORE_MAX_ITER    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_BI_IGN | OT_STRING       | 0               | Consult MOSEK   |
+| ORE_NUM_ERROR   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_BI_MAX | OT_STRING       | 1000000         | Consult MOSEK   |
+| _ITERATIONS     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_CACHE_ | OT_STRING       | 1               | Consult MOSEK   |
+| LICENSE         |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_CHECK_ | OT_STRING       | 2               | Consult MOSEK   |
+| CONVEXITY       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_COMPRE | OT_STRING       | 1               | Consult MOSEK   |
+| SS_STATFILE     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_CONCUR | OT_STRING       | 2               | Consult MOSEK   |
+| RENT_NUM_OPTIMI |                 |                 | manual.         |
+| ZERS            |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_CONCUR | OT_STRING       | 2               | Consult MOSEK   |
+| RENT_PRIORITY_D |                 |                 | manual.         |
+| UAL_SIMPLEX     |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_CONCUR | OT_STRING       | 3               | Consult MOSEK   |
+| RENT_PRIORITY_F |                 |                 | manual.         |
+| REE_SIMPLEX     |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_CONCUR | OT_STRING       | 4               | Consult MOSEK   |
+| RENT_PRIORITY_I |                 |                 | manual.         |
+| NTPNT           |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_CONCUR | OT_STRING       | 1               | Consult MOSEK   |
+| RENT_PRIORITY_P |                 |                 | manual.         |
+| RIMAL_SIMPLEX   |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_FEASRE | OT_STRING       | 0               | Consult MOSEK   |
+| PAIR_OPTIMIZE   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INFEAS | OT_STRING       | 0               | Consult MOSEK   |
+| _GENERIC_NAMES  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INFEAS | OT_STRING       | 1               | Consult MOSEK   |
+| _PREFER_PRIMAL  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INFEAS | OT_STRING       | 0               | Consult MOSEK   |
+| _REPORT_AUTO    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INFEAS | OT_STRING       | 1               | Consult MOSEK   |
+| _REPORT_LEVEL   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | 1               | Consult MOSEK   |
+| _BASIS          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | 1               | Consult MOSEK   |
+| _DIFF_STEP      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | 0               | Consult MOSEK   |
+| _FACTOR_DEBUG_L |                 |                 | manual.         |
+| VL              |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | 0               | Consult MOSEK   |
+| _FACTOR_METHOD  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | 0               | Consult MOSEK   |
+| _HOTSTART       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | 400             | Consult MOSEK   |
+| _MAX_ITERATIONS |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | -1              | Consult MOSEK   |
+| _MAX_NUM_COR    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | -1              | Consult MOSEK   |
+| _MAX_NUM_REFINE |                 |                 | manual.         |
+| MENT_STEPS      |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | 40              | Consult MOSEK   |
+| _OFF_COL_TRH    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | 0               | Consult MOSEK   |
+| _ORDER_METHOD   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | 1               | Consult MOSEK   |
+| _REGULARIZATION |                 |                 | manual.         |
+| _USE            |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | 0               | Consult MOSEK   |
+| _SCALING        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | 0               | Consult MOSEK   |
+| _SOLVE_FORM     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_INTPNT | OT_STRING       | 0               | Consult MOSEK   |
+| _STARTING_POINT |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LICENS | OT_STRING       | 0               | Consult MOSEK   |
+| E_DEBUG         |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LICENS | OT_STRING       | 100             | Consult MOSEK   |
+| E_PAUSE_TIME    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LICENS | OT_STRING       | 0               | Consult MOSEK   |
+| E_SUPPRESS_EXPI |                 |                 | manual.         |
+| RE_WRNS         |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LICENS | OT_STRING       | 0               | Consult MOSEK   |
+| E_WAIT          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LIC_TR | OT_STRING       | 7               | Consult MOSEK   |
+| H_EXPIRY_WRN    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG    | OT_STRING       | 10              | Consult MOSEK   |
+|                 |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_BI | OT_STRING       | 4               | Consult MOSEK   |
+|                 |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_BI | OT_STRING       | 2500            | Consult MOSEK   |
+| _FREQ           |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_CH | OT_STRING       | 0               | Consult MOSEK   |
+| ECK_CONVEXITY   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_CO | OT_STRING       | 1               | Consult MOSEK   |
+| NCURRENT        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_CU | OT_STRING       | 1               | Consult MOSEK   |
+| T_SECOND_OPT    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_EX | OT_STRING       | 0               | Consult MOSEK   |
+| PAND            |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_FA | OT_STRING       | 1               | Consult MOSEK   |
+| CTOR            |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_FE | OT_STRING       | 1               | Consult MOSEK   |
+| AS_REPAIR       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_FI | OT_STRING       | 1               | Consult MOSEK   |
+| LE              |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_HE | OT_STRING       | 1               | Consult MOSEK   |
+| AD              |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_IN | OT_STRING       | 1               | Consult MOSEK   |
+| FEAS_ANA        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_IN | OT_STRING       | 4               | Consult MOSEK   |
+| TPNT            |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_MI | OT_STRING       | 4               | Consult MOSEK   |
+| O               |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_MI | OT_STRING       | 1000            | Consult MOSEK   |
+| O_FREQ          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_NO | OT_STRING       | 1               | Consult MOSEK   |
+| NCONVEX         |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_OP | OT_STRING       | 1               | Consult MOSEK   |
+| TIMIZER         |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_OR | OT_STRING       | 1               | Consult MOSEK   |
+| DER             |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_PA | OT_STRING       | 0               | Consult MOSEK   |
+| RAM             |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_PR | OT_STRING       | 1               | Consult MOSEK   |
+| ESOLVE          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_RE | OT_STRING       | 0               | Consult MOSEK   |
+| SPONSE          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_SE | OT_STRING       | 1               | Consult MOSEK   |
+| NSITIVITY       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_SE | OT_STRING       | 0               | Consult MOSEK   |
+| NSITIVITY_OPT   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_SI | OT_STRING       | 4               | Consult MOSEK   |
+| M               |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_SI | OT_STRING       | 1000            | Consult MOSEK   |
+| M_FREQ          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_SI | OT_STRING       | 1               | Consult MOSEK   |
+| M_MINOR         |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_SI | OT_STRING       | 1000            | Consult MOSEK   |
+| M_NETWORK_FREQ  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_LOG_ST | OT_STRING       | 0               | Consult MOSEK   |
+| ORAGE           |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MAX_NU | OT_STRING       | 6               | Consult MOSEK   |
+| M_WARNINGS      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_BR | OT_STRING       | 0               | Consult MOSEK   |
+| ANCH_DIR        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_BR | OT_STRING       | 1               | Consult MOSEK   |
+| ANCH_PRIORITIES |                 |                 | manual.         |
+| _USE            |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_CO | OT_STRING       | 0               | Consult MOSEK   |
+| NSTRUCT_SOL     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_CO | OT_STRING       | 0               | Consult MOSEK   |
+| NT_SOL          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_CU | OT_STRING       | 1               | Consult MOSEK   |
+| T_CG            |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_CU | OT_STRING       | 1               | Consult MOSEK   |
+| T_CMIR          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_CU | OT_STRING       | -1              | Consult MOSEK   |
+| T_LEVEL_ROOT    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_CU | OT_STRING       | -1              | Consult MOSEK   |
+| T_LEVEL_TREE    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_FE | OT_STRING       | -1              | Consult MOSEK   |
+| ASPUMP_LEVEL    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_HE | OT_STRING       | -1              | Consult MOSEK   |
+| URISTIC_LEVEL   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_HO | OT_STRING       | 1               | Consult MOSEK   |
+| TSTART          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_KE | OT_STRING       | 1               | Consult MOSEK   |
+| EP_BASIS        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_LO | OT_STRING       | -1              | Consult MOSEK   |
+| CAL_BRANCH_NUMB |                 |                 | manual.         |
+| ER              |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_MA | OT_STRING       | -1              | Consult MOSEK   |
+| X_NUM_BRANCHES  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_MA | OT_STRING       | -1              | Consult MOSEK   |
+| X_NUM_RELAXS    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_MA | OT_STRING       | -1              | Consult MOSEK   |
+| X_NUM_SOLUTIONS |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_MO | OT_STRING       | 1               | Consult MOSEK   |
+| DE              |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_MT | OT_STRING       | 1               | Consult MOSEK   |
+| _USER_CB        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_NO | OT_STRING       | 0               | Consult MOSEK   |
+| DE_OPTIMIZER    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_NO | OT_STRING       | 0               | Consult MOSEK   |
+| DE_SELECTION    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_OP | OT_STRING       | 0               | Consult MOSEK   |
+| TIMIZER_MODE    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_PR | OT_STRING       | 1               | Consult MOSEK   |
+| ESOLVE_AGGREGAT |                 |                 | manual.         |
+| E               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_PR | OT_STRING       | 1               | Consult MOSEK   |
+| ESOLVE_PROBING  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_PR | OT_STRING       | 1               | Consult MOSEK   |
+| ESOLVE_USE      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_PR | OT_STRING       | -1              | Consult MOSEK   |
+| OBING_LEVEL     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_RI | OT_STRING       | -1              | Consult MOSEK   |
+| NS_MAX_NODES    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_RO | OT_STRING       | 0               | Consult MOSEK   |
+| OT_OPTIMIZER    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_ST | OT_STRING       | -1              | Consult MOSEK   |
+| RONG_BRANCH     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MIO_US | OT_STRING       | 0               | Consult MOSEK   |
+| E_MULTITHREADED |                 |                 | manual.         |
+| _OPTIMIZER      |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_MT_SPI | OT_STRING       | 0               | Consult MOSEK   |
+| NCOUNT          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_NONCON | OT_STRING       | 100000          | Consult MOSEK   |
+| VEX_MAX_ITERATI |                 |                 | manual.         |
+| ONS             |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_NUM_TH | OT_STRING       | 0               | Consult MOSEK   |
+| READS           |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_OPF_MA | OT_STRING       | 5               | Consult MOSEK   |
+| X_TERMS_PER_LIN |                 |                 | manual.         |
+| E               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_OPF_WR | OT_STRING       | 1               | Consult MOSEK   |
+| ITE_HEADER      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_OPF_WR | OT_STRING       | 1               | Consult MOSEK   |
+| ITE_HINTS       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_OPF_WR | OT_STRING       | 0               | Consult MOSEK   |
+| ITE_PARAMETERS  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_OPF_WR | OT_STRING       | 1               | Consult MOSEK   |
+| ITE_PROBLEM     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_OPF_WR | OT_STRING       | 0               | Consult MOSEK   |
+| ITE_SOLUTIONS   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_OPF_WR | OT_STRING       | 1               | Consult MOSEK   |
+| ITE_SOL_BAS     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_OPF_WR | OT_STRING       | 1               | Consult MOSEK   |
+| ITE_SOL_ITG     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_OPF_WR | OT_STRING       | 1               | Consult MOSEK   |
+| ITE_SOL_ITR     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_OPTIMI | OT_STRING       | 0               | Consult MOSEK   |
+| ZER             |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_PARAM_ | OT_STRING       | 1               | Consult MOSEK   |
+| READ_CASE_NAME  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_PARAM_ | OT_STRING       | 0               | Consult MOSEK   |
+| READ_IGN_ERROR  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_PRESOL | OT_STRING       | -1              | Consult MOSEK   |
+| VE_ELIMINATOR_M |                 |                 | manual.         |
+| AX_NUM_TRIES    |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_PRESOL | OT_STRING       | 1               | Consult MOSEK   |
+| VE_ELIMINATOR_U |                 |                 | manual.         |
+| SE              |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_PRESOL | OT_STRING       | 1               | Consult MOSEK   |
+| VE_ELIM_FILL    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_PRESOL | OT_STRING       | -1              | Consult MOSEK   |
+| VE_LEVEL        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_PRESOL | OT_STRING       | 100             | Consult MOSEK   |
+| VE_LINDEP_ABS_W |                 |                 | manual.         |
+| ORK_TRH         |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_PRESOL | OT_STRING       | 100             | Consult MOSEK   |
+| VE_LINDEP_REL_W |                 |                 | manual.         |
+| ORK_TRH         |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_PRESOL | OT_STRING       | 1               | Consult MOSEK   |
+| VE_LINDEP_USE   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_PRESOL | OT_STRING       | -1              | Consult MOSEK   |
+| VE_MAX_NUM_REDU |                 |                 | manual.         |
+| CTIONS          |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_PRESOL | OT_STRING       | 2               | Consult MOSEK   |
+| VE_USE          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_PRIMAL | OT_STRING       | 0               | Consult MOSEK   |
+| _REPAIR_OPTIMIZ |                 |                 | manual.         |
+| ER              |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_QO_SEP | OT_STRING       | 0               | Consult MOSEK   |
+| ARABLE_REFORMUL |                 |                 | manual.         |
+| ATION           |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_A | OT_STRING       | 100000          | Consult MOSEK   |
+| NZ              |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_C | OT_STRING       | 10000           | Consult MOSEK   |
+| ON              |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_C | OT_STRING       | 2500            | Consult MOSEK   |
+| ONE             |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_D | OT_STRING       | 1               | Consult MOSEK   |
+| ATA_COMPRESSED  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_D | OT_STRING       | 0               | Consult MOSEK   |
+| ATA_FORMAT      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_D | OT_STRING       | 0               | Consult MOSEK   |
+| EBUG            |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_K | OT_STRING       | 0               | Consult MOSEK   |
+| EEP_FREE_CON    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_L | OT_STRING       | 0               | Consult MOSEK   |
+| P_DROP_NEW_VARS |                 |                 | manual.         |
+| _IN_BOU         |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_L | OT_STRING       | 1               | Consult MOSEK   |
+| P_QUOTED_NAMES  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_M | OT_STRING       | 1               | Consult MOSEK   |
+| PS_FORMAT       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_M | OT_STRING       | 1               | Consult MOSEK   |
+| PS_KEEP_INT     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_M | OT_STRING       | 1               | Consult MOSEK   |
+| PS_OBJ_SENSE    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_M | OT_STRING       | 1               | Consult MOSEK   |
+| PS_RELAX        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_M | OT_STRING       | 1024            | Consult MOSEK   |
+| PS_WIDTH        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_Q | OT_STRING       | 20000           | Consult MOSEK   |
+| NZ              |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_T | OT_STRING       | 0               | Consult MOSEK   |
+| ASK_IGNORE_PARA |                 |                 | manual.         |
+| M               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_READ_V | OT_STRING       | 10000           | Consult MOSEK   |
+| AR              |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SENSIT | OT_STRING       | 0               | Consult MOSEK   |
+| IVITY_ALL       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SENSIT | OT_STRING       | 6               | Consult MOSEK   |
+| IVITY_OPTIMIZER |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SENSIT | OT_STRING       | 0               | Consult MOSEK   |
+| IVITY_TYPE      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_BA | OT_STRING       | 1               | Consult MOSEK   |
+| SIS_FACTOR_USE  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_DE | OT_STRING       | 1               | Consult MOSEK   |
+| GEN             |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_DU | OT_STRING       | 90              | Consult MOSEK   |
+| AL_CRASH        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_DU | OT_STRING       | 0               | Consult MOSEK   |
+| AL_PHASEONE_MET |                 |                 | manual.         |
+| HOD             |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_DU | OT_STRING       | 50              | Consult MOSEK   |
+| AL_RESTRICT_SEL |                 |                 | manual.         |
+| ECTION          |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_DU | OT_STRING       | 0               | Consult MOSEK   |
+| AL_SELECTION    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_EX | OT_STRING       | 0               | Consult MOSEK   |
+| PLOIT_DUPVEC    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_HO | OT_STRING       | 1               | Consult MOSEK   |
+| TSTART          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_HO | OT_STRING       | 1               | Consult MOSEK   |
+| TSTART_LU       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_IN | OT_STRING       | 0               | Consult MOSEK   |
+| TEGER           |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_MA | OT_STRING       | 10000000        | Consult MOSEK   |
+| X_ITERATIONS    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_MA | OT_STRING       | 250             | Consult MOSEK   |
+| X_NUM_SETBACKS  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_NO | OT_STRING       | 1               | Consult MOSEK   |
+| N_SINGULAR      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_PR | OT_STRING       | 90              | Consult MOSEK   |
+| IMAL_CRASH      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_PR | OT_STRING       | 0               | Consult MOSEK   |
+| IMAL_PHASEONE_M |                 |                 | manual.         |
+| ETHOD           |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_PR | OT_STRING       | 50              | Consult MOSEK   |
+| IMAL_RESTRICT_S |                 |                 | manual.         |
+| ELECTION        |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_PR | OT_STRING       | 0               | Consult MOSEK   |
+| IMAL_SELECTION  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_RE | OT_STRING       | 0               | Consult MOSEK   |
+| FACTOR_FREQ     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_RE | OT_STRING       | 0               | Consult MOSEK   |
+| FORMULATION     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_SA | OT_STRING       | 0               | Consult MOSEK   |
+| VE_LU           |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_SC | OT_STRING       | 0               | Consult MOSEK   |
+| ALING           |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_SC | OT_STRING       | 0               | Consult MOSEK   |
+| ALING_METHOD    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_SO | OT_STRING       | 0               | Consult MOSEK   |
+| LVE_FORM        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_ST | OT_STRING       | 50              | Consult MOSEK   |
+| ABILITY_PRIORIT |                 |                 | manual.         |
+| Y               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SIM_SW | OT_STRING       | 0               | Consult MOSEK   |
+| ITCH_OPTIMIZER  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SOLUTI | OT_STRING       | 0               | Consult MOSEK   |
+| ON_CALLBACK     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SOL_FI | OT_STRING       | 0               | Consult MOSEK   |
+| LTER_KEEP_BASIC |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SOL_FI | OT_STRING       | 0               | Consult MOSEK   |
+| LTER_KEEP_RANGE |                 |                 | manual.         |
+| D               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SOL_RE | OT_STRING       | -1              | Consult MOSEK   |
+| AD_NAME_WIDTH   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_SOL_RE | OT_STRING       | 1024            | Consult MOSEK   |
+| AD_WIDTH        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_TIMING | OT_STRING       | 1               | Consult MOSEK   |
+| _LEVEL          |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WARNIN | OT_STRING       | 1               | Consult MOSEK   |
+| G_LEVEL         |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| BAS_CONSTRAINTS |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| BAS_HEAD        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| BAS_VARIABLES   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 0               | Consult MOSEK   |
+| DATA_COMPRESSED |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 0               | Consult MOSEK   |
+| DATA_FORMAT     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 0               | Consult MOSEK   |
+| DATA_PARAM      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 0               | Consult MOSEK   |
+| FREE_CON        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 0               | Consult MOSEK   |
+| GENERIC_NAMES   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| GENERIC_NAMES_I |                 |                 | manual.         |
+| O               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 0               | Consult MOSEK   |
+| IGNORE_INCOMPAT |                 |                 | manual.         |
+| IBLE_CONIC_ITEM |                 |                 |                 |
+| S               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 0               | Consult MOSEK   |
+| IGNORE_INCOMPAT |                 |                 | manual.         |
+| IBLE_ITEMS      |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 0               | Consult MOSEK   |
+| IGNORE_INCOMPAT |                 |                 | manual.         |
+| IBLE_NL_ITEMS   |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 0               | Consult MOSEK   |
+| IGNORE_INCOMPAT |                 |                 | manual.         |
+| IBLE_PSD_ITEMS  |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| INT_CONSTRAINTS |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| INT_HEAD        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| INT_VARIABLES   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 80              | Consult MOSEK   |
+| LP_LINE_WIDTH   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| LP_QUOTED_NAMES |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 0               | Consult MOSEK   |
+| LP_STRICT_FORMA |                 |                 | manual.         |
+| T               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 10              | Consult MOSEK   |
+| LP_TERMS_PER_LI |                 |                 | manual.         |
+| NE              |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| MPS_INT         |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 8               | Consult MOSEK   |
+| PRECISION       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| SOL_BARVARIABLE |                 |                 | manual.         |
+| S               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| SOL_CONSTRAINTS |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| SOL_HEAD        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 0               | Consult MOSEK   |
+| SOL_IGNORE_INVA |                 |                 | manual.         |
+| LID_NAMES       |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| SOL_VARIABLES   |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 1               | Consult MOSEK   |
+| TASK_INC_SOL    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_IPAR_WRITE_ | OT_STRING       | 0               | Consult MOSEK   |
+| XML_MODE        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_BAS_SO | OT_STRING       |                 | Consult MOSEK   |
+| L_FILE_NAME     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_DATA_F | OT_STRING       |                 | Consult MOSEK   |
+| ILE_NAME        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_DEBUG_ | OT_STRING       |                 | Consult MOSEK   |
+| FILE_NAME       |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_FEASRE | OT_STRING       | MSK-            | Consult MOSEK   |
+| PAIR_NAME_PREFI |                 |                 | manual.         |
+| X               |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_FEASRE | OT_STRING       | -               | Consult MOSEK   |
+| PAIR_NAME_SEPAR |                 |                 | manual.         |
+| ATOR            |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_FEASRE | OT_STRING       | WSUMVIOL        | Consult MOSEK   |
+| PAIR_NAME_WSUMV |                 |                 | manual.         |
+| IOL             |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_INT_SO | OT_STRING       |                 | Consult MOSEK   |
+| L_FILE_NAME     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_ITR_SO | OT_STRING       |                 | Consult MOSEK   |
+| L_FILE_NAME     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_MIO_DE | OT_STRING       |                 | Consult MOSEK   |
+| BUG_STRING      |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_PARAM_ | OT_STRING       | %%              | Consult MOSEK   |
+| COMMENT_SIGN    |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_PARAM_ | OT_STRING       |                 | Consult MOSEK   |
+| READ_FILE_NAME  |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_PARAM_ | OT_STRING       |                 | Consult MOSEK   |
+| WRITE_FILE_NAME |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_READ_M | OT_STRING       |                 | Consult MOSEK   |
+| PS_BOU_NAME     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_READ_M | OT_STRING       |                 | Consult MOSEK   |
+| PS_OBJ_NAME     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_READ_M | OT_STRING       |                 | Consult MOSEK   |
+| PS_RAN_NAME     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_READ_M | OT_STRING       |                 | Consult MOSEK   |
+| PS_RHS_NAME     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_SENSIT | OT_STRING       |                 | Consult MOSEK   |
+| IVITY_FILE_NAME |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_SENSIT | OT_STRING       |                 | Consult MOSEK   |
+| IVITY_RES_FILE_ |                 |                 | manual.         |
+| NAME            |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_SOL_FI | OT_STRING       |                 | Consult MOSEK   |
+| LTER_XC_LOW     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_SOL_FI | OT_STRING       |                 | Consult MOSEK   |
+| LTER_XC_UPR     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_SOL_FI | OT_STRING       |                 | Consult MOSEK   |
+| LTER_XX_LOW     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_SOL_FI | OT_STRING       |                 | Consult MOSEK   |
+| LTER_XX_UPR     |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_STAT_F | OT_STRING       |                 | Consult MOSEK   |
+| ILE_NAME        |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_STAT_K | OT_STRING       |                 | Consult MOSEK   |
+| EY              |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_STAT_N | OT_STRING       |                 | Consult MOSEK   |
+| AME             |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| MSK_SPAR_WRITE_ | OT_STRING       | XMSKGEN         | Consult MOSEK   |
+| LP_GEN_VAR_NAME |                 |                 | manual.         |
++-----------------+-----------------+-----------------+-----------------+
+| eps_unstable    | OT_REAL         | 0.000           | A margin for    |
+|                 |                 |                 | unstability     |
+|                 |                 |                 | detection       |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available stats
+
++--------------------+
+|         Id         |
++====================+
+| problem_status     |
++--------------------+
+| solution_status    |
++--------------------+
+| termination_reason |
++--------------------+
+
+--------------------------------------------------------------------------------
 
 
 
@@ -60081,9 +58399,10 @@ Get nonzeros in lower triangular part.
 ";
 
 %feature("docstring")  casadi::Sparsity::find(bool ind1=SWIG_IND1) const  "
-[INTERNAL]  Get the location of all non-zero elements as they would appear
-in a Dense matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5
-structural non-zeros.
+
+Get the location of all non-zero elements as they would appear in a Dense
+matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
+zeros.
 
 k = A.find() A[k] will contain the elements of A that are non-zero in B
 
@@ -66239,13 +64558,7 @@ check if there is an option str
 
 
 // File: namespacecasadi.xml
-%feature("docstring")  casadi::casadi_register_stabilizedqpsolver_qp(StabilizedQpSolverInternal::Plugin *plugin) "
-";
-%feature("docstring")  casadi::inner_prod(const std::vector< T > &a, const
-std::vector< T > &b) " [INTERNAL] ";
-
 %feature("docstring")  casadi::matrixName< double >() "
-
 Get typename.
 
 ";
@@ -66272,12 +64585,19 @@ Output arguments of a dple solver
 %feature("docstring")  casadi::lrdpleOut(const std::vector< M > &args, const
 std::string &arg_s0="") " ";
 
-%feature("docstring")
-casadi::casadi_register_implicitfunction_kinsol(ImplicitFunctionInternal::Plugin
-*plugin) " ";
+%feature("docstring")  casadi::inBounds(const std::vector< T > &v, int
+upper) "
 
-%feature("docstring")  casadi::describeOutput(InputOutputScheme scheme, int
-i) " ";
+Check if for each element of v holds: v_i < upper.
+
+";
+
+%feature("docstring")  casadi::inBounds(const std::vector< T > &v, int
+lower, int upper) "
+
+Check if for each element of v holds: lower <= v_i < upper.
+
+";
 
 %feature("docstring")  casadi::cumsum(const std::vector< T > &values) "
 [INTERNAL]  cumulative sum
@@ -66288,10 +64608,6 @@ i) " ";
 [INTERNAL]  cumulative sum, starting with zero
 
 ";
-
-%feature("docstring")
-casadi::casadi_register_dplesolver_condensing(DpleInternal::Plugin *plugin)
-" ";
 
 %feature("docstring")  casadi::pw_lin(const SX &t, const SX &tval, const SX
 &val) "
@@ -66306,10 +64622,6 @@ as tval)
 
 ";
 
-%feature("docstring")  casadi::casadi_load_integrator_collocation() "";
-
-%feature("docstring")  casadi::casadi_load_qpsolver_sqic() "";
-
 %feature("docstring")  casadi::getSchemeSize(InputOutputScheme scheme) " ";
 
 %feature("docstring")  casadi::erfinv(const T &x) " [INTERNAL]   Inverse of
@@ -66322,8 +64634,6 @@ CasADi additions.
 
 ";
 
-%feature("docstring")  casadi::casadi_load_qpsolver_qpoases() "";
-
 %feature("docstring")  casadi::complement(const std::vector< int > &v, int
 size) "
 
@@ -66335,21 +64645,11 @@ to be monotonously increasing
 
 ";
 
-%feature("docstring")
-casadi::casadi_register_qpsolver_nlp(QpSolverInternal::Plugin *plugin) " ";
-
-%feature("docstring")  casadi::dense_mul_tn(int n, int m, int l, const
-double *A, const double *B, double *C) " [INTERNAL] ";
-
 %feature("docstring")  casadi::dlaqge_(int *m, int *n, double *a, int *lda,
 double *r, double *c, double *colcnd, double *rowcnd, double *amax, char
 *equed) " [INTERNAL]  Equilibrate the system.
 
 ";
-
-%feature("docstring")
-casadi::casadi_register_lrdlesolver_fixed_smith(LrDleInternal::Plugin
-*plugin) " ";
 
 %feature("docstring")  casadi::casadi_copy(int n, const real_t *x, int
 inc_x, real_t *y, int inc_y) " [INTERNAL]  COPY: y <-x.
@@ -66365,17 +64665,6 @@ a pointer to the data contained in the vector.
 [INTERNAL]  Get a pointer to the data contained in the vector.
 
 ";
-
-%feature("docstring")
-casadi::casadi_register_linearsolver_lapackqr(LinearSolverInternal::Plugin
-*plugin) " ";
-
-%feature("docstring")
-casadi::casadi_register_dlesolver_lrdle(DleInternal::Plugin *plugin) " ";
-
-%feature("docstring")
-casadi::casadi_register_linearsolver_csparse(LinearSolverInternal::Plugin
-*plugin) " ";
 
 %feature("docstring")  casadi::dpleStruct(const std::string &arg_s0="",
 const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M()) "
@@ -66400,8 +64689,25 @@ const std::string &arg_s0="", const std::string &arg_s1="") " ";
 %feature("docstring")  casadi::profileWriteEntry(std::ofstream &f, T *a) "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::checkMat(const Sparsity &arg, const Sparsity
-&inp) " ";
+%feature("docstring")  casadi::gradFIn(const std::string &arg_s0="", const M
+&arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M()) "
+
+Input arguments of an NLP objective gradient function
+
+>Input scheme: casadi::GradFInput (GRADF_NUM_IN = 2) [gradFIn]
+
++-----------+-------+---------------------+
+| Full name | Short |     Description     |
++===========+=======+=====================+
+| GRADF_X   | x     | Decision variable . |
++-----------+-------+---------------------+
+| GRADF_P   | p     | Fixed parameter .   |
++-----------+-------+---------------------+
+
+";
+
+%feature("docstring")  casadi::gradFIn(const std::vector< M > &args, const
+std::string &arg_s0="", const std::string &arg_s1="") " ";
 
 %feature("docstring")  casadi::eig_symbolic(const SX &m) "
 
@@ -66413,37 +64719,37 @@ for up to 3x3 matrices.
 %feature("docstring")  casadi::ProfilingType< ProfilingData_SOURCE >() "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::controlsimulatorIn(const std::string
-&arg_s0="", const M &arg_m0=M(), const std::string &arg_s1="", const M
-&arg_m1=M(), const std::string &arg_s2="", const M &arg_m2=M()) "
+%feature("docstring")  casadi::lrdpleIn(const std::string &arg_s0="", const
+M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
+std::string &arg_s2="", const M &arg_m2=M(), const std::string &arg_s3="",
+const M &arg_m3=M()) "
 
-Input arguments of a control simulator
+Input arguments of a dple solver
 
->Input scheme: casadi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 3) [controlsimulatorIn]
+>Input scheme: casadi::LR_DPLEInput (LR_DPLE_NUM_IN = 4) [lrdpleIn]
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| CONTROLSIMULATOR_X0    | x0                     | Differential or        |
-|                        |                        | algebraic state at t0  |
-|                        |                        | (dimension nx-by-1) .  |
+| LR_DPLE_A              | a                      | A matrices (horzcat    |
+|                        |                        | when const_dim,        |
+|                        |                        | diagcat otherwise) .   |
 +------------------------+------------------------+------------------------+
-| CONTROLSIMULATOR_P     | p                      | Parameters that are    |
-|                        |                        | fixed over the entire  |
-|                        |                        | horizon (dimension np- |
-|                        |                        | by-1) .                |
+| LR_DPLE_V              | v                      | V matrices (horzcat    |
+|                        |                        | when const_dim,        |
+|                        |                        | diagcat otherwise) .   |
 +------------------------+------------------------+------------------------+
-| CONTROLSIMULATOR_U     | u                      | Parameters that change |
-|                        |                        | over the integration   |
-|                        |                        | intervals (dimension   |
-|                        |                        | nu-by-(ns-1)) .        |
+| LR_DPLE_C              | c                      | C matrix .             |
++------------------------+------------------------+------------------------+
+| LR_DPLE_H              | h                      | H matrix: horizontal   |
+|                        |                        | stack of all Hi .      |
 +------------------------+------------------------+------------------------+
 
 ";
 
-%feature("docstring")  casadi::controlsimulatorIn(const std::vector< M >
-&args, const std::string &arg_s0="", const std::string &arg_s1="", const
-std::string &arg_s2="") " ";
+%feature("docstring")  casadi::lrdpleIn(const std::vector< M > &args, const
+std::string &arg_s0="", const std::string &arg_s1="", const std::string
+&arg_s2="", const std::string &arg_s3="") " ";
 
 %feature("docstring")  casadi::daeIn(const std::string &arg_s0="", const M
 &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
@@ -66569,8 +64875,6 @@ Expand the expression as a weighted sum (with constant weights)
 
 ";
 
-%feature("docstring")  casadi::casadi_load_dplesolver_condensing() "";
-
 %feature("docstring")  casadi::profileWriteSourceLine(std::ofstream &f, T
 *a, int line_number, const std::string &sourceline, int opcode) " [INTERNAL]
 ";
@@ -66580,14 +64884,8 @@ Expand the expression as a weighted sum (with constant weights)
 
 %feature("docstring")  casadi::erf(double x) " [INTERNAL]  throw ()";
 
-%feature("docstring")
-casadi::casadi_register_linearsolver_csparsecholesky(LinearSolverInternal::Plugin
-*plugin) " [INTERNAL] ";
-
 %feature("docstring")  casadi::ProfilingType< ProfilingData_NAME >() "
 [INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_load_lrdlesolver_fixed_smith() "";
 
 %feature("docstring")  casadi::isDecreasing(const std::vector< T > &v) "
 
@@ -66628,11 +64926,6 @@ CasADi additions.
 
 ";
 
-%feature("docstring")  casadi::getDescription(const std::vector< T > &v) "
-[INTERNAL]  Print description to string.
-
-";
-
 %feature("docstring")  casadi::reverse(const std::vector< T > &v) "
 [INTERNAL]  Reverse a list.
 
@@ -66663,8 +64956,6 @@ std::string &arg_s0="") " ";
 %feature("docstring")  casadi::ProfilingType< ProfilingData_EXIT >() "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_load_xmlfile_tinyxml() "";
-
 %feature("docstring")  casadi::jacobianTimesVector(const SX &ex, const SX
 &arg, const SX &v, bool transpose_jacobian=false) "
 
@@ -66681,19 +64972,6 @@ few rows.
 int inc_x) " [INTERNAL]  SCAL: x <- alpha*x.
 
 ";
-
-%feature("docstring")  casadi::getSchemeEntryDoc(InputOutputScheme scheme,
-int i) " ";
-
-%feature("docstring")
-casadi::casadi_register_nlpsolver_stabilizedsqp(NlpSolverInternal::Plugin
-*plugin) " ";
-
-%feature("docstring")
-casadi::casadi_register_integrator_collocation(IntegratorInternal::Plugin
-*plugin) " ";
-
-%feature("docstring")  casadi::casadi_load_dlesolver_lrdle() "";
 
 %feature("docstring")  casadi::getFree(const SX &ex) "
 
@@ -66732,9 +65010,9 @@ Input arguments of a SOCP problem
 |                        |                        | all vectors hi: ( N x  |
 |                        |                        | 1) .                   |
 +------------------------+------------------------+------------------------+
-| SOCP_SOLVER_E          | e                      | The vertical stack of  |
-|                        |                        | all vectors ei: ( nm x |
-|                        |                        | 1) .                   |
+| SOCP_SOLVER_E          | e                      | The horizontal stack   |
+|                        |                        | of all vectors ei: ( n |
+|                        |                        | x m) .                 |
 +------------------------+------------------------+------------------------+
 | SOCP_SOLVER_F          | f                      | The vertical stack of  |
 |                        |                        | all scalars fi: ( m x  |
@@ -66786,20 +65064,10 @@ Output arguments of a dle solver
 %feature("docstring")  casadi::lrdleOut(const std::vector< M > &args, const
 std::string &arg_s0="") " ";
 
-%feature("docstring")
-casadi::casadi_register_qcqpsolver_socp(QcqpSolverInternal::Plugin *plugin)
-" ";
-
 %feature("docstring")  casadi::repr(const std::vector< T > &v, std::ostream
 &stream=CASADI_COUT) " [INTERNAL]  Print representation.
 
 ";
-
-%feature("docstring")
-casadi::casadi_register_nlpsolver_scpgen(NlpSolverInternal::Plugin *plugin)
-" ";
-
-%feature("docstring")  casadi::casadi_load_stabilizedqpsolver_qp() "";
 
 %feature("docstring")  casadi::ramp(const SX &x) "
 
@@ -66831,10 +65099,6 @@ Evaluate an SX graph numerically Note: this is not efficient. For critical
 parts (loops) of your code, always use SXFunction.
 
 ";
-
-%feature("docstring")  casadi::casadi_load_dplesolver_lrdple() "";
-
-%feature("docstring")  casadi::casadi_load_nlpsolver_ipopt() "";
 
 %feature("docstring")  casadi::jacobian(const MX &ex, const MX &arg) "
 
@@ -66896,9 +65160,24 @@ Input arguments of a cle solver
 %feature("docstring")  casadi::cleIn(const std::vector< M > &args, const
 std::string &arg_s0="", const std::string &arg_s1="") " ";
 
-%feature("docstring")  casadi::getSchemeName(InputOutputScheme scheme) " ";
+%feature("docstring")  casadi::heaviside(const SX &x) "
 
-%feature("docstring")  casadi::casadi_load_lrdplesolver_dple() "";
+Heaviside function.
+
+\\\\[ \\\\begin {cases} H(x) = 0 & x<0 \\\\\\\\ H(x) = 1/2 & x=0 \\\\\\\\
+H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
+
+";
+
+%feature("docstring")  casadi::if_else_zero(const T &x, const T &y) "
+[INTERNAL]  Conditional assignment.
+
+";
+
+%feature("docstring")  casadi::if_else_zero(double x, double y) " [INTERNAL]
+Conditional assignment.
+
+";
 
 %feature("docstring")  casadi::spy(const SX &A) "
 
@@ -66933,11 +65212,6 @@ std::vector< SX > &v, const std::vector< SX > &vdef) "
 Substitute variable var with expression expr in multiple expressions.
 
 ";
-
-%feature("docstring")
-casadi::casadi_register_qpsolver_ooqp(QpSolverInternal::Plugin *plugin) " ";
-
-%feature("docstring")  casadi::casadi_load_nlpsolver_sqpmethod() "";
 
 %feature("docstring")  casadi::profileWriteTime(std::ofstream &f, T *a, int
 line_number, double local, double total) " [INTERNAL] ";
@@ -67002,10 +65276,6 @@ std::string &arg_s2="", const std::string &arg_s3="", const std::string
 &arg_s4="", const std::string &arg_s5="", const std::string &arg_s6="",
 const std::string &arg_s7="") " ";
 
-%feature("docstring")
-casadi::casadi_register_dlesolver_fixed_smith(DleInternal::Plugin *plugin) "
-";
-
 %feature("docstring")  casadi::sdqpStruct(const std::string &arg_s0="",
 const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(),
 const std::string &arg_s2="", const M &arg_m2=M(), const std::string
@@ -67037,10 +65307,6 @@ Structure specification of an SDQP
 %feature("docstring")  casadi::sdqpStruct(const std::vector< M > &args,
 const std::string &arg_s0="", const std::string &arg_s1="", const
 std::string &arg_s2="", const std::string &arg_s3="") " ";
-
-%feature("docstring")
-casadi::casadi_register_implicitfunction_newton(ImplicitFunctionInternal::Plugin
-*plugin) " ";
 
 %feature("docstring")  casadi::makeVector(int size, int ind0=-1, const T
 &val0=T(), int ind1=-1, const T &val1=T(), int ind2=-1, const T &val2=T(),
@@ -67095,8 +65361,6 @@ std::string &arg_s0="", const std::string &arg_s1="", const std::string
 &arg_s2="", const std::string &arg_s3="", const std::string &arg_s4="",
 const std::string &arg_s5="", const std::string &arg_s6="") " ";
 
-%feature("docstring")  casadi::casadi_load_integrator_cvodes() "";
-
 %feature("docstring")  casadi::dependsOn(const SX &f, const SX &arg) "
 
 Check if expression depends on the argument The argument must be symbolic.
@@ -67109,10 +65373,6 @@ Check if expression depends on the argument The argument must be symbolic.
 Check if expression depends on any of the arguments The arguments must be
 symbolic.
 
-";
-
-%feature("docstring")
-casadi::casadi_register_nlpsolver_ipopt(NlpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::check_exposed(T t) " [INTERNAL] ";
@@ -67194,8 +65454,6 @@ preserving nodes.
 
 ";
 
-%feature("docstring")  casadi::casadi_load_qpsolver_ooqp() "";
-
 %feature("docstring")  casadi::read_matlab(std::istream &stream,
 std::vector< T > &v) "
 
@@ -67209,12 +65467,6 @@ std::vector< T > > &v) "
 Read matrix, matlab style.
 
 ";
-
-%feature("docstring")
-casadi::casadi_register_stabilizedqpsolver_sqic(StabilizedQpSolverInternal::Plugin
-*plugin) " ";
-
-%feature("docstring")  casadi::casadi_load_integrator_rk() "";
 
 %feature("docstring")  casadi::write_matlab(std::ostream &stream, const
 std::vector< T > &v) "
@@ -67244,14 +65496,6 @@ Hash a sparsity pattern.
 %feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const int
 *colind, const int *row) " [INTERNAL] ";
 
-%feature("docstring")  casadi::profileWriteSourceLineDep(std::ofstream &f, T
-*a, int line_number, const std::string &sourceline, int opcode, T2
-*dependency) " [INTERNAL] ";
-
-%feature("docstring")  casadi::profileWriteSourceLineDep(std::ofstream &f, T
-*a, int line_number, const std::string &sourceline, T2 *dependency) "
-[INTERNAL] ";
-
 %feature("docstring")  casadi::applymap(T(*f)(const T &), const std::vector<
 T > &) " [INTERNAL]  Apply a function f to each element in a vector
 
@@ -67262,10 +65506,6 @@ T > &) " [INTERNAL]  Apply a function f to each element in a vector
 
 ";
 
-%feature("docstring")
-casadi::casadi_register_nlpsolver_knitro(NlpSolverInternal::Plugin *plugin)
-" ";
-
 %feature("docstring")  casadi::isStrictlyMonotone(const std::vector< T > &v)
 "
 
@@ -67273,13 +65513,8 @@ Check if the vector is strictly monotone.
 
 ";
 
-%feature("docstring")
-casadi::casadi_register_qpsolver_qcqp(QpSolverInternal::Plugin *plugin) " ";
-
-%feature("docstring")  casadi::casadi_mm_sparse_t(const real_t *x, const int
-*sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
-*w) " [INTERNAL]  Sparse matrix-matrix multiplication, first factor
-transposed: z <- z + trans(x)*y.
+%feature("docstring")  casadi::casadi_asum(int n, const real_t *x, int
+inc_x) " [INTERNAL]  ASUM: ||x||_1 -> return.
 
 ";
 
@@ -67306,27 +65541,20 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
-%feature("docstring")
-casadi::casadi_register_sdpsolver_dsdp(SdpSolverInternal::Plugin *plugin) "
+%feature("docstring")  casadi::poly_roots(const SX &p) "
+
+Attempts to find the roots of a polynomial.
+
+This will only work for polynomials up to order 3 It is assumed that the
+roots are real.
+
 ";
-
-%feature("docstring")
-casadi::casadi_register_dlesolver_simple(DleInternal::Plugin *plugin) " ";
-
-%feature("docstring")  casadi::mtaylor_recursive(const SX &ex, const SX &x,
-const SX &a, int order, const std::vector< int > &order_contributions, const
-SXElement &current_dx=casadi_limits< SXElement >::one, double
-current_denom=1, int current_order=1) " ";
 
 %feature("docstring")  casadi::isMonotone(const std::vector< T > &v) "
 
 Check if the vector is monotone.
 
 ";
-
-%feature("docstring")
-casadi::casadi_register_integrator_idas(IntegratorInternal::Plugin *plugin)
-" ";
 
 %feature("docstring")  casadi::dormqr_(char *side, char *trans, int *n, int
 *m, int *k, double *a, int *lda, double *tau, double *c, int *ldc, double
@@ -67339,11 +65567,6 @@ Q-transpose (lapack)
 note that sign(nan) == nan.
 
 ";
-
-%feature("docstring")
-casadi::casadi_register_dplesolver_slicot(DpleInternal::Plugin *plugin) " ";
-
-%feature("docstring")  casadi::casadi_load_clesolver_simple() "";
 
 %feature("docstring")  casadi::isRegular(const std::vector< T > &v) "
 
@@ -67454,25 +65677,11 @@ Output arguments of an ODE/DAE backward integration function
 std::string &arg_s0="", const std::string &arg_s1="", const std::string
 &arg_s2="") " ";
 
-%feature("docstring")
-casadi::casadi_register_lrdplesolver_lifting(LrDpleInternal::Plugin *plugin)
-" ";
-
-%feature("docstring")
-casadi::casadi_register_linearsolver_lapacklu(LinearSolverInternal::Plugin
-*plugin) " ";
-
-%feature("docstring")  casadi::casadi_load_dplesolver_simple() "";
-
 %feature("docstring")  casadi::dgeequ_(int *m, int *n, double *a, int *lda,
 double *r, double *c, double *colcnd, double *rowcnd, double *amax, int
 *info) " [INTERNAL]  Calculate col and row scaling.
 
 ";
-
-%feature("docstring")  casadi::casadi_load_qpsolver_nlp() "";
-
-%feature("docstring")  casadi::casadi_load_dplesolver_lifting() "";
 
 %feature("docstring")  casadi::lookupvector(const std::vector< int > &v, int
 size) "
@@ -67518,14 +65727,6 @@ x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
 
 ";
 
-%feature("docstring")  casadi::casadi_load_nlpsolver_knitro() "";
-
-%feature("docstring")  casadi::casadi_trans(const real_t *x, const int
-*sp_x, real_t *y, const int *sp_y, int *tmp) " [INTERNAL]  TRANS: y <-
-trans(x)
-
-";
-
 %feature("docstring")  casadi::getRealTime() "[INTERNAL]  Returns the real
 time, in seconds, or -1.0 if an error occurred.
 
@@ -67535,9 +65736,26 @@ calls to this function.
 
 ";
 
-%feature("docstring")
-casadi::casadi_register_linearsolver_symbolicqr(LinearSolverInternal::Plugin
-*plugin) " ";
+%feature("docstring")  casadi::taylor(const SX &ex, const SX &x, const SX
+&a=0, int order=1) "
+
+univariate Taylor series expansion
+
+Calculate the Taylor expansion of expression 'ex' up to order 'order' with
+respect to variable 'x' around the point 'a'
+
+$(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac
+{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
+
+Example usage:
+
+::
+
+>>   x
+
+
+
+";
 
 %feature("docstring")  casadi::integratorOut(const std::string &arg_s0="",
 const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(),
@@ -67602,23 +65820,6 @@ std::string &arg_s0="") " ";
 %feature("docstring")  casadi::operation_checker(unsigned int op) "
 [INTERNAL] ";
 
-%feature("docstring")
-casadi::casadi_register_lrdlesolver_dle(LrDleInternal::Plugin *plugin) " ";
-
-%feature("docstring")  casadi::inBounds(const std::vector< T > &v, int
-upper) "
-
-Check if for each element of v holds: v_i < upper.
-
-";
-
-%feature("docstring")  casadi::inBounds(const std::vector< T > &v, int
-lower, int upper) "
-
-Check if for each element of v holds: lower <= v_i < upper.
-
-";
-
 %feature("docstring")  casadi::controldaeIn(const std::string &arg_s0="",
 const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(),
 const std::string &arg_s2="", const M &arg_m2=M(), const std::string
@@ -67677,10 +65878,6 @@ std::string &arg_s2="", const std::string &arg_s3="", const std::string
 &arg_s4="", const std::string &arg_s5="", const std::string &arg_s6="",
 const std::string &arg_s7="", const std::string &arg_s8="") " ";
 
-%feature("docstring")
-casadi::casadi_register_qpsolver_qpoases(QpSolverInternal::Plugin *plugin) "
-";
-
 %feature("docstring")  casadi::toVector(const T &v0) " [INTERNAL] ";
 
 %feature("docstring")  casadi::toVector(const T &v0, const T &v1) "
@@ -67720,14 +65917,7 @@ const std::string &arg_s0="", const std::string &arg_s1="", const
 std::string &arg_s2="", const std::string &arg_s3="", const std::string
 &arg_s4="") " ";
 
-%feature("docstring")  casadi::heaviside(const SX &x) "
-
-Heaviside function.
-
-\\\\[ \\\\begin {cases} H(x) = 0 & x<0 \\\\\\\\ H(x) = 1/2 & x=0 \\\\\\\\
-H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
-
-";
+%feature("docstring")  casadi::getSchemeName(InputOutputScheme scheme) " ";
 
 %feature("docstring")  casadi::twice(const T &x) " [INTERNAL] ";
 
@@ -67781,8 +65971,6 @@ Input arguments of a dple solver
 %feature("docstring")  casadi::dpleIn(const std::vector< M > &args, const
 std::string &arg_s0="", const std::string &arg_s1="") " ";
 
-%feature("docstring")  casadi::casadi_load_dplesolver_slicot() "";
-
 %feature("docstring")  casadi::qcqpOut(const std::string &arg_s0="", const M
 &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
 std::string &arg_s2="", const M &arg_m2=M(), const std::string &arg_s3="",
@@ -67814,8 +66002,8 @@ Output arguments of an QP Solver
 std::string &arg_s0="", const std::string &arg_s1="", const std::string
 &arg_s2="", const std::string &arg_s3="") " ";
 
-%feature("docstring")  casadi::trim_empty(const vector< MX > &x, bool
-both=false) " ";
+%feature("docstring")  casadi::profileWriteExit(std::ofstream &f, T *a,
+double total) " [INTERNAL] ";
 
 %feature("docstring")  casadi::deepcopy(const A &a) " [INTERNAL]  Make a
 deep copy of an object (Note: default is a shallow copy!)
@@ -67834,19 +66022,48 @@ deep copy of an object (Note: default is a shallow copy!)
 
 ";
 
-%feature("docstring")  casadi::getSchemeEntryEnum(InputOutputScheme scheme,
-const std::string &name) " ";
+%feature("docstring")  casadi::solve(const Matrix< DataType > &A, const
+Matrix< DataType > &b) "
 
-%feature("docstring")  casadi::casadi_load_integrator_idas() "";
+Solve a system of equations: A*x = b The solve routine works similar to
+Matlab's backslash when A is square and nonsingular. The algorithm used is
+the following:
 
-%feature("docstring")  casadi::casadi_load_implicitfunction_kinsol() "";
+A simple forward or backward substitution if A is upper or lower triangular
 
-%feature("docstring")  casadi::casadi_load_dlesolver_dple() "";
+If the linear system is at most 3-by-3, form the inverse via minor expansion
+and multiply
 
-%feature("docstring")  casadi::setAdaptorOptions(Dictionary &dict, const
-string &name, const Dictionary &op) " ";
+Permute the variables and equations as to get a (structurally) nonzero
+diagonal, then perform a QR factorization without pivoting and solve the
+factorized system.
 
-%feature("docstring")  casadi::casadi_load_linearsolver_symbolicqr() "";
+Note 1: If there are entries of the linear system known to be zero, these
+will be removed. Elements that are very small, or will evaluate to be zero,
+can still cause numerical errors, due to the lack of pivoting (which is not
+possible since cannot compare the size of entries)
+
+Note 2: When permuting the linear system, a BLT (block lower triangular)
+transformation is formed. Only the permutation part of this is however used.
+An improvement would be to solve block-by-block if there are multiple BLT
+blocks.
+
+";
+
+%feature("docstring")  casadi::solve(const Matrix< double > &A, const
+Matrix< double > &b, const std::string &lsolver, const Dictionary
+&dict=Dictionary()) "
+
+Solve a system of equations: A*x = b.
+
+";
+
+%feature("docstring")  casadi::solve(const MX &A, const MX &b, const
+std::string &lsolver="symbolicqr", const Dictionary &dict=Dictionary()) "
+
+Solve a system of equations: A*x = b.
+
+";
 
 %feature("docstring")  casadi::hnlpIn(const std::string &arg_s0="", const M
 &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
@@ -67883,19 +66100,38 @@ multiplication, first factor transposed: z <- z + trans(x)*y.
 
 ";
 
-%feature("docstring")  casadi::if_else_zero(const T &x, const T &y) "
-[INTERNAL]  Conditional assignment.
+%feature("docstring")  casadi::lrdpleStruct(const std::string &arg_s0="",
+const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(),
+const std::string &arg_s2="", const M &arg_m2=M(), const std::string
+&arg_s3="", const M &arg_m3=M()) "
+
+Structure specification of a DPLE
+
+>Struct scheme: casadi::LrDpleVecStruct ( = 4) [lrdpleStruct]
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| LR_Dple_STRUCT_A       | a                      | Sparsities for A_i,    |
+|                        |                        | block diagonal form .  |
++------------------------+------------------------+------------------------+
+| LR_Dple_STRUCT_V       | v                      | Sparsities for V_i,    |
+|                        |                        | block diagonal form .  |
++------------------------+------------------------+------------------------+
+| LR_Dple_STRUCT_C       | c                      | Sparsities for C_i     |
+|                        |                        | (defaults to unity),   |
+|                        |                        | block diagonal form .  |
++------------------------+------------------------+------------------------+
+| LR_Dple_STRUCT_H       | h                      | Sparsities for H_i     |
+|                        |                        | (defaults to unity),   |
+|                        |                        | block diagonal form .  |
++------------------------+------------------------+------------------------+
 
 ";
 
-%feature("docstring")  casadi::if_else_zero(double x, double y) " [INTERNAL]
-Conditional assignment.
-
-";
-
-%feature("docstring")
-casadi::casadi_register_homotopynlpsolver_simple(HomotopyNLPInternal::Plugin
-*plugin) " ";
+%feature("docstring")  casadi::lrdpleStruct(const std::vector< M > &args,
+const std::string &arg_s0="", const std::string &arg_s1="", const
+std::string &arg_s2="", const std::string &arg_s3="") " ";
 
 %feature("docstring")  casadi::hessian(const MX &ex, const MX &arg) "
 
@@ -67939,36 +66175,42 @@ parts (loops) of your code, always use SXFunction.
 
 ";
 
-%feature("docstring")  casadi::is_a(const SharedObject &A) " [INTERNAL]
-Check if a shared object is of a certain type.
-
-";
-
 %feature("docstring")  casadi::isIncreasing(const std::vector< T > &v) "
 
 Check if the vector is strictly increasing.
 
 ";
 
-%feature("docstring")  casadi::gradFIn(const std::string &arg_s0="", const M
-&arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M()) "
+%feature("docstring")  casadi::qpOut(const std::string &arg_s0="", const M
+&arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
+std::string &arg_s2="", const M &arg_m2=M(), const std::string &arg_s3="",
+const M &arg_m3=M()) "
 
-Input arguments of an NLP objective gradient function
+Output arguments of an QP Solver
 
->Input scheme: casadi::GradFInput (GRADF_NUM_IN = 2) [gradFIn]
+>Output scheme: casadi::QpSolverOutput (QP_SOLVER_NUM_OUT = 4) [qpOut]
 
-+-----------+-------+---------------------+
-| Full name | Short |     Description     |
-+===========+=======+=====================+
-| GRADF_X   | x     | Decision variable . |
-+-----------+-------+---------------------+
-| GRADF_P   | p     | Fixed parameter .   |
-+-----------+-------+---------------------+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| QP_SOLVER_X            | x                      | The primal solution .  |
++------------------------+------------------------+------------------------+
+| QP_SOLVER_COST         | cost                   | The optimal cost .     |
++------------------------+------------------------+------------------------+
+| QP_SOLVER_LAM_A        | lam_a                  | The dual solution      |
+|                        |                        | corresponding to       |
+|                        |                        | linear bounds .        |
++------------------------+------------------------+------------------------+
+| QP_SOLVER_LAM_X        | lam_x                  | The dual solution      |
+|                        |                        | corresponding to       |
+|                        |                        | simple bounds .        |
++------------------------+------------------------+------------------------+
 
 ";
 
-%feature("docstring")  casadi::gradFIn(const std::vector< M > &args, const
-std::string &arg_s0="", const std::string &arg_s1="") " ";
+%feature("docstring")  casadi::qpOut(const std::vector< M > &args, const
+std::string &arg_s0="", const std::string &arg_s1="", const std::string
+&arg_s2="", const std::string &arg_s3="") " ";
 
 %feature("docstring")  casadi::norm_1(const std::vector< T > &x) "
 [INTERNAL] ";
@@ -68028,10 +66270,6 @@ pointers.
 
 ";
 
-%feature("docstring")
-casadi::casadi_register_nlpsolver_snopt(NlpSolverInternal::Plugin *plugin) "
-";
-
 %feature("docstring")  casadi::dtrsm_(char *side, char *uplo, char *transa,
 char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b,
 int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
@@ -68044,8 +66282,6 @@ int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
 ";
 
 %feature("docstring")  casadi::sq(const T &x) " [INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_load_implicitfunction_nlp() "";
 
 %feature("docstring")  casadi::gradient(const MX &ex, const MX &arg) "
 
@@ -68122,8 +66358,8 @@ Structure specification of a CLE
 std::string &arg_s0="", const std::string &arg_s1="", const std::string
 &arg_s2="") " ";
 
-%feature("docstring")  casadi::collocationPointsGen(int order, const
-std::string &scheme) " ";
+%feature("docstring")  casadi::ProfilingType< ProfilingData_ENTRY >() "
+[INTERNAL] ";
 
 %feature("docstring")  casadi::lrdleIn(const std::string &arg_s0="", const M
 &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
@@ -68189,40 +66425,11 @@ largest absolute value.
 
 %feature("docstring")  casadi::slicot_mb03wd(char job, char compz, int n,
 int p, int ilo, int ihi, int iloz, int ihiz, double *h, int ldh1, int ldh2,
-double *z, int ldz1, int ldz2, double *wr, double *wi, double *dwork, int
-ldwork) " ";
+double *z, int ldz1, int ldz2, double *wr, double *wi, double *dwork=0, int
+ldwork=0) " [INTERNAL] ";
 
-%feature("docstring")  casadi::lrdpleIn(const std::string &arg_s0="", const
-M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
-std::string &arg_s2="", const M &arg_m2=M(), const std::string &arg_s3="",
-const M &arg_m3=M()) "
-
-Input arguments of a dple solver
-
->Input scheme: casadi::LR_DPLEInput (LR_DPLE_NUM_IN = 4) [lrdpleIn]
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| LR_DPLE_A              | a                      | A matrices (horzcat    |
-|                        |                        | when const_dim,        |
-|                        |                        | diagcat otherwise) .   |
-+------------------------+------------------------+------------------------+
-| LR_DPLE_V              | v                      | V matrices (horzcat    |
-|                        |                        | when const_dim,        |
-|                        |                        | diagcat otherwise) .   |
-+------------------------+------------------------+------------------------+
-| LR_DPLE_C              | c                      | C matrix .             |
-+------------------------+------------------------+------------------------+
-| LR_DPLE_H              | h                      | H matrix: horizontal   |
-|                        |                        | stack of all Hi .      |
-+------------------------+------------------------+------------------------+
-
-";
-
-%feature("docstring")  casadi::lrdpleIn(const std::vector< M > &args, const
-std::string &arg_s0="", const std::string &arg_s1="", const std::string
-&arg_s2="", const std::string &arg_s3="") " ";
+%feature("docstring")  casadi::inner_prod(const std::vector< T > &a, const
+std::vector< T > &b) " [INTERNAL] ";
 
 %feature("docstring")  casadi::getSchemeEntryNames(InputOutputScheme scheme)
 " ";
@@ -68286,8 +66493,6 @@ Input arguments of an NLP Hessian function
 %feature("docstring")  casadi::hessLagIn(const std::vector< M > &args, const
 std::string &arg_s0="", const std::string &arg_s1="", const std::string
 &arg_s2="", const std::string &arg_s3="") " ";
-
-%feature("docstring")  casadi::casadi_load_lrdlesolver_dle() "";
 
 %feature("docstring")  casadi::lpIn(const std::string &arg_s0="", const M
 &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
@@ -68358,24 +66563,8 @@ nonzero and 0 otherwise.
 
 ";
 
-%feature("docstring")  casadi::matrixName() "
-
-Get typename.
-
-";
-
-%feature("docstring")
-casadi::casadi_register_sdqpsolver_sdp(SdqpSolverInternal::Plugin *plugin) "
-";
-
-%feature("docstring")  casadi::casadi_quad_form(const real_t *A, const int
-*sp_A, const real_t *x) " [INTERNAL]  Calculates inner_prod(x, mul(A, x))
-
-Calculates inner_prod(x, mul(A, x)) without memory allocation.
-
-";
-
-%feature("docstring")  casadi::casadi_load_stabilizedqpsolver_sqic() "";
+%feature("docstring")  casadi::getSchemeEntryDoc(InputOutputScheme scheme,
+int i) " ";
 
 %feature("docstring")  casadi::collocationInterpolators(const std::vector<
 double > &tau_root, std::vector< std::vector< double > > &C, std::vector<
@@ -68415,15 +66604,11 @@ Sign function, note that sign(nan) == nan.
 
 ";
 
-%feature("docstring")  casadi::bvec_clear(bvec_t *s, int begin, int end) "
-[INTERNAL] ";
+%feature("docstring")  casadi::matrixName() "
 
-%feature("docstring")  casadi::casadi_load_linearsolver_csparsecholesky() "[INTERNAL] ";
+Get typename.
 
-%feature("docstring")  casadi::casadi_load_nlpsolver_worhp() "";
-
-%feature("docstring")  casadi::profileWriteExit(std::ofstream &f, T *a,
-double total) " [INTERNAL] ";
+";
 
 %feature("docstring")  casadi::getOperatorRepresentation(const MX &xb, const
 std::vector< std::string > &args) "
@@ -68439,27 +66624,30 @@ Get a string representation for a binary SX, using custom arguments.
 
 ";
 
-%feature("docstring")  casadi::casadi_load_nlpsolver_scpgen() "";
-
-%feature("docstring")  casadi::casadi_load_socpsolver_sdp() "";
-
 %feature("docstring")  casadi::slicot_periodic_schur(int n, int K, const
 std::vector< double > &a, std::vector< double > &t, std::vector< double >
 &z, std::vector< double > &eig_real, std::vector< double > &eig_imag, double
-num_zero) " ";
+num_zero=0) " [INTERNAL] ";
 
 %feature("docstring")  casadi::slicot_periodic_schur(int n, int K, const
 std::vector< double > &a, std::vector< double > &t, std::vector< double >
 &z, std::vector< double > &dwork, std::vector< double > &eig_real,
-std::vector< double > &eig_imag, double num_zero) " ";
+std::vector< double > &eig_imag, double num_zero=0) " [INTERNAL] ";
 
 %feature("docstring")  casadi::slicot_periodic_schur(const std::vector<
 Matrix< double > > &a, std::vector< Matrix< double > > &t, std::vector<
 Matrix< double > > &z, std::vector< double > &eig_real, std::vector< double
-> &eig_imag, double num_zero) " ";
+> &eig_imag, double num_zero) " [INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_nrm2(int n, const real_t *x, int
 inc_x) " [INTERNAL]  NRM2: ||x||_2 -> return.
+
+";
+
+%feature("docstring")  casadi::evalf(const SX &ex) "
+
+Evaluate an SX graph numerically Note: this is not efficient. For critical
+parts (loops) of your code, always use SXFunction.
 
 ";
 
@@ -68469,13 +66657,6 @@ Matrix< double > &vdef) "
 Substitute variable v with value vdef in an expression ex, and evaluate
 numerically Note: this is not efficient. For critical parts (loops) of your
 code, always use SXFunction.
-
-";
-
-%feature("docstring")  casadi::evalf(const SX &ex) "
-
-Evaluate an SX graph numerically Note: this is not efficient. For critical
-parts (loops) of your code, always use SXFunction.
 
 ";
 
@@ -68544,10 +66725,8 @@ const std::string &arg_s5="", const std::string &arg_s6="") " ";
 %feature("docstring")  casadi::matrixName< SXElement >() " [INTERNAL] ";
 
 %feature("docstring")  casadi::slicot_mb03vy(int n, int p, int ilo, int ihi,
-double *a, int lda1, int lda2, const double *tau, int ldtau, double *dwork,
-int ldwork) " ";
-
-%feature("docstring")  casadi::casadi_load_sdpsolver_dsdp() "";
+double *a, int lda1, int lda2, const double *tau, int ldtau, double
+*dwork=0, int ldwork=0) " [INTERNAL] ";
 
 %feature("docstring")  casadi::getSymbols(const SX &e) "
 
@@ -68596,9 +66775,6 @@ val:  vector with the value of the function for each interval (length n)
 
 ";
 
-%feature("docstring")
-casadi::casadi_register_dlesolver_dple(DleInternal::Plugin *plugin) " ";
-
 %feature("docstring")  casadi::collocationPoints(int order, const
 std::string &scheme="radau") "
 
@@ -68611,44 +66787,13 @@ scheme:  'radau' or 'legendre'
 
 ";
 
-%feature("docstring")  casadi::replaceMat(const M &arg, const Sparsity &inp)
-" ";
+%feature("docstring")  casadi::profileWriteSourceLineDep(std::ofstream &f, T
+*a, int line_number, const std::string &sourceline, int opcode, T2
+*dependency) " [INTERNAL] ";
 
-%feature("docstring")  casadi::dense_mul_nt(int n, int m, int l, const
-double *A, const double *B, double *C) " [INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_load_qpsolver_cplex() "";
-
-%feature("docstring")  casadi::qpOut(const std::string &arg_s0="", const M
-&arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
-std::string &arg_s2="", const M &arg_m2=M(), const std::string &arg_s3="",
-const M &arg_m3=M()) "
-
-Output arguments of an QP Solver
-
->Output scheme: casadi::QpSolverOutput (QP_SOLVER_NUM_OUT = 4) [qpOut]
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| QP_SOLVER_X            | x                      | The primal solution .  |
-+------------------------+------------------------+------------------------+
-| QP_SOLVER_COST         | cost                   | The optimal cost .     |
-+------------------------+------------------------+------------------------+
-| QP_SOLVER_LAM_A        | lam_a                  | The dual solution      |
-|                        |                        | corresponding to       |
-|                        |                        | linear bounds .        |
-+------------------------+------------------------+------------------------+
-| QP_SOLVER_LAM_X        | lam_x                  | The dual solution      |
-|                        |                        | corresponding to       |
-|                        |                        | simple bounds .        |
-+------------------------+------------------------+------------------------+
-
-";
-
-%feature("docstring")  casadi::qpOut(const std::vector< M > &args, const
-std::string &arg_s0="", const std::string &arg_s1="", const std::string
-&arg_s2="", const std::string &arg_s3="") " ";
+%feature("docstring")  casadi::profileWriteSourceLineDep(std::ofstream &f, T
+*a, int line_number, const std::string &sourceline, T2 *dependency) "
+[INTERNAL] ";
 
 %feature("docstring")  casadi::sdpStruct(const std::string &arg_s0="", const
 M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
@@ -68678,8 +66823,12 @@ Structure specification of an SDP
 std::string &arg_s0="", const std::string &arg_s1="", const std::string
 &arg_s2="") " ";
 
-%feature("docstring")  casadi::bvec_toggle(bvec_t *s, int begin, int end,
-int j) " [INTERNAL] ";
+%feature("docstring")  casadi::casadi_mm_sparse_t(const real_t *x, const int
+*sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
+*w) " [INTERNAL]  Sparse matrix-matrix multiplication, first factor
+transposed: z <- z + trans(x)*y.
+
+";
 
 %feature("docstring")  casadi::substituteInPlace(const std::vector< MX > &v,
 std::vector< MX > &SWIG_INOUT(vdef), bool reverse=false) "
@@ -68761,7 +66910,8 @@ const std::string &arg_s0="", const std::string &arg_s1="", const
 std::string &arg_s2="") " ";
 
 %feature("docstring")  casadi::slicot_mb03vd(int n, int p, int ilo, int ihi,
-double *a, int lda1, int lda2, double *tau, int ldtau, double *dwork) " ";
+double *a, int lda1, int lda2, double *tau, int ldtau, double *dwork=0) "
+[INTERNAL] ";
 
 %feature("docstring")  casadi::dpleOut(const std::string &arg_s0="", const M
 &arg_m0=M()) "
@@ -68799,8 +66949,6 @@ Print compact, introducing new variables for shared subexpressions.
 
 ";
 
-%feature("docstring")  casadi::casadi_load_homotopynlpsolver_simple() "";
-
 %feature("docstring")  casadi::dgetrf_(int *m, int *n, double *a, int *lda,
 int *ipiv, int *info) " [INTERNAL]  LU-Factorize dense matrix (lapack)
 
@@ -68812,48 +66960,21 @@ Check if the vector is non-increasing.
 
 ";
 
-%feature("docstring")  casadi::casadi_load_implicitfunction_newton() "";
-
-%feature("docstring")  casadi::taylor(const SX &ex, const SX &x, const SX
-&a=0, int order=1) "
-
-univariate Taylor series expansion
-
-Calculate the Taylor expansion of expression 'ex' up to order 'order' with
-respect to variable 'x' around the point 'a'
-
-$(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac
-{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
-
-Example usage:
-
-::
-
->>   x
-
-
+%feature("docstring")  casadi::casadi_mm_sparse(const real_t *x, const int
+*sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
+*w) " [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
 
 ";
 
-%feature("docstring")
-casadi::casadi_register_qpsolver_sqic(QpSolverInternal::Plugin *plugin) " ";
-
-%feature("docstring")
-casadi::casadi_register_clesolver_simple(CleInternal::Plugin *plugin) " ";
-
 %feature("docstring")  casadi::collocationPointsL(int order, const
-std::string &scheme) " [INTERNAL]  Obtain collocation points of specific
-order and scheme.
+std::string &scheme="radau") " [INTERNAL]  Obtain collocation points of
+specific order and scheme.
 
 Parameters:
 -----------
 
 scheme:  'radau' or 'legendre'
 
-";
-
-%feature("docstring")
-casadi::casadi_register_xmlfile_tinyxml(XmlFileInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::casadi_project(const real_t *x, const int
@@ -68885,10 +67006,6 @@ Input arguments of a dle solver
 %feature("docstring")  casadi::dleIn(const std::vector< M > &args, const
 std::string &arg_s0="", const std::string &arg_s1="") " ";
 
-%feature("docstring")
-casadi::casadi_register_dplesolver_lifting(DpleInternal::Plugin *plugin) "
-";
-
 %feature("docstring")  casadi::isNonDecreasing(const std::vector< T > &v) "
 
 Check if the vector is non-decreasing.
@@ -68907,16 +67024,11 @@ Count number of nodes.
 
 ";
 
-%feature("docstring")
-casadi::casadi_register_dplesolver_lrdple(DpleInternal::Plugin *plugin) " ";
-
 %feature("docstring")  casadi::matrixName< int >() "
 
 Get typename.
 
 ";
-
-%feature("docstring")  casadi::casadi_load_linearsolver_lapacklu() "";
 
 %feature("docstring")  casadi::fabs(int x) " [INTERNAL]  throw ()  fabs(int)
 was added in C++11
@@ -68931,11 +67043,12 @@ was added in C++11
 %feature("docstring")  casadi::socpOut(const std::string &arg_s0="", const M
 &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
 std::string &arg_s2="", const M &arg_m2=M(), const std::string &arg_s3="",
-const M &arg_m3=M()) "
+const M &arg_m3=M(), const std::string &arg_s4="", const M &arg_m4=M(),
+const std::string &arg_s5="", const M &arg_m5=M()) "
 
 Output arguments of an SOCP Solver
 
->Output scheme: casadi::SOCPOutput (SOCP_SOLVER_NUM_OUT = 4) [socpOut]
+>Output scheme: casadi::SOCPOutput (SOCP_SOLVER_NUM_OUT = 6) [socpOut]
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
@@ -68945,6 +67058,9 @@ Output arguments of an SOCP Solver
 +------------------------+------------------------+------------------------+
 | SOCP_SOLVER_COST       | cost                   | The primal optimal     |
 |                        |                        | cost (1 x 1) .         |
++------------------------+------------------------+------------------------+
+| SOCP_SOLVER_DUAL_COST  | dual_cost              | The dual optimal cost  |
+|                        |                        | (1 x 1) .              |
 +------------------------+------------------------+------------------------+
 | SOCP_SOLVER_LAM_A      | lam_a                  | The dual solution      |
 |                        |                        | corresponding to the   |
@@ -68956,18 +67072,18 @@ Output arguments of an SOCP Solver
 |                        |                        | simple bounds (n x 1)  |
 |                        |                        | .                      |
 +------------------------+------------------------+------------------------+
+| SOCP_SOLVER_LAM_CONE   | lam_cone               | The dual solution      |
+|                        |                        | correspoding to cone   |
+|                        |                        | (2-norm) constraints   |
+|                        |                        | (m x 1) .              |
++------------------------+------------------------+------------------------+
 
 ";
 
 %feature("docstring")  casadi::socpOut(const std::vector< M > &args, const
 std::string &arg_s0="", const std::string &arg_s1="", const std::string
-&arg_s2="", const std::string &arg_s3="") " ";
-
-%feature("docstring")
-casadi::casadi_register_qpsolver_cplex(QpSolverInternal::Plugin *plugin) "
-";
-
-%feature("docstring")  casadi::casadi_load_lpsolver_qp() "";
+&arg_s2="", const std::string &arg_s3="", const std::string &arg_s4="",
+const std::string &arg_s5="") " ";
 
 %feature("docstring")  casadi::nlpSolverOut(const std::string &arg_s0="",
 const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(),
@@ -69022,46 +67138,10 @@ const real_t *y, int inc_y) " [INTERNAL]  DOT: inner_prod(x, y) -> return.
 
 ";
 
-%feature("docstring")  casadi::solve(const Matrix< double > &A, const
-Matrix< double > &b, const std::string &lsolver, const Dictionary
-&dict=Dictionary()) "
+%feature("docstring")  casadi::casadi_quad_form(const real_t *A, const int
+*sp_A, const real_t *x) " [INTERNAL]  Calculates inner_prod(x, mul(A, x))
 
-Solve a system of equations: A*x = b.
-
-";
-
-%feature("docstring")  casadi::solve(const Matrix< DataType > &A, const
-Matrix< DataType > &b) "
-
-Solve a system of equations: A*x = b The solve routine works similar to
-Matlab's backslash when A is square and nonsingular. The algorithm used is
-the following:
-
-A simple forward or backward substitution if A is upper or lower triangular
-
-If the linear system is at most 3-by-3, form the inverse via minor expansion
-and multiply
-
-Permute the variables and equations as to get a (structurally) nonzero
-diagonal, then perform a QR factorization without pivoting and solve the
-factorized system.
-
-Note 1: If there are entries of the linear system known to be zero, these
-will be removed. Elements that are very small, or will evaluate to be zero,
-can still cause numerical errors, due to the lack of pivoting (which is not
-possible since cannot compare the size of entries)
-
-Note 2: When permuting the linear system, a BLT (block lower triangular)
-transformation is formed. Only the permutation part of this is however used.
-An improvement would be to solve block-by-block if there are multiple BLT
-blocks.
-
-";
-
-%feature("docstring")  casadi::solve(const MX &A, const MX &b, const
-std::string &lsolver="symbolicqr", const Dictionary &dict=Dictionary()) "
-
-Solve a system of equations: A*x = b.
+Calculates inner_prod(x, mul(A, x)) without memory allocation.
 
 ";
 
@@ -69098,18 +67178,8 @@ x:  Scalar symbol that the polynomial is build up with
 
 ";
 
-%feature("docstring")  casadi::casadi_mm_sparse(const real_t *x, const int
-*sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
-*w) " [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
-
-";
-
-%feature("docstring")
-casadi::casadi_register_integrator_oldcollocation(IntegratorInternal::Plugin
-*plugin) " ";
-
-%feature("docstring")  casadi::bvec_or(bvec_t *s, bvec_t &r, int begin, int
-end) " [INTERNAL] ";
+%feature("docstring")  casadi::getSchemeEntryEnum(InputOutputScheme scheme,
+const std::string &name) " ";
 
 %feature("docstring")  casadi::linsolOut(const std::string &arg_s0="", const
 M &arg_m0=M()) "
@@ -69168,10 +67238,6 @@ invert_indices:  Output indices such that 'sorted_values[indices=values'
 &stream=CASADI_COUT) " [INTERNAL]  Print description.
 
 ";
-
-%feature("docstring")
-casadi::casadi_register_nlpsolver_sqpmethod(NlpSolverInternal::Plugin
-*plugin) " ";
 
 %feature("docstring")  casadi::extractShared(std::vector< MX > &ex,
 std::vector< MX > &v, std::vector< MX > &vdef, const std::string
@@ -69280,7 +67346,11 @@ std::string &arg_s7="", const std::string &arg_s8="", const std::string
 &arg_s9="", const std::string &arg_s10="", const std::string &arg_s11="") "
 ";
 
-%feature("docstring")  casadi::isBadChar(char c) " ";
+%feature("docstring")  casadi::casadi_mv(const real_t *x, const int *sp_x,
+const real_t *y, real_t *z) " [INTERNAL]  Sparse matrix-vector
+multiplication: z <- z + x*y.
+
+";
 
 %feature("docstring")  casadi::dgetrs_(char *trans, int *n, int *nrhs,
 double *a, int *lda, int *ipiv, double *b, int *ldb, int *info) " [INTERNAL]
@@ -69323,26 +67393,64 @@ Structure specification of an LP
 %feature("docstring")  casadi::lpStruct(const std::vector< M > &args, const
 std::string &arg_s0="") " ";
 
-%feature("docstring")  casadi::describeInput(InputOutputScheme scheme, int
-i) " ";
+%feature("docstring")  casadi::qpIn(const std::string &arg_s0="", const M
+&arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
+std::string &arg_s2="", const M &arg_m2=M(), const std::string &arg_s3="",
+const M &arg_m3=M(), const std::string &arg_s4="", const M &arg_m4=M(),
+const std::string &arg_s5="", const M &arg_m5=M(), const std::string
+&arg_s6="", const M &arg_m6=M(), const std::string &arg_s7="", const M
+&arg_m7=M(), const std::string &arg_s8="", const M &arg_m8=M()) "
+
+Input arguments of a QP problem
+
+>Input scheme: casadi::QpSolverInput (QP_SOLVER_NUM_IN = 9) [qpIn]
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| QP_SOLVER_H            | h                      | The square matrix H:   |
+|                        |                        | sparse, (n x n). Only  |
+|                        |                        | the lower triangular   |
+|                        |                        | part is actually used. |
+|                        |                        | The matrix is assumed  |
+|                        |                        | to be symmetrical.     |
++------------------------+------------------------+------------------------+
+| QP_SOLVER_G            | g                      | The vector g: dense,   |
+|                        |                        | (n x 1) .              |
++------------------------+------------------------+------------------------+
+| QP_SOLVER_A            | a                      | The matrix A: sparse,  |
+|                        |                        | (nc x n) - product     |
+|                        |                        | with x must be dense.  |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| QP_SOLVER_LBA          | lba                    | dense, (nc x 1)        |
++------------------------+------------------------+------------------------+
+| QP_SOLVER_UBA          | uba                    | dense, (nc x 1)        |
++------------------------+------------------------+------------------------+
+| QP_SOLVER_LBX          | lbx                    | dense, (n x 1)         |
++------------------------+------------------------+------------------------+
+| QP_SOLVER_UBX          | ubx                    | dense, (n x 1)         |
++------------------------+------------------------+------------------------+
+| QP_SOLVER_X0           | x0                     | dense, (n x 1)         |
++------------------------+------------------------+------------------------+
+| QP_SOLVER_LAM_X0       | lam_x0                 | dense                  |
++------------------------+------------------------+------------------------+
+
+";
+
+%feature("docstring")  casadi::qpIn(const std::vector< M > &args, const
+std::string &arg_s0="", const std::string &arg_s1="", const std::string
+&arg_s2="", const std::string &arg_s3="", const std::string &arg_s4="",
+const std::string &arg_s5="", const std::string &arg_s6="", const
+std::string &arg_s7="", const std::string &arg_s8="") " ";
 
 %feature("docstring")  casadi::ProfilingType< ProfilingData_TIMELINE >() "
 [INTERNAL] ";
-
-%feature("docstring")
-casadi::casadi_register_lpsolver_qp(LpSolverInternal::Plugin *plugin) " ";
 
 %feature("docstring")  casadi::linspace(std::vector< T > &v, const F &first,
 const L &last) " [INTERNAL]  Matlab's linspace.
 
 ";
-
-%feature("docstring")  casadi::casadi_load_dlesolver_fixed_smith() "";
-
-%feature("docstring")  casadi::casadi_load_qcqpsolver_socp() "";
-
-%feature("docstring")  casadi::dense_mul_nn(int n, int m, int l, const
-double *A, const double *B, double *C) " [INTERNAL] ";
 
 %feature("docstring")  casadi::qpStruct(const std::string &arg_s0="", const
 M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M()) "
@@ -69372,22 +67480,14 @@ Structure specification of a QP
 %feature("docstring")  casadi::qpStruct(const std::vector< M > &args, const
 std::string &arg_s0="", const std::string &arg_s1="") " ";
 
-%feature("docstring")
-casadi::casadi_register_integrator_rk(IntegratorInternal::Plugin *plugin) "
-";
-
 %feature("docstring")  casadi::hash_value(T v) " [INTERNAL]  Hash value of
 an integer.
 
 ";
 
-%feature("docstring")
-casadi::casadi_register_implicitfunction_nlp(ImplicitFunctionInternal::Plugin
-*plugin) " ";
-
-%feature("docstring")  casadi::casadi_mv(const real_t *x, const int *sp_x,
-const real_t *y, real_t *z) " [INTERNAL]  Sparse matrix-vector
-multiplication: z <- z + x*y.
+%feature("docstring")  casadi::casadi_trans(const real_t *x, const int
+*sp_x, real_t *y, const int *sp_y, int *tmp) " [INTERNAL]  TRANS: y <-
+trans(x)
 
 ";
 
@@ -69462,10 +67562,6 @@ const std::string &arg_s7="", const std::string &arg_s8="", const
 std::string &arg_s9="", const std::string &arg_s10="", const std::string
 &arg_s11="") " ";
 
-%feature("docstring")  casadi::casadi_load_nlpsolver_stabilizedsqp() "";
-
-%feature("docstring")  casadi::casadi_load_linearsolver_csparse() "";
-
 %feature("docstring")  casadi::casadi_norm_inf_mul(const real_t *x, const
 int *sp_x, const real_t *y, const int *sp_y, real_t *dwork, int *iwork) "
 [INTERNAL]  Inf-norm of a Matrix-matrix product,*
@@ -69479,9 +67575,6 @@ iwork:  A integer work vector that you must allocate Minimum size:
 y.size1()+x.size2()+1
 
 ";
-
-%feature("docstring")
-casadi::casadi_register_dplesolver_simple(DpleInternal::Plugin *plugin) " ";
 
 %feature("docstring")  casadi::gradFOut(const std::string &arg_s0="", const
 M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
@@ -69507,30 +67600,46 @@ Output arguments of an NLP objective gradient function
 std::string &arg_s0="", const std::string &arg_s1="", const std::string
 &arg_s2="") " ";
 
-%feature("docstring")  casadi::poly_roots(const SX &p) "
+%feature("docstring")  casadi::controlsimulatorIn(const std::string
+&arg_s0="", const M &arg_m0=M(), const std::string &arg_s1="", const M
+&arg_m1=M(), const std::string &arg_s2="", const M &arg_m2=M()) "
 
-Attempts to find the roots of a polynomial.
+Input arguments of a control simulator
 
-This will only work for polynomials up to order 3 It is assumed that the
-roots are real.
+>Input scheme: casadi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 3) [controlsimulatorIn]
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| CONTROLSIMULATOR_X0    | x0                     | Differential or        |
+|                        |                        | algebraic state at t0  |
+|                        |                        | (dimension nx-by-1) .  |
++------------------------+------------------------+------------------------+
+| CONTROLSIMULATOR_P     | p                      | Parameters that are    |
+|                        |                        | fixed over the entire  |
+|                        |                        | horizon (dimension np- |
+|                        |                        | by-1) .                |
++------------------------+------------------------+------------------------+
+| CONTROLSIMULATOR_U     | u                      | Parameters that change |
+|                        |                        | over the integration   |
+|                        |                        | intervals (dimension   |
+|                        |                        | nu-by-(ns-1)) .        |
++------------------------+------------------------+------------------------+
 
 ";
 
-%feature("docstring")  casadi::casadi_asum(int n, const real_t *x, int
-inc_x) " [INTERNAL]  ASUM: ||x||_1 -> return.
+%feature("docstring")  casadi::controlsimulatorIn(const std::vector< M >
+&args, const std::string &arg_s0="", const std::string &arg_s1="", const
+std::string &arg_s2="") " ";
+
+%feature("docstring")  casadi::pinv(const Matrix< DataType > &A) "
+
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size2>size1), mul(A, pinv(A)) is unity. If the
+matrix A is slender (size1<size2), mul(pinv(A), A) is unity.
 
 ";
-
-%feature("docstring")  casadi::if_else(const SXElement &cond, const
-SXElement &if_true, const SXElement &if_false) "
-
-replaces the ternary conditional operator \"?:\", which cannot be overloaded
-
-";
-
-%feature("docstring")
-casadi::casadi_register_integrator_cvodes(IntegratorInternal::Plugin
-*plugin) " ";
 
 %feature("docstring")  casadi::pinv(const Matrix< double > &A, const
 std::string &lsolver, const Dictionary &dict=Dictionary()) "
@@ -69539,15 +67648,6 @@ Computes the Moore-Penrose pseudo-inverse.
 
 If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
 matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
-
-";
-
-%feature("docstring")  casadi::pinv(const Matrix< DataType > &A) "
-
-Computes the Moore-Penrose pseudo-inverse.
-
-If the matrix A is fat (size2>size1), mul(A, pinv(A)) is unity. If the
-matrix A is slender (size1<size2), mul(pinv(A), A) is unity.
 
 ";
 
@@ -69563,10 +67663,6 @@ matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
 
 %feature("docstring")  casadi::norm_2(const std::vector< T > &x) "
 [INTERNAL] ";
-
-%feature("docstring")
-casadi::casadi_register_nlpsolver_worhp(NlpSolverInternal::Plugin *plugin) "
-";
 
 %feature("docstring")  casadi::nlpOut(const std::string &arg_s0="", const M
 &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M()) "
@@ -69606,14 +67702,10 @@ order:  Order of interpolating polynomials
 
 ";
 
-%feature("docstring")  casadi::casadi_load_sdqpsolver_sdp() "";
-
 %feature("docstring")  casadi::isnan(double x) " [INTERNAL]  throw () Sign
 function, note that sign(nan) == nan.
 
 ";
-
-%feature("docstring")  casadi::casadi_load_dlesolver_simple() "";
 
 %feature("docstring")  casadi::dgeqrf_(int *m, int *n, double *a, int *lda,
 double *tau, double *work, int *lwork, int *info) " [INTERNAL]  QR-factorize
@@ -69621,40 +67713,25 @@ dense matrix (lapack)
 
 ";
 
-%feature("docstring")  casadi::lrdpleStruct(const std::string &arg_s0="",
-const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(),
-const std::string &arg_s2="", const M &arg_m2=M(), const std::string
-&arg_s3="", const M &arg_m3=M()) "
+%feature("docstring")  casadi::nlpIn(const std::string &arg_s0="", const M
+&arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M()) "
 
-Structure specification of a DPLE
+Input arguments of an NLP function
 
->Struct scheme: casadi::LrDpleVecStruct ( = 4) [lrdpleStruct]
+>Input scheme: casadi::NLPInput (NL_NUM_IN = 2) [nlpIn]
 
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| LR_Dple_STRUCT_A       | a                      | Sparsities for A_i,    |
-|                        |                        | block diagonal form .  |
-+------------------------+------------------------+------------------------+
-| LR_Dple_STRUCT_V       | v                      | Sparsities for V_i,    |
-|                        |                        | block diagonal form .  |
-+------------------------+------------------------+------------------------+
-| LR_Dple_STRUCT_C       | c                      | Sparsities for C_i     |
-|                        |                        | (defaults to unity),   |
-|                        |                        | block diagonal form .  |
-+------------------------+------------------------+------------------------+
-| LR_Dple_STRUCT_H       | h                      | Sparsities for H_i     |
-|                        |                        | (defaults to unity),   |
-|                        |                        | block diagonal form .  |
-+------------------------+------------------------+------------------------+
++-----------+-------+---------------------+
+| Full name | Short |     Description     |
++===========+=======+=====================+
+| NL_X      | x     | Decision variable . |
++-----------+-------+---------------------+
+| NL_P      | p     | Fixed parameter .   |
++-----------+-------+---------------------+
 
 ";
 
-%feature("docstring")  casadi::lrdpleStruct(const std::vector< M > &args,
-const std::string &arg_s0="", const std::string &arg_s1="", const
-std::string &arg_s2="", const std::string &arg_s3="") " ";
-
-%feature("docstring")  casadi::casadi_load_lrdplesolver_lifting() "";
+%feature("docstring")  casadi::nlpIn(const std::vector< M > &args, const
+std::string &arg_s0="", const std::string &arg_s1="") " ";
 
 %feature("docstring")  casadi::copysign(const T &x, const T &y) " [INTERNAL]
 copysign function
@@ -69678,20 +67755,18 @@ i:  List of indices
 
 ";
 
-%feature("docstring")  casadi::ProfilingType< ProfilingData_ENTRY >() "
-[INTERNAL] ";
-
 %feature("docstring")  casadi::asinh(double x) " [INTERNAL]  throw () Sign
 function, note that sign(nan) == nan.
 
 ";
 
 %feature("docstring")  casadi::socpStruct(const std::string &arg_s0="",
-const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M()) "
+const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(),
+const std::string &arg_s2="", const M &arg_m2=M()) "
 
 Structure specification of an SOCP
 
->Struct scheme: casadi::SOCPStruct ( = 2) [socpStruct]
+>Struct scheme: casadi::SOCPStruct ( = 3) [socpStruct]
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
@@ -69700,6 +67775,10 @@ Structure specification of an SOCP
 |                        |                        | of all matrices Gi: (  |
 |                        |                        | n x N) .               |
 +------------------------+------------------------+------------------------+
+| SOCP_STRUCT_E          | e                      | The horizontal stack   |
+|                        |                        | of all vectors ei: ( n |
+|                        |                        | x m) .                 |
++------------------------+------------------------+------------------------+
 | SOCP_STRUCT_A          | a                      | The matrix A: ( nc x   |
 |                        |                        | n) .                   |
 +------------------------+------------------------+------------------------+
@@ -69707,25 +67786,18 @@ Structure specification of an SOCP
 ";
 
 %feature("docstring")  casadi::socpStruct(const std::vector< M > &args,
-const std::string &arg_s0="", const std::string &arg_s1="") " ";
-
-%feature("docstring")
-casadi::casadi_register_socpsolver_sdp(SocpSolverInternal::Plugin *plugin) "
-";
+const std::string &arg_s0="", const std::string &arg_s1="", const
+std::string &arg_s2="") " ";
 
 %feature("docstring")  casadi::ptrToLong(T *a) " [INTERNAL] ";
 
 %feature("docstring")  casadi::getSchemeEntryEnumName(InputOutputScheme
 scheme, int i) " ";
 
-%feature("docstring")  casadi::casadi_fill(int n, real_t alpha, real_t *x,
-int inc_x) " [INTERNAL]  FILL: x <- alpha.
+%feature("docstring")  casadi::getDescription(const std::vector< T > &v) "
+[INTERNAL]  Print description to string.
 
 ";
-
-%feature("docstring")  casadi::casadi_load_nlpsolver_snopt() "";
-
-%feature("docstring")  casadi::casadi_load_linearsolver_lapackqr() "";
 
 %feature("docstring")  casadi::get_bvec_t(std::vector< double > &v) "
 [INTERNAL]  Get an pointer of sets of booleans from a double vector
@@ -69747,62 +67819,10 @@ Get an pointer of sets of booleans from a double vector.
 
 ";
 
-%feature("docstring")  casadi::qpIn(const std::string &arg_s0="", const M
-&arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
-std::string &arg_s2="", const M &arg_m2=M(), const std::string &arg_s3="",
-const M &arg_m3=M(), const std::string &arg_s4="", const M &arg_m4=M(),
-const std::string &arg_s5="", const M &arg_m5=M(), const std::string
-&arg_s6="", const M &arg_m6=M(), const std::string &arg_s7="", const M
-&arg_m7=M(), const std::string &arg_s8="", const M &arg_m8=M()) "
-
-Input arguments of a QP problem
-
->Input scheme: casadi::QpSolverInput (QP_SOLVER_NUM_IN = 9) [qpIn]
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| QP_SOLVER_H            | h                      | The square matrix H:   |
-|                        |                        | sparse, (n x n). Only  |
-|                        |                        | the lower triangular   |
-|                        |                        | part is actually used. |
-|                        |                        | The matrix is assumed  |
-|                        |                        | to be symmetrical.     |
-+------------------------+------------------------+------------------------+
-| QP_SOLVER_G            | g                      | The vector g: dense,   |
-|                        |                        | (n x 1) .              |
-+------------------------+------------------------+------------------------+
-| QP_SOLVER_A            | a                      | The matrix A: sparse,  |
-|                        |                        | (nc x n) - product     |
-|                        |                        | with x must be dense.  |
-|                        |                        | .                      |
-+------------------------+------------------------+------------------------+
-| QP_SOLVER_LBA          | lba                    | dense, (nc x 1)        |
-+------------------------+------------------------+------------------------+
-| QP_SOLVER_UBA          | uba                    | dense, (nc x 1)        |
-+------------------------+------------------------+------------------------+
-| QP_SOLVER_LBX          | lbx                    | dense, (n x 1)         |
-+------------------------+------------------------+------------------------+
-| QP_SOLVER_UBX          | ubx                    | dense, (n x 1)         |
-+------------------------+------------------------+------------------------+
-| QP_SOLVER_X0           | x0                     | dense, (n x 1)         |
-+------------------------+------------------------+------------------------+
-| QP_SOLVER_LAM_X0       | lam_x0                 | dense                  |
-+------------------------+------------------------+------------------------+
+%feature("docstring")  casadi::is_a(const SharedObject &A) " [INTERNAL]
+Check if a shared object is of a certain type.
 
 ";
-
-%feature("docstring")  casadi::qpIn(const std::vector< M > &args, const
-std::string &arg_s0="", const std::string &arg_s1="", const std::string
-&arg_s2="", const std::string &arg_s3="", const std::string &arg_s4="",
-const std::string &arg_s5="", const std::string &arg_s6="", const
-std::string &arg_s7="", const std::string &arg_s8="") " ";
-
-%feature("docstring")
-casadi::casadi_register_lrdplesolver_dple(LrDpleInternal::Plugin *plugin) "
-";
-
-%feature("docstring")  casadi::casadi_load_qpsolver_qcqp() "";
 
 %feature("docstring")  casadi::norm_inf(const std::vector< T > &x) "
 [INTERNAL] ";
@@ -69812,17 +67832,12 @@ real_t *y, int inc_y) " [INTERNAL]  SWAP: x <-> y.
 
 ";
 
-%feature("docstring")  casadi::casadi_load_integrator_oldcollocation() "";
-
 %feature("docstring")  casadi::gauss_quadrature(const SX &f, const SX &x,
 const SX &a, const SX &b, int order=5, const SX &w=SX()) "
 
 Integrate f from a to b using Gaussian quadrature with n points.
 
 ";
-
-%feature("docstring")  casadi::has_empty(const vector< MX > &x, bool
-both=false) " ";
 
 %feature("docstring")  casadi::lrdleStruct(const std::string &arg_s0="",
 const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(),
@@ -69851,25 +67866,10 @@ Structure specification of a DLE
 const std::string &arg_s0="", const std::string &arg_s1="", const
 std::string &arg_s2="", const std::string &arg_s3="") " ";
 
-%feature("docstring")  casadi::nlpIn(const std::string &arg_s0="", const M
-&arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M()) "
-
-Input arguments of an NLP function
-
->Input scheme: casadi::NLPInput (NL_NUM_IN = 2) [nlpIn]
-
-+-----------+-------+---------------------+
-| Full name | Short |     Description     |
-+===========+=======+=====================+
-| NL_X      | x     | Decision variable . |
-+-----------+-------+---------------------+
-| NL_P      | p     | Fixed parameter .   |
-+-----------+-------+---------------------+
+%feature("docstring")  casadi::casadi_fill(int n, real_t alpha, real_t *x,
+int inc_x) " [INTERNAL]  FILL: x <- alpha.
 
 ";
-
-%feature("docstring")  casadi::nlpIn(const std::vector< M > &args, const
-std::string &arg_s0="", const std::string &arg_s1="") " ";
 
 %feature("docstring")  casadi::getSchemeEntryName(InputOutputScheme scheme,
 int i) " ";

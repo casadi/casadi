@@ -2914,7 +2914,7 @@ def socpIn(*dummy,**kwargs):
 
     g   -- The horizontal stack of all matrices Gi: ( n x N) [SOCP_SOLVER_G]
     h   -- The vertical stack of all vectors hi: ( N x 1) [SOCP_SOLVER_H]
-    e   -- The vertical stack of all vectors ei: ( nm x 1) [SOCP_SOLVER_E]
+    e   -- The horizontal stack of all vectors ei: ( n x m) [SOCP_SOLVER_E]
     f   -- The vertical stack of all scalars fi: ( m x 1) [SOCP_SOLVER_F]
     c   -- The vector c: ( n x 1) [SOCP_SOLVER_C]
     a   -- The matrix A: ( nc x n) [SOCP_SOLVER_A]
@@ -2986,18 +2986,20 @@ def socpOut(*dummy,**kwargs):
   Helper function for 'SOCPOutput'
 
   Two use cases:
-     a) arg = socpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+     a) arg = socpOut(x=my_x, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x, lam_cone=my_lam_cone)
           all arguments optional
-     b) x, cost, lam_a, lam_x = socpOut(arg,"x", "cost", "lam_a", "lam_x")
+     b) x, cost, dual_cost, lam_a, lam_x, lam_cone = socpOut(arg,"x", "cost", "dual_cost", "lam_a", "lam_x", "lam_cone")
           all arguments after the first optional
   Output arguments of an SOCP Solver
   
   Keyword arguments::
 
-    x     -- The primal solution (n x 1) [SOCP_SOLVER_X]
-    cost  -- The primal optimal cost (1 x 1) [SOCP_SOLVER_COST]
-    lam_a -- The dual solution corresponding to the linear constraints  (nc x 1) [SOCP_SOLVER_LAM_A]
-    lam_x -- The dual solution corresponding to simple bounds  (n x 1) [SOCP_SOLVER_LAM_X]
+    x         -- The primal solution (n x 1) [SOCP_SOLVER_X]
+    cost      -- The primal optimal cost (1 x 1) [SOCP_SOLVER_COST]
+    dual_cost -- The dual optimal cost (1 x 1) [SOCP_SOLVER_DUAL_COST]
+    lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SOCP_SOLVER_LAM_A]
+    lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SOCP_SOLVER_LAM_X]
+    lam_cone  -- The dual solution correspoding to cone (2-norm) constraints (m x 1) [SOCP_SOLVER_LAM_CONE]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPOutput,n)] for n in dummy[1:]]
@@ -3007,16 +3009,22 @@ def socpOut(*dummy,**kwargs):
   cost = []
   if 'cost' in kwargs:
     cost = kwargs['cost']
+  dual_cost = []
+  if 'dual_cost' in kwargs:
+    dual_cost = kwargs['dual_cost']
   lam_a = []
   if 'lam_a' in kwargs:
     lam_a = kwargs['lam_a']
   lam_x = []
   if 'lam_x' in kwargs:
     lam_x = kwargs['lam_x']
+  lam_cone = []
+  if 'lam_cone' in kwargs:
+    lam_cone = kwargs['lam_cone']
   for k in kwargs.keys():
-    if not(k in ['x','cost','lam_a','lam_x']):
-      raise Exception("Keyword error in socpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_SOCPOutput))
+    if not(k in ['x','cost','dual_cost','lam_a','lam_x','lam_cone']):
+      raise Exception("Keyword error in socpOut: '%s' is not recognized. Available keywords are: x, cost, dual_cost, lam_a, lam_x, lam_cone" % k )
+  return IOSchemeVector([x,cost,dual_cost,lam_a,lam_x,lam_cone], IOScheme(SCHEME_SOCPOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -3044,15 +3052,16 @@ def socpStruct(*dummy,**kwargs):
   Helper function for 'SOCPStruct'
 
   Two use cases:
-     a) arg = socpStruct(g=my_g, a=my_a)
+     a) arg = socpStruct(g=my_g, e=my_e, a=my_a)
           all arguments optional
-     b) g, a = socpStruct(arg,"g", "a")
+     b) g, e, a = socpStruct(arg,"g", "e", "a")
           all arguments after the first optional
   Structure specification of an SOCP
   
   Keyword arguments::
 
     g -- The horizontal stack of all matrices Gi: ( n x N) [SOCP_STRUCT_G]
+    e -- The horizontal stack of all vectors ei: ( n x m) [SOCP_STRUCT_E]
     a -- The matrix A: ( nc x n) [SOCP_STRUCT_A]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpStruct. Either use keywords or non-keywords ")
@@ -3060,13 +3069,16 @@ def socpStruct(*dummy,**kwargs):
   g = Sparsity()
   if 'g' in kwargs:
     g = kwargs['g']
+  e = Sparsity()
+  if 'e' in kwargs:
+    e = kwargs['e']
   a = Sparsity()
   if 'a' in kwargs:
     a = kwargs['a']
   for k in kwargs.keys():
-    if not(k in ['g','a']):
-      raise Exception("Keyword error in socpStruct: '%s' is not recognized. Available keywords are: g, a" % k )
-  return SOCPStructure([g,a])
+    if not(k in ['g','e','a']):
+      raise Exception("Keyword error in socpStruct: '%s' is not recognized. Available keywords are: g, e, a" % k )
+  return SOCPStructure([g,e,a])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON

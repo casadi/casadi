@@ -66,9 +66,10 @@
 */
 /** \defgroup scheme_SOCPStruct
 <a name='schemes'></a><table>
-<caption>Struct scheme: casadi::SOCPStruct  ( = 2) [socpStruct]</caption>
+<caption>Struct scheme: casadi::SOCPStruct  ( = 3) [socpStruct]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>SOCP_STRUCT_G</td><td>g</td><td>The horizontal stack of all matrices Gi: ( n x N) .</td></tr>
+<tr><td>SOCP_STRUCT_E</td><td>e</td><td>The horizontal stack of all vectors ei: ( n x m) .</td></tr>
 <tr><td>SOCP_STRUCT_A</td><td>a</td><td>The matrix A: ( nc x n) .</td></tr>
 </table>
 */
@@ -244,12 +245,14 @@
 */
 /** \defgroup scheme_SOCPOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::SOCPOutput  (SOCP_SOLVER_NUM_OUT = 4) [socpOut]</caption>
+<caption>Output scheme: casadi::SOCPOutput  (SOCP_SOLVER_NUM_OUT = 6) [socpOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>SOCP_SOLVER_X</td><td>x</td><td>The primal solution (n x 1) .</td></tr>
 <tr><td>SOCP_SOLVER_COST</td><td>cost</td><td>The primal optimal cost (1 x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_DUAL_COST</td><td>dual_cost</td><td>The dual optimal cost (1 x 1) .</td></tr>
 <tr><td>SOCP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
 <tr><td>SOCP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_LAM_CONE</td><td>lam_cone</td><td>The dual solution correspoding to cone (2-norm) constraints (m x 1) .</td></tr>
 </table>
 */
 /** \defgroup scheme_SDQPInput
@@ -457,7 +460,7 @@
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>SOCP_SOLVER_G</td><td>g</td><td>The horizontal stack of all matrices Gi: ( n x N) .</td></tr>
 <tr><td>SOCP_SOLVER_H</td><td>h</td><td>The vertical stack of all vectors hi: ( N x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_E</td><td>e</td><td>The vertical stack of all vectors ei: ( nm x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_E</td><td>e</td><td>The horizontal stack of all vectors ei: ( n x m) .</td></tr>
 <tr><td>SOCP_SOLVER_F</td><td>f</td><td>The vertical stack of all scalars fi: ( m x 1) .</td></tr>
 <tr><td>SOCP_SOLVER_C</td><td>c</td><td>The vector c: ( n x 1) .</td></tr>
 <tr><td>SOCP_SOLVER_A</td><td>a</td><td>The matrix A: ( nc x n) .</td></tr>
@@ -948,6 +951,15 @@
 @copydoc scheme_DLEInput
 <br/>
 @copydoc scheme_LR_DLEOutput
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::MosekSocpInterface
+\n
+\par
+@copydoc scheme_SOCPInput
+<br/>
+@copydoc scheme_SOCPOutput
 */
 /// \endcond
 /// \cond INTERNAL
