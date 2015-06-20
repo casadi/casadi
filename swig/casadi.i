@@ -1443,13 +1443,19 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     template<typename M1, typename M2> bool to_ptr(GUESTOBJECT *p, std::pair<M1, M2>** m) {
 #ifdef SWIGPYTHON
       if (PyTuple_Check(p) && PyTuple_Size(p)==2) {
-        GUESTOBJECT *p_first = PyTuple_GetItem(p, 0);
-        GUESTOBJECT *p_second = PyTuple_GetItem(p, 1);
-        bool ret = to_val(p_first, m ? &(**m).first : 0)
-          && to_val(p_second, m ? &(**m).second : 0);
-        return ret;
+        PyObject *p_first = PyTuple_GetItem(p, 0);
+        PyObject *p_second = PyTuple_GetItem(p, 1);
+	return to_val(p_first, m ? &(**m).first : 0)
+	  && to_val(p_second, m ? &(**m).second : 0);
       }
-#endif // SWIGPYTHON
+#elif defined(SWIGMATLAB)
+      if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1 && mxGetN(p)==2) {
+	mxArray *p_first = mxGetCell(p, 0);
+	mxArray *p_second = mxGetCell(p, 1);
+	return to_val(p_first, m ? &(**m).first : 0)
+	  && to_val(p_second, m ? &(**m).second : 0);
+      }
+#endif
       // No match
       return false;
     }
@@ -1463,6 +1469,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       PyObject* ret = PyTuple_New(2);
       PyTuple_SetItem(ret, 0, a_first);
       PyTuple_SetItem(ret, 1, a_second);
+      return ret;
+#elif defined(SWIGMATLAB)
+      mxArray* ret = mxCreateCellMatrix(1, 2);
+      mxSetCell(ret, 0, a_first);
+      mxSetCell(ret, 1, a_second);
       return ret;
 #else
       return 0;
