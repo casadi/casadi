@@ -49,16 +49,7 @@ class Sparsitytests(casadiTestCase):
     for i in nzb:
       b.addNZ(i[0],i[1])
       
-    c,w =a.patternUnion(b)
-    self.assertEquals(len(w),len(nza.union(nzb)))
-    for k in range(len(w)):
-      ind = (c.row(k),c.getCol()[k])
-      if (ind in nza and ind in nzb):
-        self.assertEquals(w[k],1 | 2)
-      elif (ind in nza):
-        self.assertEquals(w[k],1)
-      elif (ind in nzb):
-        self.assertEquals(w[k],2)
+    c =a.patternUnion(b)
         
     c = a + b
     self.assertEquals(c.nnz(),len(nza.union(nzb)))
@@ -86,7 +77,7 @@ class Sparsitytests(casadiTestCase):
     for i in nzb:
       b.addNZ(i[0],i[1])
     
-    c,_=a.patternIntersection(b)
+    c=a.patternIntersection(b)
     for k in range(c.nnz()):
       ind = (c.row(k),c.getCol()[k])
       self.assertTrue(ind in nza and ind in nzb)

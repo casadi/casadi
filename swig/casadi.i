@@ -2251,8 +2251,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_input_typemaps("Callback", PREC_CALLBACK, casadi::Callback)
 %casadi_template("Dict", PREC_DICT, std::map<std::string, casadi::GenericType>)
 
-%template() std::vector<unsigned char>;
-
 %{
 using namespace casadi;
 %}

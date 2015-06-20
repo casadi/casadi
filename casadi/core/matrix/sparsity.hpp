@@ -420,15 +420,18 @@ namespace casadi {
         if the first argument is nonzero,
         the second bit indicates if the second argument is nonzero (note that none of,
         one of or both of the arguments can be nonzero) */
+#ifndef SWIG
     Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero,
-                            std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
+                            std::vector<unsigned char>& mapping) const;
+#endif // SWIG
     Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
     /// @}
 
     /// @{
     /** \brief Union of two sparsity patterns */
-    Sparsity patternUnion(const Sparsity& y,
-                          std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
+#ifndef SWIG
+    Sparsity patternUnion(const Sparsity& y, std::vector<unsigned char>& mapping) const;
+#endif // SWIG
     Sparsity patternUnion(const Sparsity& y) const;
     Sparsity operator+(const Sparsity& b) const;
     /// @}
@@ -439,8 +442,10 @@ namespace casadi {
         number of non-zero elements
         The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if it is from
         the second and 3 (i.e. 1 | 2) if from both */
+#ifndef SWIG
     Sparsity patternIntersection(const Sparsity& y,
-                                 std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
+                                 std::vector<unsigned char>& mapping) const;
+#endif // SWIG
     Sparsity patternIntersection(const Sparsity& y) const;
     Sparsity operator*(const Sparsity& b) const;
     /// @}
