@@ -184,19 +184,19 @@ endif()
 # Get paths to the Matlab MEX libraries
 find_library(MATLAB_MEX_LIBRARY
     ${LIBPREFIX}mex
-    ${MATLAB_LIBRARIES_DIR}
+    HINTS ${MATLAB_LIBRARIES_DIR}
     )
 find_library(MATLAB_MX_LIBRARY
     ${LIBPREFIX}mx
-    ${MATLAB_LIBRARIES_DIR}
+    HINTS ${MATLAB_LIBRARIES_DIR}
     )
 find_library(MATLAB_MAT_LIBRARY
     ${LIBPREFIX}mat
-    ${MATLAB_LIBRARIES_DIR}
+    HINTS ${MATLAB_LIBRARIES_DIR}
     )
 find_library(MATLAB_ENG_LIBRARY
     ${LIBPREFIX}eng
-    ${MATLAB_LIBRARIES_DIR}
+    HINTS ${MATLAB_LIBRARIES_DIR}
     )
 
 # Get path to the include directory
