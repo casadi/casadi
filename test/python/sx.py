@@ -807,20 +807,6 @@ class SXtests(casadiTestCase):
       f.evaluate()
       self.checkarray(f.getOutput(),array(op(-0.3)),"simplifications")
       self.assertEqual(str(y),"(-x)")
-
-  def test_evalf(self):
-    x = SX(3)
-    y = SX(5)
-    z = evalf(x+y)
-    self.assertEqual(type(z),DMatrix)
-    self.assertEqual(z,8)
-
-  def test_evalfs(self):
-    x = SX.sym("x")
-    y = SX(5)
-    z = evalf(x+y,x,3)
-    self.assertEqual(type(z),DMatrix)
-    self.assertEqual(z,8)
   
   def test_truth(self):
     self.message("Truth values")

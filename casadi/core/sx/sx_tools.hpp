@@ -41,17 +41,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  /** \brief Evaluate an SX graph numerically
-   * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
-   */
-  CASADI_EXPORT Matrix<double> evalf(const SX &ex);
-
-  /** \brief Substitute variable v with value vdef in an expression ex, and evaluate numerically
-   * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
-   */
-  CASADI_EXPORT Matrix<double> evalf(const SX &ex, const SX &v,
-                                              const Matrix<double> &vdef);
-
 #if !defined(SWIG) || !defined(SWIGMATLAB)
 
   /** \brief  Expand the expression as a weighted sum (with constant weights)
