@@ -1415,7 +1415,21 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         }
         return true;
       }
-#endif // SWIGPYTHON
+#elif defined(SWIGMATLAB)
+      if (mxIsStruct(p) && mxGetM(p)==1 && mxGetN(p)==1) {
+	int len = mxGetNumberOfFields(p);
+	for (int k=0; k<len; ++k) {
+	  mxArray *value = mxGetFieldByNumber(p, 0, k);
+          if (m) {
+	    M *v=&(**m)[std::string(mxGetFieldNameByNumber(p, k))], *v2=v;
+            if (!casadi::to_ptr(value, &v)) return false;
+            if (v!=v2) *v2=*v; // if only pointer changed
+	  } else {
+            if (!casadi::to_ptr(value, static_cast<M**>(0))) return false;
+	  }
+	}
+      }
+#endif
       return false;
     }
 
@@ -1432,8 +1446,29 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         Py_DECREF(e);
       }
       return p;
-#endif // SWIGPYTHON
+#elif defined(SWIGMATLAB)
+      // Get vectors of the field names and mxArrays
+      std::vector<const char*> fieldnames;
+      std::vector<mxArray*> fields;
+      for (typename std::map<std::string, M>::const_iterator it=a->begin(); it!=a->end(); ++it) {
+	fieldnames.push_back(it->first.c_str());
+	mxArray* f = from_ptr(&it->second);
+	if (!f) {
+	  // Deallocate elements created up to now
+	  for (int k=0; k<fields.size(); ++k) mxDestroyArray(fields[k]);
+	  return 0;
+	}
+	fields.push_back(f);	
+      }
+      
+      // Create return object
+      mxArray *p = mxCreateStructMatrix(1, 1, fields.size(),
+					fieldnames.empty() ? 0 : &fieldnames[0]);
+      for (int k=0; k<fields.size(); ++k) mxSetFieldByNumber(p, 0, k, fields[k]);
+      return p;
+#else
       return 0;
+#endif
     }
   } // namespace casadi
 }
