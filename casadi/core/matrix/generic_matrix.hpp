@@ -181,7 +181,7 @@ namespace casadi {
       casadi_assert(isVector());
       return inner_prod(self(), self());
     }
-    MatType zz_sum_square() const { return sumAll(self()*self()); }
+    MatType zz_sum_square() const { return inner_prod(self(), self());}
     MatType zz_linspace(const MatType &b, int nsteps) const;
     MatType zz_cross(const MatType &b, int dim=-1) const;
     MatType zz_tril2symm() const;
@@ -300,9 +300,6 @@ namespace casadi {
     /** \brief Infinity-norm */
     inline friend MatType norm_inf(const MatType &x) { return x.zz_norm_inf();}
 
-    /// Return summation of all elements
-    inline friend MatType sumAll(const MatType &x) { return x.zz_sumAll();}
-
     /** \brief Return a col-wise summation of elements */
     inline friend MatType sumCols(const MatType &x) { return x.zz_sumCols();}
 
@@ -310,10 +307,6 @@ namespace casadi {
     inline friend MatType sumRows(const MatType &x) { return x.zz_sumRows();}
 
     /** \brief Inner product of two matrices
-        Equals
-        \code
-        sumAll(x*y)
-        \endcode
         with x and y matrices of the same dimension
     */
     inline friend MatType inner_prod(const MatType &x, const MatType &y) {

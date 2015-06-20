@@ -61,7 +61,7 @@ hyper = [ ( vertcat([1,1]),   vertcat([0,0  ]) , 4),
 
 P = SX.sym("P",4,4)
 
-h_nom    = [ sumAll(((x["p"]-p)/s)**n) - 1 for s,p,n in hyper ]
+h_nom    = [ sumCols(vec(((x["p"]-p)/s)**n)) - 1 for s,p,n in hyper ]
 h_margin = [ sqrt(quad_form(jacobian(i,x).T,P)) for i in h_nom ]
 
 h_robust = SXFunction([x,P],[ n - gamma*m for n,m in zip(h_nom, h_margin) ])

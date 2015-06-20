@@ -56,7 +56,7 @@ s.solve()
 x_ = s.getOutput("X")
 
 #! By looking at the residuals between the x we knew in advance and the computed x, we see that the CSparse solver works
-print "Sum of residuals = %.2e" % sumAll(fabs(x-x_))
+print "Sum of residuals = %.2e" % norm_1(x-x_)
 
 #! Comparison of different linear solvers
 #! ======================================
@@ -83,9 +83,9 @@ for solver in ("lapacklu","lapackqr","csparse"):
   print ""
   print solver
   print "=" * 10
-  print "Sum of residuals = %.2e" % sumAll(fabs(x-x_))
+  print "Sum of residuals = %.2e" % norm_1(x-x_)
   print "Preparation time = %0.2f ms" % (pt*1000)
   print "Solve time       = %0.2f ms" % (st*1000)
-  assert(sumAll(fabs(x-x_))<1e-9)
+  assert(norm_1(x-x_)<1e-9)
   
 #! Note that these 

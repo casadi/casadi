@@ -1969,18 +1969,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_sumAll() const {
-    // Quick return if empty
-    if (isEmpty()) return Matrix<DataType>(1, 1);
-    // Sum non-zero elements
-    DataType res=0;
-    for (int k=0; k<nnz(); k++) {
-      res += data()[k];
-    }
-    return res;
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_sumCols() const {
     return mul(*this, Matrix<DataType>::ones(size2(), 1));
   }
@@ -2187,7 +2175,15 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_inner_prod(const Matrix<DataType> &y) const {
     casadi_assert_message(shape()==y.shape(), "inner_prod: Dimension mismatch");
-    return sumAll(*this*y);
+    if (sparsity()!=y.sparsity()) {
+      Sparsity sp = sparsity() * y.sparsity();
+      return inner_prod(project(*this, sp), project(y, sp));
+    }
+    Matrix<DataType> ret(0);
+    for (int k=0; k<size(); ++k) {
+      ret.at(0) += at(k) * y.at(k);
+    }
+    return ret;
   }
 
   template<typename DataType>
@@ -2217,7 +2213,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_norm_1() const {
-    return sumAll(fabs(*this));
+    return inner_prod(fabs(*this), Matrix<DataType>::ones(sparsity()));
   }
 
   template<typename DataType>
@@ -2232,7 +2228,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_norm_F() const {
-    return sqrt(sumAll((*this**this)));
+    return sqrt(sum_square(*this));
   }
 
   template<typename DataType>

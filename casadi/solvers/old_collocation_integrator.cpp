@@ -161,8 +161,10 @@ namespace casadi {
     C_num(std::vector<int>(1, 0), ALL) = 0;
     C_num(0, 0)   = 1;
 
-    casadi_assert_message(fabs(sumAll(Q)-1).at(0)<1e-9, "Check on quadrature coefficients");
-    casadi_assert_message(fabs(sumAll(D_num)-1).at(0)<1e-9, "Check on collocation coefficients");
+    casadi_assert_message(fabs(inner_prod(Q, DMatrix::ones(Q.sparsity()))-1).at(0)<1e-9,
+                          "Check on quadrature coefficients");
+    casadi_assert_message(fabs(inner_prod(D_num, DMatrix::ones(D_num.sparsity()))-1).at(0)<1e-9,
+                          "Check on collocation coefficients");
 
     // Initial state
     MX X0 = MX::sym("X0", x0().sparsity());

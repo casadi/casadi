@@ -517,7 +517,6 @@ namespace casadi {
     Matrix<DataType> zz_mtimes(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_mtimes(const Matrix<DataType> &y, const Matrix<DataType> &z) const;
     Matrix<DataType> zz_det() const;
-    Matrix<DataType> zz_sumAll() const;
     Matrix<DataType> zz_sumCols() const;
     Matrix<DataType> zz_sumRows() const;
     Matrix<DataType> zz_adj() const;

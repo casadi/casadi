@@ -445,7 +445,6 @@ namespace casadi {
     int zz_countNodes() const;
     MX zz_sumCols() const;
     MX zz_sumRows() const;
-    MX zz_sumAll() const;
     MX zz_polyval(const MX& x) const;
     std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
     static void zz_substituteInPlace(const std::vector<MX>& v,

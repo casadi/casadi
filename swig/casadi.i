@@ -3210,7 +3210,6 @@ MatType norm_F(const MatType &x);
 MatType norm_2(const MatType &x);
 MatType norm_1(const MatType &x);
 MatType norm_inf(const MatType &x);
-MatType sumAll(const MatType &x);
 MatType sumCols(const MatType &x);
 MatType sumRows(const MatType &x);
 MatType inner_prod(const MatType &x, const MatType &y);

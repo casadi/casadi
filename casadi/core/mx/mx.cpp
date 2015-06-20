@@ -1391,11 +1391,6 @@ namespace casadi {
     return mul(MX::ones(1, size1()), *this);
   }
 
-  MX MX::zz_sumAll() const {
-    return sumRows(sumCols(*this));
-  }
-
-
   MX MX::zz_polyval(const MX& x) const {
     casadi_assert_message(isDense(), "polynomial coefficients vector must be a vector");
     casadi_assert_message(isVector() && nnz()>0, "polynomial coefficients must be a vector");
