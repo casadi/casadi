@@ -113,13 +113,15 @@ namespace casadi {
     MX u = MX::sym("u", input(iin_).sparsity());
 
     // So that we can pass it on to createParent
-    std::vector<Sparsity> sps;
-    for (int i=0; i<nIn(); ++i)
-      if (i!=iin_) sps.push_back(input(i).sparsity());
-
-    // u groups all parameters in an MX
-    std::vector< MX > inputs;
-    MX p = createParent(sps, inputs);
+    std::vector<MX> inputs;
+    for (int i=0; i<nIn(); ++i) {
+      if (i!=iin_) {
+        stringstream ss;
+        ss << "p" << i;
+        inputs.push_back(MX::sym(ss.str(), input(i).sparsity()));
+      }
+    }
+    MX p = veccat(inputs);
 
     // Dummy NLP objective
     MX nlp_f = 0;

@@ -1366,59 +1366,6 @@ namespace casadi {
     return res;
   }
 
-  MX MX::zz_createParent(std::vector<MX> &deps) {
-    // First check if arguments are symbolic
-    for (int k=0;k<deps.size();k++) {
-      if (!deps[k].isSymbolic())
-          throw CasadiException("createParent: the argumenst must be pure symbolic");
-    }
-
-    // Collect the sizes of the depenencies
-    std::vector<int> index(deps.size()+1, 0);
-    for (int k=0;k<deps.size();k++) {
-      index[k+1] =  index[k] + deps[k].nnz();
-    }
-
-    // Create the parent
-    MX P = MX::sym("P", index[deps.size()], 1);
-
-    std::vector<MX> Ps = vertsplit(P, index);
-
-    // Make the arguments dependent on the parent
-    for (int k=0;k<deps.size();k++) {
-      deps[k] = MX(deps[k].sparsity(), Ps[k]);
-    }
-
-    return P;
-  }
-
-  MX MX::zz_createParent(const std::vector<Sparsity> &deps, std::vector<MX>& children) {
-    // Collect the sizes of the depenencies
-    std::vector<int> index(deps.size()+1, 0);
-    for (int k=0;k<deps.size();k++) {
-      index[k+1] =  index[k] + deps[k].nnz();
-    }
-
-    // Create the parent
-    MX P = MX::sym("P", index[deps.size()], 1);
-    std::vector<MX> Ps = vertsplit(P, index);
-
-    children.resize(deps.size());
-
-    // Make the arguments dependent on the parent
-    for (int k=0;k<deps.size();k++) {
-      children[k] =  MX(deps[k], Ps[k]);
-    }
-
-    return P;
-  }
-
-  MX MX::zz_createParent(const std::vector<MX> &deps, std::vector<MX>& children) {
-    children = deps;
-    MX P = createParent(children);
-    return P;
-  }
-
   MX MX::zz_diag() const {
     // Nonzero mapping
     std::vector<int> mapping;

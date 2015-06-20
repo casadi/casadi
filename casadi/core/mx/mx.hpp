@@ -441,9 +441,6 @@ namespace casadi {
                       bool short_circuit=true) const;
     MX zz_unite(const MX& B) const;
     MX zz_trace() const;
-    static MX zz_createParent(std::vector<MX> &deps);
-    static MX zz_createParent(const std::vector<Sparsity> &deps, std::vector<MX>& children);
-    static MX zz_createParent(const std::vector<MX> &deps, std::vector<MX>& children);
     MX zz_diag() const;
     int zz_countNodes() const;
     MX zz_sumCols() const;

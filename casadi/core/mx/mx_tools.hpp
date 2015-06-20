@@ -38,28 +38,6 @@ namespace casadi {
 @{
 */
 #if !defined(SWIG) || !defined(SWIGMATLAB)
-  /** \brief  Create a parent MX on which all given MX's will depend.
-
-      In some sense, this function is the inverse of
-
-      \param deps  Must all be symbolic matrices.
-  */
-  inline MX createParent(std::vector<MX> &deps) { return MX::zz_createParent(deps);}
-
-  /** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
-   */
-  inline MX createParent(const std::vector<MX> &deps,
-                         std::vector<MX>& SWIG_OUTPUT(children)) {
-    return MX::zz_createParent(deps, children);
-  }
-
-  /** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
-   */
-  inline MX createParent(const std::vector<Sparsity> &deps,
-                         std::vector<MX>& SWIG_OUTPUT(children)) {
-    return MX::zz_createParent(deps, children);
-  }
-
   /** Count number of nodes */
   inline int countNodes(const MX& A) { return A.zz_countNodes();}
 
