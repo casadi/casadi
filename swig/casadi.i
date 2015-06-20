@@ -567,6 +567,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     bool to_ptr(GUESTOBJECT *p, DerivativeGenerator** m);
     bool to_ptr(GUESTOBJECT *p, CustomEvaluate** m);
     bool to_ptr(GUESTOBJECT *p, GenericType** m);
+#ifdef SWIGMATLAB
+    bool to_ptr(GUESTOBJECT *p, std::pair<int, int>** m);
+#endif // SWIGMATLAB
     template<typename M1, typename M2> bool to_ptr(GUESTOBJECT *p, std::pair<M1, M2>** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
@@ -593,6 +596,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     GUESTOBJECT* from_ptr(const SX *a);
     GUESTOBJECT* from_ptr(const MX *a);
     GUESTOBJECT* from_ptr(const Function *a);
+#ifdef SWIGMATLAB
+    GUESTOBJECT* from_ptr(const std::pair<int, int>* a);
+#endif // SWIGMATLAB
     template<typename M1, typename M2> GUESTOBJECT* from_ptr(const std::pair<M1, M2>* a);
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a);
     template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a);
@@ -633,6 +639,15 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         return to_ptr(p, static_cast<M**>(0));
       }
     }
+
+    // Check if int
+    template<typename T> struct is_int {
+      static inline bool check() {return false;}
+    };
+
+    template<> struct is_int<int> {
+      static inline bool check() {return true;}
+    };
 
     // Traits for assign vector
     template<typename E, typename M> struct traits_assign_vector {
@@ -798,8 +813,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     GUESTOBJECT * from_ptr(const int *a) {
 #ifdef SWIGPYTHON
       return PyInt_FromLong(*a);
-#endif // SWIGPYTHON
+#elif defined(SWIGMATLAB)
+      return mxCreateDoubleScalar(static_cast<double>(*a));
+#else
       return 0;
+#endif
     }
   } // namespace casadi
  }
@@ -1475,6 +1493,27 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 %fragment("casadi_pair", "header", fragment="casadi_aux") {
   namespace casadi {
+#ifdef SWIGMATLAB
+    bool to_ptr(GUESTOBJECT *p, std::pair<int, int>** m) {
+      // (int,int) mapped to 2-by-1 double matrix
+      if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2 && !mxIsSparse(p)
+          && mxGetM(p)==1 && mxGetN(p)==2) {
+        double* data = static_cast<double*>(mxGetData(p));
+        int first = static_cast<int>(data[0]);
+        int second = static_cast<int>(data[1]);
+        if (data[0]==first && data[1]==second) {
+          if (m) **m = std::make_pair(first, second);
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      // No match
+      return false;
+    }
+#endif // SWIGMATLAB
+
     template<typename M1, typename M2> bool to_ptr(GUESTOBJECT *p, std::pair<M1, M2>** m) {
 #ifdef SWIGPYTHON
       if (PyTuple_Check(p) && PyTuple_Size(p)==2) {
@@ -1484,31 +1523,40 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 	  && to_val(p_second, m ? &(**m).second : 0);
       }
 #elif defined(SWIGMATLAB)
+      // Other overloads mapped to 2-by-1 cell array
       if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1 && mxGetN(p)==2) {
-	mxArray *p_first = mxGetCell(p, 0);
-	mxArray *p_second = mxGetCell(p, 1);
-	return to_val(p_first, m ? &(**m).first : 0)
-	  && to_val(p_second, m ? &(**m).second : 0);
+        mxArray *p_first = mxGetCell(p, 0);
+        mxArray *p_second = mxGetCell(p, 1);
+        return to_val(p_first, m ? &(**m).first : 0)
+          && to_val(p_second, m ? &(**m).second : 0);
       }
 #endif
       // No match
       return false;
     }
 
+#ifdef SWIGMATLAB
+    GUESTOBJECT* from_ptr(const std::pair<int, int>* a) {
+      // (int,int) mapped to 2-by-1 double matrix
+      mxArray* ret = mxCreateDoubleMatrix(1, 2, mxREAL);
+      double* data = static_cast<double*>(mxGetData(ret));
+      data[0] = a->first;
+      data[1] = a->second;
+      return ret;
+    }
+#endif // SWIGMATLAB
+
     template<typename M1, typename M2> GUESTOBJECT* from_ptr(const std::pair<M1, M2>* a) {
-      GUESTOBJECT* a_first = from_ref(a->first);
-      if (!a_first) return 0;
-      GUESTOBJECT* a_second = from_ref(a->second);
-      if (!a_second) return 0;
 #ifdef SWIGPYTHON
       PyObject* ret = PyTuple_New(2);
-      PyTuple_SetItem(ret, 0, a_first);
-      PyTuple_SetItem(ret, 1, a_second);
+      PyTuple_SetItem(ret, 0, from_ref(a->first));
+      PyTuple_SetItem(ret, 1, from_ref(a->second));
       return ret;
 #elif defined(SWIGMATLAB)
+      // Other overloads mapped to 2-by-1 cell array
       mxArray* ret = mxCreateCellMatrix(1, 2);
-      mxSetCell(ret, 0, a_first);
-      mxSetCell(ret, 1, a_second);
+      mxSetCell(ret, 0, from_ref(a->first));
+      mxSetCell(ret, 1, from_ref(a->second));
       return ret;
 #else
       return 0;
@@ -2168,6 +2216,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_template("[bool]", SWIG_TYPECHECK_BOOL, std::vector<bool>)
 %casadi_template("[[bool]]", SWIG_TYPECHECK_BOOL, std::vector<std::vector<bool> >)
 %casadi_typemaps("int", SWIG_TYPECHECK_INTEGER, int)
+%casadi_template("(int,int)", SWIG_TYPECHECK_INTEGER, std::pair<int,int>)
 %casadi_template("[int]", PREC_IVector, std::vector<int>)
 %casadi_template("[[int]]", PREC_IVectorVector, std::vector<std::vector<int> >)
 %casadi_typemaps("double", SWIG_TYPECHECK_DOUBLE, double)
@@ -2202,31 +2251,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_input_typemaps("Callback", PREC_CALLBACK, casadi::Callback)
 %casadi_template("Dict", PREC_DICT, std::map<std::string, casadi::GenericType>)
 
-%template() std::vector<unsigned char>;
-
-#ifndef SWIGMATLAB
-%template() std::pair<int,int>;
-%template() std::vector< std::pair<int,int> >;
-#endif // SWIGMATLAB
-
-
 %{
 using namespace casadi;
 %}
-
-#ifdef SWIGMATLAB
-%typemap(out) std::pair<int, int> {
-  $result = mxCreateDoubleMatrix(1, 2, mxREAL);
-  double* data = static_cast<double*>(mxGetData($result));
-  data[0] = $1.first;
-  data[1] = $1.second;
-}
-
-// The natural way to represent an integer in MATLAB is as a double
-%typemap(out) int {
-  $result = mxCreateDoubleScalar($1);
-}
-#endif // SWIGMATLAB
 
 #ifdef SWIGPYTHON
 %pythoncode %{
