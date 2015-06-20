@@ -3231,7 +3231,7 @@ MatType project(const MatType& A, const Sparsity& sp, bool intersect=false);
 
 %define MATRIX_DECL(MatType...)
 MatType adj(const MatType& A);
-MatType getMinor(const MatType &x, int i, int j);
+MatType minor(const MatType &x, int i, int j);
 MatType cofactor(const MatType &x, int i, int j);
 void qr(const MatType& A, MatType& OUTPUT, MatType& OUTPUT);
 //MatType all(const MatType &x);
