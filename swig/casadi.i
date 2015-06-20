@@ -3175,7 +3175,6 @@ std::vector< MatType > diagsplit(const MatType& x, const std::vector<int>& outpu
 std::vector< MatType > diagsplit(const MatType& x, int incr=1);
 std::vector< MatType > diagsplit(const MatType& x, int incr1, int incr2);
 MatType veccat(const std::vector< MatType >& x);
-MatType vecNZcat(const std::vector< MatType >& x);
 MatType mul(const MatType &x, const MatType &y);
 MatType mul(const MatType &x, const MatType &y, const MatType &z);
 MatType mul(const std::vector< MatType > &args);

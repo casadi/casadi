@@ -214,23 +214,6 @@ class Matrixtests(casadiTestCase):
     B = A[0,[0,2,1]]
     self.checkarray(DMatrix([1,3,2]).T,B,"non-monotonous")
     
-  def test_vecNZcat(self):
-    self.message("vecNZcat")
-    A = DMatrix(2,3)
-    A[0,1] = 2
-    A[1,0] = 1
-    A[1,2] = 3
-    B = DMatrix(3,1)
-    B[0,0] = 4
-    B[1,0] = 5
-    B[2,0] = 6
-    C = vecNZcat([A,B])
-    
-    self.checkarray(C.shape,(6,1),"vecNZcat shape")
-    self.assertEqual(C.nnz(),A.nnz()+B.nnz(),"vecNZcat size")
-    
-    self.checkarray(tuple(C.nonzeros()),tuple(arange(1,7)),"numbers shape")
-    
   def test_IMatrix_indexing(self):
     self.message("IMatrix")
     A = IMatrix(2,2)

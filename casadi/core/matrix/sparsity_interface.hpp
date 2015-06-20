@@ -306,7 +306,6 @@ namespace casadi {
     std::vector< std::vector< MatType > >
       zz_blocksplit(const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) const;
     static MatType zz_veccat(const std::vector< MatType >& x);
-    static MatType zz_vecNZcat(const std::vector< MatType >& x);
     MatType zz_vec() const;
     MatType zz_repmat(int n, int m=1) const;
     static std::vector<int> zz_offset(const std::vector< MatType > &v, bool vert=true);
@@ -580,11 +579,6 @@ namespace casadi {
       return MatType::zz_veccat(x);
     }
 
-    /** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
-    inline friend MatType vecNZcat(const std::vector< MatType >& x) {
-      return MatType::zz_vecNZcat(x);
-    }
-
     /** \brief Matrix product of two matrices:  */
     inline friend MatType mul(const MatType &X, const MatType &Y) {
       return X.zz_mtimes(Y);
@@ -736,16 +730,6 @@ namespace casadi {
     for (typename std::vector< MatType >::iterator it=x_vec.begin();
          it!=x_vec.end(); ++it) {
       *it = vec(*it);
-    }
-    return vertcat(x_vec);
-  }
-
-  template<typename MatType>
-  MatType SparsityInterface<MatType>::zz_vecNZcat(const std::vector< MatType >& x) {
-    std::vector< MatType > x_vec = x;
-    for (typename std::vector< MatType >::iterator it=x_vec.begin();
-         it!=x_vec.end(); ++it) {
-      *it = vecNZ(*it);
     }
     return vertcat(x_vec);
   }
