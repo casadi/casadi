@@ -311,7 +311,7 @@ class NLPtests(casadiTestCase):
     sigma=SX.sym("sigma")
     lambd=SX.sym("lambd")
     h=SXFunction(hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd),
-                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(nlp.outputExpr("g"),vertcat([x,y]))))
+                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))[0]+lambd*hessian(nlp.outputExpr("g"),vertcat([x,y]))[0]))
     h.init()
     h.setInput([0.5,0.5])
     h.setInput(-40,1)
@@ -487,7 +487,7 @@ class NLPtests(casadiTestCase):
     sigma=SX.sym("sigma")
     lambd=SX.sym("lambd")
     h=SXFunction(hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd,p=p),
-                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(nlp.outputExpr("g"),vertcat([x,y]))))
+                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))[0]+lambd*hessian(nlp.outputExpr("g"),vertcat([x,y]))[0]))
 
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -567,7 +567,7 @@ class NLPtests(casadiTestCase):
     sigma=SX.sym("sigma")
     
     h=SXFunction(hessLagIn(x=vertcat([x,y]),lam_f=sigma),
-                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))))
+                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))[0]))
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = NlpSolver(Solver, nlp)
@@ -663,7 +663,7 @@ class NLPtests(casadiTestCase):
     sigma=SX.sym("sigma")
     
     h=SXFunction(hessLagIn(x=vertcat([x,y]),p=p,lam_f=sigma),
-                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))))
+                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))[0]))
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = NlpSolver(Solver, nlp)

@@ -1760,17 +1760,14 @@ namespace casadi {
   }
 
   MX MX::zz_hessian(const MX &arg) const {
-    MX H, g;
-    hessian(*this, arg, H, g);
-    return H;
+    MX g;
+    return hessian(*this, arg, g);
   }
 
-  void MX::zz_hessian(const MX &arg, MX &H, MX &g) const {
+  MX MX::zz_hessian(const MX &arg, MX &g) const {
     g = gradient(*this, arg);
-
-    MXFunction temp(make_vector(arg), make_vector(g)); // make a runtime
-    temp.init();
-    H = temp.jac(0, 0, false, true);
+    MXFunction gfcn("gfcn", make_vector(arg), make_vector(g));
+    return gfcn.jac(0, 0, false, true);
   }
 
   MX MX::zz_det() const {

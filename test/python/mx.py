@@ -2683,7 +2683,8 @@ class MXtests(casadiTestCase):
 
 
     for fun in [lambda x: x[0]*x[1],lambda x: x[0]*sin(x[1])]:
-      for op in [c.gradient, jacobian, hessian]:
+      def hessian1(f, x): return hessian(f, x)[0]
+      for op in [c.gradient, jacobian, hessian1]:
         print fun, op
         x = MX.sym("x",2)
         print fun(x)

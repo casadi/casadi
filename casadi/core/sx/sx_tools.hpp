@@ -163,11 +163,15 @@ namespace casadi {
   inline SX jacobian(const SX &ex, const SX &arg) { return ex.zz_jacobian(arg);}
   inline SX gradient(const SX &ex, const SX &arg) { return ex.zz_gradient(arg);}
   inline SX tangent(const SX &ex, const SX &arg) { return ex.zz_tangent(arg);}
-  inline SX hessian(const SX &ex, const SX &arg) { return ex.zz_hessian(arg);}
+  ///@}
 
-  // Hessian and gradient:
-  inline void hessian(const SX &ex, const SX &arg, SX &H, SX &g) {
-    return ex.zz_hessian(arg, H, g);
+  ///@{
+  // Hessian and (optionally) gradient
+#ifndef SWIG
+  inline SX hessian(const SX &ex, const SX& arg) { return ex.zz_hessian(arg);}
+#endif // SWIG
+  inline SX hessian(const SX &ex, const SX& arg, SX& SWIG_OUTPUT(g)) {
+    return ex.zz_hessian(arg, g);
   }
   ///@}
 

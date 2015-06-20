@@ -1394,17 +1394,15 @@ namespace casadi {
 
   template<>
   SX SX::zz_hessian(const SX &arg) const {
-    SX H, g;
-    hessian(*this, arg, H, g);
-    return H;
+    SX g;
+    return hessian(*this, arg, g);
   }
 
   template<>
-  void SX::zz_hessian(const SX &arg, SX &H, SX &g) const {
+  SX SX::zz_hessian(const SX &arg, SX &g) const {
     g = gradient(*this, arg);
-
-    SXFunction temp("temp", make_vector(arg), make_vector(g)); // make a runtime
-    H = temp.jac(0, 0, false, true);
+    SXFunction gfcn("gfcn", make_vector(arg), make_vector(g)); // make a runtime
+    return gfcn.jac(0, 0, false, true);
   }
 
   template<>
