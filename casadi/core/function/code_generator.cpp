@@ -305,11 +305,13 @@ namespace casadi {
   }
 
   void CodeGenerator::auxSq() {
-    auxiliaries_ << "d sq(d x) { return x*x;}" << endl << endl;
+    auxiliaries_ << "d casadi_sq(d x) { return x*x;}" << endl;
+    auxiliaries_ << "#define sq(x) casadi_sq(x)" << endl << endl;
   }
 
   void CodeGenerator::auxSign() {
-    auxiliaries_ << "d sign(d x) { return x<0 ? -1 : x>0 ? 1 : x;}" << endl << endl;
+    auxiliaries_ << "d casadi_sign(d x) { return x<0 ? -1 : x>0 ? 1 : x;}" << endl;
+    auxiliaries_ << "#define sign(x) casadi_sign(x)" << endl << endl;
   }
 
   void CodeGenerator::printConstant(std::ostream& s, double v) {

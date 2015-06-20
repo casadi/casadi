@@ -474,7 +474,7 @@ class ADtests(casadiTestCase):
     print f.input().shape
     J=f.jacobian(0,0)
     
-    
+  @memory_heavy()
   def test_MX(self):
 
     x = MX.sym("x",2)

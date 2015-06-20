@@ -96,6 +96,7 @@ class typemaptests(casadiTestCase):
       
       
   def test_setget(self):
+    return # get/set with return-by-reference has been dropped
     self.message("DMatrix set/get")
     data = n.array([3,2.3,8])
     dm=DMatrix(Sparsity(3,4,[0,0,2,3,3],[0,2,0]),[3,2.3,8])
@@ -608,10 +609,12 @@ class typemaptests(casadiTestCase):
     B = matrix([[4.0,5],[6,7]])
     
     w.set(A)
-    w.get(B.T)
+
+    B = np.array(w.get()).reshape(B.shape)
     
     self.checkarray(B.T,A,"get")
     
+
   def test_setgetslice(self):
     self.message("set/get on DMatrix using slices")
     
@@ -868,18 +871,22 @@ class typemaptests(casadiTestCase):
     
   def test_matrices(self):
 
-    from scipy.sparse import csc_matrix
-
-
-    for D in [    
-          csc_matrix(([1.0,3.0,2.0,4.0],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.double),
-          csc_matrix(([1,3,2,4],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.int),
+    Ds = [    
           numpy.matrix([[1,2],[3,4]]),
           numpy.matrix([[1,2],[3,4.0]]),
           numpy.array([[1,2],[3,4]]),
           numpy.array([[1,2],[3,4.0]]),
+        ]
+        
+    if scipy_available:
+      Ds+=[
+          csc_matrix(([1.0,3.0,2.0,4.0],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.double),
+          csc_matrix(([1,3,2,4],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.int),
           DMatrix([[1,2],[3,4]]).toCsc_matrix()
-        ]:
+      ]
+
+
+    for D in Ds:
       print D
       d = DMatrix.ones(2,2)
       
@@ -910,6 +917,29 @@ class typemaptests(casadiTestCase):
     self.assertTrue(isinstance(a,list))
     for i in a:
       self.assertTrue(isinstance(i,str))
-      
+
+  def test_issue1373(self):
+    print np.array(casadi.DMatrix([2]))
+    print np.array(casadi.DMatrix([1,2,3.0]))
+
+  def test_None(self):
+    self.assertFalse(None==DMatrix(3))
+    x = SX.sym('x')
+    f = SXFunction([x],[x])
+    f.setOption('verbose', None)
+
+    b = atleast_2d(None)
+    with self.assertRaises(NotImplementedError):
+      c = repmat(b, 1, 1)
+  
+  def test_SXtypemap_bug(self):
+    x = casadi.SX.sym("x",3)
+    print "x =", repr(x), "\n"
+    print "array(x) =", repr(np.array(x)), "\n"
+    print "SX(array(x)) =", repr(casadi.SX(np.array(x))), "\n"
+    sx = casadi.SX(np.array(x))
+    self.assertTrue(sx[0] == x[0] )
+    self.assertTrue(sx[1] == x[1] )
+    self.assertTrue(sx[2] == x[2] )
 if __name__ == '__main__':
     unittest.main()

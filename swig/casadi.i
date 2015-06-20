@@ -114,6 +114,19 @@ def _swig_repr(self):
 %}
 #endif // WITH_SWIGPYTHON
 
+#ifdef SWIGMATLAB
+%matlabsetup %{
+
+disect_path = strsplit(mfilename('fullpath'),filesep);
+libpath = strjoin(disect_path(1:end-1),filesep);
+
+import casadi.*
+
+CasadiOptions.setCasadiPath(libpath);
+
+%}
+#endif
+
 #ifdef SWIGPYTHON
 %include "doc_merged.i"
 #else
@@ -727,6 +740,16 @@ void dummy2(
 
 #ifdef SWIGPYTHON
 %pythoncode %{
+if __name__ != "casadi.casadi":
+  raise Exception("""
+            CasADi is not running from its package context.
+
+            You probably specified the wrong casadi directory.
+
+            When setting PYTHONPATH or sys.path.append,
+            take care not to add a trailing '/casadi'.
+                        
+        """)
 import _casadi
 %}
 #endif // SWIGPYTHON

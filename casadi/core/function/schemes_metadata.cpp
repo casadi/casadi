@@ -193,9 +193,9 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_SOCPInput:
       return "g, h, e, f, c, a, lba, uba, lbx, ubx";
     case SCHEME_SOCPOutput:
-      return "x, cost, lam_a, lam_x";
+      return "x, cost, dual_cost, lam_a, lam_x, lam_cone";
     case SCHEME_SOCPStruct:
-      return "g, a";
+      return "g, e, a";
     case SCHEME_StabilizedQpSolverInput:
       return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu";
   default: casadi_error("getSchemeName: Scheme '" << scheme <<  "' does not exist.");
@@ -521,12 +521,15 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
     case SCHEME_SOCPOutput:
       if (i==0) return "x";
       if (i==1) return "cost";
-      if (i==2) return "lam_a";
-      if (i==3) return "lam_x";
+      if (i==2) return "dual_cost";
+      if (i==3) return "lam_a";
+      if (i==4) return "lam_x";
+      if (i==5) return "lam_cone";
       break;
     case SCHEME_SOCPStruct:
       if (i==0) return "g";
-      if (i==1) return "a";
+      if (i==1) return "e";
+      if (i==2) return "a";
       break;
     case SCHEME_StabilizedQpSolverInput:
       if (i==0) return "h";
@@ -855,7 +858,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_SOCPInput:
       if (i==0) return "The horizontal stack of all matrices Gi: ( n x N)";  // NOLINT(whitespace/line_length)
       if (i==1) return "The vertical stack of all vectors hi: ( N x 1)";  // NOLINT(whitespace/line_length)
-      if (i==2) return "The vertical stack of all vectors ei: ( nm x 1)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The horizontal stack of all vectors ei: ( n x m)";  // NOLINT(whitespace/line_length)
       if (i==3) return "The vertical stack of all scalars fi: ( m x 1)";  // NOLINT(whitespace/line_length)
       if (i==4) return "The vector c: ( n x 1)";  // NOLINT(whitespace/line_length)
       if (i==5) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
@@ -867,12 +870,15 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_SOCPOutput:
       if (i==0) return "The primal solution (n x 1)";  // NOLINT(whitespace/line_length)
       if (i==1) return "The primal optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
-      if (i==2) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
-      if (i==3) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The dual optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
+      if (i==3) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==4) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==5) return "The dual solution correspoding to cone (2-norm) constraints (m x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SOCPStruct:
       if (i==0) return "The horizontal stack of all matrices Gi: ( n x N)";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The horizontal stack of all vectors ei: ( n x m)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_StabilizedQpSolverInput:
       if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
@@ -1213,12 +1219,15 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
     case SCHEME_SOCPOutput:
       if (i==0) return "SOCP_SOLVER_X";
       if (i==1) return "SOCP_SOLVER_COST";
-      if (i==2) return "SOCP_SOLVER_LAM_A";
-      if (i==3) return "SOCP_SOLVER_LAM_X";
+      if (i==2) return "SOCP_SOLVER_DUAL_COST";
+      if (i==3) return "SOCP_SOLVER_LAM_A";
+      if (i==4) return "SOCP_SOLVER_LAM_X";
+      if (i==5) return "SOCP_SOLVER_LAM_CONE";
       break;
     case SCHEME_SOCPStruct:
       if (i==0) return "SOCP_STRUCT_G";
-      if (i==1) return "SOCP_STRUCT_A";
+      if (i==1) return "SOCP_STRUCT_E";
+      if (i==2) return "SOCP_STRUCT_A";
       break;
     case SCHEME_StabilizedQpSolverInput:
       if (i==0) return "STABILIZED_QP_SOLVER_H";
@@ -1399,10 +1408,10 @@ int getSchemeSize(InputOutputScheme scheme) {
       return 10;
       break;
     case SCHEME_SOCPOutput:
-      return 4;
+      return 6;
       break;
     case SCHEME_SOCPStruct:
-      return 2;
+      return 3;
       break;
     case SCHEME_StabilizedQpSolverInput:
       return 12;
@@ -1730,12 +1739,15 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
     case SCHEME_SOCPOutput:
       if (name=="x") return 0;
       if (name=="cost") return 1;
-      if (name=="lam_a") return 2;
-      if (name=="lam_x") return 3;
+      if (name=="dual_cost") return 2;
+      if (name=="lam_a") return 3;
+      if (name=="lam_x") return 4;
+      if (name=="lam_cone") return 5;
       break;
     case SCHEME_SOCPStruct:
       if (name=="g") return 0;
-      if (name=="a") return 1;
+      if (name=="e") return 1;
+      if (name=="a") return 2;
       break;
     case SCHEME_StabilizedQpSolverInput:
       if (name=="h") return 0;

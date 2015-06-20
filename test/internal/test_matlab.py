@@ -35,7 +35,7 @@ t = TestSuite(dirname=src,
   skipdirs=[".svn","ctemplate"],
    inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
     args=sys.argv[2:],
-   stderr_trigger=["Error(?! unsubscribing to signals)",r"\?\?\?"],
+   stderr_trigger=["Error(?! unsubscribing to signals)",r"\?\?\?",r"Undefined"],
    check_depreciation=True
    )
   

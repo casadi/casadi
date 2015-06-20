@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.6)
 project(casadi C CXX)
 set(PACKAGE_NAME "CasADi")
-set(PACKAGE_VERSION "2.3.0-rc1")
+set(PACKAGE_VERSION "2.3.0-rc2")
 set(PACKAGE_SO_VERSION "2.3")
 set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differentation and numeric optimization")
 set(PACKAGE_AUTHOR "Joel Andersson")
@@ -65,6 +65,7 @@ option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" ON)
 option(WITH_DSDP "Compile the interface to DSDP" ON)
+option(WITH_MOSEK "Compile the interface to MOSEK" OFF)
 option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
@@ -82,6 +83,7 @@ option(WITH_JSON "Compile the JSON front-end" OFF)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside Python front-end" OFF)
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
 option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" OFF)
+option(WITH_SELFCONTAINED "Make the install directory self-contained" OFF)
 
 # static on windows, shared on linux/osx by default
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -157,6 +159,10 @@ endif()
 ############################################################
 ######################## rpath #############################
 ############################################################
+
+if(WITH_SELFCONTAINED)
+set(CMAKE_INSTALL_RPATH "$ORIGIN")
+else()
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
@@ -175,7 +181,7 @@ list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib"
 if("${isSystemDir}" STREQUAL "-1")
    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib/casadi")
 endif("${isSystemDir}" STREQUAL "-1")
-
+endif()
 
 
 # For code optimization
@@ -409,6 +415,14 @@ if(WITH_DSDP)
 endif()
 add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP.")
 
+# MOSEK
+if(WITH_MOSEK)
+  # try to find system mosek
+  find_package(MOSEK)
+endif()
+add_feature_info(mosek-interface MOSEK_FOUND "Interface to the interior point SOCP solver MOSEK.")
+
+
 # Use the included qpOASES
 if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
   set(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
@@ -479,10 +493,10 @@ endif()
 add_feature_info(slicot-interface SLICOT_FOUND "Interface to the controls library SLICOT.")
 
 
-if(WITH_WORHP AND LIBXML2_FOUND  AND WSMP_FOUND AND METIS_FOUND AND BLAS_FOUND AND LAPACK_FOUND)
+if(WITH_WORHP)
   find_package(WORHP)
 endif()
-add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp (requires LibXml2, wsmp, metis, blas, lapack).")
+add_feature_info(worhp-interface WORHP_FOUND "Interface to the NLP solver Worhp (requires gfortran, gomp).")
 
 
 if(WITH_PROFILING)

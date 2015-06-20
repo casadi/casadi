@@ -30,12 +30,35 @@ import sys
 import re
 import itertools
 import json
+import time
 
 my_module = sys.argv[2]
 
+t0 = time.time()
+
+removed = 0
+bag = dict()
 # Parse the input XML
-e = etree.parse(sys.argv[1])
-r = e.getroot()
+#e = etree.parse(sys.argv[1])
+e = etree.iterparse(sys.argv[1],events=('end',))
+for event, elem in e:
+  if not elem.tag in bag:
+    bag[elem.tag] = 1
+  else:
+    bag[elem.tag]+=1
+  if elem.tag=='top':
+    r = elem
+  else:
+    if elem.tag in ['typescopesitem']:
+      removed+=1
+      elem.clear()
+      while elem.getprevious() is not None:
+        del elem.getparent()[0]
+
+print bag
+print removed
+
+#r = e.getroot()
 
 def getAttribute(e,name,default=""):
   d = e.find('attributelist/attribute[@name="' + name + '"]')
@@ -61,6 +84,9 @@ def isInternal(d,msg=None):
 #  return "[INTERNAL]" in v
 #  return not (("_EXPORT" in v) and ("CASADI_" in v))
 
+print "elpased", time.time()-t0
+t0 = time.time()
+print "get all the enums"
 # get all the enums
 enums = {}
 for d in r.findall('*//enum'):
@@ -149,7 +175,9 @@ def getCanonicalParams(d,debug=""):
       params.append( getCanonicalType(x.attrib['value']) )
 
   return params
-
+print "elpased", time.time()-t0
+t0 = time.time()
+print "classes0"
 for name,c in classes0.items():
   docs = getDocstring(c)
   if name in classes:
@@ -222,7 +250,9 @@ for name,c in classes0.items():
     base = d.attrib["name"]
     #if isInternal(d,msg="bases"): continue
     data["bases"].append( getCanonicalType( base ) )
-
+print "elpased", time.time()-t0
+t0 = time.time()
+print "classes"
 for n,c in classes.items():
   new_bases = []
   for base in c['bases']:
@@ -287,7 +317,9 @@ def getAllMethods(name,base=None):
     ret = ret + getAllMethods(b,base)
 
   return ret
-
+print "elpased", time.time()-t0
+t0 = time.time()
+print "classes2"
 myclasses = []
 for k,v in classes.items():
   methods = []
@@ -296,10 +328,14 @@ for k,v in classes.items():
       methods.append({"methodName": name, "methodReturn": rettype, "methodParams": pars, "methodKind": mkind,"methodDocs":"","methodDocslink":""})
 
   treedata["treeClasses"].append({"classType": k, "classMethods": methods, "classDocs": v['docs'],"classDocslink":""})
-
+print "elpased", time.time()-t0
+t0 = time.time()
+print "functions"
 for (name,pars,rettype,docs) in functions:
   treedata["treeFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":docs,"funDocslink":""})
-
+print "elpased", time.time()-t0
+t0 = time.time()
+print "enums"
 for k,v in enums.items():
   treedata["treeEnums"][k] = {
     "enumDocs": v['docs'],
@@ -318,5 +354,10 @@ print "%5d classes %5d functions %5d enums" % (len(treedata['treeClasses']),
 #print "functions:    %5d exposed %5d internal" % (len(functions),         numInternalFunctions)
 
 treedata["treeInheritance"] = dict((k, [i for i in v["bases"]]) for k,v in classes.items())
+print "elpased", time.time()-t0
+t0 = time.time()
 
+print "dump"
 json.dump(treedata,file(my_module+'.json','w'),indent=True)
+print "elpased", time.time()-t0
+t0 = time.time()

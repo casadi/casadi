@@ -40,7 +40,7 @@ except:
   pass
   
 
-class NLPtests(casadiTestCase):
+class HomotopyNLPtests(casadiTestCase):
 
   def test_simple(self):
     x = SX.sym("x")

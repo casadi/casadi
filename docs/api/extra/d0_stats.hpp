@@ -177,6 +177,30 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::MosekSocpInterface
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>problem_status</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>solution_status</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>termination_reason</td><td>casadi::MosekSocpInterface</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_SocpSolver_mosek
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th></tr>
+<tr><td>problem_status</td></tr>
+<tr><td>solution_status</td></tr>
+<tr><td>termination_reason</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::Newton
 \n
 \par

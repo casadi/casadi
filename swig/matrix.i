@@ -234,9 +234,10 @@ PyObject* arrayView() {
         raise Expection("toArray(shared=True) only possible for dense arrays.")
       return self.arrayView()
     else:
-      r = n.zeros((self.size1(),self.size2()))
-      self.get(r)
-      return r
+      if isinstance(self,IMatrix):
+        return n.array(self.get(),n.int).reshape((self.shape[1],self.shape[0])).T
+      else:    
+        return n.array(self.get()).reshape((self.shape[1],self.shape[0])).T
 %}
 
 %python_array_wrappers(999.0)

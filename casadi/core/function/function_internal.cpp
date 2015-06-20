@@ -2041,6 +2041,10 @@ namespace casadi {
     // Add standard math
     gen.addInclude("math.h");
 
+    // Add auxiliaries. TODO: Only add the auxiliaries that are actually used
+    gen.addAuxiliary(CodeGenerator::AUX_SQ);
+    gen.addAuxiliary(CodeGenerator::AUX_SIGN);
+
     // Generate declarations
     generateDeclarations(stream, type, gen);
 

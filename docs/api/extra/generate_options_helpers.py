@@ -32,9 +32,12 @@ def optionDocumented(name,cl,metadata):
   return False
   
 def extra(metadata,i,iname):
+  print "Adding to ", metadata
   for name in i.getOptionNames():
+    print "found option", name
     if optionDocumented(name,"casadi::%s" % iname,metadata):
       continue
+    print "Adding it."
     meta = metadata["casadi::%s" % iname]["options"][name] = dict()
     meta['name'] = name
     meta['type'] = i.getOptionTypeName(name)
@@ -46,43 +49,42 @@ def extra(metadata,i,iname):
     except:
       meta['default'] = ''
       pass #too bad
+    print meta
 
 def addExtra(metadata):
+  
+  print "Adding extra"
 
   x=SX.sym("x")
   f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
   f.init()
-  try:
-    NlpSolver.loadPlugin("ipopt")
-    i = NlpSolver("ipopt", f)
-    extra(metadata,i,"IpoptInterface")
-  except Exception as e:
-    print e 
   
+  NlpSolver.loadPlugin("ipopt")
+  i = NlpSolver("ipopt", f)
+  extra(metadata,i,"IpoptInterface")
+
   x=SX.sym("x")
   f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
   f.init()
-  try:
-    NlpSolver.loadPlugin("worhp")
-    i = NlpSolver("worhp", f)
-    extra(metadata,i,"WorhpInterface")
-  except Exception as e:
-    print e
-    
+  NlpSolver.loadPlugin("worhp")
+  i = NlpSolver("worhp", f)
+  extra(metadata,i,"WorhpInterface")
+
   x=SX.sym("x")
   f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
   f.init()
-  try:
-    NlpSolver.loadPlugin("snopt")
-    i = NlpSolver("snopt", f)
-    extra(metadata,i,"SnoptInterface")
-  except Exception as e:
-    print e
+  NlpSolver.loadPlugin("snopt")
+  i = NlpSolver("snopt", f)
+  extra(metadata,i,"SnoptInterface")
+
+  i = QpSolver("qpoases", qpStruct(h=Sparsity.dense(3,3),a=Sparsity.dense(1,3)))
+  extra(metadata,i,"QpoasesInterface")
  
-  try:
-    i = QpSolver("qpoases", qpStruct(h=Sparsity.dense(3,3),a=Sparsity.dense(1,3)))
-    extra(metadata,i,"QpoasesInterface")
-  except Exception as e:
-    print e
-    
+  G = sparsify(DMatrix([[1,0],[0,1]])).T
+  E = sparsify(DMatrix([0,0]))
+
+  A = DMatrix(0,2)
+
+  i = SocpSolver("mosek", socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
+  extra(metadata,i,"MosekSocpInterface")
 

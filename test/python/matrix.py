@@ -634,9 +634,8 @@ class Matrixtests(casadiTestCase):
     self.message("sparsesym")
     D = DMatrix([[1,2,-3],[2,-1,0],[-3,0,5]])
     D = sparsify(D)
-    i = DVector([0]*5)
     
-    D.getSym(i)
+    i = D.getSym()
     #self.checkarray(list(i),[1,2,-1,-3,5])
     A = 2*D
     A.setSym(i)

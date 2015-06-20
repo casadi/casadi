@@ -21,12 +21,13 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import *
+
 import casadi as c
 from numpy import *
 import unittest
 from types import *
 from helpers import *
+from casadi import *
 
 scipy_available = True
 try:
@@ -77,8 +78,10 @@ class SXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: a[0]+a[1],lambda a: a[0]+a[1],"Matrix+Matrix")
     self.matrixbinarypool.append(lambda a: a[0]-a[1],lambda a: a[0]-a[1],"Matrix-Matrix")
     self.matrixbinarypool.append(lambda a: a[0]*a[1],lambda a: a[0]*a[1],"Matrix*Matrix")
+    self.matrixbinarypool.append(lambda a: fmax(a[0],a[1]),lambda a: fmax(a[0],a[1]),"fmin")
+    self.matrixbinarypool.append(lambda a: fmin(a[0],a[1]),lambda a: fmin(a[0],a[1]),"fmax")
     #self.matrixbinarypool.append(lambda a: inner_prod(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="inner_prod(Matrix,Matrix)") 
-    self.matrixbinarypool.append(lambda a: mul(a[0],a[1].T),lambda a: dot(a[0],a[1].T),"dot(Matrix,Matrix.T)")
+    self.matrixbinarypool.append(lambda a: mul(a[0],a[1].T),lambda a: np.dot(a[0],a[1].T),"dot(Matrix,Matrix.T)")
 
     #self.pool.append(lambda x: erf(x[0]),erf,"erf") # numpy has no erf
     
@@ -210,6 +213,16 @@ class SXtests(casadiTestCase):
       y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SX")
       self.assertRaises(RuntimeError, lambda : mul(x,y))
+
+      
+  def test_DMatrixbinary(self):
+      self.message("SX binary operations")
+      x=SX.sym("x",3,2)
+      y=SX.sym("x",3,2)
+      x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
+      y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
+      for f,fr,label,flags in self.matrixbinarypool.zip():
+        self.checkarray(f(vertcat([x0,y0])),fr(vertcat([x0,y0])),label)
 
   def test_SXbinarySparse(self):
       self.message("SX binary operations")

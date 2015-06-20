@@ -176,10 +176,15 @@
 }
 %enddef
 
-%fragment("conv_constref", "header") {
+%fragment("conv_constref", "header", fragment="is_a") {
   template<typename T>
   bool conv_constref(GUESTOBJECT *p, T* &ptr, T &m, swig_type_info *type, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
-    if (SWIG_ConvertPtr(p, (void **)&ptr, type, 0) == -1) {
+    if (is_null(p)) {
+      m = T();
+      ptr = &m;
+      return true;
+    }
+    if (!is_null(p) && SWIG_ConvertPtr(p, (void **)&ptr, type, 0) == -1) {
       if (!f(p, &m, 0)) return false;
       ptr = &m;
     }
@@ -439,13 +444,13 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %}
 #endif // SWIGPYTHON
 
-%fragment("try_copy", "header") {
+%fragment("try_copy", "header", fragment="is_a") {
   template<typename FromType>
   struct CopyTraits {
     template<typename ToType>
     static bool try_copy(GUESTOBJECT *p, swig_type_info *type, ToType* m) {
       FromType *mp = 0;
-      if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
+      if (!is_null(p) && SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
         if (m) *m=*mp;
         return true;
       }

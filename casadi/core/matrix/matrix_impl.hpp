@@ -2177,9 +2177,18 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_horzcat(const std::vector<Matrix<DataType> > &v) {
-    Matrix<DataType> ret;
-    for (int i=0; i<v.size(); ++i)
-      ret.appendColumns(v[i]);
+    // Concatenate sparsity patterns
+    std::vector<Sparsity> sp(v.size());
+    for (int i=0; i<v.size(); ++i) sp[i] = v[i].sparsity();
+    Matrix<DataType> ret(horzcat(sp));
+
+    // Copy nonzeros
+    typename Matrix<DataType>::iterator i=ret.begin();
+    for (typename std::vector<Matrix<DataType> >::const_iterator j=v.begin();
+         j!=v.end(); ++j) {
+      std::copy(j->begin(), j->end(), i);
+      i += j->size();
+    }
     return ret;
   }
 
@@ -2209,10 +2218,9 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_vertcat(const std::vector<Matrix<DataType> > &v) {
-    Matrix<DataType> ret;
-    for (int i=0; i<v.size(); ++i)
-      ret.appendColumns(v[i].T());
-    return ret.T();
+    std::vector<Matrix<DataType> > vT(v.size());
+    for (int i=0; i<v.size(); ++i) vT[i] = v[i].T();
+    return horzcat(vT).T();
   }
 
   template<typename DataType>
@@ -2913,9 +2921,9 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::get(std::vector<double>& val, bool tr) const {
-    casadi_assert(val.size()==this->numel());
-    get(getPtr(val), tr);
+  void Matrix<DataType>::get(std::vector<double>& val) const {
+    val.resize(this->numel());
+    get(getPtr(val), false);
   }
 
   template<typename DataType>
@@ -2959,13 +2967,13 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::getNZ(std::vector<double>& val) const {
-    casadi_assert(val.size()==this->nnz());
+    val.resize(this->nnz());
     getNZ(getPtr(val));
   }
 
   template<typename DataType>
   void Matrix<DataType>::getSym(std::vector<double>& val) const {
-    casadi_assert(val.size()==this->sizeU());
+    val.resize(this->sizeU());
     getSym(getPtr(val));
   }
 

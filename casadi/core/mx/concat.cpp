@@ -141,13 +141,10 @@ namespace casadi {
 
 
   Diagcat::Diagcat(const std::vector<MX>& x) : Concat(x) {
-    // Construct the sparsity
-    casadi_assert(!x.empty());
-    std::vector<Sparsity> sp;
-    for (int i=0;i<x.size(); ++i) {
-      sp.push_back(x[i].sparsity());
-    }
-
+    casadi_assert(x.size()>1);
+    std::vector<Sparsity> sp(x.size());
+    for (int i=0; i<x.size(); ++i)
+      sp[i] = x[i].sparsity();
     setSparsity(diagcat(sp));
   }
 
@@ -196,14 +193,11 @@ namespace casadi {
   }
 
   Horzcat::Horzcat(const std::vector<MX>& x) : Concat(x) {
-    // Construct the sparsity
-    casadi_assert(!x.empty());
-    Sparsity sp = x.front().sparsity();
-    for (vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
-      sp.appendColumns(i->sparsity());
-    }
-
-    setSparsity(sp);
+    casadi_assert(x.size()>1);
+    std::vector<Sparsity> sp(x.size());
+    for (int i=0; i<x.size(); ++i)
+      sp[i] = x[i].sparsity();
+    setSparsity(horzcat(sp));
   }
 
   void Horzcat::printPart(std::ostream &stream, int part) const {
@@ -248,14 +242,11 @@ namespace casadi {
   }
 
   Vertcat::Vertcat(const std::vector<MX>& x) : Concat(x) {
-    // Construct the sparsity
-    casadi_assert(!x.empty());
-    Sparsity sp = x.front().sparsity();
-    for (vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
-      sp.append(i->sparsity());
-    }
-
-    setSparsity(sp);
+    casadi_assert(x.size()>1);
+    std::vector<Sparsity> sp(x.size());
+    for (int i=0; i<x.size(); ++i)
+      sp[i] = x[i].sparsity();
+    setSparsity(vertcat(sp));
   }
 
   void Vertcat::printPart(std::ostream &stream, int part) const {

@@ -69,7 +69,9 @@ def run(args, input=None, cwd = None, shell = False, kill_tree = True, timeout =
             signal(SIGALRM, alarm_handler)
         alarm(timeout)
     try:
+        t0 = time.time()
         stdout, stderr = p.communicate()
+        print "Ran for", time.time()-t0, "seconds."
         if timeout != -1:
             alarm(0)
     except Alarm:
@@ -223,9 +225,11 @@ class TestSuite:
 
     inp = None
     if callable(self.inputs):
-      self.inputs = self.inputs(dir,fn)
-    if fn in self.inputs:
-      inp = self.inputs[fn]
+      inputs = self.inputs(dir,fn)
+    else:
+      inputs = self.inputs
+    if fn in inputs:
+      inp = inputs[fn]
       
           
     alarm(60*60) # 1 hour
@@ -236,6 +240,7 @@ class TestSuite:
       raise Exception("Timout.")
     alarm(0) # Remove alarm
     t = time.clock() - t0
+    print "Ran for",t, "seconds"
     
     stderr_trigger = False
     for trigger in self.stderr_trigger:
@@ -278,6 +283,7 @@ class TestSuite:
       p=Popen(['valgrind','--leak-check=full']+supps+['--show-possibly-lost=no','--error-limit=no',"--gen-suppressions=all"]+self.command(dir,fn,self.passoptions),cwd=self.workingdir(dir),stdout=stdoutfile, stderr=PIPE, stdin=PIPE)
       f=Popen(['grep','-E','-C','50', "definitely lost|leaks|ERROR SUMMARY|Invalid write|casadi"],stdin=p.stderr,stdout=PIPE)
       p.stderr.close()
+      t0 = time.time()
       alarm(60*60) # 1 hour
       try:
         stdoutdata, stderrdata = f.communicate()
@@ -287,6 +293,7 @@ class TestSuite:
         killProcess(f.pid)
         raise Exception("Timeout.")
       alarm(0) # Remove alarm
+      print "Ran for", time.time()-t0, "seconds"
       m = re.search('definitely lost: (.*) bytes', stdoutdata)
       lost = "0"
       if m:

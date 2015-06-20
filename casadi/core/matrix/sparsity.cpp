@@ -1123,7 +1123,7 @@ namespace casadi {
 
   Sparsity Sparsity::zz_horzcat(const std::vector<Sparsity> & sp) {
     // Quick return if possible
-    if (sp.empty()) return Sparsity();
+    if (sp.empty()) return Sparsity(0, 0);
     if (sp.size()==1) return sp.front();
 
     // Count total nnz
@@ -1135,7 +1135,9 @@ namespace casadi {
     ret_row.reserve(nnz_total);
     ret_col.reserve(nnz_total);
     int ret_ncol = 0;
-    int ret_nrow = sp[0].size1();
+    int ret_nrow = 0;
+    for (int i=0; i<sp.size() && ret_nrow==0; ++i)
+      ret_nrow = sp[i].size1();
 
     // Append all patterns
     for (vector<Sparsity>::const_iterator i=sp.begin(); i!=sp.end(); ++i) {
@@ -1144,7 +1146,7 @@ namespace casadi {
       int sp_ncol = i->size2();
       const int* sp_colind = i->colind();
       const int* sp_row = i->row();
-      casadi_assert_message(sp_nrow==ret_nrow,
+      casadi_assert_message(sp_nrow==ret_nrow || sp_nrow==0,
                             "Sparsity::zz_horzcat: Mismatching number of rows");
 
       // Add entries to pattern
@@ -1191,7 +1193,9 @@ namespace casadi {
     ret_row.reserve(nnz_total);
     ret_col.reserve(nnz_total);
     int ret_nrow = 0;
-    int ret_ncol = sp[0].size2();
+    int ret_ncol = 0;
+    for (int i=0; i<sp.size() && ret_ncol==0; ++i)
+      ret_ncol = sp[i].size2();
 
     // Append all patterns
     for (vector<Sparsity>::const_iterator i=sp.begin(); i!=sp.end(); ++i) {
@@ -1200,7 +1204,7 @@ namespace casadi {
       int sp_ncol = i->size2();
       const int* sp_colind = i->colind();
       const int* sp_row = i->row();
-      casadi_assert_message(sp_ncol==ret_ncol,
+      casadi_assert_message(sp_ncol==ret_ncol || sp_ncol==0,
                             "Sparsity::zz_vertcat: Mismatching number of columns");
 
       // Add entries to pattern
