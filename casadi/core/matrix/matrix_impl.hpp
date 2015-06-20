@@ -2518,31 +2518,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_project(const Sparsity& sp) const {
-    // Check dimensions
-    if (!(isEmpty() && sp.numel()==0)) {
-      casadi_assert_message(size2()==sp.size2() && size1()==sp.size1(),
-                            "Shape mismatch. Expecting " << dimString() << ", but got " <<
-                            sp.dimString() << " instead.");
-    }
-
-    // Return value
-    Matrix<DataType> ret(sp, 0, false);
-
-    // Get the elements of the known matrix
-    std::vector<int> known_ind = sparsity().find();
-
-    // Find the corresponding nonzeros in the return matrix
-    sp.getNZ(known_ind);
-
-    // Set the element values
-    const std::vector<DataType>& A_data = data();
-    std::vector<DataType>& ret_data = ret.data();
-    for (int k=0; k<known_ind.size(); ++k) {
-      if (known_ind[k]!=-1) {
-        ret_data[known_ind[k]] = A_data[k];
-      }
-    }
-    return ret;
+    return setSparse(sp);
   }
 
   template<typename DataType>
