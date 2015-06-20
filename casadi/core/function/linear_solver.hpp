@@ -135,10 +135,12 @@ namespace casadi {
     /// Check if prepared
     bool prepared() const;
 
+#ifndef SWIG
     /** \brief Solve the system of equations <tt>Lx = b</tt>
         Only when a Cholesky factorization is available
     */
     void solveL(double* x, int nrhs, bool transpose);
+#endif // SWIG
 
     /** \brief Obtain a symbolic Cholesky factorization
         Only for Cholesky solvers
@@ -150,8 +152,10 @@ namespace casadi {
      */
     DMatrix getFactorization(bool transpose=false) const;
 
+#ifndef SWIG
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
+#endif // SWIG
 
     /// Check if a plugin is available
     static bool hasPlugin(const std::string& name);

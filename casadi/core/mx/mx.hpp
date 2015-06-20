@@ -449,9 +449,9 @@ namespace casadi {
     MX zz_polyval(const MX& x) const;
     std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
     static void zz_substituteInPlace(const std::vector<MX>& v,
-                                     std::vector<MX>& vdef, bool reverse=false);
+                                     std::vector<MX>& SWIG_INOUT(vdef), bool reverse=false);
     static void zz_substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef,
-                              std::vector<MX>& ex, bool reverse=false);
+                                     std::vector<MX>& SWIG_INOUT(ex), bool reverse=false);
     MX zz_substitute(const MX& v, const MX& vdef) const;
     static std::vector<MX> zz_substitute(const std::vector<MX> &ex,
                                          const std::vector<MX> &v,
@@ -460,13 +460,17 @@ namespace casadi {
     static std::vector<MX> zz_graph_substitute(const std::vector<MX> &ex,
                                                const std::vector<MX> &expr,
                                                const std::vector<MX> &exprs);
-    static void zz_extractShared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
+    static void zz_extractShared(std::vector<MX>& SWIG_INOUT(ex),
+                                 std::vector<MX>& SWIG_OUTPUT(v),
+                                 std::vector<MX>& SWIG_OUTPUT(vdef),
                                  const std::string& v_prefix="v_", const std::string& v_suffix="");
     MX zz_jacobian(const MX &arg) const;
     MX zz_gradient(const MX &arg) const;
     MX zz_tangent(const MX &arg) const;
     MX zz_hessian(const MX &arg) const;
+#ifndef SWIG
     void zz_hessian(const MX &arg, MX &H, MX &g) const;
+#endif // SWIG
     MX zz_det() const;
     MX zz_inv() const;
     bool zz_dependsOn(const MX &arg) const;
@@ -477,8 +481,7 @@ namespace casadi {
     static std::vector<MX> zz_matrix_expand(const std::vector<MX>& e,
                                             const std::vector<MX>& boundary = std::vector<MX>());
     MX zz_kron(const MX& b) const;
-    MX zz_solve(const MX& b, const std::string& lsolver,
-                const Dict& dict = Dict()) const;
+    MX zz_solve(const MX& b, const std::string& lsolver, const Dict& dict = Dict()) const;
     MX zz_pinv(const std::string& lsolver, const Dict& dict = Dict()) const;
     MX zz_nullspace() const;
     bool zz_isEqual(const MX& y, int depth=0) const;

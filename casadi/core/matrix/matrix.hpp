@@ -438,8 +438,8 @@ namespace casadi {
                                                         const std::vector<Matrix<DataType> >& v,
                                                         const std::vector<Matrix<DataType> >& vdef);
     static void zz_substituteInPlace(const std::vector<Matrix<DataType> >& v,
-                                     std::vector<Matrix<DataType> >& vdef,
-                                     std::vector<Matrix<DataType> >& ex,
+                                     std::vector<Matrix<DataType> >& SWIG_INOUT(vdef),
+                                     std::vector<Matrix<DataType> >& SWIG_INOUT(ex),
                                      bool reverse=false);
     Matrix<DataType> zz_spy() const;
     bool zz_dependsOn(const Matrix<DataType> &arg) const;
@@ -449,7 +449,9 @@ namespace casadi {
     Matrix<DataType> zz_gradient(const Matrix<DataType> &arg) const;
     Matrix<DataType> zz_tangent(const Matrix<DataType> &arg) const;
     Matrix<DataType> zz_hessian(const Matrix<DataType> &arg) const;
+#ifndef SWIG
     void zz_hessian(const Matrix<DataType> &arg, Matrix<DataType> &H, Matrix<DataType> &g) const;
+#endif // SWIG
     Matrix<DataType> zz_jacobianTimesVector(const Matrix<DataType> &arg, const Matrix<DataType> &v,
                                             bool transpose_jacobian=false) const;
     Matrix<DataType> zz_taylor(const Matrix<DataType>& x,
@@ -460,9 +462,9 @@ namespace casadi {
                                 const std::vector<int>& order_contributions) const;
     int zz_countNodes() const;
     std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
-    static void zz_extractShared(std::vector<Matrix<DataType> >& ex,
-                                 std::vector<Matrix<DataType> >& v,
-                                 std::vector<Matrix<DataType> >& vdef,
+    static void zz_extractShared(std::vector<Matrix<DataType> >& SWIG_INOUT(ex),
+                                 std::vector<Matrix<DataType> >& SWIG_OUTPUT(v),
+                                 std::vector<Matrix<DataType> >& SWIG_OUTPUT(vdef),
                                  const std::string& v_prefix="v_",
                                  const std::string& v_suffix="");
     Matrix<DataType> zz_poly_coeff(const Matrix<DataType>&x) const;

@@ -181,13 +181,9 @@ namespace casadi {
     std::vector<MX> getFree() const;
 
     /// \cond INTERNAL
-#ifndef SWIG
     /** \brief Extract the functions needed for the Lifted Newton method */
-    void generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn);
-#else
-    /** \brief Extract the functions needed for the Lifted Newton method */
-    void generateLiftingFunctions(MXFunction& OUTPUT, MXFunction& OUTPUT);
-#endif
+    void generateLiftingFunctions(MXFunction& SWIG_OUTPUT(vdef_fcn),
+                                  MXFunction& SWIG_OUTPUT(vinit_fcn));
     /// \endcond
 
     /** \brief Get the corresponding matrix type */
