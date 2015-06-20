@@ -474,8 +474,7 @@ namespace casadi {
     MX zz_det() const;
     MX zz_inv() const;
     bool zz_dependsOn(const MX &arg) const;
-    std::vector<MX> zz_getSymbols() const;
-    static std::vector<MX> zz_getSymbols(const std::vector<MX>& e);
+    std::vector<MX> zz_symvar() const;
     static MX zz_matrix_expand(const MX& e,
                                const std::vector<MX> &boundary = std::vector<MX>());
     static std::vector<MX> zz_matrix_expand(const std::vector<MX>& e,

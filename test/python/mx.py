@@ -1616,12 +1616,12 @@ class MXtests(casadiTestCase):
     
     self.assertRaises(Exception, lambda : B[Sparsity.dense(4,4)])
 
-  def test_getSymbols(self):
+  def test_symvar(self):
     a = MX.sym("a")
     b = MX.sym("b")
     c = MX.sym("c")
     e = cos(a*b) + c
-    w = getSymbols(e)
+    w = symvar(e)
     self.assertEqual(len(w),3)
     if CasadiOptions.getSimplificationOnTheFly():
       self.assertTrue(isEqual(w[0],a))

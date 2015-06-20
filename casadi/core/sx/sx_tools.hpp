@@ -173,7 +173,7 @@ namespace casadi {
    * Get all symbols on which the supplied expression depends
    * \see SXFunction::getFree()
    */
-  inline SX getSymbols(const SX& e) { return e.zz_getSymbols().front();}
+  inline std::vector<SX> symvar(const SX& e) { return e.zz_symvar();}
 
   ///@{
   /** \brief Calculate jacobian via source code transformation

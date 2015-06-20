@@ -872,13 +872,13 @@ class SXtests(casadiTestCase):
       self.assertFalse(vertcat([x,x]).isRegular())
       
       
-  def test_getSymbols(self):
+  def test_symvar(self):
     a = SX.sym("a")
     b = SX.sym("b")
     c = SX.sym("c")
     e = cos(a*b) + c
-    w = getSymbols(e)
-    self.assertEqual(w.nnz(),3)
+    w = symvar(e)
+    self.assertEqual(len(w),3)
     if CasadiOptions.getSimplificationOnTheFly():
       self.assertTrue(isEqual(w[0],a))
       self.assertTrue(isEqual(w[1],b))

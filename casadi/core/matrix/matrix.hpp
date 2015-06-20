@@ -443,8 +443,7 @@ namespace casadi {
                                      bool reverse=false);
     Matrix<DataType> zz_spy() const;
     bool zz_dependsOn(const Matrix<DataType> &arg) const;
-    std::vector<Matrix<DataType> > zz_getSymbols() const;
-    static std::vector<Matrix<DataType> > zz_getSymbols(const std::vector<Matrix<DataType> >& e);
+    std::vector<Matrix<DataType> > zz_symvar() const;
     Matrix<DataType> zz_jacobian(const Matrix<DataType> &arg) const;
     Matrix<DataType> zz_gradient(const Matrix<DataType> &arg) const;
     Matrix<DataType> zz_tangent(const Matrix<DataType> &arg) const;

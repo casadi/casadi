@@ -1279,7 +1279,7 @@ namespace casadi {
       std::vector<MX> arg;
       arg.push_back(x_true);
       arg.push_back(x_false);
-      arg = getSymbols(arg);
+      arg = symvar(veccat(arg));
 
       // Form functions for cases
       MXFunction f_true("f_true", arg, make_vector(x_true));
@@ -1303,7 +1303,7 @@ namespace casadi {
       // Get symbolic primitives
       std::vector<MX> arg = x;
       arg.push_back(x_default);
-      arg = getSymbols(arg);
+      arg = symvar(veccat(arg));
 
       // Form functions for cases
       vector<Function> f(x.size());
@@ -1792,15 +1792,8 @@ namespace casadi {
     return (*this)->getInverse();
   }
 
-  std::vector<MX> MX::zz_getSymbols() const {
-    MXFunction f(std::vector<MX>(), make_vector(*this));
-    f.init();
-    return f.getFree();
-  }
-
-  std::vector<MX> MX::zz_getSymbols(const std::vector<MX>& e) {
-    MXFunction f(std::vector<MX>(), e);
-    f.init();
+  std::vector<MX> MX::zz_symvar() const {
+    MXFunction f("f", std::vector<MX>(), make_vector(*this));
     return f.getFree();
   }
 
@@ -1822,7 +1815,7 @@ namespace casadi {
     std::vector<MX> ret = graph_substitute(e, boundary, syms);
 
     // Obtain list of dependents
-    std::vector<MX> v = getSymbols(ret);
+    std::vector<MX> v = symvar(veccat(ret));
 
     // Construct an MXFunction with it
     MXFunction f(v, ret);

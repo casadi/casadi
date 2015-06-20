@@ -1547,16 +1547,12 @@ namespace casadi {
   }
 
   template<>
-  std::vector<SX> SX::zz_getSymbols() const {
+  std::vector<SX> SX::zz_symvar() const {
     SXFunction f("tmp", std::vector<SX>(), make_vector(*this));
-    return make_vector(f.getFree());
-  }
-
-  template<>
-  std::vector<SX >
-  SX::zz_getSymbols(const std::vector<SX >& e) {
-    throw CasadiException("\"getSymbols\" not defined for instantiation");
-    return std::vector<SX >();
+    std::vector<SXElement> ret1 = f.getFree().data();
+    std::vector<SX> ret(ret1.size());
+    std::copy(ret1.begin(), ret1.end(), ret.begin());
+    return ret;
   }
 
   template<>

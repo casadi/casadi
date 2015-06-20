@@ -362,8 +362,7 @@ namespace casadi {
                                            bool reverse);
   template<> SX SX::zz_spy() const;
   template<> bool SX::zz_dependsOn(const SX &arg) const;
-  template<> std::vector<SX > SX::zz_getSymbols() const;
-  template<> std::vector<SX > SX::zz_getSymbols(const std::vector<SX >& e);
+  template<> std::vector<SX > SX::zz_symvar() const;
   template<> SX SX::zz_jacobian(const SX &arg) const;
   template<> SX SX::zz_gradient(const SX &arg) const;
   template<> SX SX::zz_tangent(const SX &arg) const;

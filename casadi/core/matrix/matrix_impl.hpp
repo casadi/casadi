@@ -2747,15 +2747,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  std::vector<Matrix<DataType> > Matrix<DataType>::zz_getSymbols() const {
-    throw CasadiException("\"getSymbols\" not defined for instantiation");
-    return std::vector<Matrix<DataType> >();
-  }
-
-  template<typename DataType>
-  std::vector<Matrix<DataType> >
-  Matrix<DataType>::zz_getSymbols(const std::vector<Matrix<DataType> >& e) {
-    throw CasadiException("\"getSymbols\" not defined for instantiation");
+  std::vector<Matrix<DataType> > Matrix<DataType>::zz_symvar() const {
+    throw CasadiException("\"symvar\" not defined for instantiation");
     return std::vector<Matrix<DataType> >();
   }
 

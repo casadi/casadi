@@ -119,15 +119,7 @@ namespace casadi {
   * Get all symbols on which the supplied expression depends
   * \see MXFunction::getFree()
   */
-  inline std::vector<MX> getSymbols(const MX& e) { return e.zz_getSymbols();}
-
-  /** \brief Get all symbols contained in the supplied expression
-  * Get all symbols on which the supplied expression depends
-  * \see MXFunction::getFree()
-  */
-  inline std::vector<MX> getSymbols(const std::vector<MX>& e) {
-    return MX::zz_getSymbols(e);
-  }
+  inline std::vector<MX> symvar(const MX& e) { return e.zz_symvar();}
 
   /** \brief Expand MX graph to SXFunction call
   *
