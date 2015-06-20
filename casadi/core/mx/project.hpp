@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_SET_SPARSE_HPP
-#define CASADI_SET_SPARSE_HPP
+#ifndef CASADI_PROJECT_HPP
+#define CASADI_PROJECT_HPP
 
 #include "mx_node.hpp"
 /// \cond INTERNAL
@@ -34,17 +34,17 @@ namespace casadi {
       \author Joel Andersson
       \date 2011-2013
   */
-  class CASADI_EXPORT SetSparse : public MXNode {
+  class CASADI_EXPORT Project : public MXNode {
   public:
 
     /** \brief  Constructor */
-    SetSparse(const MX& x, const Sparsity& sp);
+    Project(const MX& x, const Sparsity& sp);
 
     /** \brief  Destructor */
-    virtual ~SetSparse() {}
+    virtual ~Project() {}
 
     /** \brief  Clone function */
-    virtual SetSparse * clone() const;
+    virtual Project * clone() const;
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
@@ -82,7 +82,7 @@ namespace casadi {
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_SET_SPARSE;}
+    virtual int getOp() const { return OP_PROJECT;}
 
     /** \brief Get required length of w field */
     virtual size_t sz_w() const { return size1();}
@@ -92,4 +92,4 @@ namespace casadi {
 
 /// \endcond
 
-#endif // CASADI_SET_SPARSE_HPP
+#endif // CASADI_PROJECT_HPP

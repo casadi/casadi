@@ -23,7 +23,7 @@
  */
 
 
-#include "set_sparse.hpp"
+#include "project.hpp"
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
@@ -33,66 +33,66 @@ using namespace std;
 
 namespace casadi {
 
-  SetSparse::SetSparse(const MX& x, const Sparsity& sp) {
+  Project::Project(const MX& x, const Sparsity& sp) {
     setDependencies(x);
     setSparsity(Sparsity(sp));
   }
 
-  SetSparse* SetSparse::clone() const {
-    return new SetSparse(*this);
+  Project* Project::clone() const {
+    return new Project(*this);
   }
 
-  std::string SetSparse::print(const std::vector<std::string>& arg) const {
+  std::string Project::print(const std::vector<std::string>& arg) const {
     if (sparsity().isDense()) {
       return "dense(" + arg.at(0) + ")";
     } else {
-      return "set_sparse(" + arg.at(0) + ")";
+      return "project(" + arg.at(0) + ")";
     }
   }
 
   template<typename T>
-  void SetSparse::evalGen(const T** arg, T** res, int* iw, T* w) {
+  void Project::evalGen(const T** arg, T** res, int* iw, T* w) {
     casadi_project(arg[0], dep().sparsity(), res[0], sparsity(), w);
   }
 
-  void SetSparse::evalD(const double** arg, double** res, int* iw, double* w) {
+  void Project::evalD(const double** arg, double** res, int* iw, double* w) {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void SetSparse::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+  void Project::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
     evalGen<SXElement>(arg, res, iw, w);
   }
 
-  void SetSparse::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
-    res[0] = arg[0].setSparse(sparsity());
+  void Project::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = project(arg[0], sparsity());
   }
 
-  void SetSparse::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void Project::evalFwd(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) {
     int nfwd = fsens.size();
     for (int d=0; d<nfwd; ++d) {
-      fsens[d][0] = fseed[d][0].setSparse(sparsity(), true);
+      fsens[d][0] = project(fseed[d][0], sparsity(), true);
     }
   }
 
-  void SetSparse::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void Project::evalAdj(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) {
     int nadj = aseed.size();
     for (int d=0; d<nadj; ++d) {
-      asens[d][0] += aseed[d][0].setSparse(dep().sparsity(), true);
+      asens[d][0] += project(aseed[d][0], dep().sparsity(), true);
     }
   }
 
-  void SetSparse::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Project::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     sparsity().set(res[0], arg[0], dep().sparsity());
   }
 
-  void SetSparse::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Project::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     dep().sparsity().bor(arg[0], res[0], sparsity());
     fill(res[0], res[0]+nnz(), 0);
   }
 
-  void SetSparse::generate(const std::vector<int>& arg, const std::vector<int>& res,
+  void Project::generate(const std::vector<int>& arg, const std::vector<int>& res,
                            CodeGenerator& g) const {
     g.body << "  " << g.project(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
                                 g.work(res.front(), nnz()), sparsity(), "w") << endl;

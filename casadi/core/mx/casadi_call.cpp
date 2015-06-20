@@ -36,7 +36,7 @@ namespace casadi {
   MX GenericCall::projectArg(const MX& x, const Sparsity& sp, int i) {
     if (x.shape()==sp.shape()) {
       // Insert sparsity projection nodes if needed
-      return x.setSparse(sp);
+      return project(x, sp);
     } else {
       // Different dimensions
       if (x.isEmpty() || sp.isEmpty()) { // NOTE: To permissive?

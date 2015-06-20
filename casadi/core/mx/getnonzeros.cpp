@@ -402,7 +402,7 @@ namespace casadi {
 
           // Create a new pattern which includes both the the previous seed and the addition
           Sparsity sp = asens0.sparsity().patternUnion(dep().sparsity());
-          asens0 = asens0->getSetSparse(sp);
+          asens0 = asens0->getProject(sp);
 
           // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
           copy(el_input.begin(), el_input.end(), r_ind.begin());

@@ -594,7 +594,7 @@ namespace casadi {
         Matrix product of two matrices (X and Y), adding the result to
         a third matrix Z. The result has the same sparsity pattern as
         C meaning that other entries of (X*Y) are ignored.
-        The operation is equivalent to: Z+mul(X,Y).setSparse(Z.sparsity()).
+        The operation is equivalent to: Z+mul(X,Y).project(Z.sparsity()).
     */
     inline friend MatType mul(const MatType &X, const MatType &Y, const MatType &Z) {
       return X.zz_mtimes(Y, Z);

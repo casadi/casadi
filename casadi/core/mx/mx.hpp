@@ -502,7 +502,7 @@ namespace casadi {
     MX monitor(const std::string& comment) const;
 
     /** \brief Set sparse */
-    MX setSparse(const Sparsity& sp, bool intersect=false) const;
+    MX zz_project(const Sparsity& sp, bool intersect=false) const;
 
     /// Make the matrix dense
     void makeDense(const MX& val = 0);

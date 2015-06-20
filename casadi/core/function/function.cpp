@@ -315,7 +315,7 @@ namespace casadi {
       vector<MX>::iterator it=res.begin();
       for (int d=0; d<nfwd; ++d)
         for (int i=0; i<num_out; ++i, ++it)
-          *it = it->setSparse(output(i).sparsity());
+          *it = project(*it, output(i).sparsity());
       ret_out.insert(ret_out.end(), res.begin(), res.end());
     }
 
@@ -330,7 +330,7 @@ namespace casadi {
       vector<MX>::iterator it=res.begin();
       for (int d=0; d<nadj; ++d)
         for (int i=0; i<num_in; ++i, ++it)
-          *it = it->setSparse(input(i).sparsity());
+          *it = project(*it, input(i).sparsity());
       ret_out.insert(ret_out.end(), res.begin(), res.end());
     }
 

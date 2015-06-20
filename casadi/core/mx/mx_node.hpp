@@ -362,7 +362,7 @@ namespace casadi {
     virtual MX getAssign(const MX& y, const Slice& i, const Slice& j) const;
 
     /// Create set sparse
-    virtual MX getSetSparse(const Sparsity& sp) const;
+    virtual MX getProject(const Sparsity& sp) const;
 
     /// Get a unary operation
     virtual MX getUnary(int op) const;

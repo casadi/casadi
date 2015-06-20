@@ -199,7 +199,7 @@ namespace casadi {
     virtual DMatrix getMatrixValue() const { return DMatrix(); }
 
     /// Get densification
-    virtual MX getSetSparse(const Sparsity& sp) const;
+    virtual MX getProject(const Sparsity& sp) const;
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
@@ -306,7 +306,7 @@ namespace casadi {
     }
 
     /// Get densification
-    virtual MX getSetSparse(const Sparsity& sp) const;
+    virtual MX getProject(const Sparsity& sp) const;
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
@@ -414,7 +414,7 @@ namespace casadi {
 
       if (ret!=0) {
         Sparsity f = Sparsity::dense(y.size1(), y.size2());
-        MX yy = y.setSparse(f);
+        MX yy = project(y, f);
         return MX(f, shared_from_this<MX>())->getBinary(op, yy, false, false);
       }
     } else if (ScY && !operation_checker<F0XChecker>(op)) {
@@ -426,7 +426,7 @@ namespace casadi {
       }
       if (grow) {
         Sparsity f = Sparsity::dense(size1(), size2());
-        MX xx = shared_from_this<MX>().setSparse(f);
+        MX xx = project(shared_from_this<MX>(), f);
         return xx->getBinary(op, MX(f, y), false, false);
       }
     }
@@ -518,7 +518,7 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::getSetSparse(const Sparsity& sp) const {
+  MX Constant<Value>::getProject(const Sparsity& sp) const {
     if (isZero()) {
       return MX::create(new Constant<Value>(sp, v_));
     } else if (sp.isDense()) {
@@ -526,7 +526,7 @@ namespace casadi {
       v.makeDense();
       return v;
     } else {
-      return MXNode::getSetSparse(sp);
+      return MXNode::getProject(sp);
     }
   }
 

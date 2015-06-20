@@ -3226,6 +3226,7 @@ MatType if_else(const MatType &cond, const MatType &if_true, const MatType &if_f
 MatType conditional(const MatType& ind, const std::vector< MatType > &x,
                     const MatType &x_default, bool short_circuit=true);
 bool dependsOn(const MatType& f, const MatType &arg);
+MatType project(const MatType& A, const Sparsity& sp, bool intersect=false);
 %enddef
 
 %define MATRIX_DECL(MatType...)
@@ -3235,7 +3236,6 @@ MatType cofactor(const MatType &x, int i, int j);
 void qr(const MatType& A, MatType& OUTPUT, MatType& OUTPUT);
 //MatType all(const MatType &x);
 //MatType any(const MatType &x);
-MatType project(const MatType& A, const Sparsity& sp);
 MatType sparsify(const MatType& A, double tol=0);
 MatType norm_inf_mul(const MatType &x, const MatType &y);
 %enddef

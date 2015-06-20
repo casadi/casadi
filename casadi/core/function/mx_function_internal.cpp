@@ -690,8 +690,8 @@ namespace casadi {
     int alg_counter = 0;
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
       if (it->op == OP_INPUT) {
-        swork[it->res.front()] = arg_split.at(it->arg.at(0)).at(it->arg.at(1))
-          .setSparse(it->data.sparsity(), true);
+        swork[it->res.front()] = project(arg_split.at(it->arg.at(0)).at(it->arg.at(1)),
+                                         it->data.sparsity(), true);
       } else if (it->op==OP_OUTPUT) {
         // Collect the results
         res[it->res.front()] = swork[it->arg.front()];
@@ -795,8 +795,8 @@ namespace casadi {
       if (it->op == OP_INPUT) {
         // Fetch forward seed
         for (int d=0; d<nfwd; ++d) {
-          dwork[it->res.front()][d] = fseed_split[d].at(it->arg.at(0)).at(it->arg.at(1))
-            .setSparse(it->data.sparsity(), true);
+          dwork[it->res.front()][d] = project(fseed_split[d].at(it->arg.at(0)).at(it->arg.at(1)),
+                                              it->data.sparsity(), true);
         }
       } else if (it->op==OP_OUTPUT) {
         // Collect forward sensitivity
@@ -926,7 +926,7 @@ namespace casadi {
       } else if (it->op==OP_OUTPUT) {
         // Pass the adjoint seeds
         for (int d=0; d<nadj; ++d) {
-          MX a = aseed[d][it->res.front()].setSparse(output(it->res.front()).sparsity(), true);
+          MX a = project(aseed[d][it->res.front()], output(it->res.front()).sparsity(), true);
           if (dwork[it->arg.front()][d].isEmpty(true)) {
             dwork[it->arg.front()][d] = a;
           } else {

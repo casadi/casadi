@@ -168,10 +168,10 @@ namespace casadi {
     int zz_sprank() const { return sprank(sparsity());}
     int zz_norm_0_mul(const MatType &A) const { return norm_0_mul(sparsity(), A.sparsity());}
     MatType zz_tril(bool includeDiagonal=true) const {
-      return self().setSparse(tril(sparsity(), includeDiagonal));
+      return project(self(), tril(sparsity(), includeDiagonal));
     }
     MatType zz_triu(bool includeDiagonal=true) const {
-      return self().setSparse(triu(sparsity(), includeDiagonal));
+      return project(self(), triu(sparsity(), includeDiagonal));
     }
     MatType zz_quad_form(const MatType &A) const {
       casadi_assert(isVector());
@@ -360,7 +360,14 @@ namespace casadi {
     /** \brief  Make the matrix dense if not already */
     inline friend MatType densify(const MatType& x) { return x.zz_densify();}
 
-    /** \brief Check if expression depends on the argument
+    /** \brief Create a new matrix with a given sparsity pattern but with the
+     * nonzeros taken from an existing matrix */
+    inline friend MatType project(const MatType& A, const Sparsity& sp,
+                                  bool intersect=false) {
+      return A.zz_project(sp, intersect);
+    }
+
+/** \brief Check if expression depends on the argument
         The argument must be symbolic
     */
     //inline friend bool dependsOn(const MatType& f, const MatType &arg) {

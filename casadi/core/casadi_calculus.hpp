@@ -135,7 +135,7 @@ namespace casadi {
     OP_SETNONZEROS,
 
     // Set sparse
-    OP_SET_SPARSE,
+    OP_PROJECT,
 
     // Assertion
     OP_ASSERTION,

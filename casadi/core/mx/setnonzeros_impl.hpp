@@ -168,7 +168,7 @@ namespace casadi {
         // Create a new pattern which includes both the the previous seed
         // and the addition/assignment
         Sparsity sp = res[0].sparsity().patternUnion(osp);
-        res[0] = res[0]->getSetSparse(sp);
+        res[0] = res[0]->getProject(sp);
 
         // Recalculate the nz locations in the arguments corresponding to the inputs
         copy(el_output.begin(), el_output.end(), r_ind.begin());
@@ -300,7 +300,7 @@ namespace casadi {
           // Create a new pattern which includes both the the previous seed
           // and the addition/assignment
           Sparsity sp = res.sparsity().patternUnion(osp);
-          res = res->getSetSparse(sp);
+          res = res->getProject(sp);
 
           // Recalculate the nz locations in the arguments corresponding to the inputs
           copy(el_output.begin(), el_output.end(), r_ind.begin());

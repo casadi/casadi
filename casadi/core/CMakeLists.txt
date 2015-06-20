@@ -83,7 +83,7 @@ set(CASADI_SRCS
   mx/subassign.hpp           mx/subassign.cpp           # Submatrix assignment
   mx/getnonzeros.hpp         mx/getnonzeros.cpp         # Get the nonzeros of matrix
   mx/setnonzeros.hpp         mx/setnonzeros_impl.hpp    # Assign the nonzeros of a matrix to another matrix
-  mx/set_sparse.hpp          mx/set_sparse.cpp          # Sparse copy
+  mx/project.hpp             mx/project.cpp             # Sparse copy to another sparsity pattern
   mx/determinant.hpp         mx/determinant.cpp         # Determinant
   mx/inverse.hpp             mx/inverse.cpp             # Matrix inverse
   mx/inner_prod.hpp          mx/inner_prod.cpp          # Inner product

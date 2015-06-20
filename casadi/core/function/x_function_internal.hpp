@@ -561,7 +561,7 @@ namespace casadi {
     int dir = 0;
     for (int i=0; i<nIn(); ++i) { // Correct sparsities #1025
       if (asens[dir][i].sparsity()!=inputv_[i].sparsity()) {
-        asens[dir][i] = asens[dir][i].setSparse(inputv_[i].sparsity());
+        asens[dir][i] = project(asens[dir][i], inputv_[i].sparsity());
       }
     }
 

@@ -1337,7 +1337,7 @@ namespace casadi {
       vector<SX> arg2(arg);
       for (int i=0; i<num_in; ++i)
         if (arg2[i].sparsity()!=input(i).sparsity())
-          arg2[i] = arg2[i].setSparse(input(i).sparsity());
+          arg2[i] = project(arg2[i], input(i).sparsity());
       return evalSX(arg2, res);
     }
 

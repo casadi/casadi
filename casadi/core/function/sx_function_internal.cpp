@@ -651,7 +651,7 @@ namespace casadi {
       for (int d=0; d<nfwd; ++d)
         for (int i=0; i<num_in; ++i)
           if (fseed2[d][i].sparsity()!=input(i).sparsity())
-            fseed2[d][i] = fseed2[d][i].setSparse(input(i).sparsity());
+            fseed2[d][i] = project(fseed2[d][i], input(i).sparsity());
       return evalFwd(fseed2, fsens);
     }
 
@@ -742,7 +742,7 @@ namespace casadi {
       for (int d=0; d<nadj; ++d)
         for (int i=0; i<num_out; ++i)
           if (aseed2[d][i].sparsity()!=output(i).sparsity())
-            aseed2[d][i] = aseed2[d][i].setSparse(output(i).sparsity());
+            aseed2[d][i] = project(aseed2[d][i], output(i).sparsity());
       return evalAdj(aseed2, asens);
     }
 

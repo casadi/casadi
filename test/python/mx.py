@@ -2106,9 +2106,9 @@ class MXtests(casadiTestCase):
     
     self.checkarray(c_,numpy.kron(a,b))
     
-  def test_setSparse(self):
+  def test_project(self):
     x = MX.sym("x",Sparsity.lower(3))
-    y = x.setSparse(Sparsity.lower(3).T)
+    y = x.project(Sparsity.lower(3).T)
     
     f = MXFunction([x],[y])
     f.init()

@@ -49,7 +49,7 @@ namespace casadi {
       for (int i=0; i<n_; ++i) {
         casadi_assert(j->at(i).shape()==fcn_.input(i).shape());
         // Insert sparsity projection nodes if needed
-        all_arg.push_back(j->at(i).setSparse(fcn_.input(i).sparsity()));
+        all_arg.push_back(project(j->at(i), fcn_.input(i).sparsity()));
       }
     }
     casadi_assert(all_arg.size() == n_ * f_num_in);

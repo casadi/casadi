@@ -518,7 +518,7 @@ inline void casadi_math<T>::printName(unsigned char op, std::ostream &stream) {
     case OP_GETNONZEROS:         stream << "getnonzeros";         break;
     case OP_ADDNONZEROS:         stream << "addnonzeros";         break;
     case OP_SETNONZEROS:         stream << "setnonzeros";         break;
-    case OP_SET_SPARSE:          stream << "set_sparse";          break;
+    case OP_PROJECT:             stream << "project";             break;
     case OP_ASSERTION:           stream << "assertion";           break;
     case OP_NORM2:               stream << "norm2";               break;
     case OP_NORM1:               stream << "norm1";               break;

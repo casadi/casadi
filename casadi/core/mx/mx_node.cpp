@@ -35,7 +35,7 @@
 #include "subassign.hpp"
 #include "getnonzeros.hpp"
 #include "setnonzeros.hpp"
-#include "set_sparse.hpp"
+#include "project.hpp"
 #include "solve.hpp"
 #include "unary_mx.hpp"
 #include "binary_mx.hpp"
@@ -506,13 +506,13 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getSetSparse(const Sparsity& sp) const {
+  MX MXNode::getProject(const Sparsity& sp) const {
     if (sp==sparsity()) {
       return shared_from_this<MX>();
     } else if (sp.nnz()==0) {
       return MX::zeros(sp);
     } else {
-      return MX::create(new SetSparse(shared_from_this<MX>(), sp));
+      return MX::create(new Project(shared_from_this<MX>(), sp));
     }
   }
 
@@ -567,8 +567,8 @@ namespace casadi {
                                             operation_checker<Function0Checker>(op));
 
         // Project the arguments to this sparsity
-        MX xx = shared_from_this<MX>().setSparse(r_sp);
-        MX yy = y.setSparse(r_sp);
+        MX xx = project(shared_from_this<MX>(), r_sp);
+        MX yy = project(y, r_sp);
         return xx->getBinary(op, yy, false, false);
       }
     }
@@ -751,8 +751,8 @@ namespace casadi {
     } else {
       // Project to pattern intersection
       Sparsity sp = sparsity().patternIntersection(y.sparsity());
-      MX xx = shared_from_this<MX>().setSparse(sp);
-      MX yy = y.setSparse(sp);
+      MX xx = project(shared_from_this<MX>(), sp);
+      MX yy = project(y, sp);
       return xx->getInnerProd(yy);
     }
   }

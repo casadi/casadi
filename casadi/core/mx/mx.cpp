@@ -192,7 +192,7 @@ namespace casadi {
                           "get(Sparsity sp): shape mismatch. This matrix has shape "
                           << shape() << ", but supplied sparsity index has shape "
                           << sp.shape() << ".");
-    m = setSparse(sp);
+    m = project(*this, sp);
   }
 
   void MX::set(const MX& m, bool ind1, const Slice& rr, const Slice& cc) {
@@ -296,7 +296,7 @@ namespace casadi {
         Sparsity sp = rr.sparsity() * m.sparsity();
 
         // Project both matrices to this sparsity
-        return set(m.setSparse(sp), ind1, rr.setSparse(sp));
+        return set(project(m, sp), ind1, project(rr, sp));
       } else if (m.isScalar()) {
         // m scalar means "set all"
         if (m.isDense()) {
@@ -348,7 +348,7 @@ namespace casadi {
     Sparsity sp = Sparsity::triplet(sz1, sz2, new_row, new_col);
 
     // If needed, update pattern
-    if (sp != sparsity()) *this = setSparse(sp);
+    if (sp != sparsity()) *this = project(*this, sp);
 
     // Find the nonzeros corresponding to rr
     sparsity().getNZ(nz);
@@ -428,7 +428,7 @@ namespace casadi {
         return setNZ(MX(kk.sparsity(), m), ind1, kk);
       } else if (kk.shape() == m.shape()) {
         // Project sparsity if needed
-        return setNZ(m.setSparse(kk.sparsity()), ind1, kk);
+        return setNZ(project(m, kk.sparsity()), ind1, kk);
       } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
@@ -915,14 +915,14 @@ namespace casadi {
     return (*this)->getOutput(oind);
   }
 
-  MX MX::setSparse(const Sparsity& sp, bool intersect) const {
+  MX MX::zz_project(const Sparsity& sp, bool intersect) const {
     if (isEmpty() || (sp==sparsity())) {
       return *this;
     } else {
       if (intersect) {
-        return (*this)->getSetSparse(sp.patternIntersection(sparsity()));
+        return (*this)->getProject(sp.patternIntersection(sparsity()));
       } else {
-        return (*this)->getSetSparse(sp);
+        return (*this)->getProject(sp);
       }
     }
   }
@@ -932,7 +932,7 @@ namespace casadi {
     if (isDense()) {
       return; // Already ok
     } else if (val->isZero()) {
-      *this = setSparse(Sparsity::dense(shape()));
+      *this = project(*this, Sparsity::dense(shape()));
     } else {
       MX new_this = repmat(val, shape());
       new_this(sparsity()) = *this;

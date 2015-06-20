@@ -368,7 +368,7 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Set sparse */
-    Matrix<DataType> setSparse(const Sparsity& sp, bool intersect=false) const;
+    Matrix<DataType> zz_project(const Sparsity& sp, bool intersect=false) const;
 
 #ifndef SWIG
     /// Make the matrix dense
@@ -553,7 +553,6 @@ namespace casadi {
     static Matrix<DataType> zz_diagcat(const std::vector< Matrix<DataType> > &A);
     Matrix<DataType> zz_unite(const Matrix<DataType>& B) const;
     Matrix<DataType> zz_polyval(const Matrix<DataType>& x) const;
-    Matrix<DataType> zz_project(const Sparsity& sparsity) const;
     Matrix<DataType> zz_norm_inf_mul(const Matrix<DataType> &y) const;
     ///@}
 
@@ -584,12 +583,6 @@ namespace casadi {
      * Note that in SWIG, Q and R are returned by value. */
     inline friend void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R) {
       return A.zz_qr(Q, R);
-    }
-
-    /** \brief Create a new matrix with a given sparsity pattern but with the
-     * nonzeros taken from an existing matrix */
-    inline friend Matrix<DataType> project(const Matrix<DataType>& A, const Sparsity& sp) {
-      return A.zz_project(sp);
     }
 
     /// Returns true only if every element in the matrix is true

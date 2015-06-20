@@ -188,7 +188,7 @@ namespace casadi {
                           "get(Sparsity sp): shape mismatch. This matrix has shape "
                           << shape() << ", but supplied sparsity index has shape "
                           << sp.shape() << ".");
-    m = setSparse(sp);
+    m = project(*this, sp);
   }
 
   template<typename DataType>
@@ -325,7 +325,7 @@ namespace casadi {
         Sparsity sp = rr.sparsity() * m.sparsity();
 
         // Project both matrices to this sparsity
-        return set(m.setSparse(sp), ind1, rr.setSparse(sp));
+        return set(project(m, sp), ind1, project(rr, sp));
       } else if (m.isScalar()) {
         // m scalar means "set all"
         if (m.isDense()) {
@@ -377,7 +377,7 @@ namespace casadi {
     Sparsity sp = Sparsity::triplet(sz1, sz2, new_row, new_col);
 
     // If needed, update pattern
-    if (sp != sparsity()) *this = setSparse(sp);
+    if (sp != sparsity()) *this = project(*this, sp);
 
     // Find the nonzeros corresponding to rr
     sparsity().getNZ(nz);
@@ -472,7 +472,7 @@ namespace casadi {
         return setNZ(Matrix<DataType>(kk.sparsity(), m), ind1, kk);
       } else if (kk.shape() == m.shape()) {
         // Project sparsity if needed
-        return setNZ(m.setSparse(kk.sparsity()), ind1, kk);
+        return setNZ(project(m, kk.sparsity()), ind1, kk);
       } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
@@ -1793,7 +1793,7 @@ namespace casadi {
     // Project to union of patterns and call recursively if different sparsity
     if (sparsity() != ex2.sparsity()) {
       Sparsity sp = sparsity() + ex2.sparsity();
-      return isEqual(setSparse(sp), ex2.setSparse(sp), depth);
+      return isEqual(project(*this, sp), project(ex2, sp), depth);
     }
 
     // Check individual elements
@@ -1880,9 +1880,9 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::setSparse(const Sparsity& sp, bool intersect) const {
+  Matrix<DataType> Matrix<DataType>::zz_project(const Sparsity& sp, bool intersect) const {
     if (intersect) {
-      return setSparse(sp.patternIntersection(sparsity()), false);
+      return project(*this, sp.patternIntersection(sparsity()), false);
     } else {
       Matrix<DataType> ret(sp);
       ret.set(*this);
@@ -2514,11 +2514,6 @@ namespace casadi {
       ret = ret*x + (*this)[i];
     }
     return ret;
-  }
-
-  template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_project(const Sparsity& sp) const {
-    return setSparse(sp);
   }
 
   template<typename DataType>

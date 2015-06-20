@@ -184,7 +184,7 @@ namespace casadi {
     return "0x0";
   }
 
-  MX ZeroByZero::getSetSparse(const Sparsity& sp) const {
+  MX ZeroByZero::getProject(const Sparsity& sp) const {
     return shared_from_this<MX>();
   }
 
