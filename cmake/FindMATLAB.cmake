@@ -91,7 +91,7 @@ if (NOT MATLAB_ROOT)
     elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")   # Check if this is a Mac
       # we look in the applications folder
       # Search for a version of Matlab available, starting from the most modern one to older versions
-      foreach(MATVER "2015b" "2015a" "R2014b" "R2014a" "R2013b" "R2013a" "R2012b" "R2012a" "R2011b" "R2011a" "R2010b" "R2010a" "R2009b" "R2009a" "R2008b")
+      foreach(MATVER "R2015b" "R2015a" "R2014b" "R2014a" "R2013b" "R2013a" "R2012b" "R2012a" "R2011b" "R2011a" "R2010b" "R2010a" "R2009b" "R2009a" "R2008b")
         if((NOT DEFINED MATLAB_ROOT) OR ("${MATLAB_ROOT}" STREQUAL ""))
           if(EXISTS /Applications/MATLAB_${MATVER}.app)
             set(MATLAB_ROOT /Applications/MATLAB_${MATVER}.app)

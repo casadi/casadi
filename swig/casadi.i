@@ -45,7 +45,7 @@
 %}
 #endif
 
-// Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
+// Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning,
 // for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
 
@@ -367,7 +367,7 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 bool PyObjectHasClassName(PyObject* p, const char * name) {
   PyObject * classo = PyObject_GetAttrString( p, "__class__");
   PyObject * classname = PyObject_GetAttrString( classo, "__name__");
-  
+
   bool ret = strcmp(PyString_AsString(classname),name)==0;
   Py_DECREF(classo);Py_DECREF(classname);
 	return ret;
@@ -440,36 +440,36 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     protected:
       PyObject *p_;
     };
-  
+
     class DerivativeGeneratorPythonInternal : public DerivativeGeneratorInternal, FunctorPythonInternal {
       friend class DerivativeGeneratorPython;
-    
+
     DerivativeGeneratorPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
       virtual Function call(Function& fcn, int ndir, void* user_data);
       virtual DerivativeGeneratorPythonInternal* clone() const { return new DerivativeGeneratorPythonInternal(p_); }
     };
-   
+
     class CustomEvaluatePythonInternal : public CustomEvaluateInternal, FunctorPythonInternal {
       friend class CustomEvaluatePython;
-    
+
     CustomEvaluatePythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
       virtual void call(CustomFunction& fcn, void* user_data);
       virtual CustomEvaluatePythonInternal* clone() const { return new CustomEvaluatePythonInternal(p_); }
     };
-  
+
     class DerivativeGeneratorPython : public DerivativeGenerator {
     public:
       DerivativeGeneratorPython(PyObject *p) { assignNode(new DerivativeGeneratorPythonInternal(p)); }
     };
-  
+
     class CallbackPythonInternal : public CallbackInternal, FunctorPythonInternal {
       friend class CallbackPython;
-    
+
     CallbackPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
       virtual int call(Function& fcn, void* user_data);
       virtual CallbackPythonInternal* clone() const { return new CallbackPythonInternal(p_); }
     };
-  
+
     class CustomEvaluatePython : public CustomEvaluate {
     public:
       CustomEvaluatePython(PyObject *p) { assignNode(new CustomEvaluatePythonInternal(p)); }
@@ -843,7 +843,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // 1D numpy array
       if (is_array(p) && array_numdims(p)==1 && array_type(p)!=NPY_OBJECT && array_is_native(p)) {
         int sz = array_size(p,0);
-      
+
         // Make sure we have a contigous array with int datatype
         int array_is_new_object;
         PyArrayObject* array;
@@ -854,7 +854,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           if (array) {
             int *d = reinterpret_cast<int*>(array_data(array));
             int flag = assign_vector(d, sz, m);
-            if (array_is_new_object) Py_DECREF(array); 
+            if (array_is_new_object) Py_DECREF(array);
             return flag;
           }
         }
@@ -865,7 +865,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           if (array) {
             long* d= reinterpret_cast<long*>(array_data(array));
             int flag = assign_vector(d, sz, m);
-            if (array_is_new_object) Py_DECREF(array); 
+            if (array_is_new_object) Py_DECREF(array);
             return flag;
           }
         }
@@ -876,7 +876,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           if (array) {
             double* d= reinterpret_cast<double*>(array_data(array));
             int flag = assign_vector(d, sz, m);
-            if (array_is_new_object) Py_DECREF(array); 
+            if (array_is_new_object) Py_DECREF(array);
             return flag;
           }
         }
@@ -893,7 +893,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           PyErr_Clear();
           return false;
         }
-      
+
         // Get size
         Py_ssize_t sz = PySequence_Size(p);
         if (sz==-1) {
@@ -906,7 +906,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           (**m).clear();
           (**m).reserve(sz);
         }
-        
+
         // Temporary
         M tmp;
 
@@ -1032,7 +1032,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       Py_DECREF(ndir_py);
       Py_DECREF(fcn_py);
       if (r) {
-        Function ret;  
+        Function ret;
         if(!to_val(r, &ret)) {
           Py_DECREF(r);
           throw CasadiException("DerivativeGeneratorPythonInternal: return type was not Function.");
@@ -1097,7 +1097,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       if (to_val(r, static_cast<int*>(0))) to_val(r, &ret);
       Py_DECREF(r);
       return ret;
-    }  
+    }
 #endif // SWIGPYTHON
 
     bool to_ptr(GUESTOBJECT *p, Callback** m) {
@@ -1209,12 +1209,12 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
         PyObject* args = PyTuple_New(1);
         PyTuple_SetItem(args,0,c);
-    
+
         PyObject* g = PyObject_CallObject(gt,args);
-    
+
         Py_DECREF(args);
         Py_DECREF(gt);
-    
+
         if (g) {
           int result = to_ptr(g, m);
           Py_DECREF(g);
@@ -1233,12 +1233,12 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         PyObject* args = PyTuple_New(1);
         Py_INCREF(p); // Needed because PyTuple_SetItem steals the reference
         PyTuple_SetItem(args,0,p);
-    
+
         PyObject* g = PyObject_CallObject(gt,args);
-    
+
         Py_DECREF(args);
         Py_DECREF(gt);
-    
+
         if (g) {
           int result = to_val(g, m ? *m : 0);
           Py_DECREF(g);
@@ -1338,7 +1338,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       if (PySlice_Check(p)) {
         PySliceObject *r = (PySliceObject*)(p);
         if (m) {
-          (**m).start_ = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min()) 
+          (**m).start_ = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min())
             ? std::numeric_limits<int>::min() : PyInt_AsLong(r->start);
           (**m).stop_  = (r->stop ==Py_None || PyInt_AsLong(r->stop)> std::numeric_limits<int>::max())
             ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop);
@@ -1422,7 +1422,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           && to_val(p_second, m ? &(**m).second : 0);
         return ret;
       }
-#endif // SWIGPYTHON      
+#endif // SWIGPYTHON
       // No match
       return false;
     }
@@ -1439,7 +1439,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return ret;
 #else
       return 0;
-#endif // SWIGPYTHON      
+#endif // SWIGPYTHON
     }
   } // namespace casadi
  }
@@ -1520,7 +1520,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         int k=0;
         casadi::SX tmp, *tmp2;
         PyObject *pe;
-        while (it->index < it->size) { 
+        while (it->index < it->size) {
           pe = *((PyObject**) PyArray_ITER_DATA(it));
           tmp2=&tmp;
           if (!to_ptr(pe, &tmp2) || !tmp2->isScalar()) {
@@ -1668,12 +1668,12 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           break;
         case 2:
           // Matrix
-          nrow=array_size(p, 0); 
-          ncol=array_size(p, 1); 
+          nrow=array_size(p, 0);
+          ncol=array_size(p, 1);
           break;
         default:
           // More than two dimension unsupported
-          if (array_is_new_object) Py_DECREF(array); 
+          if (array_is_new_object) Py_DECREF(array);
           return false;
         }
         if (m) {
@@ -1686,15 +1686,15 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
             }
           }
         }
-           
+
         // Free memory
-        if (array_is_new_object) Py_DECREF(array); 
+        if (array_is_new_object) Py_DECREF(array);
         return true;
       }
 
       // scipy's csc_matrix will be cast to sparse DMatrix
       if(PyObjectHasClassName(p, "csc_matrix")) {
-    
+
         // Get the dimensions of the csc_matrix
         PyObject * shape = PyObject_GetAttrString( p, "shape"); // need's to be decref'ed
         if (!shape) return false;
@@ -1705,20 +1705,20 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         int nrows=PyInt_AsLong(PyTuple_GetItem(shape,0));
         int ncols=PyInt_AsLong(PyTuple_GetItem(shape,1));
         Py_DECREF(shape);
-  
+
         bool ret= false;
-    
+
         PyObject * narray=0;
         PyObject * row=0;
         PyObject * colind=0;
         PyArrayObject* array=0;
         PyArrayObject* array_row=0;
         PyArrayObject* array_colind=0;
-    
+
         int array_is_new_object=0;
         int row_is_new_object=0;
         int colind_is_new_object=0;
-    
+
         // Fetch data
         narray=PyObject_GetAttrString( p, "data"); // need's to be decref'ed
         if (!narray || !is_array(narray) || array_numdims(narray)!=1) goto cleanup;
@@ -1740,18 +1740,18 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           int size=array_size(array,0); // number on non-zeros
           double* d=(double*) array_data(array);
           std::vector<double> v(d,d+size);
-      
+
           int* rowd=(int*) array_data(array_row);
           std::vector<int> rowv(rowd,rowd+size);
-      
+
           int* colindd=(int*) array_data(array_colind);
           std::vector<int> colindv(colindd,colindd+(ncols+1));
-      
+
           if (m) **m = casadi::Matrix<double>(casadi::Sparsity(nrows,ncols,colindv,rowv), v, false);
-      
+
           ret = true;
         }
-    
+
       cleanup: // yes that's right; goto.
         // Rather that than a pyramid of conditional memory-deallocation
         // TODO(jaeandersson): Create a helper struct and put the below in the destructor
@@ -1883,12 +1883,12 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           break;
         case 2:
           // Matrix
-          nrow=array_size(p, 0); 
-          ncol=array_size(p, 1); 
+          nrow=array_size(p, 0);
+          ncol=array_size(p, 1);
           break;
         default:
           // More than two dimension unsupported
-          if (array_is_new_object) Py_DECREF(array); 
+          if (array_is_new_object) Py_DECREF(array);
           return false;
         }
         if (m) {
@@ -1912,7 +1912,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         }
 
         // Free memory
-        if (array_is_new_object) Py_DECREF(array); 
+        if (array_is_new_object) Py_DECREF(array);
         return true;
       }
 
@@ -2017,15 +2017,26 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   if(!($result = casadi::from_ptr(static_cast<const xType *>($1)))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
 }
 
-// Inputs marked OUTPUT are also returned by the function
+// Inputs marked OUTPUT are also returned by the function, ...
 %typemap(argout,noblock=1,fragment="casadi_all") xType &OUTPUT {
   %append_output(casadi::from_ptr(static_cast<xType *>($1)));
  }
 
-// Corresponding input typemap
-%typemap(in, numinputs=0) xType &OUTPUT (xType temp) {
- $1 = &temp;
+// ... and the corresponding inputs are ignored
+%typemap(in, numinputs=0) xType &OUTPUT (xType m) {
+ $1 = &m;
 }
+
+// Inputs marked INOUT are also returned by the function, ...
+%typemap(argout,noblock=1,fragment="casadi_all") xType &INOUT {
+  %append_output(casadi::from_ptr(static_cast<xType *>($1)));
+ }
+
+// ... but kept as inputs
+%typemap(in, noblock=1, fragment="casadi_all") xType &INOUT (xType m) {
+  $1 = &m;
+  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to " xName ".");
+ }
 
 %enddef
 
@@ -2072,14 +2083,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %define PREC_STRING 180 %enddef
 %define PREC_FUNCTION 200 %enddef
 
-%template() std::vector<unsigned char>;
-%template() std::pair<std::vector<int>, std::vector<int> >;
-
-#ifndef SWIGMATLAB
-%template() std::pair<int,int>;
-%template() std::vector< std::pair<int,int> >;
-#endif // SWIGMATLAB
-
 %casadi_typemaps("str", PREC_STRING, std::string)
 %casadi_template("[str]", PREC_STRING, std::vector<std::string>)
 %casadi_typemaps("Sparsity", PREC_SPARSITY, casadi::Sparsity)
@@ -2125,6 +2128,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_input_typemaps("CustomEvaluate", PREC_CUSTOMEVALUATE, casadi::CustomEvaluate)
 %casadi_input_typemaps("Callback", PREC_CALLBACK, casadi::Callback)
 %casadi_template("Dict", PREC_DICT, std::map<std::string, casadi::GenericType>)
+
+%template() std::vector<unsigned char>;
+%template() std::pair<std::vector<int>, std::vector<int> >;
+
+#ifndef SWIGMATLAB
+%template() std::pair<int,int>;
+%template() std::vector< std::pair<int,int> >;
+#endif // SWIGMATLAB
+
+
 %{
 using namespace casadi;
 %}
@@ -2276,11 +2289,11 @@ def prod(self,*args):
     raise Exception("'prod' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
 def dot(self,*args):
     raise Exception("'dot' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
-    
+
 class NZproxy:
   def __init__(self,matrix):
     self.matrix = matrix
-    
+
   def __getitem__(self,s):
     return self.matrix.getNZ(False, s)
 
@@ -2289,7 +2302,7 @@ class NZproxy:
 
   def __len__(self):
     return self.matrix.nnz()
-    
+
   def __iter__(self):
     for k in range(len(self)):
       yield self[k]
@@ -2297,7 +2310,7 @@ class NZproxy:
 
 %define %matrix_convertors
 %pythoncode %{
-        
+
     def toMatrix(self):
         import numpy as n
         return n.matrix(self.toArray())
@@ -2305,22 +2318,22 @@ class NZproxy:
     def __iter__(self):
       for k in self.nz:
         yield k
-        
+
 %}
-%enddef 
+%enddef
 %define %matrix_helpers(Type)
 %pythoncode %{
     @property
     def shape(self):
         return (self.size1(),self.size2())
-        
+
     def reshape(self,arg):
         return _casadi.reshape(self,arg)
-        
+
     @property
     def T(self):
         return _casadi.transpose(self)
-        
+
     def __getitem__(self, s):
         with internalAPI():
           if isinstance(s, tuple) and len(s)==2:
@@ -2330,19 +2343,19 @@ class NZproxy:
     def __setitem__(self,s,val):
         with internalAPI():
           if isinstance(s,tuple) and len(s)==2:
-            return self.set(val, False, s[0], s[1])  
+            return self.set(val, False, s[0], s[1])
           return self.set(val, False, s)
-        
+
     @property
     def nz(self):
       return NZproxy(self)
-        
+
     def prod(self,*args):
         raise Exception("'prod' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
-     
+
 %}
-%enddef 
-    
+%enddef
+
 %define %python_array_wrappers(arraypriority)
 %pythoncode %{
 
@@ -2353,13 +2366,13 @@ class NZproxy:
       return out_arr
     name = context[0].__name__
     args = list(context[1])
-    
+
     if len(context[1])==3:
       raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b' where 'a' is a numpy type. This is not supported, and cannot be supported without changing numpy." % name)
 
     if "vectorized" in name:
         name = name[:-len(" (vectorized)")]
-    
+
     conversion = {"multiply": "mul", "divide": "div", "true_divide": "div", "subtract":"sub","power":"pow","greater_equal":"ge","less_equal": "le", "less": "lt", "greater": "gt"}
     if name in conversion:
       name = conversion[name]
@@ -2370,8 +2383,8 @@ class NZproxy:
       name = '__' + name + '__'
     fun=getattr(self, name)
     return fun(*args[1:])
-     
-     
+
+
   def __array__(self,*args,**kwargs):
     import numpy as n
     if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc) and isinstance(args[1][0],n.ufunc) and len(args[1])>1 and args[1][0].nin==len(args[1][1]):
@@ -2383,7 +2396,7 @@ class NZproxy:
         return self.__array_custom__(*args,**kwargs)
       else:
         return self.toArray()
-      
+
 %}
 %enddef
 #endif // SWIGPYTHON
@@ -2461,13 +2474,13 @@ class NZproxy:
 
 namespace casadi {
   %extend OptionsFunctionality {
-    void setOption(const std::string &name, const std::string& val){$self->setOption(name,val);} 
-    void setOption(const std::string &name, const std::vector<int>& val){$self->setOption(name,val);} 
-    void setOption(const std::string &name, const std::vector<double>& val){$self->setOption(name,val);} 
+    void setOption(const std::string &name, const std::string& val){$self->setOption(name,val);}
+    void setOption(const std::string &name, const std::vector<int>& val){$self->setOption(name,val);}
+    void setOption(const std::string &name, const std::vector<double>& val){$self->setOption(name,val);}
     void setOption(const std::string &name, double val){$self->setOption(name,val);}
-    void setOption(const std::string &name, int val){$self->setOption(name,val);} 
-    void setOption(const std::string &name, bool val){$self->setOption(name,val);}  
-    void setOption(const std::string &name, const std::vector< std::vector<int> >& val){$self->setOption(name,val);}  
+    void setOption(const std::string &name, int val){$self->setOption(name,val);}
+    void setOption(const std::string &name, bool val){$self->setOption(name,val);}
+    void setOption(const std::string &name, const std::vector< std::vector<int> >& val){$self->setOption(name,val);}
   }
 } // namespace casadi
 
@@ -2492,7 +2505,7 @@ namespace casadi{
     def __getstate__(self):
         if self.isNull(): return {}
         return {"nrow": self.size1(), "ncol": self.size2(), "colind": numpy.array(self.colind(),dtype=int), "row": numpy.array(self.row(),dtype=int)}
-  %}  
+  %}
 }
 
 } // namespace casadi
@@ -2617,7 +2630,7 @@ namespace casadi{
 /// Create a 2D contiguous NP_DOUBLE numpy.ndarray
 
 PyObject* arrayView() {
-  if ($self->nnz()!=$self->numel()) 
+  if ($self->nnz()!=$self->numel())
     throw  casadi::CasadiException("Matrix<double>::arrayview() can only construct arrayviews for dense DMatrices.");
   npy_intp dims[2];
   dims[0] = $self->size2();
@@ -2625,10 +2638,10 @@ PyObject* arrayView() {
   std::vector<double> &v = $self->data();
   PyArrayObject* temp = (PyArrayObject*) PyArray_New(&PyArray_Type, 2, dims, NPY_DOUBLE, NULL, &v[0], 0, NPY_ARRAY_CARRAY, NULL);
   PyObject* ret = PyArray_Transpose(temp,NULL);
-  Py_DECREF(temp); 
+  Py_DECREF(temp);
   return ret;
 }
-    
+
 %pythoncode %{
   def toArray(self,shared=False):
     import numpy as n
@@ -2639,7 +2652,7 @@ PyObject* arrayView() {
     else:
       if isinstance(self,IMatrix):
         return n.array(self.get(),n.int).reshape((self.shape[1],self.shape[0])).T
-      else:    
+      else:
         return n.array(self.get()).reshape((self.shape[1],self.shape[0])).T
 %}
 
@@ -2710,7 +2723,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
           r[i,j] = d[k]
       return r
   %}
-  
+
 #ifdef SWIGPYTHON
   binopsrFull(casadi::Matrix<int>)
   binopsFull(const casadi::SX & b,,casadi::SX,casadi::SX)
@@ -2736,7 +2749,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
 
     def __getstate__(self):
         return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros_int(),dtype=int)}
-  %} 
+  %}
 }
 
 %extend Matrix<double> {
@@ -2750,7 +2763,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
     def __getstate__(self):
         return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros(),dtype=float)}
   %}
-  
+
 }
 
 
@@ -2765,11 +2778,11 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
         @property
         def shape(self):
             return (self.size1(),self.size2())
-            
+
         @property
         def T(self):
             return _casadi.transpose(self)
-            
+
         def __array__(self,*args,**kwargs):
             return DMatrix.ones(self).toArray()
     %}
@@ -2793,7 +2806,7 @@ try:
 
   def fmin(x,y):
     pass
-    
+
   def fmax(x,y):
     pass
 
@@ -2809,7 +2822,7 @@ try:
       return _min_ufunc(*args)
     else:
       return _defaultmin(*args,**kwargs)
-      
+
   _defaultmax = max
   def max(*args,**kwargs):
     if len(args)==2 and len(kwargs)==0 and (hasattr(args[0],'fmax') or hasattr(args[1],'fmax')):
@@ -2823,10 +2836,10 @@ except:
 
 namespace casadi {
 %extend Matrix<SXElement>{
-    
+
     %matrix_convertors
     %matrix_helpers(casadi::Matrix<casadi::SXElement>)
-       
+
     #ifdef SWIGPYTHON
     %pythoncode %{
     def toArray(self):
@@ -2839,12 +2852,12 @@ namespace casadi {
           r[i,j] = self.nz[el]
       return r
     %}
-    
+
   %python_array_wrappers(1001.0)
-  #endif // SWIGPYTHON 
-  
+  #endif // SWIGPYTHON
+
 #ifdef SWIGPYTHON
-  binopsrFull(casadi::Matrix<casadi::SXElement>)  
+  binopsrFull(casadi::Matrix<casadi::SXElement>)
 #endif // SWIGPYTHON
 
 };
@@ -2866,23 +2879,23 @@ namespace casadi {
 
 %extend casadi::MX{
   %matrix_helpers(casadi::MX)
-  
+
   #ifdef SWIGPYTHON
   %python_array_wrappers(1002.0)
-  
+
   %pythoncode %{
   def __array_custom__(self,*args,**kwargs):
     import numpy as np
     if np.__version__=="1.8.1": #1083
       return np.array(np.nan)
     raise Exception("MX cannot be converted to an array. MX.__array__ purely exists to allow ufunc/numpy goodies")
-    
+
   def __iter__(self):
     return self.nz.__iter__()
-    
+
   %}
   #endif //SWIGPYTHON
-  
+
 #ifdef SWIGPYTHON
   binopsrFull(casadi::MX)
 #endif // SWIGPYTHON
@@ -2903,14 +2916,14 @@ def pyderivativegenerator(f):
 
 def pyevaluate(f):
   return attach_return_type(f,None)
-  
+
 def pycallback(f):
   return attach_return_type(f,int)
-  
+
 
 def pyfunction(inputs,outputs):
   def wrap(f):
-    
+
     @pyevaluate
     def fcustom(f2):
       res = f([f2.getInput(i) for i in range(f2.nIn())])
@@ -2922,14 +2935,14 @@ def pyfunction(inputs,outputs):
     Fun.setOption("name","CustomFunction")
     return Fun
   return wrap
-  
+
 def PyFunction(obj,inputs,outputs):
     @pyevaluate
     def fcustom(f):
       res = [f.getOutput(i) for i in range(f.nOut())]
       obj.evaluate([f.getInput(i) for i in range(f.nIn())],res)
       for i in range(f.nOut()): f.setOutput(res[i], i)
-      
+
     Fun = CustomFunction(fcustom,inputs,outputs)
     Fun.setOption("name","CustomFunction")
     if hasattr(obj,'getDerForward'):
@@ -2937,19 +2950,19 @@ def PyFunction(obj,inputs,outputs):
       def derivativewrap(f,nfwd):
         return obj.getDerForward(f,nfwd)
       Fun.setOption("custom_forward",derivativewrap)
-      
+
     if hasattr(obj,'getDerReverse'):
       @pyderivativegenerator
       def derivativewrap(f,adj):
         return obj.getDerReverse(f,adj)
       Fun.setOption("custom_reverse",derivativewrap)
-      
+
     if hasattr(obj,'fwd'):
       @pyderivativegenerator
       def derivativewrapFwd(f,nfwd):
         num_in = f.nIn()
         num_out = f.nOut()
-        
+
         @pyevaluate
         def der(f2):
           all_inputs = [f2.getInput(i) for i in range(f2.nIn())]
@@ -2961,20 +2974,20 @@ def PyFunction(obj,inputs,outputs):
           obj.fwd(inputs,outputs,fwd_seeds,fwd_sens)
           for i in range(f2.nOut()): f2.setOutput(all_outputs[i], i)
 
-          
+
         DerFun = CustomFunction(der,inputs+outputs+nfwd*inputs,nfwd*outputs)
         DerFun.setOption("name","CustomFunction_derivative")
         DerFun.init()
         return DerFun
- 
+
       Fun.setOption("custom_forward",derivativewrapFwd)
-    
+
     if hasattr(obj,'adj'):
       @pyderivativegenerator
       def derivativewrapAdj(f,nadj):
         num_in = f.nIn()
         num_out = f.nOut()
-        
+
         @pyevaluate
         def der(f2):
           all_inputs = [f2.getInput(i) for i in range(f2.nIn())]
@@ -2985,15 +2998,15 @@ def PyFunction(obj,inputs,outputs):
           adj_sens=zip(*[iter(all_outputs)]*num_in)
           obj.adj(inputs,outputs,adj_seeds,adj_sens)
           for i in range(f2.nOut()): f2.setOutput(all_outputs[i],i)
-          
+
         DerFun = CustomFunction(der,inputs+outputs+nadj*outputs,nadj*inputs)
         DerFun.setOption("name","CustomFunction_derivative")
         DerFun.init()
         return DerFun
- 
+
       Fun.setOption("custom_reverse",derivativewrapAdj)
     return Fun
-  
+
 %}
 #endif
 
