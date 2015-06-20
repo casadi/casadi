@@ -72,15 +72,6 @@ namespace casadi {
     return MX::zz_graph_substitute(ex, v, vdef);
   }
 
-  /** \brief Inplace substitution
-   * Substitute variables v out of the expressions vdef sequentially
-   */
-  inline void
-  substituteInPlace(const std::vector<MX>& v,
-                    std::vector<MX>& SWIG_INOUT(vdef), bool reverse=false) {
-    return MX::zz_substituteInPlace(v, vdef, reverse);
-  }
-
   /** \brief Inplace substitution with piggyback expressions
    * Substitute variables v out of the expressions vdef sequentially,
    * as well as out of a number of other expressions piggyback */

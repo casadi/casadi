@@ -141,29 +141,12 @@ namespace casadi {
   }
 
   /** \brief Substitute variable var out of or into an expression expr,
-   *  with an arbitrary number of other expressions piggyback (vector version) */
+   *  with an arbitrary number of other expressions piggyback  */
   inline void substituteInPlace(const std::vector<SX>& v,
-                                std::vector<SX>& vdef,
-                                std::vector<SX>& ex,
+                                std::vector<SX>& SWIG_INOUT(vdef),
+                                std::vector<SX>& SWIG_INOUT(ex),
                                 bool reverse=false) {
     return SX::zz_substituteInPlace(v, vdef, ex, reverse);
-  }
-
-  /** \brief Substitute variable var out of or into an expression expr,
-   *  with an arbitrary number of other expressions piggyback */
-  inline void substituteInPlace(const SX& v, SX &vdef,
-                                std::vector<SX>& ex, bool reverse=false) {
-    std::vector<SX> v2(1, v);
-    std::vector<SX> vdef2(1, vdef);
-    substituteInPlace(v2, vdef2, ex, reverse);
-    vdef = vdef2.front();
-  }
-
-  /** \brief Substitute variable var out of or into an expression expr */
-  inline void substituteInPlace(const SX& v, SX &vdef, bool reverse=false) {
-    // Empty vector
-    std::vector<SX> ex;
-    substituteInPlace(v, vdef, ex, reverse);
   }
 
   /** \brief  Get the sparsity pattern of a matrix */

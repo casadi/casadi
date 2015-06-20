@@ -1410,14 +1410,8 @@ namespace casadi {
     return (*this)->print(args);
   }
 
-  void MX::zz_substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool reverse) {
-    // Empty vector
-    vector<MX> ex;
-    substituteInPlace(v, vdef, ex, reverse);
-  }
-
   void MX::zz_substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef,
-                         std::vector<MX>& ex, bool reverse) {
+                                std::vector<MX>& ex, bool reverse) {
     casadi_assert_message(v.size()==vdef.size(),
                           "Mismatch in the number of expression to substitute.");
     for (int k=0; k<v.size(); ++k) {

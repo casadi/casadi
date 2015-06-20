@@ -2758,9 +2758,6 @@
 %exception  casadi::Matrix< DataType >::zz_substitute(const std::vector< Matrix< DataType > > &ex, const std::vector< Matrix< DataType > > &v, const std::vector< Matrix< DataType > > &vdef) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::zz_substituteInPlace(const std::vector< Matrix< DataType > > &v, std::vector< Matrix< DataType > > &vdef, std::vector< Matrix< DataType > > &ex, bool reverse=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Matrix< DataType >::zz_sumAll() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

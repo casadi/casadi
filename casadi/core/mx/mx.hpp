@@ -449,8 +449,7 @@ namespace casadi {
     MX zz_polyval(const MX& x) const;
     std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
     static void zz_substituteInPlace(const std::vector<MX>& v,
-                                     std::vector<MX>& SWIG_INOUT(vdef), bool reverse=false);
-    static void zz_substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef,
+                                     std::vector<MX>& SWIG_INOUT(vdef),
                                      std::vector<MX>& SWIG_INOUT(ex), bool reverse=false);
     MX zz_substitute(const MX& v, const MX& vdef) const;
     static std::vector<MX> zz_substitute(const std::vector<MX> &ex,
