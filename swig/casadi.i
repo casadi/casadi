@@ -1311,6 +1311,17 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         return true;
       }
 #endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+      if (mxIsChar(p) && mxGetM(p)==1) {
+	if (m) {
+	  size_t len=mxGetN(p);
+	  std::vector<char> s(len+1);
+	  if (mxGetString(p, &s[0], (len+1)*sizeof(char))) return false;
+	  **m = std::string(&s[0], len);
+        }
+	return true;
+      }
+#endif // SWIGMATLAB
 
       // No match
       return false;
@@ -1319,8 +1330,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     GUESTOBJECT* from_ptr(const std::string *a) {
 #ifdef SWIGPYTHON
       return PyString_FromString(a->c_str());
-#endif // SWIGPYTHON
+#elif defined(SWIGMATLAB)
+      return mxCreateString(a->c_str());
+#else
       return 0;
+#endif
     }
   } // namespace casadi
 }
