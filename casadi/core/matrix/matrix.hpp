@@ -543,7 +543,7 @@ namespace casadi {
     Matrix<DataType> zz_norm_2() const;
     Matrix<DataType> zz_norm_F() const;
     Matrix<DataType> zz_norm_inf() const;
-    void zz_qr(Matrix<DataType>& Q, Matrix<DataType> &R) const;
+    void zz_qr(Matrix<DataType>& SWIG_OUTPUT(Q), Matrix<DataType>& SWIG_OUTPUT(R)) const;
     Matrix<DataType> zz_nullspace() const;
     Matrix<DataType> zz_solve(const Matrix<DataType>& b) const;
     Matrix<DataType> zz_pinv() const;
