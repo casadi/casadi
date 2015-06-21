@@ -786,7 +786,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 #ifdef SWIGPYTHON
       // Numpy integer
-      if (PyArray_IsScalar(p, Int)) {
+      if (PyArray_IsScalar(p, Integer)) {
         int tmp = PyArray_PyIntAsInt(p);
         if (!PyErr_Occurred()) {
           if (m) **m = tmp;
