@@ -11,6 +11,18 @@
  *    License as published by the Free Software Foundation; either
  *    version 3 of the License, or (at your option) any later version.
  *
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
  *    CasADi is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -783,6 +795,13 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal(int)(p, m ? *m : 0))) return true;
+
+      **m = PyArray_PyIntAsInt(p);
+      if (PyErr_Occurred()) {
+        PyErr_Clear();
+      } else {
+         return true;
+      }
 
       // long within int bounds
       {
