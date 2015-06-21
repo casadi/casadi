@@ -523,7 +523,7 @@ namespace casadi {
     Matrix<DataType> zz_adj() const;
     Matrix<DataType> zz_inv() const;
     Matrix<DataType> zz_cofactor(int i, int j) const;
-    Matrix<DataType> zz_minor(int i, int j) const;
+    Matrix<DataType> zz_getMinor(int i, int j) const;
     Matrix<DataType> zz_reshape(int nrow, int ncol) const;
     Matrix<DataType> zz_reshape(const Sparsity& sp) const;
     Matrix<DataType> zz_trace() const;
@@ -566,8 +566,8 @@ namespace casadi {
     inline friend Matrix<DataType> adj(const Matrix<DataType>& A) { return A.zz_adj();}
 
     /** \brief Get the (i,j) minor matrix */
-    inline friend Matrix<DataType> minor(const Matrix<DataType> &x, int i, int j) {
-      return x.zz_minor(i, j);
+    inline friend Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j) {
+      return x.zz_getMinor(i, j);
     }
 
     /** \brief Get the (i,j) cofactor matrix */

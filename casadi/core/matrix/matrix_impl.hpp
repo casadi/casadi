@@ -1979,9 +1979,9 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_minor(int i, int j) const {
+  Matrix<DataType> Matrix<DataType>::zz_getMinor(int i, int j) const {
     int n = size2();
-    casadi_assert_message(n == size1(), "minor: matrix must be square");
+    casadi_assert_message(n == size1(), "getMinor: matrix must be square");
 
     // Trivial return if scalar
     if (n==1) return 1;
@@ -2010,7 +2010,7 @@ namespace casadi {
   Matrix<DataType> Matrix<DataType>::zz_cofactor(int i, int j) const {
 
     // Calculate the i, j minor
-    Matrix<DataType> minor_ij = minor(*this, i, j);
+    Matrix<DataType> minor_ij = getMinor(*this, i, j);
     // Calculate the cofactor
     int sign_i = 1-2*((i+j) % 2);
 
