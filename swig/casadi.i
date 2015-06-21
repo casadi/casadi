@@ -784,7 +784,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal(int)(p, m ? *m : 0))) return true;
 
-      {
+#ifdef SWIGPYTHON
+      // Numpy integer
+      if (PyArray_CheckScalar(p)) {
         int tmp = PyArray_PyIntAsInt(p);
         if (!PyErr_Occurred()) {
           if (m) **m = tmp;
@@ -792,6 +794,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         }
         PyErr_Clear();
       }
+#endif // SWIGPYTHON
 
       // long within int bounds
       {
