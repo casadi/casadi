@@ -32,17 +32,11 @@
 
   /// Data structure in the target language holding data
 #ifdef SWIGPYTHON
-%{
 #define GUESTOBJECT PyObject
-%}
 #elif defined(SWIGMATLAB)
-%{
 #define GUESTOBJECT mxArray
-%}
 #else
-%{
 #define GUESTOBJECT void
-%}
 #endif
 
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning,
