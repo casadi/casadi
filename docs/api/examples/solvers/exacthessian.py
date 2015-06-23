@@ -47,7 +47,7 @@ lambd=SX.sym("lambd")  # Multipier of the problem, shape m x 1.
 xy = vertcat([x,y])
 
 h=SXFunction(hessLagIn(x=xy,lam_g=lambd,lam_f=sigma),
-             hessLagOut(hess=sigma*hessian(obj,xy)+lambd*hessian(constr,xy)))
+             hessLagOut(hess=sigma*hessian(obj,xy)[0]+lambd*hessian(constr,xy)[0]))
    
 #! We solve the problem with an exact hessian
 solver = NlpSolver("ipopt", nlp)
