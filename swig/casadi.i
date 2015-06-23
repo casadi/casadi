@@ -1458,6 +1458,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
             if (!casadi::to_ptr(value, static_cast<M**>(0))) return false;
 	  }
 	}
+        return true;
       }
 #endif
       return false;
