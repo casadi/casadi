@@ -33,11 +33,10 @@ z = SX.sym('z');
 v = [x;y;z]
 f = x^2 + 100*z^2;
 g = z + (1-x)^2 - y;
-nlp = SXFunction(nlpIn('x',v),nlpOut('f',f','g',g));
+nlp = SXFunction('nlp', nlpIn('x',v),nlpOut('f',f','g',g));
 
 % Create IPOPT solver object
-solver = NlpSolver('ipopt', nlp);
-solver.init();
+solver = NlpSolver('solver', 'ipopt', nlp);
  
 % Pass solution guess
 solver.setInput([2.5 3.0 0.75], 'x0');
@@ -54,6 +53,3 @@ f_opt = full(solver.getOutput('f'))          % >> 0
 x_opt = full(solver.getOutput('x'))          % >> [0; 1; 0]
 lam_x_opt = full(solver.getOutput('lam_x'))  % >> [0; 0; 0]
 lam_g_opt = full(solver.getOutput('lam_g'))  % >> 0
-
-% Unload CasADi (important!)
-clear
