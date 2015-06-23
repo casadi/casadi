@@ -44,6 +44,8 @@ namespace casadi {
         st_[SOCP_STRUCT_A]=i->second;
       } else if (i->first=="g") {
         st_[SOCP_STRUCT_G]=i->second;
+      } else if (i->first=="e") {
+        st_[SOCP_STRUCT_E]=i->second;
       } else {
         casadi_error("Unrecognized field in SOCP structure: " << i->first);
       }

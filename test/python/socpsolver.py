@@ -107,7 +107,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, aux_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,{"g": G.sparsity(),"e":E.sparsity(),"a":A.sparsity()})
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
