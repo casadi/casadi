@@ -532,6 +532,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %}
 #endif
 
+#ifndef SWIGXML
+
 %fragment("casadi_decl", "header") {
   namespace casadi {
     /* Check if Null or None */
@@ -2102,6 +2104,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 // Collect all fragments
 %fragment("casadi_all", "header", fragment="casadi_aux,casadi_bool,casadi_int,casadi_double,casadi_vector,casadi_function,casadi_derivativegenerator,casadi_callback,casadi_customevaluate,casadi_generictype,casadi_string,casadi_slice,casadi_map,casadi_pair,casadi_dvector,casadi_sx,casadi_mx,casadi_dmatrix,casadi_sparsity,casadi_imatrix") { }
 
+#endif // SWIGXML
+
  // Define all input typemaps
 %define %casadi_input_typemaps(xName, xPrec, xType...)
  // Pass input by value, check if matches
@@ -2216,6 +2220,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %define PREC_STRING 180 %enddef
 %define PREC_FUNCTION 200 %enddef
 
+#ifndef SWIGXML
+
 %casadi_typemaps("str", PREC_STRING, std::string)
 %casadi_template("[str]", PREC_STRING, std::vector<std::string>)
 %casadi_typemaps("Sparsity", PREC_SPARSITY, casadi::Sparsity)
@@ -2262,6 +2268,8 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_input_typemaps("CustomEvaluate", PREC_CUSTOMEVALUATE, casadi::CustomEvaluate)
 %casadi_input_typemaps("Callback", PREC_CALLBACK, casadi::Callback)
 %casadi_template("Dict", PREC_DICT, std::map<std::string, casadi::GenericType>)
+
+#endif // SWIGXML
 
 %{
 using namespace casadi;
