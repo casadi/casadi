@@ -152,8 +152,8 @@ f.init()
 print "%d -> %d" % (f.nIn(),f.nOut())
 print f([x,y])
 f.init()
-f.setInput([1,2,3,4],0); # instead of f.setInput([[1,2],[3,4]],0);
-f.setInput([4,5,6,7],1);
+f.setInput(DMatrix([[1,2],[3,4]]),0)
+f.setInput(DMatrix([[4,5],[6,7]]),1)
 f.evaluate()
 print f.getOutput()
 print f.jac(0).T
