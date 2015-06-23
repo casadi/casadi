@@ -27,8 +27,8 @@ import warnings
 import os
 import numpy as np
 
-from casadi_loader import *    # import everything
-import casadi_loader as casadi # import everything
+from casadi import *
+import casadi
 
 # For plugin loading
 CasadiOptions.setCasadiPath(os.path.dirname(__file__))
