@@ -37,7 +37,7 @@ namespace casadi {
     plugin->creator = QcqpToSocp::creator;
     plugin->name = "socp";
     plugin->doc = QcqpToSocp::meta_doc.c_str();;
-    plugin->version = 22;
+    plugin->version = 23;
     plugin->adaptorHasPlugin = SocpSolver::hasPlugin;
     return 0;
   }
@@ -130,11 +130,11 @@ namespace casadi {
       solver_.input(SOCP_SOLVER_F).at(i) = sqrt(solver_.input(SOCP_SOLVER_F).at(i));
     }
 
-    solver_.input(SOCP_SOLVER_E)[n_] = 0.5/solver_.input(SOCP_SOLVER_F)[0];
+    solver_.input(SOCP_SOLVER_E)[0] = 0.5/solver_.input(SOCP_SOLVER_F)[0];
 
     // Fix the first qc arising from epigraph reformulation: we must make use of e here.
     solver_.input(SOCP_SOLVER_G)[cholesky_[0].getFactorization().nnz()] =
-      solver_.input(SOCP_SOLVER_E)[n_];
+      solver_.input(SOCP_SOLVER_E)[0];
 
     /// Objective of the epigraph form
     solver_.input(SOCP_SOLVER_C)[n_] = 1;
@@ -160,14 +160,14 @@ namespace casadi {
     stats_["socp_solver_stats"] = solver_.getStats();
 
     // Read the outputs from SOCP Solver
-    output(SOCP_SOLVER_COST).set(solver_.output(QCQP_SOLVER_COST));
-    output(SOCP_SOLVER_LAM_A).set(solver_.output(QCQP_SOLVER_LAM_A));
-    std::copy(solver_.output(QCQP_SOLVER_X).begin(),
-              solver_.output(QCQP_SOLVER_X).begin()+n_,
-              output(SOCP_SOLVER_X).begin());
-    std::copy(solver_.output(QCQP_SOLVER_LAM_X).begin(),
-              solver_.output(QCQP_SOLVER_LAM_X).begin()+n_,
-              output(SOCP_SOLVER_LAM_X).begin());
+    output(QCQP_SOLVER_COST).set(solver_.output(SOCP_SOLVER_COST));
+    output(QCQP_SOLVER_LAM_A).set(solver_.output(SOCP_SOLVER_LAM_A));
+    std::copy(solver_.output(SOCP_SOLVER_X).begin(),
+              solver_.output(SOCP_SOLVER_X).begin()+n_,
+              output(QCQP_SOLVER_X).begin());
+    std::copy(solver_.output(SOCP_SOLVER_LAM_X).begin(),
+              solver_.output(SOCP_SOLVER_LAM_X).begin()+n_,
+              output(QCQP_SOLVER_LAM_X).begin());
   }
 
   void QcqpToSocp::init() {
@@ -195,11 +195,21 @@ namespace casadi {
         cholesky_[i].getFactorizationSparsity(false), Sparsity::dense(1, 1)));
     }
 
+    // Initialize sparsity pattern for E
+    // E has merely one value, on the last row of the first column.
+    std::vector<int> socp_e_colind, socp_e_row;
+    socp_e_colind.push_back(0);
+    for (int i=0;i<nq_+1;++i) socp_e_colind.push_back(1);
+    socp_e_row.push_back(n_);
+    Sparsity socp_e(n_+1, nq_+1, socp_e_colind, socp_e_row);
+
     // Create an SocpSolver instance
     solver_ = SocpSolver(getOption(solvername()),
                          make_map("g", horzcat(socp_g),
+                                  "e", socp_e,
                                   "a", horzcat(input(QCQP_SOLVER_A).sparsity(),
                                                Sparsity(nc_, 1))));
+
     //solver_.setQCQPOptions();
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
 

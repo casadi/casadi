@@ -30,10 +30,13 @@ from helpers import *
 
 qcqpsolvers = []
 if SdpSolver.hasPlugin("dsdp"):
-  qcqpsolvers.append(("socp",{"socp_solver": "sdp", "socp_solver_options": {"sdp_solver": "dsdp"} },False))
+  qcqpsolvers.append(("socp",{"socp_solver": "sdp", "socp_solver_options": {"sdp_solver": "dsdp"} },{},False))
 
 if SdpSolver.hasPlugin("dsdp"):
-  qcqpsolvers.append(("socp.sdp.dsdp",{},False))
+  qcqpsolvers.append(("socp.sdp.dsdp",{},{},False))
+
+if SocpSolver.hasPlugin("mosek"):
+  qcqpsolvers.append(("socp",{"socp_solver": "mosek", "socp_solver_options": {"MSK_DPAR_INTPNT_CO_TOL_REL_GAP": 1e-10} },{"less_digits": 3},False))
 
 class QcqpSolverTests(casadiTestCase):
 
@@ -47,7 +50,7 @@ class QcqpSolverTests(casadiTestCase):
     LBX = DMatrix([ -inf,-3 ])
     UBX = DMatrix([ inf, -inf ])
     
-    for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
+    for qcqpsolver, qcqp_options, aux_options, re_init in qcqpsolvers:
       solver = QcqpSolver(qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()})
       solver.setOption(qcqp_options)
       solver.init()
@@ -78,12 +81,17 @@ class QcqpSolverTests(casadiTestCase):
     LBX = DMatrix([ -inf, -inf ])
     UBX = DMatrix([ inf, inf ])
     
-    for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
+    for qcqpsolver, qcqp_options, aux_options, re_init in qcqpsolvers:
       self.message("qcqpsolver: " + str(qcqpsolver))
 
       solver = QcqpSolver(qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()})
       solver.setOption(qcqp_options)
       solver.init()
+
+      try:
+        less_digits=aux_options["less_digits"]
+      except:
+        less_digits=0
 
       solver.setInput(H,"h")
       solver.setInput(G,"g")
@@ -98,12 +106,12 @@ class QcqpSolverTests(casadiTestCase):
       
       #socp = solver.getSolver()
         
-      self.checkarray(solver.getOutput(),DMatrix([-(sqrt(73)+3)/3,-(sqrt(73)+9)/12]),str(qcqpsolver),digits=5)
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qcqpsolver),digits=5)
+      self.checkarray(solver.getOutput(),DMatrix([-(sqrt(73)+3)/3,-(sqrt(73)+9)/12]),str(qcqpsolver),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qcqpsolver),digits=max(1,5-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(qcqpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(qcqpsolver),digits=max(1,5-less_digits))
       
-      self.checkarray(solver.getOutput("cost"),mul(G.T,solver.getOutput()),str(qcqpsolver),digits=4)
+      self.checkarray(solver.getOutput("cost"),mul(G.T,solver.getOutput()),str(qcqpsolver),digits=max(1,4-less_digits))
 
   def test_qp(self):
     #  min  1/2 x' H x + 2 x + y
@@ -118,12 +126,17 @@ class QcqpSolverTests(casadiTestCase):
     LBX = DMatrix([ -inf, -inf ])
     UBX = DMatrix([ inf, inf ])
     
-    for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
+    for qcqpsolver, qcqp_options, aux_options, re_init in qcqpsolvers:
       self.message("qcqpsolver: " + str(qcqpsolver))
 
       solver = QcqpSolver(qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()})
       solver.setOption(qcqp_options)
       solver.init()
+
+      try:
+        less_digits=aux_options["less_digits"]
+      except:
+        less_digits=0
 
       solver.setInput(H,"h")
       solver.setInput(G,"g")
@@ -138,12 +151,12 @@ class QcqpSolverTests(casadiTestCase):
       
       #socp = solver.getSolver()
         
-      self.checkarray(solver.getOutput(),DMatrix([-2,-1]),str(qcqpsolver),digits=5)
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qcqpsolver),digits=5)
+      self.checkarray(solver.getOutput(),DMatrix([-2,-1]),str(qcqpsolver),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qcqpsolver),digits=max(1,5-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(qcqpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(qcqpsolver),digits=max(1,5-less_digits))
       
-      self.checkarray(solver.getOutput("cost"),-2.5,str(qcqpsolver),digits=4)
+      self.checkarray(solver.getOutput("cost"),-2.5,str(qcqpsolver),digits=max(1,4-less_digits))
   
       
 if __name__ == '__main__':

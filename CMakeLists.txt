@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.6)
 project(casadi C CXX)
 set(PACKAGE_NAME "CasADi")
-set(PACKAGE_VERSION "2.2.0+")
-set(PACKAGE_SO_VERSION "2.3")
+set(PACKAGE_VERSION "2.3.0")
+set(PACKAGE_SO_VERSION "2.4")
 set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differentation and numeric optimization")
 set(PACKAGE_AUTHOR "Joel Andersson")
 set(PACKAGE_MAINTAINER "Joris Gillis")
@@ -65,6 +65,7 @@ option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" ON)
 option(WITH_DSDP "Compile the interface to DSDP" ON)
+option(WITH_MOSEK "Compile the interface to MOSEK" OFF)
 option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
@@ -416,6 +417,14 @@ if(WITH_DSDP)
 endif()
 add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP.")
 
+# MOSEK
+if(WITH_MOSEK)
+  # try to find system mosek
+  find_package(MOSEK)
+endif()
+add_feature_info(mosek-interface MOSEK_FOUND "Interface to the interior point SOCP solver MOSEK.")
+
+
 # Use the included qpOASES
 if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
   set(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
@@ -489,7 +498,7 @@ add_feature_info(slicot-interface SLICOT_FOUND "Interface to the controls librar
 if(WITH_WORHP)
   find_package(WORHP)
 endif()
-add_feature_info(worhp-interface WORHP_FOUND "Interface to the NLP solver Worhp.")
+add_feature_info(worhp-interface WORHP_FOUND "Interface to the NLP solver Worhp (requires gfortran, gomp).")
 
 
 if(WITH_PROFILING)

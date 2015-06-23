@@ -783,14 +783,33 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > socpOut(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M(),
-    const std::string &n3 ="", const M &x3 =M()) {
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M()) {
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
   if (!n2.empty()) m[n2]=x2;
   if (!n3.empty()) m[n3]=x3;
-  std::string s[] = {"x", "cost", "lam_a", "lam_x"};
-  return std::make_pair(m, std::vector<std::string>(s, s+4));
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  std::string s[] = {"x", "cost", "dual_cost", "lam_a", "lam_x", "lam_cone"};
+  return std::make_pair(m, std::vector<std::string>(s, s+6));
+}
+/// Structure specification of an SOCP
+///
+/// \copydoc scheme_SOCPStruct
+template<class M>
+std::pair<std::map<std::string, M>, std::vector<std::string> > socpStruct(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  std::string s[] = {"g", "e", "a"};
+  return std::make_pair(m, std::vector<std::string>(s, s+3));
 }
 /// Input arguments of a QP problem
 ///

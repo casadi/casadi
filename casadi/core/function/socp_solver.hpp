@@ -45,10 +45,10 @@
     LBX <= x   <= UBX
 
     with x ( n x 1)
-    c ( n x 1 )
+    c   dense ( n x 1 )
     Gi  sparse (n x ni)
     hi  dense (ni x 1)
-    ei  dense (n x 1)
+    ei  sparse (n x 1)
     fi  dense (1 x 1)
     N = Sum_i^m ni
     A sparse (nc x n)
@@ -68,7 +68,7 @@ namespace casadi {
     SOCP_SOLVER_G,
     /// The vertical stack of all vectors hi: ( N x 1) [h]
     SOCP_SOLVER_H,
-    /// The vertical stack of all vectors ei: ( nm x 1) [e]
+    /// The horizontal stack of all vectors ei: ( n x m) [e]
     SOCP_SOLVER_E,
     /// The vertical stack of all scalars fi: ( m x 1) [f]
     SOCP_SOLVER_F,
@@ -92,11 +92,25 @@ namespace casadi {
     SOCP_SOLVER_X,
     /// The primal optimal cost (1 x 1) [cost]
     SOCP_SOLVER_COST,
+    /// The dual optimal cost (1 x 1) [dual_cost]
+    SOCP_SOLVER_DUAL_COST,
     /// The dual solution corresponding to the linear constraints  (nc x 1) [lam_a]
     SOCP_SOLVER_LAM_A,
     /// The dual solution corresponding to simple bounds  (n x 1) [lam_x]
     SOCP_SOLVER_LAM_X,
+    /// The dual solution correspoding to cone (2-norm) constraints (m x 1) [lam_cone]
+    SOCP_SOLVER_LAM_CONE,
     SOCP_SOLVER_NUM_OUT};
+
+  /// Structure specification of an SOCP [socpStruct]
+  enum SOCPStruct {
+    /// The horizontal stack of all matrices Gi: ( n x N) [g]
+    SOCP_STRUCT_G,
+    /// The horizontal stack of all vectors ei: ( n x m) [e]
+    SOCP_STRUCT_E,
+    /// The matrix A: ( nc x n) [a]
+    SOCP_STRUCT_A,
+    SOCP_STRUCT_NUM};
 #endif // SWIG
 
   // Forward declaration of internal class

@@ -1,19 +1,21 @@
-find_package(PythonLibs QUIET)
-find_package(PythonInterp QUIET)
-if(PYTHON_EXECUTABLE AND NOT NUMPY_INCLUDE_DIR)
-  message(STATUS "Python executable is ${PYTHON_EXECUTABLE}")
-  exec_program ("${PYTHON_EXECUTABLE}" 
-       ARGS "-c \"import numpy; print numpy.get_include()\""
-       OUTPUT_VARIABLE NUMPY_INCLUDE_DIR
-       RETURN_VALUE NUMPY_NOT_FOUND)
-  message(STATUS "numpy.get_include() is ${NUMPY_INCLUDE_DIR}")
-endif(PYTHON_EXECUTABLE AND NOT NUMPY_INCLUDE_DIR)
-
-find_path(NUMPY_PATH
-ndarrayobject.h
-HINTS $ENV{NUMPY_INCLUDE}
-PATHS ${PYTHON_INCLUDE_DIRS}/numpy ${PYTHON_INCLUDE_PATH}/numpy ${NUMPY_INCLUDE_DIR}/numpy 
-)
+if(NOT NUMPY_PATH)
+  find_package(PythonLibs QUIET)
+  find_package(PythonInterp QUIET)
+  if(PYTHON_EXECUTABLE AND NOT NUMPY_INCLUDE_DIR)
+    message(STATUS "Python executable is ${PYTHON_EXECUTABLE}")
+    exec_program ("${PYTHON_EXECUTABLE}" 
+         ARGS "-c \"import numpy; print numpy.get_include()\""
+         OUTPUT_VARIABLE NUMPY_INCLUDE_DIR
+         RETURN_VALUE NUMPY_NOT_FOUND)
+    message(STATUS "numpy.get_include() is ${NUMPY_INCLUDE_DIR}")
+  endif(PYTHON_EXECUTABLE AND NOT NUMPY_INCLUDE_DIR)
+  
+  find_path(NUMPY_PATH
+  ndarrayobject.h
+  HINTS $ENV{NUMPY_INCLUDE}
+  PATHS ${PYTHON_INCLUDE_DIRS}/numpy ${PYTHON_INCLUDE_PATH}/numpy ${NUMPY_INCLUDE_DIR}/numpy 
+  )
+endif()
 
 # Joel: What is the purpose of this??
 find_path(NUMPY_PATH_DEP1

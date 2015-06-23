@@ -1333,12 +1333,12 @@
 <tr><td>ma27_ignore_singularity</td><td>OT_STRING</td><td>no</td><td>Enables MA27's ability to solve a linear system even if the matrix is singular. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma27_la_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Real workspace memory for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma27_liw_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Integer workspace memory for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>2.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>10.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma27_pivtol</td><td>OT_REAL</td><td>1e-08</td><td>Pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma27_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma27_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma28_pivtol</td><td>OT_REAL</td><td>0.01</td><td>Pivot tolerance for linear solver MA28. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>no</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>yes</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma57_block_size</td><td>OT_INTEGER</td><td>16</td><td>Controls block size used by Level 3 BLAS in MA57BD (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma57_node_amalgamation</td><td>OT_INTEGER</td><td>16</td><td>Node amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma57_pivot_order</td><td>OT_INTEGER</td><td>5</td><td>Controls pivot order in MA57 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1346,39 +1346,12 @@
 <tr><td>ma57_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA57. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma57_pre_alloc</td><td>OT_REAL</td><td>1.05</td><td>Safety factor for work space memory allocation for the linear solver MA57. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma57_small_pivot_flag</td><td>OT_INTEGER</td><td>0</td><td>If set to 1, then when small entries defined by CNTL(2) are detected they are removed and the corresponding pivots placed at the end of the factorization.  This can be particularly efficient if the matrix is highly rank deficient. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_buffer_lpage</td><td>OT_INTEGER</td><td>4096</td><td>Number of scalars per MA77 buffer page (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_buffer_npage</td><td>OT_INTEGER</td><td>1600</td><td>Number of pages that make up MA77 buffer (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_file_size</td><td>OT_INTEGER</td><td>2097152</td><td>Target size of each temporary file for MA77, scalars per type (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_maxstore</td><td>OT_INTEGER</td><td>0</td><td>Maximum storage size for MA77 in-core mode (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_nemin</td><td>OT_INTEGER</td><td>8</td><td>Node Amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_order</td><td>OT_STRING</td><td>amd</td><td>Controls type of ordering used by HSL_MA77 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_print_level</td><td>OT_INTEGER</td><td>-1</td><td>Debug printing level for the linear solver MA77 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma77_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma86_nemin</td><td>OT_INTEGER</td><td>32</td><td>Node Amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma86_order</td><td>OT_STRING</td><td>amd</td><td>Controls type of ordering used by HSL_MA86 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>-1</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma86_scaling</td><td>OT_STRING</td><td>mc64</td><td>Controls scaling of matrix (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma86_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma86_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma86_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ma86_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_nemin</td><td>OT_INTEGER</td><td>8</td><td>Node Amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_order</td><td>OT_STRING</td><td>auto</td><td>Controls type of ordering used by HSL_MA97 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA97 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_scaling</td><td>OT_STRING</td><td>dynamic</td><td>Specifies strategy for scaling in HSL_MA97 linear solver (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_scaling1</td><td>OT_STRING</td><td>mc64</td><td>First scaling. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_scaling2</td><td>OT_STRING</td><td>mc64</td><td>Second scaling. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_scaling3</td><td>OT_STRING</td><td>mc64</td><td>Third scaling. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_solve_blas3</td><td>OT_STRING</td><td>no</td><td>Controls if blas2 or blas3 routines are used for solve (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_switch1</td><td>OT_STRING</td><td>od_hd_reuse</td><td>First switch, determine when ma97_scaling1 is enabled. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_switch2</td><td>OT_STRING</td><td>never</td><td>Second switch, determine when ma97_scaling2 is enabled. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_switch3</td><td>OT_STRING</td><td>never</td><td>Third switch, determine when ma97_scaling3 is enabled. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma97_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>magic_steps</td><td>OT_STRING</td><td>no</td><td>Enables magic steps. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>max_cpu_time</td><td>OT_REAL</td><td>1000000.0</td><td>Maximum number of CPU seconds. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>max_filter_resets</td><td>OT_INTEGER</td><td>5</td><td>Maximal allowed number of filter resets (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1405,7 +1378,7 @@
 <tr><td>mu_target</td><td>OT_REAL</td><td>0.0</td><td>Desired value of complementarity. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>mult_diverg_feasibility_tol</td><td>OT_REAL</td><td>1e-07</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>mult_diverg_y_tol</td><td>OT_REAL</td><td>100000000.0</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>0.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>-1.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>mumps_mem_percent</td><td>OT_INTEGER</td><td>1000</td><td>Percentage increase in the estimated working space for MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>mumps_permuting_scaling</td><td>OT_INTEGER</td><td>7</td><td>Controls permuting and scaling in MUMPS (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>mumps_pivot_order</td><td>OT_INTEGER</td><td>7</td><td>Controls pivot order in MUMPS (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1428,7 +1401,7 @@
 <tr><td>num_linear_variables</td><td>OT_INTEGER</td><td>0</td><td>Number of linear variables (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>obj_max_inc</td><td>OT_REAL</td><td>5.0</td><td>Determines the upper bound on the acceptable increase of barrier objective function. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>obj_scaling_factor</td><td>OT_REAL</td><td>1.0</td><td>Scaling factor for the objective function. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>option_file_name</td><td>OT_STRING</td><td>ipopt.opt</td><td>File name of options file. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>option_file_name</td><td>OT_STRING</td><td></td><td>File name of options file (to overwrite default). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>output_file</td><td>OT_STRING</td><td></td><td>File name of desired output file (leave unset for no file output). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_iter_coarse_size</td><td>OT_INTEGER</td><td>5000</td><td>Maximum Size of Coarse Grid Matrix (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_iter_dropping_factor</td><td>OT_REAL</td><td>0.5</td><td>dropping value for incomplete factor (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1441,9 +1414,8 @@
 <tr><td>pardiso_matching_strategy</td><td>OT_STRING</td><td>complete+2x2</td><td>Matching strategy to be used by Pardiso (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_max_droptol_corrections</td><td>OT_INTEGER</td><td>4</td><td>Maximal number of decreases of drop tolerance during one solve. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_max_iter</td><td>OT_INTEGER</td><td>500</td><td>Maximum number of Krylov-Subspace Iteration (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_max_iterative_refinement_steps</td><td>OT_INTEGER</td><td>0</td><td>Limit on number of iterative refinement steps. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_msglvl</td><td>OT_INTEGER</td><td>0</td><td>Pardiso message level (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_order</td><td>OT_STRING</td><td>five</td><td>Controls the fill-in reduction ordering algorithm for the input matrix. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>pardiso_out_of_core_power</td><td>OT_INTEGER</td><td>0</td><td>Enables out-of-core variant of Pardiso (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_redo_symbolic_fact_only_if_inertia_wrong</td><td>OT_STRING</td><td>no</td><td>Toggle for handling case when elements were perturbed by Pardiso. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_repeated_perturbation_means_singular</td><td>OT_STRING</td><td>no</td><td>Interpretation of perturbed elements. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1463,8 +1435,6 @@
 <tr><td>piecewisepenalty_gamma_infeasi</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>piecewisepenalty_gamma_obj</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>point_perturbation_radius</td><td>OT_REAL</td><td>10.0</td><td>Maximal perturbation of an evaluation point. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>print_frequency_iter</td><td>OT_INTEGER</td><td>1</td><td>Determines at which iteration frequency the summarizing iteration output line should be printed. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>print_frequency_time</td><td>OT_REAL</td><td>0.0</td><td>Determines at which time frequency the summarizing iteration output line should be printed. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>print_info_string</td><td>OT_STRING</td><td>no</td><td>Enables printing of additional info string at end of iteration output. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td>5</td><td>Output verbosity level. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>print_options_documentation</td><td>OT_STRING</td><td>no</td><td>Switch to print all algorithmic options. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1647,12 +1617,12 @@
 <tr><td>ma27_ignore_singularity</td><td>OT_STRING</td><td>no</td><td>Enables MA27's ability to solve a linear system even if the matrix is singular. (see IPOPT documentation)</td></tr>
 <tr><td>ma27_la_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Real workspace memory for MA27. (see IPOPT documentation)</td></tr>
 <tr><td>ma27_liw_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Integer workspace memory for MA27. (see IPOPT documentation)</td></tr>
-<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>2.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td></tr>
+<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>10.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td></tr>
 <tr><td>ma27_pivtol</td><td>OT_REAL</td><td>1e-08</td><td>Pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td></tr>
 <tr><td>ma27_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td></tr>
 <tr><td>ma27_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td></tr>
 <tr><td>ma28_pivtol</td><td>OT_REAL</td><td>0.01</td><td>Pivot tolerance for linear solver MA28. (see IPOPT documentation)</td></tr>
-<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>no</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td></tr>
+<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>yes</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td></tr>
 <tr><td>ma57_block_size</td><td>OT_INTEGER</td><td>16</td><td>Controls block size used by Level 3 BLAS in MA57BD (see IPOPT documentation)</td></tr>
 <tr><td>ma57_node_amalgamation</td><td>OT_INTEGER</td><td>16</td><td>Node amalgamation parameter (see IPOPT documentation)</td></tr>
 <tr><td>ma57_pivot_order</td><td>OT_INTEGER</td><td>5</td><td>Controls pivot order in MA57 (see IPOPT documentation)</td></tr>
@@ -1660,39 +1630,12 @@
 <tr><td>ma57_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA57. (see IPOPT documentation)</td></tr>
 <tr><td>ma57_pre_alloc</td><td>OT_REAL</td><td>1.05</td><td>Safety factor for work space memory allocation for the linear solver MA57. (see IPOPT documentation)</td></tr>
 <tr><td>ma57_small_pivot_flag</td><td>OT_INTEGER</td><td>0</td><td>If set to 1, then when small entries defined by CNTL(2) are detected they are removed and the corresponding pivots placed at the end of the factorization.  This can be particularly efficient if the matrix is highly rank deficient. (see IPOPT documentation)</td></tr>
-<tr><td>ma77_buffer_lpage</td><td>OT_INTEGER</td><td>4096</td><td>Number of scalars per MA77 buffer page (see IPOPT documentation)</td></tr>
-<tr><td>ma77_buffer_npage</td><td>OT_INTEGER</td><td>1600</td><td>Number of pages that make up MA77 buffer (see IPOPT documentation)</td></tr>
-<tr><td>ma77_file_size</td><td>OT_INTEGER</td><td>2097152</td><td>Target size of each temporary file for MA77, scalars per type (see IPOPT documentation)</td></tr>
-<tr><td>ma77_maxstore</td><td>OT_INTEGER</td><td>0</td><td>Maximum storage size for MA77 in-core mode (see IPOPT documentation)</td></tr>
-<tr><td>ma77_nemin</td><td>OT_INTEGER</td><td>8</td><td>Node Amalgamation parameter (see IPOPT documentation)</td></tr>
-<tr><td>ma77_order</td><td>OT_STRING</td><td>amd</td><td>Controls type of ordering used by HSL_MA77 (see IPOPT documentation)</td></tr>
-<tr><td>ma77_print_level</td><td>OT_INTEGER</td><td>-1</td><td>Debug printing level for the linear solver MA77 (see IPOPT documentation)</td></tr>
-<tr><td>ma77_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma77_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma77_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma77_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td></tr>
 <tr><td>ma86_nemin</td><td>OT_INTEGER</td><td>32</td><td>Node Amalgamation parameter (see IPOPT documentation)</td></tr>
-<tr><td>ma86_order</td><td>OT_STRING</td><td>amd</td><td>Controls type of ordering used by HSL_MA86 (see IPOPT documentation)</td></tr>
-<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>-1</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td></tr>
-<tr><td>ma86_scaling</td><td>OT_STRING</td><td>mc64</td><td>Controls scaling of matrix (see IPOPT documentation)</td></tr>
+<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td></tr>
 <tr><td>ma86_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td></tr>
 <tr><td>ma86_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td></tr>
 <tr><td>ma86_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td></tr>
 <tr><td>ma86_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma97_nemin</td><td>OT_INTEGER</td><td>8</td><td>Node Amalgamation parameter (see IPOPT documentation)</td></tr>
-<tr><td>ma97_order</td><td>OT_STRING</td><td>auto</td><td>Controls type of ordering used by HSL_MA97 (see IPOPT documentation)</td></tr>
-<tr><td>ma97_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA97 (see IPOPT documentation)</td></tr>
-<tr><td>ma97_scaling</td><td>OT_STRING</td><td>dynamic</td><td>Specifies strategy for scaling in HSL_MA97 linear solver (see IPOPT documentation)</td></tr>
-<tr><td>ma97_scaling1</td><td>OT_STRING</td><td>mc64</td><td>First scaling. (see IPOPT documentation)</td></tr>
-<tr><td>ma97_scaling2</td><td>OT_STRING</td><td>mc64</td><td>Second scaling. (see IPOPT documentation)</td></tr>
-<tr><td>ma97_scaling3</td><td>OT_STRING</td><td>mc64</td><td>Third scaling. (see IPOPT documentation)</td></tr>
-<tr><td>ma97_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma97_solve_blas3</td><td>OT_STRING</td><td>no</td><td>Controls if blas2 or blas3 routines are used for solve (see IPOPT documentation)</td></tr>
-<tr><td>ma97_switch1</td><td>OT_STRING</td><td>od_hd_reuse</td><td>First switch, determine when ma97_scaling1 is enabled. (see IPOPT documentation)</td></tr>
-<tr><td>ma97_switch2</td><td>OT_STRING</td><td>never</td><td>Second switch, determine when ma97_scaling2 is enabled. (see IPOPT documentation)</td></tr>
-<tr><td>ma97_switch3</td><td>OT_STRING</td><td>never</td><td>Third switch, determine when ma97_scaling3 is enabled. (see IPOPT documentation)</td></tr>
-<tr><td>ma97_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma97_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td></tr>
 <tr><td>magic_steps</td><td>OT_STRING</td><td>no</td><td>Enables magic steps. (see IPOPT documentation)</td></tr>
 <tr><td>max_cpu_time</td><td>OT_REAL</td><td>1000000.0</td><td>Maximum number of CPU seconds. (see IPOPT documentation)</td></tr>
 <tr><td>max_filter_resets</td><td>OT_INTEGER</td><td>5</td><td>Maximal allowed number of filter resets (see IPOPT documentation)</td></tr>
@@ -1718,7 +1661,7 @@
 <tr><td>mu_target</td><td>OT_REAL</td><td>0.0</td><td>Desired value of complementarity. (see IPOPT documentation)</td></tr>
 <tr><td>mult_diverg_feasibility_tol</td><td>OT_REAL</td><td>1e-07</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td></tr>
 <tr><td>mult_diverg_y_tol</td><td>OT_REAL</td><td>100000000.0</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td></tr>
-<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>0.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td></tr>
+<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>-1.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td></tr>
 <tr><td>mumps_mem_percent</td><td>OT_INTEGER</td><td>1000</td><td>Percentage increase in the estimated working space for MUMPS. (see IPOPT documentation)</td></tr>
 <tr><td>mumps_permuting_scaling</td><td>OT_INTEGER</td><td>7</td><td>Controls permuting and scaling in MUMPS (see IPOPT documentation)</td></tr>
 <tr><td>mumps_pivot_order</td><td>OT_INTEGER</td><td>7</td><td>Controls pivot order in MUMPS (see IPOPT documentation)</td></tr>
@@ -1740,7 +1683,7 @@
 <tr><td>num_linear_variables</td><td>OT_INTEGER</td><td>0</td><td>Number of linear variables (see IPOPT documentation)</td></tr>
 <tr><td>obj_max_inc</td><td>OT_REAL</td><td>5.0</td><td>Determines the upper bound on the acceptable increase of barrier objective function. (see IPOPT documentation)</td></tr>
 <tr><td>obj_scaling_factor</td><td>OT_REAL</td><td>1.0</td><td>Scaling factor for the objective function. (see IPOPT documentation)</td></tr>
-<tr><td>option_file_name</td><td>OT_STRING</td><td>ipopt.opt</td><td>File name of options file. (see IPOPT documentation)</td></tr>
+<tr><td>option_file_name</td><td>OT_STRING</td><td></td><td>File name of options file (to overwrite default). (see IPOPT documentation)</td></tr>
 <tr><td>output_file</td><td>OT_STRING</td><td></td><td>File name of desired output file (leave unset for no file output). (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_iter_coarse_size</td><td>OT_INTEGER</td><td>5000</td><td>Maximum Size of Coarse Grid Matrix (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_iter_dropping_factor</td><td>OT_REAL</td><td>0.5</td><td>dropping value for incomplete factor (see IPOPT documentation)</td></tr>
@@ -1753,9 +1696,8 @@
 <tr><td>pardiso_matching_strategy</td><td>OT_STRING</td><td>complete+2x2</td><td>Matching strategy to be used by Pardiso (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_max_droptol_corrections</td><td>OT_INTEGER</td><td>4</td><td>Maximal number of decreases of drop tolerance during one solve. (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_max_iter</td><td>OT_INTEGER</td><td>500</td><td>Maximum number of Krylov-Subspace Iteration (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_max_iterative_refinement_steps</td><td>OT_INTEGER</td><td>0</td><td>Limit on number of iterative refinement steps. (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_msglvl</td><td>OT_INTEGER</td><td>0</td><td>Pardiso message level (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_order</td><td>OT_STRING</td><td>five</td><td>Controls the fill-in reduction ordering algorithm for the input matrix. (see IPOPT documentation)</td></tr>
+<tr><td>pardiso_out_of_core_power</td><td>OT_INTEGER</td><td>0</td><td>Enables out-of-core variant of Pardiso (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_redo_symbolic_fact_only_if_inertia_wrong</td><td>OT_STRING</td><td>no</td><td>Toggle for handling case when elements were perturbed by Pardiso. (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_repeated_perturbation_means_singular</td><td>OT_STRING</td><td>no</td><td>Interpretation of perturbed elements. (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td></tr>
@@ -1775,8 +1717,6 @@
 <tr><td>piecewisepenalty_gamma_infeasi</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
 <tr><td>piecewisepenalty_gamma_obj</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
 <tr><td>point_perturbation_radius</td><td>OT_REAL</td><td>10.0</td><td>Maximal perturbation of an evaluation point. (see IPOPT documentation)</td></tr>
-<tr><td>print_frequency_iter</td><td>OT_INTEGER</td><td>1</td><td>Determines at which iteration frequency the summarizing iteration output line should be printed. (see IPOPT documentation)</td></tr>
-<tr><td>print_frequency_time</td><td>OT_REAL</td><td>0.0</td><td>Determines at which time frequency the summarizing iteration output line should be printed. (see IPOPT documentation)</td></tr>
 <tr><td>print_info_string</td><td>OT_STRING</td><td>no</td><td>Enables printing of additional info string at end of iteration output. (see IPOPT documentation)</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td>5</td><td>Output verbosity level. (see IPOPT documentation)</td></tr>
 <tr><td>print_options_documentation</td><td>OT_STRING</td><td>no</td><td>Switch to print all algorithmic options. (see IPOPT documentation)</td></tr>
@@ -2497,6 +2437,646 @@
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::MosekSocpInterface
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>MSK_DPAR_ANA_SOL_INFEAS_TOL</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_BASIS_REL_TOL_S</td><td>OT_REAL</td><td>1e-12</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_BASIS_TOL_S</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_BASIS_TOL_X</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_CHECK_CONVEXITY_REL_TOL</td><td>OT_REAL</td><td>1e-10</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_AIJ</td><td>OT_REAL</td><td>1e-12</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_AIJ_HUGE</td><td>OT_REAL</td><td>1e+20</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_AIJ_LARGE</td><td>OT_REAL</td><td>10000000000.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_BOUND_INF</td><td>OT_REAL</td><td>1e+16</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_BOUND_WRN</td><td>OT_REAL</td><td>100000000.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_CJ_LARGE</td><td>OT_REAL</td><td>100000000.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_C_HUGE</td><td>OT_REAL</td><td>1e+16</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_QIJ</td><td>OT_REAL</td><td>1e-16</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_X</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_FEASREPAIR_TOL</td><td>OT_REAL</td><td>1e-10</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_CO_TOL_DFEAS</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_CO_TOL_INFEAS</td><td>OT_REAL</td><td>1e-10</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_CO_TOL_MU_RED</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_CO_TOL_NEAR_REL</td><td>OT_REAL</td><td>1000.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_CO_TOL_PFEAS</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_CO_TOL_REL_GAP</td><td>OT_REAL</td><td>1e-07</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_MERIT_BAL</td><td>OT_REAL</td><td>0.0001</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_TOL_DFEAS</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_TOL_MU_RED</td><td>OT_REAL</td><td>1e-12</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_TOL_NEAR_REL</td><td>OT_REAL</td><td>1000.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_TOL_PFEAS</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_TOL_REL_GAP</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_TOL_REL_STEP</td><td>OT_REAL</td><td>0.995</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_DFEAS</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_DSAFE</td><td>OT_REAL</td><td>1.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_INFEAS</td><td>OT_REAL</td><td>1e-10</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_MU_RED</td><td>OT_REAL</td><td>1e-16</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_PATH</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_PFEAS</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_PSAFE</td><td>OT_REAL</td><td>1.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_REL_GAP</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_REL_STEP</td><td>OT_REAL</td><td>0.9999</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_STEP_SIZE</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_LOWER_OBJ_CUT</td><td>OT_REAL</td><td>-1e+30</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_LOWER_OBJ_CUT_FINITE_TRH</td><td>OT_REAL</td><td>-5e+29</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_DISABLE_TERM_TIME</td><td>OT_REAL</td><td>-1.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_HEURISTIC_TIME</td><td>OT_REAL</td><td>-1.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_MAX_TIME</td><td>OT_REAL</td><td>-1.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_MAX_TIME_APRX_OPT</td><td>OT_REAL</td><td>60.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_NEAR_TOL_ABS_GAP</td><td>OT_REAL</td><td>0.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_NEAR_TOL_REL_GAP</td><td>OT_REAL</td><td>0.001</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_REL_ADD_CUT_LIMITED</td><td>OT_REAL</td><td>0.75</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_REL_GAP_CONST</td><td>OT_REAL</td><td>1e-10</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_ABS_GAP</td><td>OT_REAL</td><td>0.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_ABS_RELAX_INT</td><td>OT_REAL</td><td>1e-05</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_FEAS</td><td>OT_REAL</td><td>1e-07</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_MAX_CUT_FRAC_RHS</td><td>OT_REAL</td><td>0.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_MIN_CUT_FRAC_RHS</td><td>OT_REAL</td><td>0.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_REL_DUAL_BOUND_IMPROVEMENT</td><td>OT_REAL</td><td>0.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_REL_GAP</td><td>OT_REAL</td><td>0.0001</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_REL_RELAX_INT</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_X</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_NONCONVEX_TOL_FEAS</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_NONCONVEX_TOL_OPT</td><td>OT_REAL</td><td>1e-07</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_OPTIMIZER_MAX_TIME</td><td>OT_REAL</td><td>-1.0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_PRESOLVE_TOL_ABS_LINDEP</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_PRESOLVE_TOL_AIJ</td><td>OT_REAL</td><td>1e-12</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_PRESOLVE_TOL_REL_LINDEP</td><td>OT_REAL</td><td>1e-10</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_PRESOLVE_TOL_S</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_PRESOLVE_TOL_X</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_QCQO_REFORMULATE_REL_DROP_TOL</td><td>OT_REAL</td><td>1e-15</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_SIMPLEX_ABS_TOL_PIV</td><td>OT_REAL</td><td>1e-07</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_SIM_LU_TOL_REL_PIV</td><td>OT_REAL</td><td>0.01</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_UPPER_OBJ_CUT</td><td>OT_REAL</td><td>1e+30</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_DPAR_UPPER_OBJ_CUT_FINITE_TRH</td><td>OT_REAL</td><td>5e+29</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_ALLOC_ADD_QNZ</td><td>OT_STRING</td><td>5000</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_ANA_SOL_BASIS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_ANA_SOL_PRINT_VIOLATED</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_AUTO_SORT_A_BEFORE_OPT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_AUTO_UPDATE_SOL_INFO</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_BASIS_SOLVE_USE_PLUS_ONE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_BI_CLEAN_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_BI_IGNORE_MAX_ITER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_BI_IGNORE_NUM_ERROR</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_BI_MAX_ITERATIONS</td><td>OT_STRING</td><td>1000000</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_CACHE_LICENSE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_CHECK_CONVEXITY</td><td>OT_STRING</td><td>2</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_COMPRESS_STATFILE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_CONCURRENT_NUM_OPTIMIZERS</td><td>OT_STRING</td><td>2</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_CONCURRENT_PRIORITY_DUAL_SIMPLEX</td><td>OT_STRING</td><td>2</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_CONCURRENT_PRIORITY_FREE_SIMPLEX</td><td>OT_STRING</td><td>3</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_CONCURRENT_PRIORITY_INTPNT</td><td>OT_STRING</td><td>4</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_CONCURRENT_PRIORITY_PRIMAL_SIMPLEX</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_FEASREPAIR_OPTIMIZE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INFEAS_GENERIC_NAMES</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INFEAS_PREFER_PRIMAL</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INFEAS_REPORT_AUTO</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INFEAS_REPORT_LEVEL</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_BASIS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_DIFF_STEP</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_FACTOR_DEBUG_LVL</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_FACTOR_METHOD</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_HOTSTART</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_MAX_ITERATIONS</td><td>OT_STRING</td><td>400</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_MAX_NUM_COR</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_MAX_NUM_REFINEMENT_STEPS</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_OFF_COL_TRH</td><td>OT_STRING</td><td>40</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_ORDER_METHOD</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_REGULARIZATION_USE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_SCALING</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_SOLVE_FORM</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_INTPNT_STARTING_POINT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LICENSE_DEBUG</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LICENSE_PAUSE_TIME</td><td>OT_STRING</td><td>100</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LICENSE_SUPPRESS_EXPIRE_WRNS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LICENSE_WAIT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LIC_TRH_EXPIRY_WRN</td><td>OT_STRING</td><td>7</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG</td><td>OT_STRING</td><td>10</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_BI</td><td>OT_STRING</td><td>4</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_BI_FREQ</td><td>OT_STRING</td><td>2500</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_CHECK_CONVEXITY</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_CONCURRENT</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_CUT_SECOND_OPT</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_EXPAND</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_FACTOR</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_FEAS_REPAIR</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_FILE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_HEAD</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_INFEAS_ANA</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_INTPNT</td><td>OT_STRING</td><td>4</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_MIO</td><td>OT_STRING</td><td>4</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_MIO_FREQ</td><td>OT_STRING</td><td>1000</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_NONCONVEX</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_OPTIMIZER</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_ORDER</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_PARAM</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_PRESOLVE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_RESPONSE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_SENSITIVITY</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_SENSITIVITY_OPT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_SIM</td><td>OT_STRING</td><td>4</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_SIM_FREQ</td><td>OT_STRING</td><td>1000</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_SIM_MINOR</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_SIM_NETWORK_FREQ</td><td>OT_STRING</td><td>1000</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_LOG_STORAGE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MAX_NUM_WARNINGS</td><td>OT_STRING</td><td>6</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_BRANCH_DIR</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_BRANCH_PRIORITIES_USE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_CONSTRUCT_SOL</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_CONT_SOL</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_CUT_CG</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_CUT_CMIR</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_CUT_LEVEL_ROOT</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_CUT_LEVEL_TREE</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_FEASPUMP_LEVEL</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_HEURISTIC_LEVEL</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_HOTSTART</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_KEEP_BASIS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_LOCAL_BRANCH_NUMBER</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_MAX_NUM_BRANCHES</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_MAX_NUM_RELAXS</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_MAX_NUM_SOLUTIONS</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_MODE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_MT_USER_CB</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_NODE_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_NODE_SELECTION</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_OPTIMIZER_MODE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_PRESOLVE_AGGREGATE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_PRESOLVE_PROBING</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_PRESOLVE_USE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_PROBING_LEVEL</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_RINS_MAX_NODES</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_ROOT_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_STRONG_BRANCH</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MIO_USE_MULTITHREADED_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_MT_SPINCOUNT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_NONCONVEX_MAX_ITERATIONS</td><td>OT_STRING</td><td>100000</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_NUM_THREADS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_OPF_MAX_TERMS_PER_LINE</td><td>OT_STRING</td><td>5</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_HEADER</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_HINTS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_PARAMETERS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_PROBLEM</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_SOLUTIONS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_SOL_BAS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_SOL_ITG</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_SOL_ITR</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_PARAM_READ_CASE_NAME</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_PARAM_READ_IGN_ERROR</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_ELIMINATOR_MAX_NUM_TRIES</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_ELIMINATOR_USE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_ELIM_FILL</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_LEVEL</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_LINDEP_ABS_WORK_TRH</td><td>OT_STRING</td><td>100</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_LINDEP_REL_WORK_TRH</td><td>OT_STRING</td><td>100</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_LINDEP_USE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_MAX_NUM_REDUCTIONS</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_USE</td><td>OT_STRING</td><td>2</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_PRIMAL_REPAIR_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_QO_SEPARABLE_REFORMULATION</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_ANZ</td><td>OT_STRING</td><td>100000</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_CON</td><td>OT_STRING</td><td>10000</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_CONE</td><td>OT_STRING</td><td>2500</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_DATA_COMPRESSED</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_DATA_FORMAT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_DEBUG</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_KEEP_FREE_CON</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_LP_DROP_NEW_VARS_IN_BOU</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_LP_QUOTED_NAMES</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_MPS_FORMAT</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_MPS_KEEP_INT</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_MPS_OBJ_SENSE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_MPS_RELAX</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_MPS_WIDTH</td><td>OT_STRING</td><td>1024</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_QNZ</td><td>OT_STRING</td><td>20000</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_TASK_IGNORE_PARAM</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_READ_VAR</td><td>OT_STRING</td><td>10000</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SENSITIVITY_ALL</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SENSITIVITY_OPTIMIZER</td><td>OT_STRING</td><td>6</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SENSITIVITY_TYPE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_BASIS_FACTOR_USE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_DEGEN</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_DUAL_CRASH</td><td>OT_STRING</td><td>90</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_DUAL_PHASEONE_METHOD</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_DUAL_RESTRICT_SELECTION</td><td>OT_STRING</td><td>50</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_DUAL_SELECTION</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_EXPLOIT_DUPVEC</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_HOTSTART</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_HOTSTART_LU</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_INTEGER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_MAX_ITERATIONS</td><td>OT_STRING</td><td>10000000</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_MAX_NUM_SETBACKS</td><td>OT_STRING</td><td>250</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_NON_SINGULAR</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_PRIMAL_CRASH</td><td>OT_STRING</td><td>90</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_PRIMAL_PHASEONE_METHOD</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_PRIMAL_RESTRICT_SELECTION</td><td>OT_STRING</td><td>50</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_PRIMAL_SELECTION</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_REFACTOR_FREQ</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_REFORMULATION</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_SAVE_LU</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_SCALING</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_SCALING_METHOD</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_SOLVE_FORM</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_STABILITY_PRIORITY</td><td>OT_STRING</td><td>50</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SIM_SWITCH_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SOLUTION_CALLBACK</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SOL_FILTER_KEEP_BASIC</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SOL_FILTER_KEEP_RANGED</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SOL_READ_NAME_WIDTH</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_SOL_READ_WIDTH</td><td>OT_STRING</td><td>1024</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_TIMING_LEVEL</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WARNING_LEVEL</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_BAS_CONSTRAINTS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_BAS_HEAD</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_BAS_VARIABLES</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_DATA_COMPRESSED</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_DATA_FORMAT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_DATA_PARAM</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_FREE_CON</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_GENERIC_NAMES</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_GENERIC_NAMES_IO</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_IGNORE_INCOMPATIBLE_CONIC_ITEMS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_IGNORE_INCOMPATIBLE_ITEMS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_IGNORE_INCOMPATIBLE_NL_ITEMS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_IGNORE_INCOMPATIBLE_PSD_ITEMS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_INT_CONSTRAINTS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_INT_HEAD</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_INT_VARIABLES</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_LP_LINE_WIDTH</td><td>OT_STRING</td><td>80</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_LP_QUOTED_NAMES</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_LP_STRICT_FORMAT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_LP_TERMS_PER_LINE</td><td>OT_STRING</td><td>10</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_MPS_INT</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_PRECISION</td><td>OT_STRING</td><td>8</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_SOL_BARVARIABLES</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_SOL_CONSTRAINTS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_SOL_HEAD</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_SOL_IGNORE_INVALID_NAMES</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_SOL_VARIABLES</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_TASK_INC_SOL</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_IPAR_WRITE_XML_MODE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_BAS_SOL_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_DATA_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_DEBUG_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_FEASREPAIR_NAME_PREFIX</td><td>OT_STRING</td><td>MSK-</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_FEASREPAIR_NAME_SEPARATOR</td><td>OT_STRING</td><td>-</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_FEASREPAIR_NAME_WSUMVIOL</td><td>OT_STRING</td><td>WSUMVIOL</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_INT_SOL_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_ITR_SOL_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_MIO_DEBUG_STRING</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_PARAM_COMMENT_SIGN</td><td>OT_STRING</td><td>%%</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_PARAM_READ_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_PARAM_WRITE_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_READ_MPS_BOU_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_READ_MPS_OBJ_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_READ_MPS_RAN_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_READ_MPS_RHS_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_SENSITIVITY_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_SENSITIVITY_RES_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_SOL_FILTER_XC_LOW</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_SOL_FILTER_XC_UPR</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_SOL_FILTER_XX_LOW</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_SOL_FILTER_XX_UPR</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_STAT_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_STAT_KEY</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_STAT_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>MSK_SPAR_WRITE_LP_GEN_VAR_NAME</td><td>OT_STRING</td><td>XMSKGEN</td><td>Consult MOSEK manual.</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td><td>casadi::MosekSocpInterface</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>ni</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Provide the size of each SOC constraint. Must sum up to N.</td><td>casadi::SocpSolverInternal</td></tr>
+<tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SocpSolverInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_SocpSolver_mosek
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td>MSK_DPAR_ANA_SOL_INFEAS_TOL</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_BASIS_REL_TOL_S</td><td>OT_REAL</td><td>1e-12</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_BASIS_TOL_S</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_BASIS_TOL_X</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_CHECK_CONVEXITY_REL_TOL</td><td>OT_REAL</td><td>1e-10</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_AIJ</td><td>OT_REAL</td><td>1e-12</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_AIJ_HUGE</td><td>OT_REAL</td><td>1e+20</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_AIJ_LARGE</td><td>OT_REAL</td><td>10000000000.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_BOUND_INF</td><td>OT_REAL</td><td>1e+16</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_BOUND_WRN</td><td>OT_REAL</td><td>100000000.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_CJ_LARGE</td><td>OT_REAL</td><td>100000000.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_C_HUGE</td><td>OT_REAL</td><td>1e+16</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_QIJ</td><td>OT_REAL</td><td>1e-16</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_DATA_TOL_X</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_FEASREPAIR_TOL</td><td>OT_REAL</td><td>1e-10</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_CO_TOL_DFEAS</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_CO_TOL_INFEAS</td><td>OT_REAL</td><td>1e-10</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_CO_TOL_MU_RED</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_CO_TOL_NEAR_REL</td><td>OT_REAL</td><td>1000.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_CO_TOL_PFEAS</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_CO_TOL_REL_GAP</td><td>OT_REAL</td><td>1e-07</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_MERIT_BAL</td><td>OT_REAL</td><td>0.0001</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_TOL_DFEAS</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_TOL_MU_RED</td><td>OT_REAL</td><td>1e-12</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_TOL_NEAR_REL</td><td>OT_REAL</td><td>1000.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_TOL_PFEAS</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_TOL_REL_GAP</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_NL_TOL_REL_STEP</td><td>OT_REAL</td><td>0.995</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_DFEAS</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_DSAFE</td><td>OT_REAL</td><td>1.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_INFEAS</td><td>OT_REAL</td><td>1e-10</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_MU_RED</td><td>OT_REAL</td><td>1e-16</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_PATH</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_PFEAS</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_PSAFE</td><td>OT_REAL</td><td>1.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_REL_GAP</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_REL_STEP</td><td>OT_REAL</td><td>0.9999</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_INTPNT_TOL_STEP_SIZE</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_LOWER_OBJ_CUT</td><td>OT_REAL</td><td>-1e+30</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_LOWER_OBJ_CUT_FINITE_TRH</td><td>OT_REAL</td><td>-5e+29</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_DISABLE_TERM_TIME</td><td>OT_REAL</td><td>-1.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_HEURISTIC_TIME</td><td>OT_REAL</td><td>-1.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_MAX_TIME</td><td>OT_REAL</td><td>-1.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_MAX_TIME_APRX_OPT</td><td>OT_REAL</td><td>60.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_NEAR_TOL_ABS_GAP</td><td>OT_REAL</td><td>0.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_NEAR_TOL_REL_GAP</td><td>OT_REAL</td><td>0.001</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_REL_ADD_CUT_LIMITED</td><td>OT_REAL</td><td>0.75</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_REL_GAP_CONST</td><td>OT_REAL</td><td>1e-10</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_ABS_GAP</td><td>OT_REAL</td><td>0.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_ABS_RELAX_INT</td><td>OT_REAL</td><td>1e-05</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_FEAS</td><td>OT_REAL</td><td>1e-07</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_MAX_CUT_FRAC_RHS</td><td>OT_REAL</td><td>0.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_MIN_CUT_FRAC_RHS</td><td>OT_REAL</td><td>0.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_REL_DUAL_BOUND_IMPROVEMENT</td><td>OT_REAL</td><td>0.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_REL_GAP</td><td>OT_REAL</td><td>0.0001</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_REL_RELAX_INT</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_MIO_TOL_X</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_NONCONVEX_TOL_FEAS</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_NONCONVEX_TOL_OPT</td><td>OT_REAL</td><td>1e-07</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_OPTIMIZER_MAX_TIME</td><td>OT_REAL</td><td>-1.0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_PRESOLVE_TOL_ABS_LINDEP</td><td>OT_REAL</td><td>1e-06</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_PRESOLVE_TOL_AIJ</td><td>OT_REAL</td><td>1e-12</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_PRESOLVE_TOL_REL_LINDEP</td><td>OT_REAL</td><td>1e-10</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_PRESOLVE_TOL_S</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_PRESOLVE_TOL_X</td><td>OT_REAL</td><td>1e-08</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_QCQO_REFORMULATE_REL_DROP_TOL</td><td>OT_REAL</td><td>1e-15</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_SIMPLEX_ABS_TOL_PIV</td><td>OT_REAL</td><td>1e-07</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_SIM_LU_TOL_REL_PIV</td><td>OT_REAL</td><td>0.01</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_UPPER_OBJ_CUT</td><td>OT_REAL</td><td>1e+30</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_DPAR_UPPER_OBJ_CUT_FINITE_TRH</td><td>OT_REAL</td><td>5e+29</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_ALLOC_ADD_QNZ</td><td>OT_STRING</td><td>5000</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_ANA_SOL_BASIS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_ANA_SOL_PRINT_VIOLATED</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_AUTO_SORT_A_BEFORE_OPT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_AUTO_UPDATE_SOL_INFO</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_BASIS_SOLVE_USE_PLUS_ONE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_BI_CLEAN_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_BI_IGNORE_MAX_ITER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_BI_IGNORE_NUM_ERROR</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_BI_MAX_ITERATIONS</td><td>OT_STRING</td><td>1000000</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_CACHE_LICENSE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_CHECK_CONVEXITY</td><td>OT_STRING</td><td>2</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_COMPRESS_STATFILE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_CONCURRENT_NUM_OPTIMIZERS</td><td>OT_STRING</td><td>2</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_CONCURRENT_PRIORITY_DUAL_SIMPLEX</td><td>OT_STRING</td><td>2</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_CONCURRENT_PRIORITY_FREE_SIMPLEX</td><td>OT_STRING</td><td>3</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_CONCURRENT_PRIORITY_INTPNT</td><td>OT_STRING</td><td>4</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_CONCURRENT_PRIORITY_PRIMAL_SIMPLEX</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_FEASREPAIR_OPTIMIZE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INFEAS_GENERIC_NAMES</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INFEAS_PREFER_PRIMAL</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INFEAS_REPORT_AUTO</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INFEAS_REPORT_LEVEL</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_BASIS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_DIFF_STEP</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_FACTOR_DEBUG_LVL</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_FACTOR_METHOD</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_HOTSTART</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_MAX_ITERATIONS</td><td>OT_STRING</td><td>400</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_MAX_NUM_COR</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_MAX_NUM_REFINEMENT_STEPS</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_OFF_COL_TRH</td><td>OT_STRING</td><td>40</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_ORDER_METHOD</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_REGULARIZATION_USE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_SCALING</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_SOLVE_FORM</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_INTPNT_STARTING_POINT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LICENSE_DEBUG</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LICENSE_PAUSE_TIME</td><td>OT_STRING</td><td>100</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LICENSE_SUPPRESS_EXPIRE_WRNS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LICENSE_WAIT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LIC_TRH_EXPIRY_WRN</td><td>OT_STRING</td><td>7</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG</td><td>OT_STRING</td><td>10</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_BI</td><td>OT_STRING</td><td>4</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_BI_FREQ</td><td>OT_STRING</td><td>2500</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_CHECK_CONVEXITY</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_CONCURRENT</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_CUT_SECOND_OPT</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_EXPAND</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_FACTOR</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_FEAS_REPAIR</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_FILE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_HEAD</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_INFEAS_ANA</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_INTPNT</td><td>OT_STRING</td><td>4</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_MIO</td><td>OT_STRING</td><td>4</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_MIO_FREQ</td><td>OT_STRING</td><td>1000</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_NONCONVEX</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_OPTIMIZER</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_ORDER</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_PARAM</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_PRESOLVE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_RESPONSE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_SENSITIVITY</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_SENSITIVITY_OPT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_SIM</td><td>OT_STRING</td><td>4</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_SIM_FREQ</td><td>OT_STRING</td><td>1000</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_SIM_MINOR</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_SIM_NETWORK_FREQ</td><td>OT_STRING</td><td>1000</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_LOG_STORAGE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MAX_NUM_WARNINGS</td><td>OT_STRING</td><td>6</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_BRANCH_DIR</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_BRANCH_PRIORITIES_USE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_CONSTRUCT_SOL</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_CONT_SOL</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_CUT_CG</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_CUT_CMIR</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_CUT_LEVEL_ROOT</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_CUT_LEVEL_TREE</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_FEASPUMP_LEVEL</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_HEURISTIC_LEVEL</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_HOTSTART</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_KEEP_BASIS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_LOCAL_BRANCH_NUMBER</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_MAX_NUM_BRANCHES</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_MAX_NUM_RELAXS</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_MAX_NUM_SOLUTIONS</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_MODE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_MT_USER_CB</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_NODE_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_NODE_SELECTION</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_OPTIMIZER_MODE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_PRESOLVE_AGGREGATE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_PRESOLVE_PROBING</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_PRESOLVE_USE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_PROBING_LEVEL</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_RINS_MAX_NODES</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_ROOT_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_STRONG_BRANCH</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MIO_USE_MULTITHREADED_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_MT_SPINCOUNT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_NONCONVEX_MAX_ITERATIONS</td><td>OT_STRING</td><td>100000</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_NUM_THREADS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_OPF_MAX_TERMS_PER_LINE</td><td>OT_STRING</td><td>5</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_HEADER</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_HINTS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_PARAMETERS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_PROBLEM</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_SOLUTIONS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_SOL_BAS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_SOL_ITG</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_OPF_WRITE_SOL_ITR</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_PARAM_READ_CASE_NAME</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_PARAM_READ_IGN_ERROR</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_ELIMINATOR_MAX_NUM_TRIES</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_ELIMINATOR_USE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_ELIM_FILL</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_LEVEL</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_LINDEP_ABS_WORK_TRH</td><td>OT_STRING</td><td>100</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_LINDEP_REL_WORK_TRH</td><td>OT_STRING</td><td>100</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_LINDEP_USE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_MAX_NUM_REDUCTIONS</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_PRESOLVE_USE</td><td>OT_STRING</td><td>2</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_PRIMAL_REPAIR_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_QO_SEPARABLE_REFORMULATION</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_ANZ</td><td>OT_STRING</td><td>100000</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_CON</td><td>OT_STRING</td><td>10000</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_CONE</td><td>OT_STRING</td><td>2500</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_DATA_COMPRESSED</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_DATA_FORMAT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_DEBUG</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_KEEP_FREE_CON</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_LP_DROP_NEW_VARS_IN_BOU</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_LP_QUOTED_NAMES</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_MPS_FORMAT</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_MPS_KEEP_INT</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_MPS_OBJ_SENSE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_MPS_RELAX</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_MPS_WIDTH</td><td>OT_STRING</td><td>1024</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_QNZ</td><td>OT_STRING</td><td>20000</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_TASK_IGNORE_PARAM</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_READ_VAR</td><td>OT_STRING</td><td>10000</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SENSITIVITY_ALL</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SENSITIVITY_OPTIMIZER</td><td>OT_STRING</td><td>6</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SENSITIVITY_TYPE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_BASIS_FACTOR_USE</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_DEGEN</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_DUAL_CRASH</td><td>OT_STRING</td><td>90</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_DUAL_PHASEONE_METHOD</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_DUAL_RESTRICT_SELECTION</td><td>OT_STRING</td><td>50</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_DUAL_SELECTION</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_EXPLOIT_DUPVEC</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_HOTSTART</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_HOTSTART_LU</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_INTEGER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_MAX_ITERATIONS</td><td>OT_STRING</td><td>10000000</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_MAX_NUM_SETBACKS</td><td>OT_STRING</td><td>250</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_NON_SINGULAR</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_PRIMAL_CRASH</td><td>OT_STRING</td><td>90</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_PRIMAL_PHASEONE_METHOD</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_PRIMAL_RESTRICT_SELECTION</td><td>OT_STRING</td><td>50</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_PRIMAL_SELECTION</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_REFACTOR_FREQ</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_REFORMULATION</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_SAVE_LU</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_SCALING</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_SCALING_METHOD</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_SOLVE_FORM</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_STABILITY_PRIORITY</td><td>OT_STRING</td><td>50</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SIM_SWITCH_OPTIMIZER</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SOLUTION_CALLBACK</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SOL_FILTER_KEEP_BASIC</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SOL_FILTER_KEEP_RANGED</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SOL_READ_NAME_WIDTH</td><td>OT_STRING</td><td>-1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_SOL_READ_WIDTH</td><td>OT_STRING</td><td>1024</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_TIMING_LEVEL</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WARNING_LEVEL</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_BAS_CONSTRAINTS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_BAS_HEAD</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_BAS_VARIABLES</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_DATA_COMPRESSED</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_DATA_FORMAT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_DATA_PARAM</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_FREE_CON</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_GENERIC_NAMES</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_GENERIC_NAMES_IO</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_IGNORE_INCOMPATIBLE_CONIC_ITEMS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_IGNORE_INCOMPATIBLE_ITEMS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_IGNORE_INCOMPATIBLE_NL_ITEMS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_IGNORE_INCOMPATIBLE_PSD_ITEMS</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_INT_CONSTRAINTS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_INT_HEAD</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_INT_VARIABLES</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_LP_LINE_WIDTH</td><td>OT_STRING</td><td>80</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_LP_QUOTED_NAMES</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_LP_STRICT_FORMAT</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_LP_TERMS_PER_LINE</td><td>OT_STRING</td><td>10</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_MPS_INT</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_PRECISION</td><td>OT_STRING</td><td>8</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_SOL_BARVARIABLES</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_SOL_CONSTRAINTS</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_SOL_HEAD</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_SOL_IGNORE_INVALID_NAMES</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_SOL_VARIABLES</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_TASK_INC_SOL</td><td>OT_STRING</td><td>1</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_IPAR_WRITE_XML_MODE</td><td>OT_STRING</td><td>0</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_BAS_SOL_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_DATA_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_DEBUG_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_FEASREPAIR_NAME_PREFIX</td><td>OT_STRING</td><td>MSK-</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_FEASREPAIR_NAME_SEPARATOR</td><td>OT_STRING</td><td>-</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_FEASREPAIR_NAME_WSUMVIOL</td><td>OT_STRING</td><td>WSUMVIOL</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_INT_SOL_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_ITR_SOL_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_MIO_DEBUG_STRING</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_PARAM_COMMENT_SIGN</td><td>OT_STRING</td><td>%%</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_PARAM_READ_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_PARAM_WRITE_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_READ_MPS_BOU_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_READ_MPS_OBJ_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_READ_MPS_RAN_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_READ_MPS_RHS_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_SENSITIVITY_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_SENSITIVITY_RES_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_SOL_FILTER_XC_LOW</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_SOL_FILTER_XC_UPR</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_SOL_FILTER_XX_LOW</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_SOL_FILTER_XX_UPR</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_STAT_FILE_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_STAT_KEY</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_STAT_NAME</td><td>OT_STRING</td><td></td><td>Consult MOSEK manual.</td></tr>
+<tr><td>MSK_SPAR_WRITE_LP_GEN_VAR_NAME</td><td>OT_STRING</td><td>XMSKGEN</td><td>Consult MOSEK manual.</td></tr>
+<tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -4345,7 +4925,14 @@
 <tr><td>LowPassAlphaG</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for constraint values</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>LowPassAlphaMerit</td><td>OT_REAL</td><td>0.1</td><td>Lowpass-filter update factor for merit function values</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>LowPassFilter</td><td>OT_BOOLEAN</td><td>True</td><td>Enable lowpass-filter termination criterion</td><td>casadi::WorhpInterface</td></tr>
-<tr><td>MAPivotThreshold</td><td>OT_REAL</td><td>1e-06</td><td>Pivoting tolerance for MA solvers</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>MA97blas3</td><td>OT_BOOLEAN</td><td>False</td><td>Use BLAS level 3 (dgemm) in MA97</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>MA97mf</td><td>OT_BOOLEAN</td><td>False</td><td>Use multifrontal-style forward solve of MA97</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>MA97nemin</td><td>OT_INTEGER</td><td>8</td><td>Node amalgation, controls merging in elimination tree by MA97</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>MA97ordering</td><td>OT_INTEGER</td><td>5</td><td>Ordering used by MA97</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>MA97print</td><td>OT_INTEGER</td><td>-1</td><td>Print level used by MA97</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>MA97scaling</td><td>OT_INTEGER</td><td>0</td><td>Scaling used by MA97</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>MA97small</td><td>OT_REAL</td><td>1e-20</td><td>Any pivot whose modulus is less than this is treated as zero by MA97</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>MA97u</td><td>OT_REAL</td><td>0.01</td><td>Relative pivot tolerance of MA97</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>MatrixCC</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>MaxCalls</td><td>OT_INTEGER</td><td>2147483647</td><td>Upper bound to Reverse Communication calls</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>MaxForce</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of Force recovery strategy steps</td><td>casadi::WorhpInterface</td></tr>
@@ -4371,6 +4958,11 @@
 <tr><td>QPscaleParam</td><td>OT_REAL</td><td>0.0</td><td>(currently unused) Scaling factor for QP</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>QuadraticProblem</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>ReduceBettsTau</td><td>OT_REAL</td><td>0.3</td><td>Decrease factor for Betts' update dampening term</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>RefineFeasibility</td><td>OT_INTEGER</td><td>0</td><td>0 - Deactivated, 1 - After first feasible iterate, 2 - Always on, Activates iterative refinement due to perturbation in constraints using parametric sensitivities</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>RefineMaxHMReg</td><td>OT_REAL</td><td>1000.0</td><td>Maximum allowed regularisation of the hessian CAUTION absolute value</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>RefineMaxRelax</td><td>OT_REAL</td><td>0.75</td><td>Maximum allowed relaxation to apply feasibility refinement</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>RefineOnlyOnAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Activates new iterative refinement of constraints only when Armijo alpha equals one</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>RefineStartTol</td><td>OT_REAL</td><td>1e-06</td><td>Start tolerance for successful termination of iterative refinement due to perturbation in constraints</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>RegStrategy</td><td>OT_INTEGER</td><td>1</td><td>Select Hessian regularisation strategy in Filter</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>ReinitFilter</td><td>OT_BOOLEAN</td><td>False</td><td>Enables Filter-reinitialisation accelerating heuristic</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>RelaxMaxDelta</td><td>OT_REAL</td><td>0.92</td><td>Upper bound for accepting the constraint relaxation variable</td><td>casadi::WorhpInterface</td></tr>
@@ -4386,6 +4978,7 @@
 <tr><td>ScaledObj</td><td>OT_BOOLEAN</td><td>True</td><td>Scale the objective function</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>ScaledQP</td><td>OT_BOOLEAN</td><td>True</td><td>Scale some matrices handed to the QP</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>StartBettsTau</td><td>OT_REAL</td><td>0.1</td><td>Initial value for Betts' update dampening term</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>SteffensenOnRefine</td><td>OT_BOOLEAN</td><td>False</td><td>Use Steffensen Extrapolation during Feasibility Refinement</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>SwitchingDelta</td><td>OT_REAL</td><td>0.01</td><td>Filter switching condition parameter</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>SwitchingSCV</td><td>OT_REAL</td><td>1.1</td><td>Filter switching condition parameter</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>SwitchingSF</td><td>OT_REAL</td><td>2.3</td><td>Filter switching condition parameter</td><td>casadi::WorhpInterface</td></tr>
@@ -4398,11 +4991,20 @@
 <tr><td>TooBig</td><td>OT_BOOLEAN</td><td>True</td><td>Enable too-big termination heuristics</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>TooBigCV</td><td>OT_REAL</td><td>1e+25</td><td>Upper bound on constraint violation for too-big heuristic</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>TooBigKKT</td><td>OT_REAL</td><td>1e+30</td><td>Upper bound on KKT values for too-big heuristic</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>UpdateMu</td><td>OT_BOOLEAN</td><td>True</td><td>Activates update of lagrange multipliers during correction step</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>UseZen</td><td>OT_BOOLEAN</td><td>False</td><td>Run Zen module after successful termination</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>UserDF</td><td>OT_BOOLEAN</td><td>True</td><td>Objective gradient values supplied by caller</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>UserDG</td><td>OT_BOOLEAN</td><td>True</td><td>Jacobian values supplied by caller</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>UserHM</td><td>OT_BOOLEAN</td><td>True</td><td>Hessian values supplied by caller</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>UserHMstructure</td><td>OT_INTEGER</td><td>2</td><td>Enable automatic Hessian structure generation or checking</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>UserZenDGp</td><td>OT_BOOLEAN</td><td>False</td><td>Hessian values supplied by caller</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>UserZenDLp</td><td>OT_BOOLEAN</td><td>False</td><td>Gradient values supplied by caller</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>UserZenDLpp</td><td>OT_BOOLEAN</td><td>False</td><td>Hessian values supplied by caller</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>UserZenDLxp</td><td>OT_BOOLEAN</td><td>False</td><td>Hessian values supplied by caller</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>WeakActiveSet</td><td>OT_BOOLEAN</td><td>False</td><td>(experimental)</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>ZenCheckMaxPert</td><td>OT_BOOLEAN</td><td>False</td><td>Check maximum of secure perturbation when updating solution</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>ZenFDnewMethod</td><td>OT_BOOLEAN</td><td>True</td><td></td><td>casadi::WorhpInterface</td></tr>
+<tr><td>ZenRenewLU</td><td>OT_BOOLEAN</td><td>False</td><td>false: use LU from last QP step; true: renew LU decomposition.</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
@@ -4539,7 +5141,14 @@
 <tr><td>LowPassAlphaG</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for constraint values</td></tr>
 <tr><td>LowPassAlphaMerit</td><td>OT_REAL</td><td>0.1</td><td>Lowpass-filter update factor for merit function values</td></tr>
 <tr><td>LowPassFilter</td><td>OT_BOOLEAN</td><td>True</td><td>Enable lowpass-filter termination criterion</td></tr>
-<tr><td>MAPivotThreshold</td><td>OT_REAL</td><td>1e-06</td><td>Pivoting tolerance for MA solvers</td></tr>
+<tr><td>MA97blas3</td><td>OT_BOOLEAN</td><td>False</td><td>Use BLAS level 3 (dgemm) in MA97</td></tr>
+<tr><td>MA97mf</td><td>OT_BOOLEAN</td><td>False</td><td>Use multifrontal-style forward solve of MA97</td></tr>
+<tr><td>MA97nemin</td><td>OT_INTEGER</td><td>8</td><td>Node amalgation, controls merging in elimination tree by MA97</td></tr>
+<tr><td>MA97ordering</td><td>OT_INTEGER</td><td>5</td><td>Ordering used by MA97</td></tr>
+<tr><td>MA97print</td><td>OT_INTEGER</td><td>-1</td><td>Print level used by MA97</td></tr>
+<tr><td>MA97scaling</td><td>OT_INTEGER</td><td>0</td><td>Scaling used by MA97</td></tr>
+<tr><td>MA97small</td><td>OT_REAL</td><td>1e-20</td><td>Any pivot whose modulus is less than this is treated as zero by MA97</td></tr>
+<tr><td>MA97u</td><td>OT_REAL</td><td>0.01</td><td>Relative pivot tolerance of MA97</td></tr>
 <tr><td>MatrixCC</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td></tr>
 <tr><td>MaxCalls</td><td>OT_INTEGER</td><td>2147483647</td><td>Upper bound to Reverse Communication calls</td></tr>
 <tr><td>MaxForce</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of Force recovery strategy steps</td></tr>
@@ -4565,6 +5174,11 @@
 <tr><td>QPscaleParam</td><td>OT_REAL</td><td>0.0</td><td>(currently unused) Scaling factor for QP</td></tr>
 <tr><td>QuadraticProblem</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td></tr>
 <tr><td>ReduceBettsTau</td><td>OT_REAL</td><td>0.3</td><td>Decrease factor for Betts' update dampening term</td></tr>
+<tr><td>RefineFeasibility</td><td>OT_INTEGER</td><td>0</td><td>0 - Deactivated, 1 - After first feasible iterate, 2 - Always on, Activates iterative refinement due to perturbation in constraints using parametric sensitivities</td></tr>
+<tr><td>RefineMaxHMReg</td><td>OT_REAL</td><td>1000.0</td><td>Maximum allowed regularisation of the hessian CAUTION absolute value</td></tr>
+<tr><td>RefineMaxRelax</td><td>OT_REAL</td><td>0.75</td><td>Maximum allowed relaxation to apply feasibility refinement</td></tr>
+<tr><td>RefineOnlyOnAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Activates new iterative refinement of constraints only when Armijo alpha equals one</td></tr>
+<tr><td>RefineStartTol</td><td>OT_REAL</td><td>1e-06</td><td>Start tolerance for successful termination of iterative refinement due to perturbation in constraints</td></tr>
 <tr><td>RegStrategy</td><td>OT_INTEGER</td><td>1</td><td>Select Hessian regularisation strategy in Filter</td></tr>
 <tr><td>ReinitFilter</td><td>OT_BOOLEAN</td><td>False</td><td>Enables Filter-reinitialisation accelerating heuristic</td></tr>
 <tr><td>RelaxMaxDelta</td><td>OT_REAL</td><td>0.92</td><td>Upper bound for accepting the constraint relaxation variable</td></tr>
@@ -4580,6 +5194,7 @@
 <tr><td>ScaledObj</td><td>OT_BOOLEAN</td><td>True</td><td>Scale the objective function</td></tr>
 <tr><td>ScaledQP</td><td>OT_BOOLEAN</td><td>True</td><td>Scale some matrices handed to the QP</td></tr>
 <tr><td>StartBettsTau</td><td>OT_REAL</td><td>0.1</td><td>Initial value for Betts' update dampening term</td></tr>
+<tr><td>SteffensenOnRefine</td><td>OT_BOOLEAN</td><td>False</td><td>Use Steffensen Extrapolation during Feasibility Refinement</td></tr>
 <tr><td>SwitchingDelta</td><td>OT_REAL</td><td>0.01</td><td>Filter switching condition parameter</td></tr>
 <tr><td>SwitchingSCV</td><td>OT_REAL</td><td>1.1</td><td>Filter switching condition parameter</td></tr>
 <tr><td>SwitchingSF</td><td>OT_REAL</td><td>2.3</td><td>Filter switching condition parameter</td></tr>
@@ -4592,11 +5207,20 @@
 <tr><td>TooBig</td><td>OT_BOOLEAN</td><td>True</td><td>Enable too-big termination heuristics</td></tr>
 <tr><td>TooBigCV</td><td>OT_REAL</td><td>1e+25</td><td>Upper bound on constraint violation for too-big heuristic</td></tr>
 <tr><td>TooBigKKT</td><td>OT_REAL</td><td>1e+30</td><td>Upper bound on KKT values for too-big heuristic</td></tr>
+<tr><td>UpdateMu</td><td>OT_BOOLEAN</td><td>True</td><td>Activates update of lagrange multipliers during correction step</td></tr>
+<tr><td>UseZen</td><td>OT_BOOLEAN</td><td>False</td><td>Run Zen module after successful termination</td></tr>
 <tr><td>UserDF</td><td>OT_BOOLEAN</td><td>True</td><td>Objective gradient values supplied by caller</td></tr>
 <tr><td>UserDG</td><td>OT_BOOLEAN</td><td>True</td><td>Jacobian values supplied by caller</td></tr>
 <tr><td>UserHM</td><td>OT_BOOLEAN</td><td>True</td><td>Hessian values supplied by caller</td></tr>
 <tr><td>UserHMstructure</td><td>OT_INTEGER</td><td>2</td><td>Enable automatic Hessian structure generation or checking</td></tr>
+<tr><td>UserZenDGp</td><td>OT_BOOLEAN</td><td>False</td><td>Hessian values supplied by caller</td></tr>
+<tr><td>UserZenDLp</td><td>OT_BOOLEAN</td><td>False</td><td>Gradient values supplied by caller</td></tr>
+<tr><td>UserZenDLpp</td><td>OT_BOOLEAN</td><td>False</td><td>Hessian values supplied by caller</td></tr>
+<tr><td>UserZenDLxp</td><td>OT_BOOLEAN</td><td>False</td><td>Hessian values supplied by caller</td></tr>
 <tr><td>WeakActiveSet</td><td>OT_BOOLEAN</td><td>False</td><td>(experimental)</td></tr>
+<tr><td>ZenCheckMaxPert</td><td>OT_BOOLEAN</td><td>False</td><td>Check maximum of secure perturbation when updating solution</td></tr>
+<tr><td>ZenFDnewMethod</td><td>OT_BOOLEAN</td><td>True</td><td></td></tr>
+<tr><td>ZenRenewLU</td><td>OT_BOOLEAN</td><td>False</td><td>false: use LU from last QP step; true: renew LU decomposition.</td></tr>
 <tr><td>eps</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Machine epsilon</td></tr>
 <tr><td>internalParChanged</td><td>OT_INTEGER</td><td>0</td><td>Counter for changed parameters. Internal use only.</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>Print information about execution time</td></tr>

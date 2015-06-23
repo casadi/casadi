@@ -392,4 +392,7 @@ print J()
 #!     mystructure.save("myfilename")
 #!  Loading:
 #!     struct_load("myfilename")
+#!    
+#!    or   
+#!        pickle.load(file('myfilename','r'))
 
