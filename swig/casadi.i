@@ -2538,30 +2538,30 @@ class NZproxy:
 #ifdef SWIGMATLAB
 %define %matrix_helpers(Type)
     // Get a submatrix (index-1)
-    const Type getitem(const Slice& rr) const { Type m; $self->get(m, true, rr); return m;}
-    const Type getitem(const Matrix<int>& rr) const { Type m; $self->get(m, true, rr); return m;}
-    const Type getitem(const Sparsity& sp) const { Type m; $self->get(m, true, sp); return m;}
-    const Type getitem(const Slice& rr, const Slice& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
-    const Type getitem(const Slice& rr, const Matrix<int>& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
-    const Type getitem(const Matrix<int>& rr, const Slice& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
-    const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
+    const Type paren(const Slice& rr) const { Type m; $self->get(m, true, rr); return m;}
+    const Type paren(const Matrix<int>& rr) const { Type m; $self->get(m, true, rr); return m;}
+    const Type paren(const Sparsity& sp) const { Type m; $self->get(m, true, sp); return m;}
+    const Type paren(const Slice& rr, const Slice& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
+    const Type paren(const Slice& rr, const Matrix<int>& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
+    const Type paren(const Matrix<int>& rr, const Slice& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
+    const Type paren(const Matrix<int>& rr, const Matrix<int>& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
 
     // Set a submatrix (index-1)
-    void setitem(const Type& m, const Slice& rr) { $self->set(m, true, rr);}
-    void setitem(const Type& m, const Matrix<int>& rr) { $self->set(m, true, rr);}
-    void setitem(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
-    void setitem(const Type& m, const Slice& rr, const Slice& cc) { $self->set(m, true, rr, cc);}
-    void setitem(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
-    void setitem(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->set(m, true, rr, cc);}
-    void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
+    void setparen(const Type& m, const Slice& rr) { $self->set(m, true, rr);}
+    void setparen(const Type& m, const Matrix<int>& rr) { $self->set(m, true, rr);}
+    void setparen(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
+    void setparen(const Type& m, const Slice& rr, const Slice& cc) { $self->set(m, true, rr, cc);}
+    void setparen(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
+    void setparen(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->set(m, true, rr, cc);}
+    void setparen(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
 
     // Get nonzeros (index-1)
-    const Type getitemcurl(const Slice& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
-    const Type getitemcurl(const Matrix<int>& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
+    const Type brace(const Slice& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
+    const Type brace(const Matrix<int>& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
 
     // Set nonzeros (index-1)
-    void setitemcurl(const Type& m, const Slice& rr) { $self->setNZ(m, true, rr);}
-    void setitemcurl(const Type& m, const Matrix<int>& rr) { $self->setNZ(m, true, rr);}
+    void setbrace(const Type& m, const Slice& rr) { $self->setNZ(m, true, rr);}
+    void setbrace(const Type& m, const Matrix<int>& rr) { $self->setNZ(m, true, rr);}
 
     // 'end' function (needed for end syntax in MATLAB)
     inline int end(int i, int n) const {
