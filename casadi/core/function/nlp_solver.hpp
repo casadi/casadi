@@ -256,7 +256,7 @@ namespace casadi {
     static std::string doc(const std::string& name);
 
     /// Prints out a human readable report about possible constraint violations, after solving
-    void reportConstraints(std::ostream &stream=CASADI_COUT);
+    void reportConstraints(std::ostream &stream=std::cout);
 
     std::string getReportConstraints()
     { std::stringstream s; reportConstraints(s); return s.str(); }

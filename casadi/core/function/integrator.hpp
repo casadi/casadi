@@ -214,7 +214,7 @@ namespace casadi {
     Integrator clone() const;
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=CASADI_COUT) const;
+    void printStats(std::ostream &stream=std::cout) const;
 
     /// Access functions of the node
     IntegratorInternal* operator->();
