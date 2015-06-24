@@ -284,6 +284,14 @@ class Misctests(casadiTestCase):
     
   def test_exceptions(self):
     try:
+      MXFunction(nlpIn(x=SX.sym("x")))
+      self.assertTrue(False)
+    except NotImplementedError as e:
+      print e.message
+      for m in e.message.split("\n"):
+        if "You have" in m:
+          assert "SX" in m
+    try:
       NlpSolver(123)
       self.assertTrue(False)
     except NotImplementedError as e:
@@ -320,7 +328,7 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "You have: SXFunction((dict,[str]))" in e.message
+      assert "You have: SXFunction((str:SX,[str]))" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
 
@@ -386,7 +394,8 @@ class Misctests(casadiTestCase):
         self.assertTrue(False)
       except RuntimeError as e:
         self.assertTrue("Function([SX]" in e.message)
-        self.assertTrue("You have: Function(dict)" in e.message)
+        print e.message
+        self.assertTrue("You have: Function(str:Sparsity)" in e.message)
 
       with self.assertRaises(RuntimeError):
         [f_,g_] = itemgetter('f','g')(f({'x':[x]}))

@@ -80,10 +80,9 @@ import re
 def pythonify(s):
   s = s.replace("C/C++ prototypes","Python usages")
   s = s.replace("casadi::","")
+  s = s.replace("MXDict","str:MX")
+  s = s.replace("SXDict","str:SX")
   s = s.replace("std::string","str")
-  s = s.replace("SXDict","dict")
-  s = s.replace("MXDict","dict")
-  s = s.replace("Dict","dict")
   s = s.replace(" const &","")
   s = re.sub("(const )?Matrix< SXElement >( &)?",r"SX",s)
   s = re.sub("(const )?GenericMatrix< ?(\w+) *>( ?&)?",r"\2 ",s)
@@ -92,13 +91,10 @@ def pythonify(s):
   s = re.sub(r"const (\w+) &",r"\1 ",s)
   s = re.sub(r"< [\w\(\)]+ +>\(",r"(",s)
   s = re.sub(r"\b(\w+)(< \w+ >)?::\1",r"\1",s)
-  s = re.sub(r"(const )? ?std::pair< ?([\w\(\) ]+?) ?, ?([\w\(\) ]+?) ?> ?&?",r"(\2,\3) ",s)
   for i in range(5):
+    s = re.sub(r"(const )? ?std::pair< ?([\w\(\)\]\[: ]+?) ?, ?([\w\(\)\]\[: ]+?) ?> ?&?",r"(\2,\3) ",s)
     s = re.sub(r"(const )? ?std::vector< ?([\w\(\)\[\] ]+) ?(, ?std::allocator< ?\2 ?>)? ?> ?&?",r"[\2] ",s)
-  s = re.sub(r"StructIOSchemeVector(< ?([\w\[\] ]+) ?>)?",r"Structure",s)
-  s = re.sub(r"IOSchemeVector< ?(\w+) ?>",r"scheme(\1)",s)
   s = re.sub(r"\b(\w+)(< \w+ >)?::\1",r"\1",s)
-  s = s.replace("std::pair< dict,[str] >","(dict,[str])")
   s = s.replace("casadi::","")
   s = s.replace("IOInterface< Function >","Function")
   s = s.replace("::",".")
@@ -109,17 +105,16 @@ def pythonify(s):
 def type_descr(a):
   if isinstance(a,list):
     if len(a)>0:
-      return "[%s]" % ",".join(set([type_descr(i) for i in a]))
+      return "[%s]" % "|".join(set([type_descr(i) for i in a]))
     else:
       return "[]"
   elif isinstance(a,tuple):
     return "(%s)" % ",".join([type_descr(i) for i in a])
   elif isinstance(a,np.ndarray):
-    return "np.array(%s)" % ",".join(set([type_descr(i) for i in np.array(a).flatten().tolist()])) 
-  if type(a).__name__.startswith("IOSchemeVector"):
-    return "scheme(%s)" % type(a).__name__[len("IOSchemeVector"):]
-  else:
-    return type(a).__name__
+    return "np.array(%s)" % ",".join(set([type_descr(i) for i in np.array(a).flatten().tolist()]))
+  elif isinstance(a,dict):
+    return "|".join(set([type_descr(i) for i in a.keys()])) +":"+ "|".join(set([type_descr(i) for i in a.values()]))
+  return type(a).__name__
 
 def monkeypatch(v,cl=True):
   if hasattr(v,"__monkeypatched__"):
