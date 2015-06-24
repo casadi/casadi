@@ -47,7 +47,7 @@ namespace casadi {
     plugin->creator = SnoptInterface::creator;
     plugin->name = "snopt";
     plugin->doc = SnoptInterface::meta_doc.c_str();
-    plugin->version = 22;
+    plugin->version = 23;
     return 0;
   }
 

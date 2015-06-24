@@ -41,7 +41,7 @@ namespace casadi {
     plugin->creator = WorhpInterface::creator;
     plugin->name = "worhp";
     plugin->doc = WorhpInterface::meta_doc.c_str();
-    plugin->version = 22;
+    plugin->version = 23;
     return 0;
   }
 

@@ -39,7 +39,7 @@ namespace casadi {
     plugin->creator = SocpToSdp::creator;
     plugin->name = "sdp";
     plugin->doc = SocpToSdp::meta_doc.c_str();
-    plugin->version = 22;
+    plugin->version = 23;
     plugin->adaptorHasPlugin = SdpSolver::hasPlugin;
     return 0;
   }
@@ -138,7 +138,7 @@ namespace casadi {
       // Loop over all SOCP constraints
       for (int i=0;i<ni_.size();++i) {
         MX Gik = G(Slice(k), Slice(i_start, i_start+ni_[i])).T();
-        MX Eik = E[n_*i+k];
+        MX Eik = E(Slice(k), Slice(i));
         Fi_d.push_back(blockcat(Eik*MX::eye(ni_[i]), Gik, Gik.T(), Eik));
         i_start += ni_[i];
       }

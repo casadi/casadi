@@ -83,7 +83,7 @@ namespace casadi {
     typedef int (*RegFcn)(Plugin* plugin);
 
     /// Check if a plugin is available or can be loaded
-    static bool hasPlugin(const std::string& name);
+    static bool hasPlugin(const std::string& name, bool verbose=false);
 
     /// Instantiate a Plugin struct from a factory function
     static Plugin pluginFromRegFcn(RegFcn regfcn);
@@ -106,7 +106,7 @@ namespace casadi {
   };
 
   template<class Derived>
-  bool PluginInterface<Derived>::hasPlugin(const std::string& name) {
+  bool PluginInterface<Derived>::hasPlugin(const std::string& name, bool verbose) {
 
     // Check if any dot in the name, i.e. an adaptor
     std::string::size_type dotpos = name.find(".");
@@ -127,6 +127,9 @@ namespace casadi {
       }
       return true;
     } catch (CasadiException& ex) {
+      if (verbose) {
+        casadi_warning(ex.what());
+      }
       return false;
     }
 
@@ -335,7 +338,7 @@ namespace casadi {
   PluginInterface<Derived>::instantiatePlugin(const std::string& name, Problem problem) {
 
     // Assert the plugin exists (needed for adaptors)
-    if (!hasPlugin(name)) {
+    if (!hasPlugin(name, true)) {
       casadi_error("Plugin '" << name << "' is not found.");
     }
 

@@ -1240,7 +1240,7 @@ def socpIn(**kwargs):
 
     g   -- The horizontal stack of all matrices Gi: ( n x N) [SOCP_SOLVER_G]
     h   -- The vertical stack of all vectors hi: ( N x 1) [SOCP_SOLVER_H]
-    e   -- The vertical stack of all vectors ei: ( nm x 1) [SOCP_SOLVER_E]
+    e   -- The horizontal stack of all vectors ei: ( n x m) [SOCP_SOLVER_E]
     f   -- The vertical stack of all scalars fi: ( m x 1) [SOCP_SOLVER_F]
     c   -- The vector c: ( n x 1) [SOCP_SOLVER_C]
     a   -- The matrix A: ( nc x n) [SOCP_SOLVER_A]
@@ -1267,18 +1267,20 @@ def socpOut(**kwargs):
   Helper function for 'SOCPOutput'
 
   Usage:
-    arg = socpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+    arg = socpOut(x=my_x, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x, lam_cone=my_lam_cone)
         all arguments optional
   Output arguments of an SOCP Solver
   
   Keyword arguments::
 
-    x     -- The primal solution (n x 1) [SOCP_SOLVER_X]
-    cost  -- The primal optimal cost (1 x 1) [SOCP_SOLVER_COST]
-    lam_a -- The dual solution corresponding to the linear constraints  (nc x 1) [SOCP_SOLVER_LAM_A]
-    lam_x -- The dual solution corresponding to simple bounds  (n x 1) [SOCP_SOLVER_LAM_X]
+    x         -- The primal solution (n x 1) [SOCP_SOLVER_X]
+    cost      -- The primal optimal cost (1 x 1) [SOCP_SOLVER_COST]
+    dual_cost -- The dual optimal cost (1 x 1) [SOCP_SOLVER_DUAL_COST]
+    lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SOCP_SOLVER_LAM_A]
+    lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SOCP_SOLVER_LAM_X]
+    lam_cone  -- The dual solution correspoding to cone (2-norm) constraints (m x 1) [SOCP_SOLVER_LAM_CONE]
   """
-  return (kwargs, ['x', 'cost', 'lam_a', 'lam_x'])
+  return (kwargs, ['x', 'cost', 'dual_cost', 'lam_a', 'lam_x', 'lam_cone'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1287,6 +1289,31 @@ namespace casadi {
 %template(socpOut) socpOut<casadi::MX>;
 %template(socpOut) socpOut<casadi::Matrix<double> >;
 %template(socpOut) socpOut<casadi::Sparsity>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
+def socpStruct(**kwargs):
+  """
+  Helper function for 'SOCPStruct'
+
+  Usage:
+    arg = socpStruct(g=my_g, e=my_e, a=my_a)
+        all arguments optional
+  Structure specification of an SOCP
+  
+  Keyword arguments::
+
+    g -- The horizontal stack of all matrices Gi: ( n x N) [SOCP_STRUCT_G]
+    e -- The horizontal stack of all vectors ei: ( n x m) [SOCP_STRUCT_E]
+    a -- The matrix A: ( nc x n) [SOCP_STRUCT_A]
+  """
+  return (kwargs, ['g', 'e', 'a'])
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace casadi {
+%template(socpStruct) socpStruct<casadi::Sparsity>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
