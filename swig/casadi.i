@@ -39,6 +39,23 @@
 #define GUESTOBJECT void
 #endif
 
+// Define printing routine
+#ifdef SWIGPYTHON
+// TODO(@jgillis)
+#elif defined(SWIGMATLAB)
+%{
+  namespace casadi {
+    // Redirect printout to mexPrintf
+    static void mexlogger(const char* s, std::streamsize num) {
+      mexPrintf("%.*s", static_cast<int>(num), s);
+    }
+  }
+%}
+%init %{
+  casadi::Logger::writeOut = mexlogger;
+%}
+#endif
+
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning,
 // for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
