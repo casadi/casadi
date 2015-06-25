@@ -110,7 +110,7 @@ class CASADI_EXPORT CasadiException : public std::exception {
   if (verbose()) { \
     std::stringstream ss_internal_; \
     ss_internal_ << msg; \
-    std::cout << "CasADi log message: " << ss_internal_.str() << std::endl; \
+    casadi::csout << "CasADi log message: " << ss_internal_.str() << std::endl; \
   }
 
 #define casadi_error(msg) \
@@ -150,15 +150,16 @@ class CASADI_EXPORT CasadiException : public std::exception {
 #endif
 
 // This is for warnings to be issued when casadi is not in release mode and an assertion fails
-#define casadi_assert_warning(x, msg) \
-if ((x)==false) { \
-  std::cerr << "CasADi warning: \"" << msg << "\" (assertion \"" CASADI_ASSERT_STR(x) \
-    "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl;  \
-}
+#define casadi_assert_warning(x, msg)                                   \
+  if ((x)==false) {                                                     \
+    casadi::cserr << "CasADi warning: \"" << msg << "\" (assertion \"" CASADI_ASSERT_STR(x) \
+      "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl;                \
+  }
 
 // This is for warnings to be issued when casadi is not in release mode
-#define casadi_warning(msg) \
-std::cerr << "CasADi warning: \"" << msg << "\" issued " CASADI_ASSERT_WHERE ". " << std::endl;
+#define casadi_warning(msg)                                             \
+  casadi::cserr << "CasADi warning: \"" << msg << "\" issued " CASADI_ASSERT_WHERE \
+  ". " << std::endl;
 
 // http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
 #define STRING(ITEMS) \

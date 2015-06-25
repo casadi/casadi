@@ -68,7 +68,7 @@ namespace casadi {
 
     // **** Add model variables ****
     {
-      //if (verbose) cout << "Adding model variables." << endl;
+      //if (verbose) csout << "Adding model variables." << endl;
 
       // Get a reference to the ModelVariables node
       const XmlNode& modvars = document[0]["ModelVariables"];
@@ -216,7 +216,7 @@ namespace casadi {
 
     // **** Add binding equations ****
     {
-      //if (verbose) cout << "Adding binding equations." << endl;
+      //if (verbose) csout << "Adding binding equations." << endl;
 
       // Get a reference to the BindingEquations node
       const XmlNode& bindeqs = document[0]["equ:BindingEquations"];
@@ -668,7 +668,7 @@ namespace casadi {
   void DaeBuilder::scaleEquations() {
     casadi_error("DaeBuilder::scaleEquations broken");
 #if 0
-    cout << "Scaling equations ..." << endl;
+    csout << "Scaling equations ..." << endl;
     double time1 = clock();
 
     // Variables
@@ -719,7 +719,7 @@ namespace casadi {
     // Make sure nonzero factor found
     for (int rr=0; rr<J0.size1(); ++rr) {
       if (scale[rr]==0) {
-        cout << "Warning: Could not generate a scaling factor for equation " << rr;
+        csout << "Warning: Could not generate a scaling factor for equation " << rr;
         scale[rr]=1.;
       }
     }
@@ -729,7 +729,7 @@ namespace casadi {
 
     double time2 = clock();
     double dt = (time2-time1)/CLOCKS_PER_SEC;
-    cout << "... equation scaling complete after " << dt << " seconds." << endl;
+    csout << "... equation scaling complete after " << dt << " seconds." << endl;
 #endif
   }
 

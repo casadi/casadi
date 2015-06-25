@@ -310,9 +310,9 @@ namespace casadi {
     }
 
     if (monitored("setup_nlp")) {
-      std::cout << "Variable classification (obj): " << x_type_f_ << std::endl;
-      std::cout << "Variable classification (con): " << x_type_g_ << std::endl;
-      std::cout << "Constraint classification: " << g_type_ << std::endl;
+      csout << "Variable classification (obj): " << x_type_f_ << std::endl;
+      csout << "Variable classification (con): " << x_type_g_ << std::endl;
+      csout << "Constraint classification: " << g_type_ << std::endl;
     }
 
     // An encoding of the desired sorting pattern
@@ -364,18 +364,18 @@ namespace casadi {
     if (monitored("setup_nlp")) {
       for (int p = 0; p < order_template.size(); ++p) {
         int start_k = (p > 0 ?x_order_count[p-1]:0);
-        std::cout << "Variables (" << order_template[p]/10 << ", "
+        csout << "Variables (" << order_template[p]/10 << ", "
                   << order_template[p]%10 << ") - " << x_order_count[p]-start_k << ":"
                   << std::vector<int>(x_order_.begin()+start_k,
                                       x_order_.begin()+std::min(x_order_count[p], 200+start_k))
                   << std::endl;
       }
 
-      std::cout << "Variable order:" << x_order_ << std::endl;
-      std::cout << "Constraint order:" << g_order_ << std::endl;
-      std::cout << "nnJac:" << nnJac_ << std::endl;
-      std::cout << "nnObj:" << nnObj_ << std::endl;
-      std::cout << "nnCon:" << nnCon_ << std::endl;
+      csout << "Variable order:" << x_order_ << std::endl;
+      csout << "Constraint order:" << g_order_ << std::endl;
+      csout << "nnJac:" << nnJac_ << std::endl;
+      csout << "nnObj:" << nnObj_ << std::endl;
+      csout << "nnCon:" << nnCon_ << std::endl;
     }
 
     // Here follows the core of the mapping
@@ -436,9 +436,9 @@ namespace casadi {
     casadi_assert(!(dummyrow_ && jacF_row_));
 
     if (monitored("setup_nlp")) {
-      std::cout << "Objective gradient row presence: " << jacF_row_ << std::endl;
-      std::cout << "Dummy row presence: " << dummyrow_ << std::endl;
-      std::cout << "iObj: " << iObj_ << std::endl;
+      csout << "Objective gradient row presence: " << jacF_row_ << std::endl;
+      csout << "Dummy row presence: " << dummyrow_ << std::endl;
+      csout << "iObj: " << iObj_ << std::endl;
     }
 
     // Allocate data structures needed in evaluate
@@ -609,16 +609,16 @@ namespace casadi {
     casadi_assert_message(!jacF_.isNull(), "blaasssshc");
 
     if (monitored("setup_nlp")) {
-      std::cout << "indA:" << row << std::endl;
-      std::cout << "locA:" << col << std::endl;
-      std::cout << "colA:" << A_data_ << std::endl;
+      csout << "indA:" << row << std::endl;
+      csout << "locA:" << col << std::endl;
+      csout << "colA:" << A_data_ << std::endl;
       A_structure_.sparsity().spy();
-      std::cout << "A:" << DMatrix(A_structure_.sparsity(), A_data_) << std::endl;
-      std::cout << "n:" << n << std::endl;
-      std::cout << "m:" << m_ << std::endl;
-      std::cout << "nea:" << nea << std::endl;
-      std::cout << "bl_:" << bl_ << std::endl;
-      std::cout << "bu_:" << bu_ << std::endl;
+      csout << "A:" << DMatrix(A_structure_.sparsity(), A_data_) << std::endl;
+      csout << "n:" << n << std::endl;
+      csout << "m:" << m_ << std::endl;
+      csout << "nea:" << nea << std::endl;
+      csout << "bl_:" << bl_ << std::endl;
+      csout << "bu_:" << bu_ << std::endl;
     }
 
     // Outputs
@@ -689,48 +689,48 @@ namespace casadi {
     // print timing information
     // save state
     std::ios state(NULL);
-    state.copyfmt(std::cout);
+    state.copyfmt(csout);
     const int w_time = 7;
     const int p_time = 3;
     const int w_ms = 7;
     const int p_ms = 2;
     const int w_n = 5;
     if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
-      std::cout << std::endl;
+      csout << std::endl;
 
-      std::cout << "time spent in eval_grad_f       "
+      csout << "time spent in eval_grad_f       "
                 << std::fixed << std::setw(w_time) << std::setprecision(p_time)
                 << t_eval_grad_f_ << " s.";
       if (n_eval_grad_f_>0)
-        std::cout << " (" << std::setw(w_n) << n_eval_grad_f_ << " calls, "
+        csout << " (" << std::setw(w_n) << n_eval_grad_f_ << " calls, "
                   << std::setw(w_ms) << std::setprecision(p_ms)
                   << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms average)";
-      std::cout << std::endl;
+      csout << std::endl;
 
-      std::cout << "time spent in eval_jac_g        "
+      csout << "time spent in eval_jac_g        "
                 << std::fixed << std::setw(w_time) << std::setprecision(p_time)
                 << t_eval_jac_g_ << " s.";
       if (n_eval_jac_g_>0)
-        std::cout << " (" << std::setw(w_n) << n_eval_jac_g_ << " calls, "
+        csout << " (" << std::setw(w_n) << n_eval_jac_g_ << " calls, "
                   << std::setw(w_ms) << std::setprecision(p_ms)
                   << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms average)";
-      std::cout << std::endl;
+      csout << std::endl;
 
-      std::cout << "time spent in callback function "
+      csout << "time spent in callback function "
                 << std::fixed << std::setw(w_time) << std::setprecision(p_time)
                 << t_callback_fun_ << " s.";
       if (n_callback_fun_>0)
-        std::cout << " (" << std::setw(w_n) << n_callback_fun_ << " calls, "
+        csout << " (" << std::setw(w_n) << n_callback_fun_ << " calls, "
                   << std::setw(w_ms) << std::setprecision(p_ms)
                   << (t_callback_fun_/n_callback_fun_)*1000 << " ms average)";
-      std::cout << std::endl;
+      csout << std::endl;
 
-      std::cout << "time spent in main loop         "
+      csout << "time spent in main loop         "
                 << std::setw(w_time) << std::setprecision(p_time)
                 << t_mainloop_ << " s." << std::endl;
     }
     // restore state
-    std::cout.copyfmt(state);
+    csout.copyfmt(state);
 
     // set timing information
     stats_["t_eval_grad_f"] = t_eval_grad_f_;
@@ -771,12 +771,12 @@ namespace casadi {
       }
 
       if (monitored("eval_nlp")) {
-        std::cout << "mode: " << *mode << std::endl;
-        std::cout << "A before we touch it:"
+        csout << "mode: " << *mode << std::endl;
+        csout << "A before we touch it:"
                   << DMatrix(A_structure_.sparsity(), A_data_) << std::endl;
-        std::cout << "x (obj - sorted indices   - all elements present):"
+        csout << "x (obj - sorted indices   - all elements present):"
                   << std::vector<double>(x, x+nnObj) << std::endl;
-        std::cout << "x (obj - original indices - linear elements zero):"
+        csout << "x (obj - original indices - linear elements zero):"
                   << jacF_.input(NL_X) << std::endl;
       }
 
@@ -809,9 +809,9 @@ namespace casadi {
 
 
       if (monitored("eval_nlp")) {
-        std::cout << "fObj:" << *fObj << std::endl;
-        std::cout << "gradF:" << jacF_.output() << std::endl;
-        std::cout << "gObj:" << std::vector<double>(gObj, gObj+nnObj) << std::endl;
+        csout << "fObj:" << *fObj << std::endl;
+        csout << "gradF:" << jacF_.output() << std::endl;
+        csout << "gObj:" << std::vector<double>(gObj, gObj+nnObj) << std::endl;
       }
 
       time0 = clock();
@@ -822,9 +822,9 @@ namespace casadi {
           jacG_.input(JACG_X)[x_order_[k]] = x[k];
         }
         if (monitored("eval_nlp")) {
-          std::cout << "x (con - sorted indices   - all elements present):"
+          csout << "x (con - sorted indices   - all elements present):"
                     << std::vector<double>(x, x+nnJac) << std::endl;
-          std::cout << "x (con - original indices - linear elements zero):"
+          csout << "x (con - original indices - linear elements zero):"
                     << jacG_.input(JACG_X) << std::endl;
         }
         jacG_.setInput(input(NLP_SOLVER_P), JACG_P);
@@ -847,7 +847,7 @@ namespace casadi {
         casadi_assert(kk == 0 || kk == neJac);
 
         if (monitored("eval_nlp")) {
-          std::cout << jacG_.output(GRADF_G) << std::endl;
+          csout << jacG_.output(GRADF_G) << std::endl;
         }
 
         // provide nonlinear part of objective to SNOPT
@@ -861,13 +861,13 @@ namespace casadi {
         n_eval_jac_g_ += 1;
 
         if (monitored("eval_nlp")) {
-          std::cout << "fCon:" << std::vector<double>(fCon, fCon+nnCon) << std::endl;
-          std::cout << "gCon:" << std::vector<double>(gCon, gCon+neJac) << std::endl;
+          csout << "fCon:" << std::vector<double>(fCon, fCon+nnCon) << std::endl;
+          csout << "gCon:" << std::vector<double>(gCon, gCon+neJac) << std::endl;
         }
       }
 
     } catch(std::exception& ex) {
-      std::cerr << "eval_nlp failed: " << ex.what() << std::endl;
+      cserr << "eval_nlp failed: " << ex.what() << std::endl;
       *mode = -1;  // Reduce step size - we've got problems
       return;
     }
@@ -919,7 +919,7 @@ namespace casadi {
       }
     } catch(std::exception& ex) {
       if (getOption("iteration_callback_ignore_errors")) {
-        std::cerr << "callback: " << ex.what() << std::endl;
+        cserr << "callback: " << ex.what() << std::endl;
       } else {
         throw ex;
       }

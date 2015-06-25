@@ -270,7 +270,7 @@ namespace casadi {
     for (int i=0;i<pi_.size();++i) {
       file << "  pi(" << i +1 << ") = " <<  0 << std::endl; //pi_[i] << std::endl;
     }
-    std::cout << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
+    csout << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
     for (int i=0;i<rc_.size();++i) {
       file << "  rc(" << i +1 << ") = "
            << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)
@@ -285,7 +285,7 @@ namespace casadi {
        for (int i=0;i<pi_.size();++i) {
        file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
        }
-       std::cout << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
+       csout << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
        for (int i=0;i<rc_.size();++i) {
        file << "  rc(" << i +1 << ") = "
        << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)
@@ -299,7 +299,7 @@ namespace casadi {
        for (int i=0;i<pi_.size();++i) {
        file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
        }
-       std::cout << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
+       csout << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
        for (int i=0;i<rc_.size();++i) {
        file << "  rc(" << i +1 << ") = "
        << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)

@@ -130,10 +130,10 @@ namespace casadi {
     bool free;
 
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void print(std::ostream &stream=casadi::csout, bool trailing_newline=true) const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=casadi::csout, bool trailing_newline=true) const;
   };
 } // namespace casadi
 

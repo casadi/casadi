@@ -283,19 +283,19 @@ namespace casadi {
 
     // Header
     if (static_cast<bool>(getOption("print_header"))) {
-      cout << "-------------------------------------------" << endl;
-      cout << "This is casadi::StabilizedSQPMethod." << endl;
+      csout << "-------------------------------------------" << endl;
+      csout << "This is casadi::StabilizedSQPMethod." << endl;
       if (exact_hessian_) {
-        cout << "Using exact Hessian" << endl;
+        csout << "Using exact Hessian" << endl;
       } else {
-        cout << "Using limited memory BFGS Hessian approximation" << endl;
+        csout << "Using limited memory BFGS Hessian approximation" << endl;
       }
-      cout << endl;
-      cout << "Number of variables:                       " << setw(9) << nx_ << endl;
-      cout << "Number of constraints:                     " << setw(9) << ng_ << endl;
-      cout << "Number of nonzeros in constraint Jacobian: " << setw(9) << A_sparsity.nnz() << endl;
-      cout << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << H_sparsity.nnz() << endl;
-      cout << endl;
+      csout << endl;
+      csout << "Number of variables:                       " << setw(9) << nx_ << endl;
+      csout << "Number of constraints:                     " << setw(9) << ng_ << endl;
+      csout << "Number of nonzeros in constraint Jacobian: " << setw(9) << A_sparsity.nnz() << endl;
+      csout << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << H_sparsity.nnz() << endl;
+      csout << endl;
     }
   }
 
@@ -397,7 +397,7 @@ namespace casadi {
       double dx_norm1 = norm_1(dx_);
 
       // Print header occasionally
-      if (iter % 10 == 0) printIteration(cout);
+      if (iter % 10 == 0) printIteration(csout);
 
       // This log entry is here to avoid #822
       log("Checking Stopping criteria");
@@ -412,8 +412,8 @@ namespace casadi {
         int ret = callback_(ref_, user_data_);
 
         if (!ret) {
-          cout << endl;
-          cout << "casadi::StabilizedSQPMethod: aborted by callback..." << endl;
+          csout << endl;
+          csout << "casadi::StabilizedSQPMethod: aborted by callback..." << endl;
           stats_["return_status"] = "User_Requested_Stop";
           break;
         }
@@ -437,10 +437,10 @@ namespace casadi {
 
       // Checking convergence criteria
       if (pr_inf/scaleglag_ < tol_pr_ && gLag_norminf/scaleglag_ < tol_du_) {
-        printIteration(cout, iter, fk_, pr_inf, gLag_norminf, dx_norm1, reg_,
+        printIteration(csout, iter, fk_, pr_inf, gLag_norminf, dx_norm1, reg_,
                        TRDelta_, ls_iter, ls_success, ' ');
-        cout << endl;
-        cout << "casadi::StabilizedSQPMethod: Convergence achieved after "
+        csout << endl;
+        csout << "casadi::StabilizedSQPMethod: Convergence achieved after "
              << iter << " iterations." << endl;
         stats_["return_status"] = "Solve_Succeeded";
         break;
@@ -492,29 +492,29 @@ namespace casadi {
       }
 
       if (iter >= max_iter_) {
-        cout << endl;
-        cout << "casadi::StabilizedSQPMethod: Maximum number of iterations reached." << endl;
+        csout << endl;
+        csout << "casadi::StabilizedSQPMethod: Maximum number of iterations reached." << endl;
         stats_["return_status"] = "Maximum_Iterations_Exceeded";
         break;
       }
 
       if (iter > 0 && dx_norminf <= min_step_size_) {
-        cout << endl;
-        cout << "casadi::StabilizedSQPMethod: Search direction becomes too small without "
+        csout << endl;
+        csout << "casadi::StabilizedSQPMethod: Search direction becomes too small without "
             "convergence criteria being met." << endl;
         stats_["return_status"] = "Search_Direction_Becomes_Too_Small";
         break;
       }
 
       if ((clock()-initial_time)/CLOCKS_PER_SEC > static_cast<double>(getOption("max_time"))) {
-        cout << endl;
-        cout << "casadi::StabilizedSQPMethod: Maximum time (" << getOption("max_time")
+        csout << endl;
+        csout << "casadi::StabilizedSQPMethod: Maximum time (" << getOption("max_time")
              << " sec.) exceeded." << endl;
         stats_["return_status"] = "Maximum_Time_Exceeded";
         break;
       }
 
-      printIteration(cout, iter, fk_, pr_inf, gLag_norminf, dx_norm1, reg_,
+      printIteration(csout, iter, fk_, pr_inf, gLag_norminf, dx_norm1, reg_,
                      TRDelta_, ls_iter, ls_success, info);
 
       // Start a new iteration
@@ -891,8 +891,8 @@ namespace casadi {
     }
 
     if (monitored("eval_h")) {
-      cout << "x = " << x_ << endl;
-      cout << "H = " << endl;
+      csout << "x = " << x_ << endl;
+      csout << "H = " << endl;
       Bk_.printSparse();
     }
   }
@@ -955,8 +955,8 @@ namespace casadi {
       hessLag.getOutput(H);
 
       if (monitored("eval_h")) {
-        cout << "x = " << x << endl;
-        cout << "H = " << endl;
+        csout << "x = " << x << endl;
+        csout << "H = " << endl;
         H.printSparse();
       }
 
@@ -969,7 +969,7 @@ namespace casadi {
       }
 
     } catch(exception& ex) {
-      cerr << "eval_h failed: " << ex.what() << endl;
+      cserr << "eval_h failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -992,11 +992,11 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_g")) {
-        cout << "x = " << nlp_.input(NL_X) << endl;
-        cout << "g = " << nlp_.output(NL_G) << endl;
+        csout << "x = " << nlp_.input(NL_X) << endl;
+        csout << "g = " << nlp_.output(NL_G) << endl;
       }
     } catch(exception& ex) {
-      cerr << "eval_g failed: " << ex.what() << endl;
+      cserr << "eval_g failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -1022,13 +1022,13 @@ namespace casadi {
       jacG.output().get(J);
 
       if (monitored("eval_jac_g")) {
-        cout << "x = " << x << endl;
-        cout << "g = " << g << endl;
-        cout << "J = " << endl;
+        csout << "x = " << x << endl;
+        csout << "g = " << g << endl;
+        csout << "J = " << endl;
         J.printSparse();
       }
     } catch(exception& ex) {
-      cerr << "eval_jac_g failed: " << ex.what() << endl;
+      cserr << "eval_jac_g failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -1052,16 +1052,16 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_f")) {
-        cout << "x = " << x << endl;
-        cout << "f = " << f << endl;
+        csout << "x = " << x << endl;
+        csout << "f = " << f << endl;
       }
 
       if (monitored("eval_grad_f")) {
-        cout << "x      = " << x << endl;
-        cout << "grad_f = " << grad_f << endl;
+        csout << "x      = " << x << endl;
+        csout << "grad_f = " << grad_f << endl;
       }
     } catch(exception& ex) {
-      cerr << "eval_grad_f failed: " << ex.what() << endl;
+      cserr << "eval_grad_f failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -1080,11 +1080,11 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_f")) {
-        cout << "x = " << nlp_.input(NL_X) << endl;
-        cout << "f = " << f << endl;
+        csout << "x = " << nlp_.input(NL_X) << endl;
+        csout << "f = " << f << endl;
       }
     } catch(exception& ex) {
-      cerr << "eval_f failed: " << ex.what() << endl;
+      cserr << "eval_f failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -1127,15 +1127,15 @@ namespace casadi {
     }
 
     if (monitored("qp")) {
-      cout << "H = " << endl;
+      csout << "H = " << endl;
       H.printDense();
-      cout << "A = " << endl;
+      csout << "A = " << endl;
       A.printDense();
-      cout << "g = " << g << endl;
-      cout << "lbx = " << lbx << endl;
-      cout << "ubx = " << ubx << endl;
-      cout << "lbA = " << lbA << endl;
-      cout << "ubA = " << ubA << endl;
+      csout << "g = " << g << endl;
+      csout << "lbx = " << lbx << endl;
+      csout << "ubx = " << ubx << endl;
+      csout << "lbA = " << lbA << endl;
+      csout << "ubA = " << ubA << endl;
     }
 
     // Solve the QP
@@ -1146,7 +1146,7 @@ namespace casadi {
     stabilized_qp_solver_.getOutputNZ(lambda_x_opt, QP_SOLVER_LAM_X);
     stabilized_qp_solver_.getOutputNZ(lambda_A_opt, QP_SOLVER_LAM_A);
     if (monitored("dx")) {
-      cout << "dx = " << x_opt << endl;
+      csout << "dx = " << x_opt << endl;
     }
 
    }

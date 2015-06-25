@@ -329,13 +329,13 @@ namespace casadi {
 
   void FunctionInternal::log(const string& msg) const {
     if (verbose()) {
-      cout << "CasADi log message: " << msg << endl;
+      csout << "CasADi log message: " << msg << endl;
     }
   }
 
   void FunctionInternal::log(const string& fcn, const string& msg) const {
     if (verbose()) {
-      cout << "CasADi log message: In \"" << fcn << "\" --- " << msg << endl;
+      csout << "CasADi log message: In \"" << fcn << "\" --- " << msg << endl;
     }
   }
 
@@ -472,9 +472,9 @@ namespace casadi {
 
     // Print
     if (verbose()) {
-      std::cout << "FunctionInternal::getJacSparsity: using "
+      csout << "FunctionInternal::getJacSparsity: using "
                 << (use_fwd ? "forward" : "adjoint") << " mode: ";
-      std::cout << nsweep << " sweeps needed for " << nz_seed << " directions" << endl;
+      csout << nsweep << " sweeps needed for " << nz_seed << " directions" << endl;
     }
 
     // Progress
@@ -492,7 +492,7 @@ namespace casadi {
         // Print when entering a new decade
         if (progress_new / 10 > progress / 10) {
           progress = progress_new;
-          std::cout << progress << " %"  << endl;
+          csout << progress << " %"  << endl;
         }
       }
 
@@ -1220,10 +1220,10 @@ namespace casadi {
             floor(best_coloring/w);
           D1 = AT.unidirectionalColoring(A, max_colorings_to_test);
           if (D1.isNull()) {
-            if (verbose()) cout << "Forward mode coloring interrupted (more than "
+            if (verbose()) csout << "Forward mode coloring interrupted (more than "
                                << max_colorings_to_test << " needed)." << endl;
           } else {
-            if (verbose()) cout << "Forward mode coloring completed: "
+            if (verbose()) csout << "Forward mode coloring completed: "
                                << D1.size2() << " directional derivatives needed ("
                                << A.size1() << " without coloring)." << endl;
             D2 = Sparsity();
@@ -1236,10 +1236,10 @@ namespace casadi {
 
           D2 = A.unidirectionalColoring(AT, max_colorings_to_test);
           if (D2.isNull()) {
-            if (verbose()) cout << "Adjoint mode coloring interrupted (more than "
+            if (verbose()) csout << "Adjoint mode coloring interrupted (more than "
                                << max_colorings_to_test << " needed)." << endl;
           } else {
-            if (verbose()) cout << "Adjoint mode coloring completed: "
+            if (verbose()) csout << "Adjoint mode coloring completed: "
                                << D2.size2() << " directional derivatives needed ("
                                << A.size2() << " without coloring)." << endl;
             D1 = Sparsity();
@@ -2287,7 +2287,7 @@ namespace casadi {
     if (f_is_init) {
       f_gen.init();
       if (verbose_) {
-        cout << "Dynamically loaded " << fdescr << " (" << fname << ")" << endl;
+        csout << "Dynamically loaded " << fdescr << " (" << fname << ")" << endl;
       }
     }
     return f_gen;

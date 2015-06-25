@@ -98,7 +98,7 @@ namespace casadi {
 
   bool SymbolicMX::hasDuplicates() {
     if (this->temp!=0) {
-      cerr << "Duplicate expression: " << getName() << endl;
+      cserr << "Duplicate expression: " << getName() << endl;
       return true;
     } else {
       this->temp = 1;

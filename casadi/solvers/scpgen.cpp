@@ -259,7 +259,7 @@ namespace casadi {
       g_lam = MX::sym("g_lam", ng_);
 
       if (verbose_) {
-        cout << "Allocated intermediate variables." << endl;
+        csout << "Allocated intermediate variables." << endl;
       }
 
       // Adjoint sweep to get the definitions of the lifted dual variables
@@ -287,7 +287,7 @@ namespace casadi {
       }
 
       if (verbose_) {
-        cout << "Generated the gradient of the Lagrangian." << endl;
+        csout << "Generated the gradient of the Lagrangian." << endl;
       }
     }
     gL_.resize(nx_, numeric_limits<double>::quiet_NaN());
@@ -331,7 +331,7 @@ namespace casadi {
     MXFunction res_fcn(res_fcn_in, res_fcn_out);
     res_fcn.init();
     if (verbose_) {
-      cout << "Generated residual function ( " << res_fcn.countNodes() << " nodes)." << endl;
+      csout << "Generated residual function ( " << res_fcn.countNodes() << " nodes)." << endl;
     }
 
     // Declare difference vector d and substitute out p and v
@@ -489,7 +489,7 @@ namespace casadi {
     vec_fcn.setOption("name", "vec_fcn");
     vec_fcn.init();
     if (verbose_) {
-      cout << "Generated linearization function ( " << vec_fcn.countNodes()
+      csout << "Generated linearization function ( " << vec_fcn.countNodes()
            << " nodes)." << endl;
     }
 
@@ -541,7 +541,7 @@ namespace casadi {
     exp_fcn.setOption("name", "exp_fcn");
     exp_fcn.init();
     if (verbose_) {
-      cout << "Generated step expansion function ( " << exp_fcn.countNodes() << " nodes)."
+      csout << "Generated step expansion function ( " << exp_fcn.countNodes() << " nodes)."
            << endl;
     }
 
@@ -559,14 +559,14 @@ namespace casadi {
 
       // Complile and run
       if (verbose_) {
-        cout << "Starting compilation"  << endl;
+        csout << "Starting compilation"  << endl;
       }
       time_t time1 = time(0);
       string dlname = gen.compile(name, compiler);
       time_t time2 = time(0);
       double comp_time = difftime(time2, time1);
       if (verbose_) {
-        cout << "Compilation completed after " << comp_time << " s."  << endl;
+        csout << "Compilation completed after " << comp_time << " s."  << endl;
       }
 
       // Load the generated code
@@ -605,7 +605,7 @@ namespace casadi {
     // Initialize the QP solver
     qp_solver_.init();
     if (verbose_) {
-      cout << "Allocated QP solver." << endl;
+      csout << "Allocated QP solver." << endl;
     }
 
     // Residual
@@ -620,17 +620,17 @@ namespace casadi {
     }
 
     if (verbose_) {
-      cout << "NLP preparation completed" << endl;
+      csout << "NLP preparation completed" << endl;
     }
 
     // Header
     if (static_cast<bool>(getOption("print_header"))) {
-      cout << "-------------------------------------------" << endl;
-      cout << "This is casadi::SCPgen." << endl;
+      csout << "-------------------------------------------" << endl;
+      csout << "This is casadi::SCPgen." << endl;
       if (gauss_newton_) {
-        cout << "Using Gauss-Newton Hessian" << endl;
+        csout << "Using Gauss-Newton Hessian" << endl;
       } else {
-        cout << "Using exact Hessian" << endl;
+        csout << "Using exact Hessian" << endl;
       }
 
       // Count the total number of variables
@@ -639,29 +639,29 @@ namespace casadi {
         n_lifted += i->n;
       }
 
-      cout << endl;
-      cout << "Number of reduced variables:               " << setw(9) << nx_ << endl;
-      cout << "Number of reduced constraints:             " << setw(9) << ng_ << endl;
-      cout << "Number of lifted variables/constraints:    " << setw(9) << n_lifted << endl;
-      cout << "Number of parameters:                      " << setw(9) << np_ << endl;
-      cout << "Total number of variables:                 " << setw(9) << (nx_+n_lifted) << endl;
-      cout << "Total number of constraints:               " << setw(9) << (ng_+n_lifted) << endl;
-      cout << endl;
-      cout << "Iteration options:" << endl;
+      csout << endl;
+      csout << "Number of reduced variables:               " << setw(9) << nx_ << endl;
+      csout << "Number of reduced constraints:             " << setw(9) << ng_ << endl;
+      csout << "Number of lifted variables/constraints:    " << setw(9) << n_lifted << endl;
+      csout << "Number of parameters:                      " << setw(9) << np_ << endl;
+      csout << "Total number of variables:                 " << setw(9) << (nx_+n_lifted) << endl;
+      csout << "Total number of constraints:               " << setw(9) << (ng_+n_lifted) << endl;
+      csout << endl;
+      csout << "Iteration options:" << endl;
 
-      cout << "{ \"max_iter\":" << max_iter_ << ", ";
-      cout << "\"max_iter_ls\":" << max_iter_ls_ << ", ";
-      cout << "\"c1\":" << c1_ << ", ";
-      cout << "\"beta\":" << beta_ << ", ";
-      cout << "\"merit_memsize\":" << merit_memsize_ << ", ";
-      cout << "\"merit_start\":" << merit_start_ << ", ";
-      cout << "\"regularize\":" << regularize_ << ", ";
-      cout << endl << "  ";
-      cout << "\"tol_pr\":" << tol_pr_ << ", ";
-      cout << "\"tol_du\":" << tol_du_ << ", ";
-      cout << "\"tol_reg\":" << tol_reg_ << ", ";
-      cout << "\"reg_threshold\":" << reg_threshold_ << "}" << endl;
-      cout << endl;
+      csout << "{ \"max_iter\":" << max_iter_ << ", ";
+      csout << "\"max_iter_ls\":" << max_iter_ls_ << ", ";
+      csout << "\"c1\":" << c1_ << ", ";
+      csout << "\"beta\":" << beta_ << ", ";
+      csout << "\"merit_memsize\":" << merit_memsize_ << ", ";
+      csout << "\"merit_start\":" << merit_start_ << ", ";
+      csout << "\"regularize\":" << regularize_ << ", ";
+      csout << endl << "  ";
+      csout << "\"tol_pr\":" << tol_pr_ << ", ";
+      csout << "\"tol_du\":" << tol_du_ << ", ";
+      csout << "\"tol_reg\":" << tol_reg_ << ", ";
+      csout << "\"reg_threshold\":" << reg_threshold_ << "}" << endl;
+      csout << endl;
     }
   }
 
@@ -692,7 +692,7 @@ namespace casadi {
       }
     }
     if (verbose_) {
-      cout << "Passed initial guess" << endl;
+      csout << "Passed initial guess" << endl;
     }
 
     // Reset dual guess
@@ -760,29 +760,29 @@ namespace casadi {
       double du_inf = dualInfeasibility();
 
       // Print header occasionally
-      if (iter % 10 == 0) printIteration(cout);
+      if (iter % 10 == 0) printIteration(csout);
 
       // Printing information about the actual iterate
-      printIteration(cout, iter, f_, pr_inf, du_inf, reg_, ls_iter, ls_success);
+      printIteration(csout, iter, f_, pr_inf, du_inf, reg_, ls_iter, ls_success);
 
       // Checking convergence criteria
       bool converged = pr_inf <= tol_pr_ && pr_step_ <= tol_pr_step_ && reg_ <= tol_reg_;
       converged = converged && du_inf <= tol_du_;
       if (converged) {
-        cout << endl;
-        cout << "casadi::SCPgen: Convergence achieved after " << iter << " iterations." << endl;
+        csout << endl;
+        csout << "casadi::SCPgen: Convergence achieved after " << iter << " iterations." << endl;
         break;
       }
 
       if (iter >= max_iter_) {
-        cout << endl;
-        cout << "casadi::SCPgen: Maximum number of iterations reached." << endl;
+        csout << endl;
+        csout << "casadi::SCPgen: Maximum number of iterations reached." << endl;
         break;
       }
 
       // Check if not-a-number
       if (f_!=f_ || pr_step_ != pr_step_ || pr_inf != pr_inf) {
-        cout << "casadi::SCPgen: Aborted, nan detected" << endl;
+        csout << "casadi::SCPgen: Aborted, nan detected" << endl;
         break;
       }
 
@@ -808,7 +808,7 @@ namespace casadi {
     t_mainloop_ = (time2-time1)/CLOCKS_PER_SEC;
 
     // Store optimal value
-    cout << "optimal cost = " << f_ << endl;
+    csout << "optimal cost = " << f_ << endl;
 
     // Save results to outputs
     output(NLP_SOLVER_F).set(f_);
@@ -819,19 +819,19 @@ namespace casadi {
 
     // Write timers
     if (print_time_) {
-      cout << endl;
-      cout << "time spent in eval_mat:    " << setw(9) << t_eval_mat_ << " s." << endl;
-      cout << "time spent in eval_res:    " << setw(9) << t_eval_res_ << " s." << endl;
-      cout << "time spent in eval_vec:    " << setw(9) << t_eval_vec_ << " s." << endl;
-      cout << "time spent in eval_exp:    " << setw(9) << t_eval_exp_ << " s." << endl;
-      cout << "time spent in solve_qp:    " << setw(9) << t_solve_qp_ << " s." << endl;
-      cout << "time spent in main loop:   " << setw(9) << t_mainloop_ << " s." << endl;
+      csout << endl;
+      csout << "time spent in eval_mat:    " << setw(9) << t_eval_mat_ << " s." << endl;
+      csout << "time spent in eval_res:    " << setw(9) << t_eval_res_ << " s." << endl;
+      csout << "time spent in eval_vec:    " << setw(9) << t_eval_vec_ << " s." << endl;
+      csout << "time spent in eval_exp:    " << setw(9) << t_eval_exp_ << " s." << endl;
+      csout << "time spent in solve_qp:    " << setw(9) << t_solve_qp_ << " s." << endl;
+      csout << "time spent in main loop:   " << setw(9) << t_mainloop_ << " s." << endl;
     }
 
     // Save statistics
     stats_["iter_count"] = iter;
 
-    cout << endl;
+    csout << endl;
   }
 
   double Scpgen::primalInfeasibility() {

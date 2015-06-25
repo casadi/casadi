@@ -67,7 +67,7 @@ namespace casadi {
     static void writeErrCh(char ch) { writeOut(&ch, 1);}
   };
 
-  // Stream buffer for std::cout like printing
+  // Stream buffer for csout like printing
   template<bool Err>
   class LoggerStreambuf : public std::streambuf {
   public:
@@ -93,7 +93,7 @@ namespace casadi {
     }
   };
 
-  // Output stream for std::cout like printing
+  // Output stream for csout like printing
   template<bool Err>
   class LoggerStream : public std::ostream {
     protected:
@@ -102,10 +102,10 @@ namespace casadi {
     LoggerStream() : std::ostream(&buf) {}
   };
 
-  // This replaces std::cout
+  // This replaces csout
   static LoggerStream<false> csout;
 
-  // This replaces std::cerr
+  // This replaces cserr
   static LoggerStream<true> cserr;
 
 } // namespace casadi

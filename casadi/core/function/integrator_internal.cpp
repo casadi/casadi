@@ -82,7 +82,7 @@ namespace casadi {
     }
 
     // Print statistics
-    if (print_stats_) printStats(std::cout);
+    if (print_stats_) printStats(csout);
   }
 
   void IntegratorInternal::init() {
@@ -210,7 +210,7 @@ namespace casadi {
                                                                 AugOffset& offset) {
     log("IntegratorInternal::getAugmented", "call");
 
-    //    cout << "here" << endl;
+    //    csout << "here" << endl;
 
     // Return object
     std::pair<Function, Function> ret;

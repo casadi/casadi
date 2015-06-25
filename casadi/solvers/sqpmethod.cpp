@@ -212,19 +212,19 @@ namespace casadi {
 
     // Header
     if (static_cast<bool>(getOption("print_header"))) {
-      cout << "-------------------------------------------" << endl;
-      cout << "This is casadi::SQPMethod." << endl;
+      csout << "-------------------------------------------" << endl;
+      csout << "This is casadi::SQPMethod." << endl;
       if (exact_hessian_) {
-        cout << "Using exact Hessian" << endl;
+        csout << "Using exact Hessian" << endl;
       } else {
-        cout << "Using limited memory BFGS Hessian approximation" << endl;
+        csout << "Using limited memory BFGS Hessian approximation" << endl;
       }
-      cout << endl;
-      cout << "Number of variables:                       " << setw(9) << nx_ << endl;
-      cout << "Number of constraints:                     " << setw(9) << ng_ << endl;
-      cout << "Number of nonzeros in constraint Jacobian: " << setw(9) << A_sparsity.nnz() << endl;
-      cout << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << H_sparsity.nnz() << endl;
-      cout << endl;
+      csout << endl;
+      csout << "Number of variables:                       " << setw(9) << nx_ << endl;
+      csout << "Number of constraints:                     " << setw(9) << ng_ << endl;
+      csout << "Number of nonzeros in constraint Jacobian: " << setw(9) << A_sparsity.nnz() << endl;
+      csout << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << H_sparsity.nnz() << endl;
+      csout << endl;
     }
   }
 
@@ -313,10 +313,10 @@ namespace casadi {
       double dx_norminf = norm_inf(dx_);
 
       // Print header occasionally
-      if (iter % 10 == 0) printIteration(cout);
+      if (iter % 10 == 0) printIteration(csout);
 
       // Printing information about the actual iterate
-      printIteration(cout, iter, fk_, pr_inf, gLag_norminf, dx_norminf, reg_, ls_iter, ls_success);
+      printIteration(csout, iter, fk_, pr_inf, gLag_norminf, dx_norminf, reg_, ls_iter, ls_success);
 
       if (gather_stats_) {
         Dict iterations = stats_["iterations"];
@@ -369,8 +369,8 @@ namespace casadi {
         time2 = clock();
         t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
         if (ret) {
-          cout << endl;
-          cout << "casadi::SQPMethod: aborted by callback..." << endl;
+          csout << endl;
+          csout << "casadi::SQPMethod: aborted by callback..." << endl;
           stats_["return_status"] = "User_Requested_Stop";
           break;
         }
@@ -378,22 +378,22 @@ namespace casadi {
 
       // Checking convergence criteria
       if (pr_inf < tol_pr_ && gLag_norminf < tol_du_) {
-        cout << endl;
-        cout << "casadi::SQPMethod: Convergence achieved after " << iter << " iterations." << endl;
+        csout << endl;
+        csout << "casadi::SQPMethod: Convergence achieved after " << iter << " iterations." << endl;
         stats_["return_status"] = "Solve_Succeeded";
         break;
       }
 
       if (iter >= max_iter_) {
-        cout << endl;
-        cout << "casadi::SQPMethod: Maximum number of iterations reached." << endl;
+        csout << endl;
+        csout << "casadi::SQPMethod: Maximum number of iterations reached." << endl;
         stats_["return_status"] = "Maximum_Iterations_Exceeded";
         break;
       }
 
       if (iter > 0 && dx_norminf <= min_step_size_) {
-        cout << endl;
-        cout << "casadi::SQPMethod: Search direction becomes too small without "
+        csout << endl;
+        csout << "casadi::SQPMethod: Search direction becomes too small without "
             "convergence criteria being met." << endl;
         stats_["return_status"] = "Search_Direction_Becomes_Too_Small";
         break;
@@ -564,8 +564,8 @@ namespace casadi {
         // Get the updated Hessian
         bfgs_.getOutput(Bk_);
         if (monitored("bfgs")) {
-          cout << "x = " << x_ << endl;
-          cout << "BFGS = "  << endl;
+          csout << "x = " << x_ << endl;
+          csout << "BFGS = "  << endl;
           Bk_.printSparse();
         }
       } else {
@@ -587,31 +587,31 @@ namespace casadi {
 
     if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
       // Write timings
-      cout << "time spent in eval_f: " << t_eval_f_ << " s.";
+      csout << "time spent in eval_f: " << t_eval_f_ << " s.";
       if (n_eval_f_>0)
-        cout << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
+        csout << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
+      csout << endl;
+      csout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
       if (n_eval_grad_f_>0)
-        cout << " (" << n_eval_grad_f_ << " calls, "
+        csout << " (" << n_eval_grad_f_ << " calls, "
              << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_g: " << t_eval_g_ << " s.";
+      csout << endl;
+      csout << "time spent in eval_g: " << t_eval_g_ << " s.";
       if (n_eval_g_>0)
-        cout << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
+        csout << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
+      csout << endl;
+      csout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
       if (n_eval_jac_g_>0)
-        cout << " (" << n_eval_jac_g_ << " calls, "
+        csout << " (" << n_eval_jac_g_ << " calls, "
              << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_h: " << t_eval_h_ << " s.";
+      csout << endl;
+      csout << "time spent in eval_h: " << t_eval_h_ << " s.";
       if (n_eval_h_>1)
-        cout << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
-      cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
-      cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
+        csout << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
+      csout << endl;
+      csout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
+      csout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
+      csout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
     }
 
     // Save statistics
@@ -671,8 +671,8 @@ namespace casadi {
     }
 
     if (monitored("eval_h")) {
-      cout << "x = " << x_ << endl;
-      cout << "H = " << endl;
+      csout << "x = " << x_ << endl;
+      csout << "H = " << endl;
       Bk_.printSparse();
     }
   }
@@ -734,8 +734,8 @@ namespace casadi {
       hessLag.getOutput(H);
 
       if (monitored("eval_h")) {
-        cout << "x = " << x << endl;
-        cout << "H = " << endl;
+        csout << "x = " << x << endl;
+        csout << "H = " << endl;
         H.printSparse();
       }
 
@@ -748,7 +748,7 @@ namespace casadi {
       }
 
     } catch(exception& ex) {
-      cerr << "eval_h failed: " << ex.what() << endl;
+      cserr << "eval_h failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -772,15 +772,15 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_g")) {
-        cout << "x = " << nlp_.input(NL_X) << endl;
-        cout << "g = " << nlp_.output(NL_G) << endl;
+        csout << "x = " << nlp_.input(NL_X) << endl;
+        csout << "g = " << nlp_.output(NL_G) << endl;
       }
 
       double time2 = clock();
       t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_g_ += 1;
     } catch(exception& ex) {
-      cerr << "eval_g failed: " << ex.what() << endl;
+      cserr << "eval_g failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -808,9 +808,9 @@ namespace casadi {
       jacG.output().get(J);
 
       if (monitored("eval_jac_g")) {
-        cout << "x = " << x << endl;
-        cout << "g = " << g << endl;
-        cout << "J = " << endl;
+        csout << "x = " << x << endl;
+        csout << "g = " << g << endl;
+        csout << "J = " << endl;
         J.printSparse();
       }
 
@@ -819,7 +819,7 @@ namespace casadi {
       n_eval_jac_g_ += 1;
 
     } catch(exception& ex) {
-      cerr << "eval_jac_g failed: " << ex.what() << endl;
+      cserr << "eval_jac_g failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -845,20 +845,20 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_f")) {
-        cout << "x = " << x << endl;
-        cout << "f = " << f << endl;
+        csout << "x = " << x << endl;
+        csout << "f = " << f << endl;
       }
 
       if (monitored("eval_grad_f")) {
-        cout << "x      = " << x << endl;
-        cout << "grad_f = " << grad_f << endl;
+        csout << "x      = " << x << endl;
+        csout << "grad_f = " << grad_f << endl;
       }
       double time2 = clock();
       t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_grad_f_ += 1;
 
     } catch(exception& ex) {
-      cerr << "eval_grad_f failed: " << ex.what() << endl;
+      cserr << "eval_grad_f failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -880,15 +880,15 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_f")) {
-        cout << "x = " << nlp_.input(NL_X) << endl;
-        cout << "f = " << f << endl;
+        csout << "x = " << nlp_.input(NL_X) << endl;
+        csout << "f = " << f << endl;
       }
       double time2 = clock();
       t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_f_ += 1;
 
     } catch(exception& ex) {
-      cerr << "eval_f failed: " << ex.what() << endl;
+      cserr << "eval_f failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -922,15 +922,15 @@ namespace casadi {
     }
 
     if (monitored("qp")) {
-      cout << "H = " << endl;
+      csout << "H = " << endl;
       H.printDense();
-      cout << "A = " << endl;
+      csout << "A = " << endl;
       A.printDense();
-      cout << "g = " << g << endl;
-      cout << "lbx = " << lbx << endl;
-      cout << "ubx = " << ubx << endl;
-      cout << "lbA = " << lbA << endl;
-      cout << "ubA = " << ubA << endl;
+      csout << "g = " << g << endl;
+      csout << "lbx = " << lbx << endl;
+      csout << "ubx = " << ubx << endl;
+      csout << "lbA = " << lbA << endl;
+      csout << "ubA = " << ubA << endl;
     }
 
     // Solve the QP
@@ -941,7 +941,7 @@ namespace casadi {
     qp_solver_.getOutputNZ(lambda_x_opt, QP_SOLVER_LAM_X);
     qp_solver_.getOutputNZ(lambda_A_opt, QP_SOLVER_LAM_A);
     if (monitored("dx")) {
-      cout << "dx = " << x_opt << endl;
+      csout << "dx = " << x_opt << endl;
     }
   }
 

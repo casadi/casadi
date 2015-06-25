@@ -226,12 +226,12 @@ namespace casadi {
     if (inputs_check_) checkInputs();
 
     if (verbose()) {
-      //     cout << "X_INIT = " << input(QP_SOLVER_X_INIT) << endl;
-      //     cout << "LAMBDA_INIT = " << input(QP_SOLVER_LAMBDA_INIT) << endl;
-      cout << "LBX = " << input(QP_SOLVER_LBX) << endl;
-      cout << "UBX = " << input(QP_SOLVER_UBX) << endl;
-      cout << "LBA = " << input(QP_SOLVER_LBA) << endl;
-      cout << "UBA = " << input(QP_SOLVER_UBA) << endl;
+      //     csout << "X_INIT = " << input(QP_SOLVER_X_INIT) << endl;
+      //     csout << "LAMBDA_INIT = " << input(QP_SOLVER_LAMBDA_INIT) << endl;
+      csout << "LBX = " << input(QP_SOLVER_LBX) << endl;
+      csout << "UBX = " << input(QP_SOLVER_UBX) << endl;
+      csout << "LBA = " << input(QP_SOLVER_LBA) << endl;
+      csout << "UBA = " << input(QP_SOLVER_UBA) << endl;
     }
 
     // Get pointer to H

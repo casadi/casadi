@@ -51,7 +51,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
   // Open the NL file for reading
   ifstream nlfile;
   nlfile.open(filename.c_str());
-  if (verbose) cout << "Reading file \"" << filename << "\"" << endl;
+  if (verbose) csout << "Reading file \"" << filename << "\"" << endl;
 
   // Read the header of the NL-file (first 10 lines)
   const int header_sz = 10;
@@ -71,7 +71,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
   ss >> n_var >> n_con >> n_obj >> n_eq >> n_lcon;
 
   if (verbose) {
-    cout << "n_var = " << n_var << ", n_con  = " << n_con << ", n_obj = " << n_obj
+    csout << "n_var = " << n_var << ", n_con  = " << n_con << ", n_obj = " << n_obj
          << ", n_eq = " << n_eq << ", n_lcon = " << n_lcon << endl;
   }
 
@@ -109,12 +109,12 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
     switch (key) {
       // Imported function description
       case 'F':
-        if (verbose) cerr << "Imported function description unsupported: ignored" << endl;
+        if (verbose) cserr << "Imported function description unsupported: ignored" << endl;
         break;
 
       // Suffix values
       case 'S':
-        if (verbose) cerr << "Suffix values unsupported: ignored" << endl;
+        if (verbose) cserr << "Suffix values unsupported: ignored" << endl;
         break;
 
       // Defined variable definition
@@ -165,7 +165,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
 
       // Logical constraint expression
       case 'L':
-        if (verbose) cerr << "Logical constraint expression unsupported: ignored" << endl;
+        if (verbose) cserr << "Logical constraint expression unsupported: ignored" << endl;
         break;
 
       // Objective function
@@ -282,7 +282,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
                 // Read the indices
                 int ck, ci;
                 nlfile >> ck >> ci;
-                if (verbose) cerr << "Complementary constraints unsupported: ignored" << endl;
+                if (verbose) cserr << "Complementary constraints unsupported: ignored" << endl;
                 continue;
               }
 

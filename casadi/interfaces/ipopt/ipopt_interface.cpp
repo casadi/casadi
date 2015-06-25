@@ -239,9 +239,9 @@ namespace casadi {
     *userclass = new IpoptUserClass(this);
 
     if (verbose_) {
-      cout << "There are " << nx_ << " variables and " << ng_ << " constraints." << endl;
-      if (exact_hessian_) cout << "Using exact Hessian" << endl;
-      else             cout << "Using limited memory Hessian approximation" << endl;
+      csout << "There are " << nx_ << " variables and " << ng_ << " constraints." << endl;
+      if (exact_hessian_) csout << "Using exact Hessian" << endl;
+      else             csout << "Using limited memory Hessian approximation" << endl;
     }
 
     bool ret = true;
@@ -384,31 +384,31 @@ namespace casadi {
 
     if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
       // Write timings
-      cout << "time spent in eval_f: " << t_eval_f_ << " s.";
+      csout << "time spent in eval_f: " << t_eval_f_ << " s.";
       if (n_eval_f_>0)
-        cout << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
+        csout << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
+      csout << endl;
+      csout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
       if (n_eval_grad_f_>0)
-        cout << " (" << n_eval_grad_f_ << " calls, "
+        csout << " (" << n_eval_grad_f_ << " calls, "
              << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_g: " << t_eval_g_ << " s.";
+      csout << endl;
+      csout << "time spent in eval_g: " << t_eval_g_ << " s.";
       if (n_eval_g_>0)
-        cout << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
+        csout << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
+      csout << endl;
+      csout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
       if (n_eval_jac_g_>0)
-        cout << " (" << n_eval_jac_g_ << " calls, "
+        csout << " (" << n_eval_jac_g_ << " calls, "
              << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_h: " << t_eval_h_ << " s.";
+      csout << endl;
+      csout << "time spent in eval_h: " << t_eval_h_ << " s.";
       if (n_eval_h_>1)
-        cout << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
-      cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
-      cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
+        csout << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
+      csout << endl;
+      csout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
+      csout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
+      csout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
     }
 
     if (status == Solve_Succeeded)
@@ -498,7 +498,7 @@ namespace casadi {
           if (!output(NLP_SOLVER_G).isEmpty()) copy(g, g+ng_, output(NLP_SOLVER_G).begin());
         } else {
           if (iter==0) {
-            cerr << "Warning: intermediate_callback is disfunctional in your installation. "
+            cserr << "Warning: intermediate_callback is disfunctional in your installation. "
                 "You will only be able to use getStats(). "
                 "See https://github.com/casadi/casadi/wiki/enableIpoptCallback to enable it."
                  << endl;
@@ -530,7 +530,7 @@ namespace casadi {
       }
     } catch(exception& ex) {
       if (getOption("iteration_callback_ignore_errors")) {
-        cerr << "intermediate_callback: " << ex.what() << endl;
+        cserr << "intermediate_callback: " << ex.what() << endl;
       } else {
         throw ex;
       }
@@ -564,7 +564,7 @@ namespace casadi {
       stats_["iter_count"] = iter_count;
 
     } catch(exception& ex) {
-      cerr << "finalize_solution failed: " << ex.what() << endl;
+      cserr << "finalize_solution failed: " << ex.what() << endl;
     }
   }
 
@@ -599,8 +599,8 @@ namespace casadi {
         hessLag_.output().getSym(values);
 
         if (monitored("eval_h")) {
-          cout << "x = " << hessLag_.input(NL_X).data() << endl;
-          cout << "H = " << endl;
+          csout << "x = " << hessLag_.input(NL_X).data() << endl;
+          csout << "H = " << endl;
           hessLag_.output().printSparse();
         }
 
@@ -618,7 +618,7 @@ namespace casadi {
       return true;
     } catch(exception& ex) {
       if (eval_errors_fatal_) throw ex;
-      cerr << "eval_h failed: " << ex.what() << endl;
+      cserr << "eval_h failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -662,8 +662,8 @@ namespace casadi {
         jacG.getOutputNZ(values);
 
         if (monitored("eval_jac_g")) {
-          cout << "x = " << jacG.input(NL_X).data() << endl;
-          cout << "J = " << endl;
+          csout << "x = " << jacG.input(NL_X).data() << endl;
+          csout << "J = " << endl;
           jacG.output().printSparse();
         }
         if (regularity_check_ && !isRegular(jacG.output().data()))
@@ -680,7 +680,7 @@ namespace casadi {
       return true;
     } catch(exception& ex) {
       if (eval_errors_fatal_) throw ex;
-      cerr << "eval_jac_g failed: " << ex.what() << endl;
+      cserr << "eval_jac_g failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -705,8 +705,8 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_f")) {
-        cout << "x = " << nlp_.input(NL_X) << endl;
-        cout << "obj_value = " << obj_value << endl;
+        csout << "x = " << nlp_.input(NL_X) << endl;
+        csout << "obj_value = " << obj_value << endl;
       }
 
       if (regularity_check_ && !isRegular(nlp_.output(NL_F).data()))
@@ -722,7 +722,7 @@ namespace casadi {
       return true;
     } catch(exception& ex) {
       if (eval_errors_fatal_) throw ex;
-      cerr << "eval_f failed: " << ex.what() << endl;
+      cserr << "eval_f failed: " << ex.what() << endl;
       return false;
     }
 
@@ -746,8 +746,8 @@ namespace casadi {
 
         // Printing
         if (monitored("eval_g")) {
-          cout << "x = " << nlp_.input(NL_X) << endl;
-          cout << "g = " << nlp_.output(NL_G) << endl;
+          csout << "x = " << nlp_.input(NL_X) << endl;
+          csout << "g = " << nlp_.output(NL_G) << endl;
         }
       }
 
@@ -764,7 +764,7 @@ namespace casadi {
       return true;
     } catch(exception& ex) {
       if (eval_errors_fatal_) throw ex;
-      cerr << "eval_g failed: " << ex.what() << endl;
+      cserr << "eval_g failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -787,8 +787,8 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_grad_f")) {
-        cout << "x = " << gradF_.input(NL_X) << endl;
-        cout << "grad_f = " << gradF_.output() << endl;
+        csout << "x = " << gradF_.input(NL_X) << endl;
+        csout << "grad_f = " << gradF_.output() << endl;
       }
 
       if (regularity_check_ && !isRegular(gradF_.output().data()))
@@ -804,7 +804,7 @@ namespace casadi {
       return true;
     } catch(exception& ex) {
       if (eval_errors_fatal_) throw ex;
-      cerr << "eval_grad_f failed: " << ex.what() << endl;
+      cserr << "eval_grad_f failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -820,7 +820,7 @@ namespace casadi {
       input(NLP_SOLVER_UBG).getNZ(g_u);
       return true;
     } catch(exception& ex) {
-      cerr << "get_bounds_info failed: " << ex.what() << endl;
+      cserr << "get_bounds_info failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -857,7 +857,7 @@ namespace casadi {
 
       return true;
     } catch(exception& ex) {
-      cerr << "get_starting_point failed: " << ex.what() << endl;
+      cserr << "get_starting_point failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -879,7 +879,7 @@ namespace casadi {
       else
         nnz_h_lag = 0;
     } catch(exception& ex) {
-      cerr << "get_nlp_info failed: " << ex.what() << endl;
+      cserr << "get_nlp_info failed: " << ex.what() << endl;
     }
   }
 
@@ -906,7 +906,7 @@ namespace casadi {
         return nv;
       }
     } catch(exception& ex) {
-      cerr << "get_number_of_nonlinear_variables failed: " << ex.what() << endl;
+      cserr << "get_number_of_nonlinear_variables failed: " << ex.what() << endl;
       return -1;
     }
   }
@@ -931,7 +931,7 @@ namespace casadi {
       casadi_assert(el==num_nonlin_vars);
       return true;
     } catch(exception& ex) {
-      cerr << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
+      cserr << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
       return false;
     }
   }

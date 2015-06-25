@@ -255,7 +255,7 @@ namespace casadi {
   template<class T> T constpow(const T &x, const T &n) { return x.constpow(n);}
   template<class T> T printme(const T &x, const T &y) { return x.printme(y);}
   inline double printme(double x, double y) {
-    std::cout << "|> " << y << " : " << x << std::endl;
+    csout << "|> " << y << " : " << x << std::endl;
     return x;
   }
 

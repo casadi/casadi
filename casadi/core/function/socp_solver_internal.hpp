@@ -59,7 +59,7 @@ namespace casadi {
     virtual void checkInputs() const;
 
     /// Print out problem statement for debugging
-    void printProblem(std::ostream &stream=std::cout) const;
+    void printProblem(std::ostream &stream=casadi::csout) const;
 
     // Creator function for internal class
     typedef SocpSolverInternal* (*Creator)(const std::map<std::string, Sparsity>& st);

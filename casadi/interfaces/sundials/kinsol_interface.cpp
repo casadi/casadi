@@ -285,7 +285,7 @@ namespace casadi {
     t_jac_ = 0;
 
     if (verbose()) {
-      cout << "KinsolInterface::solveNonLinear: Initial guess = " << output(0).data() << endl;
+      csout << "KinsolInterface::solveNonLinear: Initial guess = " << output(0).data() << endl;
     }
 
     // Get the initial guess
@@ -316,7 +316,7 @@ namespace casadi {
 
     // Print solution
     if (verbose()) {
-      cout << "KinsolInterface::solveNonLinear: solution = " << output(iout_).data() << endl;
+      csout << "KinsolInterface::solveNonLinear: solution = " << output(iout_).data() << endl;
     }
   }
 
@@ -333,7 +333,7 @@ namespace casadi {
     f_.evaluate();
 
     if (monitored("eval_f")) {
-      cout << "f = " << f_.output(iout_) << endl;
+      csout << "f = " << f_.output(iout_) << endl;
     }
 
     // Get results
@@ -377,7 +377,7 @@ namespace casadi {
       this_->func(u, fval);
       return 0;
     } catch(exception& e) {
-      cerr << "func failed: " << e.what() << endl;
+      cserr << "func failed: " << e.what() << endl;
       return 1;
     }
   }
@@ -390,7 +390,7 @@ namespace casadi {
       this_->djac(N, u, fu, J, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
-      cerr << "djac failed: " << e.what() << endl;;
+      cserr << "djac failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -409,7 +409,7 @@ namespace casadi {
     jac_.evaluate();
 
     if (monitored("eval_djac")) {
-      cout << "djac = " << jac_.output() << endl;
+      csout << "djac = " << jac_.output() << endl;
     }
 
     // Get sparsity and non-zero elements
@@ -431,7 +431,7 @@ namespace casadi {
     }
 
     if (monitored("eval_djac")) {
-      cout << "djac = ";
+      csout << "djac = ";
       PrintMat(J);
     }
 
@@ -449,7 +449,7 @@ namespace casadi {
       this_->bjac(N, mupper, mlower, u, fu, J, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
-      cerr << "bjac failed: " << e.what() << endl;;
+      cserr << "bjac failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -499,7 +499,7 @@ namespace casadi {
       this_->jtimes(v, Jv, u, new_u);
       return 0;
     } catch(exception& e) {
-      cerr << "jtimes failed: " << e.what() << endl;;
+      cserr << "jtimes failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -537,7 +537,7 @@ namespace casadi {
       this_->psetup(u, uscale, fval, fscale, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
-      cerr << "psetup failed: " << e.what() << endl;;
+      cserr << "psetup failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -624,7 +624,7 @@ namespace casadi {
       this_->psolve(u, uscale, fval, fscale, v, tmp);
       return 0;
     } catch(exception& e) {
-      cerr << "psolve failed: " << e.what() << endl;;
+      cserr << "psolve failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -649,7 +649,7 @@ namespace casadi {
       this_->lsetup(kin_mem);
       return 0;
     } catch(exception& e) {
-      cerr << "lsetup failed: " << e.what() << endl;;
+      cserr << "lsetup failed: " << e.what() << endl;;
       return -1;
     }
   }
@@ -671,7 +671,7 @@ namespace casadi {
       this_->lsolve(kin_mem, x, b, res_norm);
       return 0;
     } catch(exception& e) {
-      cerr << "lsolve failed: " << e.what() << endl;;
+      cserr << "lsolve failed: " << e.what() << endl;;
       return -1;
     }
   }
@@ -705,13 +705,13 @@ namespace casadi {
       KinsolInterface *this_ = static_cast<KinsolInterface*>(eh_data);
       this_->ehfun(error_code, module, function, msg);
     } catch(exception& e) {
-      cerr << "ehfun failed: " << e.what() << endl;
+      cserr << "ehfun failed: " << e.what() << endl;
     }
   }
 
   void KinsolInterface::ehfun(int error_code, const char *module, const char *function, char *msg) {
     if (!disable_internal_warnings_) {
-      cerr << msg << endl;
+      cserr << msg << endl;
     }
   }
 

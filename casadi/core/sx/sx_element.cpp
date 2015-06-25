@@ -914,7 +914,7 @@ namespace casadi {
     for (vector<SXElement>::iterator it = begin(); it != end(); ++it) {
       bool is_duplicate = it->getTemp()!=0;
       if (is_duplicate) {
-        cerr << "Duplicate expression: " << *it << endl;
+        cserr << "Duplicate expression: " << *it << endl;
       }
       has_duplicates = has_duplicates || is_duplicate;
       it->setTemp(1);

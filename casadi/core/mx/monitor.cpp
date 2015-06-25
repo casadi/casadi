@@ -72,14 +72,14 @@ namespace casadi {
 
   void Monitor::evalD(const double** arg, double** res, int* iw, double* w) {
     // Print comment
-    cout << comment_ << ":" << endl;
-    cout << "[";
+    csout << comment_ << ":" << endl;
+    csout << "[";
     int n = nnz();
     for (int i=0; i<n; ++i) {
-      if (i!=0) cout << ", ";
-      cout << arg[0][i];
+      if (i!=0) csout << ", ";
+      csout << arg[0][i];
     }
-    cout << "]" << endl;
+    csout << "]" << endl;
 
     // Perform operation
     if (arg[0]!=res[0]) {
