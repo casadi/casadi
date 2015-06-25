@@ -30,6 +30,7 @@
 #include "../../core/profiling.hpp"
 #include "../../core/casadi_options.hpp"
 
+#include "sys/time.h"  // gettimeofday, timersub
 #include <ctime>
 #include <stdlib.h>
 
@@ -341,7 +342,7 @@ namespace casadi {
 
     // Reset the counters
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ =
-        t_callback_prepare_ = t_mainloop_ = 0;
+        t_callback_prepare_ = t_mainloop_ = t_mainloop_wall_ = 0;
 
     n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = n_iter_ = 0;
 
@@ -352,10 +353,16 @@ namespace casadi {
         static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(app_);
 
     double time1 = clock();
+    struct timeval t2, t1, delta_t;
+    gettimeofday(&t1, NULL);
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
+    gettimeofday(&t2, NULL);
     double delta = (clock()-time1)/CLOCKS_PER_SEC;
+    timersub(&t2, &t1, &delta_t);
+    double wall_clock_delta = delta_t.tv_sec + 1.0e-6 * delta_t.tv_usec;
     t_mainloop_ = delta;
+    t_mainloop_wall_ = wall_clock_delta;
 
 #ifdef WITH_SIPOPT
     if (run_sens_ || compute_red_hessian_) {
@@ -412,7 +419,8 @@ namespace casadi {
       if (n_eval_h_>1)
         csout << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
       csout << endl;
-      csout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
+      csout << "time spent in main loop (proc): " << t_mainloop_ << " s." << endl;
+      csout << "time spent in main loop (wall): " << t_mainloop_wall_ << " s." << endl;
       csout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
       csout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
     }
@@ -456,6 +464,7 @@ namespace casadi {
     stats_["t_eval_jac_g"] = t_eval_jac_g_;
     stats_["t_eval_h"] = t_eval_h_;
     stats_["t_mainloop"] = t_mainloop_;
+    stats_["t_mainloop_wall"] = t_mainloop_wall_;
     stats_["t_callback_fun"] = t_callback_fun_;
     stats_["t_callback_prepare"] = t_callback_prepare_;
     stats_["n_eval_f"] = n_eval_f_;

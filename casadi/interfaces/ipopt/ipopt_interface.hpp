@@ -156,6 +156,7 @@ public:
   double t_callback_fun_;  // time spent in callback function
   double t_callback_prepare_; // time spent in callback preparation
   double t_mainloop_; // time spent in the main loop of the solver
+  double t_mainloop_wall_; // time spent in the main loop of the solver
 
   // Accumulated counts since last reset:
   int n_eval_f_; // number of calls to eval_f
