@@ -2178,6 +2178,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 #ifndef SWIGXML
 
+ // std::ostream & is not typemapped to anything useful and should be ignored
+ // (or possibly turned into a string output) 
+%typemap(in, numinputs=0) std::ostream &stream ""
+
 %casadi_typemaps("str", PREC_STRING, std::string)
 %casadi_template("[str]", PREC_STRING, std::vector<std::string>)
 %casadi_typemaps("Sparsity", PREC_SPARSITY, casadi::Sparsity)
