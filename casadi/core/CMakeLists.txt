@@ -23,6 +23,7 @@ set(CASADI_SRCS
   # MISC
   casadi_limits.hpp
   casadi_types.hpp
+  casadi_logger.hpp           casadi_logger.cpp
   casadi_exception.hpp
   casadi_calculus.hpp
   casadi_math.hpp
