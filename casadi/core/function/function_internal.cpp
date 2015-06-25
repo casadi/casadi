@@ -121,10 +121,10 @@ namespace casadi {
 
     // Warn for functions with too many inputs or outputs
     casadi_assert_warning(nIn()<10000, "Function " << getOption("name")
-                          << " has a large number of inputs. "
+                          << " has a large number of inputs (" << nIn() << "). "
                           "Changing the problem formulation is strongly encouraged.");
     casadi_assert_warning(nOut()<10000, "Function " << getOption("name")
-                          << " has a large number of outputs. "
+                          << " has a large number of outputs (" << nOut() << "). "
                           "Changing the problem formulation is strongly encouraged.");
 
     // Resize the matrix that holds the sparsity of the Jacobian blocks
