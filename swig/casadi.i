@@ -720,11 +720,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     }
 
     GUESTOBJECT * from_ptr(const bool *a) {
-#ifdef SWIGPYTHON
-      return PyBool_FromLong(*a);
-#else
-      return 0;
-#endif // SWIGPYTHON
+      return SWIG_From_bool(*a);
     }
   } // namespace casadi
   }
@@ -1187,13 +1183,15 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       }
 
       // Try to convert to different types
-      if (to_generic<int>(p, m)
+      if (to_generic<bool>(p, m)
+          || to_generic<int>(p, m)
           || to_generic<double>(p, m)
           || to_generic<std::string>(p, m)
           || to_generic<std::vector<int> >(p, m)
           || to_generic<std::vector<double> >(p, m)
           || to_generic<std::vector<std::string> >(p, m)
-          || to_generic<casadi::Function>(p, m)) {
+          || to_generic<casadi::Function>(p, m)
+          || to_generic<casadi::GenericType::Dict>(p, m)) {
         return true;
       }
 

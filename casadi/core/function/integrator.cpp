@@ -38,8 +38,10 @@ namespace casadi {
     Function g;
     Dict opts2 = opts;
     Dict::const_iterator it=opts2.find("rdae");
-    if (it!=opts2.end()) g = it->second;
-    opts2.erase(it);
+    if (it!=opts2.end()) {
+      g = it->second;
+      opts2.erase(it);
+    }
 
     // Create an initialize
     assignNode(IntegratorInternal::getPlugin(solver).creator(f, g));

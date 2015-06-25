@@ -50,8 +50,8 @@ for ode=0:1
     beta = 0.1;   % fuel consumption rate
       
     % Differential equation
-    ode = [v,
-           (u-alpha*v*v)/m,
+    ode = [v;
+           (u-alpha*v*v)/m;
            -beta*u*u];
       
     % Quadrature
@@ -126,6 +126,6 @@ for ode=0:1
     disp(opts)
 
     % Integrator
-    %I = Integrator('myintegrator', MyIntegrator, ffcn); % segfault
+    I = Integrator('myintegrator', MyIntegrator, ffcn, opts);
   end
 end
