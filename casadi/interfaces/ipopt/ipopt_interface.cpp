@@ -216,7 +216,13 @@ namespace casadi {
     // Start an IPOPT application
     Ipopt::SmartPtr<Ipopt::IpoptApplication> *app = new Ipopt::SmartPtr<Ipopt::IpoptApplication>();
     app_ = static_cast<void*>(app);
-    *app = new Ipopt::IpoptApplication();
+    *app = new Ipopt::IpoptApplication(false);
+
+    // Direct output through casadi::csout
+    SmartPtr<StreamJournal> jrnl = new StreamJournal("console", J_ITERSUMMARY);
+    jrnl->SetOutputStream(&casadi::csout);
+    jrnl->SetPrintLevel(J_DBG, J_NONE);
+    (*app)->Jnlst()->AddJournal(jrnl);
 
 #ifdef WITH_SIPOPT
     if (run_sens_ || compute_red_hessian_) {
