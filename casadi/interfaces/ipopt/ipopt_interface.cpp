@@ -30,7 +30,6 @@
 #include "../../core/profiling.hpp"
 #include "../../core/casadi_options.hpp"
 
-#include "sys/time.h"  // gettimeofday, timersub
 #include <ctime>
 #include <stdlib.h>
 
@@ -352,17 +351,12 @@ namespace casadi {
     Ipopt::SmartPtr<Ipopt::IpoptApplication> *app =
         static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(app_);
 
-    double time1 = clock();
-    struct timeval t2, t1, delta_t;
-    gettimeofday(&t1, NULL);
+    const double procTime0 = clock();
+    const double wallTime0 = getRealTime();
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
-    gettimeofday(&t2, NULL);
-    double delta = (clock()-time1)/CLOCKS_PER_SEC;
-    timersub(&t2, &t1, &delta_t);
-    double wall_clock_delta = delta_t.tv_sec + 1.0e-6 * delta_t.tv_usec;
-    t_mainloop_ = delta;
-    t_mainloop_wall_ = wall_clock_delta;
+    t_mainloop_ = (clock()-procTime0)/CLOCKS_PER_SEC;
+    t_mainloop_wall_ = getRealTime() - wallTime0;
 
 #ifdef WITH_SIPOPT
     if (run_sens_ || compute_red_hessian_) {
@@ -392,7 +386,7 @@ namespace casadi {
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       profileWriteExit(CasadiOptions::profilingLog, this,
-        delta - (t_callback_fun_-t_callback_prepare_));
+        t_mainloop_ - (t_callback_fun_-t_callback_prepare_));
     }
 
     if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
