@@ -220,9 +220,10 @@ namespace casadi {
     *app = new Ipopt::IpoptApplication(false);
 
     // Direct output through casadi::csout
-    SmartPtr<StreamJournal> jrnl = new StreamJournal("console", J_ITERSUMMARY);
-    jrnl->SetOutputStream(&casadi::csout);
-    jrnl->SetPrintLevel(J_DBG, J_NONE);
+    StreamJournal* jrnl_raw = new StreamJournal("console", J_ITERSUMMARY);
+    jrnl_raw->SetOutputStream(&casadi::csout);
+    jrnl_raw->SetPrintLevel(J_DBG, J_NONE);
+    SmartPtr<Journal> jrnl = jrnl_raw;
     (*app)->Jnlst()->AddJournal(jrnl);
 
 #ifdef WITH_SIPOPT
