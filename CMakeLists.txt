@@ -84,6 +84,7 @@ option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside Python front-end" 
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
 option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" OFF)
 option(WITH_SELFCONTAINED "Make the install directory self-contained" OFF)
+option(WITH_LEGACY_CONSTRUCTORS "Compile the legacy constructors for function objects (without initialization)" ON)
 
 # static on windows, shared on linux/osx by default
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -337,6 +338,10 @@ endif()
 
 if(WITH_DEBIAN_BUILD)
   add_definitions(-DWITH_DEBIAN_BUILD)
+endif()
+
+if (WITH_LEGACY_CONSTRUCTORS)
+  add_definitions(-DWITH_LEGACY_CONSTRUCTORS)
 endif()
 
 include_directories(.)
