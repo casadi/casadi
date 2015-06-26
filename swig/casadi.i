@@ -41,7 +41,22 @@
 
 // Define printing routine
 #ifdef SWIGPYTHON
-// TODO(@jgillis)
+%{
+  namespace casadi {
+    // Redirect printout
+    static void pythonlogger_out(const char* s, std::streamsize num) {
+      PySys_WriteStdout("%.*s", static_cast<int>(num), s);
+    }
+    // Redirect printout
+    static void pythonlogger_err(const char* s, std::streamsize num) {
+      PySys_WriteStderr("%.*s", static_cast<int>(num), s);
+    }
+  }
+%}
+%init %{
+  casadi::Logger::writeOut = pythonlogger_out;
+  casadi::Logger::writeErr = pythonlogger_err;
+%}
 #elif defined(SWIGMATLAB)
 %{
   namespace casadi {
