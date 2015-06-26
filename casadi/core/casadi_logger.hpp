@@ -26,7 +26,7 @@
 #ifndef CASADI_LOGGER_HPP
 #define CASADI_LOGGER_HPP
 
-#include "casadi_common.hpp"
+#include <casadi/core/casadi_export.h>
 
 #include <iostream>
 #include <fstream>
@@ -45,26 +45,26 @@ namespace casadi {
     Logger();
   public:
     /// Print output message, can be redefined
-    static void (*writeOut)(const char* s, std::streamsize num);
+    CASADI_EXPORT static void (*writeOut)(const char* s, std::streamsize num);
 
     /// Print error message, can be redefined
-    static void (*writeErr)(const char* s, std::streamsize num);
+    CASADI_EXPORT static void (*writeErr)(const char* s, std::streamsize num);
 
     /// Print output message, default
-    static void writeOutDefault(const char* s, std::streamsize num) {
+    CASADI_EXPORT static void writeOutDefault(const char* s, std::streamsize num) {
       std::cout.write(s, num);
     }
 
     /// Print error message, default
-    static void writeErrDefault(const char* s, std::streamsize num) {
+    CASADI_EXPORT static void writeErrDefault(const char* s, std::streamsize num) {
       std::cerr.write(s, num);
     }
 
     /// Print log message, single character
-    static void writeOutCh(char ch) { writeOut(&ch, 1);}
+    CASADI_EXPORT static void writeOutCh(char ch) { writeOut(&ch, 1);}
 
     /// Print error message, single character
-    static void writeErrCh(char ch) { writeOut(&ch, 1);}
+    CASADI_EXPORT static void writeErrCh(char ch) { writeOut(&ch, 1);}
   };
 
   // Stream buffer for csout like printing

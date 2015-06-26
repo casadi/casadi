@@ -106,19 +106,20 @@ class CASADI_EXPORT CasadiException : public std::exception {
 #define CASADI_ASSERT_WHERE " on line " CASADI_ASSERT_STR(__LINE__) \
     " of file " CASADI_ASSERT_STR(__FILE__)
 
-#define casadi_log(msg) \
-  if (verbose()) { \
-    std::stringstream ss_internal_; \
-    ss_internal_ << msg; \
-    casadi::csout << "CasADi log message: " << ss_internal_.str() << std::endl; \
+  // Should be removed, cf. #890
+#define casadi_log(msg)                                                 \
+  if (verbose()) {                                                      \
+    std::stringstream ss;                                               \
+    ss << msg;                                                          \
+    log(ss.str());                                                      \
   }
 
-#define casadi_error(msg) \
- {\
-  std::stringstream ss_internal_; \
-  ss_internal_ << CASADI_ASSERT_WHERE << std::endl << msg  <<  std::endl; \
-  throw casadi::CasadiException(ss_internal_.str()); \
- }
+#define casadi_error(msg)                                               \
+  {                                                                     \
+    std::stringstream ss_internal_;                                     \
+    ss_internal_ << CASADI_ASSERT_WHERE << std::endl << msg  <<  std::endl; \
+    throw casadi::CasadiException(ss_internal_.str());                  \
+  }
 
 // This assertion checks for illegal user inputs. It will not be checked if CASADI_NDEBUG is defined
 #define casadi_assert_message(x, msg) \
