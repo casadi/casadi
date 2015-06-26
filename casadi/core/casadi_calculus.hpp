@@ -33,7 +33,6 @@
 #include <limits>
 #include <algorithm>
 #include "casadi_exception.hpp"
-#include "casadi_logger.hpp"
 
 // Define pi if the compiler fails to do so
 #ifndef M_PI
@@ -256,7 +255,7 @@ namespace casadi {
   template<class T> T constpow(const T &x, const T &n) { return x.constpow(n);}
   template<class T> T printme(const T &x, const T &y) { return x.printme(y);}
   inline double printme(double x, double y) {
-    csout << "|> " << y << " : " << x << std::endl;
+    std::cout << "|> " << y << " : " << x << std::endl;
     return x;
   }
 

@@ -27,10 +27,10 @@
 
 namespace casadi {
 
-  void (*Logger::writeOut)(const char* s, std::streamsize num) =
+  CASADI_EXPORT void (*Logger::writeOut)(const char* s, std::streamsize num) =
     Logger::writeOutDefault;
 
-  void (*Logger::writeErr)(const char* s, std::streamsize num) =
+  CASADI_EXPORT void (*Logger::writeErr)(const char* s, std::streamsize num) =
     Logger::writeErrDefault;
 
 } // namespace casadi
