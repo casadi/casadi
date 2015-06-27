@@ -227,7 +227,7 @@ namespace casadi {
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
         If there are symbolic primitives appearing more than once, the function will return
-        true and the names of the duplicate expressions will be printed to cserr.
+        true and the names of the duplicate expressions will be printed to userOut<true, PL_WARN>().
         Note: Will mark the node using MX::setTemp.
         Make sure to call resetInput() after usage.
     */

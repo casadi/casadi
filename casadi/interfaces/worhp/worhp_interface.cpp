@@ -621,31 +621,31 @@ namespace casadi {
 
     if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
       // Write timings
-      csout << "time spent in eval_f: " << t_eval_f_ << " s.";
+      userOut() << "time spent in eval_f: " << t_eval_f_ << " s.";
       if (n_eval_f_>0)
-        csout << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
-      csout << endl;
-      csout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
+        userOut() << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
+      userOut() << endl;
+      userOut() << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
       if (n_eval_grad_f_>0)
-        csout << " (" << n_eval_grad_f_ << " calls, "
+        userOut() << " (" << n_eval_grad_f_ << " calls, "
              << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
-      csout << endl;
-      csout << "time spent in eval_g: " << t_eval_g_ << " s.";
+      userOut() << endl;
+      userOut() << "time spent in eval_g: " << t_eval_g_ << " s.";
       if (n_eval_g_>0)
-        csout << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
-      csout << endl;
-      csout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
+        userOut() << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
+      userOut() << endl;
+      userOut() << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
       if (n_eval_jac_g_>0)
-        csout << " (" << n_eval_jac_g_ << " calls, "
+        userOut() << " (" << n_eval_jac_g_ << " calls, "
              << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
-      csout << endl;
-      csout << "time spent in eval_h: " << t_eval_h_ << " s.";
+      userOut() << endl;
+      userOut() << "time spent in eval_h: " << t_eval_h_ << " s.";
       if (n_eval_h_>1)
-        csout << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
-      csout << endl;
-      csout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
-      csout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
-      csout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
+        userOut() << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
+      userOut() << endl;
+      userOut() << "time spent in main loop: " << t_mainloop_ << " s." << endl;
+      userOut() << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
+      userOut() << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
     }
 
     stats_["t_eval_f"] = t_eval_f_;
@@ -718,10 +718,10 @@ namespace casadi {
       }
 
       if (monitored("eval_h")) {
-        csout << "x = " <<  hessLag.input(HESSLAG_X) << std::endl;
-        csout << "obj_factor= " << obj_factor << std::endl;
-        csout << "lambda = " << hessLag.input(HESSLAG_LAM_G) << std::endl;
-        csout << "H = " << hessLag.output(HESSLAG_HESS) << std::endl;
+        userOut() << "x = " <<  hessLag.input(HESSLAG_X) << std::endl;
+        userOut() << "obj_factor= " << obj_factor << std::endl;
+        userOut() << "lambda = " << hessLag.input(HESSLAG_LAM_G) << std::endl;
+        userOut() << "H = " << hessLag.output(HESSLAG_HESS) << std::endl;
       }
 
       if (regularity_check_ && !isRegular(hessLag.output(HESSLAG_HESS).data()))
@@ -733,7 +733,7 @@ namespace casadi {
       log("eval_h ok");
       return true;
     } catch(exception& ex) {
-      cserr << "eval_h failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_h failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -768,8 +768,8 @@ namespace casadi {
       std::copy(J.data().begin(), J.data().end(), values);
 
       if (monitored("eval_jac_g")) {
-        csout << "x = " << jacG_.input().data() << endl;
-        csout << "J = " << endl;
+        userOut() << "x = " << jacG_.input().data() << endl;
+        userOut() << "J = " << endl;
         jacG_.output().printSparse();
       }
 
@@ -779,7 +779,7 @@ namespace casadi {
       log("eval_jac_g ok");
       return true;
     } catch(exception& ex) {
-      cserr << "eval_jac_g failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -803,8 +803,8 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_f")) {
-        csout << "x = " << nlp_.input(NL_X) << endl;
-        csout << "obj_value = " << obj_value << endl;
+        userOut() << "x = " << nlp_.input(NL_X) << endl;
+        userOut() << "obj_value = " << obj_value << endl;
       }
       obj_value *= scale;
 
@@ -817,7 +817,7 @@ namespace casadi {
       log("eval_f ok");
       return true;
     } catch(exception& ex) {
-      cserr << "eval_f failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_f failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -840,8 +840,8 @@ namespace casadi {
 
         // Printing
         if (monitored("eval_g")) {
-          csout << "x = " << nlp_.input(NL_X) << endl;
-          csout << "g = " << nlp_.output(NL_G) << endl;
+          userOut() << "x = " << nlp_.input(NL_X) << endl;
+          userOut() << "g = " << nlp_.output(NL_G) << endl;
         }
       }
 
@@ -854,7 +854,7 @@ namespace casadi {
       log("eval_g ok");
       return true;
     } catch(exception& ex) {
-      cserr << "eval_g failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_g failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -881,7 +881,7 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_grad_f")) {
-        csout << "grad_f = " << gradF_.output() << endl;
+        userOut() << "grad_f = " << gradF_.output() << endl;
       }
 
       if (regularity_check_ && !isRegular(gradF_.output().data()))
@@ -901,7 +901,7 @@ namespace casadi {
       log("eval_grad_f ok");
       return true;
     } catch(exception& ex) {
-      cserr << "eval_jac_f failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_jac_f failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -970,7 +970,7 @@ namespace casadi {
     setOption("qp_scaleIntern", worhp_p_.qp.scaleIntern);
     setOption("qp_strict", worhp_p_.qp.strict);
 
-    csout << "readparams status: " << status << std::endl;
+    userOut() << "readparams status: " << status << std::endl;
   }
 
   map<int, string> WorhpInterface::calc_flagmap() {

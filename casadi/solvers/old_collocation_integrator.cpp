@@ -502,7 +502,7 @@ namespace casadi {
 
       // Print
       if (has_startup_integrator && verbose()) {
-        csout << "startup trajectory generated, statistics:" << endl;
+        userOut() << "startup trajectory generated, statistics:" << endl;
         startup_integrator_.printStats();
       }
 

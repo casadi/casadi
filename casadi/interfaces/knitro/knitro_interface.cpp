@@ -346,7 +346,7 @@ namespace casadi {
 
       return 0;
     } catch(exception& ex) {
-      cserr << "KnitroInterface::callback caugth exception: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "KnitroInterface::callback caugth exception: " << ex.what() << endl;
       return -1;
     }
   }
@@ -365,12 +365,12 @@ namespace casadi {
 
     // Printing
     if (monitored("eval_f")) {
-      csout << "x = " << nlp_.input(NL_X) << endl;
-      csout << "f = " << nlp_.output(NL_F) << endl;
+      userOut() << "x = " << nlp_.input(NL_X) << endl;
+      userOut() << "f = " << nlp_.output(NL_F) << endl;
     }
     if (monitored("eval_g")) {
-      csout << "x = " << nlp_.input(NL_X) << endl;
-      csout << "g = " << nlp_.output(NL_G) << endl;
+      userOut() << "x = " << nlp_.input(NL_X) << endl;
+      userOut() << "g = " << nlp_.output(NL_G) << endl;
     }
   }
 
@@ -387,8 +387,8 @@ namespace casadi {
 
     // Printing
     if (monitored("eval_grad_f")) {
-      csout << "x = " << gradF_.input(NL_X) << endl;
-      csout << "grad_f = " << gradF_.output() << endl;
+      userOut() << "x = " << gradF_.input(NL_X) << endl;
+      userOut() << "grad_f = " << gradF_.output() << endl;
     }
 
     if (!jacG_.isNull()) {
@@ -404,8 +404,8 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_jac_g")) {
-        csout << "x = " << jacG_.input(NL_X) << endl;
-        csout << "jac_g = " << jacG_.output() << endl;
+        userOut() << "x = " << jacG_.input(NL_X) << endl;
+        userOut() << "jac_g = " << jacG_.output() << endl;
       }
     }
   }
@@ -425,11 +425,11 @@ namespace casadi {
 
     // Printing
     if (monitored("eval_h")) {
-      csout << "eval_h" << endl;
-      csout << "x = " << hessLag_.input(0) << endl;
-      csout << "lambda = " << hessLag_.input(1) << endl;
-      csout << "scale = " << hessLag_.input(2) << endl;
-      csout << "H = " << hessLag_ << endl;
+      userOut() << "eval_h" << endl;
+      userOut() << "x = " << hessLag_.input(0) << endl;
+      userOut() << "lambda = " << hessLag_.input(1) << endl;
+      userOut() << "scale = " << hessLag_.input(2) << endl;
+      userOut() << "H = " << hessLag_ << endl;
     }
   }
 

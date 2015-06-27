@@ -210,7 +210,7 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
       found = true;
       const std::vector<std::string> & opv = op.toStringVector();
       for (std::vector<std::string>::const_iterator it=opv.begin();it!=opv.end();it++) {
-        csout << "checking " << *it << std::endl;
+        userOut() << "checking " << *it << std::endl;
         if (std::find(allowed_vals_[name].begin(),
                       allowed_vals_[name].end(), (*it))==allowed_vals_[name].end()) {
           problem = (*it);

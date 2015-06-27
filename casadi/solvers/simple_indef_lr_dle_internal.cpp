@@ -140,7 +140,7 @@ namespace casadi {
 
 
   void SimpleIndefDleInternal::evaluate() {
-    csout << "eval" << std::endl;
+    userOut() << "eval" << std::endl;
     input(DLE_A).printDense();
     for (int i=0;i<nIn();++i) {
       std::copy(input(i).begin(), input(i).end(), f_.input(i).begin());

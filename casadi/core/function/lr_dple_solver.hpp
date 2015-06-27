@@ -110,7 +110,7 @@ namespace casadi {
                  const std::map<std::string, std::vector<Sparsity> >& st);
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=casadi::csout) const;
+    void printStats(std::ostream &stream=casadi::userOut()) const;
 
     /// Access functions of the node
     LrDpleInternal* operator->();

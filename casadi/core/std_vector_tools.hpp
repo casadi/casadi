@@ -100,11 +100,11 @@ namespace casadi {
 
   /// Print representation
   template<typename T>
-  void repr(const std::vector<T> &v, std::ostream &stream=casadi::csout);
+  void repr(const std::vector<T> &v, std::ostream &stream=casadi::userOut());
 
   /// Print description
   template<typename T>
-  void print(const std::vector<T> &v, std::ostream &stream=casadi::csout);
+  void print(const std::vector<T> &v, std::ostream &stream=casadi::userOut());
   #endif // SWIG
 
   /// Check if for each element of v holds: v_i < upper

@@ -100,7 +100,7 @@ namespace casadi {
     }
     if (!called_once_) {
       if (verbose()) {
-        csout << "CsparseInterface::prepare: symbolic factorization" << endl;
+        userOut() << "CsparseInterface::prepare: symbolic factorization" << endl;
       }
 
       // ordering and symbolic analysis
@@ -122,8 +122,8 @@ namespace casadi {
     }
 
     if (verbose()) {
-      csout << "CsparseInterface::prepare: numeric factorization" << endl;
-      csout << "linear system to be factorized = " << endl;
+      userOut() << "CsparseInterface::prepare: numeric factorization" << endl;
+      userOut() << "linear system to be factorized = " << endl;
       input(0).printSparse();
     }
 

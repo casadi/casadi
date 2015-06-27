@@ -176,9 +176,9 @@ namespace casadi {
     }
 
     if (has_duplicates) {
-      cserr << "Input expressions:" << std::endl;
+      userOut<true, PL_WARN>() << "Input expressions:" << std::endl;
       for (int iind=0; iind<inputv_.size(); ++iind) {
-        cserr << iind << ": " << inputv_[iind] << std::endl;
+        userOut<true, PL_WARN>() << iind << ": " << inputv_[iind] << std::endl;
       }
       casadi_error("The input expressions are not independent (or were not reset properly).");
     }
@@ -402,11 +402,11 @@ namespace casadi {
     int maxl=-1;
     for (int i=0; i<lind.size()-1; ++i) {
       int l = (lind[i+1] - lind[i]);
-      //if (l>10)    csout << "#level " << i << ": " << l << std::endl;
-      csout << l << ", ";
+      //if (l>10)    userOut() << "#level " << i << ": " << l << std::endl;
+      userOut() << l << ", ";
       if (l>maxl) maxl= l;
     }
-    csout << std::endl << "maxl = " << maxl << std::endl;
+    userOut() << std::endl << "maxl = " << maxl << std::endl;
 
     for (int i=0; i<algnodes.size(); ++i) {
       algnodes[i]->temp = i;
@@ -416,7 +416,7 @@ namespace casadi {
     maxl=-1;
     for (int i=0; i<lind.size()-1; ++i) {
       int l = (lind[i+1] - lind[i]);
-      csout << std::endl << "#level " << i << ": " << l << std::endl;
+      userOut() << std::endl << "#level " << i << ": " << l << std::endl;
 
       int ii = 0;
 
@@ -424,7 +424,7 @@ namespace casadi {
 
         std::vector<NodeType*>::const_iterator it = algnodes.begin() + j;
 
-        csout << "  "<< ii++ << ": ";
+        userOut() << "  "<< ii++ << ": ";
 
         int op = (*it)->op;
         stringstream s, s0, s1;
@@ -438,19 +438,19 @@ namespace casadi {
         if ((*it)->child[1]->hasDep())  s1 << "i_" << i1;
         else                             s1 << (*it)->child[1];
 
-        csout << s.str() << " = ";
-        print_c[op](csout, s0.str(), s1.str());
-        csout << ";" << std::endl;
+        userOut() << s.str() << " = ";
+        print_c[op](userOut(), s0.str(), s1.str());
+        userOut() << ";" << std::endl;
 
 
 
 
       }
 
-      csout << l << ", ";
+      userOut() << l << ", ";
       if (l>maxl) maxl= l;
     }
-    csout << std::endl << "maxl (before) = " << maxl << std::endl;
+    userOut() << std::endl << "maxl (before) = " << maxl << std::endl;
 
 
     for (int i=0; i<algnodes.size(); ++i) {
@@ -475,7 +475,7 @@ namespace casadi {
     maxl=-1;
     for (int i=0; i<lind.size()-1; ++i) {
       int l = (lind[i+1] - lind[i]);
-      csout << std::endl << "#level " << i << ": " << l << std::endl;
+      userOut() << std::endl << "#level " << i << ": " << l << std::endl;
 
       int ii = 0;
 
@@ -483,7 +483,7 @@ namespace casadi {
 
         std::vector<NodeType*>::const_iterator it = algnodes.begin() + j;
 
-        csout << "  "<< ii++ << ": ";
+        userOut() << "  "<< ii++ << ": ";
 
         int op = (*it)->op;
         stringstream s, s0, s1;
@@ -497,19 +497,19 @@ namespace casadi {
         if ((*it)->child[1]->hasDep())  s1 << "i_" << i1;
         else                             s1 << (*it)->child[1];
 
-        csout << s.str() << " = ";
-        print_c[op](csout, s0.str(), s1.str());
-        csout << ";" << std::endl;
+        userOut() << s.str() << " = ";
+        print_c[op](userOut(), s0.str(), s1.str());
+        userOut() << ";" << std::endl;
 
 
 
 
       }
 
-      csout << l << ", ";
+      userOut() << l << ", ";
       if (l>maxl) maxl= l;
     }
-    csout << std::endl << "maxl = " << maxl << std::endl;
+    userOut() << std::endl << "maxl = " << maxl << std::endl;
 
 
     //  return;
@@ -604,7 +604,7 @@ namespace casadi {
                                                                           bool always_inline,
                                                                           bool never_inline) {
     using namespace std;
-    if (verbose()) csout << "XFunctionInternal::jac begin" << std::endl;
+    if (verbose()) userOut() << "XFunctionInternal::jac begin" << std::endl;
 
     // Quick return if trivially empty
     if (input(iind).nnz()==0 || output(oind).nnz()==0) {
@@ -620,7 +620,7 @@ namespace casadi {
 
     // Create return object
     MatType ret = MatType(jacSparsity(iind, oind, compact, symmetric).T());
-    if (verbose()) csout << "XFunctionInternal::jac allocated return value" << std::endl;
+    if (verbose()) userOut() << "XFunctionInternal::jac allocated return value" << std::endl;
 
     // Quick return if empty
     if (ret.nnz()==0) {
@@ -630,7 +630,7 @@ namespace casadi {
     // Get a bidirectional partition
     Sparsity D1, D2;
     getPartition(iind, oind, D1, D2, true, symmetric);
-    if (verbose()) csout << "XFunctionInternal::jac graph coloring completed" << std::endl;
+    if (verbose()) userOut() << "XFunctionInternal::jac graph coloring completed" << std::endl;
 
     // Get the number of forward and adjoint sweeps
     int nfdir = D1.isNull() ? 0 : D1.size2();
@@ -663,7 +663,7 @@ namespace casadi {
     const int* output_row = output(oind).row();
 
     // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode
-    if (verbose())   csout << "XFunctionInternal::jac transposes and mapping" << std::endl;
+    if (verbose())   userOut() << "XFunctionInternal::jac transposes and mapping" << std::endl;
     std::vector<int> mapping;
     Sparsity jsp_trans;
     if (nfdir>0) {
@@ -688,7 +688,7 @@ namespace casadi {
     int nsweep_adj = nadir/max_nadir;   // Number of sweeps needed for the adjoint mode
     if (nadir%max_nadir>0) nsweep_adj++;
     int nsweep = std::max(nsweep_fwd, nsweep_adj);
-    if (verbose())   csout << "XFunctionInternal::jac " << nsweep << " sweeps needed for "
+    if (verbose())   userOut() << "XFunctionInternal::jac " << nsweep << " sweeps needed for "
                               << nfdir << " forward and " << nadir << " adjoint directions"
                               << std::endl;
 
@@ -703,7 +703,7 @@ namespace casadi {
         // Print when entering a new decade
         if (progress_new / 10 > progress / 10) {
           progress = progress_new;
-          csout << progress << " %"  << std::endl;
+          userOut() << progress << " %"  << std::endl;
         }
       }
 
@@ -792,7 +792,7 @@ namespace casadi {
       }
 
       // Evaluate symbolically
-      if (verbose()) csout << "XFunctionInternal::jac making function call" << std::endl;
+      if (verbose()) userOut() << "XFunctionInternal::jac making function call" << std::endl;
       if (fseed.size()>0) {
         casadi_assert(aseed.size()==0);
         static_cast<DerivedType*>(this)->callForward(inputv_, outputv_,
@@ -945,7 +945,7 @@ namespace casadi {
     }
 
     // Return
-    if (verbose()) csout << "XFunctionInternal::jac end" << std::endl;
+    if (verbose()) userOut() << "XFunctionInternal::jac end" << std::endl;
     return ret.T();
   }
 

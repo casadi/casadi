@@ -44,30 +44,35 @@
 %{
   namespace casadi {
     // Redirect printout
-    static void pythonlogger_out(const char* s, std::streamsize num) {
-      PySys_WriteStdout("%.*s", static_cast<int>(num), s);
-    }
-    // Redirect printout
-    static void pythonlogger_err(const char* s, std::streamsize num) {
-      PySys_WriteStderr("%.*s", static_cast<int>(num), s);
+    static void pythonlogger(const char* s, std::streamsize num, bool error) {
+      if (error) {
+        PySys_WriteStderr("%.*s", static_cast<int>(num), s);
+      } else {
+        PySys_WriteStdout("%.*s", static_cast<int>(num), s);
+      }
     }
   }
 %}
 %init %{
-  casadi::Logger::writeOut = pythonlogger_out;
-  casadi::Logger::writeErr = pythonlogger_err;
+  casadi::Logger::writeWarn = pythonlogger;
+  casadi::Logger::writeProg = pythonlogger;
+  casadi::Logger::writeDebug = pythonlogger;
+  casadi::Logger::writeAll = pythonlogger;
 %}
 #elif defined(SWIGMATLAB)
 %{
   namespace casadi {
     // Redirect printout to mexPrintf
-    static void mexlogger(const char* s, std::streamsize num) {
+    static void mexlogger(const char* s, std::streamsize num, bool error) {
       mexPrintf("%.*s", static_cast<int>(num), s);
     }
   }
 %}
 %init %{
-  casadi::Logger::writeOut = mexlogger;
+  casadi::Logger::writeWarn = mexlogger;
+  casadi::Logger::writeProg = mexlogger;
+  casadi::Logger::writeDebug = mexlogger;
+  casadi::Logger::writeAll = mexlogger;
 %}
 #endif
 

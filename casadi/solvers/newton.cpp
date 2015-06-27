@@ -109,11 +109,11 @@ namespace casadi {
 
       // Print progress
       if (monitored("step") || monitored("stepsize")) {
-        csout << "Step " << iter << "." << std::endl;
+        userOut() << "Step " << iter << "." << std::endl;
       }
 
       if (monitored("step")) {
-        csout << "  u = " << u << std::endl;
+        userOut() << "  u = " << u << std::endl;
       }
 
       // Use u to evaluate J
@@ -137,13 +137,13 @@ namespace casadi {
             << jac_.getOption("name") << "|evaluate jacobian" << std::endl;
       }
 
-      if (monitored("F")) csout << "  F = " << F << std::endl;
+      if (monitored("F")) userOut() << "  F = " << F << std::endl;
       if (monitored("normF"))
-        csout << "  F (min, max, 1-norm, 2-norm) = "
+        userOut() << "  F (min, max, 1-norm, 2-norm) = "
                   << (*std::min_element(F.data().begin(), F.data().end()))
                   << ", " << (*std::max_element(F.data().begin(), F.data().end()))
                   << ", " << norm_1(F) << ", " << norm_F(F) << std::endl;
-      if (monitored("J")) csout << "  J = " << J << std::endl;
+      if (monitored("J")) userOut() << "  J = " << J << std::endl;
 
       double abstol = 0;
       if (numeric_limits<double>::infinity() != abstol_) {
@@ -188,7 +188,7 @@ namespace casadi {
       }
 
       if (monitored("step")) {
-        csout << "  step = " << F << std::endl;
+        userOut() << "  step = " << F << std::endl;
       }
 
       double abstolStep=0;
@@ -198,7 +198,7 @@ namespace casadi {
                                -(*std::min_element(F.data().begin(),
                                                    F.data().end())));
         if (monitored("stepsize")) {
-          csout << "  stepsize = " << abstolStep << std::endl;
+          userOut() << "  stepsize = " << abstolStep << std::endl;
         }
         if (abstolStep <= abstolStep_) {
           casadi_log("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
@@ -209,11 +209,11 @@ namespace casadi {
       if (print_iteration_) {
         // Only print iteration header once in a while
         if (iter % 10==0) {
-          printIteration(csout);
+          printIteration(userOut());
         }
 
         // Print iteration information
-        printIteration(csout, iter, abstol, abstolStep);
+        printIteration(userOut(), iter, abstol, abstolStep);
       }
 
       // Update Xk+1 = Xk - J^(-1) F

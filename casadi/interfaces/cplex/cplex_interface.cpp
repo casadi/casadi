@@ -100,7 +100,7 @@ namespace casadi {
       CPXsetintparam(env_, CPX_PARAM_SCRIND, CPX_OFF);
     }
     if (status) {
-      csout << "CPLEX: Problem with setting parameter... ERROR: " << status << std::endl;
+      userOut() << "CPLEX: Problem with setting parameter... ERROR: " << status << std::endl;
     }
 
     /* SETTING OPTIONS */
@@ -263,7 +263,7 @@ namespace casadi {
                           output(QP_SOLVER_LAM_X).ptr());
 
     if (status) {
-      csout << "CPLEX: Failed to get solution.\n";
+      userOut() << "CPLEX: Failed to get solution.\n";
     }
     // Retrieving the basis
     if (qp_method_ != 0 && qp_method_ != 4) {
@@ -277,7 +277,7 @@ namespace casadi {
         it!=output(QP_SOLVER_LAM_X).end(); ++it) *it = -*it;
 
     int solnstat = CPXgetstat(env_, lp_);
-    stringstream errormsg; // NOTE: Why not print directly to csout and cserr?
+    stringstream errormsg; // NOTE: Why not print directly to userOut() and userOut<true, PL_WARN>()?
     if (verbose()) {
       if (solnstat == CPX_STAT_OPTIMAL) {
         errormsg << "CPLEX: solution status: Optimal solution found.\n";
@@ -299,12 +299,12 @@ namespace casadi {
       } else {
         errormsg << "CPLEX: solution status: " <<  solnstat << "\n";
       }
-      csout << errormsg.str();
+      userOut() << errormsg.str();
 
       // Printing basis condition number
       //double cn;
       //status = CPXgetdblquality(env_, lp_, &cn, CPX_KAPPA);
-      //csout << "CPLEX: Basis condition number: " << cn << endl;
+      //userOut() << "CPLEX: Basis condition number: " << cn << endl;
     }
     if (solnstat != CPX_STAT_OPTIMAL) {
       //    throw CasadiException(errormsg.c_str());
@@ -338,7 +338,7 @@ namespace casadi {
     if (lp_!=0) {
       status = CPXfreeprob(env_, &lp_);
       if (status!=0) {
-        cserr << "CPXfreeprob failed, error code " << status << ".\n";
+        userOut<true, PL_WARN>() << "CPXfreeprob failed, error code " << status << ".\n";
       }
       lp_ = 0;
     }
@@ -347,7 +347,7 @@ namespace casadi {
     if (env_!=0) {
       status = CPXcloseCPLEX(&env_);
       if (status!=0) {
-        cserr << "CPXcloseCPLEX failed, error code " << status << ".\n";
+        userOut<true, PL_WARN>() << "CPXcloseCPLEX failed, error code " << status << ".\n";
       }
       env_ = 0;
     }

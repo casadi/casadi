@@ -153,14 +153,14 @@ class CASADI_EXPORT CasadiException : public std::exception {
 // This is for warnings to be issued when casadi is not in release mode and an assertion fails
 #define casadi_assert_warning(x, msg)                                   \
   if ((x)==false) {                                                     \
-    casadi::cserr << "CasADi warning: \"" << msg << "\" (assertion \"" CASADI_ASSERT_STR(x) \
-      "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl;                \
+    casadi::userOut<true, casadi::PL_WARN>() << "CasADi warning: \"" << msg << "\" (assertion \"" \
+      CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl; \
   }
 
 // This is for warnings to be issued when casadi is not in release mode
-#define casadi_warning(msg)                                             \
-  casadi::cserr << "CasADi warning: \"" << msg << "\" issued " CASADI_ASSERT_WHERE \
-  ". " << std::endl;
+#define casadi_warning(msg)                                                       \
+  casadi::userOut<true, casadi::PL_WARN>() << "CasADi warning: \"" << msg << "\" issued " \
+  CASADI_ASSERT_WHERE ". " << std::endl;
 
 // http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
 #define STRING(ITEMS) \

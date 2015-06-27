@@ -84,7 +84,7 @@ namespace casadi {
     temp_.resize(AT_.n);
 
     if (verbose()) {
-      csout << "CSparseCholeskyInternal::prepare: symbolic factorization" << endl;
+      userOut() << "CSparseCholeskyInternal::prepare: symbolic factorization" << endl;
     }
 
     // ordering and symbolic analysis
@@ -157,8 +157,8 @@ namespace casadi {
     }
 
     if (verbose()) {
-      csout << "CSparseCholeskyInternal::prepare: numeric factorization" << endl;
-      csout << "linear system to be factorized = " << endl;
+      userOut() << "CSparseCholeskyInternal::prepare: numeric factorization" << endl;
+      userOut() << "linear system to be factorized = " << endl;
       input(0).printSparse();
     }
 

@@ -35,7 +35,7 @@ namespace casadi {
 
   // Stream printer for MOSEK
   static void MSKAPI printstr(void *handle, MSKCONST char str[]) {
-    csout << str;
+    userOut() << str;
   }
 
   extern "C"

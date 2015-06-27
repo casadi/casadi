@@ -149,7 +149,7 @@ namespace casadi {
     virtual void spInit(bool fwd);
 
     /// Print work vector
-    void printWork(std::ostream &stream=casadi::csout);
+    void printWork(std::ostream &stream=casadi::userOut());
 
     // print an element of an algorithm
     void print(std::ostream &stream, const AlgEl& el) const;

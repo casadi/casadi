@@ -27,10 +27,18 @@
 
 namespace casadi {
 
-  CASADI_EXPORT void (*Logger::writeOut)(const char* s, std::streamsize num) =
-    Logger::writeOutDefault;
+  PrintLevel Logger::level = PL_ALL;
 
-  CASADI_EXPORT void (*Logger::writeErr)(const char* s, std::streamsize num) =
-    Logger::writeErrDefault;
+  void (*Logger::writeWarn)(const char* s, std::streamsize num, bool error) =
+    Logger::writeDefault;
+
+  void (*Logger::writeProg)(const char* s, std::streamsize num, bool error) =
+    Logger::writeDefault;
+
+  void (*Logger::writeDebug)(const char* s, std::streamsize num, bool error) =
+    Logger::writeDefault;
+
+  void (*Logger::writeAll)(const char* s, std::streamsize num, bool error) =
+    Logger::writeDefault;
 
 } // namespace casadi

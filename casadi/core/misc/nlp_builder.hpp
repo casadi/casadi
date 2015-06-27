@@ -69,10 +69,10 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
     void parseNL(const std::string& filename, const Dict& options = Dict());
 
     /// Print a description of the object
-    void print(std::ostream &stream=casadi::csout, bool trailing_newline=true) const;
+    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::csout, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
 #ifndef SWIG
   protected:

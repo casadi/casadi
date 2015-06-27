@@ -406,10 +406,10 @@ namespace casadi {
     void setUnit(const std::string& name, const std::string& val);
 
     ///  Print representation
-    void repr(std::ostream &stream=casadi::csout, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print description
-    void print(std::ostream &stream=casadi::csout, bool trailing_newline=true) const;
+    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Add a variable
     void addVariable(const std::string& name, const Variable& var);

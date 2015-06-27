@@ -283,19 +283,20 @@ namespace casadi {
 
     // Header
     if (static_cast<bool>(getOption("print_header"))) {
-      csout << "-------------------------------------------" << endl;
-      csout << "This is casadi::StabilizedSQPMethod." << endl;
+      userOut() << "-------------------------------------------" << endl;
+      userOut() << "This is casadi::StabilizedSQPMethod." << endl;
       if (exact_hessian_) {
-        csout << "Using exact Hessian" << endl;
+        userOut() << "Using exact Hessian" << endl;
       } else {
-        csout << "Using limited memory BFGS Hessian approximation" << endl;
+        userOut() << "Using limited memory BFGS Hessian approximation" << endl;
       }
-      csout << endl;
-      csout << "Number of variables:                       " << setw(9) << nx_ << endl;
-      csout << "Number of constraints:                     " << setw(9) << ng_ << endl;
-      csout << "Number of nonzeros in constraint Jacobian: " << setw(9) << A_sparsity.nnz() << endl;
-      csout << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << H_sparsity.nnz() << endl;
-      csout << endl;
+      userOut()
+        << endl
+        << "Number of variables:                       " << setw(9) << nx_ << endl
+        << "Number of constraints:                     " << setw(9) << ng_ << endl
+        << "Number of nonzeros in constraint Jacobian: " << setw(9) << A_sparsity.nnz() << endl
+        << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << H_sparsity.nnz() << endl
+        << endl;
     }
   }
 
@@ -397,7 +398,7 @@ namespace casadi {
       double dx_norm1 = norm_1(dx_);
 
       // Print header occasionally
-      if (iter % 10 == 0) printIteration(csout);
+      if (iter % 10 == 0) printIteration(userOut());
 
       // This log entry is here to avoid #822
       log("Checking Stopping criteria");
@@ -412,8 +413,8 @@ namespace casadi {
         int ret = callback_(ref_, user_data_);
 
         if (!ret) {
-          csout << endl;
-          csout << "casadi::StabilizedSQPMethod: aborted by callback..." << endl;
+          userOut() << endl;
+          userOut() << "casadi::StabilizedSQPMethod: aborted by callback..." << endl;
           stats_["return_status"] = "User_Requested_Stop";
           break;
         }
@@ -437,10 +438,10 @@ namespace casadi {
 
       // Checking convergence criteria
       if (pr_inf/scaleglag_ < tol_pr_ && gLag_norminf/scaleglag_ < tol_du_) {
-        printIteration(csout, iter, fk_, pr_inf, gLag_norminf, dx_norm1, reg_,
+        printIteration(userOut(), iter, fk_, pr_inf, gLag_norminf, dx_norm1, reg_,
                        TRDelta_, ls_iter, ls_success, ' ');
-        csout << endl;
-        csout << "casadi::StabilizedSQPMethod: Convergence achieved after "
+        userOut() << endl;
+        userOut() << "casadi::StabilizedSQPMethod: Convergence achieved after "
              << iter << " iterations." << endl;
         stats_["return_status"] = "Solve_Succeeded";
         break;
@@ -492,29 +493,29 @@ namespace casadi {
       }
 
       if (iter >= max_iter_) {
-        csout << endl;
-        csout << "casadi::StabilizedSQPMethod: Maximum number of iterations reached." << endl;
+        userOut() << endl;
+        userOut() << "casadi::StabilizedSQPMethod: Maximum number of iterations reached." << endl;
         stats_["return_status"] = "Maximum_Iterations_Exceeded";
         break;
       }
 
       if (iter > 0 && dx_norminf <= min_step_size_) {
-        csout << endl;
-        csout << "casadi::StabilizedSQPMethod: Search direction becomes too small without "
+        userOut() << endl;
+        userOut() << "casadi::StabilizedSQPMethod: Search direction becomes too small without "
             "convergence criteria being met." << endl;
         stats_["return_status"] = "Search_Direction_Becomes_Too_Small";
         break;
       }
 
       if ((clock()-initial_time)/CLOCKS_PER_SEC > static_cast<double>(getOption("max_time"))) {
-        csout << endl;
-        csout << "casadi::StabilizedSQPMethod: Maximum time (" << getOption("max_time")
+        userOut() << endl;
+        userOut() << "casadi::StabilizedSQPMethod: Maximum time (" << getOption("max_time")
              << " sec.) exceeded." << endl;
         stats_["return_status"] = "Maximum_Time_Exceeded";
         break;
       }
 
-      printIteration(csout, iter, fk_, pr_inf, gLag_norminf, dx_norm1, reg_,
+      printIteration(userOut(), iter, fk_, pr_inf, gLag_norminf, dx_norm1, reg_,
                      TRDelta_, ls_iter, ls_success, info);
 
       // Start a new iteration
@@ -891,8 +892,8 @@ namespace casadi {
     }
 
     if (monitored("eval_h")) {
-      csout << "x = " << x_ << endl;
-      csout << "H = " << endl;
+      userOut() << "x = " << x_ << endl;
+      userOut() << "H = " << endl;
       Bk_.printSparse();
     }
   }
@@ -955,8 +956,8 @@ namespace casadi {
       hessLag.getOutput(H);
 
       if (monitored("eval_h")) {
-        csout << "x = " << x << endl;
-        csout << "H = " << endl;
+        userOut() << "x = " << x << endl;
+        userOut() << "H = " << endl;
         H.printSparse();
       }
 
@@ -969,7 +970,7 @@ namespace casadi {
       }
 
     } catch(exception& ex) {
-      cserr << "eval_h failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_h failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -992,11 +993,11 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_g")) {
-        csout << "x = " << nlp_.input(NL_X) << endl;
-        csout << "g = " << nlp_.output(NL_G) << endl;
+        userOut() << "x = " << nlp_.input(NL_X) << endl;
+        userOut() << "g = " << nlp_.output(NL_G) << endl;
       }
     } catch(exception& ex) {
-      cserr << "eval_g failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_g failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -1022,13 +1023,13 @@ namespace casadi {
       jacG.output().get(J);
 
       if (monitored("eval_jac_g")) {
-        csout << "x = " << x << endl;
-        csout << "g = " << g << endl;
-        csout << "J = " << endl;
+        userOut() << "x = " << x << endl;
+        userOut() << "g = " << g << endl;
+        userOut() << "J = " << endl;
         J.printSparse();
       }
     } catch(exception& ex) {
-      cserr << "eval_jac_g failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -1052,16 +1053,16 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_f")) {
-        csout << "x = " << x << endl;
-        csout << "f = " << f << endl;
+        userOut() << "x = " << x << endl;
+        userOut() << "f = " << f << endl;
       }
 
       if (monitored("eval_grad_f")) {
-        csout << "x      = " << x << endl;
-        csout << "grad_f = " << grad_f << endl;
+        userOut() << "x      = " << x << endl;
+        userOut() << "grad_f = " << grad_f << endl;
       }
     } catch(exception& ex) {
-      cserr << "eval_grad_f failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_grad_f failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -1080,11 +1081,11 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_f")) {
-        csout << "x = " << nlp_.input(NL_X) << endl;
-        csout << "f = " << f << endl;
+        userOut() << "x = " << nlp_.input(NL_X) << endl;
+        userOut() << "f = " << f << endl;
       }
     } catch(exception& ex) {
-      cserr << "eval_f failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_f failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -1127,15 +1128,15 @@ namespace casadi {
     }
 
     if (monitored("qp")) {
-      csout << "H = " << endl;
+      userOut() << "H = " << endl;
       H.printDense();
-      csout << "A = " << endl;
+      userOut() << "A = " << endl;
       A.printDense();
-      csout << "g = " << g << endl;
-      csout << "lbx = " << lbx << endl;
-      csout << "ubx = " << ubx << endl;
-      csout << "lbA = " << lbA << endl;
-      csout << "ubA = " << ubA << endl;
+      userOut() << "g = " << g << endl;
+      userOut() << "lbx = " << lbx << endl;
+      userOut() << "ubx = " << ubx << endl;
+      userOut() << "lbA = " << lbA << endl;
+      userOut() << "ubA = " << ubA << endl;
     }
 
     // Solve the QP
@@ -1146,7 +1147,7 @@ namespace casadi {
     stabilized_qp_solver_.getOutputNZ(lambda_x_opt, QP_SOLVER_LAM_X);
     stabilized_qp_solver_.getOutputNZ(lambda_A_opt, QP_SOLVER_LAM_A);
     if (monitored("dx")) {
-      csout << "dx = " << x_opt << endl;
+      userOut() << "dx = " << x_opt << endl;
     }
 
    }

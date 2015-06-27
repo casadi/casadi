@@ -44,7 +44,7 @@ namespace casadi {
 
   double SXNode::getValue() const {
     return numeric_limits<double>::quiet_NaN();
-    /*  cserr << "getValue() not defined for class " << typeid(*this).name() << std::endl;
+    /*  userOut<true, PL_WARN>() << "getValue() not defined for class " << typeid(*this).name() << std::endl;
         throw "SXNode::getValue()";*/
   }
 

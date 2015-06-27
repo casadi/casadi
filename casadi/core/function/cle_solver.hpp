@@ -103,7 +103,7 @@ namespace casadi {
     CleSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=casadi::csout) const;
+    void printStats(std::ostream &stream=casadi::userOut()) const;
 
     /// Access functions of the node
     CleInternal* operator->();

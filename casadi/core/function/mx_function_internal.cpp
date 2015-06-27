@@ -250,11 +250,11 @@ namespace casadi {
 
     if (verbose()) {
       if (live_variables) {
-        csout << "Using live variables: work array is "
+        userOut() << "Using live variables: work array is "
              <<  worksize << " instead of "
              << nodes.size() << endl;
       } else {
-        csout << "Live variables disabled." << endl;
+        userOut() << "Live variables disabled." << endl;
       }
     }
 

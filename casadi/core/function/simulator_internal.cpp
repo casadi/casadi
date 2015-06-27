@@ -147,10 +147,10 @@ namespace casadi {
     integrator_.setInput(input(INTEGRATOR_P), INTEGRATOR_P);
 
     if (monitored("initial")) {
-      csout << "SimulatorInternal::evaluate: initial condition:" << std::endl;
-      csout << " x0     = "  << input(INTEGRATOR_X0) << std::endl;
-      csout << " z0     = "  << input(INTEGRATOR_Z0) << std::endl;
-      csout << " p      = "   << input(INTEGRATOR_P) << std::endl;
+      userOut() << "SimulatorInternal::evaluate: initial condition:" << std::endl;
+      userOut() << " x0     = "  << input(INTEGRATOR_X0) << std::endl;
+      userOut() << " z0     = "  << input(INTEGRATOR_Z0) << std::endl;
+      userOut() << " p      = "   << input(INTEGRATOR_P) << std::endl;
     }
 
     // Reset the integrator_
@@ -163,18 +163,18 @@ namespace casadi {
     for (int k=0; k<grid_.size(); ++k) {
 
       if (monitored("step")) {
-        csout << "SimulatorInternal::evaluate: integrating up to: " <<  grid_[k] << std::endl;
-        csout << " x0       = "  << integrator_.input(INTEGRATOR_X0) << std::endl;
-        csout << " z0       = "  << integrator_.input(INTEGRATOR_Z0) << std::endl;
-        csout << " p        = "   << integrator_.input(INTEGRATOR_P) << std::endl;
+        userOut() << "SimulatorInternal::evaluate: integrating up to: " <<  grid_[k] << std::endl;
+        userOut() << " x0       = "  << integrator_.input(INTEGRATOR_X0) << std::endl;
+        userOut() << " z0       = "  << integrator_.input(INTEGRATOR_Z0) << std::endl;
+        userOut() << " p        = "   << integrator_.input(INTEGRATOR_P) << std::endl;
       }
 
       // Integrate to the output time
       integrator_.integrate(grid_[k]);
 
       if (monitored("step")) {
-        csout << " xf  = "  << integrator_.output(INTEGRATOR_XF) << std::endl;
-        csout << " zf  = "  << integrator_.output(INTEGRATOR_ZF) << std::endl;
+        userOut() << " xf  = "  << integrator_.output(INTEGRATOR_XF) << std::endl;
+        userOut() << " zf  = "  << integrator_.output(INTEGRATOR_ZF) << std::endl;
       }
 
       // Pass integrator output to the output function

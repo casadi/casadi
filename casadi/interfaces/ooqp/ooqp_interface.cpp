@@ -278,35 +278,35 @@ namespace casadi {
 
     // Print problem
     if (verbose()) {
-      csout << "Attempting to solve the QP:" << endl;
-      csout << "   minimize    1/2*x'*Q*x + c'*x" << endl;
-      csout << "   subject to  A*x = b,  d <= C*x <= f, l <= x <= u" << endl;
-      csout << "with" << endl;
-      csout << "Q = " <<
+      userOut() << "Attempting to solve the QP:" << endl;
+      userOut() << "   minimize    1/2*x'*Q*x + c'*x" << endl;
+      userOut() << "   subject to  A*x = b,  d <= C*x <= f, l <= x <= u" << endl;
+      userOut() << "with" << endl;
+      userOut() << "Q = " <<
           tril2symm(DMatrix::triplet(vector<int>(irowQ_.begin(), irowQ_.begin()+nnzQ),
                                      vector<int>(jcolQ_.begin(), jcolQ_.begin()+nnzQ),
                                      vector<double>(dQ_.begin(), dQ_.begin()+nnzQ),
                                      nx, nx)) << endl;
-      csout << "c = " << vector<double>(c_.begin(), c_.begin()+nx) << endl;
-      csout << "A = " << DMatrix::triplet(vector<int>(irowA_.begin(),
+      userOut() << "c = " << vector<double>(c_.begin(), c_.begin()+nx) << endl;
+      userOut() << "A = " << DMatrix::triplet(vector<int>(irowA_.begin(),
                                                      irowA_.begin()+nnzA),
                                         vector<int>(jcolA_.begin(),
                                                     jcolA_.begin()+nnzA),
                                         vector<double>(dA_.begin(),
                                                        dA_.begin()+nnzA),
                                          nA, nx) << endl;
-      csout << "b = " << vector<double>(bA_.begin(), bA_.begin()+nA) << endl;
-      csout << "C = " << DMatrix::triplet(vector<int>(irowC_.begin(),
+      userOut() << "b = " << vector<double>(bA_.begin(), bA_.begin()+nA) << endl;
+      userOut() << "C = " << DMatrix::triplet(vector<int>(irowC_.begin(),
                                                      irowC_.begin()+nnzC),
                                         vector<int>(jcolC_.begin(),
                                                     jcolC_.begin()+nnzC),
                                         vector<double>(dC_.begin(),
                                                        dC_.begin()+nnzC),
                                          nC, nx) << endl;
-      csout << "d = " << printBounds(clow_, iclow_, nC, "-") << endl;
-      csout << "f = " << printBounds(cupp_, icupp_, nC, "") << endl;
-      csout << "l = " << printBounds(xlow_, ixlow_, nx, "-") << endl;
-      csout << "u = " << printBounds(xupp_, ixupp_, nx, "") << endl;
+      userOut() << "d = " << printBounds(clow_, iclow_, nC, "-") << endl;
+      userOut() << "f = " << printBounds(cupp_, icupp_, nC, "") << endl;
+      userOut() << "l = " << printBounds(xlow_, ixlow_, nx, "-") << endl;
+      userOut() << "u = " << printBounds(xupp_, ixupp_, nx, "") << endl;
     }
 
     // Reset the solution
