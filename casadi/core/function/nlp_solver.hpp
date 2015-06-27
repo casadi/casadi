@@ -276,15 +276,15 @@ namespace casadi {
     */
     Function gradF();
 
-    /** \brief Access the Jacobian of the constraint function
-    *  \copydoc scheme_HessLagInput
-    *  \copydoc scheme_HessLagOutput
-    */
-    Function jacG();
-
     /** \brief Access the Hessian of the Lagrangian function
     *  \copydoc scheme_JacGInput
     *  \copydoc scheme_JacGOutput
+    */
+    Function jacG();
+
+    /** \brief Access the Jacobian of the constraint function
+    *  \copydoc scheme_HessLagInput
+    *  \copydoc scheme_HessLagOutput
     */
     Function hessLag();
 
