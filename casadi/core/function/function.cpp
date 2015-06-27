@@ -467,6 +467,10 @@ namespace casadi {
     (*this)->setDerReverse(fcn, nadj);
   }
 
+  void Function::printSignature(std::ostream &stream) const {
+    (*this)->printSignature(stream);
+  }
+
   void Function::generate(const Dict& opts) {
     generate(getSanitizedName(), opts);
   }

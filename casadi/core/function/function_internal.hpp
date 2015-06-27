@@ -275,6 +275,9 @@ namespace casadi {
     /** \brief Check if the numerical values of the supplied bounds make sense */
     virtual void checkInputs() const {}
 
+    /** \brief  Print signature */
+    void printSignature(std::ostream &stream) const;
+
     /** \brief Get the unidirectional or bidirectional partition */
     void getPartition(int iind, int oind, Sparsity& D1, Sparsity& D2, bool compact, bool symmetric);
 

@@ -181,7 +181,7 @@ namespace casadi {
     is_init_ = true;
   }
 
-  void FunctionInternal::print(ostream &stream) const {
+  void FunctionInternal::printSignature(ostream &stream) const {
     casadi_assert(isInit());
     stream << " Number of inputs: " << nIn() << endl;
     for (int i=0; i<nIn(); ++i) {
@@ -193,6 +193,10 @@ namespace casadi {
       stream << "  Output " << i  << ", a.k.a. \"" << outputName(i) << "\", "
              << output(i).dimString() << ", " << outputDescription(i) << endl;
     }
+  }
+
+  void FunctionInternal::print(ostream &stream) const {
+    printSignature(stream);
   }
 
   void FunctionInternal::repr(ostream &stream) const {

@@ -182,6 +182,9 @@ namespace casadi {
     /** \brief  Evaluate */
     void evaluate();
 
+    /** \brief  Print signature */
+    void printSignature(std::ostream &stream) const;
+
     ///@{
     /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind
      * \param iind The index of the input
