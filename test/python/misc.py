@@ -22,6 +22,7 @@
 #
 #
 from casadi import *
+from casadi.tools import capture_stdout
 import casadi as c
 from numpy import *
 import unittest
@@ -451,9 +452,34 @@ class Misctests(casadiTestCase):
     except Exception as e:
       print str(e)
       self.assertTrue("x must be larger than 3" in str(e))
+
+  def test_output(self):
+    with capture_stdout() as result:
+      DMatrix([1,2]).printDense()
+
+    assert "2" in result[0]
+
+    x=SX.sym("x")
+    f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
+    f.init()
+    solver = NlpSolver("ipopt",f)
+    solver.init()    
+    with capture_stdout() as result:
+      solver.evaluate()
+
+    assert "Number of nonzeros in equality constraint" in result[0]
+    assert "iter    objective    inf_pr" in result[0]
+    assert "time spent in main loop" in result[0]
+
+    with capture_stdout() as result:
+      try:    
+        solver = NlpSolver("foo",f)
+      except:
+        pass
+    
+    assert "casadi_nlpsolver_foo" in result[1]
     
 
-    
 pickle.dump(Sparsity(),file("temp.txt","w"))
     
 if __name__ == '__main__':

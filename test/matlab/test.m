@@ -94,6 +94,34 @@ catch
 end
 assert(flag);
 
+
+
+% Checking stdout
+
+delete 'diary'
+diary ON
+x = DMatrix.ones(2,2);
+
+x.printDense();
+
+x = SX.sym('x');
+
+
+ode = SXFunction(daeIn('x',x),daeOut('ode',x));
+ode.init();
+
+intg = Integrator('rk',ode);
+intg.setOption('verbose',1);
+intg.init();
+intg.evaluate();
+diary OFF
+
+logged = fileread('diary');
+
+assert(~isempty(strfind(logged,'1')))
+assert(~isempty(strfind(logged,'::init')))
+
+
 clear
 
 
