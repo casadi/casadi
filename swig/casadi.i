@@ -1220,8 +1220,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       }
 
       // Try to convert to different types
-      if (to_generic<bool>(p, m)
-          || to_generic<int>(p, m)
+      if (to_generic<int>(p, m)
           || to_generic<double>(p, m)
           || to_generic<std::string>(p, m)
           || to_generic<std::vector<int> >(p, m)
