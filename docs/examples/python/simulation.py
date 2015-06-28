@@ -50,7 +50,7 @@ p = vertcat([x,y])
 q = vertcat([u,v])
 
 # System dynamics
-F = -k*(p-q) - beta*v*sqrt(sumAll(vel**2)+c**2)
+F = -k*(p-q) - beta*v*sqrt(sum_square(vel) + c**2)
 
 # System right hand side
 rhs = struct_SX(states)
@@ -140,8 +140,8 @@ csim_aug = ControlSimulator(f_aug,tgrid)
 csim_aug.setOption("integrator", "cvodes")
 csim_aug.init()
 
-states_aug(csim_aug.input("x0"))["orig"] = x0
-states_aug(csim_aug.input("x0"))["P"] = P0
+states_aug(csim_aug.getInput("x0"))["orig"] = x0
+states_aug(csim_aug.getInput("x0"))["P"] = P0
 
 csim_aug.setInput(parameters_,"p")
 csim_aug.setInput(controls_,"u")
