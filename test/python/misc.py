@@ -390,14 +390,6 @@ class Misctests(casadiTestCase):
       with self.assertRaises(RuntimeError):
         [f_,g_] = itemgetter('f','g')(f({'m':4}))
       
-      try:
-        [f_,g_] = itemgetter('f','g')(f({'x':Sparsity.dense(2)}))
-        self.assertTrue(False)
-      except RuntimeError as e:
-        self.assertTrue("Function([SX]" in e.message)
-        print e.message
-        self.assertTrue("You have: Function(str:Sparsity)" in e.message)
-
       with self.assertRaises(RuntimeError):
         [f_,g_] = itemgetter('f','g')(f({'x':[x]}))
 

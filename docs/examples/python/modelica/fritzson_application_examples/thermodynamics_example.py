@@ -78,7 +78,7 @@ dae_fcn_in = daeIn(
 )
 
 # Create an integrator
-dae = MXFunction(dae_fcn_in,daeOut(ode=vertcat(ivp.ode)))
+dae = MXFunction('dae', dae_fcn_in, daeOut(ode=vertcat(ivp.ode)))
 integrator = Integrator("cvodes", dae)
 
 # Output function

@@ -1620,6 +1620,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         }
       }
 
+      // Object is a sparsity pattern
+      {
+        Sparsity *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                      $descriptor(casadi::Sparsity*), 0))) {
+          if (m) **m=SX::ones(*m2);
+          return true;
+        }
+      }
+
       // Try first converting to a temporary DMatrix
       {
         DMatrix tmp, *mt=&tmp;
@@ -1700,6 +1710,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         }
       }
 
+      // Object is a sparsity pattern
+      {
+        Sparsity *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                      $descriptor(casadi::Sparsity*), 0))) {
+          if (m) **m=MX::ones(*m2);
+          return true;
+        }
+      }
+
       // Try first converting to a temporary DMatrix
       {
         DMatrix tmp, *mt=&tmp;
@@ -1749,6 +1769,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
                                       $descriptor(casadi::Matrix<int>*), 0))) {
           if (m) **m=*m2;
+          return true;
+        }
+      }
+
+      // Object is a sparsity pattern
+      {
+        Sparsity *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                      $descriptor(casadi::Sparsity*), 0))) {
+          if (m) **m=DMatrix::ones(*m2);
           return true;
         }
       }
@@ -1968,6 +1998,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
                                     $descriptor(casadi::Matrix<int>*), 0))) {
         return true;
+      }
+
+      // Object is a sparsity pattern
+      {
+        Sparsity *m2;
+        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                      $descriptor(casadi::Sparsity*), 0))) {
+          if (m) **m=IMatrix::ones(*m2);
+          return true;
+        }
       }
 
       // First convert to integer
