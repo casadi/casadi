@@ -81,13 +81,14 @@ namespace casadi {
                 bool always_inline=true, bool never_inline=false);
 
     /** \brief Return gradient function  */
-    virtual Function getGradient(int iind, int oind);
+    virtual Function getGradient(const std::string& name, int iind, int oind, const Dict& opts);
 
     /** \brief Return tangent function  */
-    virtual Function getTangent(int iind, int oind);
+    virtual Function getTangent(const std::string& name, int iind, int oind, const Dict& opts);
 
     /** \brief Return Jacobian function  */
-    virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
+    virtual Function getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
+                                 const Dict& opts);
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
@@ -950,8 +951,8 @@ namespace casadi {
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::getGradient(int iind,
-                                                                                   int oind) {
+  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::
+  getGradient(const std::string& name, int iind, int oind, const Dict& opts) {
     // Create expressions for the gradient
     std::vector<MatType> ret_out;
     ret_out.reserve(1+outputv_.size());
@@ -959,12 +960,12 @@ namespace casadi {
     ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
 
     // Return function
-    return PublicType(inputv_, ret_out);
+    return PublicType(name, inputv_, ret_out, opts);
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::getTangent(int iind,
-                                                                                  int oind) {
+  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::
+  getTangent(const std::string& name, int iind, int oind, const Dict& opts) {
     // Create expressions for the gradient
     std::vector<MatType> ret_out;
     ret_out.reserve(1+outputv_.size());
@@ -972,14 +973,13 @@ namespace casadi {
     ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
 
     // Return function
-    return PublicType(inputv_, ret_out);
+    return PublicType(name, inputv_, ret_out, opts);
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::getJacobian(int iind,
-                                                                                   int oind,
-                                                                                   bool compact,
-                                                                                   bool symmetric) {
+  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::
+  getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
+              const Dict& opts) {
     // Return function expression
     std::vector<MatType> ret_out;
     ret_out.reserve(1+outputv_.size());
@@ -987,7 +987,7 @@ namespace casadi {
     ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
 
     // Return function
-    return PublicType(inputv_, ret_out);
+    return PublicType(name, inputv_, ret_out, opts);
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
@@ -1106,8 +1106,7 @@ namespace casadi {
       static_cast<DerivedType*>(this)->evalFwd(fseed, fsens);
     } else {
       // Need to create a temporary function
-      PublicType f(arg, res);
-      f.init();
+      PublicType f("tmp", arg, res);
       f->evalFwd(fseed, fsens);
     }
   }
@@ -1137,8 +1136,7 @@ namespace casadi {
       static_cast<DerivedType*>(this)->evalAdj(aseed, asens);
     } else {
       // Need to create a temporary function
-      PublicType f(arg, res);
-      f.init();
+      PublicType f("tmp", arg, res);
       f->evalAdj(aseed, asens);
     }
   }

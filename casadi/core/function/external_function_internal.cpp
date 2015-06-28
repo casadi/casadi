@@ -300,8 +300,8 @@ namespace casadi {
     return jac_init!=0;
   }
 
-  Function ExternalFunctionInternal::getFullJacobian() {
-    return ExternalFunction(f_name_ + "_jac", bin_name_);
+  Function ExternalFunctionInternal::getFullJacobian(const std::string& name, const Dict& opts) {
+    return ExternalFunction(name, bin_name_, opts);
   }
 
   Function ExternalFunctionInternal::getDerForward(int nfwd) {

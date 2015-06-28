@@ -620,17 +620,15 @@ namespace casadi {
     }
   }
 
-  Function MXFunctionInternal::getNumericJacobian(int iind, int oind,
-                                                  bool compact, bool symmetric) {
+  Function MXFunctionInternal::getNumericJacobian(const std::string& name, int iind, int oind,
+                                                  bool compact, bool symmetric, const Dict& opts) {
     // Create expressions for the Jacobian
     vector<MX> ret_out;
     ret_out.reserve(1+outputv_.size());
     ret_out.push_back(jac(iind, oind, compact, symmetric, false, true));
     ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
 
-    MXFunction ret(inputv_, ret_out);
-    ret.setOption("input_scheme", ischeme_);
-    return ret;
+    return MXFunction(name, inputv_, ret_out, opts);
   }
 
   std::vector<MX> MXFunctionInternal::symbolicOutput(const std::vector<MX>& arg) {
@@ -1108,11 +1106,8 @@ namespace casadi {
     FunctionInternal::evalSX(arg, res);
 
     // Create function
-    SXFunction f(arg, res);
-    f.setOption("input_scheme", ischeme_);
-    f.setOption("output_scheme", oscheme_);
-    string name = getOption("name");
-    f.setOption("name", "expand_" + name);
+    SXFunction f("expand_" + name_, arg, res,
+                 make_dict("input_scheme", ischeme_, "output_scheme", oscheme_));
     return f;
   }
 

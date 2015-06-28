@@ -165,28 +165,30 @@ namespace casadi {
     ///@{
     /** \brief Return gradient function */
     Function gradient(int iind, int oind);
-    virtual Function getGradient(int iind, int oind);
+    virtual Function getGradient(const std::string& name, int iind, int oind, const Dict& opts);
     ///@}
 
     ///@{
     /** \brief Return tangent function */
     Function tangent(int iind, int oind);
-    virtual Function getTangent(int iind, int oind);
+    virtual Function getTangent(const std::string& name, int iind, int oind, const Dict& opts);
     ///@}
 
     ///@{
     /** \brief Return Jacobian function */
     Function jacobian(int iind, int oind, bool compact, bool symmetric);
     void setJacobian(const Function& jac, int iind, int oind, bool compact);
-    virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
-    virtual Function getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
+    virtual Function getJacobian(const std::string& name, int iind, int oind,
+                                 bool compact, bool symmetric, const Dict& opts);
+    virtual Function getNumericJacobian(const std::string& name, int iind, int oind,
+                                        bool compact, bool symmetric, const Dict& opts);
     ///@}
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     Function fullJacobian();
     virtual bool hasFullJacobian() const;
-    virtual Function getFullJacobian();
+    virtual Function getFullJacobian(const std::string& name, const Dict& opts);
     ///@}
 
     ///@{

@@ -1206,7 +1206,7 @@ namespace casadi {
     wi.push_back((322-13*sqrt(70.0))/900.0);
 
     // Evaluate at the Gauss points
-    SXFunction fcn(make_vector(x), make_vector(f));
+    SXFunction fcn("gauss_quadrature", make_vector(x), make_vector(f));
     vector<SXElement> f_val(5);
     for (int i=0; i<5; ++i)
       f_val[i] = fcn(SX(xi[i])).at(0).toScalar();
@@ -1270,8 +1270,7 @@ namespace casadi {
 
 
     // Otherwise, evaluate symbolically
-    SXFunction F(v, ex);
-    F.init();
+    SXFunction F("tmp", v, ex);
     return F(vdef);
   }
 
@@ -1300,8 +1299,7 @@ namespace casadi {
     f_out.insert(f_out.end(), ex.begin(), ex.end());
 
     // Write the mapping function
-    SXFunction f(f_in, f_out);
-    f.init();
+    SXFunction f("tmp", f_in, f_out);
 
     // Get references to the internal data structures
     const vector<ScalarAtomic>& algorithm = f.algorithm();
@@ -1551,8 +1549,7 @@ namespace casadi {
                             const std::string& v_suffix) {
 
     // Sort the expression
-    SXFunction f(vector<SX>(), ex);
-    f.init();
+    SXFunction f("tmp", vector<SX>(), ex);
 
     // Get references to the internal data structures
     const vector<ScalarAtomic>& algorithm = f.algorithm();

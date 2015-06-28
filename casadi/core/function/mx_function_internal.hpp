@@ -110,7 +110,8 @@ namespace casadi {
     void generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn);
 
     /** \brief Generate a function that calculates a Jacobian function by operator overloading */
-    virtual Function getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
+    virtual Function getNumericJacobian(const std::string& name, int iind, int oind,
+                                        bool compact, bool symmetric, const Dict& opts);
 
     /** \brief Evaluate symbolically, SX type*/
     virtual void evalSX(const SXElement** arg, SXElement** res,

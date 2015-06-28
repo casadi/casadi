@@ -73,7 +73,7 @@ namespace casadi {
     ///@{
     /** \brief Full Jacobian */
     virtual bool hasFullJacobian() const;
-    virtual Function getFullJacobian();
+    virtual Function getFullJacobian(const std::string& name, const Dict& opts);
     ///@}
   protected:
 

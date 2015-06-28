@@ -907,7 +907,7 @@ namespace casadi {
 
   Function SXFunctionInternal::getFullJacobian() {
     SX J = casadi::jacobian(veccat(outputv_), veccat(inputv_));
-    return SXFunction(inputv_, make_vector(J));
+    return SXFunction(name_ + "_jac", inputv_, make_vector(J));
   }
 
 

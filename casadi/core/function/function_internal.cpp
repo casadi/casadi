@@ -208,24 +208,21 @@ namespace casadi {
     casadi_assert_message(output(oind).isScalar(),
                           "Only gradients of scalar functions allowed. Use jacobian instead.");
 
-    // Generate gradient function
-    Function ret = getGradient(iind, oind);
-
     // Give it a suitable name
     stringstream ss;
     ss << "gradient_" << getOption("name") << "_" << iind << "_" << oind;
-    ret.setOption("name", ss.str());
-    ret.setOption("input_scheme", ischeme_);
 
     // Output names
     std::vector<std::string> ionames;
-    ionames.reserve(ret.nOut());
+    ionames.reserve(1 + nOut());
     ionames.push_back("grad");
-    for (int i=0;i<nOut();++i) {
+    for (int i=0; i<nOut(); ++i) {
       ionames.push_back(oscheme_.at(i));
     }
-    ret.setOption("output_scheme", ionames);
-    return ret;
+
+    // Generate gradient function
+    return getGradient(ss.str(), iind, oind,
+                       make_dict("input_scheme", ischeme_, "output_scheme", ionames));
   }
 
   Function FunctionInternal::tangent(int iind, int oind) {
@@ -233,25 +230,21 @@ namespace casadi {
     casadi_assert_message(input(iind).isScalar(),
                           "Only tangent of scalar input functions allowed. Use jacobian instead.");
 
-    // Generate gradient function
-    Function ret = getTangent(iind, oind);
-
     // Give it a suitable name
     stringstream ss;
     ss << "tangent_" << getOption("name") << "_" << iind << "_" << oind;
-    ret.setOption("name", ss.str());
-    ret.setOption("input_scheme", ischeme_);
 
     // Output names
     std::vector<std::string> ionames;
-    ionames.reserve(ret.nOut());
+    ionames.reserve(1 + nOut());
     ionames.push_back("tangent");
-    for (int i=0;i<nOut();++i) {
+    for (int i=0; i<nOut(); ++i) {
       ionames.push_back(oscheme_.at(i));
     }
-    ret.setOption("output_scheme", ionames);
 
-    return ret;
+    // Generate gradient function
+    return getTangent(ss.str(), iind, oind,
+                      make_dict("input_scheme", ischeme_, "output_scheme", ionames));
   }
 
   Function FunctionInternal::hessian(int iind, int oind) {
@@ -282,13 +275,15 @@ namespace casadi {
     return ret;
   }
 
-  Function FunctionInternal::getGradient(int iind, int oind) {
+  Function FunctionInternal::getGradient(const std::string& name, int iind, int oind,
+                                         const Dict& opts) {
     Function f = wrapMXFunction();
     f.init();
     return f.gradient(iind, oind);
   }
 
-  Function FunctionInternal::getTangent(int iind, int oind) {
+  Function FunctionInternal::getTangent(const std::string& name, int iind, int oind,
+                                        const Dict& opts) {
     Function f = wrapMXFunction();
     f.init();
     return f.tangent(iind, oind);
@@ -1475,26 +1470,23 @@ namespace casadi {
       return shared_cast<Function>(cached.shared());
 
     } else {
-      // Generate a Jacobian
-      Function ret = getJacobian(iind, oind, compact, symmetric);
-
       // Give it a suitable name
       stringstream ss;
       ss << "jacobian_" << getOption("name") << "_" << iind << "_" << oind;
-      ret.setOption("name", ss.str());
-      ret.setOption("verbose", getOption("verbose"));
-
-      // Same input scheme
-      ret.setOption("input_scheme", ischeme_);
 
       // Output names
       std::vector<std::string> ionames;
-      ionames.reserve(ret.nOut());
+      ionames.reserve(1 + nOut());
       ionames.push_back("jac");
       for (int i=0; i<nOut(); ++i) {
         ionames.push_back(oscheme_.at(i));
       }
-      ret.setOption("output_scheme", ionames);
+
+      // Generate a Jacobian
+      Function ret = getJacobian(ss.str(), iind, oind, compact, symmetric,
+                                 make_dict("verbose", getOption("verbose"),
+                                           "input_scheme", ischeme_,
+                                           "output_scheme", ionames));
 
       // Save in cache
       compact ? jac_compact_.elem(oind, iind) : jac_.elem(oind, iind) = ret;
@@ -1510,8 +1502,10 @@ namespace casadi {
     }
   }
 
-  Function FunctionInternal::getJacobian(int iind, int oind, bool compact, bool symmetric) {
-    return getNumericJacobian(iind, oind, compact, symmetric);
+  Function FunctionInternal::
+  getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
+              const Dict& opts) {
+    return getNumericJacobian(name, iind, oind, compact, symmetric, opts);
   }
 
   Function FunctionInternal::derForward(int nfwd) {
@@ -1846,10 +1840,12 @@ namespace casadi {
     }
   }
 
-  Function FunctionInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetric) {
+  Function FunctionInternal::
+  getNumericJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
+                     const Dict& opts) {
     Function f = wrapMXFunction();
     f.init();
-    return f->getNumericJacobian(iind, oind, compact, symmetric);
+    return f->getNumericJacobian(name, iind, oind, compact, symmetric, opts);
   }
 
   Function FunctionInternal::fullJacobian() {
@@ -1857,28 +1853,23 @@ namespace casadi {
       // Return cached Jacobian
       return shared_cast<Function>(full_jacobian_.shared());
     } else {
+      // Options
+      string name = name_ + "_jac";
+      Dict opts;
+      opts["input_scheme"] = ischeme_;
+      opts["output_scheme"] = std::vector<std::string>(1, "jac");
+
       Function ret;
       if (hasSetOption("full_jacobian")) {
         /// User-provided Jacobian function
         ret = getOption("full_jacobian");
+        ret.setOption("name", name);
+        ret.setOption(opts);
+        ret.init();
       } else {
         // Generate full Jacobian
-        ret = getFullJacobian();
+        ret = getFullJacobian(name, opts);
       }
-
-      // Give it a suitable name
-      stringstream ss;
-      ss << "jacobian_" << getOption("name");
-      ret.setOption("name", ss.str());
-      ret.setOption("verbose", getOption("verbose"));
-
-      // Set input and output schemes
-      ret.setOption("input_scheme", ischeme_);
-      std::vector<std::string> oscheme(1, "jac");
-      ret.setOption("output_scheme", oscheme);
-
-      // Initialize
-      ret.init();
 
       // Consistency check
       casadi_assert(ret.nIn()==nIn());
@@ -1890,7 +1881,7 @@ namespace casadi {
     }
   }
 
-  Function FunctionInternal::getFullJacobian() {
+  Function FunctionInternal::getFullJacobian(const std::string& name, const Dict& opts) {
     casadi_assert(numDerForward()>0 || numDerReverse()>0);
 
     // Number inputs and outputs
@@ -1949,7 +1940,7 @@ namespace casadi {
     }
 
     // Form an expression for the full Jacobian
-    return MXFunction(ret_argv, make_vector(J));
+    return MXFunction(name, ret_argv, make_vector(J), opts);
   }
 
   void FunctionInternal::generateFunction(CodeGenerator& g,
