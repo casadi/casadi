@@ -114,6 +114,10 @@ namespace casadi {
     // Initialize the base classes
     SundialsInterface::init();
 
+    // Algebraic variables not supported
+    casadi_assert_message(nz_==0 && nrz_==0,
+                          "CVODES does not support algebraic variables");
+
     // Read options
     monitor_rhsB_  = monitored("resB");
     monitor_rhs_   = monitored("res");
