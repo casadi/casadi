@@ -54,7 +54,7 @@ namespace casadi {
 
     // Allocate inputs
     ibuf_.resize(LINSOL_NUM_IN);
-    input(LINSOL_A) = DMatrix(sparsity);
+    input(LINSOL_A) = DMatrix::zeros(sparsity);
     input(LINSOL_B) = DMatrix::zeros(sparsity.size2(), nrhs);
 
     // Allocate outputs

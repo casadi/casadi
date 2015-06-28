@@ -155,12 +155,12 @@ namespace casadi {
     // Allocate space for inputs
     ibuf_.resize(inputv_.size());
     for (int i=0; i<inputv_.size(); ++i)
-      input(i) = DMatrix(inputv_[i].sparsity());
+      input(i) = DMatrix::zeros(inputv_[i].sparsity());
 
     // Allocate space for outputs
     obuf_.resize(outputv_.size());
     for (int i=0; i<outputv_.size(); ++i)
-      output(i) = DMatrix(outputv_[i].sparsity());
+      output(i) = DMatrix::zeros(outputv_[i].sparsity());
 
     // Check for duplicate entries among the input expressions
     bool has_duplicates = false;
@@ -552,7 +552,7 @@ namespace casadi {
     // Adjoint sensitivities
     std::vector<std::vector<MatType> > asens(1, std::vector<MatType>(inputv_.size()));
     for (int i=0; i<inputv_.size(); ++i) {
-      asens[0][i] = MatType(inputv_[i].sparsity());
+      asens[0][i] = MatType::zeros(inputv_[i].sparsity());
     }
 
     // Calculate with adjoint mode AD
@@ -619,7 +619,7 @@ namespace casadi {
     }
 
     // Create return object
-    MatType ret = MatType(jacSparsity(iind, oind, compact, symmetric).T());
+    MatType ret = MatType::zeros(jacSparsity(iind, oind, compact, symmetric).T());
     if (verbose()) userOut() << "XFunctionInternal::jac allocated return value" << std::endl;
 
     // Quick return if empty

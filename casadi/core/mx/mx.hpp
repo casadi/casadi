@@ -71,10 +71,10 @@ namespace casadi {
     explicit MX(const std::pair<int, int>& rc);
 #endif // SWIG
 
-    /** \brief Sparse matrix with a given sparsity and zero entries
-        Same as MX::zeros(sparsity)
+    /** \brief Create a sparse matrix from a sparsity pattern.
+        Same as MX::ones(sparsity)
      */
-    explicit MX(const Sparsity& sp);
+    explicit MX(const Sparsity& sp, int dummy1, int dummy2, int dummy3);
 
     /** \brief Construct matrix with a given sparsity and nonzeros */
     MX(const Sparsity& sp, const MX& val);

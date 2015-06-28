@@ -105,10 +105,10 @@ namespace casadi {
 
     // Output arguments
     obuf_.resize(QCQP_SOLVER_NUM_OUT);
-    output(QCQP_SOLVER_X) = DMatrix(x_sparsity);
+    output(QCQP_SOLVER_X) = DMatrix::zeros(x_sparsity);
     output(QCQP_SOLVER_COST) = 0.0;
-    output(QCQP_SOLVER_LAM_X) = DMatrix(x_sparsity);
-    output(QCQP_SOLVER_LAM_A) = DMatrix(bounds_sparsity);
+    output(QCQP_SOLVER_LAM_X) = DMatrix::zeros(x_sparsity);
+    output(QCQP_SOLVER_LAM_A) = DMatrix::zeros(bounds_sparsity);
 
     ischeme_ = IOScheme(SCHEME_QcqpSolverInput);
     oscheme_ = IOScheme(SCHEME_QcqpSolverOutput);

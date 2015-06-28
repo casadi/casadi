@@ -90,8 +90,8 @@ namespace casadi {
     }
   }
 
-  MX::MX(const Sparsity& sp) {
-    assignNode(ConstantMX::create(sp, 0));
+  MX::MX(const Sparsity& sp, int dummy1, int dummy2, int dummy3) {
+    assignNode(ConstantMX::create(sp, 1));
   }
 
   MX::MX(int nrow, int ncol) {
@@ -266,7 +266,7 @@ namespace casadi {
     }
 
     // Collect all assignments
-    IMatrix el(m.sparsity());
+    IMatrix el = IMatrix::zeros(m.sparsity());
     for (int j=0; j<el.size2(); ++j) { // Loop over columns of m
       int this_j = cc.at(j) - ind1; // Corresponding column in this
       if (this_j<0) this_j += sz2;

@@ -1073,7 +1073,7 @@ namespace casadi {
     if (inputvsx.empty()) { // No symbolic input provided
       for (int i=0; i<arg.size(); ++i) {
         // Start with matrix with the correct sparsity
-        arg[i] = SX(inputv_[i].sparsity());
+        arg[i] = SX::zeros(inputv_[i].sparsity());
 
         // Divide input into primitives and create corresponding SX
         vector<SXElement>::iterator ait = arg[i].begin();
@@ -1101,7 +1101,7 @@ namespace casadi {
     // Create output vector with correct sparsity
     vector<SX> res(outputv_.size());
     for (int i=0; i<res.size(); ++i) {
-      res[i] = SX(outputv_[i].sparsity());
+      res[i] = SX::zeros(outputv_[i].sparsity());
     }
 
     // Evaluate symbolically

@@ -155,10 +155,10 @@ namespace casadi {
     gk_cand_.resize(ng_);
 
     // Hessian approximation
-    Bk_ = DMatrix(H_sparsity);
+    Bk_ = DMatrix::zeros(H_sparsity);
 
     // Jacobian
-    Jk_ = DMatrix(A_sparsity);
+    Jk_ = DMatrix::zeros(A_sparsity);
 
     // Bounds of the QP
     qp_LBA_.resize(ng_);

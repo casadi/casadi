@@ -139,7 +139,7 @@ namespace casadi {
     Sparsity sp = sparsity().sub(rr.data(), cc.data(), mapping, ind1);
 
     // Copy nonzeros
-    m = Matrix<DataType>(sp);
+    m = Matrix<DataType>::zeros(sp);
     for (int k=0; k<mapping.size(); ++k) m.at(k) = at(mapping[k]);
   }
 
@@ -178,7 +178,7 @@ namespace casadi {
     Sparsity sp = sparsity().sub(rr.data(), rr.sparsity(), mapping, ind1);
 
     // Copy nonzeros
-    m = Matrix<DataType>(sp);
+    m = Matrix<DataType>::zeros(sp);
     for (int k=0; k<mapping.size(); ++k) m.at(k) = at(mapping[k]);
   }
 
@@ -281,7 +281,7 @@ namespace casadi {
     }
 
     // Collect all assignments
-    IMatrix el(m.sparsity());
+    IMatrix el = IMatrix::zeros(m.sparsity());
     for (int j=0; j<el.size2(); ++j) { // Loop over columns of m
       int this_j = cc.at(j) - ind1; // Corresponding column in this
       if (this_j<0) this_j += sz2;
@@ -858,8 +858,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType>::Matrix(const Sparsity& sp) :
-      sparsity_(sp), data_(sp.nnz(), 0) {
+  Matrix<DataType>::Matrix(const Sparsity& sp, int dummy1, int dummy2, int dummy3) :
+      sparsity_(sp), data_(sp.nnz(), 1) {
   }
 
 
@@ -913,7 +913,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::unary(int op, const Matrix<DataType> &x) {
     // Return value
-    Matrix<DataType> ret(x.sparsity());
+    Matrix<DataType> ret = Matrix<DataType>::zeros(x.sparsity());
 
     // Nonzeros
     std::vector<DataType>& ret_data = ret.data();
@@ -1396,7 +1396,7 @@ namespace casadi {
     Sparsity s = sparsity().transpose(mapping);
 
     // create the return matrix
-    Matrix<DataType> ret(s);
+    Matrix<DataType> ret = zeros(s);
 
     // Copy the content
     for (int i=0; i<mapping.size(); ++i)
@@ -1434,7 +1434,7 @@ namespace casadi {
                                                    const Matrix<DataType> &x,
                                                    const Matrix<DataType> &y) {
     // Return value
-    Matrix<DataType> ret(y.sparsity());
+    Matrix<DataType> ret = Matrix<DataType>::zeros(y.sparsity());
 
     // Nonzeros
     std::vector<DataType>& ret_data = ret.data();
@@ -1465,7 +1465,7 @@ namespace casadi {
                                                    const Matrix<DataType> &x,
                                                    const Matrix<DataType> &y) {
     // Return value
-    Matrix<DataType> ret(x.sparsity());
+    Matrix<DataType> ret = Matrix<DataType>::zeros(x.sparsity());
 
     // Nonzeros
     std::vector<DataType>& ret_data = ret.data();
@@ -1513,7 +1513,7 @@ namespace casadi {
                                         operation_checker<Function0Checker>(op));
 
     // Return value
-    Matrix<DataType> r(r_sp);
+    Matrix<DataType> r = zeros(r_sp);
 
     // Perform the operations elementwise
     if (x_sp==y_sp) {
@@ -1884,7 +1884,7 @@ namespace casadi {
     if (intersect) {
       return project(*this, sp.patternIntersection(sparsity()), false);
     } else {
-      Matrix<DataType> ret(sp);
+      Matrix<DataType> ret = Matrix<DataType>::zeros(sp);
       ret.set(*this);
       return ret;
     }
@@ -2088,7 +2088,7 @@ namespace casadi {
     // Concatenate sparsity patterns
     std::vector<Sparsity> sp(v.size());
     for (int i=0; i<v.size(); ++i) sp[i] = v[i].sparsity();
-    Matrix<DataType> ret(horzcat(sp));
+    Matrix<DataType> ret = zeros(horzcat(sp));
 
     // Copy nonzeros
     typename Matrix<DataType>::iterator i=ret.begin();
@@ -2454,7 +2454,7 @@ namespace casadi {
     // Get the sparsity
     Sparsity sp = sparsity().getDiag(mapping);
 
-    Matrix<DataType> ret = Matrix<DataType>(sp);
+    Matrix<DataType> ret = zeros(sp);
 
     for (int k=0;k<mapping.size();k++) ret[k] = (*this)[mapping[k]];
     return ret;
@@ -2481,7 +2481,7 @@ namespace casadi {
     Sparsity sp = sparsity().patternUnion(B.sparsity(), mapping);
 
     // Create return matrix
-    Matrix<DataType> ret(sp);
+    Matrix<DataType> ret = zeros(sp);
 
     // Copy sparsity
     int elA=0, elB=0;

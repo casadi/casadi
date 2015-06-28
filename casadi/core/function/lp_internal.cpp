@@ -51,7 +51,7 @@ namespace casadi {
 
     // Input arguments
     ibuf_.resize(LP_SOLVER_NUM_IN);
-    input(LP_SOLVER_A) = DMatrix(A);
+    input(LP_SOLVER_A) = DMatrix::zeros(A);
     input(LP_SOLVER_C) = DMatrix::zeros(n_);
     input(LP_SOLVER_LBA) = -DMatrix::inf(nc_);
     input(LP_SOLVER_UBA) = DMatrix::inf(nc_);

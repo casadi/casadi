@@ -845,7 +845,7 @@ class MXtests(casadiTestCase):
       
     def gentest(m,n):
       As = randsparsity(m,n)
-      A_ = DMatrix(As)
+      A_ = DMatrix.zeros(As)
       for k in range(As.nnz()):
         A_.nz[k]= numpy.random.rand()
       A = MX.sym("A",As)
@@ -922,7 +922,7 @@ class MXtests(casadiTestCase):
       
     def gentest(m,n):
       As = randsparsity(m,n)
-      A_ = DMatrix(As)
+      A_ = DMatrix.zeros(As)
       for k in range(As.nnz()):
         A_.nz[k]= numpy.random.rand()
       A = MX.sym("A",As)

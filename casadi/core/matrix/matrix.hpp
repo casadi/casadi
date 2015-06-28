@@ -98,10 +98,10 @@ namespace casadi {
     explicit Matrix(const std::pair<int, int>& rc);
 #endif // SWIG
 
-    /** \brief Sparse matrix with a given sparsity and zero entries
-        Alias for Matrix::zeros(sparsity)
+    /** \brief Create a sparse matrix from a sparsity pattern.
+        Same as Matrix::ones(sparsity)
      */
-    explicit Matrix(const Sparsity& sp);
+    explicit Matrix(const Sparsity& sp, int dummy1, int dummy2, int dummy3);
 
     /** \brief Construct matrix with a given sparsity and nonzeros */
     Matrix(const Sparsity& sp, const Matrix<DataType>& d);

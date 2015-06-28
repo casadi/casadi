@@ -210,7 +210,7 @@ namespace casadi {
     casadi_assert(res[0]!=0);
 
     // Get A and factorize it
-    SX A(input(LINSOL_A).sparsity());
+    SX A = SX::zeros(input(LINSOL_A).sparsity());
     copy(arg[1], arg[1]+A.nnz(), A.begin());
     vector<SX> v = fact_fcn_(A);
 

@@ -182,7 +182,8 @@ namespace casadi {
     for (int i=0;i<nq_;++i) {
       cholesky_.push_back(
         LinearSolver("csparsecholesky",
-          DMatrix(st_[QCQP_STRUCT_P])(range(i*n_, (i+1)*n_), ALL).sparsity()));
+                     DMatrix::zeros(st_[QCQP_STRUCT_P])(range(i*n_, (i+1)*n_),
+                                                        ALL).sparsity()));
     }
 
     for (int i=0;i<nq_+1;++i) {
