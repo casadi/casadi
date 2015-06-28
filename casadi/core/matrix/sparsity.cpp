@@ -1174,7 +1174,7 @@ namespace casadi {
 
   Sparsity Sparsity::zz_vertcat(const std::vector<Sparsity> & sp) {
     // Quick return if possible
-    if (sp.empty()) return Sparsity();
+    if (sp.empty()) return Sparsity(0, 0);
     if (sp.size()==1) return sp.front();
 
     // Count total nnz
