@@ -90,7 +90,7 @@ namespace casadi {
     }
   }
 
-  MX::MX(const Sparsity& sp, int dummy1, int dummy2, int dummy3) {
+  MX::MX(const Sparsity& sp) {
     assignNode(ConstantMX::create(sp, 1));
   }
 

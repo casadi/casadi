@@ -849,10 +849,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType>::Matrix(const Sparsity& sp, int dummy1, int dummy2, int dummy3) :
-      sparsity_(sp), data_(sp.nnz(), 1) {
+  Matrix<DataType>::Matrix(const Sparsity& sp) : sparsity_(sp), data_(sp.nnz(), 1) {
   }
-
 
   template<typename DataType>
   Matrix<DataType>::Matrix(int nrow, int ncol) : sparsity_(nrow, ncol) {

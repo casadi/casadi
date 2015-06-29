@@ -74,7 +74,7 @@ namespace casadi {
     /** \brief Create a sparse matrix from a sparsity pattern.
         Same as MX::ones(sparsity)
      */
-    explicit MX(const Sparsity& sp, int dummy1, int dummy2, int dummy3);
+    explicit MX(const Sparsity& sp);
 
     /** \brief Construct matrix with a given sparsity and nonzeros */
     MX(const Sparsity& sp, const MX& val);
