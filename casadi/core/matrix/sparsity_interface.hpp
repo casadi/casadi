@@ -539,7 +539,7 @@ namespace casadi {
      */
     inline friend std::vector< MatType > diagsplit(const MatType& x,
                                                    const std::vector<int>& output_offset) {
-      casadi_assert_message(x.isSquare(), "diagsplit(x,incr)::input must be square but got "
+      casadi_assert_message(x.issquare(), "diagsplit(x,incr)::input must be square but got "
                             << x.dimString()  << ".");
       return diagsplit(x, output_offset, output_offset);
     }
@@ -551,7 +551,7 @@ namespace casadi {
      */
     inline friend std::vector< MatType > diagsplit(const MatType& x, int incr=1) {
       casadi_assert(incr>=1);
-      casadi_assert_message(x.isSquare(), "diagsplit(x,incr)::input must be square but got "
+      casadi_assert_message(x.issquare(), "diagsplit(x,incr)::input must be square but got "
                             << x.dimString()  << ".");
       std::vector<int> offset2 = range(0, x.size2(), incr);
       offset2.push_back(x.size2());

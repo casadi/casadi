@@ -1989,7 +1989,7 @@ namespace casadi {
     return true;
   }
 
-  bool SparsityInternal::isSquare() const {
+  bool SparsityInternal::issquare() const {
     return size2() == size1();
   }
 

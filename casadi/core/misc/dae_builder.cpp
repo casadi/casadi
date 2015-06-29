@@ -600,7 +600,7 @@ namespace casadi {
     MXFunction f("tmp", make_vector(vertcat(this->d)),
                  make_vector(vertcat(this->d) - vertcat(this->ddef)));
     Sparsity sp = f.jacSparsity();
-    casadi_assert(sp.isSquare());
+    casadi_assert(sp.issquare());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -739,7 +739,7 @@ namespace casadi {
     // Find out which differential equation depends on which differential state
     MXFunction f("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
     Sparsity sp = f.jacSparsity();
-    casadi_assert(sp.isSquare());
+    casadi_assert(sp.issquare());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -767,7 +767,7 @@ namespace casadi {
     // Find out which algebraic equation depends on which algebraic state
     MXFunction f("tmp", make_vector(vertcat(this->z)), make_vector(vertcat(this->alg)));
     Sparsity sp = f.jacSparsity();
-    casadi_assert(sp.isSquare());
+    casadi_assert(sp.issquare());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -802,7 +802,7 @@ namespace casadi {
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
     Sparsity sp = f.jacSparsity();
-    casadi_assert(sp.isSquare());
+    casadi_assert(sp.issquare());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -886,7 +886,7 @@ namespace casadi {
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
     Sparsity sp = f.jacSparsity();
-    casadi_assert(sp.isSquare());
+    casadi_assert(sp.issquare());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;

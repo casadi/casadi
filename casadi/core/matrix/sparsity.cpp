@@ -259,8 +259,8 @@ namespace casadi {
     return (*this)->isVector(row_or_col);
   }
 
-  bool Sparsity::isSquare() const {
-    return (*this)->isSquare();
+  bool Sparsity::issquare() const {
+    return (*this)->issquare();
   }
 
   bool Sparsity::isSymmetric() const {
@@ -1068,7 +1068,7 @@ namespace casadi {
   }
 
   bool Sparsity::isSingular() const {
-    casadi_assert_message(isSquare(), "isSingular: only defined for square matrices, but got "
+    casadi_assert_message(issquare(), "isSingular: only defined for square matrices, but got "
                           << dimString());
     return sprank(*this)!=size2();
   }

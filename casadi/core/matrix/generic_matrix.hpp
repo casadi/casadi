@@ -115,7 +115,7 @@ namespace casadi {
     bool isscalar(bool scalar_and_dense=false) const;
 
     /** \brief  Check if the matrix expression is square */
-    bool isSquare() const { return sparsity().isSquare();}
+    bool issquare() const { return sparsity().issquare();}
 
     /** \brief  Check if the matrix is a column vector (i.e. size2()==1)
         Optionally, checks if either row or column vector.
@@ -614,7 +614,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::zz_tril2symm() const {
-    casadi_assert_message(self().isSquare(),
+    casadi_assert_message(self().issquare(),
                           "Shape error in tril2symm. Expecting square shape but got "
                           << self().dimString());
     casadi_assert_message(self().sizeU()-self().sizeD()==0,
@@ -625,7 +625,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::zz_triu2symm() const {
-    casadi_assert_message(self().isSquare(),
+    casadi_assert_message(self().issquare(),
                           "Shape error in triu2symm. Expecting square shape but got "
                           << self().dimString());
     casadi_assert_message(self().sizeL()-self().sizeD()==0,

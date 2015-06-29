@@ -571,7 +571,7 @@ namespace casadi {
     bool isDiagonal() const;
 
     /// Is square?
-    bool isSquare() const;
+    bool issquare() const;
 
     /// Is symmetric?
     bool isSymmetric() const;
