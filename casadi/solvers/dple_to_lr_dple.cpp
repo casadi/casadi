@@ -106,11 +106,13 @@ namespace casadi {
     Wrapper<DpleToLrDple>::evaluate();
   }
 
-  Function DpleToLrDple::getDerForward(int nfwd) {
+  Function DpleToLrDple
+  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function DpleToLrDple::getDerReverse(int nadj) {
+  Function DpleToLrDple
+  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     return f_.derReverse(nadj);
   }
 

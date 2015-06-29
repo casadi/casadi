@@ -53,8 +53,7 @@ int main(){
   ode.append( (1 - x[1]*x[1])*x[0] - x[1] + p );
   ode.append( x[0]                            );
   ode.append( x[0]*x[0] + x[1]*x[1] + p*p     );
-  SXFunction f(daeIn("x",x,"p",p),daeOut("ode",ode));
-  f.init();
+  SXFunction f("f", daeIn("x",x,"p",p),daeOut("ode",ode));
 
   // Number of finite elements
   int n = 100;

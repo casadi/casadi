@@ -728,7 +728,7 @@ namespace casadi {
     return ret;
   }
 
-  Function IntegratorInternal::getDerForward(int nfwd) {
+  Function IntegratorInternal::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     log("IntegratorInternal::getDerForward", "begin");
 
     // Form the augmented DAE
@@ -868,10 +868,10 @@ namespace casadi {
     log("IntegratorInternal::getDerForward", "end");
 
     // Create derivative function and return
-    return MXFunction(ret_in, ret_out);
+    return MXFunction(name, ret_in, ret_out, opts);
   }
 
-  Function IntegratorInternal::getDerReverse(int nadj) {
+  Function IntegratorInternal::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     log("IntegratorInternal::getDerReverse", "begin");
 
     // Form the augmented DAE
@@ -1047,7 +1047,7 @@ namespace casadi {
     log("IntegratorInternal::getDerivative", "end");
 
     // Create derivative function and return
-    return MXFunction(ret_in, ret_out);
+    return MXFunction(name, ret_in, ret_out, opts);
   }
 
   void IntegratorInternal::reset() {

@@ -89,12 +89,13 @@ namespace casadi {
       out[INTEGRATOR_ZF] = z;
 
       // Create the output function
-      output_fcn_ = SXFunction(arg, out);
+      output_fcn_ = SXFunction("ofcn", arg, out);
       oscheme_ = IOScheme(SCHEME_IntegratorOutput);
-    }
+    } else {
 
-    // Initialize the output function
-    output_fcn_.init();
+      // Initialize the output function
+      output_fcn_.init();
+    }
 
     // Allocate inputs
     ibuf_.resize(INTEGRATOR_NUM_IN);

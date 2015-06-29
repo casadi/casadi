@@ -845,7 +845,8 @@ namespace casadi {
 
   }
 
-  Function PsdIndefDpleInternal::getDerForward(int nfwd) {
+  Function PsdIndefDpleInternal
+  ::getDerForward(const std::string& name, int nadj, const Dict& opts) {
 
     // Base:
     // P_0 P_1 P_2 .. P_{nrhs-1} = f( A Q_0 Q_1 Q_2 .. Q_{nrhs-1})
@@ -946,14 +947,11 @@ namespace casadi {
 
     }
 
-    MXFunction ret(ins_new, outs_new);
-    ret.init();
-
-    return ret;
-
+    return MXFunction(name, ins_new, outs_new, opts);
   }
 
-  Function PsdIndefDpleInternal::getDerReverse(int nadj) {
+  Function PsdIndefDpleInternal
+  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
 
     // Base:
     // P_0 P_1 P_2 .. P_{nrhs-1} = f( A Q_0 Q_1 Q_2 .. Q_{nrhs-1})
@@ -1060,10 +1058,7 @@ namespace casadi {
 
     }
 
-    MXFunction ret(ins_new, outs_new);
-    ret.init();
-
-    return ret;
+    return MXFunction(name, ins_new, outs_new, opts);
   }
 
   void PsdIndefDpleInternal::deepCopyMembers(

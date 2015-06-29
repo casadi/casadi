@@ -104,11 +104,13 @@ namespace casadi {
     Wrapper<FixedSmithDleInternal>::evaluate();
   }
 
-  Function FixedSmithDleInternal::getDerForward(int nfwd) {
+  Function FixedSmithDleInternal
+  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function FixedSmithDleInternal::getDerReverse(int nadj) {
+  Function FixedSmithDleInternal
+  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     return f_.derReverse(nadj);
   }
 

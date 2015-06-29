@@ -1521,23 +1521,9 @@ namespace casadi {
       return shared_cast<Function>(derivative_fwd_[nfwd].shared());
     }
 
-    // Return value
-    Function ret;
-    if (hasSetOption("custom_forward")) {
-      /// User-provided derivative generator function
-      DerivativeGenerator dergen = getOption("custom_forward");
-      Function this_ = shared_from_this<Function>();
-      ret = dergen(this_, nfwd, user_data_);
-      // Fails for ImplicitFunction
-    } else {
-      casadi_assert(numDerForward()>0);
-      ret = getDerForward(nfwd);
-    }
-
     // Give it a suitable name
     stringstream ss;
-    ss << "fwd" << nfwd << "_" << getOption("name");
-    ret.setOption("name", ss.str());
+    ss << "fwd" << nfwd << "_" << name_;
 
     // Get the number of inputs and outputs
     int n_in = nIn();
@@ -1566,9 +1552,6 @@ namespace casadi {
       }
     }
 
-    // Pass to return object
-    ret.setOption("input_scheme", i_names);
-
     // Names of outputs
     std::vector<std::string> o_names;
     o_names.reserve(n_out*nfwd);
@@ -1582,11 +1565,24 @@ namespace casadi {
       }
     }
 
-    // Pass to return object
-    ret.setOption("output_scheme", o_names);
+    // Options
+    Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names);
 
-    // Initialize it
-    ret.init();
+    // Return value
+    Function ret;
+    if (hasSetOption("custom_forward")) {
+      /// User-provided derivative generator function
+      DerivativeGenerator dergen = getOption("custom_forward");
+      Function this_ = shared_from_this<Function>();
+      ret = dergen(this_, nfwd, user_data_);
+      ret.setOption("name", ss.str());
+      ret.setOption(opts);
+      ret.init();
+      // Fails for ImplicitFunction
+    } else {
+      casadi_assert(numDerForward()>0);
+      ret = getDerForward(ss.str(), nfwd, opts);
+    }
 
     // Consistency check for inputs
     for (int i=0; i<ret.nIn(); ++i) {
@@ -1628,22 +1624,9 @@ namespace casadi {
       return shared_cast<Function>(derivative_adj_[nadj].shared());
     }
 
-    // Return value
-    Function ret;
-    if (hasSetOption("custom_reverse")) {
-      /// User-provided derivative generator function
-      DerivativeGenerator dergen = getOption("custom_reverse");
-      Function this_ = shared_from_this<Function>();
-      ret = dergen(this_, nadj, user_data_);
-    } else {
-      casadi_assert(numDerReverse()>0);
-      ret = getDerReverse(nadj);
-    }
-
     // Give it a suitable name
     stringstream ss;
-    ss << "adj" << nadj << "_" << getOption("name");
-    ret.setOption("name", ss.str());
+    ss << "adj" << nadj << "_" << name_;
 
     // Get the number of inputs and outputs
     int n_in = nIn();
@@ -1672,9 +1655,6 @@ namespace casadi {
       }
     }
 
-    // Pass to return object
-    ret.setOption("input_scheme", i_names);
-
     // Names of outputs
     std::vector<std::string> o_names;
     o_names.reserve(n_in*nadj);
@@ -1688,11 +1668,23 @@ namespace casadi {
       }
     }
 
-    // Pass to return object
-    ret.setOption("output_scheme", o_names);
+    // Options
+    Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names);
 
-    // Initialize it
-    ret.init();
+    // Return value
+    Function ret;
+    if (hasSetOption("custom_reverse")) {
+      /// User-provided derivative generator function
+      DerivativeGenerator dergen = getOption("custom_reverse");
+      Function this_ = shared_from_this<Function>();
+      ret = dergen(this_, nadj, user_data_);
+      ret.setOption("name", ss.str());
+      ret.setOption(opts);
+      ret.init();
+    } else {
+      casadi_assert(numDerReverse()>0);
+      ret = getDerReverse(ss.str(), nadj, opts);
+    }
 
     // Consistency check for inputs
     for (int i=0; i<ret.nIn(); ++i) {
@@ -1743,13 +1735,13 @@ namespace casadi {
     derivative_adj_[nadj] = fcn;
   }
 
-  Function FunctionInternal::getDerForward(int nfwd) {
+  Function FunctionInternal::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     // TODO(@jaeandersson): Fallback on finite differences
     casadi_error("FunctionInternal::getDerForward not defined for class "
                  << typeid(*this).name());
   }
 
-  Function FunctionInternal::getDerReverse(int nadj) {
+  Function FunctionInternal::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     casadi_error("FunctionInternal::getDerReverse not defined for class "
                  << typeid(*this).name());
   }

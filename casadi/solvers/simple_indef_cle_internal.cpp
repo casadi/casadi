@@ -112,11 +112,13 @@ namespace casadi {
     }
   }
 
-  Function SimpleIndefCleInternal::getDerForward(int nfwd) {
+  Function SimpleIndefCleInternal
+  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function SimpleIndefCleInternal::getDerReverse(int nadj) {
+  Function SimpleIndefCleInternal
+  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     return f_.derReverse(nadj);
   }
 

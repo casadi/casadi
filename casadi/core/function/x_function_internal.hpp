@@ -87,18 +87,18 @@ namespace casadi {
     virtual Function getTangent(const std::string& name, int iind, int oind, const Dict& opts);
 
     /** \brief Return Jacobian function  */
-    virtual Function getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
-                                 const Dict& opts);
+    virtual Function getJacobian(const std::string& name, int iind, int oind,
+                                 bool compact, bool symmetric, const Dict& opts);
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function getDerForward(int nfwd);
+    virtual Function getDerForward(const std::string& name, int nfwd, const Dict& opts);
     virtual int numDerForward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function getDerReverse(int nadj);
+    virtual Function getDerReverse(const std::string& name, int nadj, const Dict& opts);
     virtual int numDerReverse() const { return 64;}
     ///@}
 
@@ -599,11 +599,8 @@ namespace casadi {
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  MatType XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::jac(int iind, int oind,
-                                                                          bool compact,
-                                                                          bool symmetric,
-                                                                          bool always_inline,
-                                                                          bool never_inline) {
+  MatType XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::jac(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline) {
     using namespace std;
     if (verbose()) userOut() << "XFunctionInternal::jac begin" << std::endl;
 
@@ -951,8 +948,8 @@ namespace casadi {
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::
-  getGradient(const std::string& name, int iind, int oind, const Dict& opts) {
+  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::getGradient(const std::string& name, int iind, int oind, const Dict& opts) {
     // Create expressions for the gradient
     std::vector<MatType> ret_out;
     ret_out.reserve(1+outputv_.size());
@@ -964,8 +961,8 @@ namespace casadi {
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::
-  getTangent(const std::string& name, int iind, int oind, const Dict& opts) {
+  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::getTangent(const std::string& name, int iind, int oind, const Dict& opts) {
     // Create expressions for the gradient
     std::vector<MatType> ret_out;
     ret_out.reserve(1+outputv_.size());
@@ -977,8 +974,8 @@ namespace casadi {
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::
-  getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
+  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
               const Dict& opts) {
     // Return function expression
     std::vector<MatType> ret_out;
@@ -991,8 +988,8 @@ namespace casadi {
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType, DerivedType,
-                             MatType, NodeType>::getDerForward(int nfwd) {
+  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     // Seeds
     std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd, inputv_), fsens;
 
@@ -1024,14 +1021,12 @@ namespace casadi {
     }
 
     // Assemble function and return
-    PublicType ret(ret_in, ret_out);
-    ret.init();
-    return ret;
+    return PublicType(name, ret_in, ret_out, opts);
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
-  ::getDerReverse(int nadj) {
+  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     // Seeds
     std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadj, outputv_), asens;
 
@@ -1062,9 +1057,7 @@ namespace casadi {
     }
 
     // Assemble function and return
-    PublicType ret(ret_in, ret_out);
-    ret.init();
-    return ret;
+    return PublicType(name, ret_in, ret_out, opts);
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>

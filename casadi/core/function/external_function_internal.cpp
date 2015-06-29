@@ -300,21 +300,20 @@ namespace casadi {
     return jac_init!=0;
   }
 
-  Function ExternalFunctionInternal::getFullJacobian(const std::string& name, const Dict& opts) {
+  Function ExternalFunctionInternal
+  ::getFullJacobian(const std::string& name, const Dict& opts) {
     return ExternalFunction(name, bin_name_, opts);
   }
 
-  Function ExternalFunctionInternal::getDerForward(int nfwd) {
+  Function ExternalFunctionInternal
+  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     // Consistency check
     int n=1;
     while (n<nfwd) n*=2;
     if (n!=nfwd || nfwd>numDerForward()) {
       casadi_error("Internal error: Refactoring needed, cf. #1055");
     }
-    // Create external function
-    stringstream ss;
-    ss << "fwd" << nfwd << "_" << f_name_;
-    return ExternalFunction(ss.str(), bin_name_);
+    return ExternalFunction(name, bin_name_, opts);
   }
 
   int ExternalFunctionInternal::numDerForward() const {
@@ -329,17 +328,15 @@ namespace casadi {
     return 0;
   }
 
-  Function ExternalFunctionInternal::getDerReverse(int nadj) {
+  Function ExternalFunctionInternal
+  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     // Consistency check
     int n=1;
     while (n<nadj) n*=2;
     if (n!=nadj || nadj>numDerReverse()) {
       casadi_error("Internal error: Refactoring needed, cf. #1055");
     }
-    // Create external function
-    stringstream ss;
-    ss << "adj" << nadj << "_" << f_name_;
-    return ExternalFunction(ss.str(), bin_name_);
+    return ExternalFunction(name, bin_name_, opts);
   }
 
   int ExternalFunctionInternal::numDerReverse() const {

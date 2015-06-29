@@ -118,24 +118,23 @@ namespace casadi {
       Ps[k+1] = mul(mul(Ass[k], Ps[k]), Ass[k].T()) + Vss[k];
     }
 
-    f_ = MXFunction(dpleIn("a", As, "v", Vs), dpleOut("p", horzcat(Ps)));
-    f_.init();
-
+    f_ = MXFunction(name_, dpleIn("a", As, "v", Vs), dpleOut("p", horzcat(Ps)),
+                    make_dict("input_scheme", ischeme_, "output_scheme", oscheme_));
     Wrapper<CondensingIndefDpleInternal>::checkDimensions();
 
   }
-
-
 
   void CondensingIndefDpleInternal::evaluate() {
     Wrapper<CondensingIndefDpleInternal>::evaluate();
   }
 
-  Function CondensingIndefDpleInternal::getDerForward(int nfwd) {
+  Function CondensingIndefDpleInternal
+  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function CondensingIndefDpleInternal::getDerReverse(int nadj) {
+  Function CondensingIndefDpleInternal
+  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     return f_.derReverse(nadj);
   }
 

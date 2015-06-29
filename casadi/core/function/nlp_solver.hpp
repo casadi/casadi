@@ -288,9 +288,6 @@ namespace casadi {
     */
     Function hessLag();
 
-    /// Join F and G in old signature style to a common NLP function
-    static Function joinFG(Function F, Function G);
-
     /** \brief Get the reduced Hessian.
      * Requires a patched sIPOPT installation, see CasADi documentation. */
     DMatrix getReducedHessian();

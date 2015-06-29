@@ -186,11 +186,13 @@ namespace casadi {
     Wrapper<LiftingLrDpleInternal>::evaluate();
   }
 
-  Function LiftingLrDpleInternal::getDerForward(int nfwd) {
+  Function LiftingLrDpleInternal
+  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function LiftingLrDpleInternal::getDerReverse(int nadj) {
+  Function LiftingLrDpleInternal
+  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     return f_.derReverse(nadj);
   }
 

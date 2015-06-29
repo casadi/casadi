@@ -94,11 +94,13 @@ namespace casadi {
     Wrapper<DleToLrDle>::evaluate();
   }
 
-  Function DleToLrDle::getDerForward(int nfwd) {
+  Function DleToLrDle
+  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function DleToLrDle::getDerReverse(int nadj) {
+  Function DleToLrDle
+  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     return f_.derReverse(nadj);
   }
 

@@ -255,17 +255,15 @@ namespace casadi {
       out[INTEGRATOR_XF] = x;
 
       // Create the output function
-      output_fcn_ = SXFunction(arg, out);
+      output_fcn_ = SXFunction("ofcn", arg, out);
       output_fcn_.setOption("name", "output");
       oscheme_ = IOScheme(SCHEME_IntegratorOutput);
     } else {
       output_fcn_ = orig_output_fcn_;
+
+      // Initialize the output function
+      output_fcn_.init();
     }
-
-
-
-    // Initialize the output function
-    output_fcn_.init();
 
     casadi_assert_message(output_fcn_.nIn()==CONTROL_DAE_NUM_IN,
                      "Output function, if supplied, must adhere to ControlledDAEInput scheme.");

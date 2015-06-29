@@ -210,8 +210,7 @@ int main(){
   vector<SX> f_out;
   f_out.push_back(sqrt(y)-1);
   f_out.push_back(sin(x)-y);
-  SXFunction f(f_in,f_out);
-  f.init();
+  SXFunction f("f", f_in,f_out);
 
   // Generate C-code
   f.generate("f");

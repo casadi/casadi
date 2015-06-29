@@ -127,11 +127,13 @@ namespace casadi {
     Wrapper<SimpleIndefDpleInternal>::evaluate();
   }
 
-  Function SimpleIndefDpleInternal::getDerForward(int nfwd) {
+  Function SimpleIndefDpleInternal
+  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function SimpleIndefDpleInternal::getDerReverse(int nadj) {
+  Function SimpleIndefDpleInternal
+  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     return f_.derReverse(nadj);
   }
 

@@ -84,7 +84,7 @@ int main(){
   // ODE right hand side and quadrature
   SX ode = vertcat((1 - s*s)*r - s + u, r);
   SX quad = r*r + s*s + u*u;
-  SXFunction rhs(daeIn("x",x,"p",u),daeOut("ode",ode,"quad",quad));
+  SXFunction rhs("rhs", daeIn("x",x,"p",u),daeOut("ode",ode,"quad",quad));
 
   // Create an integrator (CVodes)
   Integrator integrator("cvodes", rhs);

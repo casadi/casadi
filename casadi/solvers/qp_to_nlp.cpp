@@ -119,7 +119,7 @@ namespace casadi {
     par.push_back(A.data());
 
     // The nlp looks exactly like a mathematical description of the NLP
-    SXFunction QP_SOLVER_nlp(nlpIn("x", X, "p", vertcat(par)),
+    SXFunction QP_SOLVER_nlp("nlp", nlpIn("x", X, "p", vertcat(par)),
                              nlpOut("f", mul(G.T(), X) + 0.5*mul(mul(X.T(), H), X),
                                     "g", mul(A, X)));
 

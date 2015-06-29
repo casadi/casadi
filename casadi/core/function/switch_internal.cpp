@@ -139,7 +139,8 @@ namespace casadi {
     fk->evalD(arg+1, res, iw, w);
   }
 
-  Function SwitchInternal::getDerForward(int nfwd) {
+  Function SwitchInternal
+  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
@@ -177,11 +178,11 @@ namespace casadi {
 
     // Create wrapper
     casadi_assert(v.size()==sw.nIn());
-    MXFunction ret(w_in, sw(v));
-    return ret;
+    return MXFunction(name, w_in, sw(v), opts);
   }
 
-  Function SwitchInternal::getDerReverse(int nadj) {
+  Function SwitchInternal
+  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
@@ -229,8 +230,7 @@ namespace casadi {
     }
 
     // Create wrapper
-    MXFunction ret(w_in, w_out);
-    return ret;
+    return MXFunction(name, w_in, w_out, opts);
   }
 
   inline string name(const Function& f) {

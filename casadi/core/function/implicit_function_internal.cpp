@@ -185,7 +185,8 @@ namespace casadi {
     solveNonLinear();
   }
 
-  Function ImplicitFunctionInternal::getDerForward(int nfwd) {
+  Function ImplicitFunctionInternal
+  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = symbolicInput();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
@@ -199,10 +200,11 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) arg.insert(arg.end(), fseed[d].begin(), fseed[d].end());
     res.clear();
     for (int d=0; d<nfwd; ++d) res.insert(res.end(), fsens[d].begin(), fsens[d].end());
-    return MXFunction(arg, res);
+    return MXFunction(name, arg, res, opts);
   }
 
-  Function ImplicitFunctionInternal::getDerReverse(int nadj) {
+  Function ImplicitFunctionInternal
+  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = symbolicInput();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
@@ -216,7 +218,7 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) arg.insert(arg.end(), aseed[d].begin(), aseed[d].end());
     res.clear();
     for (int d=0; d<nadj; ++d) res.insert(res.end(), asens[d].begin(), asens[d].end());
-    return MXFunction(arg, res);
+    return MXFunction(name, arg, res, opts);
   }
 
   void ImplicitFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,

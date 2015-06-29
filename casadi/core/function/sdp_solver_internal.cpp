@@ -132,10 +132,9 @@ void SdpSolverInternal::init() {
     full_blocks.push_back(SX::sym("block", block_sizes_[i], block_sizes_[i]));
   }
 
-  Pmapper_ = SXFunction(full_blocks,
+  Pmapper_ = SXFunction("pmapper", full_blocks,
                         make_vector(diagcat(full_blocks)(lookupvector(p, p.size()),
                                                          lookupvector(p, p.size()))));
-  Pmapper_.init();
 
   if (nb_>0) {
     // Make a mapping function from (G, F) -> (G[p, p]_j, F_i[p, p]j)
@@ -155,8 +154,7 @@ void SdpSolverInternal::init() {
         out[(i+1)*nb_+j] = Fi(Slice(r[j], r[j+1]), Slice(r[j], r[j+1]));
       }
     }
-    mapping_ = SXFunction(in, out);
-    mapping_.init();
+    mapping_ = SXFunction("mapping", in, out);
   }
 
   // Output arguments

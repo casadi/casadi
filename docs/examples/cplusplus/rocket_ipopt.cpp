@@ -77,7 +77,7 @@ int main(){
   g.append(v_traj);
   
   // Create the NLP
-  SXFunction nlp(nlpIn("x",u),nlpOut("f",f,"g",g));
+  SXFunction nlp("nlp", nlpIn("x", u), nlpOut("f", f, "g", g));
   
   // Allocate an NLP solver
   NlpSolver solver("ipopt", nlp);

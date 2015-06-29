@@ -1929,7 +1929,7 @@ namespace casadi {
     jac_in.push_back(c_xdot);
 
     // Return generated function
-    return FunctionType(jac_in, make_vector(jac));
+    return FunctionType("jac", jac_in, make_vector(jac));
   }
 
   template<typename FunctionType>
@@ -1949,7 +1949,7 @@ namespace casadi {
     jac_in.push_back(c_xdot);
 
     // return generated function
-    return FunctionType(jac_in, make_vector(jac));
+    return FunctionType("jacB", jac_in, make_vector(jac));
   }
 
   Function CvodesInterface::getJacB() {
