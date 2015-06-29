@@ -89,11 +89,13 @@ namespace casadi {
     }
   }
 
-  Function DleToDple::getDerForward(int nfwd) {
+  Function DleToDple
+  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
     return solver_.derForward(nfwd);
   }
 
-  Function DleToDple::getDerReverse(int nadj) {
+  Function DleToDple
+  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
     return solver_.derReverse(nadj);
   }
 
