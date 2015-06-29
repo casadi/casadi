@@ -1522,6 +1522,7 @@ namespace casadi {
     // Give it a suitable name
     stringstream ss;
     ss << "fwd" << nfwd << "_" << name_;
+    string name = ss.str();
 
     // Get the number of inputs and outputs
     int n_in = nIn();
@@ -1573,13 +1574,13 @@ namespace casadi {
       DerivativeGenerator dergen = getOption("custom_forward");
       Function this_ = shared_from_this<Function>();
       ret = dergen(this_, nfwd, user_data_);
-      ret.setOption("name", ss.str());
+      ret.setOption("name", name);
       ret.setOption(opts);
       ret.init();
       // Fails for ImplicitFunction
     } else {
       casadi_assert(numDerForward()>0);
-      ret = getDerForward(ss.str(), nfwd, opts);
+      ret = getDerForward(name, nfwd, opts);
     }
 
     // Consistency check for inputs
@@ -1625,6 +1626,7 @@ namespace casadi {
     // Give it a suitable name
     stringstream ss;
     ss << "adj" << nadj << "_" << name_;
+    string name = ss.str();
 
     // Get the number of inputs and outputs
     int n_in = nIn();
@@ -1676,12 +1678,12 @@ namespace casadi {
       DerivativeGenerator dergen = getOption("custom_reverse");
       Function this_ = shared_from_this<Function>();
       ret = dergen(this_, nadj, user_data_);
-      ret.setOption("name", ss.str());
+      ret.setOption("name", name);
       ret.setOption(opts);
       ret.init();
     } else {
       casadi_assert(numDerReverse()>0);
-      ret = getDerReverse(ss.str(), nadj, opts);
+      ret = getDerReverse(name, nadj, opts);
     }
 
     // Consistency check for inputs
