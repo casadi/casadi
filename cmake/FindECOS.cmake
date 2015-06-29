@@ -2,7 +2,7 @@ message(STATUS "Looking for ecos")
 
 find_path(ECOS_INCLUDE_DIR
     ecos.h
-  HINTS $ENV{ECOS}/include /usr/local/include/ecos ~/local/lib/ecos
+  HINTS $ENV{ECOS}/include /usr/local/include/ecos ~/local/include/ecos
 )
 
 if(ECOS_INCLUDE_DIR)
@@ -14,7 +14,7 @@ endif()
 find_library(ECOS_LIBRARY
   NAMES ecos
   PATHS ~/local/lib /usr/local/lib
-  $ENV{ECOS}
+  $ENV{ECOS} $ENV{ECOS}/lib
 )
 
 if(ECOS_LIBRARY)
