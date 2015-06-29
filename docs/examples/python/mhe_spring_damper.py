@@ -184,6 +184,7 @@ estimated_W[:,0:N-1] = solution["W",horzcat]
 
 # Now make a loop for the rest of the simulation
 for i in range(1,Nsimulation-N+1):
+
   # Update the arrival cost, using linearisations around the estimate of MHE at the beginning of the horizon (according to the 'Smoothed EKF Update'): first update the state and covariance with the measurement that will be deleted, and next propagate the state and covariance because of the shifting of the horizon
   print "step %d/%d (%s)" % (i, Nsimulation-N , nlp_solver.getStat("return_status"))
   H.setInput(solution["X",0],0)
@@ -225,6 +226,9 @@ for i in range(1,Nsimulation-N+1):
   nlp_solver.setInput(current_parameters,"p")
   nlp_solver.setInput(initialisation_state,"x0")
   nlp_solver.evaluate()
+
+  solution = shooting(nlp_solver.getOutput("x"))
+
   # Now get the state estimate. Note that we are only interested in the last node of the horizon
   estimated_X[:,N-1+i] = solution["X",N-1]
   estimated_W[:,N-2+i] = solution["W",N-2]
