@@ -284,7 +284,7 @@ namespace casadi {
     // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.
     worhp_w_.DF.nnz = nx_;
     if (worhp_o_.m>0) {
-      worhp_w_.DG.nnz = jacG_.output().size();  // Jacobian of G
+      worhp_w_.DG.nnz = jacG_.output().nnz();  // Jacobian of G
     } else {
       worhp_w_.DG.nnz = 0;
     }
@@ -481,7 +481,7 @@ namespace casadi {
       "Reformulate your problem by using a parameter for the corresponding variable.");
     }
 
-    for (int i=0;i<lbg.size();++i) {
+    for (int i=0;i<lbg.nnz();++i) {
       casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),
       "WorhpInterface::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite."
       "You have that case at non-zero " << i << "."
