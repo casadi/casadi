@@ -623,7 +623,8 @@ namespace casadi {
       // Write timings
       userOut() << "time spent in eval_f: " << t_eval_f_ << " s.";
       if (n_eval_f_>0)
-        userOut() << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
+        userOut() << " (" << n_eval_f_ << " calls, " <<
+          (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
       userOut() << endl;
       userOut() << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
       if (n_eval_grad_f_>0)
@@ -632,7 +633,8 @@ namespace casadi {
       userOut() << endl;
       userOut() << "time spent in eval_g: " << t_eval_g_ << " s.";
       if (n_eval_g_>0)
-        userOut() << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
+        userOut() << " (" << n_eval_g_ << " calls, " <<
+          (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
       userOut() << endl;
       userOut() << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
       if (n_eval_jac_g_>0)
@@ -641,7 +643,8 @@ namespace casadi {
       userOut() << endl;
       userOut() << "time spent in eval_h: " << t_eval_h_ << " s.";
       if (n_eval_h_>1)
-        userOut() << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
+        userOut() << " (" << n_eval_h_ << " calls, " <<
+          (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
       userOut() << endl;
       userOut() << "time spent in main loop: " << t_mainloop_ << " s." << endl;
       userOut() << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
