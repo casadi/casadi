@@ -66,6 +66,7 @@ option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOAS
 option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" ON)
 option(WITH_DSDP "Compile the interface to DSDP" ON)
 option(WITH_MOSEK "Compile the interface to MOSEK" OFF)
+option(WITH_ECOS "Compile the interface to ECOS" OFF)
 option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
@@ -421,6 +422,13 @@ if(WITH_MOSEK)
   find_package(MOSEK)
 endif()
 add_feature_info(mosek-interface MOSEK_FOUND "Interface to the interior point SOCP solver MOSEK.")
+
+# ECOS
+if(WITH_ECOS)
+  # try to find system ecos
+  find_package(ECOS)
+endif()
+add_feature_info(ecos-interface ECOS_FOUND "Interface to the interior point SOCP solver ECOS.")
 
 
 # Use the included qpOASES
