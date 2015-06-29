@@ -102,9 +102,9 @@ class DotArtist:
     sp = s.sparsity()
     deps = getDeps(s)
     if nzlabels is None:
-      nzlabels = map(str,range(sp.size()))
+      nzlabels = map(str,range(sp.nnz()))
     nzlabelcounter = 0
-    if s.size()==s.numel():
+    if s.nnz()==s.numel():
       graph.add_node(pydot.Node(id,label="%d x %d" % (s.size1(),s.size2()),shape='rectangle',color=self.sparsitycol,style="filled"))
     else:
       label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
@@ -133,7 +133,7 @@ class MXSymbolicArtist(DotArtist):
     sp = s.sparsity()
     row = sp.row()
     col = "#990000"
-    if s.size() == s.numel() and s.size()==1:
+    if s.nnz() == s.numel() and s.nnz()==1:
       # The Matrix grid is represented by a html table with 'ports'
       graph.add_node(pydot.Node(str(self.s.__hash__())+":f0",label=s.getName(),shape='rectangle',color=col))
     else:
@@ -187,7 +187,7 @@ class MXSymbolicArtist(DotArtist):
 #       candidates.sort()
 #       if candidates[0] == hash(s):
 #         label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="#0000aa">'
-#         if not(d.numel()==1 and d.numel()==d.size()): 
+#         if not(d.numel()==1 and d.numel()==d.nnz()): 
 #           label+="<TR><TD COLSPAN='%d' BGCOLOR='#dddddd'><font>%s</font></TD></TR>" % (d.size2(), d.dimString())
 #         for i in range(d.size1()):
 #           label+="<TR>"
@@ -204,7 +204,7 @@ class MXSymbolicArtist(DotArtist):
       
 #     # The Matrix grid is represented by a html table with 'ports'
 #     label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
-#     if not(s.numel()==1 and s.numel()==s.size()): 
+#     if not(s.numel()==1 and s.numel()==s.nnz()): 
 #       label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
 #     for i in range(s.size1()):
 #       label+="<TR>"
@@ -254,7 +254,7 @@ class MXConstantArtist(DotArtist):
     row = sp.row()
     M = s.getMatrixValue()
     col = "#009900"
-    if s.size() == s.numel() and s.size() == 1:
+    if s.nnz() == s.numel() and s.nnz() == 1:
       graph.add_node(pydot.Node(str(self.s.__hash__())+":f0",label=M[0,0],shape='rectangle',color=col))
     else:
       # The Matrix grid is represented by a html table with 'ports'
@@ -309,7 +309,7 @@ class MXGetNonzerosArtist(DotArtist):
     n = getDeps(s)[0]
     
     
-    show_sp = not(s.size() == s.numel() and s.size() == 1)
+    show_sp = not(s.nnz() == s.numel() and s.nnz() == 1)
     
     if show_sp:
       op = "op"
@@ -321,7 +321,7 @@ class MXGetNonzerosArtist(DotArtist):
     row = sp.row()
     M = s.mapping()
     col = "#333333"
-    if s.size() == s.numel() and s.size() == 1:
+    if s.nnz() == s.numel() and s.nnz() == 1:
       graph.add_node(pydot.Node(op+str(s.__hash__())+":f0",label="[%s]" % str(M[0,0]),shape='rectangle',style="filled",fillcolor='#eeeeff'))
     else:
       # The Matrix grid is represented by a html table with 'ports'
