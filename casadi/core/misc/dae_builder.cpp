@@ -1217,7 +1217,7 @@ namespace casadi {
   }
 
   MX DaeBuilder::der(const MX& var) const {
-    casadi_assert(var.isVector() && var.isSymbolic());
+    casadi_assert(var.iscolumn() && var.isSymbolic());
     MX ret = MX::zeros(var.sparsity());
     for (int i=0; i<ret.nnz(); ++i) {
       ret[i] = der(var.at(i).getName());
@@ -1302,7 +1302,7 @@ namespace casadi {
   }
 
   std::string DaeBuilder::unit(const MX& var) const {
-    casadi_assert_message(!var.isVector() && var.isValidInput(),
+    casadi_assert_message(!var.iscolumn() && var.isValidInput(),
                           "DaeBuilder::unit: Argument must be a symbolic vector");
     if (var.isempty()) {
       return "n/a";
@@ -1330,7 +1330,7 @@ namespace casadi {
   }
 
   std::vector<double> DaeBuilder::nominal(const MX& var) const {
-    casadi_assert_message(var.isVector() && var.isValidInput(),
+    casadi_assert_message(var.iscolumn() && var.isValidInput(),
                           "DaeBuilder::nominal: Argument must be a symbolic vector");
     std::vector<double> ret(var.nnz());
     std::vector<MX> prim = var.getPrimitives();
@@ -1342,7 +1342,7 @@ namespace casadi {
   }
 
   void DaeBuilder::setNominal(const MX& var, const std::vector<double>& val) {
-    casadi_assert_message(var.isVector() && var.isValidInput(),
+    casadi_assert_message(var.iscolumn() && var.isValidInput(),
                           "DaeBuilder::nominal: Argument must be a symbolic vector");
     casadi_assert_message(var.nnz()==var.nnz(), "DaeBuilder::nominal: Dimension mismatch");
     std::vector<MX> prim = var.getPrimitives();
@@ -1353,7 +1353,7 @@ namespace casadi {
   }
 
   std::vector<double> DaeBuilder::attribute(getAtt f, const MX& var, bool normalized) const {
-    casadi_assert_message(var.isVector() && var.isValidInput(),
+    casadi_assert_message(var.iscolumn() && var.isValidInput(),
                           "DaeBuilder::attribute: Argument must be a symbolic vector");
     std::vector<double> ret(var.nnz());
     std::vector<MX> prim = var.getPrimitives();
@@ -1365,7 +1365,7 @@ namespace casadi {
   }
 
   MX DaeBuilder::attribute(getAttS f, const MX& var) const {
-    casadi_assert_message(var.isVector() && var.isValidInput(),
+    casadi_assert_message(var.iscolumn() && var.isValidInput(),
                           "DaeBuilder::attribute: Argument must be a symbolic vector");
     MX ret = MX::zeros(var.sparsity());
     std::vector<MX> prim = var.getPrimitives();
@@ -1378,7 +1378,7 @@ namespace casadi {
 
   void DaeBuilder::setAttribute(setAtt f, const MX& var, const std::vector<double>& val,
                                  bool normalized) {
-    casadi_assert_message(var.isVector() && var.isValidInput(),
+    casadi_assert_message(var.iscolumn() && var.isValidInput(),
                           "DaeBuilder::setAttribute: Argument must be a symbolic vector");
     casadi_assert_message(var.nnz()==val.size(), "DaeBuilder::setAttribute: Dimension mismatch");
     std::vector<MX> prim = var.getPrimitives();
@@ -1389,7 +1389,7 @@ namespace casadi {
   }
 
   void DaeBuilder::setAttribute(setAttS f, const MX& var, const MX& val) {
-    casadi_assert_message(var.isVector() && var.isValidInput(),
+    casadi_assert_message(var.iscolumn() && var.isValidInput(),
                           "DaeBuilder::setAttribute: Argument must be a symbolic vector");
     casadi_assert_message(var.sparsity()==val.sparsity(),
                           "DaeBuilder::setAttribute: Sparsity mismatch");

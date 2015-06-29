@@ -85,7 +85,7 @@ namespace casadi {
         assignNode(ConstantMX::create(Sparsity(sp.shape()), 0));
       }
     } else {
-      casadi_assert(val.isVector() && sp.nnz()==val.size1());
+      casadi_assert(val.iscolumn() && sp.nnz()==val.size1());
       *this = densify(val)->getGetNonzeros(sp, range(sp.nnz()));
     }
   }
@@ -145,19 +145,10 @@ namespace casadi {
   }
 
   void MX::get(MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
-    // Row vector rr (e.g. in MATLAB) is transposed to column vector
-    if (rr.size1()==1 && rr.size2()>1) {
-      return get(m, ind1, rr.T(), cc);
-    }
-
-    // Row vector cc (e.g. in MATLAB) is transposed to column vector
-    if (cc.size1()==1 && cc.size2()>1) {
-      return get(m, ind1, rr, cc.T());
-    }
-
-    casadi_assert_message(rr.isdense() && rr.isVector(),
+    // Make sure dense vectors
+    casadi_assert_message(rr.isdense() && rr.isvector(),
                           "Marix::get: First index must be a dense vector");
-    casadi_assert_message(cc.isdense() && cc.isVector(),
+    casadi_assert_message(cc.isdense() && cc.isvector(),
                           "Marix::get: Second index must be a dense vector");
 
     // Get the sparsity pattern - does bounds checking
@@ -222,9 +213,9 @@ namespace casadi {
     }
 
     // Make sure rr and cc are dense vectors
-    casadi_assert_message(rr.isdense() && rr.isVector(),
+    casadi_assert_message(rr.isdense() && rr.iscolumn(),
                           "MX::set: First index not dense vector");
-    casadi_assert_message(cc.isdense() && cc.isVector(),
+    casadi_assert_message(cc.isdense() && cc.iscolumn(),
                           "MX::set: Second index not dense vector");
 
     // Assert dimensions of assigning matrix
@@ -1140,7 +1131,7 @@ namespace casadi {
       } else {
         return vertcat(ret);
       }
-    } else if (!x.front().isVector()) {
+    } else if (!x.front().iscolumn()) {
       // Vertcat operation only supports vectors, rewrite using horzcat
       vector<MX> xT = x;
       for (vector<MX>::iterator i=xT.begin(); i!=xT.end(); ++i) *i = i->T();
@@ -1185,7 +1176,7 @@ namespace casadi {
   }
 
   std::vector<MX> MX::zz_vertsplit(const std::vector<int>& offset) const {
-    if (isVector()) {
+    if (iscolumn()) {
       // Consistency check
       casadi_assert(offset.size()>=1);
       casadi_assert(offset.front()==0);
@@ -1229,7 +1220,7 @@ namespace casadi {
   }
 
   MX MX::zz_norm_2() const {
-    if (isVector()) {
+    if (iscolumn()) {
       return norm_F(*this);
     } else {
       return (*this)->getNorm2();
@@ -1392,7 +1383,7 @@ namespace casadi {
 
   MX MX::zz_polyval(const MX& x) const {
     casadi_assert_message(isdense(), "polynomial coefficients vector must be a vector");
-    casadi_assert_message(isVector() && nnz()>0, "polynomial coefficients must be a vector");
+    casadi_assert_message(iscolumn() && nnz()>0, "polynomial coefficients must be a vector");
     MX ret = (*this)[0];
     for (int i=1; i<nnz(); ++i) {
       ret = ret*x + (*this)[i];

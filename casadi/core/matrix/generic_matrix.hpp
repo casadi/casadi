@@ -112,10 +112,8 @@ namespace casadi {
     /** \brief  Check if the matrix expression is square */
     bool issquare() const { return sparsity().issquare();}
 
-    /** \brief  Check if the matrix is a column vector (i.e. size2()==1)
-        Optionally, checks if either row or column vector.
-     */
-    bool isVector(bool row_or_col=false) const { return sparsity().isVector(row_or_col);}
+    /** \brief  Check if the matrix is a row or column vector */
+    bool isvector() const { return sparsity().isvector();}
 
     /** \brief  Check if the matrix is a row vector (i.e. size1()==1) */
     bool isrow() const { return sparsity().isrow();}
@@ -172,11 +170,12 @@ namespace casadi {
       return project(self(), triu(sparsity(), includeDiagonal));
     }
     MatType zz_quad_form(const MatType &A) const {
-      casadi_assert(isVector());
+      casadi_assert(isvector());
+      if (!iscolumn()) return quad_form(self().T(), A);
       return inner_prod(self(), mul(A, self()));
     }
     MatType zz_quad_form() const {
-      casadi_assert(isVector());
+      casadi_assert(isvector());
       return inner_prod(self(), self());
     }
     MatType zz_sum_square() const { return inner_prod(self(), self());}

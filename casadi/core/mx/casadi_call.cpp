@@ -45,7 +45,7 @@ namespace casadi {
       } else if (x.isscalar()) {
         // Scalar argument means set all
         return MX(sp, x);
-      } else if (x.size1()==sp.size2() && x.size2()==sp.size1() && sp.isVector(true)) {
+      } else if (x.size1()==sp.size2() && x.size2()==sp.size1() && sp.isvector()) {
         // Transposed vector
         return projectArg(x.T(), sp, i);
       } else {

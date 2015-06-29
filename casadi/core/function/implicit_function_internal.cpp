@@ -79,9 +79,9 @@ namespace casadi {
                           "Implicit input not in range");
     casadi_assert_message(iout_>=0 && iout_<f_.nOut() && f_.nOut()>0,
                           "Implicit output not in range");
-    casadi_assert_message(f_.output(iout_).isdense() && f_.output(iout_).isVector(),
+    casadi_assert_message(f_.output(iout_).isdense() && f_.output(iout_).iscolumn(),
                           "Residual must be a dense vector");
-    casadi_assert_message(f_.input(iin_).isdense() && f_.input(iin_).isVector(),
+    casadi_assert_message(f_.input(iin_).isdense() && f_.input(iin_).iscolumn(),
                           "Unknown must be a dense vector");
     n_ = f_.output(iout_).nnz();
     casadi_assert_message(n_ == f_.input(iin_).nnz(),

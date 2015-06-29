@@ -113,25 +113,16 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1,
-                                const Matrix<int>& rr, const Matrix<int>& cc) const {
+                             const Matrix<int>& rr, const Matrix<int>& cc) const {
     // Scalar
     if (rr.isscalar(true) && cc.isscalar(true)) {
       return get(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
     }
 
-    // Row vector rr (e.g. in MATLAB) is transposed to column vector
-    if (rr.size1()==1 && rr.size2()>1) {
-      return get(m, ind1, rr.T(), cc);
-    }
-
-    // Row vector cc (e.g. in MATLAB) is transposed to column vector
-    if (cc.size1()==1 && cc.size2()>1) {
-      return get(m, ind1, rr, cc.T());
-    }
-
-    casadi_assert_message(rr.isdense() && rr.isVector(),
+    // Make sure dense vectors
+    casadi_assert_message(rr.isdense() && rr.isvector(),
                           "Marix::get: First index must be a dense vector");
-    casadi_assert_message(cc.isdense() && cc.isVector(),
+    casadi_assert_message(cc.isdense() && cc.isvector(),
                           "Marix::get: Second index must be a dense vector");
 
     // Get the sparsity pattern - does bounds checking
@@ -237,9 +228,9 @@ namespace casadi {
     }
 
     // Make sure rr and cc are dense vectors
-    casadi_assert_message(rr.isdense() && rr.isVector(),
+    casadi_assert_message(rr.isdense() && rr.iscolumn(),
                           "Matrix::set: First index not dense vector");
-    casadi_assert_message(cc.isdense() && cc.isVector(),
+    casadi_assert_message(cc.isdense() && cc.iscolumn(),
                           "Matrix::set: Second index not dense vector");
 
     // Assert dimensions of assigning matrix
@@ -632,7 +623,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::printVector(std::ostream &stream, bool trailing_newline) const {
-    casadi_assert_message(isVector(), "Not a vector");
+    casadi_assert_message(iscolumn(), "Not a vector");
 
     // Get components
     std::vector<std::string> nz, inter;
@@ -783,7 +774,7 @@ namespace casadi {
       stream << "[]";
     } else if (numel()==1) {
       printScalar(stream, false);
-    } else if (isVector()) {
+    } else if (iscolumn()) {
       printVector(stream, false);
     } else if (std::max(size1(), size2())<=10 || static_cast<double>(nnz())/numel()>=0.5) {
       // if "small" or "dense"
@@ -888,7 +879,7 @@ namespace casadi {
   Matrix<DataType>::Matrix(const Sparsity& sp, const Matrix<DataType>& d) {
     if (d.isscalar()) {
       *this = Matrix<DataType>(sp, d.toScalar(), false);
-    } else if (d.isVector() || d.size1()==1) {
+    } else if (d.iscolumn() || d.size1()==1) {
       casadi_assert(sp.nnz()==d.numel());
       if (d.isdense()) {
         *this = Matrix<DataType>(sp, d.data(), false);
@@ -1372,7 +1363,8 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_quad_form(const Matrix<DataType>& A) const {
-    casadi_assert(isVector());
+    casadi_assert(isvector());
+    if (!iscolumn()) return quad_form(this->T(), A);
 
     // Call recursively if vector not dense
     if (!isdense()) return densify(*this).zz_quad_form(A);
@@ -1631,8 +1623,8 @@ namespace casadi {
     // Quick return if empty
     if (y.size2()==0 && y.size1()==0) return;
 
-    // Appending can be done efficiently if vectors
-    if (isVector()) {
+    // Appending can be done efficiently if column vectors
+    if (iscolumn()) {
       // Append the sparsity pattern vertically
       sparsityRef().append(y.sparsity());
 
@@ -2218,7 +2210,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_norm_2() const {
-    if (isVector()) {
+    if (isvector()) {
       return norm_F(*this);
     } else {
       casadi_error("2-norms currently only supported for vectors. "
@@ -2504,7 +2496,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_polyval(const Matrix<DataType>& x) const {
     casadi_assert_message(isdense(), "polynomial coefficients vector must be dense");
-    casadi_assert_message(isVector() && nnz()>0, "polynomial coefficients must be a vector");
+    casadi_assert_message(isvector() && nnz()>0, "polynomial coefficients must be a vector");
     Matrix<DataType> ret = (*this)[0];
     for (int i=1; i<nnz(); ++i) {
       ret = ret*x + (*this)[i];

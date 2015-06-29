@@ -263,8 +263,8 @@ namespace casadi {
     return (*this)->iscolumn();
   }
 
-  bool Sparsity::isVector(bool row_or_col) const {
-    return (*this)->isVector(row_or_col);
+  bool Sparsity::isvector() const {
+    return (*this)->isvector();
   }
 
   bool Sparsity::issquare() const {
@@ -429,7 +429,7 @@ namespace casadi {
       } else if (size1()==0) {
         // No rows before
         *this = sp;
-      } else if (isVector()) {
+      } else if (iscolumn()) {
         // Append to vector (inefficient)
         *this = (*this)->zz_appendVector(*sp);
       } else {

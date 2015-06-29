@@ -646,7 +646,7 @@ namespace casadi {
   inline bool checkMat(const Sparsity& arg, const Sparsity& inp) {
     return arg.shape()==inp.shape() || arg.isempty() || arg.isscalar() ||
       (inp.size2()==arg.size1() && inp.size1()==arg.size2()
-       && (arg.isVector() || inp.isVector()));
+       && (arg.iscolumn() || inp.iscolumn()));
   }
 
   template<typename M>
@@ -757,7 +757,7 @@ namespace casadi {
     } else {
       // Assign vector with transposing
       casadi_assert(arg.size1()==inp.size2() && arg.size2()==inp.size1()
-                    && (arg.isVector() || inp.isVector()));
+                    && (arg.iscolumn() || inp.iscolumn()));
       return arg.T();
     }
   }

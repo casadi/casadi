@@ -41,7 +41,7 @@ namespace casadi {
   ControlSimulatorInternal(const Function& control_dae, const Function& output_fcn,
                            const DMatrix& grid) :
     control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(grid.data()) {
-    casadi_assert_message(grid.isVector(), "ControlSimulator::ControlSimulator: grid must be a "
+    casadi_assert_message(grid.iscolumn(), "ControlSimulator::ControlSimulator: grid must be a "
                           "column vector, but got " << grid.dimString());
     casadi_assert_message(grid.isdense(), "ControlSimulator::ControlSimulator: grid must be dense, "
                           "but got " << grid.dimString());

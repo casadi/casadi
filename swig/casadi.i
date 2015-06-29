@@ -1575,7 +1575,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
       // Convert to DMatrix
       DMatrix tmp, *tmp_ptr=&tmp;
-      if (to_ptr(p, &tmp_ptr) && tmp_ptr->isVector()) {
+      if (to_ptr(p, &tmp_ptr) && tmp_ptr->iscolumn()) {
         if (m) tmp_ptr->get(**m);
         return true;
       }

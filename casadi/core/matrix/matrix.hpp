@@ -157,7 +157,9 @@ namespace casadi {
     using B::isempty;
     using B::isscalar;
     using B::isdense;
-    using B::isVector;
+    using B::isvector;
+    using B::isrow;
+    using B::iscolumn;
     using B::istril;
     using B::istriu;
     using B::colind;

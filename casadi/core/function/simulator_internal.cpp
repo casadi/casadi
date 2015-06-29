@@ -39,7 +39,7 @@ namespace casadi {
                                        const Function& output_fcn,
                                        const DMatrix& grid) :
     integrator_(integrator), output_fcn_(output_fcn), grid_(grid.data()) {
-    casadi_assert_message(grid.isVector(),
+    casadi_assert_message(grid.iscolumn(),
                           "Simulator::Simulator: grid must be a column vector, but got "
                           << grid.dimString());
     casadi_assert_message(grid.isdense(),
@@ -108,7 +108,7 @@ namespace casadi {
     for (int i=0; i<nOut(); ++i) {
       output(i) = Matrix<double>::zeros(output_fcn_.output(i).numel(), grid_.size());
       if (!output_fcn_.output(i).isempty()) {
-        casadi_assert_message(output_fcn_.output(i).isVector(),
+        casadi_assert_message(output_fcn_.output(i).iscolumn(),
                               "SimulatorInternal::init: Output function output #" << i
                               << " has shape " << output_fcn_.output(i).dimString()
                               << ", while a column-matrix shape is expected.");

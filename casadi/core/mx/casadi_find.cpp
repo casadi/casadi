@@ -31,7 +31,7 @@ using namespace std;
 namespace casadi {
 
   Find::Find(const MX& x) {
-    casadi_assert(x.isVector());
+    casadi_assert(x.iscolumn());
     setDependencies(x);
     setSparsity(Sparsity::scalar());
   }

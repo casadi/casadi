@@ -1963,8 +1963,8 @@ namespace casadi {
     return size2()==1;
   }
 
-  bool SparsityInternal::isVector(bool row_or_col) const {
-    return size2()==1 || (row_or_col && size1()==1);
+  bool SparsityInternal::isvector() const {
+    return isrow() || iscolumn();
   }
 
   bool SparsityInternal::isempty(bool both) const {

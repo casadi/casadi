@@ -399,7 +399,7 @@ namespace casadi {
   MX MXNode::getTranspose() const {
     if (sparsity().isscalar()) {
       return shared_from_this<MX>();
-    } else if (sparsity().isVector(true)) {
+    } else if (sparsity().isvector()) {
       return getReshape(sparsity().T());
     } else if (sparsity().isdense()) {
       return MX::create(new DenseTranspose(shared_from_this<MX>()));

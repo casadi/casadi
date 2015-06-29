@@ -1412,8 +1412,8 @@ namespace casadi {
 
     // Make sure well-posed
     casadi_assert(vv.size() >= 1);
-    casadi_assert(isVector());
-    casadi_assert(arg.isVector());
+    casadi_assert(iscolumn());
+    casadi_assert(arg.iscolumn());
     if (transpose_jacobian) {
       casadi_assert(v.size1()==size1());
     } else {

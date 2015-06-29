@@ -275,8 +275,8 @@ namespace casadi {
     /** \brief  Check if the pattern is a column vector (i.e. size2()==1) */
     bool iscolumn() const;
 
-    /// Is column vector? (Optionally row or column  vector)
-    bool isVector(bool row_or_col) const;
+    /** \brief  Check if the pattern is a row or column vector */
+    bool isvector() const;
 
     /// Is diagonal?
     bool isdiag() const;
