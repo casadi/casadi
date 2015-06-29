@@ -77,14 +77,11 @@ int main(){
   g.append(v);
   g.append(v_traj);
 
-  // Create the NLP
-  SXFunction nlp(nlpIn("x",u),nlpOut("f",f,"g",g));
+  // Create an NLP
+  SXFunction nlp("nlp", nlpIn("x",u),nlpOut("f",f,"g",g));
 
-  // Allocate an NLP solver
-  NlpSolver solver("snopt", nlp);
-
-  // initialize the solver
-  solver.init();
+  // Create an NLP solver
+  NlpSolver solver("solver", "snopt", nlp);
 
   // Bounds on u and initial condition
   vector<double> umin(nu), umax(nu), uinit(nu);
