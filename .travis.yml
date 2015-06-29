@@ -9,7 +9,7 @@ env:
     - CMAKE_INCLUDE_PATH=/home/travis/build/testbot/restricted/cplex/cplex/include:/home/travis/build/testbot/restricted/cplex/concert/include
     - CMAKE_LIBRARY_PATH=/home/travis/build/testbot/restricted/cplex/cplex/lib/x86-64_sles10_4.1/static_pic/:/home/travis/build/testbot/restricted/cplex/concert/lib/x86-64_sles10_4.1/static_pic/
     - ILOG_LICENSE_FILE=/home/travis/build/testbot/restricted/cplex/access.ilm
-    - WORHP=/home/travis/build/testbot/restricted/worhp
+    - WORHP=/home/travis/build/testbot/restricted/wodrhp
     - WORHP_LICENSE_FILE=/home/travis/build/testbot/restricted/worhp/unlocked.lic
     - SNOPT=/home/travis/build/snopt7
     - MATLABPATH=/home/travis/build/matlab-install
@@ -111,7 +111,8 @@ matrix:
         - pushd docs/api && make doxexport | grep -v "file loc from" && popd
         
         # Let's verify that we can still compile
-        - pushd build && make && popd
+        - pushd build && make && sudo make -j2 install && popd
+        - python -m doctest casadi.py -v
         - git stash && git checkout $TRAVIS_BRANCH && git pull origin $TRAVIS_BRANCH && git stash pop || allowfail 1 && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git push git@github.com:casadi/casadi.git $TRAVIS_BRANCH
     - compiler: clang
       os: linux
