@@ -592,7 +592,7 @@ class SetterDispatcher(Dispatcher):
           self.master[i] = payload_
         elif type=="symm":
           iflip = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry,flip=True)
-          if payload_.isScalar():
+          if payload_.isscalar():
             self.master[i] = payload_
             self.master[iflip] = payload_
           else:

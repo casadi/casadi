@@ -823,7 +823,7 @@ namespace casadi {
         if (!iss.fail())
           retv.push_back(SXElement::sym(varname));
       }
-    } else if (sp.isScalar(true)) {
+    } else if (sp.isscalar(true)) {
       retv.push_back(SXElement::sym(name));
     } else {
       // Scalar
@@ -836,7 +836,7 @@ namespace casadi {
     }
 
     // Determine dimensions automatically if empty
-    if (sp.isScalar(true)) {
+    if (sp.isscalar(true)) {
       return SX(retv);
     } else {
       return SX(sp, retv, false);
@@ -974,7 +974,7 @@ namespace casadi {
   template<>
   void SX::zz_expand(SX &ww, SX& tt) const {
     const SX& ex2 = *this;
-    casadi_assert(ex2.isScalar());
+    casadi_assert(ex2.isscalar());
     SXElement ex = ex2.toScalar();
 
     // Terms, weights and indices of the nodes that are already expanded
@@ -1107,7 +1107,7 @@ namespace casadi {
     // number of intervals
     int n = val.numel();
 
-    casadi_assert_message(t.isScalar(), "t must be a scalar");
+    casadi_assert_message(t.isscalar(), "t must be a scalar");
     casadi_assert_message(tval.numel() == n-1, "dimensions do not match");
 
     SX ret = val.at(0);
@@ -1257,7 +1257,7 @@ namespace casadi {
     for (int k=0; k<v.size(); ++k) {
       if (v[k].sparsity()!=vdef[k].sparsity()) {
         // Expand vdef to sparsity of v if vdef is scalar
-        if (vdef[k].isScalar() && vdef[k].nnz()==1) {
+        if (vdef[k].isscalar() && vdef[k].nnz()==1) {
           std::vector<SX> vdef_mod = vdef;
           vdef_mod[k] = SX(v[k].sparsity(), vdef[k].at(0), false);
           return substitute(ex, v, vdef_mod);
@@ -1455,7 +1455,7 @@ namespace casadi {
   template<>
   SX SX::zz_taylor(const SX& x,
                    const SX& a, int order) const {
-    casadi_assert(x.isScalar() && a.isScalar());
+    casadi_assert(x.isscalar() && a.isscalar());
     if (nnz()!=numel())
       throw CasadiException("taylor: not implemented for sparse matrices");
     SX ff = vec(T());
@@ -1667,8 +1667,8 @@ namespace casadi {
 
   template<>
   SX SX::zz_poly_coeff(const SX& x) const {
-    casadi_assert(isScalar());
-    casadi_assert(x.isScalar());
+    casadi_assert(isscalar());
+    casadi_assert(x.isscalar());
     casadi_assert(x.isSymbolic());
 
     SX ret;

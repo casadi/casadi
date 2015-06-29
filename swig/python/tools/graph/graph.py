@@ -67,11 +67,11 @@ def addDependencies(master,slaves,dep={},invdep={}):
 
 def isLeaf(s):
   return s.isLeaf()
-  #return s.isScalar(True) and (s.isConstant() or s.isSymbolic())
+  #return s.isscalar(True) and (s.isConstant() or s.isSymbolic())
 
 def dependencyGraph(s,dep = {},invdep = {}):
   if isinstance(s,SX):
-    if s.isScalar(True):
+    if s.isscalar(True):
       if not(isLeaf(s)):
         addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
     else:
@@ -587,7 +587,7 @@ class SXNonLeafArtist(DotArtist):
   
 def createArtist(node,dep={},invdep={},graph=None,artists={}):
   if isinstance(node,SX):
-    if node.isScalar(True):
+    if node.isscalar(True):
       if isLeaf(node):
         return SXLeafArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
       else:

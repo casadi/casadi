@@ -97,7 +97,7 @@ namespace casadi {
         MX t = pd[c]*s;
 
         // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
-        if (!t.isScalar() && t.shape() != dep(c).shape()) {
+        if (!t.isscalar() && t.shape() != dep(c).shape()) {
           if (pd[c].shape()!=s.shape()) pd[c] = MX(s.sparsity(), pd[c]);
           t = inner_prod(pd[c], s);
         }

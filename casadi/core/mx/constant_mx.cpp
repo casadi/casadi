@@ -110,7 +110,7 @@ namespace casadi {
   ConstantMX* ConstantMX::create(const Matrix<double>& val) {
     if (val.nnz()==0) {
       return create(val.sparsity(), 0);
-    } else if (val.isScalar()) {
+    } else if (val.isscalar()) {
       return create(val.sparsity(), val.toScalar());
     } else {
       // Check if all values are the same

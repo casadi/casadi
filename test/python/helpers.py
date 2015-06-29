@@ -381,7 +381,7 @@ class casadiTestCase(unittest.TestCase):
       for i in range(trial.nIn()):
         if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
         for j in range(trial.nOut()):
-          if trial.getOutput(j).isScalar() and solution.getOutput(j).isScalar():
+          if trial.getOutput(j).isscalar() and solution.getOutput(j).isscalar():
             trialgrad = trial.gradient(i,j)
             trialgrad.init()
             self.assertEqual(trialgrad.nIn(),trial.nIn())
@@ -398,7 +398,7 @@ class casadiTestCase(unittest.TestCase):
       for i in range(trial.nIn()):
         if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
         for j in range(trial.nOut()):
-          if trial.getOutput(j).isScalar() and solution.getOutput(j).isScalar():
+          if trial.getOutput(j).isscalar() and solution.getOutput(j).isscalar():
             trialhess = trial.hessian(i,j)
             trialhess.init()
             self.assertEqual(trialhess.nIn(),trial.nIn())

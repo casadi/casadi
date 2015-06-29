@@ -799,7 +799,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       {
         IMatrix *m2;
         if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<int>*), 0))
-            && m2->isScalar()) {
+            && m2->isscalar()) {
           if (m) **m = m2->getIntValue();
           return true;
         }
@@ -834,7 +834,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       {
         DMatrix *m2;
         if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<double>*), 0))
-            && m2->isScalar()) {
+            && m2->isscalar()) {
           if (m) **m = m2->getValue();
           return true;
         }
@@ -844,7 +844,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       {
         IMatrix *m2;
         if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<int>*), 0))
-            && m2->isScalar()) {
+            && m2->isscalar()) {
           if (m) **m = m2->getValue();
           return true;
         }
@@ -1655,7 +1655,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         while (it->index < it->size) {
           pe = *((PyObject**) PyArray_ITER_DATA(it));
           tmp2=&tmp;
-          if (!to_ptr(pe, &tmp2) || !tmp2->isScalar()) {
+          if (!to_ptr(pe, &tmp2) || !tmp2->isscalar()) {
             Py_DECREF(it);
             return false;
           }

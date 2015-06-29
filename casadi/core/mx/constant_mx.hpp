@@ -534,7 +534,7 @@ namespace casadi {
   std::string
   Constant<Value>::print(const std::vector<std::string>& arg) const {
     std::stringstream ss;
-    if (sparsity().isScalar()) {
+    if (sparsity().isscalar()) {
       // Print scalar
       if (sparsity().nnz()==0) {
         ss << "00";

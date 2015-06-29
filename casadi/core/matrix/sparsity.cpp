@@ -243,8 +243,8 @@ namespace casadi {
     return (*this)->getNZ(rr, cc);
   }
 
-  bool Sparsity::isScalar(bool scalar_and_dense) const {
-    return (*this)->isScalar(scalar_and_dense);
+  bool Sparsity::isscalar(bool scalar_and_dense) const {
+    return (*this)->isscalar(scalar_and_dense);
   }
 
   bool Sparsity::isDense() const {

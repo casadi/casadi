@@ -1947,7 +1947,7 @@ namespace casadi {
     return Sparsity::triplet(d1, d2, row, col);
   }
 
-  bool SparsityInternal::isScalar(bool scalar_and_dense) const {
+  bool SparsityInternal::isscalar(bool scalar_and_dense) const {
     return size2()==1 && size1()==1 && (!scalar_and_dense || nnz()==1);
   }
 

@@ -257,7 +257,7 @@ namespace casadi {
     std::pair<int, int> shape() const;
 
     /// Is scalar?
-    bool isScalar(bool scalar_and_dense) const;
+    bool isscalar(bool scalar_and_dense) const;
 
     /** \brief Check if the sparsity is empty
      *

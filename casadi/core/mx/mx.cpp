@@ -72,7 +72,7 @@ namespace casadi {
   MX::MX(const Sparsity& sp, const MX& val) {
     if (sp.isReshape(val.sparsity())) {
       *this = reshape(val, sp);
-    } else if (val.isScalar()) {
+    } else if (val.isscalar()) {
       // Dense matrix if val dense
       if (val.isDense()) {
         if (val.isConstant()) {
@@ -229,7 +229,7 @@ namespace casadi {
 
     // Assert dimensions of assigning matrix
     if (rr.size1() != m.size1() || cc.size1() != m.size2()) {
-      if (m.isScalar()) {
+      if (m.isscalar()) {
         // m scalar means "set all"
         return set(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
       } else if (rr.size1() == m.size2() && cc.size1() == m.size1()
@@ -297,7 +297,7 @@ namespace casadi {
 
         // Project both matrices to this sparsity
         return set(project(m, sp), ind1, project(rr, sp));
-      } else if (m.isScalar()) {
+      } else if (m.isscalar()) {
         // m scalar means "set all"
         if (m.isDense()) {
           return set(MX(rr.sparsity(), m), ind1, rr);
@@ -363,7 +363,7 @@ namespace casadi {
                           << shape() << ", but supplied sparsity index has shape "
                           << sp.shape() << ".");
     std::vector<int> ii = sp.find();
-    if (m.isScalar()) {
+    if (m.isscalar()) {
       (*this)(ii) = densify(m);
     } else {
       (*this)(ii) = densify(m(ii));
@@ -422,7 +422,7 @@ namespace casadi {
 
     // Assert dimensions of assigning matrix
     if (kk.sparsity() != m.sparsity()) {
-      if (m.isScalar()) {
+      if (m.isscalar()) {
         // m scalar means "set all"
         if (!m.isDense()) return; // Nothing to set
         return setNZ(MX(kk.sparsity(), m), ind1, kk);
@@ -599,7 +599,7 @@ namespace casadi {
   }
 
   MX MX::zz_mtimes(const MX& y, const MX& z) const {
-    if (isScalar() || y.isScalar()) {
+    if (isscalar() || y.isscalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return z + *this*y;
     }
@@ -662,7 +662,7 @@ namespace casadi {
   }
 
   MX MX::attachAssert(const MX& y, const std::string &fail_message) const {
-    casadi_assert_message(y.isScalar(),
+    casadi_assert_message(y.isscalar(),
                           "Error in attachAssert: assertion expression y must be scalar, "
                           "but got " << y.dimString());
     return(*this)->getAssertion(y, fail_message);
@@ -819,7 +819,7 @@ namespace casadi {
 
   MX MX::__constpow__(const MX& b) const { return (*this).constpow(b);}
   MX MX::__mrdivide__(const MX& b) const
-  { if (b.isScalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
+  { if (b.isscalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
   MX MX::zz_mpower(const MX& b) const {
     return pow(*this, b); throw CasadiException("mpower: Not implemented");
   }
@@ -928,7 +928,7 @@ namespace casadi {
   }
 
   void MX::makeDense(const MX& val) {
-    casadi_assert(val.isScalar());
+    casadi_assert(val.isscalar());
     if (isDense()) {
       return; // Already ok
     } else if (val->isZero()) {

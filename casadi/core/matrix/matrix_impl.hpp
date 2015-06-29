@@ -83,7 +83,7 @@ namespace casadi {
   void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1,
                                 const Slice& rr, const Slice& cc) const {
     // Both are scalar
-    if (rr.isScalar(size1()) && cc.isScalar(size2())) {
+    if (rr.isscalar(size1()) && cc.isscalar(size2())) {
       int k = sparsity().getNZ(rr.toScalar(size1()), cc.toScalar(size2()));
       if (k>=0) {
         m = at(k);
@@ -115,7 +115,7 @@ namespace casadi {
   void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1,
                                 const Matrix<int>& rr, const Matrix<int>& cc) const {
     // Scalar
-    if (rr.isScalar(true) && cc.isScalar(true)) {
+    if (rr.isscalar(true) && cc.isscalar(true)) {
       return get(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
     }
 
@@ -146,7 +146,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1, const Slice& rr) const {
     // Scalar
-    if (rr.isScalar(numel())) {
+    if (rr.isscalar(numel())) {
       int r = rr.toScalar(numel());
       int k = sparsity().getNZ(r % size1(), r / size1());
       if (k>=0) {
@@ -164,7 +164,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1, const Matrix<int>& rr) const {
     // Scalar
-    if (rr.isScalar(true)) {
+    if (rr.isscalar(true)) {
       return get(m, ind1, rr.toSlice(ind1));
     }
 
@@ -195,7 +195,7 @@ namespace casadi {
   void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1,
                                 const Slice& rr, const Slice& cc) {
     // Both are scalar
-    if (rr.isScalar(size1()) && cc.isScalar(size2()) && m.isDense()) {
+    if (rr.isscalar(size1()) && cc.isscalar(size2()) && m.isDense()) {
       elem(rr.toScalar(size1()), cc.toScalar(size2())) = m.toScalar();
       return;
     }
@@ -222,7 +222,7 @@ namespace casadi {
   void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1,
                                 const Matrix<int>& rr, const Matrix<int>& cc) {
     // Scalar
-    if (rr.isScalar(true) && cc.isScalar(true) && m.isDense()) {
+    if (rr.isscalar(true) && cc.isscalar(true) && m.isDense()) {
       return set(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
     }
 
@@ -244,7 +244,7 @@ namespace casadi {
 
     // Assert dimensions of assigning matrix
     if (rr.size1() != m.size1() || cc.size1() != m.size2()) {
-      if (m.isScalar()) {
+      if (m.isscalar()) {
         // m scalar means "set all"
         return set(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
       } else if (rr.size1() == m.size2() && cc.size1() == m.size1()
@@ -298,7 +298,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1, const Slice& rr) {
     // Scalar
-    if (rr.isScalar(numel()) && m.isDense()) {
+    if (rr.isscalar(numel()) && m.isDense()) {
       int r = rr.toScalar(numel());
       elem(r % size1(), r / size1()) = m.toScalar();
       return;
@@ -311,7 +311,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr) {
     // Scalar
-    if (rr.isScalar(true) && m.isDense()) {
+    if (rr.isscalar(true) && m.isDense()) {
       return set(m, ind1, rr.toSlice(ind1));
     }
 
@@ -326,7 +326,7 @@ namespace casadi {
 
         // Project both matrices to this sparsity
         return set(project(m, sp), ind1, project(rr, sp));
-      } else if (m.isScalar()) {
+      } else if (m.isscalar()) {
         // m scalar means "set all"
         if (m.isDense()) {
           return set(Matrix<DataType>(rr.sparsity(), m), ind1, rr);
@@ -395,7 +395,7 @@ namespace casadi {
                           << shape() << ", but supplied sparsity index has shape "
                           << sp.shape() << ".");
     std::vector<int> ii = sp.find();
-    if (m.isScalar()) {
+    if (m.isscalar()) {
       (*this)(ii) = densify(m);
     } else {
       (*this)(ii) = densify(m(ii));
@@ -405,7 +405,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::getNZ(Matrix<DataType>& m, bool ind1, const Slice& kk) const {
     // Scalar
-    if (kk.isScalar(nnz())) {
+    if (kk.isscalar(nnz())) {
       m = at(kk.toScalar(nnz()));
       return;
     }
@@ -417,7 +417,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::getNZ(Matrix<DataType>& m, bool ind1, const Matrix<int>& kk) const {
     // Scalar
-    if (kk.isScalar(true)) {
+    if (kk.isscalar(true)) {
       return getNZ(m, ind1, kk.toSlice(ind1));
     }
 
@@ -448,7 +448,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::setNZ(const Matrix<DataType>& m, bool ind1, const Slice& kk) {
     // Scalar
-    if (kk.isScalar(nnz())) {
+    if (kk.isscalar(nnz())) {
       at(kk.toScalar(nnz())) = m.toScalar();
       return;
     }
@@ -460,13 +460,13 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::setNZ(const Matrix<DataType>& m, bool ind1, const Matrix<int>& kk) {
     // Scalar
-    if (kk.isScalar(true)) {
+    if (kk.isscalar(true)) {
       return setNZ(m, ind1, kk.toSlice(ind1));
     }
 
     // Assert dimensions of assigning matrix
     if (kk.sparsity() != m.sparsity()) {
-      if (m.isScalar()) {
+      if (m.isscalar()) {
         // m scalar means "set all"
         if (!m.isDense()) return; // Nothing to set
         return setNZ(Matrix<DataType>(kk.sparsity(), m), ind1, kk);
@@ -886,7 +886,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType>::Matrix(const Sparsity& sp, const Matrix<DataType>& d) {
-    if (d.isScalar()) {
+    if (d.isscalar()) {
       *this = Matrix<DataType>(sp, d.toScalar(), false);
     } else if (d.isVector() || d.size1()==1) {
       casadi_assert(sp.nnz()==d.numel());
@@ -1343,7 +1343,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_mtimes(const Matrix<DataType> &y,
                                                const Matrix<DataType> &z) const {
-    if (isScalar() || y.isScalar()) {
+    if (isscalar() || y.isscalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return z + *this*y;
     }
@@ -1389,7 +1389,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::T() const {
     // quick return if empty or scalar
-    if ((size1()==0 && size2()==0) || isScalar()) return *this;
+    if ((size1()==0 && size2()==0) || isscalar()) return *this;
 
     // Create the new sparsity pattern and the mapping
     std::vector<int> mapping;
@@ -1408,7 +1408,7 @@ namespace casadi {
   template<typename DataType>
   const DataType Matrix<DataType>::toScalar() const {
     // Make sure that the matrix is 1-by-1
-    casadi_assert_message(isScalar(), "Can only convert 1-by-1 matrices to scalars");
+    casadi_assert_message(isscalar(), "Can only convert 1-by-1 matrices to scalars");
 
     // return zero or the nonzero element
     if (nnz()==1)
@@ -1819,7 +1819,7 @@ namespace casadi {
 
   template<typename DataType>
   double Matrix<DataType>::getValue() const {
-    casadi_assert(isScalar());
+    casadi_assert(isscalar());
     if (nnz()==0) {
       return 0;
     } else {
@@ -1834,7 +1834,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::setValue(double m) {
-    casadi_assert(isScalar());
+    casadi_assert(isscalar());
     if (nnz()!=0) {
       setValue(m, 0);
     }
@@ -1906,7 +1906,7 @@ namespace casadi {
     casadi_assert_message(n == size1(), "matrix must be square");
 
     // Trivial return if scalar
-    if (isScalar()) return toScalar();
+    if (isscalar()) return toScalar();
 
     // Trivial case 2 x 2
     if (n==2) return elem(0, 0) * elem(1, 1) - elem(0, 1) * elem(1, 0);
@@ -2786,7 +2786,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::get(double& val) const {
-    casadi_assert(isScalar());
+    casadi_assert(isscalar());
     get(&val);
   }
 

@@ -112,7 +112,7 @@ namespace casadi {
     bool isDense() const { return sparsity().isDense();}
 
     /** \brief  Check if the matrix expression is scalar */
-    bool isScalar(bool scalar_and_dense=false) const;
+    bool isscalar(bool scalar_and_dense=false) const;
 
     /** \brief  Check if the matrix expression is square */
     bool isSquare() const { return sparsity().isSquare();}
@@ -525,8 +525,8 @@ namespace casadi {
   }
 
   template<typename MatType>
-  bool GenericMatrix<MatType>::isScalar(bool scalar_and_dense) const {
-    return sparsity().isScalar(scalar_and_dense);
+  bool GenericMatrix<MatType>::isscalar(bool scalar_and_dense) const {
+    return sparsity().isscalar(scalar_and_dense);
   }
 
 #endif

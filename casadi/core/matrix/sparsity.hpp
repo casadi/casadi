@@ -493,9 +493,9 @@ namespace casadi {
     std::vector<Sparsity> zz_diagsplit(const std::vector<int>& offset1,
                                        const std::vector<int>& offset2) const;
     Sparsity zz_mtimes(const Sparsity& y) const {
-      if (isScalar()) {
+      if (isscalar()) {
         return isDense() ? y : Sparsity(y.shape());
-      } else if (y.isScalar()) {
+      } else if (y.isscalar()) {
         return y.isDense() ? *this : Sparsity(shape());
       } else {
         // Check dimensions
@@ -557,7 +557,7 @@ namespace casadi {
     }
 
     /// Is scalar?
-    bool isScalar(bool scalar_and_dense=false) const;
+    bool isscalar(bool scalar_and_dense=false) const;
 
     /// Is dense?
     bool isDense() const;

@@ -1114,7 +1114,7 @@ namespace casadi {
   void DaeBuilder::sanityCheck() const {
     // Time
     casadi_assert_message(this->t.isSymbolic(), "Non-symbolic time t");
-    casadi_assert_message(this->t.isScalar(), "Non-scalar time t");
+    casadi_assert_message(this->t.isscalar(), "Non-scalar time t");
 
     // Differential states
     casadi_assert_message(this->x.size()==this->ode.size(),

@@ -397,7 +397,7 @@ namespace casadi {
   }
 
   MX MXNode::getTranspose() const {
-    if (sparsity().isScalar()) {
+    if (sparsity().isscalar()) {
       return shared_from_this<MX>();
     } else if (sparsity().isVector(true)) {
       return getReshape(sparsity().T());
@@ -536,18 +536,18 @@ namespace casadi {
 
   MX MXNode::getBinarySwitch(int op, const MX& y) const {
     // Make sure that dimensions match
-    casadi_assert_message(sparsity().isScalar() || y.isScalar() || sparsity().shape()==y.shape(),
+    casadi_assert_message(sparsity().isscalar() || y.isscalar() || sparsity().shape()==y.shape(),
                           "Dimension mismatch." << "lhs is " << sparsity().dimString()
                           << ", while rhs is " << y.dimString());
 
     // Create binary node
-    if (sparsity().isScalar(false)) {
+    if (sparsity().isscalar(false)) {
       if (nnz()==0) {
         return toMatrix(MX(0)->getBinary(op, y, true, false), y.sparsity());
       } else {
         return toMatrix(getBinary(op, y, true, false), y.sparsity());
       }
-    } else if (y.isScalar()) {
+    } else if (y.isscalar()) {
       if (y.nnz()==0) {
         return toMatrix(getBinary(op, MX(0), false, true), sparsity());
       } else {
@@ -743,7 +743,7 @@ namespace casadi {
     if (sparsity()==y.sparsity()) {
       if (sparsity().nnz()==0) {
         return 0;
-      } else if (sparsity().isScalar()) {
+      } else if (sparsity().isscalar()) {
         return getBinarySwitch(OP_MUL, y);
       } else {
         return MX::create(new InnerProd(shared_from_this<MX>(), y));

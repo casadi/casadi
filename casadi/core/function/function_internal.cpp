@@ -205,7 +205,7 @@ namespace casadi {
 
   Function FunctionInternal::gradient(int iind, int oind) {
     // Assert scalar
-    casadi_assert_message(output(oind).isScalar(),
+    casadi_assert_message(output(oind).isscalar(),
                           "Only gradients of scalar functions allowed. Use jacobian instead.");
 
     // Give it a suitable name
@@ -227,7 +227,7 @@ namespace casadi {
 
   Function FunctionInternal::tangent(int iind, int oind) {
     // Assert scalar
-    casadi_assert_message(input(iind).isScalar(),
+    casadi_assert_message(input(iind).isscalar(),
                           "Only tangent of scalar input functions allowed. Use jacobian instead.");
 
     // Give it a suitable name
@@ -251,7 +251,7 @@ namespace casadi {
     log("FunctionInternal::hessian");
 
     // Assert scalar
-    casadi_assert_message(output(oind).isScalar(), "Only hessians of scalar functions allowed.");
+    casadi_assert_message(output(oind).isscalar(), "Only hessians of scalar functions allowed.");
 
     // Generate gradient function
     Function ret = getHessian(iind, oind);

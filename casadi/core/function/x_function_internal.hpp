@@ -531,7 +531,7 @@ namespace casadi {
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   MatType XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::grad(int iind, int oind) {
-    casadi_assert_message(output(oind).isScalar(),
+    casadi_assert_message(output(oind).isscalar(),
                           "Only gradients of scalar functions allowed. Use jacobian instead.");
 
     // Quick return if trivially empty
@@ -572,7 +572,7 @@ namespace casadi {
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   MatType XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::tang(int iind, int oind) {
-    casadi_assert_message(input(iind).isScalar(),
+    casadi_assert_message(input(iind).isscalar(),
                           "Only tangent of scalar input functions allowed. Use jacobian instead.");
 
     // Forward seeds

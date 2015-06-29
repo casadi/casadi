@@ -42,7 +42,7 @@ namespace casadi {
       if (x.isEmpty() || sp.isEmpty()) { // NOTE: To permissive?
         // Replace nulls with zeros of the right dimension
         return MX::zeros(sp);
-      } else if (x.isScalar()) {
+      } else if (x.isscalar()) {
         // Scalar argument means set all
         return MX(sp, x);
       } else if (x.size1()==sp.size2() && x.size2()==sp.size1() && sp.isVector(true)) {
