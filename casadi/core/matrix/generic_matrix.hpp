@@ -123,7 +123,7 @@ namespace casadi {
     bool isVector(bool row_or_col=false) const { return sparsity().isVector(row_or_col);}
 
     /** \brief  Check if the matrix is a row vector (i.e. size1()==1) */
-    bool isRowVector() const { return sparsity().isVector();}
+    bool isrow() const { return sparsity().isVector();}
 
     /** \brief Check if the matrix is upper triangular */
     bool isTriu() const { return sparsity().isTriu();}
