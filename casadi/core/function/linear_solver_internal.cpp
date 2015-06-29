@@ -178,14 +178,14 @@ namespace casadi {
       } else {
         a = -mul(X, rhs[d].T(), MX::zeros(A.sparsity()));
       }
-      if (asens[d][1].isEmpty(true)) {
+      if (asens[d][1].isempty(true)) {
         asens[d][1] = a;
       } else {
         asens[d][1] += a;
       }
 
       // Propagate to B
-      if (asens[d][0].isEmpty(true)) {
+      if (asens[d][0].isempty(true)) {
         asens[d][0] = rhs[d];
       } else {
         asens[d][0] += rhs[d];

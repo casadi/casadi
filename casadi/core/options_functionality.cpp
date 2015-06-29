@@ -172,7 +172,7 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
   assert_exists(name);
 
   // If we have an empty vector, than we are not strict about the type
-  if (op.isEmptyVector()) {
+  if (op.isemptyVector()) {
     dictionary_[name] = GenericType::from_type(allowed_options[name]);
     return;
   }

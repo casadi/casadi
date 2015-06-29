@@ -39,7 +39,7 @@ namespace casadi {
       return project(x, sp);
     } else {
       // Different dimensions
-      if (x.isEmpty() || sp.isEmpty()) { // NOTE: To permissive?
+      if (x.isempty() || sp.isempty()) { // NOTE: To permissive?
         // Replace nulls with zeros of the right dimension
         return MX::zeros(sp);
       } else if (x.isscalar()) {
@@ -135,7 +135,7 @@ namespace casadi {
     fcn_.callReverse(arg, res, aseed, v);
     for (int i=0; i<v.size(); ++i) {
       for (int j=0; j<v[i].size(); ++j) {
-        if (!v[i][j].isEmpty()) { // TODO(@jaeandersson): Hack
+        if (!v[i][j].isempty()) { // TODO(@jaeandersson): Hack
           asens[i][j] += v[i][j];
         }
       }

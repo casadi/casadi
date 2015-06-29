@@ -541,7 +541,7 @@ namespace casadi {
       } else {
         ss << v_.value;
       }
-    } else if (sparsity().isEmpty()) {
+    } else if (sparsity().isempty()) {
       // Print empty
       sparsity().printCompact(ss);
     } else {

@@ -264,7 +264,7 @@ namespace casadi {
      * A sparsity is considered empty if one of the dimensions is zero
      * (or optionally both dimensions)
      */
-    bool isEmpty(bool both=false) const;
+    bool isempty(bool both=false) const;
 
     /// Is dense?
     bool isDense() const;

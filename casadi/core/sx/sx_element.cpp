@@ -1177,7 +1177,7 @@ namespace casadi {
                              const SX& w) const {
     const SX &f = *this;
     casadi_assert_message(order == 5, "gauss_quadrature: order must be 5");
-    casadi_assert_message(w.isEmpty(), "gauss_quadrature: empty weights");
+    casadi_assert_message(w.isempty(), "gauss_quadrature: empty weights");
 
     // Change variables to [-1, 1]
     if (!isEqual(a.toScalar(), -1) || !isEqual(b.toScalar(), 1)) {

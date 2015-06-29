@@ -1407,7 +1407,7 @@ namespace casadi {
     // Loop over inputs
     for (int iind = 0; iind < nIn(); ++iind) {
       // Skip if no seeds
-      if (fwd && input(iind).isEmpty())
+      if (fwd && input(iind).isempty())
         continue;
 
       // Get data array for input
@@ -1417,7 +1417,7 @@ namespace casadi {
       for (int oind = 0; oind < nOut(); ++oind) {
 
         // Skip if no seeds
-        if (!fwd && output(oind).isEmpty())
+        if (!fwd && output(oind).isempty())
           continue;
 
         // Get the sparsity of the Jacobian block
@@ -1799,7 +1799,7 @@ namespace casadi {
 
       // Assumes initialized
       for (int i=0; i<arg.size(); ++i) {
-        if (arg[i].isNull() || arg[i].isEmpty() || input(i).isEmpty()) continue;
+        if (arg[i].isNull() || arg[i].isempty() || input(i).isempty()) continue;
         casadi_assert_message(
           arg[i].size2()==input(i).size2() && arg[i].size1()==input(i).size1(),
           "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function."
@@ -2709,7 +2709,7 @@ namespace casadi {
         asens[d].resize(n_in);
         vector<MX> a = vertsplit(v[d], offset);
         for (int i=0; i<n_in; ++i) {
-          if (asens[d][i].isEmpty(true)) {
+          if (asens[d][i].isempty(true)) {
             asens[d][i] = reshape(a[i], input(i).shape());
           } else {
             asens[d][i] += reshape(a[i], input(i).shape());
@@ -2739,7 +2739,7 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) {
       asens[d].resize(n_in);
       for (int i=0; i<n_in; ++i) {
-        if (asens[d][i].isEmpty(true)) {
+        if (asens[d][i].isempty(true)) {
           asens[d][i] = *x_it++;
         } else {
           asens[d][i] += *x_it++;

@@ -1304,7 +1304,7 @@ namespace casadi {
   std::string DaeBuilder::unit(const MX& var) const {
     casadi_assert_message(!var.isVector() && var.isValidInput(),
                           "DaeBuilder::unit: Argument must be a symbolic vector");
-    if (var.isEmpty()) {
+    if (var.isempty()) {
       return "n/a";
     } else {
       std::vector<MX> prim = var.getPrimitives();
@@ -1687,7 +1687,7 @@ namespace casadi {
 
     // Get a reference to the expression
     MX& ret = lin_comb_[name];
-    casadi_assert_warning(ret.isEmpty(), "DaeBuilder::addLinearCombination: Overwriting " << name);
+    casadi_assert_warning(ret.isempty(), "DaeBuilder::addLinearCombination: Overwriting " << name);
     ret = 0;
 
     // Get indices of outputs

@@ -644,7 +644,7 @@ namespace casadi {
   }
 
   inline bool checkMat(const Sparsity& arg, const Sparsity& inp) {
-    return arg.shape()==inp.shape() || arg.isEmpty() || arg.isscalar() ||
+    return arg.shape()==inp.shape() || arg.isempty() || arg.isscalar() ||
       (inp.size2()==arg.size1() && inp.size1()==arg.size2()
        && (arg.isVector() || inp.isVector()));
   }
@@ -748,7 +748,7 @@ namespace casadi {
     if (arg.shape()==inp.shape()) {
       // Matching dimensions already
       return arg;
-    } else if (arg.isEmpty()) {
+    } else if (arg.isempty()) {
       // Empty matrix means set zero
       return M(inp.shape());
     } else if (arg.isscalar()) {

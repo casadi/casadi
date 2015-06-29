@@ -95,7 +95,7 @@ namespace casadi {
     with_H_ = true;
 
     // Default H: unity
-    if (H_.isNull() || H_.isEmpty()) {
+    if (H_.isNull() || H_.isempty()) {
       //H_ = Sparsity::diag(n);
       H_ = Sparsity(0, 0);
       //casadi_assert(Hs_.size()==0);
@@ -123,7 +123,7 @@ namespace casadi {
     }
 
     with_C_ = true;
-    if (C_.isNull()  || C_.isEmpty()) {
+    if (C_.isNull()  || C_.isempty()) {
       C_ = Sparsity(0, 0);
       //C_ = Sparsity::diag(n);
       //st_[Dle_STRUCT_C] = C_;
@@ -211,11 +211,11 @@ namespace casadi {
     if (st.count("v")) V = st.at("v");
     if (st.count("c")) C = st.at("c");
 
-    if (C.isNull() || C.isEmpty()) C = Sparsity::diag(n);
+    if (C.isNull() || C.isempty()) C = Sparsity::diag(n);
 
     if (st.count("h")) H = st.at("h");
-    bool with_H = !(H.isNull() || H.isEmpty());
-    if (H.isNull() || H.isEmpty()) {
+    bool with_H = !(H.isNull() || H.isempty());
+    if (H.isNull() || H.isempty()) {
       H = Sparsity::diag(n);
 
     }

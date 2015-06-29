@@ -327,7 +327,7 @@ class Simulatortests(casadiTestCase):
     sim.init()
     sim.setInput([num['q0']],"x0")
     sim.setInput([num['p']],"p")
-    self.assertTrue(sim.getInput("u").isEmpty())
+    self.assertTrue(sim.getInput("u").isempty())
     sim.evaluate()
     
     tf = DMatrix(sim.getMinorT())

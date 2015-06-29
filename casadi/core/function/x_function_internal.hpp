@@ -145,7 +145,7 @@ namespace casadi {
 
     // Make sure that inputs are symbolic
     for (int i=0; i<inputv.size(); ++i) {
-      if (inputv[i].isEmpty()) {
+      if (inputv[i].isempty()) {
         // That's okay
       } else if (!inputv[i].isValidInput()) {
         casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be"

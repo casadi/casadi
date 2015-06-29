@@ -106,7 +106,7 @@ namespace casadi {
 
     /** \brief Check if the sparsity is empty, i.e. if one of the dimensions is zero
      * (or optionally both dimensions) */
-    bool isEmpty(bool both=false) const { return sparsity().isEmpty(both);}
+    bool isempty(bool both=false) const { return sparsity().isempty(both);}
 
     /** \brief  Check if the matrix expression is dense */
     bool isDense() const { return sparsity().isDense();}

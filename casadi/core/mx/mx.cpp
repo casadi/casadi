@@ -116,7 +116,7 @@ namespace casadi {
     std::vector<MX> ret(x->nout());
     for (int i=0; i<ret.size(); ++i) {
       ret[i] = MX::create(new OutputNode(x, i));
-      if (ret[i].isEmpty(true)) {
+      if (ret[i].isempty(true)) {
         ret[i] = MX(0, 0);
       } else if (ret[i].nnz()==0) {
         ret[i] = MX(ret[i].shape());
@@ -916,7 +916,7 @@ namespace casadi {
   }
 
   MX MX::zz_project(const Sparsity& sp, bool intersect) const {
-    if (isEmpty() || (sp==sparsity())) {
+    if (isempty() || (sp==sparsity())) {
       return *this;
     } else {
       if (intersect) {
@@ -1039,7 +1039,7 @@ namespace casadi {
   // Helper function
   bool has_empty(const vector<MX>& x, bool both=false) {
     for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
-      if (i->isEmpty(both)) return true;
+      if (i->isempty(both)) return true;
     }
     return false;
   }
@@ -1047,7 +1047,7 @@ namespace casadi {
   vector<MX> trim_empty(const vector<MX>& x, bool both=false) {
     vector<MX> ret;
     for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
-      if (!i->isEmpty(both)) ret.push_back(*i);
+      if (!i->isempty(both)) ret.push_back(*i);
     }
     return ret;
   }
@@ -1250,7 +1250,7 @@ namespace casadi {
 
   MX MX::zz_simplify() const {
     MX ret = *this;
-    if (!isEmpty(true)) ret->simplifyMe(ret);
+    if (!isempty(true)) ret->simplifyMe(ret);
     return ret;
   }
 

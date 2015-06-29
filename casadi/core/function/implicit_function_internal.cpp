@@ -389,7 +389,7 @@ namespace casadi {
     vector<MX> tmp(nadj);
     for (int d=0; d<nadj; ++d) {
       asens[d].resize(num_in);
-      tmp[d] = asens[d][iin_].isEmpty(true) ? MX(input(iin_).shape()) : asens[d][iin_];
+      tmp[d] = asens[d][iin_].isempty(true) ? MX(input(iin_).shape()) : asens[d][iin_];
     }
 
     // Propagate through f_

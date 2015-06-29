@@ -91,7 +91,7 @@ namespace casadi {
     if (ret.shape()==shape()) {
       return ret;
     } else {
-      casadi_assert(ret.isEmpty(true));
+      casadi_assert(ret.isempty(true));
       return MX(shape());
     }
   }

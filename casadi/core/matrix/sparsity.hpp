@@ -273,7 +273,7 @@ namespace casadi {
     * A sparsity is considered empty if one of the dimensions is zero
     * (or optionally both dimensions)
     */
-    bool isEmpty(bool both=false) const;
+    bool isempty(bool both=false) const;
 
     /** \brief Get the number of (structural) non-zeros
         \see numel() */
@@ -831,10 +831,10 @@ namespace casadi {
     // Check if sparsity matches
     if (val_sp==*this) {
       std::copy(val_data, val_data+sz, data);
-    } else if (this->isEmpty()) {
+    } else if (this->isempty()) {
       // Quick return
       return;
-    } else if (val_sp.isEmpty()) {
+    } else if (val_sp.isempty()) {
       // Quick return
       return;
     } else if (val_nel==1) { // if scalar
@@ -925,10 +925,10 @@ namespace casadi {
       for (int k=0; k<sz; ++k) {
         data[k] += val_data[k];
       }
-    } else if (this->isEmpty()) {
+    } else if (this->isempty()) {
       // Quick return
       return;
-    } else if (val_sp.isEmpty()) {
+    } else if (val_sp.isempty()) {
       // Quick return
       return;
     }  else if (val_nel==1) { // if scalar
@@ -1006,10 +1006,10 @@ namespace casadi {
       for (int k=0; k<sz; ++k) {
         data[k] |= val_data[k];
       }
-    } else if (this->isEmpty()) {
+    } else if (this->isempty()) {
       // Quick return
       return;
-    } else if (val_sp.isEmpty()) {
+    } else if (val_sp.isempty()) {
       // Quick return
       return;
     }  else if (val_nel==1) { // if scalar

@@ -506,15 +506,15 @@ namespace casadi {
       const double time1 = clock();
       if (!callback_.isNull()) {
         if (full_callback) {
-          if (!output(NLP_SOLVER_X).isEmpty()) copy(x, x+nx_, output(NLP_SOLVER_X).begin());
+          if (!output(NLP_SOLVER_X).isempty()) copy(x, x+nx_, output(NLP_SOLVER_X).begin());
 
           vector<double>& lambda_x = output(NLP_SOLVER_LAM_X).data();
           for (int i=0; i<lambda_x.size(); ++i) {
             lambda_x[i] = z_U[i]-z_L[i];
           }
-          if (!output(NLP_SOLVER_LAM_G).isEmpty())
+          if (!output(NLP_SOLVER_LAM_G).isempty())
               copy(lambda, lambda+ng_, output(NLP_SOLVER_LAM_G).begin());
-          if (!output(NLP_SOLVER_G).isEmpty()) copy(g, g+ng_, output(NLP_SOLVER_G).begin());
+          if (!output(NLP_SOLVER_G).isempty()) copy(g, g+ng_, output(NLP_SOLVER_G).begin());
         } else {
           if (iter==0) {
             userOut<true, PL_WARN>()

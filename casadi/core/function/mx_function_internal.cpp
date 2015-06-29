@@ -815,7 +815,7 @@ namespace casadi {
           skip[d] = true; // All seeds are zero?
           for (int i=0; i<it->arg.size(); ++i) {
             int el = it->arg[i];
-            if (el<0 || dwork[el][d].isEmpty(true)) {
+            if (el<0 || dwork[el][d].isempty(true)) {
               seed[i] = MX(it->data->dep(i).shape());
             } else {
               seed[i] = dwork[el][d];
@@ -925,7 +925,7 @@ namespace casadi {
         // Pass the adjoint seeds
         for (int d=0; d<nadj; ++d) {
           MX a = project(aseed[d][it->res.front()], output(it->res.front()).sparsity(), true);
-          if (dwork[it->arg.front()][d].isEmpty(true)) {
+          if (dwork[it->arg.front()][d].isempty(true)) {
             dwork[it->arg.front()][d] = a;
           } else {
             dwork[it->arg.front()][d] += a;
@@ -956,7 +956,7 @@ namespace casadi {
             }
 
             // If first time encountered, reset to zero of right dimension
-            if (seed[i].isEmpty(true)) seed[i] = MX(it->data->sparsity(i).shape());
+            if (seed[i].isempty(true)) seed[i] = MX(it->data->sparsity(i).shape());
 
             // If nonzero seeds, keep direction
             if (skip[d] && !seed[i].isZero()) skip[d] = false;
@@ -982,7 +982,7 @@ namespace casadi {
             }
 
             // If first time encountered, reset to zero of right dimension
-            if (osens[d1][i].isEmpty(true)) osens[d1][i] = MX(it->data->dep(i).shape());
+            if (osens[d1][i].isempty(true)) osens[d1][i] = MX(it->data->dep(i).shape());
           }
           d1++;
         }
@@ -999,7 +999,7 @@ namespace casadi {
           for (int i=0; i<it->arg.size(); ++i) {
             int el = it->arg[i];
             if (el>=0) {
-              if (dwork[el][d].isEmpty(true)) {
+              if (dwork[el][d].isempty(true)) {
                 dwork[el][d] = osens[d1][i];
               } else {
                 dwork[el][d] += osens[d1][i];

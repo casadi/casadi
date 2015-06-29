@@ -48,7 +48,7 @@ namespace casadi {
     stream << size1() << "x" << size2();
 
     // Print shape
-    if (isEmpty()) {
+    if (isempty()) {
       // Print nothing, shape clear anyway
     } else if (isDense()) {
       stream << ", dense";
@@ -1902,7 +1902,7 @@ namespace casadi {
 
     // Quick return if both are dense
     if (isDense() && y.isDense()) {
-      return !isEmpty() && !y.isEmpty() ? Sparsity::dense(d1, d2) :
+      return !isempty() && !y.isempty() ? Sparsity::dense(d1, d2) :
         Sparsity(d1, d2);
     }
 
@@ -1959,7 +1959,7 @@ namespace casadi {
     return size2()==1 || (row_or_col && size1()==1);
   }
 
-  bool SparsityInternal::isEmpty(bool both) const {
+  bool SparsityInternal::isempty(bool both) const {
     return both ? size2()==0 && size1()==0 : size2()==0 || size1()==0;
   }
 
@@ -2591,7 +2591,7 @@ namespace casadi {
 
   Sparsity SparsityInternal::patternInverse() const {
     // Quick return clauses
-    if (isEmpty()) return Sparsity::dense(size1(), size2());
+    if (isempty()) return Sparsity::dense(size1(), size2());
     if (isDense()) return Sparsity(size1(), size2());
 
     // Sparsity of the result

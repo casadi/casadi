@@ -273,7 +273,7 @@ class Integrationtests(casadiTestCase):
                 integrator.init()
                 for ff in [fs,integrator]:
                   for k,v in point.items():
-                    if not ff.getInput(k).isEmpty():
+                    if not ff.getInput(k).isempty():
                       ff.setInput(v,k)
 
                 integrator.evaluate()
@@ -385,7 +385,7 @@ class Integrationtests(casadiTestCase):
               
               for ff in [fs,integrator]:
                 for k,v in point.items():
-                  if not ff.getInput(k).isEmpty():
+                  if not ff.getInput(k).isempty():
                     ff.setInput(v,k)
 
               integrator.evaluate()
@@ -559,11 +559,11 @@ class Integrationtests(casadiTestCase):
 #integrator.init()
 
 #integrator.setInput({x0},"x0")
-#if not integrator.getInput("p").isEmpty():
+#if not integrator.getInput("p").isempty():
 #  integrator.setInput({p_},"p")
-#if not integrator.getInput("rx0").isEmpty():
+#if not integrator.getInput("rx0").isempty():
 #  integrator.setInput(0.13,"rx0")
-#if not integrator.getInput("rp").isEmpty():
+#if not integrator.getInput("rp").isempty():
 #  integrator.setInput(0.127,"rp")
 #              """.format(din=din,dout=dout,rdin=rdin,rdout=rdout,x0=x0,p_=p_,intclass=Integrator,options=integrator.dictionary())
 #              message+="\nTo reproduce:\n" + reproduce
@@ -572,7 +572,7 @@ class Integrationtests(casadiTestCase):
        
             for ff in [fs,integrator]:
               for k,v in point.items():
-                if not ff.getInput(k).isEmpty():
+                if not ff.getInput(k).isempty():
                   ff.setInput(v,k)
             integrator.evaluate()
             
@@ -1254,11 +1254,11 @@ class Integrationtests(casadiTestCase):
     integrator.init()
 
     integrator.setInput(7.1,"x0")
-    if not integrator.getInput("p").isEmpty():
+    if not integrator.getInput("p").isempty():
       integrator.setInput(2,"p")
-    if not integrator.getInput("rx0").isEmpty():
+    if not integrator.getInput("rx0").isempty():
       integrator.setInput(0.13,"rx0")
-    if not integrator.getInput("rp").isEmpty():
+    if not integrator.getInput("rp").isempty():
       integrator.setInput(0.127,"rp")
 
     integrator.evaluate()

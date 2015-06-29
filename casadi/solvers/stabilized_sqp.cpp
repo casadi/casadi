@@ -405,11 +405,11 @@ namespace casadi {
 
       // Call callback function if present
       if (!callback_.isNull()) {
-        if (!output(NLP_SOLVER_F).isEmpty()) output(NLP_SOLVER_F).set(fk_);
-        if (!output(NLP_SOLVER_X).isEmpty()) output(NLP_SOLVER_X).setNZ(x_);
-        if (!output(NLP_SOLVER_LAM_G).isEmpty()) output(NLP_SOLVER_LAM_G).setNZ(mu_);
-        if (!output(NLP_SOLVER_LAM_X).isEmpty()) output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
-        if (!output(NLP_SOLVER_G).isEmpty()) output(NLP_SOLVER_G).setNZ(gk_);
+        if (!output(NLP_SOLVER_F).isempty()) output(NLP_SOLVER_F).set(fk_);
+        if (!output(NLP_SOLVER_X).isempty()) output(NLP_SOLVER_X).setNZ(x_);
+        if (!output(NLP_SOLVER_LAM_G).isempty()) output(NLP_SOLVER_LAM_G).setNZ(mu_);
+        if (!output(NLP_SOLVER_LAM_X).isempty()) output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
+        if (!output(NLP_SOLVER_G).isempty()) output(NLP_SOLVER_G).setNZ(gk_);
         int ret = callback_(ref_, user_data_);
 
         if (!ret) {

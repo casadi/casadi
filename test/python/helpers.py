@@ -310,7 +310,7 @@ class casadiTestCase(unittest.TestCase):
       digits_sens = digits
      
     for i in range(trial.nIn()):
-      if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
+      if (allow_empty and (trial.getInput(i).isempty() or solution.getInput(i).isempty() )): continue
       message = "input(%d)" % i
       self.checkarray(trial.getInput(i),solution.getInput(i),"",digits=digits,failmessage=failmessage+": "+ message)
 
@@ -333,7 +333,7 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.nOut()):
       message = "output(%d)" % i
-      if (allow_empty and (trial.getOutput(i).isEmpty() or solution.getOutput(i).isEmpty() )): continue
+      if (allow_empty and (trial.getOutput(i).isempty() or solution.getOutput(i).isempty() )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
       
     try:
@@ -352,7 +352,7 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.nOut()):
       message = "output(%d)" % i
-      if (allow_empty and (trial.getOutput(i).isEmpty() or solution.getOutput(i).isEmpty() )): continue
+      if (allow_empty and (trial.getOutput(i).isempty() or solution.getOutput(i).isempty() )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
     
     for i in range(trial.nIn()):
@@ -362,7 +362,7 @@ class casadiTestCase(unittest.TestCase):
     
     if jacobian:
       for i in range(trial.nIn()):
-        if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
+        if (allow_empty and (trial.getInput(i).isempty() or solution.getInput(i).isempty() )): continue
         for j in range(trial.nOut()):
           trialjac = trial.jacobian(i,j)
           trialjac.init()
@@ -379,7 +379,7 @@ class casadiTestCase(unittest.TestCase):
 
     if gradient:
       for i in range(trial.nIn()):
-        if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
+        if (allow_empty and (trial.getInput(i).isempty() or solution.getInput(i).isempty() )): continue
         for j in range(trial.nOut()):
           if trial.getOutput(j).isscalar() and solution.getOutput(j).isscalar():
             trialgrad = trial.gradient(i,j)
@@ -396,7 +396,7 @@ class casadiTestCase(unittest.TestCase):
 
     if hessian:
       for i in range(trial.nIn()):
-        if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
+        if (allow_empty and (trial.getInput(i).isempty() or solution.getInput(i).isempty() )): continue
         for j in range(trial.nOut()):
           if trial.getOutput(j).isscalar() and solution.getOutput(j).isscalar():
             trialhess = trial.hessian(i,j)

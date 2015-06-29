@@ -127,8 +127,8 @@ namespace casadi {
     return (*this)->numel();
   }
 
-  bool Sparsity::isEmpty(bool both) const {
-    return (*this)->isEmpty(both);
+  bool Sparsity::isempty(bool both) const {
+    return (*this)->isempty(both);
   }
 
   int Sparsity::nnz() const {

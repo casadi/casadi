@@ -443,7 +443,7 @@ class SXtests(casadiTestCase):
       i=c.transpose(c.transpose(arg))
       self.assertEqual(i.shape[0],shape[0],"shape mismatch")
       self.assertEqual(i.shape[1],shape[1],"shape mismatch")
-      SX(arg).isEmpty()
+      SX(arg).isempty()
           
   def test_SXFunctionc3(self):
     self.message("vector(SXmatrix) typemaps constructors")
@@ -586,25 +586,25 @@ class SXtests(casadiTestCase):
     f = SXFunction([x],[x**2,[]])
     f.init()
 
-    self.assertTrue(f.getOutput(1).isEmpty())
+    self.assertTrue(f.getOutput(1).isempty())
     
     f = SXFunction([x,[]],[x**2,[]])
     f.init()
 
-    self.assertTrue(f.getOutput(1).isEmpty())
+    self.assertTrue(f.getOutput(1).isempty())
     f.evaluate()
     
     r = f.call([x,[]])
-    self.assertTrue(r[1].isEmpty())
+    self.assertTrue(r[1].isempty())
 
     r = f.call([x,[]])
-    self.assertTrue(r[1].isEmpty())
+    self.assertTrue(r[1].isempty())
     
     r = f.call([x,SX(0,1)])
-    self.assertTrue(r[1].isEmpty())
+    self.assertTrue(r[1].isempty())
 
     r = f.call([x,SX(1,0)])
-    self.assertTrue(r[1].isEmpty())
+    self.assertTrue(r[1].isempty())
     
     #self.assertRaises(Exception,lambda : f.call([x,x]))
     #self.assertRaises(Exception,lambda : f.call([[],[]]))

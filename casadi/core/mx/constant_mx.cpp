@@ -82,7 +82,7 @@ namespace casadi {
   }
 
   ConstantMX* ConstantMX::create(const Sparsity& sp, int val) {
-    if (sp.isEmpty(true)) {
+    if (sp.isempty(true)) {
       return ZeroByZero::getInstance();
     } else {
       switch (val) {
@@ -95,7 +95,7 @@ namespace casadi {
   }
 
   ConstantMX* ConstantMX::create(const Sparsity& sp, double val) {
-    if (sp.isEmpty(true)) {
+    if (sp.isempty(true)) {
       return ZeroByZero::getInstance();
     } else {
       int intval(val);
@@ -210,7 +210,7 @@ namespace casadi {
   }
 
   MX ZeroByZero::getReshape(const Sparsity& sp) const {
-    casadi_assert(sp.isEmpty());
+    casadi_assert(sp.isempty());
     return MX::zeros(sp);
   }
 

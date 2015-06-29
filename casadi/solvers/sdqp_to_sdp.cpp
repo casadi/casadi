@@ -121,9 +121,9 @@ namespace casadi {
     output(SDQP_SOLVER_X) = DMatrix::zeros(n_, 1);
 
     std::vector<int> r = range(input(SDQP_SOLVER_G).size1());
-    output(SDQP_SOLVER_P) = solver_.output(SDP_SOLVER_P).isEmpty() ? DMatrix() :
+    output(SDQP_SOLVER_P) = solver_.output(SDP_SOLVER_P).isempty() ? DMatrix() :
         solver_.output(SDP_SOLVER_P)(r, r);
-    output(SDQP_SOLVER_DUAL) = solver_.output(SDP_SOLVER_DUAL).isEmpty() ? DMatrix() :
+    output(SDQP_SOLVER_DUAL) = solver_.output(SDP_SOLVER_DUAL).isempty() ? DMatrix() :
         solver_.output(SDP_SOLVER_DUAL)(r, r);
     output(SDQP_SOLVER_COST) = 0.0;
     output(SDQP_SOLVER_DUAL_COST) = 0.0;
@@ -181,11 +181,11 @@ namespace casadi {
               SDQP_SOLVER_COST);
     setOutput(solver_.output(SDP_SOLVER_DUAL_COST),
               SDQP_SOLVER_DUAL_COST);
-    if (!output(SDQP_SOLVER_DUAL).isEmpty())
+    if (!output(SDQP_SOLVER_DUAL).isempty())
         std::copy(solver_.output(SDP_SOLVER_DUAL).begin(),
                   solver_.output(SDP_SOLVER_DUAL).begin()+output(SDQP_SOLVER_DUAL).nnz(),
                   output(SDQP_SOLVER_DUAL).begin());
-    if (!output(SDQP_SOLVER_P).isEmpty())
+    if (!output(SDQP_SOLVER_P).isempty())
         std::copy(solver_.output(SDP_SOLVER_P).begin(),
                   solver_.output(SDP_SOLVER_P).begin()+output(SDQP_SOLVER_P).nnz(),
                   output(SDQP_SOLVER_P).begin());

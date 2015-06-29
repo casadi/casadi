@@ -107,7 +107,7 @@ namespace casadi {
     obuf_.resize(output_fcn_->nOut());
     for (int i=0; i<nOut(); ++i) {
       output(i) = Matrix<double>::zeros(output_fcn_.output(i).numel(), grid_.size());
-      if (!output_fcn_.output(i).isEmpty()) {
+      if (!output_fcn_.output(i).isempty()) {
         casadi_assert_message(output_fcn_.output(i).isVector(),
                               "SimulatorInternal::init: Output function output #" << i
                               << " has shape " << output_fcn_.output(i).dimString()
@@ -120,14 +120,14 @@ namespace casadi {
                           "scalar or empty, but got " << output_fcn_.input(DAE_T).dimString());
 
     casadi_assert_message(
-        output_fcn_.input(DAE_P).isEmpty() ||
+        output_fcn_.input(DAE_P).isempty() ||
         integrator_.input(INTEGRATOR_P).sparsity() == output_fcn_.input(DAE_P).sparsity(),
         "SimulatorInternal::init: output_fcn DAE_P argument must be empty or"
         << " have dimension " << integrator_.input(INTEGRATOR_P).dimString()
         << ", but got " << output_fcn_.input(DAE_P).dimString());
 
     casadi_assert_message(
-        output_fcn_.input(DAE_X).isEmpty() ||
+        output_fcn_.input(DAE_X).isempty() ||
         integrator_.input(INTEGRATOR_X0).sparsity() == output_fcn_.input(DAE_X).sparsity(),
         "SimulatorInternal::init: output_fcn DAE_X argument must be empty or have dimension "
         << integrator_.input(INTEGRATOR_X0).dimString()

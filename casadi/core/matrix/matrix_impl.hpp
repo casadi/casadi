@@ -779,7 +779,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::print(std::ostream &stream, bool trailing_newline) const {
-    if (isEmpty()) {
+    if (isempty()) {
       stream << "[]";
     } else if (numel()==1) {
       printScalar(stream, false);
