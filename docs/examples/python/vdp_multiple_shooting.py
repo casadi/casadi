@@ -105,8 +105,8 @@ for k in range(nk):
   
   # append continuity constraints
   g.append(Xk_next - Xk_end)
-  g_min.append(NP.zeros(Xk.size()))
-  g_max.append(NP.zeros(Xk.size()))
+  g_min.append(NP.zeros(Xk.nnz()))
+  g_max.append(NP.zeros(Xk.nnz()))
 
 # Objective function: L(T)
 f = X2[nk]

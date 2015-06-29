@@ -209,11 +209,11 @@ MayerTerm.init()
 # NLP setup
 # -----------------------------------------------------------------------------
 # Dimensions of the problem
-nx = xd.size() + xa.size()  # total number of states        #MODIF
-ndiff = xd.size()           # number of differential states #MODIF
-nalg = xa.size()            # number of algebraic states
-nu = u.size()               # number of controls
-NP  = p.size()              # number of parameters
+nx = xd.nnz() + xa.nnz()  # total number of states        #MODIF
+ndiff = xd.nnz()           # number of differential states #MODIF
+nalg = xa.nnz()            # number of algebraic states
+nu = u.nnz()               # number of controls
+NP  = p.nnz()              # number of parameters
 
 # Total number of variables
 NXD = nicp*nk*(deg+1)*ndiff # Collocated differential states

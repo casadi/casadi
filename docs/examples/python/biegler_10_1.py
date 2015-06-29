@@ -141,18 +141,18 @@ for N in range(1,11):
   solver.init()
 
   # Initial condition
-  xinit = x.size() * [0]
+  xinit = x.nnz() * [0]
   solver.setInput(xinit,"x0")
 
   # Bounds on x
-  lbx = x.size()*[-100]
-  ubx = x.size()*[100]
+  lbx = x.nnz()*[-100]
+  ubx = x.nnz()*[100]
   lbx[0] = ubx[0] = z0
   solver.setInput(lbx,"lbx")
   solver.setInput(ubx,"ubx")
   
   # Bounds on the constraints
-  lubg = g.size()*[0]
+  lubg = g.nnz()*[0]
   solver.setInput(lubg,"lbg")
   solver.setInput(lubg,"ubg")
   
