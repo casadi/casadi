@@ -277,7 +277,8 @@ namespace casadi {
         it!=output(QP_SOLVER_LAM_X).end(); ++it) *it = -*it;
 
     int solnstat = CPXgetstat(env_, lp_);
-    stringstream errormsg; // NOTE: Why not print directly to userOut() and userOut<true, PL_WARN>()?
+    stringstream errormsg;
+    // NOTE: Why not print directly to userOut() and userOut<true, PL_WARN>()?
     if (verbose()) {
       if (solnstat == CPX_STAT_OPTIMAL) {
         errormsg << "CPLEX: solution status: Optimal solution found.\n";
