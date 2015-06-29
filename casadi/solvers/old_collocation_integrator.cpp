@@ -364,15 +364,11 @@ namespace casadi {
     ifcn_out[1+INTEGRATOR_QF] = QF;
     ifcn_out[1+INTEGRATOR_RXF] = RX[0][0];
     ifcn_out[1+INTEGRATOR_RQF] = RQF;
-    Function ifcn = MXFunction(ifcn_in, ifcn_out);
     std::stringstream ss_ifcn;
     ss_ifcn << "collocation_implicit_residual_" << getOption("name");
-    ifcn.setOption("name", ss_ifcn.str());
-    ifcn.init();
+    Function ifcn = MXFunction(ss_ifcn.str(), ifcn_in, ifcn_out);
     if (expand_f) {
       ifcn = SXFunction(shared_cast<MXFunction>(ifcn));
-      ifcn.setOption("name", ss_ifcn.str());
-      ifcn.init();
     }
 
     // Get the root-finding solver creator function

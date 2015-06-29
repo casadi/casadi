@@ -95,10 +95,8 @@ namespace casadi {
 
     MX P = reshape(Pf, n_, n_);
 
-    f_ = MXFunction(dleIn("a", As, "v", Vs),
-      dleOut("p", MX(P(output().sparsity()))));
-
-    f_.init();
+    f_ = MXFunction(name_, dleIn("a", As, "v", Vs),
+                    dleOut("p", MX(P(output().sparsity()))));
 
     casadi_assert(nOut()==f_.nOut());
     for (int i=0;i<nIn();++i) {

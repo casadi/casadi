@@ -1378,8 +1378,7 @@ namespace casadi {
   }
 
   int MX::zz_countNodes() const {
-    MXFunction f(vector<MX>(), make_vector(*this));
-    f.init();
+    MXFunction f("tmp", vector<MX>(), make_vector(*this));
     return f.countNodes();
   }
 
@@ -1427,8 +1426,7 @@ namespace casadi {
     f_out.insert(f_out.end(), ex.begin(), ex.end());
 
     // Write the mapping function
-    MXFunction f(f_in, f_out);
-    f.init();
+    MXFunction f("mapping", f_in, f_out);
 
     // Get references to the internal data structures
     std::vector<MXAlgEl>& algorithm = f->algorithm_;
@@ -1494,8 +1492,7 @@ namespace casadi {
     if (all_equal) return ex;
 
     // Otherwise, evaluate symbolically
-    MXFunction F(v, ex);
-    F.init();
+    MXFunction F("tmp", v, ex);
     return F(vdef, true);
   }
 
@@ -1511,8 +1508,7 @@ namespace casadi {
                           << expr.size() << " <-> " << exprs.size() << ".");
 
     // Sort the expression
-    MXFunction f(vector<MX>(), ex);
-    f.init();
+    MXFunction f("tmp", vector<MX>(), ex);
 
     // Get references to the internal data structures
     const vector<MXAlgEl>& algorithm = f->algorithm_;
@@ -1614,8 +1610,7 @@ namespace casadi {
                             const std::string& v_prefix, const std::string& v_suffix) {
 
     // Sort the expression
-    MXFunction f(vector<MX>(), ex);
-    f.init();
+    MXFunction f("tmp", vector<MX>(), ex);
 
     // Get references to the internal data structures
     const vector<MXAlgEl>& algorithm = f->algorithm_;
@@ -1739,23 +1734,17 @@ namespace casadi {
   }
 
   MX MX::zz_jacobian(const MX &arg) const {
-    MXFunction temp(make_vector(arg), make_vector(*this)); // make a runtime
-    temp.setOption("name", "helper_jacobian_MX");
-    temp.init();
+    MXFunction temp("helper_jacobian_MX", make_vector(arg), make_vector(*this));
     return temp.jac();
   }
 
   MX MX::zz_gradient(const MX &arg) const {
-    MXFunction temp(make_vector(arg), make_vector(*this)); // make a runtime
-    temp.setOption("name", "helper_gradient_MX");
-    temp.init();
+    MXFunction temp("helper_gradient_MX", make_vector(arg), make_vector(*this));
     return temp.grad();
   }
 
   MX MX::zz_tangent(const MX &arg) const {
-    MXFunction temp(make_vector(arg), make_vector(*this)); // make a runtime
-    temp.setOption("name", "helper_tangent_MX");
-    temp.init();
+    MXFunction temp("helper_tangent_MX", make_vector(arg), make_vector(*this));
     return temp.tang();
   }
 
@@ -1804,8 +1793,7 @@ namespace casadi {
     std::vector<MX> v = symvar(veccat(ret));
 
     // Construct an MXFunction with it
-    MXFunction f(v, ret);
-    f.init();
+    MXFunction f("tmp", v, ret);
 
     // Expand to SXFunction
     SXFunction s = f.expand();
@@ -1854,8 +1842,7 @@ namespace casadi {
     if (nnz()==0) return false;
 
     // Construct a temporary algorithm
-    MXFunction temp(make_vector(arg), make_vector(*this));
-    temp.init();
+    MXFunction temp("tmp", make_vector(arg), make_vector(*this));
     temp.spInit(true);
 
     bvec_t* input_ =  get_bvec_t(temp.input().data());

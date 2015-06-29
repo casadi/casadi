@@ -119,9 +119,8 @@ namespace casadi {
     }
 
 
-    f_ = MXFunction(lrdpleIn("a", As, "v", Vs, "c", Cs, "h", Hs),
+    f_ = MXFunction(name_, lrdpleIn("a", As, "v", Vs, "c", Cs, "h", Hs),
                     lrdpleOut("y", horzcat(HPH)));
-    f_.init();
 
     Wrapper<LrDpleToDple>::checkDimensions();
   }

@@ -96,9 +96,8 @@ namespace casadi {
       HPH[k] = mul(Hs[k].T(), mul(P, Hs[k]));
     }
 
-    f_ = MXFunction(lrdpleIn("a", A, "v", V, "c", C, "h", H),
+    f_ = MXFunction(name_, lrdpleIn("a", A, "v", V, "c", C, "h", H),
                     lrdleOut("y", diagcat(HPH)));
-    f_.init();
 
     Wrapper<LrDleToDle>::checkDimensions();
 

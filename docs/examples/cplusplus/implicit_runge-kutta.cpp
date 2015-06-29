@@ -147,8 +147,7 @@ int main(){
   
   // Get the discrete time dynamics
   vector<MX> F_arg = make_vector(X0, P);
-  MXFunction F(F_arg, make_vector(XF));
-  F.init();
+  MXFunction F("F", F_arg, make_vector(XF));
 
   // Do this iteratively for all finite elements
   for(int i=0; i<n; ++i){
@@ -156,15 +155,11 @@ int main(){
   }
 
   // Fixed-step integrator
-  MXFunction irk_integrator(integratorIn("x0",X0,"p",P),integratorOut("xf",F_arg[0]));
-  irk_integrator.setOption("name","irk_integrator");
-  irk_integrator.init();
+  MXFunction irk_integrator("irk_integrator", integratorIn("x0",X0,"p",P),
+                            integratorOut("xf",F_arg[0]));
 
   // Create a convensional integrator for reference
-  Integrator ref_integrator("cvodes", f);
-  ref_integrator.setOption("name","ref_integrator");
-  ref_integrator.setOption("tf",tf);
-  ref_integrator.init();
+  Integrator ref_integrator("ref_integrator", "cvodes", f, make_dict("tf", tf));
 
   // Test values
   double x0_val[] = {0,1,0};

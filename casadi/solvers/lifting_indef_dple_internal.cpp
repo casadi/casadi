@@ -140,8 +140,7 @@ namespace casadi {
       Ps = reverse(Ps);
     }
 
-    f_ = MXFunction(dpleIn("a", As, "v", Vs), dpleOut("p", horzcat(Ps)));
-    f_.init();
+    f_ = MXFunction(name_, dpleIn("a", As, "v", Vs), dpleOut("p", horzcat(Ps)));
 
     Wrapper<LiftingIndefDpleInternal>::checkDimensions();
 

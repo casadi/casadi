@@ -80,15 +80,14 @@ int main(){
   bool expand = true;
 
   // NLP function
-  Function nlp = MXFunction(nlpIn("x",x),nlpOut("f",f,"g",g));
-  nlp.init();
+  Function nlp = MXFunction("nlp", nlpIn("x", x),nlpOut("f", f, "g", g));
 
   // Gradient of the objective
-  Function grad_f = nlp.gradient("x","f");
+  Function grad_f = nlp.gradient("x", "f");
   grad_f.init();
 
   // Jacobian of the constraints
-  Function jac_g = nlp.jacobian("x","g");
+  Function jac_g = nlp.jacobian("x", "g");
   jac_g.init();
 
   // Hessian of the lagrangian

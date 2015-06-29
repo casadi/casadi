@@ -293,12 +293,10 @@ namespace casadi {
     vector<MX> arg = symbolicInput();
     vector<MX> res = shared_from_this<Function>()(arg);
 
-    MXFunction f = MXFunction(arg, res);
-    f.setOption("name", "wrap_" + string(getOption("name")));
-    f.setOption("input_scheme", ischeme_);
-    f.setOption("output_scheme", oscheme_);
-    f.setOption("ad_weight", adWeight());
-    f.setOption("ad_weight_sp", adWeightSp());
+    Dict opts = make_dict("input_scheme", ischeme_,
+                          "output_scheme", oscheme_,
+                          "ad_weight", adWeight(),
+                          "ad_weight_sp", adWeightSp());
     for (int i=0; i<3; ++i) {
       string n;
       switch (i) {
@@ -306,9 +304,9 @@ namespace casadi {
       case 1: n="custom_reverse"; break;
       case 2: n="full_jacobian"; break;
       }
-      if (hasSetOption(n)) f.setOption(n, getOption(n));
+      if (hasSetOption(n)) opts[n] = getOption(n);
     }
-    return f;
+    return MXFunction("wrap_" + name_, arg, res, opts);
   }
 
   Function FunctionInternal::getHessian(int iind, int oind) {
@@ -1920,9 +1918,8 @@ namespace casadi {
     // Form Jacobian
     MX J;
     {
-      MXFunction tmp(make_vector(arg), make_vector(res));
-      tmp.setOption("ad_weight", adWeight());
-      tmp.init();
+      MXFunction tmp("tmp", make_vector(arg), make_vector(res),
+                     make_dict("ad_weight", adWeight()));
       J = tmp.jac();
     }
 

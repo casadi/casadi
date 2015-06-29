@@ -86,6 +86,7 @@ namespace casadi {
                const Dict& opts=Dict());
 #endif // USE_CXX11
 #endif // SWIG
+    //#ifdef WITH_LEGACY_CONSTRUCTORS
     /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
     MXFunction(const std::vector<MX>& arg,
                const std::vector<MX>& res);
@@ -101,6 +102,7 @@ namespace casadi {
     /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
     MXFunction(const std::pair< MXDict, std::vector<std::string> >& arg,
                const std::pair< MXDict, std::vector<std::string> >& res);
+    //#endif // WITH_LEGACY_CONSTRUCTORS
 
     /// \cond INTERNAL
     /** \brief  Access functions of the node */

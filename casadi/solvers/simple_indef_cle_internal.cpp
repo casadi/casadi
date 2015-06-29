@@ -94,13 +94,10 @@ namespace casadi {
     std::vector<MX> v_in;
     v_in.push_back(As);
     v_in.push_back(Vs);
-    f_ = MXFunction(v_in, make_vector(reshape(Pf, n_, n_)));
-    f_.setOption("input_scheme", IOScheme(SCHEME_CLEInput));
-    f_.setOption("output_scheme", IOScheme(SCHEME_CLEOutput));
-    f_.init();
+    f_ = MXFunction(name_, v_in, make_vector(reshape(Pf, n_, n_)),
+                    make_dict("input_scheme", IOScheme(SCHEME_CLEInput),
+                              "output_scheme", IOScheme(SCHEME_CLEOutput)));
   }
-
-
 
   void SimpleIndefCleInternal::evaluate() {
     for (int i=0;i<nIn();++i) {

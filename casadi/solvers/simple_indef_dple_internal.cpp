@@ -115,8 +115,7 @@ namespace casadi {
 
     P = P(output(DPLE_P).sparsity());
 
-    f_ = MXFunction(dpleIn("a", As, "v", Vs), dpleOut("p", P));
-    f_.init();
+    f_ = MXFunction(name_, dpleIn("a", As, "v", Vs), dpleOut("p", P));
 
     Wrapper<SimpleIndefDpleInternal>::checkDimensions();
   }

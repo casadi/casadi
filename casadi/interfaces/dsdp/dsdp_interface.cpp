@@ -184,8 +184,7 @@ namespace casadi {
       MX lba = horzcat(fmax(fmin(LBA, dsdp_inf), -dsdp_inf), A).T();
       MX uba = horzcat(fmax(fmin(UBA, dsdp_inf), -dsdp_inf), A).T();
 
-      mappingA_ = MXFunction(syms, make_vector(horzcat(-lba, uba).T()));
-      mappingA_.init();
+      mappingA_ = MXFunction("mappingA", syms, make_vector(horzcat(-lba, uba).T()));
     }
 
     if (calc_dual_) {

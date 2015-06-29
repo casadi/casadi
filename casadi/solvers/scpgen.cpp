@@ -162,9 +162,10 @@ namespace casadi {
     if (fg.isNull()) {
       vector<MX> nlp_in = nlp_.symbolicInput();
       vector<MX> nlp_out = nlp_(nlp_in);
-      fg = MXFunction(nlp_in, nlp_out);
+      fg = MXFunction("fg", nlp_in, nlp_out);
+    } else {
+      fg.init();
     }
-    fg.init();
 
     if (codegen_) {
 #ifdef WITH_DL
@@ -180,8 +181,6 @@ namespace casadi {
     // Generate lifting functions
     MXFunction vdef_fcn, vinit_fcn;
     fg.generateLiftingFunctions(vdef_fcn, vinit_fcn);
-    vdef_fcn.init();
-    vinit_fcn.init();
     vinit_fcn_ = vinit_fcn;
 
     // Extract the expressions
@@ -328,8 +327,7 @@ namespace casadi {
     }
 
     // Generate function
-    MXFunction res_fcn(res_fcn_in, res_fcn_out);
-    res_fcn.init();
+    MXFunction res_fcn("res", res_fcn_in, res_fcn_out);
     if (verbose_) {
       userOut() << "Generated residual function ( " << res_fcn.countNodes() << " nodes)." << endl;
     }
@@ -419,8 +417,7 @@ namespace casadi {
     mfcn_out.push_back(gL_z);                            mod_gl_ = n++;
 
     // Lagrangian gradient function
-    MXFunction lgrad(mfcn_in, mfcn_out);
-    lgrad.init();
+    MXFunction lgrad("lgrad", mfcn_in, mfcn_out);
 
     // Jacobian of the constraints
     MX jac = lgrad.jac(mod_x_, mod_g_);
@@ -439,8 +436,7 @@ namespace casadi {
     vector<MX> mat_out;
     mat_out.push_back(jac);                             mat_jac_ = n++;
     mat_out.push_back(hes);                             mat_hes_ = n++;
-    MXFunction mat_fcn(mfcn_in, mat_out);
-    mat_fcn.init();
+    MXFunction mat_fcn("mfcn", mfcn_in, mat_out);
 
     // Definition of intermediate variables
     n = mfcn_out.size();
@@ -452,8 +448,7 @@ namespace casadi {
     }
 
     // Modifier function
-    MXFunction mfcn(mfcn_in, mfcn_out);
-    mfcn.init();
+    MXFunction mfcn("mfcn", mfcn_in, mfcn_out);
 
     // Directional derivative of Z
     vector<vector<MX> > mfcn_fwdSeed(1, mfcn_in), mfcn_fwdSens(1, mfcn_out);
@@ -485,9 +480,7 @@ namespace casadi {
     vec_fcn_out.push_back(b_g);                               vec_g_ = n++;
     casadi_assert(n==vec_fcn_out.size());
 
-    MXFunction vec_fcn(mfcn_in, vec_fcn_out);
-    vec_fcn.setOption("name", "vec_fcn");
-    vec_fcn.init();
+    MXFunction vec_fcn("vec_fcn", mfcn_in, vec_fcn_out);
     if (verbose_) {
       userOut() << "Generated linearization function ( " << vec_fcn.countNodes()
            << " nodes)." << endl;
@@ -537,9 +530,7 @@ namespace casadi {
     }
 
     // Step expansion function
-    MXFunction exp_fcn(mfcn_in, exp_fcn_out);
-    exp_fcn.setOption("name", "exp_fcn");
-    exp_fcn.init();
+    MXFunction exp_fcn("exp_fcn", mfcn_in, exp_fcn_out);
     if (verbose_) {
       userOut() << "Generated step expansion function ( " << exp_fcn.countNodes() << " nodes)."
            << endl;

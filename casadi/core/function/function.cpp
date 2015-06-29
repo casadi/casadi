@@ -334,13 +334,9 @@ namespace casadi {
       ret_out.insert(ret_out.end(), res.begin(), res.end());
     }
 
-    // Construct return function
-    MXFunction ret(ret_in, ret_out);
-
-    // Give it a suitable name
+    // Name of return function
     stringstream ss;
     ss << "derivative_" << getOption("name") << "_" << nfwd << "_" << nadj;
-    ret.setOption("name", ss.str());
 
     // Names of inputs
     std::vector<std::string> i_names;
@@ -371,9 +367,6 @@ namespace casadi {
       }
     }
 
-    // Pass to return object
-    ret.setOption("input_scheme", i_names);
-
     // Names of outputs
     std::vector<std::string> o_names;
     o_names.reserve(nOut()*(1+nfwd)+nIn()*nadj);
@@ -401,11 +394,9 @@ namespace casadi {
       }
     }
 
-    // Pass to return object
-    ret.setOption("output_scheme", o_names);
-
-    // Initialize it
-    ret.init();
+    // Construct return function
+    MXFunction ret(ss.str(), ret_in, ret_out,
+                   make_dict("input_scheme", i_names, "output_scheme", o_names));
 
     // Consistency check for inputs
     int ind=0;

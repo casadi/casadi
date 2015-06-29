@@ -597,9 +597,8 @@ namespace casadi {
     if (this->d.empty()) return;
 
     // Find out which intermediates depends on which other
-    MXFunction f(make_vector(vertcat(this->d)),
+    MXFunction f("tmp", make_vector(vertcat(this->d)),
                  make_vector(vertcat(this->d) - vertcat(this->ddef)));
-    f.init();
     Sparsity sp = f.jacSparsity();
     casadi_assert(sp.isSquare());
 
@@ -738,8 +737,7 @@ namespace casadi {
     if (this->x.empty()) return;
 
     // Find out which differential equation depends on which differential state
-    MXFunction f(make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
-    f.init();
+    MXFunction f("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
     Sparsity sp = f.jacSparsity();
     casadi_assert(sp.isSquare());
 
@@ -767,8 +765,7 @@ namespace casadi {
     if (this->z.empty()) return;
 
     // Find out which algebraic equation depends on which algebraic state
-    MXFunction f(make_vector(vertcat(this->z)), make_vector(vertcat(this->alg)));
-    f.init();
+    MXFunction f("tmp", make_vector(vertcat(this->z)), make_vector(vertcat(this->alg)));
     Sparsity sp = f.jacSparsity();
     casadi_assert(sp.isSquare());
 
@@ -800,8 +797,7 @@ namespace casadi {
     if (this->s.empty()) return;
 
     // Write the ODE as a function of the state derivatives
-    MXFunction f(make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
-    f.init();
+    MXFunction f("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
 
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
@@ -828,8 +824,7 @@ namespace casadi {
     this->sdot = sdotnew;
 
     // Now write the sorted ODE as a function of the state derivatives
-    f = MXFunction(make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
-    f.init();
+    f = MXFunction("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
 
     // Get the Jacobian
     MX J = f.jac();
@@ -1980,12 +1975,8 @@ namespace casadi {
     }
 
     // Generate the constructed function
-    MXFunction ret(ret_in, ret_out);
-    ret.setOption("name", fname);
-    ret.setOption("input_scheme", s_in);
-    ret.setOption("output_scheme", s_out);
-    ret.init();
-    return ret;
+    return MXFunction(fname, ret_in, ret_out,
+                      make_dict("input_scheme", s_in, "output_scheme", s_out));
   }
 
 } // namespace casadi

@@ -1334,14 +1334,12 @@ namespace casadi {
     f_in.insert(f_in.end(), y.begin(), y.end());
     vector<MX> f_out = f_G;
     f_out.insert(f_out.end(), g.begin(), g.end());
-    vdef_fcn = MXFunction(f_in, f_out);
-    vdef_fcn.setOption("name", "lifting_variable_definition");
+    vdef_fcn = MXFunction("lifting_variable_definition", f_in, f_out);
 
     // Initial guess of intermediate variables
     f_in = inputv_;
     f_out = x_init;
-    vinit_fcn = MXFunction(f_in, f_out);
-    vinit_fcn.setOption("name", "lifting_variable_guess");
+    vinit_fcn = MXFunction("lifting_variable_guess", f_in, f_out);
   }
 
 } // namespace casadi

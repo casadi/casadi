@@ -134,7 +134,7 @@ namespace casadi {
     MX nlp_g = f_(args_call).at(iout_);
 
     // We're going to use two-argument objective and constraints to allow the use of parameters
-    MXFunction nlp(nlpIn("x", u, "p", p), nlpOut("f", nlp_f, "g", nlp_g));
+    MXFunction nlp("nlp", nlpIn("x", u, "p", p), nlpOut("f", nlp_f, "g", nlp_g));
 
     // Create an NlpSolver instance
     solver_ = NlpSolver(getOption(solvername()), nlp);

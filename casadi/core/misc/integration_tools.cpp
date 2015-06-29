@@ -197,12 +197,9 @@ namespace casadi {
     ret_in[0] = x0;
     ret_in[1] = p;
     ret_in[2] = h;
-    MXFunction ret(ret_in, make_vector(xf));
-    ret.setOption("name", "F");
-    ret.setOption("input_scheme", IOScheme("x0", "p", "h"));
-    ret.setOption("output_scheme", IOScheme("xf"));
-    ret.init();
-    return ret;
+    return MXFunction("F", ret_in, make_vector(xf),
+                      make_dict("input_scheme", IOScheme("x0", "p", "h"),
+                                "output_scheme", IOScheme("xf")));
   }
 
   void collocationInterpolators(const std::vector<double> & tau_root,
@@ -321,12 +318,9 @@ namespace casadi {
     }
 
     // Form discrete-time dynamics
-    MXFunction ret(make_vector(x0, p, h), make_vector(xf));
-    ret.setOption("name", "F");
-    ret.setOption("input_scheme", IOScheme("x0", "p", "h"));
-    ret.setOption("output_scheme", IOScheme("xf"));
-    ret.init();
-    return ret;
+    return MXFunction("F", make_vector(x0, p, h), make_vector(xf),
+                      make_dict("input_scheme", IOScheme("x0", "p", "h"),
+                                "output_scheme", IOScheme("xf")));
   }
 
   MXFunction simpleIntegrator(Function f, const std::string& integrator,
@@ -356,7 +350,7 @@ namespace casadi {
     xdot *= h;
 
     // Form DAE function
-    MXFunction dae(daeIn("x", x, "p", u), daeOut("ode", xdot));
+    MXFunction dae("dae", daeIn("x", x, "p", u), daeOut("ode", xdot));
 
     // Create integrator function
     Integrator ifcn(integrator, dae);
@@ -375,12 +369,9 @@ namespace casadi {
     MX xf = ifcn(make_map("x0", x0, "p", vertcat(h, vec(p)))).at("xf");
 
     // Form discrete-time dynamics
-    MXFunction ret(make_vector(x0, p, h), make_vector(xf));
-    ret.setOption("name", "F");
-    ret.setOption("input_scheme", IOScheme("x0", "p", "h"));
-    ret.setOption("output_scheme", IOScheme("xf"));
-    ret.init();
-    return ret;
+    return MXFunction("F", make_vector(x0, p, h), make_vector(xf),
+                      make_dict("input_scheme", IOScheme("x0", "p", "h"),
+                                "output_scheme", IOScheme("xf")));
   }
 
 } // namespace casadi

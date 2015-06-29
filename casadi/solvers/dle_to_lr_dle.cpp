@@ -82,9 +82,7 @@ namespace casadi {
 
     MX P = solver_(make_map("a", A, "v", V)).at("y");
 
-    f_ = MXFunction(dleIn("a", A, "v", V),
-                    dleOut("p", P));
-    f_.init();
+    f_ = MXFunction(name_, dleIn("a", A, "v", V), dleOut("p", P));
 
     Wrapper<DleToLrDle>::checkDimensions();
 

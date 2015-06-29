@@ -86,7 +86,7 @@ namespace casadi {
     MX x = MX::sym("x", hnlp_.input(HNL_X).nnz());
 
     map<string, MX> v = hnlp_(make_map("x", x, "p", p_tau[0], "tau", p_tau[1]));
-    MXFunction nlp(nlpIn("x", x, "p", P),
+    MXFunction nlp("nlp", nlpIn("x", x, "p", P),
                    nlpOut("f", v["f"], "g", v["g"]));
 
     // Create an nlpsolver instance
@@ -96,9 +96,6 @@ namespace casadi {
     if (hasSetOption("nlp_solver_options")) {
       nlpsolver_.setOption(getOption("nlp_solver_options"));
     }
-
-    // Initialize the NLP solver
-    nlpsolver_.init();
 
     num_steps_ = getOption("num_steps");
 

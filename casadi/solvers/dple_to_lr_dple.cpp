@@ -94,8 +94,7 @@ namespace casadi {
 
     MX P = solver_(make_map("a", A, "v", V, "c", repmat(C, 1, K), "h", repmat(H, 1, K))).at("y");
 
-    f_ = MXFunction(dpleIn("a", A, "v", V), dpleOut("p", P));
-    f_.init();
+    f_ = MXFunction(name_, dpleIn("a", A, "v", V), dpleOut("p", P));
 
     Wrapper<DpleToLrDple>::checkDimensions();
   }

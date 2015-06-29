@@ -166,8 +166,7 @@ namespace casadi {
     syms.push_back(E);
     syms.push_back(F);
 
-    mapping_ = MXFunction(syms, out);
-    mapping_.init();
+    mapping_ = MXFunction("mapping", syms, out);
 
     log("SocpToSdp::init", "Created mapping function");
 

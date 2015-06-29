@@ -93,8 +93,7 @@ namespace casadi {
       }
     }
 
-    f_ = MXFunction(dleIn("a", As, "v", Vs), dleOut("p", P));
-    f_.init();
+    f_ = MXFunction(name_, dleIn("a", As, "v", Vs), dleOut("p", P));
 
     Wrapper<FixedSmithDleInternal>::checkDimensions();
 

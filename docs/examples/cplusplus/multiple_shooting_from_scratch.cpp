@@ -156,7 +156,7 @@ int main(){
   }
   
   // NLP 
-  MXFunction nlp(nlpIn("x",V),nlpOut("f",J,"g",vertcat(g)));
+  MXFunction nlp("nlp", nlpIn("x", V), nlpOut("f", J, "g", vertcat(g)));
   
   // Create an NLP solver instance
   NlpSolver nlp_solver("ipopt", nlp);

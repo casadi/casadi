@@ -83,8 +83,7 @@ int main(int argc, char *argv[])
   MX A = MX::sym("A",spA);
   MX B = MX::sym("B",ncol,1);
   MX X = linear_solver.solve(A,B,tr);
-  MXFunction F(linsolIn("A",A,"B",B),linsolOut("X",X));
-  F.init();
+  MXFunction F("F", linsolIn("A", A, "B", B), linsolOut("X", X));
 
   // Solve
   F.setInputNZ(val,"A");

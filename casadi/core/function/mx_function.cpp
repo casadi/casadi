@@ -48,6 +48,7 @@ namespace casadi {
     assignNode(temp->clone());
   }
 
+  //#ifdef WITH_LEGACY_CONSTRUCTORS
   MXFunction::MXFunction(const std::vector<MX>& arg, const std::vector<MX>& res) {
     assignNode(new MXFunctionInternal(arg, res));
   }
@@ -70,6 +71,7 @@ namespace casadi {
     setOption("input_scheme", arg.second);
     setOption("output_scheme", res.second);
   }
+  //#endif // WITH_LEGACY_CONSTRUCTORS
 
   void MXFunction::construct(const std::string& name,
                              const std::vector<MX>& arg,

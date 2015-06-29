@@ -98,17 +98,12 @@ int main(){
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  MXFunction nlp(nlpIn("x",U),nlpOut("f",F,"g",G));
+  MXFunction nlp("nlp", nlpIn("x",U),nlpOut("f",F,"g",G));
 
   // Allocate an NLP solver
-  NlpSolver solver("ipopt", nlp);
-  
-  // Set options
-  solver.setOption("tol",1e-10);
-  solver.setOption("hessian_approximation","limited-memory");
-
-  // initialize the solver
-  solver.init();
+  Dict opts = make_dict("tol", 1e-10,
+                        "hessian_approximation","limited-memory");
+  NlpSolver solver("solver", "ipopt", nlp, opts);
 
   // Bounds on u and initial condition
   vector<double> Umin(nu), Umax(nu), Usol(nu);

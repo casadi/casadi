@@ -197,8 +197,7 @@ namespace casadi {
     F_out[DAE_ODE] = xf;
     F_out[DAE_ALG] = vertcat(eq);
     F_out[DAE_QUAD] = qf;
-    F_ = MXFunction(F_in, F_out);
-    F_.init();
+    F_ = MXFunction("dae", F_in, F_out);
 
     // Backwards dynamics
     // NOTE: The following is derived so that it will give the exact adjoint
@@ -282,8 +281,7 @@ namespace casadi {
       G_out[RDAE_ODE] = rxf;
       G_out[RDAE_ALG] = vertcat(eq);
       G_out[RDAE_QUAD] = rqf;
-      G_ = MXFunction(G_in, G_out);
-      G_.init();
+      G_ = MXFunction("rdae", G_in, G_out);
     }
   }
 
