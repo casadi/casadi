@@ -244,21 +244,21 @@ namespace casadi {
     // A-matrix: [-ei Gi -Alba' Auba' -Ilbx Iubx]
     int begin_colind;
     int end_colind;
-    dual_A_data_.resize(primal_E.size()+primal_G.size());
-    dual_A_row_.resize(primal_E.size()+primal_G.size());
+    dual_A_data_.resize(primal_E.nnz()+primal_G.nnz());
+    dual_A_row_.resize(primal_E.nnz()+primal_G.nnz());
     dual_A_colind_.resize(m_+N_+1);
 
     // TODO(jgillis): replace T()-call by casadi_trans()
     DMatrix primal_A_T = primal_A.T();
     const Sparsity& primal_A_T_sparse = primal_A_T.sparsity();
     start_idx = 0;
-    end_idx = primal_E.size();
+    end_idx = primal_E.nnz();
     std::copy(primal_E.data().begin(), primal_E.data().end(), dual_A_data_.begin()+start_idx);
     std::transform(
       primal_E.data().begin(), primal_E.data().end(),
       dual_A_data_.begin()+start_idx, std::negate<double>());
     start_idx = end_idx;
-    end_idx += primal_G.size();
+    end_idx += primal_G.nnz();
     std::copy(primal_G.data().begin(), primal_G.data().end(), dual_A_data_.begin()+start_idx);
     for (int k=0;k<primal_idx_lba_.size();++k) {
       int i = primal_idx_lba_[k];

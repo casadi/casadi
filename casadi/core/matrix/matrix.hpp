@@ -147,7 +147,6 @@ namespace casadi {
     typedef GenericMatrix<Matrix<DataType> > B;
 
     /// Expose base class functions
-    using B::size;
     using B::nnz;
     using B::sizeL;
     using B::sizeU;

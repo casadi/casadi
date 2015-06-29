@@ -2429,7 +2429,6 @@ except:
 %rename(mrdivide) __mrdivide__;
 %rename(mldivide) __mldivide__;
 %rename(transpose) T;
-%ignore size;
 %rename(size) shape;
 %feature("varargin","1") zz_vertcat;
 %feature("varargin","1") zz_horzcat;

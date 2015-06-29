@@ -279,11 +279,6 @@ namespace casadi {
         \see numel() */
     int nnz() const;
 
-    /** \brief DEPRECATED: Alias for nnz
-        \see nnz()
-    */
-    int size() const { return nnz();}
-
     /** \brief Number of non-zeros in the upper triangular half,
      * i.e. the number of elements (i, j) with j>=i */
     int sizeU() const;

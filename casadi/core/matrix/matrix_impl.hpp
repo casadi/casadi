@@ -1571,10 +1571,10 @@ namespace casadi {
                                              const std::vector<int>& col,
                                              const Matrix<DataType>& d,
                                              int nrow, int ncol) {
-    casadi_assert_message(col.size()==row.size() && col.size()==d.size(),
+    casadi_assert_message(col.size()==row.size() && col.size()==d.nnz(),
                           "Argument error in Matrix<DataType>::triplet(row, col, d): "
                           "supplied lists must all be of equal length, but got: "
-                          << row.size() << ", " << col.size()  << " and " << d.size());
+                          << row.size() << ", " << col.size()  << " and " << d.nnz());
     std::vector<int> mapping;
     Sparsity sp = Sparsity::triplet(nrow, ncol, row, col, mapping);
     return Matrix<DataType>(sp, d[mapping]);
@@ -2095,7 +2095,7 @@ namespace casadi {
     for (typename std::vector<Matrix<DataType> >::const_iterator j=v.begin();
          j!=v.end(); ++j) {
       std::copy(j->begin(), j->end(), i);
-      i += j->size();
+      i += j->nnz();
     }
     return ret;
   }
@@ -2180,7 +2180,7 @@ namespace casadi {
       return inner_prod(project(*this, sp), project(y, sp));
     }
     Matrix<DataType> ret(0);
-    for (int k=0; k<size(); ++k) {
+    for (int k=0; k<nnz(); ++k) {
       ret.at(0) += at(k) * y.at(k);
     }
     return ret;
