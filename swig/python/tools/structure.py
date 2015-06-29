@@ -1363,7 +1363,7 @@ class DataReference:
   
 class DataReferenceRepeated(DataReference):
   def __init__(self,a,n):
-    assert(a.isDense())
+    assert(a.isdense())
     self.a = a
     self.n = n
     self.v = a.reshape((n*a.size1(),1))
@@ -1378,7 +1378,7 @@ class DataReferenceRepeated(DataReference):
 
 class DataReferenceSquared(DataReference):
   def __init__(self,a,n):
-    assert(a.isDense())
+    assert(a.isdense())
     self.a = a
     self.v = a
     self.n = n
@@ -1395,7 +1395,7 @@ class DataReferenceSquared(DataReference):
     
 class DataReferenceProduct(DataReference):
   def __init__(self,a,n,m):
-    assert(a.isDense())
+    assert(a.isdense())
     self.a = a
     self.v = a
     self.n = n
@@ -1419,7 +1419,7 @@ class DataReferenceProduct(DataReference):
 
 class DataReferenceSquaredRepeated(DataReference):
   def __init__(self,a,n,N):
-    assert(a.isDense())
+    assert(a.isdense())
     self.a = a
     self.n = n
     self.N = N

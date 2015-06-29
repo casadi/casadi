@@ -185,7 +185,7 @@ namespace casadi {
     casadi_assert_message(cc>=0 && cc<size2(), "Column index out of bounds");
 
     // Quick return if matrix is dense
-    if (isDense()) return rr+cc*size1();
+    if (isdense()) return rr+cc*size1();
 
     // Quick return if we are adding an element to the end
     if (colind(cc)==nnz() || (colind(cc+1)==nnz() && row(nnz()-1)<rr)) {
@@ -247,8 +247,8 @@ namespace casadi {
     return (*this)->isscalar(scalar_and_dense);
   }
 
-  bool Sparsity::isDense() const {
-    return (*this)->isDense();
+  bool Sparsity::isdense() const {
+    return (*this)->isdense();
   }
 
   bool Sparsity::isDiagonal() const {

@@ -50,7 +50,7 @@ namespace casadi {
     // Print shape
     if (isempty()) {
       // Print nothing, shape clear anyway
-    } else if (isDense()) {
+    } else if (isdense()) {
       stream << ", dense";
     } else if (isDiagonal()) {
       stream << ", diagonal";
@@ -1901,7 +1901,7 @@ namespace casadi {
     int d2 = y.size2();
 
     // Quick return if both are dense
-    if (isDense() && y.isDense()) {
+    if (isdense() && y.isdense()) {
       return !isempty() && !y.isempty() ? Sparsity::dense(d1, d2) :
         Sparsity(d1, d2);
     }
@@ -1951,7 +1951,7 @@ namespace casadi {
     return size2()==1 && size1()==1 && (!scalar_and_dense || nnz()==1);
   }
 
-  bool SparsityInternal::isDense() const {
+  bool SparsityInternal::isdense() const {
     return nnz() == numel();
   }
 
@@ -2592,7 +2592,7 @@ namespace casadi {
   Sparsity SparsityInternal::patternInverse() const {
     // Quick return clauses
     if (isempty()) return Sparsity::dense(size1(), size2());
-    if (isDense()) return Sparsity(size1(), size2());
+    if (isdense()) return Sparsity(size1(), size2());
 
     // Sparsity of the result
     std::vector<int> row_ret;
@@ -2805,7 +2805,7 @@ namespace casadi {
                           << " out of bounds [0, " << size2() << ")");
 
     // Quick return if matrix is dense
-    if (isDense()) return rr+cc*size1();
+    if (isdense()) return rr+cc*size1();
 
     // Quick return if past the end
     if (colind[cc]==nnz() || (colind[cc+1]==nnz() && row[nnz()-1]<rr)) return -1;
@@ -3596,7 +3596,7 @@ namespace casadi {
       return false;
 
     // Quick return if empty interior or dense
-    if (nnz()==0 || isDense())
+    if (nnz()==0 || isdense())
       return true;
 
     // Run algorithm on the pattern with the least number of rows
@@ -3644,7 +3644,7 @@ namespace casadi {
     if (numel()!=y.numel() || nnz()!=y.nnz()) return false;
 
     // Quick return if empty interior or dense
-    if (nnz()==0 || isDense()) return true;
+    if (nnz()==0 || isdense()) return true;
 
     // Get Pattern
     const int* colind = this->colind();

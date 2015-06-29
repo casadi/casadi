@@ -43,7 +43,7 @@ namespace casadi {
   }
 
   std::string Project::print(const std::vector<std::string>& arg) const {
-    if (sparsity().isDense()) {
+    if (sparsity().isdense()) {
       return "dense(" + arg.at(0) + ")";
     } else {
       return "project(" + arg.at(0) + ")";

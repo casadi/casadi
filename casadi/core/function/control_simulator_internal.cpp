@@ -43,7 +43,7 @@ namespace casadi {
     control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(grid.data()) {
     casadi_assert_message(grid.isVector(), "ControlSimulator::ControlSimulator: grid must be a "
                           "column vector, but got " << grid.dimString());
-    casadi_assert_message(grid.isDense(), "ControlSimulator::ControlSimulator: grid must be dense, "
+    casadi_assert_message(grid.isdense(), "ControlSimulator::ControlSimulator: grid must be dense, "
                           "but got " << grid.dimString());
     setOption("name", "unnamed controlsimulator");
     addOption("nf", OT_INTEGER, 1, "Number of minor grained integration steps per major interval. "

@@ -387,7 +387,7 @@ namespace casadi {
     // Constant folding
     double ret(0);
     casadi_math<double>::fun(op, v_.value, 0.0, ret);
-    if (operation_checker<F0XChecker>(op) || sparsity().isDense()) {
+    if (operation_checker<F0XChecker>(op) || sparsity().isdense()) {
       return MX(sparsity(), ret);
     } else {
       if (v_.value==0) {
@@ -521,7 +521,7 @@ namespace casadi {
   MX Constant<Value>::getProject(const Sparsity& sp) const {
     if (isZero()) {
       return MX::create(new Constant<Value>(sp, v_));
-    } else if (sp.isDense()) {
+    } else if (sp.isdense()) {
       DMatrix v = getMatrixValue();
       v.makeDense();
       return v;

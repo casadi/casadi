@@ -74,7 +74,7 @@ namespace casadi {
       *this = reshape(val, sp);
     } else if (val.isscalar()) {
       // Dense matrix if val dense
-      if (val.isDense()) {
+      if (val.isdense()) {
         if (val.isConstant()) {
           assignNode(ConstantMX::create(sp, val.getValue()));
         } else {
@@ -155,9 +155,9 @@ namespace casadi {
       return get(m, ind1, rr, cc.T());
     }
 
-    casadi_assert_message(rr.isDense() && rr.isVector(),
+    casadi_assert_message(rr.isdense() && rr.isVector(),
                           "Marix::get: First index must be a dense vector");
-    casadi_assert_message(cc.isDense() && cc.isVector(),
+    casadi_assert_message(cc.isdense() && cc.isVector(),
                           "Marix::get: Second index must be a dense vector");
 
     // Get the sparsity pattern - does bounds checking
@@ -175,7 +175,7 @@ namespace casadi {
 
   void MX::get(MX& m, bool ind1, const Matrix<int>& rr) const {
     // If the indexed matrix is dense, use nonzero indexing
-    if (isDense()) {
+    if (isdense()) {
       return getNZ(m, ind1, rr);
     }
 
@@ -222,9 +222,9 @@ namespace casadi {
     }
 
     // Make sure rr and cc are dense vectors
-    casadi_assert_message(rr.isDense() && rr.isVector(),
+    casadi_assert_message(rr.isdense() && rr.isVector(),
                           "MX::set: First index not dense vector");
-    casadi_assert_message(cc.isDense() && cc.isVector(),
+    casadi_assert_message(cc.isdense() && cc.isVector(),
                           "MX::set: Second index not dense vector");
 
     // Assert dimensions of assigning matrix
@@ -261,7 +261,7 @@ namespace casadi {
     }
 
     // If we are assigning with something sparse, first remove existing entries
-    if (!m.isDense()) {
+    if (!m.isdense()) {
       erase(rr.data(), cc.data(), ind1);
     }
 
@@ -299,7 +299,7 @@ namespace casadi {
         return set(project(m, sp), ind1, project(rr, sp));
       } else if (m.isscalar()) {
         // m scalar means "set all"
-        if (m.isDense()) {
+        if (m.isdense()) {
           return set(MX(rr.sparsity(), m), ind1, rr);
         } else {
           return set(MX(rr.shape()), ind1, rr);
@@ -330,7 +330,7 @@ namespace casadi {
     }
 
     // Dense mode
-    if (isDense() && m.isDense()) {
+    if (isdense() && m.isdense()) {
       return setNZ(m, ind1, rr);
     }
 
@@ -424,7 +424,7 @@ namespace casadi {
     if (kk.sparsity() != m.sparsity()) {
       if (m.isscalar()) {
         // m scalar means "set all"
-        if (!m.isDense()) return; // Nothing to set
+        if (!m.isdense()) return; // Nothing to set
         return setNZ(MX(kk.sparsity(), m), ind1, kk);
       } else if (kk.shape() == m.shape()) {
         // Project sparsity if needed
@@ -929,7 +929,7 @@ namespace casadi {
 
   void MX::makeDense(const MX& val) {
     casadi_assert(val.isscalar());
-    if (isDense()) {
+    if (isdense()) {
       return; // Already ok
     } else if (val->isZero()) {
       *this = project(*this, Sparsity::dense(shape()));
@@ -1266,7 +1266,7 @@ namespace casadi {
   }
 
   MX MX::zz_vecNZ() const {
-    if (isDense()) {
+    if (isdense()) {
       return vec(*this);
     } else {
       return (*this)->getGetNonzeros(Sparsity::dense(nnz(), 1), range(nnz()));
@@ -1391,7 +1391,7 @@ namespace casadi {
   }
 
   MX MX::zz_polyval(const MX& x) const {
-    casadi_assert_message(isDense(), "polynomial coefficients vector must be a vector");
+    casadi_assert_message(isdense(), "polynomial coefficients vector must be a vector");
     casadi_assert_message(isVector() && nnz()>0, "polynomial coefficients must be a vector");
     MX ret = (*this)[0];
     for (int i=1; i<nnz(); ++i) {

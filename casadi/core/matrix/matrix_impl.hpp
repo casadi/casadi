@@ -129,9 +129,9 @@ namespace casadi {
       return get(m, ind1, rr, cc.T());
     }
 
-    casadi_assert_message(rr.isDense() && rr.isVector(),
+    casadi_assert_message(rr.isdense() && rr.isVector(),
                           "Marix::get: First index must be a dense vector");
-    casadi_assert_message(cc.isDense() && cc.isVector(),
+    casadi_assert_message(cc.isdense() && cc.isVector(),
                           "Marix::get: Second index must be a dense vector");
 
     // Get the sparsity pattern - does bounds checking
@@ -169,7 +169,7 @@ namespace casadi {
     }
 
     // If the indexed matrix is dense, use nonzero indexing
-    if (isDense()) {
+    if (isdense()) {
       return getNZ(m, ind1, rr);
     }
 
@@ -195,7 +195,7 @@ namespace casadi {
   void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1,
                                 const Slice& rr, const Slice& cc) {
     // Both are scalar
-    if (rr.isscalar(size1()) && cc.isscalar(size2()) && m.isDense()) {
+    if (rr.isscalar(size1()) && cc.isscalar(size2()) && m.isdense()) {
       elem(rr.toScalar(size1()), cc.toScalar(size2())) = m.toScalar();
       return;
     }
@@ -222,7 +222,7 @@ namespace casadi {
   void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1,
                                 const Matrix<int>& rr, const Matrix<int>& cc) {
     // Scalar
-    if (rr.isscalar(true) && cc.isscalar(true) && m.isDense()) {
+    if (rr.isscalar(true) && cc.isscalar(true) && m.isdense()) {
       return set(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
     }
 
@@ -237,9 +237,9 @@ namespace casadi {
     }
 
     // Make sure rr and cc are dense vectors
-    casadi_assert_message(rr.isDense() && rr.isVector(),
+    casadi_assert_message(rr.isdense() && rr.isVector(),
                           "Matrix::set: First index not dense vector");
-    casadi_assert_message(cc.isDense() && cc.isVector(),
+    casadi_assert_message(cc.isdense() && cc.isVector(),
                           "Matrix::set: Second index not dense vector");
 
     // Assert dimensions of assigning matrix
@@ -276,7 +276,7 @@ namespace casadi {
     }
 
     // If we are assigning with something sparse, first remove existing entries
-    if (!m.isDense()) {
+    if (!m.isdense()) {
       erase(rr.data(), cc.data(), ind1);
     }
 
@@ -298,7 +298,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1, const Slice& rr) {
     // Scalar
-    if (rr.isscalar(numel()) && m.isDense()) {
+    if (rr.isscalar(numel()) && m.isdense()) {
       int r = rr.toScalar(numel());
       elem(r % size1(), r / size1()) = m.toScalar();
       return;
@@ -311,7 +311,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr) {
     // Scalar
-    if (rr.isscalar(true) && m.isDense()) {
+    if (rr.isscalar(true) && m.isdense()) {
       return set(m, ind1, rr.toSlice(ind1));
     }
 
@@ -328,7 +328,7 @@ namespace casadi {
         return set(project(m, sp), ind1, project(rr, sp));
       } else if (m.isscalar()) {
         // m scalar means "set all"
-        if (m.isDense()) {
+        if (m.isdense()) {
           return set(Matrix<DataType>(rr.sparsity(), m), ind1, rr);
         } else {
           return set(Matrix<DataType>(rr.shape()), ind1, rr);
@@ -359,7 +359,7 @@ namespace casadi {
     }
 
     // Dense mode
-    if (isDense() && m.isDense()) {
+    if (isdense() && m.isdense()) {
       return setNZ(m, ind1, rr);
     }
 
@@ -468,7 +468,7 @@ namespace casadi {
     if (kk.sparsity() != m.sparsity()) {
       if (m.isscalar()) {
         // m scalar means "set all"
-        if (!m.isDense()) return; // Nothing to set
+        if (!m.isdense()) return; // Nothing to set
         return setNZ(Matrix<DataType>(kk.sparsity(), m), ind1, kk);
       } else if (kk.shape() == m.shape()) {
         // Project sparsity if needed
@@ -510,7 +510,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::makeDense(const DataType& val) {
     // Quick return if possible
-    if (isDense()) return;
+    if (isdense()) return;
 
     // Get sparsity pattern
     int nrow = size1();
@@ -890,7 +890,7 @@ namespace casadi {
       *this = Matrix<DataType>(sp, d.toScalar(), false);
     } else if (d.isVector() || d.size1()==1) {
       casadi_assert(sp.nnz()==d.numel());
-      if (d.isDense()) {
+      if (d.isdense()) {
         *this = Matrix<DataType>(sp, d.data(), false);
       } else {
         *this = Matrix<DataType>(sp, densify(d).data(), false);
@@ -925,7 +925,7 @@ namespace casadi {
     }
 
     // Check the value of the structural zero-entries, if there are any
-    if (!x.isDense() && !operation_checker<F0XChecker>(op)) {
+    if (!x.isdense() && !operation_checker<F0XChecker>(op)) {
       // Get the value for the structural zeros
       DataType fcn_0;
       casadi_math<DataType>::fun(op, 0, 0, fcn_0);
@@ -1375,7 +1375,7 @@ namespace casadi {
     casadi_assert(isVector());
 
     // Call recursively if vector not dense
-    if (!isDense()) return densify(*this).zz_quad_form(A);
+    if (!isdense()) return densify(*this).zz_quad_form(A);
 
     // Assert dimensions
     casadi_assert_message(size1()==A.size2() && size1()==A.size1(),
@@ -1448,7 +1448,7 @@ namespace casadi {
     }
 
     // Check the value of the structural zero-entries, if there are any
-    if (!y.isDense() && !operation_checker<Function0Checker>(op)) {
+    if (!y.isdense() && !operation_checker<Function0Checker>(op)) {
       // Get the value for the structural zeros
       DataType fcn_0;
       casadi_math<DataType>::fun(op, x_val, casadi_limits<DataType>::zero, fcn_0);
@@ -1479,7 +1479,7 @@ namespace casadi {
     }
 
     // Check the value of the structural zero-entries, if there are any
-    if (!x.isDense() && !operation_checker<F0XChecker>(op)) {
+    if (!x.isdense() && !operation_checker<F0XChecker>(op)) {
       // Get the value for the structural zeros
       DataType fcn_0;
       casadi_math<DataType>::fun(op, casadi_limits<DataType>::zero, y_val, fcn_0);
@@ -1539,7 +1539,7 @@ namespace casadi {
     }
 
     // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
-    if (!r.isDense() && !operation_checker<F00Checker>(op)) {
+    if (!r.isdense() && !operation_checker<F00Checker>(op)) {
       // Get the value for the structural zeros
       DataType fcn_0;
       casadi_math<DataType>::fun(op, casadi_limits<DataType>::zero,
@@ -1732,7 +1732,7 @@ namespace casadi {
 
   template<typename DataType>
   bool Matrix<DataType>::isOne() const {
-    if (!isDense()) {
+    if (!isdense()) {
       return false;
     }
 
@@ -1746,7 +1746,7 @@ namespace casadi {
 
   template<typename DataType>
   bool Matrix<DataType>::isMinusOne() const {
-    if (!isDense()) {
+    if (!isdense()) {
       return false;
     }
 
@@ -1923,13 +1923,13 @@ namespace casadi {
     Matrix<int> row_count = sp.zz_sumCols();
 
     // A blank row? determinant is structurally zero
-    if (!row_count.isDense()) return 0;
+    if (!row_count.isdense()) return 0;
 
     // Have a count of the nonzeros for each col
     Matrix<int> col_count = sp.zz_sumRows().T();
 
     // A blank col? determinant is structurally zero
-    if (!row_count.isDense()) return 0;
+    if (!row_count.isdense()) return 0;
 
     int min_row = std::distance(row_count.data().begin(),
                                 std::min_element(row_count.data().begin(),
@@ -2193,7 +2193,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_all() const {
-    if (!isDense()) return false;
+    if (!isdense()) return false;
     DataType ret=1;
     for (int i=0;i<nnz();++i) {
       ret = ret && at(i)==1;
@@ -2203,7 +2203,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_any() const {
-    if (!isDense()) return false;
+    if (!isdense()) return false;
     DataType ret=0;
     for (int i=0;i<nnz();++i) {
       ret = ret || at(i)==1;
@@ -2503,7 +2503,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_polyval(const Matrix<DataType>& x) const {
-    casadi_assert_message(isDense(), "polynomial coefficients vector must be dense");
+    casadi_assert_message(isdense(), "polynomial coefficients vector must be dense");
     casadi_assert_message(isVector() && nnz()>0, "polynomial coefficients must be a vector");
     Matrix<DataType> ret = (*this)[0];
     for (int i=1; i<nnz(); ++i) {
@@ -2799,7 +2799,7 @@ namespace casadi {
     const int* row = this->row();
 
     // Initialize to zero
-    if (!this->isDense()) {
+    if (!this->isdense()) {
       std::fill(val, val+size1*size2, 0);
     }
 

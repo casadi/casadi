@@ -893,7 +893,7 @@ namespace casadi {
 
   template<>
   bool SX::isSymbolic() const {
-    if (isDense()) {
+    if (isdense()) {
       return isValidInput();
     } else {
       return false;
@@ -1700,7 +1700,7 @@ namespace casadi {
     casadi_assert_message(p.size2()==1,
                           "poly_root(): supplied parameter must be column vector but got "
                           << p.dimString() << ".");
-    casadi_assert(p.isDense());
+    casadi_assert(p.isdense());
     if (p.size1()==2) { // a*x + b
       SX a = p(0);
       SX b = p(1);

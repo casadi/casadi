@@ -30,7 +30,7 @@ namespace casadi {
 
   template<>
   bool Matrix<int>::isSlice(bool ind1) const {
-    return isscalar() || (isVector() && isDense() && Slice::isSlice(data(), ind1));
+    return isscalar() || (isVector() && isdense() && Slice::isSlice(data(), ind1));
   }
 
   template<>

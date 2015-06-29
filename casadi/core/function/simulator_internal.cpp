@@ -42,7 +42,7 @@ namespace casadi {
     casadi_assert_message(grid.isVector(),
                           "Simulator::Simulator: grid must be a column vector, but got "
                           << grid.dimString());
-    casadi_assert_message(grid.isDense(),
+    casadi_assert_message(grid.isdense(),
                           "Simulator::Simulator: grid must be dense, but got "
                           << grid.dimString());
     setOption("name", "unnamed simulator");

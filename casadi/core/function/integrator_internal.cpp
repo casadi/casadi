@@ -140,7 +140,7 @@ namespace casadi {
     }
 
     // Warn if sparse inputs (was previously an error)
-    casadi_assert_warning(f_.input(DAE_X).isDense(),
+    casadi_assert_warning(f_.input(DAE_X).isdense(),
                           "Sparse states in integrators are experimental");
 
     // Consistency checks

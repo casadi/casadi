@@ -494,9 +494,9 @@ namespace casadi {
                                        const std::vector<int>& offset2) const;
     Sparsity zz_mtimes(const Sparsity& y) const {
       if (isscalar()) {
-        return isDense() ? y : Sparsity(y.shape());
+        return isdense() ? y : Sparsity(y.shape());
       } else if (y.isscalar()) {
-        return y.isDense() ? *this : Sparsity(shape());
+        return y.isdense() ? *this : Sparsity(shape());
       } else {
         // Check dimensions
         casadi_assert_message(size2()==y.size1(),
@@ -560,7 +560,7 @@ namespace casadi {
     bool isscalar(bool scalar_and_dense=false) const;
 
     /// Is dense?
-    bool isDense() const;
+    bool isdense() const;
 
     /** \brief Check if the pattern is a column vector (i.e. size2()==1)
         Optionally, checks if either row or column vector.

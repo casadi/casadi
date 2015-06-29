@@ -267,7 +267,7 @@ namespace casadi {
     bool isempty(bool both=false) const;
 
     /// Is dense?
-    bool isDense() const;
+    bool isdense() const;
 
     /// Is column vector? (Optionally row or column  vector)
     bool isVector(bool row_or_col) const;

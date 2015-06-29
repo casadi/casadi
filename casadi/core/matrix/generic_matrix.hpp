@@ -109,7 +109,7 @@ namespace casadi {
     bool isempty(bool both=false) const { return sparsity().isempty(both);}
 
     /** \brief  Check if the matrix expression is dense */
-    bool isDense() const { return sparsity().isDense();}
+    bool isdense() const { return sparsity().isdense();}
 
     /** \brief  Check if the matrix expression is scalar */
     bool isscalar(bool scalar_and_dense=false) const;

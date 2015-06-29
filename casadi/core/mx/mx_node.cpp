@@ -401,7 +401,7 @@ namespace casadi {
       return shared_from_this<MX>();
     } else if (sparsity().isVector(true)) {
       return getReshape(sparsity().T());
-    } else if (sparsity().isDense()) {
+    } else if (sparsity().isdense()) {
       return MX::create(new DenseTranspose(shared_from_this<MX>()));
     } else {
       return MX::create(new Transpose(shared_from_this<MX>()));
@@ -428,7 +428,7 @@ namespace casadi {
                           << x.dimString() << " and z=" << z.dimString() << ".");
     casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got y=" << y.size1()
                           << " and x" << x.dimString() << ".");
-    if (x.isDense() && y.isDense()) {
+    if (x.isdense() && y.isdense()) {
       return MX::create(new DenseMultiplication(z, x, y));
     } else {
       return MX::create(new Multiplication(z, x, y));
@@ -663,7 +663,7 @@ namespace casadi {
 
     if (scX) {
       // Check if it is ok to loop over nonzeros only
-      if (y.isDense() || operation_checker<Function0Checker>(op)) {
+      if (y.isdense() || operation_checker<Function0Checker>(op)) {
         // Loop over nonzeros
         return MX::create(new BinaryMX<true, false>(Operation(op), shared_from_this<MX>(), y));
       } else {
@@ -672,7 +672,7 @@ namespace casadi {
       }
     } else if (scY) {
       // Check if it is ok to loop over nonzeros only
-      if (sparsity().isDense() || operation_checker<F0XChecker>(op)) {
+      if (sparsity().isdense() || operation_checker<F0XChecker>(op)) {
         // Loop over nonzeros
         return MX::create(new BinaryMX<false, true>(Operation(op), shared_from_this<MX>(), y));
       } else {
@@ -684,7 +684,7 @@ namespace casadi {
       MX rr = MX::create(new BinaryMX<false, false>(Operation(op), shared_from_this<MX>(), y));
 
       // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
-      if (!rr.isDense() && !operation_checker<F00Checker>(op)) {
+      if (!rr.isdense() && !operation_checker<F00Checker>(op)) {
         // Get the value for the structural zeros
         double fcn_0(0);
         casadi_math<double>::fun(op, 0, 0, fcn_0);

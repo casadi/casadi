@@ -2811,7 +2811,7 @@ PyObject* arrayView() {
   def toArray(self,shared=False):
     import numpy as n
     if shared:
-      if not self.isDense():
+      if not self.isdense():
         raise Expection("toArray(shared=True) only possible for dense arrays.")
       return self.arrayView()
     else:

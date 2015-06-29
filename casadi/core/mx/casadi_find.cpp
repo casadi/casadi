@@ -77,7 +77,7 @@ namespace casadi {
     g.body << "  for (i=0, cr=" << g.work(arg[0], nnz) << "; i<" << nnz
            << " && *cr++==0; ++i) {}" << endl
            << "  " << g.workel(res[0]) << " = ";
-    if (dep(0).isDense()) {
+    if (dep(0).isdense()) {
       g.body << "i" << ";" << endl;
     } else {
       // The row is in position 1+1+2+i (colind has length 2)

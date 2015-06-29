@@ -613,7 +613,7 @@ namespace casadi {
     }
 
     if (symmetric) {
-      casadi_assert(output(oind).isDense());
+      casadi_assert(output(oind).isdense());
     }
 
     // Create return object

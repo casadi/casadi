@@ -108,8 +108,8 @@ namespace casadi {
     DenseIO::init();
 
     //for (int k=0;k<K_;k++) {
-    //  casadi_assert_message(A_[k].isDense(), "Solver requires arguments to be dense.");
-    //  casadi_assert_message(V_[k].isDense(), "Solver requires arguments to be dense.");
+    //  casadi_assert_message(A_[k].isdense(), "Solver requires arguments to be dense.");
+    //  casadi_assert_message(V_[k].isdense(), "Solver requires arguments to be dense.");
     //}
 
     n_ = A_[0].size1();
@@ -1226,7 +1226,7 @@ if (dwork==0) {
     for (int k=0;k<K;++k) {
       casadi_assert_message(a[k].issquare(), "a must be square");
       casadi_assert_message(a[k].size1()==n, "a must be n-by-n");
-      casadi_assert_message(a[k].isDense(), "a must be dense");
+      casadi_assert_message(a[k].isdense(), "a must be dense");
     }
 
 
