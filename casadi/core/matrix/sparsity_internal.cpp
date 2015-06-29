@@ -1955,6 +1955,14 @@ namespace casadi {
     return nnz() == numel();
   }
 
+  bool SparsityInternal::isrow() const {
+    return size1()==1;
+  }
+
+  bool SparsityInternal::iscolumn() const {
+    return size2()==1;
+  }
+
   bool SparsityInternal::isVector(bool row_or_col) const {
     return size2()==1 || (row_or_col && size1()==1);
   }

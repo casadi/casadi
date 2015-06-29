@@ -118,7 +118,10 @@ namespace casadi {
     bool isVector(bool row_or_col=false) const { return sparsity().isVector(row_or_col);}
 
     /** \brief  Check if the matrix is a row vector (i.e. size1()==1) */
-    bool isrow() const { return sparsity().isVector();}
+    bool isrow() const { return sparsity().isrow();}
+
+    /** \brief  Check if the matrix is a column vector (i.e. size2()==1) */
+    bool iscolumn() const { return sparsity().iscolumn();}
 
     /** \brief Check if the matrix is upper triangular */
     bool istriu() const { return sparsity().istriu();}

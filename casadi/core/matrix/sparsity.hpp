@@ -557,6 +557,12 @@ namespace casadi {
     /// Is dense?
     bool isdense() const;
 
+    /** \brief  Check if the pattern is a row vector (i.e. size1()==1) */
+    bool isrow() const;
+
+    /** \brief  Check if the pattern is a column vector (i.e. size2()==1) */
+    bool iscolumn() const;
+
     /** \brief Check if the pattern is a column vector (i.e. size2()==1)
         Optionally, checks if either row or column vector.
      */
