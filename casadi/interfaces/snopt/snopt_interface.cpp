@@ -388,10 +388,10 @@ namespace casadi {
 
     IMatrix mapping_jacG  = IMatrix(0, nx_);
     IMatrix mapping_gradF = IMatrix(jacF_.output().sparsity(),
-                                    range(-1, -1-jacF_.output().size(), -1));
+                                    range(-1, -1-jacF_.output().nnz(), -1));
 
     if (!jacG_.isNull()) {
-      mapping_jacG = IMatrix(jacG_.output().sparsity(), range(1, jacG_.output().size()+1));
+      mapping_jacG = IMatrix(jacG_.output().sparsity(), range(1, jacG_.output().nnz()+1));
     }
 
     // First, remap jacG
@@ -416,7 +416,7 @@ namespace casadi {
     // Make it as sparse as you can
     d = sparsify(d);
 
-    jacF_row_ = d.size() != 0;
+    jacF_row_ = d.nnz() != 0;
     if (jacF_row_) {  // We need an objective gradient row
       A_structure_ = vertcat(A_structure_, d);
       m_ +=1;
@@ -424,7 +424,7 @@ namespace casadi {
     iObj_ = jacF_row_ ? (m_ - 1) : -1;
 
     // Is the A matrix completely empty?
-    dummyrow_ = A_structure_.size() == 0;  // Then we need a dummy row
+    dummyrow_ = A_structure_.nnz() == 0;  // Then we need a dummy row
     if (dummyrow_) {
       IMatrix dummyrow = IMatrix(1, nx_);
       dummyrow(0, 0) = 0;
@@ -448,7 +448,7 @@ namespace casadi {
     x_.resize(nx_+m_);
     pi_.resize(m_);
     rc_.resize(nx_+m_);
-    A_data_.resize(A_structure_.size());
+    A_data_.resize(A_structure_.nnz());
 
     // Reset the counters
     t_eval_grad_f_ = t_eval_jac_g_ = t_callback_fun_ = t_mainloop_ = 0;
@@ -531,7 +531,7 @@ namespace casadi {
     // perform the mapping:
     // populate A_data_ (the nonzeros of A)
     // with numbers pulled from jacG and gradF
-    for (int k = 0; k < A_structure_.size(); ++k) {
+    for (int k = 0; k < A_structure_.nnz(); ++k) {
       int i = A_structure_.data()[k];
       if (i == 0) {
         A_data_[k] = 0;
@@ -551,8 +551,8 @@ namespace casadi {
     }
 
     // Obtain sparsity pattern of A (Fortran is Index-1 based, but the C++ wrappers are Index-0)
-    std::vector<int> row(A_structure_.size());
-    for (int k = 0; k < A_structure_.size(); ++k) {
+    std::vector<int> row(A_structure_.nnz());
+    for (int k = 0; k < A_structure_.nnz(); ++k) {
       row[k] = A_structure_.row()[k];
     }
 
@@ -588,7 +588,7 @@ namespace casadi {
     }
 
     int n = nx_;
-    int nea = A_structure_.size();
+    int nea = A_structure_.nnz();
     double ObjAdd = 0;
 
     casadi_assert(m_ > 0);
@@ -597,7 +597,7 @@ namespace casadi {
     casadi_assert(row.size() == nea);
     casadi_assert(hs_.size() == n+m_);
     casadi_assert(col.size() == n+1);
-    casadi_assert(A_structure_.size() == nea);
+    casadi_assert(A_structure_.nnz() == nea);
     casadi_assert(bl_.size() == n+m_);
     casadi_assert(bu_.size() == n+m_);
     casadi_assert(pi_.size() == m_);
