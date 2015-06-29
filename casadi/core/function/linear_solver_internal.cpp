@@ -42,7 +42,7 @@ namespace casadi {
     casadi_assert_message(sparsity.size2()==sparsity.size1(),
                           "LinearSolverInternal::init: the matrix must be square but got "
                           << sparsity.dimString());
-    casadi_assert_message(!sparsity.isSingular(),
+    casadi_assert_message(!sparsity.issingular(),
                           "LinearSolverInternal::init: singularity - the matrix is structurally "
                           "rank-deficient. sprank(J)=" << sprank(sparsity)
                           << " (in stead of "<< sparsity.size2() << ")");

@@ -120,7 +120,7 @@ namespace casadi {
 
     // Check for structural singularity in the Jacobian
     casadi_assert_message(
-      !jac_.output().sparsity().isSingular(),
+      !jac_.output().sparsity().issingular(),
       "ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. "
       "sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.output().size1() << ")");
 

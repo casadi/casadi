@@ -134,7 +134,7 @@ namespace casadi {
     if (N_==0) {
       DMatrix temp = input();
       temp.makeSparse();
-      if (temp.sparsity().isSingular()) {
+      if (temp.sparsity().issingular()) {
         stringstream ss;
         ss << "CsparseInterface::prepare: factorization failed due to matrix"
           " being singular. Matrix contains numerical zeros which are "

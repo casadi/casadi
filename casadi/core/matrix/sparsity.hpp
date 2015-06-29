@@ -583,7 +583,7 @@ namespace casadi {
     bool istril() const;
 
     /// Check whether the sparsity-pattern indicates structural singularity
-    bool isSingular() const;
+    bool issingular() const;
 
     /// \cond INTERNAL
     /// Get upper triangular part

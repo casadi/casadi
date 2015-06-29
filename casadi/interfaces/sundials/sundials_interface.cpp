@@ -242,7 +242,7 @@ void SundialsInterface::init() {
       "be square but got " << jac_.output().dimString());
 
     casadi_assert_message(
-      !jac_.output().sparsity().isSingular(),
+      !jac_.output().sparsity().issingular(),
       "SundialsInterface::init: singularity - the jacobian of the forward "
       "problem is structurally rank-deficient. sprank(J)="
       << sprank(jac_.output()) << " (in stead of "<< jac_.output().size2()
@@ -261,7 +261,7 @@ void SundialsInterface::init() {
       "square but got " << jacB_.output().dimString());
 
     casadi_assert_message(
-      !jacB_.output().sparsity().isSingular(),
+      !jacB_.output().sparsity().issingular(),
       "SundialsInterface::init: singularity - the jacobian of the backward"
       " problem is structurally rank-deficient. sprank(J)="
       << sprank(jacB_.output()) << " (instead of "

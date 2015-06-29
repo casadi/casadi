@@ -1067,8 +1067,8 @@ namespace casadi {
     return Sparsity::triplet(nrow, ncol, row, col, mapping, false);
   }
 
-  bool Sparsity::isSingular() const {
-    casadi_assert_message(issquare(), "isSingular: only defined for square matrices, but got "
+  bool Sparsity::issingular() const {
+    casadi_assert_message(issquare(), "issingular: only defined for square matrices, but got "
                           << dimString());
     return sprank(*this)!=size2();
   }

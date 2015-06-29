@@ -167,7 +167,7 @@ namespace casadi {
     if (L_==0) {
       DMatrix temp = input();
       temp.makeSparse();
-      if (temp.sparsity().isSingular()) {
+      if (temp.sparsity().issingular()) {
         stringstream ss;
         ss << "CSparseCholeskyInternal::prepare: factorization failed due "
           "to matrix being singular. Matrix contains numerical zeros which are"
