@@ -112,7 +112,7 @@ matrix:
         
         # Let's verify that we can still compile
         - pushd build && make && sudo make -j2 install && popd
-        - python -c "import doctest;import casadi;doctest.testmod(casadi.casadi,verbose=True)"
+        - python -c "import doctest;import casadi;assert doctest.testmod(casadi.casadi,verbose=True).failed==0"
         - git stash && git checkout $TRAVIS_BRANCH && git pull origin $TRAVIS_BRANCH && git stash pop || allowfail 1 && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git push git@github.com:casadi/casadi.git $TRAVIS_BRANCH
     - compiler: clang
       os: linux
