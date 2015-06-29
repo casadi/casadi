@@ -445,6 +445,7 @@ class Misctests(casadiTestCase):
       print str(e)
       self.assertTrue("x must be larger than 3" in str(e))
 
+  @requiresPlugin(NlpSolver,"ipopt")
   def test_output(self):
     with capture_stdout() as result:
       DMatrix([1,2]).printDense()
