@@ -580,7 +580,7 @@ namespace casadi {
     bool isTriu() const;
 
     /// Is lower triangular?
-    bool isTril() const;
+    bool istril() const;
 
     /// Check whether the sparsity-pattern indicates structural singularity
     bool isSingular() const;

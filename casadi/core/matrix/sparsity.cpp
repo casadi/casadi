@@ -267,8 +267,8 @@ namespace casadi {
     return (*this)->isSymmetric();
   }
 
-  bool Sparsity::isTril() const {
-    return (*this)->isTril();
+  bool Sparsity::istril() const {
+    return (*this)->istril();
   }
 
   bool Sparsity::isTriu() const {

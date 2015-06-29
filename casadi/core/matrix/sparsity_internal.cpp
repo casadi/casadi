@@ -3754,7 +3754,7 @@ namespace casadi {
     return hash_sparsity(size1(), size2(), colind(), row());
   }
 
-  bool SparsityInternal::isTril() const {
+  bool SparsityInternal::istril() const {
     const int* colind = this->colind();
     const int* row = this->row();
     // loop over columns

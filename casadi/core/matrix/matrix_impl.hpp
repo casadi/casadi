@@ -2331,7 +2331,7 @@ namespace casadi {
                           << b.size1() << " rows while A has " << size1() << ".");
     casadi_assert_message(size1() == size2(), "solve: A not square but " << dimString());
 
-    if (isTril()) {
+    if (istril()) {
       // forward substitution if lower triangular
       Matrix<DataType> x = b;
       const int*  Arow = row();
@@ -2390,7 +2390,7 @@ namespace casadi {
       Matrix<DataType> xperm;
 
       // Solve permuted system
-      if (Aperm.isTril()) {
+      if (Aperm.istril()) {
 
         // Forward substitution if lower triangular
         xperm = solve(Aperm, bperm);

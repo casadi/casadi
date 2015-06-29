@@ -129,7 +129,7 @@ namespace casadi {
     bool isTriu() const { return sparsity().isTriu();}
 
     /** \brief Check if the matrix is lower triangular */
-    bool isTril() const { return sparsity().isTril();}
+    bool istril() const { return sparsity().istril();}
 
     ///@{
     /** \brief Get the sparsity pattern. See the Sparsity class for details. */
