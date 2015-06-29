@@ -3771,7 +3771,7 @@ namespace casadi {
     return true;
   }
 
-  bool SparsityInternal::isTriu() const {
+  bool SparsityInternal::istriu() const {
     const int* colind = this->colind();
     const int* row = this->row();
     // loop over columns

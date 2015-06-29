@@ -126,7 +126,7 @@ namespace casadi {
     bool isrow() const { return sparsity().isVector();}
 
     /** \brief Check if the matrix is upper triangular */
-    bool isTriu() const { return sparsity().isTriu();}
+    bool istriu() const { return sparsity().istriu();}
 
     /** \brief Check if the matrix is lower triangular */
     bool istril() const { return sparsity().istril();}

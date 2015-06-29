@@ -160,7 +160,7 @@ namespace casadi {
     using B::isDense;
     using B::isVector;
     using B::istril;
-    using B::isTriu;
+    using B::istriu;
     using B::colind;
     using B::row;
     using B::dimString;

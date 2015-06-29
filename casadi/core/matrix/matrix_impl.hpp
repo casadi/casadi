@@ -2348,7 +2348,7 @@ namespace casadi {
         }
       }
       return x;
-    } else if (isTriu()) {
+    } else if (istriu()) {
       // backward substitution if upper triangular
       Matrix<DataType> x = b;
       const int*  Arow = row();

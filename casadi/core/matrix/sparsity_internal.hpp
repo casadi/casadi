@@ -285,7 +285,7 @@ namespace casadi {
     bool istril() const;
 
     /// is upper triangular?
-    bool isTriu() const;
+    bool istriu() const;
 
     /// Get upper triangular part
     Sparsity zz_triu(bool includeDiagonal) const;

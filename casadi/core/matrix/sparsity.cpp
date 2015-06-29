@@ -271,8 +271,8 @@ namespace casadi {
     return (*this)->istril();
   }
 
-  bool Sparsity::isTriu() const {
-    return (*this)->isTriu();
+  bool Sparsity::istriu() const {
+    return (*this)->istriu();
   }
 
   Sparsity Sparsity::sub(const std::vector<int>& rr, const Sparsity& sp,
