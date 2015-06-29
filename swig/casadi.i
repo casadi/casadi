@@ -3485,6 +3485,15 @@ def swig_monkeypatch(v,cl=True):
         s = e.args[0]
         ne = TypeError(s+"\nYou have: (%s)\n" % (", ".join(map(swig_typename_convertor_python2cpp,args[1:] if cl else args) + ["%s=%s" % (k,swig_typename_convertor_python2cpp(vv)) for k,vv in kwargs.items()]  )))
         raise ne.__class__, ne, exc_info[2].tb_next
+    except AttributeError as e:
+      import sys
+      exc_info = sys.exc_info()
+      if e.message=="type object 'object' has no attribute '__getattr__'":
+        # swig 3.0 bug
+        ne = AttributeError("Unkown attribute: %s has no attribute '%s'." % (str(args[1]),args[2]))
+        raise ne.__class__, ne, exc_info[2].tb_next
+      else:
+        raise exc_info[1], None, exc_info[2].tb_next
     except Exception as e:
       import sys
       exc_info = sys.exc_info()
