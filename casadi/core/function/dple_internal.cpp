@@ -89,7 +89,7 @@ namespace casadi {
                           << A_.size() << " and " << V_.size() << ".");
     K_ = A_.size();
     for (int k=0;k<K_;++k) {
-      casadi_assert_message(V_[k].isSymmetric(), "V_i must be symmetric but got "
+      casadi_assert_message(V_[k].issymmetric(), "V_i must be symmetric but got "
                             << V_[k].dimString() << " for i = " << k << ".");
 
       casadi_assert_message(A_[k].size1()==V_[k].size1(), "First dimension of A ("

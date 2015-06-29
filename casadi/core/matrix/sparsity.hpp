@@ -574,7 +574,7 @@ namespace casadi {
     bool issquare() const;
 
     /// Is symmetric?
-    bool isSymmetric() const;
+    bool issymmetric() const;
 
     /// Is upper triangular?
     bool istriu() const;

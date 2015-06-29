@@ -279,7 +279,7 @@ namespace casadi {
     bool issquare() const;
 
     /// Is symmetric?
-    bool isSymmetric() const;
+    bool issymmetric() const;
 
     /// Is lower triangular?
     bool istril() const;

@@ -51,7 +51,7 @@ namespace casadi {
     L_ = 0;
     S_ = 0;
 
-    casadi_assert_message(sparsity.isSymmetric(),
+    casadi_assert_message(sparsity.issymmetric(),
                           "CSparseCholeskyInternal: supplied sparsity must be symmetric, got "
                           << sparsity.dimString() << ".");
   }

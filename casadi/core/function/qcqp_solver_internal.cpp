@@ -98,7 +98,7 @@ namespace casadi {
 
     for (int i=0;i<nq_;++i) {
       DMatrix Pi = input(QCQP_SOLVER_P)(ALL, Slice(i*n_, (i+1)*n_));
-      casadi_assert_message(Pi.sparsity().isSymmetric(),
+      casadi_assert_message(Pi.sparsity().issymmetric(),
                             "We need Pi square & symmetric but got " << Pi.dimString()
                             << " for i = " << i << ".");
     }

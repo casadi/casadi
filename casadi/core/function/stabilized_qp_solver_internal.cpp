@@ -61,7 +61,7 @@ namespace casadi {
       "H: " << H.dimString() << " - A: " << A.dimString() << std::endl <<
       "We need: H.size2()==A.size2()" << std::endl);
 
-    casadi_assert_message(H.isSymmetric(),
+    casadi_assert_message(H.issymmetric(),
       "Got incompatible dimensions.   min          x'Hx + G'x" << std::endl <<
       "H: " << H.dimString() <<
       "We need H square & symmetric" << std::endl);

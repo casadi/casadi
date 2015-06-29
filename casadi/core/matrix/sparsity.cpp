@@ -263,8 +263,8 @@ namespace casadi {
     return (*this)->issquare();
   }
 
-  bool Sparsity::isSymmetric() const {
-    return (*this)->isSymmetric();
+  bool Sparsity::issymmetric() const {
+    return (*this)->issymmetric();
   }
 
   bool Sparsity::istril() const {

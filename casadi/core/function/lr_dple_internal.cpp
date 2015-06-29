@@ -152,7 +152,7 @@ namespace casadi {
     int m = with_C_? V_[0].size1(): n;
 
     for (int k=0;k<K_;++k) {
-      casadi_assert_message(V_[k].isSymmetric(), "V_i must be symmetric but got "
+      casadi_assert_message(V_[k].issymmetric(), "V_i must be symmetric but got "
                             << V_[k].dimString() << " for i = " << k << ".");
       if (with_C_) {
         casadi_assert_message(n==C_[k].size1(), "Number of rows in C ("

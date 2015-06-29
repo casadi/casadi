@@ -1993,7 +1993,7 @@ namespace casadi {
     return size2() == size1();
   }
 
-  bool SparsityInternal::isSymmetric() const {
+  bool SparsityInternal::issymmetric() const {
     return isTranspose(*this);
   }
 

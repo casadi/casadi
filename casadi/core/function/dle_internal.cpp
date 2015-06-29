@@ -81,7 +81,7 @@ namespace casadi {
     A_ = st_[Dle_STRUCT_A];
     V_ = st_[Dle_STRUCT_V];
 
-    casadi_assert_message(V_.isSymmetric(), "V must be symmetric but got "
+    casadi_assert_message(V_.issymmetric(), "V must be symmetric but got "
                           << V_.dimString() << ".");
 
     casadi_assert_message(A_.size1()==V_.size1(), "First dimension of A ("

@@ -132,7 +132,7 @@ namespace casadi {
 
 
 
-    casadi_assert_message(V_.isSymmetric(), "V must be symmetric but got "
+    casadi_assert_message(V_.issymmetric(), "V must be symmetric but got "
                           << V_.dimString() << ".");
 
     casadi_assert_message(A_.size1()==A_.size2(), "A must be square but got "
