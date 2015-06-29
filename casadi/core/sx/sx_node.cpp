@@ -37,9 +37,11 @@ namespace casadi {
 
   SXNode::~SXNode() {
     // Make sure that this is there are no scalar expressions pointing to it when it is destroyed
-    casadi_assert_warning(count==0,
-                          "Reference counting failure. "
-                          "Possible cause: Circular dependency in user code.");
+    if (count!=0) {
+      // Note that casadi_assert_warning cannot be used in destructors
+      std::cerr << "Reference counting failure." <<
+                   "Possible cause: Circular dependency in user code." << std::endl;
+    }
   }
 
   double SXNode::getValue() const {
