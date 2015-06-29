@@ -251,8 +251,8 @@ namespace casadi {
     return (*this)->isdense();
   }
 
-  bool Sparsity::isDiagonal() const {
-    return (*this)->isDiagonal();
+  bool Sparsity::isdiag() const {
+    return (*this)->isdiag();
   }
 
   bool Sparsity::isVector(bool row_or_col) const {

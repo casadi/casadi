@@ -568,7 +568,7 @@ namespace casadi {
     bool isVector(bool row_or_col=false) const;
 
     /// Is diagonal?
-    bool isDiagonal() const;
+    bool isdiag() const;
 
     /// Is square?
     bool issquare() const;

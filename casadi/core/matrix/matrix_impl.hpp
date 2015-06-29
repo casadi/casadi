@@ -1773,7 +1773,7 @@ namespace casadi {
   bool Matrix<DataType>::isIdentity() const {
 
     // Make sure that the matrix is diagonal
-    if (!sparsity().isDiagonal())
+    if (!sparsity().isdiag())
       return false;
 
     // Make sure that all entries are one

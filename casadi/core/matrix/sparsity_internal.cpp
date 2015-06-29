@@ -52,7 +52,7 @@ namespace casadi {
       // Print nothing, shape clear anyway
     } else if (isdense()) {
       stream << ", dense";
-    } else if (isDiagonal()) {
+    } else if (isdiag()) {
       stream << ", diagonal";
     } else {
       stream << ", " << nnz() << " nnz";
@@ -1907,10 +1907,10 @@ namespace casadi {
     }
 
     // Quick return if first factor is diagonal
-    if (isDiagonal()) return y;
+    if (isdiag()) return y;
 
     // Quick return if second factor is diagonal
-    if (y.isDiagonal()) return shared_from_this<Sparsity>();
+    if (y.isdiag()) return shared_from_this<Sparsity>();
 
     // Direct access to the vectors
     const int* x_row = row();
@@ -1963,7 +1963,7 @@ namespace casadi {
     return both ? size2()==0 && size1()==0 : size2()==0 || size1()==0;
   }
 
-  bool SparsityInternal::isDiagonal() const {
+  bool SparsityInternal::isdiag() const {
     const int* colind = this->colind();
     const int* row = this->row();
 

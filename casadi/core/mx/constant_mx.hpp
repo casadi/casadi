@@ -292,7 +292,7 @@ namespace casadi {
     /** \brief  Check if a particular integer value */
     virtual bool isZero() const { return v_.value==0;}
     virtual bool isOne() const { return v_.value==1;}
-    virtual bool isIdentity() const { return v_.value==1 && sparsity().isDiagonal();}
+    virtual bool isIdentity() const { return v_.value==1 && sparsity().isdiag();}
     virtual bool isValue(double val) const { return v_.value==val;}
 
     /// Get the value (only for scalar constant nodes)
