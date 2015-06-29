@@ -77,7 +77,7 @@ def addExtra(metadata):
   i = NlpSolver("snopt", f)
   extra(metadata,i,"SnoptInterface")
 
-  i = QpSolver("qpoases", qpStruct(h=Sparsity.dense(3,3),a=Sparsity.dense(1,3)))
+  i = QpSolver("qpoases", {"h":Sparsity.dense(3,3),"a":Sparsity.dense(1,3)})
   extra(metadata,i,"QpoasesInterface")
  
   G = sparsify(DMatrix([[1,0],[0,1]])).T
@@ -85,6 +85,6 @@ def addExtra(metadata):
 
   A = DMatrix(0,2)
 
-  i = SocpSolver("mosek", socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
+  i = SocpSolver("mosek", {"g":G.sparsity(),"e":E.sparsity(),"a": A.sparsity()})
   extra(metadata,i,"MosekSocpInterface")
 

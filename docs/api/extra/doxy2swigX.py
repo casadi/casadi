@@ -452,11 +452,11 @@ class Doxy2SWIG_X(Doxy2SWIG):
              grouped_dict[total] = ([origin],pieces)
              grouped_list.append(grouped_dict[total])
           if not self.merge:
-            self.add_text_original(map(swig_typename_convertor_cpp2python,["%feature(\"docstring\") ", swigname if len(swigname)>0 else k, " \"\n"]+pieces+["\";\n","\n"]))
+            self.add_text_original(["%feature(\"docstring\") ", swigname if len(swigname)>0 else k, " \"\n"]+map(swig_typename_convertor_cpp2python,pieces)+["\";\n","\n"])
             
         if self.merge:
           if len(grouped_list)==1:
-            self.add_text_original(map(swig_typename_convertor_cpp2python,["%feature(\"docstring\") ", k, " \"\n"]+grouped_list[0][1]+["\";\n","\n"]))
+            self.add_text_original(["%feature(\"docstring\") ", k, " \"\n"]+map(swig_typename_convertor_cpp2python,grouped_list[0][1])+["\";\n","\n"])
           else:
             self.add_text_original(["%feature(\"docstring\") ",k , " \"\n"])
             for (origin,pieces) in grouped_list:
