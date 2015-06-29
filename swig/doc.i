@@ -55754,6 +55754,8 @@ name:
 
 Name of a solver. It might be one of:
 
+- ecos
+
 - mosek
 
 - sdp
@@ -56128,6 +56130,8 @@ List of plugins
 
 
 
+- ecos
+
 - mosek
 
 - sdp
@@ -56136,6 +56140,26 @@ Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 SocpSolver.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+ecos
+----
+
+
+
+Interface to the SOCP solver ECOS
+
+>List of available options
+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
+
+--------------------------------------------------------------------------------
 
 
 
