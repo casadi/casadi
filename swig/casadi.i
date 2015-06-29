@@ -3371,3 +3371,166 @@ GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
 %include <casadi/core/misc/variable.hpp>
 %include <casadi/core/misc/dae_builder.hpp>
 %include <casadi/core/misc/xml_file.hpp>
+#ifdef SWIGPYTHON
+%pythoncode %{
+
+
+def swig_typename_convertor_cpp2python(s):
+  import re
+  s = s.replace("C/C++ prototypes","Python usages")
+  s = s.replace("casadi::","")
+  s = s.replace("MXDict","str:MX")
+  s = s.replace("SXDict","str:SX")
+  s = s.replace("std::string","str")
+  s = s.replace(" const &","")
+  s = re.sub("(const )?Matrix< SXElement >( &)?",r"SX",s)
+  s = re.sub("(const )?GenericMatrix< ?(\w+) *>( ?&)?",r"\2 ",s)
+  s = re.sub("(const )?Matrix< ?(\w+) *>( ?&)?",r"array(\2) ",s)
+  s = re.sub("(const )?GenericMatrix< ?([\w\(\)]+) *>( ?&)?",r"\2 ",s)
+  s = re.sub(r"const (\w+) &",r"\1 ",s)
+  s = re.sub(r"< [\w\(\)]+ +>\(",r"(",s)
+  s = re.sub(r"\b(\w+)(< \w+ >)?::\1",r"\1",s)
+  for i in range(5):
+    s = re.sub(r"(const )? ?std::pair< ?([\w\(\)\]\[: ]+?) ?, ?([\w\(\)\]\[: ]+?) ?> ?&?",r"(\2,\3) ",s)
+    s = re.sub(r"(const )? ?std::vector< ?([\w\(\)\[\] ]+) ?(, ?std::allocator< ?\2 ?>)? ?> ?&?",r"[\2] ",s)
+  s = re.sub(r"\b(\w+)(< \w+ >)?::\1",r"\1",s)
+  s = s.replace("casadi::","")
+  s = s.replace("IOInterface< Function >","Function")
+  s = s.replace("::",".")
+  s = s.replace(".operator ()","")
+  s = re.sub(r"([A-Z]\w+)Vector",r"[\1]",s)
+  return s
+  
+def swig_typename_convertor_python2cpp(a):
+  try:  
+    import numpy as np
+  except:
+    class NoExist:
+      pass
+    class Temp(object):
+      ndarray = NoExist
+    np = Temp()
+  if isinstance(a,list):
+    if len(a)>0:
+      return "[%s]" % "|".join(set([swig_typename_convertor_python2cpp(i) for i in a]))
+    else:
+      return "[]"
+  elif isinstance(a,tuple):
+    return "(%s)" % ",".join([swig_typename_convertor_python2cpp(i) for i in a])
+  elif isinstance(a,np.ndarray):
+    return "np.array(%s)" % ",".join(set([swig_typename_convertor_python2cpp(i) for i in np.array(a).flatten().tolist()]))
+  elif isinstance(a,dict):
+    return "|".join(set([swig_typename_convertor_python2cpp(i) for i in a.keys()])) +":"+ "|".join(set([swig_typename_convertor_python2cpp(i) for i in a.values()]))
+
+  return type(a).__name__
+
+
+def swig_monkeypatch(v,cl=True):
+  import re
+  if hasattr(v,"__monkeypatched__"):
+    return v
+  def foo(*args,**kwargs):
+    try:
+      return v(*args,**kwargs)
+    except NotImplementedError as e:
+      import sys
+      exc_info = sys.exc_info()
+      if e.message.startswith("Wrong number or type of arguments for overloaded function"):
+
+        s = e.args[0]
+        s = s.replace("'new_","'")
+        s = re.sub(r"overloaded function '(\w+?)_(\w+)'",r"overloaded function '\1.\2'",s)
+        m = re.search("overloaded function '([\w\.]+)'",s)
+        if m:
+          name = m.group(1)
+          name = name.replace(".__call__","")
+        else:
+          name = "method"
+        ne = NotImplementedError(swig_typename_convertor_cpp2python(s)+"You have: %s(%s)\n" % (name,", ".join(map(swig_typename_convertor_python2cpp,args[1:] if cl else args)+ ["%s=%s" % (k,swig_typename_convertor_python2cpp(vv)) for k,vv in kwargs.items()])))
+        raise ne.__class__, ne, exc_info[2].tb_next
+      else:
+        raise exc_info[1], None, exc_info[2].tb_next
+    except TypeError as e:
+      import sys
+      exc_info = sys.exc_info()
+      
+      methodname = "method"
+      try:
+        methodname = exc_info[2].tb_next.tb_frame.f_code.co_name
+      except:
+        pass
+
+      if e.message.startswith("in method '"):
+        s = e.args[0]
+        s = re.sub(r"method '(\w+?)_(\w+)'",r"method '\1.\2'",s)
+        m = re.search("method '([\w\.]+)'",s)
+        if m:
+          name = m.group(1)
+          name = name.replace(".__call__","")
+        else:
+          name = "method"
+        ne = TypeError(swig_typename_convertor_cpp2python(s)+" expected.\nYou have: %s(%s)\n" % (name,", ".join(map(swig_typename_convertor_python2cpp,args[1:] if cl else args))))
+        raise ne.__class__, ne, exc_info[2].tb_next
+      elif e.message.startswith("Expecting one of"):
+        s = e.args[0]
+        conversion = {"mul": "*", "div": "/", "add": "+", "sub": "-","le":"<=","ge":">=","lt":"<","gt":">","eq":"==","pow":"**"}
+        if methodname.startswith("__") and methodname[2:-2] in conversion:
+          ne = TypeError(swig_typename_convertor_cpp2python(s)+"\nYou try to do: %s %s %s.\n" % (  swig_typename_convertor_python2cpp(args[0]),conversion[methodname[2:-2]] ,swig_typename_convertor_python2cpp(args[1]) ))
+        elif methodname.startswith("__r") and methodname[3:-2] in conversion:
+          ne = TypeError(swig_typename_convertor_cpp2python(s)+"\nYou try to do: %s %s %s.\n" % ( swig_typename_convertor_python2cpp(args[1]),  conversion[methodname[3:-2]], swig_typename_convertor_python2cpp(args[0]) ))
+        else:
+          ne = TypeError(swig_typename_convertor_cpp2python(s)+"\nYou have: (%s)\n" % (", ".join(map(swig_typename_convertor_python2cpp,args[1:] if cl else args))))
+        raise ne.__class__, ne, exc_info[2].tb_next
+      else:
+        s = e.args[0]
+        ne = TypeError(s+"\nYou have: (%s)\n" % (", ".join(map(swig_typename_convertor_python2cpp,args[1:] if cl else args) + ["%s=%s" % (k,swig_typename_convertor_python2cpp(vv)) for k,vv in kwargs.items()]  )))
+        raise ne.__class__, ne, exc_info[2].tb_next
+    except Exception as e:
+      import sys
+      exc_info = sys.exc_info()
+      raise exc_info[1], None, exc_info[2].tb_next
+      
+  if v.__doc__ is not None:
+    foo.__doc__ = swig_typename_convertor_cpp2python(v.__doc__)
+  foo.__name__ = v.__name__
+  foo.__monkeypatched__ = True
+  return foo
+
+import inspect
+
+def swig_improvedcall(v):
+  def newcall(self,*args,**kwargs):
+    if len(args)>0 and len(kwargs)>0:
+      raise Exception("You cannot mix positional and keyword arguments in __call__")
+    if len(kwargs)>0:
+      return v(self,kwargs)
+    else:
+      return v(self,*args)
+
+  newcall.__name__ = v.__name__
+  newcall.__doc__ = v.__doc__ + "\nYou can also call with keyword arguments if the Function has a known scheme\nExample: nlp(x=x)\n"
+  return newcall
+
+for name,cl in locals().items():
+  if not inspect.isclass(cl): continue
+  for k,v in inspect.getmembers(cl, inspect.ismethod):
+    if k == "__del__" or v.__name__ == "<lambda>": continue
+    vv = v
+    if k=="__call__" and issubclass(cl,Function):
+      vv = swig_improvedcall(v)
+    setattr(cl,k,swig_monkeypatch(vv))
+  for k,v in inspect.getmembers(cl, inspect.isfunction):
+    setattr(cl,k,staticmethod(swig_monkeypatch(v,cl=False)))
+  
+for name,v in locals().items():
+  if not inspect.isfunction(v): continue
+  if name.startswith("swig") : continue
+  p = swig_monkeypatch(v,cl=False)
+  #setattr(casadi,name,p)
+  import sys
+  setattr(sys.modules[__name__], name, p)
+
+
+%}
+
+#endif
