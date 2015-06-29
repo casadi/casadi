@@ -52,7 +52,7 @@ class OCPtests(casadiTestCase):
       cost = cost + s*X[i]**2+r*U[i]**2
     cost = cost + q*X[N]**2
     
-    nlp = SXFunction(nlpIn(x=V),nlpOut(f=cost,g=vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])))
+    nlp = SXFunction('nlp', nlpIn(x=V),nlpOut(f=cost,g=vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])))
     
     solver = NlpSolver("ipopt", nlp)
     solver.setOption("tol",1e-5)
@@ -86,8 +86,7 @@ class OCPtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
-    f.init()
+    f=SXFunction('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
     
     integrator = Integrator("cvodes", f)
     integrator.setOption("reltol",1e-15)
@@ -109,10 +108,8 @@ class OCPtests(casadiTestCase):
     
     parc = MX(0)
     
-    f = MXFunction([var,parMX],[qend[0]])
-    f.init()
-    nlp = MXFunction(nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0]))
-    nlp.init()
+    f = MXFunction('f', [var,parMX],[qend[0]])
+    nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0]))
     solver = NlpSolver("ipopt", nlp)
     solver.setOption("tol",1e-12)
     solver.setOption("hessian_approximation", "limited-memory")
@@ -145,8 +142,7 @@ class OCPtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
-    f.init()
+    f=SXFunction('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
     
     integrator = Integrator("cvodes", f)
     integrator.setOption("reltol",1e-15)
@@ -167,10 +163,8 @@ class OCPtests(casadiTestCase):
     
     parc = MX(dy0)
     
-    f = MXFunction([var,par],[qend[0]])
-    f.init()
-    nlp = MXFunction(nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0],g=var[0]-var[1]))
-    nlp.init()
+    f = MXFunction('f', [var,par],[qend[0]])
+    nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0],g=var[0]-var[1]))
     
     solver = NlpSolver("ipopt", nlp)
     solver.setOption("tol",1e-12)
@@ -240,8 +234,7 @@ class OCPtests(casadiTestCase):
     print ivp.init
     print c,T,cost
     #print c.atTime(0)
-    f=MXFunction([vertcat([c,T,cost])],[vertcat(ivp.init)])
-    f.init()
+    f=MXFunction('f', [vertcat([c,T,cost])],[vertcat(ivp.init)])
     return 
     f.evaluate()
     self.checkarray(f.getOutput(),matrix([-956.271065,-250.051971,0]).T,"initeq")
@@ -264,8 +257,8 @@ class OCPtests(casadiTestCase):
   #   x0 = SX.sym("x0",nx)
   #   p = SX.sym("p",nu)
   #   xf = x0 + p[0]
-  #   daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
-  #   mayer = SXFunction([x0],[7*x0[0]])
+  #   daeres = SXFunction('daeres', daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
+  #   mayer = SXFunction('mayer', [x0],[7*x0[0]])
   #   ms = DirectMultipleShooting(daeres,mayer)
   #   ms.setOption("integrator", "cvodes")
   #   ms.setOption("number_of_grid_points",ns)
@@ -296,12 +289,11 @@ class OCPtests(casadiTestCase):
   #   x0 = SX.sym("x0",nx)
   #   p = SX.sym("p",nu+np)
   #   xf = x0 + p[0]
-  #   daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
-  #   mayer = SXFunction([x0],[7*x0[0]])
+  #   daeres = SXFunction('daeres', daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
+  #   mayer = SXFunction('mayer', [x0],[7*x0[0]])
     
   #   t = SX.sym("t")
-  #   cfcn = SXFunction(daeIn(t=t,x=x0, p=p),[x0[:nh,0]])
-  #   cfcn.init()
+  #   cfcn = SXFunction('cfcn', daeIn(t=t,x=x0, p=p),[x0[:nh,0]])
     
   #   ms = DirectMultipleShooting(daeres,mayer,cfcn)
   #   ms.setOption("integrator", "cvodes")
@@ -346,8 +338,7 @@ class OCPtests(casadiTestCase):
   #   t=SX.sym("t")
   #   y=SX.sym("y",3,1)
   #   p=SX.sym("p")
-  #   f=SXFunction(daeIn(t=t, x=y, p=p),daeOut(ode=vertcat([y[1,0],-y[0,0],p*y[0,0]])))
-  #   f.init()
+  #   f=SXFunction('f', daeIn(t=t, x=y, p=p),daeOut(ode=vertcat([y[1,0],-y[0,0],p*y[0,0]])))
     
   #   # Options to be passed to the integrator
   #   integrator_options = {}
@@ -357,8 +348,7 @@ class OCPtests(casadiTestCase):
   #   integrator_options["t0"]=0
   #   integrator_options["tf"]=te/N
     
-  #   mayer = SXFunction([y],[-y[2]])
-  #   mayer.init()
+  #   mayer = SXFunction('mayer', [y],[-y[2]])
     
   #   ms = DirectMultipleShooting(f,mayer)
   #   ms.setOption("integrator", "cvodes")
@@ -421,8 +411,7 @@ class OCPtests(casadiTestCase):
   #   x=SX.sym("x")
   #   a=SX.sym("a")
   #   u=SX.sym("u")
-  #   f=SXFunction(daeIn(t=t, x=x, p=vertcat([a,u])),daeOut(a*x+u))
-  #   f.init()
+  #   f=SXFunction('f', daeIn(t=t, x=x, p=vertcat([a,u])),daeOut(a*x+u))
     
   #   integrator_options = {}
   #   integrator_options["reltol"]=1e-9
@@ -431,8 +420,7 @@ class OCPtests(casadiTestCase):
   #   integrator_options["t0"]=0
   #   integrator_options["tf"]=te/N
     
-  #   mayer = SXFunction([x],[-x])
-  #   mayer.init()
+  #   mayer = SXFunction('mayer', [x],[-x])
     
   #   ms = DirectMultipleShooting(f,mayer)
   #   ms.setOption("integrator", "cvodes")

@@ -258,13 +258,11 @@ class typemaptests(casadiTestCase):
       if hasNum:
         dummy = [1.3,2.7,9.4,1.0]
 
-        f=function([z],[r])
-        f.init()
+        f=function("f", [z],[r])
         f.setInputNZ(dummy[0:f.getInput().nnz()])
         f.evaluate()
         
-        f_=function([z],[z])
-        f_.init()
+        f_=function("f", [z],[z])
         f_.setInputNZ(dummy[0:f.getInput().nnz()])
         f_.evaluate()
         
@@ -274,14 +272,12 @@ class typemaptests(casadiTestCase):
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
         
-        f=function([z,s],[r])
-        f.init()
+        f=function("f", [z,s],[r])
         f.setInputNZ(dummy[0:f.getInput(0).nnz()],0)
         f.setInputNZ(dummy2[0:f.getInput(1).nnz()],1)
         f.evaluate()
         
-        f_=function([z,s],[z,s])
-        f_.init()
+        f_=function("f", [z,s],[z,s])
         f_.setInputNZ(dummy[0:f.getInput(0).nnz()],0)
         f_.setInputNZ(dummy2[0:f.getInput(1).nnz()],1)
         f_.evaluate()
@@ -448,8 +444,7 @@ class typemaptests(casadiTestCase):
   def testGenericType(self):
     self.message("Generic type")
     x=SX.sym("x")
-    f=SXFunction([x],[2*x])
-    f.setOption("name","foo")
+    f=SXFunction("foo", [x],[2*x])
     self.assertEquals(f.getOption("name"),"foo")
     f.setOption("verbose",True)
     #self.assertTrue(isinstance(f.getOption("verbose"),bool))
@@ -507,7 +502,7 @@ class typemaptests(casadiTestCase):
     a = GenericType(["foo","bar"])
     self.assertTrue(a.isStringVector())
     x = SX.sym("x")
-    f = SXFunction([x],[x])
+    f = SXFunction("f", [x],[x])
     #f.setOption("monitor",["foo","bar"])
     #self.assertEqual(f.getOption("monitor")[0],"foo")
     #self.assertEqual(f.getOption("monitor")[1],"bar")
@@ -523,8 +518,7 @@ class typemaptests(casadiTestCase):
     x=SX.sym("x") 
     dx=SX.sym("dx")
 
-    f=SXFunction(daeIn(t=t, x=vertcat([x,dx])),[vertcat([dx,-x])])
-    f.init()
+    f=SXFunction("f", daeIn(t=t, x=vertcat([x,dx])),[vertcat([dx,-x])])
    
     integrator = Integrator("cvodes", f)
     integrator.setOption("fsens_scaling_factors",[5.0,7])
@@ -541,8 +535,7 @@ class typemaptests(casadiTestCase):
   def testGenericTypeBoolean(self):
     x=SX.sym("x")
 
-    nlp = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
-    nlp.init()
+    nlp = SXFunction("nlp", nlpIn(x=x),nlpOut(f=x**2))
 
     nlp_solver = NlpSolver("ipopt", nlp)
     
@@ -570,7 +563,7 @@ class typemaptests(casadiTestCase):
     w = DMatrix([[1,2,3],[4,5,6]])
     x = SX.sym("x")
     
-    f = SXFunction([x],[w])
+    f = SXFunction("f", [x],[w])
     
     W = f.outputExpr(0)
     self.assertEqual(W.size1(),2)
@@ -581,7 +574,7 @@ class typemaptests(casadiTestCase):
     w = DMatrix([[1,2,3],[4,5,6]])
     x = MX.sym("x")
     
-    f = MXFunction([x],[w])
+    f = MXFunction("f", [x],[w])
     
     W = f.outputExpr(0)
 
@@ -710,8 +703,7 @@ class typemaptests(casadiTestCase):
     self.message("casting DMatrix")
     
     x = SX.sym("x")
-    f = SXFunction([x],[x])
-    f.init()
+    f = SXFunction("f", [x],[x])
     class Foo:
       def __DMatrix__(self):
         return DMatrix([4])
@@ -772,24 +764,24 @@ class typemaptests(casadiTestCase):
       def __SX__(self):
         return x
         
-    SXFunction([x],[Foo()])
+    SXFunction("tmp", [x],[Foo()])
     
     class Foo:
       def __SX__(self):
         return MX.sym("x")
         
-    self.assertRaises(NotImplementedError,lambda : SXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : SXFunction("tmp", [x],[Foo()]))
     
     class Foo:
       def __SX__(self):
         raise Exception("15")
         
-    self.assertRaises(NotImplementedError,lambda : SXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : SXFunction("tmp", [x],[Foo()]))
 
     class Foo:
       pass
         
-    self.assertRaises(NotImplementedError,lambda :SXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda :SXFunction("tmp", [x],[Foo()]))
 
 
   def test_casting_MX(self):
@@ -802,24 +794,24 @@ class typemaptests(casadiTestCase):
       def __MX__(self):
         return x
         
-    MXFunction([x],[Foo()])
+    MXFunction("tmp", [x],[Foo()])
     
     class Foo:
       def __MX__(self):
         return SX.sym("x")
         
-    self.assertRaises(NotImplementedError,lambda : MXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : MXFunction("tmp", [x],[Foo()]))
     
     class Foo:
       def __MX__(self):
         raise Exception("15")
         
-    self.assertRaises(NotImplementedError,lambda : MXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : MXFunction("tmp", [x],[Foo()]))
 
     class Foo:
       pass
         
-    self.assertRaises(NotImplementedError,lambda :MXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda :MXFunction("tmp", [x],[Foo()]))
     
   def test_OUTPUT(self):
     self.message("OUTPUT typemap")
@@ -840,8 +832,7 @@ class typemaptests(casadiTestCase):
   def test_sxmatrix(self):
 
     def val(a):
-      f = SXFunction([],[a])
-      f.init()
+      f = SXFunction("f", [],[a])
       f.evaluate()
       return f.getOutput()
       
@@ -890,8 +881,7 @@ class typemaptests(casadiTestCase):
       d = DMatrix.ones(2,2)
       
       x = SX.sym("x",d.sparsity())
-      f = SXFunction([x],[x])
-      f.init()
+      f = SXFunction("f", [x],[x])
       f.setInput(D)
 
       self.checkarray(f.getInput(),DMatrix([[1,2],[3,4]]))
@@ -907,8 +897,7 @@ class typemaptests(casadiTestCase):
 
     states = SX.sym("x",2)
 
-    ode = SXFunction([states],[states**2])
-    ode.init()
+    ode = SXFunction("ode", [states],[states**2])
 
     sol = Integrator("idas",ode);
     a = sol.getOptionAllowed("linear_solver_type")
@@ -923,10 +912,6 @@ class typemaptests(casadiTestCase):
 
   def test_None(self):
     self.assertFalse(None==DMatrix(3))
-    x = SX.sym('x')
-    f = SXFunction([x],[x])
-    f.setOption('verbose', None)
-
     b = atleast_2d(None)
     with self.assertRaises(NotImplementedError):
       c = repmat(b, 1, 1)

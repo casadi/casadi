@@ -40,14 +40,12 @@ f = det(x)
 x = vec(x)
 x0 = [random.rand() for xi in range(x.nnz())]
 
-fcn = SXFunction([x],[f])
-fcn.init()
+fcn = SXFunction('fcn', [x],[f])
 
 # adjoint
 gf = fcn.grad()
 
-gfcn = SXFunction([x],[gf])
-gfcn.init()
+gfcn = SXFunction('gfcn', [x],[gf])
 
 name = "grad_det"
 gfcn.generate(name)
@@ -89,9 +87,7 @@ f_test = [gfcn,efcn_no_opt,efcn_O3_opt,efcn_Os_opt]
 if False:
   print "Just-in-time compilation with OpenCL"
   t1 = time.time()
-  gfcn_opencl = SXFunction([x],[gf])
-  gfcn_opencl.setOption("just_in_time_opencl",True)
-  gfcn_opencl.init()
+  gfcn_opencl = SXFunction('gfcn_opencl', [x], [gf], {"just_in_time_opencl":True})
   t2 = time.time()
   print "time = ", (t2-t1)*1e3, " ms"
   f_test.append(gfcn_opencl)

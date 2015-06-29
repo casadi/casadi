@@ -88,19 +88,13 @@ print "lbx = ", lbx, "ubx = ", ubx, "lbu = ", lbu, "ubu = ", ubu
 #$ From the symbolic expressions, we can create functions (functors) for evaluating the 
 #$ ODE right hand side numerically or symbolically. The following code creates a function
 #$ with two inputs (x and u) and two outputs (f and L):
-ode_fcn = MXFunction([x,u],[f,L])
-ode_fcn.setOption("name","ode_fcn")
-ode_fcn.init()
+ode_fcn = MXFunction('ode_fcn', [x,u],[f,L])
 #$ We also create a function for evaluating the initial conditions:
-init_fcn = MXFunction([x],[I])
-init_fcn.setOption("name","init_fcn")
-init_fcn.init()
+init_fcn = MXFunction('init_fcn', [x],[I])
 #$ Increased speed is often possible by converting the MXFunction instances to SXFunction instances.
 #$ This is possible when the symbolic expressions do not contain any exotic operators:
-ode_fcn = SXFunction(ode_fcn)
-ode_fcn.init()
+ode_fcn = SXFunction('ode_fcn', ode_fcn)
 init_fcn = SXFunction(init_fcn)
-init_fcn.init()
 #$ We shall use the "direct multiple shooting" method with 20 shooting intervals of equal length
 #$ to solve the IVP. 
 nk = 20
@@ -146,9 +140,7 @@ for j in range(nj):
    [k4,k4_L] = ode_fcn([xkj + h*k3,uk])
    xkj   += h/6 * (k1   + 2*k2   + 2*k3   + k4)
    xkj_L += h/6 * (k1_L + 2*k2_L + 2*k3_L + k4_L)
-integrator = MXFunction([xk,uk],[xkj,xkj_L])
-integrator.setOption("name","integrator")
-integrator.init()
+integrator = MXFunction('integrator', [xk,uk],[xkj,xkj_L])
 #$ where we have applied the method both the the ODE and to the \emph{quadrature} $\frac{d}{dt}{x_{\text{L}}}(t) = L, \quad x_{\text{L}}(0) = 0$. The code above include "calls" the previously created ODE right-hand-side function (\verb|ode_fcn|).
 #$
 #$ The next step is to formulate a nonlinear program (NLP) for solving the discrete time optimal control problem. 
@@ -202,9 +194,8 @@ for k in range(nk):
 #$ which is able to solve large-scale NLPs efficiently. CasADi will automatically and efficiently generate
 #$ the derivative information needed by IPOPT, including the Jacobian of the NLP constraints and the 
 #$ Hessian of the Lagrangian function:
-nlp = MXFunction(nlpIn(x=v),nlpOut(f=J,g=vertcat(eq)))
-solver = NlpSolver("ipopt", nlp)
-solver.init()
+nlp = MXFunction('nlp', nlpIn(x=v),nlpOut(f=J,g=vertcat(eq)))
+solver = NlpSolver("solver", "ipopt", nlp)
 #$ Pass bounds on the variables and constraints. The upper and lower bounds on the equality constraints are 0:
 solver.setInput(lbv,"lbx")
 solver.setInput(ubv,"ubx")

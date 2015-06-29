@@ -46,12 +46,11 @@ print z
 #! Any elementwise logic is postponed until evaluation demands it.
 #! Just like, SXFunction, MXFunction can be single or multi input/output.
 #! The only allowed input/output primitive is MX.
-f = MXFunction([x,y],[z])
+f = MXFunction('f', [x,y],[z])
 
 
 #! Evaluation
 #! ----------------
-f.init()
 f.setInput(DMatrix([[1,2,3],[4,5,6]]),0);
 f.setInput(DMatrix([[1,3],[0,6],[0,9]]),1);
 f.evaluate()
@@ -71,8 +70,7 @@ print MX(DMatrix([1,2,3]).T)
 print MX([1,2,3])
 #! As before, evaluation is lazy on the matrix level
 Y = MX.sym("Y")
-f = MXFunction([Y],[X])
-f.init()
+f = MXFunction('f', [Y],[X])
 f.setInput([2])
 f.evaluate()
 print f.getOutput()

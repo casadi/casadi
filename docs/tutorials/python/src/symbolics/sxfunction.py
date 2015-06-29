@@ -62,11 +62,10 @@ print z
 #! ----------------------------------
 #! The following code creates and evaluates a single input (scalar valued), single output (scalar valued) function.
 #$ f : $\mathbb{R} \mapsto \mathbb{R}$
-f = SXFunction([x], [z]) # z = f(x)
+f = SXFunction('f', [x], [z]) # z = f(x)
 print "%d -> %d" % (f.nIn(),f.nOut())
 print f.inputExpr(), type(f.inputExpr())
 print f.outputExpr(), type(f.outputExpr())
-f.init()
 f.setInput(2)
 f.evaluate()
 print f.getOutput()
@@ -86,12 +85,11 @@ print f.grad()
 #$ The mathematical notation could be $ f_{i,j} : $\mathbb{R} \mapsto \mathbb{R} \quad  i,j \in [0,1]$
 x = SX.sym("x") # 1 by 1 matrix serves as scalar
 y = SX.sym("y") # 1 by 1 matrix serves as scalar
-f = SXFunction([x , y ], [x*y, x+y])
+f = SXFunction('f', [x , y ], [x*y, x+y])
 print "%d -> %d" % (f.nIn(),f.nOut())
 f.init()
 f.setInput(2,0)
 f.setInput(3,1)
-f.evaluate()
 
 print [f.getOutput(i) for i in range(2)]
 print [[f.grad(i,j) for i in range(2)] for j in range(2)]
@@ -102,8 +100,7 @@ print [[f.grad(i,j) for i in range(2)] for j in range(2)]
 x=SX.sym("x")
 a=SX.sym("a")
 b=SX.sym("b")
-f = SXFunction([x,vertcat((a,b))],[a*x + b]) 
-f.init()
+f = SXFunction('f', [x,vertcat((a,b))],[a*x + b]) 
 
 print f([x,vertcat([a,b])])
 print f([SX(1.0),vertcat((a,b))])
@@ -123,9 +120,8 @@ print f([x,vertcat((SX.sym("c"),SX.sym("d")))])
 
 x = SX.sym("x")
 y = SX.sym("y")
-f = SXFunction([vertcat((x , y ))], [vertcat((x*y, x+y))])
+f = SXFunction('f', [vertcat((x , y ))], [vertcat((x*y, x+y))])
 print "%d -> %d" % (f.nIn(),f.nOut())
-f.init()
 f.setInput([2,3])
 f.evaluate()
 print f.getOutput()
@@ -147,8 +143,7 @@ print df.getOutput(1) # v
 x = SX.sym("x",2,2)
 y = SX.sym("y",2,2)
 print x*y # Not a dot product
-f = SXFunction([x,y], [x*y])
-f.init()
+f = SXFunction('f', [x,y], [x*y])
 print "%d -> %d" % (f.nIn(),f.nOut())
 print f([x,y])
 f.init()
@@ -161,8 +156,7 @@ print f.jac(1).T
 
 print 12
 
-f = SXFunction([x,y], [x*y,x+y])
-f.init()
+f = SXFunction('f', [x,y], [x*y,x+y])
 print type(x)
 print f([x,y])
 print type(f([x,y]))
@@ -170,8 +164,7 @@ print type(f([x,y])[0])
 print type(f([x,y])[0][0,0])
 
 
-f = SXFunction([x], [x+y])
-f.init()
+f = SXFunction('f', [x], [x+y])
 print type(x)
 print f([x])
 print type(f([x]))

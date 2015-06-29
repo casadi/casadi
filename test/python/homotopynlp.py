@@ -47,10 +47,9 @@ class HomotopyNLPtests(casadiTestCase):
     y = SX.sym("y")
     tau = SX.sym("tau")
 
-    nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2))
+    nlp=SXFunction('nlp', nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2))
 
-    hnlp = SXFunction(hnlpIn(x=vertcat([x,y]),tau=tau),nlpOut(f=(1-x)**2+100*(y-x**2)**2+x-tau,g=x**2+y**2 - (tau -1.2)**2))
-    hnlp.init()
+    hnlp = SXFunction('hnlp', hnlpIn(x=vertcat([x,y]),tau=tau),nlpOut(f=(1-x)**2+100*(y-x**2)**2+x-tau,g=x**2+y**2 - (tau -1.2)**2))
 
     for Solver, solver_options in solvers:
       hnlpsolver = Solver(hnlp)

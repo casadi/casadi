@@ -228,22 +228,19 @@ class ControlTests(casadiTestCase):
           if with_H:
             for i in Y:
               i.sparsity().spy()
-            f = MXFunction(lrdpleIn(a=A,c=C,v=Vs,h=H),[horzcat(Y)])
+            f = MXFunction("reference", lrdpleIn(a=A,c=C,v=Vs,h=H),[horzcat(Y)])
           else:
-            f = MXFunction(lrdpleIn(a=A,c=C,v=Vs),[horzcat(Y)])
+            f = MXFunction("reference", lrdpleIn(a=A,c=C,v=Vs),[horzcat(Y)])
         else:
           if with_H:
-            f = MXFunction(lrdpleIn(a=A,v=Vs,h=H),[horzcat(Y)])
+            f = MXFunction("reference", lrdpleIn(a=A,v=Vs,h=H),[horzcat(Y)])
           else:
-            f = MXFunction(lrdpleIn(a=A,v=Vs),[horzcat(Y)])
-        f.setOption("name","reference")
-        f.init()
+            f = MXFunction("reference", lrdpleIn(a=A,v=Vs),[horzcat(Y)])
         
         print "f",f
         
         
-        temp = MXFunction([A],[An])
-        temp.init()
+        temp = MXFunction("temp", [A],[An])
         Af_ = temp([horzcat(A_)])[0]
         print "Af"
         Af_.printDense()
@@ -341,15 +338,14 @@ class ControlTests(casadiTestCase):
         
         if with_C:
           if with_H:
-            f = MXFunction(lrdleIn(a=A,c=C,v=Vs,h=H),[diagcat(Y)])
+            f = MXFunction("f", lrdleIn(a=A,c=C,v=Vs,h=H),[diagcat(Y)])
           else:
-            f = MXFunction(lrdleIn(a=A,c=C,v=Vs),[diagcat(Y)])
+            f = MXFunction("f", lrdleIn(a=A,c=C,v=Vs),[diagcat(Y)])
         else:
           if with_H:
-            f = MXFunction(lrdleIn(a=A,v=Vs,h=H),[diagcat(Y)])
+            f = MXFunction("f", lrdleIn(a=A,v=Vs,h=H),[diagcat(Y)])
           else:
-            f = MXFunction(lrdleIn(a=A,v=Vs),[diagcat(Y)])
-        f.init()
+            f = MXFunction("f", lrdleIn(a=A,v=Vs),[diagcat(Y)])
         
         
         for Solver, options in lrdlesolvers:
@@ -411,8 +407,7 @@ class ControlTests(casadiTestCase):
           
           Pf = solve(A_total,vec(Vss),"csparse")
           
-          refsol = MXFunction(dleIn(a=As,v=Vs),dleOut(p=Pf.reshape((n,n))))
-          refsol.init()
+          refsol = MXFunction("refsol", dleIn(a=As,v=Vs),dleOut(p=Pf.reshape((n,n))))
           
           refsol.setInput(A_,"a")
           refsol.setInput(V_,"v")
@@ -473,8 +468,7 @@ class ControlTests(casadiTestCase):
           
           Pf = solve(A_total,vec(Vss),"csparse")
           
-          refsol = MXFunction(dleIn(a=As,v=Vs),dleOut(p=Pf.reshape((n,n))))
-          refsol.init()
+          refsol = MXFunction("refsol", dleIn(a=As,v=Vs),dleOut(p=Pf.reshape((n,n))))
           
           refsol.setInput(A_,"a")
           refsol.setInput(V_,"v")
@@ -533,8 +527,7 @@ class ControlTests(casadiTestCase):
           Pf = solve(A_total,vec(Vss),"csparse")
           P = Pf.reshape((n,K*n))
           
-          refsol = MXFunction(dpleIn(a=As,v=Vs),dpleOut(p=P))
-          refsol.init()
+          refsol = MXFunction("refsol", dpleIn(a=As,v=Vs),dpleOut(p=P))
           
           refsol.setInput(horzcat(A_),"a")
           refsol.setInput(horzcat(V_),"v")

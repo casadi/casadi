@@ -47,15 +47,12 @@ for N in range(1,11):
   
   # Differential equation
   z = SX.sym("z")
-  F = SXFunction([z],[z*z - 2*z + 1])
-  F.setOption("name","dz/dt")
-  F.init()
+  F = SXFunction("dz/dt", [z],[z*z - 2*z + 1])
   
   z0 = -3
   
   # Analytic solution
-  z_analytic = SXFunction([t], [(4*t-3)/(3*t+1)])
-  z_analytic.setOption("name","analytic solution")
+  z_analytic = SXFunction("analytic solution", [t], [(4*t-3)/(3*t+1)])
   
   # Collocation point
   tau = SX.sym("tau")
@@ -73,8 +70,7 @@ for N in range(1,11):
 
     print "l(", j, ") = ", L
 
-    f = SXFunction([tau],[L])
-    f.setOption("name", "l(" + str(j) + ")")
+    f = SXFunction("l(" + str(j) + ")", [tau],[L])
     
     # initialize
     f.init()
@@ -125,7 +121,7 @@ for N in range(1,11):
   print "g = ", g
 
   # NLP
-  nlp = SXFunction(nlpIn(x=x),nlpOut(f=x[0]**2,g=g))
+  nlp = SXFunction('nlp', nlpIn(x=x),nlpOut(f=x[0]**2,g=g))
 
   ## ----
   ## SOLVE THE NLP

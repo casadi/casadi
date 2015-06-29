@@ -42,7 +42,7 @@ namespace casadi {
   SXFunction::SXFunction() {
   }
 
-  //#ifdef WITH_LEGACY_CONSTRUCTORS
+#ifdef WITH_LEGACY_CONSTRUCTORS
   SXFunction::SXFunction(const vector<SX>& arg, const vector<SX>& res) {
     assignNode(new SXFunctionInternal(arg, res));
   }
@@ -65,7 +65,7 @@ namespace casadi {
     setOption("input_scheme", arg.second);
     setOption("output_scheme", res.second);
   }
-  //#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_LEGACY_CONSTRUCTORS
 
   void SXFunction::construct(const std::string& name,
                              const std::vector<SX>& arg,

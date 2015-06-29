@@ -69,7 +69,7 @@ f = substitute(f,u,u_opt)
 
 # Create the right hand side function
 rhs_in = daeIn(x=vertcat((x,lam)))
-rhs = SXFunction(rhs_in,daeOut(ode=f))
+rhs = SXFunction('rhs', rhs_in,daeOut(ode=f))
 
 # Create an integrator (CVodes)
 I = Integrator("cvodes", rhs)
@@ -96,7 +96,7 @@ lam_f = X[2:4]
 g = lam_f
 
 # Formulate root-finding problem
-rfp = MXFunction([l_init],[g])
+rfp = MXFunction('rfp', [l_init],[g])
 
 # Select a solver for the root-finding problem
 Solver = "nlp"
@@ -131,11 +131,10 @@ l_init_opt = NP.array(solver.getOutput().nonzeros())
 tgrid = NP.linspace(0,10,100)
 
 # Output functions
-output_fcn = SXFunction(rhs_in,[x0,x1,u_opt])
+output_fcn = SXFunction('output_fcn', rhs_in,[x0,x1,u_opt])
 
 # Simulator to get optimal state and control trajectories
-simulator = Simulator(I, output_fcn, tgrid)
-simulator.init()
+simulator = Simulator('simulator', I, output_fcn, tgrid)
 
 # Pass initial conditions to the simulator
 simulator.setInput(NP.concatenate((x_init,l_init_opt)),"x0")

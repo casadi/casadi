@@ -237,9 +237,9 @@ class casadiTestCase(unittest.TestCase):
       
 
     if isinstance(sample,SX):
-      f = SXFunction(x,yt)
+      f = SXFunction("f", x, yt)
     else:
-      f = MXFunction(x,yt)
+      f = MXFunction("f", x, yt)
     
     f.init()
     if (not(fmod is None)):
@@ -298,8 +298,7 @@ class casadiTestCase(unittest.TestCase):
 
     if indirect:
       ins = trial.symbolicInput()
-      extra_trial = MXFunction(ins,trial.call(ins))
-      extra_trial.init()
+      extra_trial = MXFunction("extra_trial", ins,trial.call(ins))
       for i in range(trial.nIn()):
         extra_trial.setInput(trial.getInput(i),i)
       self.checkfunction(extra_trial,solution,fwd,adj,jacobian,gradient,hessian,sens_der,evals,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
@@ -468,10 +467,8 @@ class casadiTestCase(unittest.TestCase):
             fwdsens = f.callForward(inputss, res, fseeds)
             adjsens = f.callReverse(inputss, res, aseeds)
           
-          vf = Function(inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
+          vf = Function("vf", inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
           
-          vf.init()
-
           for i,v in enumerate(values):
             vf.setInput(v,i)
         
@@ -502,8 +499,7 @@ class casadiTestCase(unittest.TestCase):
                 fwdsens2 = vf.callForward(inputss2, res2, fseeds2)
                 adjsens2 = vf.callReverse(inputss2, res2, aseeds2)
 
-              vf2 = Function(inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
-              vf2.init()
+              vf2 = Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
                 
               for i,v in enumerate(values):
                 vf2.setInput(v,i)

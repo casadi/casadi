@@ -33,12 +33,11 @@ from pylab import *
 u = SX.sym("u")
 x = SX.sym("x")
 y = SX.sym("y")
-f  = SXFunction([vertcat([x,y]),u], [vertcat([(1-y*y)*x-y+u,x])])
+f  = SXFunction('f', [vertcat([x,y]),u], [vertcat([(1-y*y)*x-y+u,x])])
 #! Manipulate the function to adhere to the integrator's
 #! input/output signature
 #! f(time;states;parameters)
-fmod=SXFunction(daeIn(x=f.inputExpr(0),p=f.inputExpr(1)),daeOut(ode=f.outputExpr(0)))
-fmod.setOption("name","ODE right hand side")
+fmod=SXFunction('ODE_right_hand_side', daeIn(x=f.inputExpr(0),p=f.inputExpr(1)),daeOut(ode=f.outputExpr(0)))
 #! Create the Integrator
 integrator = Integrator("cvodes", fmod)
 #! The whole series of sundials options are available for the user
@@ -217,8 +216,7 @@ u=MX.sym("u")
 w = integrator({'x0':MX([1,0]),'p':u})["xf"]
 
 #! We construct an MXfunction and a python help function 'out'
-f=MXFunction([u],[w])
-f.init()
+f=MXFunction('f', [u],[w])
 
 def out(u):
 	f.setInput(u)

@@ -173,8 +173,7 @@ class ComplexityTests(casadiTestCase):
     def setupfun(self,N):
       A = SX.sym("A",N,1)
       B = SX.sym("B",N,1)
-      f = SXFunction([A,B],[A+B])
-      f.init()
+      f = SXFunction('f', [A,B],[A+B])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
@@ -187,8 +186,7 @@ class ComplexityTests(casadiTestCase):
     def setupfun(self,N):
       A = SX.sym("A",N,1)
       B = SX.sym("B",N,1)
-      f = SXFunction([A,B],[c.dot(A.T,B)])
-      f.init()
+      f = SXFunction('f', [A,B],[c.dot(A.T,B)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
@@ -200,8 +198,7 @@ class ComplexityTests(casadiTestCase):
       A = SX.sym("A",Sparsity.diag(N))
       A[-1,0]=SX("off") # Have one of-diagonal element
       B = SX.sym("B",N,1)
-      f = SXFunction([A,B],[c.dot(A,B)])
-      f.init()
+      f = SXFunction('f', [A,B],[c.dot(A,B)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
@@ -214,8 +211,7 @@ class ComplexityTests(casadiTestCase):
     def setupfun(self,N):
       G = MX.sym("G",N,1)
       X = MX.sym("X",N,1)
-      f = MXFunction([G,X],[c.prod(G.T,X)])
-      f.init()
+      f = MXFunction('f', [G,X],[c.prod(G.T,X)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
@@ -228,8 +224,7 @@ class ComplexityTests(casadiTestCase):
       s[-1,0]=1
       H = MX.sym("H",s)
       X = MX.sym("X",N,1)
-      f = MXFunction([H,X],[c.prod(H,X)])
-      f.init()
+      f = MXFunction('f', [H,X],[c.prod(H,X)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
@@ -242,8 +237,7 @@ class ComplexityTests(casadiTestCase):
       s = Sparsity.diag(N)
       s[-1,0]=1
       X = MX.sym("X",s)
-      f = MXFunction([H,X],[c.prod(H,X)])
-      f.init()
+      f = MXFunction('f', [H,X],[c.prod(H,X)])
       return {'f':f}
     self.complexity(setupfun,fun, 2)  # 1
 

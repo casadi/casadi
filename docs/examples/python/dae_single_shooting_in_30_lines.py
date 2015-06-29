@@ -50,12 +50,11 @@ f_z = x[1]**2 + z - 1
 f_q = x[1]**2 + x[1]**2 + u**2
 
 # DAE callback function
-f = SXFunction([x,z,u,t],[f_x,f_z,f_q])
+f = SXFunction('f', [x,z,u,t],[f_x,f_z,f_q])
 
 # Create an integrator
-I = Integrator("idas", f)
-I.setOption("tf",0.5) # interval length
-I.init()
+opts = {"tf":0.5} # interval length
+I = Integrator('I', "idas", f, opts)
 
 # All controls
 U = MX.sym("U",20)
@@ -68,11 +67,10 @@ for k in range(20):
   J += Q   # Sum up quadratures
   
 # NLP callback functions
-nlp = MXFunction(nlpIn(x=U),nlpOut(f=J,g=X))
+nlp = MXFunction('nlp', nlpIn(x=U), nlpOut(f=J, g=X))
 
 # Allocate an NLP solver
-solver = NlpSolver("ipopt", nlp)
-solver.init()
+solver = NlpSolver("solver", "ipopt", nlp)
 
 # Pass bounds, initial guess and solve NLP
 solver.setInput(-0.75, "lbx")    # Lower variable bound

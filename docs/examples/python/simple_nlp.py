@@ -28,7 +28,7 @@ from casadi import *
 x = SX.sym("x",2)
 
 # Form the NLP
-nlp = SXFunction([x,[]],[
+nlp = SXFunction('nlp', [x,[]],[
         x[0]**2 + x[1]**2, # objective
         x[0]+x[1]-10      # constraint
       ])

@@ -38,10 +38,10 @@ x  = SX.sym("x",3)  # state
 rhs = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
                x[0], \
                x[0]*x[0] + x[1]*x[1] + u*u])
-f = SXFunction([t,x,u],[rhs])
+f = SXFunction('f', [t,x,u],[rhs])
 
 # Objective function (meyer term)
-m = SXFunction([t,x,u],[x[2]])
+m = SXFunction('m', [t,x,u],[x[2]])
 
 # Control bounds
 u_min = -0.75
@@ -100,8 +100,7 @@ for j in range(d+1):
   for r in range(d+1):
     if r != j:
       L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
-  lfcn = SXFunction([tau],[L])
-  lfcn.init()
+  lfcn = SXFunction('lfcn', [tau],[L])
   
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
   lfcn.setInput(1.0)
@@ -205,8 +204,8 @@ g = vertcat(g)
 [f] = m.call([T[nk-1,d],X[nk,0],U[nk-1]])
   
 # NLP
-nlp = MXFunction(nlpIn(x=V),nlpOut(f=f,g=g))
-  
+nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=f,g=g))
+
 ## ----
 ## SOLVE THE NLP
 ## ----

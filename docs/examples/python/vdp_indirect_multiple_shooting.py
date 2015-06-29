@@ -68,7 +68,7 @@ f = substitute(f,u,u_opt)
 
 # Create the right hand side function
 rhs_in = daeIn(x=vertcat((x,lam)))
-rhs = SXFunction(rhs_in,daeOut(ode=f))
+rhs = SXFunction('rhs', rhs_in,daeOut(ode=f))
 
 # Augmented DAE state dimension
 nX = 4
@@ -107,27 +107,27 @@ for k in range(num_nodes):
 G.append(X[num_nodes][2:] - NP.array([0,0])) # costates fixed, states free at final time
 
 # Terminal constraints: lam = 0
-rfp = MXFunction([V],[vertcat(G)])
+rfp = MXFunction('rfp', [V],[vertcat(G)])
 
 # Select a solver for the root-finding problem
 Solver = "nlp"
 #Solver = "newton"
 #Solver = "kinsol"
 
-# Allocate an implict solver
-solver = ImplicitFunction(Solver, rfp)
+# Solver options
+opts = {}
 if Solver=="nlp":
-    solver.setOption("nlp_solver", "ipopt")
-    solver.setOption("nlp_solver_options",{"hessian_approximation":"limited-memory"})
+    opts["nlp_solver"] = "ipopt"
+    opts["nlp_solver_options"] = {"hessian_approximation":"limited-memory"}
 elif Solver=="newton":
-    solver.setOption("linear_solver",CSparse)
+    opts["linear_solver"] = CSparse
 elif Solver=="kinsol":
-    solver.setOption("linear_solver_type","user_defined")
-    solver.setOption("linear_solver",CSparse)
-    solver.setOption("max_iter",1000)
+    opts["linear_solver_type"] = "user_defined"
+    opts["linear_solver"] = CSparse
+    opts["max_iter"] = 1000
 
-# Initialize the solver
-solver.init()
+# Allocate a solver
+solver = ImplicitFunction('solver', Solver, rfp, opts)
 
 # Set bounds and initial guess
 #solver.setInput([   0,   0,   0,   0] + (num_nodes-1)*[   0,   0,   0,   0] + [   0,   0,   0,   0], "x0")

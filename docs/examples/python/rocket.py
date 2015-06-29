@@ -40,9 +40,7 @@ mdot = -0.1*u*u
 xdot = vertcat([sdot,vdot,mdot])
 
 # ODE right hand side function
-f = MXFunction([x,u],[xdot])
-f.setOption("name","f")
-f.init()
+f = MXFunction('f', [x,u],[xdot])
 
 # Integrate with Explicit Euler over 0.2 seconds
 dt = 0.01  # Time step
@@ -52,8 +50,7 @@ for j in range(20):
   xj += dt*fj
 
 # Discrete time dynamics function
-F = MXFunction([x,u],[xj])
-F.init()
+F = MXFunction('F', [x,u],[xj])
 
 # Number of control segments
 nu = 50 
@@ -74,7 +71,7 @@ J = mul(U.T,U) # u'*u in Matlab
 G = X[0:2]     # x(1:2) in Matlab
 
 # NLP
-nlp = MXFunction(nlpIn(x=U),nlpOut(f=J,g=G))
+nlp = MXFunction('nlp', nlpIn(x=U),nlpOut(f=J,g=G))
   
 # Allocate an NLP solver
 solver = NlpSolver("ipopt", nlp)

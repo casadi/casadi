@@ -103,12 +103,10 @@ class Matrixtests(casadiTestCase):
     
     L = [x,y,z]
 
-    fMX = MXFunction(L,[diagcat(L)])
-    fMX.init()
+    fMX = MXFunction("fMX", L,[diagcat(L)])
     
     LSX = [ SX.sym("",i.sparsity()) for i in L ]
-    fSX = SXFunction(LSX,[diagcat(LSX)])
-    fSX.init()
+    fSX = SXFunction("fSX", LSX,[diagcat(LSX)])
 
     for f in [fMX,fSX]:
       for i in range(3):
@@ -734,8 +732,7 @@ class Matrixtests(casadiTestCase):
     x = MX.sym('x',10,1)
     sp = Sparsity.upper(2)
     y = triu2symm(MX(sp,x[1:4]))
-    f = MXFunction([x],[y])
-    f.init()
+    f = MXFunction("f", [x],[y])
       
   def test_append_empty(self):
     a = DMatrix(0,0)
@@ -868,8 +865,7 @@ class Matrixtests(casadiTestCase):
         B = SX.sym("B",b.sparsity())
         C = solve(A,B)
         
-        f = SXFunction([A,B],[C])
-        f.init()
+        f = SXFunction("f", [A,B],[C])
         
         f.setInput(a,0)
         f.setInput(b,1)
@@ -914,8 +910,7 @@ class Matrixtests(casadiTestCase):
     B = SX.sym("B",4,5)
     P = SX.sym("P",A.size2(),B.size1())
 
-    f = SXFunction([vec(P.T),A,B],[vec(mul([A,P,B]).T)])
-    f.init()
+    f = SXFunction("f", [vec(P.T),A,B],[vec(mul([A,P,B]).T)])
 
     J = f.jacobian()
     J.init()

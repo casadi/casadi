@@ -47,8 +47,7 @@ rhs["v"]  = -10*(x["p"]-u) - x["v"]*sqrt(sum_square(x["v"])+1) + w
 
 T = SX.sym("T") # Time-period
 
-f = SXFunction(daeIn(x=x,p=vertcat([T,u,w])),daeOut(ode=T*rhs))
-f.init()
+f = SXFunction('f', daeIn(x=x,p=vertcat([T,u,w])),daeOut(ode=T*rhs))
 
 #  ==================================
 #    Construct the path constraints
@@ -65,8 +64,7 @@ h_nom    = [ sumRows(vec(((x["p"]-p)/s)**n)) - 1 for s,p,n in hyper ]
 
 h_margin = [ sqrt(quad_form(jacobian(i,x).T,P)) for i in h_nom ]
 
-h_robust = SXFunction([x,P],[ n - gamma*m for n,m in zip(h_nom, h_margin) ])
-h_robust.init()
+h_robust = SXFunction('h_robust', [x,P],[ n - gamma*m for n,m in zip(h_nom, h_margin) ])
 
 
 #  ==================================
@@ -133,7 +131,7 @@ g = struct_MX([
 # Objective function
 F = V["T"] + 1e-2*sum_square(vertcat(V["U"]))/2/N
 
-nlp = MXFunction(nlpIn(x=V),nlpOut(f=F,g=g))
+nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=F,g=g))
 
 #  ==================================
 #   Set NLP initial guess and bounds
@@ -182,8 +180,7 @@ for s,p,n in hyper:
   fill(s[0]*fabs(cos(theta))**(2.0/n)*sign(cos(theta)) + p[0],s[1]*fabs(sin(theta))**(2.0/n)*sign(sin(theta)) + p[1],'r')
 
 # Plot the unertainty ellipsoids
-Pf = MXFunction(nlpIn(x=V),Ps)
-Pf.init()
+Pf = MXFunction('Pf', nlpIn(x=V),Ps)
 
 Pf.setInput(sol)
 Pf.evaluate()

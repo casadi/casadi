@@ -284,8 +284,7 @@ class Toolstests(casadiTestCase):
 
     self.assertTrue(isinstance(V.cat,MX)) 
     def isEqualV(a,b):
-      ft = MXFunction([x,m],[a-b])
-      ft.init()
+      ft = MXFunction("ft", [x,m],[a-b])
       for i in range(ft.nIn()):
         ft.setInput(numpy.random.rand(*ft.getInput(i).shape),i)
       ft.evaluate()
@@ -302,8 +301,7 @@ class Toolstests(casadiTestCase):
     V["y",0] = abc
     
     def isEqualV(a,b):
-      ft = MXFunction([x,m,abc],[a-b])
-      ft.init()
+      ft = MXFunction("ft", [x,m,abc],[a-b])
       for i in range(ft.nIn()):
         ft.setInput(numpy.random.rand(*ft.getInput(i).shape),i)
       ft.evaluate()
@@ -527,8 +525,7 @@ class Toolstests(casadiTestCase):
     self.assertEqual(a.size,6)
     self.checkarray(a["P"].shape,(3,3))
     
-    f = SXFunction([a],[a["P"]])
-    f.init()
+    f = SXFunction("f", [a],[a["P"]])
     f.setInput(range(6))
     f.evaluate()
     
@@ -743,8 +740,7 @@ class Toolstests(casadiTestCase):
 
     print d["b"]
 
-    f = MXFunction([V],[d["a"],d["b"],d["c"]])
-    f.init()
+    f = MXFunction("f", [V],[d["a"],d["b"],d["c"]])
 
     s_ = s()
     s_["a"] = 1
@@ -783,8 +779,7 @@ class Toolstests(casadiTestCase):
 
       J = states.product(controls,J)
 
-      f = F([J],[J["x","v"], J["x",:] , J["y",["v","w"]],  J[:,"u"] ])
-      f.init()
+      f = F("f", [J],[J["x","v"], J["x",:] , J["y",["v","w"]],  J[:,"u"] ])
       f.setInputNZ(range(1,7))
 
       f.evaluate()

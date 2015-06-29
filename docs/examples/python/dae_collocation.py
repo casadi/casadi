@@ -78,8 +78,7 @@ for j in range(deg+1):
         if j2 != j:
             L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
 
-    lfcn = SXFunction([tau],[L])
-    lfcn.init()
+    lfcn = SXFunction('lfcn', [tau],[L])
     # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
     lfcn.setInput(1.0)
     lfcn.evaluate()
@@ -133,11 +132,11 @@ xd[5] = dw
                    
 
 # System dynamics (implicit formulation)
-ffcn = SXFunction([t,xddot,xd,xa,u,p],[res])
+ffcn = SXFunction('ffcn', [t,xddot,xd,xa,u,p],[res])
 
 # Objective function 
-MayerTerm = SXFunction([t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
-LagrangeTerm = SXFunction([t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
+MayerTerm = SXFunction('mayer', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
+LagrangeTerm = SXFunction('lagrange', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
 
 # Control bounds
 u_min = np.array([-2])
@@ -183,27 +182,19 @@ ic_min = np.array([])
 ic_max = np.array([])
 ic = SX()
 #ic.append();       ic_min = append(ic_min, 0.);         ic_max = append(ic_max, 0.)
-icfcn = SXFunction([t,xd,xa,u,p],[ic])
+icfcn = SXFunction('icfcn', [t,xd,xa,u,p],[ic])
 # Path constraint
 pc_min = np.array([])
 pc_max = np.array([])
 pc = SX()
 #pc.append();       pc_min = append(pc_min, 0.);         pc_max = append(pc_max, 0.)
-pcfcn = SXFunction([t,xd,xa,u,p],[pc])
+pcfcn = SXFunction('pcfcn', [t,xd,xa,u,p],[pc])
 # Final constraint
 fc_min = np.array([])
 fc_max = np.array([])
 fc = SX()
 #fc.append();       fc_min = append(fc_min, 0.);         fc_max = append(fc_max, 0.)
-fcfcn = SXFunction([t,xd,xa,u,p],[fc])
-
-# Initialize the functions
-ffcn.init()
-icfcn.init()
-pcfcn.init()
-fcfcn.init()
-LagrangeTerm.init()
-MayerTerm.init()
+fcfcn = SXFunction('fcfcn', [t,xd,xa,u,p],[fc])
 
 # -----------------------------------------------------------------------------
 # NLP setup
@@ -375,7 +366,7 @@ for k in range(nk):
 Obj += lagrangeTerm        
 
 # NLP
-nlp = MXFunction(nlpIn(x=V),nlpOut(f=Obj,g=vertcat(g)))
+nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=Obj,g=vertcat(g)))
 
 ## ----
 ## SOLVE THE NLP
@@ -455,8 +446,7 @@ for j in range(1,deg+1):
     for j2 in range(1,deg+1):
         if j2 != j:
             La *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
-    lafcn = SXFunction([tau],[La])
-    lafcn.init()
+    lafcn = SXFunction('lafcn', [tau],[La])
     lafcn.setInput(tau_root[0])
     lafcn.evaluate()
     Da[j-1] = lafcn.getOutput()
