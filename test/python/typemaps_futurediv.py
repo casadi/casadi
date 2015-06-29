@@ -170,13 +170,11 @@ class typemaptests(casadiTestCase):
       if hasNum:
         dummy = [1.3,2.7,9.4,1.0]
 
-        f=function([z],[r])
-        f.init()
+        f=function('f', [z],[r])
         f.setInputNZ(dummy[0:f.getInput().nnz()])
         f.evaluate()
         
-        f_=function([z],[z])
-        f_.init()
+        f_=function('f', [z],[z])
         f_.setInputNZ(dummy[0:f.getInput().nnz()])
         f_.evaluate()
         
@@ -186,14 +184,12 @@ class typemaptests(casadiTestCase):
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
         
-        f=function([z,s],[r])
-        f.init()
+        f=function('f',[z,s],[r])
         f.setInputNZ(dummy[0:f.getInput(0).nnz()],0)
         f.setInputNZ(dummy2[0:f.getInput(1).nnz()],1)
         f.evaluate()
         
-        f_=function([z,s],[z,s])
-        f_.init()
+        f_=function('f', [z,s],[z,s])
         f_.setInputNZ(dummy[0:f.getInput(0).nnz()],0)
         f_.setInputNZ(dummy2[0:f.getInput(1).nnz()],1)
         f_.evaluate()
