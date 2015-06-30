@@ -49,6 +49,7 @@ namespace casadi {
     init();
   }
 
+#ifdef WITH_LEGACY_CONSTRUCTORS
   ControlSimulator::ControlSimulator(const Function& dae, const Function& output_fcn,
                                      const Matrix<double>& grid) {
     assignNode(new ControlSimulatorInternal(dae, output_fcn, grid));
@@ -57,6 +58,7 @@ namespace casadi {
   ControlSimulator::ControlSimulator(const Function& dae, const Matrix<double>& grid) {
     assignNode(new ControlSimulatorInternal(dae, Function(), grid));
   }
+#endif // WITH_LEGACY_CONSTRUCTORS
 
   ControlSimulatorInternal* ControlSimulator::operator->() {
     return static_cast<ControlSimulatorInternal*>(Function::operator->());

@@ -353,12 +353,10 @@ namespace casadi {
     MXFunction dae("dae", daeIn("x", x, "p", u), daeOut("ode", xdot));
 
     // Create integrator function
-    Integrator ifcn(integrator, dae);
-    ifcn.setOption("name", "integrator");
-    ifcn.setOption(integrator_options);
-    ifcn.setOption("t0", 0); // Normalized time
-    ifcn.setOption("tf", 1); // Normalized time
-    ifcn.init();
+    Dict integrator_options2 = integrator_options;
+    integrator_options2["t0"] = 0; // Normalized time
+    integrator_options2["tf"] = 1; // Normalized time
+    Integrator ifcn("integrator", integrator, dae, integrator_options2);
 
     // Inputs of constructed function
     MX x0 = MX::sym("x0", x_sp);

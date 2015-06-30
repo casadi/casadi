@@ -391,28 +391,20 @@ namespace casadi {
     implicit_solver_.init();
 
     if (hasSetOption("startup_integrator")) {
+      Dict startup_integrator_options;
+      if (hasSetOption("startup_integrator_options")) {
+        startup_integrator_options = getOption("startup_integrator_options");
+      }
+      // Pass options
+      startup_integrator_options["t0"] = coll_time_.front().front();
+      startup_integrator_options["tf"] = coll_time_.back().back();
 
       // Create the linear solver
       std::string startup_integrator_name = getOption("startup_integrator");
 
       // Allocate a root-finding solver
-      startup_integrator_ = Integrator(startup_integrator_name, f_, g_);
-
-      // Pass options
-      startup_integrator_.setOption("t0", coll_time_.front().front());
-      startup_integrator_.setOption("tf", coll_time_.back().back());
-
-      std::stringstream ss_startup_integrator;
-      ss_startup_integrator << "collocation_startup_" << getOption("name");
-      startup_integrator_.setOption("name", ss_startup_integrator.str());
-
-      if (hasSetOption("startup_integrator_options")) {
-        const Dict& startup_integrator_options = getOption("startup_integrator_options");
-        startup_integrator_.setOption(startup_integrator_options);
-      }
-
-      // Initialize the startup integrator
-      startup_integrator_.init();
+      startup_integrator_ = Integrator("collocation_startup_" + name_, startup_integrator_name,
+                                       make_pair(f_, g_), startup_integrator_options);
     }
 
     // Mark the system not yet integrated

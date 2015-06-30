@@ -50,9 +50,19 @@ namespace casadi {
     init();
   }
 
+  Integrator::Integrator(const std::string& name, const std::string& solver,
+                         const std::pair<Function, Function>& fg, const Dict& opts) {
+    assignNode(IntegratorInternal::getPlugin(solver).creator(fg.first, fg.second));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+#ifdef WITH_LEGACY_CONSTRUCTORS
   Integrator::Integrator(const std::string& solver, const Function& f, const Function& g) {
     assignNode(IntegratorInternal::getPlugin(solver).creator(f, g));
   }
+#endif // WITH_LEGACY_CONSTRUCTORS
 
   Integrator  Integrator::clone() const {
     Integrator ret;

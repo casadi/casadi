@@ -176,13 +176,6 @@ namespace casadi {
 
     dae_ = MXFunction("dae", dae_in_, dae_out);
 
-    // Create an integrator instance
-    std::string integrator_name = getOption("integrator");
-    integrator_ = Integrator(integrator_name, dae_, Function());
-    if (hasSetOption("integrator_options")) {
-      integrator_.setOption(getOption("integrator_options"));
-    }
-
     // Size of the coarse grid
     ns_ = gridc_.size();
 
@@ -218,11 +211,17 @@ namespace casadi {
       grid_[grid_.size()-1] = gridc_[gridc_.size()-1];
     }
 
-    // Let the integration time start from the np_first point of the time grid.
-    if (!gridc_.empty()) integrator_.setOption("t0", gridc_[0]);
+    // Create an integrator instance
+    Dict integrator_options;
+    if (hasSetOption("integrator_options")) {
+      integrator_options = getOption("integrator_options");
+    }
 
-    // Initialize the integrator
-    integrator_.init();
+    // Let the integration time start from the np_first point of the time grid.
+    if (!gridc_.empty()) integrator_options["t0"] =  gridc_[0];
+
+    std::string integrator_name = getOption("integrator");
+    integrator_ = Integrator("integrator", integrator_name, dae_, integrator_options);
 
     // Generate an output function if there is none (returns the whole state)
     if (orig_output_fcn_.isNull()) {
@@ -318,12 +317,13 @@ namespace casadi {
     // Transform the output_fcn_ with CONTROL_DAE input scheme to a DAE input scheme
     output_fcn_ = MXFunction("output_function", dae_in_, output_fcn_(output_fcn_in_));
 
-    // Create the simulator
-    simulator_ = Simulator(integrator_, output_fcn_, gridlocal_);
+    // Simulator options
+    Dict simulator_options;
     if (hasSetOption("simulator_options")) {
-      simulator_.setOption(getOption("simulator_options"));
+      simulator_options = getOption("simulator_options");
     }
-    simulator_.init();
+    // Create the simulator
+    simulator_ = Simulator("simulator", integrator_, output_fcn_, gridlocal_, simulator_options);
 
     // Allocate inputs
     ibuf_.resize(CONTROLSIMULATOR_NUM_IN);

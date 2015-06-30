@@ -53,13 +53,12 @@ class OCPtests(casadiTestCase):
     cost = cost + q*X[N]**2
     
     nlp = SXFunction('nlp', nlpIn(x=V),nlpOut(f=cost,g=vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])))
-    
-    solver = NlpSolver("ipopt", nlp)
-    solver.setOption("tol",1e-5)
-    solver.setOption("hessian_approximation", "limited-memory")
-    solver.setOption("max_iter",100)
-    solver.setOption("print_level",0)
-    solver.init()
+    opts = {}
+    opts["tol"] = 1e-5
+    opts["hessian_approximation"] = "limited-memory"
+    opts["max_iter"] = 100
+    opts["print_level"] = 0
+    solver = NlpSolver("solver", "ipopt", nlp, opts)
     solver.setInput([-1000 for i in range(V.nnz())],"lbx")
     solver.setInput([1000 for i in range(V.nnz())],"ubx")
     solver.setInput([0 for i in range(N+1)],"lbg")
@@ -87,16 +86,14 @@ class OCPtests(casadiTestCase):
     # y
     # y'
     f=SXFunction('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
-    
-    integrator = Integrator("cvodes", f)
-    integrator.setOption("reltol",1e-15)
-    integrator.setOption("abstol",1e-15)
-    integrator.setOption("verbose",False)
-    integrator.setOption("steps_per_checkpoint",10000)
-    integrator.setOption("t0",0)
-    integrator.setOption("tf",te)
-
-    integrator.init()
+    opts = {}
+    opts["reltol"] = 1e-15
+    opts["abstol"] = 1e-15
+    opts["verbose"] = False
+    opts["steps_per_checkpoint"] = 10000
+    opts["t0"] = 0
+    opts["tf"] = te
+    integrator = Integrator("integrator", "cvodes", f, opts)
 
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
@@ -110,13 +107,13 @@ class OCPtests(casadiTestCase):
     
     f = MXFunction('f', [var,parMX],[qend[0]])
     nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0]))
-    solver = NlpSolver("ipopt", nlp)
-    solver.setOption("tol",1e-12)
-    solver.setOption("hessian_approximation", "limited-memory")
-    solver.setOption("max_iter",10)
-    solver.setOption("derivative_test","first-order")
-    solver.setOption("print_level",0)
-    solver.init()
+    opts = {}
+    opts["tol"] = 1e-12
+    opts["hessian_approximation"] = "limited-memory"
+    opts["max_iter"] = 10
+    opts["derivative_test"] = "first-order"
+    opts["print_level"] = 0
+    solver = NlpSolver("solver", "ipopt", nlp, opts)
     solver.setInput([-1, -1],"lbx")
     solver.setInput([1, 0.2],"ubx")
     solver.evaluate()
@@ -143,16 +140,14 @@ class OCPtests(casadiTestCase):
     # y
     # y'
     f=SXFunction('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
-    
-    integrator = Integrator("cvodes", f)
-    integrator.setOption("reltol",1e-15)
-    integrator.setOption("abstol",1e-15)
-    integrator.setOption("verbose",False)
-    integrator.setOption("steps_per_checkpoint",10000)
-    integrator.setOption("t0",0)
-    integrator.setOption("tf",te)
-
-    integrator.init()
+    opts = {}
+    opts["reltol"] = 1e-15
+    opts["abstol"] = 1e-15
+    opts["verbose"] = False
+    opts["steps_per_checkpoint"] = 10000
+    opts["t0"] = 0
+    opts["tf"] = te
+    integrator = Integrator("integrator", "cvodes", f, opts)
 
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
@@ -165,14 +160,13 @@ class OCPtests(casadiTestCase):
     
     f = MXFunction('f', [var,par],[qend[0]])
     nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0],g=var[0]-var[1]))
-    
-    solver = NlpSolver("ipopt", nlp)
-    solver.setOption("tol",1e-12)
-    solver.setOption("hessian_approximation", "limited-memory")
-    solver.setOption("max_iter",10)
-    solver.setOption("derivative_test","first-order")
-    #solver.setOption("print_level",0)
-    solver.init()
+    opts = {}
+    opts["tol"] = 1e-12
+    opts["hessian_approximation"] = "limited-memory"
+    opts["max_iter"] = 10
+    opts["derivative_test"] = "first-order"
+    #opts["print_level"] = 0
+    solver = NlpSolver("solver", "ipopt", nlp, opts)
     solver.setInput([-1, -1],"lbx")
     solver.setInput([1, 0.2],"ubx")
     solver.setInput([-1],"lbg")

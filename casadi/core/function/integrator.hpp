@@ -182,6 +182,7 @@ namespace casadi {
     /// Default constructor
     Integrator();
 
+    ///@}
     /** \brief  Integrator factory (new syntax, includes initialization)
     *
     * \param solver \pluginargument{Integrator}
@@ -193,7 +194,11 @@ namespace casadi {
     */
     Integrator(const std::string& name, const std::string& solver, const Function& f,
                const Dict& opts=Dict());
+    Integrator(const std::string& name, const std::string& solver,
+               const std::pair<Function, Function>& fg, const Dict& opts=Dict());
+    ///@}
 
+#ifdef WITH_LEGACY_CONSTRUCTORS
     /** \brief  Integrator factory, no initialization (to be deprecated)
     *
     * \param name \pluginargument{Integrator}
@@ -209,6 +214,7 @@ namespace casadi {
     * \endparblock
     */
     Integrator(const std::string& solver, const Function& f, const Function& g=Function());
+#endif // WITH_LEGACY_CONSTRUCTORS
 
     /// Clone
     Integrator clone() const;

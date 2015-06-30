@@ -509,21 +509,7 @@ class typemaptests(casadiTestCase):
     #f.setOption("monitor",["foo"])
     #self.assertEqual(f.getOption("monitor")[0],"foo")
     #f.setOption("monitor",[])
-    
-  @requiresPlugin(Integrator,"cvodes")
-  def testGenericType2bis(self):
-  
-    t=SX.sym("t")
-
-    x=SX.sym("x") 
-    dx=SX.sym("dx")
-
-    f=SXFunction("f", daeIn(t=t, x=vertcat([x,dx])),[vertcat([dx,-x])])
-   
-    integrator = Integrator("cvodes", f)
-    integrator.setOption("fsens_scaling_factors",[5.0,7])
-    integrator.setOption("fsens_scaling_factors",[])
-    
+        
   def testGenericType3(self):
     self.message("Generic type 3")
     
@@ -892,19 +878,6 @@ class typemaptests(casadiTestCase):
     a = numpy.matrix([0,SX.sym("x")])
 
     print if_else(0,a,a)
-
-  def test_vector_generic_return(self):
-
-    states = SX.sym("x",2)
-
-    ode = SXFunction("ode", [states],[states**2])
-
-    sol = Integrator("idas",ode);
-    a = sol.getOptionAllowed("linear_solver_type")
-    
-    self.assertTrue(isinstance(a,list))
-    for i in a:
-      self.assertTrue(isinstance(i,str))
 
   def test_issue1373(self):
     print np.array(casadi.DMatrix([2]))

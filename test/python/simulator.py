@@ -47,14 +47,14 @@ class Simulatortests(casadiTestCase):
     q=SX.sym("q")
     p=SX.sym("p")
     f=SXFunction('f', daeIn(t=t,x=q,p=p),daeOut(ode=q/p*t**2))
-    integrator = Integrator("cvodes", f)
-    integrator.setOption("reltol",1e-15)
-    integrator.setOption("abstol",1e-15)
-    integrator.setOption("fsens_err_con", True)
-    #integrator.setOption("verbose",True)
-    integrator.setOption("t0",0)
-    integrator.setOption("tf",2.3)
-    integrator.init()
+    opts = {}
+    opts["reltol"] = 1e-15
+    opts["abstol"] = 1e-15
+    opts["fsens_err_con"] = True
+    #opts["verbose"] = True
+    opts["t0"] = 0
+    opts["tf"] = 2.3
+    integrator = Integrator("integrator", "cvodes", f, opts)
     q0   = MX.sym("q0")
     par  = MX.sym("p")
     qend = integrator({'x0':q0,'p':par})["xf"]
@@ -81,17 +81,15 @@ class Simulatortests(casadiTestCase):
     out = SXFunction('out', daeIn(t=t, x=q, p=p),[q])
         
     f=SXFunction('f', daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
-    integrator = Integrator("cvodes", f)
-    integrator.setOption("reltol",1e-15)
-    integrator.setOption("abstol",1e-15)
-    integrator.setOption("fsens_err_con", True)
-    #integrator.setOption("verbose",True)
-    integrator.setOption("t0",0)
-    integrator.setOption("tf",2.3)
-    integrator.init()
-    sim = Simulator(integrator,out,tc)
-    sim.init()
-    
+    opts = {}
+    opts["reltol"] = 1e-15
+    opts["abstol"] = 1e-15
+    opts["fsens_err_con"] = True
+    #opts["verbose"] = True
+    opts["t0"] = 0
+    opts["tf"] = 2.3
+    integrator = Integrator("integrator", "cvodes", f, opts)
+    sim = Simulator("sim", integrator, out, tc)
     solution = SXFunction('solution', integratorIn(x0=q, p=p),[horzcat([q*exp(t**3/(3*p)) for t in tc])])
     
     for f in [sim,solution]:
@@ -113,21 +111,19 @@ class Simulatortests(casadiTestCase):
     out = SXFunction('out', controldaeIn(t=t, x=q, p=p),[q])
         
     f=SXFunction('f', daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
-    integrator = Integrator("cvodes", f)
-    integrator.setOption("reltol",1e-15)
-    integrator.setOption("abstol",1e-15)
-    integrator.setOption("fsens_err_con", True)
-    #integrator.setOption("verbose",True)
-    integrator.setOption("t0",0)
-    integrator.setOption("tf",2.3)
-    integrator.init()
-    
-    cdae = SXFunction('cdae', controldaeIn(t=t,x=q,p=p,u=u),daeOut(ode=u*q/p*t**2))
-    
-    sim = ControlSimulator(cdae,out,tc)
-    sim.setOption("integrator", "cvodes")
-    sim.setOption("integrator_options",{"reltol": 1e-15, "abstol": 1e-15, "fsens_err_con": True})
-    sim.init()
+    opts = {}
+    opts["reltol"] = 1e-15
+    opts["abstol"] = 1e-15
+    opts["fsens_err_con"] = True
+    #opts["verbose"] = True
+    opts["t0"] = 0
+    opts["tf"] = 2.3
+    integrator = Integrator("integrator", "cvodes", f, opts)
+    cdae = SXFunction('cdae', controldaeIn(t=t,x=q,p=p,u=u),daeOut(ode=u*q/p*t**2))    
+    sim = ControlSimulator("sim", cdae,out,tc, {"integrator":"cvodes",
+                                                "integrator_options":{"reltol": 1e-15,
+                                                                      "abstol": 1e-15,
+                                                                      "fsens_err_con": True}})
     
     U = SX.sym("U",1,N-1)
     
@@ -160,16 +156,15 @@ class Simulatortests(casadiTestCase):
     out = SXFunction('out', daeIn(t=t, x=q, p=p),[q,t,p])
         
     f=SXFunction('f', daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
-    integrator = Integrator("cvodes", f)
-    integrator.setOption("reltol",1e-15)
-    integrator.setOption("abstol",1e-15)
-    integrator.setOption("fsens_err_con", True)
-    #integrator.setOption("verbose",True)
-    integrator.setOption("t0",0)
-    integrator.setOption("tf",2.3)
-    integrator.init()
-    sim = Simulator(integrator,out,tc)
-    sim.init()
+    opts = {}
+    opts["reltol"] = 1e-15
+    opts["abstol"] = 1e-15
+    opts["fsens_err_con"] = True
+    #opts["verbose"] = True
+    opts["t0"] = 0
+    opts["tf"] = 2.3
+    integrator = Integrator("integrator", "cvodes", f, opts)
+    sim = Simulator("sim", integrator, out, tc)
     sim.setInput([num['q0']],0)
     sim.setInput([num['p']],1)
     sim.evaluate()
@@ -179,16 +174,15 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.getOutput(2).T,DMatrix.ones(tc.shape)*num['p'],"Evaluation output mismatch")
     
     f=SXFunction('f', daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
-    integrator = Integrator("cvodes", f)
-    integrator.setOption("reltol",1e-15)
-    integrator.setOption("abstol",1e-15)
-    integrator.setOption("fsens_err_con", True)
-    #integrator.setOption("verbose",True)
-    integrator.setOption("t0",0)
-    integrator.setOption("tf",2.3)
-    integrator.init()
-    sim = Simulator(integrator,out,tc)
-    sim.init()
+    opts = {}
+    opts["reltol"] = 1e-15
+    opts["abstol"] = 1e-15
+    opts["fsens_err_con"] = True
+    #opts["verbose"] = True
+    opts["t0"] = 0
+    opts["tf"] = 2.3
+    integrator = Integrator("integrator", "cvodes", f, opts)
+    sim = Simulator("sim", integrator,out,tc)
     sim.setInput([num['q0']],0)
     sim.setInput([num['p']],1)
     sim.evaluate()
@@ -200,16 +194,15 @@ class Simulatortests(casadiTestCase):
     out = SXFunction('out', daeIn(t=t, x=q),[q,t])
     
     f=SXFunction('f', daeIn(t=t, x=q),daeOut(ode=q/num['p']*t**2))
-    integrator = Integrator("cvodes", f)
-    integrator.setOption("reltol",1e-15)
-    integrator.setOption("abstol",1e-15)
-    integrator.setOption("fsens_err_con", True)
-    #integrator.setOption("verbose",True)
-    integrator.setOption("t0",0)
-    integrator.setOption("tf",2.3)
-    integrator.init()
-    sim = Simulator(integrator,out,tc)
-    sim.init()
+    opts = {}
+    opts["reltol"] = 1e-15
+    opts["abstol"] = 1e-15
+    opts["fsens_err_con"] = True
+    #opts["verbose"] = True
+    opts["t0"] = 0
+    opts["tf"] = 2.3
+    integrator = Integrator("integrator", "cvodes", f, opts)
+    sim = Simulator("sim", integrator, out, tc)
     sim.setInput([num['q0']],0)
     sim.evaluate()
 
@@ -217,16 +210,15 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.getOutput(1).T,tc,"Evaluation output mismatch")
     
     f=SXFunction('f', daeIn(x=q),daeOut(ode=-q))
-    integrator = Integrator("cvodes", f)
-    integrator.setOption("reltol",1e-15)
-    integrator.setOption("abstol",1e-15)
-    integrator.setOption("fsens_err_con", True)
-    #integrator.setOption("verbose",True)
-    integrator.setOption("t0",0)
-    integrator.setOption("tf",2.3)
-    integrator.init()
-    sim = Simulator(integrator,out,tc)
-    sim.init()
+    opts = {}
+    opts["reltol"] = 1e-15
+    opts["abstol"] = 1e-15
+    opts["fsens_err_con"] = True
+    #opts["verbose"] = True
+    opts["t0"] = 0
+    opts["tf"] = 2.3
+    integrator = Integrator("integrator", "cvodes", f, opts)
+    sim = Simulator("sim", integrator, out, tc)
     sim.setInput([num['q0']],0)
     sim.evaluate()
 
@@ -241,8 +233,7 @@ class Simulatortests(casadiTestCase):
     q0=num['q0']
     p=num['p']
     t = n.linspace(0,num['tend'],100)
-    sim = Simulator(self.integrator,t)
-    sim.init()
+    sim = Simulator("sim", self.integrator, t)
     sim.setInput([num['q0']],0)
     sim.setInput([num['p']],1)
     sim.evaluate()
@@ -297,11 +288,11 @@ class Simulatortests(casadiTestCase):
     out = SXFunction('out', controldaeIn(t=t, x=q, p=p, t0=t0, tf=tf_, x_major=qm),[q,t,p,t0,tf_,qm])
     
     f=SXFunction('f', controldaeIn(t=t, x=q, p=p, x_major=qm),[q/p*t**2])
-    sim = ControlSimulator(f,out,tc)
-    sim.setOption('nf',4)
-    sim.setOption('integrator', "cvodes")
-    sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
-    sim.init()
+    opts = {}
+    opts['nf'] = 4
+    opts['integrator'] = "cvodes"
+    opts['integrator_options'] = {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True}
+    sim = ControlSimulator("sim", f, out, tc, opts)
     sim.setInput([num['q0']],"x0")
     sim.setInput([num['p']],"p")
     self.assertTrue(sim.getInput("u").isempty())
@@ -320,11 +311,11 @@ class Simulatortests(casadiTestCase):
     
     #CasadiOptions.setCatchErrorsPython(False)
     f=SXFunction('f', controldaeIn(t=t, x=q, p=p, x_major=qm),[q/p*t**2])
-    sim = ControlSimulator(f,out,tc)
-    sim.setOption('nf',4)
-    sim.setOption('integrator', "cvodes")
-    sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
-    sim.init()
+    opts = {}
+    opts['nf'] = 4
+    opts['integrator'] = "cvodes"
+    opts['integrator_options'] = {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True}
+    sim = ControlSimulator("sim", f, out, tc, opts)
     sim.setInput([num['q0']],"x0")
     sim.setInput([num['p']],"p")
     sim.evaluate()
@@ -341,11 +332,11 @@ class Simulatortests(casadiTestCase):
     out = SXFunction('out', controldaeIn(t=t, x=q, t0=t0, tf=tf_, x_major=qm),[q,t,t0,tf_,qm])
     
     f=SXFunction('f', controldaeIn(t=t, x=q, x_major=qm),[q/num['p']*t**2])
-    sim = ControlSimulator(f,out,tc)
-    sim.setOption('nf',4)
-    sim.setOption('integrator', "cvodes")
-    sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
-    sim.init()
+    opts = {}
+    opts['nf'] = 4
+    opts['integrator'] = "cvodes"
+    opts['integrator_options'] = {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True}
+    sim = ControlSimulator("sim", f,out, tc, opts)
     sim.setInput([num['q0']],"x0")
     sim.evaluate()
 
@@ -356,11 +347,11 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.getOutput(4),num['q0']*exp(sim.getOutput(2)**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
     
     f=SXFunction('f', controldaeIn(x=q, x_major=qm),[-q])
-    sim = ControlSimulator(f,out,tc)
-    sim.setOption('nf',4)
-    sim.setOption('integrator', "cvodes")
-    sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
-    sim.init()
+    opts = {}
+    opts['nf'] = 4
+    opts['integrator']  = "cvodes"
+    opts['integrator_options'] = {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True}
+    sim = ControlSimulator("sim", f, out, tc, opts)
     sim.setInput([num['q0']],"x0")
     sim.evaluate()
 
@@ -387,31 +378,29 @@ class Simulatortests(casadiTestCase):
     out = SXFunction('out', controldaeIn(x=q, u=u, u_interp=ui),[q,u,ui])
     
     f=SXFunction('f', controldaeIn(x=q, u=u),[-q])
-    sim = ControlSimulator(f,out,tc)
-    sim.setOption('nf',4)
-    sim.setOption('integrator', "cvodes")
-    sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
-    self.assertRaises(Exception,lambda : sim.init())
+    opts = {}
+    opts['nf'] = 4
+    opts['integrator'] = "cvodes"
+    opts['integrator_options'] = {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True}
+    self.assertRaises(Exception,lambda : ControlSimulator("sim", f, out, tc, opts))
     
     out = SXFunction('out', controldaeIn(x=q, u=u),[q,u])
     
     f=SXFunction('f', controldaeIn(x=q),[-q])
-    sim = ControlSimulator(f,out,tc)
-    sim.setOption('nf',4)
-    sim.setOption('integrator', "cvodes")
-    sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
-    self.assertRaises(Exception,lambda : sim.init())
-
+    opts = {}
+    opts['nf'] = 4
+    opts['integrator'] = "cvodes"
+    opts['integrator_options'] = {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True}
+    self.assertRaises(Exception,lambda : ControlSimulator("sim", f, out, tc, opts))
 
     out = SXFunction('out', controldaeIn(x=q, u=u, u_interp=ui),[q,u,ui])
     
     f=SXFunction('f', controldaeIn(x=q, u=u, u_interp=ui),[-q])
-    sim = ControlSimulator(f,out,tc)
-    sim.setOption('nf',4)
-    sim.setOption('integrator', "cvodes")
-    sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
-    
-    sim.init()
+    opts = {}
+    opts['nf'] = 4
+    opts['integrator'] = "cvodes"
+    opts['integrator_options'] = {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True}
+    sim = ControlSimulator("sim", f, out, tc, opts)
     sim.setInput([2.3],"x0")
     sim.setInput(U,"u")
     sim.evaluate()
@@ -425,12 +414,12 @@ class Simulatortests(casadiTestCase):
     out = SXFunction('out', controldaeIn(x=q, u=u, u_interp=ui),[q,u,ui])
     
     f=SXFunction('f', controldaeIn(x=q,u=u, u_interp=ui),[-q])
-    sim = ControlSimulator(f,out,tc)
-    sim.setOption('control_endpoint',True)
-    sim.setOption('nf',4)
-    sim.setOption('integrator', "cvodes")
-    sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
-    sim.init()
+    opts = {}
+    opts['control_endpoint'] = True
+    opts['nf'] = 4
+    opts['integrator'] = "cvodes"
+    opts['integrator_options'] = {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True}
+    sim = ControlSimulator("sim", f, out, tc, opts)
     sim.setInput([2.3],"x0")
     sim.setInput(horzcat([U,0]),"u")
     sim.evaluate()
@@ -451,11 +440,11 @@ class Simulatortests(casadiTestCase):
     q=SX.sym("q")
     p=SX.sym("p")
     f=SXFunction('f', controldaeIn(t=t, x=q, p=p),[q/p*t**2])
-    sim = ControlSimulator(f,tc)
-    sim.setOption('nf',4)
-    sim.setOption('integrator', "cvodes")
-    sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
-    sim.init()
+    opts = {}
+    opts['nf'] = 4
+    opts['integrator'] = "cvodes"
+    opts['integrator_options'] = {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True}
+    sim = ControlSimulator("sim", f, tc, opts)
     sim.setInput([num['q0']],0)
     sim.setInput([num['p']],1)
     sim.evaluate()
@@ -469,8 +458,7 @@ class Simulatortests(casadiTestCase):
     self.message("CVodes integration: simulator time offset")
     num=self.num
     t = n.linspace(0.7,num['tend'],100)
-    sim = Simulator(self.integrator,t)
-    sim.init()
+    sim = Simulator("sim", self.integrator, t)
     sim.setInput([num['q0']],0)
     sim.setInput([num['p']],1)
     sim.evaluate()
