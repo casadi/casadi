@@ -249,7 +249,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
     for (i,row) in enumerate(node.getElementsByTagName("row")):
       rows.append([])
       for (j,entry) in enumerate(row.getElementsByTagName("entry")):
-        rows[i].append(astext(entry,escape=False).encode("ascii","ignore").replace("&gt;",">").replace("&lt;","<"))
+        rows[i].append(swig_typename_convertor_cpp2python(astext(entry,escape=False).encode("ascii","ignore")).replace("&gt;",">").replace("&lt;","<"))
       
     table = texttable.Texttable(max_width=80-4)
     table.add_rows(rows)
