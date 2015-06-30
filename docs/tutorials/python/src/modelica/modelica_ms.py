@@ -93,7 +93,7 @@ ode_fcn = MXFunction('ode_fcn', [x,u],[f,L])
 init_fcn = MXFunction('init_fcn', [x],[I])
 #$ Increased speed is often possible by converting the MXFunction instances to SXFunction instances.
 #$ This is possible when the symbolic expressions do not contain any exotic operators:
-ode_fcn = SXFunction('ode_fcn', ode_fcn)
+ode_fcn = SXFunction(ode_fcn)
 init_fcn = SXFunction(init_fcn)
 #$ We shall use the "direct multiple shooting" method with 20 shooting intervals of equal length
 #$ to solve the IVP. 
@@ -234,5 +234,4 @@ show()
 #$ As an example, the following code will generate C-code for the Hessian of the objective function
 #$ with respect to the decision variables:
 hess_f = nlp.hessian("x","f")
-hess_f.init()
 hess_f.generate("hess_f")
