@@ -45,8 +45,7 @@ output_ex = [2*a + b]
 output_val = [numpy.zeros(2)]
 
 # Create a function
-f = SXFunction(input_ex,output_ex)
-f.init()
+f = SXFunction("f", input_ex,output_ex)
 
 # Work vector
 work = numpy.zeros(f.getWorkSize())

@@ -73,7 +73,6 @@ for N in range(1,11):
     f = SXFunction("l(" + str(j) + ")", [tau],[L])
     
     # initialize
-    f.init()
     l.append(f)
   
   # Get the coefficients of the continuity equation
@@ -88,7 +87,6 @@ for N in range(1,11):
   C = DMatrix.zeros(K+1,K+1)
   for j in range(K+1):
     tfcn = l[j].tangent()
-    tfcn.init()
     for k in range(K+1):
       tfcn.setInput(tau_root[k])
       tfcn.evaluate()
@@ -127,14 +125,11 @@ for N in range(1,11):
   ## SOLVE THE NLP
   ## ----
   
+  # NLP solver options
+  opts = {"tol" : 1e-10}
+
   # Allocate an NLP solver
-  solver = NlpSolver("ipopt", nlp)
-
-  # Set options
-  solver.setOption("tol",1e-10)
-
-  # initialize the solver
-  solver.init()
+  solver = NlpSolver("solver", "ipopt", nlp, opts)
 
   # Initial condition
   xinit = x.nnz() * [0]

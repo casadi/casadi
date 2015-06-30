@@ -46,18 +46,16 @@ int main(int argc, char **argv){
   // NLP
   SXFunction nlp("nlp", nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
 
-  // Allocate NLP solver
-  NlpSolver nlp_solver("ipopt", nlp);
-    
   // Set options
-  //  nlp_solver.setOption("max_iter",10);
-  //  nlp_solver.setOption("verbose",true);
-  //  nlp_solver.setOption("linear_solver","ma57");
-  //  nlp_solver.setOption("hessian_approximation","limited-memory");
-  //  nlp_solver.setOption("derivative_test","second-order");
-  
-  // Initialize NLP solver
-  nlp_solver.init();
+  Dict opts;
+  //  opts["max_iter"] = 10;
+  //  opts["verbose"] = true;
+  //  opts["linear_solver"] = "ma57";
+  //  opts["hessian_approximation"] = "limited-memory";
+  //  opts["derivative_test"] = "second-order";
+
+  // Allocate NLP solver
+  NlpSolver nlp_solver("nlp_solver", "ipopt", nlp, opts);
   
   // Pass the bounds and initial guess
   nlp_solver.setInput(nl.x_lb,"lbx");

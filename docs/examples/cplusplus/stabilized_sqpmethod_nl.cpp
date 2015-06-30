@@ -66,34 +66,27 @@ int main(int argc, char **argv){
   nl.parseNL(problem);
 
   // NLP
-  SXFunction nlp(nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
+  SXFunction nlp("nlp", nlpIn("x", nl.x), nlpOut("f", nl.f," g", nl.g));
  
-  // Allocate NLP solver
-  NlpSolver nlp_solver("stabilizedsqp", nlp);
-
-  // Set options
-  // nlp_solver.setOption("max_iter",10);
-  // nlp_solver.setOption("verbose",true);
-  // nlp_solver.setOption("linear_solver","ma57");
-  nlp_solver.setOption("hessian_approximation","exact");
-  // nlp_solver.setOption("derivative_test","second-order");
+  // NLP solver options
+  Dict opts;
+  // opts["max_iter"] = 10;
+  // opts["verbose"] = true;
+  // opts["linear_solver"] = "ma57";
+  opts["hessian_approximation"] = "exact";
+  // opts["derivative_test"] = "second-order";
 
   /// Unstabilized SQIC Solver
-  
-  nlp_solver.setOption("stabilized_qp_solver","qp");
-  Dict stabilized_qp_solver_options;
-  stabilized_qp_solver_options["qp_solver"] = "sqic";
-  nlp_solver.setOption("stabilized_qp_solver_options",stabilized_qp_solver_options);
+  opts["stabilized_qp_solver"] = "qp";
+  opts["stabilized_qp_solver_options"] = make_dict("qp_solver", "sqic");
   
   /// Stabilized SQIC Solver
-  
-  //nlp_solver.setOption("stabilized_qp_solver","sqic");
+  //opts["stabilized_qp_solver"] = "sqic";
   
   /// Ipopt QP Solver 
-  
     
   /**
-  nlp_solver.setOption("stabilized_qp_solver","qp");
+  opts["stabilized_qp_solver"] = "qp";
   Dict stabilized_qp_solver_options;
   stabilized_qp_solver_options["qp_solver"] = "nlp";
   Dict qp_solver_options;
@@ -107,11 +100,11 @@ int main(int argc, char **argv){
   nlp_solver_options["compl_inf_tol"] = 1e-16;
   qp_solver_options["nlp_solver_options"] = nlp_solver_options;
   stabilized_qp_solver_options["qp_solver_options"] = qp_solver_options;
-  nlp_solver.setOption("stabilized_qp_solver_options",stabilized_qp_solver_options);
+  opts["stabilized_qp_solver_options"] = stabilized_qp_solver_options;
   */
   
-  // Initialize NLP solver
-  nlp_solver.init();
+  // Allocate NLP solver
+  NlpSolver nlp_solver("nlp_solver", "stabilizedsqp", nlp, opts);
 
   // Pass the bounds and initial guess
   nlp_solver.setInput(nl.x_lb,"lbx");

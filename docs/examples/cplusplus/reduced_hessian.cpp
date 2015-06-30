@@ -71,21 +71,23 @@ int main(){
   vector<double> lbg(lbg_,lbg_+1);
   vector<double> ubg(ubg_,ubg_+1);
 
-  // Create NLP solver
-  SXFunction nlp(nlpIn("x",x),nlpOut("f",f,"g",g));
-  NlpSolver solver("ipopt", nlp);
+  // Create NLP
+  SXFunction nlp("nlp", nlpIn("x",x),nlpOut("f",f,"g",g));
+
+  // NLP solver options
+  Dict opts;
 
   // Mark the parameters amongst the variables (see sIPOPT documentation)
   Dict var_integer_md;
   int red_hessian[] = {0,1,2};
   var_integer_md["red_hessian"] = std::vector<int>(red_hessian,red_hessian+3);
-  solver.setOption("var_integer_md",var_integer_md);
+  opts["var_integer_md"] = var_integer_md;
 
   // Enable reduced hessian calculation
-  solver.setOption("compute_red_hessian","yes");
+  opts["compute_red_hessian"] = "yes";
   
-  // Initialize solver
-  solver.init();
+  // Create NLP solver
+  NlpSolver solver("solver", "ipopt", nlp, opts);
 
   // Solve NLP
   solver.setInput( x0, "x0");

@@ -80,10 +80,7 @@ int main(){
   SXFunction nlp("nlp", nlpIn("x", u), nlpOut("f", f, "g", g));
   
   // Allocate an NLP solver
-  NlpSolver solver("ipopt", nlp);
-
-  // initialize the solver
-  solver.init();
+  NlpSolver solver("solver", "ipopt", nlp);
 
   // Bounds on u and initial condition
   vector<double> umin(nu), umax(nu), uinit(nu);

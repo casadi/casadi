@@ -72,12 +72,12 @@ rhs_in = daeIn(x=vertcat((x,lam)))
 rhs = SXFunction('rhs', rhs_in,daeOut(ode=f))
 
 # Create an integrator (CVodes)
-I = Integrator("cvodes", rhs)
-I.setOption("abstol",1e-8) # abs. tolerance
-I.setOption("reltol",1e-8) # rel. tolerance
-I.setOption("t0",0.0)
-I.setOption("tf",10.0)
-I.init()
+opts = {}
+opts["abstol"] = 1e-8 # abs. tolerance
+opts["reltol"] = 1e-8 # rel. tolerance
+opts["t0"] = 0.0
+opts["tf"] = 10.0
+I = Integrator("I", "cvodes", rhs, opts)
 
 # The initial state
 x_init = NP.array([0.,1.])
@@ -104,19 +104,17 @@ Solver = "nlp"
 #Solver = "kinsol"
 
 # Allocate an implict solver
-solver = ImplicitFunction(Solver, rfp)
+opts = {}
 if Solver=="nlp":
-    solver.setOption("nlp_solver", "ipopt")
-    solver.setOption("nlp_solver_options",{"hessian_approximation":"limited-memory"})
+    opts["nlp_solver"] = "ipopt"
+    opts["nlp_solver_options"] = {"hessian_approximation":"limited-memory"}
 elif Solver=="newton":
-    solver.setOption("linear_solver",CSparse)
+    opts["linear_solver"] = 'csparse'
 elif Solver=="kinsol":
-    solver.setOption("linear_solver_type","user_defined")
-    solver.setOption("linear_solver",CSparse)
-    solver.setOption("max_iter",1000)
-
-# Initialize the solver
-solver.init()
+    opts["linear_solver_type"] = "user_defined"
+    opts["linear_solver"] = 'csparse'
+    opts["max_iter"] = 1000
+solver = ImplicitFunction("solver", Solver, rfp, opts)
 
 # Pass initial guess
 #solver.setInput([   0,   0], "x0")

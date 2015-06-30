@@ -42,7 +42,6 @@ Function generateCodeAndCompile(Function fcn, const std::string& name, bool expa
   // Convert to an SXFunction (may or may not improve efficiency)
   if(expand && is_a<MXFunction>(fcn)){
     fcn = SXFunction(shared_cast<MXFunction>(fcn));
-    fcn.init();
   }
 
   // Generate C code
@@ -84,16 +83,13 @@ int main(){
 
   // Gradient of the objective
   Function grad_f = nlp.gradient("x", "f");
-  grad_f.init();
 
   // Jacobian of the constraints
   Function jac_g = nlp.jacobian("x", "g");
-  jac_g.init();
 
   // Hessian of the lagrangian
-  Function grad_lag = nlp.derivative(0,1);
-  Function hess_lag = grad_lag.jacobian(NL_X,NL_NUM_OUT+NL_X,false,true);
-  hess_lag.init();
+  Function grad_lag = nlp.derivative(0, 1);
+  Function hess_lag = grad_lag.jacobian(NL_X, NL_NUM_OUT+NL_X, false, true);
 
   // Codegen and compile
   nlp = generateCodeAndCompile(nlp,"nlp", expand);
@@ -102,11 +98,10 @@ int main(){
   hess_lag = generateCodeAndCompile(hess_lag,"hess_lag", expand);
 
   // Create an NLP solver passing derivative information
-  NlpSolver solver("ipopt", nlp);
-  solver.setOption("grad_f",grad_f);
-  solver.setOption("jac_g",jac_g);
-  solver.setOption("hess_lag",hess_lag);
-  solver.init();
+  NlpSolver solver("solver", "ipopt", nlp,
+                   make_dict("grad_f", grad_f,
+                             "jac_g", jac_g,
+                             "hess_lag",hess_lag));
 
   // Set constraint bounds
   solver.setInput(0.,"lbg");

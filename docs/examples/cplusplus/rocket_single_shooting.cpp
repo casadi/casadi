@@ -95,38 +95,40 @@ int main(){
   // DAE residual function
   SXFunction daefcn("dae_residual", daeIn("x", x, "p", u, "t", t), daeOut("ode", rhs));
 
-  // Integrator
-  Integrator integrator;
+  // Integrator options
+  string plugin;
+  Dict opts;
   if(sundials_integrator){
     if(explicit_integrator){
       // Explicit integrator (CVODES)
-      integrator = Integrator("cvodes", daefcn);
-      // integrator.setOption("exact_jacobian",true);
-      // integrator.setOption("linear_multistep_method","bdf"); // adams or bdf
-      // integrator.setOption("nonlinear_solver_iteration","newton"); // newton or functional
+      plugin = "cvodes";
+      // opts["exact_jacobian"] = true;
+      // opts["linear_multistep_method"] = "bdf"; // adams or bdf
+      // opts["nonlinear_solver_iteration"] = "newton"; // newton or functional
     } else {
       // Implicit integrator (IDAS)
-      integrator = Integrator("idas", daefcn);
-      integrator.setOption("calc_ic",false);
+      plugin = "idas";
+      opts["calc_ic"] = false;
     }
-    integrator.setOption("fsens_err_con",true);
-    integrator.setOption("quad_err_con",true);
-    integrator.setOption("abstol",1e-6);
-    integrator.setOption("reltol",1e-6);
-    integrator.setOption("stop_at_end",false);
-    //  integrator.setOption("fsens_all_at_once",false);
-    integrator.setOption("steps_per_checkpoint",100); // BUG: Too low number causes segfaults
+    opts["fsens_err_con"] = true;
+    opts["quad_err_con"] = true;
+    opts["abstol"] = 1e-6;
+    opts["reltol"] = 1e-6;
+    opts["stop_at_end"] = false;
+    //  opts["fsens_all_at_once"] = false;
+    opts["steps_per_checkpoint"] = 100; // BUG: Too low number causes segfaults
   } else {
     // An explicit Euler integrator
-    integrator = Integrator("rk", daefcn);
-    integrator.setOption("expand_f",true);
-    integrator.setOption("interpolation_order",1);
-    integrator.setOption("number_of_finite_elements",1000);
+    plugin = "rk";
+    opts["expand_f"] = true;
+    opts["interpolation_order"] = 1;
+    opts["number_of_finite_elements"] = 1000;
   }
+  opts["t0"] = t0;
+  opts["tf"] = tf;
 
-  integrator.setOption("t0",t0);
-  integrator.setOption("tf",tf);
-  integrator.init();
+  // Create integrator
+  Integrator integrator("integrator", plugin, daefcn, opts);
 
   // control for all segments
   MX U = MX::sym("U",nu); 

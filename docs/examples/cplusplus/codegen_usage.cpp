@@ -183,7 +183,6 @@ void usage_cplusplus(){
 
   // Use CasADi's "ExternalFunction" to load the compiled function
   ExternalFunction ff("f");
-  ff.init();
 
   // Use like any other CasADi function (note that derivatives are not supported)
   double x_val[] = {1,2,3,4};

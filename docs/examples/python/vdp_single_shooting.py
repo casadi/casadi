@@ -38,12 +38,10 @@ xdot = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, x[0]] )
 qdot = x[0]*x[0] + x[1]*x[1] + u*u
 
 # DAE residual function
-dae = SXFunction(daeIn(x=x,p=u),daeOut(ode=xdot, quad=qdot))
+dae = SXFunction("dae", daeIn(x=x, p=u),daeOut(ode=xdot, quad=qdot))
 
 # Create an integrator
-integrator = Integrator("cvodes", dae)
-integrator.setOption("tf",tf/nk) # final time
-integrator.init()
+integrator = Integrator("integrator", "cvodes", dae, {"tf":tf/nk})
 
 # All controls (use matrix graph)
 x = MX.sym("x",nk) # nk-by-1 symbolic variable
@@ -64,9 +62,8 @@ for k in range(nk):
 g = X
 
 # Allocate an NLP solver
-nlp = MXFunction(nlpIn(x=x),nlpOut(f=f,g=g))
-solver = NlpSolver("ipopt", nlp)
-solver.init()
+nlp = MXFunction("nlp", nlpIn(x=x),nlpOut(f=f,g=g))
+solver = NlpSolver("solver", "ipopt", nlp)
 
 # Set bounds and initial guess
 solver.setInput(-0.75, "lbx")

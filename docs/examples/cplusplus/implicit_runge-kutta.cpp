@@ -126,9 +126,7 @@ int main(){
   SXFunction vfcn_sx(vfcn);
 
   // Create a implicit function instance to solve the system of equations
-  ImplicitFunction ifcn("newton", vfcn_sx);
-  ifcn.setOption("linear_solver", "csparse");
-  ifcn.init();
+  ImplicitFunction ifcn("ifcn", "newton", vfcn_sx, make_dict("linear_solver", "csparse"));
   vector<MX> ifcn_arg;
   ifcn_arg.push_back(MX());
   ifcn_arg.push_back(X0);

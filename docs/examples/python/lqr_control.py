@@ -85,12 +85,12 @@ p = SX.sym("p")
 tn = np.linspace(0,te,N)
 cdae = SXFunction('cdae', controldaeIn(x=y,u=u),[mul(A,y)+mul(B,u)])
 
+opts = {}
+opts["integrator"] = "cvodes"
+opts["integrator_options"] = {"fsens_err_con": True,"reltol":1e-12}
+opts["nf"] = 20
 
-sim = ControlSimulator(cdae,tn)
-sim.setOption("integrator", "cvodes")
-sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-12})
-sim.setOption("nf",20)
-sim.init()
+sim = ControlSimulator("sim", cdae, tn, opts)
 sim.setInput(x0,"x0")
 sim.setInput(u_,"u")
 sim.evaluate()
@@ -214,10 +214,7 @@ rhs["Wt"]  = mul([eAt,B,B.T,eAt.T])
 
 dae = SXFunction('dae', daeIn(x=states),daeOut(ode=rhs))
 
-integrator = Integrator("cvodes", dae)
-integrator.setOption("tf",t1)
-integrator.setOption("reltol",1e-12)
-integrator.init()
+integrator = Integrator("integrator", "cvodes", dae, {"tf":t1, "reltol":1e-12})
 integrator.setInput(states_,"x0")
 integrator.evaluate()
 
@@ -257,11 +254,12 @@ cdae = SXFunction('cdae', controldaeIn(x=states),[rhs])
 # Output function
 out = SXFunction('out', controldaeIn(x=states),[states,u])
 
-sim = ControlSimulator(cdae,out,tn)
-sim.setOption("integrator", "cvodes")
-sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-12})
-sim.setOption("nf",20)
-sim.init()
+opts = {}
+opts["integrator"] = "cvodes"
+opts["integrator_options"] = {"fsens_err_con": True,"reltol":1e-12}
+opts["nf"] = 20
+
+sim = ControlSimulator("sim", cdae, out, tn, opts)
 sim.setInput(states_,"x0")
 sim.evaluate()
 
@@ -296,10 +294,9 @@ ric = (Q + mul(A.T,P) + mul(P,A) - mul([P,B,inv(R),B.T,P]))
 dae = SXFunction('dae', daeIn(x=vec(P)),daeOut(ode=vec(ric)))
 
 # We solve the ricatti equation by simulating backwards in time until steady state is reached.
-integrator = Integrator("cvodes", dae)
-integrator.setOption("reltol",1e-16)
-integrator.setOption("stop_at_end",False)
-integrator.init()
+opts = {"reltol":1e-16, "stop_at_end":False}
+integrator = Integrator("integrator", "cvodes", dae, opts)
+
 # Start from P = identity matrix
 u = densify(DMatrix.eye(ns))
 integrator.reset()
@@ -343,10 +340,7 @@ print "Open-loop eigenvalues: ", D
 # Check what happens if we integrate the Riccati equation forward in time
 dae = SXFunction('dae', daeIn(x = vec(P)),daeOut(ode=vec(-ric)))
 
-integrator = Integrator("cvodes", dae)
-integrator.setOption("reltol",1e-16)
-integrator.setOption("stop_at_end",False)
-integrator.init()
+integrator = Integrator("integrator", "cvodes", dae, {"reltol":1e-16, "stop_at_end":False})
 x0_pert = vec(P_)
 x0_pert[0] += 1e-9 # Put a tiny perturbation
 integrator.setInput(x0_pert,"x0")
@@ -401,11 +395,11 @@ for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-
   # Output function
   out = SXFunction('out', controldaeIn(t=t, x=y),[y,mul(C,y),u,yref])
 
-  sim = ControlSimulator(cdae, out, tn)
-  sim.setOption("integrator", "cvodes")
-  sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-12})
-  sim.setOption("nf",200)
-  sim.init()
+  opts = {}
+  opts["integrator"] = "cvodes"
+  opts["integrator_options"] = {"fsens_err_con": True,"reltol":1e-12}
+  opts["nf"] = 200
+  sim = ControlSimulator("sim", cdae, out, tn, opts)
   sim.setInput(x0,"x0")
   #sim.setInput(yref_,"u")
   sim.evaluate()
@@ -465,11 +459,11 @@ cdae = SXFunction('cdae', controldaeIn(x=states, p=param),[rhs])
 # Output function
 out = SXFunction('out', controldaeIn(x=states, p=param),[states,u,uref,states["yref"]])
 
-sim = ControlSimulator(cdae,out,tn)
-sim.setOption("integrator", "cvodes")
-sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-8})
-sim.setOption("nf",20)
-sim.init()
+opts = {}
+opts["integrator"] = "cvodes"
+opts["integrator_options"] = {"fsens_err_con": True,"reltol":1e-8}
+opts["nf"] = 20
+sim = ControlSimulator("sim", cdae, out, tn, opts)
 
 # Not supported in current revision, cf. #929
 # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
@@ -545,11 +539,11 @@ cdae = SXFunction('cdae', controldaeIn(x=y, u=controls, p=param),[rhs])
 # Output function
 out = SXFunction('out', controldaeIn(x=y, u=controls, p=param),[y,u,controls["uref"],controls["yref"]])
 
-sim = ControlSimulator(cdae, out, tn)
-sim.setOption("integrator", "cvodes")
-sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-8})
-sim.setOption("nf",20)
-sim.init()
+opts = {}
+opts["integrator"] = "cvodes"
+opts["integrator_options"] = {"fsens_err_con": True,"reltol":1e-8}
+opts["nf"] = 20
+sim = ControlSimulator("sim", cdae, out, tn, opts)
 sim.setInput(2*x0,"x0")
 sim.setInput(param_,"p")
 sim.setInput(u_,"u")
@@ -600,11 +594,12 @@ cdae = SXFunction('çdae', controldaeIn(x=y, x_major=y0, u=controls, p=param),[r
 # Output function
 out = SXFunction('out', controldaeIn(x=y, x_major=y0, u=controls, p=param),[y,u,controls["uref"],controls["yref"]])
 
-sim = ControlSimulator(cdae, out, tn)
-sim.setOption("integrator", "cvodes")
-sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-8})
-sim.setOption("nf",20)
-sim.init()
+opts = {}
+opts["integrator"] = "cvodes"
+opts["integrator_options"] = {"fsens_err_con": True,"reltol":1e-8}
+opts["nf"] = 20
+
+sim = ControlSimulator("sim", cdae, out, tn, opts)
 sim.setInput(2*x0,"x0")
 sim.setInput(param_,"p")
 sim.setInput(u_,"u")

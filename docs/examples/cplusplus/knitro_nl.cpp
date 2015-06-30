@@ -45,16 +45,14 @@ int main(int argc, char **argv){
   nl.parseNL(problem);
 
   // NLP
-  SXFunction nlp(nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
- 
-  // Allocate NLP solver
-  NlpSolver nlp_solver("knitro", nlp);
+  SXFunction nlp("nlp", nlpIn("x", nl.x), nlpOut("f", nl.f, "g", nl.g));
 
   // Set options
-  // nlp_solver.setOption("verbose",true);
- 
-  // Initialize NLP solver
-  nlp_solver.init();
+  Dict opts;
+  // opts["verbose"] = true;
+
+  // Allocate NLP solver
+  NlpSolver nlp_solver("nlp_solver", "knitro", nlp, opts);
 
   // Pass the bounds and initial guess
   nlp_solver.setInput(nl.x_lb,"lbx");

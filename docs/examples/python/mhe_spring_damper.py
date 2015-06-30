@@ -149,10 +149,8 @@ sigma_x0 = 0.01
 P = sigma_x0**2*DMatrix.eye(Nstates)
 x0 = simulated_X[:,0] + sigma_x0*NP.random.randn(Nstates,1)
 # Create the solver
-nlp_solver = NlpSolver("ipopt", nlp)
-nlp_solver.setOption({"print_level":0, "print_time": False})
-nlp_solver.setOption('max_iter',100)
-nlp_solver.init()
+opts = {"print_level":0, "print_time": False, 'max_iter':100}
+nlp_solver = NlpSolver("nlp_solver", "ipopt", nlp, opts)
 
 # Set the bounds for the constraints: we only have the multiple shooting constraints, so all constraints have upper and lower bound of zero
 nlp_solver.setInput(0,"lbg")

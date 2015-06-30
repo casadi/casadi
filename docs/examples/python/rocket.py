@@ -74,10 +74,8 @@ G = X[0:2]     # x(1:2) in Matlab
 nlp = MXFunction('nlp', nlpIn(x=U),nlpOut(f=J,g=G))
   
 # Allocate an NLP solver
-solver = NlpSolver("ipopt", nlp)
-solver.setOption("tol",1e-10)
-solver.setOption("expand",True)
-solver.init()
+opts = {"tol":1e-10, "expand":True}
+solver = NlpSolver("solver", "ipopt", nlp, opts)
 
 # Bounds on u and initial condition
 solver.setInput(-0.5, "lbx")

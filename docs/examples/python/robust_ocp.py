@@ -76,10 +76,7 @@ Tref = 4.0
 
 ts = [i*1.0/N for i in range(N)]
 
-Phi = Integrator("rk",f)
-Phi.setOption("number_of_finite_elements",2)
-Phi.setOption("tf",1.0/N)
-Phi.init()
+Phi = Integrator("Phi", "rk", f, {"number_of_finite_elements":2, "tf":1.0/N})
 
 # Obtain some sensitivity functions from the integrating block
 APhi = Phi.jacobian("x0","xf")
@@ -115,9 +112,8 @@ for k in range(N):
  
 
 # DPLE solver
-dple = DpleSolver("slicot",{'a':[i.sparsity() for i in As],'v':[i.sparsity() for i in Qs]})
-dple.setOption("linear_solver","csparse")
-dple.init()
+opts = {"linear_solver":"csparse"}
+dple = DpleSolver("dple", "slicot",{'a':[i.sparsity() for i in As],'v':[i.sparsity() for i in Qs]}, opts)
 
 Ps = horzsplit(dple(a=horzcat(As),v=horzcat(Qs))["p"],x.shape[0])
 
@@ -137,9 +133,7 @@ nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=F,g=g))
 #   Set NLP initial guess and bounds
 #  ==================================
 
-solver = NlpSolver("ipopt",nlp)
-solver.setOption("hessian_approximation","limited-memory")
-solver.init()
+solver = NlpSolver("solver", "ipopt", nlp, {"hessian_approximation","limited-memory"})
 
 V0 = V(0.0)
 

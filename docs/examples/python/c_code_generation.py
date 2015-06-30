@@ -78,9 +78,6 @@ print "time = ", (t2-t1)*1e3, " ms"
 efcn_no_opt = ExternalFunction(name, "./"+objname_no_opt)
 efcn_O3_opt = ExternalFunction(name, "./"+objname_O3_opt)
 efcn_Os_opt = ExternalFunction(name, "./"+objname_O3_opt)
-efcn_no_opt.init()
-efcn_O3_opt.init()
-efcn_Os_opt.init()
 f_test = [gfcn,efcn_no_opt,efcn_O3_opt,efcn_Os_opt]
 
 # Just-in-time compilation with OpenCL

@@ -86,7 +86,6 @@ for j in range(deg+1):
 
     # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
     tfcn = lfcn.tangent()
-    tfcn.init()
     for j2 in range(deg+1):
         tfcn.setInput(tau_root[j2])
         tfcn.evaluate()
@@ -371,17 +370,15 @@ nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=Obj,g=vertcat(g)))
 ## ----
 ## SOLVE THE NLP
 ## ----
-  
+
+# NLP solver options
+opts = {}
+opts["expand"] = True
+opts["max_iter"] = 1000
+opts["tol"] = 1e-4
+
 # Allocate an NLP solver
-solver = NlpSolver("ipopt", nlp)
-
-# Set options
-solver.setOption("expand",True)
-solver.setOption("max_iter",1000)
-solver.setOption("tol",1e-4)
-
-# initialize the solver
-solver.init()
+solver = NlpSolver("solver", "ipopt", nlp, opts)
   
 # Initial condition
 solver.setInput(vars_init,"x0")

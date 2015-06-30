@@ -137,58 +137,42 @@ int main(){
     enum Integrators{CVODES,IDAS,RK,COLLOCATION,OLD_COLLOCATION,NUM_INTEGRATORS};
     for(int integrator=0; integrator<NUM_INTEGRATORS; ++integrator){
 
+      // Integrator options
+      Dict opts = make_dict("tf", tf);
+
       // Get integrator
       Integrator I;
       switch(integrator){
       case CVODES:
         if(problem==DAE) continue; // Skip if DAE
         cout << endl << "== cvodes == " << endl;
-        I = Integrator("cvodes", ffcn);
+        I = Integrator("I", "cvodes", ffcn, opts);
         break;
       case IDAS:
         cout << endl << "== idas == " << endl;
-        I = Integrator("idas", ffcn);
+        I = Integrator("I", "idas", ffcn, opts);
         break;
       case RK:
         if(problem==DAE) continue; // Skip if DAE
         cout << endl << "== RKIntegrator == " << endl;
-        I = Integrator("rk", ffcn);
+        I = Integrator("I", "rk", ffcn, opts);
         break;
-      case COLLOCATION:        
+      case COLLOCATION:
         cout << endl << "== CollocationIntegrator == " << endl;
-        I = Integrator("collocation", ffcn);
-
-        // Set collocation integrator specific options
-        I.setOption("implicit_solver","kinsol");
-        I.setOption("collocation_scheme","legendre");
-
-        {
-          Dict kinsol_options;
-          kinsol_options["linear_solver"] = "csparse";
-          I.setOption("implicit_solver_options",kinsol_options);
-        }
+        opts["implicit_solver"] = "kinsol";
+        opts["collocation_scheme"] = "legendre";
+        opts["implicit_solver_options"] = make_dict("linear_solver", "csparse");
+        I = Integrator("I", "collocation", ffcn, opts);
         break;
       case OLD_COLLOCATION:        
         cout << endl << "== OldCollocationIntegrator == " << endl;
-        I = Integrator("oldcollocation", ffcn);
-
-        // Set collocation integrator specific options
-        I.setOption("expand_f",true);
-        I.setOption("collocation_scheme","legendre");
-        I.setOption("implicit_solver", "kinsol");
-        {
-          Dict kinsol_options;
-          kinsol_options["linear_solver"] = "csparse";
-          I.setOption("implicit_solver_options",kinsol_options);
-        }
+        opts["expand_f"] = true;
+        opts["collocation_scheme"] = "legendre";
+        opts["implicit_solver"] = "kinsol";
+        opts["implicit_solver_options"] = make_dict("linear_solver", "csparse");
+        I = Integrator("I", "oldcollocation", ffcn, opts);
         break;
       }
-      
-      // Set common options
-      I.setOption("tf",tf);
-      
-      // Initialize the integrator
-      I.init();
       
       // Integrate to get results
       I.setInputNZ(x0,"x0");

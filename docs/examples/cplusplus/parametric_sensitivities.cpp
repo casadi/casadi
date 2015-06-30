@@ -93,34 +93,36 @@ int main(){
   vector<double> lbg(lbg_,lbg_+4);
   vector<double> ubg(ubg_,ubg_+4);
     
-  // Create NLP solver
-  SXFunction nlp(nlpIn("x",x),nlpOut("f",f,"g",g));
-  NlpSolver solver("ipopt", nlp);
+  // Create NLP
+  SXFunction nlp("nlp", nlpIn("x",x),nlpOut("f",f,"g",g));
+
+  // NLP solver options
+  Dict opts;
   
   // Mark the parameters amongst the constraints (see sIPOPT documentation)
   Dict con_integer_md;
   int sens_init_constr[] = {0,0,1,2};
   con_integer_md["sens_init_constr"] = vector<int>(sens_init_constr,sens_init_constr+4);
-  solver.setOption("con_integer_md",con_integer_md);
+  opts["con_integer_md"] = con_integer_md;
   
   // Mark the parameters amongst the variables (see sIPOPT documentation)
   Dict var_integer_md;
   int sens_state_1[] = {0,0,0,1,2};
   var_integer_md["sens_state_1"] = vector<int>(sens_state_1,sens_state_1+5);
-  solver.setOption("var_integer_md",var_integer_md);
+  opts["var_integer_md"] = var_integer_md;
 
   // Pass the perturbed values (see sIPOPT documentation)
   Dict var_numeric_md;
   double sens_state_value_1[] = {0,0,0,p_b[0],p_b[1]};
   var_numeric_md["sens_state_value_1"] = vector<double>(sens_state_value_1,sens_state_value_1+5);
-  solver.setOption("var_numeric_md",var_numeric_md);
+  opts["var_numeric_md"] = var_numeric_md;
   
   // Enable sensitivities
-  solver.setOption("run_sens","yes");
-  solver.setOption("n_sens_steps", 1);
+  opts["run_sens"] = "yes";
+  opts["n_sens_steps"] = 1;
   
-  // Initialize solver
-  solver.init();
+  // Create NLP solver
+  NlpSolver solver("solver", "ipopt", nlp, opts);
   
   // Solve NLP
   solver.setInput( x0, "x0");

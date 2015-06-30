@@ -50,17 +50,15 @@ nlp_solver = "ipopt"
 #qp_solver = ooqp"
 #qp_solver_options = {}
 
-# Create solver
-solv = NlpSolver(nlp_solver, nlp)
-
 # NLP solver options
+opts = {}
 if nlp_solver in ("sqpmethod", "scpgen"):
-  solv.setOption("qp_solver",qp_solver)
-  solv.setOption("qp_solver_options",qp_solver_options)
-  solv.setOption("max_iter",5)
+  opts["qp_solver"] = qp_solver
+  opts["qp_solver_options"] = qp_solver_options
+  opts["max_iter"] = 5
   
-# Init solver  
-solv.init()
+# Create solver
+solv = NlpSolver("solv", nlp_solver, nlp, opts)
 
 # Solve the rosenbrock problem
 solv.setInput([2.5,3.0,0.75],"x0")

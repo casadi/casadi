@@ -84,13 +84,10 @@ int main(){
   // ODE right hand side and quadrature
   SX ode = vertcat((1 - s*s)*r - s + u, r);
   SX quad = r*r + s*s + u*u;
-  SXFunction rhs("rhs", daeIn("x",x,"p",u),daeOut("ode",ode,"quad",quad));
+  SXFunction rhs("rhs", daeIn("x", x, "p", u), daeOut("ode", ode, "quad", quad));
 
   // Create an integrator (CVodes)
-  Integrator integrator("cvodes", rhs);
-  integrator.setOption("t0",0);
-  integrator.setOption("tf",tf/ns);
-  integrator.init();
+  Integrator integrator("integrator", "cvodes", rhs, make_dict("t0", 0, "tf", tf/ns));
   
   // Total number of NLP variables
   int NV = nx*(ns+1) + nu*ns;
@@ -157,14 +154,16 @@ int main(){
   
   // NLP 
   MXFunction nlp("nlp", nlpIn("x", V), nlpOut("f", J, "g", vertcat(g)));
-  
+
+  // Set options
+  Dict opts;
+  opts["tol"] = 1e-5;
+  opts["max_iter"] = 100;
+  opts["linear_solver"] = "ma57";
+
   // Create an NLP solver instance
-  NlpSolver nlp_solver("ipopt", nlp);
-  nlp_solver.setOption("tol",1e-5);
-  nlp_solver.setOption("max_iter",100);
-  nlp_solver.setOption("linear_solver","ma57");
-  nlp_solver.init();
-    
+  NlpSolver nlp_solver("nlp_solver", "ipopt", nlp, opts);
+
   // Initial guess and bounds on variables
   nlp_solver.setInputNZ(v_init,"x0");
   nlp_solver.setInputNZ(v_min,"lbx");

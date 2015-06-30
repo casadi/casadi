@@ -93,8 +93,7 @@ output_fcn = MXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
 grid = NP.linspace(0,1,100)
-simulator = Simulator(integrator,output_fcn,grid)
-simulator.init()
+simulator = Simulator("simulator", integrator,output_fcn,grid)
 
 # Pass initial conditions
 x0 = ivp.start(vertcat(ivp.x))
@@ -152,8 +151,7 @@ output_fcn = MXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
 grid = NP.linspace(0,10,100)
-simulator = Simulator(integrator,output_fcn,grid)
-simulator.init()
+simulator = Simulator("simulator", integrator,output_fcn,grid)
 
 # Pass initial conditions
 x0 = ivp.start(vertcat(ivp.x))
@@ -204,8 +202,7 @@ output_fcn = MXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
 grid = NP.linspace(0,2,100)
-simulator = Simulator(integrator,output_fcn,grid)
-simulator.init()
+simulator = Simulator("simulator", integrator, output_fcn, grid)
 
 # Pass initial conditions
 x0 = ivp.start(vertcat(ivp.x))

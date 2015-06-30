@@ -85,7 +85,6 @@ for j in range(d+1):
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
   tfcn = lfcn.tangent()
-  tfcn.init()
   for r in range(d+1):
     tfcn.setInput(tau_root[r])
     tfcn.evaluate()
@@ -121,10 +120,8 @@ vfcn = MXFunction('vfcn', [V,X0,P],[V_eq])
 vfcn_sx = SXFunction(vfcn)
 
 # Create a implicit function instance to solve the system of equations
-ifcn = ImplicitFunction("newton", vfcn_sx)
-ifcn.setOption("linear_solver","csparse")
-ifcn.init()
-[V] = ifcn.call([MX(),X0,P])
+ifcn = ImplicitFunction("ifcn", "newton", vfcn_sx, {"linear_solver":"csparse"})
+[V] = ifcn([MX(),X0,P])
 X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]
 
 # Get an expression for the state at the end of the finie element

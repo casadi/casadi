@@ -39,12 +39,14 @@ MySolver = "ipopt"
 #MySolver = "worhp"
 #MySolver = "sqpmethod"
 
-# Allocate a solver
-solver = NlpSolver(MySolver, nlp)
+# Solver options
+opts = {}
 if MySolver=="sqpmethod":
-  solver.setOption("qp_solver","qpoases")
-  solver.setOption("qp_solver_options",{"printLevel":"none"})
-solver.init()
+  opts["qp_solver"] = "qpoases"
+  opts["qp_solver_options"] = {"printLevel":"none"}
+
+# Allocate a solver
+solver = NlpSolver("solver", MySolver, nlp, opts)
 
 # Set constraint bounds
 solver.setInput(0.,"lbg")

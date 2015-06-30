@@ -114,7 +114,6 @@ for j in range(d+1):
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
   tfcn = lfcn.tangent()
-  tfcn.init()
   for r in range(d+1):
     tfcn.setInput(tau_root[r])
     tfcn.evaluate()

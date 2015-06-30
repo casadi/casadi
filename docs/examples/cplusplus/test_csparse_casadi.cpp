@@ -51,11 +51,8 @@ int main(int argc, char *argv[])
   Sparsity spA(nrow,ncol,colind,row);
   
   // Create a solver instance
-  LinearSolver linear_solver("csparse", spA);
+  LinearSolver linear_solver("linear_solver", "csparse", spA);
     
-  // Initialize
-  linear_solver.init();
-
   // Pass Non-zero elements
   double   s, u, p, e, r, l;
   s = 19.0; u = 21.0; p = 16.0; e = 5.0; r = 18.0; l = 12.0;

@@ -61,10 +61,6 @@ xf_min = [ 0.0,  0.0, -inf]
 xf_max = [ 0.0,  0.0,  inf]
 x_init = [ 0.0,  0.0,  0.0]
 
-# Initialize functions
-f.init()
-m.init()
-
 # Dimensions
 nx = 3
 nu = 1
@@ -109,7 +105,6 @@ for j in range(d+1):
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
   tfcn = lfcn.tangent()
-  tfcn.init()
   for r in range(d+1):
     tfcn.setInput(tau_root[r])
     tfcn.evaluate()
@@ -209,16 +204,14 @@ nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=f,g=g))
 ## ----
 ## SOLVE THE NLP
 ## ----
-  
-# Allocate an NLP solver
-solver = NlpSolver("ipopt", nlp)
 
 # Set options
-solver.setOption("expand",True)
-#solver.setOption("max_iter",4)
+opts = {}
+opts["expand"] = True
+#opts["max_iter"] = 4
 
-# initialize the solver
-solver.init()
+# Allocate an NLP solver
+solver = NlpSolver("solver", "ipopt", nlp, opts)
   
 # Initial condition
 solver.setInput(vars_init,"x0")

@@ -45,17 +45,15 @@ int main(int argc, char **argv){
   nl.parseNL(problem);
   
   // NLP
-  SXFunction nlp(nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
+  SXFunction nlp("nlp", nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
+
+  // Set options
+  Dict opts;
+  // opts["detect_linear"] = true;
 
   // Allocate NLP solver
-  NlpSolver nlp_solver("snopt", nlp);
+  NlpSolver nlp_solver("nlp_solver", "snopt", nlp, opts);
     
-  // Set options
-  // nlp_solver.setOption("detect_linear",true);
-  
-  // Initialize NLP solver
-  nlp_solver.init();
-  
   // Pass the bounds and initial guess
   nlp_solver.setInput(nl.x_lb,"lbx");
   nlp_solver.setInput(nl.x_ub,"ubx");
