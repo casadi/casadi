@@ -187,6 +187,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
           filtered = False          
           for f in filters:
             if f in refid or f.capitalize() in refid: filtered = True
+          if "SparsityInterface" in refid: filtered = False
           if filtered: continue
 
           print c.attributes['refid'].value, c.attributes['kind'].value
