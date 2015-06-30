@@ -38,17 +38,17 @@ f  = SXFunction('f', [vertcat([x,y]),u], [vertcat([(1-y*y)*x-y+u,x])])
 #! input/output signature
 #! f(time;states;parameters)
 fmod=SXFunction('ODE_right_hand_side', daeIn(x=f.inputExpr(0),p=f.inputExpr(1)),daeOut(ode=f.outputExpr(0)))
-#! Create the Integrator
-integrator = Integrator("cvodes", fmod)
 #! The whole series of sundials options are available for the user
-integrator.setOption("fsens_err_con",True)
-integrator.setOption("quad_err_con",True)
-integrator.setOption("abstol",1e-6)
-integrator.setOption("reltol",1e-6)
+opts = {}
+opts["fsens_err_con"] = True
+opts["quad_err_con"] = True
+opts["abstol"] = 1e-6
+opts["reltol"] = 1e-6
 tend=10
-integrator.setOption("t0",0)
-integrator.setOption("tf",tend)
-integrator.init()
+opts["t0"] = 0
+opts["tf"] = tend)
+#! Create the Integrator
+integrator = Integrator("integrator", "cvodes", fmod, opts)
 #$ The integrator is really just a special kind of Function. Assume that we have an ODE/DAE in either explicit form:
 #$ \begin{verbatim}
 #$   der(x) = fx(x,z,p,t)
@@ -119,8 +119,7 @@ ylabel('y')
 show()
 
 #! We demonstrate method B:
-sim=Simulator(integrator,ts)
-sim.init()
+sim=Simulator("sim", integrator, ts)
 sim.setInput([x0,y0],"x0")
 sim.setInput(0,"p")
 sim.evaluate()
@@ -192,7 +191,6 @@ show()
 #J=integrator.jacobian(INTEGRATOR_X0,0)
 #print J
 #print type(J)
-#J.init()
 #J.setInput(0,"t0")
 #J.setInput(tend,"tf")
 #J.setInput([x0,y0],"x0")
