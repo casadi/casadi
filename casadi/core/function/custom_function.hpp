@@ -49,11 +49,28 @@ public:
 /** \brief  default constructor */
   CustomFunction();
 
+  ///@{
   /** \brief Constructor (new syntax, includes initialization) */
   CustomFunction(const std::string& name, const CustomEvaluate &c_fcn,
                  const std::vector<Sparsity>& inputscheme,
                  const std::vector<Sparsity>& outputscheme,
                  const Dict& opts=Dict());
+
+  CustomFunction(const std::string& name, const CustomEvaluate &c_fcn,
+                 const std::pair< SparsityDict, std::vector<std::string> >& inputscheme,
+                 const std::vector<Sparsity>& outputscheme,
+                 const Dict& opts=Dict());
+
+  CustomFunction(const std::string& name, const CustomEvaluate &c_fcn,
+                 const std::vector<Sparsity>& inputscheme,
+                 const std::pair< SparsityDict, std::vector<std::string> >& outputscheme,
+                 const Dict& opts=Dict());
+
+  CustomFunction(const std::string& name, const CustomEvaluate &c_fcn,
+                 const std::pair< SparsityDict, std::vector<std::string> >& inputscheme,
+                 const std::pair< SparsityDict, std::vector<std::string> >& outputscheme,
+                 const Dict& opts=Dict());
+  ///@}
 
   ///@{
   /** \brief Constructor (no initialization, to be deprecated) */
