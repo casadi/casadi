@@ -32,9 +32,7 @@ z = x*y+2*y
 z += 4*z
 
 #! An SXFunction is needed to inspect the graph
-f = SXFunction([x,y],[z])
-f.init()
-
+f = SXFunction("f", [x,y],[z])
 
 #! The default representation is just the name of the function
 print f.__repr__()

@@ -34,8 +34,7 @@ outs = [x,y,vertcat((x,y)),y*x,0]
 
 print outs
 
-f = SXFunction(ins,outs)
-f.init()
+f = SXFunction("f", ins, outs)
 
 #! f now has two inputs and a 4 outputs:
 print f.nIn()

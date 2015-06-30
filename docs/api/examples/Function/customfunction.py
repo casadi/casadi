@@ -31,16 +31,13 @@ from casadi import *
 #! The function calculates the factorial of its input
 #! We annotate the function with the pyfunction decorator
 
-@pyfunction([Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
+@pyfunction("fac", [Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
 def fac(inputs):
   x = inputs[0]
   y = 1
   for i in range(x):
     y*=(i+1)
   return [y]
-  
-#! Just as other CasADi function, we have to initialize
-fac.init()
 
 #! Set the input
 fac.setInput(4)

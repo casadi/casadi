@@ -60,11 +60,11 @@ k_     = 0.2
 params_ = [0.1,0.1,alpha_,k_,sigma_]
 
 #! We create a NLPImplicitSolver instance
-f=SXFunction([vertcat([a,gamma]),vertcat(params)],[vertcat([res0,res1])])
-s=ImplicitFunction("nlp", f)
-s.setOption("nlp_solver","ipopt")
-s.setOption("nlp_solver_options",{"tol":1e-14})
-s.init()
+f=SXFunction("f", [vertcat([a, gamma]), vertcat(params)], [vertcat([res0, res1])])
+opts = {}
+opts["nlp_solver"] = "ipopt"
+opts["nlp_solver_options"] = {"tol":1e-14}
+s=ImplicitFunction("s", "nlp", f, opts)
 s.setInput(params_,1)
 
 #$ Initialize [$a$,$\gamma$] with a guess and solve

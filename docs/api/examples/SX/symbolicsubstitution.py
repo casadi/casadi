@@ -33,8 +33,7 @@ z = z_+x
 print type(z), z
 
 #! We need SXFuncion to manipulate the SX graph
-f = SXFunction([vertcat((x,y))],[z])
-f.init()
+f = SXFunction('f', [vertcat((x,y))],[z])
 
 #! We can substitute a leaf in the graph
 w = SX.sym("w")

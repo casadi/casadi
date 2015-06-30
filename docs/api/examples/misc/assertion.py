@@ -31,8 +31,7 @@ x = MX.sym("x")
 y = sin(x)
 z = sqrt(y)
 
-f = MXFunction([x],[z])
-f.init()
+f = MXFunction("f", [x],[z])
 
 f.setInput(5)
 f.evaluate()
@@ -45,8 +44,7 @@ print f.getOutput()
 y = y.attachAssert(y>0,"bummer") # Add assertion here
 z = sqrt(y)
 
-f = MXFunction([x],[z])
-f.init()
+f = MXFunction("f", [x],[z])
 
 f.setInput(5)
 
@@ -67,16 +65,14 @@ def dummy(f):
   f.setOutput(int(m>2))
 
 
-foo = CustomFunction(dummy, [x.sparsity()], [Sparsity.dense(1,1)] )
-foo.init()
+foo = CustomFunction("foo", dummy, [x.sparsity()], [Sparsity.dense(1,1)] )
 
 y = sin(x)
 
 y = y.attachAssert(foo.call([y])[0],"you are in trouble") # Add assertion here
 z = sqrt(y)
 
-f = MXFunction([x],[z])
-f.init()
+f = MXFunction("f", [x],[z])
 
 f.setInput(5)
 

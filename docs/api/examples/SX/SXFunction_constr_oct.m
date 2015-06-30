@@ -30,8 +30,7 @@ in = {x y}; % function inputs
 disp('Function outputs are:')
 out = {x,y,[x x; x x],y*x,0}
 
-f = SXFunction(in,out);
-f.init();
+f = SXFunction('f', in,out);
 
 %! f now has two inputs and a 4 outputs:
 number_in = f.nIn()

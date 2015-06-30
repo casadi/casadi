@@ -37,11 +37,9 @@ dotdraw(e)
 
 #! We can use MXFunction.expand to expand into subexpressions
 
-f = MXFunction([a,b,c],[e])
-f.init()
+f = MXFunction("f", [a,b,c],[e])
 
 g = SXFunction(f.expand())
-g.init()
 
 dotdraw(g.outputExpr(0))
 

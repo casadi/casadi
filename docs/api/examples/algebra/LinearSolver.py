@@ -39,8 +39,7 @@ x=DMatrix([tan(i) for i in range(n)])
 b=mul(A,x)
 
 #! We demonstrate the LinearSolver API with CSparse:
-s = LinearSolver("csparse", A.sparsity())
-s.init()
+s = LinearSolver("s", "csparse", A.sparsity())
 
 #! Give it the matrix A
 s.setInput(A,"A")
@@ -61,8 +60,7 @@ print "Sum of residuals = %.2e" % norm_1(x-x_)
 #! Comparison of different linear solvers
 #! ======================================
 for solver in ("lapacklu","lapackqr","csparse"):
-  s = LinearSolver(solver, A.sparsity()) # We create a solver
-  s.init()
+  s = LinearSolver("s", solver, A.sparsity()) # We create a solver
 
   s.setInput(A,"A") # Give it the matrix A
   

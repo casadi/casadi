@@ -46,12 +46,9 @@ params = vertcat([eps,mu,alpha,k,sigma])
 states = vertcat([u,v])
 rhs    = vertcat([v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t))])
 
-f=SXFunction(daeIn(x=states,p=params,t=t),daeOut(ode=rhs))
-f.init()
+f=SXFunction("f", daeIn(x=states,p=params,t=t),daeOut(ode=rhs))
 
-integrator = Integrator("cvodes", f)
-
-integrator.init()
+integrator = Integrator("integrator", "cvodes", f)
 
 #! First argument is input index, secpnd argument is output index
 jac = integrator.jacobian("p", "xf")

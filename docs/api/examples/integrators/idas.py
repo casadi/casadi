@@ -67,8 +67,7 @@ Z_ = [1147.0/720] # algebraic state
 #! We construct the DAE system
 ode = vertcat([u,lambd*x,v,lambd*y+g])
 alg = x**2+y**2-L**2
-f = SXFunction(daeIn(x=x_all,z=z_all,p=p_all,t=t),daeOut(ode=ode,alg=alg))
-f.init()
+f = SXFunction("f", daeIn(x=x_all,z=z_all,p=p_all,t=t),daeOut(ode=ode,alg=alg))
 
 #! Let's check we have consistent initial conditions:
 f.setInput(P_,"p")
@@ -88,11 +87,7 @@ print j
 #! It is impossible to lambda from the last element of the residual.
 
 #! We create a DAE system solver
-I = Integrator("idas", f)
-I.setOption("calc_ic",False)
-I.setOption("init_xdot",XDOT_)
-  
-I.init()
+I = Integrator("I", "idas", f, {"calc_ic":False, "init_xdot":XDOT_})
 
 I.setInput(P_,"p")
 I.setInput(X_,"x0")
@@ -111,8 +106,7 @@ ode = vertcat([u,lambd*x])
 alg = vertcat([x**2+y**2-L**2, u*x+v*y,u**2-g*y+v**2+L**2*lambd])
 x_all = vertcat([x,u])
 z_all = vertcat([y,v,lambd])
-f = SXFunction(daeIn(x=x_all,z=z_all,p=p_all,t=t),daeOut(ode=ode,alg=alg))
-f.init()
+f = SXFunction("f", daeIn(x=x_all,z=z_all,p=p_all,t=t),daeOut(ode=ode,alg=alg))
 
 #! the initial state of the pendulum
 P_ = [5,10] # parameters
@@ -140,12 +134,7 @@ print array(j.getOutput())
 #! $\frac{dg}{dy}$ is invertible this time.
 
 #! We create a DAE system solver
-I = Integrator("idas", f)
-
-I.setOption('t0',0)
-I.setOption('tf',1)
-I.setOption("init_xdot",XDOT_)
-I.init()
+I = Integrator("I", "idas", f, {'t0':0, 'tf':1, "init_xdot":XDOT_})
   
 I.setInput(P_,"p")
 I.setInput(X_,"x0")

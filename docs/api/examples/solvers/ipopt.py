@@ -38,8 +38,7 @@ from numpy import *
 x=SX.sym("x")
 nlp=SXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2))
 
-solver = NlpSolver("ipopt", nlp)
-solver.init()
+solver = NlpSolver("solver", "ipopt", nlp)
 solver.setInput([-10],"lbx")
 solver.setInput([10],"ubx")
 solver.evaluate()
@@ -63,8 +62,7 @@ x=SX.sym("x",n)
 #! Note how we do not distinguish between equalities and inequalities here
 nlp=SXFunction(nlpIn(x=x),nlpOut(f=mul((x-1).T,x-1),g=vertcat([x[1]+x[2],x[0]])))
 
-solver = NlpSolver("ipopt", nlp)
-solver.init()
+solver = NlpSolver("solver", "ipopt", nlp)
 solver.setInput([-10]*n,"lbx")
 solver.setInput([10]*n,"ubx")
 #$  $ 2 \le x_0 \le 2$ is not really as bad it looks. Ipopt will recognise this situation as an equality constraint. 
@@ -90,8 +88,7 @@ a=SX.sym("a")
 a_ = 2
 nlp=SXFunction(nlpIn(x=x,p=a),nlpOut(f=(x-a)**2))
 
-solver = NlpSolver("ipopt", nlp)
-solver.init()
+solver = NlpSolver("solver", "ipopt", nlp)
 solver.setInput([-10],"lbx")
 solver.setInput([10],"ubx")
 solver.setInput([a_],"p")

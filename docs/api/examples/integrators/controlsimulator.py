@@ -58,18 +58,15 @@ fin = controldaeIn(
     u = u,
     x_major = vertcat((x0,v0))
   )
-f=SXFunction(fin,daeOut(ode=rhs))
-f.init()
+f=SXFunction("f", fin,daeOut(ode=rhs))
 
 #! Choose a time grid, we will have 10-1 = 9 control intervals
 ts = linspace(0,50,10)
-
-sim=ControlSimulator(f,ts)
-sim.setOption("integrator", "cvodes")
-
+opts = {}
+opts["integrator"] = "cvodes"
 #! Each control interval will be subdived in 8
-sim.setOption("nf",8) 
-sim.init()
+opts["nf"] = 8 
+sim = ControlSimulator("sim", f, ts, opts)
 sim.setInput([0,0],"x0")
 sim.setInput([1,0.1,1],"p")
 #! Our 9 control intervals have the following prescribed values for u:
@@ -103,15 +100,11 @@ fin = controldaeIn(
     u = u,
     x_major = vertcat([x0,v0])
   )
-h=SXFunction(fin,[x0,u])
-h.init()
+h=SXFunction("h", fin, [x0, u])
 
-sim=ControlSimulator(f,h,ts)
-sim.setOption("integrator", "cvodes")
-
-#! Each control interval will be subdived in 8
-sim.setOption("nf",8) 
-sim.init()
+#! Set options, each control interval will be subdived in 8
+opts = {"integrator":"cvodes", "nf":8}
+sim=ControlSimulator("sim", f, h, ts, opts)
 sim.setInput([0,0],"x0")
 sim.setInput([1,0.1,1],"p")
 #! Our 9 control intervals have the following prescribed values for u:
@@ -136,8 +129,7 @@ fin = controldaeIn(
     x_major = vertcat([x0,v0])
   )
   
-f=SXFunction(fin,[rhs])
-f.init()
+f=SXFunction("f", fin,[rhs])
 
 ui = SX.sym("ui")
 
@@ -149,17 +141,15 @@ fin = controldaeIn(
     x_major = vertcat([x0,v0])
   )
   
-h=SXFunction(fin,[x,ui])
-h.init()
+h=SXFunction("h", fin,[x,ui])
 
-sim=ControlSimulator(f,h,ts)
-sim.setOption("integrator", "cvodes")
-
-#! Each control interval will be subdived in 8
-sim.setOption("control_interpolation","linear")
-sim.setOption("control_endpoint",True)
-sim.setOption("nf",8) 
-sim.init()
+#! Set options, each control interval will be subdived in 8
+opts = {}
+opts["control_interpolation"] = "linear"
+opts["control_endpoint"] = True
+opts["nf"] = 8 
+opts["integrator"] = "cvodes"
+sim=ControlSimulator("sim", f, h, ts, opts)
 sim.setInput([0,0],"x0")
 sim.setInput([1,0.1,1],"p")
 #! CONTROLSIMULATOR_U is larger, it has a value at the end of the last control interval, such that interpolation can happen

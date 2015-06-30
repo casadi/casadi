@@ -50,9 +50,7 @@ h=SXFunction(hessLagIn(x=xy,lam_g=lambd,lam_f=sigma),
              hessLagOut(hess=sigma*hessian(obj,xy)[0]+lambd*hessian(constr,xy)[0]))
    
 #! We solve the problem with an exact hessian
-solver = NlpSolver("ipopt", nlp)
-solver.setOption("hess_lag",h)
-solver.init()
+solver = NlpSolver("solver", "ipopt", nlp, {"hess_lag":h})
 solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([0],"lbg")
@@ -63,8 +61,7 @@ for sol in array(solver.getOutput()):
   print "%.15f" % sol
 
 #! To compare the behaviour of convergence, we solve the same problem without exact hessian
-solver = NlpSolver("ipopt", nlp)
-solver.init()
+solver = NlpSolver("solver", "ipopt", nlp)
 solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([0],"lbg")

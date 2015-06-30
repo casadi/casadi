@@ -54,11 +54,11 @@ def simplecallback(f):
   else:
     return 0
 
-solver = NlpSolver("ipopt", nlp)
-solver.setOption("iteration_callback",simplecallback)
-solver.setOption("tol",1e-8)
-solver.setOption("max_iter",20)
-solver.init()
+opts = {}
+opts["iteration_callback"] = simplecallback
+opts["tol"] = 1e-8
+opts["max_iter"] = 20
+solver = NlpSolver("solver", "ipopt", nlp, opts)
 solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([-10],"lbg")
@@ -112,12 +112,11 @@ class MyCallback:
     draw()
     time.sleep(0.25)
 
-
-solver = NlpSolver("ipopt", nlp)
-solver.setOption("iteration_callback",MyCallback())
-solver.setOption("tol",1e-8)
-solver.setOption("max_iter",50)
-solver.init()
+opts = {}
+opts["iteration_callback"] = MyCallback()
+opts["tol"] = 1e-8
+opts["max_iter"] = 50
+solver = NlpSolver("solver", "ipopt", nlp, opts)
 solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([-10],"lbg")
