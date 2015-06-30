@@ -54,10 +54,9 @@ print "4! = ", fac.getOutput()
 #!==============================
 
 x = MX.sym("x")
-[y] = fac.call([x])
+[y] = fac([x])
 
-f = MXFunction([x],[y])
-f.init()
+f = MXFunction('f', [x],[y])
 
 
 f.setInput(5)
