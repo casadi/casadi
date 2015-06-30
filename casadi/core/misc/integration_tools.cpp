@@ -300,9 +300,7 @@ namespace casadi {
     MXFunction rfp("rfp", make_vector(v, x0, p, h), make_vector(vertcat(V_eq)));
 
     // Create a implicit function instance to solve the system of equations
-    ImplicitFunction ifcn(solver, rfp);
-    ifcn.setOption(solver_options);
-    ifcn.init();
+    ImplicitFunction ifcn("ifcn", solver, rfp, solver_options);
 
     // Get state at end time
     MX xf = x0;

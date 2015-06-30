@@ -58,9 +58,7 @@ class ImplicitFunctiontests(casadiTestCase):
       C_ = DMatrix([[1.6,2.1],[1,1.3]])
       b_ = DMatrix([0.7,0.6])
       f=SXFunction("f", [x],[mul(A_,x)-b_, mul(C_,x)])
-      solver=ImplicitFunction(Solver,f)
-      solver.setOption(options)
-      solver.init()
+      solver=ImplicitFunction("solver", Solver, f, options)
       solver.evaluate()
       
       refsol = SXFunction("refsol", [x],[solve(A_,b_), mul(C_,solve(A_,b_))])
@@ -69,9 +67,7 @@ class ImplicitFunctiontests(casadiTestCase):
       A = SX.sym("A",2,2)
       b = SX.sym("b",2)
       f=SXFunction("f", [x,A,b],[mul(A,x)-b])
-      solver=ImplicitFunction(Solver,f)
-      solver.setOption(options)
-      solver.init()
+      solver=ImplicitFunction("solver", Solver, f, options)
       solver.setInput(A_,1)
       solver.setInput(b_,2)
       solver.evaluate()
@@ -88,11 +84,10 @@ class ImplicitFunctiontests(casadiTestCase):
       for ad_weight_sp in [0,1]:
         for ad_weight in [0,1]:
           print ad_weight, ad_weight_sp
-          solver=ImplicitFunction(Solver,f)
-          solver.setOption("ad_weight_sp",ad_weight_sp)
-          solver.setOption("ad_weight",ad_weight)
-          solver.setOption(options)
-          solver.init()
+          options2 = dict(options)
+          options2["ad_weight_sp"] = ad_weight_sp
+          options2["ad_weight"] = ad_weight
+          solver=ImplicitFunction("solver", Solver, f, options2)
           solver.setInput(0,0)
           solver.setInput(A_,1)
           solver.setInput(b_,2)
@@ -109,9 +104,7 @@ class ImplicitFunctiontests(casadiTestCase):
       self.message(Solver)
       x=SX.sym("x")
       f=SXFunction("f", [x],[sin(x)])
-      solver=ImplicitFunction(Solver,f)
-      solver.setOption(options)
-      solver.init()
+      solver=ImplicitFunction("solver", Solver, f, options)
       solver.setInput(6)
       solver.evaluate()
       
@@ -128,9 +121,7 @@ class ImplicitFunctiontests(casadiTestCase):
       y=SX.sym("y")
       n=0.2
       f=SXFunction("f", [y,x],[x-arcsin(y)])
-      solver=ImplicitFunction(Solver,f)
-      solver.setOption(options)
-      solver.init()
+      solver=ImplicitFunction("solver", Solver, f, options)
       solver.setInput(n,1)
 
       refsol = SXFunction("refsol", [y,x],[sin(x)])
@@ -145,12 +136,10 @@ class ImplicitFunctiontests(casadiTestCase):
       y=SX.sym("y")
       n=0.2
       f=SXFunction("f", [y,x],[x-arcsin(y)])
-      solver=ImplicitFunction(Solver,f)
-      solver.setOption(options)
-      solver.init()
+      solver=ImplicitFunction("solver", Solver, f, options)
       
       X = MX.sym("X")
-      [R] = solver.call([MX(),X])
+      [R] = solver([MX(),X])
       
       trial = MXFunction("trial", [X],[R])
       trial.setInput(n)
@@ -173,14 +162,12 @@ class ImplicitFunctiontests(casadiTestCase):
       y0 = DMatrix(Sparsity.diag(N),0.1)
 
       f=SXFunction("f", [vecNZ(y),vecNZ(x)],[vecNZ((mul((x+y0),(x+y0).T)-mul((y+y0),(y+y0).T))[s])])
-      solver=ImplicitFunction(Solver,f)
-      solver.setOption(options)
-      # Cholesky is only unique for positive diagonal entries
-      solver.setOption("constraints",[1]*s.nnz())
-      solver.init()
+      options2 = dict(options)
+      options2["constraints"] = [1]*s.nnz()
+      solver=ImplicitFunction("options2", Solver, f, options2)
       
       X = MX.sym("X",x.sparsity())
-      [R] = solver.call([MX(),vecNZ(X)])
+      [R] = solver([MX(),vecNZ(X)])
       
       trial = MXFunction("trial", [X],[R])
       trial.setInputNZ([abs(cos(i)) for i in range(x.nnz())])
@@ -211,9 +198,7 @@ class ImplicitFunctiontests(casadiTestCase):
       yy = y + y0
       n=0.2
       f=SXFunction("f", [y,x],[vertcat([x-arcsin(yy[0]),yy[1]**2-yy[0]])])
-      solver=ImplicitFunction(Solver,f)
-      solver.setOption(options)
-      solver.init()
+      solver=ImplicitFunction("solver", Solver, f, options)
       solver.setInput(n)
       solver.evaluate()
       
@@ -225,10 +210,7 @@ class ImplicitFunctiontests(casadiTestCase):
     self.message("Scalar KINSol problem, n=0, constraint")
     x=SX.sym("x")
     f=SXFunction("f", [x],[sin(x)])
-    solver=ImplicitFunction("kinsol",f)
-    solver.setOption("constraints",[-1])
-    print solver.dictionary()
-    solver.init()
+    solver=ImplicitFunction("solver", "kinsol", f, {"constraints":[-1]})
     solver.setInput(-6)
     solver.evaluate()
     self.assertAlmostEqual(solver.getOutput()[0],-2*pi,5)
@@ -239,21 +221,17 @@ class ImplicitFunctiontests(casadiTestCase):
       if 'newton' in str(Solver): continue
       x=SX.sym("x",2)
       f=SXFunction("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
-      
-      solver=ImplicitFunction(Solver,f)
-      solver.setOption(options)
-      solver.setOption("constraints",[-1,0])
-      solver.init()
+      options2 = dict(options)
+      options2["constraints"] = [-1,0]
+      solver=ImplicitFunction("solver", Solver, f, options2)
       solver.evaluate()
       
       self.checkarray(solver.getOutput(),DMatrix([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
 
       f=SXFunction("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
-      
-      solver=ImplicitFunction(Solver,f)
-      solver.setOption(options)
-      solver.setOption("constraints",[1,0])
-      solver.init()
+      options2 = dict(options)
+      options2["constraints"] = [1,0]
+      solver=ImplicitFunction("solver", Solver, f, options2)
       solver.evaluate()
       
       self.checkarray(solver.getOutput(),DMatrix([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
@@ -285,14 +263,12 @@ class ImplicitFunctiontests(casadiTestCase):
     x0_val  = 1
 
     G = F.gradient(0,0)
-    G.init()
     G.setInput(x0_val)
     G.evaluate()
     print G.getOutput()
     print G
 
     J = F.jacobian(0,0)
-    J.init()
     J.setInput(x0_val)
     J.evaluate()
     print J.getOutput()
@@ -306,10 +282,9 @@ class ImplicitFunctiontests(casadiTestCase):
     a = SX.sym("a")
     f = SXFunction("f", [x,a],[tan(x)-a,sqrt(a)*x**2 ])
     for Solver, options in solvers:
-      solver=ImplicitFunction(Solver,f)
-      solver.setOption("ad_weight_sp",1)
-      solver.setOption(options)
-      solver.init()
+      options2 = dict(options)
+      options2["ad_weight_sp"] = 1
+      solver=ImplicitFunction("solver", Solver, f, options2)
       solver.setInput(0.3,1)
       solver.setInput(0.1,0)
       solver.evaluate()

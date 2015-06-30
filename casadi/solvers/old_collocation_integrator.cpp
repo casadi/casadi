@@ -371,24 +371,16 @@ namespace casadi {
       ifcn = SXFunction(shared_cast<MXFunction>(ifcn));
     }
 
-    // Get the root-finding solver creator function
-    std::string implicit_function_name = getOption("implicit_solver");
-
-    // Allocate a root-finding solver
-    implicit_solver_ = ImplicitFunction(implicit_function_name,
-                                        ifcn, Function(), LinearSolver());
-    std::stringstream ss_implicit_solver;
-    ss_implicit_solver << "collocation_implicitsolver_" << getOption("name");
-    implicit_solver_.setOption("name", ss_implicit_solver.str());
-
-    // Pass options
+    // Options
+    Dict implicit_solver_options;
     if (hasSetOption("implicit_solver_options")) {
-      const Dict& implicit_solver_options = getOption("implicit_solver_options");
-      implicit_solver_.setOption(implicit_solver_options);
+      implicit_solver_options = getOption("implicit_solver_options");
     }
 
-    // Initialize the solver
-    implicit_solver_.init();
+    // Allocate a root-finding solver
+    implicit_solver_ =
+      ImplicitFunction("collocation_implicitsolver_" + name_, getOption("implicit_solver"),
+                       ifcn, implicit_solver_options);
 
     if (hasSetOption("startup_integrator")) {
       Dict startup_integrator_options;
@@ -399,12 +391,10 @@ namespace casadi {
       startup_integrator_options["t0"] = coll_time_.front().front();
       startup_integrator_options["tf"] = coll_time_.back().back();
 
-      // Create the linear solver
-      std::string startup_integrator_name = getOption("startup_integrator");
-
       // Allocate a root-finding solver
-      startup_integrator_ = Integrator("collocation_startup_" + name_, startup_integrator_name,
-                                       make_pair(f_, g_), startup_integrator_options);
+      startup_integrator_ =
+        Integrator("collocation_startup_" + name_, getOption("startup_integrator"),
+                   make_pair(f_, g_), startup_integrator_options);
     }
 
     // Mark the system not yet integrated
