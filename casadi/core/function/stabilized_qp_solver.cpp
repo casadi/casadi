@@ -62,10 +62,12 @@ namespace casadi {
     init();
   }
 
+#ifdef WITH_LEGACY_CONSTRUCTORS
   StabilizedQpSolver::StabilizedQpSolver(const std::string& solver,
                                          const std::map<std::string, Sparsity>& st) {
     assignNode(StabilizedQpSolverInternal::instantiatePlugin(solver, st));
   }
+#endif // WITH_LEGACY_CONSTRUCTORS
 
   bool StabilizedQpSolver::hasPlugin(const std::string& name) {
     return StabilizedQpSolverInternal::hasPlugin(name);

@@ -167,23 +167,22 @@ namespace casadi {
       hessLag();
     }
 
+    // QP solver options
+    Dict stabilized_qp_solver_options;
+    if (hasSetOption("stabilized_qp_solver_options")) {
+      stabilized_qp_solver_options = getOption("stabilized_qp_solver_options");
+    }
+
     // Allocate a QP solver
     Sparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity()
         : Sparsity::dense(nx_, nx_);
     H_sparsity = H_sparsity + Sparsity::diag(nx_);
     Sparsity A_sparsity = jacG().isNull() ? Sparsity(0, nx_)
         : jacG().output().sparsity();
-
-    std::string stabilized_qp_solver_name = getOption("stabilized_qp_solver");
-    stabilized_qp_solver_ = StabilizedQpSolver(stabilized_qp_solver_name,
-                                               make_map("h", H_sparsity, "a", A_sparsity));
-
-    // Set options if provided
-    if (hasSetOption("stabilized_qp_solver_options")) {
-      Dict stabilized_qp_solver_options = getOption("stabilized_qp_solver_options");
-      stabilized_qp_solver_.setOption(stabilized_qp_solver_options);
-    }
-    stabilized_qp_solver_.init();
+    stabilized_qp_solver_ = StabilizedQpSolver("stabilized_qp_solver",
+                                               getOption("stabilized_qp_solver"),
+                                               make_map("h", H_sparsity, "a", A_sparsity),
+                                               stabilized_qp_solver_options);
 
     // Lagrange multipliers of the NLP
     mu_.resize(ng_);

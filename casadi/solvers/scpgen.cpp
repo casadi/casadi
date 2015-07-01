@@ -582,19 +582,16 @@ namespace casadi {
     qpA_ = mat_fcn_.output(mat_jac_);
     qpB_.resize(ng_);
 
-    // Allocate a QP solver
-    std::string qp_solver_name = getOption("qp_solver");
-    qp_solver_ = QpSolver(qp_solver_name,
-                          make_map("h", qpH_.sparsity(), "a", qpA_.sparsity()));
-
-    // Set options if provided
+    // QP solver options
+    Dict qp_solver_options;
     if (hasSetOption("qp_solver_options")) {
-      Dict qp_solver_options = getOption("qp_solver_options");
-      qp_solver_.setOption(qp_solver_options);
+      qp_solver_options = getOption("qp_solver_options");
     }
 
-    // Initialize the QP solver
-    qp_solver_.init();
+    // Allocate a QP solver
+    qp_solver_ = QpSolver("qp_solver", getOption("qp_solver"),
+                          make_map("h", qpH_.sparsity(), "a", qpA_.sparsity()),
+                          qp_solver_options);
     if (verbose_) {
       userOut() << "Allocated QP solver." << endl;
     }

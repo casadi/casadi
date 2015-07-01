@@ -126,16 +126,16 @@ namespace casadi {
     Sparsity A_sparsity = jacG().isNull() ? Sparsity(0, nx_)
         : jacG().output().sparsity();
 
-    std::string qp_solver_name = getOption("qp_solver");
-    qp_solver_ = QpSolver(qp_solver_name,
-                          make_map("h", H_sparsity, "a", A_sparsity));
-
-    // Set options if provided
+    // QP solver options
+    Dict qp_solver_options;
     if (hasSetOption("qp_solver_options")) {
-      Dict qp_solver_options = getOption("qp_solver_options");
-      qp_solver_.setOption(qp_solver_options);
+      qp_solver_options = getOption("qp_solver_options");
     }
-    qp_solver_.init();
+
+    // Allocate a QP solver
+    qp_solver_ = QpSolver("qp_solver", getOption("qp_solver"),
+                          make_map("h", H_sparsity, "a", A_sparsity),
+                          qp_solver_options);
 
     // Lagrange multipliers of the NLP
     mu_.resize(ng_);

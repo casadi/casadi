@@ -122,11 +122,13 @@ namespace casadi {
     QpSolver(const std::string& name, const std::string& solver,
              const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
+    //#ifdef WITH_LEGACY_CONSTRUCTORS
     /** \brief Constructor (no initialization, to be deprecated)
      *  \param name \pluginargument{QpSolver}
      *  \param st \structargument{QP}
      */
     QpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
+    //#endif // WITH_LEGACY_CONSTRUCTORS
 
     /// Access functions of the node
     QpSolverInternal* operator->();
