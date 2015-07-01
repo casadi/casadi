@@ -76,10 +76,12 @@ namespace casadi {
     init();
   }
 
+#ifdef WITH_LEGACY_CONSTRUCTORS
   LrDpleSolver::LrDpleSolver(const std::string& solver,
                              const std::map<std::string, std::vector<Sparsity> >& st) {
     assignNode(LrDpleInternal::instantiatePlugin(solver, st));
   }
+#endif // WITH_LEGACY_CONSTRUCTORS
 
 } // namespace casadi
 

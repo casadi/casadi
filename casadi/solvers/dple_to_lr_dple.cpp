@@ -81,16 +81,20 @@ namespace casadi {
 
     int K = A_.size();
 
+    // Solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
+    options["Hs"] = std::vector< std::vector<int> >(K, std::vector<int>(1, n));
+
     // Create an LrDpleSolver instance
     std::map<std::string, std::vector<Sparsity> > tmp;
     tmp["a"] = st_[DPLE_A];
     tmp["v"] = st_[DPLE_V];
     tmp["c"] = std::vector<Sparsity>(K, C.sparsity());
     tmp["h"] = std::vector<Sparsity>(K, H.sparsity());
-    solver_ = LrDpleSolver(getOption(solvername()), tmp);
-    solver_.setOption("Hs", std::vector< std::vector<int> >(K, std::vector<int>(1, n)));
-    solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    solver_ = LrDpleSolver("solver", getOption(solvername()), tmp, options);
 
     MX P = solver_(make_map("a", A, "v", V, "c", repmat(C, 1, K), "h", repmat(H, 1, K))).at("y");
 

@@ -96,13 +96,17 @@ namespace casadi {
       Vsp[k] = V_[k].sparsity();
     }
 
+    // Solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
+
     // Create an dplesolver instance
     std::map<std::string, std::vector<Sparsity> > tmp;
     tmp["a"] = A_;
     tmp["v"] = Vsp;
-    solver_ = DpleSolver(getOption(solvername()), tmp);
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    solver_ = DpleSolver("solver", getOption(solvername()), tmp, options);
 
     MX P = solver_(make_map("a", horzcat(As_), "v", horzcat(V_))).at("p");
     std::vector<MX> Ps_ = horzsplit(P, n_);

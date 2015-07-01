@@ -143,15 +143,19 @@ namespace casadi {
       H = diagcat(form_==0? Hs_ : reverse(Hs_));
     }
 
+    // QP solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
+    options["Hs"] = Hss_;
+
     // Create an LrDleSolver instance
-    solver_ = LrDleSolver(getOption(solvername()),
+    solver_ = LrDleSolver("solver", getOption(solvername()),
                           make_map("a", A.sparsity(),
                                    "v", V.sparsity(),
                                    "c", C.sparsity(),
-                                   "h", H.sparsity()));
-    solver_.setOption("Hs", Hss_);
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+                                   "h", H.sparsity()), options);
 
     std::vector<MX> v_in(LR_DPLE_NUM_IN);
     v_in[LR_DLE_A] = As;

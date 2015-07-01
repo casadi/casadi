@@ -104,12 +104,15 @@ namespace casadi {
 
     MX Ap = mul(Assr);
 
-    // Create an dlesolver instance
-    solver_ = DleSolver(getOption(solvername()), make_map("a", Ap.sparsity(), "v", R.sparsity()));
-    solver_.setOption(getOption(optionsname()));
+    // Solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
 
-    // Initialize the NLP solver
-    solver_.init();
+    // Create an dlesolver instance
+    solver_ = DleSolver("solver", getOption(solvername()),
+                        make_map("a", Ap.sparsity(), "v", R.sparsity()), options);
 
     std::vector<MX> Ps(K_);
     Ps[0] = solver_(make_map("a", Ap, "v", R)).at("p");

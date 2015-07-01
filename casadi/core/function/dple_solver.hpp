@@ -98,12 +98,14 @@ namespace casadi {
                const std::map<std::string, std::vector<Sparsity> >& st,
                const Dict& opts=Dict());
 
+#ifdef WITH_LEGACY_CONSTRUCTORS
     /** \brief Constructor (no initialization, to be deprecated)
      * \param solver \pluginargument{DpleSolver}
      * \param st \structargument{Dple}
      */
     DpleSolver(const std::string& solver,
                const std::map<std::string, std::vector<Sparsity> >& st);
+#endif // WITH_LEGACY_CONSTRUCTORS
 
     /// Print solver statistics
     void printStats(std::ostream &stream=casadi::userOut()) const;

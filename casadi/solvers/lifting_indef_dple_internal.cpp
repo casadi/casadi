@@ -124,13 +124,15 @@ namespace casadi {
       V = diagcat(diagcat(reverse(vector_slice(Vs_, range(Vs_.size()-1)))), Vs_.back());
     }
 
-    // Create an dlesolver instance
-    solver_ = DleSolver(getOption(solvername()),
-                        make_map("a", A.sparsity(), "v", V.sparsity()));
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
+    // Solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
 
-    // Initialize the NLP solver
-    solver_.init();
+    // Create an dlesolver instance
+    solver_ = DleSolver("solver", getOption(solvername()),
+                        make_map("a", A.sparsity(), "v", V.sparsity()), options);
 
     MX Pf = solver_(make_map("a", A, "v" , V)).at("p");
 

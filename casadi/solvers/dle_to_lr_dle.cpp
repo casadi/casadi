@@ -74,11 +74,15 @@ namespace casadi {
     MX A = MX::sym("A", A_);
     MX V = MX::sym("V", V_);
 
+    // Solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
+
     // Create an LrDleSolver instance
-    solver_ = LrDleSolver(getOption(solvername()),
-                          make_map("a", A_, "v", V_));
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    solver_ = LrDleSolver("solver", getOption(solvername()),
+                          make_map("a", A_, "v", V_), options);
 
     MX P = solver_(make_map("a", A, "v", V)).at("y");
 
