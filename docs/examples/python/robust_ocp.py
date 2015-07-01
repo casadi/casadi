@@ -80,10 +80,8 @@ Phi = Integrator("Phi", "rk", f, {"number_of_finite_elements":2, "tf":1.0/N})
 
 # Obtain some sensitivity functions from the integrating block
 APhi = Phi.jacobian("x0","xf")
-APhi.init()
 
 CPhi = Phi.jacobian("p","xf")
-CPhi.init()
 
 #  ==================================
 #         Construct the NLP

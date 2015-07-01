@@ -155,10 +155,8 @@ c = PyFunction(Fun(), [Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense
 c.init()
 
 J = c.jacobian(1) # jacobian w.r.t second argument
-J.init()
 J.setInput(1.2,0)
 J.setInput(1.5,1)
-J.init()
 J.evaluate()
 
 print J.getOutput(), cos(1.2+3*1.5)*3
@@ -291,7 +289,6 @@ class Fun:
 Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
 Fun.init()
 J = Fun.jacobian(1)
-J.init()
 J.setInput(1.2,0)
 J.setInput(1.5,1)
 J.evaluate()

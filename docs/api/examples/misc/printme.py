@@ -43,7 +43,6 @@ f.setInput(3,1)
 f.evaluate()
 
 J = f.jacobian(0,0)
-J.init()
 
 J.setInput(2,0)
 J.setInput(9,1)
@@ -54,7 +53,6 @@ J.evaluate()
 
 
 J = J.jacobian(0,0)
-J.init()
 
 J.setInput(2,0)
 J.setInput(9,1)

@@ -100,7 +100,6 @@ int main(int argc, char *argv[])
 
   // Jacobian
   Function J = F.jacobian("B","X");  
-  J.init();
   J.setInputNZ(val,"A");
   J.setInputNZ(rhs,"B");
   J.evaluate();

@@ -120,7 +120,6 @@ plot(tf,sim.getOutput().T-out.T,linewidth=3)
 
 # Not supported in current revision, cf. #929
 # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
-# jacsim.init()
 # jacsim.setInput(x0,"x0")
 # jacsim.setInput(u_,"u")
 
@@ -163,7 +162,6 @@ plot(tf,sim.getOutput().T-out.T,linewidth=3)
 
 # Not supported in current revision, cf. #929
 # jacsim = sim.jacobian(CONTROLSIMULATOR_U,0)
-# jacsim.init()
 # jacsim.setInput(x0,"x0")
 # jacsim.setInput(u_,"u")
 
@@ -467,7 +465,6 @@ sim = ControlSimulator("sim", cdae, out, tn, opts)
 
 # Not supported in current revision, cf. #929
 # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
-# jacsim.init()
 
 figure(7)
   
@@ -565,7 +562,6 @@ title('controls (%s)' % caption)
 
 # Not supported in current revision, cf. #929  
 # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
-# jacsim.init()
 
 # # Calculate monodromy matrix
 # jacsim.setInput(x0,"x0")
@@ -621,7 +617,6 @@ title('controls (%s)' % caption)
 
 # Not supported in current revision, cf. #929  
 # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
-# jacsim.init()
 
 # # Calculate monodromy matrix
 # jacsim.setInput(x0,"x0")

@@ -90,7 +90,6 @@ x0 = DMatrix([-3.1,0])
 #! ===============================================
 #! First argument is input index, second argument is output index
 jac = integrator.jacobian("x0","xf")
-jac.init()
 
 jac.setInput(x0,"x0")
 jac.setInput(params_,"p")
@@ -108,7 +107,6 @@ print Ji
 # #! =============================================================
 
 # jacsim = sim.jacobian(INTEGRATOR_X0,0)
-# jacsim.init()
 
 # jacsim.setInput(x0,"x0")
 # jacsim.setInput(params_,"p")
@@ -138,7 +136,6 @@ print Ji
 # csim = ControlSimulator("csim", cf, linspace(0, tf, 50), opts)
 
 # jaccsim = csim.jacobian(CONTROLSIMULATOR_X0,0)
-# jaccsim.init()
 # jaccsim.setInput(params_[:-1],"p")
 # jaccsim.setInput(x0,"x0")
 # jaccsim.setInput(0,"u")

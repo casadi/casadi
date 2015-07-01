@@ -124,7 +124,6 @@ print f.getOutput("alg") # This should be all zeros
 
 #! Let's check our jacobian:
 j = f.jacobian("z","alg")
-j.init()
 
 j.setInput(P_,"p")
 j.setInput(X_,"x")

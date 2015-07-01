@@ -87,28 +87,20 @@
 \paragraph{Function SISO}
 
 \begin{verbatim}
-  f = SXFunction([x],[x**2])
-  f.init()
+  f = SXFunction('f', [x],[x**2])
 \end{verbatim}
 
 \paragraph{Function MIMO}
 \begin{verbatim}
-  g = SXFunction([x,y],[x**2,x*y,vertcat([x,2*x])])
-  g.init()
+  g = SXFunction('g', [x,y],[x**2,x*y,vertcat([x,2*x])])
 \end{verbatim}
 
 \paragraph{Function MIMO with scheme}
 \begin{verbatim}
-  solver = SXFunction(
+  solver = SXFunction('nlp',
     nlpIn(x=x),
     nlpOut(f=f,g=vertcat([x,2*x]))
   )
-  solver.init()
-\end{verbatim}
-
-\paragraph{Setting options}
-\begin{verbatim}
-  f.setOption("option_name",option value)
 \end{verbatim}
 
 \paragraph{Evaluate SISO}

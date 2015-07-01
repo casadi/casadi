@@ -97,11 +97,9 @@ k4 = f([states+dt*k3,controls,disturbances])[0]
 states_1 = states+dt/6.0*(k1+2*k2+2*k3+k4)
 phi = SXFunction('phi', [states,controls,disturbances],[states_1])
 PHI = phi.jacobian()
-PHI.init()
 # Define the measurement system
 h = SXFunction('h', [states],[x]) # We have measurements of the position
 H = h.jacobian()
-H.init()
 # Build the objective
 obj = 0
 # First the arrival cost

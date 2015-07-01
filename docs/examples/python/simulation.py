@@ -106,7 +106,6 @@ P0["x","dy"] = P0["dy","x"] = 0.002
 
 # Not supported in current revision, cf. #929
 # J = csim.jacobian("x0","xf")
-# J.init()
 # J.setInput(x0,"x0")
 # J.setInput(parameters_,"p")
 # J.setInput(controls_,"u")
