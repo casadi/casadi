@@ -68,8 +68,7 @@ namespace casadi {
     // Initialize the base classes
     SdqpSolverInternal::init();
 
-    cholesky_ = LinearSolver("csparsecholesky", st_[SDQP_STRUCT_H]);
-    cholesky_.init();
+    cholesky_ = LinearSolver("cholesky", "csparsecholesky", st_[SDQP_STRUCT_H]);
 
     MX g_socp = MX::sym("x", cholesky_.getFactorizationSparsity(true));
     MX h_socp = MX::sym("h", n_);

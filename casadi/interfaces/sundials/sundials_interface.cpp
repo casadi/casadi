@@ -269,28 +269,31 @@ void SundialsInterface::init() {
   }
 
   if (hasSetOption("linear_solver") && !jac_.isNull()) {
-    // Create a linear solver
-    std::string linear_solver_name = getOption("linear_solver");
-    linsol_ = LinearSolver(linear_solver_name, jac_.output().sparsity(), 1);
-    // Pass options
+    // Options
+    Dict linear_solver_options;
     if (hasSetOption("linear_solver_options")) {
-      linsol_.setOption(getOption("linear_solver_options"));
+      linear_solver_options = getOption("linear_solver_options");
     }
-    linsol_.init();
+
+    // Create a linear solver
+    linsol_ = LinearSolver("linsol", getOption("linear_solver"), jac_.output().sparsity(),
+                           1, linear_solver_options);
   }
 
   if ((hasSetOption("linear_solverB") || hasSetOption("linear_solver")) && !jacB_.isNull()) {
+    // Linear solver options
+    Dict opts;
+    if (hasSetOption("linear_solver_optionsB")) {
+      opts = getOption("linear_solver_optionsB");
+    } else if (hasSetOption("linear_solver_options")) {
+      opts = getOption("linear_solver_options");
+    }
+
     // Create a linear solver
     std::string linear_solver_name =
-        hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
-    linsolB_ = LinearSolver(linear_solver_name, jacB_.output().sparsity(), 1);
-    // Pass options
-    if (hasSetOption("linear_solver_optionsB")) {
-      linsolB_.setOption(getOption("linear_solver_optionsB"));
-    } else if (hasSetOption("linear_solver_options")) {
-      linsolB_.setOption(getOption("linear_solver_options"));
-    }
-    linsolB_.init();
+      hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
+    linsolB_ = LinearSolver("linsolB", linear_solver_name, jacB_.output().sparsity(),
+                            1, opts);
   }
 }
 

@@ -76,6 +76,7 @@ namespace casadi {
     (*this)->spSolve(X, B, transpose);
   }
 
+#ifdef WITH_LEGACY_CONSTRUCTORS
   LinearSolver::LinearSolver(const std::string& solver, const Sparsity& sp, int nrhs) {
     if (solver=="none") {
       assignNode(new LinearSolverInternal(sp, nrhs));
@@ -83,6 +84,7 @@ namespace casadi {
       assignNode(LinearSolverInternal::getPlugin(solver).creator(sp, nrhs));
     }
   }
+#endif // WITH_LEGACY_CONSTRUCTORS
 
   LinearSolver::LinearSolver(const std::string& name, const std::string& solver,
                              const Sparsity& sp, int nrhs, const Dict& opts) {
@@ -90,6 +92,18 @@ namespace casadi {
       assignNode(new LinearSolverInternal(sp, nrhs));
     } else {
       assignNode(LinearSolverInternal::getPlugin(solver).creator(sp, nrhs));
+    }
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  LinearSolver::LinearSolver(const std::string& name, const std::string& solver,
+                             const Sparsity& sp, const Dict& opts) {
+    if (solver=="none") {
+      assignNode(new LinearSolverInternal(sp, 1));
+    } else {
+      assignNode(LinearSolverInternal::getPlugin(solver).creator(sp, 1));
     }
     setOption("name", name);
     setOption(opts);

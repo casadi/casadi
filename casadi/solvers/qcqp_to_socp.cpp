@@ -178,18 +178,14 @@ namespace casadi {
     std::vector<Sparsity> socp_g;
 
     // Allocate Cholesky solvers
-    cholesky_.push_back(LinearSolver("csparsecholesky", st_[QCQP_STRUCT_H]));
+    cholesky_.push_back(LinearSolver("cholesky", "csparsecholesky", st_[QCQP_STRUCT_H]));
     for (int i=0;i<nq_;++i) {
-      cholesky_.push_back(
-        LinearSolver("csparsecholesky",
-                     DMatrix::zeros(st_[QCQP_STRUCT_P])(range(i*n_, (i+1)*n_),
-                                                        ALL).sparsity()));
+      LinearSolver ls("cholesky", "csparsecholesky",
+                      DMatrix::zeros(st_[QCQP_STRUCT_P])(range(i*n_, (i+1)*n_), ALL).sparsity());
+      cholesky_.push_back(ls);
     }
 
     for (int i=0;i<nq_+1;++i) {
-      // Initialize Cholesky solve
-      cholesky_[i].init();
-
       // Harvest Cholsesky sparsity patterns
       // Note that we add extra scalar to make room for the epigraph-reformulation variable
       socp_g.push_back(diagcat(

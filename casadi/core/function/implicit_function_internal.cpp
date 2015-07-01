@@ -133,19 +133,15 @@ namespace casadi {
     // Get the linear solver creator function
     if (linsol_.isNull()) {
       if (hasSetOption("linear_solver")) {
-        std::string linear_solver_name = getOption("linear_solver");
-
-        // Allocate an NLP solver
-        linsol_ = LinearSolver(linear_solver_name, jac_.output().sparsity(), 1);
-
         // Pass options
+        Dict linear_solver_options;
         if (hasSetOption("linear_solver_options")) {
-          const Dict& linear_solver_options = getOption("linear_solver_options");
-          linsol_.setOption(linear_solver_options);
+          linear_solver_options = getOption("linear_solver_options");
         }
 
-        // Initialize
-        linsol_.init();
+        // Allocate an NLP solver
+        linsol_ = LinearSolver("linsol", getOption("linear_solver"),
+                               jac_.output().sparsity(), 1, linear_solver_options);
       }
     } else {
       // Initialize the linear solver, if provided

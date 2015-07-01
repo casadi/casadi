@@ -178,11 +178,9 @@ namespace casadi {
     print_stats_ = getOption("print_stats");
 
     // Form a linear solver for the sparsity propagation
-    linsol_f_ = LinearSolver("none", spJacF());
-    linsol_f_.init();
+    linsol_f_ = LinearSolver("linsol_f", "none", spJacF());
     if (!g_.isNull()) {
-      linsol_g_ = LinearSolver("none", spJacG());
-      linsol_g_.init();
+      linsol_g_ = LinearSolver("linsol_g", "none", spJacG());
     }
 
     // Allocate sufficiently large work vectors

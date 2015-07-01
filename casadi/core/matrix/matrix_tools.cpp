@@ -33,9 +33,7 @@ namespace casadi {
 
   Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b,
                        const std::string& lsolver, const Dict& dict) {
-    LinearSolver mysolver(lsolver, A.sparsity(), b.size2());
-    mysolver.setOption(dict);
-    mysolver.init();
+    LinearSolver mysolver("tmp", lsolver, A.sparsity(), b.size2(), dict);
     mysolver.setInput(A, LINSOL_A);
     mysolver.setInput(b, LINSOL_B);
     mysolver.prepare();

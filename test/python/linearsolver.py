@@ -245,9 +245,7 @@ class LinearSolverTests(casadiTestCase):
   def test_simple_trans(self):
     A = DMatrix([[3,1],[7,2]])
     for Solver, options in lsolvers:
-      solver = LinearSolver(Solver, A.sparsity())
-      solver.setOption(options)
-      solver.init()
+      solver = LinearSolver("solver", Solver, A.sparsity(), options)
       solver.setInput(A,"A")
 
       solver.prepare()
@@ -265,9 +263,7 @@ class LinearSolverTests(casadiTestCase):
     A = DMatrix([[3,1],[7,2]])
     for Solver, options in lsolvers:
       print Solver
-      solver = LinearSolver(Solver, A.sparsity())
-      solver.setOption(options)
-      solver.init()
+      solver = LinearSolver("solver", Solver, A.sparsity(), options)
       solver.setInput(A,"A")
 
       solver.prepare()
@@ -289,9 +285,7 @@ class LinearSolverTests(casadiTestCase):
     
     for Solver, options in lsolvers:
       print Solver
-      solver = LinearSolver(Solver, A.sparsity())
-      solver.setOption(options)
-      solver.init()
+      solver = LinearSolver("solver", Solver, A.sparsity(), options)
       solver.setInput(A_,"A")
       solver.setInput(b_,"B")
       
@@ -319,9 +313,7 @@ class LinearSolverTests(casadiTestCase):
     
     for Solver, options in lsolvers:
       print Solver
-      solver = LinearSolver(Solver, A.sparsity())
-      solver.setOption(options)
-      solver.init()
+      solver = LinearSolver("solver", Solver, A.sparsity(), options)
       solver.setInput(A_,"A")
       solver.setInput(b_,"B")
       
@@ -357,9 +349,7 @@ class LinearSolverTests(casadiTestCase):
       b = MX.sym("b",b_.sparsity())
       for Solver, options in lsolvers:
         print Solver
-        solver = LinearSolver(Solver, A.sparsity())
-        solver.setOption(options)
-        solver.init()
+        solver = LinearSolver("solver", Solver, A.sparsity(), options)
         for tr in [True, False]:
           x = solver.solve(A,b,tr)
           f = MXFunction("f", [A,b],[x])
@@ -411,9 +401,7 @@ class LinearSolverTests(casadiTestCase):
     
     M.sparsity().spy()
 
-    S = LinearSolver("csparsecholesky",M.sparsity())
-    
-    S.init()
+    S = LinearSolver("S", "csparsecholesky",M.sparsity())
     S.setInput(M)
     S.prepare()
     
@@ -439,10 +427,8 @@ class LinearSolverTests(casadiTestCase):
     M = mul(L,L.T)
 
     print L
-    S = LinearSolver("csparsecholesky",M.sparsity())
+    S = LinearSolver("S", "csparsecholesky", M.sparsity())
     
-
-    S.init()
     S.getFactorizationSparsity().spy()
     S.setInput(M)
     S.prepare()

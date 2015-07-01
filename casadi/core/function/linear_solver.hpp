@@ -88,18 +88,24 @@ namespace casadi {
     LinearSolver();
     /// \endcond
 
+    ///@{
     /** \brief Create a linear solver given a sparsity pattern
      * (new syntax, includes initialization)
     * \param solver \pluginargument{LinearSolver}
     */
     LinearSolver(const std::string& name, const std::string& solver,
-                 const Sparsity& sp, int nrhs=1, const Dict& opts=Dict());
+                 const Sparsity& sp, const Dict& opts=Dict());
+    LinearSolver(const std::string& name, const std::string& solver,
+                 const Sparsity& sp, int nrhs, const Dict& opts=Dict());
+    ///@}
 
+#ifdef WITH_LEGACY_CONSTRUCTORS
     /** \brief Create a linear solver given a sparsity pattern
      * No initialization (to be deprecated)
     * \param solver \pluginargument{LinearSolver}
     */
     LinearSolver(const std::string& solver, const Sparsity& sp, int nrhs=1);
+#endif // WITH_LEGACY_CONSTRUCTORS
 
     /// \cond INTERNAL
     /// Access functions of the node
