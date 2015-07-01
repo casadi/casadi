@@ -772,7 +772,7 @@ One important member of the \texttt{Function} derived classes is \texttt{SXFunct
 \begin{pytex}
 x = SX.sym("x",2,2)
 y = SX.sym("y")
-f = SXFunction([x,y],[x,sin(y)*x])
+f = SXFunction("f",[x,y],[x,sin(y)*x])
 \end{pytex}
 which defines a function $f : \mathbb{R}^{2 \times 2} \times \mathbb{R}, \quad (x,y) \mapsto (x,\sin(y) x)$.
 
@@ -780,7 +780,7 @@ which defines a function $f : \mathbb{R}^{2 \times 2} \times \mathbb{R}, \quad (
 \begin{pytex}
 x = MX.sym("x",2,2)
 y = MX.sym("y")
-f = MXFunction([x,y],[x,sin(y)*x])
+f = MXFunction("f",[x,y],[x,sin(y)*x])
 \end{pytex}
 
 %% We can get a list of other supported function objects deriving from \texttt{Function}:
@@ -840,7 +840,7 @@ x = SX.sym("x")
 p = SX.sym("p")
 f = x*x
 g = log(x)-p
-nlp = SXFunction(nlpIn(x=x,p=p),nlpOut(f=f,g=g))
+nlp = SXFunction("nlp",nlpIn(x=x,p=p),nlpOut(f=f,g=g))
 \end{pytex}
 
 The last line is essentially equivalent to \verb|nlp = SXFunction([x,p],[f,g])|, but is preferred for a number of reasons:
@@ -860,7 +860,7 @@ That is, you provide a \emph{list} of argument expressions (which may consist of
 A = SX.sym("A",3,3)
 x = SX.sym("x",3)
 y = mul(A,x)
-f = SXFunction([A,x],[y])
+f = SXFunction("f",[A,x],[y])
 f.init()  # Must be called before symbolic or numeric evaluation
 
 A2 = MX.sym("A",3,3)
