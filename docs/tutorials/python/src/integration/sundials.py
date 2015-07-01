@@ -46,7 +46,7 @@ opts["abstol"] = 1e-6
 opts["reltol"] = 1e-6
 tend=10
 opts["t0"] = 0
-opts["tf"] = tend)
+opts["tf"] = tend
 #! Create the Integrator
 integrator = Integrator("integrator", "cvodes", fmod, opts)
 #$ The integrator is really just a special kind of Function. Assume that we have an ODE/DAE in either explicit form:

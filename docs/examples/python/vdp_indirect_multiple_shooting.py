@@ -86,6 +86,7 @@ opts["reltol"] = 1e-8 # rel. tolerance
 opts["t0"] = 0.0
 opts["tf"] = tf/num_nodes
 I = Integrator("I", "cvodes", rhs, opts)
+opts_intg = opts
 
 # Variables in the root finding problem
 NV = nX*(num_nodes+1)
@@ -139,11 +140,11 @@ solver.evaluate()
 tgrid = NP.linspace(0,tf,100)
 
 # Output functions
-output_fcn = SXFunction(rhs_in,[x0,x1,u_opt])
+output_fcn = SXFunction("output",rhs_in,[x0,x1,u_opt])
 
 # Increase the end time for the integrator
 opts["tf"] = tf
-I = Integrator("I", "cvodes", rhs, opts)
+I = Integrator("I", "cvodes", rhs, opts_intg)
 
 # Simulator to get optimal state and control trajectories
 simulator = Simulator("simulator", I, output_fcn, tgrid)

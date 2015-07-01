@@ -60,7 +60,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     quad = v**3 + ((3-sin(t)) - u)**2
 
     # DAE callback function
-    ffcn = SXFunction(daeIn(t=t,x=x,p=u),daeOut(ode=ode,quad=quad))
+    ffcn = SXFunction("ffcn",daeIn(t=t,x=x,p=u),daeOut(ode=ode,quad=quad))
 
     # Time length
     tf = 0.5
@@ -94,7 +94,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     quad = x*x + 3.0*u*u
 
     # DAE callback function
-    ffcn = SXFunction(daeIn(x=x,z=z,p=u),daeOut(ode=ode,alg=alg,quad=quad))
+    ffcn = SXFunction("ffcn",daeIn(x=x,z=z,p=u),daeOut(ode=ode,alg=alg,quad=quad))
     
     # End time
     tf = 5.

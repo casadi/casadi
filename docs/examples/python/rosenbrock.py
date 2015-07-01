@@ -32,7 +32,7 @@ z = SX.sym("z")
 v = vertcat([x,y,z])
 
 # Form NLP functions
-nlp = SXFunction(nlpIn(x=v),nlpOut(f=x**2 + 100*z**2, g=z + (1-x)**2 - y))
+nlp = SXFunction("nlp",nlpIn(x=v),nlpOut(f=x**2 + 100*z**2, g=z + (1-x)**2 - y))
 
 # Choose NLP solver
 nlp_solver = "ipopt"

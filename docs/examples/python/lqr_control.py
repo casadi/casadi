@@ -589,7 +589,7 @@ y0     = SX.sym("y0",ns)
 u     = controls["uref"]-mul(param["K"],y0-controls["yref"])
 rhs   = mul(A,y)+mul(B,u)
 
-cdae = SXFunction('çdae', controldaeIn(x=y, x_major=y0, u=controls, p=param),[rhs])
+cdae = SXFunction('cdae', controldaeIn(x=y, x_major=y0, u=controls, p=param),[rhs])
 
 # Output function
 out = SXFunction('out', controldaeIn(x=y, x_major=y0, u=controls, p=param),[y,u,controls["uref"],controls["yref"]])

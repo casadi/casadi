@@ -43,17 +43,17 @@ dae = SXFunction("dae", daeIn(x=x, p=u, t=t), daeOut(ode=ode))
 # Create an integrator
 opts = {"tf":tf/nk} # final time
 if coll:
-  opts["number_of_finite_elements" = 5
-  opts["interpolation_order" = 5
-  opts["collocation_scheme" = "legendre"
-  opts["implicit_solver" = "kinsol"
-  opts["implicit_solver_options" =  {'linear_solver' : 'csparse'}
-  opts["expand_f" = True
+  opts["number_of_finite_elements"] = 5
+  opts["interpolation_order"] = 5
+  opts["collocation_scheme"] = "legendre"
+  opts["implicit_solver"] = "kinsol"
+  opts["implicit_solver_options"] =  {'linear_solver' : 'csparse'}
+  opts["expand_f"] = True
   integrator = Integrator("integrator", "oldcollocation", dae, opts)
 else:
-  opts["abstol" = 1e-8 # tolerance
-  opts["reltol" = 1e-8 # tolerance
-  opts["steps_per_checkpoint" = 1000
+  opts["abstol"] = 1e-8 # tolerance
+  opts["reltol"] = 1e-8 # tolerance
+  opts["steps_per_checkpoint"] = 1000
   integrator = Integrator("integrator", "cvodes", dae, opts)
 
 # Total number of variables

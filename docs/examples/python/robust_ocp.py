@@ -133,7 +133,7 @@ nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=F,g=g))
 #   Set NLP initial guess and bounds
 #  ==================================
 
-solver = NlpSolver("solver", "ipopt", nlp, {"hessian_approximation","limited-memory"})
+solver = NlpSolver("solver","ipopt", nlp, {"hessian_approximation":"limited-memory"})
 
 V0 = V(0.0)
 
