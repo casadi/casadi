@@ -56,24 +56,18 @@ def addExtra(metadata):
   print "Adding extra"
 
   x=SX.sym("x")
-  f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
-  f.init()
+  f = SXFunction("f",nlpIn(x=x),nlpOut(f=x**2))
   
-  NlpSolver.loadPlugin("ipopt")
   i = NlpSolver("ipopt", f)
   extra(metadata,i,"IpoptInterface")
 
   x=SX.sym("x")
-  f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
-  f.init()
-  NlpSolver.loadPlugin("worhp")
+  f = SXFunction("f",nlpIn(x=x),nlpOut(f=x**2))
   i = NlpSolver("worhp", f)
   extra(metadata,i,"WorhpInterface")
 
   x=SX.sym("x")
-  f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
-  f.init()
-  NlpSolver.loadPlugin("snopt")
+  f = SXFunction("f",nlpIn(x=x),nlpOut(f=x**2))
   i = NlpSolver("snopt", f)
   extra(metadata,i,"SnoptInterface")
 
