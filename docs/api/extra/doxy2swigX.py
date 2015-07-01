@@ -249,7 +249,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
     for (i,row) in enumerate(node.getElementsByTagName("row")):
       rows.append([])
       for (j,entry) in enumerate(row.getElementsByTagName("entry")):
-        rows[i].append(swig_typename_convertor_cpp2python(astext(entry,escape=False).encode("ascii","ignore")).replace("&gt;",">").replace("&lt;","<"))
+        rows[i].append(astext(entry,escape=False).encode("ascii","ignore").replace("&gt;",">").replace("&lt;","<"))
       
     table = texttable.Texttable(max_width=80-4)
     table.add_rows(rows)
@@ -453,16 +453,16 @@ class Doxy2SWIG_X(Doxy2SWIG):
              grouped_dict[total] = ([origin],pieces)
              grouped_list.append(grouped_dict[total])
           if not self.merge:
-            self.add_text_original(["%feature(\"docstring\") ", swigname if len(swigname)>0 else k, " \"\n"]+map(swig_typename_convertor_cpp2python,pieces)+["\";\n","\n"])
+            self.add_text_original(["%feature(\"docstring\") ", swigname if len(swigname)>0 else k, " \"\n"]+pieces+["\";\n","\n"])
             
         if self.merge:
           if len(grouped_list)==1:
-            self.add_text_original(["%feature(\"docstring\") ", k, " \"\n"]+map(swig_typename_convertor_cpp2python,grouped_list[0][1])+["\";\n","\n"])
+            self.add_text_original(["%feature(\"docstring\") ", k, " \"\n"]+grouped_list[0][1]+["\";\n","\n"])
           else:
             self.add_text_original(["%feature(\"docstring\") ",k , " \"\n"])
             for (origin,pieces) in grouped_list:
               if len(u"".join(pieces).rstrip())>0:
-                self.add_text_original(map(swig_typename_convertor_cpp2python,["\n"]+["\n>  " + o.replace('"',r'\"') + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"]))
+                self.add_text_original(["\n"]+["\n>  " + swig_typename_convertor_cpp2python(o.replace('"',r'\"')) + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
             self.add_text_original(["\";\n","\n"])
   
 
