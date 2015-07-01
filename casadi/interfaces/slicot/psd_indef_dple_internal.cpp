@@ -180,8 +180,7 @@ namespace casadi {
 
           sp = Sparsity(np*K_, np*K_, row_ind, col);
         }
-        LinearSolver solver(linear_solver_name, sp, 1);
-        solver.init();
+        LinearSolver solver("solver", linear_solver_name, sp);
 
         dpse_solvers_[i].resize(n_*(n_+1)/2, solver);
         for (int k=0;k<n_*(n_+1)/2;++k) {
