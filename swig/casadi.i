@@ -1226,6 +1226,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           || to_generic<std::vector<int> >(p, m)
           || to_generic<std::vector<double> >(p, m)
           || to_generic<std::vector<std::string> >(p, m)
+          || to_generic<std::vector<std::vector<int> > >(p, m)
           || to_generic<casadi::Function>(p, m)
           || to_generic<casadi::GenericType::Dict>(p, m)) {
         return true;
