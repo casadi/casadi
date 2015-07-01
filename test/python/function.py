@@ -1089,6 +1089,54 @@ class Functiontests(casadiTestCase):
     f = SXFunction("f", daeIn(x=x),[x**2])
 
     self.checkarray(f(x=0.3)['0'],DMatrix(0.09))
+
+  def test_issue1464(self):
+    n = 6
+    x = SX.sym("x",n)
+    u = SX.sym("u")
+
+
+    N = 9
+
+    rk4 = SXFunction("f",[x,u],[x+u])
+    rk4.init()
+
+    for XX,XFunction in [(SX,SXFunction),(MX,MXFunction)]:
+
+      g = []
+      g2 = []
+
+
+      V = XX.sym("V",(N+1)*n+N)
+      VX,VU = vertsplit(V,[0,(N+1)*n,(N+1)*n+N])
+
+      VXk = vertsplit(VX,n)
+      VUk = vertsplit(VU,1)
+
+      for k in range(N):
+          
+          [xf] = rk4([VXk[k],VUk[k]])
+
+          xfp = vertsplit(xf,n/2)
+          vp = vertsplit(VXk[k+1],n/2)
+
+          g.append(xfp[0] - vp[0])
+          g.append(xfp[1] - vp[1])
+
+          g2.append(xf-VXk[k+1])
+
+      for i in range(2):
+        f = XFunction("nlp",[V],[vertcat(g)])
+        f.setOption("ad_weight_sp",i)
+        f.init()
+
+        assert f.jacSparsity().nnz()==162
+
+        f2 = XFunction("nlp",[V],[vertcat(g2)])
+        f2.setOption("ad_weight_sp",i)
+        f2.init()
+
+        assert f2.jacSparsity().nnz()==162
     
 if __name__ == '__main__':
     unittest.main()
