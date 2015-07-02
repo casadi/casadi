@@ -65,7 +65,22 @@ namespace casadi {
 
     // Includes needed
     if (this->main) addInclude("stdio.h");
-    if (this->mex) addInclude("mex.h");
+
+    // Mex file?
+    if (this->mex) {
+      addInclude("string.h");
+      addInclude("mex.h", false, "MATLAB_MEX_FILE");
+      // Define printf (note file should be compilable both with and without mex)
+      this->auxiliaries
+        << "#ifdef MATLAB_MEX_FILE" << endl
+        << "#define PRINTF mexPrintf" << endl
+        << "#else" << endl
+        << "#define PRINTF printf" << endl
+        << "#endif" << endl;
+    } else {
+      // Define printf as standard printf from stdio.h
+      this->auxiliaries << "#define PRINTF printf" << endl;
+    }
   }
 
   void CodeGenerator::add(const Function& f) {
@@ -81,6 +96,7 @@ namespace casadi {
         << "(const real_t** arg, real_t** res, int* iw, real_t* w);" << endl;
     }
     f->generateMeta(*this, fname);
+    this->exposed_fname.push_back(fname);
   }
 
   std::string CodeGenerator::generate() const {
@@ -149,10 +165,42 @@ namespace casadi {
 
     // Mex gateway
     if (this->mex) {
-      s[0]
-        << "void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {" << endl
-        << "  mex_eval(resc, resv, argc, argv);" << endl
-        << "}" << endl << endl;
+      // Begin conditional compilation
+      s[0] << "#ifdef MATLAB_MEX_FILE" << endl;
+
+      // Function prototype
+      s[0] << "void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {"
+           << endl;
+
+      // Create a buffer
+      size_t buf_len = 0;
+      for (int i=0; i<exposed_fname.size(); ++i) {
+        buf_len = std::max(buf_len, exposed_fname[i].size());
+      }
+      s[0] << "  char buf[" << (buf_len+1) << "];" << endl;
+
+      // Read string argument
+      s[0] << "  int buf_ok = --argc >= 0 && !mxGetString(*argv++, buf, sizeof(buf));" << endl;
+
+      // Create switch
+      s[0] << "  if (!buf_ok) {" << endl
+           << "    /* name error */" << endl;
+      for (int i=0; i<exposed_fname.size(); ++i) {
+        s[0] << "  } else if (strcmp(buf, \"" << exposed_fname[i] << "\")==0) {" << endl
+             << "    return mex_" << exposed_fname[i] << "(resc, resv, argc, argv);" << endl;
+      }
+      s[0] << "  }" << endl;
+
+      // Error
+      s[0] << "  mexErrMsgTxt(\"First input should be a command string. Possible values:";
+      for (int i=0; i<exposed_fname.size(); ++i) {
+        s[0] << " '" << exposed_fname[i] << "'";
+      }
+      s[0] << "\");" << endl;
+
+      // End conditional compilation and function
+      s[0] << "}" << endl
+           << "#endif" << endl;
     }
 
     // Generate main
@@ -252,12 +300,16 @@ namespace casadi {
     s << "};" << endl;
   }
 
-  void CodeGenerator::addInclude(const std::string& new_include, bool relative_path) {
+  void CodeGenerator::addInclude(const std::string& new_include, bool relative_path,
+                                 const std::string& use_ifdef) {
     // Register the new element
     bool added = added_includes_.insert(new_include).second;
 
     // Quick return if it already exists
     if (!added) return;
+
+    // Ifdef opening
+    if (!use_ifdef.empty()) this->includes << "#ifdef " << use_ifdef << endl;
 
     // Print to the header section
     if (relative_path) {
@@ -265,6 +317,9 @@ namespace casadi {
     } else {
       this->includes << "#include <" << new_include << ">" << endl;
     }
+
+    // Ifdef closing
+    if (!use_ifdef.empty()) this->includes << "#endif" << endl;
   }
 
   bool CodeGenerator::simplifiedCall(const Function& f) {
@@ -450,6 +505,7 @@ namespace casadi {
       break;
     case AUX_TO_MEX:
       this->auxiliaries
+        << "#ifdef MATLAB_MEX_FILE" << endl
         << "mxArray* CASADI_PREFIX(to_mex)(const int* sp, real_t** x) {" << endl
         << "  int nrow = *sp++, ncol = *sp++, nnz = sp[ncol];" << endl
         << "  mxArray* p = mxCreateSparse(nrow, ncol, nnz, mxREAL);" << endl
@@ -460,11 +516,13 @@ namespace casadi {
         << "  if (x) *x = (real_t*)mxGetData(p);" << endl
         << "  return p;" << endl
         << "}" << endl
-        << "#define to_mex(sp, x) CASADI_PREFIX(to_mex)(sp, x)" << endl << endl;
+        << "#define to_mex(sp, x) CASADI_PREFIX(to_mex)(sp, x)" << endl
+        << "#endif" << endl << endl;
       break;
     case AUX_FROM_MEX:
       addAuxiliary(AUX_FILL_N);
       this->auxiliaries
+        << "#ifdef MATLAB_MEX_FILE" << endl
         << "real_t* CASADI_PREFIX(from_mex)(const mxArray *p, "
         << "real_t* y, const int* sp, real_t* w) {" << endl
         << "  if (!mxIsDouble(p) || mxGetNumberOfDimensions(p)!=2)" << endl
@@ -513,13 +571,13 @@ namespace casadi {
         << "  }" << endl
         << "  return y;" << endl
         << "}" << endl
-        << "#define from_mex(p, y, sp, w) CASADI_PREFIX(from_mex)(p, y, sp, w)" << endl << endl;
+        << "#define from_mex(p, y, sp, w) CASADI_PREFIX(from_mex)(p, y, sp, w)" << endl
+        << "#endif" << endl << endl;
       break;
     }
   }
 
   std::string CodeGenerator::to_mex(const Sparsity& sp, const std::string& data) {
-    addInclude("mex.h");
     addAuxiliary(AUX_TO_MEX);
     stringstream s;
     s << "to_mex(" << sparsity(sp) << ", " << data << ");";
@@ -532,7 +590,6 @@ namespace casadi {
     // Handle offset with recursion
     if (res_off!=0) return from_mex(arg, res+"+"+to_string(res_off), 0, sp_res, w);
 
-    addInclude("mex.h");
     addAuxiliary(AUX_FROM_MEX);
     stringstream s;
     s << "from_mex(" << arg
@@ -618,15 +675,9 @@ namespace casadi {
   }
 
   std::string CodeGenerator::printf(const std::string& str, const std::vector<std::string>& arg) {
+    addInclude("stdio.h");
     stringstream s;
-    if (this->mex) {
-      addInclude("mex.h");
-      s << "mexPrintf";
-    } else {
-      addInclude("stdio.h");
-      s << "printf";
-    }
-    s << "(\"" << str << "\"";
+    s << "PRINTF(\"" << str << "\"";
     for (int i=0; i<arg.size(); ++i) s << ", " << arg[i];
     s << ");";
     return s.str();

@@ -60,7 +60,8 @@ namespace casadi {
 
 #ifndef SWIG
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
-    void addInclude(const std::string& new_include, bool relative_path = false);
+    void addInclude(const std::string& new_include, bool relative_path=false,
+                    const std::string& use_ifdef=std::string());
 
     /// Add an external function declaration
     void addExternal(const std::string& new_external);
@@ -204,6 +205,9 @@ namespace casadi {
     std::stringstream auxiliaries;
     std::stringstream body;
     std::stringstream header;
+
+    // Names of exposed functions
+    std::vector<std::string> exposed_fname;
 
     // Set of already included header files
     typedef std::map<const void*, int> PointerMap;

@@ -2094,6 +2094,9 @@ namespace casadi {
 
     // Generate mex gateway for the function
     if (g.mex) {
+      // Begin conditional compilation
+      s << "#ifdef MATLAB_MEX_FILE" << endl;
+
       // Declare wrapper
       s << "void mex_" << fname
              << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {" << endl
@@ -2132,11 +2135,20 @@ namespace casadi {
         offset += input(i).nnz();
       }
 
-      // Output sparsities
+      // Allocate result
       s << "  real_t* res[" << n_out << "] = {0};" << endl;
       for (int i=0; i<n_out; ++i) {
-        s << "  if (--resc>=0) resv[" << i << "] = "
-               << g.to_mex(output(i).sparsity(), "&res["+g.to_string(i)+"]") << endl;
+        if (i==0) {
+          // if i==0, always store output (possibly ans output)
+          s << "  --resc;" << endl
+            << "  ";
+        } else {
+          // Store output, if it exists
+          s << "  if (--resc>=0) ";
+        }
+        // Create and get pointer
+        s << "resv[" << i << "] = " << g.to_mex(output(i).sparsity(),
+                                                "&res["+g.to_string(i)+"]") << endl;
       }
 
       // Call the function
@@ -2144,9 +2156,11 @@ namespace casadi {
       s << "  if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << fname
              << "\\\" failed.\");" << endl;
 
-      // Finalize mex gateway
-      s << "}" << endl << endl;
+      // End conditional compilation and function
+      s << "}" << endl
+        << "#endif" << endl << endl;
     }
+
     if (g.main) {
       // Declare wrapper
       s << "int main_" << fname << "(int argc, char* argv[]) {" << endl;
