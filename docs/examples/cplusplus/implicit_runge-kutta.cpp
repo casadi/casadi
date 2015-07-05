@@ -49,10 +49,9 @@ int main(){
   SX p  = SX::sym("u",np);  // control
 
   // ODE right hand side function
-  SX ode;
-  ode.append( (1 - x[1]*x[1])*x[0] - x[1] + p );
-  ode.append( x[0]                            );
-  ode.append( x[0]*x[0] + x[1]*x[1] + p*p     );
+  SX ode = vertcat((1 - x[1]*x[1])*x[0] - x[1] + p,
+                   x[0],
+                   x[0]*x[0] + x[1]*x[1] + p*p);
   SXFunction f("f", daeIn("x",x,"p",p),daeOut("ode",ode));
 
   // Number of finite elements
@@ -120,21 +119,18 @@ int main(){
   }
 
   // Root-finding function, implicitly defines V as a function of X0 and P
-  MXFunction vfcn("vfcn", make_vector(V, X0, P), make_vector(V_eq));
+  MXFunction vfcn("vfcn", {V, X0, P}, {V_eq});
   
   // Convert to SXFunction to decrease overhead
   SXFunction vfcn_sx(vfcn);
 
   // Create a implicit function instance to solve the system of equations
   ImplicitFunction ifcn("ifcn", "newton", vfcn_sx, make_dict("linear_solver", "csparse"));
-  vector<MX> ifcn_arg;
-  ifcn_arg.push_back(MX());
-  ifcn_arg.push_back(X0);
-  ifcn_arg.push_back(P);
+  vector<MX> ifcn_arg = {MX(), X0, P};
   V = ifcn(ifcn_arg).front();
   X.resize(1);
   for(int r=0; r<d; ++r){
-    X.push_back(V[Slice(r*nx,(r+1)*nx)]);
+    X.push_back(V[Slice(r*nx, (r+1)*nx)]);
   }
 
   // Get an expression for the state at the end of the finite element
@@ -144,23 +140,24 @@ int main(){
   }
   
   // Get the discrete time dynamics
-  vector<MX> F_arg = make_vector(X0, P);
-  MXFunction F("F", F_arg, make_vector(XF));
+  MXFunction F("F", {X0, P}, {XF});
 
   // Do this iteratively for all finite elements
+  MX Xk = X0;
   for(int i=0; i<n; ++i){
-    F_arg[0] = F(F_arg).front();
+    Xk = F(vector<MX>{Xk, P}).at(0);
   }
 
   // Fixed-step integrator
-  MXFunction irk_integrator("irk_integrator", integratorIn("x0",X0,"p",P),
-                            integratorOut("xf",F_arg[0]));
+  MXFunction irk_integrator("irk_integrator",
+                            integratorIn("x0", X0, "p", P),
+                            integratorOut("xf", Xk));
 
   // Create a convensional integrator for reference
   Integrator ref_integrator("ref_integrator", "cvodes", f, make_dict("tf", tf));
 
   // Test values
-  double x0_val[] = {0,1,0};
+  vector<double> x0_val = {0, 1, 0};
   double p_val = 0.2;
 
   // Make sure that both integrators give consistent results
@@ -173,36 +170,35 @@ int main(){
     // Generate a new function that calculates two forward directions and one adjoint direction
     Function dintegrator = integrator.derivative(2,1);
 
-    // Pass arguments
-    dintegrator.setInputNZ(x0_val,"der_x0");
-    dintegrator.setInput(p_val,"der_p");
-  
+    // Arguments for evaluation
+    map<string, DMatrix> arg, res;
+    arg["der_x0"] = x0_val;
+    arg["der_p"] = p_val;
+
     // Forward sensitivity analysis, first direction: seed p
-    dintegrator.setInput(0.0,"fwd0_x0");
-    dintegrator.setInput(1.0,"fwd0_p");
+    arg["fwd0_x0"] = 0;
+    arg["fwd0_p"] = 1;
   
     // Forward sensitivity analysis, second direction: seed x0[0]
-    double x0_seed[] = {1,0,0};
-    dintegrator.setInputNZ(x0_seed,"fwd1_x0");
-    dintegrator.setInput(0.0,"fwd1_p");
-  
+    arg["fwd1_x0"] = vector<double>{1, 0, 0};
+    arg["fwd1_p"] = 0;
+
     // Adjoint sensitivity analysis, seed xf[2]
-    double xf_seed[] = {0,0,1};
-    dintegrator.setInputNZ(xf_seed,"adj0_xf");
+    arg["adj0_xf"] = vector<double>{0, 0, 1};
 
     // Integrate
-    dintegrator.evaluate();
+    res = dintegrator(arg);
 
     // Get the nondifferentiated results
-    cout << setw(15) << "xf = " << dintegrator.output("der_xf") << endl;
+    cout << setw(15) << "xf = " << res.at("der_xf") << endl;
 
     // Get the forward sensitivities
-    cout << setw(15) << "d(xf)/d(p) = " <<  dintegrator.output("fwd0_xf") << endl;
-    cout << setw(15) << "d(xf)/d(x0[0]) = " << dintegrator.output("fwd1_xf") << endl;
+    cout << setw(15) << "d(xf)/d(p) = " <<  res.at("fwd0_xf") << endl;
+    cout << setw(15) << "d(xf)/d(x0[0]) = " << res.at("fwd1_xf") << endl;
 
     // Get the adjoint sensitivities
-    cout << setw(15) << "d(xf[2])/d(x0) = " << dintegrator.output("adj0_x0") << endl;
-    cout << setw(15) << "d(xf[2])/d(p) = " << dintegrator.output("adj0_p") << endl;
+    cout << setw(15) << "d(xf[2])/d(x0) = " << res.at("adj0_x0") << endl;
+    cout << setw(15) << "d(xf[2])/d(p) = " << res.at("adj0_p") << endl;
   }
   return 0;
 }

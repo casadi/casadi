@@ -99,22 +99,25 @@ int main(){
 
   // Create an NLP solver passing derivative information
   NlpSolver solver("solver", "ipopt", nlp,
-                   make_dict("grad_f", grad_f,
-                             "jac_g", jac_g,
-                             "hess_lag",hess_lag));
+                   make_dict("grad_f", grad_f, "jac_g", jac_g, "hess_lag",hess_lag));
 
-  // Set constraint bounds
-  solver.setInput(0.,"lbg");
+  // Bounds and initial guess
+  std::map<std::string, DMatrix> arg, res;
+  arg["lbx"] = -DMatrix::inf();
+  arg["ubx"] =  DMatrix::inf();
+  arg["lbg"] =  0;
+  arg["ubg"] =  DMatrix::inf();
+  arg["x0"] = 0;
 
   // Solve the NLP
-  solver.evaluate();
+  res = solver(arg);
 
   // Print solution
   cout << "-----" << endl;
-  cout << "objective at solution = " << solver.output("f") << endl;
-  cout << "primal solution = " << solver.output("x") << endl;
-  cout << "dual solution (x) = " << solver.output("lam_x") << endl;
-  cout << "dual solution (g) = " << solver.output("lam_g") << endl;
+  cout << "objective at solution = " << res.at("f") << endl;
+  cout << "primal solution = " << res.at("x") << endl;
+  cout << "dual solution (x) = " << res.at("lam_x") << endl;
+  cout << "dual solution (g) = " << res.at("lam_g") << endl;
   
   return 0;
 }

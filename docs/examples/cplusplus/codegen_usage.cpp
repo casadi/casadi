@@ -182,34 +182,25 @@ void usage_cplusplus(){
   cout << endl;
 
   // Use CasADi's "ExternalFunction" to load the compiled function
-  ExternalFunction ff("f");
+  ExternalFunction f("f");
 
-  // Use like any other CasADi function (note that derivatives are not supported)
-  double x_val[] = {1,2,3,4};
-  ff.setInputNZ(x_val,0);
-  double y_val = 5;
-  ff.setInput(y_val,1);
+  // Use like any other CasADi function
+  vector<double> x = {1, 2, 3, 4};
+  vector<DMatrix> arg = {reshape(DMatrix(x), 2, 2), 5};
+  vector<DMatrix> res = f(arg);
 
-  ff.evaluate();
-
-  cout << "result (0): " << ff.output(0) << endl;
-  cout << "result (1): " << ff.output(1) << endl;
+  cout << "result (0): " << res.at(0) << endl;
+  cout << "result (1): " << res.at(1) << endl;
 }
 
 int main(){
     
   // Variables
-  SX x = SX::sym("x",2,2);
-  SX y = SX::sym("y",1); 
+  SX x = SX::sym("x", 2, 2);
+  SX y = SX::sym("y");
 
   // Simple function
-  vector<SX> f_in;
-  f_in.push_back(x);
-  f_in.push_back(y);
-  vector<SX> f_out;
-  f_out.push_back(sqrt(y)-1);
-  f_out.push_back(sin(x)-y);
-  SXFunction f("f", f_in,f_out);
+  SXFunction f("f", {x, y}, {sqrt(y)-1, sin(x)-y});
 
   // Generate C-code
   f.generate("f");
@@ -228,4 +219,3 @@ int main(){
 
   return 0;
 }
-

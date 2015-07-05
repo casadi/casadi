@@ -54,18 +54,18 @@ int main(int argc, char **argv){
   //  opts["hessian_approximation"] = "limited-memory";
   //  opts["derivative_test"] = "second-order";
 
-  // Allocate NLP solver
+  // Allocate NLP solver and buffers
   NlpSolver nlp_solver("nlp_solver", "ipopt", nlp, opts);
+  std::map<std::string, DMatrix> arg, res;
   
-  // Pass the bounds and initial guess
-  nlp_solver.setInput(nl.x_lb,"lbx");
-  nlp_solver.setInput(nl.x_ub,"ubx");
-  nlp_solver.setInput(nl.g_lb,"lbg");
-  nlp_solver.setInput(nl.g_ub,"ubg");
-  nlp_solver.setInput(nl.x_init,"x0");
-  
-  // Solve NLP
-  nlp_solver.evaluate();
-  
+  // Structure with bounds and initial guess
+  arg["lbx"] = nl.x_lb;
+  arg["ubx"] = nl.x_ub;
+  arg["lbg"] = nl.g_lb;
+  arg["ubg"] = nl.g_ub;
+  arg["x0"] = nl.x_init;
+
+  // Solve the NLP
+  res = nlp_solver(arg);
   return 0;
 }
