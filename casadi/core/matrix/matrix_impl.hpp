@@ -2902,6 +2902,46 @@ namespace casadi {
     }
   }
 
+#ifdef USE_CXX11
+  template<typename DataType>
+  Matrix<DataType>::operator double() const {
+    casadi_assert(isscalar());
+    if (isdense()) {
+      return nonzeros().at(0);
+    } else {
+      return 0;
+    }
+  }
+
+  template<typename DataType>
+  Matrix<DataType>::operator std::vector<double>() const {
+    casadi_assert(isvector());
+    if (isdense()) {
+      return nonzeros();
+    } else {
+      std::vector<double> ret(numel(), 0), nz=nonzeros();
+      int size1 = this->size1(), size2 = this->size2();
+      const int *colind = this->colind(), *row = this->row();
+      for (int cc=0; cc<size2; ++cc) {
+        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+          ret[row[el] + cc*size1] = nz[el];
+        }
+      }
+      return ret;
+    }
+  }
+
+  template<typename DataType>
+  Matrix<DataType>::operator int() const {
+    casadi_assert(isscalar());
+    if (isdense()) {
+      return nonzeros_int().at(0);
+    } else {
+      return 0;
+    }
+  }
+#endif // USE_CXX11
+
 } // namespace casadi
 
 /// \endcond

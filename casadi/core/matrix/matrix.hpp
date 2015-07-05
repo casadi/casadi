@@ -837,6 +837,19 @@ namespace casadi {
     /** \brief Get all nonzeros */
     std::vector<int> nonzeros_int() const;
 
+#ifndef SWIG
+#ifdef USE_CXX11
+    /** \brief Type conversion to double */
+    explicit operator double() const;
+
+    /** \brief Type conversion to double vector */
+    explicit operator std::vector<double>() const;
+
+    /** \brief Type conversion to int */
+    explicit operator int() const;
+#endif // USE_CXX11
+#endif // SWIG
+
     /** \brief Get name (only if symbolic scalar) */
     std::string getName() const;
 
