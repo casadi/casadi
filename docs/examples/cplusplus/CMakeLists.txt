@@ -1,5 +1,7 @@
 include_directories(../../)
 
+if(USE_CXX11)
+
 # Add IPOPT link directories
 if(IPOPT_FOUND)
   link_directories(${IPOPT_LIBRARY_DIRS})
@@ -90,19 +92,19 @@ if(WITH_SUNDIALS AND WITH_CSPARSE)
 endif()
 
 # Parametric sensitivities with sIPOPT
-if(IPOPT_FOUND AND USE_CXX11 AND WITH_SIPOPT)
+if(IPOPT_FOUND AND WITH_SIPOPT)
   add_executable(parametric_sensitivities parametric_sensitivities.cpp)
   target_link_libraries(parametric_sensitivities casadi)
 endif()
 
 # Reduced hessian calculations with sIPOPT
-if(IPOPT_FOUND AND USE_CXX11 AND WITH_SIPOPT)
+if(IPOPT_FOUND AND WITH_SIPOPT)
   add_executable(reduced_hessian reduced_hessian.cpp)
   target_link_libraries(reduced_hessian casadi)
 endif()
 
 # Parametric NLP
-if(IPOPT_FOUND AND USE_CXX11)
+if(IPOPT_FOUND)
   add_executable(parametric_nlp parametric_nlp.cpp)
   target_link_libraries(parametric_nlp casadi)
 endif()
@@ -128,3 +130,5 @@ if(WITH_SUNDIALS AND WITH_CSPARSE)
   add_executable(implicit_runge-kutta implicit_runge-kutta.cpp)
   target_link_libraries(implicit_runge-kutta casadi)
 endif()
+
+endif(USE_CXX11)
