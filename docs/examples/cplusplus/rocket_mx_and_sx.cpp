@@ -53,12 +53,11 @@ Function create_integrator(int nj, int nu){
   }
 
   // State vector
-  SX x = vertcat(make_vector(s, v, m));
-  SX x0 = vertcat(make_vector(s0, v0, m0));
+  SX x = vertcat(s, v, m);
+  SX x0 = vertcat(s0, v0, m0);
 
   // Integrator
-  SXFunction integrator("integrator", make_vector(u, x0), make_vector(x));
-  return integrator;
+  return SXFunction("integrator", {u, x0}, {x});
 }
 
 
@@ -100,35 +99,29 @@ int main(){
   // Create the NLP
   MXFunction nlp("nlp", nlpIn("x",U),nlpOut("f",F,"g",G));
 
-  // Allocate an NLP solver
+  // Allocate an NLP solver and buffers
   Dict opts = make_dict("tol", 1e-10,
-                        "hessian_approximation","limited-memory");
+                        "hessian_approximation", "limited-memory");
   NlpSolver solver("solver", "ipopt", nlp, opts);
+  std::map<std::string, DMatrix> arg, res;
 
   // Bounds on u and initial condition
-  vector<double> Umin(nu), Umax(nu), Usol(nu);
-  for(int i=0; i<nu; ++i){
-    Umin[i] = -10;
-    Umax[i] =  10;
-    Usol[i] = 0.4;
-  }
-  solver.setInputNZ(Umin,"lbx");
-  solver.setInputNZ(Umax,"ubx");
-  solver.setInputNZ(Usol,"x0");
+  arg["lbx"] = -10;
+  arg["ubx"] = 10;
+  arg["x0"] = 0.4;
 
   // Bounds on g
   vector<double> Gmin(2), Gmax(2);
   Gmin[0] = Gmax[0] = 10;
   Gmin[1] = Gmax[1] =  0;
-  solver.setInputNZ(Gmin,"lbg");
-  solver.setInputNZ(Gmax,"ubg");
+  arg["lbg"] = Gmin;
+  arg["ubg"] = Gmax;
 
   // Solve the problem
-  solver.evaluate();
+  res = solver(arg);
 
   // Get the solution
-  solver.getOutputNZ(Usol,"x");
-  cout << "optimal solution: " << Usol << endl;
+  cout << "optimal solution: " << res.at("x") << endl;
 
   return 0;
 }

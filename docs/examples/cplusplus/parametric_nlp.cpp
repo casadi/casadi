@@ -106,7 +106,6 @@ int main(){
 
   // Change the parameter and resolve
   arg["p"] = 4.5;
-  solver.setInputNZ( p0, "p");
   res = solver(arg);
   
   // Print the new solution

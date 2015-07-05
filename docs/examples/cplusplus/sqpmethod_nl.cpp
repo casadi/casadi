@@ -62,17 +62,17 @@ int main(int argc, char **argv){
               "nlp_solver_options", make_dict("print_level", 0,
                                               "print_time", 0));
 
-  // Allocate NLP solver
+  // Allocate NLP solver and buffers
   NlpSolver nlp_solver("nlp_solver", "sqpmethod", nlp, opts);
-
-  // Pass the bounds and initial guess
-  nlp_solver.setInput(nl.x_lb,"lbx");
-  nlp_solver.setInput(nl.x_ub,"ubx");
-  nlp_solver.setInput(nl.g_lb,"lbg");
-  nlp_solver.setInput(nl.g_ub,"ubg");
-  nlp_solver.setInput(nl.x_init,"x0");
+  std::map<std::string, DMatrix> arg, res;
 
   // Solve NLP
-  nlp_solver.evaluate();
+  arg["lbx"] = nl.x_lb;
+  arg["ubx"] = nl.x_ub;
+  arg["lbg"] = nl.g_lb;
+  arg["ubg"] = nl.g_ub;
+  arg["x0"] = nl.x_init;
+  res = nlp_solver(arg);
+
   return 0;
 }

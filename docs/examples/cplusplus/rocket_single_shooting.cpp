@@ -176,32 +176,27 @@ int main(){
     solver_opts["hessian_approximation"] = "limited-memory";
   }
 
-  // NLP solver
+  // NLP solver and buffers
   NlpSolver solver("nlp_solver", solver_name, nlp, solver_opts);
+  std::map<std::string, DMatrix> arg, res;
 
   // Bounds on u and initial condition
-  vector<double> Umin(nu), Umax(nu), Usol(nu);
-  for(int i=0; i<nu; ++i){
-    Umin[i] = -10;
-    Umax[i] =  10;
-    Usol[i] = 0.4;
-  }
-  solver.setInputNZ(Umin,"lbx");
-  solver.setInputNZ(Umax,"ubx");
-  solver.setInputNZ(Usol,"x0");
+  arg["lbx"] = -10;
+  arg["ubx"] = 10;
+  arg["x0"] = 0.4;
 
   // Bounds on g
-  vector<double> Gmin(2), Gmax(2);
-  Gmin[0] = Gmax[0] = 10;
-  Gmin[1] = Gmax[1] =  0;
-  solver.setInputNZ(Gmin,"lbg");
-  solver.setInputNZ(Gmax,"ubg");
+  vector<double> gmin(2), gmax(2);
+  gmin[0] = gmax[0] = 10;
+  gmin[1] = gmax[1] =  0;
+  arg["lbg"] = gmin;
+  arg["ubg"] = gmax;
 
   // Solve the problem
-  solver.evaluate();
+  res = solver(arg);
 
   // Get the solution
-  solver.getOutputNZ(Usol,"x");
+  vector<double> Usol(res.at("x"));
   cout << "optimal solution: " << Usol << endl;
 
   return 0;

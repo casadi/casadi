@@ -78,21 +78,16 @@ int main(){
   g.append(v_traj);
 
   // Create an NLP
-  SXFunction nlp("nlp", nlpIn("x",u),nlpOut("f",f,"g",g));
+  SXFunction nlp("nlp", nlpIn("x", u), nlpOut("f", f, "g", g));
 
-  // Create an NLP solver
+  // Create an NLP solver and buffers
   NlpSolver solver("solver", "snopt", nlp);
+  std::map<std::string, DMatrix> arg, res;
 
   // Bounds on u and initial condition
-  vector<double> umin(nu), umax(nu), uinit(nu);
-  for(int i=0; i<nu; ++i){
-    umin[i] = -10;
-    umax[i] =  10;
-    uinit[i] = 0.4;
-  }
-  solver.setInputNZ(umin,"lbx");
-  solver.setInputNZ(umax,"ubx");
-  solver.setInputNZ(uinit,"x0");
+  arg["lbx"] = -10;
+  arg["ubx"] = 10;
+  arg["x0"] = 0.4;
 
   // Bounds on g
   vector<double> gmin(2), gmax(2);
@@ -100,31 +95,26 @@ int main(){
   gmin[1] = gmax[1] =  0;
   gmin.resize(2+nu, -numeric_limits<double>::infinity());
   gmax.resize(2+nu, 1.1);
-
-  solver.setInputNZ(gmin,"lbg");
-  solver.setInputNZ(gmax,"ubg");
+  arg["lbg"] = gmin;
+  arg["ubg"] = gmax;
 
   // Solve the problem
-  solver.evaluate();
+  res = solver(arg);
 
   // Print the optimal cost
-  double cost;
-  solver.getOutput(cost,"f");
+  double cost(res.at("f"));
   cout << "optimal cost: " << cost << endl;
 
   // Print the optimal solution
-  vector<double> uopt(nu);
-  solver.getOutputNZ(uopt,"x");
+  vector<double> uopt(res.at("x"));
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory
-  vector<double> sopt(nu), vopt(nu), mopt(nu);
   SXFunction xfcn("xfcn", make_vector(u), make_vector(s_traj, v_traj, m_traj));
-  xfcn.setInputNZ(uopt);
-  xfcn.evaluate();
-  xfcn.getOutputNZ(sopt,0);
-  xfcn.getOutputNZ(vopt,1);
-  xfcn.getOutputNZ(mopt,2);
+  vector<DMatrix> xopt = xfcn(make_vector(DMatrix(uopt)));
+  vector<double> sopt(xopt.at(0));
+  vector<double> vopt(xopt.at(1));
+  vector<double> mopt(xopt.at(2));
   cout << "position: " << sopt << endl;
   cout << "velocity: " << vopt << endl;
   cout << "mass:     " << mopt << endl;

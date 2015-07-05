@@ -58,14 +58,12 @@ int main(int argc, char **argv){
   NlpSolver nlp_solver("nlp_solver", "ipopt", nlp, opts);
   std::map<std::string, DMatrix> arg, res;
   
-  // Structure with bounds and initial guess
+  // Solve NLP
   arg["lbx"] = nl.x_lb;
   arg["ubx"] = nl.x_ub;
   arg["lbg"] = nl.g_lb;
   arg["ubg"] = nl.g_ub;
   arg["x0"] = nl.x_init;
-
-  // Solve the NLP
   res = nlp_solver(arg);
   return 0;
 }
