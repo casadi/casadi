@@ -103,20 +103,19 @@ opts["n_sens_steps"] = 1
 solver = NlpSolver("solver", "ipopt", nlp, opts)
   
 # Solve NLP
-solver.setInput( x0, "x0")
-solver.setInput(lbx, "lbx")
-solver.setInput(ubx, "ubx")
-solver.setInput(lbg, "lbg")
-solver.setInput(ubg, "ubg")
-solver.evaluate()
+res = solver({"x0" : x0,
+              "lbx" : lbx,
+              "ubx" : ubx,
+              "lbg" : lbg,
+              "ubg" : ubg})
   
 # Print the solution
 print "----"
-print "Minimal cost " , solver.getOutput("f")
+print "Minimal cost " , res["f"]
 print "----"
 
 print "Nominal solution"
-print "x = " , solver.getOutput("x").nonzeros()
+print "x = " , res["x"].nonzeros()
 print "----"
   
 print "perturbed solution"

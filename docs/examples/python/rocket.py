@@ -76,21 +76,22 @@ nlp = MXFunction('nlp', nlpIn(x=U),nlpOut(f=J,g=G))
 # Allocate an NLP solver
 opts = {"tol":1e-10, "expand":True}
 solver = NlpSolver("solver", "ipopt", nlp, opts)
+arg = {}
 
 # Bounds on u and initial condition
-solver.setInput(-0.5, "lbx")
-solver.setInput( 0.5, "ubx")
-solver.setInput( 0.4, "x0")
+arg["lbx"] = -0.5
+arg["ubx"] =  0.5
+arg["x0"] =   0.4
 
 # Bounds on g
-solver.setInput([10,0],"lbg")
-solver.setInput([10,0],"ubg")
+arg["lbg"] = [10,0]
+arg["ubg"] = [10,0]
 
 # Solve the problem
-solver.evaluate()
+res = solver(arg)
 
 # Get the solution
-plot(solver.getOutput("x"))
-plot(solver.getOutput("lam_x"))
+plot(res["x"])
+plot(res["lam_x"])
 grid()
 show()

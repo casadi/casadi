@@ -78,9 +78,7 @@ for N in range(1,11):
   # Get the coefficients of the continuity equation
   D = DMatrix.zeros(K+1)
   for j in range(K+1):
-    l[j].setInput(1.)
-    l[j].evaluate()
-    D[j] = l[j].getOutput()
+    [D[j]] = l[j]([1.])[0]
   print "D = ", D
 
   # Get the coefficients of the collocation equation using AD
@@ -88,9 +86,7 @@ for N in range(1,11):
   for j in range(K+1):
     tfcn = l[j].tangent()
     for k in range(K+1):
-      tfcn.setInput(tau_root[k])
-      tfcn.evaluate()
-      C[j,k] = tfcn.getOutput()
+      C[j,k], _ = tfcn([tau_root[k]])
   print "C = ", C
   
   # Collocated states
@@ -128,27 +124,26 @@ for N in range(1,11):
   # NLP solver options
   opts = {"tol" : 1e-10}
 
-  # Allocate an NLP solver
+  # Allocate an NLP solver and buffer
   solver = NlpSolver("solver", "ipopt", nlp, opts)
+  arg = {}
 
   # Initial condition
-  xinit = x.nnz() * [0]
-  solver.setInput(xinit,"x0")
+  arg["x0"] = x.nnz() * [0]
 
   # Bounds on x
   lbx = x.nnz()*[-100]
   ubx = x.nnz()*[100]
   lbx[0] = ubx[0] = z0
-  solver.setInput(lbx,"lbx")
-  solver.setInput(ubx,"ubx")
+  arg["lbx"] = lbx
+  arg["ubx"] = ubx
   
   # Bounds on the constraints
-  lubg = g.nnz()*[0]
-  solver.setInput(lubg,"lbg")
-  solver.setInput(lubg,"ubg")
+  arg["lbg"] = 0
+  arg["ubg"] = 0
   
   # Solve the problem
-  solver.evaluate()
+  res = solver(arg)
   
   ## Print the time points
   t_opt = N*(K+1) * [0]
@@ -159,10 +154,10 @@ for N in range(1,11):
   print "time points: ", t_opt
 
   # Print the optimal cost
-  print "optimal cost: ", float(solver.getOutput("f"))
+  print "optimal cost: ", float(res["f"])
 
   # Print the optimal solution
-  xopt = solver.getOutput("x").nonzeros()
+  xopt = res["x"].nonzeros()
   print "optimal solution: ", xopt
  
   # plot to screen

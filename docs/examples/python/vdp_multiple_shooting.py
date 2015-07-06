@@ -112,21 +112,18 @@ f = X2[nk]
 g = vertcat(g)
 
 # Create NLP solver instance
-nlp = MXFunction("nlp", nlpIn(x=V),nlpOut(f=f,g=g))
+nlp = MXFunction("nlp", nlpIn(x=V), nlpOut(f=f,g=g))
 solver = NlpSolver("solver", "ipopt", nlp)
 
-# Set bounds and initial guess
-solver.setInput(VMIN,  "lbx")
-solver.setInput(VMAX,  "ubx")
-solver.setInput(VINIT, "x0")
-solver.setInput(NP.concatenate(g_min),"lbg")
-solver.setInput(NP.concatenate(g_max),"ubg")
-
 # Solve the problem
-solver.evaluate()
+sol = solver({"lbx" : VMIN,
+              "ubx" : VMAX,
+              "x0" : VINIT,
+              "lbg" : NP.concatenate(g_min),
+              "ubg" : NP.concatenate(g_max)})
 
 # Retrieve the solution
-v_opt = solver.getOutput("x")
+v_opt = sol["x"]
 u_opt = v_opt[0:nk]
 x0_opt = v_opt[nk+0::3]
 x1_opt = v_opt[nk+1::3]

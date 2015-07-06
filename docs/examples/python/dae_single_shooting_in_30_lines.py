@@ -73,9 +73,10 @@ nlp = MXFunction('nlp', nlpIn(x=U), nlpOut(f=J, g=X))
 solver = NlpSolver("solver", "ipopt", nlp)
 
 # Pass bounds, initial guess and solve NLP
-solver.setInput(-0.75, "lbx")    # Lower variable bound
-solver.setInput( 1.0,  "ubx")    # Upper variable bound
-solver.setInput( 0.0,  "lbg")    # Lower constraint bound
-solver.setInput( 0.0,  "ubg")    # Upper constraint bound
-solver.setInput( 0.0,  "x0")     # Initial guess
-solver.evaluate()
+arg = {}
+arg["lbx"] = -0.75    # Lower variable bound
+arg["ubx"] =  1.0     # Upper variable bound
+arg["lbg"] =  0.0     # Lower constraint bound
+arg["ubg"] =  0.0     # Upper constraint bound
+arg["x0"] = 0.0       # Initial guess
+res = solver(arg)

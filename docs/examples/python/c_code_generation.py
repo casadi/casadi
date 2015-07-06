@@ -90,13 +90,12 @@ if False:
   f_test.append(gfcn_opencl)
 
 for f in f_test:
-  f.setInput(x0)
   t1 = time.time()
   nrep = 10000
   for r in range(nrep):
-    f.evaluate()
+    [r] = f([x0])
   t2 = time.time()
-  print "result = ", f.getOutput().nonzeros()
+  print "result = ", r.nonzeros()
   dt = (t2-t1)/nrep
   print "time = ", dt*1e3, " ms"
   

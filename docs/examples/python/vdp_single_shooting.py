@@ -65,18 +65,15 @@ g = X
 nlp = MXFunction("nlp", nlpIn(x=x),nlpOut(f=f,g=g))
 solver = NlpSolver("solver", "ipopt", nlp)
 
-# Set bounds and initial guess
-solver.setInput(-0.75, "lbx")
-solver.setInput( 1.,   "ubx")
-solver.setInput( 0.,   "x0")
-solver.setInput( 0.,   "lbg")
-solver.setInput( 0.,   "ubg")
-
 # Solve the problem
-solver.evaluate()
-
+sol = solver({"lbx" : -0.75,
+              "ubx" : 1,
+              "x0" : 0,
+              "lbg" : 0,
+              "ubg" : 0})
+              
 # Retrieve the solution
-u_opt = NP.array(solver.getOutput("x"))
+u_opt = NP.array(sol["x"])
 
 # Time grid
 tgrid_x = NP.linspace(0,10,nk+1)

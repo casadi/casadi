@@ -53,12 +53,12 @@ opts = {}
 nlp_solver = NlpSolver("nlp_solver", "ipopt", nlp, opts)
   
 # Pass the bounds and initial guess
-nlp_solver.setInput(nl.x_lb,"lbx")
-nlp_solver.setInput(nl.x_ub,"ubx")
-nlp_solver.setInput(nl.g_lb,"lbg")
-nlp_solver.setInput(nl.g_ub,"ubg")
-nlp_solver.setInput(nl.x_init,"x0")
+arg = {"lbx" : nl.x_lb, 
+       "ubx" : nl.x_ub,
+       "lbg" : nl.g_lb,
+       "ubg" : nl.g_ub,
+       "x0" : nl.x_init}
   
 # Solve NLP
-nlp_solver.evaluate()
+res = nlp_solver(arg)
 

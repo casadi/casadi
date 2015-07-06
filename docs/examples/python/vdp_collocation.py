@@ -99,16 +99,12 @@ for j in range(d+1):
   lfcn = SXFunction('lfcn', [tau],[L])
   
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-  lfcn.setInput(1.0)
-  lfcn.evaluate()
-  D[j] = lfcn.getOutput()
+  [D[j]] = lfcn([1.0])
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
   tfcn = lfcn.tangent()
   for r in range(d+1):
-    tfcn.setInput(tau_root[r])
-    tfcn.evaluate()
-    C[j,r] = tfcn.getOutput()
+    C[j,r], _ = tfcn([tau_root[r]])
 
 # Total number of variables
 NX = nk*(d+1)*nx      # Collocated states
@@ -209,29 +205,31 @@ nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=f,g=g))
 opts = {}
 opts["expand"] = True
 #opts["max_iter"] = 4
+opts["linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
 solver = NlpSolver("solver", "ipopt", nlp, opts)
+arg = {}
   
 # Initial condition
-solver.setInput(vars_init,"x0")
+arg["x0"] = vars_init
 
 # Bounds on x
-solver.setInput(vars_lb,"lbx")
-solver.setInput(vars_ub,"ubx")
+arg["lbx"] = vars_lb
+arg["ubx"] = vars_ub
 
 # Bounds on g
-solver.setInput(NP.concatenate(lbg),"lbg")
-solver.setInput(NP.concatenate(ubg),"ubg")
+arg["lbg"] = NP.concatenate(lbg)
+arg["ubg"] = NP.concatenate(ubg)
 
 # Solve the problem
-solver.evaluate()
+res = solver(arg)
 
 # Print the optimal cost
-print "optimal cost: ", float(solver.getOutput("f"))
+print "optimal cost: ", float(res["f"])
 
 # Retrieve the solution
-v_opt = NP.array(solver.getOutput("x"))
+v_opt = NP.array(res["x"])
 
 # Get values at the beginning of each finite element
 x0_opt = v_opt[0::(d+1)*nx+nu]

@@ -108,7 +108,7 @@ for k in range(num_nodes):
 G.append(X[num_nodes][2:] - NP.array([0,0])) # costates fixed, states free at final time
 
 # Terminal constraints: lam = 0
-rfp = MXFunction('rfp', [V],[vertcat(G)])
+rfp = MXFunction('rfp', [V], [vertcat(G)])
 
 # Select a solver for the root-finding problem
 Solver = "nlp"
@@ -130,17 +130,14 @@ elif Solver=="kinsol":
 # Allocate a solver
 solver = ImplicitFunction('solver', Solver, rfp, opts)
 
-# Set bounds and initial guess
-#solver.setInput([   0,   0,   0,   0] + (num_nodes-1)*[   0,   0,   0,   0] + [   0,   0,   0,   0], "x0")
-
 # Solve the problem
-solver.evaluate()
+V_sol, = solver([0])
 
 # Time grid for visualization
 tgrid = NP.linspace(0,tf,100)
 
 # Output functions
-output_fcn = SXFunction("output",rhs_in,[x0,x1,u_opt])
+output_fcn = SXFunction("output", rhs_in, [x0,x1,u_opt])
 
 # Increase the end time for the integrator
 opts["tf"] = tf
@@ -149,16 +146,13 @@ I = Integrator("I", "cvodes", rhs, opts_intg)
 # Simulator to get optimal state and control trajectories
 simulator = Simulator("simulator", I, output_fcn, tgrid)
 
-# Pass initial conditions to the simulator
-simulator.setInput(solver.getOutput()[0:4],"x0")
-
 # Simulate to get the trajectories
-simulator.evaluate()
+res = simulator({"x0" : V_sol[0:4]})
 
 # Get optimal control
-x_opt = simulator.getOutput(0).T
-y_opt = simulator.getOutput(1).T
-u_opt = simulator.getOutput(2).T
+x_opt = res["0"].T
+y_opt = res["1"].T
+u_opt = res["2"].T
 
 # Plot the results
 plt.figure(1)

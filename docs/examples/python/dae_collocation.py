@@ -80,16 +80,12 @@ for j in range(deg+1):
 
     lfcn = SXFunction('lfcn', [tau],[L])
     # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-    lfcn.setInput(1.0)
-    lfcn.evaluate()
-    D[j] = lfcn.getOutput()
+    [D[j]] = lfcn([1.0])
 
     # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
     tfcn = lfcn.tangent()
     for j2 in range(deg+1):
-        tfcn.setInput(tau_root[j2])
-        tfcn.evaluate()
-        C[j][j2] = tfcn.getOutput()
+        C[j][j2], _ = tfcn([tau_root[j2]])
 
 
 
@@ -376,29 +372,31 @@ opts = {}
 opts["expand"] = True
 opts["max_iter"] = 1000
 opts["tol"] = 1e-4
+opts["linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
 solver = NlpSolver("solver", "ipopt", nlp, opts)
-  
+arg = {}
+
 # Initial condition
-solver.setInput(vars_init,"x0")
+arg["x0"] = vars_init
 
 # Bounds on x
-solver.setInput(vars_lb,"lbx")
-solver.setInput(vars_ub,"ubx")
+arg["lbx"] = vars_lb
+arg["ubx"] = vars_ub
 
 # Bounds on g
-solver.setInput(np.concatenate(lbg),"lbg")
-solver.setInput(np.concatenate(ubg),"ubg")
+arg["lbg"] = np.concatenate(lbg)
+arg["ubg"] = np.concatenate(ubg)
 
 # Solve the problem
-solver.evaluate()
+res = solver(arg)
 
 # Print the optimal cost
-print "optimal cost: ", float(solver.getOutput("f"))
+print "optimal cost: ", float(res["f"])
 
 # Retrieve the solution
-v_opt = np.array(solver.getOutput("x"))
+v_opt = np.array(res["x"])
     
 
 ## ----
@@ -443,10 +441,8 @@ for j in range(1,deg+1):
     for j2 in range(1,deg+1):
         if j2 != j:
             La *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
-    lafcn = SXFunction('lafcn', [tau],[La])
-    lafcn.setInput(tau_root[0])
-    lafcn.evaluate()
-    Da[j-1] = lafcn.getOutput()
+    lafcn = SXFunction('lafcn', [tau], [La])
+    [Da[j-1]] = lafcn([tau_root[0]])
 
 xA_plt = np.resize(np.array([],dtype=MX),(nalg,(deg+1)*nicp*(nk)+1))
 offset4=0

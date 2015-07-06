@@ -61,16 +61,16 @@ if nlp_solver in ("sqpmethod", "scpgen"):
 solv = NlpSolver("solv", nlp_solver, nlp, opts)
 
 # Solve the rosenbrock problem
-solv.setInput([2.5,3.0,0.75],"x0")
-solv.setInput(0,"ubg")
-solv.setInput(0,"lbg")
-solv.evaluate()
+res = solv({"x0" :[2.5,3.0,0.75],
+            "ubg" : 0,
+            "lbg" : 0,
+            "ubx" : inf,
+            "lbx" : -inf})
 
 # Print solution
 print
 print 
-print "%50s " % "Optimal cost:", solv.getOutput("f")
-print "%50s " % "Primal solution:", solv.getOutput("x")
-print "%50s " % "Dual solution (simple bounds):", solv.getOutput("lam_x")
-print "%50s " % "Dual solution (nonlinear bounds):", solv.getOutput("lam_g")
-
+print "%50s " % "Optimal cost:", res["f"]
+print "%50s " % "Primal solution:", res["x"]
+print "%50s " % "Dual solution (simple bounds):", res["lam_x"]
+print "%50s " % "Dual solution (nonlinear bounds):", res["lam_g"]

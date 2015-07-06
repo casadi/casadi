@@ -86,7 +86,7 @@ x_init = NP.array([0.,1.])
 l_init = MX.sym("l_init",2)
 
 # The initial condition for the shooting
-X = vertcat((x_init,l_init))
+X = vertcat((x_init, l_init))
 
 # Call the integrator
 X = I({'x0':X})["xf"]
@@ -96,7 +96,7 @@ lam_f = X[2:4]
 g = lam_f
 
 # Formulate root-finding problem
-rfp = MXFunction('rfp', [l_init],[g])
+rfp = MXFunction('rfp', [l_init], [g])
 
 # Select a solver for the root-finding problem
 Solver = "nlp"
@@ -116,14 +116,9 @@ elif Solver=="kinsol":
     opts["max_iter"] = 1000
 solver = ImplicitFunction("solver", Solver, rfp, opts)
 
-# Pass initial guess
-#solver.setInput([   0,   0], "x0")
-
 # Solve the problem
-solver.evaluate()
-
-# Retrieve the optimal solution
-l_init_opt = NP.array(solver.getOutput().nonzeros())
+l_init_opt, = solver([0])
+l_init_opt = NP.array(l_init_opt.nonzeros())
 
 # Time grid for visualization
 tgrid = NP.linspace(0,10,100)
@@ -134,16 +129,13 @@ output_fcn = SXFunction('output_fcn', rhs_in,[x0,x1,u_opt])
 # Simulator to get optimal state and control trajectories
 simulator = Simulator('simulator', I, output_fcn, tgrid)
 
-# Pass initial conditions to the simulator
-simulator.setInput(NP.concatenate((x_init,l_init_opt)),"x0")
-
 # Simulate to get the trajectories
-simulator.evaluate()
+sol = simulator({"x0" : NP.concatenate((x_init, l_init_opt))})
 
 # Get optimal control
-x_opt = simulator.getOutput(0).T
-y_opt = simulator.getOutput(1).T
-u_opt = simulator.getOutput(2).T
+x_opt = sol["0"].T
+y_opt = sol["1"].T
+u_opt = sol["2"].T
 
 # Plot the results
 plt.figure(1)
