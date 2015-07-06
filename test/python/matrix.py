@@ -985,6 +985,12 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(norm_inf_mul(A,B),norm_inf(mul(A,B)))
     self.checkarray(DMatrix(norm_0_mul(A,B)),mul(A,B).nnz())
+
+  def  test_mul3_issue_1465(self):
+    with self.assertRaises(Exception):
+      w = SX.sym("w",2,1)
+      Q = np.eye(2)
+      mul(w.T,Q,w)
     
 if __name__ == '__main__':
     unittest.main()

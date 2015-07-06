@@ -1342,6 +1342,14 @@ namespace casadi {
                           "Matrix product with incompatible dimensions. Lhs is "
                           << dimString() << " and rhs is " << y.dimString() << ".");
 
+    casadi_assert_message(y.size2()==z.size2(),
+                          "Matrix addition with incompatible dimensions. Lhs is "
+                          << mul(*this, y).dimString() << " and rhs is " << z.dimString() << ".");
+
+    casadi_assert_message(size1()==z.size1(),
+                          "Matrix addition with incompatible dimensions. Lhs is "
+                          << mul(*this, y).dimString() << " and rhs is " << z.dimString() << ".");
+
     // Check if we can simplify the product
     if (isIdentity()) {
       return y + z;
