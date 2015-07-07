@@ -761,10 +761,10 @@ namespace casadi {
     int ind = g.getConstant(this->nz_, true);
 
     // Perform the operation inplace
-    g.body << "  for (ii=s" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
-           << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; ii!=s" << ind
+    g.body << "  for (cii=s" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
+           << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; cii!=s" << ind
            << "+" << this->nz_.size() << "; ++ii, ++ss)";
-    g.body << " if (*ii>=0) rr[*ii] " << (Add?"+=":"=") << " *ss;" << endl;
+    g.body << " if (*cii>=0) rr[*cii] " << (Add?"+=":"=") << " *ss;" << endl;
   }
 
   template<bool Add>

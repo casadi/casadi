@@ -1140,6 +1140,7 @@ namespace casadi {
 
     // Temporary variables and vectors
     s << "  int i, j, k, *ii, *jj, *kk;" << endl
+      << "  const int *cii;" << endl
       << "  real_t r, s, t, *rr, *ss, *tt;" << endl
       << "  const real_t *cr, *cs, *ct;" << endl
       << "  const real_t** arg1=arg+" << nIn() << ";" << endl
