@@ -31,14 +31,13 @@ using a minimal number of concepts.
 
 We do not recommend using this example as a template for solving optimal control problems in practise.
 
-Joel Andersson, 2012
+Joel Andersson, 2012-2015
 """
 
 # Declare variables
 x = SX.sym("x",2) # Differential states
 z = SX.sym("z")   # Algebraic variable
 u = SX.sym("u")   # Control
-t = SX.sym("t")   # Time
 
 # Differential equation
 f_x = vertcat((z*x[0]-x[1]+u, x[0]))
@@ -50,22 +49,24 @@ f_z = x[1]**2 + z - 1
 f_q = x[1]**2 + x[1]**2 + u**2
 
 # DAE callback function
-f = SXFunction('f', [x,z,u,t],[f_x,f_z,f_q])
+f = SXFunction('f', daeIn(x=x, z=z, p=u),
+               daeOut(ode=f_x, alg=f_z, quad=f_q))
 
 # Create an integrator
 opts = {"tf":0.5} # interval length
 I = Integrator('I', "idas", f, opts)
 
 # All controls
-U = MX.sym("U",20)
+U = MX.sym("U", 20)
 
 # Construct graph of integrator calls
-X  = MX([0,1])
+X  = [0,1]
 J = 0
 for k in range(20):
-  X,Q = itemgetter('xf','qf')(I({'x0':X,'p':U[k]}))
-  J += Q   # Sum up quadratures
-  
+  Ik = I({'x0':X,'p':U[k]})
+  X = Ik['xf']
+  J += Ik['qf']   # Sum up quadratures
+
 # NLP callback functions
 nlp = MXFunction('nlp', nlpIn(x=U), nlpOut(f=J, g=X))
 
@@ -73,10 +74,9 @@ nlp = MXFunction('nlp', nlpIn(x=U), nlpOut(f=J, g=X))
 solver = NlpSolver("solver", "ipopt", nlp)
 
 # Pass bounds, initial guess and solve NLP
-arg = {}
-arg["lbx"] = -0.75    # Lower variable bound
-arg["ubx"] =  1.0     # Upper variable bound
-arg["lbg"] =  0.0     # Lower constraint bound
-arg["ubg"] =  0.0     # Upper constraint bound
-arg["x0"] = 0.0       # Initial guess
-res = solver(arg)
+sol = solver({"lbx" : -0.75, # Lower variable bound
+              "ubx" :  1.0,  # Upper variable bound
+              "lbg" :  0.0,  # Lower constraint bound
+              "ubg" :  0.0,  # Upper constraint bound
+              "x0"  :  0.0}) # Initial guess
+print sol
