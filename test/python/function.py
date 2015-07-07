@@ -417,7 +417,7 @@ class Functiontests(casadiTestCase):
     with self.assertRaises(Exception):
       f.getOutput("baz")
       
-    ret = f({'0':SX(12)})
+    ret = f({'i0':SX(12)})
     self.checkarray(ret["foo"],DMatrix([144]))
     self.checkarray(ret["bar"],DMatrix([12]))
     with self.assertRaises(Exception):
@@ -1088,7 +1088,7 @@ class Functiontests(casadiTestCase):
 
     f = SXFunction("f", daeIn(x=x),[x**2])
 
-    self.checkarray(f(x=0.3)['0'],DMatrix(0.09))
+    self.checkarray(f(x=0.3)['o0'],DMatrix(0.09))
 
   def test_issue1464(self):
     n = 6
