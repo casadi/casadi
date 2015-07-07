@@ -129,6 +129,9 @@ namespace casadi {
     /** \brief Get output scheme description by index */
     std::string outputDescription(int ind) const;
 
+    /** \brief Get default input value */
+    double defaultInput(int ind) const;
+
 #ifndef SWIG
     /// \cond UNSAFE
     /** \brief [UNSAFE] Obtain reference to inputs

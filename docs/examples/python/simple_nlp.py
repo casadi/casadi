@@ -47,10 +47,7 @@ if MySolver=="sqpmethod":
 solver = NlpSolver("solver", MySolver, nlp, opts)
 
 # Solve the NLP
-sol = solver({"lbg" : 0,
-              "ubg" : inf,
-              "lbx" : -inf,
-              "ubx" : inf})
+sol = solver({"lbg" : 0})
 
 # Print solution
 print "-----"

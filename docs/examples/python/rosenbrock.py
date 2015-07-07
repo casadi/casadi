@@ -63,9 +63,7 @@ solv = NlpSolver("solv", nlp_solver, nlp, opts)
 # Solve the rosenbrock problem
 res = solv({"x0" :[2.5,3.0,0.75],
             "ubg" : 0,
-            "lbg" : 0,
-            "ubx" : inf,
-            "lbx" : -inf})
+            "lbg" : 0})
 
 # Print solution
 print

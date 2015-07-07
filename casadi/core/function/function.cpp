@@ -611,8 +611,13 @@ namespace casadi {
   Function::callMap(const std::map<std::string, M>& arg, bool always_inline, bool never_inline) {
     casadi_assert(isInit());
 
-    // Order inputs
+    // Get default inputs
     std::vector<M> v(nIn());
+    for (int i=0; i<v.size(); ++i) {
+      v[i] = defaultInput(i);
+    }
+
+    // Assign provided inputs
     for (typename std::map<std::string, M>::const_iterator i=arg.begin(); i!=arg.end(); ++i) {
       v.at(inputIndex(i->first)) = i->second;
     }
@@ -792,6 +797,9 @@ namespace casadi {
     return r;
   }
 
+  double Function::defaultInput(int ind) const {
+    return (*this)->defaultInput(ind);
+  }
 
 } // namespace casadi
 

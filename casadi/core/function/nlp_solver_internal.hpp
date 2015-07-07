@@ -84,6 +84,9 @@ namespace casadi {
     /// Get or generate the sparsity pattern of the Hessian of the Lagrangian
     virtual Sparsity getSpHessLag();
 
+    /** \brief Get default input value */
+    virtual double defaultInput(int ind) const;
+
     // Access the objective gradient function
     Function& gradF();
 

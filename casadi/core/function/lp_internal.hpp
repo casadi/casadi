@@ -79,6 +79,9 @@ namespace casadi {
     /// Short name
     static std::string shortname() { return "lp";}
 
+    /** \brief Get default input value */
+    virtual double defaultInput(int ind) const;
+
   protected:
 
     /// Problem structure

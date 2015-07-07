@@ -104,9 +104,17 @@ namespace casadi {
 
   const std::string LpSolverInternal::infix_ = "lpsolver";
 
+  double LpSolverInternal::defaultInput(int ind) const {
+    switch (ind) {
+    case LP_SOLVER_LBX:
+    case LP_SOLVER_LBA:
+      return -std::numeric_limits<double>::infinity();
+    case LP_SOLVER_UBX:
+    case LP_SOLVER_UBA:
+      return std::numeric_limits<double>::infinity();
+    default:
+      return 0;
+    }
+  }
 
 } // namespace casadi
-
-
-
-

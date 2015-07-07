@@ -405,6 +405,9 @@ namespace casadi {
       }
     }
 
+    /** \brief Get default input value */
+    virtual double defaultInput(int ind) const { return 0;}
+
     /// Access input argument by index
     inline Matrix<double>& input(int i=0) {
       try {

@@ -390,4 +390,17 @@ namespace casadi {
                  << typeid(*this).name());
   }
 
+  double NlpSolverInternal::defaultInput(int ind) const {
+    switch (ind) {
+    case NLP_SOLVER_LBX:
+    case NLP_SOLVER_LBG:
+      return -std::numeric_limits<double>::infinity();
+    case NLP_SOLVER_UBX:
+    case NLP_SOLVER_UBG:
+      return std::numeric_limits<double>::infinity();
+    default:
+      return 0;
+    }
+  }
+
 } // namespace casadi
