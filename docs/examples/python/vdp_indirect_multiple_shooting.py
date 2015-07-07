@@ -80,13 +80,12 @@ tf = 10.0
 num_nodes = 20
 
 # Create an integrator (CVodes)
-opts = {}
-opts["abstol"] = 1e-8 # abs. tolerance
-opts["reltol"] = 1e-8 # rel. tolerance
-opts["t0"] = 0.0
-opts["tf"] = tf/num_nodes
-I = Integrator("I", "cvodes", rhs, opts)
-opts_intg = opts
+iopts = {}
+iopts["abstol"] = 1e-8 # abs. tolerance
+iopts["reltol"] = 1e-8 # rel. tolerance
+iopts["t0"] = 0.0
+iopts["tf"] = tf/num_nodes
+I = Integrator("I", "cvodes", rhs, iopts)
 
 # Variables in the root finding problem
 NV = nX*(num_nodes+1)
@@ -139,27 +138,18 @@ tgrid = NP.linspace(0,tf,100)
 # Output functions
 output_fcn = SXFunction("output", rhs_in, [x0,x1,u_opt])
 
-# Increase the end time for the integrator
-opts["tf"] = tf
-I = Integrator("I", "cvodes", rhs, opts_intg)
-
 # Simulator to get optimal state and control trajectories
 simulator = Simulator("simulator", I, output_fcn, tgrid)
 
 # Simulate to get the trajectories
-res = simulator({"x0" : V_sol[0:4]})
-
-# Get optimal control
-x_opt = res["0"].T
-y_opt = res["1"].T
-u_opt = res["2"].T
+sol = simulator({"x0" : V_sol[0:4]})
 
 # Plot the results
 plt.figure(1)
 plt.clf()
-plt.plot(tgrid,x_opt,'--')
-plt.plot(tgrid,y_opt,'-')
-plt.plot(tgrid,u_opt,'-.')
+plt.plot(tgrid, sol["r0"].T, '--')
+plt.plot(tgrid, sol["r1"].T, '-')
+plt.plot(tgrid, sol["r2"].T, '-.')
 plt.title("Van der Pol optimization - indirect multiple shooting")
 plt.xlabel('time')
 plt.legend(['x trajectory','y trajectory','u trajectory'])

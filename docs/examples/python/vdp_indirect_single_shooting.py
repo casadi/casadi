@@ -132,17 +132,12 @@ simulator = Simulator('simulator', I, output_fcn, tgrid)
 # Simulate to get the trajectories
 sol = simulator({"x0" : NP.concatenate((x_init, l_init_opt))})
 
-# Get optimal control
-x_opt = sol["0"].T
-y_opt = sol["1"].T
-u_opt = sol["2"].T
-
 # Plot the results
 plt.figure(1)
 plt.clf()
-plt.plot(tgrid,x_opt,'--')
-plt.plot(tgrid,y_opt,'-')
-plt.plot(tgrid,u_opt,'-.')
+plt.plot(tgrid, sol["r0"].T, '--')
+plt.plot(tgrid, sol["r1"].T, '-')
+plt.plot(tgrid, sol["r2"].T, '-.')
 plt.title("Van der Pol optimization - indirect single shooting")
 plt.xlabel('time')
 plt.legend(['x trajectory','y trajectory','u trajectory'])

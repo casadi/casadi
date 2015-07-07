@@ -153,7 +153,7 @@ namespace casadi {
     if (ischeme_.empty()) {
       ischeme_.resize(nIn());
       for (size_t i=0; i!=ischeme_.size(); ++i) {
-        ischeme_[i]=CodeGenerator::to_string(i);
+        ischeme_[i] = "a" + CodeGenerator::to_string(i);
       }
     }
 
@@ -166,7 +166,7 @@ namespace casadi {
     if (oscheme_.empty()) {
       oscheme_.resize(nOut());
       for (size_t i=0; i!=oscheme_.size(); ++i) {
-        oscheme_[i]=CodeGenerator::to_string(i);
+        oscheme_[i] = "r" + CodeGenerator::to_string(i);
       }
     }
 
