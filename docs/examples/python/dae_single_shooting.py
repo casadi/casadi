@@ -24,11 +24,27 @@
 from casadi import *
 
 """
-This example mainly intended for CasADi presentations. 
-It implements direct single shooting for DAEs in only about 30 lines of code, 
-using a minimal number of concepts.
+This example mainly intended for CasADi presentations. It contains a compact
+implementation of a direct single shooting method for DAEs using a minimal
+number of CasADi concepts.
 
-We do not recommend using this example as a template for solving optimal control problems in practise.
+It solves the following optimal control problem (OCP) in differential-algebraic
+equations (DAE):
+
+minimize     integral_{t=0}^{10} x0^2 + x1^2 + u^2  dt
+x0,x1,z,u
+
+subject to   dot(x0) == z*x0-x1+u     \
+             dot(x1) == x0             }  for 0 <= t <= 10
+                   0 == x1^2 + z - 1  /
+             x0(t=0) == 0
+             x1(t=0) == 1
+             x0(t=10) == 0
+             x1(t=10) == 0
+             -0.75 <= u <= 1  for 0 <= t <= 10
+
+Note that other methods such as direct collocation or direct single shooting
+are usually preferably to the direct single shooting method in practise.
 
 Joel Andersson, 2012-2015
 """
@@ -45,7 +61,7 @@ f_x = vertcat((z*x[0]-x[1]+u, x[0]))
 f_z = x[1]**2 + z - 1
 
 # Lagrange cost term (quadrature)
-f_q = x[1]**2 + x[1]**2 + u**2
+f_q = x[0]**2 + x[1]**2 + u**2
 
 # DAE callback function
 f = SXFunction('f', daeIn(x=x, z=z, p=u),
@@ -70,7 +86,8 @@ for k in range(20):
 nlp = MXFunction('nlp', nlpIn(x=U), nlpOut(f=J, g=X))
 
 # Allocate an NLP solver
-solver = NlpSolver("solver", "ipopt", nlp)
+opts = {"linear_solver":"ma27"}
+solver = NlpSolver("solver", "ipopt", nlp, opts)
 
 # Pass bounds, initial guess and solve NLP
 sol = solver({"lbx" : -0.75, # Lower variable bound

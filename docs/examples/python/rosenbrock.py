@@ -22,52 +22,37 @@
 #
 #
 from casadi import *
-import numpy as NP
-import matplotlib.pyplot as plt
+
+"""
+Solve the Rosenbrock problem, formulated as the NLP:
+
+minimize     x^2 + 100*z^2
+subject to   z+(1-x)^2-y == 0
+
+Joel Andersson, 2015
+"""
 
 # Declare variables
 x = SX.sym("x")
 y = SX.sym("y")
 z = SX.sym("z")
-v = vertcat([x,y,z])
+w = vertcat([x,y,z])
 
 # Form NLP functions
-nlp = SXFunction("nlp",nlpIn(x=v),nlpOut(f=x**2 + 100*z**2, g=z + (1-x)**2 - y))
-
-# Choose NLP solver
-nlp_solver = "ipopt"
-#nlp_solver = "worhp"
-#nlp_solver = "sqpmethod"
-#nlp_solver = "scpgen"
-
-# Choose a qp solver (for CasADi NLP methods)
-#qp_solver = "qpoases"
-#qp_solver_options = {"printLevel" : "none"}
-
-#qp_solver = "nlp"
-#qp_solver_options = {"nlp_solver":"ipopt", "nlp_solver_options": {"print_level" : 0}}
-
-#qp_solver = ooqp"
-#qp_solver_options = {}
-
-# NLP solver options
-opts = {}
-if nlp_solver in ("sqpmethod", "scpgen"):
-  opts["qp_solver"] = qp_solver
-  opts["qp_solver_options"] = qp_solver_options
-  opts["max_iter"] = 5
+f = x**2 + 100*z**2
+g = z + (1-x)**2 - y
+nlp = SXFunction("nlp", nlpIn(x=w), nlpOut(f=f, g=g))
   
-# Create solver
-solv = NlpSolver("solv", nlp_solver, nlp, opts)
+# Create an NLP solver
+solver = NlpSolver("solver", "ipopt", nlp)
 
-# Solve the rosenbrock problem
-res = solv({"x0" :[2.5,3.0,0.75],
-            "ubg" : 0,
-            "lbg" : 0})
+# Solve the Rosenbrock problem
+res = solver({"x0" :[2.5,3.0,0.75],
+              "ubg" : 0,
+              "lbg" : 0})
 
 # Print solution
 print
-print 
 print "%50s " % "Optimal cost:", res["f"]
 print "%50s " % "Primal solution:", res["x"]
 print "%50s " % "Dual solution (simple bounds):", res["lam_x"]
