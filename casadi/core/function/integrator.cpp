@@ -25,6 +25,8 @@
 
 #include "integrator.hpp"
 #include "integrator_internal.hpp"
+#include "sx_function.hpp"
+#include "mx_function.hpp"
 
 using namespace std;
 namespace casadi {
@@ -53,6 +55,72 @@ namespace casadi {
   Integrator::Integrator(const std::string& name, const std::string& solver,
                          const std::pair<Function, Function>& fg, const Dict& opts) {
     assignNode(IntegratorInternal::getPlugin(solver).creator(fg.first, fg.second));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  Integrator::Integrator(const std::string& name, const std::string& solver,
+                         const SXDict& dae, const Dict& opts) {
+    SX x, z, p, t, ode, alg, quad;
+    for (SXDict::const_iterator i=dae.begin(); i!=dae.end(); ++i) {
+      if (i->first=="x") {
+        x = i->second;
+      } else if (i->first=="z") {
+        z = i->second;
+      } else if (i->first=="p") {
+        p = i->second;
+      } else if (i->first=="t") {
+        t = i->second;
+      } else if (i->first=="ode") {
+        ode = i->second;
+      } else if (i->first=="alg") {
+        alg = i->second;
+      } else if (i->first=="quad") {
+        quad = i->second;
+      } else {
+        casadi_error("No such field: \"" + i->first + "\"");
+      }
+    }
+    SXFunction f("dae", daeIn("x", x, "z", z, "p", p),
+                    daeOut("ode", ode, "alg", alg, "quad", quad));
+    Function g; // dummy
+
+    // Load the plugin
+    assignNode(IntegratorInternal::getPlugin(solver).creator(f, g));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  Integrator::Integrator(const std::string& name, const std::string& solver,
+                         const MXDict& dae, const Dict& opts) {
+    MX x, z, p, t, ode, alg, quad;
+    for (MXDict::const_iterator i=dae.begin(); i!=dae.end(); ++i) {
+      if (i->first=="x") {
+        x = i->second;
+      } else if (i->first=="z") {
+        z = i->second;
+      } else if (i->first=="p") {
+        p = i->second;
+      } else if (i->first=="t") {
+        t = i->second;
+      } else if (i->first=="ode") {
+        ode = i->second;
+      } else if (i->first=="alg") {
+        alg = i->second;
+      } else if (i->first=="quad") {
+        quad = i->second;
+      } else {
+        casadi_error("No such field: \"" + i->first + "\"");
+      }
+    }
+    MXFunction f("dae", daeIn("x", x, "z", z, "p", p),
+                    daeOut("ode", ode, "alg", alg, "quad", quad));
+    Function g; // dummy
+
+    // Load the plugin
+    assignNode(IntegratorInternal::getPlugin(solver).creator(f, g));
     setOption("name", name);
     setOption(opts);
     init();

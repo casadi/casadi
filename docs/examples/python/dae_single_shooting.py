@@ -63,13 +63,10 @@ f_z = x[1]**2 + z - 1
 # Lagrange cost term (quadrature)
 f_q = x[0]**2 + x[1]**2 + u**2
 
-# DAE callback function
-f = SXFunction('f', daeIn(x=x, z=z, p=u),
-               daeOut(ode=f_x, alg=f_z, quad=f_q))
-
 # Create an integrator
+dae = {'x':x, 'z':z, 'p':u, 'ode':f_x, 'alg':f_z, 'quad':f_q}
 opts = {"tf":0.5} # interval length
-I = Integrator('I', "idas", f, opts)
+I = Integrator('I', "idas", dae, opts)
 
 # All controls
 U = MX.sym("U", 20)
