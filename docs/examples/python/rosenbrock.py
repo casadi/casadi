@@ -38,10 +38,10 @@ y = SX.sym("y")
 z = SX.sym("z")
 w = vertcat([x,y,z])
 
-# Form NLP functions
+# Formulate the NLP
 f = x**2 + 100*z**2
 g = z + (1-x)**2 - y
-nlp = SXFunction("nlp", nlpIn(x=w), nlpOut(f=f, g=g))
+nlp = {'x':w, 'f':f, 'g':g}
   
 # Create an NLP solver
 solver = NlpSolver("solver", "ipopt", nlp)

@@ -82,10 +82,8 @@ for k in range(20):
   X = Ik['xf']
   J += Ik['qf']   # Sum up quadratures
 
-# NLP callback functions
-nlp = MXFunction('nlp', nlpIn(x=U), nlpOut(f=J, g=X))
-
 # Allocate an NLP solver
+nlp = {'x':U, 'f':J, 'g':X}
 opts = {"linear_solver":"ma27"}
 solver = NlpSolver("solver", "ipopt", nlp, opts)
 

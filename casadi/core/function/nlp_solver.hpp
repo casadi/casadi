@@ -222,6 +222,18 @@ namespace casadi {
       const Dict& opts=Dict()
       ); // NOLINT(whitespace/parens)
 
+    /// Create an NLP solver from a dictionary with SX expressions
+    NlpSolver(const std::string& name,
+              const std::string& solver,
+              const SXDict& nlp,
+              const Dict& opts=Dict());
+
+    /// Create an NLP solver from a dictionary with MX expressions
+    NlpSolver(const std::string& name,
+              const std::string& solver,
+              const MXDict& nlp,
+              const Dict& opts=Dict());
+
     /// NLP solver factory, no initialization (to be deprecated)
     NlpSolver(
       const std::string& solver,
