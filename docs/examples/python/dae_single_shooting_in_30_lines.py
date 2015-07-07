@@ -22,7 +22,6 @@
 #
 #
 from casadi import *
-from operator import itemgetter
 
 """
 This example mainly intended for CasADi presentations. 
