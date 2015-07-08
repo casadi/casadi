@@ -294,6 +294,7 @@ namespace casadi {
   }
 
   bool ExternalFunctionInternal::hasFullJacobian() const {
+    if (FunctionInternal::hasFullJacobian()) return true;
     // Init function for Jacobian?
     initPtr jac_init;
     getSym(jac_init, handle_, f_name_ + "_jac_init");
@@ -302,7 +303,11 @@ namespace casadi {
 
   Function ExternalFunctionInternal
   ::getFullJacobian(const std::string& name, const Dict& opts) {
-    return ExternalFunction(name, bin_name_, opts);
+    if (hasFullJacobian()) {
+      return ExternalFunction(name, bin_name_, opts);
+    } else {
+      return FunctionInternal::getFullJacobian(name, opts);
+    }
   }
 
   Function ExternalFunctionInternal
