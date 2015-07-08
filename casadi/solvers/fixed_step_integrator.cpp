@@ -93,6 +93,7 @@ namespace casadi {
       F.evaluate();
       F.output(DAE_ODE).get(output(INTEGRATOR_XF));
       F.output(DAE_ALG).get(Z_);
+      copy(Z_.end()-nz_, Z_.end(), output(INTEGRATOR_ZF).begin());
       transform(F.output(DAE_QUAD).begin(),
                 F.output(DAE_QUAD).end(),
                 output(INTEGRATOR_QF).begin(),
@@ -137,6 +138,7 @@ namespace casadi {
       G.evaluate();
       G.output(RDAE_ODE).get(output(INTEGRATOR_RXF));
       G.output(RDAE_ALG).get(RZ_);
+      copy(RZ_.end()-nrz_, RZ_.end(), output(INTEGRATOR_RZF).begin());
       transform(G.output(RDAE_QUAD).begin(),
                 G.output(RDAE_QUAD).end(),
                 output(INTEGRATOR_RQF).begin(),
