@@ -3286,6 +3286,7 @@ MatType adj(const MatType& A);
 MatType getMinor(const MatType &x, int i, int j);
 MatType cofactor(const MatType &x, int i, int j);
 void qr(const MatType& A, MatType& OUTPUT, MatType& OUTPUT);
+MatType chol(const MatType& A);
 //MatType all(const MatType &x);
 //MatType any(const MatType &x);
 MatType sparsify(const MatType& A, double tol=0);

@@ -545,6 +545,7 @@ namespace casadi {
     Matrix<DataType> zz_norm_F() const;
     Matrix<DataType> zz_norm_inf() const;
     void zz_qr(Matrix<DataType>& SWIG_OUTPUT(Q), Matrix<DataType>& SWIG_OUTPUT(R)) const;
+    Matrix<DataType> zz_chol() const;
     Matrix<DataType> zz_nullspace() const;
     Matrix<DataType> zz_solve(const Matrix<DataType>& b) const;
     Matrix<DataType> zz_pinv() const;
@@ -583,6 +584,18 @@ namespace casadi {
      * Note that in SWIG, Q and R are returned by value. */
     inline friend void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R) {
       return A.zz_qr(Q, R);
+    }
+
+    /** \brief Obtain a Cholesky factorisation of a matrix
+    *
+    *  Returns an upper triangular R such that R'R = A.
+    *  Matrix A must be positive definite.
+    *
+    * At the moment, the algorithm is dense (Cholesky-Banachiewicz).
+    * There is an open ticket #1212 to make it sparse.
+    */
+    inline friend Matrix<DataType> chol(const Matrix<DataType>& A) {
+      return A.zz_chol();
     }
 
     /// Returns true only if every element in the matrix is true

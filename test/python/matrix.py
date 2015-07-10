@@ -991,6 +991,18 @@ class Matrixtests(casadiTestCase):
       w = SX.sym("w",2,1)
       Q = np.eye(2)
       mul(w.T,Q,w)
+      
+  def test_chol(self):
+    numpy.random.seed(0)
+    
+    for i in range(4):
+      A = numpy.random.random((3,3))
+      H = mul(A,A.T)
+      
+      R = chol(H)
+      
+      assert R.istriu()
+      self.checkarray(mul(R.T,R),H)
     
 if __name__ == '__main__':
     unittest.main()

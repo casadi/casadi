@@ -2323,6 +2323,42 @@ namespace casadi {
   }
 
   template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_chol() const {
+    // Cholesky-Banachiewicz algorithm
+    // Naive, dense implementation O(n^3)
+
+    // check dimensions
+    casadi_assert_message(size1() == size2(), "Cholesky decomposition requires square matrix."
+                                              "Got " << dimString() << " instead.");
+
+    const int*  Arow = row();
+    const int*  Acolind = colind();
+    const std::vector<DataType> & Adata = data();
+
+    Matrix<DataType> ret = Matrix<DataType>(Sparsity::lower(size1()));
+
+    for (int i=0; i<size1(); ++i) { // loop over rows
+      for (int j=0; j<i; ++j) {
+        // Loop over columns before diagonal
+        Matrix<DataType> sum=0;
+        for (int k=0;k<j;++k) {
+          sum += ret(i, k)*ret(j, k);
+        }
+        ret(i, j) = ((*this)(i, j)-sum)/ret(j, j);
+      }
+
+      // Treat the diagonal element separately
+      int j = i;
+      Matrix<DataType> sum = 0;
+      for (int k=0;k<j;++k) {
+        sum += pow(ret(j, k), 2);
+      }
+      ret(j, j) = sqrt((*this)(j, j)-sum);
+    }
+    return ret.T();
+  }
+
+  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_solve(const Matrix<DataType>& b) const {
     // check dimensions
     casadi_assert_message(size1() == b.size1(), "solve Ax=b: dimension mismatch: b has "
