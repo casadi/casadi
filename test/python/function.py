@@ -1082,6 +1082,73 @@ class Functiontests(casadiTestCase):
     H.setInput([0.1])
     H.evaluate()
     
+  def test_map(self):
+    a = SX.sym("a",1,2)
+    b = SX.sym("b")
+    c = sin(a)+b
+    d = cos(sumCols(a)-c)
+    f = SXFunction("f",[a,b],[c,d])
+
+    random.seed(0)
+
+    random.random(())
+
+    r = [[ DMatrix([1,2]).T , 3],
+    [ DMatrix([2,1]).T , 1.7],
+    [ DMatrix([3,4.1]).T , 2.7],
+    ]
+
+    Fref = blockcat([f(e) for e in r])
+
+
+    F = MXFunction("F",[],[blockcat(f.map(r))])
+
+    self.checkarray(F([])[0],Fref)
+    
+    a = SX.sym("a",1,2)
+    c = sin(a)
+    d = cos(sumCols(a)-c)
+    f = SXFunction("f",[a],[c,d])
+
+    random.seed(0)
+
+    random.random(())
+
+    r = [[ DMatrix([1,2]).T ],
+    [ DMatrix([2,1]).T ],
+    [ DMatrix([3,4.1]).T],
+    ]
+
+    Fref = blockcat([f(e) for e in r])
+
+
+    F = MXFunction("F",[],[blockcat(f.map(r))])
+
+    self.checkarray(F([])[0],Fref)
+
+    a = SX.sym("a",1,2)
+    b = SX.sym("b")
+    c = sin(a)+b
+    d = cos(sumCols(a)-c)
+    f = SXFunction("f",[a,b],[c])
+
+    random.seed(0)
+
+    random.random(())
+
+    r = [[ DMatrix([1,2]).T , 3],
+    [ DMatrix([2,1]).T , 1.7],
+    [ DMatrix([3,4.1]).T , 2.7],
+    ]
+
+    Fref = blockcat([f(e) for e in r])
+
+
+    F = MXFunction("F",[],[blockcat(f.map(r))])
+
+    self.checkarray(F([])[0],Fref)
+    
+
   def test_simple_scheme_call(self):
 
     x = SX.sym("x")

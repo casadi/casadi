@@ -45,8 +45,8 @@ namespace casadi {
     vector<MX> all_arg;
     all_arg.reserve(n_ * f_num_in);
     for (vector<vector<MX> >::const_iterator j=arg.begin(); j!=arg.end(); ++j) {
-      casadi_assert(j->size()==n_);
-      for (int i=0; i<n_; ++i) {
+      casadi_assert(j->size()==f_num_in);//, "Entries of arg must be lists of length");
+      for (int i=0; i<f_num_in; ++i) {
         casadi_assert(j->at(i).shape()==fcn_.input(i).shape());
         // Insert sparsity projection nodes if needed
         all_arg.push_back(project(j->at(i), fcn_.input(i).sparsity()));
