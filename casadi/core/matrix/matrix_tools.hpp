@@ -61,8 +61,14 @@ namespace casadi {
 
   /** \brief Computes the Moore-Penrose pseudo-inverse
   *
-  * If the matrix A is fat (size2>size1), mul(A, pinv(A)) is unity.
-  * If the matrix A is slender (size1<size2), mul(pinv(A), A) is unity.
+  * If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
+  * 
+  *  pinv(A)' = (AA')^(-1) A
+  *
+  *
+  * If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
+  *
+  *  pinv(A) = (A'A)^(-1) A'
   *
   */
   template<typename DataType>
