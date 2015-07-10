@@ -28,9 +28,6 @@
 #include "../../core/std_vector_tools.hpp"
 #include "../../core/matrix/matrix_tools.hpp"
 
-// Bug in qpOASES?
-#define ALLOW_QPROBLEMB true
-
 using namespace std;
 namespace casadi {
 
@@ -174,14 +171,13 @@ namespace casadi {
 
     // Create qpOASES instance
     if (qp_) delete qp_;
-    if (ALLOW_QPROBLEMB && nc_==0) {
+    if (nc_==0) {
       qp_ = new qpOASES::QProblemB(n_);
     } else {
       qp_ = new qpOASES::SQProblem(n_, nc_);
     }
     called_once_ = false;
 
-#ifdef ALLOW_ALL_OPTIONS
     qpOASES::Options ops;
     ops.setToDefault();
     ops.printLevel = string_to_PrintLevel(getOption("printLevel"));
@@ -217,9 +213,6 @@ namespace casadi {
 
     // Pass to qpOASES
     qp_->setOptions(ops);
-#else // ALLOW_ALL_OPTIONS
-    qp_->setPrintLevel(string_to_PrintLevel(getOption("printLevel")));
-#endif // ALLOW_ALL_OPTIONS
   }
 
   void QpoasesInterface::evaluate() {
@@ -267,7 +260,7 @@ namespace casadi {
 
     int flag;
     if (!called_once_) {
-      if (ALLOW_QPROBLEMB && nc_==0) {
+      if (nc_==0) {
         flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h, g, lb, ub, nWSR, cputime_ptr);
       } else {
         flag = static_cast<qpOASES::SQProblem*>(qp_)->init(h, g, a, lb, ub, lbA, ubA,
@@ -275,7 +268,7 @@ namespace casadi {
       }
       called_once_ = true;
     } else {
-      if (ALLOW_QPROBLEMB && nc_==0) {
+      if (nc_==0) {
         static_cast<qpOASES::QProblemB*>(qp_)->reset();
         flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h, g, lb, ub, nWSR, cputime_ptr);
         //flag = static_cast<qpOASES::QProblemB*>(qp_)->hotstart(g, lb, ub, nWSR, cputime_ptr);
