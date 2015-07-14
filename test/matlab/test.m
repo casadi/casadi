@@ -14,8 +14,7 @@ z = MX.sym('z',3);
 
 
 
-f = SXFunction({x},{cos(x)})
-f.init()
+f = SXFunction('f',{x},{cos(x)})
 
 f.setInput(3,0)
 
@@ -30,8 +29,7 @@ assert(res.isZero())
 
 x = SX.sym('x',4);
 
-f = SXFunction({x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
-f.init()
+f = SXFunction('f',{x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
 
 f.setInput([1,2,3,4])
 f.evaluate()
@@ -64,8 +62,7 @@ assert(flag);
 
 x = MX.sym('x',4);
 
-f = MXFunction({x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
-f.init()
+f = MXFunction('f',{x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
 
 f.setInput([1,2,3,4])
 f.evaluate()
@@ -107,12 +104,12 @@ x.printDense();
 x = SX.sym('x');
 
 
-ode = SXFunction(daeIn('x',x),daeOut('ode',x));
-ode.init();
+ode = SXFunction('ode',daeIn('x',x),daeOut('ode',x));
 
-intg = Integrator('rk',ode);
-intg.setOption('verbose',1);
-intg.init();
+opts = struct
+opts.verbose = true
+
+intg = Integrator('integrator', 'rk',ode,opts);
 intg.evaluate();
 diary OFF
 
