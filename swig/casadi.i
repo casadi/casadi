@@ -624,6 +624,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         // Temporary
         M tmp, *tmp_ptr=&tmp;
         bool ret = to_ptr(p, &tmp_ptr);
+        if (!ret) return ret;
         **m = GenericType(*tmp_ptr);
         return ret;
       } else {
