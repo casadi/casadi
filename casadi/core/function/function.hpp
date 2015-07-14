@@ -321,6 +321,11 @@ namespace casadi {
     std::vector<SX> operator()(const SX& arg0) { return operator()(make_vector(arg0));}
     std::vector<MX> operator()(const MX& arg0) { return operator()(make_vector(arg0));}
     ///@}
+
+    ///@{
+    /// Evaluate memory-less
+    void operator()(const double** arg, double** res, int* iw, double* w);
+    ///@}
 #endif // SWIG
 
     /** \brief Create call to (cached) derivative function, forward mode  */

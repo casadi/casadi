@@ -801,5 +801,9 @@ namespace casadi {
     return (*this)->defaultInput(ind);
   }
 
+  void Function::operator()(const double** arg, double** res, int* iw, double* w) {
+    (*this)->evalD(arg, res, iw, w);
+  }
+
 } // namespace casadi
 
