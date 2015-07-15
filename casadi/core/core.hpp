@@ -59,6 +59,7 @@
 #include "function/integrator.hpp"
 #include "function/implicit_function.hpp"
 #include "function/custom_function.hpp"
+#include "function/callback.hpp"
 #include "function/simulator.hpp"
 #include "function/control_simulator.hpp"
 #include "function/qp_solver.hpp"

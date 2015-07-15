@@ -140,6 +140,8 @@ set(CASADI_SRCS
 
   function/schemes_metadata.hpp function/schemes_metadata.cpp function/schemes_helpers.hpp
 
+  function/callback.cpp            function/callback.hpp
+
 )
 
 set_source_files_properties( ${RUNTIME_EMBEDDED_SRC} PROPERTIES GENERATED TRUE )

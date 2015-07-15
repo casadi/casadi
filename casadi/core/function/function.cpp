@@ -195,6 +195,10 @@ namespace casadi {
     return (*this)->symbolicInputSX();
   }
 
+  std::vector<MX> Function::symbolicOutput() const {
+    return (*this)->symbolicOutput();
+  }
+
   std::vector<std::string> Function::inputScheme() const {
     return (*this)->ischeme_;
   }

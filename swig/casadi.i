@@ -23,7 +23,7 @@
  */
 
 
-%module(package="casadi") casadi
+%module(package="casadi",directors=1) casadi
 
  // Include all public CasADi C++
 %{
@@ -1035,6 +1035,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
                                     $descriptor(casadi::Function*), 0))) {
         return true;
+      }
+
+      {
+            casadi::Callback2 *m2;
+            // Is callback?
+            if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
+                                          $descriptor(casadi::Callback2*), 0))) {
+               if (m) **m = (*m2).create();
+               return true;
+            }
       }
 
       // No match
@@ -2148,6 +2158,13 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
  // Pass input by value, check if matches
 %typemap(typecheck, noblock=1, precedence=xPrec, fragment="casadi_all") xType {
   $1 = casadi::to_ptr($input, static_cast< xType **>(0));
+ }
+
+ // Directorout typemap; as input by value
+%typemap(directorout, noblock=1, fragment="casadi_all") xType {
+    if (!casadi::to_val($input, &$result)) { 
+      %dirout_fail(SWIG_TypeError,"$type");
+    }
  }
 
  // Pass input by value, convert argument
@@ -3312,6 +3329,8 @@ GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(casadi::SXElement)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
 #endif // SWIGMATLAB
 
+%feature("director") casadi::Callback2;
+
 %include <casadi/core/sx/sx_tools.hpp>
 %include <casadi/core/mx/mx_tools.hpp>
 %include <casadi/core/function/sx_function.hpp>
@@ -3333,6 +3352,7 @@ GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
 %include <casadi/core/function/external_function.hpp>
 %include <casadi/core/function/switch.hpp>
 %include <casadi/core/function/custom_function.hpp>
+%include <casadi/core/function/callback.hpp>
 %include <casadi/core/functor.hpp>
 %include <casadi/core/function/nullspace.hpp>
 %include <casadi/core/function/dple_solver.hpp>

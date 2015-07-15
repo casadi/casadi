@@ -1204,6 +1204,48 @@ class Functiontests(casadiTestCase):
         f2.init()
 
         assert f2.jacSparsity().nnz()==162
+
+  def test_callback(self):
+    class mycallback(Callback2):
+      def __call__(self,argin):
+        return [argin[0]**2]
+
+    c = mycallback()
+    foo = c.create()
+    
+    x = MX.sym('x')
+    y = foo([x])
+
+    f = MXFunction("f",[x],y)
+    J = f.jacobian()
+
+    out = f([5])
+    
+    self.checkarray(out[0],25)
+
+    out = J([8])
+    
+    self.checkarray(out[0],16,digits=6)
+
+    class mycallback2(Callback2):
+      pass
+
+    c2 = mycallback2()
+    foo = c2.create()
+    
+    x = MX.sym('x')
+    y = foo([x])
+
+    f = MXFunction("f",[x],y)
+    J = f.jacobian()
+
+    out = f([5])
+    
+    self.checkarray(out[0],10)
+
+    out = J([8])
+    
+    self.checkarray(out[0],2,digits=6)
     
 if __name__ == '__main__':
     unittest.main()

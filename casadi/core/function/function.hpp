@@ -521,6 +521,12 @@ namespace casadi {
      */
     std::vector<SX> symbolicInputSX() const;
 
+    /** \brief  Get a vector of symbolic variables with the same dimensions as the outputs
+     *
+     * There is no guarantee that consecutive calls return identical objects
+     */
+    std::vector<MX> symbolicOutput() const;
+
     /// \cond INTERNAL
     /** \brief Is the class able to propagate seeds through the algorithm?
      *
