@@ -437,7 +437,8 @@ class Functiontests(casadiTestCase):
     self.assertTrue(f.getOption("name")=="abc")
     f.setOption({"name": "def"},True)
     self.assertTrue(f.getOption("name")=="def")
-    
+  
+  @skip("WITH_DEPRECATED_FEATURES" not in CasadiMeta.getCompilerFlags())
   def test_CustomFunctionHard(self):
 
     x = MX.sym("x")
@@ -569,6 +570,7 @@ class Functiontests(casadiTestCase):
                 
       self.checkfunction(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
     
+  @skip("WITH_DEPRECATED_FEATURES" not in CasadiMeta.getCompilerFlags())
   def test_CustomFunction(self):
   
     x = MX.sym("x")
@@ -1026,7 +1028,8 @@ class Functiontests(casadiTestCase):
 
     
     self.assertFalse("derivative" in str(P_P))
-    
+  
+  @skip("WITH_DEPRECATED_FEATURES" not in CasadiMeta.getCompilerFlags())
   def test_assert_derivatives(self):
     x = MX.sym("x")
     
@@ -1035,18 +1038,28 @@ class Functiontests(casadiTestCase):
       print f
       f.setOutput(1)
 
-    foo = CustomFunction(dummy, [x.sparsity()], [Sparsity.dense(1,1)] )
-    foo.setOption("name","foo")
-    foo.setOption("verbose",True)
-    foo.init()
+    import warnings
+
+    with warnings.catch_warnings():
+      warnings.filterwarnings("ignore",category=DeprecationWarning)
+        
+      foo = CustomFunction(dummy, [x.sparsity()], [Sparsity.dense(1,1)] )
+      foo.setOption("name","foo")
+      foo.setOption("verbose",True)
+      foo.init()
 
     # Jacobian for derivative information
     def dummy_jac(f):
       f.setOutput(1,1)
 
-    foo_jac = CustomFunction(dummy_jac, [x.sparsity()], [Sparsity(1,1),Sparsity.dense(1,1)] )
-    foo_jac.setOption("name","foo_jac")
-    foo_jac.init()
+    import warnings
+
+    with warnings.catch_warnings():
+      warnings.filterwarnings("ignore",category=DeprecationWarning)
+        
+      foo_jac = CustomFunction(dummy_jac, [x.sparsity()], [Sparsity(1,1),Sparsity.dense(1,1)] )
+      foo_jac.setOption("name","foo_jac")
+      foo_jac.init()
     foo.setFullJacobian(foo_jac)
 
     y = x**2

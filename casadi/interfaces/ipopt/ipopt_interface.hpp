@@ -81,7 +81,8 @@ public:
   virtual void init();
   virtual void evaluate();
 
-  virtual void setQPOptions();
+  /// Set default options for a given recipe
+  virtual void setDefaultOptions(const std::vector<std::string>& recipes);
 
   // Get reduced Hessian
   virtual DMatrix getReducedHessian();

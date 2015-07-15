@@ -136,10 +136,10 @@ namespace casadi {
     // We're going to use two-argument objective and constraints to allow the use of parameters
     MXFunction nlp("nlp", nlpIn("x", u, "p", p), nlpOut("f", nlp_f, "g", nlp_g));
 
+    Dict options;
+    if (hasSetOption(optionsname())) options = getOption(optionsname());
     // Create an NlpSolver instance
-    solver_ = NlpSolver(getOption(solvername()), nlp);
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    solver_ = NlpSolver("nlpsolver", getOption(solvername()), nlp, options);
   }
 
 } // namespace casadi

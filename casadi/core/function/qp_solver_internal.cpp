@@ -46,6 +46,9 @@ namespace casadi {
       }
     }
 
+    addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "",
+                                                       "lp", true);
+
     const Sparsity& A = st_[QP_STRUCT_A];
     const Sparsity& H = st_[QP_STRUCT_H];
 

@@ -110,23 +110,23 @@ namespace casadi {
 #endif // USE_CXX11
 #endif // SWIG
 
-#ifdef WITH_LEGACY_CONSTRUCTORS
-    /// Multiple input, multiple output, no initialization (to be deprecated)
+#ifdef WITH_DEPRECATED_FEATURES
+    /// [DEPRECATED] Multiple input, multiple output, no initialization
     SXFunction(const std::vector<SX>& arg,
                const std::vector<SX>& res);
 
-    /// Multiple input, multiple  output, no initialization (to be deprecated)
+    /// [DEPRECATED] Multiple input, multiple  output, no initialization
     SXFunction(const std::vector<SX>& arg,
                const std::pair< SXDict, std::vector<std::string> >& res);
 
-    /// Multiple input, multiple output, no initialization (to be deprecated)
+    /// [DEPRECATED] Multiple input, multiple output, no initialization
     SXFunction(const std::pair< SXDict, std::vector<std::string> >& arg,
                const std::vector<SX>& res);
 
-    /// Multiple input, multiple output, no initialization (to be deprecated)
+    /// [DEPRECATED] Multiple input, multiple output, no initialization
     SXFunction(const std::pair< SXDict, std::vector<std::string> >& arg,
                const std::pair< SXDict, std::vector<std::string> >& res);
-#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_DEPRECATED_FEATURES
 
 /// \cond INTERNAL
     /// Access functions of the node

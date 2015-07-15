@@ -45,6 +45,9 @@ SdpSolverInternal::SdpSolverInternal(const std::map<std::string, Sparsity> &st) 
             "as is always dense (m x m).");
   addOption("print_problem", OT_BOOLEAN, false, "Print out problem statement for debugging.");
 
+  addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "",
+                                                       "socp", true);
+
   st_.resize(SDP_STRUCT_NUM);
   for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
     if (i->first=="a") {

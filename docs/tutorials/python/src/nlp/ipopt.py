@@ -73,10 +73,8 @@ nlp.evaluate()
 #! Test the objective for some value of x:
 print nlp.getOutput("f").toArray()
 
-solver = NlpSolver("ipopt", nlp)
+solver = NlpSolver("nlp","ipopt", nlp)
 solver.printOptions()
-
-solver.init()
 
 #! The default lower an upper bound on the optimizations variables is zero.
 #! Change them to unbouded as follows:

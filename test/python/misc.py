@@ -281,7 +281,7 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "NlpSolver(str,Function)" in e.message
+      assert "NlpSolver(str,str,Function,Dict)" in e.message
       assert "You have: NlpSolver(int)" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
@@ -444,7 +444,7 @@ class Misctests(casadiTestCase):
 
     with capture_stdout() as result:
       try:    
-        solver = NlpSolver("foo",f)
+        solver = NlpSolver("solver","foo",f)
       except:
         pass
     

@@ -140,12 +140,13 @@ namespace casadi {
     SocpSolver(const std::string& name, const std::string& solver,
                const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
-    /** \brief Constructor (no initialization, to be deprecated)
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor (no initialization)
      *  \param solver \pluginargument{SocpSolver}
      *  \param st \structargument{SOCP}
      */
     SocpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
-
+#endif // WITH_DEPRECATED_FEATURES
     /// Access functions of the node
     SocpSolverInternal* operator->();
     const SocpSolverInternal* operator->() const;

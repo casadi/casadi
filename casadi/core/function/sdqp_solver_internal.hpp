@@ -67,9 +67,6 @@ namespace casadi {
     // Solve the system of equations
     virtual void solve();
 
-    /// Set options that make the SDQP solver more suitable for solving SOCPs
-    virtual void setSOCQPOptions() {}
-
     /// Print out problem statement for debugging
     void printProblem(std::ostream &stream=casadi::userOut()) const;
 

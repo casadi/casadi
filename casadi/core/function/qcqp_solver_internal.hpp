@@ -69,9 +69,6 @@ namespace casadi {
     // Solve the system of equations
     virtual void solve();
 
-    /// Set options that make the QP solver more suitable for solving LPs
-    virtual void setQPOptions() {}
-
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
 

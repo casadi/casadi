@@ -438,7 +438,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
             self.internal[swigname] = ""
             
           if deprecated is not None:
-            self.deprecated[swigname] = "%exception " + swigname + " {\n CATCH_OR_NOT(DEPRECATED_MSG(\"%s\")) \n}" % deprecated
+            self.deprecated[swigname] = "%exception " + swigname + " {\n CATCH_OR_NOT(DEPRECATED_MSG(\"%s\")) $action\n}" % deprecated
           else:
             self.deprecated[swigname] = ""
               

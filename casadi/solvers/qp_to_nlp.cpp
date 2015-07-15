@@ -118,16 +118,19 @@ namespace casadi {
     par.push_back(G.data());
     par.push_back(A.data());
 
+
+
     // The nlp looks exactly like a mathematical description of the NLP
     SXFunction QP_SOLVER_nlp("nlp", nlpIn("x", X, "p", vertcat(par)),
                              nlpOut("f", mul(G.T(), X) + 0.5*mul(mul(X.T(), H), X),
                                     "g", mul(A, X)));
 
+    Dict options;
+    if (hasSetOption(optionsname())) options = getOption(optionsname());
+    options = OptionsFunctionality::addOptionRecipe(options, "qp");
+
     // Create an NlpSolver instance
-    solver_ = NlpSolver(getOption(solvername()), QP_SOLVER_nlp);
-    solver_.setQPOptions();
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    solver_ = NlpSolver("nlpsolver", getOption(solvername()), QP_SOLVER_nlp, options);
   }
 
 } // namespace casadi

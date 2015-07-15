@@ -200,24 +200,22 @@ namespace casadi {
     socp_e_row.push_back(n_);
     Sparsity socp_e(n_+1, nq_+1, socp_e_colind, socp_e_row);
 
-    // Create an SocpSolver instance
-    solver_ = SocpSolver(getOption(solvername()),
-                         make_map("g", horzcat(socp_g),
-                                  "e", socp_e,
-                                  "a", horzcat(input(QCQP_SOLVER_A).sparsity(),
-                                               Sparsity(nc_, 1))));
 
-    //solver_.setQCQPOptions();
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-
+    Dict options;
+    if (hasSetOption(optionsname())) options = getOption(optionsname());
     std::vector<int> ni(nq_+1);
     for (int i=0;i<nq_+1;++i) {
       ni[i] = n_+1;
     }
-    solver_.setOption("ni", ni);
+    options["ni"] = ni;
 
-    // Initialize the SocpSolver
-    solver_.init();
+    // Create an SocpSolver instance
+    solver_ = SocpSolver("socpsolver", getOption(solvername()),
+                         make_map("g", horzcat(socp_g),
+                                  "e", socp_e,
+                                  "a", horzcat(input(QCQP_SOLVER_A).sparsity(),
+                                               Sparsity(nc_, 1))),
+                         options);
   }
 
 } // namespace casadi

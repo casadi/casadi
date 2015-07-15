@@ -364,8 +364,12 @@ namespace casadi {
     }
   }
 
-  void WorhpInterface::setQPOptions() {
-    setOption("UserHM", true);
+  void WorhpInterface::setDefaultOptions(const std::vector<std::string>& recipes) {
+    for (int i=0;i<recipes.size();++i) {
+      if (recipes[i]=="qp") {
+        setOption("UserHM", true);
+      }
+    }
   }
 
   void WorhpInterface::passOptions() {

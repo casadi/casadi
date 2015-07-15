@@ -220,12 +220,12 @@ if (internal("$decl")) SWIG_fail;
 %wrapper %{
 int deprecated(const std::string & c,const std::string & a) {
   std::string msg = "This CasADi function (" + c + ") is deprecated. " + a;
-  return PyErr_WarnEx(PyExc_DeprecationWarning,msg.c_str(),2);
+  return PyErr_WarnEx(PyExc_DeprecationWarning,msg.c_str(),3);
 }
 int internal(const std::string & c) {
   if (CasadiOptions::allowed_internal_api) return 0;
   std::string msg = "This CasADi function (" + c + ") is not part of the public API. Use at your own risk.";
-  return PyErr_WarnEx(PyExc_SyntaxWarning,msg.c_str(),2);
+  return PyErr_WarnEx(PyExc_SyntaxWarning,msg.c_str(),3);
 }
 %}
 #endif // SWIGPYTHON
@@ -3118,9 +3118,13 @@ def pyfunction(inputs,outputs):
         res = [res]
       for i in range(f2.nOut()):
         f2.setOutput(res[i],i)
-    Fun = CustomFunction(fcustom,inputs,outputs)
-    Fun.setOption("name","CustomFunction")
-    return Fun
+    import warnings
+
+    with warnings.catch_warnings():
+      warnings.filterwarnings("ignore",category=DeprecationWarning)
+      Fun = CustomFunction(fcustom,inputs,outputs)
+      Fun.setOption("name","CustomFunction")
+      return Fun
   return wrap
 
 def PyFunction(obj,inputs,outputs):
@@ -3130,69 +3134,82 @@ def PyFunction(obj,inputs,outputs):
       obj.evaluate([f.getInput(i) for i in range(f.nIn())],res)
       for i in range(f.nOut()): f.setOutput(res[i], i)
 
-    Fun = CustomFunction(fcustom,inputs,outputs)
-    Fun.setOption("name","CustomFunction")
-    if hasattr(obj,'getDerForward'):
-      @pyderivativegenerator
-      def derivativewrap(f,nfwd):
-        return obj.getDerForward(f,nfwd)
-      Fun.setOption("custom_forward",derivativewrap)
+    import warnings
 
-    if hasattr(obj,'getDerReverse'):
-      @pyderivativegenerator
-      def derivativewrap(f,adj):
-        return obj.getDerReverse(f,adj)
-      Fun.setOption("custom_reverse",derivativewrap)
+    with warnings.catch_warnings():
+      warnings.filterwarnings("ignore",category=DeprecationWarning)
+      Fun = CustomFunction(fcustom,inputs,outputs)
+      Fun.setOption("name","CustomFunction")
+      if hasattr(obj,'getDerForward'):
+        @pyderivativegenerator
+        def derivativewrap(f,nfwd):
+          return obj.getDerForward(f,nfwd)
+        Fun.setOption("custom_forward",derivativewrap)
 
-    if hasattr(obj,'fwd'):
-      @pyderivativegenerator
-      def derivativewrapFwd(f,nfwd):
-        num_in = f.nIn()
-        num_out = f.nOut()
+      if hasattr(obj,'getDerReverse'):
+        @pyderivativegenerator
+        def derivativewrap(f,adj):
+          return obj.getDerReverse(f,adj)
+        Fun.setOption("custom_reverse",derivativewrap)
 
-        @pyevaluate
-        def der(f2):
-          all_inputs = [f2.getInput(i) for i in range(f2.nIn())]
-          all_outputs = [f2.getOutput(i) for i in range(f2.nOut())]
-          inputs=all_inputs[:num_in]
-          outputs=all_inputs[num_in:num_in+num_out]
-          fwd_seeds=zip(*[iter(all_inputs[num_in+num_out:])]*num_in)
-          fwd_sens=zip(*[iter(all_outputs)]*num_out)
-          obj.fwd(inputs,outputs,fwd_seeds,fwd_sens)
-          for i in range(f2.nOut()): f2.setOutput(all_outputs[i], i)
+      if hasattr(obj,'fwd'):
+        @pyderivativegenerator
+        def derivativewrapFwd(f,nfwd):
+          num_in = f.nIn()
+          num_out = f.nOut()
 
+          @pyevaluate
+          def der(f2):
+            all_inputs = [f2.getInput(i) for i in range(f2.nIn())]
+            all_outputs = [f2.getOutput(i) for i in range(f2.nOut())]
+            inputs=all_inputs[:num_in]
+            outputs=all_inputs[num_in:num_in+num_out]
+            fwd_seeds=zip(*[iter(all_inputs[num_in+num_out:])]*num_in)
+            fwd_sens=zip(*[iter(all_outputs)]*num_out)
+            obj.fwd(inputs,outputs,fwd_seeds,fwd_sens)
+            for i in range(f2.nOut()): f2.setOutput(all_outputs[i], i)
 
-        DerFun = CustomFunction(der,inputs+outputs+nfwd*inputs,nfwd*outputs)
-        DerFun.setOption("name","CustomFunction_derivative")
-        DerFun.init()
-        return DerFun
+          import warnings
 
-      Fun.setOption("custom_forward",derivativewrapFwd)
+          with warnings.catch_warnings():
+            warnings.filterwarnings("ignore",category=DeprecationWarning)
+            
+            DerFun = CustomFunction(der,inputs+outputs+nfwd*inputs,nfwd*outputs)
+            DerFun.setOption("name","CustomFunction_derivative")
+            DerFun.init()
+            return DerFun
 
-    if hasattr(obj,'adj'):
-      @pyderivativegenerator
-      def derivativewrapAdj(f,nadj):
-        num_in = f.nIn()
-        num_out = f.nOut()
+        Fun.setOption("custom_forward",derivativewrapFwd)
 
-        @pyevaluate
-        def der(f2):
-          all_inputs = [f2.getInput(i) for i in range(f2.nIn())]
-          all_outputs = [f2.getOutput(i) for i in range(f2.nOut())]
-          inputs=all_inputs[:num_in]
-          outputs=all_inputs[num_in:num_in+num_out]
-          adj_seeds=zip(*[iter(all_inputs[num_in+num_out:])]*num_out)
-          adj_sens=zip(*[iter(all_outputs)]*num_in)
-          obj.adj(inputs,outputs,adj_seeds,adj_sens)
-          for i in range(f2.nOut()): f2.setOutput(all_outputs[i],i)
+      if hasattr(obj,'adj'):
+        @pyderivativegenerator
+        def derivativewrapAdj(f,nadj):
+          num_in = f.nIn()
+          num_out = f.nOut()
 
-        DerFun = CustomFunction(der,inputs+outputs+nadj*outputs,nadj*inputs)
-        DerFun.setOption("name","CustomFunction_derivative")
-        DerFun.init()
-        return DerFun
+          @pyevaluate
+          def der(f2):
+            all_inputs = [f2.getInput(i) for i in range(f2.nIn())]
+            all_outputs = [f2.getOutput(i) for i in range(f2.nOut())]
+            inputs=all_inputs[:num_in]
+            outputs=all_inputs[num_in:num_in+num_out]
+            adj_seeds=zip(*[iter(all_inputs[num_in+num_out:])]*num_out)
+            adj_sens=zip(*[iter(all_outputs)]*num_in)
+            obj.adj(inputs,outputs,adj_seeds,adj_sens)
+            for i in range(f2.nOut()): f2.setOutput(all_outputs[i],i)
 
-      Fun.setOption("custom_reverse",derivativewrapAdj)
-    return Fun
+          import warnings
+
+          with warnings.catch_warnings():
+            warnings.filterwarnings("ignore",category=DeprecationWarning)
+      
+            DerFun = CustomFunction(der,inputs+outputs+nadj*outputs,nadj*inputs)
+            DerFun.setOption("name","CustomFunction_derivative")
+            DerFun.init()
+            return DerFun
+
+        Fun.setOption("custom_reverse",derivativewrapAdj)
+      return Fun
 
 %}
 #endif

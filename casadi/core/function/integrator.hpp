@@ -202,8 +202,8 @@ namespace casadi {
                const MXDict& dae, const Dict& opts=Dict());
     ///@}
 
-#ifdef WITH_LEGACY_CONSTRUCTORS
-    /** \brief  Integrator factory, no initialization (to be deprecated)
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Integrator factory, no initialization
     *
     * \param name \pluginargument{Integrator}
     * \param f dynamical system
@@ -218,7 +218,7 @@ namespace casadi {
     * \endparblock
     */
     Integrator(const std::string& solver, const Function& f, const Function& g=Function());
-#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Clone
     Integrator clone() const;

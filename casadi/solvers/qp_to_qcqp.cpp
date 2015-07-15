@@ -93,14 +93,16 @@ namespace casadi {
     // Initialize the base classes
     QpSolverInternal::init();
 
+    Dict options;
+    if (hasSetOption(optionsname())) options = getOption(optionsname());
+    options = OptionsFunctionality::addOptionRecipe(options, "qp");
+
     // Create an QcqpSolver instance
-    solver_ = QcqpSolver(getOption(solvername()),
+    solver_ = QcqpSolver("qcqpsolver", getOption(solvername()),
                          make_map("h", input(QP_SOLVER_H).sparsity(),
                                   "p", Sparsity(n_, 0),
-                                  "a", input(QP_SOLVER_A).sparsity()));
-    solver_.setQPOptions();
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+                                  "a", input(QP_SOLVER_A).sparsity()),
+                         options);
   }
 
 } // namespace casadi

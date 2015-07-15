@@ -42,6 +42,9 @@ namespace casadi {
     addOption("sdp_solver_options",       OT_DICT, GenericType(),
               "Options to be passed to the SDPSOlver");
 
+    addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "",
+                                                       "socqp", true);
+
     st_.resize(SDQP_STRUCT_NUM);
     for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
       if (i->first=="a") {

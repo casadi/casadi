@@ -102,14 +102,14 @@ namespace casadi {
                  const std::map<std::string, std::vector<Sparsity> >& st,
                  const Dict& opts=Dict());
 
-#ifdef WITH_LEGACY_CONSTRUCTORS
-    /** \brief Constructor (no initialization, to be deprecated)
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor (no initialization)
      * \param solver \pluginargument{LrDpleSolver}
      * \param st \structargument{LrDple}
      */
     LrDpleSolver(const std::string& solver,
                  const std::map<std::string, std::vector<Sparsity> >& st);
-#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Print solver statistics
     void printStats(std::ostream &stream=casadi::userOut()) const;

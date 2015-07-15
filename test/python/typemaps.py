@@ -523,7 +523,7 @@ class typemaptests(casadiTestCase):
 
     nlp = SXFunction("nlp", nlpIn(x=x),nlpOut(f=x**2))
 
-    nlp_solver = NlpSolver("ipopt", nlp)
+    nlp_solver = NlpSolver("mysolver","ipopt", nlp)
     
     self.assertRaises(RuntimeError,lambda : nlp_solver.setOption('acceptable_tol',SX.sym("x")))
     nlp_solver.setOption('acceptable_tol',DMatrix(1))

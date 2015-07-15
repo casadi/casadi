@@ -115,14 +115,14 @@ namespace casadi {
     StabilizedQpSolver(const std::string& name, const std::string& solver,
                        const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
-#ifdef WITH_LEGACY_CONSTRUCTORS
-    /** \brief Constructor (no initialization, to be deprecated)
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor (no initialization)
      *  \param solver \pluginargument{StabilizedQpSolver}
      *  \param st Problem structure
      *  \copydoc scheme_QPStruct
      */
     StabilizedQpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
-#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Access functions of the node
     StabilizedQpSolverInternal* operator->();
@@ -136,9 +136,6 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
-
-    /// Set options that make the QP solver more suitable for solving LPs
-    void setLPOptions();
 
     /** Generate native code in the interfaced language for debugging */
     void generateNativeCode(const std::string &filename) const;

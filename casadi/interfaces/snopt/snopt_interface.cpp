@@ -455,9 +455,6 @@ namespace casadi {
     n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = n_iter_ = 0;
   }
 
-  void SnoptInterface::setQPOptions() {
-  }
-
   void SnoptInterface::passOptions(snoptProblemC &probC) {
     for (std::map<std::string, std::string>::const_iterator it = intOpts_.begin();
          it != intOpts_.end(); ++it)

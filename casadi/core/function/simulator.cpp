@@ -49,7 +49,7 @@ namespace casadi {
     init();
   }
 
-#ifdef WITH_LEGACY_CONSTRUCTORS
+#ifdef WITH_DEPRECATED_FEATURES
   Simulator::Simulator(const Integrator& integrator, const Function& output_fcn,
                        const Matrix<double>& grid) {
     assignNode(new SimulatorInternal(integrator, output_fcn, grid));
@@ -58,7 +58,7 @@ namespace casadi {
   Simulator::Simulator(const Integrator& integrator, const Matrix<double>& grid) {
     assignNode(new SimulatorInternal(integrator, Function(), grid));
   }
-#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_DEPRECATED_FEATURES
 
   SimulatorInternal* Simulator::operator->() {
     return static_cast<SimulatorInternal*>(Function::operator->());

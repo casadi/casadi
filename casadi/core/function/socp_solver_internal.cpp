@@ -51,6 +51,10 @@ namespace casadi {
       }
     }
 
+    addOption("defaults_recipe",    OT_STRING, GenericType(),
+                                                   "Changes default options in a given way",
+                                                   "qcqp");
+
     addOption("ni", OT_INTEGERVECTOR, GenericType(),
               "Provide the size of each SOC constraint. Must sum up to N.");
     addOption("print_problem", OT_BOOLEAN, false, "Print out problem statement for debugging.");

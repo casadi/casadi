@@ -469,6 +469,8 @@ const OptionsFunctionalityNode* OptionsFunctionality::operator->() const {
 
 OptionsFunctionalityNode::OptionsFunctionalityNode() {
   addOption("name",            OT_STRING, "unnamed_shared_object"); // name of the object
+  addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(),
+            "Changes default options according to a given recipe (low-level)");
 }
 
 OptionsFunctionalityNode::~OptionsFunctionalityNode() {
@@ -667,5 +669,24 @@ void OptionsFunctionalityNode::setDefault(const std::string &name, const Generic
   defaults_[name] = def_val;
 }
 
+Dict OptionsFunctionality::addOptionRecipe(const Dict& dict, const std::string& recipe) {
+  Dict ret = dict;
+  Dict::const_iterator f = dict.find("defaults_recipes");
+  if (f!=dict.end()) {
+    std::vector<std::string> defaults_recipes = f->second;
+    defaults_recipes.push_back(recipe);
+    ret["defaults_recipes"] = defaults_recipes;
+  } else {
+    ret["defaults_recipes"] = std::vector<std::string>(1, recipe);
+  }
+  return ret;
+}
+
+void OptionsFunctionalityNode::setDefaultOptions() {
+    if (hasSetOption("defaults_recipes")) {
+      const std::vector<std::string> & recipes = getOption("defaults_recipes");
+      setDefaultOptions(recipes);
+    }
+}
 
 } // namespace casadi

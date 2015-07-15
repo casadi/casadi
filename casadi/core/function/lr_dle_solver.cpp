@@ -75,12 +75,12 @@ namespace casadi {
     init();
   }
 
-#ifdef WITH_LEGACY_CONSTRUCTORS
+#ifdef WITH_DEPRECATED_FEATURES
   LrDleSolver::LrDleSolver(const std::string& solver,
                            const std::map<std::string, Sparsity>& st) {
     assignNode(LrDleInternal::instantiatePlugin(solver, st));
   }
-#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_DEPRECATED_FEATURES
 
   Sparsity LrDleSolver::getSparsity(const std::map<std::string, Sparsity>& st,
                                     const std::vector<int> &Hs) {

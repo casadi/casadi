@@ -75,17 +75,11 @@ class QpSolverTests(casadiTestCase):
     LBX = DMatrix([0]*2)
     UBX = DMatrix([inf,-inf])
 
-    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
-      
+
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
-      solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':A.sparsity()})
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
-      solver.setOption(qp_options)
-      solver.init()
+      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -118,12 +112,7 @@ class QpSolverTests(casadiTestCase):
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
-      solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':A.sparsity()})
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
-      solver.setOption(qp_options)
-      solver.init()
+      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -159,12 +148,7 @@ class QpSolverTests(casadiTestCase):
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
-      solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':A.sparsity()})
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
-      solver.setOption(qp_options)
-      solver.init()
+      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -206,12 +190,7 @@ class QpSolverTests(casadiTestCase):
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
-      solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':A.sparsity()})
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
-      solver.setOption(qp_options)
-      solver.init()
+      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -302,17 +281,11 @@ class QpSolverTests(casadiTestCase):
     LBX = DMatrix([0]*5)
     UBX = DMatrix([inf]*5)
 
-    options = { "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
-      
+  
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
-      solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':A.sparsity()})
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
-      solver.setOption(qp_options)
-      solver.init()
+      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -349,19 +322,11 @@ class QpSolverTests(casadiTestCase):
     LBX = DMatrix([0]*2)
     UBX = DMatrix([inf]*2)
 
-    options = { "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
-      
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("general_nonconvex: " + str(qpsolver))
       if not("cplex" in str(qpsolver)):
         continue
-      solver = QpSolver(qpsolver, {'h':H.sparsity(),'a':A.sparsity()})
-      
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
-      solver.setOption(qp_options)
-      solver.init()
+      solver = QpSolver("mysolver",qpsolver, {'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       solver.setInput(H,"h")
       solver.setInput(G,"g")
@@ -384,12 +349,7 @@ class QpSolverTests(casadiTestCase):
       self.message("equality: " + str(qpsolver))
       if "ooqp" in str(qpsolver):
         continue
-      solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':Sparsity.dense(3,2)})
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
-      solver.setOption(qp_options)
-      solver.init()
+      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':Sparsity.dense(3,2)},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]      
@@ -473,18 +433,10 @@ class QpSolverTests(casadiTestCase):
     LBX = DMatrix([-10])
     UBX = DMatrix([10])
 
-    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
-      
-      
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("degenerate hessian: " + str(qpsolver))
       if 'qcqp' in str(qpsolver): continue
-      solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':A.sparsity()})
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
-      solver.setOption(qp_options)
-      solver.init()
+      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -526,16 +478,9 @@ class QpSolverTests(casadiTestCase):
     UBX = DMatrix([10])
 
 
-    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
-      
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("no inequality: " + str(qpsolver))
-      solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':A.sparsity()})
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
-      solver.setOption(qp_options)
-      solver.init()
+      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
       
       try:
         less_digits=aux_options["less_digits"]
@@ -576,18 +521,12 @@ class QpSolverTests(casadiTestCase):
     UBX = DMatrix([10])
 
 
-    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
-      
+ 
     for qpsolver, qp_options, aux_options in qpsolvers:
       if "cplex" in str(qpsolver):
         continue
       self.message("no A: " + str(qpsolver))
-      solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':A.sparsity()})
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
-      solver.setOption(qp_options)
-      solver.init()
+      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
       
       try:
         less_digits=aux_options["less_digits"]
@@ -623,16 +562,9 @@ class QpSolverTests(casadiTestCase):
     LBX = DMatrix([-10])
     UBX = DMatrix([10])
 
-
-    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
-      
     for qpsolver, qp_options, aux_options in qpsolvers:
-      solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':A.sparsity()})
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
-      solver.setOption(qp_options)
-      solver.init()
+      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+
       
       try:
         less_digits=aux_options["less_digits"]
@@ -671,16 +603,10 @@ class QpSolverTests(casadiTestCase):
     LBX = DMatrix([-1000]*N)
     UBX = DMatrix([1000]*N)
 
-
-    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
-      
     for qpsolver, qp_options, aux_options in qpsolvers:
       if 'cplex' in str(qpsolver):
         continue
-      solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':A.sparsity()})
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
+      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
            
       solver.setOption(qp_options)
       solver.init()
@@ -724,12 +650,7 @@ class QpSolverTests(casadiTestCase):
         
       for qpsolver, qp_options, aux_options in qpsolvers:
         if 'qcqp' in str(qpsolver): continue
-        solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':A.sparsity()})
-        for key, val in options.iteritems():
-          if solver.hasOption(key):
-             solver.setOption(key,val)
-        solver.setOption(qp_options)
-        solver.init()
+        solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
         try:
           less_digits=aux_options["less_digits"]
@@ -760,17 +681,10 @@ class QpSolverTests(casadiTestCase):
     G = DMatrix([ 2, 1 ])
 
 
-    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
-      
     for qpsolver, qp_options, aux_options in qpsolvers:
       if 'qcqp' in str(qpsolver): continue
-      solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':A.sparsity()})
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
-      solver.setOption(qp_options)
-      solver.init()
-      
+      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+
       try:
         less_digits=aux_options["less_digits"]
       except:
@@ -803,17 +717,10 @@ class QpSolverTests(casadiTestCase):
     G = DMatrix([ 2.0, 1.0 ])
 
 
-    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
-      
     for qpsolver, qp_options, aux_options in qpsolvers:
       if 'qcqp' in str(qpsolver): continue
       if 'nlp' in str(qpsolver): continue
-      solver = QpSolver(qpsolver,{'h':H.sparsity(),'a':A.sparsity()})
-      for key, val in options.iteritems():
-        if solver.hasOption(key):
-           solver.setOption(key,val)
-      solver.setOption(qp_options)
-      solver.init()
+      solver = QpSolver("msyolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]

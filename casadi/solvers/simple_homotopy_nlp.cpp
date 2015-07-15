@@ -91,7 +91,7 @@ namespace casadi {
 
     // Create an nlpsolver instance
     std::string nlpsolver_name = getOption("nlp_solver");
-    nlpsolver_ = NlpSolver(nlpsolver_name, nlp);
+    nlpsolver_ = NlpSolver("nlpsolver", nlpsolver_name, nlp);
 
     if (hasSetOption("nlp_solver_options")) {
       nlpsolver_.setOption(getOption("nlp_solver_options"));

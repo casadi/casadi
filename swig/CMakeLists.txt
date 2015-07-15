@@ -36,6 +36,10 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../doc/doc.i)
   set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_DOXDOC")
 endif()
 
+if(WITH_DEPRECATED_FEATURES)
+  set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_DEPRECATED_FEATURES")
+endif()
+
 if(WITH_PYTHON)
    add_subdirectory(python)
 endif()

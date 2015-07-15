@@ -234,7 +234,8 @@ namespace casadi {
               const MXDict& nlp,
               const Dict& opts=Dict());
 
-    /// NLP solver factory, no initialization (to be deprecated)
+#ifdef WITH_DEPRECATED_FEATURES
+    /// [DEPRECATED] NLP solver factory, no initialization
     NlpSolver(
       const std::string& solver,
       /**< \pluginargument{NlpSolver}
@@ -250,6 +251,7 @@ namespace casadi {
        *  \endparblock
        */
       ); // NOLINT(whitespace/parens)
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Access functions of the node
     NlpSolverInternal* operator->();
@@ -272,9 +274,6 @@ namespace casadi {
 
     std::string getReportConstraints()
     { std::stringstream s; reportConstraints(s); return s.str(); }
-
-    /// Set options that make the NLP solver more suitable for solving QPs
-    void setQPOptions();
 
     /** \brief Access the NLP
     *  \copydoc scheme_NlpSolverInput

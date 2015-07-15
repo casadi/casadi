@@ -442,14 +442,14 @@ namespace casadi {
 
 #if !defined(SWIG) || !defined(SWIGMATLAB)
     ///@{
-    /** \brief Create a sparse matrix with all zeros 
-        DEPRECATED: Use MatType(nrow, ncol) instead **/
+    /** \brief [DEPRECATED] Create a sparse matrix with all zeros 
+        Use MatType(nrow, ncol) instead **/
     static MatType sparse(int nrow=1, int ncol=1) { return MatType(nrow, ncol);}
     static MatType sparse(const std::pair<int, int>& rc) { return MatType(rc);}
     ///@}
 
-    /** \brief Create a sparse matrix with nonzeros given as a (dense) vector 
-        DEPRECATED: Use MatType(Sparsity, nz) instead **/
+    /** \brief [DEPRECATED] Create a sparse matrix with nonzeros given as a (dense) vector 
+        Use MatType(Sparsity, nz) instead **/
     static MatType sparse(const Sparsity& sp, const MatType& nz) { return MatType(sp, nz); }
 #endif // !defined(SWIG) || !defined(SWIGMATLAB)
 

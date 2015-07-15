@@ -39,7 +39,7 @@ namespace casadi {
     init();
   }
 
-#ifdef WITH_LEGACY_CONSTRUCTORS
+#ifdef WITH_DEPRECATED_FEATURES
   ImplicitFunction::ImplicitFunction(const std::string& solver, const Function& f,
                                      const Function& jac,
                                      const LinearSolver& linsol) {
@@ -47,7 +47,7 @@ namespace casadi {
     setOption("jacobian_function", jac);
     setOption("linear_solver_function", linsol);
   }
-#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_DEPRECATED_FEATURES
 
   ImplicitFunctionInternal* ImplicitFunction::operator->() {
     return static_cast<ImplicitFunctionInternal*>(Function::operator->());

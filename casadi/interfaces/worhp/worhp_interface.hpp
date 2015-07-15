@@ -78,8 +78,8 @@ namespace casadi {
     // Solve the NLP
     virtual void evaluate();
 
-
-    virtual void setQPOptions();
+    /// Set default options for a given recipe
+    virtual void setDefaultOptions(const std::vector<std::string>& recipes);
 
     /// Read options from worhp parameter xml
     virtual void setOptionsFromFile(const std::string & file);

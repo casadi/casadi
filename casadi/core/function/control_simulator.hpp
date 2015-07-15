@@ -122,8 +122,8 @@ namespace casadi {
     ControlSimulator(const std::string& name, const Function& dae,
                      const Matrix<double>& grid, const Dict& opts=Dict());
 
-#ifdef WITH_LEGACY_CONSTRUCTORS
-    /** \brief Creates a piecewise simulator, no initialization (to be deprecated)
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Creates a piecewise simulator, no initialization
      * \param ffcn Continuous time dynamics, an casadi::Function with the following mapping:
      * \copydoc scheme_ControlledDAEInput
      * \copydoc scheme_DAEOutput
@@ -137,9 +137,9 @@ namespace casadi {
     ControlSimulator(const Function& dae, const Function& output_fcn,
                      const Matrix<double>& grid);
 
-    /// Output function equal to the state, no initialization (to be deprecated)
+    /// [DEPRECATED] Output function equal to the state, no initialization
     ControlSimulator(const Function& dae, const Matrix<double>& grid);
-#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Access functions of the node.
     ControlSimulatorInternal* operator->();

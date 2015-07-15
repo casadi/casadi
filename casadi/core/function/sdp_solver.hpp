@@ -180,11 +180,13 @@ namespace casadi {
     SdpSolver(const std::string& name, const std::string& solver,
               const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
-    /** \brief Constructor (to be deprecated)
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor
      *  \param solver \pluginargument{SdpSolver}
      *  \param st \structargument{SDP}
      */
     SdpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Access functions of the node
     SdpSolverInternal* operator->();
@@ -198,9 +200,6 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
-
-    /// Set options that make the SDP solver more suitable for solving SOCPs
-    void setSOCPOptions();
 
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);

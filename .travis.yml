@@ -129,6 +129,18 @@ matrix:
         - pushd test && make unittests_py examples_code_py && popd
     - compiler: gcc
       os: linux
+      env: TESTMODE=minimal
+      script:
+        - mkdir build
+        - pushd build
+        - cmake -DWITH_DEPRECATED_FEATURES=OFF -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - make
+        - sudo make install
+        - popd
+        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        - pushd test && make unittests_py examples_code_py && popd
+    - compiler: gcc
+      os: linux
       env: TESTMODE=quick
       script:
         - sudo add-apt-repository ppa:webupd8team/java -y

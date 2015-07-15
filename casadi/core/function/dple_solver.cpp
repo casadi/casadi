@@ -76,12 +76,12 @@ namespace casadi {
     init();
   }
 
-#ifdef WITH_LEGACY_CONSTRUCTORS
+#ifdef WITH_DEPRECATED_FEATURES
   DpleSolver::DpleSolver(const std::string& solver,
                          const std::map<std::string, std::vector<Sparsity> >& st) {
     assignNode(DpleInternal::instantiatePlugin(solver, st));
   }
-#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_DEPRECATED_FEATURES
 
   void DpleSolver::periodic_schur(const std::string& name,
                                   const std::vector< Matrix<double> > & A,

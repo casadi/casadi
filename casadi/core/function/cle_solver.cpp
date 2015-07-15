@@ -75,12 +75,12 @@ namespace casadi {
     init();
   }
 
-#ifdef WITH_LEGACY_CONSTRUCTORS
+#ifdef WITH_DEPRECATED_FEATURES
   CleSolver::CleSolver(const std::string& solver,
                        const std::map<std::string, Sparsity>& st) {
     assignNode(CleInternal::instantiatePlugin(solver, st));
   }
-#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_DEPRECATED_FEATURES
 
 } // namespace casadi
 

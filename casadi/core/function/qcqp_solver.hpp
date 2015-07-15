@@ -129,11 +129,13 @@ namespace casadi {
     QcqpSolver(const std::string& name, const std::string& solver,
                const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
-    /** \brief Constructor (no initialization, to be deprecated)
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor (no initialization)
      *  \param solver \pluginargument{QcqpSolver}
      *  \param st \structargument{QCQP}
      */
     QcqpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Access functions of the node
     QcqpSolverInternal* operator->();
@@ -151,8 +153,6 @@ namespace casadi {
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
 
-    /// Set options that make the QP solver more suitable for solving LPs
-    void setQPOptions();
   };
 
 } // namespace casadi

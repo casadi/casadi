@@ -71,6 +71,9 @@ namespace casadi {
               "When errors occur during evaluation of f,g,...,"
               "stop the iterations");
 
+    addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "",
+                                                       "qp", true);
+
     // Enable string notation for IO
     ischeme_ = IOScheme(SCHEME_NlpSolverInput);
     oscheme_ = IOScheme(SCHEME_NlpSolverOutput);

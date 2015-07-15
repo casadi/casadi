@@ -43,10 +43,6 @@ namespace casadi {
     return dynamic_cast<const QcqpSolverInternal*>(ptr)!=0;
   }
 
-  void QcqpSolver::setQPOptions() {
-    (*this)->setQPOptions();
-  }
-
   QcqpSolver::QcqpSolver(const std::string& name, const std::string& solver,
                          const std::map<std::string, Sparsity>& st, const Dict& opts) {
     assignNode(QcqpSolverInternal::instantiatePlugin(solver, st));
@@ -55,10 +51,12 @@ namespace casadi {
     init();
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   QcqpSolver::QcqpSolver(const std::string& solver,
                          const std::map<std::string, Sparsity>& st) {
     assignNode(QcqpSolverInternal::instantiatePlugin(solver, st));
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   bool QcqpSolver::hasPlugin(const std::string& name) {
     return QcqpSolverInternal::hasPlugin(name);

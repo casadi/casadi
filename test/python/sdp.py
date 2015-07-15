@@ -66,7 +66,7 @@ class SDPtests(casadiTestCase):
     G = sparsify(G)
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdp_options)
 
   def test_memleak2(self):
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
@@ -84,9 +84,7 @@ class SDPtests(casadiTestCase):
     G = sparsify(G)
 
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdp_options)
 
   def test_nodsdp(self):
     self.message("scalar")
@@ -95,9 +93,7 @@ class SDPtests(casadiTestCase):
     n1 = 3.1
     c = DMatrix(n1)
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':Sparsity.dense(0,1),'g':Sparsity.dense(0,0),'f':Sparsity.dense(0,0)})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':Sparsity.dense(0,1),'g':Sparsity.dense(0,0),'f':Sparsity.dense(0,0)},sdp_options)
       sdp.setInput(c,"c")
       sdp.setInput(-1,"lbx")
       sdp.setInput(1,"ubx")
@@ -130,9 +126,7 @@ class SDPtests(casadiTestCase):
     F = horzcat(Fi)
     G = DMatrix([[2,0],[0,2]])
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdp_options)
       sdp.setInput(G,"g")
       sdp.setInput(c,"c")
       sdp.setInput(F,"f")
@@ -171,9 +165,7 @@ class SDPtests(casadiTestCase):
     F = horzcat(Fi)
     G = DMatrix([[0,-2],[-2,0]])
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdp_options)
       sdp.setInput(G,"g")
       sdp.setInput(c,"c")
       sdp.setInput(F,"f")
@@ -207,9 +199,7 @@ class SDPtests(casadiTestCase):
     F = sparsify(F)
     G = -DMatrix(n2)
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdp_options)
       sdp.setInput(G,"g")
       sdp.setInput(c,"c")
       sdp.setInput(F,"f")
@@ -244,9 +234,7 @@ class SDPtests(casadiTestCase):
     G = -diagcat([n2,-n2])
     F = -horzcat(Fi)
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdp_options)
       sdp.setInput(G,"g")
       sdp.setInput(c,"c")
       sdp.setInput(F,"f")
@@ -279,9 +267,7 @@ class SDPtests(casadiTestCase):
     F = -horzcat(Fi)
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdp_options)
       sdp.setInput(G,"g")
       sdp.setInput(c,"c")
       sdp.setInput(F,"f")
@@ -314,9 +300,7 @@ class SDPtests(casadiTestCase):
     F = -horzcat(Fi)
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdp_options)
       sdp.setInput(G,"g")
       sdp.setInput(c,"c")
       sdp.setInput(F,"f")
@@ -339,9 +323,7 @@ class SDPtests(casadiTestCase):
     c = DMatrix([2,3])
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':Sparsity.dense(0,0),'f':Sparsity.dense(0,0)})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':Sparsity.dense(0,0),'f':Sparsity.dense(0,0)},sdp_options)
       sdp.setInput(c,"c")
       sdp.setInput(A,"a")
       sdp.setInput([0,0],"lbx")
@@ -375,9 +357,7 @@ class SDPtests(casadiTestCase):
     c = DMatrix([2,3])
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':Sparsity.dense(0,0),'f':Sparsity.dense(0,0)})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':Sparsity.dense(0,0),'f':Sparsity.dense(0,0)},sdp_options)
       sdp.setInput(c,"c")
       sdp.setInput(A,"a")
       sdp.setInput([0,0],"lbx")
@@ -410,9 +390,7 @@ class SDPtests(casadiTestCase):
     F = -horzcat(Fi)
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdp_options)
       sdp.setInput(G,"g")
       sdp.setInput(c,"c")
       sdp.setInput(F,"f")
@@ -451,9 +429,7 @@ class SDPtests(casadiTestCase):
     F = -horzcat(Fi)
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdp_options)
       sdp.setInput(G,"g")
       sdp.setInput(c,"c")
       sdp.setInput(F,"f")
@@ -485,9 +461,7 @@ class SDPtests(casadiTestCase):
     G = sparsify(G)
 
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdp_options)
 
       sdp.setInput(G,"g")
       sdp.setInput(c,"c")
@@ -522,8 +496,7 @@ class SDPtests(casadiTestCase):
 
       nlp = SXFunction('nlp', nlpIn(x=V),nlpOut(f=mul(c.T,x),g=veccat(g)))
 
-      sol = NlpSolver("ipopt", nlp)
-      sol.init()
+      sol = NlpSolver("mysolver","ipopt", nlp)
       sol.setInput(0,"lbg")
       sol.setInput(0,"ubg")
       tmp = sol.getInput("x0")
@@ -561,9 +534,7 @@ class SDPtests(casadiTestCase):
 
 
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdp_options)
 
       sdp.setInput(G,"g")
       sdp.setInput(c,"c")
@@ -603,9 +574,7 @@ class SDPtests(casadiTestCase):
     
     G = G[perm,perm]
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SdpSolver(sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdp.setOption(sdp_options)
-      sdp.init()
+      sdp = SdpSolver("mysolver",sdpsolver,{'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdp_options)
 
       sdp.setInput(G,"g")
       sdp.setInput(c,"c")
@@ -650,9 +619,7 @@ class SDPtests(casadiTestCase):
     F = horzcat(Fi)
     G = DMatrix([[0,-2],[-2,0]])
     for sdqpsolver, sdqp_options in sdqpsolvers:
-      sdqp = SdqpSolver(sdqpsolver,{'h':h.sparsity(),'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdqp.setOption(sdqp_options)
-      sdqp.init()
+      sdqp = SdqpSolver("mysolver",sdqpsolver,{'h':h.sparsity(),'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdqp_options)
       sdqp.setInput(G,"g")
       sdqp.setInput(c,"c")
       sdqp.setInput(h,"h")
@@ -696,9 +663,7 @@ class SDPtests(casadiTestCase):
     F = horzcat(Fi)
     G = DMatrix([[0,-2],[-2,0]])
     for sdqpsolver, sdqp_options in sdqpsolvers:
-      sdqp = SdqpSolver(sdqpsolver,{'h':h.sparsity(),'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()})
-      sdqp.setOption(sdqp_options)
-      sdqp.init()
+      sdqp = SdqpSolver("mysolver",sdqpsolver,{'h':h.sparsity(),'a':A.sparsity(),'g':G.sparsity(),'f':F.sparsity()},sdqp_options)
       sdqp.setInput(G,"g")
       sdqp.setInput(c,"c")
       sdqp.setInput(h,"h")

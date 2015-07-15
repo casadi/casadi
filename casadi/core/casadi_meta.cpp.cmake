@@ -30,7 +30,7 @@ namespace casadi {
   const std::string CasadiMeta::build_type = "${CMAKE_BUILD_TYPE}";  // NOLINT(whitespace/line_length)
   const std::string CasadiMeta::compiler_id = "${CMAKE_CXX_COMPILER_ID}";  // NOLINT(whitespace/line_length)
   const std::string CasadiMeta::compiler = "${CMAKE_CXX_COMPILER}";  // NOLINT(whitespace/line_length)
-  const std::string CasadiMeta::compiler_flags ="${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPER_CMAKE_BUILD_TYPE}}";  // NOLINT(whitespace/line_length)
+  const std::string CasadiMeta::compiler_flags ="${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPER_CMAKE_BUILD_TYPE}} ${EXTRA_CXX_FLAGS_FROM_DEFS}";  // NOLINT(whitespace/line_length)
   const std::string CasadiMeta::modules ="${CASADI_MODULES}";  // NOLINT(whitespace/line_length)
   const std::string CasadiMeta::plugins ="${CASADI_PLUGINS}";  // NOLINT(whitespace/line_length)
 } // namespace casadi

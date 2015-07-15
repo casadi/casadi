@@ -54,6 +54,9 @@ namespace casadi {
     n_ = H.size2();
     nc_ = A.isNull() ? 0 : A.size1();
 
+    addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "",
+                                                       "qp", true);
+
     // Check consistency
     casadi_assert_message(A.isNull() || A.size2()==n_,
       "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :"

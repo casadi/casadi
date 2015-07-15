@@ -135,6 +135,10 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
 
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
+
+    // Add an option to the recipe list
+    static Dict addOptionRecipe(const Dict& dict, const std::string& recipe);
+
 };
 
 /// \cond INTERNAL
@@ -265,6 +269,12 @@ virtual ~OptionsFunctionalityNode();
   **/
   void addOption(const std::string &str, const TypeID& type, const GenericType &def_val,
                  const std::string& desc, const std::string &allowed_vals, bool inherit = false);
+
+  // Set default options according to defaults_recipe
+  void setDefaultOptions();
+
+  /// Set a recipe to populate default options
+  virtual void setDefaultOptions(const std::vector<std::string>& recipes) {}
 
 protected:
 

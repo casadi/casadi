@@ -100,9 +100,11 @@ namespace casadi {
     init();
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   NlpSolver::NlpSolver(const std::string& solver, const Function& nlp) {
     assignNode(NlpSolverInternal::instantiatePlugin(solver, nlp));
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   NlpSolverInternal* NlpSolver::operator->() {
     return static_cast<NlpSolverInternal*>(Function::operator->());
@@ -118,10 +120,6 @@ namespace casadi {
 
   void NlpSolver::reportConstraints(std::ostream &stream) {
     (*this)->reportConstraints();
-  }
-
-  void NlpSolver::setQPOptions() {
-    (*this)->setQPOptions();
   }
 
   Function NlpSolver::nlp() {

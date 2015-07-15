@@ -104,14 +104,15 @@ namespace casadi {
     mapping_ = MXFunction("mapping", make_vector(g_socp, h_socp, f_sdqp, g_sdqp),
                           make_vector(horzcat(fi), g), opts);
 
+    Dict options;
+    if (hasSetOption(optionsname())) options = getOption(optionsname());
     // Create an SdpSolver instance
-    solver_ = SdpSolver(getOption(solvername()),
+    solver_ = SdpSolver("sdpsolver", getOption(solvername()),
                         make_map("g", mapping_.output("g").sparsity(),
                                  "f", mapping_.output("f").sparsity(),
                                  "a", horzcat(input(SDQP_SOLVER_A).sparsity(),
-                                              Sparsity(nc_, 1))));
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+                                              Sparsity(nc_, 1))),
+                        options);
 
     solver_.input(SDP_SOLVER_C).at(n_)=1;
 

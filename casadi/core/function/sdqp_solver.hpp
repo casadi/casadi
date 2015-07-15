@@ -106,11 +106,13 @@ namespace casadi {
     SdqpSolver(const std::string& name, const std::string& solver,
                const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
-    /** \brief Constructor (no initialization, to be deprecated)
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor (no initialization)
      *  \param solver \pluginargument{SdqpSolver}
      *  \param st \structargument{SDQP}
      */
     SdqpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
+#endif //WITH_DEPRECATED_FEATURES
 
     /// Access functions of the node
     SdqpSolverInternal* operator->();
@@ -124,9 +126,6 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
-
-    /// Set options that make the SDQP solver more suitable for solving SOCPs
-    void setSOCQPOptions();
 
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);

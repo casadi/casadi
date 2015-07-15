@@ -170,14 +170,16 @@ namespace casadi {
 
     log("SocpToSdp::init", "Created mapping function");
 
+    Dict options;
+    if (hasSetOption(optionsname())) options = getOption(optionsname());
+    options = OptionsFunctionality::addOptionRecipe(options, "socp");
+
     // Create an SdpSolver instance
-    solver_ = SdpSolver(getOption(solvername()),
+    solver_ = SdpSolver("sdpsolver", getOption(solvername()),
                         make_map("a", input(SOCP_SOLVER_A).sparsity(),
                                  "f", mapping_.output(0).sparsity(),
-                                 "g", mapping_.output(1).sparsity()));
-    solver_.setSOCPOptions();
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+                                 "g", mapping_.output(1).sparsity()),
+                        options);
 
     log("SocpToSdp::init", "Initialized SDP solver");
   }

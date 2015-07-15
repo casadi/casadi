@@ -99,13 +99,13 @@ namespace casadi {
                  const Sparsity& sp, int nrhs, const Dict& opts=Dict());
     ///@}
 
-#ifdef WITH_LEGACY_CONSTRUCTORS
-    /** \brief Create a linear solver given a sparsity pattern
-     * No initialization (to be deprecated)
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Create a linear solver given a sparsity pattern
+     * No initialization
     * \param solver \pluginargument{LinearSolver}
     */
     LinearSolver(const std::string& solver, const Sparsity& sp, int nrhs=1);
-#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_DEPRECATED_FEATURES
 
     /// \cond INTERNAL
     /// Access functions of the node

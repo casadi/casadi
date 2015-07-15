@@ -43,10 +43,6 @@ namespace casadi {
     return dynamic_cast<const StabilizedQpSolverInternal*>(ptr)!=0;
   }
 
-  void StabilizedQpSolver::setLPOptions() {
-    (*this)->setLPOptions();
-  }
-
   void StabilizedQpSolver::generateNativeCode(const std::string &filename) const {
     std::ofstream file;
     file.open(filename.c_str());
@@ -62,12 +58,12 @@ namespace casadi {
     init();
   }
 
-#ifdef WITH_LEGACY_CONSTRUCTORS
+#ifdef WITH_DEPRECATED_FEATURES
   StabilizedQpSolver::StabilizedQpSolver(const std::string& solver,
                                          const std::map<std::string, Sparsity>& st) {
     assignNode(StabilizedQpSolverInternal::instantiatePlugin(solver, st));
   }
-#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_DEPRECATED_FEATURES
 
   bool StabilizedQpSolver::hasPlugin(const std::string& name) {
     return StabilizedQpSolverInternal::hasPlugin(name);

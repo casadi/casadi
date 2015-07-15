@@ -23,9 +23,12 @@
 #
 from casadi import *
 
+# Syntax will change in next release, because we rely on deprecated features
+import sys
+if "WITH_DEPRECATED_FEATURES" not in CasadiMeta.getCompilerFlags(): sys.exit(0)
+
 #! A simple case of CustomFunction
 #!================================
-
 
 #! We start with a python function with evaluate-like arguments
 #! The function calculates the factorial of its input

@@ -115,6 +115,8 @@ namespace casadi {
   }
 
   void FunctionInternal::init() {
+    setDefaultOptions();
+
     verbose_ = getOption("verbose");
     regularity_check_ = getOption("regularity_check");
     name_ = getOption("name").toString();

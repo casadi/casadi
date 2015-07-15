@@ -51,9 +51,7 @@ class QcqpSolverTests(casadiTestCase):
     UBX = DMatrix([ inf, -inf ])
     
     for qcqpsolver, qcqp_options, aux_options, re_init in qcqpsolvers:
-      solver = QcqpSolver(qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()})
-      solver.setOption(qcqp_options)
-      solver.init()
+      solver = QcqpSolver("mysolver",qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()},qcqp_options)
 
       solver.setInput(H,"h")
       solver.setInput(G,"g")
@@ -84,9 +82,7 @@ class QcqpSolverTests(casadiTestCase):
     for qcqpsolver, qcqp_options, aux_options, re_init in qcqpsolvers:
       self.message("qcqpsolver: " + str(qcqpsolver))
 
-      solver = QcqpSolver(qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()})
-      solver.setOption(qcqp_options)
-      solver.init()
+      solver = QcqpSolver("mysolver",qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()},qcqp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -129,9 +125,7 @@ class QcqpSolverTests(casadiTestCase):
     for qcqpsolver, qcqp_options, aux_options, re_init in qcqpsolvers:
       self.message("qcqpsolver: " + str(qcqpsolver))
 
-      solver = QcqpSolver(qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()})
-      solver.setOption(qcqp_options)
-      solver.init()
+      solver = QcqpSolver("mysolver",qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()},qcqp_options)
 
       try:
         less_digits=aux_options["less_digits"]

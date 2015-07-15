@@ -44,10 +44,6 @@ namespace casadi {
     return dynamic_cast<const QpSolverInternal*>(ptr)!=0;
   }
 
-  void QpSolver::setLPOptions() {
-    (*this)->setLPOptions();
-  }
-
   void QpSolver::generateNativeCode(const std::string &filename) const {
     std::ofstream file;
     file.open(filename.c_str());
@@ -58,11 +54,11 @@ namespace casadi {
     (*this)->generateNativeCode(file);
   }
 
-  //#ifdef WITH_LEGACY_CONSTRUCTORS
+#ifdef WITH_DEPRECATED_FEATURES
   QpSolver::QpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st) {
     assignNode(QpSolverInternal::instantiatePlugin(solver, st));
   }
-  //#endif // WITH_LEGACY_CONSTRUCTORS
+#endif // WITH_DEPRECATED_FEATURES
 
   QpSolver::QpSolver(const std::string& name, const std::string& solver,
                      const std::map<std::string, Sparsity>& st, const Dict& opts) {

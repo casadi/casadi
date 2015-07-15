@@ -120,8 +120,8 @@ namespace casadi {
     ///@}
 
 #if !defined(SWIG) || !defined(SWIGMATLAB)
-    /** \brief Create a sparse (empty) rectangular sparsity pattern
-        DEPRECATED: Use Sparse(nrow, ncol) instead **/
+    /** \brief [DEPRECATED] Create a sparse (empty) rectangular sparsity pattern
+        Use Sparse(nrow, ncol) instead **/
     ///@{
     static Sparsity sparse(int nrow, int ncol=1);
     static Sparsity sparse(const std::pair<int, int> &rc) { return sparse(rc.first, rc.second);}
@@ -546,7 +546,7 @@ namespace casadi {
     /// Append another sparsity patten horizontally
     void appendColumns(const Sparsity& sp);
 
-    /// DEPRECATED: Reserve space
+    /// [DEPRECATED]: Reserve space
     void reserve(int nnz, int ncol) {
       casadi_warning("Sparsity::reserve: Deprecated function. Ignored.");
     }
