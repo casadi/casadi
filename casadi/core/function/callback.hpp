@@ -106,6 +106,7 @@ class CASADI_EXPORT Callback2 {
     /** \brief  Destructor */
     virtual ~Callback2();
 
+
 };
 
 #ifndef SWIG
@@ -130,6 +131,8 @@ class CASADI_EXPORT CallbackFunctionInternal : public FunctionInternal {
     virtual void init();
 
     Callback2& callback_;
+
+    double eps_;
 
 };
 #endif

@@ -48,7 +48,7 @@ Callback2::~Callback2() {
 
 Function finiteDiffGenerator(Function& fcn, int ndir, void* user_data) {
   // The step size to take
-  DMatrix eps = 1e-7;
+  DMatrix eps = * reinterpret_cast<double *>(user_data);
 
   // Obtain the symbols for nominal inputs/outputs
   std::vector<MX> nominal_in  = fcn.symbolicInput();
@@ -81,10 +81,15 @@ Function finiteDiffGenerator(Function& fcn, int ndir, void* user_data) {
 
 Function Callback2::create() {
   Function ret;
-  ret.assignNode(new CallbackFunctionInternal(*this));
+  CallbackFunctionInternal* node = new CallbackFunctionInternal(*this);
+  ret.assignNode(node);
   ret.setOption("name", name());
   ret.setOption("custom_forward", DerivativeGenerator(finiteDiffGenerator) );
+
   ret.setOption(options());
+  node->eps_ = ret.getOption("fin_diff_eps");
+
+  ret.setOption("user_data", reinterpret_cast<void *>(&node->eps_));
   ret.init();
   return ret;
 }
@@ -92,6 +97,8 @@ Function Callback2::create() {
 
 CallbackFunctionInternal::CallbackFunctionInternal(
     Callback2 &callback) : callback_(callback) {
+
+  addOption("fin_diff_eps", OT_REAL, 1e-7, "eps used for finite differences");
 
   ibuf_.resize(callback_.nIn());
   obuf_.resize(callback_.nOut());
