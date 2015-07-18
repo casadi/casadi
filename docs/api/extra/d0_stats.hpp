@@ -99,6 +99,7 @@
 <tr><td>t_eval_h</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>t_eval_jac_g</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>t_mainloop</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_mainloop_wall</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_integer_md</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_numeric_md</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_string_md</td><td>casadi::IpoptInterface</td></tr>
@@ -131,6 +132,7 @@
 <tr><td>t_eval_h</td></tr>
 <tr><td>t_eval_jac_g</td></tr>
 <tr><td>t_mainloop</td></tr>
+<tr><td>t_mainloop_wall</td></tr>
 <tr><td>var_integer_md</td></tr>
 <tr><td>var_numeric_md</td></tr>
 <tr><td>var_string_md</td></tr>

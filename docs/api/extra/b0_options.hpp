@@ -11,9 +11,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -29,6 +31,31 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::CallbackFunctionInternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>fin_diff_eps</td><td>OT_REAL</td><td>1e-7</td><td>eps used for finite differences</td><td>casadi::CallbackFunctionInternal</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/// \cond INTERNAL
 /** \class casadi::CleInternal
 \n
 \par
@@ -43,9 +70,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::CleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::CleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -67,9 +96,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::CleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::CleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -94,11 +125,13 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_solver</td><td>OT_STRING</td><td>GenericType()</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>implicit_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>3</td><td>Order of the interpolating polynomials</td><td>casadi::CollocationIntegrator</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
@@ -137,9 +170,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -170,6 +205,7 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>integrator</td><td>OT_STRING</td><td>GenericType()</td><td>An integrator creator function</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>integrator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>casadi::ControlSimulatorInternal</td></tr>
@@ -177,6 +213,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>nf</td><td>OT_INTEGER</td><td>1</td><td>Number of minor grained integration steps per major interval. nf&gt;0 must hold. This option is not used when 'minor_grid' is provided.</td><td>casadi::ControlSimulatorInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>simulator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the simulator</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -198,6 +235,7 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>integrator</td><td>OT_STRING</td><td>GenericType()</td><td>An integrator creator function</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>integrator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>casadi::ControlSimulatorInternal</td></tr>
@@ -205,6 +243,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>nf</td><td>OT_INTEGER</td><td>1</td><td>Number of minor grained integration steps per major interval. nf&gt;0 must hold. This option is not used when 'minor_grid' is provided.</td><td>casadi::ControlSimulatorInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>simulator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the simulator</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -229,9 +268,11 @@
 <tr><td>dump_to_file</td><td>OT_BOOLEAN</td><td>false</td><td>Dumps QP to file in CPLEX format.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>qp_method</td><td>OT_STRING</td><td>"automatic"</td><td>Determines which CPLEX algorithm to use. (automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover)</td><td>casadi::CplexInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>simplex_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of simplex iterations.</td><td>casadi::CplexInterface</td></tr>
@@ -272,9 +313,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -302,9 +345,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -323,9 +368,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -358,6 +405,7 @@
 <tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Specifies which components will be used when estimating the sensitivity equations</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>casadi::SundialsInterface</td></tr>
@@ -378,6 +426,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(res|resB|resQB|reset|psetupB|djacB)</td><td>casadi::FunctionInternal<br />casadi::CvodesInterface</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>"newton"</td><td>(newton|functional)</td><td>casadi::CvodesInterface</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>pretypeB</td><td>OT_STRING</td><td>GenericType()</td><td>(none|left|right|both)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
@@ -463,9 +512,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -487,9 +538,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -511,9 +564,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -544,9 +599,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -578,9 +635,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -603,9 +662,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -628,9 +689,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -671,10 +734,12 @@
 <tr><td>gapTol</td><td>OT_REAL</td><td>1e-8</td><td>Convergence criterion based on distance between primal and dual objective</td><td>casadi::DsdpInterface</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>infinity</td><td>OT_REAL</td><td>1e30</td><td>Treat numbers higher than this as infinity</td><td>casadi::DsdpInterface</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>maxIter</td><td>OT_INTEGER</td><td>500</td><td>Maximum number of iterations</td><td>casadi::DsdpInterface</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>primalTol</td><td>OT_REAL</td><td>1e-4</td><td>Tolerance for primal infeasibility (translates to dual infeasibility in dsdp terms)</td><td>casadi::DsdpInterface</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SdpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
@@ -718,9 +783,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -739,9 +806,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -763,10 +832,12 @@
 <tr><td>freq_doubling</td><td>OT_BOOLEAN</td><td>false</td><td>Use frequency doubling</td><td>casadi::FixedSmithDleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iter</td><td>OT_INTEGER</td><td>100</td><td>Number of Smith iterations</td><td>casadi::FixedSmithDleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -799,10 +870,12 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iter</td><td>OT_INTEGER</td><td>100</td><td>Number of Smith iterations</td><td>casadi::FixedSmithLrDleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -834,10 +907,12 @@
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
@@ -860,9 +935,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -881,14 +958,40 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
+/** \class casadi::GenericExternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
 /// \cond INTERNAL
 /** \class casadi::HomotopyNLPInternal
 \n
@@ -903,9 +1006,11 @@
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::HomotopyNLPInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -925,9 +1030,11 @@
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::HomotopyNLPInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -967,6 +1074,7 @@
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>init_xdot</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Initial values for the state derivatives</td><td>casadi::IdasInterface</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>casadi::SundialsInterface</td></tr>
@@ -986,6 +1094,7 @@
 <tr><td>max_step_size</td><td>OT_REAL</td><td>0</td><td>Maximim step size</td><td>casadi::IdasInterface</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(correctInitialConditions|res|resS|resB|rhsQB|bjacB|jtimesB|psetupB|psolveB|psetup)</td><td>casadi::FunctionInternal<br />casadi::IdasInterface</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>pretypeB</td><td>OT_STRING</td><td>GenericType()</td><td>(none|left|right|both)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
@@ -1081,10 +1190,12 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_solver</td><td>OT_STRING</td><td>GenericType()</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>implicit_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
@@ -1110,6 +1221,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INTEGER</td><td>0</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
@@ -1117,6 +1229,7 @@
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -1138,6 +1251,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INTEGER</td><td>0</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
@@ -1145,6 +1259,7 @@
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -1165,9 +1280,11 @@
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
@@ -1191,9 +1308,11 @@
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
@@ -1299,6 +1418,7 @@
 <tr><td>honor_original_bounds</td><td>OT_STRING</td><td>yes</td><td>Indicates whether final points should be projected into original bounds. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>inf_pr_output</td><td>OT_STRING</td><td>original</td><td>Determines what value is printed in the "inf_pr" output column. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
@@ -1403,6 +1523,7 @@
 <tr><td>obj_scaling_factor</td><td>OT_REAL</td><td>1.0</td><td>Scaling factor for the objective function. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>option_file_name</td><td>OT_STRING</td><td></td><td>File name of options file (to overwrite default). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>output_file</td><td>OT_STRING</td><td></td><td>File name of desired output file (leave unset for no file output). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pardiso_iter_coarse_size</td><td>OT_INTEGER</td><td>5000</td><td>Maximum Size of Coarse Grid Matrix (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_iter_dropping_factor</td><td>OT_REAL</td><td>0.5</td><td>dropping value for incomplete factor (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_iter_dropping_schur</td><td>OT_REAL</td><td>0.1</td><td>dropping value for sparsify schur complement factor (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1802,6 +1923,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INTEGER</td><td>0</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>gmres|bcgstab|tfqmr</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
@@ -1814,6 +1936,7 @@
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>0</td><td></td><td>casadi::KinsolInterface</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_djac)</td><td>casadi::FunctionInternal<br />casadi::KinsolInterface</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>strategy</td><td>OT_STRING</td><td>"none"</td><td>Globalization strategy (none|linesearch)</td><td>casadi::KinsolInterface</td></tr>
@@ -1894,6 +2017,7 @@
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
@@ -1902,6 +2026,7 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>casadi::FunctionInternal<br />casadi::KnitroInterface</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -1960,9 +2085,11 @@
 <tr><td>equilibration</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>casadi::LapackLuDense</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -1992,9 +2119,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -2026,9 +2155,11 @@
 <tr><td>form</td><td>OT_STRING</td><td>"A"</td><td>The form of the lifting (A:0|B:1)</td><td>casadi::LiftingIndefDpleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -2062,9 +2193,11 @@
 <tr><td>form</td><td>OT_STRING</td><td>"A"</td><td>The form of the lifting (A:0|B:1)</td><td>casadi::LiftingLrDpleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -2094,9 +2227,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -2115,9 +2250,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -2136,9 +2273,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -2157,9 +2296,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -2178,9 +2319,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -2210,9 +2353,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -2234,9 +2379,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -2258,9 +2405,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -2292,9 +2441,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::LrDpleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -2317,9 +2468,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::LrDpleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -2342,9 +2495,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::LrDpleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -2377,9 +2532,11 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -2410,9 +2567,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -2431,9 +2590,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -2756,10 +2917,12 @@
 <tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td><td>casadi::MosekSocpInterface</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>ni</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Provide the size of each SOC constraint. Must sum up to N.</td><td>casadi::SocpSolverInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SocpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -3097,6 +3260,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INTEGER</td><td>0</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
@@ -3105,6 +3269,7 @@
 <tr><td>max_iter</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of Newton iterations to perform before returning.</td><td>casadi::Newton</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(step|stepsize|J|F|normF)</td><td>casadi::FunctionInternal<br />casadi::Newton</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOLEAN</td><td>false</td><td>Print information about each iteration</td><td>casadi::Newton</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -3143,6 +3308,7 @@
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
@@ -3151,6 +3317,7 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3176,6 +3343,7 @@
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
@@ -3184,6 +3352,7 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3204,9 +3373,11 @@
 <tr><td>dense</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates that dense matrices can be assumed</td><td>casadi::NullspaceInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3226,9 +3397,11 @@
 <tr><td>dense</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates that dense matrices can be assumed</td><td>casadi::NullspaceInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3255,11 +3428,13 @@
 <tr><td>hotstart</td><td>OT_BOOLEAN</td><td>true</td><td>Initialize the trajectory at the previous solution</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>implicit_solver</td><td>OT_STRING</td><td>GenericType()</td><td>An implicit function solver</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>implicit_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the implicit solver</td><td>casadi::OldCollocationIntegrator</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>3</td><td>Order of the interpolating polynomials</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::OldCollocationIntegrator</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>startup_integrator</td><td>OT_STRING</td><td>GenericType()</td><td>An ODE/DAE integrator that can be used to generate a startup trajectory</td><td>casadi::OldCollocationIntegrator</td></tr>
@@ -3303,10 +3478,12 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>mutol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setMuTol to OOQP</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td>0</td><td>Print level. OOQP listens to print_level 0, 10 and 100</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -3361,11 +3538,13 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::PsdIndefDpleInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::PsdIndefDpleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>psd_num_zero</td><td>OT_REAL</td><td>1e-12</td><td>Numerical zero used in Periodic Schur decomposition with slicot.This option is needed when your systems has Floquet multiplierszero or close to zero</td><td>casadi::PsdIndefDpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
@@ -3398,9 +3577,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3419,9 +3600,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3440,9 +3623,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3470,9 +3655,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3491,9 +3678,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3515,6 +3704,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>implicit_input</td><td>OT_INTEGER</td><td>0</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
@@ -3522,6 +3712,7 @@
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3549,9 +3740,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3579,9 +3772,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3633,6 +3828,7 @@
 <tr><td>initialFarBounds</td><td>OT_REAL</td><td>1000000.0</td><td>Initial size for far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialRamping</td><td>OT_REAL</td><td>0.5</td><td>Start value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialStatusBounds</td><td>OT_STRING</td><td>lower</td><td>Initial status of bounds at first iteration.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>maxDualJump</td><td>OT_REAL</td><td>100000000.0</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxPrimalJump</td><td>OT_REAL</td><td>100000000.0</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td><td>casadi::QpoasesInterface</td></tr>
@@ -3641,6 +3837,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>numRefinementSteps</td><td>OT_INTEGER</td><td>1</td><td>Maximum number of iterative refinement steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRegularisationSteps</td><td>OT_INTEGER</td><td>0</td><td>Maximum number of successive regularisation steps.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>medium</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>terminationTolerance</td><td>OT_REAL</td><td>2.221e-09</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
@@ -3703,10 +3900,12 @@
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
@@ -3738,11 +3937,13 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>just_in_time_opencl</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation using OpenCL (experimental)</td><td>casadi::SXFunctionInternal</td></tr>
 <tr><td>just_in_time_sparsity</td><td>OT_BOOLEAN</td><td>false</td><td>Propagate sparsity patterns using just-in-time compilation to a CPU or GPU using OpenCL</td><td>casadi::SXFunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3761,11 +3962,13 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>just_in_time_opencl</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation using OpenCL (experimental)</td><td>casadi::SXFunctionInternal</td></tr>
 <tr><td>just_in_time_sparsity</td><td>OT_BOOLEAN</td><td>false</td><td>Propagate sparsity patterns using just-in-time compilation to a CPU or GPU using OpenCL</td><td>casadi::SXFunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3795,6 +3998,7 @@
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>"exact"</td><td>gauss-newton|exact</td><td>casadi::Scpgen</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
@@ -3809,6 +4013,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx)</td><td>casadi::FunctionInternal<br />casadi::Scpgen</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>name_x</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Names of the variables.</td><td>casadi::Scpgen</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td><td>casadi::Scpgen</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td><td>casadi::Scpgen</td></tr>
 <tr><td>print_x</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Which variables to print.</td><td>casadi::Scpgen</td></tr>
@@ -3872,9 +4077,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SdpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -3896,9 +4103,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SdpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -3918,9 +4127,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdqpSolver used to solve the SDPs.</td><td>casadi::SdqpSolverInternal</td></tr>
 <tr><td>sdp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpSolverInternal</td></tr>
@@ -3941,9 +4152,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdqpSolver used to solve the SDPs.</td><td>casadi::SdqpSolverInternal</td></tr>
 <tr><td>sdp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpSolverInternal</td></tr>
@@ -3964,9 +4177,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdqpSolver used to solve the SDPs.</td><td>casadi::SdqpSolverInternal</td></tr>
 <tr><td>sdp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpSolverInternal</td></tr>
@@ -3997,12 +4212,14 @@
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::HomotopyNLPInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>nlp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The NLP solver to be used by the Homotopy solver</td><td>casadi::SimpleHomotopyNlp</td></tr>
 <tr><td>nlp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the Homotopy solver</td><td>casadi::SimpleHomotopyNlp</td></tr>
 <tr><td>num_steps</td><td>OT_INTEGER</td><td>10</td><td>Take this many steps to go from tau=0 to tau=1.</td><td>casadi::SimpleHomotopyNlp</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -4035,11 +4252,13 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::CleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::SimpleIndefCleInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::SimpleIndefCleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::CleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -4073,11 +4292,13 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::SimpleIndefDleInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::SimpleIndefDleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -4112,11 +4333,13 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::SimpleIndefDpleInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::SimpleIndefDpleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -4135,6 +4358,30 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::SimplifiedExternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/// \cond INTERNAL
 /** \class casadi::SimulatorInternal
 \n
 \par
@@ -4147,9 +4394,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(initial|step)</td><td>casadi::FunctionInternal<br />casadi::SimulatorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -4168,9 +4417,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(initial|step)</td><td>casadi::FunctionInternal<br />casadi::SimulatorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -4254,6 +4505,7 @@
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
@@ -4262,6 +4514,7 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_nlp|setup_nlp)</td><td>casadi::FunctionInternal<br />casadi::SnoptInterface</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print file</td><td>OT_STRING</td><td>None</td><td>n/a</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>print information about execution time</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
@@ -4359,10 +4612,12 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>ni</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Provide the size of each SOC constraint. Must sum up to N.</td><td>casadi::SocpSolverInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SocpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -4382,10 +4637,12 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>ni</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Provide the size of each SOC constraint. Must sum up to N.</td><td>casadi::SocpSolverInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SocpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -4405,10 +4662,12 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>ni</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Provide the size of each SOC constraint. Must sum up to N.</td><td>casadi::SocpSolverInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SocpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -4437,9 +4696,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -4476,6 +4737,7 @@
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>"exact"</td><td>limited-memory|exact</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
@@ -4489,6 +4751,7 @@
 <tr><td>min_step_size</td><td>OT_REAL</td><td>1e-10</td><td>The size (inf-norm) of the step size should not become smaller than this.</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx|bfgs)</td><td>casadi::FunctionInternal<br />casadi::Sqpmethod</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QP solver to be used by the SQP method</td><td>casadi::Sqpmethod</td></tr>
@@ -4539,9 +4802,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -4560,9 +4825,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -4581,9 +4848,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QP solver used to solve the stabilized QPs.</td><td>casadi::StabilizedQpToQp</td></tr>
 <tr><td>qp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the QP solver instance</td><td>casadi::StabilizedQpToQp</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
@@ -4615,9 +4884,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -4662,6 +4933,7 @@
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>"exact"</td><td>limited-memory|exact</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
@@ -4678,6 +4950,7 @@
 <tr><td>muR0</td><td>OT_REAL</td><td>1e-4</td><td>Initial choice of regularization parameter</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>nu</td><td>OT_REAL</td><td>1</td><td>Parameter for primal-dual augmented Lagrangian.</td><td>casadi::StabilizedSqp</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>phiWeight</td><td>OT_REAL</td><td>1e-5</td><td>Weight used in pseudo-filter.</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
@@ -4755,6 +5028,7 @@
 <tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Specifies which components will be used when estimating the sensitivity equations</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>casadi::SundialsInterface</td></tr>
@@ -4773,6 +5047,7 @@
 <tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>pretypeB</td><td>OT_STRING</td><td>GenericType()</td><td>(none|left|right|both)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
@@ -4795,6 +5070,52 @@
 */
 /// \endcond
 /// \cond INTERNAL
+/** \class casadi::SwitchInternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \class casadi::Switch
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::SymbolicQr
 \n
 \par
@@ -4809,9 +5130,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -5018,6 +5341,7 @@
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>internalParChanged</td><td>OT_INTEGER</td><td>0</td><td>Counter for changed parameters. Internal use only.</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
@@ -5027,6 +5351,7 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />Monitor functions (eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>casadi::FunctionInternal<br />casadi::WorhpInterface</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>Print information about execution time</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>qp_ipBarrier</td><td>OT_REAL</td><td>7.8</td><td>IP barrier parameter.</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>qp_ipComTol</td><td>OT_REAL</td><td>2e-07</td><td>IP complementarity tolerance.</td><td>casadi::WorhpInterface</td></tr>
@@ -5268,9 +5593,11 @@
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>

@@ -42,6 +42,18 @@
 <tr><td>LINSOL_B</td><td>B</td><td>The right-hand-side matrix b: dense, (n x m) .</td></tr>
 </table>
 */
+/** \defgroup scheme_SOCPOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::SOCPOutput  (SOCP_SOLVER_NUM_OUT = 6) [socpOut]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>SOCP_SOLVER_X</td><td>x</td><td>The primal solution (n x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_COST</td><td>cost</td><td>The primal optimal cost (1 x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_DUAL_COST</td><td>dual_cost</td><td>The dual optimal cost (1 x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_LAM_CONE</td><td>lam_cone</td><td>The dual solution correspoding to cone (2-norm) constraints (m x 1) .</td></tr>
+</table>
+*/
 /** \defgroup scheme_QpSolverInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::QpSolverInput  (QP_SOLVER_NUM_IN = 9) [qpIn]</caption>
@@ -55,13 +67,6 @@
 <tr><td>QP_SOLVER_UBX</td><td>ubx</td><td>dense, (n x 1) </td></tr>
 <tr><td>QP_SOLVER_X0</td><td>x0</td><td>dense, (n x 1) </td></tr>
 <tr><td>QP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
-</table>
-*/
-/** \defgroup scheme_LPStruct
-<a name='schemes'></a><table>
-<caption>Struct scheme: casadi::LPStruct  ( = 1) [lpStruct]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>LP_STRUCT_A</td><td>a</td><td>The matrix A: sparse .</td></tr>
 </table>
 */
 /** \defgroup scheme_SOCPStruct
@@ -187,13 +192,13 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::InputOutputScheme  ( = 54) []</caption>
+<caption>Input scheme: casadi::InputOutputScheme  ( = 44) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::InputOutputScheme  ( = 54) []</caption>
+<caption>Output scheme: casadi::InputOutputScheme  ( = 44) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
@@ -216,18 +221,18 @@
 */
 /** \defgroup scheme_DpleVecStruct
 <a name='schemes'></a><table>
-<caption>Struct scheme: casadi::DpleVecStruct  ( = 2) [dpleStruct]</caption>
+<caption>Struct scheme: casadi::DpleVecStruct  ( = 2) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>Dple_STRUCT_A</td><td>a</td><td>Sparsities for A_i, block diagonal form .</td></tr>
-<tr><td>Dple_STRUCT_V</td><td>v</td><td>Sparsities for V_i, block diagonal form .</td></tr>
+<tr><td>Dple_STRUCT_A</td><td></td><td>Sparsities for A_i, block diagonal form.</td></tr>
+<tr><td>Dple_STRUCT_V</td><td></td><td>Sparsities for V_i, block diagonal form.</td></tr>
 </table>
 */
 /** \defgroup scheme_QPStruct
 <a name='schemes'></a><table>
-<caption>Struct scheme: casadi::QPStruct  ( = 2) [qpStruct]</caption>
+<caption>Struct scheme: casadi::QPStruct  ( = 2) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QP_STRUCT_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
-<tr><td>QP_STRUCT_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
+<tr><td>QP_STRUCT_H</td><td></td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
+<tr><td>QP_STRUCT_A</td><td></td><td>The matrix A: sparse, (nc x n) - product with x must be dense.</td></tr>
 </table>
 */
 /** \defgroup scheme_SDQPOutput
@@ -241,18 +246,6 @@
 <tr><td>SDQP_SOLVER_DUAL_COST</td><td>dual_cost</td><td>The dual optimal cost (1 x 1) .</td></tr>
 <tr><td>SDQP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
 <tr><td>SDQP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
-</table>
-*/
-/** \defgroup scheme_SOCPOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::SOCPOutput  (SOCP_SOLVER_NUM_OUT = 6) [socpOut]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>SOCP_SOLVER_X</td><td>x</td><td>The primal solution (n x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_COST</td><td>cost</td><td>The primal optimal cost (1 x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_DUAL_COST</td><td>dual_cost</td><td>The dual optimal cost (1 x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_LAM_CONE</td><td>lam_cone</td><td>The dual solution correspoding to cone (2-norm) constraints (m x 1) .</td></tr>
 </table>
 */
 /** \defgroup scheme_SDQPInput
@@ -287,10 +280,10 @@
 */
 /** \defgroup scheme_DleStruct
 <a name='schemes'></a><table>
-<caption>Struct scheme: casadi::DleStruct  ( = 2) [dleStruct]</caption>
+<caption>Struct scheme: casadi::DleStruct  ( = 2) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>Dle_STRUCT_A</td><td>a</td><td>The matrix A .</td></tr>
-<tr><td>Dle_STRUCT_V</td><td>v</td><td>The matrix V .</td></tr>
+<tr><td>Dle_STRUCT_A</td><td></td><td>The matrix A.</td></tr>
+<tr><td>Dle_STRUCT_V</td><td></td><td>The matrix V.</td></tr>
 </table>
 */
 /** \defgroup scheme_DAEInput
@@ -335,12 +328,12 @@
 */
 /** \defgroup scheme_SDQPStruct
 <a name='schemes'></a><table>
-<caption>Struct scheme: casadi::SDQPStruct  ( = 4) [sdqpStruct]</caption>
+<caption>Struct scheme: casadi::SDQPStruct  ( = 4) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>SDQP_STRUCT_H</td><td>h</td><td>The matrix H: sparse ( n x n) .</td></tr>
-<tr><td>SDQP_STRUCT_F</td><td>f</td><td>The horizontal stack of all matrices F_i: ( m x nm) .</td></tr>
-<tr><td>SDQP_STRUCT_G</td><td>g</td><td>The matrix G: ( m x m) .</td></tr>
-<tr><td>SDQP_STRUCT_A</td><td>a</td><td>The matrix A: ( nc x n) .</td></tr>
+<tr><td>SDQP_STRUCT_H</td><td></td><td>The matrix H: sparse ( n x n)</td></tr>
+<tr><td>SDQP_STRUCT_F</td><td></td><td>The horizontal stack of all matrices F_i: ( m x nm)</td></tr>
+<tr><td>SDQP_STRUCT_G</td><td></td><td>The matrix G: ( m x m)</td></tr>
+<tr><td>SDQP_STRUCT_A</td><td></td><td>The matrix A: ( nc x n)</td></tr>
 </table>
 */
 /** \defgroup scheme_CLEInput
@@ -390,11 +383,11 @@
 */
 /** \defgroup scheme_QCQPStruct
 <a name='schemes'></a><table>
-<caption>Struct scheme: casadi::QCQPStruct  ( = 3) [qcqpStruct]</caption>
+<caption>Struct scheme: casadi::QCQPStruct  ( = 3) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QCQP_STRUCT_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
-<tr><td>QCQP_STRUCT_P</td><td>p</td><td>The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
-<tr><td>QCQP_STRUCT_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
+<tr><td>QCQP_STRUCT_H</td><td></td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
+<tr><td>QCQP_STRUCT_P</td><td></td><td>The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
+<tr><td>QCQP_STRUCT_A</td><td></td><td>The matrix A: sparse, (nc x n) - product with x must be dense.</td></tr>
 </table>
 */
 /** \defgroup scheme_LinsolOutput
@@ -424,11 +417,11 @@
 */
 /** \defgroup scheme_CleStruct
 <a name='schemes'></a><table>
-<caption>Struct scheme: casadi::CleStruct  ( = 3) [cleStruct]</caption>
+<caption>Struct scheme: casadi::CleStruct  ( = 3) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>Cle_STRUCT_A</td><td>a</td><td>The matrix A .</td></tr>
-<tr><td>Cle_STRUCT_V</td><td>v</td><td>The matrix V .</td></tr>
-<tr><td>Cle_STRUCT_C</td><td>c</td><td>The matrix C (defaults to unity) .</td></tr>
+<tr><td>Cle_STRUCT_A</td><td></td><td>The matrix A.</td></tr>
+<tr><td>Cle_STRUCT_V</td><td></td><td>The matrix V.</td></tr>
+<tr><td>Cle_STRUCT_C</td><td></td><td>The matrix C (defaults to unity)</td></tr>
 </table>
 */
 /** \defgroup scheme_NlpSolverInput
@@ -482,21 +475,21 @@
 */
 /** \defgroup scheme_SDPStruct
 <a name='schemes'></a><table>
-<caption>Struct scheme: casadi::SDPStruct  ( = 3) [sdpStruct]</caption>
+<caption>Struct scheme: casadi::SDPStruct  ( = 3) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>SDP_STRUCT_F</td><td>f</td><td>The horizontal stack of all matrices F_i: ( m x nm) .</td></tr>
-<tr><td>SDP_STRUCT_G</td><td>g</td><td>The matrix G: ( m x m) .</td></tr>
-<tr><td>SDP_STRUCT_A</td><td>a</td><td>The matrix A: ( nc x n) .</td></tr>
+<tr><td>SDP_STRUCT_F</td><td></td><td>The horizontal stack of all matrices F_i: ( m x nm)</td></tr>
+<tr><td>SDP_STRUCT_G</td><td></td><td>The matrix G: ( m x m)</td></tr>
+<tr><td>SDP_STRUCT_A</td><td></td><td>The matrix A: ( nc x n)</td></tr>
 </table>
 */
 /** \defgroup scheme_LrDpleVecStruct
 <a name='schemes'></a><table>
-<caption>Struct scheme: casadi::LrDpleVecStruct  ( = 4) [lrdpleStruct]</caption>
+<caption>Struct scheme: casadi::LrDpleVecStruct  ( = 4) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>LR_Dple_STRUCT_A</td><td>a</td><td>Sparsities for A_i, block diagonal form .</td></tr>
-<tr><td>LR_Dple_STRUCT_V</td><td>v</td><td>Sparsities for V_i, block diagonal form .</td></tr>
-<tr><td>LR_Dple_STRUCT_C</td><td>c</td><td>Sparsities for C_i (defaults to unity), block diagonal form .</td></tr>
-<tr><td>LR_Dple_STRUCT_H</td><td>h</td><td>Sparsities for H_i (defaults to unity), block diagonal form .</td></tr>
+<tr><td>LR_Dple_STRUCT_A</td><td></td><td>Sparsities for A_i, block diagonal form.</td></tr>
+<tr><td>LR_Dple_STRUCT_V</td><td></td><td>Sparsities for V_i, block diagonal form.</td></tr>
+<tr><td>LR_Dple_STRUCT_C</td><td></td><td>Sparsities for C_i (defaults to unity), block diagonal form.</td></tr>
+<tr><td>LR_Dple_STRUCT_H</td><td></td><td>Sparsities for H_i (defaults to unity), block diagonal form.</td></tr>
 </table>
 */
 /** \defgroup scheme_JacGInput
@@ -528,12 +521,12 @@
 */
 /** \defgroup scheme_LrDleStruct
 <a name='schemes'></a><table>
-<caption>Struct scheme: casadi::LrDleStruct  ( = 4) [lrdleStruct]</caption>
+<caption>Struct scheme: casadi::LrDleStruct  ( = 4) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>LR_DLE_STRUCT_A</td><td>a</td><td>The matrix A .</td></tr>
-<tr><td>LR_DLE_STRUCT_V</td><td>v</td><td>The matrix V .</td></tr>
-<tr><td>LR_DLE_STRUCT_C</td><td>c</td><td>The matrix C (defaults to unity) .</td></tr>
-<tr><td>LR_DLE_STRUCT_H</td><td>h</td><td>H matrix: horizontal stack of all Hi .</td></tr>
+<tr><td>LR_DLE_STRUCT_A</td><td></td><td>The matrix A.</td></tr>
+<tr><td>LR_DLE_STRUCT_V</td><td></td><td>The matrix V.</td></tr>
+<tr><td>LR_DLE_STRUCT_C</td><td></td><td>The matrix C (defaults to unity)</td></tr>
+<tr><td>LR_DLE_STRUCT_H</td><td></td><td>H matrix: horizontal stack of all Hi.</td></tr>
 </table>
 */
 /** \defgroup scheme_DPLEOutput
