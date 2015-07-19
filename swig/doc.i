@@ -811,6 +811,41 @@ Problem structure.>Struct scheme: casadi::CleStruct ( = 3) []
 
 ";
 
+%feature("docstring") casadi::CleSolver::CleSolver(const std::string
+&solver, const std::map< std::string, Sparsity > &st) "
+
+[DEPRECATED] Constructor (no initialization)
+
+Parameters:
+-----------
+
+solver:
+
+Name of a solver. It might be one of:
+
+- simple
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+CleSolver.doc(\"myextraplugin\")
+
+st:
+
+Problem structure.>Struct scheme: casadi::CleStruct ( = 3) []
+
++--------------+-------+----------------------------------+
+|  Full name   | Short |           Description            |
++==============+=======+==================================+
+| Cle_STRUCT_A |       | The matrix A.                    |
++--------------+-------+----------------------------------+
+| Cle_STRUCT_V |       | The matrix V.                    |
++--------------+-------+----------------------------------+
+| Cle_STRUCT_C |       | The matrix C (defaults to unity) |
++--------------+-------+----------------------------------+
+
+";
+
 %feature("docstring")  casadi::Function::nIn() const  "
 
 Get the number of function inputs.
@@ -1358,6 +1393,14 @@ General information
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | eps_unstable | OT_REAL      | 0.000        | A margin for | casadi::CleI |
 |              |              |              | unstability  | nternal      |
@@ -2614,6 +2657,14 @@ Joris Gillis
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
 |              |              |              | outputs with |              |
@@ -3233,6 +3284,143 @@ std::string &name, const Function &dae, const Matrix< double > &grid, const
 Dict &opts=Dict()) "
 
 Output function equal to the state (new syntax, includes initialization)
+
+";
+
+%feature("docstring") casadi::ControlSimulator::ControlSimulator(const
+Function &dae, const Function &output_fcn, const Matrix< double > &grid) "
+
+[DEPRECATED] Creates a piecewise simulator, no initialization
+
+Parameters:
+-----------
+
+ffcn:  Continuous time dynamics, an casadi::Function with the following
+mapping:
+
+>Input scheme: casadi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9) [controldaeIn]
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| CONTROL_DAE_T          | t                      | Global physical time.  |
+|                        |                        | (1-by-1) .             |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_X          | x                      | State vector           |
+|                        |                        | (dimension nx-by-1).   |
+|                        |                        | Should have the same   |
+|                        |                        | amount of non-zeros as |
+|                        |                        | DAEOutput:DAE_RES      |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_Z          | z                      | Algebraic state vector |
+|                        |                        | (dimension np-by-1). . |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_P          | p                      | Parameter vector       |
+|                        |                        | (dimension np-by-1). . |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_U          | u                      | Control vector         |
+|                        |                        | (dimension nu-by-1). . |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_U_INTERP   | u_interp               | Control vector,        |
+|                        |                        | linearly interpolated  |
+|                        |                        | (dimension nu-by-1). . |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_X_MAJOR    | x_major                | State vector           |
+|                        |                        | (dimension nx-by-1) at |
+|                        |                        | the last major time-   |
+|                        |                        | step .                 |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_T0         | t0                     | Time at start of       |
+|                        |                        | control interval       |
+|                        |                        | (1-by-1) .             |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_TF         | tf                     | Time at end of control |
+|                        |                        | interval (1-by-1) .    |
++------------------------+------------------------+------------------------+
+
+>Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
+
++-----------+-------+--------------------------------------------+
+| Full name | Short |                Description                 |
++===========+=======+============================================+
+| DAE_ODE   | ode   | Right hand side of the implicit ODE .      |
++-----------+-------+--------------------------------------------+
+| DAE_ALG   | alg   | Right hand side of algebraic equations .   |
++-----------+-------+--------------------------------------------+
+| DAE_QUAD  | quad  | Right hand side of quadratures equations . |
++-----------+-------+--------------------------------------------+
+
+Parameters:
+-----------
+
+output_fcn:  output function which maps ControlledDAEInput or DAEInput to n
+outputs.
+
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
+
++-----------+-------+----------------------------+
+| Full name | Short |        Description         |
++===========+=======+============================+
+| DAE_X     | x     | Differential state .       |
++-----------+-------+----------------------------+
+| DAE_Z     | z     | Algebraic state .          |
++-----------+-------+----------------------------+
+| DAE_P     | p     | Parameter .                |
++-----------+-------+----------------------------+
+| DAE_T     | t     | Explicit time dependence . |
++-----------+-------+----------------------------+
+
+>Input scheme: casadi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9) [controldaeIn]
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| CONTROL_DAE_T          | t                      | Global physical time.  |
+|                        |                        | (1-by-1) .             |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_X          | x                      | State vector           |
+|                        |                        | (dimension nx-by-1).   |
+|                        |                        | Should have the same   |
+|                        |                        | amount of non-zeros as |
+|                        |                        | DAEOutput:DAE_RES      |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_Z          | z                      | Algebraic state vector |
+|                        |                        | (dimension np-by-1). . |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_P          | p                      | Parameter vector       |
+|                        |                        | (dimension np-by-1). . |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_U          | u                      | Control vector         |
+|                        |                        | (dimension nu-by-1). . |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_U_INTERP   | u_interp               | Control vector,        |
+|                        |                        | linearly interpolated  |
+|                        |                        | (dimension nu-by-1). . |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_X_MAJOR    | x_major                | State vector           |
+|                        |                        | (dimension nx-by-1) at |
+|                        |                        | the last major time-   |
+|                        |                        | step .                 |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_T0         | t0                     | Time at start of       |
+|                        |                        | control interval       |
+|                        |                        | (1-by-1) .             |
++------------------------+------------------------+------------------------+
+| CONTROL_DAE_TF         | tf                     | Time at end of control |
+|                        |                        | interval (1-by-1) .    |
++------------------------+------------------------+------------------------+
+
+Parameters:
+-----------
+
+grid:  the major time grid
+
+";
+
+%feature("docstring") casadi::ControlSimulator::ControlSimulator(const
+Function &dae, const Matrix< double > &grid) "
+
+[DEPRECATED] Output function equal to the state, no initialization
 
 ";
 
@@ -4154,6 +4342,14 @@ Joel Andersson
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
 |              |              |              | outputs with |              |
@@ -4293,7 +4489,7 @@ Constructor (new syntax, includes initialization)
 CustomEvaluate &c_fcn, const std::vector< Sparsity > &inputscheme, const
 std::vector< Sparsity > &outputscheme) "
 
-Constructor (no initialization, to be deprecated)
+[DEPRECATED] Constructor
 
 ";
 
@@ -4301,7 +4497,7 @@ Constructor (no initialization, to be deprecated)
 CustomEvaluate &c_fcn, const std::pair< SparsityDict, std::vector<
 std::string > > &inputscheme, const std::vector< Sparsity > &outputscheme) "
 
-Constructor (no initialization, to be deprecated)
+[DEPRECATED] Constructor
 
 ";
 
@@ -4309,7 +4505,7 @@ Constructor (no initialization, to be deprecated)
 CustomEvaluate &c_fcn, const std::vector< Sparsity > &inputscheme, const
 std::pair< SparsityDict, std::vector< std::string > > &outputscheme) "
 
-Constructor (no initialization, to be deprecated)
+[DEPRECATED] Constructor
 
 ";
 
@@ -4318,7 +4514,7 @@ CustomEvaluate &c_fcn, const std::pair< SparsityDict, std::vector<
 std::string > > &inputscheme, const std::pair< SparsityDict, std::vector<
 std::string > > &outputscheme) "
 
-Constructor (no initialization, to be deprecated)
+[DEPRECATED] Constructor
 
 ";
 
@@ -6997,6 +7193,14 @@ General information
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
 | eps_unstable | OT_REAL      | 0.000        | A margin for | casadi::DleI |
 |              |              |              | unstability  | nternal      |
 |              |              |              | detection    |              |
@@ -7262,6 +7466,45 @@ const std::string &solver, const std::map< std::string, Sparsity > &st,
 const Dict &opts=Dict()) "
 
 Constructor (new syntax, includes initialization)
+
+Parameters:
+-----------
+
+solver:
+
+Name of a solver. It might be one of:
+
+- dple
+
+- lrdle
+
+- fixed_smith
+
+- simple
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+DleSolver.doc(\"myextraplugin\")
+
+st:
+
+Problem structure.>Struct scheme: casadi::DleStruct ( = 2) []
+
++--------------+-------+---------------+
+|  Full name   | Short |  Description  |
++==============+=======+===============+
+| Dle_STRUCT_A |       | The matrix A. |
++--------------+-------+---------------+
+| Dle_STRUCT_V |       | The matrix V. |
++--------------+-------+---------------+
+
+";
+
+%feature("docstring") casadi::DleSolver::DleSolver(const std::string
+&solver, const std::map< std::string, Sparsity > &st) "
+
+[DEPRECATED] Constructor (no initialization)
 
 Parameters:
 -----------
@@ -8443,6 +8686,14 @@ General information
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
 | eps_unstable | OT_REAL      | 0.000        | A margin for | casadi::Dple |
 |              |              |              | unstability  | Internal     |
 |              |              |              | detection    |              |
@@ -8753,6 +9004,39 @@ Default constructor.
 Sparsity > > &st, const Dict &opts=Dict()) "
 
 Constructor (new syntax, includes initialization)
+
+Parameters:
+-----------
+
+solver:
+
+Name of a solver. It might be one of:
+
+- slicot
+
+- condensing
+
+- lrdple
+
+- lifting
+
+- simple
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+DpleSolver.doc(\"myextraplugin\")
+
+st:
+
+Problem structure.
+
+";
+
+%feature("docstring") casadi::DpleSolver::DpleSolver(const std::string
+&solver, const std::map< std::string, std::vector< Sparsity > > &st) "
+
+[DEPRECATED] Constructor (no initialization)
 
 Parameters:
 -----------
@@ -9647,6 +9931,14 @@ Joel Andersson
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
@@ -11347,6 +11639,14 @@ Joel Andersson
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
 |              |              |              | outputs with |              |
@@ -12445,16 +12745,16 @@ Matlab's linspace command.
 %feature("docstring")  casadi::GenericMatrix< MatType >::sparse(int nrow=1,
 int ncol=1) "
 
-Create a sparse matrix with all zeros DEPRECATED: Use MatType(nrow, ncol)
-instead.
+[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
+instead
 
 ";
 
 %feature("docstring")  casadi::GenericMatrix< MatType >::sparse(const
 std::pair< int, int > &rc) "
 
-Create a sparse matrix with all zeros DEPRECATED: Use MatType(nrow, ncol)
-instead.
+[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
+instead
 
 ";
 
@@ -14132,6 +14432,14 @@ General information
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
 | expand       | OT_BOOLEAN   | false        | Expand the   | casadi::Homo |
 |              |              |              | NLP function | topyNLPInter |
 |              |              |              | in terms of  | nal          |
@@ -15049,6 +15357,14 @@ General information
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
 |              |              |              | outputs with |              |
@@ -15475,6 +15791,35 @@ std::string &name, const std::string &solver, const Function &f, const Dict
 &opts=Dict()) "
 
 Create an implicit function solver (new syntax, includes initialization)
+
+Parameters:
+-----------
+
+solver:
+
+Name of a solver. It might be one of:
+
+- kinsol
+
+- nlp
+
+- newton
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+ImplicitFunction.doc(\"myextraplugin\")
+
+f:   Function where one of the inputs (by default the first) is an unknown
+and one of the outputs (by default the first) is a residual.
+
+";
+
+%feature("docstring") casadi::ImplicitFunction::ImplicitFunction(const
+std::string &solver, const Function &f, const Function &jac=Function(),
+const LinearSolver &linsol=LinearSolver()) "
+
+[DEPRECATED] Create an implicit function solver, no initialization
 
 Parameters:
 -----------
@@ -16717,6 +17062,97 @@ const Dict &opts=Dict()) " ";
 &name, const std::string &solver, const MXDict &dae, const Dict
 &opts=Dict()) " ";
 
+%feature("docstring") casadi::Integrator::Integrator(const std::string
+&solver, const Function &f, const Function &g=Function()) "
+
+[DEPRECATED] Integrator factory, no initialization
+
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- cvodes
+
+- idas
+
+- collocation
+
+- oldcollocation
+
+- rk
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Integrator.doc(\"myextraplugin\")
+
+f:  dynamical system
+
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
+
++-----------+-------+----------------------------+
+| Full name | Short |        Description         |
++===========+=======+============================+
+| DAE_X     | x     | Differential state .       |
++-----------+-------+----------------------------+
+| DAE_Z     | z     | Algebraic state .          |
++-----------+-------+----------------------------+
+| DAE_P     | p     | Parameter .                |
++-----------+-------+----------------------------+
+| DAE_T     | t     | Explicit time dependence . |
++-----------+-------+----------------------------+
+
+>Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
+
++-----------+-------+--------------------------------------------+
+| Full name | Short |                Description                 |
++===========+=======+============================================+
+| DAE_ODE   | ode   | Right hand side of the implicit ODE .      |
++-----------+-------+--------------------------------------------+
+| DAE_ALG   | alg   | Right hand side of algebraic equations .   |
++-----------+-------+--------------------------------------------+
+| DAE_QUAD  | quad  | Right hand side of quadratures equations . |
++-----------+-------+--------------------------------------------+
+
+g:  backwards system
+
+>Input scheme: casadi::RDAEInput (RDAE_NUM_IN = 7) [rdaeIn]
+
++-----------+-------+-------------------------------+
+| Full name | Short |          Description          |
++===========+=======+===============================+
+| RDAE_RX   | rx    | Backward differential state . |
++-----------+-------+-------------------------------+
+| RDAE_RZ   | rz    | Backward algebraic state .    |
++-----------+-------+-------------------------------+
+| RDAE_RP   | rp    | Backward parameter vector .   |
++-----------+-------+-------------------------------+
+| RDAE_X    | x     | Forward differential state .  |
++-----------+-------+-------------------------------+
+| RDAE_Z    | z     | Forward algebraic state .     |
++-----------+-------+-------------------------------+
+| RDAE_P    | p     | Parameter vector .            |
++-----------+-------+-------------------------------+
+| RDAE_T    | t     | Explicit time dependence .    |
++-----------+-------+-------------------------------+
+
+>Output scheme: casadi::RDAEOutput (RDAE_NUM_OUT = 3) [rdaeOut]
+
++-----------+-------+-------------------------------------------+
+| Full name | Short |                Description                |
++===========+=======+===========================================+
+| RDAE_ODE  | ode   | Right hand side of ODE. .                 |
++-----------+-------+-------------------------------------------+
+| RDAE_ALG  | alg   | Right hand side of algebraic equations. . |
++-----------+-------+-------------------------------------------+
+| RDAE_QUAD | quad  | Right hand side of quadratures. .         |
++-----------+-------+-------------------------------------------+
+
+";
+
 %feature("docstring")  casadi::Function::nIn() const  "
 
 Get the number of function inputs.
@@ -17028,6 +17464,14 @@ General information
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | expand_augme | OT_BOOLEAN   | true         | If DAE       | casadi::Inte |
 | nted         |              |              | callback     | gratorIntern |
@@ -18921,6 +19365,36 @@ Default (empty) constructor
 
 ";
 
+%feature("docstring") casadi::LinearSolver::LinearSolver(const std::string
+&solver, const Sparsity &sp, int nrhs=1) "
+
+[DEPRECATED] Create a linear solver given a sparsity pattern No
+initialization
+
+Parameters:
+-----------
+
+solver:
+
+Name of a solver. It might be one of:
+
+- csparsecholesky
+
+- csparse
+
+- lapacklu
+
+- lapackqr
+
+- symbolicqr
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+LinearSolver.doc(\"myextraplugin\")
+
+";
+
 %feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
 int oind=0) "
 
@@ -19598,6 +20072,14 @@ General information
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
@@ -20541,7 +21023,7 @@ Problem structure.
 %feature("docstring") casadi::LpSolver::LpSolver(const std::string &solver,
 const std::map< std::string, Sparsity > &st) "
 
-Constructor, no initialization (to be deprecated)
+[DEPRECATED] Constructor, no initialization
 
 Parameters:
 -----------
@@ -21228,6 +21710,14 @@ General information
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
@@ -22175,6 +22665,47 @@ Problem structure.>Struct scheme: casadi::LrDleStruct ( = 4) []
 
 ";
 
+%feature("docstring") casadi::LrDleSolver::LrDleSolver(const std::string
+&solver, const std::map< std::string, Sparsity > &st) "
+
+[DEPRECATED] Constructor (no initialization)
+
+Parameters:
+-----------
+
+solver:
+
+Name of a solver. It might be one of:
+
+- fixed_smith
+
+- dle
+
+- lrdple
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+LrDleSolver.doc(\"myextraplugin\")
+
+st:
+
+Problem structure.>Struct scheme: casadi::LrDleStruct ( = 4) []
+
++-----------------+-------+---------------------------------------+
+|    Full name    | Short |              Description              |
++=================+=======+=======================================+
+| LR_DLE_STRUCT_A |       | The matrix A.                         |
++-----------------+-------+---------------------------------------+
+| LR_DLE_STRUCT_V |       | The matrix V.                         |
++-----------------+-------+---------------------------------------+
+| LR_DLE_STRUCT_C |       | The matrix C (defaults to unity)      |
++-----------------+-------+---------------------------------------+
+| LR_DLE_STRUCT_H |       | H matrix: horizontal stack of all Hi. |
++-----------------+-------+---------------------------------------+
+
+";
+
 %feature("docstring")  casadi::Function::sz_iw() const  " [INTERNAL]  Get
 required length of iw field.
 
@@ -23038,6 +23569,14 @@ General information
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
 | eps_unstable | OT_REAL      | 0.000        | A margin for | casadi::LrDl |
 |              |              |              | unstability  | eInternal    |
 |              |              |              | detection    |              |
@@ -23550,6 +24089,33 @@ Default constructor.
 Sparsity > > &st, const Dict &opts=Dict()) "
 
 Constructor (new syntax, includes initialization)
+
+Parameters:
+-----------
+
+solver:
+
+Name of a solver. It might be one of:
+
+- lifting
+
+- dple
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+LrDpleSolver.doc(\"myextraplugin\")
+
+st:
+
+Problem structure.
+
+";
+
+%feature("docstring") casadi::LrDpleSolver::LrDpleSolver(const std::string
+&solver, const std::map< std::string, std::vector< Sparsity > > &st) "
+
+[DEPRECATED] Constructor (no initialization)
 
 Parameters:
 -----------
@@ -24720,6 +25286,14 @@ General information
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
 | eps_unstable | OT_REAL      | 0.000        | A margin for | casadi::LrDp |
 |              |              |              | unstability  | leInternal   |
 |              |              |              | detection    |              |
@@ -25222,16 +25796,16 @@ Accessed by friend functions.
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::sparse(int nrow=1, int ncol=1) "
 
-Create a sparse matrix with all zeros DEPRECATED: Use MatType(nrow, ncol)
-instead.
+[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
+instead
 
 ";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::sparse(const std::pair< int, int > &rc) "
 
-Create a sparse matrix with all zeros DEPRECATED: Use MatType(nrow, ncol)
-instead.
+[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
+instead
 
 ";
 
@@ -27391,16 +27965,16 @@ Is initialized?
 %feature("docstring")  casadi::GenericMatrix< MX  >::sparse(int nrow=1, int
 ncol=1) "
 
-Create a sparse matrix with all zeros DEPRECATED: Use MatType(nrow, ncol)
-instead.
+[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
+instead
 
 ";
 
 %feature("docstring")  casadi::GenericMatrix< MX  >::sparse(const std::pair<
 int, int > &rc) "
 
-Create a sparse matrix with all zeros DEPRECATED: Use MatType(nrow, ncol)
-instead.
+[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
+instead
 
 ";
 
@@ -28520,6 +29094,35 @@ Construct from vectors (new syntax, includes initialization)
 
 ";
 
+%feature("docstring") casadi::MXFunction::MXFunction(const std::vector< MX >
+&arg, const std::vector< MX > &res) "
+
+[DEPRECATED] Multiple input, multiple output, no initialization
+
+";
+
+%feature("docstring") casadi::MXFunction::MXFunction(const std::vector< MX >
+&arg, const std::pair< MXDict, std::vector< std::string > > &res) "
+
+[DEPRECATED] Multiple input, multiple output, no initialization
+
+";
+
+%feature("docstring") casadi::MXFunction::MXFunction(const std::pair<
+MXDict, std::vector< std::string > > &arg, const std::vector< MX > &res) "
+
+[DEPRECATED] Multiple input, multiple output, no initialization
+
+";
+
+%feature("docstring") casadi::MXFunction::MXFunction(const std::pair<
+MXDict, std::vector< std::string > > &arg, const std::pair< MXDict,
+std::vector< std::string > > &res) "
+
+[DEPRECATED] Multiple input, multiple output, no initialization
+
+";
+
 %feature("docstring")  casadi::SharedObject::assertInit() const  "
 [INTERNAL]  Assert that it is initialized
 
@@ -29234,6 +29837,14 @@ Joel Andersson
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
@@ -30115,7 +30726,7 @@ Create an NLP solver from a dictionary with MX expressions.
 %feature("docstring") casadi::NlpSolver::NlpSolver(const std::string
 &solver, const Function &nlp) "
 
-NLP solver factory, no initialization (to be deprecated)
+[DEPRECATED] NLP solver factory, no initialization
 
 ";
 
@@ -30447,12 +31058,6 @@ corresponding to the Hessian and the gradients.
 %feature("docstring")  casadi::Function::inputDescription(int ind) const  "
 
 Get input scheme description by index.
-
-";
-
-%feature("docstring")  casadi::NlpSolver::setQPOptions() "
-
-Set options that make the NLP solver more suitable for solving QPs.
 
 ";
 
@@ -31071,6 +31676,14 @@ General information
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode   c |
+|              |              |              | according to | asadi::NlpSo |
+|              |              |              | a given      | lverInternal |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)  (qp) |              |
 +--------------+--------------+--------------+--------------+--------------+
 | eval_errors_ | OT_BOOLEAN   | false        | When errors  | casadi::NlpS |
 | fatal        |              |              | occur during | olverInterna |
@@ -36803,6 +37416,14 @@ basis Joris Gillis
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
 | dense        | OT_BOOLEAN   | true         | Indicates    | casadi::Null |
 |              |              |              | that dense   | spaceInterna |
 |              |              |              | matrices can | l            |
@@ -37219,6 +37840,14 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -37646,6 +38275,14 @@ General information
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode   c |
+|              |              |              | according to | asadi::QcqpS |
+|              |              |              | a given      | olverInterna |
+|              |              |              | recipe (low- | l            |
+|              |              |              | level)  (qp) |              |
 +--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
@@ -38192,7 +38829,7 @@ Problem structure.>Struct scheme: casadi::QCQPStruct ( = 3) []
 %feature("docstring") casadi::QcqpSolver::QcqpSolver(const std::string
 &solver, const std::map< std::string, Sparsity > &st) "
 
-Constructor (no initialization, to be deprecated)
+[DEPRECATED] Constructor (no initialization)
 
 Parameters:
 -----------
@@ -38355,12 +38992,6 @@ the allowed values.
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
 Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::QcqpSolver::setQPOptions() "
-
-Set options that make the QP solver more suitable for solving LPs.
 
 ";
 
@@ -39538,7 +40169,7 @@ Problem structure.>Struct scheme: casadi::QPStruct ( = 2) []
 %feature("docstring") casadi::QpSolver::QpSolver(const std::string &solver,
 const std::map< std::string, Sparsity > &st) "
 
-Constructor (no initialization, to be deprecated)
+[DEPRECATED] Constructor (no initialization)
 
 Parameters:
 -----------
@@ -39896,6 +40527,14 @@ General information
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode   c |
+|              |              |              | according to | asadi::QpSol |
+|              |              |              | a given      | verInternal  |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)  (lp) |              |
 +--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
@@ -40938,12 +41577,6 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
-%feature("docstring")  casadi::QpSolver::setLPOptions() "
-
-Set options that make the QP solver more suitable for solving LPs.
-
-";
-
 %feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
 Check if the numerical values of the supplied bounds make sense.
 
@@ -41145,7 +41778,7 @@ Problem structure.>Struct scheme: casadi::SDPStruct ( = 3) []
 %feature("docstring") casadi::SdpSolver::SdpSolver(const std::string
 &solver, const std::map< std::string, Sparsity > &st) "
 
-Constructor (to be deprecated)
+[DEPRECATED] Constructor
 
 Parameters:
 -----------
@@ -41322,12 +41955,6 @@ Get default input value.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
-
-";
-
-%feature("docstring")  casadi::SdpSolver::setSOCPOptions() "
-
-Set options that make the SDP solver more suitable for solving SOCPs.
 
 ";
 
@@ -41659,6 +42286,15 @@ General information
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode   c |
+|              |              |              | according to | asadi::SdpSo |
+|              |              |              | a given      | lverInternal |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
+|              |              |              | (socp)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
@@ -43013,6 +43649,15 @@ General information
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode   c |
+|              |              |              | according to | asadi::SdqpS |
+|              |              |              | a given      | olverInterna |
+|              |              |              | recipe (low- | l            |
+|              |              |              | level)       |              |
+|              |              |              | (socqp)      |              |
++--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
 |              |              |              | outputs with |              |
@@ -44071,7 +44716,7 @@ Problem structure.>Struct scheme: casadi::SDQPStruct ( = 4) []
 %feature("docstring") casadi::SdqpSolver::SdqpSolver(const std::string
 &solver, const std::map< std::string, Sparsity > &st) "
 
-Constructor (no initialization, to be deprecated)
+[DEPRECATED] Constructor (no initialization)
 
 Parameters:
 -----------
@@ -44266,12 +44911,6 @@ Get input scheme description by index.
 %feature("docstring")  casadi::Function::outputName(int ind) const  "
 
 Get output scheme name by index.
-
-";
-
-%feature("docstring")  casadi::SdqpSolver::setSOCQPOptions() "
-
-Set options that make the SDQP solver more suitable for solving SOCPs.
 
 ";
 
@@ -44888,6 +45527,14 @@ Joel Andersson
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
@@ -45768,6 +46415,39 @@ const Integrator &integrator, const Matrix< double > &grid, const Dict
 &opts=Dict()) "
 
 Output function equal to the state (new syntax, includes initialization)
+
+";
+
+%feature("docstring") casadi::Simulator::Simulator(const Integrator
+&integrator, const Function &output_fcn, const Matrix< double > &grid) "
+
+[DEPRECATED] Constructor, no initialization
+
+Parameters:
+-----------
+
+output_fcn:  output function which maps to n outputs.
+
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
+
++-----------+-------+----------------------------+
+| Full name | Short |        Description         |
++===========+=======+============================+
+| DAE_X     | x     | Differential state .       |
++-----------+-------+----------------------------+
+| DAE_Z     | z     | Algebraic state .          |
++-----------+-------+----------------------------+
+| DAE_P     | p     | Parameter .                |
++-----------+-------+----------------------------+
+| DAE_T     | t     | Explicit time dependence . |
++-----------+-------+----------------------------+
+
+";
+
+%feature("docstring") casadi::Simulator::Simulator(const Integrator
+&integrator, const Matrix< double > &grid) "
+
+[DEPRECATED] Output function equal to the state, no initialization
 
 ";
 
@@ -46792,7 +47472,7 @@ Problem structure.>Struct scheme: casadi::SOCPStruct ( = 3) [socpStruct]
 %feature("docstring") casadi::SocpSolver::SocpSolver(const std::string
 &solver, const std::map< std::string, Sparsity > &st) "
 
-Constructor (no initialization, to be deprecated)
+[DEPRECATED] Constructor (no initialization)
 
 Parameters:
 -----------
@@ -47079,6 +47759,20 @@ General information
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRING    | GenericType( | Changes      | casadi::Socp |
+| ipe          |              | )            | default      | SolverIntern |
+|              |              |              | options in a | al           |
+|              |              |              | given way    |              |
+|              |              |              | (qcqp)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
@@ -49379,16 +50073,16 @@ optionally both dimensions)
 
 %feature("docstring")  casadi::Sparsity::sparse(int nrow, int ncol=1) "
 
-Create a sparse (empty) rectangular sparsity pattern DEPRECATED: Use
-Sparse(nrow, ncol) instead.
+[DEPRECATED] Create a sparse (empty) rectangular sparsity pattern Use
+Sparse(nrow, ncol) instead
 
 ";
 
 %feature("docstring")  casadi::Sparsity::sparse(const std::pair< int, int >
 &rc) "
 
-Create a sparse (empty) rectangular sparsity pattern DEPRECATED: Use
-Sparse(nrow, ncol) instead.
+[DEPRECATED] Create a sparse (empty) rectangular sparsity pattern Use
+Sparse(nrow, ncol) instead
 
 ";
 
@@ -49893,7 +50587,7 @@ Returns true if the pattern has a non-zero at location rr, cc.
 
 %feature("docstring")  casadi::Sparsity::reserve(int nnz, int ncol) "
 
-DEPRECATED: Reserve space.
+[DEPRECATED]: Reserve space
 
 ";
 
@@ -51141,6 +51835,14 @@ General information
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode   c |
+|              |              |              | according to | asadi::Stabi |
+|              |              |              | a given      | lizedQpSolve |
+|              |              |              | recipe (low- | rInternal    |
+|              |              |              | level)  (qp) |              |
++--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
 |              |              |              | outputs with |              |
@@ -51766,6 +52468,48 @@ st:  Problem structure
 
 ";
 
+%feature("docstring") casadi::StabilizedQpSolver::StabilizedQpSolver(const
+std::string &solver, const std::map< std::string, Sparsity > &st) "
+
+[DEPRECATED] Constructor (no initialization)
+
+Parameters:
+-----------
+
+solver:
+
+Name of a solver. It might be one of:
+
+- sqic
+
+- qp
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+StabilizedQpSolver.doc(\"myextraplugin\")
+
+st:  Problem structure
+
+>Struct scheme: casadi::QPStruct ( = 2) []
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| QP_STRUCT_H            |                        | The square matrix H:   |
+|                        |                        | sparse, (n x n). Only  |
+|                        |                        | the lower triangular   |
+|                        |                        | part is actually used. |
+|                        |                        | The matrix is assumed  |
+|                        |                        | to be symmetrical.     |
++------------------------+------------------------+------------------------+
+| QP_STRUCT_A            |                        | The matrix A: sparse,  |
+|                        |                        | (nc x n) - product     |
+|                        |                        | with x must be dense.  |
++------------------------+------------------------+------------------------+
+
+";
+
 %feature("docstring")  casadi::Function::nOut() const  "
 
 Get the number of function outputs.
@@ -51814,12 +52558,6 @@ val:  can be double, const std::vector<double>&, const Matrix<double>&,
 double *
 
 iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::StabilizedQpSolver::setLPOptions() "
-
-Set options that make the QP solver more suitable for solving LPs.
 
 ";
 
@@ -53067,6 +53805,14 @@ Switch statement Joel Andersson
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
@@ -54444,6 +55190,35 @@ Construct from vectors (new syntax, includes initialization)
 
 ";
 
+%feature("docstring") casadi::SXFunction::SXFunction(const std::vector< SX >
+&arg, const std::vector< SX > &res) "
+
+[DEPRECATED] Multiple input, multiple output, no initialization
+
+";
+
+%feature("docstring") casadi::SXFunction::SXFunction(const std::vector< SX >
+&arg, const std::pair< SXDict, std::vector< std::string > > &res) "
+
+[DEPRECATED] Multiple input, multiple output, no initialization
+
+";
+
+%feature("docstring") casadi::SXFunction::SXFunction(const std::pair<
+SXDict, std::vector< std::string > > &arg, const std::vector< SX > &res) "
+
+[DEPRECATED] Multiple input, multiple output, no initialization
+
+";
+
+%feature("docstring") casadi::SXFunction::SXFunction(const std::pair<
+SXDict, std::vector< std::string > > &arg, const std::pair< SXDict,
+std::vector< std::string > > &res) "
+
+[DEPRECATED] Multiple input, multiple output, no initialization
+
+";
+
 %feature("docstring")  casadi::Function::symbolicInput() const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
@@ -54771,6 +55546,14 @@ Joel Andersson
 |              |              |              | Overrides    |              |
 |              |              |              | default      |              |
 |              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
