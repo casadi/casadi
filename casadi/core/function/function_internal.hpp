@@ -408,6 +408,27 @@ namespace casadi {
     /** \brief Get default input value */
     virtual double defaultInput(int ind) const { return 0;}
 
+    /** \brief Get sparsity of a given input */
+    /// @{
+    inline Sparsity inputSparsity(int ind=0) const {
+      return input(ind).sparsity();
+    }
+    inline Sparsity inputSparsity(const std::string& iname) const {
+      return input(inputIndex(iname)).sparsity();
+    }
+    /// @}
+
+    /** \brief Get sparsity of a given output */
+    /// @{
+    inline Sparsity outputSparsity(int ind=0) const {
+      return output(ind).sparsity();
+    }
+    inline Sparsity outputSparsity(const std::string& iname) const {
+      return output(outputIndex(iname)).sparsity();
+    }
+    /// @}
+
+
     /// Access input argument by index
     inline Matrix<double>& input(int i=0) {
       try {

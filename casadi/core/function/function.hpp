@@ -132,6 +132,18 @@ namespace casadi {
     /** \brief Get default input value */
     double defaultInput(int ind) const;
 
+    /** \brief Get sparsity of a given input */
+    /// @{
+    Sparsity inputSparsity(int ind=0) const;
+    Sparsity inputSparsity(const std::string& iname) const;
+    /// @}
+
+    /** \brief Get sparsity of a given output */
+    /// @{
+    Sparsity outputSparsity(int ind=0) const;
+    Sparsity outputSparsity(const std::string& iname) const;
+    /// @}
+
 #ifndef SWIG
     /// \cond UNSAFE
     /** \brief [UNSAFE] Obtain reference to inputs

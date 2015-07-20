@@ -83,15 +83,11 @@ class Functiontests(casadiTestCase):
       n2 = DMatrix([5,7])
       N2 = 8
       
-      p.setInput(n1,0)
-      p.setInput(N1,1)
-      p.setInput(n2,2)
-      p.setInput(N2,3)
-      
-      p.evaluate()
 
-      self.checkarray(sin(n1)+N1,p.getOutput(0),"output")
-      self.checkarray(sin(n2)+N2,p.getOutput(1),"output")
+      out = p([n1,N1,n2,N2])
+
+      self.checkarray(sin(n1)+N1,out[0],"output")
+      self.checkarray(sin(n2)+N2,out[1],"output")
       
   def test_MXFunctionSeed(self):
     self.message("MXFunctionSeed")
@@ -106,15 +102,10 @@ class Functiontests(casadiTestCase):
     n2 = DMatrix([5,7])
     N2 = 8
     
-    p.setInput(n1,0)
-    p.setInput(N1,1)
-    p.setInput(n2,2)
-    p.setInput(N2,3)
-        
-    p.evaluate()
+    out = p([n1,N1,n2,N2])
 
-    self.checkarray(sin(n1)+N1,p.getOutput(0),"output")
-    self.checkarray(sin(n2)+N2,p.getOutput(1),"output")
+    self.checkarray(sin(n1)+N1,out[0],"output")
+    self.checkarray(sin(n2)+N2,out[1],"output")
                   
   def test_map(self):
     self.message("MX parallel call")
@@ -135,27 +126,12 @@ class Functiontests(casadiTestCase):
     N1 = 3
     n2 = DMatrix([5,7])
     N2 = 8
-    
-    p.setInput(n1,0)
-    p.setInput(N1,1)
-    p.setInput(n2,2)
-    p.setInput(N2,3)
-    
-    p.evaluate()
+  
+    out = p([n1,N1,n2,N2])
 
-    self.checkarray(sin(n1)+N1,p.getOutput(0),"output")
-    self.checkarray(sin(n2)+N2,p.getOutput(1),"output")
+    self.checkarray(sin(n1)+N1,out[0],"output")
+    self.checkarray(sin(n2)+N2,out[1],"output")
 
-  def test_set_wrong(self):
-    self.message("setter, wrong sparsity")
-    x = SX.sym("x")
-
-    f = SXFunction("f", [x],[x])
-    A = DMatrix(1,1)
-    #self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0)) # This is now o.k. syntax
-    B = repmat(DMatrix(2),1,2)
-    #self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0)) # This is now o.k. syntax
-    
   def test_issue304(self):
     self.message("regression test for #304") # this code used to segfault
     x = SX.sym("x")
@@ -408,10 +384,10 @@ class Functiontests(casadiTestCase):
     x = SX.sym("x")
     f = SXFunction('f',[x],[x*x, x],{'output_scheme':["foo","bar"]})
     
-    f.setInput(12,0)
-    f.evaluate()
-    self.checkarray(DMatrix([144]),f.getOutput("foo"))
-    self.checkarray(DMatrix([12]),f.getOutput("bar"))
+    ret = f({"i0": 12})
+
+    self.checkarray(DMatrix([144]),ret["foo"])
+    self.checkarray(DMatrix([12]),ret["bar"])
 
     
     with self.assertRaises(Exception):
