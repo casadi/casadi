@@ -420,6 +420,12 @@ Set a certain option by giving an enum value.
 
 ";
 
+%feature("docstring") casadi::CleSolver::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
 %feature("docstring") casadi::CleSolver::inputScheme "
 
 Get input scheme.
@@ -436,6 +442,12 @@ Get, if necessary generate, the sparsity of a Jacobian block
 sparsity propagation.
 
 (for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::CleSolver::outputSparsity "
+
+Get sparsity of a given output.
 
 ";
 
@@ -1750,8 +1762,9 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::ControlSimulator::assertInit "[INTERNAL]
-Assert that it is initialized
+%feature("docstring") casadi::ControlSimulator::getOption "
+
+get an option value
 
 ";
 
@@ -2221,6 +2234,12 @@ Create call to (cached) derivative function, reverse mode.
 
 ";
 
+%feature("docstring") casadi::ControlSimulator::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
 %feature("docstring") casadi::ControlSimulator::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
@@ -2335,9 +2354,8 @@ Get output scheme description by index.
 
 ";
 
-%feature("docstring") casadi::ControlSimulator::getOption "
-
-get an option value
+%feature("docstring") casadi::ControlSimulator::assertInit "[INTERNAL]
+Assert that it is initialized
 
 ";
 
@@ -2777,6 +2795,12 @@ Propagate the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::ControlSimulator::outputSparsity "
+
+Get sparsity of a given output.
 
 ";
 
@@ -3466,6 +3490,12 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
+%feature("docstring") casadi::CustomFunction::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::CustomFunction::CustomFunction "
 
 >  CustomFunction(str name, CustomEvaluate c_fcn, [Sparsity ] inputscheme, [Sparsity ] outputscheme, Dict opts=Dict())
@@ -3673,9 +3703,10 @@ internally
 
 ";
 
-%feature("docstring") casadi::CustomFunction::outputName "
+%feature("docstring") casadi::CustomFunction::fullJacobian "
 
-Get output scheme name by index.
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
 
 ";
 
@@ -3687,10 +3718,9 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::CustomFunction::fullJacobian "
+%feature("docstring") casadi::CustomFunction::outputName "
 
-Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
+Get output scheme name by index.
 
 ";
 
@@ -3718,6 +3748,12 @@ Return a string with a description (for SWIG)
 %feature("docstring") casadi::CustomFunction::printDimensions "
 
 Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::CustomFunction::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
@@ -4627,19 +4663,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::DleSolver::tangent "
+%feature("docstring") casadi::DleSolver::inputSparsity "
 
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
+Get sparsity of a given input.
 
 ";
 
@@ -4702,6 +4728,12 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 %feature("docstring") casadi::DleSolver::dictionary "
 
 Get the dictionary.
+
+";
+
+%feature("docstring") casadi::DleSolver::outputSparsity "
+
+Get sparsity of a given output.
 
 ";
 
@@ -4914,8 +4946,19 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::DleSolver::sz_arg "[INTERNAL]  Get required
-length of arg field.
+%feature("docstring") casadi::DleSolver::tangent "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
@@ -5026,6 +5069,11 @@ check if the user has there is an option str
 %feature("docstring") casadi::DleSolver::outputDescription "
 
 Get output scheme description by index.
+
+";
+
+%feature("docstring") casadi::DleSolver::sz_arg "[INTERNAL]  Get required
+length of arg field.
 
 ";
 
@@ -6275,6 +6323,12 @@ Is initialized?
 
 ";
 
+%feature("docstring") casadi::DpleSolver::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
 %feature("docstring") casadi::DpleSolver::setOptionByEnumValue "[INTERNAL]
 Set a certain option by giving an enum value.
 
@@ -6507,6 +6561,12 @@ Get output scheme.
 %feature("docstring") casadi::DpleSolver::getSanitizedName "
 
 get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring") casadi::DpleSolver::outputSparsity "
+
+Get sparsity of a given output.
 
 ";
 
@@ -7143,7 +7203,13 @@ Create call to (cached) derivative function, forward mode.
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::ExternalFunction::nnzOut "
+casadi::ExternalFunction::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
+%feature("docstring") casadi::ExternalFunction::nnzOut "
 
 Get total number of nonzeros in all of the matrix-valued outputs.
 
@@ -7724,9 +7790,9 @@ Copy all options from another object.
 
 ";
 
-%feature("docstring") casadi::ExternalFunction::getRepresentation "
+%feature("docstring") casadi::ExternalFunction::getOptionDefault "
 
-Return a string with a representation (for SWIG)
+Get the default of a certain option.
 
 ";
 
@@ -7987,9 +8053,9 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::ExternalFunction::getOptionDefault "
+%feature("docstring") casadi::ExternalFunction::getRepresentation "
 
-Get the default of a certain option.
+Return a string with a representation (for SWIG)
 
 ";
 
@@ -8040,6 +8106,12 @@ Load an external function File name is assumed to be ./<f_name>.so.
 ------------------------------------------------------------------------
 
 Load an external function File name given.
+
+";
+
+%feature("docstring") casadi::ExternalFunction::outputSparsity "
+
+Get sparsity of a given output.
 
 ";
 
@@ -8361,6 +8433,12 @@ adheres to SCHEME_NLPINput
 
 ";
 
+%feature("docstring") casadi::Function::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::Function::callReverse "
 
 Create call to (cached) derivative function, reverse mode.
@@ -8554,9 +8632,9 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::Function::evaluate "
+%feature("docstring") casadi::Function::isNull "
 
-Evaluate.
+Is a null pointer?
 
 ";
 
@@ -8598,9 +8676,9 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
-%feature("docstring") casadi::Function::isNull "
+%feature("docstring") casadi::Function::evaluate "
 
-Is a null pointer?
+Evaluate.
 
 ";
 
@@ -8650,6 +8728,12 @@ There is no guarantee that consecutive calls return identical objects
 %feature("docstring") casadi::Function::outputScheme "
 
 Get output scheme.
+
+";
+
+%feature("docstring") casadi::Function::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
@@ -10472,51 +10556,9 @@ are kept internally
 
 ";
 
-%feature("docstring") casadi::HomotopyNlpSolver::getInput "
+%feature("docstring") casadi::HomotopyNlpSolver::outputSparsity "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
-------------------------------------------------------------------------
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0..nIn()-1]
-
->  array(double)  IOInterface< Function  >.getInput(str iname) const
-------------------------------------------------------------------------
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
-
->  void IOInterface< Function  >.getInput(T val, int iind=0)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an input by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iind:  index within the range [0..nIn()-1]
-
->  void IOInterface< Function  >.getInput(T val, str iname)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an input by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iname:  input name. Only allowed when an input scheme is set.
+Get sparsity of a given output.
 
 ";
 
@@ -10632,9 +10674,63 @@ Print options to a stream.
 
 ";
 
+%feature("docstring") casadi::HomotopyNlpSolver::getInput "
+
+>  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+------------------------------------------------------------------------
+
+Get an input by index.
+
+Parameters:
+-----------
+
+iind:  index within the range [0..nIn()-1]
+
+>  array(double)  IOInterface< Function  >.getInput(str iname) const
+------------------------------------------------------------------------
+
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+>  void IOInterface< Function  >.getInput(T val, int iind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0..nIn()-1]
+
+>  void IOInterface< Function  >.getInput(T val, str iname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
 %feature("docstring") casadi::HomotopyNlpSolver::removeMonitor "
 
 Remove modules to be monitored.
+
+";
+
+%feature("docstring") casadi::HomotopyNlpSolver::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
@@ -12265,6 +12361,12 @@ point to this new object
 
 ";
 
+%feature("docstring") casadi::ImplicitFunction::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::ImplicitFunction::generate "
 
 Export / Generate C code for the function.
@@ -12299,6 +12401,12 @@ Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
+%feature("docstring") casadi::ImplicitFunction::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
@@ -14301,6 +14409,12 @@ adjoint sensitivities.
 
 ";
 
+%feature("docstring") casadi::Integrator::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
 %feature("docstring") casadi::Integrator::getOutput "
 
 >  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
@@ -14653,6 +14767,12 @@ length of res field.
 %feature("docstring") casadi::Integrator::getOptionTypeName "
 
 Get the type name of a certain option.
+
+";
+
+%feature("docstring") casadi::Integrator::outputSparsity "
+
+Get sparsity of a given output.
 
 ";
 
@@ -15180,6 +15300,12 @@ check if there is an option str
 
 ";
 
+%feature("docstring") casadi::LinearSolver::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::LinearSolver::derReverse "
 
 Get a function that calculates nadj adjoint derivatives.
@@ -15668,6 +15794,12 @@ adheres to SCHEME_NLPINput
 ";
 
 %feature("docstring") casadi::LinearSolver::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring") casadi::LinearSolver::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
@@ -16255,6 +16387,12 @@ Is initialized?
 
 Set a function that calculates nfwd forward derivatives NOTE: Does not take
 ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::LpSolver::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
@@ -16936,6 +17074,12 @@ returned.
 
 ";
 
+%feature("docstring") casadi::LpSolver::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::LpSolver::nOut "
 
 Get the number of function outputs.
@@ -17228,6 +17372,12 @@ Parameters:
 val:  can be double&, std::vector<double>&, Matrix<double>&, double *
 
 oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::LrDleSolver::outputSparsity "
+
+Get sparsity of a given output.
 
 ";
 
@@ -17810,6 +17960,12 @@ of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
+
+";
+
+%feature("docstring") casadi::LrDleSolver::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
@@ -18998,6 +19154,12 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
+%feature("docstring") casadi::LrDpleSolver::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
 %feature("docstring") casadi::LrDpleSolver::isNull "
 
 Is a null pointer?
@@ -19100,6 +19262,12 @@ val:  can be double, const std::vector<double>&, const Matrix<double>&,
 double *
 
 oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::LrDpleSolver::outputSparsity "
+
+Get sparsity of a given output.
 
 ";
 
@@ -22808,6 +22976,12 @@ Get the index into allowed options of a certain option.
 
 ";
 
+%feature("docstring") casadi::MXFunction::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
 %feature("docstring") casadi::MXFunction::setOptionByEnumValue "[INTERNAL]
 Set a certain option by giving an enum value.
 
@@ -23064,6 +23238,12 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 %feature("docstring") casadi::MXFunction::countNodes "
 
 Number of nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::MXFunction::outputSparsity "
+
+Get sparsity of a given output.
 
 ";
 
@@ -23992,6 +24172,12 @@ exploited by the algorithm.
 
 The generated Jacobian has one more output than the calling function
 corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring") casadi::NlpSolver::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
@@ -28726,6 +28912,12 @@ sparsity propagation.
 
 ";
 
+%feature("docstring") casadi::NlpSolver::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::NlpSolver::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
@@ -28848,51 +29040,33 @@ Get output scheme description by index.
 
 ";
 
-%feature("docstring") casadi::Nullspace::getOutput "
+%feature("docstring") casadi::Nullspace::setInput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  void IOInterface< Function  >.setInput(T val, int iind=0)
 ------------------------------------------------------------------------
 
-Get an output by index.
+Set an input by index.
 
 Parameters:
 -----------
 
-oind:  index within the range [0..nOut()-1]
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+iind:  index within the range [0..nIn()-1]
+
+>  void IOInterface< Function  >.setInput(T val, str iname)
 ------------------------------------------------------------------------
 
-Get an output by name.
+Set an input by name.
 
 Parameters:
 -----------
 
-oname:  output name. Only allowed when an output scheme is set.
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
 
->  void IOInterface< Function  >.getOutput(T val, int oind=0)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0..nOut()-1]
-
->  void IOInterface< Function  >.getOutput(T val, str oname)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
+iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
@@ -29065,9 +29239,11 @@ Evaluate.
 
 ";
 
-%feature("docstring") casadi::Nullspace::getRepresentation "
+%feature("docstring") casadi::Nullspace::init "
 
-Return a string with a representation (for SWIG)
+Initialize or re-initialize the object:
+
+more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -29080,36 +29256,6 @@ get function name with all non alphanumeric characters converted to '_'
 %feature("docstring") casadi::Nullspace::inputScheme "
 
 Get input scheme.
-
-";
-
-%feature("docstring") casadi::Nullspace::setInput "
-
->  void IOInterface< Function  >.setInput(T val, int iind=0)
-------------------------------------------------------------------------
-
-Set an input by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iind:  index within the range [0..nIn()-1]
-
->  void IOInterface< Function  >.setInput(T val, str iname)
-------------------------------------------------------------------------
-
-Set an input by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
@@ -29181,9 +29327,21 @@ Is initialized?
 
 ";
 
+%feature("docstring") casadi::Nullspace::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
+
 %feature("docstring") casadi::Nullspace::nnzOut "
 
 Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::Nullspace::outputSparsity "
+
+Get sparsity of a given output.
 
 ";
 
@@ -29321,6 +29479,12 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
+%feature("docstring") casadi::Nullspace::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
 %feature("docstring") casadi::Nullspace::sz_arg "[INTERNAL]  Get required
 length of arg field.
 
@@ -29435,14 +29599,6 @@ Get a list of all option names.
 %feature("docstring") casadi::Nullspace::removeMonitor "
 
 Remove modules to be monitored.
-
-";
-
-%feature("docstring") casadi::Nullspace::init "
-
-Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -29681,6 +29837,54 @@ Get the default of a certain option.
 %feature("docstring") casadi::Nullspace::isNull "
 
 Is a null pointer?
+
+";
+
+%feature("docstring") casadi::Nullspace::getOutput "
+
+>  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+------------------------------------------------------------------------
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0..nOut()-1]
+
+>  array(double)  IOInterface< Function  >.getOutput(str oname) const
+------------------------------------------------------------------------
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+>  void IOInterface< Function  >.getOutput(T val, int oind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0..nOut()-1]
+
+>  void IOInterface< Function  >.getOutput(T val, str oname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -30646,12 +30850,6 @@ Copy all options from another object.
 
 ";
 
-%feature("docstring") casadi::QcqpSolver::getOption "
-
-get an option value
-
-";
-
 %feature("docstring") casadi::QcqpSolver::gradient "
 
 Generate a gradient function of output oind with respect to input iind.
@@ -30705,6 +30903,24 @@ Get the allowed values of a certain option.
 %feature("docstring") casadi::QcqpSolver::outputScheme "
 
 Get output scheme.
+
+";
+
+%feature("docstring") casadi::QcqpSolver::getOption "
+
+get an option value
+
+";
+
+%feature("docstring") casadi::QcqpSolver::getOptionDescription "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring") casadi::QcqpSolver::nOut "
+
+Get the number of function outputs.
 
 ";
 
@@ -30809,27 +31025,21 @@ Problem structure.>Struct scheme: casadi::QCQPStruct ( = 3) []
 
 ";
 
-%feature("docstring") casadi::QcqpSolver::getOptionDescription "
+%feature("docstring") casadi::QcqpSolver::addMonitor "
 
-Get the description of a certain option.
+Add modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::QcqpSolver::nOut "
+%feature("docstring") casadi::QcqpSolver::outputSparsity "
 
-Get the number of function outputs.
+Get sparsity of a given output.
 
 ";
 
 %feature("docstring") casadi::QcqpSolver::getDescription "
 
 Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::QcqpSolver::addMonitor "
-
-Add modules to be monitored.
 
 ";
 
@@ -31022,6 +31232,11 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
+%feature("docstring") casadi::QcqpSolver::setOptionByEnumValue "[INTERNAL]
+Set a certain option by giving an enum value.
+
+";
+
 %feature("docstring") casadi::QcqpSolver::fullJacobian "
 
 Generate a Jacobian function of all the inputs elements with respect to all
@@ -31070,8 +31285,9 @@ Get output scheme name by index.
 
 ";
 
-%feature("docstring") casadi::QcqpSolver::setOptionByEnumValue "[INTERNAL]
-Set a certain option by giving an enum value.
+%feature("docstring") casadi::QcqpSolver::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
@@ -31632,6 +31848,12 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
+%feature("docstring") casadi::QpSolver::isNull "
+
+Is a null pointer?
+
+";
+
 %feature("docstring") casadi::QpSolver::callForward "
 
 Create call to (cached) derivative function, forward mode.
@@ -31664,9 +31886,8 @@ Get the dictionary.
 
 ";
 
-%feature("docstring") casadi::QpSolver::isNull "
-
-Is a null pointer?
+%feature("docstring") casadi::QpSolver::setOptionByAllowedIndex "[INTERNAL]
+Set a certain option by giving its index into the allowed values.
 
 ";
 
@@ -32544,6 +32765,12 @@ Print options to a stream.
 
 ";
 
+%feature("docstring") casadi::QpSolver::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::QpSolver::getOptionType "
 
 Get the type of a certain option.
@@ -32568,11 +32795,6 @@ the output elements).
 Get a vector of symbolic variables with the same dimensions as the outputs.
 
 There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring") casadi::QpSolver::setOptionByAllowedIndex "[INTERNAL]
-Set a certain option by giving its index into the allowed values.
 
 ";
 
@@ -32875,6 +33097,12 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
+%feature("docstring") casadi::QpSolver::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
 %feature("docstring") casadi::QpSolver::evaluate "
 
 Evaluate.
@@ -33092,9 +33320,9 @@ Problem structure.>Struct scheme: casadi::SDPStruct ( = 3) []
 
 ";
 
-%feature("docstring") casadi::SdpSolver::inputName "
+%feature("docstring") casadi::SdpSolver::inputSparsity "
 
-Get input scheme name by index.
+Get sparsity of a given input.
 
 ";
 
@@ -33811,6 +34039,12 @@ Get output scheme description by index.
 
 ";
 
+%feature("docstring") casadi::SdpSolver::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::SdpSolver::getOptionTypeName "
 
 Get the type name of a certain option.
@@ -33909,6 +34143,12 @@ Evaluate.
 %feature("docstring") casadi::SdpSolver::getOptionDefault "
 
 Get the default of a certain option.
+
+";
+
+%feature("docstring") casadi::SdpSolver::inputName "
+
+Get input scheme name by index.
 
 ";
 
@@ -34798,9 +35038,9 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::SdqpSolver::getOptionTypeName "
+%feature("docstring") casadi::SdqpSolver::numelIn "
 
-Get the type name of a certain option.
+Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
@@ -34885,6 +35125,12 @@ iname:  input name. Only allowed when an input scheme is set.
 %feature("docstring") casadi::SdqpSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::SdqpSolver::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
@@ -35383,15 +35629,21 @@ Print options to a stream.
 
 ";
 
-%feature("docstring") casadi::SdqpSolver::numelIn "
+%feature("docstring") casadi::SdqpSolver::getOptionTypeName "
 
-Get total number of elements in all of the matrix-valued inputs.
+Get the type name of a certain option.
 
 ";
 
 %feature("docstring") casadi::SdqpSolver::inputDescription "
 
 Get input scheme description by index.
+
+";
+
+%feature("docstring") casadi::SdqpSolver::outputSparsity "
+
+Get sparsity of a given output.
 
 ";
 
@@ -35752,9 +36004,9 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::Simulator::evaluate "
+%feature("docstring") casadi::Simulator::isNull "
 
-Evaluate.
+Is a null pointer?
 
 ";
 
@@ -36253,9 +36505,9 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::Simulator::isNull "
+%feature("docstring") casadi::Simulator::evaluate "
 
-Is a null pointer?
+Evaluate.
 
 ";
 
@@ -36496,6 +36748,12 @@ Set a certain option by giving an enum value.
 
 ";
 
+%feature("docstring") casadi::Simulator::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::Simulator::getOptionAllowed "
 
 Get the allowed values of a certain option.
@@ -36671,6 +36929,12 @@ check if the user has there is an option str
 %feature("docstring") casadi::Simulator::addMonitor "
 
 Add modules to be monitored.
+
+";
+
+%feature("docstring") casadi::Simulator::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
@@ -37174,6 +37438,12 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
+%feature("docstring") casadi::SocpSolver::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
 %feature("docstring") casadi::SocpSolver::copyOptions "
 
 Copy all options from another object.
@@ -37276,6 +37546,12 @@ Generate the sparsity of a Jacobian block
 
 ";
 
+%feature("docstring") casadi::SocpSolver::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::SocpSolver::init "
 
 Initialize or re-initialize the object:
@@ -37373,9 +37649,9 @@ Problem structure.>Struct scheme: casadi::SOCPStruct ( = 3) [socpStruct]
 
 ";
 
-%feature("docstring") casadi::SocpSolver::getRepresentation "
+%feature("docstring") casadi::SocpSolver::call "
 
-Return a string with a representation (for SWIG)
+Evaluate the function symbolically or numerically.
 
 ";
 
@@ -38932,9 +39208,9 @@ class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::SocpSolver::call "
+%feature("docstring") casadi::SocpSolver::getRepresentation "
 
-Evaluate the function symbolically or numerically.
+Return a string with a representation (for SWIG)
 
 ";
 
@@ -40726,6 +41002,12 @@ returned.
 
 ";
 
+%feature("docstring") casadi::StabilizedQpSolver::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::StabilizedQpSolver::setDerReverse "
 
 Set a function that calculates nadj adjoint derivatives NOTE: Does not take
@@ -41344,7 +41626,9 @@ required length of w field.
 
 ";
 
-%feature("docstring") casadi::StabilizedQpSolver::getOptionEnumValue "[INTERNAL]  Get the enum value corresponding to th certain option.
+%feature("docstring") casadi::StabilizedQpSolver::isNull "
+
+Is a null pointer?
 
 ";
 
@@ -41420,12 +41704,14 @@ adjoint sensitivities, one direction at a time.
 
 ";
 
-%feature("docstring") casadi::StabilizedQpSolver::makeUnique "
-
-Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+%feature("docstring") casadi::StabilizedQpSolver::callDerivative "[INTERNAL]  Evaluate the function symbolically or numerically with
+directional derivatives The first two arguments are the nondifferentiated
+inputs and results of the evaluation, the next two arguments are a set of
+forward directional seeds and the resulting forward directional derivatives,
+the length of the vector being the number of forward directions. The next
+two arguments are a set of adjoint directional seeds and the resulting
+adjoint directional derivatives, the length of the vector being the number
+of adjoint directions.
 
 ";
 
@@ -41467,20 +41753,16 @@ Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::StabilizedQpSolver::isNull "
-
-Is a null pointer?
+%feature("docstring") casadi::StabilizedQpSolver::getOptionEnumValue "[INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring") casadi::StabilizedQpSolver::callDerivative "[INTERNAL]  Evaluate the function symbolically or numerically with
-directional derivatives The first two arguments are the nondifferentiated
-inputs and results of the evaluation, the next two arguments are a set of
-forward directional seeds and the resulting forward directional derivatives,
-the length of the vector being the number of forward directions. The next
-two arguments are a set of adjoint directional seeds and the resulting
-adjoint directional derivatives, the length of the vector being the number
-of adjoint directions.
+%feature("docstring") casadi::StabilizedQpSolver::makeUnique "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
 
 ";
 
@@ -41733,6 +42015,12 @@ Is the class able to propagate seeds through the algorithm?
 Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring") casadi::StabilizedQpSolver::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
@@ -42368,6 +42656,12 @@ adjoint sensitivities, one direction at a time.
 
 ";
 
+%feature("docstring") casadi::Switch::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::Switch::nOut "
 
 Get the number of function outputs.
@@ -42725,6 +43019,12 @@ length of arg field.
 %feature("docstring") casadi::Switch::callReverse "
 
 Create call to (cached) derivative function, reverse mode.
+
+";
+
+%feature("docstring") casadi::Switch::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
@@ -43549,6 +43849,12 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
+%feature("docstring") casadi::SXFunction::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::SXFunction::derivative "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -43860,6 +44166,12 @@ iname:  input name. Only allowed when an input scheme is set.
 
 %feature("docstring") casadi::SXFunction::getOptionEnumValue "[INTERNAL]
 Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring") casadi::SXFunction::inputSparsity "
+
+Get sparsity of a given input.
 
 ";
 
