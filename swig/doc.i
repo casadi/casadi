@@ -5946,6 +5946,21 @@ Return a string with a representation (for SWIG)
 ";
 
 
+// File: classcasadi_1_1DerivativeGenerator2.xml
+%feature("docstring")  casadi::DerivativeGenerator2::create() "";
+
+%feature("docstring") casadi::DerivativeGenerator2::~DerivativeGenerator2 "
+
+Destructor.
+
+";
+
+%feature("docstring") casadi::DerivativeGenerator2 "C++ includes:
+callback.hpp ";
+
+%feature("docstring") casadi::DerivativeGenerator2::DerivativeGenerator2() "";
+
+
 // File: classcasadi_1_1Determinant.xml
 
 
