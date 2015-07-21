@@ -1255,6 +1255,151 @@ class Functiontests(casadiTestCase):
     except Exception as e:
       self.assertTrue("foobar" in str(e))
 
+
+  def test_callback_derivatives(self):
+
+    class mydergen(DerivativeGenerator2):
+      def __init__(self,fwd=True):
+        DerivativeGenerator2.__init__(self)
+        self.fwd = fwd
+
+      def __call__(self,fcn,ndir):
+        # Obtain the symbols for nominal inputs/outputs
+        nominal_in  = fcn.symbolicInput()
+        nominal_out = fcn.symbolicOutput()
+
+        # A growing list of inputs to the returned derivative function
+        der_ins = nominal_in + nominal_out
+
+        # A growing list of outputs to the returned derivative function
+        der_outs = []
+
+        [A] = nominal_in
+        [U,S,V] = nominal_out
+
+        constr = veccat([
+          mul([U,casadi.diag(S),V])-A,
+          casadi.tril(mul(U.T,U)-DMatrix.eye(mul(U.T,U).shape[0])).nz[:],
+          casadi.tril(mul(V.T,V)-DMatrix.eye(mul(V.T,V).shape[0])).nz[:],
+        ])
+
+        USV = veccat(nominal_out)
+
+        f = MXFunction("f",[USV,A],[constr])
+
+        impl = ImplicitFunction("impl","nlp.ipopt",f,{"nlp_solver_options" : {"print_level":0,"print_time":False}})
+
+        if self.fwd:
+          fd = impl.derivative(ndir,0)
+
+          seeds = [ fcn.symbolicInput()[0] for i in range(ndir)]
+
+          der_ins+=seeds
+
+          allseeds = []
+          for s in seeds:
+            allseeds += [0,s]
+
+          out = fd([USV,A] + allseeds)
+
+          for s in out[1:]:
+            [du,ds,dv]=vertsplit(s,[0,U.nnz(),U.nnz()+S.nnz(),U.nnz()+S.nnz()+V.nnz()])
+            du = du.reshape(U.shape)
+            ds = casadi.reshape(ds,S.shape)
+            dv = casadi.reshape(dv,V.shape)
+
+            der_outs+= [du,ds,dv]
+          
+        else:
+          bd = impl.derivative(0,ndir)
+          seeds = [ fcn.symbolicOutput() for j in range(ndir)]
+          for s in seeds:
+            der_ins+=s
+          seedsflat = [veccat(s) for s in seeds]
+
+          out = bd([USV,A] + seedsflat)
+          
+
+          der_outs +=out[1:][1::2]
+
+        ret = MXFunction("my_derivative", der_ins, der_outs)
+        return ret
+
+    myd = mydergen()
+
+
+    class mycallback(Callback2):
+      def __init__(self,n,m, fd=True):
+        Callback2.__init__(self)
+        self.n = n
+        self.m = m
+        self.k = min(n,m)
+        self.fwd = mydergen(True)
+        self.adj = mydergen(False)
+        self.fd = fd
+
+      def nOut(self):
+        return 3
+
+      def inputShape(self,i):
+        return (self.n,self.m)    
+
+      def outputShape(self,i):
+        if i==0:
+          return (self.n, self.k) 
+        elif i==1:
+          return (self.k, 1)
+        else:
+          return (self.k, self.m)
+
+      def __call__(self,argin):
+        u,s,v = numpy.linalg.svd(argin[0],full_matrices=False)
+        return [u,s,v]
+
+      def options(self):
+        return {} if self.fd else {"custom_forward": self.fwd.create(), "custom_reverse": self.adj.create()}
+
+    n = 3
+    m = 3
+    c = mycallback(n,m,fd=True)
+    foo = c.create()
+
+    x = DMatrix(np.random.random((n,m)))
+    X = MX.sym('x',n,m)
+    Y = foo([X])
+
+    f = MXFunction("f",[X],Y)
+    Js = [f.jacobian(0,i) for i in range(3)]
+    Js_ = [J([x]) for J in Js]
+
+    u,s,v = numpy.linalg.svd(x,full_matrices=False)
+
+    for j in Js_:
+      self.checkarray(u,j[1])
+      self.checkarray(s,j[2])
+      self.checkarray(v,j[3])
+
+    Js_alts = []
+    for w in [0,1]:
+      c = mycallback(n,m,fd=False)
+      foo = c.create()
+
+      Y = foo([X])
+
+      f = MXFunction("f",[X],Y,{"ad_weight": w})
+
+      J = f.jacobian(0,1)
+      Js = [f.jacobian(0,i) for i in range(3)]
+      Js_alt = [J([x]) for J in Js]
+      Js_alts.append(Js_alt)
+      for j, j_alt in zip(Js_,Js_alt):
+        for i,i_alt in zip(j,j_alt):
+          self.checkarray(i,i_alt,digits=5)
+ 
+    for j, j_alt in zip(Js_alts[0],Js_alts[1]):
+      for i,i_alt in zip(j,j_alt):
+        self.checkarray(i,i_alt)   
+
     
 if __name__ == '__main__':
     unittest.main()
