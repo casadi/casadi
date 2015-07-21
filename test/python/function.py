@@ -1287,7 +1287,8 @@ class Functiontests(casadiTestCase):
 
         f = MXFunction("f",[USV,A],[constr])
 
-        impl = ImplicitFunction("impl","nlp.ipopt",f,{"nlp_solver_options" : {"print_level":0,"print_time":False}})
+        #impl = ImplicitFunction("impl","nlp.ipopt",f,{"nlp_solver_options" : {"print_level":0,"print_time":False}})
+        impl = ImplicitFunction("impl","newton",f,{"linear_solver": "csparse"})
 
         if self.fwd:
           fd = impl.derivative(ndir,0)
