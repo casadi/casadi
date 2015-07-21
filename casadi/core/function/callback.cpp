@@ -94,6 +94,34 @@ Function Callback2::create() {
   return ret;
 }
 
+Function DerivativeGenerator2::operator()(const Function& fcn, int ndir) {
+
+}
+
+
+
+DerivativeGenerator DerivativeGenerator2::create() {
+  DerivativeGenerator ret;
+  ret.assignNode(new DerivativeGeneratorInternal2(*this));
+  return ret;
+}
+
+DerivativeGenerator2::DerivativeGenerator2() {
+}
+
+DerivativeGenerator2::~DerivativeGenerator2() {
+
+}
+
+DerivativeGeneratorInternal2::DerivativeGeneratorInternal2(
+    DerivativeGenerator2 &callback) : callback_(callback) {
+
+}
+
+DerivativeGeneratorInternal2::~DerivativeGeneratorInternal2() {
+
+}
+
 
 CallbackFunctionInternal::CallbackFunctionInternal(
     Callback2 &callback) : callback_(callback) {

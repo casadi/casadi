@@ -3348,6 +3348,7 @@ GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
 #endif // SWIGMATLAB
 
 %feature("director") casadi::Callback2;
+%feature("director") casadi::DerivativeGenerator2;
 
 %include <casadi/core/sx/sx_tools.hpp>
 %include <casadi/core/mx/mx_tools.hpp>

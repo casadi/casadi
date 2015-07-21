@@ -26,7 +26,7 @@
 #define CASADI_CALLBACK_HPP
 
 #include "function_internal.hpp"
-
+#include "../functor_internal.hpp"
 
 namespace casadi {
 
@@ -109,7 +109,38 @@ class CASADI_EXPORT Callback2 {
 
 };
 
+class CASADI_EXPORT DerivativeGenerator2 {
+
+  public:
+    DerivativeGenerator2();
+
+    virtual Function operator()(const Function& fcn, int ndir);
+
+    DerivativeGenerator create();
+
+    /** \brief  Destructor */
+    virtual ~DerivativeGenerator2();
+};
+
 #ifndef SWIG
+
+class DerivativeGeneratorInternal2 : public DerivativeGeneratorInternal {
+public:
+  /** \brief  Create a function */
+  explicit DerivativeGeneratorInternal2(DerivativeGenerator2 &callback);
+
+  /** \brief  Destructor */
+  virtual ~DerivativeGeneratorInternal2();
+
+  /** \brief  Cloning */
+  virtual DerivativeGeneratorInternal2* clone() const { return new DerivativeGeneratorInternal2(*this);}
+
+  virtual Function call(Function& fcn, int ndir, void* user_data) { return callback_(fcn, ndir); };
+
+  DerivativeGenerator2& callback_;
+};
+
+
 class CASADI_EXPORT CallbackFunctionInternal : public FunctionInternal {
   friend class CallbackFunction;
   public:
