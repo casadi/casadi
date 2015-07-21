@@ -133,9 +133,11 @@ public:
   virtual ~DerivativeGeneratorInternal2();
 
   /** \brief  Cloning */
-  virtual DerivativeGeneratorInternal2* clone() const { return new DerivativeGeneratorInternal2(*this);}
+  virtual DerivativeGeneratorInternal2* clone() const {
+    return new DerivativeGeneratorInternal2(*this);
+  }
 
-  virtual Function call(Function& fcn, int ndir, void* user_data) { return callback_(fcn, ndir); };
+  virtual Function call(Function& fcn, int ndir, void* user_data) { return callback_(fcn, ndir); }
 
   DerivativeGenerator2& callback_;
 };
