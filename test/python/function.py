@@ -1235,6 +1235,26 @@ class Functiontests(casadiTestCase):
     out = J([8])
     
     self.checkarray(out[0],2,digits=6)
+
+  @known_bug()
+  def test_callback_errors(self):
+    class mycallback(Callback2):
+      def __call__(self,argin):
+        raise Exception("foobar")
+
+    c = mycallback()
+    foo = c.create()
+    
+    x = MX.sym('x')
+    y = foo([x])
+
+    f = MXFunction("f",[x],y)
+
+    try:
+      f([3])
+    except Exception as e:
+      self.assertTrue("foobar" in str(e))
+
     
 if __name__ == '__main__':
     unittest.main()

@@ -288,6 +288,18 @@ if (casadi::CasadiOptions::catch_errors_swig) { \
   SWIG_exception(SWIG_TypeError, e.what()); \
   }
 }
+
+#ifdef SWIGPYTHON
+%feature("director:except") {
+	if ($error != NULL) {
+    SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+    PyErr_Print();
+    SWIG_PYTHON_THREAD_END_BLOCK; 
+		throw Swig::DirectorMethodException();
+	}
+}
+#endif //SWIGPYTHON
+
 %include "internal.i"
 %include "deprecated.i"
 
