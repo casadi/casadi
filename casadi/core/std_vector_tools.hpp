@@ -755,10 +755,11 @@ namespace casadi {
     int n = mat.size();
     int m = -1;
     for (int i=0;i<n;++i) {
-      casadi_assert_message(m==-1 || m==mat[i].size(), "transpose(vector<vector>) dimension mismatch.");
+      casadi_assert_message(m==-1 || m==mat[i].size(),
+        "transpose(vector<vector>) dimension mismatch.");
       if (m==-1) m = mat[i].size();
     }
-    
+
     // Allocate the result
     std::vector< std::vector<T> > ret(m);
     for (int i=0;i<m;++i) {

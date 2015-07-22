@@ -1408,7 +1408,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    f = SXFunction("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
+    fun = SXFunction("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -1417,36 +1417,91 @@ class Functiontests(casadiTestCase):
     Z = [MX.sym("z",2,2) for i in range(n)]
     V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
 
+    for Z_alt,Z_alt2 in [
+          (Z,Z),
+          ([Z[0]],[Z[0]]*n),
+          ([MX()]*3,[MX()]*3),
+        ]:
 
-    res = f.map(zip(X,Y,Z,V))
+      for parallelization in ["serial","expand","openmp"]:
+        res = fun.map(map(horzcat,[X,Y,Z_alt,V]),parallelization)
 
 
-    flatres = []
-    for r in res:
-      flatres+= map(sin,r)
-    F = MXFunction("F",X+Y+Z+V,flatres)
+        F = MXFunction("F",X+Y+Z+V,map(sin,res))
 
-    flatresref = []
-    for r in zip(X,Y,Z,V):
-      flatresref+=map(sin,f(r))
+        resref = [[] for i in range(fun.nOut())]
+        for r in zip(X,Y,Z_alt2,V):
+          for i,e in enumerate(map(sin,fun(r))):
+            resref[i] = resref[i] + [e]
 
-    Fref = MXFunction("F",X+Y+Z+V,flatresref)
-    
-    np.random.seed(0)
-    X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
-    Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
-    Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
-    V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
+        Fref = MXFunction("F",X+Y+Z+V,map(horzcat,resref))
+        
+        np.random.seed(0)
+        X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+        Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+        Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
+        V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
-    for i,e in enumerate(X_+Y_+Z_+V_):
-      F.setInput(e,i)
-      Fref.setInput(e,i)
+        for f in [F, F.expand()]:
+          for i,e in enumerate(X_+Y_+Z_+V_):
+            f.setInput(e,i)
+            Fref.setInput(e,i)
 
-    F.evaluate()
-    Fref.evaluate()
-    
-    self.checkfunction(F,Fref)
+          f.evaluate()
+          Fref.evaluate()
+          
+          self.checkfunction(f,Fref,sparsity_mod = False)
 
+
+  @memory_heavy()
+  @slow()
+  def test_map_node_old(self):
+    x = SX.sym("x")
+    y = SX.sym("y",2)
+    z = SX.sym("z",2,2)
+    v = SX.sym("z",Sparsity.upper(3))
+
+    fun = SXFunction("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
+
+    n = 2
+
+    X = [MX.sym("x") for i in range(n)]
+    Y = [MX.sym("y",2) for i in range(n)]
+    Z = [MX.sym("z",2,2) for i in range(n)]
+    V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
+
+    for Z_alt in [Z,[MX()]*3]:
+
+      for parallelization in ["serial","expand","openmp"]:
+        res = fun.map(zip(X,Y,Z_alt,V),parallelization)
+
+
+        flatres = []
+        for r in res:
+          flatres+= map(sin,r)
+        F = MXFunction("F",X+Y+Z+V,flatres)
+
+        flatresref = []
+        for r in zip(X,Y,Z_alt,V):
+          flatresref+=map(sin,fun(r))
+
+        Fref = MXFunction("F",X+Y+Z+V,flatresref)
+        
+        np.random.seed(0)
+        X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+        Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+        Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
+        V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
+
+        for f in [F, F.expand()]:
+          for i,e in enumerate(X_+Y_+Z_+V_):
+            f.setInput(e,i)
+            Fref.setInput(e,i)
+
+          f.evaluate()
+          Fref.evaluate()
+          
+          self.checkfunction(f,Fref)
     
 if __name__ == '__main__':
     unittest.main()

@@ -601,9 +601,12 @@ namespace casadi {
     const std::map<std::string, M> callMap(const std::map<std::string, M>& arg,
                                        bool always_inline, bool never_inline);
 
-    /** \brief Check if input arguments have correct length and dimensions */
+    /** \brief Check if input arguments have correct length and dimensions
+    *
+    * \param hcat check if horizontal repetion of the function input is allowed
+    */
     template<typename M>
-    void checkArg(const std::vector<M>& arg) const;
+    void checkArg(const std::vector<M>& arg, bool hcat=false) const;
 
     /** \brief Check if output arguments have correct length and dimensions */
     template<typename M>
@@ -617,9 +620,12 @@ namespace casadi {
     template<typename M>
     void checkAdjSeed(const std::vector<std::vector<M> >& aseed) const;
 
-    /** \brief Check if input arguments that needs to be replaced */
+    /** \brief Check if input arguments that needs to be replaced
+    * 
+    * \param hcat check if horizontal repetion of the function input is allowed
+    */
     template<typename M>
-    bool matchingArg(const std::vector<M>& arg) const;
+    bool matchingArg(const std::vector<M>& arg, bool hcat=false) const;
 
     /** \brief Check if output arguments that needs to be replaced */
     template<typename M>
@@ -633,9 +639,12 @@ namespace casadi {
     template<typename M>
     bool matchingAdjSeed(const std::vector<std::vector<M> >& aseed) const;
 
-    /** \brief Replace 0-by-0 inputs */
+    /** \brief Replace 0-by-0 inputs
+    *
+    * \param hcat check if horizontal repetion of the function input is allowed
+    */
     template<typename M>
-    std::vector<M> replaceArg(const std::vector<M>& arg) const;
+    std::vector<M> replaceArg(const std::vector<M>& arg, bool hcat=false) const;
 
     /** \brief Replace 0-by-0 outputs */
     template<typename M>

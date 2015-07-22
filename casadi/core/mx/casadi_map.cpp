@@ -40,30 +40,35 @@ namespace casadi {
       fcn_(fcn), n_in_(fcn.nIn()), n_out_(fcn.nOut()) {
 
     casadi_assert(fcn_.nIn()==arg.size());
-    
-    n_repeated_.resize(n_in_);
 
-    // Number of calls
-    n_ = arg.size();
+    step_in_.resize(n_in_, 0);
+    step_out_.resize(n_out_, 0);
 
     // Get all inputs
     int f_num_in = n_in_;
     vector<MX> all_arg;
 
+    // Number of calls
     n_ = 1;
     for (int i=0;i<n_in_;++i) {
       casadi_assert(arg[i].size1()==fcn_.input(i).size1());
       casadi_assert(arg[i].size2() % fcn_.input(i).size2()==0);
       int n = arg[i].size2() / fcn_.input(i).size2();
-      n_repeated_[i] = n;
+
+      // An input is either of original shape or repeated n times
       casadi_assert(n==1 || n_==1 || n==n_);
       if (n>1) n_ = n;
       all_arg.push_back(project(arg[i], repmat(fcn_.input(i).sparsity(), 1, n)));
+
+      if (n!=1) {
+        step_in_[i] = fcn_.input(i).nnz();
+      }
     }
 
     output_sparsity_.resize(n_out_);
     for (int i=0;i<n_out_;++i) {
       output_sparsity_[i] = repmat(fcn_.output(i).sparsity(), 1, n_);
+      step_out_[i] = fcn_.output(i).nnz();
     }
 
     setDependencies(all_arg);
@@ -93,18 +98,15 @@ namespace casadi {
   }
 
   void Map::evalD(const double** arg, double** res, int* iw, double* w) {
-    int n_in = n_in_, n_out = n_out_;
     const double** arg1 = arg+ndep();
     double** res1 = res+nout();
+
     for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) {
-        arg1[j]=arg[j];
-        if (n_repeated_[j]!=1)
-          arg[j] += fcn_.input(j).nnz();
+      for (int j=0; j<n_in_; ++j) {
+        arg1[j] = arg[j]+i*step_in_[j];
       }
-      for (int j=0; j<n_out; ++j) {
-        res1[j]=res[j];
-        res[j] += fcn_.output(j).nnz();
+      for (int j=0; j<n_out_; ++j) {
+        res1[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
       }
       fcn_->evalD(arg1, res1, iw, w);
     }
@@ -117,13 +119,17 @@ namespace casadi {
 #else // WITH_OPENMP
     size_t sz_arg, sz_res, sz_iw, sz_w;
     fcn_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+
 #pragma omp parallel for
     for (int i=0; i<n_; ++i) {
-      int n_in = n_in_, n_out = n_out_;
-      const double** arg_i = arg + n_in*n_ + sz_arg*i;
-      copy(arg+i*n_in, arg+(i+1)*n_in, arg_i);
-      double** res_i = res + n_out*n_ + sz_res*i;
-      copy(res+i*n_out, res+(i+1)*n_out, res_i);
+      const double** arg_i = arg + n_in_ + sz_arg*i;
+      for (int j=0; j<n_in_; ++j) {
+        arg_i[j] = arg[j]+i*step_in_[j];
+      }
+      double** res_i = res + n_out_ + sz_res*i;
+      for (int j=0; j<n_out_; ++j) {
+        res_i[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
+      }
       int* iw_i = iw + i*sz_iw;
       double* w_i = w + i*sz_w;
       fcn_->evalD(arg_i, res_i, iw_i, w_i);
@@ -132,36 +138,28 @@ namespace casadi {
   }
 
   void Map::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    int n_in = n_in_, n_out = n_out_;
     const bvec_t** arg1 = arg+ndep();
     bvec_t** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) {
-        arg1[j]=arg[j];
-        if (n_repeated_[j]!=1)
-          arg[j] += fcn_.input(j).nnz();
+      for (int j=0; j<n_in_; ++j) {
+        arg1[j] = arg[j]+i*step_in_[j];
       }
-      for (int j=0; j<n_out; ++j) {
-        res1[j]=res[j];
-        res[j] += fcn_.output(j).nnz();
+      for (int j=0; j<n_out_; ++j) {
+        res1[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
       }
       fcn_->spFwd(arg1, res1, iw, w);
     }
   }
 
   void Map::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    int n_in = n_in_, n_out = n_out_;
     bvec_t** arg1 = arg+ndep();
     bvec_t** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) {
-        arg1[j]=arg[j];
-        if (n_repeated_[j]!=1)
-          arg[j] += fcn_.input(j).nnz();
+      for (int j=0; j<n_in_; ++j) {
+        arg1[j] = arg[j]+i*step_in_[j];
       }
-      for (int j=0; j<n_out; ++j) {
-        res1[j]=res[j];
-        res[j] += fcn_.output(j).nnz();
+      for (int j=0; j<n_out_; ++j) {
+        res1[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
       }
       fcn_->spAdj(arg1, res1, iw, w);
     }
@@ -180,18 +178,14 @@ namespace casadi {
   }
 
   void Map::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    int n_in = n_in_, n_out = n_out_;
     const SXElement** arg1 = arg+ndep();
     SXElement** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) {
-        arg1[j]=arg[j];
-        if (n_repeated_[j]!=1)
-          arg[j] += fcn_.input(j).nnz();
+      for (int j=0; j<n_in_; ++j) {
+        arg1[j] = arg[j]+i*step_in_[j];
       }
-      for (int j=0; j<n_out; ++j) {
-        res1[j]=res[j];
-        res[j] += fcn_.output(j).nnz();
+      for (int j=0; j<n_out_; ++j) {
+        res1[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
       }
       fcn_->evalSX(arg1, res1, iw, w);
     }
@@ -199,23 +193,21 @@ namespace casadi {
 
   void Map::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Collect arguments
-    int f_num_in = n_in_;
     vector<vector<MX> > v(n_);
     vector<MX>::const_iterator arg_it = arg.begin();
     for (int i=0; i<n_; ++i) {
-      v[i] = vector<MX>(arg_it, arg_it+f_num_in);
-      arg_it += f_num_in;
+      v[i] = vector<MX>(arg_it, arg_it+n_in_);
+      arg_it += n_in_;
     }
 
     // Call in parallel
     v = fcn_.map(v, parallelization());
 
     // Get results
-    int f_num_out = n_out_;
     vector<MX>::iterator res_it = res.begin();
     for (int i=0; i<n_; ++i) {
       copy(v[i].begin(), v[i].end(), res_it);
-      res_it += f_num_out;
+      res_it += n_out_;
     }
   }
 
@@ -224,6 +216,7 @@ namespace casadi {
 
     // Derivative function
     int nfwd = fsens.size();
+
     Function dfcn = fcn_.derForward(nfwd);
 
     // Nondifferentiated inputs and outputs
@@ -233,22 +226,19 @@ namespace casadi {
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
     // Collect arguments
-    vector<vector<MX> > v(n_);
-    for (int i=0; i<n_; ++i) {
-      v[i].insert(v[i].end(), arg.begin()+i*n_in_,  arg.begin()+(i+1)*n_in_);
-      v[i].insert(v[i].end(), res.begin()+i*n_out_, res.begin()+(i+1)*n_out_);
-      for (int j=0;j<nfwd;++j) {
-        v[i].insert(v[i].end(), fseed[j].begin()+i*n_in_, fseed[j].begin()+(i+1)*n_in_);
-      }
+    vector< MX > v;
+    v.insert(v.end(), arg.begin(), arg.end());
+    v.insert(v.end(), res.begin(), res.end());
+    for (int j=0;j<nfwd;++j) {
+      v.insert(v.end(), fseed[j].begin(), fseed[j].end());
     }
 
     // Call the cached function
     v = dfcn.map(v, parallelization());
-    for (int i=0; i<n_; ++i) {
-      for (int k=0;k<n_out_;++k) {
-        for (int j=0;j<nfwd;++j) {
-          fsens[j][i*n_out_+k] = v[i][k+j*n_out_];
-        }
+
+    for (int k=0;k<n_out_;++k) {
+      for (int j=0;j<nfwd;++j) {
+        fsens[j][k] = v[k+j*n_out_];
       }
     }
   }
@@ -266,21 +256,25 @@ namespace casadi {
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
     // Collect arguments
-    vector<vector<MX> > v(n_);
-    for (int i=0; i<n_; ++i) {
-      v[i].insert(v[i].end(), arg.begin()+i*n_in_, arg.begin()+(i+1)*n_in_);
-      v[i].insert(v[i].end(), res.begin()+i*n_out_, res.begin()+(i+1)*n_out_);
-      for (int j=0;j<nadj;++j) {
-        v[i].insert(v[i].end(), aseed[j].begin()+i*n_out_, aseed[j].begin()+(i+1)*n_out_);
-      }
+    vector< MX > v;
+    v.insert(v.end(), arg.begin(), arg.end());
+    v.insert(v.end(), res.begin(), res.end());
+    for (int j=0;j<nadj;++j) {
+      v.insert(v.end(), aseed[j].begin(), aseed[j].end());
     }
 
     // Call the cached function
     v = dfcn.map(v, parallelization());
-    for (int i=0; i<n_; ++i) {
-      for (int k=0;k<n_in_;++k) {
-        for (int j=0;j<nadj;++j) {
-          asens[j][i*n_in_+k] += v[i][k+j*n_in_];
+    for (int k=0;k<n_in_;++k) {
+      for (int j=0;j<nadj;++j) {
+        if (v[k+j*n_in_].size2()>asens[j][k].size2()) {
+          // Deal with non-repeated inputs
+          vector< MX > s = horzsplit(v[k+j*n_in_], asens[j][k].size2());
+          for (int i=0;i<s.size();++i) {
+            asens[j][k] += s[i];
+          }
+        } else {
+          asens[j][k] += v[k+j*n_in_];
         }
       }
     }
@@ -326,13 +320,40 @@ namespace casadi {
   std::vector<MX >
   Map::create(const Function& fcn, const std::vector< MX > &arg,
               const std::string& parallelization) {
-    int n = arg.size();
-    std::vector<MX > ret(n);
+
     if (parallelization.compare("expand")==0) {
-      // Bypass the Map, call the original function n times
-     // for (int i=0; i<n; ++i) {
-     //   const_cast<Function&>(fcn)->call(arg[i], ret[i], false, false);
-     // }
+      //Bypass the Map, call the original function n times
+      int n = 1;
+
+      // split arguments
+      std::vector< std::vector< MX > > arg_split;
+      for (int i=0;i<arg.size();++i) {
+        arg_split.push_back(horzsplit(arg[i], fcn.input(i).size2()));
+        if (arg_split[i].size()>n) n = arg_split[i].size();
+      }
+
+      std::vector< std::vector<MX> > ret(n);
+
+      // call the original function
+      for (int i=0; i<n; ++i) {
+        std::vector< MX > argi;
+        for (int j=0;j<arg.size();++j) {
+          if (arg_split[j].size()>1) {
+            argi.push_back(arg_split[j][i]);
+          } else {
+            argi.push_back(arg_split[j][0]);
+          }
+        }
+        const_cast<Function&>(fcn)->call(argi, ret[i], false, false);
+      }
+
+      ret = transpose(ret);
+
+      std::vector<MX> ret_cat;
+      for (int i=0;i<fcn.nOut();++i) {
+        ret_cat.push_back(horzcat(ret[i]));
+      }
+      return ret_cat;
     } else {
       // Get type of parallelization
       bool omp;
