@@ -1401,6 +1401,52 @@ class Functiontests(casadiTestCase):
       for i,i_alt in zip(j,j_alt):
         self.checkarray(i,i_alt)   
 
+  @memory_heavy()
+  def test_map_node(self):
+    x = SX.sym("x")
+    y = SX.sym("y",2)
+    z = SX.sym("z",2,2)
+    v = SX.sym("z",Sparsity.upper(3))
+
+    f = SXFunction("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
+
+    n = 2
+
+    X = [MX.sym("x") for i in range(n)]
+    Y = [MX.sym("y",2) for i in range(n)]
+    Z = [MX.sym("z",2,2) for i in range(n)]
+    V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
+
+
+    res = f.map(zip(X,Y,Z,V))
+
+
+    flatres = []
+    for r in res:
+      flatres+= map(sin,r)
+    F = MXFunction("F",X+Y+Z+V,flatres)
+
+    flatresref = []
+    for r in zip(X,Y,Z,V):
+      flatresref+=map(sin,f(r))
+
+    Fref = MXFunction("F",X+Y+Z+V,flatresref)
+    
+    np.random.seed(0)
+    X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+    Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+    Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
+    V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
+
+    for i,e in enumerate(X_+Y_+Z_+V_):
+      F.setInput(e,i)
+      Fref.setInput(e,i)
+
+    F.evaluate()
+    Fref.evaluate()
+    
+    self.checkfunction(F,Fref)
+
     
 if __name__ == '__main__':
     unittest.main()

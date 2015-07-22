@@ -122,6 +122,13 @@ namespace casadi {
 
     /// Number of times called
     int n_;
+
+    /// Number of Function inputs
+    int n_in_;
+
+    /// Number of Function outputs
+    int n_out_;
+
   };
 
   /**

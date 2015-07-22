@@ -36,12 +36,13 @@ using namespace std;
 
 namespace casadi {
 
-  Map::Map(const Function& fcn, const vector<vector<MX> >& arg) : fcn_(fcn) {
+  Map::Map(const Function& fcn, const vector<vector<MX> >& arg) :
+      fcn_(fcn), n_in_(fcn.nIn()), n_out_(fcn.nOut()) {
     // Number of calls
     n_ = arg.size();
 
     // Get all inputs
-    int f_num_in = fcn_.nIn();
+    int f_num_in = n_in_;
     vector<MX> all_arg;
     all_arg.reserve(n_ * f_num_in);
     for (vector<vector<MX> >::const_iterator j=arg.begin(); j!=arg.end(); ++j) {
@@ -80,7 +81,7 @@ namespace casadi {
   }
 
   void Map::evalD(const double** arg, double** res, int* iw, double* w) {
-    int n_in = fcn_.nIn(), n_out = fcn_.nOut();
+    int n_in = n_in_, n_out = n_out_;
     const double** arg1 = arg+ndep();
     double** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
@@ -99,7 +100,7 @@ namespace casadi {
     fcn_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 #pragma omp parallel for
     for (int i=0; i<n_; ++i) {
-      int n_in = fcn_.nIn(), n_out = fcn_.nOut();
+      int n_in = n_in_, n_out = n_out_;
       const double** arg_i = arg + n_in*n_ + sz_arg*i;
       copy(arg+i*n_in, arg+(i+1)*n_in, arg_i);
       double** res_i = res + n_out*n_ + sz_res*i;
@@ -112,7 +113,7 @@ namespace casadi {
   }
 
   void Map::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    int n_in = fcn_.nIn(), n_out = fcn_.nOut();
+    int n_in = n_in_, n_out = n_out_;
     const bvec_t** arg1 = arg+ndep();
     bvec_t** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
@@ -123,7 +124,7 @@ namespace casadi {
   }
 
   void Map::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    int n_in = fcn_.nIn(), n_out = fcn_.nOut();
+    int n_in = n_in_, n_out = n_out_;
     bvec_t** arg1 = arg+ndep();
     bvec_t** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
@@ -134,11 +135,11 @@ namespace casadi {
   }
 
   int Map::nout() const {
-    return n_ * fcn_.nOut();
+    return n_ * n_out_;
   }
 
   const Sparsity& Map::sparsity(int oind) const {
-    return fcn_.output(oind % fcn_.nOut()).sparsity();
+    return fcn_.output(oind % n_out_).sparsity();
   }
 
   const Function& Map::getFunction() const {
@@ -146,7 +147,7 @@ namespace casadi {
   }
 
   void Map::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    int n_in = fcn_.nIn(), n_out = fcn_.nOut();
+    int n_in = n_in_, n_out = n_out_;
     const SXElement** arg1 = arg+ndep();
     SXElement** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
@@ -158,7 +159,7 @@ namespace casadi {
 
   void Map::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Collect arguments
-    int f_num_in = fcn_.nIn();
+    int f_num_in = n_in_;
     vector<vector<MX> > v(n_);
     vector<MX>::const_iterator arg_it = arg.begin();
     for (int i=0; i<n_; ++i) {
@@ -170,7 +171,7 @@ namespace casadi {
     v = fcn_.map(v, parallelization());
 
     // Get results
-    int f_num_out = fcn_.nOut();
+    int f_num_out = n_out_;
     vector<MX>::iterator res_it = res.begin();
     for (int i=0; i<n_; ++i) {
       copy(v[i].begin(), v[i].end(), res_it);
@@ -180,6 +181,7 @@ namespace casadi {
 
   void Map::evalFwd(const std::vector<std::vector<MX> >& fseed,
                      std::vector<std::vector<MX> >& fsens) {
+
     // Derivative function
     int nfwd = fsens.size();
     Function dfcn = fcn_.derForward(nfwd);
@@ -193,13 +195,22 @@ namespace casadi {
     // Collect arguments
     vector<vector<MX> > v(n_);
     for (int i=0; i<n_; ++i) {
-      v[i].insert(v[i].end(), arg.begin(), arg.end());
-      v[i].insert(v[i].end(), res.begin(), res.end());
-      v[i].insert(v[i].end(), fseed[i].begin(), fseed[i].end());
+      v[i].insert(v[i].end(), arg.begin()+i*n_in_,  arg.begin()+(i+1)*n_in_);
+      v[i].insert(v[i].end(), res.begin()+i*n_out_, res.begin()+(i+1)*n_out_);
+      for (int j=0;j<nfwd;++j) {
+        v[i].insert(v[i].end(), fseed[j].begin()+i*n_in_, fseed[j].begin()+(i+1)*n_in_);
+      }
     }
 
     // Call the cached function
-    fsens = dfcn.map(v, parallelization());
+    v = dfcn.map(v, parallelization());
+    for (int i=0; i<n_; ++i) {
+      for (int k=0;k<n_out_;++k) {
+        for (int j=0;j<nfwd;++j) {
+          fsens[j][i*n_out_+k] = v[i][k+j*n_out_];
+        }
+      }
+    }
   }
 
   void Map::evalAdj(const std::vector<std::vector<MX> >& aseed,
@@ -217,16 +228,20 @@ namespace casadi {
     // Collect arguments
     vector<vector<MX> > v(n_);
     for (int i=0; i<n_; ++i) {
-      v[i].insert(v[i].end(), arg.begin(), arg.end());
-      v[i].insert(v[i].end(), res.begin(), res.end());
-      v[i].insert(v[i].end(), aseed[i].begin(), aseed[i].end());
+      v[i].insert(v[i].end(), arg.begin()+i*n_in_, arg.begin()+(i+1)*n_in_);
+      v[i].insert(v[i].end(), res.begin()+i*n_out_, res.begin()+(i+1)*n_out_);
+      for (int j=0;j<nadj;++j) {
+        v[i].insert(v[i].end(), aseed[j].begin()+i*n_out_, aseed[j].begin()+(i+1)*n_out_);
+      }
     }
 
     // Call the cached function
     v = dfcn.map(v, parallelization());
-    for (int i=0; i<v.size(); ++i) {
-      for (int j=0; j<v[i].size(); ++j) {
-        asens[i][j] += v[i][j];
+    for (int i=0; i<n_; ++i) {
+      for (int k=0;k<n_in_;++k) {
+        for (int j=0;j<nadj;++j) {
+          asens[j][i*n_in_+k] += v[i][k+j*n_in_];
+        }
       }
     }
   }
