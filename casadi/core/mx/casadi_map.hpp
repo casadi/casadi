@@ -40,8 +40,8 @@ namespace casadi {
   class CASADI_EXPORT Map : public MultipleOutput {
   public:
     /** \brief  Create map node */
-    static std::vector<std::vector<MX> >
-      create(const Function& fcn, const std::vector<std::vector<MX> > &arg,
+    static std::vector< MX >
+      create(const Function& fcn, const std::vector< MX > &arg,
              const std::string& parallelization);
 
     /** \brief  Destructor */
@@ -115,7 +115,7 @@ namespace casadi {
 
   protected:
     /** \brief  Constructor */
-    explicit Map(const Function& fcn, const std::vector<std::vector<MX> >& arg);
+    explicit Map(const Function& fcn, const std::vector< MX >& arg);
 
     // Function to be evaluated
     Function fcn_;
@@ -129,6 +129,9 @@ namespace casadi {
     /// Number of Function outputs
     int n_out_;
 
+    /// Sparsity pattern of the outputs
+    std::vector<Sparsity> output_sparsity_;
+
   };
 
   /**
@@ -139,7 +142,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    explicit OmpMap(const Function& fcn, const std::vector<std::vector<MX> >& arg);
+    explicit OmpMap(const Function& fcn, const std::vector< MX >& arg);
 
     /** \brief  Destructor */
     virtual ~OmpMap() {}

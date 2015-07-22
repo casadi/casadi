@@ -93,6 +93,41 @@ namespace casadi {
       return map(x_new, parallelization);
     }
 
+    vector< vector<MX> > trans = transpose(x);
+    vector< MX > x_cat(trans.size());
+    for (int i=0;i<trans.size();++i) {
+      x_cat[i] = horzcat(trans[i]);
+    }
+    
+    // Call the internal function
+    vector< MX > ret_cat = map(x_cat, parallelization);
+    vector< vector<MX> > ret;
+
+    std::cout << "check" << std::endl;
+    
+
+    for (int i=0;i<ret_cat.size();++i) {
+      std::cout << ret_cat[i].dimString() << std::endl;
+      ret.push_back( horzsplit(ret_cat[i], output(i).size2()));
+    }
+    return transpose(ret);
+
+  }
+
+  vector<MX> Function::map(const vector< MX > &x,
+                                    const std::string& parallelization) {
+    assertInit();
+    if (x.empty()) return x;
+
+    // Check if arguments match
+    int n = x.size();
+
+    // Replace arguments if needed
+    //if (!matchingArg(x)) {
+    //  vector< MX > x_new = replaceArg(x);
+    //  return map(x, parallelization);
+    //}
+
     // Call the internal function
     return (*this)->createMap(x, parallelization);
   }

@@ -2295,8 +2295,8 @@ namespace casadi {
     return f_gen;
   }
 
-  std::vector<std::vector<MX> >
-  FunctionInternal::createMap(const std::vector<std::vector<MX> > &arg,
+  std::vector< MX >
+  FunctionInternal::createMap(const std::vector< MX > &arg,
                               const std::string& parallelization) {
     return Map::create(shared_from_this<Function>(), arg, parallelization);
   }

@@ -36,29 +36,38 @@ using namespace std;
 
 namespace casadi {
 
-  Map::Map(const Function& fcn, const vector<vector<MX> >& arg) :
+  Map::Map(const Function& fcn, const vector< MX >& arg) :
       fcn_(fcn), n_in_(fcn.nIn()), n_out_(fcn.nOut()) {
+
+    casadi_assert(fcn_.nIn()==arg.size());
+
     // Number of calls
     n_ = arg.size();
 
     // Get all inputs
     int f_num_in = n_in_;
     vector<MX> all_arg;
-    all_arg.reserve(n_ * f_num_in);
-    for (vector<vector<MX> >::const_iterator j=arg.begin(); j!=arg.end(); ++j) {
-      casadi_assert(j->size()==f_num_in);//, "Entries of arg must be lists of length");
-      for (int i=0; i<f_num_in; ++i) {
-        casadi_assert(j->at(i).shape()==fcn_.input(i).shape());
-        // Insert sparsity projection nodes if needed
-        all_arg.push_back(project(j->at(i), fcn_.input(i).sparsity()));
-      }
+
+    n_ = 1;
+    for (int i=0;i<arg.size();++i) {
+      casadi_assert(arg[i].size1()==fcn_.input(i).size1());
+      casadi_assert(arg[i].size2() % fcn_.input(i).size2()==0);
+      int n = arg[i].size2() / fcn_.input(i).size2();
+      casadi_assert(n==1 || n_==1 || n==n_);
+      if (n>1) n_ = n;
+      all_arg.push_back(project(arg[i], repmat(fcn_.input(i).sparsity(), 1, n)));
     }
-    casadi_assert(all_arg.size() == n_ * f_num_in);
+
+    output_sparsity_.resize(n_out_);
+    for (int i=0;i<n_out_;++i) {
+      output_sparsity_[i] = repmat(fcn_.output(i).sparsity(), 1, n_);
+    }
+
     setDependencies(all_arg);
     setSparsity(Sparsity::scalar());
   }
 
-  OmpMap::OmpMap(const Function& fcn, const vector<vector<MX> >& arg) : Map(fcn, arg) {
+  OmpMap::OmpMap(const Function& fcn, const vector<MX >& arg) : Map(fcn, arg) {
   }
 
   Map* Map::clone() const {
@@ -85,8 +94,14 @@ namespace casadi {
     const double** arg1 = arg+ndep();
     double** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
-      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      for (int j=0; j<n_in; ++j) {
+        arg1[j]=arg[j];
+        arg[j] += fcn_.input(j).nnz();
+      }
+      for (int j=0; j<n_out; ++j) {
+        res1[j]=res[j];
+        res[j] += fcn_.output(j).nnz();
+      }
       fcn_->evalD(arg1, res1, iw, w);
     }
   }
@@ -117,8 +132,14 @@ namespace casadi {
     const bvec_t** arg1 = arg+ndep();
     bvec_t** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
-      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      for (int j=0; j<n_in; ++j) {
+        arg1[j]=arg[j];
+        arg[j] += fcn_.input(j).nnz();
+      }
+      for (int j=0; j<n_out; ++j) {
+        res1[j]=res[j];
+        res[j] += fcn_.output(j).nnz();
+      }
       fcn_->spFwd(arg1, res1, iw, w);
     }
   }
@@ -128,18 +149,24 @@ namespace casadi {
     bvec_t** arg1 = arg+ndep();
     bvec_t** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
-      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      for (int j=0; j<n_in; ++j) {
+        arg1[j]=arg[j];
+        arg[j] += fcn_.input(j).nnz();
+      }
+      for (int j=0; j<n_out; ++j) {
+        res1[j]=res[j];
+        res[j] += fcn_.output(j).nnz();
+      }
       fcn_->spAdj(arg1, res1, iw, w);
     }
   }
 
   int Map::nout() const {
-    return n_ * n_out_;
+    return n_out_;
   }
 
   const Sparsity& Map::sparsity(int oind) const {
-    return fcn_.output(oind % n_out_).sparsity();
+    return output_sparsity_[oind];
   }
 
   const Function& Map::getFunction() const {
@@ -151,8 +178,14 @@ namespace casadi {
     const SXElement** arg1 = arg+ndep();
     SXElement** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
-      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      for (int j=0; j<n_in; ++j) {
+        arg1[j]=arg[j];
+        arg[j] += fcn_.input(j).nnz();
+      }
+      for (int j=0; j<n_out; ++j) {
+        res1[j]=res[j];
+        res[j] += fcn_.output(j).nnz();
+      }
       fcn_->evalSX(arg1, res1, iw, w);
     }
   }
@@ -283,16 +316,16 @@ namespace casadi {
     return fcn_.sz_w()*n_;
   }
 
-  std::vector<std::vector<MX> >
-  Map::create(const Function& fcn, const std::vector<std::vector<MX> > &arg,
+  std::vector<MX >
+  Map::create(const Function& fcn, const std::vector< MX > &arg,
               const std::string& parallelization) {
     int n = arg.size();
-    std::vector<std::vector<MX> > ret(n);
+    std::vector<MX > ret(n);
     if (parallelization.compare("expand")==0) {
       // Bypass the Map, call the original function n times
-      for (int i=0; i<n; ++i) {
-        const_cast<Function&>(fcn)->call(arg[i], ret[i], false, false);
-      }
+     // for (int i=0; i<n; ++i) {
+     //   const_cast<Function&>(fcn)->call(arg[i], ret[i], false, false);
+     // }
     } else {
       // Get type of parallelization
       bool omp;
@@ -308,21 +341,12 @@ namespace casadi {
       // Call the map
       std::vector<MX> v;
       if (omp) {
-        v = MX::createMultipleOutput(new OmpMap(fcn, arg));
+        return MX::createMultipleOutput(new OmpMap(fcn, arg));
       } else {
-        v = MX::createMultipleOutput(new Map(fcn, arg));
+        return MX::createMultipleOutput(new Map(fcn, arg));
       }
 
-      // Collect outputs
-      std::vector<MX>::const_iterator v_it = v.begin();
-      int n_out = fcn.nOut();
-      for (int i=0; i<n; ++i) {
-        ret[i] = std::vector<MX>(v_it, v_it+n_out);
-        v_it += n_out;
-      }
-      casadi_assert(v_it==v.end());
     }
-    return ret;
   }
 
 

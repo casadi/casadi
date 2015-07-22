@@ -106,8 +106,8 @@ namespace casadi {
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief  Create map node */
-    virtual std::vector<std::vector<MX> >
-      createMap(const std::vector<std::vector<MX> > &arg, const std::string& parallelization);
+    virtual std::vector< MX >
+      createMap(const std::vector< MX > &arg, const std::string& parallelization);
 
     /** \brief Call a function, DMatrix type (overloaded) */
     void call(const DMatrixVector& arg, DMatrixVector& res,
