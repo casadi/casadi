@@ -46286,6 +46286,12 @@ Extract shared subexpressions from an set of expressions.
 
 ";
 
+%feature("docstring") casadi::transpose "
+
+Returns the transpose of a list of lists.
+
+";
+
 %feature("docstring") casadi::matrix_expand "
 
 Expand MX graph to SXFunction call.
