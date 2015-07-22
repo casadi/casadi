@@ -1861,6 +1861,25 @@ Get output scheme.
 
 
 // File: classcasadi_1_1CodeGenerator.xml
+%feature("docstring")  casadi::CodeGenerator::addInclude(const std::string
+&new_include, bool relative_path=false, const std::string
+&use_ifdef=std::string()) "
+
+Add an include file optionally using a relative path \"...\" instead of an
+absolute path <...>
+
+";
+
+%feature("docstring") casadi::CodeGenerator "C++ includes:
+code_generator.hpp ";
+
+%feature("docstring")  casadi::CodeGenerator::compile(const std::string
+&name, const std::string &compiler="gcc -fPIC -O2") "
+
+Compile and load function.
+
+";
+
 %feature("docstring")  casadi::CodeGenerator::add(const Function &f) "
 
 Add a function (name generated)
@@ -1891,16 +1910,6 @@ Generate a file.
 %feature("docstring")  casadi::CodeGenerator::generate() const  "
 
 Generate a file, return code as string.
-
-";
-
-%feature("docstring") casadi::CodeGenerator "C++ includes:
-code_generator.hpp ";
-
-%feature("docstring")  casadi::CodeGenerator::compile(const std::string
-&name, const std::string &compiler="gcc -fPIC -O2") "
-
-Compile and load function.
 
 ";
 

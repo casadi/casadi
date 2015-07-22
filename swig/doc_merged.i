@@ -1440,6 +1440,22 @@ Get output scheme.
 
 
 // File: classcasadi_1_1CodeGenerator.xml
+%feature("docstring") casadi::CodeGenerator::addInclude "
+
+Add an include file optionally using a relative path \"...\" instead of an
+absolute path <...>
+
+";
+
+%feature("docstring") casadi::CodeGenerator "C++ includes:
+code_generator.hpp ";
+
+%feature("docstring") casadi::CodeGenerator::compile "
+
+Compile and load function.
+
+";
+
 %feature("docstring") casadi::CodeGenerator::add "
 
 >  void CodeGenerator.add(Function f)
@@ -1471,15 +1487,6 @@ Generate a file.
 ------------------------------------------------------------------------
 
 Generate a file, return code as string.
-
-";
-
-%feature("docstring") casadi::CodeGenerator "C++ includes:
-code_generator.hpp ";
-
-%feature("docstring") casadi::CodeGenerator::compile "
-
-Compile and load function.
 
 ";
 
