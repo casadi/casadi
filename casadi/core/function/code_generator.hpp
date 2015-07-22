@@ -58,11 +58,11 @@ namespace casadi {
     /// Compile and load function
     std::string compile(const std::string& name, const std::string& compiler="gcc -fPIC -O2");
 
-#ifndef SWIG
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     void addInclude(const std::string& new_include, bool relative_path=false,
                     const std::string& use_ifdef=std::string());
 
+#ifndef SWIG
     /// Add an external function declaration
     void addExternal(const std::string& new_external);
 
