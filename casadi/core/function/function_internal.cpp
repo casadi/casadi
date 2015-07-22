@@ -1952,7 +1952,11 @@ namespace casadi {
 
     // Define function
     g.body << "/* " << getSanitizedName() << " */" << endl;
-    if (decl_static) g.body << "static ";
+    if (decl_static) {
+      g.body << "static ";
+    } else if (g.cpp) {
+      g.body << "extern \"C\" ";
+    }
     g.body << "int " << fname << "(const real_t** arg, real_t** res, int* iw, real_t* w) {"
       << endl;
 
@@ -2010,8 +2014,11 @@ namespace casadi {
     // Function that returns the number of inputs and outputs
     string tmp = "int " + fname + "_init(int *f_type, int *n_in, int *n_out, "
       "int *sz_arg, int* sz_res)";
+    if (g.cpp) {
+      tmp = "extern \"C\" " + tmp;  // C linkage
+    }
     if (g.with_header) {
-      g.header << "extern " << tmp << ";" << endl;
+      g.header << tmp << ";" << endl;
     }
     s << tmp << " {" << endl
       << "  *f_type = 1;" << endl
@@ -2045,8 +2052,11 @@ namespace casadi {
     // Function that returns the sparsity pattern
     tmp = "int " + fname + "_sparsity"
       "(int i, int *nrow, int *ncol, const int **colind, const int **row)";
+    if (g.cpp) {
+      tmp = "extern \"C\" " + tmp;  // C linkage
+    }
     if (g.with_header) {
-      g.header << "extern " << tmp << ";" << endl;
+      g.header << tmp << ";" << endl;
     }
     s << tmp << " {" << endl;
 
@@ -2084,8 +2094,11 @@ namespace casadi {
 
     // Function that returns work vector lengths
     tmp = "int " + fname + "_work(int *sz_iw, int *sz_w)";
+    if (g.cpp) {
+      tmp = "extern \"C\" " + tmp;  // C linkage
+    }
     if (g.with_header) {
-      g.header << "extern " << tmp << ";" << endl;
+      g.header << tmp << ";" << endl;
     }
     s << tmp << " {" << endl;
     s << "  if (sz_iw) *sz_iw = " << sz_iw() << ";" << endl;
@@ -2113,19 +2126,18 @@ namespace casadi {
              << "\"Evaluation of \\\"" << fname << "\\\" failed. "
              << "Too many output arguments (%d, max " << n_out << ")\", resc);" << endl;
 
-      // Work vectors, including input buffers
-      int i_nnz = 0;
+      // Work vectors, including input and output buffers
+      int i_nnz = nnzIn(), o_nnz = nnzOut();
       size_t sz_w = this->sz_w();
       for (int i=0; i<n_in; ++i) {
         const Sparsity& s = input(i).sparsity();
-        i_nnz += s.nnz();
         sz_w = max(sz_w, static_cast<size_t>(s.size1())); // To be able to copy a column
         sz_w = max(sz_w, static_cast<size_t>(s.size2())); // To be able to copy a row
       }
-      sz_w += i_nnz;
+      sz_w += i_nnz + o_nnz;
       s << "  int iw[" << sz_iw() << "];" << endl;
       s << "  real_t w[" << sz_w << "];" << endl;
-      string fw = "w+" + g.to_string(i_nnz);
+      string fw = "w+" + g.to_string(i_nnz + o_nnz);
 
       // Copy inputs to buffers
       int offset=0;
@@ -2137,7 +2149,7 @@ namespace casadi {
         offset += input(i).nnz();
       }
 
-      // Allocate result
+      // Allocate output buffers
       s << "  real_t* res[" << n_out << "] = {0};" << endl;
       for (int i=0; i<n_out; ++i) {
         if (i==0) {
@@ -2149,14 +2161,21 @@ namespace casadi {
           s << "  if (--resc>=0) ";
         }
         // Create and get pointer
-        s << "resv[" << i << "] = " << g.to_mex(output(i).sparsity(),
-                                                "&res["+g.to_string(i)+"]") << endl;
+        s << "res[" << i << "] = w+" << g.to_string(offset) << endl;
+        offset += output(i).nnz();
       }
 
       // Call the function
       s << "  i = " << fname << "(arg, res, iw, " << fw << ");" << endl;
       s << "  if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << fname
              << "\\\" failed.\");" << endl;
+
+      // Save results
+      for (int i=0; i<n_out; ++i) {
+        string res_i = "res[" + g.to_string(i) + "]";
+        s << "  if (" << res_i << ") resv[" << i << "] = "
+          << g.to_mex(output(i).sparsity(), res_i) << endl;
+      }
 
       // End conditional compilation and function
       s << "}" << endl

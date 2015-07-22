@@ -268,7 +268,7 @@ namespace casadi {
     bool if_else = f_.size()==1;
 
     // Codegen condition
-    g.body << "  " << (if_else ? "if" : "switch")  << " ((int)arg[0][0]) {" << endl;
+    g.body << "  " << (if_else ? "if" : "switch")  << " (to_int(arg[0][0])) {" << endl;
 
     // Loop over cases/functions
     for (int k=0; k<=f_.size(); ++k) {

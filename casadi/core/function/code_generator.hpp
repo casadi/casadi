@@ -147,7 +147,7 @@ namespace casadi {
                         const std::string& w);
 
     /** \brief Create matrix in MATLAB's MEX format */
-    std::string to_mex(const Sparsity& sp, const std::string& data="0");
+    std::string to_mex(const Sparsity& sp, const std::string& arg);
 
     /** \brief Get matrix from MATLAB's MEX format */
     std::string from_mex(std::string& arg,
@@ -188,8 +188,8 @@ namespace casadi {
     // Verbose codegen?
     bool verbose;
 
-    // C++ guards (making the code valid C++)
-    bool cpp_guards;
+    // Are we generating C++?
+    bool cpp;
 
     // Should we generate a main (allowing evaluation from command line)
     bool main;
