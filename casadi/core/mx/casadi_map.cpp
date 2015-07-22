@@ -40,6 +40,8 @@ namespace casadi {
       fcn_(fcn), n_in_(fcn.nIn()), n_out_(fcn.nOut()) {
 
     casadi_assert(fcn_.nIn()==arg.size());
+    
+    n_repeated_.resize(n_in_);
 
     // Number of calls
     n_ = arg.size();
@@ -49,10 +51,11 @@ namespace casadi {
     vector<MX> all_arg;
 
     n_ = 1;
-    for (int i=0;i<arg.size();++i) {
+    for (int i=0;i<n_in_;++i) {
       casadi_assert(arg[i].size1()==fcn_.input(i).size1());
       casadi_assert(arg[i].size2() % fcn_.input(i).size2()==0);
       int n = arg[i].size2() / fcn_.input(i).size2();
+      n_repeated_[i] = n;
       casadi_assert(n==1 || n_==1 || n==n_);
       if (n>1) n_ = n;
       all_arg.push_back(project(arg[i], repmat(fcn_.input(i).sparsity(), 1, n)));
@@ -96,7 +99,8 @@ namespace casadi {
     for (int i=0; i<n_; ++i) {
       for (int j=0; j<n_in; ++j) {
         arg1[j]=arg[j];
-        arg[j] += fcn_.input(j).nnz();
+        if (n_repeated_[j]!=1)
+          arg[j] += fcn_.input(j).nnz();
       }
       for (int j=0; j<n_out; ++j) {
         res1[j]=res[j];
@@ -134,7 +138,8 @@ namespace casadi {
     for (int i=0; i<n_; ++i) {
       for (int j=0; j<n_in; ++j) {
         arg1[j]=arg[j];
-        arg[j] += fcn_.input(j).nnz();
+        if (n_repeated_[j]!=1)
+          arg[j] += fcn_.input(j).nnz();
       }
       for (int j=0; j<n_out; ++j) {
         res1[j]=res[j];
@@ -151,7 +156,8 @@ namespace casadi {
     for (int i=0; i<n_; ++i) {
       for (int j=0; j<n_in; ++j) {
         arg1[j]=arg[j];
-        arg[j] += fcn_.input(j).nnz();
+        if (n_repeated_[j]!=1)
+          arg[j] += fcn_.input(j).nnz();
       }
       for (int j=0; j<n_out; ++j) {
         res1[j]=res[j];
@@ -180,7 +186,8 @@ namespace casadi {
     for (int i=0; i<n_; ++i) {
       for (int j=0; j<n_in; ++j) {
         arg1[j]=arg[j];
-        arg[j] += fcn_.input(j).nnz();
+        if (n_repeated_[j]!=1)
+          arg[j] += fcn_.input(j).nnz();
       }
       for (int j=0; j<n_out; ++j) {
         res1[j]=res[j];

@@ -128,6 +128,9 @@ namespace casadi {
 
     /// Number of Function outputs
     int n_out_;
+    
+    /// Sparsity pattern of the outputs
+    std::vector<int> n_repeated_;
 
     /// Sparsity pattern of the outputs
     std::vector<Sparsity> output_sparsity_;
