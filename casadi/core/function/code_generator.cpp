@@ -91,7 +91,7 @@ namespace casadi {
   void CodeGenerator::add(const Function& f, const std::string& fname) {
     f->generateFunction(*this, fname, false);
     if (this->with_header) {
-      if (this->cpp) this->header << "extern \"C\"" ; // C linkage
+      if (this->cpp) this->header << "extern \"C\" " ; // C linkage
       this->header
         << "int " << fname << "(const real_t** arg, real_t** res, int* iw, real_t* w);" << endl;
     }
