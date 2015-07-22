@@ -1408,7 +1408,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    f = SXFunction("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
+    fun = SXFunction("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -1417,36 +1417,36 @@ class Functiontests(casadiTestCase):
     Z = [MX.sym("z",2,2) for i in range(n)]
     V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
 
+    for parallelization in ["serial","expand","openmp"]:
+      res = fun.map(zip(X,Y,Z,V),parallelization)
 
-    res = f.map(zip(X,Y,Z,V))
 
+      flatres = []
+      for r in res:
+        flatres+= map(sin,r)
+      F = MXFunction("F",X+Y+Z+V,flatres)
 
-    flatres = []
-    for r in res:
-      flatres+= map(sin,r)
-    F = MXFunction("F",X+Y+Z+V,flatres)
+      flatresref = []
+      for r in zip(X,Y,Z,V):
+        flatresref+=map(sin,fun(r))
 
-    flatresref = []
-    for r in zip(X,Y,Z,V):
-      flatresref+=map(sin,f(r))
+      Fref = MXFunction("F",X+Y+Z+V,flatresref)
+      
+      np.random.seed(0)
+      X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+      Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+      Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
+      V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
-    Fref = MXFunction("F",X+Y+Z+V,flatresref)
-    
-    np.random.seed(0)
-    X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
-    Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
-    Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
-    V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
+      for f in [F, F.expand()]:
+        for i,e in enumerate(X_+Y_+Z_+V_):
+          f.setInput(e,i)
+          Fref.setInput(e,i)
 
-    for i,e in enumerate(X_+Y_+Z_+V_):
-      F.setInput(e,i)
-      Fref.setInput(e,i)
-
-    F.evaluate()
-    Fref.evaluate()
-    
-    self.checkfunction(F,Fref)
-
+        f.evaluate()
+        Fref.evaluate()
+        
+        self.checkfunction(f,Fref)
     
 if __name__ == '__main__':
     unittest.main()
