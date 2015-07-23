@@ -1422,8 +1422,10 @@ class Functiontests(casadiTestCase):
           ([Z[0]],[Z[0]]*n),
           ([MX()]*3,[MX()]*3),
         ]:
+      print "args", Z_alt
 
-      for parallelization in ["serial","expand","openmp"]:
+      for parallelization in ["serial","expand","openmp"] if args.run_slow else ["serial"]:
+        print parallelization
         res = fun.map(map(horzcat,[X,Y,Z_alt,V]),parallelization)
 
 
@@ -1450,7 +1452,7 @@ class Functiontests(casadiTestCase):
           f.evaluate()
           Fref.evaluate()
           
-          self.checkfunction(f,Fref,sparsity_mod = False)
+          self.checkfunction(f,Fref,sparsity_mod=args.run_slow)
 
 
   @memory_heavy()
