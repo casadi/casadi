@@ -44625,6 +44625,22 @@ to be monotonously increasing
 
 ";
 
+%feature("docstring") casadi::swapIndices "
+
+swap inner and outer indices of list of lists
+
+
+
+::
+
+  * [[apple0,apple1,...],[pear0,pear1,...]] ->
+  *   [[apple0,pear0],[apple1,pear1],...]
+  * 
+
+
+
+";
+
 %feature("docstring") casadi::dlaqge_ "[INTERNAL]  Equilibrate the system.
 
 ";
@@ -46283,12 +46299,6 @@ Output arguments of a linear solver
 %feature("docstring") casadi::extractShared "
 
 Extract shared subexpressions from an set of expressions.
-
-";
-
-%feature("docstring") casadi::transpose "
-
-Returns the transpose of a list of lists.
 
 ";
 

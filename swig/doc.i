@@ -57221,6 +57221,23 @@ to be monotonously increasing
 
 ";
 
+%feature("docstring")  casadi::swapIndices(const std::vector< std::vector< T
+> > &m) "
+
+swap inner and outer indices of list of lists
+
+
+
+::
+
+  * [[apple0,apple1,...],[pear0,pear1,...]] ->
+  *   [[apple0,pear0],[apple1,pear1],...]
+  * 
+
+
+
+";
+
 %feature("docstring")  casadi::dlaqge_(int *m, int *n, double *a, int *lda,
 double *r, double *c, double *colcnd, double *rowcnd, double *amax, char
 *equed) " [INTERNAL]  Equilibrate the system.
@@ -59097,13 +59114,6 @@ std::vector< SX > &v, std::vector< SX > &vdef, const std::string
 &v_prefix="v_", const std::string &v_suffix="") "
 
 Extract shared subexpressions from an set of expressions.
-
-";
-
-%feature("docstring")  casadi::transpose(const std::vector< std::vector< T >
-> &m) "
-
-Returns the transpose of a list of lists.
 
 ";
 
