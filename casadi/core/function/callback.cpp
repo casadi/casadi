@@ -95,7 +95,7 @@ Function Callback2::create() {
 }
 
 Function DerivativeGenerator2::operator()(const Function& fcn, int ndir) {
-
+  casadi_error("This virtual method must be implemented");
 }
 
 
