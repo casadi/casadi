@@ -38,6 +38,9 @@ if SdpSolver.hasPlugin("dsdp"):
 if SocpSolver.hasPlugin("mosek"):
   socpsolvers.append(("mosek",{ "MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10 },{"less_digits": 1},False))
 
+if SocpSolver.hasPlugin("ecos"):
+  socpsolvers.append(("ecos",{},{},False))
+
 print socpsolvers
   
 class SocpSolverTests(casadiTestCase):

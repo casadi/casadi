@@ -75,6 +75,19 @@ namespace casadi {
 
   private:
 
+    /// Static ECOS input: G
+    std::vector<pfloat> ecos_Gpr_vec_;
+    std::vector<idxint> ecos_Gjc_vec_;
+    std::vector<idxint> ecos_Gir_vec_;
+
+    /// Static ECOS input: h
+    std::vector<pfloat> ecos_h_vec_;
+
+    /// Static ECOS input: q
+    std::vector<idxint> ecos_q_vec_;
+
+    /// ECOS input: c
+    std::vector<pfloat> ecos_c_vec_;
 
   };
 

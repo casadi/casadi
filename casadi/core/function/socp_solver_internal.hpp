@@ -119,7 +119,7 @@ namespace casadi {
     A  sparse ( n x nx )             | [-ei Gi -Alba' Auba' -Ilbx Iubx]
     b  dense ( n x 1 )               | [c]
     lbx dense ( nx x 1 )             | [-inf' 0']'
-    nx = m + N + nlba + nuba + nlbx + nubx
+    nx = m + N + nlba + nuba + nlbx + nubx (alias: dual_n_)
     \endverbatim
     */
     void convertToDualSocp();
@@ -136,6 +136,12 @@ namespace casadi {
 
     /// Vector of affine terms in linear inequality constraint in dual SOCP
     std::vector<double>  dual_b_;
+
+    /// Size of dual decision variable vector
+    int dual_n_;
+
+    /// Number of linear constraints in dual problem
+    int dual_nc_;
 
     /** Indices of lower bounded linear inequality constraints (LBA != -inf),
     used to set up dual SOCP variables */

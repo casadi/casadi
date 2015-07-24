@@ -105,6 +105,43 @@ namespace casadi {
     output(SOCP_SOLVER_LAM_X) = DMatrix::zeros(n_, 1);
     output(SOCP_SOLVER_LAM_A) = DMatrix::zeros(nc_, 1);
     output(SOCP_SOLVER_LAM_CONE) = DMatrix::zeros(m_, 1);
+
+
+    // Dual computation
+
+    // Pre-allocate memory for vector indices of relevant bounds
+    primal_idx_lba_.reserve(nc_);
+    primal_idx_uba_.reserve(nc_);
+    primal_idx_lbx_.reserve(n_);
+    primal_idx_ubx_.reserve(n_);
+
+    // Start to construct base of dual_c_
+    std::vector<DMatrix> dual_c_v;
+    dual_c_v.push_back(input(SOCP_SOLVER_F));
+    dual_c_v.push_back(input(SOCP_SOLVER_H));
+    dual_c_ = vertcat(dual_c_v).data();
+    // Reserve maximum size of dual_c_
+    int sizeof_c = m_+N_+2*nc_+2*n_;
+    dual_c_.reserve(sizeof_c);
+
+    // Start to construct base of dual_A_
+    std::vector<DMatrix> dual_A_v;
+    DMatrix dual_A_DMatrix;
+    dual_A_v.push_back(input(SOCP_SOLVER_E));
+    dual_A_v.push_back(input(SOCP_SOLVER_G));
+    dual_A_DMatrix = horzcat(dual_A_v);
+    dual_A_data_ = dual_A_DMatrix.data();
+    dual_A_row_ = dual_A_DMatrix.sparsity().getRow();
+    dual_A_colind_ = dual_A_DMatrix.sparsity().getColind();
+    // Reserve memory for maximum size of dual_A_
+    int sizeof_A = input(SOCP_SOLVER_E).size() + input(SOCP_SOLVER_G).size() +
+                     2*input(SOCP_SOLVER_A).size()+2*n_;
+    dual_A_data_.reserve(sizeof_A);
+    dual_A_row_.reserve(sizeof_A);
+    dual_A_colind_.reserve(m_+N_+2*nc_+2*n_+1);
+
+    // Start to construct base of dual_b_
+    dual_b_ = input(SOCP_SOLVER_C).data();
   }
 
   SocpSolverInternal::~SocpSolverInternal() {
@@ -283,6 +320,10 @@ namespace casadi {
 
     // b-vector
     std::copy(primal_C.data().begin(), primal_C.data().end(), dual_b_.begin());
+
+    // some properties of dual problem
+    dual_n_ = m_ + N_ + primal_idx_lba_.size() + primal_idx_uba_.size() + primal_idx_lbx_.size() + primal_idx_ubx_.size();
+    dual_nc_ = n_;
 
   }
 

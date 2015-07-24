@@ -218,8 +218,7 @@ namespace casadi {
     // Remove or append variables
     int numvar_old;
     MSK_getnumvar(mosek_task_, &numvar_old);
-    int numvar_new = m_ + N_ + primal_idx_lba_.size() + primal_idx_uba_.size() +
-                       primal_idx_lbx_.size() + primal_idx_ubx_.size();
+    int numvar_new = dual_n_;
     int num_vars_to_remove = numvar_old - numvar_new;
     if (num_vars_to_remove < 0) {
       MSK_appendvars(mosek_task_, -num_vars_to_remove);
