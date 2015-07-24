@@ -338,7 +338,7 @@ namespace casadi {
   }
 
   template<typename real_t>
-  real_t CASADI_PREFIX(norm_inf_mul)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t *dwork, int *iwork) {
+  real_t CASADI_PREFIX(norm_inf_mul)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* dwork, int* iwork) {
     real_t res = 0;
     /* Get sparsities */
     int nrow_x = sp_x[0], ncol_x = sp_x[1];

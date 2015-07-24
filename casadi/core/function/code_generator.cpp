@@ -460,41 +460,55 @@ namespace casadi {
     case AUX_COPY_N:
       this->auxiliaries
         << codegen_str_copy_n
-        << "#define copy_n(x, n, y) CASADI_PREFIX(copy_n)(x, n, y)" << endl
+        << codegen_str_copy_n_define << endl
         << endl;
       break;
     case AUX_SWAP:
-      this->auxiliaries << codegen_str_swap << endl;
+      this->auxiliaries << codegen_str_swap
+        << codegen_str_swap_define
+        << endl;
       break;
     case AUX_SCAL:
-      this->auxiliaries << codegen_str_scal << endl;
+      this->auxiliaries << codegen_str_scal
+        << codegen_str_scal_define
+        << endl;
       break;
     case AUX_AXPY:
-      this->auxiliaries << codegen_str_axpy << endl;
+      this->auxiliaries << codegen_str_axpy
+        << codegen_str_axpy_define
+        << endl;
       break;
     case AUX_INNER_PROD:
       this->auxiliaries
         << codegen_str_inner_prod
-        << "#define inner_prod(n, x, y) CASADI_PREFIX(inner_prod)(n, x, y)" << endl
+        << codegen_str_inner_prod_define << endl
         << endl;
       break;
     case AUX_ASUM:
-      this->auxiliaries << codegen_str_asum << endl;
+      this->auxiliaries << codegen_str_asum
+        << codegen_str_asum_define
+        << endl;
       break;
     case AUX_IAMAX:
-      this->auxiliaries << codegen_str_iamax << endl;
+      this->auxiliaries << codegen_str_iamax
+        << codegen_str_iamax_define
+        << endl;
       break;
     case AUX_NRM2:
-      this->auxiliaries << codegen_str_nrm2 << endl;
+      this->auxiliaries << codegen_str_nrm2
+        << codegen_str_nrm2_define
+        << endl;
       break;
     case AUX_FILL_N:
       this->auxiliaries
         << codegen_str_fill_n
-        << "#define fill_n(x, n, alpha) CASADI_PREFIX(fill_n)(x, n, alpha)" << endl
+        << codegen_str_fill_n_define << endl
         << endl;
       break;
     case AUX_MM_SPARSE:
-      this->auxiliaries << codegen_str_mm_sparse << endl;
+      this->auxiliaries << codegen_str_mm_sparse
+        << codegen_str_mm_sparse_define
+        << endl;
       break;
     case AUX_SQ:
       auxSq();
@@ -505,7 +519,7 @@ namespace casadi {
     case AUX_PROJECT:
       this->auxiliaries
         << codegen_str_project
-        << "#define project(x, sp_x, y, sp_y, w) CASADI_PREFIX(project)(x, sp_x, y, sp_y, w)"
+        << codegen_str_project_define
         << endl << endl;
       break;
     case AUX_TRANS:
