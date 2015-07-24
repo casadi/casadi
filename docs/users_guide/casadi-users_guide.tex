@@ -1256,27 +1256,101 @@ Other useful commands available for an instance \texttt{ocp} of \texttt{Symbolic
 
 For a more detailed description of this class and its functionalities, we refer to the API documentation. We also recommend potential users to have a look at the {\texttt{modelica\_ms.py}} tutorial example.
 
-\chapter{Syntax differences between \CasADi in Python, C++ and MATLAB (in development)} \label{ch:syntax_differences}
+\chapter{Difference in usage from different languages} \label{ch:syntax_differences}
+
+\section{General usage}
 \scriptsize
 \begin{center}
   \begin{tabular}{| p{3.5cm} | p{3.5cm} | p{3.5cm} | p{3.5cm} | }
     \hline
-      & Python & C++ & MATLAB (in development) \\ \hline
+      & Python & C++ & MATLAB \\ \hline
     Starting \CasADi & \verb|from casadi import *| & \verb|#include \| \verb|"casadi/casadi.hpp"| \verb|using namespace casadi;| & \verb|import casadi.*| \\ \hline
     Printing the \emph{representation} (string representation intended to be \emph{unambiguous}) & \verb|A <ENTER>| (interactive), \verb|print repr(A)| (in scripts) & \verb|std::cout << A;|& \verb|A <ENTER>| or \verb|disp A|\\ \hline
     Printing the \emph{description} (string representation intended to be \emph{readable}) & \verb|print A| & \verb|A.print();| or \verb|A.print(stream);|& \verb|A.print()| \\ \hline
     Calling a class function & \verb|SX.zeros(3,4)| & \verb|SX::zeros(3,4)| & \verb|SX.zeros(3,4)|\\ \hline
-    Element access & \verb|A[i,j]|, \emph{0-based} & \verb|A(i,j)| and \verb|A(i)|, \emph{0-based} & \verb|A(i,j)|, \emph{1-based} \\ \hline
-    Element assignment & \verb|A[i,j] = b|, \emph{0-based} & \verb|A(i,j) = b| and \verb|A(i) = b|, \linebreak \emph{0-based} & \verb|A(i,j) = b|, \emph{1-based} \\ \hline
-    Nonzero access & \verb|A.el[k]|, \emph{0-based} & \verb|A[k]|, \emph{0-based} & \verb|A{k}|, \emph{1-based} \\ \hline
-    Nonzero assignment & \verb|A.el[k] = b|, \emph{0-based} & \verb|A[k] = b|, \emph{0-based} & \verb|A{k} = b|, \emph{1-based} \\ \hline
-    Matrix multiplication & \verb|mul(x,y)| & \verb|mul(x,y)| & \verb|mul(x,y)| or \verb|x*y| \\ \hline
-    Elementwise multiplication & \verb|x*y| & \verb|x*y| & \verb|x.*y| \\ \hline
-    Elementwise division & \verb|x/y| & \verb|x/y| & \verb|x./y| \\ \hline
-    Power & \verb|x**y| & \verb|pow(x,y)| & \verb|x^y| or \verb|x.^y| \\ \hline
-    Transpose & \verb|transpose(A)| or \verb|A.T| & \verb|transpose(A)| or \verb|A.T()|& \verb|transpose(A)| or \verb|A'| or \verb|A.'| \\ \hline
     Creating a dictionary (e.g. for options) & \verb|d = {'opt1':opt1}| or \verb|d = {}; a['opt1'] = opt1| & \verb|a = Dict();| \verb|a['opt1'] = opt1;| & \verb|a = Dict();| \verb|a('opt1') = opt1;| \\ \hline
     Getting function output by value & \verb|out = f.getOutput()| & \verb|DMatrix out;| \verb|f.getOutput(out);| & \verb|out = f.getOutput()| \\ \hline
+  \end{tabular}
+\end{center}
+
+\section{List of operations}
+The following is a list of the most important operations. Operations that differ between the different
+languages are marked with a star (*). This list is neither complete, nor does it show all the variants of
+each operation. Further information is available in the API documentation.
+
+\scriptsize
+\begin{center}
+  \begin{tabular}{| p{3.5cm} | p{3.5cm} | p{3.5cm} | p{3.5cm} | }
+    \hline
+      & Python & C++ & MATLAB \\ \hline
+    Addition, subtraction
+    & \verb|x+y, x-y| & \verb|x+y, x-y| & \verb|x+y, x-y| \\ \hline
+    *Elementwise multiplication, division
+    & \verb|x*y, x/y| & \verb|x*y, x/y| & \verb|x.*y, x./y| \\ \hline
+    Negation
+    & \verb|-x| & \verb|-x| & \verb|-x| \\ \hline
+    Natural exponential function
+    & \verb|exp(x)| & \verb|exp(x)| & \verb|exp(x)| \\ \hline
+    Natural logarithm
+    & \verb|log(x)| & \verb|log(x)| & \verb|log(x)| \\ \hline
+    *Exponentiation & \verb|x**y| & \verb|pow(x,y)| & \verb|x^y| or \verb|x.^y| \\ \hline
+    Square root & \verb|sqrt(x)| & \verb|sqrt(x)| & \verb|sqrt(x)| \\ \hline
+    Trigonometric functions & \verb|sin(x), cos(x), tan(x)| & \verb|sin(x), cos(x), tan(x)| & \verb|sin(x), cos(x), tan(x)| \\ \hline
+    *Inverse trigonometric & \verb|asin(x), acos(x), ...| & \verb|arcsin(x), arccos(x), ...| & \verb|asin(x), acos(x), ...| \\ \hline
+    Two argument arctangent & \verb|atan2(x, y)| & \verb|arctan2(x, y)| & \verb|atan2(x, y)| \\ \hline
+    Hyperbolic functions & \verb|sinh(x), cosh(x), tanh(x)| & \verb|sinh(x), cosh(x), tanh(x)| & \verb|sinh(x), cosh(x), tanh(x)| \\ \hline
+    *Inverse hyperbolic & \verb|asinh(x), acosh(x), ...| & \verb|arcsinh(x), arccosh(x), ...| & \verb|asinh(x), acosh(x), ...| \\ \hline
+    Inequalities & \verb|a<b, a<=b, a>b, a>=b| & \verb|a<b, a<=b, a>b, a>=b| & \verb|a<b, a<=b, a>b, a>=b| \\ \hline
+    *(Not) equal to & \verb|a==b, a!=b| & \verb|a==b, a!=b| & \verb|a==b, a~=b| \\ \hline
+    *Logical and & \verb|a && b| & \verb|logic_and(a, b)| & \verb|a & b| \\ \hline
+    *Logical or & \verb=a || b= & \verb|logic_or(a, b)| & \verb=a | b= \\ \hline
+    *Logical not & \verb|!a| & \verb|logic_not(a)| & \verb|~a| \\ \hline
+    Round to integer
+    & \verb|floor(x), ceil(x)| & \verb|floor(x), ceil(x)| & \verb|floor(x), ceil(x)| \\ \hline
+    *Modulus after division
+    & \verb|fmod(x, y)| & \verb|fmod(x, y)| & \verb|mod(x, y)| \\ \hline
+    *Absolute value 
+    & \verb|fabs(x)| & \verb|fabs(x)| & \verb|abs(x)| \\ \hline
+    Sign function 
+    & \verb|sign(x)| & \verb|sign(x)| & \verb|sign(x)| \\ \hline
+    (Inverse) error function
+    & \verb|erf(x), erfinv(x)| & \verb|erf(x), erfinv(x)| & \verb|erf(x), erfinv(x)| \\ \hline
+    *Elementwise min and max
+    & \verb|fmin(x, y), fmax(x, y)| & \verb|fmin(x, y), fmax(x, y)| & \verb|min(x, y), max(x, y)| \\ \hline
+    Index of first nonzero
+    & \verb|find(x)| & \verb|find(x)| & \verb|find(x)| \\ \hline
+    If-then-else
+    & \verb|if_else(c, x, y)| & \verb|if_else(c, x, y)| & \verb|if_else(c, x, y)| \\ \hline
+    *Matrix multiplication
+    & \verb|mul(x,y)| & \verb|mul(x,y)| & \verb|mul(x,y)| or \verb|x*y| \\ \hline
+    *Transpose
+    & \verb|transpose(A)| or \verb|A.T| & \verb|transpose(A)| or \verb|A.T()|& \verb|transpose(A)| or \verb|A'| or \verb|A.'| \\ \hline
+    Inner product
+    & \verb|inner_prod(x, y)| & \verb|inner_prod(x, y)| & \verb|inner_prod(x, y)| \\ \hline
+    *Horizontal concatenation
+    & \verb|horzcat([x, y])| & \verb|horzcat(x, y)| (max 4 arguments)) or \verb|horzcat(v)| (vector of matrices) & \verb|[x, y]| \\ \hline
+    *Vertical concatenation
+    & \verb|vertcat([x, y])| & \verb|\verb|vertcat(v)| (vector of matrices) & \verb|[x; y]| \\ \hline
+    Horizontal/vertical split (inverse of concatenation)
+    & \verb|vertsplit(x)|, \verb|horzsplit(x)| & \verb|vertsplit(x)|, \verb|horzsplit(x)| & \verb|vertsplit(x)|, \verb|horzsplit(x)| \\ \hline
+    *Element access
+    & \verb|A[i,j]| and \verb|A[i]|, \linebreak \emph{0-based}
+    & \verb|A(i,j)| and \verb|A(i)|, \linebreak \emph{0-based}
+    & \verb|A(i,j)| and \verb|A(i)|, \linebreak \emph{1-based} \\ \hline
+    *Element assignment
+    & \verb|A[i,j] = b| and \verb|A[i] = b|, \linebreak \emph{0-based}
+    & \verb|A(i,j) = b| and \verb|A(i) = b|, \linebreak \emph{0-based}
+    & \verb|A(i,j) = b| and \verb|A(i) = b|, \linebreak \emph{1-based} \\ \hline
+    *Nonzero access
+    & \verb|A.nz[k]|, \emph{0-based}
+    & \verb|A[k]|, \emph{0-based}
+    & (currently unsupported) \\ \hline
+    *Nonzero assignment
+    & \verb|A.nz[k] = b|, \emph{0-based}
+    & \verb|A[k] = b|, \emph{0-based}
+    & (currently unsupported) \\ \hline
+    Project to a different sparsity
+    & \verb|project(x, s)| & \verb|project(x, s)| & \verb|project(x, s)| \\ \hline
   \end{tabular}
 \end{center}
 
