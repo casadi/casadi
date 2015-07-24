@@ -347,7 +347,7 @@ namespace casadi {
         const_cast<Function&>(fcn)->call(argi, ret[i], false, false);
       }
 
-      ret = transpose(ret);
+      ret = swapIndices(ret);
 
       std::vector<MX> ret_cat;
       for (int i=0;i<fcn.nOut();++i) {

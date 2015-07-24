@@ -93,7 +93,7 @@ namespace casadi {
       return map(x_new, parallelization);
     }
 
-    vector< vector<MX> > trans = transpose(x);
+    vector< vector<MX> > trans = swapIndices(x);
     vector< MX > x_cat(trans.size());
     for (int i=0;i<trans.size();++i) {
       x_cat[i] = horzcat(trans[i]);
@@ -106,7 +106,7 @@ namespace casadi {
     for (int i=0;i<ret_cat.size();++i) {
       ret.push_back(horzsplit(ret_cat[i], output(i).size2()));
     }
-    return transpose(ret);
+    return swapIndices(ret);
 
   }
 

@@ -115,9 +115,15 @@ namespace casadi {
   template<typename T>
   bool inBounds(const std::vector<T> &v, int lower, int upper);
 
-  /// Returns the transpose of a list of lists
+  /** \brief swap inner and outer indices of list of lists
+  * 
+  * \verbatim
+  * [[apple0,apple1,...],[pear0,pear1,...]] ->
+  *   [[apple0,pear0],[apple1,pear1],...]
+  * \endverbatim
+  */
   template<typename T>
-  std::vector< std::vector<T> > transpose(const std::vector< std::vector<T> > &m);
+  std::vector< std::vector<T> > swapIndices(const std::vector< std::vector<T> > &m);
 
   /** \brief Returns the list of all i in [0, size[ not found in supplied list
   *
@@ -749,14 +755,14 @@ namespace casadi {
   }
 
   template<typename T>
-  std::vector< std::vector<T> > transpose(const std::vector< std::vector<T> > &mat) {
+  std::vector< std::vector<T> > swapIndices(const std::vector< std::vector<T> > &mat) {
 
     // Get the matrix dimensions
     int n = mat.size();
     int m = -1;
     for (int i=0;i<n;++i) {
       casadi_assert_message(m==-1 || m==mat[i].size(),
-        "transpose(vector<vector>) dimension mismatch.");
+        "swapIndices(vector<vector>) dimension mismatch.");
       if (m==-1) m = mat[i].size();
     }
 
