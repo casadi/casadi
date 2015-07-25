@@ -559,9 +559,63 @@ namespace casadi {
 
     /// \endcond
 
-#ifndef SWIG
-#include "matrix_friends.hpp"
-#endif // SWIG
+/**
+\ingroup expression_tools
+@{
+*/
+#if !defined(SWIG) || defined(DOXYGEN)
+    /** \brief Matrix adjoint */
+    inline friend Matrix<DataType> adj(const Matrix<DataType>& A) { return A.zz_adj();}
+
+    /** \brief Get the (i,j) minor matrix */
+    inline friend Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j) {
+      return x.zz_getMinor(i, j);
+    }
+
+    /** \brief Get the (i,j) cofactor matrix */
+    inline friend Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j) {
+      return x.zz_cofactor(i, j);
+    }
+
+    /** \brief  QR factorization using the modified Gram-Schmidt algorithm
+     * More stable than the classical Gram-Schmidt, but may break down if the rows of A
+     * are nearly linearly dependent
+     * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
+     * Note that in SWIG, Q and R are returned by value. */
+    inline friend void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R) {
+      return A.zz_qr(Q, R);
+    }
+
+    /** \brief Obtain a Cholesky factorisation of a matrix
+    *
+    *  Returns an upper triangular R such that R'R = A.
+    *  Matrix A must be positive definite.
+    *
+    * At the moment, the algorithm is dense (Cholesky-Banachiewicz).
+    * There is an open ticket #1212 to make it sparse.
+    */
+    inline friend Matrix<DataType> chol(const Matrix<DataType>& A) {
+      return A.zz_chol();
+    }
+
+    /// Returns true only if every element in the matrix is true
+    inline friend Matrix<DataType> all(const Matrix<DataType> &x) { return x.zz_all();}
+
+    /// Returns true if any element in the matrix is true
+    inline friend Matrix<DataType> any(const Matrix<DataType> &x) { return x.zz_any();}
+
+    /** Inf-norm of a Matrix-Matrix product */
+    inline friend Matrix<DataType>
+      norm_inf_mul(const Matrix<DataType> &x, const Matrix<DataType> &y) {
+      return x.zz_norm_inf_mul(y);
+    }
+
+    /** \brief  Make a matrix sparse by removing numerical zeros*/
+    inline friend Matrix<DataType> sparsify(const Matrix<DataType>& A, double tol=0) {
+      return A.zz_sparsify(tol);
+    }
+#endif // !SWIG || DOXYGEN
+/** @} */
 
     /** \brief Set or reset the depth to which equalities are being checked for simplifications */
     static void setEqualityCheckingDepth(int eq_depth=1);

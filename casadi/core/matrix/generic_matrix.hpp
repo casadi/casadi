@@ -241,9 +241,162 @@ namespace casadi {
     }
 #endif // SWIG
 
-#ifndef SWIG
-#include "generic_matrix_friends.hpp"
-#endif // SWIG
+#if !defined(SWIG) || defined(DOXYGEN)
+
+    /**
+       \ingroup expression_tools
+     * @{ */
+
+    /** \brief Calculate quadratic form X^T A X*/
+    inline friend MatType quad_form(const MatType &X, const MatType &A) {
+      return X.zz_quad_form(A);
+    }
+
+    /** \brief Calculate quadratic form X^T X*/
+    inline friend MatType quad_form(const MatType &X) {
+     return X.zz_quad_form();
+    }
+
+    /** \brief Calculate some of squares: sum_ij X_ij^2  */
+    inline friend MatType sum_square(const MatType &X) {
+     return X.zz_sum_square();
+    }
+
+    /** \brief Matlab's \c linspace command
+     */
+    inline friend MatType linspace(const MatType &a, const MatType &b, int nsteps) {
+      return a.zz_linspace(b, nsteps);
+    }
+
+    /** \brief Matlab's \c cross command
+     */
+    inline friend MatType cross(const MatType &a, const MatType &b, int dim = -1) {
+      return a.zz_cross(b, dim);
+    }
+
+    /** \brief Matrix determinant (experimental) */
+    inline friend MatType det(const MatType& A) { return A.zz_det();}
+
+    /** \brief Matrix inverse (experimental) */
+    inline friend MatType inv(const MatType& A) { return A.zz_inv();}
+
+    /** \brief Matrix trace */
+    inline friend MatType trace(const MatType& a) { return a.zz_trace();}
+
+    /** \brief Convert a lower triangular matrix to a symmetric one
+     */
+    inline friend MatType tril2symm(const MatType &a) { return a.zz_tril2symm();}
+
+    /** \brief Convert a upper triangular matrix to a symmetric one
+     */
+    inline friend MatType triu2symm(const MatType &a) { return a.zz_triu2symm();}
+
+    /** \brief  Frobenius norm  */
+    inline friend MatType norm_F(const MatType &x) { return x.zz_norm_F();}
+
+    /** \brief  2-norm  */
+    inline friend MatType norm_2(const MatType &x) { return x.zz_norm_2();}
+
+    /** \brief 1-norm  */
+    inline friend MatType norm_1(const MatType &x) { return x.zz_norm_1();}
+
+    /** \brief Infinity-norm */
+    inline friend MatType norm_inf(const MatType &x) { return x.zz_norm_inf();}
+
+    /** \brief Return a col-wise summation of elements */
+    inline friend MatType sumCols(const MatType &x) { return x.zz_sumCols();}
+
+    /** \brief Return a row-wise summation of elements */
+    inline friend MatType sumRows(const MatType &x) { return x.zz_sumRows();}
+
+    /** \brief Inner product of two matrices
+        with x and y matrices of the same dimension
+    */
+    inline friend MatType inner_prod(const MatType &x, const MatType &y) {
+      return x.zz_inner_prod(y);
+    }
+
+    /** \brief  Take the outer product of two vectors
+        Equals
+        \code
+        x*y.T()
+        \endcode
+        with x and y vectors
+    */
+    inline friend MatType outer_prod(const MatType &x, const MatType &y) {
+      return x.zz_outer_prod(y);
+    }
+
+    /** \brief Computes the nullspace of a matrix A
+     *
+     * Finds Z m-by-(m-n) such that AZ = 0
+     * with A n-by-m with m > n
+     *
+     * Assumes A is full rank
+     *
+     * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
+     */
+    inline friend MatType nullspace(const MatType& A) { return A.zz_nullspace();}
+
+    /** \brief  Evaluate a polynomial with coefficients p in x */
+    inline friend MatType polyval(const MatType& p, const MatType& x) {
+      return p.zz_polyval(x);
+    }
+
+    /** \brief   Get the diagonal of a matrix or construct a diagonal
+        When the input is square, the diagonal elements are returned.
+        If the input is vector-like, a diagonal matrix is constructed with it. */
+    inline friend MatType diag(const MatType &A) { return A.zz_diag();}
+
+    /** \brief  Unite two matrices no overlapping sparsity */
+    inline friend MatType unite(const MatType& A, const MatType& B) {
+      return A.zz_unite(B);
+    }
+
+    /** \brief  Make the matrix dense if not already */
+    inline friend MatType densify(const MatType& x) { return x.zz_densify();}
+
+    /** \brief Create a new matrix with a given sparsity pattern but with the
+     * nonzeros taken from an existing matrix */
+    inline friend MatType project(const MatType& A, const Sparsity& sp,
+                                  bool intersect=false) {
+      return A.zz_project(sp, intersect);
+    }
+
+/** \brief Check if expression depends on the argument
+        The argument must be symbolic
+    */
+    //inline friend bool dependsOn(const MatType& f, const MatType &arg) {
+    //return f.zz_dependsOn(arg);
+    //}
+
+    /** \brief Branching on MX nodes
+        Ternary operator, "cond ? if_true : if_false"
+    */
+    inline friend MatType if_else(const MatType &cond, const MatType &if_true,
+                                  const MatType &if_false, bool short_circuit=true) {
+      return cond.zz_if_else(if_true, if_false, short_circuit);
+    }
+
+    /** \brief Create a switch
+     *
+     * If the condition \param ind evaluates to the integer k, where 0<=k<f.size(),
+     * then x[k] will be returned, otherwise \param x_default will be returned.
+     */
+    inline friend MatType conditional(const MatType& ind, const std::vector<MatType> &x,
+                                      const MatType &x_default, bool short_circuit=true) {
+      return ind.zz_conditional(x, x_default, short_circuit);
+    }
+
+    /** \brief Check if expression depends on the argument
+        The argument must be symbolic
+    */
+    inline friend bool dependsOn(const MatType& f, const MatType &arg) {
+      return f.zz_dependsOn(arg);
+    }
+    /** @} */
+
+#endif // !SWIG || DOXYGEN
 
     /** @name Construct symbolic primitives
         The "sym" function is intended to work in a similar way as "sym" used
