@@ -34,6 +34,7 @@
 #include "casadi_logger.hpp"
 
 #ifdef SWIG
+#define SWIG_FRIEND
 #define SWIG_OUTPUT(arg) OUTPUT
 #define SWIG_INOUT(arg) INOUT
 #define SWIG_CONSTREF(arg) const arg
@@ -43,6 +44,7 @@
 #define SWIG_IND1 false
 #endif // SWIGMATLAB
 #else // SWIG
+#define SWIG_FRIEND friend
 #define SWIG_OUTPUT(arg) arg
 #define SWIG_INOUT(arg) arg
 #define SWIG_CONSTREF(arg) const arg &
