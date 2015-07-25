@@ -23,9 +23,6 @@
  */
 
 
-#ifndef CASADI_MATRIX_FRIENDS_HPP
-#define CASADI_MATRIX_FRIENDS_HPP
-
 /** \brief Matrix adjoint */
 inline SWIG_FRIEND Matrix<DataType> adj(const Matrix<DataType>& A) { return A.zz_adj();}
 
@@ -44,7 +41,9 @@ inline SWIG_FRIEND Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, i
  * are nearly linearly dependent
  * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
  * Note that in SWIG, Q and R are returned by value. */
-inline SWIG_FRIEND void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R) {
+inline SWIG_FRIEND void qr(const Matrix<DataType>& A,
+                           Matrix<DataType>& SWIG_OUTPUT(Q),
+                           Matrix<DataType>& SWIG_OUTPUT(R)) {
   return A.zz_qr(Q, R);
 }
 
@@ -60,11 +59,15 @@ inline SWIG_FRIEND Matrix<DataType> chol(const Matrix<DataType>& A) {
   return A.zz_chol();
 }
 
+#ifndef SWIG
+
 /// Returns true only if every element in the matrix is true
 inline SWIG_FRIEND Matrix<DataType> all(const Matrix<DataType> &x) { return x.zz_all();}
 
 /// Returns true if any element in the matrix is true
 inline SWIG_FRIEND Matrix<DataType> any(const Matrix<DataType> &x) { return x.zz_any();}
+
+#endif // SWIG
 
 /** Inf-norm of a Matrix-Matrix product */
 inline SWIG_FRIEND Matrix<DataType>
@@ -76,5 +79,3 @@ norm_inf_mul(const Matrix<DataType> &x, const Matrix<DataType> &y) {
 inline SWIG_FRIEND Matrix<DataType> sparsify(const Matrix<DataType>& A, double tol=0) {
   return A.zz_sparsify(tol);
 }
-
-#endif // CASADI_MATRIX_FRIENDS_HPP

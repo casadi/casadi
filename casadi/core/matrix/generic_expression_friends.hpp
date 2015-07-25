@@ -23,9 +23,6 @@
  */
 
 
-#ifndef CASADI_GENERIC_EXPRESSION_FRIENDS_HPP
-#define CASADI_GENERIC_EXPRESSION_FRIENDS_HPP
-
 /** \brief This file is included from generic_expression.hpp and used for SWIG wrapping
     \author Joel Andersson
     \date 2015
@@ -165,5 +162,3 @@ inline SWIG_FRIEND ExType fmin(const ExType& x, const ExType& y) { return x.zz_m
 
 /** \brief Maximum of two values */
 inline SWIG_FRIEND ExType fmax(const ExType& x, const ExType& y) { return x.zz_max(y);}
-
-#endif // CASADI_GENERIC_EXPRESSION_FRIENDS_HPP

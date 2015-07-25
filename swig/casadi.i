@@ -3260,86 +3260,22 @@ MATRIX_TOOLS_TEMPLATES(double)
 MATRIX_TOOLS_TEMPLATES(casadi::SXElement)
 #endif // SWIGMATLAB
 
-%define SPARSITY_INTERFACE_DECL(MatType...)
-MatType horzcat(const std::vector< MatType > &v);
-std::vector<MatType > horzsplit(const MatType &v, const std::vector<int>& offset);
-std::vector<MatType > horzsplit(const MatType &v, int incr=1);
-MatType vertcat(const std::vector< MatType > &v);
-std::vector<MatType > vertsplit(const MatType &v, const std::vector<int>& offset);
-std::vector<MatType > vertsplit(const MatType &v, int incr=1);
-MatType blockcat(const std::vector< std::vector<MatType > > &v);
-std::vector< std::vector< MatType > >
-blocksplit(const MatType& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
-std::vector< std::vector< MatType > > blocksplit(const MatType& x, int vert_incr=1, int horz_incr=1);
-MatType diagcat(const std::vector< MatType > &v);
-std::vector< MatType > diagsplit(const MatType& x, const std::vector<int>& output_offset1,
-                                 const std::vector<int>& output_offset2);
-std::vector< MatType > diagsplit(const MatType& x, const std::vector<int>& output_offset);
-std::vector< MatType > diagsplit(const MatType& x, int incr=1);
-std::vector< MatType > diagsplit(const MatType& x, int incr1, int incr2);
-MatType veccat(const std::vector< MatType >& x);
-MatType mul(const MatType &x, const MatType &y);
-MatType mul(const MatType &x, const MatType &y, const MatType &z);
-MatType mul(const std::vector< MatType > &args);
-MatType transpose(const MatType &X);
-MatType vec(const MatType& a);
-MatType vecNZ(const MatType& a);
-MatType reshape(const MatType& a, const Sparsity& sp);
-MatType reshape(const MatType& a, int nrow, int ncol);
-MatType reshape(const MatType& a, std::pair<int, int> rc);
-int sprank(const MatType& A);
-MatType triu(const MatType& a, bool includeDiagonal=true);
-MatType tril(const MatType& a, bool includeDiagonal=true);
-int norm_0_mul(const MatType &x, const MatType &y);
-MatType kron(const MatType& a, const MatType& b);
-MatType repmat(const MatType &A, int n, int m=1);
-MatType repmat(const MatType &A, const std::pair<int, int>& rc);
+%define SPARSITY_INTERFACE_DECL(MATTYPE...)
+#define MatType MATTYPE
+%include <casadi/core/matrix/sparsity_interface_friends.hpp>
+#undef MatType
 %enddef
 
-%define GENERIC_MATRIX_DECL(MatType...)
-MatType quad_form(const MatType &X, const MatType &A);
-MatType quad_form(const MatType &X);
-MatType sum_square(const MatType &X);
-MatType linspace(const MatType &a, const MatType &b, int nsteps);
-MatType cross(const MatType &a, const MatType &b, int dim = -1);
-MatType det(const MatType& A);
-MatType inv(const MatType& A);
-MatType trace(const MatType& a);
-bool isEqual(const MatType& x, const MatType& y, int depth=0);
-MatType tril2symm(const MatType &a);
-MatType triu2symm(const MatType &a);
-MatType norm_F(const MatType &x);
-MatType norm_2(const MatType &x);
-MatType norm_1(const MatType &x);
-MatType norm_inf(const MatType &x);
-MatType sumCols(const MatType &x);
-MatType sumRows(const MatType &x);
-MatType inner_prod(const MatType &x, const MatType &y);
-MatType outer_prod(const MatType &x, const MatType &y);
-MatType nullspace(const MatType& A);
-MatType polyval(const MatType& p, const MatType& x);
-MatType diag(const MatType &A);
-MatType unite(const MatType& A, const MatType& B);
-MatType densify(const MatType& x);
-MatType simplify(const MatType &x);
-MatType if_else(const MatType &cond, const MatType &if_true, const MatType &if_false,
-                bool short_circuit=true);
-MatType conditional(const MatType& ind, const std::vector< MatType > &x,
-                    const MatType &x_default, bool short_circuit=true);
-bool dependsOn(const MatType& f, const MatType &arg);
-MatType project(const MatType& A, const Sparsity& sp, bool intersect=false);
+%define GENERIC_MATRIX_DECL(MATTYPE...)
+#define MatType MATTYPE
+%include <casadi/core/matrix/generic_matrix_friends.hpp>
+#undef MatType
 %enddef
 
-%define MATRIX_DECL(MatType...)
-MatType adj(const MatType& A);
-MatType getMinor(const MatType &x, int i, int j);
-MatType cofactor(const MatType &x, int i, int j);
-void qr(const MatType& A, MatType& OUTPUT, MatType& OUTPUT);
-MatType chol(const MatType& A);
-//MatType all(const MatType &x);
-//MatType any(const MatType &x);
-MatType sparsify(const MatType& A, double tol=0);
-MatType norm_inf_mul(const MatType &x, const MatType &y);
+%define MATRIX_DECL(DATATYPE...)
+#define DataType DATATYPE
+%include <casadi/core/matrix/matrix_friends.hpp>
+#undef DataType
 %enddef
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)
@@ -3348,8 +3284,8 @@ GENERIC_MATRIX_DECL(MatType)
 %enddef
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(DataType...)
-GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix<DataType>)
-MATRIX_DECL(casadi::Matrix<DataType>)
+GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix< DataType >)
+MATRIX_DECL(DataType)
 %enddef
 
 #ifndef SWIGMATLAB

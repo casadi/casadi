@@ -23,9 +23,6 @@
  */
 
 
-#ifndef CASADI_GENERIC_MATRIX_FRIENDS_HPP
-#define CASADI_GENERIC_MATRIX_FRIENDS_HPP
-
 /** \brief Calculate quadratic form X^T A X*/
 inline SWIG_FRIEND MatType quad_form(const MatType &X, const MatType &A) {
   return X.zz_quad_form(A);
@@ -173,5 +170,3 @@ inline SWIG_FRIEND MatType conditional(const MatType& ind, const std::vector<Mat
 inline SWIG_FRIEND bool dependsOn(const MatType& f, const MatType &arg) {
   return f.zz_dependsOn(arg);
 }
-
-#endif // CASADI_GENERIC_MATRIX_FRIENDS_HPP

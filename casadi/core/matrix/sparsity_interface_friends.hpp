@@ -23,9 +23,6 @@
  */
 
 
-#ifndef CASADI_SPARSITY_INTERFACE_FRIENDS_HPP
-#define CASADI_SPARSITY_INTERFACE_FRIENDS_HPP
-
 /** \brief This file is included from sparsity_interface.hpp and used for SWIG wrapping
     \author Joel Andersson
     \date 2015
@@ -39,6 +36,8 @@
 inline SWIG_FRIEND MatType horzcat(const std::vector<MatType> &v) {
   return MatType::zz_horzcat(v);
 }
+
+#ifndef SWIG
 
 /** \brief Concatenate horizontally, two matrices */
 inline SWIG_FRIEND MatType horzcat(const MatType &x, const MatType &y) {
@@ -59,6 +58,8 @@ inline SWIG_FRIEND MatType horzcat(const MatType &x, const MatType &y, const Mat
   return horzcat(std::vector<MatType>(v, v+4));
 }
 
+#endif // SWIG
+
 /** \brief Concatenate a list of matrices vertically
  * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
  *
@@ -67,6 +68,8 @@ inline SWIG_FRIEND MatType horzcat(const MatType &x, const MatType &y, const Mat
 inline SWIG_FRIEND MatType vertcat(const std::vector<MatType> &v) {
   return MatType::zz_vertcat(v);
 }
+
+#ifndef SWIG
 
 /** \brief Concatenate vertically, two matrices */
 inline SWIG_FRIEND MatType vertcat(const MatType &x, const MatType &y) {
@@ -86,6 +89,8 @@ inline SWIG_FRIEND MatType vertcat(const MatType &x, const MatType &y, const Mat
   MatType v[] = {x, y, z, w};
   return vertcat(std::vector<MatType>(v, v+4));
 }
+
+#endif // SWIG
 
 /** \brief  split horizontally, retaining groups of columns
  * \param offset List of all start columns for each group
@@ -213,6 +218,8 @@ inline SWIG_FRIEND MatType diagcat(const std::vector<MatType> &A) {
   return MatType::zz_diagcat(A);
 }
 
+#ifndef SWIG
+
 /** \brief Concatenate along diagonal, two matrices */
 inline SWIG_FRIEND MatType diagcat(const MatType &x, const MatType &y) {
   MatType v[] = {x, y};
@@ -231,6 +238,8 @@ inline SWIG_FRIEND MatType diagcat(const MatType &x, const MatType &y, const Mat
   MatType v[] = {x, y, z, w};
   return diagcat(std::vector<MatType>(v, v+4));
 }
+
+#endif // SWIG
 
 /** \brief  split diagonally, retaining square matrices
  * \param output_offset1 List of all start locations (row) for each group
@@ -400,5 +409,3 @@ inline SWIG_FRIEND MatType repmat(const MatType &A, int n, int m=1) {
 inline SWIG_FRIEND MatType repmat(const MatType &A, const std::pair<int, int>& rc) {
   return A.zz_repmat(rc.first, rc.second);
 }
-
-#endif // CASADI_SPARSITY_INTERFACE_FRIENDS_HPP
