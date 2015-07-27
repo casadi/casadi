@@ -59,139 +59,139 @@ class CASADI_EXPORT GenericExpression {
  *  a.isEqual(b, 0)  will return false, but a.isEqual(b, 1) will return true
  */
 
-#define GENERIC_EXPRESSION_FRIENDS_UNWRAPPED(M)                         \
-    inline SWIG_FRIEND M operator+(const M &x, const M &y) {            \
-      return x.zz_plus(y);                                              \
-    }                                                                   \
-    inline SWIG_FRIEND M operator-(const M &x, const M &y) {            \
-      return x.zz_minus(y);                                             \
-    }                                                                   \
-    inline SWIG_FRIEND M operator*(const M &x, const M &y) {            \
-      return x.zz_times(y);                                             \
-    }                                                                   \
-    inline SWIG_FRIEND M operator/(const M &x, const M &y) {            \
-      return x.zz_rdivide(y);                                           \
-    }                                                                   \
-    inline SWIG_FRIEND M operator<(const M &x, const M &y) {            \
-      return x.zz_lt(y);                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M operator<=(const M &x, const M &y) {           \
-      return x.zz_le(y);                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M operator>(const M &x, const M &y) {            \
-      return x.zz_gt(y);                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M operator>=(const M &x, const M &y) {           \
-      return x.zz_ge(y);                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M operator==(const M &x, const M &y) {           \
-      return x.zz_eq(y);                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M operator!=(const M &x, const M &y) {           \
-      return x.zz_ne(y);                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M operator&&(const M &x, const M &y) {           \
-      return x.zz_and(y);                                               \
-    }                                                                   \
-    inline SWIG_FRIEND M operator||(const M &x, const M &y) {           \
-      return x.zz_or(y);                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M abs(const M& x) {                              \
-      return x.zz_abs();                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M fabs(const M& x) {                             \
-      return x.zz_abs();                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M sqrt(const M& x) {                             \
-      return x.zz_sqrt();                                               \
-    }                                                                   \
-    inline SWIG_FRIEND M sin(const M& x) {                              \
-      return x.zz_sin();                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M cos(const M& x) {                              \
-      return x.zz_cos();                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M tan(const M& x) {                              \
-      return x.zz_tan();                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M atan(const M& x) {                             \
-      return x.zz_atan();                                               \
-    }                                                                   \
-    inline SWIG_FRIEND M asin(const M& x) {                             \
-      return x.zz_asin();                                               \
-    }                                                                   \
-    inline SWIG_FRIEND M acos(const M& x) {                             \
-      return x.zz_acos();                                               \
-    }                                                                   \
-    inline SWIG_FRIEND M tanh(const M& x) {                             \
-      return x.zz_tanh();                                               \
-    }                                                                   \
-    inline SWIG_FRIEND M sinh(const M& x) {                             \
-      return x.zz_sinh();                                               \
-    }                                                                   \
-    inline SWIG_FRIEND M cosh(const M& x) {                             \
-      return x.zz_cosh();                                               \
-    }                                                                   \
-    inline SWIG_FRIEND M atanh(const M& x) {                            \
-      return x.zz_atanh();                                              \
-    }                                                                   \
-    inline SWIG_FRIEND M asinh(const M& x) {                            \
-      return x.zz_asinh();                                              \
-    }                                                                   \
-    inline SWIG_FRIEND M acosh(const M& x) {                            \
-      return x.zz_acosh();                                              \
-    }                                                                   \
-    inline SWIG_FRIEND M exp(const M& x) {                              \
-      return x.zz_exp();                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M log(const M& x) {                              \
-      return x.zz_log();                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M log10(const M& x) {                            \
-      return x.zz_log10();                                              \
-    }                                                                   \
-    inline SWIG_FRIEND M floor(const M& x) {                            \
-      return x.zz_floor();                                              \
-    }                                                                   \
-    inline SWIG_FRIEND M ceil(const M& x) {                             \
-      return x.zz_ceil();                                               \
-    }                                                                   \
-    inline SWIG_FRIEND M erf(const M& x) {                              \
-      return x.zz_erf();                                                \
-    }                                                                   \
-    inline SWIG_FRIEND M sign(const M& x) {                             \
-      return x.zz_sign();                                               \
-    }                                                                   \
-    inline SWIG_FRIEND M pow(const M& x, const M& n) {                  \
-      return x.zz_power(n);                                             \
-    }                                                                   \
-    inline SWIG_FRIEND M fmod(const M& x, const M& y) {                 \
-      return x.zz_mod(y);                                               \
-    }                                                                   \
-    inline SWIG_FRIEND M atan2(const M& x, const M& y) {                \
-      return x.zz_atan2(y);                                             \
-    }                                                                   \
-    inline SWIG_FRIEND M fmin(const M& x, const M& y) {                 \
-      return x.zz_min(y);                                               \
-    }                                                                   \
-    inline SWIG_FRIEND M fmax(const M& x, const M& y) {                 \
-      return x.zz_max(y);                                               \
-    }                                                                   \
+#define GENERIC_EXPRESSION_FRIENDS_UNWRAPPED(DECL, M)   \
+    DECL M operator+(const M &x, const M &y) {          \
+      return x.zz_plus(y);                              \
+    }                                                   \
+    DECL M operator-(const M &x, const M &y) {          \
+      return x.zz_minus(y);                             \
+    }                                                   \
+    DECL M operator*(const M &x, const M &y) {          \
+      return x.zz_times(y);                             \
+    }                                                   \
+    DECL M operator/(const M &x, const M &y) {          \
+      return x.zz_rdivide(y);                           \
+    }                                                   \
+    DECL M operator<(const M &x, const M &y) {          \
+      return x.zz_lt(y);                                \
+    }                                                   \
+    DECL M operator<=(const M &x, const M &y) {         \
+      return x.zz_le(y);                                \
+    }                                                   \
+    DECL M operator>(const M &x, const M &y) {          \
+      return x.zz_gt(y);                                \
+    }                                                   \
+    DECL M operator>=(const M &x, const M &y) {         \
+      return x.zz_ge(y);                                \
+    }                                                   \
+    DECL M operator==(const M &x, const M &y) {         \
+      return x.zz_eq(y);                                \
+    }                                                   \
+    DECL M operator!=(const M &x, const M &y) {         \
+      return x.zz_ne(y);                                \
+    }                                                   \
+    DECL M operator&&(const M &x, const M &y) {         \
+      return x.zz_and(y);                               \
+    }                                                   \
+    DECL M operator||(const M &x, const M &y) {         \
+      return x.zz_or(y);                                \
+    }                                                   \
+    DECL M abs(const M& x) {                            \
+      return x.zz_abs();                                \
+    }                                                   \
+    DECL M fabs(const M& x) {                           \
+      return x.zz_abs();                                \
+    }                                                   \
+    DECL M sqrt(const M& x) {                           \
+      return x.zz_sqrt();                               \
+    }                                                   \
+    DECL M sin(const M& x) {                            \
+      return x.zz_sin();                                \
+    }                                                   \
+    DECL M cos(const M& x) {                            \
+      return x.zz_cos();                                \
+    }                                                   \
+    DECL M tan(const M& x) {                            \
+      return x.zz_tan();                                \
+    }                                                   \
+    DECL M atan(const M& x) {                           \
+      return x.zz_atan();                               \
+    }                                                   \
+    DECL M asin(const M& x) {                           \
+      return x.zz_asin();                               \
+    }                                                   \
+    DECL M acos(const M& x) {                           \
+      return x.zz_acos();                               \
+    }                                                   \
+    DECL M tanh(const M& x) {                           \
+      return x.zz_tanh();                               \
+    }                                                   \
+    DECL M sinh(const M& x) {                           \
+      return x.zz_sinh();                               \
+    }                                                   \
+    DECL M cosh(const M& x) {                           \
+      return x.zz_cosh();                               \
+    }                                                   \
+    DECL M atanh(const M& x) {                          \
+      return x.zz_atanh();                              \
+    }                                                   \
+    DECL M asinh(const M& x) {                          \
+      return x.zz_asinh();                              \
+    }                                                   \
+    DECL M acosh(const M& x) {                          \
+      return x.zz_acosh();                              \
+    }                                                   \
+    DECL M exp(const M& x) {                            \
+      return x.zz_exp();                                \
+    }                                                   \
+    DECL M log(const M& x) {                            \
+      return x.zz_log();                                \
+    }                                                   \
+    DECL M log10(const M& x) {                          \
+      return x.zz_log10();                              \
+    }                                                   \
+    DECL M floor(const M& x) {                          \
+      return x.zz_floor();                              \
+    }                                                   \
+    DECL M ceil(const M& x) {                           \
+      return x.zz_ceil();                               \
+    }                                                   \
+    DECL M erf(const M& x) {                            \
+      return x.zz_erf();                                \
+    }                                                   \
+    DECL M sign(const M& x) {                           \
+      return x.zz_sign();                               \
+    }                                                   \
+    DECL M pow(const M& x, const M& n) {                \
+      return x.zz_power(n);                             \
+    }                                                   \
+    DECL M fmod(const M& x, const M& y) {               \
+      return x.zz_mod(y);                               \
+    }                                                   \
+    DECL M atan2(const M& x, const M& y) {              \
+      return x.zz_atan2(y);                             \
+    }                                                   \
+    DECL M fmin(const M& x, const M& y) {               \
+      return x.zz_min(y);                               \
+    }                                                   \
+    DECL M fmax(const M& x, const M& y) {               \
+      return x.zz_max(y);                               \
+    }                                                   \
 
-#define GENERIC_EXPRESSION_FRIENDS(M)                                   \
-    inline SWIG_FRIEND M simplify(const M &x) {                         \
-      return x.zz_simplify();                                           \
-    }                                                                   \
-    inline SWIG_FRIEND bool isEqual(const M& x, const M& y, int depth=0) { \
-      return x.zz_isEqual(y, depth);                                    \
-    }                                                                   \
-    inline SWIG_FRIEND bool iszero(const M& x) {                        \
-      return x.isZero();                                                \
-    }                                                                   \
+#define GENERIC_EXPRESSION_FRIENDS(DECL, M)                     \
+    DECL M simplify(const M &x) {                               \
+      return x.zz_simplify();                                   \
+    }                                                           \
+    DECL bool isEqual(const M& x, const M& y, int depth=0) {    \
+      return x.zz_isEqual(y, depth);                            \
+    }                                                           \
+    DECL bool iszero(const M& x) {                              \
+      return x.isZero();                                        \
+    }                                                           \
 
 #ifndef SWIG
-  GENERIC_EXPRESSION_FRIENDS_UNWRAPPED(ExType)
-  GENERIC_EXPRESSION_FRIENDS(ExType)
+  GENERIC_EXPRESSION_FRIENDS_UNWRAPPED(inline friend, ExType)
+  GENERIC_EXPRESSION_FRIENDS(inline friend, ExType)
 
     /// In-place addition
     inline ExType& operator+=(const ExType &y) { return self() = self().zz_plus(y); }

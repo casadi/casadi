@@ -605,40 +605,40 @@ namespace casadi {
       \brief  Make a matrix sparse by removing numerical zeros
     */
 
-#define MATRIX_FRIENDS_UNWRAPPED(M)                                               \
-  inline SWIG_FRIEND M all(const M &x) {                                \
+#define MATRIX_FRIENDS_UNWRAPPED(DECL, M)                               \
+    DECL M all(const M &x) {                                            \
     return x.zz_all();                                                  \
   }                                                                     \
-  inline SWIG_FRIEND M any(const M &x) {                                \
+    DECL M any(const M &x) {                                            \
     return x.zz_any();                                                  \
   }                                                                     \
 
-#define MATRIX_FRIENDS(M)                                               \
-  inline SWIG_FRIEND M adj(const M& A) {                                \
-    return A.zz_adj();                                                  \
-  }                                                                     \
-  inline SWIG_FRIEND M getMinor(const M &x, int i, int j) {             \
-    return x.zz_getMinor(i, j);                                         \
-  }                                                                     \
-  inline SWIG_FRIEND M cofactor(const M &x, int i, int j) {             \
-    return x.zz_cofactor(i, j);                                         \
-  }                                                                     \
-  inline SWIG_FRIEND void qr(const M& A, M& SWIG_OUTPUT(Q), M& SWIG_OUTPUT(R)) { \
-    return A.zz_qr(Q, R);                                               \
-  }                                                                     \
-  inline SWIG_FRIEND M chol(const M& A) {                               \
-    return A.zz_chol();                                                 \
-  }                                                                     \
-  inline SWIG_FRIEND M norm_inf_mul(const M &x, const M &y) {           \
-    return x.zz_norm_inf_mul(y);                                        \
-  }                                                                     \
-  inline SWIG_FRIEND M sparsify(const M& A, double tol=0) {             \
-    return A.zz_sparsify(tol);                                          \
-  }                                                                     \
+#define MATRIX_FRIENDS(DECL, M)                                         \
+    DECL M adj(const M& A) {                                            \
+      return A.zz_adj();                                                \
+    }                                                                   \
+    DECL M getMinor(const M &x, int i, int j) {                         \
+      return x.zz_getMinor(i, j);                                       \
+    }                                                                   \
+    DECL M cofactor(const M &x, int i, int j) {                         \
+      return x.zz_cofactor(i, j);                                       \
+    }                                                                   \
+    DECL void qr(const M& A, M& SWIG_OUTPUT(Q), M& SWIG_OUTPUT(R)) {    \
+      return A.zz_qr(Q, R);                                             \
+    }                                                                   \
+    DECL M chol(const M& A) {                                           \
+      return A.zz_chol();                                               \
+    }                                                                   \
+    DECL M norm_inf_mul(const M &x, const M &y) {                       \
+      return x.zz_norm_inf_mul(y);                                      \
+    }                                                                   \
+    DECL M sparsify(const M& A, double tol=0) {                         \
+      return A.zz_sparsify(tol);                                        \
+    }                                                                   \
 
 #ifndef SWIG
-    MATRIX_FRIENDS_UNWRAPPED(Matrix<DataType>)
-    MATRIX_FRIENDS(Matrix<DataType>)
+    MATRIX_FRIENDS_UNWRAPPED(inline friend, Matrix<DataType>)
+    MATRIX_FRIENDS(inline friend, Matrix<DataType>)
 #endif
 
     /** \brief Set or reset the depth to which equalities are being checked for simplifications */

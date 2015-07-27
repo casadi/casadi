@@ -373,96 +373,96 @@ namespace casadi {
       The argument must be symbolic
     */
 
-#define GENERIC_MATRIX_FRIENDS(M)                                       \
-    inline SWIG_FRIEND M quad_form(const M &X, const M &A) {            \
+#define GENERIC_MATRIX_FRIENDS(DECL, M)                                 \
+    DECL M quad_form(const M &X, const M &A) {                          \
       return X.zz_quad_form(A);                                         \
     }                                                                   \
-    inline SWIG_FRIEND M quad_form(const M &X) {                        \
+    DECL M quad_form(const M &X) {                                      \
       return X.zz_quad_form();                                          \
     }                                                                   \
-    inline SWIG_FRIEND M sum_square(const M &X) {                       \
+    DECL M sum_square(const M &X) {                                     \
       return X.zz_sum_square();                                         \
     }                                                                   \
-    inline SWIG_FRIEND M linspace(const M &a, const M &b, int nsteps) { \
+    DECL M linspace(const M &a, const M &b, int nsteps) {               \
       return a.zz_linspace(b, nsteps);                                  \
     }                                                                   \
-    inline SWIG_FRIEND M cross(const M &a, const M &b, int dim = -1) {  \
+    DECL M cross(const M &a, const M &b, int dim = -1) {                \
       return a.zz_cross(b, dim);                                        \
     }                                                                   \
-    inline SWIG_FRIEND M det(const M& A) {                              \
+    DECL M det(const M& A) {                                            \
       return A.zz_det();                                                \
     }                                                                   \
-    inline SWIG_FRIEND M inv(const M& A) {                              \
+    DECL M inv(const M& A) {                                            \
       return A.zz_inv();                                                \
     }                                                                   \
-    inline SWIG_FRIEND M trace(const M& a) {                            \
+    DECL M trace(const M& a) {                                          \
       return a.zz_trace();                                              \
     }                                                                   \
-    inline SWIG_FRIEND M tril2symm(const M &a) {                        \
+    DECL M tril2symm(const M &a) {                                      \
       return a.zz_tril2symm();                                          \
     }                                                                   \
-    inline SWIG_FRIEND M triu2symm(const M &a) {                        \
+    DECL M triu2symm(const M &a) {                                      \
       return a.zz_triu2symm();                                          \
     }                                                                   \
-    inline SWIG_FRIEND M norm_F(const M &x) {                           \
+    DECL M norm_F(const M &x) {                                         \
       return x.zz_norm_F();                                             \
     }                                                                   \
-    inline SWIG_FRIEND M norm_2(const M &x) {                           \
+    DECL M norm_2(const M &x) {                                         \
       return x.zz_norm_2();                                             \
     }                                                                   \
-    inline SWIG_FRIEND M norm_1(const M &x) {                           \
+    DECL M norm_1(const M &x) {                                         \
       return x.zz_norm_1();                                             \
     }                                                                   \
-    inline SWIG_FRIEND M norm_inf(const M &x) {                         \
+    DECL M norm_inf(const M &x) {                                       \
       return x.zz_norm_inf();                                           \
     }                                                                   \
-    inline SWIG_FRIEND M sumCols(const M &x) {                          \
+    DECL M sumCols(const M &x) {                                        \
       return x.zz_sumCols();                                            \
     }                                                                   \
-    inline SWIG_FRIEND M sumRows(const M &x) {                          \
+    DECL M sumRows(const M &x) {                                        \
       return x.zz_sumRows();                                            \
     }                                                                   \
-    inline SWIG_FRIEND M inner_prod(const M &x, const M &y) {           \
+    DECL M inner_prod(const M &x, const M &y) {                         \
       return x.zz_inner_prod(y);                                        \
     }                                                                   \
-    inline SWIG_FRIEND M outer_prod(const M &x, const M &y) {           \
+    DECL M outer_prod(const M &x, const M &y) {                         \
       return x.zz_outer_prod(y);                                        \
     }                                                                   \
-    inline SWIG_FRIEND M nullspace(const M& A) {                        \
+    DECL M nullspace(const M& A) {                                      \
       return A.zz_nullspace();                                          \
     }                                                                   \
-    inline SWIG_FRIEND M polyval(const M& p, const M& x) {              \
+    DECL M polyval(const M& p, const M& x) {                            \
       return p.zz_polyval(x);                                           \
     }                                                                   \
-    inline SWIG_FRIEND M diag(const M &A) {                             \
+    DECL M diag(const M &A) {                                           \
       return A.zz_diag();                                               \
     }                                                                   \
-    inline SWIG_FRIEND M unite(const M& A, const M& B) {                \
+    DECL M unite(const M& A, const M& B) {                              \
       return A.zz_unite(B);                                             \
     }                                                                   \
-    inline SWIG_FRIEND M densify(const M& x) {                          \
+    DECL M densify(const M& x) {                                        \
       return x.zz_densify();                                            \
     }                                                                   \
-    inline SWIG_FRIEND M                                                \
-    project(const M& A, const Sparsity& sp, bool intersect=false) {     \
+    DECL M                                                              \
+      project(const M& A, const Sparsity& sp, bool intersect=false) {   \
       return A.zz_project(sp, intersect);                               \
     }                                                                   \
-    inline SWIG_FRIEND M                                                \
-    if_else(const M &cond, const M &if_true,                            \
-            const M &if_false, bool short_circuit=true) {               \
+    DECL M                                                              \
+      if_else(const M &cond, const M &if_true,                          \
+              const M &if_false, bool short_circuit=true) {             \
       return cond.zz_if_else(if_true, if_false, short_circuit);         \
     }                                                                   \
-    inline SWIG_FRIEND M                                                \
+    DECL M                                                              \
       conditional(const M& ind, const std::vector<M> &x,                \
                   const M &x_default, bool short_circuit=true) {        \
       return ind.zz_conditional(x, x_default, short_circuit);           \
     }                                                                   \
-    inline SWIG_FRIEND bool dependsOn(const M& f, const M &arg) {       \
+    DECL bool dependsOn(const M& f, const M &arg) {                     \
       return f.zz_dependsOn(arg);                                       \
     }                                                                   \
 
 #ifndef SWIG
-    GENERIC_MATRIX_FRIENDS(MatType)
+    GENERIC_MATRIX_FRIENDS(inline friend, MatType)
 #endif
 
     /** @name Construct symbolic primitives

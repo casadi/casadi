@@ -552,177 +552,177 @@ namespace casadi {
     */
 
 
-#define SPARSITY_INTERFACE_FRIENDS(M)                                   \
-    inline SWIG_FRIEND M horzcat(const std::vector<M> &v) {             \
+#define SPARSITY_INTERFACE_FRIENDS(DECL, M)                             \
+    DECL M horzcat(const std::vector<M> &v) {                           \
       return M::zz_horzcat(v);                                          \
     }                                                                   \
-    inline SWIG_FRIEND M vertcat(const std::vector<M> &v) {             \
+    DECL M vertcat(const std::vector<M> &v) {                           \
       return M::zz_vertcat(v);                                          \
     }                                                                   \
-    inline SWIG_FRIEND std::vector<M >                                  \
+    DECL std::vector<M >                                                \
       horzsplit(const M &v, const std::vector<int>& offset) {           \
       return v.zz_horzsplit(offset);                                    \
     }                                                                   \
-    inline SWIG_FRIEND std::vector<M >                                  \
+    DECL std::vector<M >                                                \
       horzsplit(const M &v, int incr=1) {                               \
       return v.zz_horzsplit(incr);                                      \
     }                                                                   \
-    inline SWIG_FRIEND std::vector<M >                                  \
+    DECL std::vector<M >                                                \
       vertsplit(const M &v, const std::vector<int>& offset) {           \
       return v.zz_vertsplit(offset);                                    \
     }                                                                   \
-    inline SWIG_FRIEND std::vector<int >                                \
+    DECL std::vector<int >                                              \
       offset(const std::vector<M> &v, bool vert=true) {                 \
       return M::zz_offset(v, vert);                                     \
     }                                                                   \
-    inline SWIG_FRIEND std::vector<M >                                  \
+    DECL std::vector<M >                                                \
       vertsplit(const M &v, int incr=1) {                               \
       return v.zz_vertsplit(incr);                                      \
     }                                                                   \
-    inline SWIG_FRIEND M                                                \
+    DECL M                                                              \
       blockcat(const std::vector< std::vector<M > > &v) {               \
       return M::zz_blockcat(v);                                         \
     }                                                                   \
-    inline SWIG_FRIEND M                                                \
+    DECL M                                                              \
       blockcat(const M &A, const M &B, const M &C, const M &D) {        \
       return vertcat(horzcat(A, B), horzcat(C, D));                     \
     }                                                                   \
-    inline SWIG_FRIEND std::vector< std::vector< M > >                  \
+    DECL std::vector< std::vector< M > >                                \
       blocksplit(const M& x, const std::vector<int>& vert_offset,       \
                  const std::vector<int>& horz_offset) {                 \
       return x.zz_blocksplit(vert_offset, horz_offset);                 \
     }                                                                   \
-    inline SWIG_FRIEND std::vector< std::vector< M > >                  \
+    DECL std::vector< std::vector< M > >                                \
       blocksplit(const M& x, int vert_incr=1, int horz_incr=1) {        \
       return x.zz_blocksplit(vert_incr, horz_incr);                     \
     }                                                                   \
-    inline SWIG_FRIEND M diagcat(const std::vector<M> &A) {             \
+    DECL M diagcat(const std::vector<M> &A) {                           \
       return M::zz_diagcat(A);                                          \
     }                                                                   \
-    inline SWIG_FRIEND std::vector< M >                                 \
+    DECL std::vector< M >                                               \
       diagsplit(const M& x, const std::vector<int>& output_offset1,     \
                 const std::vector<int>& output_offset2) {               \
       return x.zz_diagsplit(output_offset1, output_offset2);            \
     }                                                                   \
-    inline SWIG_FRIEND std::vector< M >                                 \
+    DECL std::vector< M >                                               \
       diagsplit(const M& x, const std::vector<int>& output_offset) {    \
       return x.zz_diagsplit(output_offset);                             \
     }                                                                   \
-    inline SWIG_FRIEND std::vector< M >                                 \
+    DECL std::vector< M >                                               \
       diagsplit(const M& x, int incr=1) {                               \
       return x.zz_diagsplit(incr);                                      \
     }                                                                   \
-    inline SWIG_FRIEND std::vector< M >                                 \
+    DECL std::vector< M >                                               \
       diagsplit(const M& x, int incr1, int incr2) {                     \
       return x.zz_diagsplit(incr1, incr2);                              \
     }                                                                   \
-    inline SWIG_FRIEND M veccat(const std::vector< M >& x) {            \
+    DECL M veccat(const std::vector< M >& x) {                          \
       return M::zz_veccat(x);                                           \
     }                                                                   \
-    inline SWIG_FRIEND M mul(const M &X, const M &Y) {                  \
+    DECL M mul(const M &X, const M &Y) {                                \
       return X.zz_mtimes(Y);                                            \
     }                                                                   \
-    inline SWIG_FRIEND M mul(const M &X, const M &Y, const M &Z) {      \
+    DECL M mul(const M &X, const M &Y, const M &Z) {                    \
       return X.zz_mtimes(Y, Z);                                         \
     }                                                                   \
-    inline SWIG_FRIEND M mul(const std::vector<M> &args) {              \
+    DECL M mul(const std::vector<M> &args) {                            \
       return M::zz_mul(args);                                           \
     }                                                                   \
-    inline SWIG_FRIEND M transpose(const M& X) {                        \
+    DECL M transpose(const M& X) {                                      \
       return X.T();                                                     \
     }                                                                   \
-    inline SWIG_FRIEND M vec(const M& a) {                              \
+    DECL M vec(const M& a) {                                            \
       return a.zz_vec();                                                \
     }                                                                   \
-    inline SWIG_FRIEND M vecNZ(const M& a) {                            \
+    DECL M vecNZ(const M& a) {                                          \
       return a.zz_vecNZ();                                              \
     }                                                                   \
-    inline SWIG_FRIEND M reshape(const M& a, int nrow, int ncol) {      \
+    DECL M reshape(const M& a, int nrow, int ncol) {                    \
       return a.zz_reshape(nrow, ncol);                                  \
     }                                                                   \
-    inline SWIG_FRIEND M reshape(const M& a, std::pair<int, int> rc) {  \
+    DECL M reshape(const M& a, std::pair<int, int> rc) {                \
       return reshape(a, rc.first, rc.second);                           \
     }                                                                   \
-    inline SWIG_FRIEND M reshape(const M& a, const Sparsity& sp) {      \
+    DECL M reshape(const M& a, const Sparsity& sp) {                    \
       return a.zz_reshape(sp);                                          \
     }                                                                   \
-    inline SWIG_FRIEND int sprank(const M& A) {                         \
+    DECL int sprank(const M& A) {                                       \
       return A.zz_sprank();                                             \
     }                                                                   \
-    inline SWIG_FRIEND int norm_0_mul(const M &x, const M &y) {         \
+    DECL int norm_0_mul(const M &x, const M &y) {                       \
       return x.zz_norm_0_mul(y);                                        \
     }                                                                   \
-    inline SWIG_FRIEND M triu(const M& a, bool includeDiagonal=true) {  \
+    DECL M triu(const M& a, bool includeDiagonal=true) {                \
       return a.zz_triu(includeDiagonal);                                \
     }                                                                   \
-    inline SWIG_FRIEND M tril(const M& a, bool includeDiagonal=true) {  \
+    DECL M tril(const M& a, bool includeDiagonal=true) {                \
       return a.zz_tril(includeDiagonal);                                \
     }                                                                   \
-    inline SWIG_FRIEND M kron(const M& a, const M& b) {                 \
+    DECL M kron(const M& a, const M& b) {                               \
       return a.zz_kron(b);                                              \
     }                                                                   \
-    inline SWIG_FRIEND M repmat(const M &A, int n, int m=1) {           \
+    DECL M repmat(const M &A, int n, int m=1) {                         \
       return A.zz_repmat(n, m);                                         \
     }                                                                   \
-    inline SWIG_FRIEND M repmat(const M &A, const std::pair<int, int>& rc) { \
+    DECL M repmat(const M &A, const std::pair<int, int>& rc) {          \
       return A.zz_repmat(rc.first, rc.second);                          \
     }                                                                   \
 
 #ifndef SWIG
-SPARSITY_INTERFACE_FRIENDS(MatType)
+SPARSITY_INTERFACE_FRIENDS(inline friend, MatType)
 
   /** \brief Concatenate horizontally, two matrices */
-  inline SWIG_FRIEND MatType horzcat(const MatType &x, const MatType &y) {
+  inline friend MatType horzcat(const MatType &x, const MatType &y) {
   MatType v[] = {x, y};
   return horzcat(std::vector<MatType>(v, v+2));
  }
 
 /** \brief Concatenate horizontally, three matrices */
- inline SWIG_FRIEND MatType horzcat(const MatType &x, const MatType &y, const MatType &z) {
+ inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z) {
    MatType v[] = {x, y, z};
    return horzcat(std::vector<MatType>(v, v+3));
  }
 
  /** \brief Concatenate horizontally, four matrices */
- inline SWIG_FRIEND MatType horzcat(const MatType &x, const MatType &y, const MatType &z,
+ inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z,
                                     const MatType &w) {
    MatType v[] = {x, y, z, w};
    return horzcat(std::vector<MatType>(v, v+4));
  }
 
  /** \brief Concatenate vertically, two matrices */
- inline SWIG_FRIEND MatType vertcat(const MatType &x, const MatType &y) {
+ inline friend MatType vertcat(const MatType &x, const MatType &y) {
    MatType v[] = {x, y};
    return vertcat(std::vector<MatType>(v, v+2));
  }
 
  /** \brief Concatenate vertically, three matrices */
- inline SWIG_FRIEND MatType vertcat(const MatType &x, const MatType &y, const MatType &z) {
+ inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z) {
    MatType v[] = {x, y, z};
    return vertcat(std::vector<MatType>(v, v+3));
  }
 
  /** \brief Concatenate vertically, four matrices */
- inline SWIG_FRIEND MatType vertcat(const MatType &x, const MatType &y, const MatType &z,
+ inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z,
                                     const MatType &w) {
    MatType v[] = {x, y, z, w};
    return vertcat(std::vector<MatType>(v, v+4));
  }
 
  /** \brief Concatenate along diagonal, two matrices */
- inline SWIG_FRIEND MatType diagcat(const MatType &x, const MatType &y) {
+ inline friend MatType diagcat(const MatType &x, const MatType &y) {
    MatType v[] = {x, y};
    return diagcat(std::vector<MatType>(v, v+2));
  }
 
  /** \brief Concatenate along diagonal, three matrices */
- inline SWIG_FRIEND MatType diagcat(const MatType &x, const MatType &y, const MatType &z) {
+ inline friend MatType diagcat(const MatType &x, const MatType &y, const MatType &z) {
    MatType v[] = {x, y, z};
    return diagcat(std::vector<MatType>(v, v+3));
  }
 
  /** \brief Concatenate along diagonal, four matrices */
- inline SWIG_FRIEND MatType diagcat(const MatType &x, const MatType &y, const MatType &z,
+ inline friend MatType diagcat(const MatType &x, const MatType &y, const MatType &z,
                                     const MatType &w) {
    MatType v[] = {x, y, z, w};
    return diagcat(std::vector<MatType>(v, v+4));
