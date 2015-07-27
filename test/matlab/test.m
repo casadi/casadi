@@ -138,3 +138,15 @@ catch err
 end
 
 assert(~isempty(strfind(msg,'[x, p]')))
+
+% error message beautification
+
+msg = '';
+try
+  SXFunction('f',[SX.sym('12')])
+catch err
+  msg = err.message;
+end
+
+assert(~isempty(strfind(msg,'  SXFunction(char,{SX} ,{SX} ,Dict)')))
+assert(~isempty(strfind(msg,'You have: char, SX')))
