@@ -48,8 +48,150 @@ class CASADI_EXPORT GenericExpression {
 #endif // SWIG
   public:
 
+
+/*! inline friend bool isEqual(const ExType& x, const ExType& y, int depth=0)
+ * \brief Check if two nodes are equivalent up to a given depth.
+ *  Depth=0 checks if the expressions are identical, i.e. points to the same node.
+ *
+ *  a = x*x
+ *  b = x*x
+ *
+ *  a.isEqual(b, 0)  will return false, but a.isEqual(b, 1) will return true
+ */
+
+#define GENERIC_EXPRESSION_FRIENDS_UNWRAPPED(M)                         \
+    inline SWIG_FRIEND M operator+(const M &x, const M &y) {            \
+      return x.zz_plus(y);                                              \
+    }                                                                   \
+    inline SWIG_FRIEND M operator-(const M &x, const M &y) {            \
+      return x.zz_minus(y);                                             \
+    }                                                                   \
+    inline SWIG_FRIEND M operator*(const M &x, const M &y) {            \
+      return x.zz_times(y);                                             \
+    }                                                                   \
+    inline SWIG_FRIEND M operator/(const M &x, const M &y) {            \
+      return x.zz_rdivide(y);                                           \
+    }                                                                   \
+    inline SWIG_FRIEND M operator<(const M &x, const M &y) {            \
+      return x.zz_lt(y);                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M operator<=(const M &x, const M &y) {           \
+      return x.zz_le(y);                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M operator>(const M &x, const M &y) {            \
+      return x.zz_gt(y);                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M operator>=(const M &x, const M &y) {           \
+      return x.zz_ge(y);                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M operator==(const M &x, const M &y) {           \
+      return x.zz_eq(y);                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M operator!=(const M &x, const M &y) {           \
+      return x.zz_ne(y);                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M operator&&(const M &x, const M &y) {           \
+      return x.zz_and(y);                                               \
+    }                                                                   \
+    inline SWIG_FRIEND M operator||(const M &x, const M &y) {           \
+      return x.zz_or(y);                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M abs(const M& x) {                              \
+      return x.zz_abs();                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M fabs(const M& x) {                             \
+      return x.zz_abs();                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M sqrt(const M& x) {                             \
+      return x.zz_sqrt();                                               \
+    }                                                                   \
+    inline SWIG_FRIEND M sin(const M& x) {                              \
+      return x.zz_sin();                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M cos(const M& x) {                              \
+      return x.zz_cos();                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M tan(const M& x) {                              \
+      return x.zz_tan();                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M atan(const M& x) {                             \
+      return x.zz_atan();                                               \
+    }                                                                   \
+    inline SWIG_FRIEND M asin(const M& x) {                             \
+      return x.zz_asin();                                               \
+    }                                                                   \
+    inline SWIG_FRIEND M acos(const M& x) {                             \
+      return x.zz_acos();                                               \
+    }                                                                   \
+    inline SWIG_FRIEND M tanh(const M& x) {                             \
+      return x.zz_tanh();                                               \
+    }                                                                   \
+    inline SWIG_FRIEND M sinh(const M& x) {                             \
+      return x.zz_sinh();                                               \
+    }                                                                   \
+    inline SWIG_FRIEND M cosh(const M& x) {                             \
+      return x.zz_cosh();                                               \
+    }                                                                   \
+    inline SWIG_FRIEND M atanh(const M& x) {                            \
+      return x.zz_atanh();                                              \
+    }                                                                   \
+    inline SWIG_FRIEND M asinh(const M& x) {                            \
+      return x.zz_asinh();                                              \
+    }                                                                   \
+    inline SWIG_FRIEND M acosh(const M& x) {                            \
+      return x.zz_acosh();                                              \
+    }                                                                   \
+    inline SWIG_FRIEND M exp(const M& x) {                              \
+      return x.zz_exp();                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M log(const M& x) {                              \
+      return x.zz_log();                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M log10(const M& x) {                            \
+      return x.zz_log10();                                              \
+    }                                                                   \
+    inline SWIG_FRIEND M floor(const M& x) {                            \
+      return x.zz_floor();                                              \
+    }                                                                   \
+    inline SWIG_FRIEND M ceil(const M& x) {                             \
+      return x.zz_ceil();                                               \
+    }                                                                   \
+    inline SWIG_FRIEND M erf(const M& x) {                              \
+      return x.zz_erf();                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M sign(const M& x) {                             \
+      return x.zz_sign();                                               \
+    }                                                                   \
+    inline SWIG_FRIEND M pow(const M& x, const M& n) {                  \
+      return x.zz_power(n);                                             \
+    }                                                                   \
+    inline SWIG_FRIEND M fmod(const M& x, const M& y) {                 \
+      return x.zz_mod(y);                                               \
+    }                                                                   \
+    inline SWIG_FRIEND M atan2(const M& x, const M& y) {                \
+      return x.zz_atan2(y);                                             \
+    }                                                                   \
+    inline SWIG_FRIEND M fmin(const M& x, const M& y) {                 \
+      return x.zz_min(y);                                               \
+    }                                                                   \
+    inline SWIG_FRIEND M fmax(const M& x, const M& y) {                 \
+      return x.zz_max(y);                                               \
+    }                                                                   \
+
+#define GENERIC_EXPRESSION_FRIENDS(M)                                   \
+    inline SWIG_FRIEND M simplify(const M &x) {                         \
+      return x.zz_simplify();                                           \
+    }                                                                   \
+    inline SWIG_FRIEND bool isEqual(const M& x, const M& y, int depth=0) { \
+      return x.zz_isEqual(y, depth);                                    \
+    }                                                                   \
+    inline SWIG_FRIEND bool iszero(const M& x) {                        \
+      return x.isZero();                                                \
+    }                                                                   \
+
 #ifndef SWIG
-#include "generic_expression_friends.hpp"
+  GENERIC_EXPRESSION_FRIENDS_UNWRAPPED(ExType)
+  GENERIC_EXPRESSION_FRIENDS(ExType)
 
     /// In-place addition
     inline ExType& operator+=(const ExType &y) { return self() = self().zz_plus(y); }

@@ -3260,36 +3260,19 @@ MATRIX_TOOLS_TEMPLATES(double)
 MATRIX_TOOLS_TEMPLATES(casadi::SXElement)
 #endif // SWIGMATLAB
 
-%define SPARSITY_INTERFACE_DECL(MATTYPE...)
-#define MatType MATTYPE
-%include <casadi/core/matrix/sparsity_interface_friends.hpp>
-#undef MatType
-%enddef
-
-%define GENERIC_MATRIX_DECL(MATTYPE...)
-#define MatType MATTYPE
-%include <casadi/core/matrix/generic_matrix_friends.hpp>
-#undef MatType
-%enddef
-
-%define MATRIX_DECL(DATATYPE...)
-#define DataType DATATYPE
-%include <casadi/core/matrix/matrix_friends.hpp>
-#undef DataType
-%enddef
-
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)
-SPARSITY_INTERFACE_DECL(MatType)
-GENERIC_MATRIX_DECL(MatType)
+SPARSITY_INTERFACE_FRIENDS(MatType)
+GENERIC_EXPRESSION_FRIENDS(MatType)
+GENERIC_MATRIX_FRIENDS(MatType)
 %enddef
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(DataType...)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix< DataType >)
-MATRIX_DECL(DataType)
+MATRIX_FRIENDS(casadi::Matrix< DataType >)
 %enddef
 
 #ifndef SWIGMATLAB
-SPARSITY_INTERFACE_DECL(casadi::Sparsity)
+SPARSITY_INTERFACE_FRIENDS(casadi::Sparsity)
 GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(int)
 GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(double)
 GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(casadi::SXElement)

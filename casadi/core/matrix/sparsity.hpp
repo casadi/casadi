@@ -105,6 +105,14 @@ namespace casadi {
 #ifndef SWIG
     /** \brief  Create from node */
     static Sparsity create(SparsityInternal *node);
+
+    /// Base class
+    typedef SparsityInterface<Sparsity> B;
+
+    /// Expose base class functions
+    using B::zz_horzsplit;
+    using B::zz_diagsplit;
+    using B::zz_vertsplit;
 #endif
 
     /** \brief Create a scalar sparsity pattern **/

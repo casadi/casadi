@@ -170,6 +170,9 @@ namespace casadi {
     using B::ones;
     using B::operator[];
     using B::operator();
+    using B::zz_horzsplit;
+    using B::zz_vertsplit;
+    using B::zz_diagsplit;
 
     /// \cond INTERNAL
     /// Expose iterators
@@ -559,9 +562,84 @@ namespace casadi {
 
     /// \endcond
 
+    /*! \fn friend Matrix<DataType> adj(const Matrix<DataType>& A)
+      \brief Matrix adjoint
+    */
+
+    /*! \fn friend Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j)
+      \brief Get the (i,j) minor matrix
+    */
+
+    /*! \fn friend Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j)
+      \brief Get the (i,j) cofactor matrix
+    */
+
+    /*! \fn friend void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R)
+      \brief  QR factorization using the modified Gram-Schmidt algorithm
+      
+      More stable than the classical Gram-Schmidt, but may break down if the rows of A
+      are nearly linearly dependent
+      See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
+      Note that in SWIG, Q and R are returned by value.
+    */
+
+    /*! \fn friend Matrix<DataType> chol(const Matrix<DataType>& A)
+      \brief Obtain a Cholesky factorisation of a matrix
+      
+      Returns an upper triangular R such that R'R = A.
+      Matrix A must be positive definite.
+     
+      At the moment, the algorithm is dense (Cholesky-Banachiewicz).
+      There is an open ticket #1212 to make it sparse.
+    */
+
+    /*! \fn friend Matrix<DataType> all(const Matrix<DataType> &x)
+      \brief Returns true only if every element in the matrix is true
+    */
+
+    /*! \fn friend Matrix<DataType> norm_inf_mul(const Matrix<DataType> &x, const Matrix<DataType> &y)
+      \brief Inf-norm of a Matrix-Matrix product
+    */
+
+    /*! \fn friend Matrix<DataType> sparsify(const Matrix<DataType>& A, double tol=0)
+      \brief  Make a matrix sparse by removing numerical zeros
+    */
+
+#define MATRIX_FRIENDS_UNWRAPPED(M)                                               \
+  inline SWIG_FRIEND M all(const M &x) {                                \
+    return x.zz_all();                                                  \
+  }                                                                     \
+  inline SWIG_FRIEND M any(const M &x) {                                \
+    return x.zz_any();                                                  \
+  }                                                                     \
+
+#define MATRIX_FRIENDS(M)                                               \
+  inline SWIG_FRIEND M adj(const M& A) {                                \
+    return A.zz_adj();                                                  \
+  }                                                                     \
+  inline SWIG_FRIEND M getMinor(const M &x, int i, int j) {             \
+    return x.zz_getMinor(i, j);                                         \
+  }                                                                     \
+  inline SWIG_FRIEND M cofactor(const M &x, int i, int j) {             \
+    return x.zz_cofactor(i, j);                                         \
+  }                                                                     \
+  inline SWIG_FRIEND void qr(const M& A, M& SWIG_OUTPUT(Q), M& SWIG_OUTPUT(R)) { \
+    return A.zz_qr(Q, R);                                               \
+  }                                                                     \
+  inline SWIG_FRIEND M chol(const M& A) {                               \
+    return A.zz_chol();                                                 \
+  }                                                                     \
+  inline SWIG_FRIEND M norm_inf_mul(const M &x, const M &y) {           \
+    return x.zz_norm_inf_mul(y);                                        \
+  }                                                                     \
+  inline SWIG_FRIEND M sparsify(const M& A, double tol=0) {             \
+    return A.zz_sparsify(tol);                                          \
+  }                                                                     \
+
 #ifndef SWIG
-#include "matrix_friends.hpp"
-#endif // SWIG
+    MATRIX_FRIENDS_UNWRAPPED(Matrix<DataType>)
+    MATRIX_FRIENDS(Matrix<DataType>)
+#endif
 
     /** \brief Set or reset the depth to which equalities are being checked for simplifications */
     static void setEqualityCheckingDepth(int eq_depth=1);

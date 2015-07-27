@@ -304,16 +304,431 @@ namespace casadi {
 
     /// \cond CLUTTER
     std::vector< std::vector< MatType > >
-      zz_blocksplit(const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) const;
+      zz_blocksplit(const std::vector<int>& vert_offset,
+                    const std::vector<int>& horz_offset) const;
+    std::vector< std::vector< MatType > >
+      zz_blocksplit(int vert_incr, int horz_incr) const;
     static MatType zz_veccat(const std::vector< MatType >& x);
     MatType zz_vec() const;
     MatType zz_repmat(int n, int m=1) const;
     static std::vector<int> zz_offset(const std::vector< MatType > &v, bool vert=true);
+    std::vector< MatType > zz_diagsplit(const std::vector<int>& output_offset) const;
+    std::vector< MatType > zz_diagsplit(int incr) const;
+    std::vector< MatType > zz_diagsplit(int incr1, int incr2) const;
+    static MatType zz_mul(const std::vector<MatType> &args);
+    std::vector<MatType > zz_horzsplit(int incr) const;
+    std::vector<MatType > zz_vertsplit(int incr) const;
     /// \endcond
 
+    /*! \fn inline friend MatType horzcat(const std::vector<MatType> &v)
+     *  \brief Concatenate a list of matrices horizontally
+     * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
+     *
+     *   horzcat(horzsplit(x, ...)) = x
+     */
+
+    /*! \fn friend MatType vertcat(const std::vector<MatType> &v)
+     * \brief Concatenate a list of matrices vertically
+     * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
+     *
+     *   vertcat(vertsplit(x, ...)) = x
+     */
+
+
+    /*! \fn inline friend std::vector<MatType > horzsplit(const MatType &v,
+      const std::vector<int>& offset)
+      \brief  split horizontally, retaining groups of columns
+      * \param offset List of all start columns for each group
+      *      the last column group will run to the end.
+      *
+      *   horzcat(horzsplit(x, ...)) = x
+      */
+
+    /*! \fn inline friend std::vector<MatType > horzsplit(const MatType &v, int incr=1)
+      \brief  split horizontally, retaining fixed-sized groups of columns
+      * \param incr Size of each group of columns
+      *
+      *   horzcat(horzsplit(x, ...)) = x
+      */
+
+    /*! \fn friend std::vector<MatType > vertsplit(const MatType &v,
+      const std::vector<int>& offset)
+      * \brief  split vertically, retaining groups of rows
+      * \param output_offset List of all start rows for each group
+      *      the last row group will run to the end.
+      *
+      *   vertcat(vertsplit(x, ...)) = x
+      */
+
+    /*! \fn inline friend std::vector<int > offset(const std::vector<MatType> &v, bool vert=true)
+      \brief Helper function, get offsets corresponding to a vector of matrices
+    */
+
+    /*! \fn inline friend std::vector<MatType > vertsplit(const MatType &v, int incr=1)
+      \brief  split vertically, retaining fixed-sized groups of rows
+      * \param incr Size of each group of rows
+      *
+      *   vertcat(vertsplit(x, ...)) = x
+     
+      \doctest
+      print vertsplit(SX.sym("a",4))
+      \doctestout
+      [SX(a_0), SX(a_1), SX(a_2), SX(a_3)]
+      \enddoctest
+     
+      \doctest
+      print vertsplit(SX.sym("a",4),2)
+      \doctestout
+      [SX([a_0, a_1]), SX([a_2, a_3])]
+      \enddoctest
+     
+      If the number of rows is not a multiple of \p incr,
+      the last entry returned will have a size smaller than \p incr.
+     
+      \doctest
+      print vertsplit(DMatrix([0,1,2,3,4]),2)
+      \doctestout
+      [DMatrix([0, 1]), DMatrix([2, 3]), DMatrix(4)]
+      \enddoctest
+      *
+      */
+
+    /*! \fn inline friend MatType blockcat(const std::vector< std::vector<MatType > > &v)
+     * \brief Construct a matrix from a list of list of blocks.
+     */
+
+    /*! \fn inline friend MatType blockcat(const MatType &A, const MatType &B,
+      const MatType &C, const MatType &D)
+      \brief Construct a matrix from 4 blocks
+    */
+
+    /*! \fn inline friend std::vector< std::vector< MatType > > 
+      blocksplit(const MatType& x,
+      const std::vector<int>& vert_offset,
+      const std::vector<int>& horz_offset)
+  
+      \brief  chop up into blocks
+      * \param vert_offset Defines the boundaries of the block rows
+      * \param horz_offset Defines the boundaries of the block columns
+      *
+      *   blockcat(blocksplit(x,..., ...)) = x
+      */
+
+    /*! \fn inline friend std::vector< std::vector< MatType > >
+      blocksplit(const MatType& x, int vert_incr=1, int horz_incr=1)
+      \brief  chop up into blocks
+      * \param vert_incr Defines the increment for block boundaries in row dimension
+      * \param horz_incr Defines the increment for block boundaries in column dimension
+      *
+      *   blockcat(blocksplit(x,..., ...)) = x
+      */
+
+    /*! \fn inline friend MatType diagcat(const std::vector<MatType> &A)
+      \brief Construct a matrix with given block on the diagonal
+    */
+
+
+    /*! \fn friend std::vector< MatType > diagsplit(const MatType& x,
+      const std::vector<int>& output_offset1,
+      const std::vector<int>& output_offset2)
+      \brief  split diagonally, retaining square matrices
+      * \param output_offset1 List of all start locations (row) for each group
+      *      the last matrix will run to the end.
+      * \param output_offset2 List of all start locations (row) for each group
+      *      the last matrix will run to the end.
+      *
+      *   diagcat(diagsplit(x, ...)) = x
+      */
+
+    /*! \fn inline friend std::vector< MatType > diagsplit(const MatType& x,
+      const std::vector<int>& output_offset)
+      \brief  split diagonally, retaining square matrices
+      * \param output_offset List of all start locations for each group
+      *      the last matrix will run to the end.
+      *
+      *   diagcat(diagsplit(x, ...)) = x
+      */
+
+    /*! \fn inline friend std::vector< MatType > diagsplit(const MatType& x, int incr=1)
+      \brief  split diagonally, retaining groups of square matrices
+      * \param incr Size of each matrix
+      *
+      *  diagsplit(diagsplit(x, ...)) = x
+      */
+
+    /*! \fn inline friend std::vector< MatType > diagsplit(const MatType& x, int incr1, int incr2)
+      \brief  split diagonally, retaining fixed-sized matrices
+      * \param incr1 Row dimension of each matrix
+      * \param incr2 Column dimension of each matrix
+      *
+      *  diagsplit(diagsplit(x, ...)) = x
+      */
+
+    /*! \fn inline friend MatType veccat(const std::vector< MatType >& x)
+      \brief  concatenate vertically while vectorizing all arguments with vec
+    */
+
+    /*! \fn inline friend MatType mul(const MatType &X, const MatType &Y)
+      \brief Matrix product of two matrices
+    */
+
+    /*! \fn inline friend MatType mul(const MatType &X, const MatType &Y, const MatType &Z)
+      \brief Matrix product and addition
+      Matrix product of two matrices (X and Y), adding the result to
+      a third matrix Z. The result has the same sparsity pattern as
+      C meaning that other entries of (X*Y) are ignored.
+      The operation is equivalent to: Z+mul(X,Y).project(Z.sparsity()).
+    */
+
+    /*! \fn inline friend MatType mul(const std::vector<MatType> &args)
+      \brief Matrix product of n matrices
+    */
+
+    /*! \fn inline friend MatType transpose(const MatType& X)
+      \brief Transpose
+    */
+
+    /*! \fn inline friend MatType vec(const MatType& a)
+      \brief  make a vector
+      Reshapes/vectorizes the matrix such that the shape becomes (expr.numel(), 1).
+      Columns are stacked on top of each other.
+      Same as reshape(expr, expr.numel(), 1)
+  
+      a c \n
+      b d \n
+
+      turns into
+
+      a \n
+      b \n
+      c \n
+      d \n
+    */
+
+    /*! inline friend MatType vecNZ(const MatType& a)
+      \brief Returns a flattened version of the matrix, preserving only nonzeros
+    */
+
+    /*! \fn inline friend MatType reshape(const MatType& a, int nrow, int ncol)
+      \brief Returns a reshaped version of the matrix
+    */
+
+    /*! \fn inline friend MatType reshape(const MatType& a, std::pair<int, int> rc)
+      \brief Returns a reshaped version of the matrix, dimensions as a vector
+    */
+
+    /*! \fn inline friend MatType reshape(const MatType& a, const Sparsity& sp)
+      \brief Reshape the matrix
+    */
+
+    /*! inline friend int sprank(const MatType& A)
+      \brief Obtain the structural rank of a sparsity-pattern
+    */
+
+    /*! inline friend int norm_0_mul(const MatType &x, const MatType &y)
+      \brief 0-norm (nonzero count) of a Matrix-matrix product
+    */
+
+    /*! inline friend MatType triu(const MatType& a, bool includeDiagonal=true)
+      \brief Get the upper triangular part of a matrix
+    */
+
+    /*! inline friend MatType tril(const MatType& a, bool includeDiagonal=true)
+      \brief Get the lower triangular part of a matrix
+    */
+
+    /*! inline friend MatType kron(const MatType& a, const MatType& b)
+      \brief Kronecker tensor product
+      *
+      * Creates a block matrix in which each element (i, j) is a_ij*b
+      */
+
+    /*! inline friend MatType repmat(const MatType &A, int n, int m=1)
+      \brief Repeat matrix A n times vertically and m times horizontally
+    */
+
+    /*! inline friend MatType repmat(const MatType &A, const std::pair<int, int>& rc)
+      \brief Repeat matrix A n times vertically and m times horizontally
+    */
+
+
+#define SPARSITY_INTERFACE_FRIENDS(M)                                   \
+    inline SWIG_FRIEND M horzcat(const std::vector<M> &v) {             \
+      return M::zz_horzcat(v);                                          \
+    }                                                                   \
+    inline SWIG_FRIEND M vertcat(const std::vector<M> &v) {             \
+      return M::zz_vertcat(v);                                          \
+    }                                                                   \
+    inline SWIG_FRIEND std::vector<M >                                  \
+      horzsplit(const M &v, const std::vector<int>& offset) {           \
+      return v.zz_horzsplit(offset);                                    \
+    }                                                                   \
+    inline SWIG_FRIEND std::vector<M >                                  \
+      horzsplit(const M &v, int incr=1) {                               \
+      return v.zz_horzsplit(incr);                                      \
+    }                                                                   \
+    inline SWIG_FRIEND std::vector<M >                                  \
+      vertsplit(const M &v, const std::vector<int>& offset) {           \
+      return v.zz_vertsplit(offset);                                    \
+    }                                                                   \
+    inline SWIG_FRIEND std::vector<int >                                \
+      offset(const std::vector<M> &v, bool vert=true) {                 \
+      return M::zz_offset(v, vert);                                     \
+    }                                                                   \
+    inline SWIG_FRIEND std::vector<M >                                  \
+      vertsplit(const M &v, int incr=1) {                               \
+      return v.zz_vertsplit(incr);                                      \
+    }                                                                   \
+    inline SWIG_FRIEND M                                                \
+      blockcat(const std::vector< std::vector<M > > &v) {               \
+      return M::zz_blockcat(v);                                         \
+    }                                                                   \
+    inline SWIG_FRIEND M                                                \
+      blockcat(const M &A, const M &B, const M &C, const M &D) {        \
+      return vertcat(horzcat(A, B), horzcat(C, D));                     \
+    }                                                                   \
+    inline SWIG_FRIEND std::vector< std::vector< M > >                  \
+      blocksplit(const M& x, const std::vector<int>& vert_offset,       \
+                 const std::vector<int>& horz_offset) {                 \
+      return x.zz_blocksplit(vert_offset, horz_offset);                 \
+    }                                                                   \
+    inline SWIG_FRIEND std::vector< std::vector< M > >                  \
+      blocksplit(const M& x, int vert_incr=1, int horz_incr=1) {        \
+      return x.zz_blocksplit(vert_incr, horz_incr);                     \
+    }                                                                   \
+    inline SWIG_FRIEND M diagcat(const std::vector<M> &A) {             \
+      return M::zz_diagcat(A);                                          \
+    }                                                                   \
+    inline SWIG_FRIEND std::vector< M >                                 \
+      diagsplit(const M& x, const std::vector<int>& output_offset1,     \
+                const std::vector<int>& output_offset2) {               \
+      return x.zz_diagsplit(output_offset1, output_offset2);            \
+    }                                                                   \
+    inline SWIG_FRIEND std::vector< M >                                 \
+      diagsplit(const M& x, const std::vector<int>& output_offset) {    \
+      return x.zz_diagsplit(output_offset);                             \
+    }                                                                   \
+    inline SWIG_FRIEND std::vector< M >                                 \
+      diagsplit(const M& x, int incr=1) {                               \
+      return x.zz_diagsplit(incr);                                      \
+    }                                                                   \
+    inline SWIG_FRIEND std::vector< M >                                 \
+      diagsplit(const M& x, int incr1, int incr2) {                     \
+      return x.zz_diagsplit(incr1, incr2);                              \
+    }                                                                   \
+    inline SWIG_FRIEND M veccat(const std::vector< M >& x) {            \
+      return M::zz_veccat(x);                                           \
+    }                                                                   \
+    inline SWIG_FRIEND M mul(const M &X, const M &Y) {                  \
+      return X.zz_mtimes(Y);                                            \
+    }                                                                   \
+    inline SWIG_FRIEND M mul(const M &X, const M &Y, const M &Z) {      \
+      return X.zz_mtimes(Y, Z);                                         \
+    }                                                                   \
+    inline SWIG_FRIEND M mul(const std::vector<M> &args) {              \
+      return M::zz_mul(args);                                           \
+    }                                                                   \
+    inline SWIG_FRIEND M transpose(const M& X) {                        \
+      return X.T();                                                     \
+    }                                                                   \
+    inline SWIG_FRIEND M vec(const M& a) {                              \
+      return a.zz_vec();                                                \
+    }                                                                   \
+    inline SWIG_FRIEND M vecNZ(const M& a) {                            \
+      return a.zz_vecNZ();                                              \
+    }                                                                   \
+    inline SWIG_FRIEND M reshape(const M& a, int nrow, int ncol) {      \
+      return a.zz_reshape(nrow, ncol);                                  \
+    }                                                                   \
+    inline SWIG_FRIEND M reshape(const M& a, std::pair<int, int> rc) {  \
+      return reshape(a, rc.first, rc.second);                           \
+    }                                                                   \
+    inline SWIG_FRIEND M reshape(const M& a, const Sparsity& sp) {      \
+      return a.zz_reshape(sp);                                          \
+    }                                                                   \
+    inline SWIG_FRIEND int sprank(const M& A) {                         \
+      return A.zz_sprank();                                             \
+    }                                                                   \
+    inline SWIG_FRIEND int norm_0_mul(const M &x, const M &y) {         \
+      return x.zz_norm_0_mul(y);                                        \
+    }                                                                   \
+    inline SWIG_FRIEND M triu(const M& a, bool includeDiagonal=true) {  \
+      return a.zz_triu(includeDiagonal);                                \
+    }                                                                   \
+    inline SWIG_FRIEND M tril(const M& a, bool includeDiagonal=true) {  \
+      return a.zz_tril(includeDiagonal);                                \
+    }                                                                   \
+    inline SWIG_FRIEND M kron(const M& a, const M& b) {                 \
+      return a.zz_kron(b);                                              \
+    }                                                                   \
+    inline SWIG_FRIEND M repmat(const M &A, int n, int m=1) {           \
+      return A.zz_repmat(n, m);                                         \
+    }                                                                   \
+    inline SWIG_FRIEND M repmat(const M &A, const std::pair<int, int>& rc) { \
+      return A.zz_repmat(rc.first, rc.second);                          \
+    }                                                                   \
+
 #ifndef SWIG
-#include "sparsity_interface_friends.hpp"
+SPARSITY_INTERFACE_FRIENDS(MatType)
+
+  /** \brief Concatenate horizontally, two matrices */
+  inline SWIG_FRIEND MatType horzcat(const MatType &x, const MatType &y) {
+  MatType v[] = {x, y};
+  return horzcat(std::vector<MatType>(v, v+2));
+ }
+
+/** \brief Concatenate horizontally, three matrices */
+ inline SWIG_FRIEND MatType horzcat(const MatType &x, const MatType &y, const MatType &z) {
+   MatType v[] = {x, y, z};
+   return horzcat(std::vector<MatType>(v, v+3));
+ }
+
+ /** \brief Concatenate horizontally, four matrices */
+ inline SWIG_FRIEND MatType horzcat(const MatType &x, const MatType &y, const MatType &z,
+                                    const MatType &w) {
+   MatType v[] = {x, y, z, w};
+   return horzcat(std::vector<MatType>(v, v+4));
+ }
+
+ /** \brief Concatenate vertically, two matrices */
+ inline SWIG_FRIEND MatType vertcat(const MatType &x, const MatType &y) {
+   MatType v[] = {x, y};
+   return vertcat(std::vector<MatType>(v, v+2));
+ }
+
+ /** \brief Concatenate vertically, three matrices */
+ inline SWIG_FRIEND MatType vertcat(const MatType &x, const MatType &y, const MatType &z) {
+   MatType v[] = {x, y, z};
+   return vertcat(std::vector<MatType>(v, v+3));
+ }
+
+ /** \brief Concatenate vertically, four matrices */
+ inline SWIG_FRIEND MatType vertcat(const MatType &x, const MatType &y, const MatType &z,
+                                    const MatType &w) {
+   MatType v[] = {x, y, z, w};
+   return vertcat(std::vector<MatType>(v, v+4));
+ }
+
+ /** \brief Concatenate along diagonal, two matrices */
+ inline SWIG_FRIEND MatType diagcat(const MatType &x, const MatType &y) {
+   MatType v[] = {x, y};
+   return diagcat(std::vector<MatType>(v, v+2));
+ }
+
+ /** \brief Concatenate along diagonal, three matrices */
+ inline SWIG_FRIEND MatType diagcat(const MatType &x, const MatType &y, const MatType &z) {
+   MatType v[] = {x, y, z};
+   return diagcat(std::vector<MatType>(v, v+3));
+ }
+
+ /** \brief Concatenate along diagonal, four matrices */
+ inline SWIG_FRIEND MatType diagcat(const MatType &x, const MatType &y, const MatType &z,
+                                    const MatType &w) {
+   MatType v[] = {x, y, z, w};
+   return diagcat(std::vector<MatType>(v, v+4));
+ }
 #endif // SWIG
+
   };
 
 #ifndef SWIG
@@ -341,6 +756,20 @@ namespace casadi {
   }
 
   template<typename MatType>
+  std::vector< std::vector< MatType > >
+  SparsityInterface<MatType>::zz_blocksplit(int vert_incr, int horz_incr) const {
+    casadi_assert(horz_incr>=1);
+    casadi_assert(vert_incr>=1);
+    int sz1 = self().size1();
+    std::vector<int> offset1 = range(0, sz1, vert_incr);
+    offset1.push_back(sz1);
+    int sz2 = self().size2();
+    std::vector<int> offset2 = range(0, sz2, horz_incr);
+    offset2.push_back(sz2);
+    return blocksplit(self(), offset1, offset2);
+  }
+
+  template<typename MatType>
   std::vector<int>
   SparsityInterface<MatType>::zz_offset(const std::vector< MatType > &v, bool vert) {
     std::vector<int> ret(v.size()+1);
@@ -359,6 +788,65 @@ namespace casadi {
       *it = vec(*it);
     }
     return vertcat(x_vec);
+  }
+
+  template<typename MatType>
+  std::vector< MatType >
+  SparsityInterface<MatType>::zz_diagsplit(const std::vector<int>& output_offset) const {
+    casadi_assert_message(self().issquare(), "diagsplit(x,incr)::input must be square but got "
+                          << self().dimString()  << ".");
+    return diagsplit(self(), output_offset, output_offset);
+  }
+
+  template<typename MatType>
+  std::vector< MatType >
+  SparsityInterface<MatType>::zz_diagsplit(int incr) const {
+    casadi_assert(incr>=1);
+    casadi_assert_message(self().issquare(), "diagsplit(x,incr)::input must be square but got "
+                          << self().dimString()  << ".");
+    std::vector<int> offset2 = range(0, self().size2(), incr);
+    offset2.push_back(self().size2());
+    return diagsplit(self(), offset2);
+  }
+
+  template<typename MatType>
+  std::vector< MatType >
+  SparsityInterface<MatType>::zz_diagsplit(int incr1, int incr2) const {
+    casadi_assert(incr1>=1);
+    casadi_assert(incr2>=1);
+    std::vector<int> offset1 = range(0, self().size1(), incr1);
+    offset1.push_back(self().size1());
+    std::vector<int> offset2 = range(0, self().size2(), incr2);
+    offset2.push_back(self().size2());
+    return diagsplit(self(), offset1, offset2);
+  }
+
+  template<typename MatType>
+  MatType SparsityInterface<MatType>::zz_mul(const std::vector<MatType> &args) {
+    casadi_assert_message(args.size()>=1,
+                          "mul(std::vector<MatType> &args): "
+                          "supplied list must not be empty.");
+    MatType ret = args[0];
+    for (int i=1; i<args.size(); ++i) ret = mul(ret, args[i]);
+    return ret;
+  }
+
+  template<typename MatType>
+  std::vector<MatType > SparsityInterface<MatType>::zz_horzsplit(int incr) const {
+    casadi_assert(incr>=1);
+    int sz2 = self().size2();
+    std::vector<int> offset2 = range(0, sz2, incr);
+    offset2.push_back(sz2);
+    return horzsplit(self(), offset2);
+  }
+
+  template<typename MatType>
+  std::vector<MatType > SparsityInterface<MatType>::zz_vertsplit(int incr) const {
+    casadi_assert(incr>=1);
+    int sz1 = self().size1();
+    std::vector<int> offset1 = range(0, sz1, incr);
+    offset1.push_back(sz1);
+    return vertsplit(self(), offset1);
   }
 #endif // SWIG
 

@@ -117,15 +117,22 @@ namespace casadi {
     /// Access the sparsity, make a copy if there are multiple references to it
     Sparsity& sparsityRef();
 
-#endif // SWIG
-
-    /// Returns the truth value of an MX expression
-    bool __nonzero__() const;
-
     /// \cond INTERNAL
     /// Scalar type
     typedef MX ScalarType;
     /// \endcond
+
+    /// Base class
+    typedef GenericMatrix<MX> B;
+
+    /// Expose base class functions
+    using B::zz_horzsplit;
+    using B::zz_diagsplit;
+    using B::zz_vertsplit;
+#endif // SWIG
+
+    /// Returns the truth value of an MX expression
+    bool __nonzero__() const;
 
     /** \brief Get an owning reference to the sparsity pattern */
     Sparsity getSparsity() const { return sparsity();}
