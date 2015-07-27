@@ -105,11 +105,6 @@ namespace casadi {
     /** \brief  Get the shape */
     std::pair<int, int> shape() const;
 
-    #ifndef SWIGPYTHON // Matlab-specific
-    /** \brief  Get the size along a particular dimensions */
-    int shape(int axis) const;
-    #endif
-
     /** \brief Check if the sparsity is empty, i.e. if one of the dimensions is zero
      * (or optionally both dimensions) */
     bool isempty(bool both=false) const { return sparsity().isempty(both);}
@@ -525,15 +520,6 @@ namespace casadi {
   template<typename MatType>
   std::pair<int, int> GenericMatrix<MatType>::shape() const {
     return sparsity().shape();
-  }
-
-  template<typename MatType>
-  int GenericMatrix<MatType>::shape(int axis) const {
-    if (axis==1)
-      return sparsity().size1();
-    if (axis==2)
-      return sparsity().size2();
-    casadi_error("Axis must be 1 or 2.");
   }
 
   template<typename MatType>
