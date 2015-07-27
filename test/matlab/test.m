@@ -122,4 +122,7 @@ assert(~isempty(strfind(logged,'::init')))
 clear
 
 
-
+x = SX.sym('x',4,5);
+dim = size(x);
+assert(dim(1)==4)
+assert(dim(2)==5)
