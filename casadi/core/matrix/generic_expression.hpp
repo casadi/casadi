@@ -30,6 +30,11 @@
 
 namespace casadi {
 
+  /** \brief Expression interface - non-tempalated base class 
+      SWIG wrapping, to allow treating GenericExpression as a non-templated class in SWIG.
+   */
+  struct CASADI_EXPORT GenericExpressionCommon {};
+
   /** \brief Expression interface
   *
   This is a common base class for SX, MX and Matrix<>, introducing a uniform syntax and implementing
@@ -39,7 +44,7 @@ namespace casadi {
   \date 2012
 */
 template<typename ExType>
-class CASADI_EXPORT GenericExpression {
+class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
 #ifndef SWIG
   protected:
     // Helper functions
@@ -209,6 +214,7 @@ class CASADI_EXPORT GenericExpression {
     inline ExType operator!() const { return self().zz_not(); }
 
 #endif // SWIG
+
     // \cond CLUTTER
 
     /// Matrix division from left
@@ -227,7 +233,6 @@ class CASADI_EXPORT GenericExpression {
     inline ExType __truediv__(const ExType& y) const {return self()/y;}
     /// \endcond
 };
-
 
 } // namespace casadi
 

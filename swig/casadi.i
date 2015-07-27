@@ -2754,11 +2754,23 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
 %template(GenMX)             casadi::GenericMatrix<casadi::MX>;
 
 %include <casadi/core/matrix/generic_expression.hpp>
-
+#ifdef SWIGMATLAB
+%feature("nonstatic");
+namespace casadi {
+  %extend GenericExpressionCommon {
+    GENERIC_EXPRESSION_FRIENDS(static inline, MX)
+    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<int>)
+    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<double>)
+    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<SXElement>)
+  }
+%feature("nonstatic","");
+}
+#else
 %template(ExpIMatrix)        casadi::GenericExpression<casadi::Matrix<int> >;
 %template(ExpDMatrix)        casadi::GenericExpression<casadi::Matrix<double> >;
 %template(ExpSX)             casadi::GenericExpression<casadi::Matrix<casadi::SXElement> >;
 %template(ExpMX)             casadi::GenericExpression<casadi::MX>;
+#endif
 
 // FIXME: Placing in printable_object.i does not work
 %template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;

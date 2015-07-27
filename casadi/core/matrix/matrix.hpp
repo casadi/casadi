@@ -73,9 +73,13 @@ namespace casadi {
   */
   template<typename DataType>
   class CASADI_EXPORT Matrix :
-        public GenericExpression<Matrix<DataType> >,
-        public GenericMatrix<Matrix<DataType> >,
-        public PrintableObject<Matrix<DataType> > {
+#if defined(SWIG) && defined(SWIGMATLAB)
+    public GenericExpressionCommon,
+#else
+    public GenericExpression<Matrix<DataType> >,
+#endif
+    public GenericMatrix<Matrix<DataType> >,
+    public PrintableObject<Matrix<DataType> > {
   public:
 
     /** \brief  constructors */
