@@ -42,7 +42,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > cleIn(
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
   std::string s[] = {"a", "v"};
-  return std::make_pair(m, std::vector<std::string>(s, s+2));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'cleIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of a \e cle solver
 ///
@@ -53,7 +59,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > cleOut(
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   std::string s[] = {"p"};
-  return std::make_pair(m, std::vector<std::string>(s, s+1));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'cleOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of an ODE/DAE function
 ///
@@ -80,7 +92,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > controldaeIn(
   if (!n7.empty()) m[n7]=x7;
   if (!n8.empty()) m[n8]=x8;
   std::string s[] = {"t", "x", "z", "p", "u", "u_interp", "x_major", "t0", "tf"};
-  return std::make_pair(m, std::vector<std::string>(s, s+9));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+9);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'controldaeIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of a control simulator
 ///
@@ -95,7 +113,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > controlsimulatorI
   if (!n1.empty()) m[n1]=x1;
   if (!n2.empty()) m[n2]=x2;
   std::string s[] = {"x0", "p", "u"};
-  return std::make_pair(m, std::vector<std::string>(s, s+3));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'controlsimulatorIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of a \e dle solver
 ///
@@ -108,7 +132,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > dleIn(
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
   std::string s[] = {"a", "v"};
-  return std::make_pair(m, std::vector<std::string>(s, s+2));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'dleIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of a \e dle solver
 ///
@@ -119,7 +149,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > dleOut(
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   std::string s[] = {"p"};
-  return std::make_pair(m, std::vector<std::string>(s, s+1));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'dleOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of a \e dple solver
 ///
@@ -132,7 +168,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > dpleIn(
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
   std::string s[] = {"a", "v"};
-  return std::make_pair(m, std::vector<std::string>(s, s+2));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'dpleIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of a \e dple solver
 ///
@@ -143,7 +185,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > dpleOut(
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   std::string s[] = {"p"};
-  return std::make_pair(m, std::vector<std::string>(s, s+1));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'dpleOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of an Homotopy NLP function
 ///
@@ -158,7 +206,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > hnlpIn(
   if (!n1.empty()) m[n1]=x1;
   if (!n2.empty()) m[n2]=x2;
   std::string s[] = {"x", "p", "tau"};
-  return std::make_pair(m, std::vector<std::string>(s, s+3));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'hnlpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of an ODE/DAE function
 ///
@@ -175,7 +229,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > daeIn(
   if (!n2.empty()) m[n2]=x2;
   if (!n3.empty()) m[n3]=x3;
   std::string s[] = {"x", "z", "p", "t"};
-  return std::make_pair(m, std::vector<std::string>(s, s+4));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'daeIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an DAE function
 ///
@@ -190,7 +250,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > daeOut(
   if (!n1.empty()) m[n1]=x1;
   if (!n2.empty()) m[n2]=x2;
   std::string s[] = {"ode", "alg", "quad"};
-  return std::make_pair(m, std::vector<std::string>(s, s+3));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'daeOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of an ODE/DAE backward integration function
 ///
@@ -213,7 +279,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > rdaeIn(
   if (!n5.empty()) m[n5]=x5;
   if (!n6.empty()) m[n6]=x6;
   std::string s[] = {"rx", "rz", "rp", "x", "z", "p", "t"};
-  return std::make_pair(m, std::vector<std::string>(s, s+7));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+7);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'rdaeIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an ODE/DAE backward integration function
 ///
@@ -228,7 +300,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > rdaeOut(
   if (!n1.empty()) m[n1]=x1;
   if (!n2.empty()) m[n2]=x2;
   std::string s[] = {"ode", "alg", "quad"};
-  return std::make_pair(m, std::vector<std::string>(s, s+3));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'rdaeOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of an integrator
 ///
@@ -249,7 +327,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > integratorIn(
   if (!n4.empty()) m[n4]=x4;
   if (!n5.empty()) m[n5]=x5;
   std::string s[] = {"x0", "p", "z0", "rx0", "rp", "rz0"};
-  return std::make_pair(m, std::vector<std::string>(s, s+6));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+6);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'integratorIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an integrator
 ///
@@ -270,7 +354,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > integratorOut(
   if (!n4.empty()) m[n4]=x4;
   if (!n5.empty()) m[n5]=x5;
   std::string s[] = {"xf", "qf", "zf", "rxf", "rqf", "rzf"};
-  return std::make_pair(m, std::vector<std::string>(s, s+6));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+6);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'integratorOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of a linear solver
 ///
@@ -283,7 +373,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > linsolIn(
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
   std::string s[] = {"A", "B"};
-  return std::make_pair(m, std::vector<std::string>(s, s+2));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'linsolIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of a linear solver
 ///
@@ -294,7 +390,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > linsolOut(
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   std::string s[] = {"X"};
-  return std::make_pair(m, std::vector<std::string>(s, s+1));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'linsolOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of a LP problem
 ///
@@ -315,7 +417,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > lpIn(
   if (!n4.empty()) m[n4]=x4;
   if (!n5.empty()) m[n5]=x5;
   std::string s[] = {"c", "a", "lba", "uba", "lbx", "ubx"};
-  return std::make_pair(m, std::vector<std::string>(s, s+6));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+6);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'lpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an LP Solver
 ///
@@ -332,7 +440,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > lpOut(
   if (!n2.empty()) m[n2]=x2;
   if (!n3.empty()) m[n3]=x3;
   std::string s[] = {"x", "cost", "lam_a", "lam_x"};
-  return std::make_pair(m, std::vector<std::string>(s, s+4));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'lpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of a \e dle solver
 ///
@@ -349,7 +463,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > lrdleIn(
   if (!n2.empty()) m[n2]=x2;
   if (!n3.empty()) m[n3]=x3;
   std::string s[] = {"a", "v", "c", "h"};
-  return std::make_pair(m, std::vector<std::string>(s, s+4));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'lrdleIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of a \e dle solver
 ///
@@ -360,7 +480,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > lrdleOut(
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   std::string s[] = {"y"};
-  return std::make_pair(m, std::vector<std::string>(s, s+1));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'lrdleOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of a \e dple solver
 ///
@@ -377,7 +503,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > lrdpleIn(
   if (!n2.empty()) m[n2]=x2;
   if (!n3.empty()) m[n3]=x3;
   std::string s[] = {"a", "v", "c", "h"};
-  return std::make_pair(m, std::vector<std::string>(s, s+4));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'lrdpleIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of a \e dple solver
 ///
@@ -388,7 +520,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > lrdpleOut(
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   std::string s[] = {"y"};
-  return std::make_pair(m, std::vector<std::string>(s, s+1));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'lrdpleOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of an NLP function
 ///
@@ -401,7 +539,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > nlpIn(
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
   std::string s[] = {"x", "p"};
-  return std::make_pair(m, std::vector<std::string>(s, s+2));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'nlpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an NLP function
 ///
@@ -414,7 +558,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > nlpOut(
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
   std::string s[] = {"f", "g"};
-  return std::make_pair(m, std::vector<std::string>(s, s+2));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'nlpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of an NLP objective gradient function
 ///
@@ -427,7 +577,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > gradFIn(
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
   std::string s[] = {"x", "p"};
-  return std::make_pair(m, std::vector<std::string>(s, s+2));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'gradFIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an NLP objective gradient function
 ///
@@ -442,7 +598,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > gradFOut(
   if (!n1.empty()) m[n1]=x1;
   if (!n2.empty()) m[n2]=x2;
   std::string s[] = {"grad", "f", "g"};
-  return std::make_pair(m, std::vector<std::string>(s, s+3));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'gradFOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of an NLP Jacobian function
 ///
@@ -455,7 +617,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > jacGIn(
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
   std::string s[] = {"x", "p"};
-  return std::make_pair(m, std::vector<std::string>(s, s+2));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'jacGIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an NLP Jacobian function
 ///
@@ -470,7 +638,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > jacGOut(
   if (!n1.empty()) m[n1]=x1;
   if (!n2.empty()) m[n2]=x2;
   std::string s[] = {"jac", "f", "g"};
-  return std::make_pair(m, std::vector<std::string>(s, s+3));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'jacGOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of an NLP Hessian function
 ///
@@ -487,7 +661,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > hessLagIn(
   if (!n2.empty()) m[n2]=x2;
   if (!n3.empty()) m[n3]=x3;
   std::string s[] = {"x", "p", "lam_f", "lam_g"};
-  return std::make_pair(m, std::vector<std::string>(s, s+4));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'hessLagIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an NLP Hessian function
 ///
@@ -506,7 +686,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > hessLagOut(
   if (!n3.empty()) m[n3]=x3;
   if (!n4.empty()) m[n4]=x4;
   std::string s[] = {"hess", "f", "g", "grad_x", "grad_p"};
-  return std::make_pair(m, std::vector<std::string>(s, s+5));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+5);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'hessLagOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of an NLP Solver
 ///
@@ -531,7 +717,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > nlpSolverIn(
   if (!n6.empty()) m[n6]=x6;
   if (!n7.empty()) m[n7]=x7;
   std::string s[] = {"x0", "p", "lbx", "ubx", "lbg", "ubg", "lam_x0", "lam_g0"};
-  return std::make_pair(m, std::vector<std::string>(s, s+8));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+8);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'nlpSolverIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an NLP Solver
 ///
@@ -552,7 +744,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > nlpSolverOut(
   if (!n4.empty()) m[n4]=x4;
   if (!n5.empty()) m[n5]=x5;
   std::string s[] = {"x", "f", "g", "lam_x", "lam_g", "lam_p"};
-  return std::make_pair(m, std::vector<std::string>(s, s+6));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+6);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'nlpSolverOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of a QP problem
 ///
@@ -585,7 +783,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > qcqpIn(
   if (!n10.empty()) m[n10]=x10;
   if (!n11.empty()) m[n11]=x11;
   std::string s[] = {"h", "g", "p", "q", "r", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0"};
-  return std::make_pair(m, std::vector<std::string>(s, s+12));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+12);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'qcqpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an QP Solver
 ///
@@ -602,7 +806,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > qcqpOut(
   if (!n2.empty()) m[n2]=x2;
   if (!n3.empty()) m[n3]=x3;
   std::string s[] = {"x", "cost", "lam_a", "lam_x"};
-  return std::make_pair(m, std::vector<std::string>(s, s+4));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'qcqpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of a QP problem
 ///
@@ -629,7 +839,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > qpIn(
   if (!n7.empty()) m[n7]=x7;
   if (!n8.empty()) m[n8]=x8;
   std::string s[] = {"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0"};
-  return std::make_pair(m, std::vector<std::string>(s, s+9));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+9);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'qpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an QP Solver
 ///
@@ -646,7 +862,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > qpOut(
   if (!n2.empty()) m[n2]=x2;
   if (!n3.empty()) m[n3]=x3;
   std::string s[] = {"x", "cost", "lam_a", "lam_x"};
-  return std::make_pair(m, std::vector<std::string>(s, s+4));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'qpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of a SDP problem
 ///
@@ -671,7 +893,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > sdpIn(
   if (!n6.empty()) m[n6]=x6;
   if (!n7.empty()) m[n7]=x7;
   std::string s[] = {"f", "c", "g", "a", "lba", "uba", "lbx", "ubx"};
-  return std::make_pair(m, std::vector<std::string>(s, s+8));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+8);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'sdpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an SDP Solver
 ///
@@ -694,7 +922,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > sdpOut(
   if (!n5.empty()) m[n5]=x5;
   if (!n6.empty()) m[n6]=x6;
   std::string s[] = {"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x"};
-  return std::make_pair(m, std::vector<std::string>(s, s+7));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+7);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'sdpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of a SDQP problem
 ///
@@ -721,7 +955,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > sdqpIn(
   if (!n7.empty()) m[n7]=x7;
   if (!n8.empty()) m[n8]=x8;
   std::string s[] = {"h", "c", "f", "g", "a", "lba", "uba", "lbx", "ubx"};
-  return std::make_pair(m, std::vector<std::string>(s, s+9));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+9);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'sdqpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an SDQP Solver
 ///
@@ -744,7 +984,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > sdqpOut(
   if (!n5.empty()) m[n5]=x5;
   if (!n6.empty()) m[n6]=x6;
   std::string s[] = {"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x"};
-  return std::make_pair(m, std::vector<std::string>(s, s+7));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+7);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'sdqpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of a SOCP problem
 ///
@@ -773,7 +1019,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > socpIn(
   if (!n8.empty()) m[n8]=x8;
   if (!n9.empty()) m[n9]=x9;
   std::string s[] = {"g", "h", "e", "f", "c", "a", "lba", "uba", "lbx", "ubx"};
-  return std::make_pair(m, std::vector<std::string>(s, s+10));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+10);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'socpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Output arguments of an SOCP Solver
 ///
@@ -794,7 +1046,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > socpOut(
   if (!n4.empty()) m[n4]=x4;
   if (!n5.empty()) m[n5]=x5;
   std::string s[] = {"x", "cost", "dual_cost", "lam_a", "lam_x", "lam_cone"};
-  return std::make_pair(m, std::vector<std::string>(s, s+6));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+6);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'socpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Structure specification of an SOCP
 ///
@@ -809,7 +1067,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > socpStruct(
   if (!n1.empty()) m[n1]=x1;
   if (!n2.empty()) m[n2]=x2;
   std::string s[] = {"g", "e", "a"};
-  return std::make_pair(m, std::vector<std::string>(s, s+3));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'socpStruct' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 /// Input arguments of a QP problem
 ///
@@ -842,7 +1106,13 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > stabilizedQpIn(
   if (!n10.empty()) m[n10]=x10;
   if (!n11.empty()) m[n11]=x11;
   std::string s[] = {"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0", "muR", "muE", "mu"};
-  return std::make_pair(m, std::vector<std::string>(s, s+12));
+  std::vector<std::string> sv = std::vector<std::string>(s, s+12);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'stabilizedQpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
 }
 } // namespace casadi
 #endif //SCHEMES_HELPERS_HPP
