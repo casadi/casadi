@@ -127,6 +127,10 @@ dim = size(x);
 assert(dim(1)==4)
 assert(dim(2)==5)
 
+assert(size(x,1)==4)
+assert(size(x,2)==5)
+
+
 %nlpErr
 
 warning('error','SWIG:RuntimeError')
