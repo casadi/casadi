@@ -65,6 +65,7 @@
     // Redirect printout to mexPrintf
     static void mexlogger(const char* s, std::streamsize num, bool error) {
       mexPrintf("%.*s", static_cast<int>(num), s);
+      mexEvalString("drawnow;");
     }
   }
 %}
