@@ -257,13 +257,13 @@ int internal(const std::string & c) {
 int deprecated(const std::string & c,const std::string & a) {
   std::string msg = "This CasADi function (" + c + ") is deprecated. " + a;
   mexWarnMsgIdAndTxt("SWIG:DeprecationWarning",msg.c_str());
-  return 1;
+  return 0;
 }
 int internal(const std::string & c) {
   if (CasadiOptions::allowed_internal_api) return 0;
   std::string msg = "This CasADi function (" + c + ") is not part of the public API. Use at your own risk.";
   mexWarnMsgIdAndTxt("SWIG:SyntaxWarning",msg.c_str());
-  return 1;
+  return 0;
 }
 %}
 #endif // SWIGMATLAB
