@@ -254,13 +254,21 @@ namespace casadi {
 #ifndef SWIG
     /** \brief Matrix power x^n
      */
-    friend inline MatType mpower(const MatType& x, const MatType& n) {
+    inline friend MatType mpower(const MatType& x, const MatType& n) {
       return x.zz_mpower(n);
+    }
+
+    /** \brief Get all symbols contained in the supplied expression
+     * Get all symbols on which the supplied expression depends
+     * \see SXFunction::getFree(), MXFunction::getFree()
+     */
+    inline friend std::vector<MatType> symvar(const MatType& x) {
+      return x.zz_symvar();
     }
 
     /** \brief Calculate quadratic form X^T A X
      */
-    friend MatType quad_form(const MatType &X, const MatType &A) {
+    inline friend MatType quad_form(const MatType &X, const MatType &A) {
       return X.zz_quad_form(A);
     }
 
@@ -272,7 +280,7 @@ namespace casadi {
 
     /** \brief Calculate some of squares: sum_ij X_ij^2 
      */
-    friend MatType sum_square(const MatType &X) {
+    inline friend MatType sum_square(const MatType &X) {
       return X.zz_sum_square();
     }
 

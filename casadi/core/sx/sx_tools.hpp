@@ -149,12 +149,6 @@ namespace casadi {
     return SX::zz_substituteInPlace(v, vdef, ex, reverse);
   }
 
-  /** \brief Get all symbols contained in the supplied expression
-   * Get all symbols on which the supplied expression depends
-   * \see SXFunction::getFree()
-   */
-  inline std::vector<SX> symvar(const SX& e) { return e.zz_symvar();}
-
   ///@{
   /** \brief Calculate jacobian via source code transformation
 

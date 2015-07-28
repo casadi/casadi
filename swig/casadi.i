@@ -2911,6 +2911,9 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
 DECL M %PREF(mpower)(const M& x, const M& n) {
   return mpower(x, n);
 }
+DECL std::vector< M > %PREF(symvar)(const M& x) {
+  return symvar(x);
+}
 DECL M %PREF(quad_form)(const M& X, const M& A) {
   return quad_form(X, A);
 }
