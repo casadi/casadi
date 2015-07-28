@@ -249,6 +249,12 @@ namespace casadi {
 #endif // SWIG
 
 #ifndef SWIG
+    /** \brief Matrix power x^n
+     */
+    friend inline MatType mpower(const MatType& x, const MatType& n) {
+      return x.zz_mpower(n);
+    }
+
     /** \brief Calculate quadratic form X^T A X
      */
     friend MatType quad_form(const MatType &X, const MatType &A) {

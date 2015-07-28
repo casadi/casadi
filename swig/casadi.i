@@ -2885,19 +2885,22 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
 %enddef
 
 %define GENERIC_MATRIX_FRIENDS(DECL, M)
-DECL M %PREF(quad_form)(const M &X, const M &A) {
+DECL M %PREF(mpower)(const M& x, const M& n) {
+  return mpower(x, n);
+}
+DECL M %PREF(quad_form)(const M& X, const M& A) {
   return quad_form(X, A);
 }
-DECL M %PREF(quad_form)(const M &X) {
+DECL M %PREF(quad_form)(const M& X) {
   return quad_form(X);          
 }
-DECL M %PREF(sum_square)(const M &X) {
+DECL M %PREF(sum_square)(const M& X) {
   return sum_square(X);         
 }
-DECL M %PREF(linspace)(const M &a, const M &b, int nsteps) {
+DECL M %PREF(linspace)(const M& a, const M& b, int nsteps) {
   return linspace(a, b, nsteps);
 }
-DECL M %PREF(cross)(const M &a, const M &b, int dim = -1) {
+DECL M %PREF(cross)(const M& a, const M& b, int dim = -1) {
   return cross(a, b, dim);      
 }
 DECL M %PREF(det)(const M& A) {
@@ -2909,34 +2912,34 @@ DECL M %PREF(inv)(const M& A) {
 DECL M %PREF(trace)(const M& a) {
   return trace(a);              
 }
-DECL M %PREF(tril2symm)(const M &a) {
+DECL M %PREF(tril2symm)(const M& a) {
   return tril2symm(a);          
 }
-DECL M %PREF(triu2symm)(const M &a) {
+DECL M %PREF(triu2symm)(const M& a) {
   return triu2symm(a);          
 }
-DECL M %PREF(norm_F)(const M &x) {
+DECL M %PREF(norm_F)(const M& x) {
   return norm_F(x);             
 }
-DECL M %PREF(norm_2)(const M &x) {
+DECL M %PREF(norm_2)(const M& x) {
   return norm_2(x);             
 }
-DECL M %PREF(norm_1)(const M &x) {
+DECL M %PREF(norm_1)(const M& x) {
   return norm_1(x);             
 }
-DECL M %PREF(norm_inf)(const M &x) {
+DECL M %PREF(norm_inf)(const M& x) {
   return norm_inf(x);           
 }
-DECL M %PREF(sumCols)(const M &x) {
+DECL M %PREF(sumCols)(const M& x) {
   return sumCols(x);            
 }
-DECL M %PREF(sumRows)(const M &x) {
+DECL M %PREF(sumRows)(const M& x) {
   return sumRows(x);            
 }
-DECL M %PREF(inner_prod)(const M &x, const M &y) {
+DECL M %PREF(inner_prod)(const M& x, const M& y) {
   return inner_prod(x, y);      
 }
-DECL M %PREF(outer_prod)(const M &x, const M &y) {
+DECL M %PREF(outer_prod)(const M& x, const M& y) {
   return outer_prod(x, y);      
 }
 DECL M %PREF(nullspace)(const M& A) {
@@ -2945,7 +2948,7 @@ DECL M %PREF(nullspace)(const M& A) {
 DECL M %PREF(polyval)(const M& p, const M& x) {
   return polyval(p, x);         
 }
-DECL M %PREF(diag)(const M &A) {
+DECL M %PREF(diag)(const M& A) {
   return diag(A);               
 }
 DECL M %PREF(unite)(const M& A, const M& B) {
@@ -2957,32 +2960,32 @@ DECL M %PREF(densify)(const M& x) {
 DECL M %PREF(project)(const M& A, const Sparsity& sp, bool intersect=false) {
   return project(A, sp, intersect);    
 }
-DECL M %PREF(if_else)(const M &cond, const M &if_true, 
-                    const M &if_false, bool short_circuit=true) {
+DECL M %PREF(if_else)(const M& cond, const M& if_true, 
+                    const M& if_false, bool short_circuit=true) {
   return if_else(cond, if_true, if_false, short_circuit);   
 }
 DECL M %PREF(conditional)(const M& ind, const std::vector< M > &x,
-                        const M &x_default, bool short_circuit=true) {
+                        const M& x_default, bool short_circuit=true) {
   return conditional(ind, x, x_default, short_circuit);     
 }
-DECL bool %PREF(dependsOn)(const M& f, const M &arg) {
+DECL bool %PREF(dependsOn)(const M& f, const M& arg) {
   return dependsOn(f, arg);     
 }
 %enddef
 
 %define GENERIC_EXPRESSION_FRIENDS(DECL, M) 
-DECL M %PREF(plus)(const M &x, const M &y) { return x+y; }
-DECL M %PREF(minus)(const M &x, const M &y) { return x-y; }
-DECL M %PREF(times)(const M &x, const M &y) { return x*y; }
-DECL M %PREF(rdivide)(const M &x, const M &y) { return x/y; }
-DECL M %PREF(lt)(const M &x, const M &y) { return x<y; }
-DECL M %PREF(le)(const M &x, const M &y) { return x<=y; }
-DECL M %PREF(gt)(const M &x, const M &y) { return x>y; }
-DECL M %PREF(ge)(const M &x, const M &y) { return x>=y; }
-DECL M %PREF(eq)(const M &x, const M &y) { return x==y; }
-DECL M %PREF(ne)(const M &x, const M &y) { return x!=y; }
-DECL M %PREF(and)(const M &x, const M &y) { return x&&y; }
-DECL M %PREF(or)(const M &x, const M &y) { return x||y; }
+DECL M %PREF(plus)(const M& x, const M& y) { return x+y; }
+DECL M %PREF(minus)(const M& x, const M& y) { return x-y; }
+DECL M %PREF(times)(const M& x, const M& y) { return x*y; }
+DECL M %PREF(rdivide)(const M& x, const M& y) { return x/y; }
+DECL M %PREF(lt)(const M& x, const M& y) { return x<y; }
+DECL M %PREF(le)(const M& x, const M& y) { return x<=y; }
+DECL M %PREF(gt)(const M& x, const M& y) { return x>y; }
+DECL M %PREF(ge)(const M& x, const M& y) { return x>=y; }
+DECL M %PREF(eq)(const M& x, const M& y) { return x==y; }
+DECL M %PREF(ne)(const M& x, const M& y) { return x!=y; }
+DECL M %PREF(and)(const M& x, const M& y) { return x&&y; }
+DECL M %PREF(or)(const M& x, const M& y) { return x||y; }
 DECL M %PREF(abs)(const M& x) { return fabs(x); }
 DECL M %PREF(sqrt)(const M& x) { return sqrt(x); }
 DECL M %PREF(sin)(const M& x) { return sin(x); }
@@ -3009,16 +3012,16 @@ DECL M %PREF(mod)(const M& x, const M& y) { return fmod(x, y); }
 DECL M %PREF(atan2)(const M& x, const M& y) { return atan2(x, y); }
 DECL M %PREF(min)(const M& x, const M& y) { return fmin(x, y); }
 DECL M %PREF(max)(const M& x, const M& y) { return fmax(x, y); }
-DECL M %PREF(simplify)(const M &x) { return simplify(x); }
+DECL M %PREF(simplify)(const M& x) { return simplify(x); }
 DECL bool %PREF(isEqual)(const M& x, const M& y, int depth=0) { return isEqual(x, y, depth); }
 DECL bool %PREF(iszero)(const M& x) { return iszero(x); }
 %enddef
 
 %define MATRIX_FRIENDS_UNWRAPPED(DECL, M)
- DECL M %PREF(all)(const M &x) {
+ DECL M %PREF(all)(const M& x) {
  return all(x);
  }
- DECL M %PREF(any)(const M &x) {
+ DECL M %PREF(any)(const M& x) {
  return any(x);
  }
 %enddef
