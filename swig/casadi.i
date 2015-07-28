@@ -2751,6 +2751,20 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
 %template(SpSX)             casadi::SparsityInterface<casadi::Matrix<casadi::SXElement> >;
 %template(SpMX)             casadi::SparsityInterface<casadi::MX>;
 
+%include <casadi/core/matrix/generic_matrix.hpp>
+
+%template(GenIMatrix)        casadi::GenericMatrix<casadi::Matrix<int> >;
+%template(GenDMatrix)        casadi::GenericMatrix<casadi::Matrix<double> >;
+%template(GenSX)             casadi::GenericMatrix<casadi::Matrix<casadi::SXElement> >;
+%template(GenMX)             casadi::GenericMatrix<casadi::MX>;
+
+%include <casadi/core/matrix/generic_expression.hpp>
+
+%template(ExpIMatrix)        casadi::GenericExpression<casadi::Matrix<int> >;
+%template(ExpDMatrix)        casadi::GenericExpression<casadi::Matrix<double> >;
+%template(ExpSX)             casadi::GenericExpression<casadi::Matrix<casadi::SXElement> >;
+%template(ExpMX)             casadi::GenericExpression<casadi::MX>;
+
 // Prefix symbols
 #ifdef SWIGMATLAB
 %define %PREF(SYM) friendwrap_ ## SYM %enddef
@@ -2887,45 +2901,6 @@ DECL M %PREF(simplify)(const M &x) { return simplify(x); }
 DECL bool %PREF(isEqual)(const M& x, const M& y, int depth=0) { return isEqual(x, y, depth); }
 DECL bool %PREF(iszero)(const M& x) { return iszero(x); }
 %enddef
-
-%include <casadi/core/matrix/generic_matrix.hpp>
-
-#ifdef SWIGMATLAB
-%feature("nonstatic");
-namespace casadi {
-  %extend GenericMatrixCommon {
-    GENERIC_MATRIX_FRIENDS(static inline, MX)
-    GENERIC_MATRIX_FRIENDS(static inline, Matrix<int>)
-    GENERIC_MATRIX_FRIENDS(static inline, Matrix<double>)
-    GENERIC_MATRIX_FRIENDS(static inline, Matrix<SXElement>)
-  }
-}
-%feature("nonstatic","");
-#endif
-
-%template(GenIMatrix)        casadi::GenericMatrix<casadi::Matrix<int> >;
-%template(GenDMatrix)        casadi::GenericMatrix<casadi::Matrix<double> >;
-%template(GenSX)             casadi::GenericMatrix<casadi::Matrix<casadi::SXElement> >;
-%template(GenMX)             casadi::GenericMatrix<casadi::MX>;
-
-%include <casadi/core/matrix/generic_expression.hpp>
-
-#ifdef SWIGMATLAB
-%feature("nonstatic");
-namespace casadi {
-  %extend GenericExpressionCommon {
-    GENERIC_EXPRESSION_FRIENDS(static inline, MX)
-    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<int>)
-    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<double>)
-    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<SXElement>)
-  }
-}
-#else
-%template(ExpIMatrix)        casadi::GenericExpression<casadi::Matrix<int> >;
-%template(ExpDMatrix)        casadi::GenericExpression<casadi::Matrix<double> >;
-%template(ExpSX)             casadi::GenericExpression<casadi::Matrix<casadi::SXElement> >;
-%template(ExpMX)             casadi::GenericExpression<casadi::MX>;
-#endif
 
 // FIXME: Placing in printable_object.i does not work
 %template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;
@@ -3446,6 +3421,24 @@ GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(int)
 GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(double)
 GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(casadi::SXElement)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
+#else // SWIGMATLAB
+%feature("nonstatic");
+
+namespace casadi {
+  %extend GenericMatrixCommon {
+    GENERIC_MATRIX_FRIENDS(static inline, MX)
+    GENERIC_MATRIX_FRIENDS(static inline, Matrix<int>)
+    GENERIC_MATRIX_FRIENDS(static inline, Matrix<double>)
+    GENERIC_MATRIX_FRIENDS(static inline, Matrix<SXElement>)
+  }
+
+  %extend GenericExpressionCommon {
+    GENERIC_EXPRESSION_FRIENDS(static inline, MX)
+    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<int>)
+    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<double>)
+    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<SXElement>)
+  }
+}
 #endif // SWIGMATLAB
 
 %feature("director") casadi::Callback2;

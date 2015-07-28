@@ -56,11 +56,7 @@ namespace casadi {
       \date 2010-2011
   */
   class CASADI_EXPORT MX :
-#if defined(SWIG) && defined(SWIGMATLAB)
-    public GenericExpressionCommon,
-#else
     public GenericExpression<MX>,
-#endif
     public GenericMatrix<MX>,
     public SharedObject {
   public:
