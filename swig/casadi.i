@@ -2416,7 +2416,11 @@ except:
 %}
 #endif // SWIGPYTHON
 
+#ifndef SWIGMATLAB
 %rename("%(regex:/zz_(?!ML)(.*)/\\1/)s") ""; // Strip leading zz_ unless followed by ML
+#endif
+%rename("%(regex:/friendwrap_(?!ML)(.*)/\\1/)s") ""; // Strip leading friendwrap_ unless followed by ML
+
 %rename(row) getRow;
 %rename(colind) getColind;
 %rename(sparsity) getSparsity;
@@ -2754,6 +2758,50 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
 %template(GenMX)             casadi::GenericMatrix<casadi::MX>;
 
 %include <casadi/core/matrix/generic_expression.hpp>
+
+#define GENERIC_EXPRESSION_FRIENDS(DECL, M)                             \
+    DECL M friendwrap_plus(const M &x, const M &y) { return x+y; }      \
+    DECL M friendwrap_minus(const M &x, const M &y) { return x-y; }     \
+    DECL M friendwrap_times(const M &x, const M &y) { return x*y; }     \
+    DECL M friendwrap_rdivide(const M &x, const M &y) { return x/y; }   \
+    DECL M friendwrap_lt(const M &x, const M &y) { return x<y; }        \
+    DECL M friendwrap_le(const M &x, const M &y) { return x<=y; }       \
+    DECL M friendwrap_gt(const M &x, const M &y) { return x>y; }        \
+    DECL M friendwrap_ge(const M &x, const M &y) { return x>=y; }       \
+    DECL M friendwrap_eq(const M &x, const M &y) { return x==y; }       \
+    DECL M friendwrap_ne(const M &x, const M &y) { return x!=y; }       \
+    DECL M friendwrap_and(const M &x, const M &y) { return x&&y; }      \
+    DECL M friendwrap_or(const M &x, const M &y) { return x||y; }       \
+    DECL M friendwrap_abs(const M& x) { return fabs(x); }               \
+    DECL M friendwrap_sqrt(const M& x) { return sqrt(x); }              \
+    DECL M friendwrap_sin(const M& x) { return sin(x); }                \
+    DECL M friendwrap_cos(const M& x) { return cos(x); }                \
+    DECL M friendwrap_tan(const M& x) { return tan(x); }                \
+    DECL M friendwrap_atan(const M& x) { return atan(x); }              \
+    DECL M friendwrap_asin(const M& x) { return asin(x); }              \
+    DECL M friendwrap_acos(const M& x) { return acos(x); }              \
+    DECL M friendwrap_tanh(const M& x) { return tanh(x); }              \
+    DECL M friendwrap_sinh(const M& x) { return sinh(x); }              \
+    DECL M friendwrap_cosh(const M& x) { return cosh(x); }              \
+    DECL M friendwrap_atanh(const M& x) { return atanh(x); }            \
+    DECL M friendwrap_asinh(const M& x) { return asinh(x); }            \
+    DECL M friendwrap_acosh(const M& x) { return acosh(x); }            \
+    DECL M friendwrap_exp(const M& x) { return exp(x); }                \
+    DECL M friendwrap_log(const M& x) { return log(x); }                \
+    DECL M friendwrap_log10(const M& x) { return log10(x); }            \
+    DECL M friendwrap_floor(const M& x) { return floor(x); }            \
+    DECL M friendwrap_ceil(const M& x) { return ceil(x); }              \
+    DECL M friendwrap_erf(const M& x) { return erf(x); }                \
+    DECL M friendwrap_sign(const M& x) { return sign(x); }              \
+    DECL M friendwrap_power(const M& x, const M& n) { return pow(x, n); } \
+    DECL M friendwrap_mod(const M& x, const M& y) { return fmod(x, y); } \
+    DECL M friendwrap_atan2(const M& x, const M& y) { return atan2(x, y); } \
+    DECL M friendwrap_min(const M& x, const M& y) { return fmin(x, y); } \
+    DECL M friendwrap_max(const M& x, const M& y) { return fmax(x, y); } \
+    DECL M friendwrap_simplify(const M &x) { return simplify(x); }      \
+    DECL bool friendwrap_isEqual(const M& x, const M& y, int depth=0) { return isEqual(x, y, depth); } \
+    DECL bool friendwrap_iszero(const M& x) { return iszero(x); }
+
 #ifdef SWIGMATLAB
 %feature("nonstatic");
 namespace casadi {
@@ -2763,8 +2811,8 @@ namespace casadi {
     GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<double>)
     GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<SXElement>)
   }
-%feature("nonstatic","");
 }
+%feature("nonstatic","");
 #else
 %template(ExpIMatrix)        casadi::GenericExpression<casadi::Matrix<int> >;
 %template(ExpDMatrix)        casadi::GenericExpression<casadi::Matrix<double> >;
@@ -3274,7 +3322,9 @@ MATRIX_TOOLS_TEMPLATES(casadi::SXElement)
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)
 SPARSITY_INTERFACE_FRIENDS(inline, MatType)
-GENERIC_EXPRESSION_FRIENDS(inline, MatType)
+inline MatType simplify(const MatType &x);
+inline bool isEqual(const MatType& x, const MatType& y, int depth=0);
+inline bool iszero(const MatType& x);
 GENERIC_MATRIX_FRIENDS(inline, MatType)
 %enddef
 

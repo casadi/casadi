@@ -30,7 +30,7 @@
 
 namespace casadi {
 
-  /** \brief Expression interface - non-tempalated base class 
+  /** \brief Expression interface - non-tempalated base class
       SWIG wrapping, to allow treating GenericExpression as a non-templated class in SWIG.
    */
   struct CASADI_EXPORT GenericExpressionCommon {};
@@ -53,150 +53,182 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
 #endif // SWIG
   public:
 
-
-/*! inline friend bool isEqual(const ExType& x, const ExType& y, int depth=0)
- * \brief Check if two nodes are equivalent up to a given depth.
- *  Depth=0 checks if the expressions are identical, i.e. points to the same node.
- *
- *  a = x*x
- *  b = x*x
- *
- *  a.isEqual(b, 0)  will return false, but a.isEqual(b, 1) will return true
- */
-
-#define GENERIC_EXPRESSION_FRIENDS_UNWRAPPED(DECL, M)   \
-    DECL M operator+(const M &x, const M &y) {          \
-      return x.zz_plus(y);                              \
-    }                                                   \
-    DECL M operator-(const M &x, const M &y) {          \
-      return x.zz_minus(y);                             \
-    }                                                   \
-    DECL M operator*(const M &x, const M &y) {          \
-      return x.zz_times(y);                             \
-    }                                                   \
-    DECL M operator/(const M &x, const M &y) {          \
-      return x.zz_rdivide(y);                           \
-    }                                                   \
-    DECL M operator<(const M &x, const M &y) {          \
-      return x.zz_lt(y);                                \
-    }                                                   \
-    DECL M operator<=(const M &x, const M &y) {         \
-      return x.zz_le(y);                                \
-    }                                                   \
-    DECL M operator>(const M &x, const M &y) {          \
-      return x.zz_gt(y);                                \
-    }                                                   \
-    DECL M operator>=(const M &x, const M &y) {         \
-      return x.zz_ge(y);                                \
-    }                                                   \
-    DECL M operator==(const M &x, const M &y) {         \
-      return x.zz_eq(y);                                \
-    }                                                   \
-    DECL M operator!=(const M &x, const M &y) {         \
-      return x.zz_ne(y);                                \
-    }                                                   \
-    DECL M operator&&(const M &x, const M &y) {         \
-      return x.zz_and(y);                               \
-    }                                                   \
-    DECL M operator||(const M &x, const M &y) {         \
-      return x.zz_or(y);                                \
-    }                                                   \
-    DECL M abs(const M& x) {                            \
-      return x.zz_abs();                                \
-    }                                                   \
-    DECL M fabs(const M& x) {                           \
-      return x.zz_abs();                                \
-    }                                                   \
-    DECL M sqrt(const M& x) {                           \
-      return x.zz_sqrt();                               \
-    }                                                   \
-    DECL M sin(const M& x) {                            \
-      return x.zz_sin();                                \
-    }                                                   \
-    DECL M cos(const M& x) {                            \
-      return x.zz_cos();                                \
-    }                                                   \
-    DECL M tan(const M& x) {                            \
-      return x.zz_tan();                                \
-    }                                                   \
-    DECL M atan(const M& x) {                           \
-      return x.zz_atan();                               \
-    }                                                   \
-    DECL M asin(const M& x) {                           \
-      return x.zz_asin();                               \
-    }                                                   \
-    DECL M acos(const M& x) {                           \
-      return x.zz_acos();                               \
-    }                                                   \
-    DECL M tanh(const M& x) {                           \
-      return x.zz_tanh();                               \
-    }                                                   \
-    DECL M sinh(const M& x) {                           \
-      return x.zz_sinh();                               \
-    }                                                   \
-    DECL M cosh(const M& x) {                           \
-      return x.zz_cosh();                               \
-    }                                                   \
-    DECL M atanh(const M& x) {                          \
-      return x.zz_atanh();                              \
-    }                                                   \
-    DECL M asinh(const M& x) {                          \
-      return x.zz_asinh();                              \
-    }                                                   \
-    DECL M acosh(const M& x) {                          \
-      return x.zz_acosh();                              \
-    }                                                   \
-    DECL M exp(const M& x) {                            \
-      return x.zz_exp();                                \
-    }                                                   \
-    DECL M log(const M& x) {                            \
-      return x.zz_log();                                \
-    }                                                   \
-    DECL M log10(const M& x) {                          \
-      return x.zz_log10();                              \
-    }                                                   \
-    DECL M floor(const M& x) {                          \
-      return x.zz_floor();                              \
-    }                                                   \
-    DECL M ceil(const M& x) {                           \
-      return x.zz_ceil();                               \
-    }                                                   \
-    DECL M erf(const M& x) {                            \
-      return x.zz_erf();                                \
-    }                                                   \
-    DECL M sign(const M& x) {                           \
-      return x.zz_sign();                               \
-    }                                                   \
-    DECL M pow(const M& x, const M& n) {                \
-      return x.zz_power(n);                             \
-    }                                                   \
-    DECL M fmod(const M& x, const M& y) {               \
-      return x.zz_mod(y);                               \
-    }                                                   \
-    DECL M atan2(const M& x, const M& y) {              \
-      return x.zz_atan2(y);                             \
-    }                                                   \
-    DECL M fmin(const M& x, const M& y) {               \
-      return x.zz_min(y);                               \
-    }                                                   \
-    DECL M fmax(const M& x, const M& y) {               \
-      return x.zz_max(y);                               \
-    }                                                   \
-
-#define GENERIC_EXPRESSION_FRIENDS(DECL, M)                     \
-    DECL M simplify(const M &x) {                               \
-      return x.zz_simplify();                                   \
-    }                                                           \
-    DECL bool isEqual(const M& x, const M& y, int depth=0) {    \
-      return x.zz_isEqual(y, depth);                            \
-    }                                                           \
-    DECL bool iszero(const M& x) {                              \
-      return x.isZero();                                        \
-    }                                                           \
-
 #ifndef SWIG
-  GENERIC_EXPRESSION_FRIENDS_UNWRAPPED(inline friend, ExType)
-  GENERIC_EXPRESSION_FRIENDS(inline friend, ExType)
+    friend inline ExType operator+(const ExType &x, const ExType &y) {
+      return x.zz_plus(y);
+    }
+
+    friend inline ExType operator-(const ExType &x, const ExType &y) {
+      return x.zz_minus(y);
+    }
+
+    friend inline ExType operator*(const ExType &x, const ExType &y) {
+      return x.zz_times(y);
+    }
+
+    friend inline ExType operator/(const ExType &x, const ExType &y) {
+      return x.zz_rdivide(y);
+    }
+
+    friend inline ExType operator<(const ExType &x, const ExType &y) {
+      return x.zz_lt(y);
+    }
+
+    friend inline ExType operator<=(const ExType &x, const ExType &y) {
+      return x.zz_le(y);
+    }
+
+    friend inline ExType operator>(const ExType &x, const ExType &y) {
+      return x.zz_gt(y);
+    }
+
+    friend inline ExType operator>=(const ExType &x, const ExType &y) {
+      return x.zz_ge(y);
+    }
+
+    friend inline ExType operator==(const ExType &x, const ExType &y) {
+      return x.zz_eq(y);
+    }
+
+    friend inline ExType operator!=(const ExType &x, const ExType &y) {
+      return x.zz_ne(y);
+    }
+
+    friend inline ExType operator&&(const ExType &x, const ExType &y) {
+      return x.zz_and(y);
+    }
+
+    friend inline ExType operator||(const ExType &x, const ExType &y) {
+      return x.zz_or(y);
+    }
+
+    friend inline ExType fabs(const ExType& x) {
+      return x.zz_abs();
+    }
+
+    friend inline ExType abs(const ExType& x) {
+      return x.zz_abs();
+    }
+
+    friend inline ExType sqrt(const ExType& x) {
+      return x.zz_sqrt();
+    }
+
+    friend inline ExType sin(const ExType& x) {
+      return x.zz_sin();
+    }
+
+    friend inline ExType cos(const ExType& x) {
+      return x.zz_cos();
+    }
+
+    friend inline ExType tan(const ExType& x) {
+      return x.zz_tan();
+    }
+
+    friend inline ExType atan(const ExType& x) {
+      return x.zz_atan();
+    }
+
+    friend inline ExType asin(const ExType& x) {
+      return x.zz_asin();
+    }
+
+    friend inline ExType acos(const ExType& x) {
+      return x.zz_acos();
+    }
+
+    friend inline ExType tanh(const ExType& x) {
+      return x.zz_tanh();
+    }
+
+    friend inline ExType sinh(const ExType& x) {
+      return x.zz_sinh();
+    }
+
+    friend inline ExType cosh(const ExType& x) {
+      return x.zz_cosh();
+    }
+
+    friend inline ExType atanh(const ExType& x) {
+      return x.zz_atanh();
+    }
+
+    friend inline ExType asinh(const ExType& x) {
+      return x.zz_asinh();
+    }
+
+    friend inline ExType acosh(const ExType& x) {
+      return x.zz_acosh();
+    }
+
+    friend inline ExType exp(const ExType& x) {
+      return x.zz_exp();
+    }
+
+    friend inline ExType log(const ExType& x) {
+      return x.zz_log();
+    }
+
+    friend inline ExType log10(const ExType& x) {
+      return x.zz_log10();
+    }
+
+    friend inline ExType floor(const ExType& x) {
+      return x.zz_floor();
+    }
+
+    friend inline ExType ceil(const ExType& x) {
+      return x.zz_ceil();
+    }
+
+    friend inline ExType erf(const ExType& x) {
+      return x.zz_erf();
+    }
+
+    friend inline ExType sign(const ExType& x) {
+      return x.zz_sign();
+    }
+
+    friend inline ExType pow(const ExType& x, const ExType& n) {
+      return x.zz_power(n);
+    }
+
+    friend inline ExType fmod(const ExType& x, const ExType& y) {
+      return x.zz_mod(y);
+    }
+
+    friend inline ExType atan2(const ExType& x, const ExType& y) {
+      return x.zz_atan2(y);
+    }
+
+    friend inline ExType fmin(const ExType& x, const ExType& y) {
+      return x.zz_min(y);
+    }
+
+    friend inline ExType fmax(const ExType& x, const ExType& y) {
+      return x.zz_max(y);
+    }
+
+    friend inline ExType simplify(const ExType &x) {
+      return x.zz_simplify();
+    }
+
+    /** \brief Check if two nodes are equivalent up to a given depth.
+     * Depth=0 checks if the expressions are identical, i.e. points to the same node.
+     *
+     * a = x*x
+     * b = x*x
+     *
+     *  a.isEqual(b, 0)  will return false, but a.isEqual(b, 1) will return true
+     */
+    friend inline bool isEqual(const ExType& x, const ExType& y, int depth=0) {
+      return x.zz_isEqual(y, depth);
+    }
+
+    friend inline bool iszero(const ExType& x) {
+      return x.isZero();
+    }
 
     /// In-place addition
     inline ExType& operator+=(const ExType &y) { return self() = self().zz_plus(y); }
@@ -212,7 +244,6 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
 
     /// Logic not
     inline ExType operator!() const { return self().zz_not(); }
-
 #endif // SWIG
 
     // \cond CLUTTER
