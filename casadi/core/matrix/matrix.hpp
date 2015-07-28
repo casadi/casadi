@@ -38,6 +38,11 @@
 
 namespace casadi {
 
+  /** \brief Empty Base
+      This class is extended in SWIG.
+  */
+  struct CASADI_EXPORT MatrixCommon {};
+
 /// \cond CLUTTER
   ///@{
   /** \brief Get typename */
@@ -73,9 +78,10 @@ namespace casadi {
   */
   template<typename DataType>
   class CASADI_EXPORT Matrix :
-        public GenericExpression<Matrix<DataType> >,
-        public GenericMatrix<Matrix<DataType> >,
-        public PrintableObject<Matrix<DataType> > {
+    public MatrixCommon,
+    public GenericExpression<Matrix<DataType> >,
+    public GenericMatrix<Matrix<DataType> >,
+    public PrintableObject<Matrix<DataType> > {
   public:
 
     /** \brief  constructors */
@@ -170,6 +176,9 @@ namespace casadi {
     using B::ones;
     using B::operator[];
     using B::operator();
+    using B::zz_horzsplit;
+    using B::zz_vertsplit;
+    using B::zz_diagsplit;
 
     /// \cond INTERNAL
     /// Expose iterators
@@ -559,21 +568,22 @@ namespace casadi {
 
     /// \endcond
 
-/**
-\ingroup expression_tools
-@{
-*/
-#if !defined(SWIG) || defined(DOXYGEN)
-    /** \brief Matrix adjoint */
-    inline friend Matrix<DataType> adj(const Matrix<DataType>& A) { return A.zz_adj();}
+#ifndef SWIG
+    /** \brief Matrix adjoint
+    */
+    friend inline Matrix<DataType> adj(const Matrix<DataType>& A) {
+      return A.zz_adj();
+    }
 
-    /** \brief Get the (i,j) minor matrix */
-    inline friend Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j) {
+    /** \brief Get the (i,j) minor matrix
+     */
+    friend inline Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j) {
       return x.zz_getMinor(i, j);
     }
 
-    /** \brief Get the (i,j) cofactor matrix */
-    inline friend Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j) {
+    /** \brief Get the (i,j) cofactor matrix
+    */
+    friend inline Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j) {
       return x.zz_cofactor(i, j);
     }
 
@@ -581,41 +591,49 @@ namespace casadi {
      * More stable than the classical Gram-Schmidt, but may break down if the rows of A
      * are nearly linearly dependent
      * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
-     * Note that in SWIG, Q and R are returned by value. */
-    inline friend void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R) {
+     * Note that in SWIG, Q and R are returned by value.
+     */
+    friend inline void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R) {
       return A.zz_qr(Q, R);
     }
 
     /** \brief Obtain a Cholesky factorisation of a matrix
-    *
-    *  Returns an upper triangular R such that R'R = A.
-    *  Matrix A must be positive definite.
-    *
-    * At the moment, the algorithm is dense (Cholesky-Banachiewicz).
-    * There is an open ticket #1212 to make it sparse.
-    */
-    inline friend Matrix<DataType> chol(const Matrix<DataType>& A) {
+     * Returns an upper triangular R such that R'R = A.
+     * Matrix A must be positive definite.
+     * 
+     * At the moment, the algorithm is dense (Cholesky-Banachiewicz).
+     * There is an open ticket #1212 to make it sparse.
+     */
+    friend inline Matrix<DataType> chol(const Matrix<DataType>& A) {
       return A.zz_chol();
     }
 
-    /// Returns true only if every element in the matrix is true
-    inline friend Matrix<DataType> all(const Matrix<DataType> &x) { return x.zz_all();}
+    /** \brief Returns true only if any element in the matrix is true
+     */
+    friend inline Matrix<DataType> any(const Matrix<DataType> &x) {
+      return x.zz_any();
+    }
 
-    /// Returns true if any element in the matrix is true
-    inline friend Matrix<DataType> any(const Matrix<DataType> &x) { return x.zz_any();}
+    /** \brief Returns true only if every element in the matrix is true
+     */
+    friend inline Matrix<DataType> all(const Matrix<DataType> &x) {
+      return x.zz_all();
+    }
 
-    /** Inf-norm of a Matrix-Matrix product */
-    inline friend Matrix<DataType>
+    /** \brief Inf-norm of a Matrix-Matrix product
+    */
+    friend inline Matrix<DataType>
       norm_inf_mul(const Matrix<DataType> &x, const Matrix<DataType> &y) {
       return x.zz_norm_inf_mul(y);
     }
 
-    /** \brief  Make a matrix sparse by removing numerical zeros*/
-    inline friend Matrix<DataType> sparsify(const Matrix<DataType>& A, double tol=0) {
+    /** \brief  Make a matrix sparse by removing numerical zeros
+    */
+    friend inline Matrix<DataType>
+      sparsify(const Matrix<DataType>& A, double tol=0) {
       return A.zz_sparsify(tol);
     }
-#endif // !SWIG || DOXYGEN
-/** @} */
+#endif
 
     /** \brief Set or reset the depth to which equalities are being checked for simplifications */
     static void setEqualityCheckingDepth(int eq_depth=1);

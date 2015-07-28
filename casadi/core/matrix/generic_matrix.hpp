@@ -34,6 +34,11 @@
 #include "sparsity_interface.hpp"
 
 namespace casadi {
+  /** \brief Empty Base
+      This class is extended in SWIG.
+   */
+  struct CASADI_EXPORT GenericMatrixCommon {};
+
   /** \brief Matrix base class
 
       This is a common base class for MX and Matrix<>, introducing a uniform syntax and implementing
@@ -63,7 +68,9 @@ namespace casadi {
       \date 2012
   */
   template<typename MatType>
-  class CASADI_EXPORT GenericMatrix : public SparsityInterface<MatType> {
+  class CASADI_EXPORT GenericMatrix
+    : public GenericMatrixCommon,
+      public SparsityInterface<MatType> {
     using SparsityInterface<MatType>::self;
   public:
 
@@ -244,25 +251,29 @@ namespace casadi {
     }
 #endif // SWIG
 
-#if !defined(SWIG) || defined(DOXYGEN)
+#ifndef SWIG
+    /** \brief Matrix power x^n
+     */
+    friend inline MatType mpower(const MatType& x, const MatType& n) {
+      return x.zz_mpower(n);
+    }
 
-    /**
-       \ingroup expression_tools
-     * @{ */
-
-    /** \brief Calculate quadratic form X^T A X*/
-    inline friend MatType quad_form(const MatType &X, const MatType &A) {
+    /** \brief Calculate quadratic form X^T A X
+     */
+    friend MatType quad_form(const MatType &X, const MatType &A) {
       return X.zz_quad_form(A);
     }
 
-    /** \brief Calculate quadratic form X^T X*/
+    /** \brief Calculate quadratic form X^T X
+     */
     inline friend MatType quad_form(const MatType &X) {
-     return X.zz_quad_form();
+      return X.zz_quad_form();
     }
 
-    /** \brief Calculate some of squares: sum_ij X_ij^2  */
-    inline friend MatType sum_square(const MatType &X) {
-     return X.zz_sum_square();
+    /** \brief Calculate some of squares: sum_ij X_ij^2 
+     */
+    friend MatType sum_square(const MatType &X) {
+      return X.zz_sum_square();
     }
 
     /** \brief Matlab's \c linspace command
@@ -339,9 +350,12 @@ namespace casadi {
      *
      * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
      */
-    inline friend MatType nullspace(const MatType& A) { return A.zz_nullspace();}
+    inline friend MatType nullspace(const MatType& A) {
+      return A.zz_nullspace();
+    }
 
-    /** \brief  Evaluate a polynomial with coefficients p in x */
+    /** \brief  Evaluate a polynomial with coefficients p in x
+    */
     inline friend MatType polyval(const MatType& p, const MatType& x) {
       return p.zz_polyval(x);
     }
@@ -349,29 +363,29 @@ namespace casadi {
     /** \brief   Get the diagonal of a matrix or construct a diagonal
         When the input is square, the diagonal elements are returned.
         If the input is vector-like, a diagonal matrix is constructed with it. */
-    inline friend MatType diag(const MatType &A) { return A.zz_diag();}
+    inline friend MatType diag(const MatType &A) {
+      return A.zz_diag();
+    }
 
-    /** \brief  Unite two matrices no overlapping sparsity */
+    /** \brief  Unite two matrices no overlapping sparsity
+     */
     inline friend MatType unite(const MatType& A, const MatType& B) {
       return A.zz_unite(B);
     }
 
-    /** \brief  Make the matrix dense if not already */
-    inline friend MatType densify(const MatType& x) { return x.zz_densify();}
+    /** \brief  Make the matrix dense if not already
+     */
+    inline friend MatType densify(const MatType& x) {
+      return x.zz_densify();
+    }
 
     /** \brief Create a new matrix with a given sparsity pattern but with the
-     * nonzeros taken from an existing matrix */
+      * nonzeros taken from an existing matrix
+      */
     inline friend MatType project(const MatType& A, const Sparsity& sp,
                                   bool intersect=false) {
       return A.zz_project(sp, intersect);
     }
-
-/** \brief Check if expression depends on the argument
-        The argument must be symbolic
-    */
-    //inline friend bool dependsOn(const MatType& f, const MatType &arg) {
-    //return f.zz_dependsOn(arg);
-    //}
 
     /** \brief Branching on MX nodes
         Ternary operator, "cond ? if_true : if_false"
@@ -397,9 +411,7 @@ namespace casadi {
     inline friend bool dependsOn(const MatType& f, const MatType &arg) {
       return f.zz_dependsOn(arg);
     }
-    /** @} */
-
-#endif // !SWIG || DOXYGEN
+#endif // SWIG
 
     /** @name Construct symbolic primitives
         The "sym" function is intended to work in a similar way as "sym" used
