@@ -80,6 +80,10 @@ namespace casadi {
     std::vector<idxint> ecos_Gjc_vec_;
     std::vector<idxint> ecos_Gir_vec_;
 
+    /// Static-size ECOS input: A
+    std::vector<idxint> ecos_Ajc_vec_;
+    std::vector<idxint> ecos_Air_vec_;
+
     /// Static ECOS input: h
     std::vector<pfloat> ecos_h_vec_;
 

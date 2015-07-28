@@ -29,14 +29,14 @@ from types import *
 from helpers import *
 
 socpsolvers = []
-if SdpSolver.hasPlugin("dsdp"):
-  socpsolvers.append(("sdp",{"sdp_solver": "dsdp" ,"verbose": True, "sdp_solver_options": {"verbose":True}},{},False))
-
-if SdpSolver.hasPlugin("dsdp"):
-  socpsolvers.append(("sdp.dsdp",{ "sdp_solver_options": {"verbose":True}},{},False))
-
-if SocpSolver.hasPlugin("mosek"):
-  socpsolvers.append(("mosek",{ "MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10 },{"less_digits": 1},False))
+#if SdpSolver.hasPlugin("dsdp"):
+#  socpsolvers.append(("sdp",{"sdp_solver": "dsdp" ,"verbose": True, "sdp_solver_options": {"verbose":True}},{},False))
+#
+#if SdpSolver.hasPlugin("dsdp"):
+#  socpsolvers.append(("sdp.dsdp",{ "sdp_solver_options": {"verbose":True}},{},False))
+#
+#if SocpSolver.hasPlugin("mosek"):
+#  socpsolvers.append(("mosek",{ "MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10 },{"less_digits": 1},False))
 
 if SocpSolver.hasPlugin("ecos"):
   socpsolvers.append(("ecos",{},{},False))
