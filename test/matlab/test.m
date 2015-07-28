@@ -150,3 +150,7 @@ end
 
 assert(~isempty(strfind(msg,'  SXFunction(char,{SX} ,{SX} ,Dict)')))
 assert(~isempty(strfind(msg,'You have: char, SX')))
+
+
+DMatrix(1)+MX(1);
+MX(1)+DMatrix(1);
