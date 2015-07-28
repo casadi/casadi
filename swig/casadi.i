@@ -2773,32 +2773,32 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
 
 %define SPARSITY_INTERFACE_FRIENDS(DECL, M)
  DECL M %PREF(horzcat)(const std::vector< M > &v) {
-  return M::zz_horzcat(v);
+  return horzcat(v);
  }
  DECL M %PREF(vertcat)(const std::vector< M > &v) {
- return M::zz_vertcat(v);
+ return vertcat(v);
  }
  DECL std::vector< M >
  %PREF(horzsplit)(const M& v, const std::vector<int>& offset) {
- return v.zz_horzsplit(offset);
+ return horzsplit(v, offset);
  }
  DECL std::vector< M > %PREF(horzsplit)(const M& v, int incr=1) {
- return v.zz_horzsplit(incr);
+ return horzsplit(v, incr);
  }
  DECL std::vector< M >
  %PREF(vertsplit)(const M& v, const std::vector<int>& offset) {
- return v.zz_vertsplit(offset);
+ return vertsplit(v, offset);
  }
  DECL std::vector<int >
  %PREF(offset)(const std::vector< M > &v, bool vert=true) {
- return M::zz_offset(v, vert);
+ return offset(v, vert);
  }
  DECL std::vector< M >
  %PREF(vertsplit)(const M& v, int incr=1) {
- return v.zz_vertsplit(incr);
+ return vertsplit(v, incr);
  }
  DECL M %PREF(blockcat)(const std::vector< std::vector< M > > &v) {
- return M::zz_blockcat(v);
+ return blockcat(v);
  }
  DECL M %PREF(blockcat)(const M& A, const M& B, const M& C, const M& D) {
  return vertcat(horzcat(A, B), horzcat(C, D));
@@ -2806,81 +2806,81 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
  DECL std::vector< std::vector< M > >
  %PREF(blocksplit)(const M& x, const std::vector<int>& vert_offset,
  const std::vector<int>& horz_offset) {
- return x.zz_blocksplit(vert_offset, horz_offset);
+ return blocksplit(x, vert_offset, horz_offset);
  }
  DECL std::vector< std::vector< M > >
  %PREF(blocksplit)(const M& x, int vert_incr=1, int horz_incr=1) {
- return x.zz_blocksplit(vert_incr, horz_incr);
+ return blocksplit(x, vert_incr, horz_incr);
  }
  DECL M %PREF(diagcat)(const std::vector< M > &A) {
- return M::zz_diagcat(A);
+ return diagcat(A);
  }
  DECL std::vector< M >
  %PREF(diagsplit)(const M& x, const std::vector<int>& output_offset1,
  const std::vector<int>& output_offset2) {
- return x.zz_diagsplit(output_offset1, output_offset2);
+ return diagsplit(x, output_offset1, output_offset2);
  }
  DECL std::vector< M >
  %PREF(diagsplit)(const M& x, const std::vector<int>& output_offset) {
- return x.zz_diagsplit(output_offset);
+ return diagsplit(x, output_offset);
  }
  DECL std::vector< M > %PREF(diagsplit)(const M& x, int incr=1) {
- return x.zz_diagsplit(incr);
+ return diagsplit(x, incr);
  }
  DECL std::vector< M >
  %PREF(diagsplit)(const M& x, int incr1, int incr2) {
- return x.zz_diagsplit(incr1, incr2);
+ return diagsplit(x, incr1, incr2);
  }
  DECL M %PREF(veccat)(const std::vector< M >& x) {
- return M::zz_veccat(x);
+ return veccat(x);
  }
  DECL M %PREF(mul)(const M& X, const M& Y) {
- return X.zz_mtimes(Y);
+ return mul(X, Y);
  }
  DECL M %PREF(mul)(const M& X, const M& Y, const M& Z) {
- return X.zz_mtimes(Y, Z);
+ return mul(X, Y, Z);
  }
  DECL M %PREF(mul)(const std::vector< M > &args) {
- return M::zz_mul(args);
+ return mul(args);
  }
  DECL M %PREF(transpose)(const M& X) {
  return X.T();
  }
  DECL M %PREF(vec)(const M& a) {
- return a.zz_vec();
+ return vec(a);
  }
  DECL M %PREF(vecNZ)(const M& a) {
- return a.zz_vecNZ();
+ return vecNZ(a);
  }
  DECL M %PREF(reshape)(const M& a, int nrow, int ncol) {
- return a.zz_reshape(nrow, ncol);
+ return reshape(a, nrow, ncol);
  }
  DECL M %PREF(reshape)(const M& a, std::pair<int, int> rc) {
  return reshape(a, rc.first, rc.second);
  }
  DECL M %PREF(reshape)(const M& a, const Sparsity& sp) {
- return a.zz_reshape(sp);
+ return reshape(a, sp);
  }
  DECL int %PREF(sprank)(const M& A) {
- return A.zz_sprank();
+ return sprank(A);
  }
  DECL int %PREF(norm_0_mul)(const M& x, const M& y) {
- return x.zz_norm_0_mul(y);
+ return norm_0_mul(x, y);
  }
  DECL M %PREF(triu)(const M& a, bool includeDiagonal=true) {
- return a.zz_triu(includeDiagonal);
+ return triu(a, includeDiagonal);
  }
  DECL M %PREF(tril)(const M& a, bool includeDiagonal=true) {
- return a.zz_tril(includeDiagonal);
+ return tril(a, includeDiagonal);
  }
  DECL M %PREF(kron)(const M& a, const M& b) {
- return a.zz_kron(b);
+ return kron(a, b);
  }
  DECL M %PREF(repmat)(const M& A, int n, int m=1) {
- return A.zz_repmat(n, m);
+ return repmat(A, n, m);
  }
  DECL M %PREF(repmat)(const M& A, const std::pair<int, int>& rc) {
- return A.zz_repmat(rc.first, rc.second);
+ return repmat(A, rc.first, rc.second);
  }
 %enddef
 
@@ -3013,6 +3013,48 @@ DECL M %PREF(simplify)(const M &x) { return simplify(x); }
 DECL bool %PREF(isEqual)(const M& x, const M& y, int depth=0) { return isEqual(x, y, depth); }
 DECL bool %PREF(iszero)(const M& x) { return iszero(x); }
 %enddef
+
+%define MATRIX_FRIENDS_UNWRAPPED(DECL, M)
+ DECL M %PREF(all)(const M &x) {
+ return all(x);
+ }
+ DECL M %PREF(any)(const M &x) {
+ return any(x);
+ }
+%enddef
+
+%define MATRIX_FRIENDS(DECL, M)
+DECL M %PREF(adj)(const M& A) {
+  return adj(A);
+ }
+
+DECL M %PREF(getMinor)(const M& x, int i, int j) {
+  return getMinor(x, i, j);
+}
+
+DECL M %PREF(cofactor)(const M& x, int i, int j) {
+  return cofactor(x, i, j);
+}
+
+%apply M& OUTPUT { M& out_Q};
+%apply M& OUTPUT { M& out_R};
+DECL void %PREF(qr)(const M& A, M& out_Q, M& out_R) {
+  return qr(A, out_Q, out_R);
+}
+
+DECL M %PREF(chol)(const M& A) {
+  return chol(A);
+}
+
+DECL M %PREF(norm_inf_mul)(const M& x, const M& y) {
+  return norm_inf_mul(x, y);
+}
+
+DECL M %PREF(sparsify)(const M& A, double tol=0) {
+  return sparsify(A, tol);
+}
+%enddef
+
 
 // FIXME: Placing in printable_object.i does not work
 %template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;
@@ -3545,6 +3587,13 @@ namespace casadi {
     SPARSITY_INTERFACE_FRIENDS(static inline, Matrix<SXElement>)
   }
 
+  %extend GenericExpressionCommon {
+    GENERIC_EXPRESSION_FRIENDS(static inline, MX)
+    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<int>)
+    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<double>)
+    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<SXElement>)
+  }
+
   %extend GenericMatrixCommon {
     GENERIC_MATRIX_FRIENDS(static inline, MX)
     GENERIC_MATRIX_FRIENDS(static inline, Matrix<int>)
@@ -3552,11 +3601,14 @@ namespace casadi {
     GENERIC_MATRIX_FRIENDS(static inline, Matrix<SXElement>)
   }
 
-  %extend GenericExpressionCommon {
-    GENERIC_EXPRESSION_FRIENDS(static inline, MX)
-    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<int>)
-    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<double>)
-    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<SXElement>)
+  %extend MatrixCommon {
+    MATRIX_FRIENDS(static inline, Matrix<int>)
+    MATRIX_FRIENDS(static inline, Matrix<double>)
+    MATRIX_FRIENDS(static inline, Matrix<SXElement>)
+
+    MATRIX_FRIENDS_UNWRAPPED(static inline, Matrix<int>)
+    MATRIX_FRIENDS_UNWRAPPED(static inline, Matrix<double>)
+    MATRIX_FRIENDS_UNWRAPPED(static inline, Matrix<SXElement>)
   }
 }
 %feature("nonstatic", "");
