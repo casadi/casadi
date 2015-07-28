@@ -590,11 +590,11 @@ namespace casadi {
       return *this*y;
     } else {
       MX z = MX::zeros(sparsity().patternProduct(y.sparsity()));
-      return zz_mtimes(y, z);
+      return mac(*this, y, z);
     }
   }
 
-  MX MX::zz_mtimes(const MX& y, const MX& z) const {
+  MX MX::zz_mac(const MX& y, const MX& z) const {
     if (isscalar() || y.isscalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return z + *this*y;

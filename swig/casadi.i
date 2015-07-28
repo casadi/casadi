@@ -2860,11 +2860,11 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
  DECL M %PREF(mul)(const M& X, const M& Y) {
  return mul(X, Y);
  }
- DECL M %PREF(mul)(const M& X, const M& Y, const M& Z) {
- return mul(X, Y, Z);
- }
  DECL M %PREF(mul)(const std::vector< M > &args) {
  return mul(args);
+ }
+ DECL M %PREF(mac)(const M& X, const M& Y, const M& Z) {
+ return mac(X, Y, Z);
  }
  DECL M %PREF(transpose)(const M& X) {
  return X.T();

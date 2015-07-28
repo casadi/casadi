@@ -526,7 +526,7 @@ namespace casadi {
     Matrix<DataType> zz_or(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_if_else_zero(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_mtimes(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_mtimes(const Matrix<DataType> &y, const Matrix<DataType> &z) const;
+    Matrix<DataType> zz_mac(const Matrix<DataType> &y, const Matrix<DataType> &z) const;
     Matrix<DataType> zz_det() const;
     Matrix<DataType> zz_sumCols() const;
     Matrix<DataType> zz_sumRows() const;

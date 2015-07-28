@@ -1604,7 +1604,7 @@ class MXtests(casadiTestCase):
     f = MXFunction("f", [x,y],[mul(x,y)])
     f.setInput(x_,0)
     f.setInput(y_,1)
-    g = MXFunction("g", [x,y],[mul(x,y,MX.zeros(filt))])
+    g = MXFunction("g", [x,y],[mac(x,y,MX.zeros(filt))])
     g.setInput(x_,0)
     g.setInput(y_,1)
     

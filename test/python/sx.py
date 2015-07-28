@@ -1035,7 +1035,7 @@ class SXtests(casadiTestCase):
     f = SXFunction("f", [x,y],[mul(x,y)])
     f.setInput(x_,0)
     f.setInput(y_,1)
-    g = SXFunction("g", [x,y],[mul(x,y,SX.zeros(filt))])
+    g = SXFunction("g", [x,y],[mac(x,y,SX.zeros(filt))])
     g.setInput(x_,0)
     g.setInput(y_,1)
     

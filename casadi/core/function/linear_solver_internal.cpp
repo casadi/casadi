@@ -174,9 +174,9 @@ namespace casadi {
       // Propagate to A
       MX a;
       if (!tr) {
-        a = -mul(rhs[d], X.T(), MX::zeros(A.sparsity()));
+        a = -mac(rhs[d], X.T(), MX::zeros(A.sparsity()));
       } else {
-        a = -mul(X, rhs[d].T(), MX::zeros(A.sparsity()));
+        a = -mac(X, rhs[d].T(), MX::zeros(A.sparsity()));
       }
       if (asens[d][1].isempty(true)) {
         asens[d][1] = a;

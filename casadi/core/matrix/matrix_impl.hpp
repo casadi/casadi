@@ -1330,13 +1330,13 @@ namespace casadi {
       return *this*y;
     } else {
       Matrix<DataType> z = Matrix<DataType>::zeros(mul(sparsity(), y.sparsity()));
-      return zz_mtimes(y, z);
+      return mac(*this, y, z);
     }
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_mtimes(const Matrix<DataType> &y,
-                                               const Matrix<DataType> &z) const {
+  Matrix<DataType> Matrix<DataType>::zz_mac(const Matrix<DataType> &y,
+                                            const Matrix<DataType> &z) const {
     if (isscalar() || y.isscalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return z + *this*y;

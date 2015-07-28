@@ -72,22 +72,22 @@ namespace casadi {
                                std::vector<std::vector<MX> >& fsens) {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0]
-        + mul(dep(1), fseed[d][2], MX::zeros(dep(0).sparsity()))
-        + mul(fseed[d][1], dep(2), MX::zeros(dep(0).sparsity()));
+        + mac(dep(1), fseed[d][2], MX::zeros(dep(0).sparsity()))
+        + mac(fseed[d][1], dep(2), MX::zeros(dep(0).sparsity()));
     }
   }
 
   void Multiplication::evalAdj(const std::vector<std::vector<MX> >& aseed,
                                std::vector<std::vector<MX> >& asens) {
     for (int d=0; d<aseed.size(); ++d) {
-      asens[d][1] += mul(aseed[d][0], dep(2).T(), MX::zeros(dep(1).sparsity()));
-      asens[d][2] += mul(dep(1).T(), aseed[d][0], MX::zeros(dep(2).sparsity()));
+      asens[d][1] += mac(aseed[d][0], dep(2).T(), MX::zeros(dep(1).sparsity()));
+      asens[d][2] += mac(dep(1).T(), aseed[d][0], MX::zeros(dep(2).sparsity()));
       asens[d][0] += aseed[d][0];
     }
   }
 
   void Multiplication::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
-    res[0] = mul(arg[1], arg[2], arg[0]);
+    res[0] = mac(arg[1], arg[2], arg[0]);
   }
 
   void Multiplication::spFwd(const bvec_t** arg, bvec_t** res, int* iw,

@@ -508,7 +508,7 @@ namespace casadi {
         return patternProduct(y);
       }
     }
-    Sparsity zz_mtimes(const Sparsity& Y, const Sparsity& Z) const { return Z;}
+    Sparsity zz_mac(const Sparsity& Y, const Sparsity& Z) const { return Z;}
     Sparsity zz_vecNZ() const;
     Sparsity zz_reshape(int nrow, int ncol) const;
     Sparsity zz_reshape(const Sparsity& sp) const;
