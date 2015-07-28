@@ -136,7 +136,13 @@ class Enum:
     for i,_ in enumerate(self.entries):
       s+="""  if (!n%d.empty()) m[n%d]=x%d;\n""" % (i,i,i)
     s+="""  std::string s[] = {%s};\n""" % ", ".join(['"'+name+'"' for name, doc, enum in self.entries])
-    s+= "  return std::make_pair(m, std::vector<std::string>(s, s+%d));\n" % len(self.entries)
+    s+="""  std::vector<std::string> sv = std::vector<std::string>(s, s+%d);\n"""  % len(self.entries)
+    s+="""  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {\n"""
+    s+="""    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())\n"""
+    s+="""      casadi_error("Error in '%s' arguments. You supplied key '"\n""" % self.name
+    s+="""        << it->first << "'. Allowed keys are: " << sv << ".");\n"""
+    s+="""  }\n"""
+    s+= "  return std::make_pair(m, sv);\n"
     s+="}\n"
 
     return s
@@ -173,6 +179,9 @@ class Enum:
     for name, doc, enum in self.entries:
       s+="    " + name + (" "*(maxlenname-len(name))) +  " -- " +  doc + " [" + enum + "]\n"
     s+='  """\n'
+    s+="  for k in kwargs.keys():\n"
+    s+="    if k not in [%s]:\n" % ", ".join(["'"+i[0]+"'" for i in self.entries])
+    s+="""      raise Exception("Error in '%s' arguments. You supplied key '%%s'. Allowed keys are: %s" %% k)\n""" %  (self.name,", ".join(["'"+i[0]+"'" for i in self.entries]))
     s+="  return (kwargs, [%s])\n" % ", ".join(["'"+i[0]+"'" for i in self.entries])
     return s
 

@@ -112,6 +112,9 @@ namespace casadi {
     /** \brief  Get the shape */
     std::pair<int, int> shape() const;
 
+    /** \brief  Get the size along a particular dimensions */
+    int shape(int axis) const;
+
     /** \brief Check if the sparsity is empty, i.e. if one of the dimensions is zero
      * (or optionally both dimensions) */
     bool isempty(bool both=false) const { return sparsity().isempty(both);}
@@ -274,7 +277,7 @@ namespace casadi {
     }
 
     /** \brief Matlab's \c linspace command
-    */
+     */
     inline friend MatType linspace(const MatType &a, const MatType &b, int nsteps) {
       return a.zz_linspace(b, nsteps);
     }
@@ -285,75 +288,43 @@ namespace casadi {
       return a.zz_cross(b, dim);
     }
 
-    /** \brief Matrix determinant (experimental)
-    */
-    inline friend MatType det(const MatType& A) {
-      return A.zz_det();
-    }
+    /** \brief Matrix determinant (experimental) */
+    inline friend MatType det(const MatType& A) { return A.zz_det();}
 
-    /** \brief Matrix inverse (experimental)
-    */
-    inline friend MatType inv(const MatType& A) {
-      return A.zz_inv();
-    }
+    /** \brief Matrix inverse (experimental) */
+    inline friend MatType inv(const MatType& A) { return A.zz_inv();}
 
-    /** inline friend MatType trace(const MatType& a)
-      \brief Matrix trace
-    */
-    inline friend MatType trace(const MatType& a) {
-      return a.zz_trace();
-    }
+    /** \brief Matrix trace */
+    inline friend MatType trace(const MatType& a) { return a.zz_trace();}
 
     /** \brief Convert a lower triangular matrix to a symmetric one
      */
-    inline friend MatType tril2symm(const MatType &a) {
-      return a.zz_tril2symm();
-    }
+    inline friend MatType tril2symm(const MatType &a) { return a.zz_tril2symm();}
 
     /** \brief Convert a upper triangular matrix to a symmetric one
      */
-    inline friend MatType triu2symm(const MatType &a) {
-      return a.zz_triu2symm();
-    }
+    inline friend MatType triu2symm(const MatType &a) { return a.zz_triu2symm();}
 
-    /** \brief  Frobenius norm 
-     */
-    inline friend MatType norm_F(const MatType &x) {
-      return x.zz_norm_F();
-    }
+    /** \brief  Frobenius norm  */
+    inline friend MatType norm_F(const MatType &x) { return x.zz_norm_F();}
 
-    /** \brief  2-norm
-     */
-    inline friend MatType norm_2(const MatType &x) {
-      return x.zz_norm_2();
-    }
+    /** \brief  2-norm  */
+    inline friend MatType norm_2(const MatType &x) { return x.zz_norm_2();}
 
-    /** \brief 1-norm
-     */
-    inline friend MatType norm_1(const MatType &x) {
-      return x.zz_norm_1();
-    }
+    /** \brief 1-norm  */
+    inline friend MatType norm_1(const MatType &x) { return x.zz_norm_1();}
 
-    /** \brief Infinity-norm
-    */
-    inline friend MatType norm_inf(const MatType &x) {
-      return x.zz_norm_inf();
-    }
+    /** \brief Infinity-norm */
+    inline friend MatType norm_inf(const MatType &x) { return x.zz_norm_inf();}
 
-    /** \brief Return a col-wise summation of elements
-    */
-    inline friend MatType sumCols(const MatType &x) {
-      return x.zz_sumCols();
-    }
+    /** \brief Return a col-wise summation of elements */
+    inline friend MatType sumCols(const MatType &x) { return x.zz_sumCols();}
 
-    /** \brief Return a row-wise summation of elements
-    */
-    inline friend MatType sumRows(const MatType &x) {
-      return x.zz_sumRows();
-    }
+    /** \brief Return a row-wise summation of elements */
+    inline friend MatType sumRows(const MatType &x) { return x.zz_sumRows();}
 
     /** \brief Inner product of two matrices
-      with x and y matrices of the same dimension
+        with x and y matrices of the same dimension
     */
     inline friend MatType inner_prod(const MatType &x, const MatType &y) {
       return x.zz_inner_prod(y);
@@ -413,7 +384,7 @@ namespace casadi {
       */
     inline friend MatType project(const MatType& A, const Sparsity& sp,
                                   bool intersect=false) {
-      return A.zz_project(sp, intersect);                               \
+      return A.zz_project(sp, intersect);
     }
 
     /** \brief Branching on MX nodes
@@ -421,7 +392,7 @@ namespace casadi {
     */
     inline friend MatType if_else(const MatType &cond, const MatType &if_true,
                                   const MatType &if_false, bool short_circuit=true) {
-      return cond.zz_if_else(if_true, if_false, short_circuit);         \
+      return cond.zz_if_else(if_true, if_false, short_circuit);
     }
 
     /** \brief Create a switch
@@ -431,14 +402,14 @@ namespace casadi {
      */
     inline friend MatType conditional(const MatType& ind, const std::vector<MatType> &x,
                                       const MatType &x_default, bool short_circuit=true) {
-      return ind.zz_conditional(x, x_default, short_circuit);           \
+      return ind.zz_conditional(x, x_default, short_circuit);
     }
 
     /** \brief Check if expression depends on the argument
         The argument must be symbolic
     */
     inline friend bool dependsOn(const MatType& f, const MatType &arg) {
-      return f.zz_dependsOn(arg);                                       \
+      return f.zz_dependsOn(arg);
     }
 #endif // SWIG
 
@@ -564,6 +535,15 @@ namespace casadi {
   template<typename MatType>
   std::pair<int, int> GenericMatrix<MatType>::shape() const {
     return sparsity().shape();
+  }
+
+  template<typename MatType>
+  int GenericMatrix<MatType>::shape(int axis) const {
+    if (axis==1)
+      return sparsity().size1();
+    if (axis==2)
+      return sparsity().size2();
+    casadi_error("Axis must be 1 or 2.");
   }
 
   template<typename MatType>

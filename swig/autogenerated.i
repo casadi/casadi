@@ -43,6 +43,9 @@ def cleIn(**kwargs):
     a -- A matrix [CLE_A]
     v -- V matrix [CLE_V]
   """
+  for k in kwargs.keys():
+    if k not in ['a', 'v']:
+      raise Exception("Error in 'cleIn' arguments. You supplied key '%s'. Allowed keys are: 'a', 'v'" % k)
   return (kwargs, ['a', 'v'])
 %}
 #endif //SWIGPYTHON
@@ -69,6 +72,9 @@ def cleOut(**kwargs):
 
     p -- Lyapunov matrix [CLE_P]
   """
+  for k in kwargs.keys():
+    if k not in ['p']:
+      raise Exception("Error in 'cleOut' arguments. You supplied key '%s'. Allowed keys are: 'p'" % k)
   return (kwargs, ['p'])
 %}
 #endif //SWIGPYTHON
@@ -103,6 +109,9 @@ def controldaeIn(**kwargs):
     t0       -- Time at start of control interval (1-by-1) [CONTROL_DAE_T0]
     tf       -- Time at end of control interval (1-by-1) [CONTROL_DAE_TF]
   """
+  for k in kwargs.keys():
+    if k not in ['t', 'x', 'z', 'p', 'u', 'u_interp', 'x_major', 't0', 'tf']:
+      raise Exception("Error in 'controldaeIn' arguments. You supplied key '%s'. Allowed keys are: 't', 'x', 'z', 'p', 'u', 'u_interp', 'x_major', 't0', 'tf'" % k)
   return (kwargs, ['t', 'x', 'z', 'p', 'u', 'u_interp', 'x_major', 't0', 'tf'])
 %}
 #endif //SWIGPYTHON
@@ -131,6 +140,9 @@ def controlsimulatorIn(**kwargs):
     p  -- Parameters that are fixed over the entire horizon  (dimension np-by-1) [CONTROLSIMULATOR_P]
     u  -- Parameters that change over the integration intervals (dimension nu-by-(ns-1)) [CONTROLSIMULATOR_U]
   """
+  for k in kwargs.keys():
+    if k not in ['x0', 'p', 'u']:
+      raise Exception("Error in 'controlsimulatorIn' arguments. You supplied key '%s'. Allowed keys are: 'x0', 'p', 'u'" % k)
   return (kwargs, ['x0', 'p', 'u'])
 %}
 #endif //SWIGPYTHON
@@ -158,6 +170,9 @@ def dleIn(**kwargs):
     a -- A matrix [DLE_A]
     v -- V matrix [DLE_V]
   """
+  for k in kwargs.keys():
+    if k not in ['a', 'v']:
+      raise Exception("Error in 'dleIn' arguments. You supplied key '%s'. Allowed keys are: 'a', 'v'" % k)
   return (kwargs, ['a', 'v'])
 %}
 #endif //SWIGPYTHON
@@ -184,6 +199,9 @@ def dleOut(**kwargs):
 
     p -- P matrix [DLE_P]
   """
+  for k in kwargs.keys():
+    if k not in ['p']:
+      raise Exception("Error in 'dleOut' arguments. You supplied key '%s'. Allowed keys are: 'p'" % k)
   return (kwargs, ['p'])
 %}
 #endif //SWIGPYTHON
@@ -211,6 +229,9 @@ def dpleIn(**kwargs):
     a -- A matrices (horzcat when const_dim, diagcat otherwise) [DPLE_A]
     v -- V matrices (horzcat when const_dim, diagcat otherwise) [DPLE_V]
   """
+  for k in kwargs.keys():
+    if k not in ['a', 'v']:
+      raise Exception("Error in 'dpleIn' arguments. You supplied key '%s'. Allowed keys are: 'a', 'v'" % k)
   return (kwargs, ['a', 'v'])
 %}
 #endif //SWIGPYTHON
@@ -237,6 +258,9 @@ def dpleOut(**kwargs):
 
     p -- Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [DPLE_P]
   """
+  for k in kwargs.keys():
+    if k not in ['p']:
+      raise Exception("Error in 'dpleOut' arguments. You supplied key '%s'. Allowed keys are: 'p'" % k)
   return (kwargs, ['p'])
 %}
 #endif //SWIGPYTHON
@@ -265,6 +289,9 @@ def hnlpIn(**kwargs):
     p   -- Fixed parameter [HNL_P]
     tau -- Homotopy parameter [HNL_TAU]
   """
+  for k in kwargs.keys():
+    if k not in ['x', 'p', 'tau']:
+      raise Exception("Error in 'hnlpIn' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p', 'tau'" % k)
   return (kwargs, ['x', 'p', 'tau'])
 %}
 #endif //SWIGPYTHON
@@ -294,6 +321,9 @@ def daeIn(**kwargs):
     p -- Parameter [DAE_P]
     t -- Explicit time dependence [DAE_T]
   """
+  for k in kwargs.keys():
+    if k not in ['x', 'z', 'p', 't']:
+      raise Exception("Error in 'daeIn' arguments. You supplied key '%s'. Allowed keys are: 'x', 'z', 'p', 't'" % k)
   return (kwargs, ['x', 'z', 'p', 't'])
 %}
 #endif //SWIGPYTHON
@@ -322,6 +352,9 @@ def daeOut(**kwargs):
     alg  -- Right hand side of algebraic equations [DAE_ALG]
     quad -- Right hand side of quadratures equations [DAE_QUAD]
   """
+  for k in kwargs.keys():
+    if k not in ['ode', 'alg', 'quad']:
+      raise Exception("Error in 'daeOut' arguments. You supplied key '%s'. Allowed keys are: 'ode', 'alg', 'quad'" % k)
   return (kwargs, ['ode', 'alg', 'quad'])
 %}
 #endif //SWIGPYTHON
@@ -354,6 +387,9 @@ def rdaeIn(**kwargs):
     p  -- Parameter vector [RDAE_P]
     t  -- Explicit time dependence [RDAE_T]
   """
+  for k in kwargs.keys():
+    if k not in ['rx', 'rz', 'rp', 'x', 'z', 'p', 't']:
+      raise Exception("Error in 'rdaeIn' arguments. You supplied key '%s'. Allowed keys are: 'rx', 'rz', 'rp', 'x', 'z', 'p', 't'" % k)
   return (kwargs, ['rx', 'rz', 'rp', 'x', 'z', 'p', 't'])
 %}
 #endif //SWIGPYTHON
@@ -382,6 +418,9 @@ def rdaeOut(**kwargs):
     alg  -- Right hand side of algebraic equations. [RDAE_ALG]
     quad -- Right hand side of quadratures. [RDAE_QUAD]
   """
+  for k in kwargs.keys():
+    if k not in ['ode', 'alg', 'quad']:
+      raise Exception("Error in 'rdaeOut' arguments. You supplied key '%s'. Allowed keys are: 'ode', 'alg', 'quad'" % k)
   return (kwargs, ['ode', 'alg', 'quad'])
 %}
 #endif //SWIGPYTHON
@@ -413,6 +452,9 @@ def integratorIn(**kwargs):
     rp  -- Backward parameter vector [INTEGRATOR_RP]
     rz0 -- Initial guess for the backwards algebraic variable [INTEGRATOR_RZ0]
   """
+  for k in kwargs.keys():
+    if k not in ['x0', 'p', 'z0', 'rx0', 'rp', 'rz0']:
+      raise Exception("Error in 'integratorIn' arguments. You supplied key '%s'. Allowed keys are: 'x0', 'p', 'z0', 'rx0', 'rp', 'rz0'" % k)
   return (kwargs, ['x0', 'p', 'z0', 'rx0', 'rp', 'rz0'])
 %}
 #endif //SWIGPYTHON
@@ -444,6 +486,9 @@ def integratorOut(**kwargs):
     rqf -- Backward quadrature state at the initial time [INTEGRATOR_RQF]
     rzf -- Backward algebraic variable at the initial time [INTEGRATOR_RZF]
   """
+  for k in kwargs.keys():
+    if k not in ['xf', 'qf', 'zf', 'rxf', 'rqf', 'rzf']:
+      raise Exception("Error in 'integratorOut' arguments. You supplied key '%s'. Allowed keys are: 'xf', 'qf', 'zf', 'rxf', 'rqf', 'rzf'" % k)
   return (kwargs, ['xf', 'qf', 'zf', 'rxf', 'rqf', 'rzf'])
 %}
 #endif //SWIGPYTHON
@@ -471,6 +516,9 @@ def linsolIn(**kwargs):
     A -- The square matrix A: sparse, (n x n). [LINSOL_A]
     B -- The right-hand-side matrix b: dense,  (n x m) [LINSOL_B]
   """
+  for k in kwargs.keys():
+    if k not in ['A', 'B']:
+      raise Exception("Error in 'linsolIn' arguments. You supplied key '%s'. Allowed keys are: 'A', 'B'" % k)
   return (kwargs, ['A', 'B'])
 %}
 #endif //SWIGPYTHON
@@ -497,6 +545,9 @@ def linsolOut(**kwargs):
 
     X -- Solution to the linear system of equations [LINSOL_X]
   """
+  for k in kwargs.keys():
+    if k not in ['X']:
+      raise Exception("Error in 'linsolOut' arguments. You supplied key '%s'. Allowed keys are: 'X'" % k)
   return (kwargs, ['X'])
 %}
 #endif //SWIGPYTHON
@@ -528,6 +579,9 @@ def lpIn(**kwargs):
     lbx -- dense, (n x 1) [LP_SOLVER_LBX]
     ubx -- dense, (n x 1) [LP_SOLVER_UBX]
   """
+  for k in kwargs.keys():
+    if k not in ['c', 'a', 'lba', 'uba', 'lbx', 'ubx']:
+      raise Exception("Error in 'lpIn' arguments. You supplied key '%s'. Allowed keys are: 'c', 'a', 'lba', 'uba', 'lbx', 'ubx'" % k)
   return (kwargs, ['c', 'a', 'lba', 'uba', 'lbx', 'ubx'])
 %}
 #endif //SWIGPYTHON
@@ -557,6 +611,9 @@ def lpOut(**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [LP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [LP_SOLVER_LAM_X]
   """
+  for k in kwargs.keys():
+    if k not in ['x', 'cost', 'lam_a', 'lam_x']:
+      raise Exception("Error in 'lpOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'cost', 'lam_a', 'lam_x'" % k)
   return (kwargs, ['x', 'cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
@@ -586,6 +643,9 @@ def lrdleIn(**kwargs):
     c -- C matrix [LR_DLE_C]
     h -- H matrix: horizontal stack of all Hi [LR_DLE_H]
   """
+  for k in kwargs.keys():
+    if k not in ['a', 'v', 'c', 'h']:
+      raise Exception("Error in 'lrdleIn' arguments. You supplied key '%s'. Allowed keys are: 'a', 'v', 'c', 'h'" % k)
   return (kwargs, ['a', 'v', 'c', 'h'])
 %}
 #endif //SWIGPYTHON
@@ -612,6 +672,9 @@ def lrdleOut(**kwargs):
 
     y -- Y matrix, block diagonal form [LR_DLE_Y]
   """
+  for k in kwargs.keys():
+    if k not in ['y']:
+      raise Exception("Error in 'lrdleOut' arguments. You supplied key '%s'. Allowed keys are: 'y'" % k)
   return (kwargs, ['y'])
 %}
 #endif //SWIGPYTHON
@@ -641,6 +704,9 @@ def lrdpleIn(**kwargs):
     c -- C matrix [LR_DPLE_C]
     h -- H matrix: horizontal stack of all Hi [LR_DPLE_H]
   """
+  for k in kwargs.keys():
+    if k not in ['a', 'v', 'c', 'h']:
+      raise Exception("Error in 'lrdpleIn' arguments. You supplied key '%s'. Allowed keys are: 'a', 'v', 'c', 'h'" % k)
   return (kwargs, ['a', 'v', 'c', 'h'])
 %}
 #endif //SWIGPYTHON
@@ -667,6 +733,9 @@ def lrdpleOut(**kwargs):
 
     y -- Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [LR_DPLE_Y]
   """
+  for k in kwargs.keys():
+    if k not in ['y']:
+      raise Exception("Error in 'lrdpleOut' arguments. You supplied key '%s'. Allowed keys are: 'y'" % k)
   return (kwargs, ['y'])
 %}
 #endif //SWIGPYTHON
@@ -694,6 +763,9 @@ def nlpIn(**kwargs):
     x -- Decision variable [NL_X]
     p -- Fixed parameter [NL_P]
   """
+  for k in kwargs.keys():
+    if k not in ['x', 'p']:
+      raise Exception("Error in 'nlpIn' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p'" % k)
   return (kwargs, ['x', 'p'])
 %}
 #endif //SWIGPYTHON
@@ -721,6 +793,9 @@ def nlpOut(**kwargs):
     f -- Objective function [NL_F]
     g -- Constraint function [NL_G]
   """
+  for k in kwargs.keys():
+    if k not in ['f', 'g']:
+      raise Exception("Error in 'nlpOut' arguments. You supplied key '%s'. Allowed keys are: 'f', 'g'" % k)
   return (kwargs, ['f', 'g'])
 %}
 #endif //SWIGPYTHON
@@ -748,6 +823,9 @@ def gradFIn(**kwargs):
     x -- Decision variable [GRADF_X]
     p -- Fixed parameter [GRADF_P]
   """
+  for k in kwargs.keys():
+    if k not in ['x', 'p']:
+      raise Exception("Error in 'gradFIn' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p'" % k)
   return (kwargs, ['x', 'p'])
 %}
 #endif //SWIGPYTHON
@@ -776,6 +854,9 @@ def gradFOut(**kwargs):
     f    -- Objective function [GRADF_F]
     g    -- Constraint function [GRADF_G]
   """
+  for k in kwargs.keys():
+    if k not in ['grad', 'f', 'g']:
+      raise Exception("Error in 'gradFOut' arguments. You supplied key '%s'. Allowed keys are: 'grad', 'f', 'g'" % k)
   return (kwargs, ['grad', 'f', 'g'])
 %}
 #endif //SWIGPYTHON
@@ -803,6 +884,9 @@ def jacGIn(**kwargs):
     x -- Decision variable [JACG_X]
     p -- Fixed parameter [JACG_P]
   """
+  for k in kwargs.keys():
+    if k not in ['x', 'p']:
+      raise Exception("Error in 'jacGIn' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p'" % k)
   return (kwargs, ['x', 'p'])
 %}
 #endif //SWIGPYTHON
@@ -831,6 +915,9 @@ def jacGOut(**kwargs):
     f   -- Objective function [JACG_F]
     g   -- Constraint function [JACG_G]
   """
+  for k in kwargs.keys():
+    if k not in ['jac', 'f', 'g']:
+      raise Exception("Error in 'jacGOut' arguments. You supplied key '%s'. Allowed keys are: 'jac', 'f', 'g'" % k)
   return (kwargs, ['jac', 'f', 'g'])
 %}
 #endif //SWIGPYTHON
@@ -860,6 +947,9 @@ def hessLagIn(**kwargs):
     lam_f -- NLP solver might use to scale the objective. [HESSLAG_LAM_F]
     lam_g -- Multiplier for g [HESSLAG_LAM_G]
   """
+  for k in kwargs.keys():
+    if k not in ['x', 'p', 'lam_f', 'lam_g']:
+      raise Exception("Error in 'hessLagIn' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p', 'lam_f', 'lam_g'" % k)
   return (kwargs, ['x', 'p', 'lam_f', 'lam_g'])
 %}
 #endif //SWIGPYTHON
@@ -890,6 +980,9 @@ def hessLagOut(**kwargs):
     grad_x -- Gradient of the Lagrangian with respect to x [HESSLAG_GRAD_X]
     grad_p -- Gradient of the Lagrangian with respect to p [HESSLAG_GRAD_P]
   """
+  for k in kwargs.keys():
+    if k not in ['hess', 'f', 'g', 'grad_x', 'grad_p']:
+      raise Exception("Error in 'hessLagOut' arguments. You supplied key '%s'. Allowed keys are: 'hess', 'f', 'g', 'grad_x', 'grad_p'" % k)
   return (kwargs, ['hess', 'f', 'g', 'grad_x', 'grad_p'])
 %}
 #endif //SWIGPYTHON
@@ -923,6 +1016,9 @@ def nlpSolverIn(**kwargs):
     lam_x0 -- Lagrange multipliers for bounds on X, initial guess (nx x 1) [NLP_SOLVER_LAM_X0]
     lam_g0 -- Lagrange multipliers for bounds on G, initial guess (ng x 1) [NLP_SOLVER_LAM_G0]
   """
+  for k in kwargs.keys():
+    if k not in ['x0', 'p', 'lbx', 'ubx', 'lbg', 'ubg', 'lam_x0', 'lam_g0']:
+      raise Exception("Error in 'nlpSolverIn' arguments. You supplied key '%s'. Allowed keys are: 'x0', 'p', 'lbx', 'ubx', 'lbg', 'ubg', 'lam_x0', 'lam_g0'" % k)
   return (kwargs, ['x0', 'p', 'lbx', 'ubx', 'lbg', 'ubg', 'lam_x0', 'lam_g0'])
 %}
 #endif //SWIGPYTHON
@@ -954,6 +1050,9 @@ def nlpSolverOut(**kwargs):
     lam_g -- Lagrange multipliers for bounds on G at the solution (ng x 1) [NLP_SOLVER_LAM_G]
     lam_p -- Lagrange multipliers for bounds on P at the solution (np x 1) [NLP_SOLVER_LAM_P]
   """
+  for k in kwargs.keys():
+    if k not in ['x', 'f', 'g', 'lam_x', 'lam_g', 'lam_p']:
+      raise Exception("Error in 'nlpSolverOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'f', 'g', 'lam_x', 'lam_g', 'lam_p'" % k)
   return (kwargs, ['x', 'f', 'g', 'lam_x', 'lam_g', 'lam_p'])
 %}
 #endif //SWIGPYTHON
@@ -991,6 +1090,9 @@ def qcqpIn(**kwargs):
     x0     -- dense, (n x 1) [QCQP_SOLVER_X0]
     lam_x0 -- dense [QCQP_SOLVER_LAM_X0]
   """
+  for k in kwargs.keys():
+    if k not in ['h', 'g', 'p', 'q', 'r', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0']:
+      raise Exception("Error in 'qcqpIn' arguments. You supplied key '%s'. Allowed keys are: 'h', 'g', 'p', 'q', 'r', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0'" % k)
   return (kwargs, ['h', 'g', 'p', 'q', 'r', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0'])
 %}
 #endif //SWIGPYTHON
@@ -1020,6 +1122,9 @@ def qcqpOut(**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [QCQP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [QCQP_SOLVER_LAM_X]
   """
+  for k in kwargs.keys():
+    if k not in ['x', 'cost', 'lam_a', 'lam_x']:
+      raise Exception("Error in 'qcqpOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'cost', 'lam_a', 'lam_x'" % k)
   return (kwargs, ['x', 'cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
@@ -1054,6 +1159,9 @@ def qpIn(**kwargs):
     x0     -- dense, (n x 1) [QP_SOLVER_X0]
     lam_x0 -- dense [QP_SOLVER_LAM_X0]
   """
+  for k in kwargs.keys():
+    if k not in ['h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0']:
+      raise Exception("Error in 'qpIn' arguments. You supplied key '%s'. Allowed keys are: 'h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0'" % k)
   return (kwargs, ['h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0'])
 %}
 #endif //SWIGPYTHON
@@ -1083,6 +1191,9 @@ def qpOut(**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [QP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [QP_SOLVER_LAM_X]
   """
+  for k in kwargs.keys():
+    if k not in ['x', 'cost', 'lam_a', 'lam_x']:
+      raise Exception("Error in 'qpOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'cost', 'lam_a', 'lam_x'" % k)
   return (kwargs, ['x', 'cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
@@ -1116,6 +1227,9 @@ def sdpIn(**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SDP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SDP_SOLVER_UBX]
   """
+  for k in kwargs.keys():
+    if k not in ['f', 'c', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx']:
+      raise Exception("Error in 'sdpIn' arguments. You supplied key '%s'. Allowed keys are: 'f', 'c', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx'" % k)
   return (kwargs, ['f', 'c', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx'])
 %}
 #endif //SWIGPYTHON
@@ -1148,6 +1262,9 @@ def sdpOut(**kwargs):
     lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDP_SOLVER_LAM_A]
     lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDP_SOLVER_LAM_X]
   """
+  for k in kwargs.keys():
+    if k not in ['x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x']:
+      raise Exception("Error in 'sdpOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x'" % k)
   return (kwargs, ['x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
@@ -1182,6 +1299,9 @@ def sdqpIn(**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SDQP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SDQP_SOLVER_UBX]
   """
+  for k in kwargs.keys():
+    if k not in ['h', 'c', 'f', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx']:
+      raise Exception("Error in 'sdqpIn' arguments. You supplied key '%s'. Allowed keys are: 'h', 'c', 'f', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx'" % k)
   return (kwargs, ['h', 'c', 'f', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx'])
 %}
 #endif //SWIGPYTHON
@@ -1214,6 +1334,9 @@ def sdqpOut(**kwargs):
     lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDQP_SOLVER_LAM_A]
     lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDQP_SOLVER_LAM_X]
   """
+  for k in kwargs.keys():
+    if k not in ['x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x']:
+      raise Exception("Error in 'sdqpOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x'" % k)
   return (kwargs, ['x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
@@ -1249,6 +1372,9 @@ def socpIn(**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SOCP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SOCP_SOLVER_UBX]
   """
+  for k in kwargs.keys():
+    if k not in ['g', 'h', 'e', 'f', 'c', 'a', 'lba', 'uba', 'lbx', 'ubx']:
+      raise Exception("Error in 'socpIn' arguments. You supplied key '%s'. Allowed keys are: 'g', 'h', 'e', 'f', 'c', 'a', 'lba', 'uba', 'lbx', 'ubx'" % k)
   return (kwargs, ['g', 'h', 'e', 'f', 'c', 'a', 'lba', 'uba', 'lbx', 'ubx'])
 %}
 #endif //SWIGPYTHON
@@ -1280,6 +1406,9 @@ def socpOut(**kwargs):
     lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SOCP_SOLVER_LAM_X]
     lam_cone  -- The dual solution correspoding to cone (2-norm) constraints (m x 1) [SOCP_SOLVER_LAM_CONE]
   """
+  for k in kwargs.keys():
+    if k not in ['x', 'cost', 'dual_cost', 'lam_a', 'lam_x', 'lam_cone']:
+      raise Exception("Error in 'socpOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'cost', 'dual_cost', 'lam_a', 'lam_x', 'lam_cone'" % k)
   return (kwargs, ['x', 'cost', 'dual_cost', 'lam_a', 'lam_x', 'lam_cone'])
 %}
 #endif //SWIGPYTHON
@@ -1308,6 +1437,9 @@ def socpStruct(**kwargs):
     e -- The horizontal stack of all vectors ei: ( n x m) [SOCP_STRUCT_E]
     a -- The matrix A: ( nc x n) [SOCP_STRUCT_A]
   """
+  for k in kwargs.keys():
+    if k not in ['g', 'e', 'a']:
+      raise Exception("Error in 'socpStruct' arguments. You supplied key '%s'. Allowed keys are: 'g', 'e', 'a'" % k)
   return (kwargs, ['g', 'e', 'a'])
 %}
 #endif //SWIGPYTHON
@@ -1342,6 +1474,9 @@ def stabilizedQpIn(**kwargs):
     muE    -- dense (nc x 1) [STABILIZED_QP_SOLVER_MUE]
     mu     -- dense (nc x 1) [STABILIZED_QP_SOLVER_MU]
   """
+  for k in kwargs.keys():
+    if k not in ['h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0', 'muR', 'muE', 'mu']:
+      raise Exception("Error in 'stabilizedQpIn' arguments. You supplied key '%s'. Allowed keys are: 'h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0', 'muR', 'muE', 'mu'" % k)
   return (kwargs, ['h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0', 'muR', 'muE', 'mu'])
 %}
 #endif //SWIGPYTHON

@@ -20,3 +20,8 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/+casadi DESTINATION ${CMAKE_INSTAL
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigRef.m DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/casadisetup.m DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(TARGETS casadiMATLAB_wrap DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+# Install matlab helper files
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_matlab2cpp.m
+              ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_cpp2matlab.m
+  DESTINATION ${CMAKE_INSTALL_PREFIX})

@@ -449,6 +449,16 @@ class Misctests(casadiTestCase):
         pass
     
     assert "casadi_nlpsolver_foo" in result[1]
+
+
+  def test_nlpInErr(self):
+    msg = ""
+    try:
+      nlpIn(foo=SX.sym('x'))
+    except Exception as e:
+      msg = str(e)
+    print msg
+    assert("'x', 'p'" in msg)
     
 
 pickle.dump(Sparsity(),file("temp.txt","w"))

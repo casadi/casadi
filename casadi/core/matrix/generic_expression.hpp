@@ -54,162 +54,207 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
   public:
 
 #ifndef SWIG
+    /// Addition
     friend inline ExType operator+(const ExType &x, const ExType &y) {
       return x.zz_plus(y);
     }
 
+    /// Subtraction
     friend inline ExType operator-(const ExType &x, const ExType &y) {
       return x.zz_minus(y);
     }
 
+    /// Elementwise multiplication
     friend inline ExType operator*(const ExType &x, const ExType &y) {
       return x.zz_times(y);
     }
 
+    /// Elementwise division
     friend inline ExType operator/(const ExType &x, const ExType &y) {
       return x.zz_rdivide(y);
     }
 
+    /// Logic less than
     friend inline ExType operator<(const ExType &x, const ExType &y) {
       return x.zz_lt(y);
     }
 
+    /// Logic less or equal to
     friend inline ExType operator<=(const ExType &x, const ExType &y) {
       return x.zz_le(y);
     }
 
+    /// Logic greater than
     friend inline ExType operator>(const ExType &x, const ExType &y) {
       return x.zz_gt(y);
     }
 
+    /// Logic greater or equal to
     friend inline ExType operator>=(const ExType &x, const ExType &y) {
       return x.zz_ge(y);
     }
 
+    /// Logic equal to
     friend inline ExType operator==(const ExType &x, const ExType &y) {
       return x.zz_eq(y);
     }
 
+    /// Logic not equal to
     friend inline ExType operator!=(const ExType &x, const ExType &y) {
       return x.zz_ne(y);
     }
 
+    /// Logic and
     friend inline ExType operator&&(const ExType &x, const ExType &y) {
       return x.zz_and(y);
     }
 
+    /// Logic or
     friend inline ExType operator||(const ExType &x, const ExType &y) {
       return x.zz_or(y);
     }
 
+    /// Absolute value
     friend inline ExType fabs(const ExType& x) {
       return x.zz_abs();
     }
 
+    /// Absolute value
     friend inline ExType abs(const ExType& x) {
       return x.zz_abs();
     }
 
+    /// Square root
     friend inline ExType sqrt(const ExType& x) {
       return x.zz_sqrt();
     }
 
+    /// Sine
     friend inline ExType sin(const ExType& x) {
       return x.zz_sin();
     }
 
+    /// Cosine
     friend inline ExType cos(const ExType& x) {
       return x.zz_cos();
     }
 
+    /// Tangent
     friend inline ExType tan(const ExType& x) {
       return x.zz_tan();
     }
 
+    /// Arc tangent
     friend inline ExType atan(const ExType& x) {
       return x.zz_atan();
     }
 
+    /// Arc sine
     friend inline ExType asin(const ExType& x) {
       return x.zz_asin();
     }
 
+    /// Arc cosine
     friend inline ExType acos(const ExType& x) {
       return x.zz_acos();
     }
 
+    /// Hyperbolic tangent
     friend inline ExType tanh(const ExType& x) {
       return x.zz_tanh();
     }
 
+    /// Hyperbolic sine
     friend inline ExType sinh(const ExType& x) {
       return x.zz_sinh();
     }
 
+    /// Hyperbolic cosine
     friend inline ExType cosh(const ExType& x) {
       return x.zz_cosh();
     }
 
+    /// Inverse hyperbolic tangent
     friend inline ExType atanh(const ExType& x) {
       return x.zz_atanh();
     }
 
+    /// Inverse hyperbolic sine
     friend inline ExType asinh(const ExType& x) {
       return x.zz_asinh();
     }
 
+    /// Inverse hyperbolic cosine
     friend inline ExType acosh(const ExType& x) {
       return x.zz_acosh();
     }
 
+    /// Exponential function
     friend inline ExType exp(const ExType& x) {
       return x.zz_exp();
     }
 
+    /// Natural logarithm
     friend inline ExType log(const ExType& x) {
       return x.zz_log();
     }
 
+    /// Base-10 logarithm
     friend inline ExType log10(const ExType& x) {
       return x.zz_log10();
     }
 
+    /// Round down to nearest integer
     friend inline ExType floor(const ExType& x) {
       return x.zz_floor();
     }
 
+    /// Round up to nearest integer
     friend inline ExType ceil(const ExType& x) {
       return x.zz_ceil();
     }
 
+    /// Error function
     friend inline ExType erf(const ExType& x) {
       return x.zz_erf();
     }
 
+    /** Sine function
+        sign(x)   := -1 for x<0
+        sign(x)   :=  1 for x>0,
+        sign(0)   :=  0
+        sign(NaN) :=  NaN
+     */
     friend inline ExType sign(const ExType& x) {
       return x.zz_sign();
     }
 
+    /// Elementwise power
     friend inline ExType pow(const ExType& x, const ExType& n) {
       return x.zz_power(n);
     }
 
+    /// Remainder after division
     friend inline ExType fmod(const ExType& x, const ExType& y) {
       return x.zz_mod(y);
     }
 
+    /// Two argument arc tangent
     friend inline ExType atan2(const ExType& x, const ExType& y) {
       return x.zz_atan2(y);
     }
 
+    /// Smallest of two values
     friend inline ExType fmin(const ExType& x, const ExType& y) {
       return x.zz_min(y);
     }
 
+    /// Largest of two values
     friend inline ExType fmax(const ExType& x, const ExType& y) {
       return x.zz_max(y);
     }
 
+    /// Simplify an expression
     friend inline ExType simplify(const ExType &x) {
       return x.zz_simplify();
     }
@@ -241,6 +286,24 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
 
     /// In-place elementwise division
     inline ExType& operator/=(const ExType &y) {return self() = self().zz_rdivide(y);}
+
+    /// Logic less than
+    inline friend ExType operator<(const ExType &x, const ExType &y) { return x.zz_lt(y); }
+
+    /// Logic less or equal to
+    inline friend ExType operator<=(const ExType &x, const ExType &y) { return x.zz_le(y); }
+
+    /// Logic greater than
+    inline friend ExType operator>(const ExType &x, const ExType &y) { return x.zz_gt(y); }
+
+    /// Logic greater or equal to
+    inline friend ExType operator>=(const ExType &x, const ExType &y) { return x.zz_ge(y); }
+
+    /// Logic equal to
+    inline friend ExType operator==(const ExType &x, const ExType &y) { return x.zz_eq(y); }
+
+    /// Logic not equal to
+    inline friend ExType operator!=(const ExType &x, const ExType &y) { return x.zz_ne(y); }
 
     /// Logic not
     inline ExType operator!() const { return self().zz_not(); }

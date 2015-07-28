@@ -65,6 +65,7 @@
     // Redirect printout to mexPrintf
     static void mexlogger(const char* s, std::streamsize num, bool error) {
       mexPrintf("%.*s", static_cast<int>(num), s);
+      mexEvalString("drawnow;");
     }
   }
 %}
@@ -170,10 +171,12 @@ import casadi.*
 
 CasadiOptions.setCasadiPath(libpath);
 
+warning('error','SWIG:OverloadError')
+
 %}
 #endif
 
-#ifdef SWIGPYTHON
+#if defined(SWIGPYTHON) || defined(SWIGMATLAB)
 %include "doc_merged.i"
 #else
 %include "doc.i"
@@ -196,6 +199,26 @@ CasadiOptions.setCasadiPath(libpath);
 %feature("compactdefaultargs","0") casadi::solve; // buggy
 %feature("compactdefaultargs","0") casadi::Function::generateCode; // buggy
 #endif //SWIGXML
+
+#ifdef SWIGMATLAB
+// This is a first iteration for having
+// beautified error messages in the Matlab iterface
+%feature("matlabprepend") %{
+  try
+%}
+
+%feature("matlabappend") %{
+  catch err
+    if (strcmp(err.identifier,'SWIG:OverloadError'))
+      msg = [swig_typename_convertor_cpp2matlab(err.message) 'You have: ' strjoin(cellfun(@swig_typename_convertor_matlab2cpp,varargin,'UniformOutput',false),', ')];
+      throwAsCaller(MException(err.identifier,msg));
+    else
+      rethrow(err);
+    end
+  end
+%}
+
+#endif // SWIGMATLAB
 
 // STL
 #ifdef SWIGXML
@@ -235,13 +258,13 @@ int internal(const std::string & c) {
 int deprecated(const std::string & c,const std::string & a) {
   std::string msg = "This CasADi function (" + c + ") is deprecated. " + a;
   mexWarnMsgIdAndTxt("SWIG:DeprecationWarning",msg.c_str());
-  return 1;
+  return 0;
 }
 int internal(const std::string & c) {
   if (CasadiOptions::allowed_internal_api) return 0;
   std::string msg = "This CasADi function (" + c + ") is not part of the public API. Use at your own risk.";
   mexWarnMsgIdAndTxt("SWIG:SyntaxWarning",msg.c_str());
-  return 1;
+  return 0;
 }
 %}
 #endif // SWIGMATLAB

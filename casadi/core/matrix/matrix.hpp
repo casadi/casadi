@@ -588,24 +588,22 @@ namespace casadi {
     }
 
     /** \brief  QR factorization using the modified Gram-Schmidt algorithm
-
-      More stable than the classical Gram-Schmidt, but may break down if the rows of A
-      are nearly linearly dependent
-      See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
-      Note that in SWIG, Q and R are returned by value.
-    */
+     * More stable than the classical Gram-Schmidt, but may break down if the rows of A
+     * are nearly linearly dependent
+     * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
+     * Note that in SWIG, Q and R are returned by value.
+     */
     friend inline void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R) {
       return A.zz_qr(Q, R);
     }
 
     /** \brief Obtain a Cholesky factorisation of a matrix
-      
-      Returns an upper triangular R such that R'R = A.
-      Matrix A must be positive definite.
-     
-      At the moment, the algorithm is dense (Cholesky-Banachiewicz).
-      There is an open ticket #1212 to make it sparse.
-    */
+     * Returns an upper triangular R such that R'R = A.
+     * Matrix A must be positive definite.
+     * 
+     * At the moment, the algorithm is dense (Cholesky-Banachiewicz).
+     * There is an open ticket #1212 to make it sparse.
+     */
     friend inline Matrix<DataType> chol(const Matrix<DataType>& A) {
       return A.zz_chol();
     }

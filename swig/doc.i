@@ -12719,6 +12719,13 @@ Get the shape.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MatType >::shape(int axis)
+const  "
+
+Get the size along a particular dimensions.
+
+";
+
 %feature("docstring")  triu2symm(const MatType &a) "
 
 Convert a upper triangular matrix to a symmetric one.
@@ -27329,6 +27336,13 @@ Get the shape.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::shape(int axis) const "
+
+Get the size along a particular dimensions.
+
+";
+
 %feature("docstring")  casadi::Matrix< DataType >::zz_min(const Matrix<
 DataType > &y) const  "
 
@@ -29188,6 +29202,12 @@ Get the sparsity pattern. See the Sparsity class for details.
 %feature("docstring")  casadi::GenericMatrix< MX  >::shape() const "
 
 Get the shape.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX  >::shape(int axis) const "
+
+Get the size along a particular dimensions.
 
 ";
 

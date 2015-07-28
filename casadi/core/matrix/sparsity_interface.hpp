@@ -673,7 +673,6 @@ namespace casadi {
       return diagcat(make_vector(x, y, z, w));
     }
 #endif // SWIG
-
   };
 
 #ifndef SWIG
