@@ -20542,6 +20542,13 @@ return true if all non-zero elements are symbolic.
 
 %feature("docstring") casadi::Matrix::resize "";
 
+%feature("docstring") casadi::Matrix::zz_mac "
+
+Operations called by the corresponding friend functions, MATLAB naming
+convention
+
+";
+
 %feature("docstring") casadi::Matrix::setSym "
 
 Set upper triangular elements.
@@ -21593,6 +21600,8 @@ Returns a number that is unique for a given MXNode. If the MX does not point
 to any node, 0 is returned.
 
 ";
+
+%feature("docstring") casadi::MX::zz_mac "";
 
 %feature("docstring") casadi::MX::getOutput "
 
@@ -39204,7 +39213,12 @@ Copy constructor.
 /*  Check if two sparsity patterns are identical  */
 
 /*  Size and element counting  */ %feature("docstring")
-casadi::Sparsity::assertInit " [INTERNAL]  Assert that it is initialized
+casadi::Sparsity::zz_mac " [INTERNAL]  Accessed by SparsityInterface.
+
+";
+
+%feature("docstring") casadi::Sparsity::assertInit "[INTERNAL]  Assert that
+it is initialized
 
 ";
 
@@ -44027,22 +44041,6 @@ Check if the vector is strictly decreasing.
 
 ";
 
-%feature("docstring") casadi::jacGIn "
-
-Input arguments of an NLP Jacobian function
-
->Input scheme: casadi::JacGInput (JACG_NUM_IN = 2) [jacGIn]
-
-+-----------+-------+---------------------+
-| Full name | Short |     Description     |
-+===========+=======+=====================+
-| JACG_X    | x     | Decision variable . |
-+-----------+-------+---------------------+
-| JACG_P    | p     | Fixed parameter .   |
-+-----------+-------+---------------------+
-
-";
-
 %feature("docstring") casadi::profileWriteName "[INTERNAL] ";
 
 %feature("docstring") casadi::cleOut "
@@ -44380,23 +44378,19 @@ Checks if vector does not contain NaN or Inf.
 
 ";
 
-%feature("docstring") casadi::symvar "
+%feature("docstring") casadi::jacGIn "
 
->  [SX] symvar(SX e)
-------------------------------------------------------------------------
+Input arguments of an NLP Jacobian function
 
-Get all symbols contained in the supplied expression Get all symbols on
-which the supplied expression depends.
+>Input scheme: casadi::JacGInput (JACG_NUM_IN = 2) [jacGIn]
 
-See:   SXFunction::getFree()
-
->  [MX] symvar(MX e)
-------------------------------------------------------------------------
-
-Get all symbols contained in the supplied expression Get all symbols on
-which the supplied expression depends.
-
-See:   MXFunction::getFree()
++-----------+-------+---------------------+
+| Full name | Short |     Description     |
++===========+=======+=====================+
+| JACG_X    | x     | Decision variable . |
++-----------+-------+---------------------+
+| JACG_P    | p     | Fixed parameter .   |
++-----------+-------+---------------------+
 
 ";
 

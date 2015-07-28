@@ -26829,14 +26829,6 @@ convention
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_mtimes(const Matrix<
-DataType > &y, const Matrix< DataType > &z) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::colind(int col) const "
 
@@ -27023,6 +27015,14 @@ int > &horz_offset) const " ";
 
 %feature("docstring")  casadi::Matrix< DataType >::resize(int nrow, int
 ncol) " ";
+
+%feature("docstring")  casadi::Matrix< DataType >::zz_mac(const Matrix<
+DataType > &y, const Matrix< DataType > &z) const  "
+
+Operations called by the corresponding friend functions, MATLAB naming
+convention
+
+";
 
 %feature("docstring")  casadi::Matrix< DataType >::setSym(const double *val)
 "
@@ -28194,9 +28194,6 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 %feature("docstring")  casadi::MX::zz_mtimes(const MX &y) const  " ";
 
-%feature("docstring")  casadi::MX::zz_mtimes(const MX &y, const MX &z) const
-" ";
-
 %feature("docstring")  casadi::MX::isZero() const  "
 
 check if zero (note that false negative answers are possible)
@@ -28252,6 +28249,9 @@ vert_incr, int horz_incr) const " ";
 Returns a number that is unique for a given MXNode. If the MX does not point
 to any node, 0 is returned.
 
+";
+
+%feature("docstring")  casadi::MX::zz_mac(const MX &y, const MX &z) const  "
 ";
 
 %feature("docstring")  casadi::MX::getOutput(int oind=0) const  "
@@ -49985,8 +49985,13 @@ SparseStorage< DataType > &m) " [INTERNAL]  Copy constructor.
 /*  Check if two sparsity patterns are identical  */
 
 /*  Size and element counting  */ %feature("docstring")
-casadi::SharedObject::assertInit() const  " [INTERNAL]  Assert that it is
-initialized
+casadi::Sparsity::zz_mac(const Sparsity &Y, const Sparsity &Z) const  "
+[INTERNAL]  Accessed by SparsityInterface.
+
+";
+
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -50679,11 +50684,6 @@ Get the dimension as a string.
 
 %feature("docstring")  casadi::Sparsity::zz_mtimes(const Sparsity &y) const
 " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_mtimes(const Sparsity &Y, const
-Sparsity &Z) const  " [INTERNAL]  Accessed by SparsityInterface.
 
 ";
 
@@ -56381,23 +56381,6 @@ Check if the vector is strictly decreasing.
 
 ";
 
-%feature("docstring")  casadi::jacGIn(const std::string &n0="", const M
-&x0=M(), const std::string &n1="", const M &x1=M()) "
-
-Input arguments of an NLP Jacobian function
-
->Input scheme: casadi::JacGInput (JACG_NUM_IN = 2) [jacGIn]
-
-+-----------+-------+---------------------+
-| Full name | Short |     Description     |
-+===========+=======+=====================+
-| JACG_X    | x     | Decision variable . |
-+-----------+-------+---------------------+
-| JACG_P    | p     | Fixed parameter .   |
-+-----------+-------+---------------------+
-
-";
-
 %feature("docstring")  casadi::profileWriteName(std::ofstream &f, T *a,
 const std::string &name, ProfilingData_FunctionType type, int
 algorithm_size) " [INTERNAL] ";
@@ -56776,21 +56759,20 @@ Checks if vector does not contain NaN or Inf.
 
 ";
 
-%feature("docstring")  casadi::symvar(const SX &e) "
+%feature("docstring")  casadi::jacGIn(const std::string &n0="", const M
+&x0=M(), const std::string &n1="", const M &x1=M()) "
 
-Get all symbols contained in the supplied expression Get all symbols on
-which the supplied expression depends.
+Input arguments of an NLP Jacobian function
 
-See:   SXFunction::getFree()
+>Input scheme: casadi::JacGInput (JACG_NUM_IN = 2) [jacGIn]
 
-";
-
-%feature("docstring")  casadi::symvar(const MX &e) "
-
-Get all symbols contained in the supplied expression Get all symbols on
-which the supplied expression depends.
-
-See:   MXFunction::getFree()
++-----------+-------+---------------------+
+| Full name | Short |     Description     |
++===========+=======+=====================+
+| JACG_X    | x     | Decision variable . |
++-----------+-------+---------------------+
+| JACG_P    | p     | Fixed parameter .   |
++-----------+-------+---------------------+
 
 ";
 
