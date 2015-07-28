@@ -9662,7 +9662,15 @@ x_default:  will be returned.
 
 %feature("docstring") casadi::GenericMatrix::shape "
 
+>  (int,int) MatType .shape() const 
+------------------------------------------------------------------------
+
 Get the shape.
+
+>  int MatType .shape(int axis) const 
+------------------------------------------------------------------------
+
+Get the size along a particular dimensions.
 
 ";
 
@@ -20885,7 +20893,15 @@ Set all elements to zero.
 
 %feature("docstring") casadi::Matrix::shape "
 
+>  (int,int) array(DataType) .shape() const
+------------------------------------------------------------------------
+
 Get the shape.
+
+>  int array(DataType) .shape(int axis) const
+------------------------------------------------------------------------
+
+Get the size along a particular dimensions.
 
 ";
 
@@ -22449,7 +22465,15 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 %feature("docstring") casadi::MX::shape "
 
+>  (int,int) MX .shape() const
+------------------------------------------------------------------------
+
 Get the shape.
+
+>  int MX .shape(int axis) const
+------------------------------------------------------------------------
+
+Get the size along a particular dimensions.
 
 ";
 
