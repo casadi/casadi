@@ -152,5 +152,8 @@ assert(~isempty(strfind(msg,'  SXFunction(char,{SX} ,{SX} ,Dict)')))
 assert(~isempty(strfind(msg,'You have: char, SX')))
 
 
-DMatrix(1)+MX(1);
-MX(1)+DMatrix(1);
+DMatrix(1)+MX(1)
+MX(1)+DMatrix(1)
+
+MX.sym('x',5,5)*3
+MX.sym('x',5,5).*3

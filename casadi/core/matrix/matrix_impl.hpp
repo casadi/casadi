@@ -1325,8 +1325,13 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_mtimes(const Matrix<DataType> &y) const {
-    Matrix<DataType> z = Matrix<DataType>::zeros(mul(sparsity(), y.sparsity()));
-    return zz_mtimes(y, z);
+    if (isscalar() || y.isscalar()) {
+      // Use element-wise multiplication if at least one factor scalar
+      return *this*y;
+    } else {
+      Matrix<DataType> z = Matrix<DataType>::zeros(mul(sparsity(), y.sparsity()));
+      return zz_mtimes(y, z);
+    }
   }
 
   template<typename DataType>

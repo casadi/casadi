@@ -585,8 +585,13 @@ namespace casadi {
   }
 
   MX MX::zz_mtimes(const MX& y) const {
-    MX z = MX::zeros(sparsity().patternProduct(y.sparsity()));
-    return zz_mtimes(y, z);
+    if (isscalar() || y.isscalar()) {
+      // Use element-wise multiplication if at least one factor scalar
+      return *this*y;
+    } else {
+      MX z = MX::zeros(sparsity().patternProduct(y.sparsity()));
+      return zz_mtimes(y, z);
+    }
   }
 
   MX MX::zz_mtimes(const MX& y, const MX& z) const {
