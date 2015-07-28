@@ -30,8 +30,8 @@
 
 namespace casadi {
 
-  /** \brief Expression interface - non-tempalated base class
-      SWIG wrapping, to allow treating GenericExpression as a non-templated class in SWIG.
+  /** \brief Empty Base
+      This class is extended in SWIG.
    */
   struct CASADI_EXPORT GenericExpressionCommon {};
 

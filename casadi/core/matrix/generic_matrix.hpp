@@ -34,6 +34,11 @@
 #include "sparsity_interface.hpp"
 
 namespace casadi {
+  /** \brief Empty Base
+      This class is extended in SWIG.
+   */
+  struct CASADI_EXPORT GenericMatrixCommon {};
+
   /** \brief Matrix base class
 
       This is a common base class for MX and Matrix<>, introducing a uniform syntax and implementing
@@ -63,7 +68,9 @@ namespace casadi {
       \date 2012
   */
   template<typename MatType>
-  class CASADI_EXPORT GenericMatrix : public SparsityInterface<MatType> {
+  class CASADI_EXPORT GenericMatrix
+    : public GenericMatrixCommon,
+      public SparsityInterface<MatType> {
     using SparsityInterface<MatType>::self;
   public:
 
@@ -241,229 +248,193 @@ namespace casadi {
     }
 #endif // SWIG
 
+#ifndef SWIG
+    /** \brief Calculate quadratic form X^T A X
+     */
+    friend MatType quad_form(const MatType &X, const MatType &A) {
+      return X.zz_quad_form(A);
+    }
 
-    /*! \fn friend MatType quad_form(const MatType &X, const MatType &A)
-      \brief Calculate quadratic form X^T A X
+    /** \brief Calculate quadratic form X^T X
+     */
+    inline friend MatType quad_form(const MatType &X) {
+      return X.zz_quad_form();
+    }
+
+    /** \brief Calculate some of squares: sum_ij X_ij^2 
+     */
+    friend MatType sum_square(const MatType &X) {
+      return X.zz_sum_square();
+    }
+
+    /** \brief Matlab's \c linspace command
     */
+    inline friend MatType linspace(const MatType &a, const MatType &b, int nsteps) {
+      return a.zz_linspace(b, nsteps);
+    }
 
-    /*! \fn inline friend MatType quad_form(const MatType &X)
-      \brief Calculate quadratic form X^T X
-    */    
+    /** \brief Matlab's \c cross command
+     */
+    inline friend MatType cross(const MatType &a, const MatType &b, int dim = -1) {
+      return a.zz_cross(b, dim);
+    }
 
-    /*! \fn inline friend MatType sum_square(const MatType &X)
-      \brief Calculate some of squares: sum_ij X_ij^2 
+    /** \brief Matrix determinant (experimental)
     */
+    inline friend MatType det(const MatType& A) {
+      return A.zz_det();
+    }
 
-    /*! \fn inline friend MatType linspace(const MatType &a, const MatType &b, int nsteps)
-      \brief Matlab's \c linspace command
+    /** \brief Matrix inverse (experimental)
     */
+    inline friend MatType inv(const MatType& A) {
+      return A.zz_inv();
+    }
 
-    /*! \fn inline friend MatType cross(const MatType &a, const MatType &b, int dim = -1)
-      \brief Matlab's \c cross command
-    */
-
-    /*! \fn inline friend MatType det(const MatType& A)
-      \brief Matrix determinant (experimental)
-    */
-
-    /*! \fn inline friend MatType inv(const MatType& A)
-      \brief Matrix inverse (experimental)
-    */
-
-    /*! \fn inline friend MatType trace(const MatType& a)
+    /** inline friend MatType trace(const MatType& a)
       \brief Matrix trace
-    */  
-
-    /*! \fn inline friend MatType tril2symm(const MatType &a)
-      \brief Convert a lower triangular matrix to a symmetric one
     */
+    inline friend MatType trace(const MatType& a) {
+      return a.zz_trace();
+    }
 
-    /*! \fn inline friend MatType triu2symm(const MatType &a)
-      \brief Convert a upper triangular matrix to a symmetric one
+    /** \brief Convert a lower triangular matrix to a symmetric one
+     */
+    inline friend MatType tril2symm(const MatType &a) {
+      return a.zz_tril2symm();
+    }
+
+    /** \brief Convert a upper triangular matrix to a symmetric one
+     */
+    inline friend MatType triu2symm(const MatType &a) {
+      return a.zz_triu2symm();
+    }
+
+    /** \brief  Frobenius norm 
+     */
+    inline friend MatType norm_F(const MatType &x) {
+      return x.zz_norm_F();
+    }
+
+    /** \brief  2-norm
+     */
+    inline friend MatType norm_2(const MatType &x) {
+      return x.zz_norm_2();
+    }
+
+    /** \brief 1-norm
+     */
+    inline friend MatType norm_1(const MatType &x) {
+      return x.zz_norm_1();
+    }
+
+    /** \brief Infinity-norm
     */
+    inline friend MatType norm_inf(const MatType &x) {
+      return x.zz_norm_inf();
+    }
 
-    /*! \fn inline friend MatType norm_F(const MatType &x)
-      \brief  Frobenius norm 
+    /** \brief Return a col-wise summation of elements
     */
+    inline friend MatType sumCols(const MatType &x) {
+      return x.zz_sumCols();
+    }
 
-    /*! \fn inline friend MatType norm_2(const MatType &x)
-      \brief  2-norm
+    /** \brief Return a row-wise summation of elements
     */
+    inline friend MatType sumRows(const MatType &x) {
+      return x.zz_sumRows();
+    }
 
-    /*! \fn inline friend MatType norm_1(const MatType &x)
-      \brief 1-norm
-    */
-
-    /*! \fn inline friend MatType norm_inf(const MatType &x)
-      \brief Infinity-norm
-    */
-
-    /*! \fn inline friend MatType sumCols(const MatType &x)
-      \brief Return a col-wise summation of elements
-    */
-
-    /*! \fn inline friend MatType sumRows(const MatType &x)
-      \brief Return a row-wise summation of elements
-    */
-
-    /*! \fn inline friend MatType inner_prod(const MatType &x, const MatType &y)
-      \brief Inner product of two matrices
+    /** \brief Inner product of two matrices
       with x and y matrices of the same dimension
     */
+    inline friend MatType inner_prod(const MatType &x, const MatType &y) {
+      return x.zz_inner_prod(y);
+    }
 
-    /*! \fn inline friend MatType outer_prod(const MatType &x, const MatType &y)
-      \brief  Take the outer product of two vectors
-      Equals
-      \code
-      x*y.T()
-      \endcode
-      with x and y vectors
+    /** \brief  Take the outer product of two vectors
+        Equals
+        \code
+        x*y.T()
+        \endcode
+        with x and y vectors
     */
+    inline friend MatType outer_prod(const MatType &x, const MatType &y) {
+      return x.zz_outer_prod(y);
+    }
 
-    /*! \fn inline friend MatType nullspace(const MatType& A)
-      \brief Computes the nullspace of a matrix A
-      *
-      * Finds Z m-by-(m-n) such that AZ = 0
-      * with A n-by-m with m > n
-      *
-      * Assumes A is full rank
-      *
-      * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
-      */
+    /** \brief Computes the nullspace of a matrix A
+     *
+     * Finds Z m-by-(m-n) such that AZ = 0
+     * with A n-by-m with m > n
+     *
+     * Assumes A is full rank
+     *
+     * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
+     */
+    inline friend MatType nullspace(const MatType& A) {
+      return A.zz_nullspace();
+    }
 
-    /*! \fn inline friend MatType polyval(const MatType& p, const MatType& x)
-      \brief  Evaluate a polynomial with coefficients p in x
+    /** \brief  Evaluate a polynomial with coefficients p in x
     */
+    inline friend MatType polyval(const MatType& p, const MatType& x) {
+      return p.zz_polyval(x);
+    }
 
-    /*! \fn inline friend MatType diag(const MatType &A)
-      \brief   Get the diagonal of a matrix or construct a diagonal
-      When the input is square, the diagonal elements are returned.
-      If the input is vector-like, a diagonal matrix is constructed with it. */
+    /** \brief   Get the diagonal of a matrix or construct a diagonal
+        When the input is square, the diagonal elements are returned.
+        If the input is vector-like, a diagonal matrix is constructed with it. */
+    inline friend MatType diag(const MatType &A) {
+      return A.zz_diag();
+    }
 
-    /*! \fn inline friend MatType unite(const MatType& A, const MatType& B)
-      \brief  Unite two matrices no overlapping sparsity
-    */
+    /** \brief  Unite two matrices no overlapping sparsity
+     */
+    inline friend MatType unite(const MatType& A, const MatType& B) {
+      return A.zz_unite(B);
+    }
 
-    /*! \fn inline friend MatType densify(const MatType& x)
-      \brief  Make the matrix dense if not already
-    */
+    /** \brief  Make the matrix dense if not already
+     */
+    inline friend MatType densify(const MatType& x) {
+      return x.zz_densify();
+    }
 
-    /*! \fn inline friend MatType project(const MatType& A, const Sparsity& sp,
-      bool intersect=false)
-      \brief Create a new matrix with a given sparsity pattern but with the
+    /** \brief Create a new matrix with a given sparsity pattern but with the
       * nonzeros taken from an existing matrix
       */
-
-    /*! \fn inline friend MatType if_else(const MatType &cond, const MatType &if_true,
-      const MatType &if_false, bool short_circuit=true)
-      \brief Branching on MX nodes
-      Ternary operator, "cond ? if_true : if_false"
-    */
-
-    /*! \fn inline friend MatType conditional(const MatType& ind, const std::vector<MatType> &x,
-      const MatType &x_default, bool short_circuit=true)
-      \brief Create a switch
-      *
-      * If the condition \param ind evaluates to the integer k, where 0<=k<f.size(),
-      * then x[k] will be returned, otherwise \param x_default will be returned.
-      */
-
-    /*! \fn inline friend bool dependsOn(const MatType& f, const MatType &arg)
-      \brief Check if expression depends on the argument
-      The argument must be symbolic
-    */
-
-#define GENERIC_MATRIX_FRIENDS(DECL, M)                                 \
-    DECL M quad_form(const M &X, const M &A) {                          \
-      return X.zz_quad_form(A);                                         \
-    }                                                                   \
-    DECL M quad_form(const M &X) {                                      \
-      return X.zz_quad_form();                                          \
-    }                                                                   \
-    DECL M sum_square(const M &X) {                                     \
-      return X.zz_sum_square();                                         \
-    }                                                                   \
-    DECL M linspace(const M &a, const M &b, int nsteps) {               \
-      return a.zz_linspace(b, nsteps);                                  \
-    }                                                                   \
-    DECL M cross(const M &a, const M &b, int dim = -1) {                \
-      return a.zz_cross(b, dim);                                        \
-    }                                                                   \
-    DECL M det(const M& A) {                                            \
-      return A.zz_det();                                                \
-    }                                                                   \
-    DECL M inv(const M& A) {                                            \
-      return A.zz_inv();                                                \
-    }                                                                   \
-    DECL M trace(const M& a) {                                          \
-      return a.zz_trace();                                              \
-    }                                                                   \
-    DECL M tril2symm(const M &a) {                                      \
-      return a.zz_tril2symm();                                          \
-    }                                                                   \
-    DECL M triu2symm(const M &a) {                                      \
-      return a.zz_triu2symm();                                          \
-    }                                                                   \
-    DECL M norm_F(const M &x) {                                         \
-      return x.zz_norm_F();                                             \
-    }                                                                   \
-    DECL M norm_2(const M &x) {                                         \
-      return x.zz_norm_2();                                             \
-    }                                                                   \
-    DECL M norm_1(const M &x) {                                         \
-      return x.zz_norm_1();                                             \
-    }                                                                   \
-    DECL M norm_inf(const M &x) {                                       \
-      return x.zz_norm_inf();                                           \
-    }                                                                   \
-    DECL M sumCols(const M &x) {                                        \
-      return x.zz_sumCols();                                            \
-    }                                                                   \
-    DECL M sumRows(const M &x) {                                        \
-      return x.zz_sumRows();                                            \
-    }                                                                   \
-    DECL M inner_prod(const M &x, const M &y) {                         \
-      return x.zz_inner_prod(y);                                        \
-    }                                                                   \
-    DECL M outer_prod(const M &x, const M &y) {                         \
-      return x.zz_outer_prod(y);                                        \
-    }                                                                   \
-    DECL M nullspace(const M& A) {                                      \
-      return A.zz_nullspace();                                          \
-    }                                                                   \
-    DECL M polyval(const M& p, const M& x) {                            \
-      return p.zz_polyval(x);                                           \
-    }                                                                   \
-    DECL M diag(const M &A) {                                           \
-      return A.zz_diag();                                               \
-    }                                                                   \
-    DECL M unite(const M& A, const M& B) {                              \
-      return A.zz_unite(B);                                             \
-    }                                                                   \
-    DECL M densify(const M& x) {                                        \
-      return x.zz_densify();                                            \
-    }                                                                   \
-    DECL M                                                              \
-      project(const M& A, const Sparsity& sp, bool intersect=false) {   \
+    inline friend MatType project(const MatType& A, const Sparsity& sp,
+                                  bool intersect=false) {
       return A.zz_project(sp, intersect);                               \
-    }                                                                   \
-    DECL M                                                              \
-      if_else(const M &cond, const M &if_true,                          \
-              const M &if_false, bool short_circuit=true) {             \
-      return cond.zz_if_else(if_true, if_false, short_circuit);         \
-    }                                                                   \
-    DECL M                                                              \
-      conditional(const M& ind, const std::vector<M> &x,                \
-                  const M &x_default, bool short_circuit=true) {        \
-      return ind.zz_conditional(x, x_default, short_circuit);           \
-    }                                                                   \
-    DECL bool dependsOn(const M& f, const M &arg) {                     \
-      return f.zz_dependsOn(arg);                                       \
-    }                                                                   \
+    }
 
-#ifndef SWIG
-    GENERIC_MATRIX_FRIENDS(inline friend, MatType)
-#endif
+    /** \brief Branching on MX nodes
+        Ternary operator, "cond ? if_true : if_false"
+    */
+    inline friend MatType if_else(const MatType &cond, const MatType &if_true,
+                                  const MatType &if_false, bool short_circuit=true) {
+      return cond.zz_if_else(if_true, if_false, short_circuit);         \
+    }
+
+    /** \brief Create a switch
+     *
+     * If the condition \param ind evaluates to the integer k, where 0<=k<f.size(),
+     * then x[k] will be returned, otherwise \param x_default will be returned.
+     */
+    inline friend MatType conditional(const MatType& ind, const std::vector<MatType> &x,
+                                      const MatType &x_default, bool short_circuit=true) {
+      return ind.zz_conditional(x, x_default, short_circuit);           \
+    }
+
+    /** \brief Check if expression depends on the argument
+        The argument must be symbolic
+    */
+    inline friend bool dependsOn(const MatType& f, const MatType &arg) {
+      return f.zz_dependsOn(arg);                                       \
+    }
+#endif // SWIG
 
     /** @name Construct symbolic primitives
         The "sym" function is intended to work in a similar way as "sym" used
