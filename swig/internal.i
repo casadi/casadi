@@ -208,7 +208,7 @@
 %exception  casadi::Sparsity::zz_kron(const Sparsity &b) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Sparsity::zz_mtimes(const Sparsity &Y, const Sparsity &Z) const  {
+%exception  casadi::Sparsity::zz_mac(const Sparsity &Y, const Sparsity &Z) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Sparsity::zz_mtimes(const Sparsity &y) const  {

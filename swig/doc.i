@@ -12739,10 +12739,36 @@ given sparsity.
 std::string &name, int nrow, int ncol, int p) "
 
 Create a vector of length p with nrow-by-ncol symbolic primitives.
+<<<<<<< Updated upstream
 
 ";
 
 %feature("docstring")  casadi::GenericMatrix< MatType >::sym(const
+std::string &name, const Sparsity &sp, int p, int r) "
+
+Create a vector of length r of vectors of length p with symbolic primitives
+with given sparsity.
+=======
+>>>>>>> Stashed changes
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::sym(const
+<<<<<<< Updated upstream
+std::string &name, int nrow, int ncol, int p, int r) "
+
+Create a vector of length r of vectors of length p with nrow-by-ncol
+symbolic primitives.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX >::sym(const std::string
+&name, const Sparsity &sp) " ";
+
+%feature("docstring")  casadi::GenericMatrix< SX >::sym(const std::string
+&name, const Sparsity &sp) " ";
+
+=======
 std::string &name, const Sparsity &sp, int p, int r) "
 
 Create a vector of length r of vectors of length p with symbolic primitives
@@ -12764,6 +12790,7 @@ symbolic primitives.
 %feature("docstring")  casadi::GenericMatrix< SX >::sym(const std::string
 &name, const Sparsity &sp) " ";
 
+>>>>>>> Stashed changes
 %feature("docstring")  casadi::GenericMatrix< MatType >::istril() const  "
 
 Check if the matrix is lower triangular.
@@ -26463,6 +26490,7 @@ Get string representation of dimensions. The representation is (nrow x ncol
 ";
 
 %feature("docstring")  casadi::Matrix< DataType >::inf(const Sparsity &sp) "
+<<<<<<< Updated upstream
 
 create a matrix with all inf
 
@@ -26471,6 +26499,16 @@ create a matrix with all inf
 %feature("docstring")  casadi::Matrix< DataType >::inf(int nrow=1, int
 ncol=1) "
 
+=======
+
+create a matrix with all inf
+
+";
+
+%feature("docstring")  casadi::Matrix< DataType >::inf(int nrow=1, int
+ncol=1) "
+
+>>>>>>> Stashed changes
 create a matrix with all inf
 
 ";
@@ -26829,14 +26867,6 @@ convention
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_mtimes(const Matrix<
-DataType > &y, const Matrix< DataType > &z) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::colind(int col) const "
 
@@ -27023,6 +27053,14 @@ int > &horz_offset) const " ";
 
 %feature("docstring")  casadi::Matrix< DataType >::resize(int nrow, int
 ncol) " ";
+
+%feature("docstring")  casadi::Matrix< DataType >::zz_mac(const Matrix<
+DataType > &y, const Matrix< DataType > &z) const  "
+
+Operations called by the corresponding friend functions, MATLAB naming
+convention
+
+";
 
 %feature("docstring")  casadi::Matrix< DataType >::setSym(const double *val)
 "
@@ -28194,9 +28232,6 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 %feature("docstring")  casadi::MX::zz_mtimes(const MX &y) const  " ";
 
-%feature("docstring")  casadi::MX::zz_mtimes(const MX &y, const MX &z) const
-" ";
-
 %feature("docstring")  casadi::MX::isZero() const  "
 
 check if zero (note that false negative answers are possible)
@@ -28252,6 +28287,9 @@ vert_incr, int horz_incr) const " ";
 Returns a number that is unique for a given MXNode. If the MX does not point
 to any node, 0 is returned.
 
+";
+
+%feature("docstring")  casadi::MX::zz_mac(const MX &y, const MX &z) const  "
 ";
 
 %feature("docstring")  casadi::MX::getOutput(int oind=0) const  "
@@ -49985,8 +50023,13 @@ SparseStorage< DataType > &m) " [INTERNAL]  Copy constructor.
 /*  Check if two sparsity patterns are identical  */
 
 /*  Size and element counting  */ %feature("docstring")
-casadi::SharedObject::assertInit() const  " [INTERNAL]  Assert that it is
-initialized
+casadi::Sparsity::zz_mac(const Sparsity &Y, const Sparsity &Z) const  "
+[INTERNAL]  Accessed by SparsityInterface.
+
+";
+
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -50679,11 +50722,6 @@ Get the dimension as a string.
 
 %feature("docstring")  casadi::Sparsity::zz_mtimes(const Sparsity &y) const
 " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_mtimes(const Sparsity &Y, const
-Sparsity &Z) const  " [INTERNAL]  Accessed by SparsityInterface.
 
 ";
 

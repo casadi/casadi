@@ -9638,6 +9638,7 @@ Create a vector of length p with nrow-by-ncol symbolic primitives.
 
 >  [[MatType ] ] MatType .sym(str name, Sparsity sp, int p, int r)
 ------------------------------------------------------------------------
+<<<<<<< Updated upstream
 
 Create a vector of length r of vectors of length p with symbolic primitives
 with given sparsity.
@@ -9650,6 +9651,20 @@ symbolic primitives.
 
 ";
 
+=======
+
+Create a vector of length r of vectors of length p with symbolic primitives
+with given sparsity.
+
+>  static[[MatType] ] MatType .sym(str name, int nrow, int ncol, int p, int r)
+------------------------------------------------------------------------
+
+Create a vector of length r of vectors of length p with nrow-by-ncol
+symbolic primitives.
+
+";
+
+>>>>>>> Stashed changes
 %feature("docstring") casadi::GenericMatrix::istril "
 
 Check if the matrix is lower triangular.
@@ -20542,6 +20557,13 @@ return true if all non-zero elements are symbolic.
 
 %feature("docstring") casadi::Matrix::resize "";
 
+%feature("docstring") casadi::Matrix::zz_mac "
+
+Operations called by the corresponding friend functions, MATLAB naming
+convention
+
+";
+
 %feature("docstring") casadi::Matrix::setSym "
 
 Set upper triangular elements.
@@ -21593,6 +21615,8 @@ Returns a number that is unique for a given MXNode. If the MX does not point
 to any node, 0 is returned.
 
 ";
+
+%feature("docstring") casadi::MX::zz_mac "";
 
 %feature("docstring") casadi::MX::getOutput "
 
@@ -39204,7 +39228,12 @@ Copy constructor.
 /*  Check if two sparsity patterns are identical  */
 
 /*  Size and element counting  */ %feature("docstring")
-casadi::Sparsity::assertInit " [INTERNAL]  Assert that it is initialized
+casadi::Sparsity::zz_mac " [INTERNAL]  Accessed by SparsityInterface.
+
+";
+
+%feature("docstring") casadi::Sparsity::assertInit "[INTERNAL]  Assert that
+it is initialized
 
 ";
 
