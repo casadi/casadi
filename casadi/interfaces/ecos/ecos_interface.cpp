@@ -135,6 +135,7 @@ namespace casadi {
              l (idxint)    : dimension of positive orthant
         ncones (idxint)    : number of second order cones
              q (idxint[])  : dimension of each cone
+           nex (idxint)    : number of exponential cones
            Gpr (pfloat[])  : matrix G in CCS format, data
            Gjc (idxint[])  : matrix G in CCS format, column indices
            Gir (idxint[])  : matrix G in CCS format, row index arrays
@@ -198,13 +199,8 @@ namespace casadi {
 
     // Setup ECOS for new problem based on problem definition. We should be able to place
     // this in init(), it requires ECOS to do a re-initialize.
-#ifdef EXPCONE
     pwork* ecos_work =  ECOS_setup(n, m, p, l, ncones, q, nex, Gpr, Gjc, Gir, 
                 Apr, Ajc, Air, c, h, b);
-#else // EXPCONE
-    pwork* ecos_work =  ECOS_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir, 
-                Apr, Ajc, Air, c, h, b);
-#endif // EXPCONE
 
     // Pass all options to ECOS
     int temp_nitref = getOption("nitref");
