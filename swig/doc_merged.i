@@ -19383,10 +19383,9 @@ Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_solve "
+%feature("docstring") casadi::Matrix::print "
 
-Operations called by the corresponding friend functions, MATLAB naming
-convention
+Print a description of the object.
 
 ";
 
@@ -19406,30 +19405,9 @@ Get a set of nonzeros
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_atanh "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring") casadi::Matrix::zz_gt "
 
 No need to have both < and >
-
-";
-
-%feature("docstring") casadi::Matrix::zz_nullspace "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring") casadi::Matrix::zz_erf "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -19489,10 +19467,10 @@ Get the number of (structural) non-zero elements.
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_acosh "
+%feature("docstring") casadi::Matrix::setPrecision "
 
-Operations called by the corresponding friend functions, MATLAB naming
-convention
+Set the 'precision, width & scientific' used in printing and serializing to
+streams.
 
 ";
 
@@ -19536,13 +19514,6 @@ Get a submatrix, single argument
 ------------------------------------------------------------------------
 
 Get a submatrix, two arguments
-
-";
-
-%feature("docstring") casadi::Matrix::zz_atan "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -19598,9 +19569,9 @@ check if the matrix is 0 (note that false negative answers are possible)
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_plus "
+%feature("docstring") casadi::Matrix::printDense "
 
-Functions called by the corresponding friend functions MATLAB naming
+Print dense matrix-stype.
 
 ";
 
@@ -19647,12 +19618,6 @@ Set the elements numerically.
 ------------------------------------------------------------------------
 
 Set a set of nonzeros
-
-";
-
-%feature("docstring") casadi::Matrix::zz_rdivide "
-
-Functions called by the corresponding friend functions MATLAB naming
 
 ";
 
@@ -19717,13 +19682,6 @@ convention
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_sinh "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring") casadi::Matrix::zz_triu2symm "
 
 Accessed by friend functions.
@@ -19749,13 +19707,6 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_log "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring") casadi::Matrix::triplet "";
 
 %feature("docstring") casadi::Matrix::zz_kron "
@@ -19771,19 +19722,7 @@ Functions called by the corresponding friend functions MATLAB naming
 
 ";
 
-%feature("docstring") casadi::Matrix::print "
-
-Print a description of the object.
-
-";
-
 %feature("docstring") casadi::Matrix::zz_taylor "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring") casadi::Matrix::zz_isEqual "
 
 Functions called by the corresponding friend functions MATLAB naming
 
@@ -19803,7 +19742,13 @@ Get the sparsity pattern.
 
 ";
 
-%feature("docstring") casadi::Matrix::reserve "";
+%feature("docstring") casadi::Matrix::isCommutative "
+
+Check whether a binary SX is commutative.
+
+Only defined if symbolic scalar.
+
+";
 
 %feature("docstring") casadi::Matrix::zz_vertcat "
 
@@ -19840,13 +19785,6 @@ Append a matrix horizontally.
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_sqrt "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring") casadi::Matrix::hasDuplicates "[INTERNAL]  Detect
 duplicate symbolic expressions If there are symbolic primitives appearing
 more than once, the function will return true and the names of the duplicate
@@ -19855,21 +19793,7 @@ node using SXElement::setTemp. Make sure to call resetInput() after usage.
 
 ";
 
-%feature("docstring") casadi::Matrix::setPrecision "
-
-Set the 'precision, width & scientific' used in printing and serializing to
-streams.
-
-";
-
 %feature("docstring") casadi::Matrix::zz_qr "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring") casadi::Matrix::zz_and "
 
 Operations called by the corresponding friend functions, MATLAB naming
 convention
@@ -19894,13 +19818,6 @@ optionally both dimensions)
 %feature("docstring") casadi::Matrix::zz_extractShared "
 
 Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring") casadi::Matrix::zz_ceil "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -19935,23 +19852,9 @@ result
 
 ";
 
-%feature("docstring") casadi::Matrix::setScientific "
-
-Set the 'precision, width & scientific' used in printing and serializing to
-streams.
-
-";
-
 %feature("docstring") casadi::Matrix::T "
 
 Transpose the matrix.
-
-";
-
-%feature("docstring") casadi::Matrix::zz_exp "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -19969,32 +19872,16 @@ Get all nonzeros.
 
 ";
 
-%feature("docstring") casadi::Matrix::isvector "
-
-Check if the matrix is a row or column vector.
-
-";
-
 %feature("docstring") casadi::Matrix::remove "
 
 Remove columns and rows Remove/delete rows and/or columns of a matrix.
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_diagsplit "
+%feature("docstring") casadi::Matrix::setScientific "
 
->  [array(DataType)  ] array(DataType) .zz_diagsplit([int ] offset1, [int ] offset2) const 
-------------------------------------------------------------------------
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring") casadi::Matrix::zz_asinh "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
+Set the 'precision, width & scientific' used in printing and serializing to
+streams.
 
 ";
 
@@ -20049,12 +19936,7 @@ than a specified tolerance.
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_floor "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
+%feature("docstring") casadi::Matrix::reserve "";
 
 %feature("docstring") casadi::Matrix::zz_norm_2 "
 
@@ -20131,13 +20013,6 @@ convention
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_asin "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring") casadi::Matrix::addSub "
 
 Add a submatrix to an existing matrix (TODO: remove memory allocation)
@@ -20151,14 +20026,6 @@ convention
 
 ";
 
-%feature("docstring") casadi::Matrix::isCommutative "
-
-Check whether a binary SX is commutative.
-
-Only defined if symbolic scalar.
-
-";
-
 %feature("docstring") casadi::Matrix::zz_vertsplit "
 
 >  [array(DataType)  ] array(DataType) .zz_vertsplit([int ] offset) const 
@@ -20167,68 +20034,6 @@ Only defined if symbolic scalar.
 Operations called by the corresponding friend functions, MATLAB naming
 convention
 
-";
-
-%feature("docstring") casadi::Matrix::Matrix "
-
->  array(DataType) .Matrix()
-------------------------------------------------------------------------
-
-constructors
-
-empty 0-by-0 matrix constructor
-
->  array(DataType) .Matrix(array(DataType) m)
-------------------------------------------------------------------------
-
-Copy constructor.
-
->  array(DataType) .Matrix(int nrow, int ncol)
-------------------------------------------------------------------------
-
-Create a sparse matrix with all structural zeros.
-
->  array(DataType) .Matrix(Sparsity sp)
-------------------------------------------------------------------------
-
-Create a sparse matrix from a sparsity pattern. Same as
-Matrix::ones(sparsity)
-
->  array(DataType) .Matrix(Sparsity sp, array(DataType) d)
-------------------------------------------------------------------------
-
-Construct matrix with a given sparsity and nonzeros.
-
->  array(DataType) .Matrix(double val)
-------------------------------------------------------------------------
-
-This constructor enables implicit type conversion from a numeric type.
-
->  array(DataType) .Matrix([[double ] ] m)
-------------------------------------------------------------------------
-
-Dense matrix constructor with data given as vector of vectors.
-
->  array(DataType) .Matrix(array(A) x)
-------------------------------------------------------------------------
-
-Create a matrix from another matrix with a different entry type Assumes that
-the scalar conversion is valid.
-
->  array(DataType) .Matrix([A ] x)
-------------------------------------------------------------------------
-
-Create an expression from a vector.
-
->  array(DataType) .Matrix([DataType ] x)
-
->  array(DataType) .Matrix((int,int) rc)
-
->  array(DataType) .Matrix(Sparsity sp, DataType val, bool dummy)
-
->  array(DataType) .Matrix(Sparsity sp, [DataType ] d, bool dummy)
-------------------------------------------------------------------------
-[INTERNAL] 
 ";
 
 %feature("docstring") casadi::Matrix::row "
@@ -20258,9 +20063,9 @@ zero.
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_ne "
+%feature("docstring") casadi::Matrix::isvector "
 
-Functions called by the corresponding friend functions MATLAB naming
+Check if the matrix is a row or column vector.
 
 ";
 
@@ -20345,20 +20150,6 @@ Checks if expression does not contain NaN or Inf.
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_cos "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring") casadi::Matrix::zz_tanh "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring") casadi::Matrix::__constpow__ "
 
 Functions called by the corresponding friend functions MATLAB naming
@@ -20374,13 +20165,6 @@ Check if the matrix is lower triangular.
 %feature("docstring") casadi::Matrix::istriu "
 
 Check if the matrix is upper triangular.
-
-";
-
-%feature("docstring") casadi::Matrix::zz_tan "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -20448,13 +20232,6 @@ create a matrix with all nan
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_or "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring") casadi::Matrix::zz_tril2symm "
 
 Accessed by friend functions.
@@ -20496,13 +20273,6 @@ Get the shape.
 ------------------------------------------------------------------------
 
 Get the size along a particular dimensions.
-
-";
-
-%feature("docstring") casadi::Matrix::zz_min "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -20595,13 +20365,6 @@ Functions called by the corresponding friend functions MATLAB naming
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_max "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring") casadi::Matrix::zz_jacobian "
 
 Functions called by the corresponding friend functions MATLAB naming
@@ -20626,12 +20389,6 @@ Functions called by the corresponding friend functions MATLAB naming
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_lt "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
 %feature("docstring") casadi::Matrix::getColind "
 
 Get the sparsity pattern. See the Sparsity class for details.
@@ -20650,7 +20407,7 @@ Check if symbolic (Dense) Sparse matrices invariable return false.
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_acos "
+%feature("docstring") casadi::Matrix::zz_nullspace "
 
 Operations called by the corresponding friend functions, MATLAB naming
 convention
@@ -20669,13 +20426,17 @@ Accessed by friend functions.
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_power "
+%feature("docstring") casadi::Matrix::zz_diagsplit "
 
-Functions called by the corresponding friend functions MATLAB naming
+>  [array(DataType)  ] array(DataType) .zz_diagsplit([int ] offset1, [int ] offset2) const 
+------------------------------------------------------------------------
+
+Operations called by the corresponding friend functions, MATLAB naming
+convention
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_le "
+%feature("docstring") casadi::Matrix::zz_conditional "
 
 Functions called by the corresponding friend functions MATLAB naming
 
@@ -20687,29 +20448,9 @@ Functions called by the corresponding friend functions MATLAB naming
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_abs "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring") casadi::Matrix::zz_minus "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
 %feature("docstring") casadi::Matrix::zz_symvar "
 
 Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring") casadi::Matrix::zz_log10 "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -20720,13 +20461,6 @@ Functions called by the corresponding friend functions MATLAB naming
 ";
 
 %feature("docstring") casadi::Matrix::zz_not "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring") casadi::Matrix::zz_sign "
 
 Operations called by the corresponding friend functions, MATLAB naming
 convention
@@ -20752,13 +20486,6 @@ Get name (only if symbolic scalar)
 ";
 
 %feature("docstring") casadi::Matrix::printme "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring") casadi::Matrix::zz_atan2 "
 
 Operations called by the corresponding friend functions, MATLAB naming
 convention
@@ -20830,11 +20557,66 @@ streams.
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_cosh "
+%feature("docstring") casadi::Matrix::Matrix "
 
-Operations called by the corresponding friend functions, MATLAB naming
-convention
+>  array(DataType) .Matrix()
+------------------------------------------------------------------------
 
+constructors
+
+empty 0-by-0 matrix constructor
+
+>  array(DataType) .Matrix(array(DataType) m)
+------------------------------------------------------------------------
+
+Copy constructor.
+
+>  array(DataType) .Matrix(int nrow, int ncol)
+------------------------------------------------------------------------
+
+Create a sparse matrix with all structural zeros.
+
+>  array(DataType) .Matrix(Sparsity sp)
+------------------------------------------------------------------------
+
+Create a sparse matrix from a sparsity pattern. Same as
+Matrix::ones(sparsity)
+
+>  array(DataType) .Matrix(Sparsity sp, array(DataType) d)
+------------------------------------------------------------------------
+
+Construct matrix with a given sparsity and nonzeros.
+
+>  array(DataType) .Matrix(double val)
+------------------------------------------------------------------------
+
+This constructor enables implicit type conversion from a numeric type.
+
+>  array(DataType) .Matrix([[double ] ] m)
+------------------------------------------------------------------------
+
+Dense matrix constructor with data given as vector of vectors.
+
+>  array(DataType) .Matrix(array(A) x)
+------------------------------------------------------------------------
+
+Create a matrix from another matrix with a different entry type Assumes that
+the scalar conversion is valid.
+
+>  array(DataType) .Matrix([A ] x)
+------------------------------------------------------------------------
+
+Create an expression from a vector.
+
+>  array(DataType) .Matrix([DataType ] x)
+
+>  array(DataType) .Matrix((int,int) rc)
+
+>  array(DataType) .Matrix(Sparsity sp, DataType val, bool dummy)
+
+>  array(DataType) .Matrix(Sparsity sp, [DataType ] d, bool dummy)
+------------------------------------------------------------------------
+[INTERNAL] 
 ";
 
 %feature("docstring") casadi::Matrix::getElementHash "
@@ -20842,12 +20624,6 @@ convention
 Returns a number that is unique for a given symbolic scalar.
 
 Only defined if symbolic scalar.
-
-";
-
-%feature("docstring") casadi::Matrix::zz_eq "
-
-Functions called by the corresponding friend functions MATLAB naming
 
 ";
 
@@ -20912,12 +20688,6 @@ convention
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_conditional "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
 %feature("docstring") casadi::Matrix::matrix_matrix "[INTERNAL]  Create
 nodes by their ID.
 
@@ -20941,22 +20711,9 @@ Get get the number of non-zeros on the diagonal.
 
 ";
 
-%feature("docstring") casadi::Matrix::sizeU "
-
-Get the number of non-zeros in the upper triangular half.
-
-";
-
 %feature("docstring") casadi::Matrix::zz_hessian "
 
 Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring") casadi::Matrix::zz_mod "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -20976,13 +20733,6 @@ Construct a matrix with given block on the diagonal.
 %feature("docstring") casadi::Matrix::sizeL "
 
 Get the number of non-zeros in the lower triangular half.
-
-";
-
-%feature("docstring") casadi::Matrix::zz_sin "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -21006,9 +20756,10 @@ convention
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_times "
+%feature("docstring") casadi::Matrix::zz_solve "
 
-Functions called by the corresponding friend functions MATLAB naming
+Operations called by the corresponding friend functions, MATLAB naming
+convention
 
 ";
 
@@ -21019,9 +20770,9 @@ convention
 
 ";
 
-%feature("docstring") casadi::Matrix::zz_simplify "
+%feature("docstring") casadi::Matrix::sizeU "
 
-Functions called by the corresponding friend functions MATLAB naming
+Get the number of non-zeros in the upper triangular half.
 
 ";
 
@@ -21029,12 +20780,6 @@ Functions called by the corresponding friend functions MATLAB naming
 
 Operations called by the corresponding friend functions, MATLAB naming
 convention
-
-";
-
-%feature("docstring") casadi::Matrix::printDense "
-
-Print dense matrix-stype.
 
 ";
 
@@ -21082,7 +20827,7 @@ Is unary operation.
 
 %feature("docstring") casadi::MX::__constpow__ "";
 
-%feature("docstring") casadi::MX::zz_asinh "";
+%feature("docstring") casadi::MX::zz_hessian "";
 
 %feature("docstring") casadi::MX::sizeL "
 
@@ -21149,8 +20894,6 @@ point to this new object
 
 %feature("docstring") casadi::MX::__copysign__ "";
 
-%feature("docstring") casadi::MX::zz_sin "";
-
 %feature("docstring") casadi::MX::erase "
 
 >  void MX.erase([int ] rr, [int ] cc, bool ind1=false)
@@ -21168,14 +20911,6 @@ a matrix.
 ";
 
 %feature("docstring") casadi::MX::zz_mldivide "";
-
-%feature("docstring") casadi::MX::zz_ceil "";
-
-%feature("docstring") casadi::MX::zz_plus "
-
-all binary operations
-
-";
 
 %feature("docstring") casadi::MX::zz_reshape "";
 
@@ -21203,10 +20938,6 @@ returns itself, but with an assertion attached
 If y does not evaluate to 1, a runtime error is raised
 
 ";
-
-%feature("docstring") casadi::MX::zz_mod "";
-
-%feature("docstring") casadi::MX::zz_log10 "";
 
 %feature("docstring") casadi::MX::append "
 
@@ -21241,22 +20972,15 @@ Set a submatrix, single argument
 
 ";
 
-%feature("docstring") casadi::MX::mapping "
-
-Get an IMatrix representation of a GetNonzeros or SetNonzeros node.
-
-";
-
 %feature("docstring") casadi::MX::getTemp "[INTERNAL]  Get the temporary
 variable
 
 ";
 
-%feature("docstring") casadi::MX::hasDuplicates "[INTERNAL]  Detect
-duplicate symbolic expressions If there are symbolic primitives appearing
-more than once, the function will return true and the names of the duplicate
-expressions will be printed to userOut<true, PL_WARN>(). Note: Will mark the
-node using MX::setTemp. Make sure to call resetInput() after usage.
+%feature("docstring") casadi::MX::zeros "
+
+Create a dense matrix or a matrix with specified sparsity with all entries
+zero.
 
 ";
 
@@ -21266,17 +20990,11 @@ Create nodes by their ID.
 
 ";
 
-%feature("docstring") casadi::MX::zz_and "";
-
 %feature("docstring") casadi::MX::sparsity "
 
 Get the sparsity pattern.
 
 ";
-
-%feature("docstring") casadi::MX::zz_cos "";
-
-%feature("docstring") casadi::MX::zz_tanh "";
 
 %feature("docstring") casadi::MX::size2 "
 
@@ -21290,11 +21008,6 @@ Get the first dimension (i.e. number of rows)
 
 ";
 
-%feature("docstring") casadi::MX::assertInit "[INTERNAL]  Assert that it is
-initialized
-
-";
-
 %feature("docstring") casadi::MX::zz_symvar "";
 
 %feature("docstring") casadi::MX::zz_gradient "";
@@ -21305,13 +21018,15 @@ Check if multiplication.
 
 ";
 
-%feature("docstring") casadi::MX::zz_minus "";
-
 %feature("docstring") casadi::MX::~MX "[INTERNAL]  Destructor.
 
 ";
 
-%feature("docstring") casadi::MX::zz_mpower "";
+%feature("docstring") casadi::MX::isConstant "
+
+Check if constant.
+
+";
 
 %feature("docstring") casadi::MX::isscalar "
 
@@ -21325,7 +21040,11 @@ Accessed by friend functions.
 
 ";
 
-%feature("docstring") casadi::MX::zz_erf "";
+%feature("docstring") casadi::MX::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
 
 %feature("docstring") casadi::MX::zz_sum_square "
 
@@ -21339,7 +21058,7 @@ Check if the matrix is a row vector (i.e. size1()==1)
 
 ";
 
-%feature("docstring") casadi::MX::zz_ne "";
+%feature("docstring") casadi::MX::zz_repmat "";
 
 %feature("docstring") casadi::MX::sizeU "
 
@@ -21359,7 +21078,11 @@ Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::MX::zz_asin "";
+%feature("docstring") casadi::MX::mapping "
+
+Get an IMatrix representation of a GetNonzeros or SetNonzeros node.
+
+";
 
 %feature("docstring") casadi::MX::isInit "
 
@@ -21373,8 +21096,6 @@ Is initialized?
 instead
 
 ";
-
-%feature("docstring") casadi::MX::zz_hessian "";
 
 %feature("docstring") casadi::MX::zz_gt "
 
@@ -21394,10 +21115,6 @@ Create a dense matrix or a matrix with specified sparsity with all entries
 one.
 
 ";
-
-%feature("docstring") casadi::MX::zz_repmat "";
-
-%feature("docstring") casadi::MX::zz_sinh "";
 
 %feature("docstring") casadi::MX::zz_vecNZ "";
 
@@ -21447,8 +21164,6 @@ create a matrix with all inf
 
 %feature("docstring") casadi::MX::zz_norm_1 "";
 
-%feature("docstring") casadi::MX::zz_isEqual "";
-
 %feature("docstring") casadi::MX::getColind "
 
 Get the sparsity pattern. See the Sparsity class for details.
@@ -21491,7 +21206,7 @@ Get the nth dependency as MX.
 
 ";
 
-%feature("docstring") casadi::MX::zz_times "";
+%feature("docstring") casadi::MX::zz_mtimes "";
 
 %feature("docstring") casadi::MX::zz_ge "
 
@@ -21499,15 +21214,11 @@ No need to have both <= and >=.
 
 ";
 
-%feature("docstring") casadi::MX::zz_sign "";
-
 %feature("docstring") casadi::MX::isvector "
 
 Check if the matrix is a row or column vector.
 
 ";
-
-%feature("docstring") casadi::MX::zz_atan "";
 
 %feature("docstring") casadi::MX::zz_not "";
 
@@ -21543,10 +21254,6 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
-%feature("docstring") casadi::MX::zz_rdivide "";
-
-%feature("docstring") casadi::MX::zz_mtimes "";
-
 %feature("docstring") casadi::MX::isZero "
 
 check if zero (note that false negative answers are possible)
@@ -21570,7 +21277,7 @@ true.
 
 %feature("docstring") casadi::MX::zz_jacobian "";
 
-%feature("docstring") casadi::MX::zz_power "";
+%feature("docstring") casadi::MX::zz_substitute "";
 
 %feature("docstring") casadi::MX::appendColumns "
 
@@ -21605,12 +21312,7 @@ Get an output.
 
 ";
 
-%feature("docstring") casadi::MX::zeros "
-
-Create a dense matrix or a matrix with specified sparsity with all entries
-zero.
-
-";
+%feature("docstring") casadi::MX::zz_if_else_zero "";
 
 %feature("docstring") casadi::MX::makeDense "
 
@@ -21632,8 +21334,6 @@ See:   nnz()
 Transpose the matrix.
 
 ";
-
-%feature("docstring") casadi::MX::zz_atanh "";
 
 %feature("docstring") casadi::MX::printme "";
 
@@ -21657,7 +21357,7 @@ create a matrix with all nan
 
 ";
 
-%feature("docstring") casadi::MX::zz_or "";
+%feature("docstring") casadi::MX::zz_sumRows "";
 
 %feature("docstring") casadi::MX::isTranspose "
 
@@ -21675,12 +21375,6 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 %feature("docstring") casadi::MX::zz_horzsplit "";
 
-%feature("docstring") casadi::MX::getRepresentation "
-
-Return a string with a representation (for SWIG)
-
-";
-
 %feature("docstring") casadi::MX::zz_diagsplit "";
 
 %feature("docstring") casadi::MX::isCommutative "
@@ -21688,8 +21382,6 @@ Return a string with a representation (for SWIG)
 Check if commutative operation.
 
 ";
-
-%feature("docstring") casadi::MX::zz_log "";
 
 %feature("docstring") casadi::MX::iscolumn "
 
@@ -21716,8 +21408,6 @@ Get the number of elements.
 Get the number of elements in slice (cf. MATLAB)
 
 ";
-
-%feature("docstring") casadi::MX::zz_eq "";
 
 %feature("docstring") casadi::MX::enlarge "
 
@@ -21770,17 +21460,9 @@ symbolic primitives.
 
 %feature("docstring") casadi::MX::zz_norm_inf "";
 
-%feature("docstring") casadi::MX::zz_if_else_zero "";
-
 %feature("docstring") casadi::MX::setNZ "
 
 Set a set of nonzeros
-
-";
-
-%feature("docstring") casadi::MX::isSymbolic "
-
-Check if symbolic.
 
 ";
 
@@ -21818,8 +21500,6 @@ Get a submatrix, two arguments
 
 %feature("docstring") casadi::MX::zz_tangent "";
 
-%feature("docstring") casadi::MX::zz_abs "";
-
 %feature("docstring") casadi::MX::repr "
 
 Print a representation of the object.
@@ -21837,10 +21517,6 @@ Get function.
 Number of functions.
 
 ";
-
-%feature("docstring") casadi::MX::zz_vec "";
-
-%feature("docstring") casadi::MX::zz_acos "";
 
 %feature("docstring") casadi::MX::zz_trace "";
 
@@ -21863,8 +21539,6 @@ Check if the matrix is lower triangular.
 
 ";
 
-%feature("docstring") casadi::MX::zz_acosh "";
-
 %feature("docstring") casadi::MX::isempty "
 
 Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
@@ -21874,17 +21548,7 @@ optionally both dimensions)
 
 %feature("docstring") casadi::MX::zz_countNodes "";
 
-%feature("docstring") casadi::MX::isNull "
-
-Is a null pointer?
-
-";
-
-%feature("docstring") casadi::MX::zz_atan2 "";
-
-%feature("docstring") casadi::MX::zz_tan "";
-
-%feature("docstring") casadi::MX::zz_cosh "";
+%feature("docstring") casadi::MX::zz_vec "";
 
 %feature("docstring") casadi::MX::zz_project "
 
@@ -21898,7 +21562,7 @@ Check if the matrix is upper triangular.
 
 ";
 
-%feature("docstring") casadi::MX::zz_floor "";
+%feature("docstring") casadi::MX::zz_sumCols "";
 
 %feature("docstring") casadi::MX::MX "
 
@@ -21950,8 +21614,6 @@ Get the number of symbolic primitive Assumes isValidInput() returns true.
 
 ";
 
-%feature("docstring") casadi::MX::zz_sumRows "";
-
 %feature("docstring") casadi::MX::isBinary "
 
 Is binary operation.
@@ -21965,8 +21627,6 @@ Is binary operation.
 Get operation type.
 
 ";
-
-%feature("docstring") casadi::MX::zz_sumCols "";
 
 %feature("docstring") casadi::MX::zz_erfinv "";
 
@@ -21983,11 +21643,10 @@ Check if norm.
 
 ";
 
-%feature("docstring") casadi::MX::zz_max "";
+%feature("docstring") casadi::MX::assertInit "[INTERNAL]  Assert that it is
+initialized
 
-%feature("docstring") casadi::MX::zz_sqrt "";
-
-%feature("docstring") casadi::MX::zz_min "";
+";
 
 %feature("docstring") casadi::MX::setTemp "[INTERNAL]  Set the temporary
 variable.
@@ -22006,11 +21665,7 @@ Get the value (only for constant nodes)
 
 ";
 
-%feature("docstring") casadi::MX::isConstant "
-
-Check if constant.
-
-";
+%feature("docstring") casadi::MX::zz_mpower "";
 
 %feature("docstring") casadi::MX::splitPrimitives "
 
@@ -22072,9 +21727,11 @@ Get the number of dependencies of a binary SXElement.
 
 %feature("docstring") casadi::MX::zz_if_else "";
 
-%feature("docstring") casadi::MX::zz_lt "";
+%feature("docstring") casadi::MX::isSymbolic "
 
-%feature("docstring") casadi::MX::zz_substitute "";
+Check if symbolic.
+
+";
 
 %feature("docstring") casadi::MX::issquare "
 
@@ -22082,13 +21739,13 @@ Check if the matrix expression is square.
 
 ";
 
-%feature("docstring") casadi::MX::zz_simplify "";
+%feature("docstring") casadi::MX::isNull "
+
+Is a null pointer?
+
+";
 
 %feature("docstring") casadi::MX::zz_vertsplit "";
-
-%feature("docstring") casadi::MX::zz_le "";
-
-%feature("docstring") casadi::MX::zz_exp "";
 
 %feature("docstring") casadi::MX::unary "
 
@@ -22097,6 +21754,14 @@ Create nodes by their ID.
 ";
 
 %feature("docstring") casadi::MX::zz_pinv "";
+
+%feature("docstring") casadi::MX::hasDuplicates "[INTERNAL]  Detect
+duplicate symbolic expressions If there are symbolic primitives appearing
+more than once, the function will return true and the names of the duplicate
+expressions will be printed to userOut<true, PL_WARN>(). Note: Will mark the
+node using MX::setTemp. Make sure to call resetInput() after usage.
+
+";
 
 
 // File: classcasadi_1_1MXFunction.xml
