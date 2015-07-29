@@ -218,3 +218,136 @@
    fun:dlopen@@GLIBC_2.2.5
    fun:_ZN6casadi15PluginInterfaceINS_16QpSolverInternalEE10loadPluginERKSs
 }
+
+{
+   Mysterious error in sdp
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_PyImport_GetDynLoadFunc
+   fun:_PyImport_LoadDynamicModule
+   fun:import_submodule.lto_priv.1588
+   fun:ensure_fromlist.lto_priv.1420
+}
+
+{
+   Error in mosek (bis)
+   Memcheck:Cond
+   ...
+   fun:MSK_*
+}
+
+{
+   Error in mosek (2)
+   Memcheck:Addr16
+   fun:__intel_sse2_str*
+   ...
+   obj:*socpsolver_mosek*
+}
+
+
+{
+   Error in mosek (3)
+   Memcheck:Addr16
+   fun:__intel_sse2_str*
+   ...
+   fun:*MosekSocpInterface*
+}
+
+{
+   Error in mosek (3bis)
+   Memcheck:Addr4
+   fun:__intel_sse2_str*
+   ...
+   fun:*MosekSocpInterface*
+}
+
+{
+   Error in mosek (4)
+   Memcheck:Addr16
+   fun:MSK_strlength
+}
+
+
+{
+   Error in mosek (5)
+   Memcheck:Addr16
+   fun:MSKP_strdupenv
+   ...
+   fun:*MosekSocpInterface*
+}
+
+{
+   Error in mosek (6)
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   fun:defaultcalloc
+   fun:MSK_memman_calloc
+   fun:bufenv_make
+   fun:MSK_maketask
+   fun:_ZN6casadi18MosekSocpInterface4initEv
+}
+
+{
+   Error in mosek (7)
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   fun:defaultcalloc
+   fun:MSK_memman_calloc
+   fun:MSK_StreamBuffer_new
+   fun:MSK_initstreamsenv
+   fun:MSK_makeenvalloc
+   fun:MSK_makeenv
+   fun:_ZN6casadi18MosekSocpInterface4initEv
+}
+
+{
+   Error in mosek (6bis)
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:defaultmalloc
+   fun:MSK_memman_malloc
+   fun:bufenv_make
+   fun:MSK_maketask
+   fun:_ZN6casadi18MosekSocpInterface4initEv
+}
+
+{
+   Error in mosek (7bis)
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:defaultmalloc
+   fun:MSK_memman_malloc
+   fun:MSK_StreamBuffer_new
+   fun:MSK_initstreamsenv
+   fun:MSK_makeenvalloc
+   fun:MSK_makeenv
+   fun:_ZN6casadi18MosekSocpInterface4initEv
+}
+
+{
+   Error in worhp -- suspicious since nlp passes without this
+   Memcheck:Cond
+   ...
+   obj:*worhp*
+}
+
+
+{
+   Scipy issues
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   obj:*sparsetools*
+}
