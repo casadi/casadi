@@ -723,6 +723,15 @@
 */
 /// \endcond
 /// \cond INTERNAL
+/** \class casadi::EcosInterface
+\n
+\par
+@copydoc scheme_SOCPInput
+<br/>
+@copydoc scheme_SOCPOutput
+*/
+/// \endcond
+/// \cond INTERNAL
 /** \class casadi::FixedSmithDleInternal
 \n
 \par
