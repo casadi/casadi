@@ -184,6 +184,7 @@ namespace casadi {
     idxint l        = dim_pos_orthant;
     idxint ncones   = m_;
     idxint* q       = &ecos_q_vec_[0];
+    idxint nex      = 0;
     pfloat* Gpr     = &ecos_Gpr_vec_[0];
     idxint* Gjc     = &ecos_Gjc_vec_[0];
     idxint* Gir     = &ecos_Gir_vec_[0];
@@ -197,7 +198,13 @@ namespace casadi {
 
     // Setup ECOS for new problem based on problem definition. We should be able to place
     // this in init(), it requires ECOS to do a re-initialize.
-    pwork* ecos_work =  ECOS_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir, Apr, Ajc, Air, c, h, b);
+#ifdef EXPCONE
+    pwork* ecos_work =  ECOS_setup(n, m, p, l, ncones, q, nex, Gpr, Gjc, Gir, 
+                Apr, Ajc, Air, c, h, b);
+#else // EXPCONE
+    pwork* ecos_work =  ECOS_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir, 
+                Apr, Ajc, Air, c, h, b);
+#endif // EXPCONE
 
     // Pass all options to ECOS
     int temp_nitref = getOption("nitref");
@@ -243,7 +250,7 @@ namespace casadi {
     for (int i=0;i<primal_idx_uba_.size();++i) {
       k = primal_idx_uba_[i];
       if (std::abs(output(SOCP_SOLVER_LAM_A).data()[k]) < dual_sol[idx])
-                output(SOCP_SOLVER_LAM_A).data()[k] = dual_sol[idx];
+                output(SOCP_SOLVER_LAM_A).data()[k] += dual_sol[idx];
       idx += 1;
     }
     for (int i=0;i<primal_idx_lbx_.size();++i) {
@@ -254,7 +261,7 @@ namespace casadi {
     for (int i=0;i<primal_idx_ubx_.size();++i) {
       k = primal_idx_ubx_[i];
       if (std::abs(output(SOCP_SOLVER_LAM_X).data()[k]) < dual_sol[idx])
-                output(SOCP_SOLVER_LAM_X).data()[k] = dual_sol[idx];
+                output(SOCP_SOLVER_LAM_X).data()[k] += dual_sol[idx];
       idx += 1;
     }
 

@@ -60,7 +60,7 @@ if QpSolver.hasPlugin("qcqp.socp.mosek"):
   qpsolvers.append(("qcqp.socp.mosek",{"qcqp_solver_options.socp_solver_options": {"MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10}},{"less_digits": 3}))
 
 if QpSolver.hasPlugin("qcqp.socp.ecos"):
-  qpsolvers.append(("qcqp.socp.ecos",{"qcqp_solver_options.socp_solver_options": {"reltol":1e-11,"abstol":1e-11}},{"less_digits": 1}))
+  qpsolvers.append(("qcqp.socp.ecos",{"qcqp_solver_options.socp_solver_options": {"reltol":1e-10,"abstol":1e-10}},{"less_digits": 2}))
 
 print qpsolvers
 
@@ -424,8 +424,7 @@ class QpSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput()[0],0.5,max(1,6-less_digits),str(qpsolver))
       self.assertAlmostEqual(solver.getOutput()[1],1.25,max(1,6-less_digits),str(qpsolver))
 
-      if 'ecos' not in str(qpsolver):    
-          self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,max(1,6-less_digits),str(qpsolver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsolver))
 
       self.checkarray(solver.getOutput("lam_a"),DMatrix([0,2,0]),str(qpsolver),digits=max(1,6-less_digits))
@@ -456,8 +455,7 @@ class QpSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,5-less_digits),str(qpsolver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,5-less_digits),str(qpsolver))
 
-      if 'ecos' not in str(qpsolver):
-          self.checkarray(solver.getOutput("lam_a"),DMatrix([3.2,0,0]),str(qpsolver),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([3.2,0,0]),str(qpsolver),digits=max(1,5-less_digits))
        
       self.assertAlmostEqual(solver.getOutput("cost")[0],-8.4,max(1,5-less_digits),str(qpsolver))
 
@@ -562,8 +560,7 @@ class QpSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsolver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsolver))
 
-      if 'ecos' not in str(qpsolver):
-        self.checkarray(solver.getOutput("lam_a"),DMatrix([3.5]),str(qpsolver),digits=max(1,6-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([3.5]),str(qpsolver),digits=max(1,6-less_digits))
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],-3.375,max(1,6-less_digits),str(qpsolver))
 
