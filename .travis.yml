@@ -56,7 +56,7 @@ matrix:
         - popd
         - sudo apt-get install valgrind -y
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test/python && ls -1 [m-z]*.py | grep -v helpers.py | xargs rm && popd
+        - pushd test/python && ls -1 [a-m]*.py | grep -v helpers.py | xargs rm && popd
         - pushd test && make unittests_py_valgrind && popd
     - compiler: gcc
       os: linux
