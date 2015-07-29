@@ -75,6 +75,11 @@ namespace casadi {
 
   private:
 
+    /** Get string representation of ECOS exit code */
+    const std::string exitCode(const idxint& retval) const;
+    /** Get string representation of the explanation of ECOS exit code */
+    const std::string exitCodeLong(const idxint& retval) const;
+
     /// Static ECOS input: G
     std::vector<pfloat> ecos_Gpr_vec_;
     std::vector<idxint> ecos_Gjc_vec_;
@@ -90,8 +95,11 @@ namespace casadi {
     /// Static ECOS input: q
     std::vector<idxint> ecos_q_vec_;
 
-    /// ECOS input: c
+    /// Static-size ECOS input: c
     std::vector<pfloat> ecos_c_vec_;
+
+    /// Static-size ECOS input: b
+    std::vector<pfloat> ecos_b_vec_;
 
   };
 

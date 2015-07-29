@@ -70,22 +70,16 @@ namespace casadi {
     /** \brief Solve the SOCP */
     virtual void evaluate();
 
-    /** Get termination reason from flag */
-    static const char* terminationReason(int flag);
-
-    /** Get solution type from flag */
-    static const char* solutionType(int flag);
-
     /// A documentation string
     static const std::string meta_doc;
 
   private:
 
     /** Get solution status from MOSEK solsta value */
-    std::string solutionStatus(MSKsolstae& solsta);
+    const std::string solutionStatus(const MSKsolstae& solsta) const;
 
     /** Get problem status from MOSEK prosta value */
-    std::string problemStatus(MSKprostae& prosta);
+    const std::string problemStatus(const MSKprostae& prosta) const;
 
     /** MOSEK variables */
     MSKenv_t   mosek_env_;

@@ -117,14 +117,6 @@ namespace casadi {
     }
   }
 
-  const char* MosekSocpInterface::terminationReason(int flag) {
-
-  }
-
-  const char* MosekSocpInterface::solutionType(int flag) {
-
-  }
-
   void MosekSocpInterface::init() {
     // Initialize the base classes
     SocpSolverInternal::init();
@@ -199,7 +191,7 @@ namespace casadi {
     dual_A_colind_ = dual_A_DMatrix.sparsity().getColind();
     // Reserve memory for maximum size of dual_A_
     int sizeof_A = input(SOCP_SOLVER_E).size() + input(SOCP_SOLVER_G).size() +
-                     2*input(SOCP_SOLVER_A).size()+2*n_;
+                2*input(SOCP_SOLVER_A).size()+2*n_;
     dual_A_data_.reserve(sizeof_A);
     dual_A_row_.reserve(sizeof_A);
     dual_A_colind_.reserve(m_+N_+2*nc_+2*n_+1);
@@ -274,8 +266,8 @@ namespace casadi {
     output(SOCP_SOLVER_COST).set(primal_objective);
     output(SOCP_SOLVER_DUAL_COST).set(dual_objective);
     // Change sign of primal solution
-    std::for_each(output(SOCP_SOLVER_X).data().begin(), output(SOCP_SOLVER_X).data().end(),
-                    [](double& in){in=-in;});
+    for (int i=0;i<n_;++i)
+                output(SOCP_SOLVER_X).data()[i] = -output(SOCP_SOLVER_X).data()[i];
     // Interpret dual solution
     std::copy(dual_solution.begin(), dual_solution.begin()+m_,
                 output(SOCP_SOLVER_LAM_CONE).data().begin());
@@ -284,22 +276,27 @@ namespace casadi {
     std::fill(output(SOCP_SOLVER_LAM_X).begin(), output(SOCP_SOLVER_LAM_X).end(), 0);
     // Cycle through solution vector to attain Lagrange multipliers
     int idx = m_+N_;
-    for (int i : primal_idx_lba_) {
-      output(SOCP_SOLVER_LAM_A).data()[i] = -dual_solution[idx];
+    int k;
+    for (int i=0;i<primal_idx_lba_.size();++i) {
+      k = primal_idx_lba_[i];
+      output(SOCP_SOLVER_LAM_A).data()[k] = -dual_solution[idx];
       idx += 1;
     }
-    for (int i : primal_idx_uba_) {
-      if (std::abs(output(SOCP_SOLVER_LAM_A).data()[i]) < dual_solution[idx])
-            output(SOCP_SOLVER_LAM_A).data()[i] = dual_solution[idx];
+    for (int i=0;i<primal_idx_uba_.size();++i) {
+      k = primal_idx_uba_[i];
+      if (std::abs(output(SOCP_SOLVER_LAM_A).data()[k]) < dual_solution[idx])
+                output(SOCP_SOLVER_LAM_A).data()[k] = dual_solution[idx];
       idx += 1;
     }
-    for (int i : primal_idx_lbx_) {
-      output(SOCP_SOLVER_LAM_X).data()[i] = -dual_solution[idx];
+    for (int i=0;i<primal_idx_lbx_.size();++i) {
+      k = primal_idx_lbx_[i];
+      output(SOCP_SOLVER_LAM_X).data()[k] = -dual_solution[idx];
       idx += 1;
     }
-    for (int i : primal_idx_ubx_) {
-      if (std::abs(output(SOCP_SOLVER_LAM_X).data()[i]) < dual_solution[idx])
-            output(SOCP_SOLVER_LAM_X).data()[i] = dual_solution[idx];
+    for (int i=0;i<primal_idx_ubx_.size();++i) {
+      k = primal_idx_ubx_[i];
+      if (std::abs(output(SOCP_SOLVER_LAM_X).data()[k]) < dual_solution[idx])
+                output(SOCP_SOLVER_LAM_X).data()[k] = dual_solution[idx];
       idx += 1;
     }
 
@@ -318,7 +315,7 @@ namespace casadi {
 
   }
 
-  std::string MosekSocpInterface::solutionStatus(MSKsolstae& solsta) {
+  const std::string MosekSocpInterface::solutionStatus(const MSKsolstae& solsta) const {
     std::string solution_status;
     switch (solsta) {
       case MSK_SOL_STA_OPTIMAL:
@@ -348,7 +345,7 @@ namespace casadi {
     return solution_status;
   }
 
-  std::string MosekSocpInterface::problemStatus(MSKprostae& prosta) {
+  const std::string MosekSocpInterface::problemStatus(const MSKprostae& prosta) const {
     std::string problem_status;
     switch (prosta) {
       case MSK_PRO_STA_PRIM_AND_DUAL_FEAS:

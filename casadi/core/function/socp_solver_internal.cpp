@@ -322,7 +322,8 @@ namespace casadi {
     std::copy(primal_C.data().begin(), primal_C.data().end(), dual_b_.begin());
 
     // some properties of dual problem
-    dual_n_ = m_ + N_ + primal_idx_lba_.size() + primal_idx_uba_.size() + primal_idx_lbx_.size() + primal_idx_ubx_.size();
+    dual_n_ = m_ + N_ + primal_idx_lba_.size() + primal_idx_uba_.size() +
+                primal_idx_lbx_.size() + primal_idx_ubx_.size();
     dual_nc_ = n_;
 
   }
