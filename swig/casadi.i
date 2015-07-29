@@ -366,16 +366,12 @@ Type __r##uname##__(const Type& b) const{ return b.##uname##(*$self);}
 Type r##uname##(const Type& b) const{ return b.##uname##(*$self);}
 
 %define binopsrFull(Type)
-Type __rpow__(const Type& b) const{ return pow(b, *$self);}
 memberbinopsr(Type,truediv)
 Type __rmldivide__(const Type& b) const{ return b.zz_mldivide(*$self);}
 Type __rmrdivide__(const Type& b) const{ return b.zz_mrdivide(*$self);}
 Type __rmpower__(const Type& b) const{ return b.zz_mpower(*$self);}
 memberbinopsr(Type,constpow)
-Type __rfmin__(const Type& b) const { return fmin(b, *$self);}
-Type __rfmax__(const Type& b) const { return fmax(b, *$self);}
 Type rmul(const Type& b) const{ return b.zz_mtimes(*$self);}
-Type __rarctan2__(const Type& b) const{ return b.zz_atan2(*$self);}
 memberbinopsr(Type,copysign)
 %enddef
 
@@ -393,20 +389,9 @@ returntype __r##uname##__(argtype) const{ return argCast(b) ##custom## selfCast(
 returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*$self));}
 %enddef
 
-// These methods must be added since the implicit type cast does not work.
-// Consider a+b  with a DMatrix and b SX
-// In C++, operator+(SX,SX) will be called (implicit cast)
-// In python, __array_priority__ will be checked and b.__radd__(a) will be called (effectively implicit casting)
-
-// This is a list of all operators:
 %define binopsFull(argtype,argCast,selfCast,returntype)
-returntype __rfmin__(argtype) const { return fmin(argCast(b), selfCast(*$self));}
-returntype __rfmax__(argtype) const { return fmax(argCast(b), selfCast(*$self));}
 memberbinops(constpow,argtype,argCast,selfCast,returntype)
-returntype __rarctan2__(argtype) const{ return argCast(b).zz_atan2(selfCast(*$self));}
 memberbinops(copysign,argtype,argCast,selfCast,returntype)
-returntype __pow__ (argtype) const { return selfCast(*$self).zz_power(argCast(b));}
-returntype __rpow__(argtype) const { return argCast(b).zz_power(selfCast(*$self));}
 returntype mul (argtype) const{ return mul(selfCast(*$self) , argCast(b));}
 returntype rmul (argtype) const{ return mul(argCast(b) , selfCast(*$self));}
 memberbinops(truediv,argtype,argCast,selfCast,returntype)
@@ -416,12 +401,6 @@ returntype __mrdivide__ (argtype) const{ return mrdivide(selfCast(*$self), argCa
 returntype __rmrdivide__(argtype) const{ return mrdivide(argCast(b), selfCast(*$self));}
 returntype __mpower__ (argtype) const{ return selfCast(*$self).zz_mpower(argCast(b));}
 returntype __rmpower__(argtype) const{ return argCast(b).zz_mpower(selfCast(*$self));}
-%enddef
-
-// This is a list of operators that do not check __array_priority__ in python
-%define binopsNoPriority(argtype,argCast,selfCast,returntype)
-returntype __pow__ (argtype) const { return pow(selfCast(*$self), argCast(b));}
-returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 %enddef
 
 #ifdef SWIGPYTHON
@@ -1665,6 +1644,24 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         }
       }
 
+      // Double scalar
+      {
+        double tmp;
+        if (to_val(p, &tmp)) {
+          if (m) **m=tmp;
+          return true;
+        }
+      }
+
+      // Integer scalar
+      {
+        int tmp;
+        if (to_val(p, &tmp)) {
+          if (m) **m=tmp;
+          return true;
+        }
+      }
+
       // Try first converting to a temporary DMatrix
       {
         DMatrix tmp, *mt=&tmp;
@@ -2434,26 +2431,12 @@ except:
 %rename(sparsity) getSparsity;
 
 #ifdef SWIGPYTHON
-%rename(arcsin) zz_asin;
-%rename(arccos) zz_acos;
-%rename(arctan) zz_atan;
-%rename(arctan2) zz_atan2;
-%rename(arcsinh) zz_asinh;
-%rename(arccosh) zz_acosh;
-%rename(arctanh) zz_atanh;
-%rename(fabs) zz_abs;
-%rename(fmod) zz_mod;
-%rename(fmin) zz_min;
-%rename(fmax) zz_max;
 %rename(mul) zz_mtimes;
 %ignore T;
 %ignore shape;
-%rename(logic_and) zz_and;
-%rename(logic_or) zz_or;
 %rename(logic_not) zz_not;
 %rename(logic_all) zz_all;
 %rename(logic_any) zz_any;
-%rename(__pow__) zz_power;
 %rename(__float__) getValue;
 %rename(__int__) getIntValue;
 
@@ -3664,41 +3647,43 @@ namespace casadi {
       def __req__(x, y) : return casadi_eq(y, x)
       def __ne__(x, y) : return casadi_ne(x, y)
       def __rne__(x, y) : return casadi_ne(y, x)
-      #def logic_and(x, y) : return casadi_and(x, y)
-      #def logic_or(x, y) : return casadi_or(x, y)
-      #def abs(x) : return casadi_abs(x)
-      #def sqrt(x) : return casadi_sqrt(x)
-      #def sin(x) : return casadi_sin(x)
-      #def cos(x) : return casadi_cos(x)
-      #def tan(x) : return casadi_tan(x)
-      #def arctan(x) : return casadi_atan(x)
-      #def arcsin(x) : return casadi_asin(x)
-      #def arccos(x) : return casadi_acos(x)
-      #def tanh(x) : return casadi_tanh(x)
-      #def sinh(x) : return casadi_sinh(x)
-      #def cosh(x) : return casadi_cosh(x)
-      #def arctanh(x) : return casadi_atanh(x)
-      #def arcsinh(x) : return casadi_asinh(x)
-      #def arccosh(x) : return casadi_acosh(x)
-      #def exp(x) : return casadi_exp(x)
-      #def log(x) : return casadi_log(x)
-      #def log10(x) : return casadi_log10(x)
-      #def floor(x) : return casadi_floor(x)
-      #def ceil(x) : return casadi_ceil(x)
-      #def erf(x) : return casadi_erf(x)
-      #def sign(x) : return casadi_sign(x)
-      #def __pow__(x, n) : return casadi_power(x, n)
-      #def __rpow__(n, x) : return casadi_power(x, n)
-      #def fmod(x, y) : return casadi_mod(x, y)
-      #def __arctan2__(x, y) : return casadi_atan2(x, y)
-      #def __rarctan2__(y, x) : return casadi_atan2(x, y)
-      #def __fmin__(x, y) : return casadi_min(x, y)
-      #def __rfmin__(y, x) : return casadi_min(x, y)
-      #def __fmax__(x, y) : return casadi_max(x, y)
-      #def __rfmax__(y, x) : return casadi_max(x, y)
-      #def simplify(x) : return casadi_simplify(x)
-      #def isEqual(x, y, depth=0) : return casadi_isEqual(x, y, depth)
-      #def iszero(x) : return casadi_iszero(x)
+      def __pow__(x, n) : return casadi_power(x, n)
+      def __rpow__(n, x) : return casadi_power(x, n)
+      def __arctan2__(x, y) : return casadi_atan2(x, y)
+      def __rarctan2__(y, x) : return casadi_atan2(x, y)
+      def fmin(x, y) : return casadi_min(x, y)
+      def fmax(x, y) : return casadi_max(x, y)
+      def __fmin__(x, y) : return casadi_min(x, y)
+      def __rfmin__(y, x) : return casadi_min(x, y)
+      def __fmax__(x, y) : return casadi_max(x, y)
+      def __rfmax__(y, x) : return casadi_max(x, y)
+      def logic_and(x, y) : return casadi_and(x, y)
+      def logic_or(x, y) : return casadi_or(x, y)
+      def fabs(x) : return casadi_abs(x)
+      def sqrt(x) : return casadi_sqrt(x)
+      def sin(x) : return casadi_sin(x)
+      def cos(x) : return casadi_cos(x)
+      def tan(x) : return casadi_tan(x)
+      def arcsin(x) : return casadi_asin(x)
+      def arccos(x) : return casadi_acos(x)
+      def arctan(x) : return casadi_atan(x)
+      def sinh(x) : return casadi_sinh(x)
+      def cosh(x) : return casadi_cosh(x)
+      def tanh(x) : return casadi_tanh(x)
+      def arcsinh(x) : return casadi_asinh(x)
+      def arccosh(x) : return casadi_acosh(x)
+      def arctanh(x) : return casadi_atanh(x)
+      def exp(x) : return casadi_exp(x)
+      def log(x) : return casadi_log(x)
+      def log10(x) : return casadi_log10(x)
+      def floor(x) : return casadi_floor(x)
+      def ceil(x) : return casadi_ceil(x)
+      def erf(x) : return casadi_erf(x)
+      def sign(x) : return casadi_sign(x)
+      def fmod(x, y) : return casadi_mod(x, y)
+      def simplify(x) : return casadi_simplify(x)
+      def isEqual(x, y, depth=0) : return casadi_isEqual(x, y, depth)
+      def iszero(x) : return casadi_iszero(x)
     %}
   }
 } // namespace casadi

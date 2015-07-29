@@ -406,10 +406,10 @@ namespace casadi {
     ///@}
     /// \endcond
 
+#ifndef SWIG
     /// \cond CLUTTER
     ///@{
-    /// Functions called by the corresponding friend functions -- MATLAB naming
-#ifndef SWIG
+    /// Functions called by friend functions defined for GenericExpression
     Matrix<DataType> zz_plus(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_minus(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_times(const Matrix<DataType> &y) const;
@@ -418,16 +418,49 @@ namespace casadi {
     Matrix<DataType> zz_le(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_eq(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_ne(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_atan2(const Matrix<DataType>& y) const;
+    Matrix<DataType> zz_min(const Matrix<DataType>& y) const;
+    Matrix<DataType> zz_max(const Matrix<DataType>& y) const;
+    Matrix<DataType> zz_and(const Matrix<DataType>& y) const;
+    Matrix<DataType> zz_or(const Matrix<DataType>& y) const;
+    Matrix<DataType> zz_abs() const;
+    Matrix<DataType> zz_sqrt() const;
+    Matrix<DataType> zz_sin() const;
+    Matrix<DataType> zz_cos() const;
+    Matrix<DataType> zz_tan() const;
+    Matrix<DataType> zz_asin() const;
+    Matrix<DataType> zz_acos() const;
+    Matrix<DataType> zz_atan() const;
+    Matrix<DataType> zz_sinh() const;
+    Matrix<DataType> zz_cosh() const;
+    Matrix<DataType> zz_tanh() const;
+    Matrix<DataType> zz_asinh() const;
+    Matrix<DataType> zz_acosh() const;
+    Matrix<DataType> zz_atanh() const;
+    Matrix<DataType> zz_exp() const;
+    Matrix<DataType> zz_log() const;
+    Matrix<DataType> zz_log10() const;
+    Matrix<DataType> zz_floor() const;
+    Matrix<DataType> zz_ceil() const;
+    Matrix<DataType> zz_erf() const;
+    Matrix<DataType> zz_sign() const;
+    Matrix<DataType> zz_power(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_mod(const Matrix<DataType>& y) const;
+    Matrix<DataType> zz_simplify() const;
+    bool zz_isEqual(const Matrix<DataType> &ex2, int depth=0) const;
+    ///@}
+    /// \endcond
 #endif // SWIG
 
+    /// \cond CLUTTER
+    ///@{
+    /// Functions called by the corresponding friend functions -- MATLAB naming
 #if !defined(SWIG) || !defined(SWIGMATLAB)
-    Matrix<DataType> __truediv__(const Matrix<DataType> &y) const {return zz_rdivide(y);}
-    Matrix<DataType> zz_power(const Matrix<DataType> &y) const;
-    Matrix<DataType> __constpow__(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_mpower(const Matrix<DataType> &y) const;
+    Matrix<DataType> __truediv__(const Matrix<DataType> &y) const {return zz_rdivide(y);}
+    Matrix<DataType> __constpow__(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_mrdivide(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_mldivide(const Matrix<DataType> &y) const;
-    bool zz_isEqual(const Matrix<DataType> &ex2, int depth=0) const;
     void zz_expand(Matrix<DataType> &weights, Matrix<DataType>& terms) const;
     Matrix<DataType> zz_pw_const(const Matrix<DataType> &tval, const Matrix<DataType> &val) const;
     Matrix<DataType> zz_pw_lin(const Matrix<DataType> &tval, const Matrix<DataType> &val) const;
@@ -447,7 +480,6 @@ namespace casadi {
     Matrix<DataType> zz_gauss_quadrature(const Matrix<DataType> &x, const Matrix<DataType> &a,
                                          const Matrix<DataType> &b, int order,
                                          const Matrix<DataType>& w) const;
-    Matrix<DataType> zz_simplify() const;
     Matrix<DataType> zz_substitute(const Matrix<DataType>& v, const Matrix<DataType>& vdef) const;
     static std::vector<Matrix<DataType> > zz_substitute(const std::vector<Matrix<DataType> >& ex,
                                                         const std::vector<Matrix<DataType> >& v,
@@ -498,37 +530,10 @@ namespace casadi {
 
     ///@{
     /// Operations called by the corresponding friend functions, MATLAB naming convention
-    Matrix<DataType> zz_sin() const;
-    Matrix<DataType> zz_cos() const;
-    Matrix<DataType> zz_tan() const;
-    Matrix<DataType> zz_asin() const;
-    Matrix<DataType> zz_acos() const;
-    Matrix<DataType> zz_atan() const;
-    Matrix<DataType> zz_exp() const;
-    Matrix<DataType> zz_log() const;
-    Matrix<DataType> zz_sqrt() const;
-    Matrix<DataType> zz_floor() const;
-    Matrix<DataType> zz_ceil() const;
-    Matrix<DataType> zz_mod(const Matrix<DataType>& y) const;
-    Matrix<DataType> zz_abs() const;
-    Matrix<DataType> zz_sign() const;
     Matrix<DataType> __copysign__(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_erfinv() const;
-    Matrix<DataType> zz_min(const Matrix<DataType>& y) const;
-    Matrix<DataType> zz_max(const Matrix<DataType>& y) const;
-    Matrix<DataType> zz_erf() const;
-    Matrix<DataType> zz_sinh() const;
-    Matrix<DataType> zz_cosh() const;
-    Matrix<DataType> zz_tanh() const;
-    Matrix<DataType> zz_asinh() const;
-    Matrix<DataType> zz_acosh() const;
-    Matrix<DataType> zz_atanh() const;
-    Matrix<DataType> zz_atan2(const Matrix<DataType>& y) const;
-    Matrix<DataType> zz_log10() const;
     Matrix<DataType> printme(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_not() const;
-    Matrix<DataType> zz_and(const Matrix<DataType>& y) const;
-    Matrix<DataType> zz_or(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_if_else_zero(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_mtimes(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_mac(const Matrix<DataType> &y, const Matrix<DataType> &z) const;

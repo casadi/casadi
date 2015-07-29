@@ -371,7 +371,7 @@ namespace casadi {
 #ifndef SWIG
     /// \cond CLUTTER
     ///@{
-    /// Functions called by the corresponding friend functions -- MATLAB naming
+    /// Functions called by friend functions defined for GenericExpression
     MX zz_plus(const MX& y) const;
     MX zz_minus(const MX& y) const;
     MX zz_times(const MX& y) const;
@@ -380,6 +380,37 @@ namespace casadi {
     MX zz_le(const MX& y) const;
     MX zz_eq(const MX& y) const;
     MX zz_ne(const MX& y) const;
+    MX zz_atan2(const MX& y) const;
+    MX zz_min(const MX& y) const;
+    MX zz_max(const MX& y) const;
+    MX zz_and(const MX& y) const;
+    MX zz_or(const MX& y) const;
+    MX zz_abs() const;
+    MX zz_sqrt() const;
+    MX zz_sin() const;
+    MX zz_cos() const;
+    MX zz_tan() const;
+    MX zz_asin() const;
+    MX zz_acos() const;
+    MX zz_atan() const;
+    MX zz_sinh() const;
+    MX zz_cosh() const;
+    MX zz_tanh() const;
+    MX zz_asinh() const;
+    MX zz_acosh() const;
+    MX zz_atanh() const;
+    MX zz_exp() const;
+    MX zz_log() const;
+    MX zz_log10() const;
+    MX zz_floor() const;
+    MX zz_ceil() const;
+    MX zz_erf() const;
+    MX zz_sign() const;
+    MX zz_power(const MX& b) const;
+    MX zz_mod(const MX& y) const;
+    MX zz_simplify() const;
+    bool zz_isEqual(const MX& y, int depth) const;
+    bool zz_isEqual(const MXNode* y, int depth) const;
     ///@}
     /// \endcond
 #endif // SWIG
@@ -388,16 +419,9 @@ namespace casadi {
     MX printme(const MX& y) const;
 
     /// \cond CLUTTER
-    MX zz_power(const MX& b) const;
     MX zz_mpower(const MX& b) const;
     MX zz_inner_prod(const MX& y) const;
     MX zz_outer_prod(const MX& y) const;
-    MX zz_min(const MX& y) const;
-    MX zz_max(const MX& y) const;
-    MX zz_mod(const MX& y) const;
-    MX zz_atan2(const MX& y) const;
-    MX zz_and(const MX& y) const;
-    MX zz_or(const MX& y) const;
     MX zz_if_else_zero(const MX& y) const;
     MX __truediv__(const MX& y) const { return zz_rdivide(y);}
     MX __constpow__(const MX& b) const;
@@ -405,28 +429,7 @@ namespace casadi {
     MX zz_mldivide(const MX& b) const;
     MX __copysign__(const MX& y) const;
     MX constpow(const MX& y) const;
-    MX zz_exp() const;
-    MX zz_log() const;
-    MX zz_log10() const;
-    MX zz_sqrt() const;
-    MX zz_sin() const;
-    MX zz_cos() const;
-    MX zz_tan() const;
-    MX zz_asin() const;
-    MX zz_acos() const;
-    MX zz_atan() const;
-    MX zz_floor() const;
-    MX zz_ceil() const;
-    MX zz_abs() const;
-    MX zz_sign() const;
     MX zz_erfinv() const;
-    MX zz_erf() const;
-    MX zz_sinh() const;
-    MX zz_cosh() const;
-    MX zz_tanh() const;
-    MX zz_asinh() const;
-    MX zz_acosh() const;
-    MX zz_atanh() const;
     MX zz_not() const;
     static MX zz_horzcat(const std::vector<MX>& x);
     static MX zz_diagcat(const std::vector<MX>& x);
@@ -442,7 +445,6 @@ namespace casadi {
     MX zz_norm_inf() const;
     MX zz_mtimes(const MX& y) const;
     MX zz_mac(const MX& y, const MX& z) const;
-    MX zz_simplify() const;
     MX zz_reshape(int nrow, int ncol) const;
     MX zz_reshape(const Sparsity& sp) const;
     MX zz_vecNZ() const;
@@ -491,10 +493,6 @@ namespace casadi {
     MX zz_solve(const MX& b, const std::string& lsolver, const Dict& dict = Dict()) const;
     MX zz_pinv(const std::string& lsolver, const Dict& dict = Dict()) const;
     MX zz_nullspace() const;
-    bool zz_isEqual(const MX& y, int depth=0) const;
-#ifndef SWIG
-    bool zz_isEqual(const MXNode* y, int depth=0) const;
-#endif // SWIG
     MX zz_find() const;
     /// \endcond
 
