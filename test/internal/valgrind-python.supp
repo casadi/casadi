@@ -606,3 +606,10 @@
   fun:PyString_Format
   fun:PyEval_EvalFrameEx
 }
+
+{
+  Travis errors (4)
+  Memcheck:Addr4
+  ...
+  fun:PyAST_Compile
+}
