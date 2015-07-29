@@ -47,6 +47,66 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::EcosInterface
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>dcost</td><td>casadi::EcosInterface</td></tr>
+<tr><td>dinf</td><td>casadi::EcosInterface</td></tr>
+<tr><td>dinfres</td><td>casadi::EcosInterface</td></tr>
+<tr><td>dres</td><td>casadi::EcosInterface</td></tr>
+<tr><td>exit_code</td><td>casadi::EcosInterface</td></tr>
+<tr><td>exit_code_explanation</td><td>casadi::EcosInterface</td></tr>
+<tr><td>gap</td><td>casadi::EcosInterface</td></tr>
+<tr><td>iter</td><td>casadi::EcosInterface</td></tr>
+<tr><td>kapovert</td><td>casadi::EcosInterface</td></tr>
+<tr><td>mu</td><td>casadi::EcosInterface</td></tr>
+<tr><td>nitref1</td><td>casadi::EcosInterface</td></tr>
+<tr><td>nitref2</td><td>casadi::EcosInterface</td></tr>
+<tr><td>nitref3</td><td>casadi::EcosInterface</td></tr>
+<tr><td>pcost</td><td>casadi::EcosInterface</td></tr>
+<tr><td>pinf</td><td>casadi::EcosInterface</td></tr>
+<tr><td>pinfres</td><td>casadi::EcosInterface</td></tr>
+<tr><td>pres</td><td>casadi::EcosInterface</td></tr>
+<tr><td>relgap</td><td>casadi::EcosInterface</td></tr>
+<tr><td>sigma</td><td>casadi::EcosInterface</td></tr>
+<tr><td>step</td><td>casadi::EcosInterface</td></tr>
+<tr><td>step_aff</td><td>casadi::EcosInterface</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_SocpSolver_ecos
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th></tr>
+<tr><td>dcost</td></tr>
+<tr><td>dinf</td></tr>
+<tr><td>dinfres</td></tr>
+<tr><td>dres</td></tr>
+<tr><td>exit_code</td></tr>
+<tr><td>exit_code_explanation</td></tr>
+<tr><td>gap</td></tr>
+<tr><td>iter</td></tr>
+<tr><td>kapovert</td></tr>
+<tr><td>mu</td></tr>
+<tr><td>nitref1</td></tr>
+<tr><td>nitref2</td></tr>
+<tr><td>nitref3</td></tr>
+<tr><td>pcost</td></tr>
+<tr><td>pinf</td></tr>
+<tr><td>pinfres</td></tr>
+<tr><td>pres</td></tr>
+<tr><td>relgap</td></tr>
+<tr><td>sigma</td></tr>
+<tr><td>step</td></tr>
+<tr><td>step_aff</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::IdasInterface
 \n
 \par
