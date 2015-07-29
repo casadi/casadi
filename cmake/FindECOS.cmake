@@ -1,9 +1,28 @@
 message(STATUS "Looking for ecos")
 
-find_path(ECOS_INCLUDE_DIR
+find_path(ECOS_CORE_INCLUDE_DIR
     ecos.h
   HINTS $ENV{ECOS}/include /usr/local/include/ecos ~/local/include/ecos
 )
+
+find_path(ECOS_AMD_INCLUDE_DIR
+    amd.h
+  HINTS $ENV{ECOS}/external/amd/include /usr/local/include/amd ~local/include/amd /usr/local/include/ecos ~local/include/ecos
+)
+
+find_path(ECOS_LDL_INCLUDE_DIR
+    ldl.h
+  HINTS $ENV{ECOS}/external/ldl/include /usr/local/include/ldl ~local/include/ldl /usr/local/include/ecos ~local/include/ecos /usr/local/include/ecos/ldl ~local/include/ecos/ldl 
+)
+
+find_path(ECOS_SSC_INCLUDE_DIR
+    SuiteSparse_config.h
+  HINTS $ENV{ECOS}/external/SuiteSparse_config /usr/local/include/SuiteSparse_config ~local/include/SuiteSparse_config /usr/local/include/ecos ~local/include/ecos /usr/local/include/ecos/SuiteSparse_config ~local/include/ecos/SuiteSparse_config 
+)
+
+if(ECOS_CORE_INCLUDE_DIR AND ECOS_AMD_INCLUDE_DIR AND ECOS_LDL_INCLUDE_DIR AND ECOS_SSC_INCLUDE_DIR)
+  set(ECOS_INCLUDE_DIR "${ECOS_CORE_INCLUDE_DIR};${ECOS_AMD_INCLUDE_DIR};${ECOS_LDL_INCLUDE_DIR};${ECOS_SSC_INCLUDE_DIR}")
+endif()
 
 if(ECOS_INCLUDE_DIR)
   message(STATUS "Found ecos include directory: ${ECOS_INCLUDE_DIR}")
