@@ -69,7 +69,7 @@ namespace casadi {
   }
 
   void Newton::solveNonLinear() {
-    casadi_log("Newton::solveNonLinear:begin");
+    casadi_msg("Newton::solveNonLinear:begin");
 
     // Set up timers for profiling
     double time_zero=0;
@@ -152,7 +152,7 @@ namespace casadi {
                                -(*std::min_element(F.data().begin(),
                                                    F.data().end())));
         if (abstol <= abstol_) {
-          casadi_log("Converged to acceptable tolerance - abstol: " << abstol_);
+          casadi_msg("Converged to acceptable tolerance - abstol: " << abstol_);
           break;
         }
       }
@@ -201,7 +201,7 @@ namespace casadi {
           userOut() << "  stepsize = " << abstolStep << std::endl;
         }
         if (abstolStep <= abstolStep_) {
-          casadi_log("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
+          casadi_msg("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
           break;
         }
       }
@@ -234,7 +234,7 @@ namespace casadi {
     // Factorization up-to-date
     fact_up_to_date_ = true;
 
-    casadi_log("Newton::solveNonLinear():end after " << iter << " steps");
+    casadi_msg("Newton::solveNonLinear():end after " << iter << " steps");
   }
 
   void Newton::init() {

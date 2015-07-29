@@ -548,9 +548,9 @@ namespace casadi {
     // Construct sparsity pattern
     Sparsity ret = Sparsity::triplet(nz_out, nz_in, use_fwd ? jcol : jrow, use_fwd ? jrow : jcol);
 
-    casadi_log("Formed Jacobian sparsity pattern (dimension " << ret.shape() << ", "
+    casadi_msg("Formed Jacobian sparsity pattern (dimension " << ret.shape() << ", "
                << ret.nnz() << " nonzeros, " << (100.0*ret.nnz())/ret.numel() << " % nonzeros).");
-    casadi_log("FunctionInternal::getJacSparsity end ");
+    casadi_msg("FunctionInternal::getJacSparsity end ");
 
     // Return sparsity pattern
     return ret;
@@ -596,7 +596,7 @@ namespace casadi {
     bool hasrun = false;
 
     while (!hasrun || coarse.size()!=nz+1) {
-      casadi_log("Block size: " << granularity);
+      casadi_msg("Block size: " << granularity);
 
       // Clear the sparsity triplet acccumulator
       jcol.clear();
@@ -607,7 +607,7 @@ namespace casadi {
 
       Sparsity D = r.starColoring();
 
-      casadi_log("Star coloring on " << r.dimString() << ": " << D.size2() << " <-> " << D.size1());
+      casadi_msg("Star coloring on " << r.dimString() << ": " << D.size2() << " <-> " << D.size1());
 
       // Reset the virtual machine
       spInit(true);
@@ -779,8 +779,8 @@ namespace casadi {
       hasrun = true;
     }
 
-    casadi_log("Number of sweeps: " << nsweeps);
-    casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() <<
+    casadi_msg("Number of sweeps: " << nsweeps);
+    casadi_msg("Formed Jacobian sparsity pattern (dimension " << r.shape() <<
                ", " << r.nnz() << " nonzeros, " << (100.0*r.nnz())/r.numel() << " % nonzeros).");
 
     return r.T();
@@ -845,7 +845,7 @@ namespace casadi {
     }
 
     while (!hasrun || coarse_col.size()!=nz_out+1 || coarse_row.size()!=nz_in+1) {
-      casadi_log("Block size: " << granularity_col << " x " << granularity_row);
+      casadi_msg("Block size: " << granularity_col << " x " << granularity_row);
 
       // Clear the sparsity triplet acccumulator
       jcol.clear();
@@ -865,7 +865,7 @@ namespace casadi {
       // Adjoint mode
       Sparsity D2 = r.unidirectionalColoring(rT);
 
-      casadi_log("Coloring on " << r.dimString() << " (fwd seeps: " << D1.size2() <<
+      casadi_msg("Coloring on " << r.dimString() << " (fwd seeps: " << D1.size2() <<
                  " , adj sweeps: " << D2.size1() << ")");
 
       // Use forward mode?
@@ -875,11 +875,11 @@ namespace casadi {
       // Use whatever required less colors if we tried both (with preference to forward mode)
       if ((w*D1.size2()*fwd_cost <= (1-w)*D2.size2()*adj_cost)) {
         use_fwd = true;
-        casadi_log("Forward mode chosen (fwd cost: " << w*D1.size2()*fwd_cost << ", adj cost: "
+        casadi_msg("Forward mode chosen (fwd cost: " << w*D1.size2()*fwd_cost << ", adj cost: "
                    << (1-w)*D2.size2()*adj_cost << ")");
       } else {
         use_fwd = false;
-        casadi_log("Adjoint mode chosen (adj cost: " << w*D1.size2()*fwd_cost << ", adj cost: "
+        casadi_msg("Adjoint mode chosen (adj cost: " << w*D1.size2()*fwd_cost << ", adj cost: "
                    << (1-w)*D2.size2()*adj_cost << ")");
       }
 
@@ -1076,8 +1076,8 @@ namespace casadi {
       }
       hasrun = true;
     }
-    casadi_log("Number of sweeps: " << nsweeps);
-    casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() <<
+    casadi_msg("Number of sweeps: " << nsweeps);
+    casadi_msg("Formed Jacobian sparsity pattern (dimension " << r.shape() <<
                ", " << r.nnz() << " nonzeros, " << (100.0*r.nnz())/r.numel() << " % nonzeros).");
 
     return r.T();
@@ -1185,7 +1185,7 @@ namespace casadi {
       // Star coloring if symmetric
       log("FunctionInternal::getPartition starColoring");
       D1 = A.starColoring();
-      casadi_log("Star coloring completed: " << D1.size2() << " directional derivatives needed ("
+      casadi_msg("Star coloring completed: " << D1.size2() << " directional derivatives needed ("
                  << A.size1() << " without coloring).");
 
     } else {

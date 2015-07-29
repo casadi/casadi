@@ -420,7 +420,7 @@ namespace casadi {
   }
 
   void CvodesInterface::reset() {
-    casadi_log("CvodesInterface::reset begin");
+    casadi_msg("CvodesInterface::reset begin");
 
     // Reset the base classes
     SundialsInterface::reset();
@@ -469,11 +469,11 @@ namespace casadi {
 
     // Set the stop time of the integration -- don't integrate past this point
     if (stop_at_end_) setStopTime(tf_);
-    casadi_log("CvodesInterface::reset end");
+    casadi_msg("CvodesInterface::reset end");
   }
 
   void CvodesInterface::integrate(double t_out) {
-    casadi_log("CvodesInterface::integrate(" << t_out << ") begin");
+    casadi_msg("CvodesInterface::integrate(" << t_out << ") begin");
 
     casadi_assert_message(t_out>=t0_,
                           "CvodesInterface::integrate(" << t_out << "): "
@@ -535,11 +535,11 @@ namespace casadi {
 
     }
 
-    casadi_log("CvodesInterface::integrate(" << t_out << ") end");
+    casadi_msg("CvodesInterface::integrate(" << t_out << ") end");
   }
 
   void CvodesInterface::resetB() {
-    casadi_log("CvodesInterface::resetB begin");
+    casadi_msg("CvodesInterface::resetB begin");
 
     // Reset the base classes
     SundialsInterface::resetB();
@@ -558,11 +558,11 @@ namespace casadi {
       // Initialize the adjoint integration
       initAdj();
     }
-    casadi_log("CvodesInterface::resetB end");
+    casadi_msg("CvodesInterface::resetB end");
   }
 
   void CvodesInterface::integrateB(double t_out) {
-    casadi_log("CvodesInterface::integrateB(" << t_out << ") begin");
+    casadi_msg("CvodesInterface::integrateB(" << t_out << ") begin");
     int flag;
 
     // Integrate backward to t_out
@@ -595,7 +595,7 @@ namespace casadi {
       stats_["nlinsetupsB"] = 1.0*nlinsetups;
 
     }
-    casadi_log("CvodesInterface::integrateB(" << t_out << ") end");
+    casadi_msg("CvodesInterface::integrateB(" << t_out << ") end");
   }
 
   void CvodesInterface::printStats(std::ostream &stream) const {

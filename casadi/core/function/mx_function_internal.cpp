@@ -363,7 +363,7 @@ namespace casadi {
 
   void MXFunctionInternal::evalD(const double** arg,
                                  double** res, int* iw, double* w) {
-    casadi_log("MXFunctionInternal::evalD():begin "  << getOption("name"));
+    casadi_msg("MXFunctionInternal::evalD():begin "  << getOption("name"));
     // Set up timers for profiling
     double time_zero=0;
     double time_start=0;
@@ -462,7 +462,7 @@ namespace casadi {
       }
     }
 
-    casadi_log("MXFunctionInternal::evalD():end "  << getOption("name"));
+    casadi_msg("MXFunctionInternal::evalD():end "  << getOption("name"));
   }
 
   void MXFunctionInternal::print(ostream &stream, const AlgEl& el) const {

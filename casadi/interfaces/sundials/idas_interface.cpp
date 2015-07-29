@@ -911,7 +911,7 @@ namespace casadi {
   }
 
   void IdasInterface::integrate(double t_out) {
-    casadi_log("IdasInterface::integrate(" << t_out << ") begin");
+    casadi_msg("IdasInterface::integrate(" << t_out << ") begin");
 
     casadi_assert_message(t_out>=t0_, "IdasInterface::integrate(" << t_out << "): "
                           "Cannot integrate to a time earlier than t0 (" << t0_ << ")");
@@ -990,7 +990,7 @@ namespace casadi {
     }
 
 
-    casadi_log("IdasInterface::integrate(" << t_out << ") end");
+    casadi_msg("IdasInterface::integrate(" << t_out << ") end");
   }
 
   void IdasInterface::resetB() {
@@ -1039,7 +1039,7 @@ namespace casadi {
   }
 
   void IdasInterface::integrateB(double t_out) {
-    casadi_log("IdasInterface::integrateB(" << t_out << ") begin");
+    casadi_msg("IdasInterface::integrateB(" << t_out << ") begin");
     int flag;
     // Integrate backwards to t_out
     flag = IDASolveB(mem_, t_out, IDA_NORMAL);
@@ -1076,7 +1076,7 @@ namespace casadi {
       stats_["nstepsB"] = 1.0*nsteps;
       stats_["nlinsetupsB"] = 1.0*nlinsetups;
     }
-    casadi_log("IdasInterface::integrateB(" << t_out << ") end");
+    casadi_msg("IdasInterface::integrateB(" << t_out << ") end");
   }
 
   void IdasInterface::printStats(std::ostream &stream) const {

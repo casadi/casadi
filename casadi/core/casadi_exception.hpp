@@ -107,7 +107,7 @@ class CASADI_EXPORT CasadiException : public std::exception {
     " of file " CASADI_ASSERT_STR(__FILE__)
 
   // Should be removed, cf. #890
-#define casadi_log(msg)                                                 \
+#define casadi_msg(msg)                                                 \
   if (verbose()) {                                                      \
     std::stringstream ss;                                               \
     ss << msg;                                                          \

@@ -85,7 +85,7 @@ namespace casadi {
       }
     }
 
-    casadi_log("SXFunctionInternal::evaluate():begin  " << getOption("name"));
+    casadi_msg("SXFunctionInternal::evaluate():begin  " << getOption("name"));
 
     // NOTE: The implementation of this function is very delicate. Small changes in the
     // class structure can cause large performance losses. For this reason,
@@ -117,7 +117,7 @@ namespace casadi {
       }
     }
 
-    casadi_log("SXFunctionInternal::evalD():end " << getOption("name"));
+    casadi_msg("SXFunctionInternal::evalD():end " << getOption("name"));
 
     if (CasadiOptions::profiling) {
       time_stop = getRealTime();
