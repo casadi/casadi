@@ -9306,12 +9306,6 @@ No need to have both < and >
 
 ";
 
-%feature("docstring") casadi::GenericExpression::__mldivide__ "
-
-Matrix division from left.
-
-";
-
 %feature("docstring") casadi::GenericExpression::zz_ge "
 
 No need to have both <= and >=.
@@ -20030,6 +20024,12 @@ Get double value (particular nonzero)
 
 ";
 
+%feature("docstring") casadi::Matrix::zz_mldivide "
+
+Functions called by the corresponding friend functions MATLAB naming
+
+";
+
 %feature("docstring") casadi::Matrix::isOne "
 
 check if the matrix is 1 (note that false negative answers are possible)
@@ -20053,12 +20053,6 @@ than a specified tolerance.
 
 Operations called by the corresponding friend functions, MATLAB naming
 convention
-
-";
-
-%feature("docstring") casadi::Matrix::__mrdivide__ "
-
-Functions called by the corresponding friend functions MATLAB naming
 
 ";
 
@@ -20555,12 +20549,6 @@ Set upper triangular elements.
 
 ";
 
-%feature("docstring") casadi::Matrix::sizeD "
-
-Get get the number of non-zeros on the diagonal.
-
-";
-
 %feature("docstring") casadi::Matrix::zz_tangent "
 
 Functions called by the corresponding friend functions MATLAB naming
@@ -20804,6 +20792,12 @@ keeping the existing non-zeros.
 
 ";
 
+%feature("docstring") casadi::Matrix::zz_mrdivide "
+
+Functions called by the corresponding friend functions MATLAB naming
+
+";
+
 %feature("docstring") casadi::Matrix::zz_sprank "
 
 Accessed by friend functions.
@@ -20941,9 +20935,9 @@ possible)
 
 ";
 
-%feature("docstring") casadi::Matrix::__mldivide__ "
+%feature("docstring") casadi::Matrix::sizeD "
 
-Matrix division from left.
+Get get the number of non-zeros on the diagonal.
 
 ";
 
@@ -21129,6 +21123,8 @@ to the internal class
 
 %feature("docstring") casadi::MX::zz_diag "";
 
+%feature("docstring") casadi::MX::zz_mrdivide "";
+
 %feature("docstring") casadi::MX::sizeD "
 
 Get get the number of non-zeros on the diagonal.
@@ -21170,6 +21166,8 @@ Erase a submatrix (leaving structural zeros in its place) Erase elements of
 a matrix.
 
 ";
+
+%feature("docstring") casadi::MX::zz_mldivide "";
 
 %feature("docstring") casadi::MX::zz_ceil "";
 
@@ -21573,8 +21571,6 @@ true.
 %feature("docstring") casadi::MX::zz_jacobian "";
 
 %feature("docstring") casadi::MX::zz_power "";
-
-%feature("docstring") casadi::MX::__mrdivide__ "";
 
 %feature("docstring") casadi::MX::appendColumns "
 
@@ -21992,12 +21988,6 @@ Check if norm.
 %feature("docstring") casadi::MX::zz_sqrt "";
 
 %feature("docstring") casadi::MX::zz_min "";
-
-%feature("docstring") casadi::MX::__mldivide__ "
-
-Matrix division from left.
-
-";
 
 %feature("docstring") casadi::MX::setTemp "[INTERNAL]  Set the temporary
 variable.

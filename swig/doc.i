@@ -12340,12 +12340,6 @@ No need to have both < and >
 
 ";
 
-%feature("docstring") casadi::GenericExpression::__mldivide__ "
-
-Matrix division from left.
-
-";
-
 %feature("docstring")  casadi::GenericExpression< ExType >::zz_ge(const
 ExType &y) const  "
 
@@ -26376,6 +26370,13 @@ Get double value (particular nonzero)
 
 ";
 
+%feature("docstring")  casadi::Matrix< DataType >::zz_mldivide(const Matrix<
+DataType > &y) const  "
+
+Functions called by the corresponding friend functions MATLAB naming
+
+";
+
 %feature("docstring")  casadi::Matrix< DataType >::isOne() const  "
 
 check if the matrix is 1 (note that false negative answers are possible)
@@ -26401,12 +26402,6 @@ than a specified tolerance.
 
 Operations called by the corresponding friend functions, MATLAB naming
 convention
-
-";
-
-%feature("docstring") casadi::Matrix::__mrdivide__ "
-
-Functions called by the corresponding friend functions MATLAB naming
 
 ";
 
@@ -27038,13 +27033,6 @@ Set upper triangular elements.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::sizeD()
-const "
-
-Get get the number of non-zeros on the diagonal.
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::zz_tangent(const Matrix<
 DataType > &arg) const  "
 
@@ -27319,6 +27307,13 @@ keeping the existing non-zeros.
 
 ";
 
+%feature("docstring")  casadi::Matrix< DataType >::zz_mrdivide(const Matrix<
+DataType > &y) const  "
+
+Functions called by the corresponding friend functions MATLAB naming
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::zz_sprank() const "
 
@@ -27486,9 +27481,10 @@ possible)
 
 ";
 
-%feature("docstring") casadi::Matrix::__mldivide__ "
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::sizeD()
+const "
 
-Matrix division from left.
+Get get the number of non-zeros on the diagonal.
 
 ";
 
@@ -27688,6 +27684,8 @@ internal class
 
 %feature("docstring")  casadi::MX::zz_diag() const  " ";
 
+%feature("docstring")  casadi::MX::zz_mrdivide(const MX &b) const  " ";
+
 %feature("docstring")  casadi::GenericMatrix< MX  >::sizeD() const "
 
 Get get the number of non-zeros on the diagonal.
@@ -27730,6 +27728,8 @@ Erase a submatrix (leaving structural zeros in its place) Erase elements of
 a matrix.
 
 ";
+
+%feature("docstring")  casadi::MX::zz_mldivide(const MX &b) const  " ";
 
 %feature("docstring")  casadi::MX::zz_ceil() const  " ";
 
@@ -28218,8 +28218,6 @@ true.
 %feature("docstring")  casadi::MX::zz_jacobian(const MX &arg) const  " ";
 
 %feature("docstring")  casadi::MX::zz_power(const MX &b) const  " ";
-
-%feature("docstring") casadi::MX::__mrdivide__ "";
 
 %feature("docstring")  casadi::MX::appendColumns(const MX &y) "
 
@@ -28741,12 +28739,6 @@ Check if norm.
 %feature("docstring")  casadi::MX::zz_sqrt() const  " ";
 
 %feature("docstring")  casadi::MX::zz_min(const MX &y) const  " ";
-
-%feature("docstring") casadi::MX::__mldivide__ "
-
-Matrix division from left.
-
-";
 
 %feature("docstring")  casadi::MX::setTemp(int t) " [INTERNAL]  Set the
 temporary variable.
