@@ -41,4 +41,7 @@ namespace casadi {
   void (*Logger::writeAll)(const char* s, std::streamsize num, bool error) =
     Logger::writeDefault;
 
+  void (*Logger::flush)(bool error) =
+    Logger::flushDefault;
+
 } // namespace casadi

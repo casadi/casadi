@@ -76,12 +76,24 @@ namespace casadi {
     /// Print everything, can be redefined
     static void (*writeAll)(const char* s, std::streamsize num, bool error);
 
+    /// Flush buffers
+    static void (*flush)(bool error);
+
     /// By default, print to std::cout or std::cerr
     static void writeDefault(const char* s, std::streamsize num, bool error) {
       if (error) {
         std::cerr.write(s, num);
       } else {
         std::cout.write(s, num);
+      }
+    }
+
+    /// By default, flush std::cout or std::cerr
+    static void flushDefault(bool error) {
+      if (error) {
+        std::cerr << std::flush;
+      } else {
+        std::cout << std::flush;
       }
     }
 
@@ -136,6 +148,10 @@ namespace casadi {
         write<Err, PL>(s, num);
         return num;
       }
+      virtual int sync() {
+        flush(Err);
+        return 0;
+      }
     };
 
     // Output stream for std::cout like printing
@@ -145,6 +161,8 @@ namespace casadi {
     public:
       Stream() : std::ostream(&buf) {}
     };
+
+
   };
 
   // Get an output stream

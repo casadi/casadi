@@ -65,7 +65,11 @@
     // Redirect printout to mexPrintf
     static void mexlogger(const char* s, std::streamsize num, bool error) {
       mexPrintf("%.*s", static_cast<int>(num), s);
-      mexEvalString("drawnow;");
+    }
+
+    // Flush the command window buffer (needed in gui mode)
+    static void mexflush(bool error) {
+      mexEvalString("drawnow('update');");
     }
   }
 %}
@@ -74,6 +78,8 @@
   casadi::Logger::writeProg = mexlogger;
   casadi::Logger::writeDebug = mexlogger;
   casadi::Logger::writeAll = mexlogger;
+
+  casadi::Logger::flush = mexflush;
 %}
 #endif
 
