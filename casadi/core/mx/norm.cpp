@@ -24,7 +24,6 @@
 
 
 #include "norm.hpp"
-#include "mx_tools.hpp"
 #include "../runtime/runtime.hpp"
 
 using namespace std;

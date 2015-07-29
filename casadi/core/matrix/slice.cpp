@@ -24,7 +24,7 @@
 
 
 #include "slice.hpp"
-#include "matrix_tools.hpp"
+#include "../std_vector_tools.hpp"
 
 using namespace std;
 namespace casadi {

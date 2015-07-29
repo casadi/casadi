@@ -25,7 +25,6 @@
 
 #include "implicit_to_nlp.hpp"
 
-#include "casadi/core/mx/mx_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
 
 using namespace std;

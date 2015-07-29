@@ -26,8 +26,6 @@
 #include "casadi_map.hpp"
 #include "../function/function_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "../mx/mx_tools.hpp"
-#include "../matrix/matrix_tools.hpp"
 #ifdef WITH_OPENMP
 #include <omp.h>
 #endif //WITH_OPENMP

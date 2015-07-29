@@ -26,8 +26,6 @@
 #include "mosek_socp_interface.hpp"
 
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
 
 using namespace std;

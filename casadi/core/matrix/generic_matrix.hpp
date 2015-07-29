@@ -32,6 +32,7 @@
 #include "sparsity.hpp"
 #include "../casadi_math.hpp"
 #include "sparsity_interface.hpp"
+#include "../generic_type.hpp"
 
 namespace casadi {
   /** \brief Empty Base
@@ -434,6 +435,71 @@ namespace casadi {
     */
     inline friend bool dependsOn(const MatType& f, const MatType &arg) {
       return f.zz_dependsOn(arg);
+    }
+
+    /** \brief Inplace substitution with piggyback expressions
+     * Substitute variables v out of the expressions vdef sequentially,
+     * as well as out of a number of other expressions piggyback */
+    inline friend void
+      substituteInPlace(const std::vector<MatType>& v,
+                        std::vector<MatType>& inout_vdef,
+                        std::vector<MatType>& inout_ex, bool reverse=false) {
+      return MatType::zz_substituteInPlace(v, inout_vdef, inout_ex, reverse);
+    }
+
+    /** \brief  Solve a system of equations: A*x = b
+        The solve routine works similar to Matlab's backslash when A is square and nonsingular.
+        The algorithm used is the following:
+        1. A simple forward or backward substitution if A is upper or lower triangular
+        2. If the linear system is at most 3-by-3, form the inverse via minor expansion and multiply
+        3. Permute the variables and equations as to get a (structurally) nonzero diagonal,
+        then perform a QR factorization without pivoting and solve the factorized system.
+
+        Note 1: If there are entries of the linear system known to be zero, these will be removed.
+        Elements that are very small, or will evaluate to be zero, can still cause numerical errors,
+        due to the lack of pivoting (which is not possible since cannot compare the size of entries)
+
+        Note 2: When permuting the linear system, a BLT (block lower triangular) transformation is
+        formed. Only the permutation part of this is however used. An improvement would be to solve
+        block-by-block if there are multiple BLT blocks.
+    */
+    friend inline MatType solve(const MatType& A, const MatType& b) {
+      return A.zz_solve(b);
+    }
+
+    /** \brief Solve a system of equations: A*x = b
+     */
+    friend inline MatType solve(const MatType& A, const MatType& b,
+                                const std::string& lsolver,
+                                const Dict& dict = Dict()) {
+      return A.zz_solve(b, lsolver, dict);
+    }
+
+    /** \brief Computes the Moore-Penrose pseudo-inverse
+     *
+     * If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
+     * 
+     *  pinv(A)' = (AA')^(-1) A
+     *
+     *
+     * If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
+     *
+     *  pinv(A) = (A'A)^(-1) A'
+     *
+     */
+    friend inline MatType pinv(const MatType& A) {
+      return A.zz_pinv();
+    }
+
+    /** \brief Computes the Moore-Penrose pseudo-inverse
+     *
+     * If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity.
+     * If the matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
+     *
+     */
+    friend inline MatType pinv(const MatType& A, const std::string& lsolver,
+                               const Dict& dict = Dict()) {
+      return A.zz_pinv(lsolver, dict);
     }
 #endif // SWIG
 

@@ -25,7 +25,6 @@
 
 #include "ooqp_interface.hpp"
 #include "casadi/core/function/qp_solver.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 
 // OOQP headers

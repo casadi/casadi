@@ -24,7 +24,6 @@
 
 
 #include "csparse_cholesky_internal.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
 
 /// \cond INTERNAL
 

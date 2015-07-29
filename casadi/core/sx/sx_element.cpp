@@ -36,6 +36,7 @@
 #include "../casadi_options.hpp"
 #include "../function/sx_function_internal.hpp"
 #include "sx_tools.hpp"
+#include "../function/linear_solver.hpp"
 
 using namespace std;
 namespace casadi {
@@ -167,6 +168,32 @@ namespace casadi {
   bool SXElement::__nonzero__() const {
     if (isConstant()) return !isZero();
     casadi_error("Cannot compute the truth value of a CasADi SXElement symbolic expression.")
+  }
+
+  template<>
+  Matrix<double> Matrix<double>::
+  zz_solve(const Matrix<double>& b,
+           const std::string& lsolver, const Dict& dict) const {
+    const Matrix<double>& A = *this;
+    LinearSolver mysolver("tmp", lsolver, A.sparsity(), b.size2(), dict);
+    mysolver.setInput(A, LINSOL_A);
+    mysolver.setInput(b, LINSOL_B);
+    mysolver.prepare();
+    mysolver.solve(false);
+
+    return mysolver.output(LINSOL_X);
+  }
+
+  template<>
+  Matrix<double> Matrix<double>::
+  zz_pinv(const std::string& lsolver,
+          const Dict& dict) const {
+    const Matrix<double>& A = *this;
+    if (A.size1()>=A.size2()) {
+      return solve(mul(A.T(), A), A.T(), lsolver, dict);
+    } else {
+      return solve(mul(A, A.T()), A, lsolver, dict).T();
+    }
   }
 
   template<>

@@ -24,7 +24,6 @@
 
 
 #include "qp_solver_internal.hpp"
-#include "../matrix/matrix_tools.hpp"
 #include <typeinfo>
 
 INPUTSCHEME(QpSolverInput)

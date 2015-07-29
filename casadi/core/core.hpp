@@ -39,14 +39,12 @@
 
 // Matrices
 #include "matrix/matrix.hpp"
-#include "matrix/matrix_tools.hpp"
 
 // Scalar expressions
 #include "sx/sx_tools.hpp"
 
 // Matrix expressions
 #include "mx/mx.hpp"
-#include "mx/mx_tools.hpp"
 
 // Functions
 #include "function/code_generator.hpp"

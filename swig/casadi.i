@@ -202,7 +202,6 @@ warning('error','SWIG:OverloadError')
 #ifndef SWIGXML
 %feature("compactdefaultargs","1");
 //%feature("compactdefaultargs","0") casadi::taylor; // taylor function has a default argument for which the namespace is not recognised by SWIG
-%feature("compactdefaultargs","0") casadi::solve; // buggy
 %feature("compactdefaultargs","0") casadi::Function::generateCode; // buggy
 #endif //SWIGXML
 
@@ -2246,6 +2245,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   $1 = casadi::to_ptr($input, static_cast< xType **>(0));
  }
 
+// No arguments need to be freed
+%typemap(freearg, noblock=1) xType& INOUT {}
+
 %enddef
 
  // Define all typemaps for a template instantiation without proxy classes
@@ -2344,6 +2346,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %casadi_input_typemaps("Callback", PREC_CALLBACK, casadi::Callback)
 %casadi_template("Dict", PREC_DICT, std::map<std::string, casadi::GenericType>)
 
+//%apply const casadi::Dict& opts { const std::map<std::string, casadi::GenericType>& opts };
+//%apply const casadi::GenericType::Dict& opts { const std::map<std::string, casadi::GenericType>& opts };
+
+
 #endif // SWIGXML
 
 %{
@@ -2420,9 +2426,8 @@ except:
 %}
 #endif // SWIGPYTHON
 
-#ifdef SWIGMATLAB
 %rename("%(regex:/friendwrap_(?!ML)(.*)/\\1/)s") ""; // Strip leading friendwrap_ unless followed by ML
-#else
+#ifndef SWIGMATLAB
 %rename("%(regex:/zz_(?!ML)(.*)/\\1/)s") ""; // Strip leading zz_ unless followed by ML
 #endif
 
@@ -2740,122 +2745,123 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
 
 // Prefix symbols
 #ifdef SWIGMATLAB
-%define %PREF(SYM) friendwrap_ ## SYM %enddef
-%define %PREFNEW(SYM) friendwrap_ ## SYM %enddef
+%define %PREFOLD(SYM) friendwrap_ ## SYM %enddef
+%define %PREFHIDE(SYM) friendwrap_ ## SYM %enddef
 #else
-%define %PREF(SYM) SYM %enddef
-%define %PREFNEW(SYM) casadi_ ## SYM %enddef
+%define %PREFOLD(SYM) SYM %enddef
+%define %PREFHIDE(SYM) casadi_ ## SYM %enddef
 #endif
+%define %PREF(SYM) friendwrap_ ## SYM %enddef
 
 %define SPARSITY_INTERFACE_FRIENDS(DECL, M)
- DECL M %PREF(horzcat)(const std::vector< M > &v) {
+ DECL M %PREFOLD(horzcat)(const std::vector< M > &v) {
   return horzcat(v);
  }
- DECL M %PREF(vertcat)(const std::vector< M > &v) {
+ DECL M %PREFOLD(vertcat)(const std::vector< M > &v) {
  return vertcat(v);
  }
  DECL std::vector< M >
- %PREF(horzsplit)(const M& v, const std::vector<int>& offset) {
+ %PREFOLD(horzsplit)(const M& v, const std::vector<int>& offset) {
  return horzsplit(v, offset);
  }
- DECL std::vector< M > %PREF(horzsplit)(const M& v, int incr=1) {
+ DECL std::vector< M > %PREFOLD(horzsplit)(const M& v, int incr=1) {
  return horzsplit(v, incr);
  }
  DECL std::vector< M >
- %PREF(vertsplit)(const M& v, const std::vector<int>& offset) {
+ %PREFOLD(vertsplit)(const M& v, const std::vector<int>& offset) {
  return vertsplit(v, offset);
  }
  DECL std::vector<int >
- %PREF(offset)(const std::vector< M > &v, bool vert=true) {
+ %PREFOLD(offset)(const std::vector< M > &v, bool vert=true) {
  return offset(v, vert);
  }
  DECL std::vector< M >
- %PREF(vertsplit)(const M& v, int incr=1) {
+ %PREFOLD(vertsplit)(const M& v, int incr=1) {
  return vertsplit(v, incr);
  }
- DECL M %PREF(blockcat)(const std::vector< std::vector< M > > &v) {
+ DECL M %PREFOLD(blockcat)(const std::vector< std::vector< M > > &v) {
  return blockcat(v);
  }
- DECL M %PREF(blockcat)(const M& A, const M& B, const M& C, const M& D) {
+ DECL M %PREFOLD(blockcat)(const M& A, const M& B, const M& C, const M& D) {
  return vertcat(horzcat(A, B), horzcat(C, D));
  }
  DECL std::vector< std::vector< M > >
- %PREF(blocksplit)(const M& x, const std::vector<int>& vert_offset,
+ %PREFOLD(blocksplit)(const M& x, const std::vector<int>& vert_offset,
  const std::vector<int>& horz_offset) {
  return blocksplit(x, vert_offset, horz_offset);
  }
  DECL std::vector< std::vector< M > >
- %PREF(blocksplit)(const M& x, int vert_incr=1, int horz_incr=1) {
+ %PREFOLD(blocksplit)(const M& x, int vert_incr=1, int horz_incr=1) {
  return blocksplit(x, vert_incr, horz_incr);
  }
- DECL M %PREF(diagcat)(const std::vector< M > &A) {
+ DECL M %PREFOLD(diagcat)(const std::vector< M > &A) {
  return diagcat(A);
  }
  DECL std::vector< M >
- %PREF(diagsplit)(const M& x, const std::vector<int>& output_offset1,
+ %PREFOLD(diagsplit)(const M& x, const std::vector<int>& output_offset1,
  const std::vector<int>& output_offset2) {
  return diagsplit(x, output_offset1, output_offset2);
  }
  DECL std::vector< M >
- %PREF(diagsplit)(const M& x, const std::vector<int>& output_offset) {
+ %PREFOLD(diagsplit)(const M& x, const std::vector<int>& output_offset) {
  return diagsplit(x, output_offset);
  }
- DECL std::vector< M > %PREF(diagsplit)(const M& x, int incr=1) {
+ DECL std::vector< M > %PREFOLD(diagsplit)(const M& x, int incr=1) {
  return diagsplit(x, incr);
  }
  DECL std::vector< M >
- %PREF(diagsplit)(const M& x, int incr1, int incr2) {
+ %PREFOLD(diagsplit)(const M& x, int incr1, int incr2) {
  return diagsplit(x, incr1, incr2);
  }
- DECL M %PREF(veccat)(const std::vector< M >& x) {
+ DECL M %PREFOLD(veccat)(const std::vector< M >& x) {
  return veccat(x);
  }
- DECL M %PREF(mul)(const M& X, const M& Y) {
+ DECL M %PREFOLD(mul)(const M& X, const M& Y) {
  return mul(X, Y);
  }
- DECL M %PREF(mul)(const std::vector< M > &args) {
+ DECL M %PREFOLD(mul)(const std::vector< M > &args) {
  return mul(args);
  }
- DECL M %PREF(mac)(const M& X, const M& Y, const M& Z) {
+ DECL M %PREFOLD(mac)(const M& X, const M& Y, const M& Z) {
  return mac(X, Y, Z);
  }
- DECL M %PREF(transpose)(const M& X) {
+ DECL M %PREFOLD(transpose)(const M& X) {
  return X.T();
  }
- DECL M %PREF(vec)(const M& a) {
+ DECL M %PREFOLD(vec)(const M& a) {
  return vec(a);
  }
- DECL M %PREF(vecNZ)(const M& a) {
+ DECL M %PREFOLD(vecNZ)(const M& a) {
  return vecNZ(a);
  }
- DECL M %PREF(reshape)(const M& a, int nrow, int ncol) {
+ DECL M %PREFOLD(reshape)(const M& a, int nrow, int ncol) {
  return reshape(a, nrow, ncol);
  }
- DECL M %PREF(reshape)(const M& a, std::pair<int, int> rc) {
+ DECL M %PREFOLD(reshape)(const M& a, std::pair<int, int> rc) {
  return reshape(a, rc.first, rc.second);
  }
- DECL M %PREF(reshape)(const M& a, const Sparsity& sp) {
+ DECL M %PREFOLD(reshape)(const M& a, const Sparsity& sp) {
  return reshape(a, sp);
  }
- DECL int %PREF(sprank)(const M& A) {
+ DECL int %PREFOLD(sprank)(const M& A) {
  return sprank(A);
  }
- DECL int %PREF(norm_0_mul)(const M& x, const M& y) {
+ DECL int %PREFOLD(norm_0_mul)(const M& x, const M& y) {
  return norm_0_mul(x, y);
  }
- DECL M %PREF(triu)(const M& a, bool includeDiagonal=true) {
+ DECL M %PREFOLD(triu)(const M& a, bool includeDiagonal=true) {
  return triu(a, includeDiagonal);
  }
- DECL M %PREF(tril)(const M& a, bool includeDiagonal=true) {
+ DECL M %PREFOLD(tril)(const M& a, bool includeDiagonal=true) {
  return tril(a, includeDiagonal);
  }
- DECL M %PREF(kron)(const M& a, const M& b) {
+ DECL M %PREFOLD(kron)(const M& a, const M& b) {
  return kron(a, b);
  }
- DECL M %PREF(repmat)(const M& A, int n, int m=1) {
+ DECL M %PREFOLD(repmat)(const M& A, int n, int m=1) {
  return repmat(A, n, m);
  }
- DECL M %PREF(repmat)(const M& A, const std::pair<int, int>& rc) {
+ DECL M %PREFOLD(repmat)(const M& A, const std::pair<int, int>& rc) {
  return repmat(A, rc.first, rc.second);
  }
 %enddef
@@ -2869,101 +2875,128 @@ SPARSITY_INTERFACE_FRIENDS(DECL, Matrix<SXElement>)
 %enddef
 
 %define GENERIC_MATRIX_FRIENDS(DECL, M)
-DECL M %PREF(mpower)(const M& x, const M& n) {
+DECL M %PREFOLD(mpower)(const M& x, const M& n) {
   return mpower(x, n);
 }
-DECL M %PREF(mrdivide)(const M& x, const M& y) {
+DECL M %PREFOLD(mrdivide)(const M& x, const M& y) {
   return mrdivide(x, y);
 }
-DECL M %PREF(mldivide)(const M& x, const M& y) {
+DECL M %PREFOLD(mldivide)(const M& x, const M& y) {
   return mldivide(x, y);
 }
-DECL std::vector< M > %PREF(symvar)(const M& x) {
+DECL std::vector< M > %PREFOLD(symvar)(const M& x) {
   return symvar(x);
 }
-DECL M %PREF(quad_form)(const M& X, const M& A) {
+DECL M %PREFOLD(quad_form)(const M& X, const M& A) {
   return quad_form(X, A);
 }
-DECL M %PREF(quad_form)(const M& X) {
+DECL M %PREFOLD(quad_form)(const M& X) {
   return quad_form(X);          
 }
-DECL M %PREF(sum_square)(const M& X) {
+DECL M %PREFOLD(sum_square)(const M& X) {
   return sum_square(X);         
 }
-DECL M %PREF(linspace)(const M& a, const M& b, int nsteps) {
+DECL M %PREFOLD(linspace)(const M& a, const M& b, int nsteps) {
   return linspace(a, b, nsteps);
 }
-DECL M %PREF(cross)(const M& a, const M& b, int dim = -1) {
+DECL M %PREFOLD(cross)(const M& a, const M& b, int dim = -1) {
   return cross(a, b, dim);      
 }
-DECL M %PREF(det)(const M& A) {
+DECL M %PREFOLD(det)(const M& A) {
   return det(A);                
 }
-DECL M %PREF(inv)(const M& A) {
+DECL M %PREFOLD(inv)(const M& A) {
   return inv(A);                
 }
-DECL M %PREF(trace)(const M& a) {
+DECL M %PREFOLD(trace)(const M& a) {
   return trace(a);              
 }
-DECL M %PREF(tril2symm)(const M& a) {
+DECL M %PREFOLD(tril2symm)(const M& a) {
   return tril2symm(a);          
 }
-DECL M %PREF(triu2symm)(const M& a) {
+DECL M %PREFOLD(triu2symm)(const M& a) {
   return triu2symm(a);          
 }
-DECL M %PREF(norm_F)(const M& x) {
+DECL M %PREFOLD(norm_F)(const M& x) {
   return norm_F(x);             
 }
-DECL M %PREF(norm_2)(const M& x) {
+DECL M %PREFOLD(norm_2)(const M& x) {
   return norm_2(x);             
 }
-DECL M %PREF(norm_1)(const M& x) {
+DECL M %PREFOLD(norm_1)(const M& x) {
   return norm_1(x);             
 }
-DECL M %PREF(norm_inf)(const M& x) {
+DECL M %PREFOLD(norm_inf)(const M& x) {
   return norm_inf(x);           
 }
-DECL M %PREF(sumCols)(const M& x) {
+DECL M %PREFOLD(sumCols)(const M& x) {
   return sumCols(x);            
 }
-DECL M %PREF(sumRows)(const M& x) {
+DECL M %PREFOLD(sumRows)(const M& x) {
   return sumRows(x);            
 }
-DECL M %PREF(inner_prod)(const M& x, const M& y) {
+DECL M %PREFOLD(inner_prod)(const M& x, const M& y) {
   return inner_prod(x, y);      
 }
-DECL M %PREF(outer_prod)(const M& x, const M& y) {
+DECL M %PREFOLD(outer_prod)(const M& x, const M& y) {
   return outer_prod(x, y);      
 }
-DECL M %PREF(nullspace)(const M& A) {
+DECL M %PREFOLD(nullspace)(const M& A) {
   return nullspace(A);          
 }
-DECL M %PREF(polyval)(const M& p, const M& x) {
+DECL M %PREFOLD(polyval)(const M& p, const M& x) {
   return polyval(p, x);         
 }
-DECL M %PREF(diag)(const M& A) {
+DECL M %PREFOLD(diag)(const M& A) {
   return diag(A);               
 }
-DECL M %PREF(unite)(const M& A, const M& B) {
+DECL M %PREFOLD(unite)(const M& A, const M& B) {
   return unite(A, B);           
 }
-DECL M %PREF(densify)(const M& x) {
+DECL M %PREFOLD(densify)(const M& x) {
   return densify(x);            
 }
-DECL M %PREF(project)(const M& A, const Sparsity& sp, bool intersect=false) {
+DECL M %PREFOLD(project)(const M& A, const Sparsity& sp, bool intersect=false) {
   return project(A, sp, intersect);    
 }
-DECL M %PREF(if_else)(const M& cond, const M& if_true, 
+DECL M %PREFOLD(if_else)(const M& cond, const M& if_true, 
                     const M& if_false, bool short_circuit=true) {
   return if_else(cond, if_true, if_false, short_circuit);   
 }
-DECL M %PREF(conditional)(const M& ind, const std::vector< M > &x,
+DECL M %PREFOLD(conditional)(const M& ind, const std::vector< M > &x,
                         const M& x_default, bool short_circuit=true) {
   return conditional(ind, x, x_default, short_circuit);     
 }
-DECL bool %PREF(dependsOn)(const M& f, const M& arg) {
+DECL bool %PREFOLD(dependsOn)(const M& f, const M& arg) {
   return dependsOn(f, arg);     
 }
+
+DECL void %PREFOLD(substituteInPlace)(const std::vector<M>& v,
+                                      std::vector<M>& inout_vdef,
+                                      std::vector<M>& inout_ex,
+                                      bool reverse=false) {
+  return substituteInPlace(v, inout_vdef, inout_ex, reverse);
+}
+
+DECL M %PREFOLD(solve)(const M& A, const M& b) {
+  return solve(A, b);
+}
+
+DECL M %PREFOLD(solve)(const M& A, const M& b,
+                       const std::string& lsolver,
+                       const casadi::Dict& opts = casadi::Dict()) {
+  return solve(A, b, lsolver, opts);
+}
+
+DECL M %PREFOLD(pinv)(const M& A) {
+  return pinv(A);
+}
+
+DECL M %PREFOLD(pinv)(const M& A, const std::string& lsolver,
+                      const casadi::Dict& opts = casadi::Dict()) {
+  return pinv(A, lsolver, opts);
+}
+
 %enddef
 
 %define GENERIC_MATRIX_ALL(DECL)
@@ -2974,48 +3007,48 @@ GENERIC_MATRIX_FRIENDS(DECL, Matrix<SXElement>)
 %enddef
 
 %define GENERIC_EXPRESSION_FRIENDS(DECL, M) 
-DECL M %PREFNEW(plus)(const M& x, const M& y) { return x+y; }
-DECL M %PREFNEW(minus)(const M& x, const M& y) { return x-y; }
-DECL M %PREFNEW(times)(const M& x, const M& y) { return x*y; }
-DECL M %PREFNEW(rdivide)(const M& x, const M& y) { return x/y; }
-DECL M %PREFNEW(ldivide)(const M& x, const M& y) { return y/x; }
-DECL M %PREFNEW(lt)(const M& x, const M& y) { return x<y; }
-DECL M %PREFNEW(le)(const M& x, const M& y) { return x<=y; }
-DECL M %PREFNEW(gt)(const M& x, const M& y) { return x>y; }
-DECL M %PREFNEW(ge)(const M& x, const M& y) { return x>=y; }
-DECL M %PREFNEW(eq)(const M& x, const M& y) { return x==y; }
-DECL M %PREFNEW(ne)(const M& x, const M& y) { return x!=y; }
-DECL M %PREFNEW(and)(const M& x, const M& y) { return x&&y; }
-DECL M %PREFNEW(or)(const M& x, const M& y) { return x||y; }
-DECL M %PREFNEW(abs)(const M& x) { return fabs(x); }
-DECL M %PREFNEW(sqrt)(const M& x) { return sqrt(x); }
-DECL M %PREFNEW(sin)(const M& x) { return sin(x); }
-DECL M %PREFNEW(cos)(const M& x) { return cos(x); }
-DECL M %PREFNEW(tan)(const M& x) { return tan(x); }
-DECL M %PREFNEW(atan)(const M& x) { return atan(x); }
-DECL M %PREFNEW(asin)(const M& x) { return asin(x); }
-DECL M %PREFNEW(acos)(const M& x) { return acos(x); }
-DECL M %PREFNEW(tanh)(const M& x) { return tanh(x); }
-DECL M %PREFNEW(sinh)(const M& x) { return sinh(x); }
-DECL M %PREFNEW(cosh)(const M& x) { return cosh(x); }
-DECL M %PREFNEW(atanh)(const M& x) { return atanh(x); }
-DECL M %PREFNEW(asinh)(const M& x) { return asinh(x); }
-DECL M %PREFNEW(acosh)(const M& x) { return acosh(x); }
-DECL M %PREFNEW(exp)(const M& x) { return exp(x); }
-DECL M %PREFNEW(log)(const M& x) { return log(x); }
-DECL M %PREFNEW(log10)(const M& x) { return log10(x); }
-DECL M %PREFNEW(floor)(const M& x) { return floor(x); }
-DECL M %PREFNEW(ceil)(const M& x) { return ceil(x); }
-DECL M %PREFNEW(erf)(const M& x) { return erf(x); }
-DECL M %PREFNEW(sign)(const M& x) { return sign(x); }
-DECL M %PREFNEW(power)(const M& x, const M& n) { return pow(x, n); }
-DECL M %PREFNEW(mod)(const M& x, const M& y) { return fmod(x, y); }
-DECL M %PREFNEW(atan2)(const M& x, const M& y) { return atan2(x, y); }
-DECL M %PREFNEW(min)(const M& x, const M& y) { return fmin(x, y); }
-DECL M %PREFNEW(max)(const M& x, const M& y) { return fmax(x, y); }
-DECL M %PREFNEW(simplify)(const M& x) { return simplify(x); }
-DECL bool %PREFNEW(isEqual)(const M& x, const M& y, int depth=0) { return isEqual(x, y, depth); }
-DECL bool %PREFNEW(iszero)(const M& x) { return iszero(x); }
+DECL M %PREFHIDE(plus)(const M& x, const M& y) { return x+y; }
+DECL M %PREFHIDE(minus)(const M& x, const M& y) { return x-y; }
+DECL M %PREFHIDE(times)(const M& x, const M& y) { return x*y; }
+DECL M %PREFHIDE(rdivide)(const M& x, const M& y) { return x/y; }
+DECL M %PREFHIDE(ldivide)(const M& x, const M& y) { return y/x; }
+DECL M %PREFHIDE(lt)(const M& x, const M& y) { return x<y; }
+DECL M %PREFHIDE(le)(const M& x, const M& y) { return x<=y; }
+DECL M %PREFHIDE(gt)(const M& x, const M& y) { return x>y; }
+DECL M %PREFHIDE(ge)(const M& x, const M& y) { return x>=y; }
+DECL M %PREFHIDE(eq)(const M& x, const M& y) { return x==y; }
+DECL M %PREFHIDE(ne)(const M& x, const M& y) { return x!=y; }
+DECL M %PREFHIDE(and)(const M& x, const M& y) { return x&&y; }
+DECL M %PREFHIDE(or)(const M& x, const M& y) { return x||y; }
+DECL M %PREFHIDE(abs)(const M& x) { return fabs(x); }
+DECL M %PREFHIDE(sqrt)(const M& x) { return sqrt(x); }
+DECL M %PREFHIDE(sin)(const M& x) { return sin(x); }
+DECL M %PREFHIDE(cos)(const M& x) { return cos(x); }
+DECL M %PREFHIDE(tan)(const M& x) { return tan(x); }
+DECL M %PREFHIDE(atan)(const M& x) { return atan(x); }
+DECL M %PREFHIDE(asin)(const M& x) { return asin(x); }
+DECL M %PREFHIDE(acos)(const M& x) { return acos(x); }
+DECL M %PREFHIDE(tanh)(const M& x) { return tanh(x); }
+DECL M %PREFHIDE(sinh)(const M& x) { return sinh(x); }
+DECL M %PREFHIDE(cosh)(const M& x) { return cosh(x); }
+DECL M %PREFHIDE(atanh)(const M& x) { return atanh(x); }
+DECL M %PREFHIDE(asinh)(const M& x) { return asinh(x); }
+DECL M %PREFHIDE(acosh)(const M& x) { return acosh(x); }
+DECL M %PREFHIDE(exp)(const M& x) { return exp(x); }
+DECL M %PREFHIDE(log)(const M& x) { return log(x); }
+DECL M %PREFHIDE(log10)(const M& x) { return log10(x); }
+DECL M %PREFHIDE(floor)(const M& x) { return floor(x); }
+DECL M %PREFHIDE(ceil)(const M& x) { return ceil(x); }
+DECL M %PREFHIDE(erf)(const M& x) { return erf(x); }
+DECL M %PREFHIDE(sign)(const M& x) { return sign(x); }
+DECL M %PREFHIDE(power)(const M& x, const M& n) { return pow(x, n); }
+DECL M %PREFHIDE(mod)(const M& x, const M& y) { return fmod(x, y); }
+DECL M %PREFHIDE(atan2)(const M& x, const M& y) { return atan2(x, y); }
+DECL M %PREFHIDE(min)(const M& x, const M& y) { return fmin(x, y); }
+DECL M %PREFHIDE(max)(const M& x, const M& y) { return fmax(x, y); }
+DECL M %PREFHIDE(simplify)(const M& x) { return simplify(x); }
+DECL bool %PREFHIDE(isEqual)(const M& x, const M& y, int depth=0) { return isEqual(x, y, depth); }
+DECL bool %PREFHIDE(iszero)(const M& x) { return iszero(x); }
 %enddef
 
 %define GENERIC_EXPRESSION_ALL(DECL) 
@@ -3026,42 +3059,42 @@ GENERIC_EXPRESSION_FRIENDS(DECL, Matrix<SXElement>)
 %enddef
 
 %define MATRIX_FRIENDS_UNWRAPPED(DECL, M)
- DECL M %PREF(all)(const M& x) {
+ DECL M %PREFOLD(all)(const M& x) {
  return all(x);
  }
- DECL M %PREF(any)(const M& x) {
+ DECL M %PREFOLD(any)(const M& x) {
  return any(x);
  }
 %enddef
 
 %define MATRIX_FRIENDS(DECL, M)
-DECL M %PREF(adj)(const M& A) {
+DECL M %PREFOLD(adj)(const M& A) {
   return adj(A);
  }
 
-DECL M %PREF(getMinor)(const M& x, int i, int j) {
+DECL M %PREFOLD(getMinor)(const M& x, int i, int j) {
   return getMinor(x, i, j);
 }
 
-DECL M %PREF(cofactor)(const M& x, int i, int j) {
+DECL M %PREFOLD(cofactor)(const M& x, int i, int j) {
   return cofactor(x, i, j);
 }
 
-%apply M& OUTPUT { M& out_Q};
-%apply M& OUTPUT { M& out_R};
-DECL void %PREF(qr)(const M& A, M& out_Q, M& out_R) {
-  return qr(A, out_Q, out_R);
+%apply M& OUTPUT { M& output_Q};
+%apply M& OUTPUT { M& output_R};
+DECL void %PREFOLD(qr)(const M& A, M& output_Q, M& output_R) {
+  return qr(A, output_Q, output_R);
 }
 
-DECL M %PREF(chol)(const M& A) {
+DECL M %PREFOLD(chol)(const M& A) {
   return chol(A);
 }
 
-DECL M %PREF(norm_inf_mul)(const M& x, const M& y) {
+DECL M %PREFOLD(norm_inf_mul)(const M& x, const M& y) {
   return norm_inf_mul(x, y);
 }
 
-DECL M %PREF(sparsify)(const M& A, double tol=0) {
+DECL M %PREFOLD(sparsify)(const M& A, double tol=0) {
   return sparsify(A, tol);
 }
 %enddef
@@ -3074,6 +3107,85 @@ MATRIX_FRIENDS(DECL, Matrix<SXElement>)
 MATRIX_FRIENDS_UNWRAPPED(DECL, Matrix<int>)
 MATRIX_FRIENDS_UNWRAPPED(DECL, Matrix<double>)
 MATRIX_FRIENDS_UNWRAPPED(DECL, Matrix<SXElement>)
+%enddef
+
+%define MX_FRIENDS(DECL, M)
+
+DECL M %PREF(find)(const M& x) {
+  return find(x);
+}
+
+DECL int %PREF(countNodes)(const M& A) {
+  return countNodes(A);
+}
+
+DECL std::string
+%PREF(getOperatorRepresentation)(const M& xb,
+                                 const std::vector<std::string>& args) {
+  return getOperatorRepresentation(xb, args);
+}
+
+DECL M %PREF(substitute)(const M &ex, const M& v, const M& vdef) {
+  return substitute(ex, v, vdef);
+}
+
+DECL std::vector<M>
+%PREF(substitute)(const std::vector<M> &ex, const std::vector<M> &v,
+           const std::vector<M> &vdef) {
+  return substitute(ex, v, vdef);
+}
+
+DECL M %PREF(graph_substitute)(const M &ex, const std::vector<M> &v,
+                         const std::vector<M> &vdef) {
+  return graph_substitute(ex, v, vdef);
+}
+
+DECL std::vector<M>
+%PREF(graph_substitute)(const std::vector<M> &ex,
+                 const std::vector<M> &v,
+                 const std::vector<M> &vdef) {
+  return graph_substitute(ex, v, vdef);
+}
+
+DECL void %PREF(extractShared)(std::vector<M>& ex,
+                               std::vector<M>& v,
+                               std::vector<M>& vdef,
+                               const std::string& v_prefix="v_",
+                               const std::string& v_suffix="") {
+  return extractShared(ex, v, vdef, v_prefix, v_suffix);
+}
+
+DECL M %PREF(jacobian)(const M &ex, const M &arg) {
+  return jacobian(ex, arg);
+}
+
+DECL M %PREF(gradient)(const M &ex, const M &arg) {
+  return gradient(ex, arg);
+}
+
+DECL M %PREF(tangent)(const M &ex, const M &arg) {
+  return tangent(ex, arg);
+}
+
+DECL M %PREF(hessian)(const M& ex, const M& arg, M& output_g) {
+  return hessian(ex, arg, output_g);
+}
+
+DECL M %PREF(matrix_expand)(const M& e,
+                             const std::vector<M> &boundary = std::vector<M>()) {
+  return matrix_expand(e, boundary);
+}
+
+DECL std::vector<M>
+%PREF(matrix_expand)(const std::vector<M>& e,
+                     const std::vector<M> &boundary = std::vector<M>()) {
+  return matrix_expand(e, boundary);
+}
+
+%enddef
+
+%define MX_ALL(DECL)
+MX_FRIENDS(DECL, MX)
 %enddef
 
 // FIXME: Placing in printable_object.i does not work
@@ -3557,24 +3669,14 @@ def PyFunction(obj,inputs,outputs):
 %include <casadi/core/function/function.hpp>
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/function/code_generator.hpp>
-%include <casadi/core/matrix/matrix_tools.hpp>
 
-// map the template name to the instantiated name
-%define MTT_INST(DataType, function_name)
-%template(function_name) casadi::function_name <DataType >;
-%enddef
+%typemap(in, noblock=1, fragment="casadi_all") const casadi::Dict& opts (casadi::Dict m) {
+  $1 = &m;
+  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to " "Dict" ".");
+ }
+%typemap(freearg, noblock=1) const casadi::GenericType::Dict & {}
 
-// Define template instantiations
-%define MATRIX_TOOLS_TEMPLATES(DataType)
-  MTT_INST(DataType, solve)
-  MTT_INST(DataType, pinv)
-%enddef
 
-#ifndef SWIGMATLAB
-MATRIX_TOOLS_TEMPLATES(int)
-MATRIX_TOOLS_TEMPLATES(double)
-MATRIX_TOOLS_TEMPLATES(casadi::SXElement)
-#endif // SWIGMATLAB
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)
 SPARSITY_INTERFACE_FRIENDS(friend inline, MatType)
@@ -3597,6 +3699,11 @@ GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(casadi::SXElement)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
 #endif // SWIGMATLAB
 
+/// Return-by-reference in C++, return-by-value in SWIG
+%apply std::vector< casadi::MX >& INOUT { std::vector< casadi::MX >& inout_vdef};
+%apply std::vector< casadi::MX >& INOUT { std::vector< casadi::MX >& inout_ex};
+%apply casadi::MX& OUTPUT { casadi::MX& output_g};
+
 #ifdef SWIGMATLAB
 // Wrap as static member functions
 %feature("nonstatic");
@@ -3613,13 +3720,18 @@ namespace casadi {
   %extend MatrixCommon {
     MATRIX_ALL(static inline)
   }
+  %extend MX {
+    MX_ALL(static inline)
+  }
 } // namespace casadi
 %feature("nonstatic", "");
 #else // SWIGMATLAB
 // Wrap as stand-alone functions with casadi_ prefix
+
 %inline {
   namespace casadi {
     GENERIC_EXPRESSION_ALL(inline)
+    MX_ALL(inline)
   }
 }
 
@@ -3695,7 +3807,6 @@ namespace casadi {
 %feature("director") casadi::DerivativeGenerator2;
 
 %include <casadi/core/sx/sx_tools.hpp>
-%include <casadi/core/mx/mx_tools.hpp>
 %include <casadi/core/function/sx_function.hpp>
 %include <casadi/core/function/mx_function.hpp>
 %include <casadi/core/function/linear_solver.hpp>

@@ -26,7 +26,6 @@
 #include "qpoases_interface.hpp"
 
 #include "../../core/std_vector_tools.hpp"
-#include "../../core/matrix/matrix_tools.hpp"
 
 using namespace std;
 namespace casadi {

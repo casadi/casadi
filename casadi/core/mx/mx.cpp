@@ -25,13 +25,11 @@
 
 #include "mx.hpp"
 #include "mx_node.hpp"
-#include "mx_tools.hpp"
 #include "../function/sx_function.hpp"
 #include "symbolic_mx.hpp"
 #include "constant_mx.hpp"
 #include "multiple_output.hpp"
 #include "../std_vector_tools.hpp"
-#include "../matrix/matrix_tools.hpp"
 #include "norm.hpp"
 #include "../casadi_math.hpp"
 #include "../function/mx_function_internal.hpp"

@@ -27,10 +27,8 @@
 #define CASADI_BINARY_MX_IMPL_HPP
 
 #include "binary_mx.hpp"
-#include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
-#include "../matrix/matrix_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../std_vector_tools.hpp"
 #include "../casadi_options.hpp"

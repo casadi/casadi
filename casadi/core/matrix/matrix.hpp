@@ -448,6 +448,15 @@ namespace casadi {
     Matrix<DataType> zz_mod(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_simplify() const;
     bool zz_isEqual(const Matrix<DataType> &ex2, int depth=0) const;
+    static void zz_substituteInPlace(const std::vector<Matrix<DataType> >& v,
+                                     std::vector<Matrix<DataType> >& vdef,
+                                     std::vector<Matrix<DataType> >& ex,
+                                     bool revers);
+    Matrix<DataType> zz_pinv() const;
+    Matrix<DataType> zz_pinv(const std::string& lsolver, const Dict& dict) const;
+    Matrix<DataType> zz_solve(const Matrix<DataType>& b) const;
+    Matrix<DataType> zz_solve(const Matrix<DataType>& b,
+                              const std::string& lsolver, const Dict& dict) const;
     ///@}
     /// \endcond
 #endif // SWIG
@@ -484,10 +493,6 @@ namespace casadi {
     static std::vector<Matrix<DataType> > zz_substitute(const std::vector<Matrix<DataType> >& ex,
                                                         const std::vector<Matrix<DataType> >& v,
                                                         const std::vector<Matrix<DataType> >& vdef);
-    static void zz_substituteInPlace(const std::vector<Matrix<DataType> >& v,
-                                     std::vector<Matrix<DataType> >& SWIG_INOUT(vdef),
-                                     std::vector<Matrix<DataType> >& SWIG_INOUT(ex),
-                                     bool reverse=false);
     bool zz_dependsOn(const Matrix<DataType> &arg) const;
     std::vector<Matrix<DataType> > zz_symvar() const;
     Matrix<DataType> zz_jacobian(const Matrix<DataType> &arg) const;
@@ -566,8 +571,6 @@ namespace casadi {
     void zz_qr(Matrix<DataType>& SWIG_OUTPUT(Q), Matrix<DataType>& SWIG_OUTPUT(R)) const;
     Matrix<DataType> zz_chol() const;
     Matrix<DataType> zz_nullspace() const;
-    Matrix<DataType> zz_solve(const Matrix<DataType>& b) const;
-    Matrix<DataType> zz_pinv() const;
     Matrix<DataType> zz_kron(const Matrix<DataType>& b) const;
     Matrix<DataType> zz_diag() const;
     static Matrix<DataType> zz_diagcat(const std::vector< Matrix<DataType> > &A);

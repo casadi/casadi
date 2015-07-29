@@ -27,7 +27,6 @@
 #define CASADI_SX_TOOLS_HPP
 
 #include "sx_element.hpp"
-#include "../matrix/matrix_tools.hpp"
 #include "../casadi_options.hpp"
 
 /** \defgroup expression_tools Expression tools
@@ -138,15 +137,6 @@ namespace casadi {
                                     const std::vector<SX>& v,
                                     const std::vector<SX>& vdef) {
     return SX::zz_substitute(ex, v, vdef);
-  }
-
-  /** \brief Substitute variable var out of or into an expression expr,
-   *  with an arbitrary number of other expressions piggyback  */
-  inline void substituteInPlace(const std::vector<SX>& v,
-                                std::vector<SX>& SWIG_INOUT(vdef),
-                                std::vector<SX>& SWIG_INOUT(ex),
-                                bool reverse=false) {
-    return SX::zz_substituteInPlace(v, vdef, ex, reverse);
   }
 
   ///@{

@@ -24,7 +24,6 @@
 
 
 #include "stabilized_qp_solver_internal.hpp"
-#include "../matrix/matrix_tools.hpp"
 
 INPUTSCHEME(StabilizedQpSolverInput)
 OUTPUTSCHEME(QpSolverOutput)

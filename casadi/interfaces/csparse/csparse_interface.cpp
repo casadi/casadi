@@ -24,7 +24,6 @@
 
 
 #include "csparse_interface.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/profiling.hpp"
 #include "casadi/core/casadi_options.hpp"
 

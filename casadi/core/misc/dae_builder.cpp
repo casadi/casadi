@@ -33,8 +33,6 @@
 
 #include "../std_vector_tools.hpp"
 #include "../casadi_exception.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "../mx/mx_tools.hpp"
 #include "../function/mx_function.hpp"
 #include "../function/integrator.hpp"
 #include "../function/code_generator.hpp"

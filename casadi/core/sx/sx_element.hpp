@@ -284,6 +284,15 @@ namespace casadi {
   /// \cond INTERNAL
   // Template specializations
   template<>
+  CASADI_EXPORT Matrix<double> Matrix<double>::
+  zz_solve(const Matrix<double>& b,
+           const std::string& lsolver, const Dict& dict) const;
+
+  template<>
+  CASADI_EXPORT Matrix<double> Matrix<double>::
+  zz_pinv(const std::string& lsolver, const Dict& dict) const;
+
+  template<>
   CASADI_EXPORT bool Matrix<SXElement>::__nonzero__() const;
 
   template<>

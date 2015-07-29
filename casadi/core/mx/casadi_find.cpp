@@ -24,7 +24,6 @@
 
 
 #include "casadi_find.hpp"
-#include "mx_tools.hpp"
 
 using namespace std;
 

@@ -24,8 +24,6 @@
 
 
 #include "inner_prod.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../runtime/runtime.hpp"
 

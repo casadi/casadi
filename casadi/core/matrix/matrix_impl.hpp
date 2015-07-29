@@ -28,7 +28,6 @@
 
 // The declaration of the class is in a separate file
 #include "matrix.hpp"
-#include "matrix_tools.hpp"
 
 /// \cond INTERNAL
 
@@ -2467,12 +2466,27 @@ namespace casadi {
   }
 
   template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::
+  zz_solve(const Matrix<DataType>& b,
+           const std::string& lsolver, const Dict& dict) const {
+    throw CasadiException("\"solve\" not defined for instantiation");
+    return Matrix<DataType>();
+  }
+
+  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_pinv() const {
     if (size2()>=size1()) {
       return solve(mul(*this, T()), *this).T();
     } else {
       return solve(mul(this->T(), *this), this->T());
     }
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::
+  zz_pinv(const std::string& lsolver, const Dict& dict) const {
+    throw CasadiException("\"solve\" not defined for instantiation");
+    return Matrix<DataType>();
   }
 
   template<typename DataType>

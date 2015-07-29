@@ -24,7 +24,6 @@
 
 
 #include "qcqp_solver_internal.hpp"
-#include "../matrix/matrix_tools.hpp"
 
 INPUTSCHEME(QcqpSolverInput)
 OUTPUTSCHEME(QcqpSolverOutput)

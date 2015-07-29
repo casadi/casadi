@@ -24,8 +24,6 @@
 
 
 #include "monitor.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
 
 using namespace std;

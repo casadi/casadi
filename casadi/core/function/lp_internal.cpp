@@ -24,7 +24,6 @@
 
 
 #include "lp_internal.hpp"
-#include "../matrix/matrix_tools.hpp"
 
 INPUTSCHEME(LpSolverInput)
 OUTPUTSCHEME(LpSolverOutput)

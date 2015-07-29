@@ -26,8 +26,6 @@
 #include "implicit_function_internal.hpp"
 #include "mx_function.hpp"
 #include "../mx/mx_node.hpp"
-#include "../mx/mx_tools.hpp"
-#include "../matrix/matrix_tools.hpp"
 #include <iterator>
 
 #include "../casadi_options.hpp"

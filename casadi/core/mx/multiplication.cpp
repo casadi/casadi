@@ -27,8 +27,6 @@
 #define CASADI_MULTIPLICATION_CPP
 
 #include "multiplication.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "mx_tools.hpp"
 #include "../std_vector_tools.hpp"
 #include "../function/function_internal.hpp"
 
