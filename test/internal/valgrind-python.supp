@@ -613,3 +613,11 @@
   ...
   fun:PyAST_Compile
 }
+
+{
+  Travis errors (5)
+  Memcheck:Cond
+  ...
+  fun:PyAST_Compile
+}
+

@@ -237,6 +237,8 @@
    fun:ensure_fromlist.lto_priv.1420
 }
 
+
+
 {
    Error in mosek (bis)
    Memcheck:Cond
@@ -298,9 +300,8 @@
    match-leak-kinds: definite
    fun:calloc
    fun:defaultcalloc
-   fun:MSK_memman_calloc
-   fun:bufenv_make
-   fun:MSK_maketask
+   fun:MSK_memman_*
+   ...
    fun:_ZN6casadi18MosekSocpInterface4initEv
 }
 
@@ -310,13 +311,12 @@
    match-leak-kinds: definite
    fun:calloc
    fun:defaultcalloc
-   fun:MSK_memman_calloc
-   fun:MSK_StreamBuffer_new
-   fun:MSK_initstreamsenv
-   fun:MSK_makeenvalloc
-   fun:MSK_makeenv
+   ...
    fun:_ZN6casadi18MosekSocpInterface4initEv
 }
+
+
+
 
 {
    Error in mosek (6bis)
@@ -324,9 +324,8 @@
    match-leak-kinds: definite
    fun:malloc
    fun:defaultmalloc
-   fun:MSK_memman_malloc
-   fun:bufenv_make
-   fun:MSK_maketask
+   fun:MSK_memman_*
+   ...
    fun:_ZN6casadi18MosekSocpInterface4initEv
 }
 
@@ -336,8 +335,7 @@
    match-leak-kinds: definite
    fun:malloc
    fun:defaultmalloc
-   fun:MSK_memman_malloc
-   fun:MSK_StreamBuffer_new
+   fun:MSK_memman_*
    ...
    fun:_ZN6casadi18MosekSocpInterface4initEv
 }
@@ -356,4 +354,16 @@
    match-leak-kinds: definite
    fun:malloc
    obj:*sparsetools*
+}
+
+{
+  flush issues
+  Memcheck:Param
+  write(buf)
+  fun:__write_nocancel
+  fun:_IO_file_write@@GLIBC_2.2.5
+  fun:new_do_write
+  fun:_IO_do_write@@GLIBC_2.2.5
+  fun:_IO_file_sync@@GLIBC_2.2.5
+  fun:fflush
 }
