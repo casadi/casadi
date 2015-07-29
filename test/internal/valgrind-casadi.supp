@@ -252,7 +252,6 @@
    obj:*socpsolver_mosek*
 }
 
-
 {
    Error in mosek (3)
    Memcheck:Addr16
@@ -268,6 +267,15 @@
    ...
    fun:*MosekSocpInterface*
 }
+
+{
+   Error in mosek (3tris)
+   Memcheck:Addr16
+   fun:__intel_sse2_str*
+   ...
+   obj:*libiomp*
+}
+
 
 {
    Error in mosek (4)
@@ -330,9 +338,7 @@
    fun:defaultmalloc
    fun:MSK_memman_malloc
    fun:MSK_StreamBuffer_new
-   fun:MSK_initstreamsenv
-   fun:MSK_makeenvalloc
-   fun:MSK_makeenv
+   ...
    fun:_ZN6casadi18MosekSocpInterface4initEv
 }
 
