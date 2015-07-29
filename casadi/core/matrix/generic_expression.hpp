@@ -291,6 +291,8 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
     inline ExType operator!() const { return self().zz_not(); }
 #endif // SWIG
 
+#if !defined(SWIG) || !defined(SWIGMATLAB)
+
     // \cond CLUTTER
 
     /// Matrix division from left
@@ -308,6 +310,9 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
     /// Division (with <tt>__future__.division</tt> in effect)
     inline ExType __truediv__(const ExType& y) const {return self()/y;}
     /// \endcond
+
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
+
 };
 
 } // namespace casadi

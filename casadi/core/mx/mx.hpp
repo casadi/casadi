@@ -368,6 +368,8 @@ namespace casadi {
     /** \brief Append a matrix horizontally */
     void appendColumns(const MX& y);
 
+#if !defined(SWIG) || !defined(SWIGMATLAB)
+
     /// \cond CLUTTER
     /// all binary operations
     MX zz_plus(const MX& y) const;
@@ -496,6 +498,8 @@ namespace casadi {
     MX zz_find() const;
     /// \endcond
 
+#endif  // !defined(SWIG) || !defined(SWIGMATLAB)
+
     /** \brief returns itself, but with an assertion attached
     *
     *  If y does not evaluate to 1, a runtime error is raised
@@ -507,8 +511,12 @@ namespace casadi {
     */
     MX monitor(const std::string& comment) const;
 
+#if !defined(SWIG) || !defined(SWIGMATLAB)
+
     /** \brief Set sparse */
     MX zz_project(const Sparsity& sp, bool intersect=false) const;
+
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
     /// Make the matrix dense
     void makeDense(const MX& val = 0);

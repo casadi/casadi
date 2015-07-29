@@ -375,15 +375,15 @@ namespace casadi {
 #ifndef SWIG
     /// Set all elements to a value
     void setAll(const DataType& val);
-#endif // SWIG
 
-    /** \brief Set sparse */
-    Matrix<DataType> zz_project(const Sparsity& sp, bool intersect=false) const;
-
-#ifndef SWIG
     /// Make the matrix dense
     void makeDense(const DataType& val = 0);
 #endif // SWIG
+
+#if !defined(SWIG) || !defined(SWIGMATLAB)
+    /** \brief Set sparse */
+    Matrix<DataType> zz_project(const Sparsity& sp, bool intersect=false) const;
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
     /** \brief  Make a matrix sparse by removing numerical zeros smaller
      * in absolute value than a specified tolerance */
@@ -406,6 +406,7 @@ namespace casadi {
     ///@}
     /// \endcond
 
+#if !defined(SWIG) || !defined(SWIGMATLAB)
     /// \cond CLUTTER
     ///@{
     /// Functions called by the corresponding friend functions -- MATLAB naming
@@ -567,6 +568,8 @@ namespace casadi {
     ///@}
 
     /// \endcond
+
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
 #ifndef SWIG
     /** \brief Matrix adjoint

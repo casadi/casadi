@@ -484,6 +484,8 @@ namespace casadi {
                               bvec_t* w);
 #endif //SWIG
 
+#if !defined(SWIG) || !defined(SWIGMATLAB)
+
     /// \cond INTERNAL
     /// @{
     /** \brief Accessed by SparsityInterface */
@@ -517,6 +519,8 @@ namespace casadi {
     Sparsity zz_kron(const Sparsity& b) const;
     /// @}
     /// \endcond
+
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
     /** \brief Enlarge matrix
         Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros
@@ -592,6 +596,8 @@ namespace casadi {
     /// Check whether the sparsity-pattern indicates structural singularity
     bool issingular() const;
 
+#if !defined(SWIG) || !defined(SWIGMATLAB)
+
     /// \cond INTERNAL
     /// Get upper triangular part
     Sparsity zz_triu(bool includeDiagonal=true) const;
@@ -599,6 +605,7 @@ namespace casadi {
     /// Get lower triangular part
     Sparsity zz_tril(bool includeDiagonal=true) const;
     /// \endcond
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
     /** \brief Do the rows appear sequentially on each column
     *

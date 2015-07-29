@@ -174,6 +174,8 @@ namespace casadi {
     /// \endcond
 #endif // SWIG
 
+#if !defined(SWIG) || !defined(SWIGMATLAB)
+
     /// \cond CLUTTER
     /**  @{  */
     /** \brief Accessed by friend functions */
@@ -206,6 +208,8 @@ namespace casadi {
     }
     /** @}  */
     /// \endcond
+
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
 #ifndef SWIG
     /** \brief  Get vector nonzero or slice of nonzeros */

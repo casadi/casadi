@@ -2446,7 +2446,6 @@ except:
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
-//%rename("%(strip:[friendwrap_])s") ""
 %rename("%(regex:/friendwrap_(?!ML)(.*)/\\1/)s") ""; // Strip leading friendwrap_ unless followed by ML
 #else
 %rename("%(regex:/zz_(?!ML)(.*)/\\1/)s") ""; // Strip leading zz_ unless followed by ML
@@ -3143,7 +3142,7 @@ namespace casadi{
 
 #ifdef SWIGMATLAB
     // Convert to a sparse matrix
-    GUESTOBJECT* zz_sparse() const {
+    GUESTOBJECT* sparse() const {
       mxArray *p  = mxCreateSparse($self->size1(), $self->size2(), $self->nnz(), mxREAL);
       $self->getNZ(static_cast<double*>(mxGetData(p)));
       std::copy($self->colind(), $self->colind()+$self->size2()+1, mxGetJc(p));

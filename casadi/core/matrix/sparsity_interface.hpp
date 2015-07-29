@@ -307,6 +307,8 @@ namespace casadi {
 
   public:
 
+#if !defined(SWIG) || !defined(SWIGMATLAB)
+
     /// \cond CLUTTER
     std::vector< std::vector< MatType > >
       zz_blocksplit(const std::vector<int>& vert_offset,
@@ -324,6 +326,8 @@ namespace casadi {
     std::vector<MatType > zz_horzsplit(int incr) const;
     std::vector<MatType > zz_vertsplit(int incr) const;
     /// \endcond
+
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
 #ifndef SWIG
 
