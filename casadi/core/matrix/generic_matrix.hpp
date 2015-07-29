@@ -262,6 +262,18 @@ namespace casadi {
       return x.zz_mpower(n);
     }
 
+    /** \brief Matrix divide (cf. slash '/' in MATLAB)
+     */
+    inline friend MatType mrdivide(const MatType& x, const MatType& n) {
+      return x.zz_mrdivide(n);
+    }
+
+    /** \brief Matrix divide (cf. backslash '\' in MATLAB)
+     */
+    inline friend MatType mldivide(const MatType& x, const MatType& n) {
+      return x.zz_mldivide(n);
+    }
+
     /** \brief Get all symbols contained in the supplied expression
      * Get all symbols on which the supplied expression depends
      * \see SXFunction::getFree(), MXFunction::getFree()

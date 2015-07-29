@@ -396,7 +396,8 @@ namespace casadi {
     /// \cond CLUTTER
     MX __truediv__(const MX& y) const { return zz_rdivide(y);}
     MX __constpow__(const MX& b) const;
-    MX __mrdivide__(const MX& b) const;
+    MX zz_mrdivide(const MX& b) const;
+    MX zz_mldivide(const MX& b) const;
     MX __copysign__(const MX& y) const;
     MX constpow(const MX& y) const;
     /// \endcond

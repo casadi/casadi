@@ -977,15 +977,21 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::__mrdivide__(const Matrix<DataType>& b) const {
-    if (b.numel()==1) return *this/b;
-    throw CasadiException("mrdivide: Not implemented");
+  Matrix<DataType> Matrix<DataType>::zz_mrdivide(const Matrix<DataType>& b) const {
+    casadi_assert_message(isscalar() || b.isscalar(), "Not implemented");
+    return *this/b;
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_mldivide(const Matrix<DataType>& b) const {
+    casadi_assert_message(isscalar() || b.isscalar(), "Not implemented");
+    return b/ *this;
   }
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_mpower(const Matrix<DataType>& b) const {
-    if (b.numel()==1) return pow(*this, b);
-    throw CasadiException("mpower: Not implemented");
+    casadi_assert_message(isscalar() || b.isscalar(), "Not implemented");
+    return pow(*this, b);
   }
 
   template<typename DataType>

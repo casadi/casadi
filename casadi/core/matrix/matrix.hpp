@@ -422,7 +422,8 @@ namespace casadi {
     Matrix<DataType> zz_power(const Matrix<DataType> &y) const;
     Matrix<DataType> __constpow__(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_mpower(const Matrix<DataType> &y) const;
-    Matrix<DataType> __mrdivide__(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_mrdivide(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_mldivide(const Matrix<DataType> &y) const;
     bool zz_isEqual(const Matrix<DataType> &ex2, int depth=0) const;
     void zz_expand(Matrix<DataType> &weights, Matrix<DataType>& terms) const;
     Matrix<DataType> zz_pw_const(const Matrix<DataType> &tval, const Matrix<DataType> &val) const;

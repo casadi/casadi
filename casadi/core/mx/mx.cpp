@@ -813,11 +813,23 @@ namespace casadi {
     return MX::binary(OP_IF_ELSE_ZERO, *this, y);
   }
 
-  MX MX::__constpow__(const MX& b) const { return (*this).constpow(b);}
-  MX MX::__mrdivide__(const MX& b) const
-  { if (b.isscalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
+  MX MX::__constpow__(const MX& b) const {
+    return (*this).constpow(b);
+  }
+
+  MX MX::zz_mrdivide(const MX& b) const {
+    casadi_assert_message(isscalar() || b.isscalar(), "Not implemented");
+    return *this/b;
+  }
+
+  MX MX::zz_mldivide(const MX& b) const {
+    casadi_assert_message(isscalar() || b.isscalar(), "Not implemented");
+    return b/ *this;
+  }
+
   MX MX::zz_mpower(const MX& b) const {
-    return pow(*this, b); throw CasadiException("mpower: Not implemented");
+    casadi_assert_message(isscalar() || b.isscalar(), "Not implemented");
+    return pow(*this, b);
   }
 
   void MX::append(const MX& y) {

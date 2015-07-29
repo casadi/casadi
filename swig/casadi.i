@@ -372,8 +372,8 @@ Type __rsub__(const Type& b) const{ return b - *$self;}
 Type __rmul__(const Type& b) const{ return b * *$self;}
 Type __rdiv__(const Type& b) const{ return b / *$self;}
 memberbinopsr(Type,truediv)
-memberbinopsr(Type,mldivide)
-memberbinopsr(Type,mrdivide)
+Type __rmldivide__(const Type& b) const{ return b.zz_mldivide(*$self);}
+Type __rmrdivide__(const Type& b) const{ return b.zz_mrdivide(*$self);}
 Type __rmpower__(const Type& b) const{ return b.zz_mpower(*$self);}
 memberbinopsr(Type,constpow)
 Type __rge__(const Type& b) const{ return b >= (*$self);}
@@ -434,8 +434,10 @@ memberbinops_custom(ne,!=,argtype,argCast,selfCast,returntype)
 returntype mul (argtype) const{ return mul(selfCast(*$self) , argCast(b));}
 returntype rmul (argtype) const{ return mul(argCast(b) , selfCast(*$self));}
 memberbinops(truediv,argtype,argCast,selfCast,returntype)
-memberbinops(mldivide,argtype,argCast,selfCast,returntype)
-memberbinops(mrdivide,argtype,argCast,selfCast,returntype)
+returntype __mldivide__ (argtype) const{ return mldivide(selfCast(*$self), argCast(b));}
+returntype __rmldivide__(argtype) const{ return mldivide(argCast(b), selfCast(*$self));}
+returntype __mrdivide__ (argtype) const{ return mrdivide(selfCast(*$self), argCast(b));}
+returntype __rmrdivide__(argtype) const{ return mrdivide(argCast(b), selfCast(*$self));}
 returntype __mpower__ (argtype) const{ return selfCast(*$self).zz_mpower(argCast(b));}
 returntype __rmpower__(argtype) const{ return argCast(b).zz_mpower(selfCast(*$self));}
 %enddef
@@ -2494,10 +2496,6 @@ except:
 #ifdef SWIGMATLAB
 %rename(uminus) operator-;
 %rename(uplus) operator+;
-%rename(ldivide) __rdiv__;
-%rename(mrdivide) __mrdivide__;
-%rename(mldivide) __mldivide__;
-%rename(transpose) T;
 %ignore size;
 %rename(size) shape;
 %rename(mtimes) friendwrap_mul;
@@ -2508,7 +2506,6 @@ except:
 %feature("convertself","1");
 
 // Workarounds, pending proper fix
-%rename(truediv) __truediv__;
 %rename(nonzero) __nonzero__;
 %rename(constpow) __constpow__;
 %rename(copysign) __copysign__;
@@ -2916,6 +2913,12 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
 DECL M %PREF(mpower)(const M& x, const M& n) {
   return mpower(x, n);
 }
+DECL M %PREF(mrdivide)(const M& x, const M& y) {
+  return mrdivide(x, y);
+}
+DECL M %PREF(mldivide)(const M& x, const M& y) {
+  return mldivide(x, y);
+}
 DECL std::vector< M > %PREF(symvar)(const M& x) {
   return symvar(x);
 }
@@ -3009,6 +3012,7 @@ DECL M %PREF(plus)(const M& x, const M& y) { return x+y; }
 DECL M %PREF(minus)(const M& x, const M& y) { return x-y; }
 DECL M %PREF(times)(const M& x, const M& y) { return x*y; }
 DECL M %PREF(rdivide)(const M& x, const M& y) { return x/y; }
+DECL M %PREF(ldivide)(const M& x, const M& y) { return y/x; }
 DECL M %PREF(lt)(const M& x, const M& y) { return x<y; }
 DECL M %PREF(le)(const M& x, const M& y) { return x<=y; }
 DECL M %PREF(gt)(const M& x, const M& y) { return x>y; }

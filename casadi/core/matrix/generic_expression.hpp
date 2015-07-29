@@ -295,17 +295,15 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
 
     // \cond CLUTTER
 
-    /// Matrix division from left
-    inline ExType __mldivide__(const ExType& y) const
-    { return y.__mrdivide__(self());}
-
     /// No need to have both < and >
-    inline ExType zz_gt(const ExType& y) const
-    { return y.zz_lt(self());}
+    inline ExType zz_gt(const ExType& y) const {
+      return y.zz_lt(self());
+    }
 
     /// No need to have both <= and >=
-    inline ExType zz_ge(const ExType& y) const
-    { return y.zz_le(self());}
+    inline ExType zz_ge(const ExType& y) const {
+      return y.zz_le(self());
+    }
 
     /// Division (with <tt>__future__.division</tt> in effect)
     inline ExType __truediv__(const ExType& y) const {return self()/y;}
