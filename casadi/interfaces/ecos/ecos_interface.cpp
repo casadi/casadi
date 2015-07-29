@@ -245,8 +245,7 @@ namespace casadi {
     }
     for (int i=0;i<primal_idx_uba_.size();++i) {
       k = primal_idx_uba_[i];
-      if (std::abs(output(SOCP_SOLVER_LAM_A).data()[k]) < dual_sol[idx])
-                output(SOCP_SOLVER_LAM_A).data()[k] += dual_sol[idx];
+      output(SOCP_SOLVER_LAM_A).data()[k] += dual_sol[idx];
       idx += 1;
     }
     for (int i=0;i<primal_idx_lbx_.size();++i) {
@@ -256,8 +255,7 @@ namespace casadi {
     }
     for (int i=0;i<primal_idx_ubx_.size();++i) {
       k = primal_idx_ubx_[i];
-      if (std::abs(output(SOCP_SOLVER_LAM_X).data()[k]) < dual_sol[idx])
-                output(SOCP_SOLVER_LAM_X).data()[k] += dual_sol[idx];
+      output(SOCP_SOLVER_LAM_X).data()[k] += dual_sol[idx];
       idx += 1;
     }
 
