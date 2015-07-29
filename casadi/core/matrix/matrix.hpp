@@ -406,10 +406,10 @@ namespace casadi {
     ///@}
     /// \endcond
 
-#if !defined(SWIG) || !defined(SWIGMATLAB)
     /// \cond CLUTTER
     ///@{
     /// Functions called by the corresponding friend functions -- MATLAB naming
+#ifndef SWIG
     Matrix<DataType> zz_plus(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_minus(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_times(const Matrix<DataType> &y) const;
@@ -418,6 +418,9 @@ namespace casadi {
     Matrix<DataType> zz_le(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_eq(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_ne(const Matrix<DataType> &y) const;
+#endif // SWIG
+
+#if !defined(SWIG) || !defined(SWIGMATLAB)
     Matrix<DataType> __truediv__(const Matrix<DataType> &y) const {return zz_rdivide(y);}
     Matrix<DataType> zz_power(const Matrix<DataType> &y) const;
     Matrix<DataType> __constpow__(const Matrix<DataType> &y) const;
@@ -566,11 +569,11 @@ namespace casadi {
     Matrix<DataType> zz_unite(const Matrix<DataType>& B) const;
     Matrix<DataType> zz_polyval(const Matrix<DataType>& x) const;
     Matrix<DataType> zz_norm_inf_mul(const Matrix<DataType> &y) const;
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
     ///@}
 
     /// \endcond
 
-#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
 #ifndef SWIG
     /** \brief Matrix adjoint

@@ -372,12 +372,6 @@ Type __rmldivide__(const Type& b) const{ return b.zz_mldivide(*$self);}
 Type __rmrdivide__(const Type& b) const{ return b.zz_mrdivide(*$self);}
 Type __rmpower__(const Type& b) const{ return b.zz_mpower(*$self);}
 memberbinopsr(Type,constpow)
-Type __rge__(const Type& b) const{ return b >= (*$self);}
-Type __rgt__(const Type& b) const{ return b > (*$self);}
-Type __rle__(const Type& b) const{ return b <= (*$self);}
-Type __rlt__(const Type& b) const{ return b < (*$self);}
-Type __req__(const Type& b) const{ return b == (*$self);}
-Type __rne__(const Type& b) const{ return b != (*$self);}
 Type __rfmin__(const Type& b) const { return fmin(b, *$self);}
 Type __rfmax__(const Type& b) const { return fmax(b, *$self);}
 Type rmul(const Type& b) const{ return b.zz_mtimes(*$self);}
@@ -413,12 +407,6 @@ returntype __rarctan2__(argtype) const{ return argCast(b).zz_atan2(selfCast(*$se
 memberbinops(copysign,argtype,argCast,selfCast,returntype)
 returntype __pow__ (argtype) const { return selfCast(*$self).zz_power(argCast(b));}
 returntype __rpow__(argtype) const { return argCast(b).zz_power(selfCast(*$self));}
-memberbinops_custom(ge,>=,argtype,argCast,selfCast,returntype)
-memberbinops_custom(le,<=,argtype,argCast,selfCast,returntype)
-memberbinops_custom(gt,>,argtype,argCast,selfCast,returntype)
-memberbinops_custom(lt,<,argtype,argCast,selfCast,returntype)
-memberbinops_custom(eq,==,argtype,argCast,selfCast,returntype)
-memberbinops_custom(ne,!=,argtype,argCast,selfCast,returntype)
 returntype mul (argtype) const{ return mul(selfCast(*$self) , argCast(b));}
 returntype rmul (argtype) const{ return mul(argCast(b) , selfCast(*$self));}
 memberbinops(truediv,argtype,argCast,selfCast,returntype)
@@ -2060,7 +2048,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // First convert to integer
       {
         int tmp;
-        if (SWIG_IsOK(SWIG_AsVal(int)(p, m ? &tmp : 0))) {
+        if (to_val(p, &tmp)) {
           if (m) **m=tmp;
           return true;
         }
@@ -2460,12 +2448,6 @@ except:
 %rename(mul) zz_mtimes;
 %ignore T;
 %ignore shape;
-%rename(__lt__) zz_lt;
-%rename(__gt__) zz_gt;
-%rename(__le__) zz_le;
-%rename(__ge__) zz_ge;
-%rename(__ne__) zz_ne;
-%rename(__eq__) zz_eq;
 %rename(logic_and) zz_and;
 %rename(logic_or) zz_or;
 %rename(logic_not) zz_not;
@@ -3670,18 +3652,18 @@ namespace casadi {
       def __rmul__(x, y) : return casadi_times(y, x)
       def __div__(x, y) : return casadi_rdivide(x, y)
       def __rdiv__(x, y) : return casadi_rdivide(y, x)
-      #def __lt__(x, y) : return casadi_lt(x, y)
-      #def __rlt__(x, y) : return casadi_lt(y, x)
-      #def __le__(x, y) : return casadi_le(x, y)
-      #def __rle__(x, y) : return casadi_le(y, x)
-      #def __gt__(x, y) : return casadi_gt(x, y)
-      #def __rlt__(x, y) : return casadi_gt(y, x)
-      #def __ge__(x, y) : return casadi_ge(x, y)
-      #def __rle__(x, y) : return casadi_ge(y, x)
-      #def __eq__(x, y) : return casadi_eq(x, y)
-      #def __req__(x, y) : return casadi_eq(y, x)
-      #def __ne__(x, y) : return casadi_ne(x, y)
-      #def __rne__(x, y) : return casadi_ne(y, x)
+      def __lt__(x, y) : return casadi_lt(x, y)
+      def __rlt__(x, y) : return casadi_lt(y, x)
+      def __le__(x, y) : return casadi_le(x, y)
+      def __rle__(x, y) : return casadi_le(y, x)
+      def __gt__(x, y) : return casadi_gt(x, y)
+      def __rlt__(x, y) : return casadi_gt(y, x)
+      def __ge__(x, y) : return casadi_ge(x, y)
+      def __rle__(x, y) : return casadi_ge(y, x)
+      def __eq__(x, y) : return casadi_eq(x, y)
+      def __req__(x, y) : return casadi_eq(y, x)
+      def __ne__(x, y) : return casadi_ne(x, y)
+      def __rne__(x, y) : return casadi_ne(y, x)
       #def logic_and(x, y) : return casadi_and(x, y)
       #def logic_or(x, y) : return casadi_or(x, y)
       #def abs(x) : return casadi_abs(x)

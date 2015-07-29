@@ -368,10 +368,10 @@ namespace casadi {
     /** \brief Append a matrix horizontally */
     void appendColumns(const MX& y);
 
-#if !defined(SWIG) || !defined(SWIGMATLAB)
-
+#ifndef SWIG
     /// \cond CLUTTER
-    /// all binary operations
+    ///@{
+    /// Functions called by the corresponding friend functions -- MATLAB naming
     MX zz_plus(const MX& y) const;
     MX zz_minus(const MX& y) const;
     MX zz_times(const MX& y) const;
@@ -380,6 +380,14 @@ namespace casadi {
     MX zz_le(const MX& y) const;
     MX zz_eq(const MX& y) const;
     MX zz_ne(const MX& y) const;
+    ///@}
+    /// \endcond
+#endif // SWIG
+
+#if !defined(SWIG) || !defined(SWIGMATLAB)
+    MX printme(const MX& y) const;
+
+    /// \cond CLUTTER
     MX zz_power(const MX& b) const;
     MX zz_mpower(const MX& b) const;
     MX zz_inner_prod(const MX& y) const;
@@ -391,21 +399,12 @@ namespace casadi {
     MX zz_and(const MX& y) const;
     MX zz_or(const MX& y) const;
     MX zz_if_else_zero(const MX& y) const;
-    /// \endcond
-
-    /// \cond CLUTTER
     MX __truediv__(const MX& y) const { return zz_rdivide(y);}
     MX __constpow__(const MX& b) const;
     MX zz_mrdivide(const MX& b) const;
     MX zz_mldivide(const MX& b) const;
     MX __copysign__(const MX& y) const;
     MX constpow(const MX& y) const;
-    /// \endcond
-    MX printme(const MX& y) const;
-
-    /// \cond CLUTTER
-
-    // all unary operations
     MX zz_exp() const;
     MX zz_log() const;
     MX zz_log10() const;
