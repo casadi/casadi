@@ -2792,8 +2792,10 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
 // Prefix symbols
 #ifdef SWIGMATLAB
 %define %PREF(SYM) friendwrap_ ## SYM %enddef
+%define %PREFNEW(SYM) friendwrap_ ## SYM %enddef
 #else
 %define %PREF(SYM) SYM %enddef
+%define %PREFNEW(SYM) casadi_ ## SYM %enddef
 #endif
 
 %define SPARSITY_INTERFACE_FRIENDS(DECL, M)
@@ -2909,6 +2911,14 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
  }
 %enddef
 
+%define SPARSITY_INTERFACE_ALL(DECL)
+SPARSITY_INTERFACE_FRIENDS(DECL, Sparsity)
+SPARSITY_INTERFACE_FRIENDS(DECL, MX)
+SPARSITY_INTERFACE_FRIENDS(DECL, Matrix<int>)
+SPARSITY_INTERFACE_FRIENDS(DECL, Matrix<double>)
+SPARSITY_INTERFACE_FRIENDS(DECL, Matrix<SXElement>)
+%enddef
+
 %define GENERIC_MATRIX_FRIENDS(DECL, M)
 DECL M %PREF(mpower)(const M& x, const M& n) {
   return mpower(x, n);
@@ -3007,49 +3017,63 @@ DECL bool %PREF(dependsOn)(const M& f, const M& arg) {
 }
 %enddef
 
+%define GENERIC_MATRIX_ALL(DECL)
+GENERIC_MATRIX_FRIENDS(DECL, MX)
+GENERIC_MATRIX_FRIENDS(DECL, Matrix<int>)
+GENERIC_MATRIX_FRIENDS(DECL, Matrix<double>)
+GENERIC_MATRIX_FRIENDS(DECL, Matrix<SXElement>)
+%enddef
+
 %define GENERIC_EXPRESSION_FRIENDS(DECL, M) 
-DECL M %PREF(plus)(const M& x, const M& y) { return x+y; }
-DECL M %PREF(minus)(const M& x, const M& y) { return x-y; }
-DECL M %PREF(times)(const M& x, const M& y) { return x*y; }
-DECL M %PREF(rdivide)(const M& x, const M& y) { return x/y; }
-DECL M %PREF(ldivide)(const M& x, const M& y) { return y/x; }
-DECL M %PREF(lt)(const M& x, const M& y) { return x<y; }
-DECL M %PREF(le)(const M& x, const M& y) { return x<=y; }
-DECL M %PREF(gt)(const M& x, const M& y) { return x>y; }
-DECL M %PREF(ge)(const M& x, const M& y) { return x>=y; }
-DECL M %PREF(eq)(const M& x, const M& y) { return x==y; }
-DECL M %PREF(ne)(const M& x, const M& y) { return x!=y; }
-DECL M %PREF(and)(const M& x, const M& y) { return x&&y; }
-DECL M %PREF(or)(const M& x, const M& y) { return x||y; }
-DECL M %PREF(abs)(const M& x) { return fabs(x); }
-DECL M %PREF(sqrt)(const M& x) { return sqrt(x); }
-DECL M %PREF(sin)(const M& x) { return sin(x); }
-DECL M %PREF(cos)(const M& x) { return cos(x); }
-DECL M %PREF(tan)(const M& x) { return tan(x); }
-DECL M %PREF(atan)(const M& x) { return atan(x); }
-DECL M %PREF(asin)(const M& x) { return asin(x); }
-DECL M %PREF(acos)(const M& x) { return acos(x); }
-DECL M %PREF(tanh)(const M& x) { return tanh(x); }
-DECL M %PREF(sinh)(const M& x) { return sinh(x); }
-DECL M %PREF(cosh)(const M& x) { return cosh(x); }
-DECL M %PREF(atanh)(const M& x) { return atanh(x); }
-DECL M %PREF(asinh)(const M& x) { return asinh(x); }
-DECL M %PREF(acosh)(const M& x) { return acosh(x); }
-DECL M %PREF(exp)(const M& x) { return exp(x); }
-DECL M %PREF(log)(const M& x) { return log(x); }
-DECL M %PREF(log10)(const M& x) { return log10(x); }
-DECL M %PREF(floor)(const M& x) { return floor(x); }
-DECL M %PREF(ceil)(const M& x) { return ceil(x); }
-DECL M %PREF(erf)(const M& x) { return erf(x); }
-DECL M %PREF(sign)(const M& x) { return sign(x); }
-DECL M %PREF(power)(const M& x, const M& n) { return pow(x, n); }
-DECL M %PREF(mod)(const M& x, const M& y) { return fmod(x, y); }
-DECL M %PREF(atan2)(const M& x, const M& y) { return atan2(x, y); }
-DECL M %PREF(min)(const M& x, const M& y) { return fmin(x, y); }
-DECL M %PREF(max)(const M& x, const M& y) { return fmax(x, y); }
-DECL M %PREF(simplify)(const M& x) { return simplify(x); }
-DECL bool %PREF(isEqual)(const M& x, const M& y, int depth=0) { return isEqual(x, y, depth); }
-DECL bool %PREF(iszero)(const M& x) { return iszero(x); }
+DECL M %PREFNEW(plus)(const M& x, const M& y) { return x+y; }
+DECL M %PREFNEW(minus)(const M& x, const M& y) { return x-y; }
+DECL M %PREFNEW(times)(const M& x, const M& y) { return x*y; }
+DECL M %PREFNEW(rdivide)(const M& x, const M& y) { return x/y; }
+DECL M %PREFNEW(ldivide)(const M& x, const M& y) { return y/x; }
+DECL M %PREFNEW(lt)(const M& x, const M& y) { return x<y; }
+DECL M %PREFNEW(le)(const M& x, const M& y) { return x<=y; }
+DECL M %PREFNEW(gt)(const M& x, const M& y) { return x>y; }
+DECL M %PREFNEW(ge)(const M& x, const M& y) { return x>=y; }
+DECL M %PREFNEW(eq)(const M& x, const M& y) { return x==y; }
+DECL M %PREFNEW(ne)(const M& x, const M& y) { return x!=y; }
+DECL M %PREFNEW(and)(const M& x, const M& y) { return x&&y; }
+DECL M %PREFNEW(or)(const M& x, const M& y) { return x||y; }
+DECL M %PREFNEW(abs)(const M& x) { return fabs(x); }
+DECL M %PREFNEW(sqrt)(const M& x) { return sqrt(x); }
+DECL M %PREFNEW(sin)(const M& x) { return sin(x); }
+DECL M %PREFNEW(cos)(const M& x) { return cos(x); }
+DECL M %PREFNEW(tan)(const M& x) { return tan(x); }
+DECL M %PREFNEW(atan)(const M& x) { return atan(x); }
+DECL M %PREFNEW(asin)(const M& x) { return asin(x); }
+DECL M %PREFNEW(acos)(const M& x) { return acos(x); }
+DECL M %PREFNEW(tanh)(const M& x) { return tanh(x); }
+DECL M %PREFNEW(sinh)(const M& x) { return sinh(x); }
+DECL M %PREFNEW(cosh)(const M& x) { return cosh(x); }
+DECL M %PREFNEW(atanh)(const M& x) { return atanh(x); }
+DECL M %PREFNEW(asinh)(const M& x) { return asinh(x); }
+DECL M %PREFNEW(acosh)(const M& x) { return acosh(x); }
+DECL M %PREFNEW(exp)(const M& x) { return exp(x); }
+DECL M %PREFNEW(log)(const M& x) { return log(x); }
+DECL M %PREFNEW(log10)(const M& x) { return log10(x); }
+DECL M %PREFNEW(floor)(const M& x) { return floor(x); }
+DECL M %PREFNEW(ceil)(const M& x) { return ceil(x); }
+DECL M %PREFNEW(erf)(const M& x) { return erf(x); }
+DECL M %PREFNEW(sign)(const M& x) { return sign(x); }
+DECL M %PREFNEW(power)(const M& x, const M& n) { return pow(x, n); }
+DECL M %PREFNEW(mod)(const M& x, const M& y) { return fmod(x, y); }
+DECL M %PREFNEW(atan2)(const M& x, const M& y) { return atan2(x, y); }
+DECL M %PREFNEW(min)(const M& x, const M& y) { return fmin(x, y); }
+DECL M %PREFNEW(max)(const M& x, const M& y) { return fmax(x, y); }
+DECL M %PREFNEW(simplify)(const M& x) { return simplify(x); }
+DECL bool %PREFNEW(isEqual)(const M& x, const M& y, int depth=0) { return isEqual(x, y, depth); }
+DECL bool %PREFNEW(iszero)(const M& x) { return iszero(x); }
+%enddef
+
+%define GENERIC_EXPRESSION_ALL(DECL) 
+GENERIC_EXPRESSION_FRIENDS(DECL, MX)
+GENERIC_EXPRESSION_FRIENDS(DECL, Matrix<int>)
+GENERIC_EXPRESSION_FRIENDS(DECL, Matrix<double>)
+GENERIC_EXPRESSION_FRIENDS(DECL, Matrix<SXElement>)
 %enddef
 
 %define MATRIX_FRIENDS_UNWRAPPED(DECL, M)
@@ -3093,6 +3117,15 @@ DECL M %PREF(sparsify)(const M& A, double tol=0) {
 }
 %enddef
 
+%define MATRIX_ALL(DECL)
+MATRIX_FRIENDS(DECL, Matrix<int>)
+MATRIX_FRIENDS(DECL, Matrix<double>)
+MATRIX_FRIENDS(DECL, Matrix<SXElement>)
+
+MATRIX_FRIENDS_UNWRAPPED(DECL, Matrix<int>)
+MATRIX_FRIENDS_UNWRAPPED(DECL, Matrix<double>)
+MATRIX_FRIENDS_UNWRAPPED(DECL, Matrix<SXElement>)
+%enddef
 
 // FIXME: Placing in printable_object.i does not work
 %template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;
@@ -3613,43 +3646,33 @@ GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(int)
 GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(double)
 GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(casadi::SXElement)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
-#else // SWIGMATLAB
-%feature("nonstatic");
+#endif // SWIGMATLAB
 
+#ifdef SWIGMATLAB
+// Wrap as static member functions
+%feature("nonstatic");
 namespace casadi {
   %extend SparsityInterfaceCommon {
-    SPARSITY_INTERFACE_FRIENDS(static inline, Sparsity)
-    SPARSITY_INTERFACE_FRIENDS(static inline, MX)
-    SPARSITY_INTERFACE_FRIENDS(static inline, Matrix<int>)
-    SPARSITY_INTERFACE_FRIENDS(static inline, Matrix<double>)
-    SPARSITY_INTERFACE_FRIENDS(static inline, Matrix<SXElement>)
+    SPARSITY_INTERFACE_ALL(static inline)
   }
-
   %extend GenericExpressionCommon {
-    GENERIC_EXPRESSION_FRIENDS(static inline, MX)
-    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<int>)
-    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<double>)
-    GENERIC_EXPRESSION_FRIENDS(static inline, Matrix<SXElement>)
+    GENERIC_EXPRESSION_ALL(static inline)
   }
-
   %extend GenericMatrixCommon {
-    GENERIC_MATRIX_FRIENDS(static inline, MX)
-    GENERIC_MATRIX_FRIENDS(static inline, Matrix<int>)
-    GENERIC_MATRIX_FRIENDS(static inline, Matrix<double>)
-    GENERIC_MATRIX_FRIENDS(static inline, Matrix<SXElement>)
+    GENERIC_MATRIX_ALL(static inline)
   }
-
   %extend MatrixCommon {
-    MATRIX_FRIENDS(static inline, Matrix<int>)
-    MATRIX_FRIENDS(static inline, Matrix<double>)
-    MATRIX_FRIENDS(static inline, Matrix<SXElement>)
-
-    MATRIX_FRIENDS_UNWRAPPED(static inline, Matrix<int>)
-    MATRIX_FRIENDS_UNWRAPPED(static inline, Matrix<double>)
-    MATRIX_FRIENDS_UNWRAPPED(static inline, Matrix<SXElement>)
+    MATRIX_ALL(static inline)
+  }
+} // namespace casadi
+%feature("nonstatic", "");
+#else // SWIGMATLAB
+// Wrap as stand-alone functions with casadi_ prefix
+%inline {
+  namespace casadi {
+    GENERIC_EXPRESSION_ALL(inline)
   }
 }
-%feature("nonstatic", "");
 #endif // SWIGMATLAB
 
 %feature("director") casadi::Callback2;
