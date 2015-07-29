@@ -367,10 +367,6 @@ Type r##uname##(const Type& b) const{ return b.##uname##(*$self);}
 
 %define binopsrFull(Type)
 Type __rpow__(const Type& b) const{ return pow(b, *$self);}
-Type __radd__(const Type& b) const{ return b + *$self;}
-Type __rsub__(const Type& b) const{ return b - *$self;}
-Type __rmul__(const Type& b) const{ return b * *$self;}
-Type __rdiv__(const Type& b) const{ return b / *$self;}
 memberbinopsr(Type,truediv)
 Type __rmldivide__(const Type& b) const{ return b.zz_mldivide(*$self);}
 Type __rmrdivide__(const Type& b) const{ return b.zz_mrdivide(*$self);}
@@ -417,14 +413,6 @@ returntype __rarctan2__(argtype) const{ return argCast(b).zz_atan2(selfCast(*$se
 memberbinops(copysign,argtype,argCast,selfCast,returntype)
 returntype __pow__ (argtype) const { return selfCast(*$self).zz_power(argCast(b));}
 returntype __rpow__(argtype) const { return argCast(b).zz_power(selfCast(*$self));}
-returntype __add__ (argtype) const { return selfCast(*$self).zz_plus(argCast(b));}
-returntype __radd__(argtype) const { return argCast(b).zz_plus(selfCast(*$self));}
-returntype __sub__ (argtype) const { return selfCast(*$self).zz_minus(argCast(b));}
-returntype __rsub__(argtype) const { return argCast(b).zz_minus(selfCast(*$self));}
-returntype __mul__ (argtype) const { return selfCast(*$self).zz_times(argCast(b));}
-returntype __rmul__(argtype) const { return argCast(b).zz_times(selfCast(*$self));}
-returntype __div__ (argtype) const { return selfCast(*$self).zz_rdivide(argCast(b));}
-returntype __rdiv__(argtype) const { return argCast(b).zz_rdivide(selfCast(*$self));}
 memberbinops_custom(ge,>=,argtype,argCast,selfCast,returntype)
 memberbinops_custom(le,<=,argtype,argCast,selfCast,returntype)
 memberbinops_custom(gt,>,argtype,argCast,selfCast,returntype)
@@ -2458,10 +2446,6 @@ except:
 %rename(sparsity) getSparsity;
 
 #ifdef SWIGPYTHON
-%rename(__add__) zz_plus;
-%rename(__sub__) zz_minus;
-%rename(__mul__) zz_times;
-%rename(__div__) zz_rdivide;
 %rename(arcsin) zz_asin;
 %rename(arccos) zz_acos;
 %rename(arctan) zz_atan;
@@ -3673,6 +3657,71 @@ namespace casadi {
     GENERIC_EXPRESSION_ALL(inline)
   }
 }
+
+#ifdef SWIGPYTHON
+namespace casadi {
+  %extend GenericExpressionCommon {
+    %pythoncode %{
+      def __add__(x, y) : return casadi_plus(x, y)
+      def __radd__(x, y) : return casadi_plus(y, x)
+      def __sub__(x, y) : return casadi_minus(x, y)
+      def __rsub__(x, y) : return casadi_minus(y, x)
+      def __mul__(x, y) : return casadi_times(x, y)
+      def __rmul__(x, y) : return casadi_times(y, x)
+      def __div__(x, y) : return casadi_rdivide(x, y)
+      def __rdiv__(x, y) : return casadi_rdivide(y, x)
+      #def __lt__(x, y) : return casadi_lt(x, y)
+      #def __rlt__(x, y) : return casadi_lt(y, x)
+      #def __le__(x, y) : return casadi_le(x, y)
+      #def __rle__(x, y) : return casadi_le(y, x)
+      #def __gt__(x, y) : return casadi_gt(x, y)
+      #def __rlt__(x, y) : return casadi_gt(y, x)
+      #def __ge__(x, y) : return casadi_ge(x, y)
+      #def __rle__(x, y) : return casadi_ge(y, x)
+      #def __eq__(x, y) : return casadi_eq(x, y)
+      #def __req__(x, y) : return casadi_eq(y, x)
+      #def __ne__(x, y) : return casadi_ne(x, y)
+      #def __rne__(x, y) : return casadi_ne(y, x)
+      #def logic_and(x, y) : return casadi_and(x, y)
+      #def logic_or(x, y) : return casadi_or(x, y)
+      #def abs(x) : return casadi_abs(x)
+      #def sqrt(x) : return casadi_sqrt(x)
+      #def sin(x) : return casadi_sin(x)
+      #def cos(x) : return casadi_cos(x)
+      #def tan(x) : return casadi_tan(x)
+      #def arctan(x) : return casadi_atan(x)
+      #def arcsin(x) : return casadi_asin(x)
+      #def arccos(x) : return casadi_acos(x)
+      #def tanh(x) : return casadi_tanh(x)
+      #def sinh(x) : return casadi_sinh(x)
+      #def cosh(x) : return casadi_cosh(x)
+      #def arctanh(x) : return casadi_atanh(x)
+      #def arcsinh(x) : return casadi_asinh(x)
+      #def arccosh(x) : return casadi_acosh(x)
+      #def exp(x) : return casadi_exp(x)
+      #def log(x) : return casadi_log(x)
+      #def log10(x) : return casadi_log10(x)
+      #def floor(x) : return casadi_floor(x)
+      #def ceil(x) : return casadi_ceil(x)
+      #def erf(x) : return casadi_erf(x)
+      #def sign(x) : return casadi_sign(x)
+      #def __pow__(x, n) : return casadi_power(x, n)
+      #def __rpow__(n, x) : return casadi_power(x, n)
+      #def fmod(x, y) : return casadi_mod(x, y)
+      #def __arctan2__(x, y) : return casadi_atan2(x, y)
+      #def __rarctan2__(y, x) : return casadi_atan2(x, y)
+      #def __fmin__(x, y) : return casadi_min(x, y)
+      #def __rfmin__(y, x) : return casadi_min(x, y)
+      #def __fmax__(x, y) : return casadi_max(x, y)
+      #def __rfmax__(y, x) : return casadi_max(x, y)
+      #def simplify(x) : return casadi_simplify(x)
+      #def isEqual(x, y, depth=0) : return casadi_isEqual(x, y, depth)
+      #def iszero(x) : return casadi_iszero(x)
+    %}
+  }
+} // namespace casadi
+#endif // SWIGPYTHON
+
 #endif // SWIGMATLAB
 
 %feature("director") casadi::Callback2;

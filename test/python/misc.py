@@ -331,13 +331,13 @@ class Misctests(casadiTestCase):
     try:
       [x]+ x
       self.assertTrue(False)
-    except TypeError as e:
+    except NotImplementedError as e:
       print e.message
 
     try:
       x + [x]
       self.assertTrue(False)
-    except TypeError as e:
+    except NotImplementedError as e:
       print e.message
 
     try:
