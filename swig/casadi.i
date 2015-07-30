@@ -1760,9 +1760,18 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         }
       }
 
-      // First convert to scalar
+      // Double scalar
       {
         double tmp;
+        if (to_val(p, &tmp)) {
+          if (m) **m=tmp;
+          return true;
+        }
+      }
+
+      // Integer scalar
+      {
+        int tmp;
         if (to_val(p, &tmp)) {
           if (m) **m=tmp;
           return true;
