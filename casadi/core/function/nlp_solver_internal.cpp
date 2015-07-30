@@ -26,7 +26,6 @@
 #include "nlp_solver_internal.hpp"
 #include "mx_function.hpp"
 #include "sx_function.hpp"
-#include "../sx/sx_tools.hpp"
 
 INPUTSCHEME(NlpSolverInput)
 OUTPUTSCHEME(NlpSolverOutput)

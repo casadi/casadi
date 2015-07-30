@@ -24,10 +24,10 @@
 
 
 #include "cvodes_interface.hpp"
+
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/function/linear_solver_internal.hpp"
 #include "casadi/core/function/mx_function.hpp"
-#include "casadi/core/sx/sx_tools.hpp"
 
 using namespace std;
 

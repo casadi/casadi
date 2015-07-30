@@ -35,7 +35,6 @@
 #include "binary_sx.hpp"
 #include "../casadi_options.hpp"
 #include "../function/sx_function_internal.hpp"
-#include "sx_tools.hpp"
 #include "../function/linear_solver.hpp"
 
 using namespace std;
@@ -1175,26 +1174,6 @@ namespace casadi {
   template<>
   SX SX::zz_if_else(const SX &if_true, const SX &if_false, bool short_circuit) const {
     return if_else_zero(*this, if_true) + if_else_zero(!*this, if_false);
-  }
-
-  template<>
-  SX SX::zz_heaviside() const {
-    return (1+sign(*this))/2;
-  }
-
-  template<>
-  SX SX::zz_rectangle() const {
-    return 0.5*(sign(*this+0.5)-sign(*this-0.5));
-  }
-
-  template<>
-  SX SX::zz_triangle() const {
-    return rectangle(toScalar()/2)*(1-abs(toScalar()));
-  }
-
-  template<>
-  SX SX::zz_ramp() const {
-    return *this*heaviside(*this);
   }
 
   template<>

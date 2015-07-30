@@ -25,7 +25,6 @@
 
 #include "stabilized_qp_to_qp.hpp"
 
-#include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
 
 using namespace std;

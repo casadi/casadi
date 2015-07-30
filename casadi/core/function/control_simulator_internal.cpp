@@ -26,7 +26,6 @@
 #include "control_simulator_internal.hpp"
 #include "integrator_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "../sx/sx_tools.hpp"
 #include "sx_function.hpp"
 #include "mx_function.hpp"
 #include <utility>

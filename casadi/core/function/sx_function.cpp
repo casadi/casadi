@@ -24,15 +24,15 @@
 
 
 #include "sx_function_internal.hpp"
+#include "../std_vector_tools.hpp"
+#include "../sx/sx_node.hpp"
+#include "mx_function.hpp"
+
 #include <limits>
 #include <stack>
 #include <deque>
 #include <fstream>
 #include <sstream>
-#include "../std_vector_tools.hpp"
-#include "../sx/sx_node.hpp"
-#include "../sx/sx_tools.hpp"
-#include "mx_function.hpp"
 
 namespace casadi {
 

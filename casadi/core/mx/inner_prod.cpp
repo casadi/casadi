@@ -24,7 +24,6 @@
 
 
 #include "inner_prod.hpp"
-#include "../sx/sx_tools.hpp"
 #include "../runtime/runtime.hpp"
 
 using namespace std;

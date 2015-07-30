@@ -24,7 +24,6 @@
 
 
 #include "transpose.hpp"
-#include "../sx/sx_tools.hpp"
 
 using namespace std;
 

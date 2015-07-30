@@ -1,5 +1,4 @@
-#include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/sx/sx_tools.hpp"
+#include "casadi/casadi.hpp"
 
 using namespace casadi;
 using namespace std;

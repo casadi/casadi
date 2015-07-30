@@ -411,6 +411,19 @@ namespace casadi {
     MX zz_simplify() const;
     bool zz_isEqual(const MX& y, int depth) const;
     bool zz_isEqual(const MXNode* y, int depth) const;
+    ///@}
+
+    ///@{
+    /// Functions called by friend functions defined for GenericExpression
+    MX zz_jacobian(const MX& arg) const;
+    MX zz_gradient(const MX& arg) const;
+    MX zz_tangent(const MX& arg) const;
+    MX zz_hessian(const MX& arg) const;
+    MX zz_hessian(const MX& arg, MX& g) const;
+    MX zz_substitute(const MX& v, const MX& vdef) const;
+    static std::vector<MX> zz_substitute(const std::vector<MX> &ex,
+                                         const std::vector<MX> &v,
+                                         const std::vector<MX> &vdef);
     static void zz_substituteInPlace(const std::vector<MX>& v,
                                      std::vector<MX>& vdef,
                                      std::vector<MX>& ex, bool reverse);
@@ -418,29 +431,25 @@ namespace casadi {
                 const Dict& dict = Dict()) const;
     MX zz_pinv(const std::string& lsolver="symbolicqr",
                const Dict& dict = Dict()) const;
+    int zz_countNodes() const;
+    std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
+    static void zz_extractShared(std::vector<MX>& ex, std::vector<MX>& v,
+                                 std::vector<MX>& vdef, const std::string& v_prefix,
+                                 const std::string& v_suffix);
+    MX zz_if_else(const MX& if_true, const MX& if_false, bool short_circuit=true) const;
+    MX zz_conditional(const std::vector<MX> &x, const MX& x_default,
+                      bool short_circuit=true) const;
+    bool zz_dependsOn(const MX& arg) const;
     ///@}
 
     ///@{
     /// Functions called by friend functions defined for this class
     MX zz_find() const;
-    int zz_countNodes() const;
-    std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
-    MX zz_substitute(const MX& v, const MX& vdef) const;
-    static std::vector<MX> zz_substitute(const std::vector<MX> &ex,
-                                         const std::vector<MX> &v,
-                                         const std::vector<MX> &vdef);
+
     MX zz_graph_substitute(const std::vector<MX> &v, const std::vector<MX> &vdef) const;
     static std::vector<MX> zz_graph_substitute(const std::vector<MX> &ex,
                                                const std::vector<MX> &expr,
                                                const std::vector<MX> &exprs);
-    static void zz_extractShared(std::vector<MX>& ex, std::vector<MX>& v,
-                                 std::vector<MX>& vdef, const std::string& v_prefix,
-                                 const std::string& v_suffix);
-    MX zz_jacobian(const MX &arg) const;
-    MX zz_gradient(const MX &arg) const;
-    MX zz_tangent(const MX &arg) const;
-    MX zz_hessian(const MX& arg) const;
-    MX zz_hessian(const MX& arg, MX& g) const;
     static MX zz_matrix_expand(const MX& e, const std::vector<MX> &boundary);
     static std::vector<MX> zz_matrix_expand(const std::vector<MX>& e,
                                             const std::vector<MX>& boundary);
@@ -482,9 +491,6 @@ namespace casadi {
     MX zz_reshape(int nrow, int ncol) const;
     MX zz_reshape(const Sparsity& sp) const;
     MX zz_vecNZ() const;
-    MX zz_if_else(const MX &if_true, const MX &if_false, bool short_circuit=true) const;
-    MX zz_conditional(const std::vector<MX> &x, const MX &x_default,
-                      bool short_circuit=true) const;
     MX zz_unite(const MX& B) const;
     MX zz_trace() const;
     MX zz_diag() const;
@@ -493,7 +499,6 @@ namespace casadi {
     MX zz_polyval(const MX& x) const;
     MX zz_det() const;
     MX zz_inv() const;
-    bool zz_dependsOn(const MX &arg) const;
     std::vector<MX> zz_symvar() const;
     MX zz_kron(const MX& b) const;
     MX zz_nullspace() const;
@@ -509,33 +514,10 @@ namespace casadi {
       return x.zz_find();
     }
 
-    /** Count number of nodes */
-    inline friend int countNodes(const MX& A) {
-      return A.zz_countNodes();
-    }
-
-    /** \brief Get a string representation for a binary MX, using custom arguments */
-    inline friend std::string
-      getOperatorRepresentation(const MX& xb, const std::vector<std::string>& args) {
-      return xb.zz_getOperatorRepresentation(args);
-    }
-
-    /** \brief  Substitute variable v with expression vdef in an expression ex */
-    inline friend MX substitute(const MX &ex, const MX& v, const MX& vdef) {
-      return ex.zz_substitute(v, vdef);
-    }
-
-    /** \brief  Substitute variable var with expression expr in multiple expressions */
-    inline friend std::vector<MX>
-      substitute(const std::vector<MX> &ex, const std::vector<MX> &v,
-                 const std::vector<MX> &vdef) {
-      return MX::zz_substitute(ex, v, vdef);
-    }
-
     /** \brief Substitute single expression in graph
      * Substitute variable v with expression vdef in an expression ex, preserving nodes
      */
-    inline friend MX graph_substitute(const MX &ex, const std::vector<MX> &v,
+    inline friend MX graph_substitute(const MX& ex, const std::vector<MX> &v,
                                       const std::vector<MX> &vdef) {
       return ex.zz_graph_substitute(v, vdef);
     }
@@ -550,41 +532,6 @@ namespace casadi {
                        const std::vector<MX> &vdef) {
       return MX::zz_graph_substitute(ex, v, vdef);
     }
-
-    /** \brief Extract shared subexpressions from an set of expressions */
-    inline friend void extractShared(std::vector<MX>& ex,
-                                     std::vector<MX>& v,
-                                     std::vector<MX>& vdef,
-                                     const std::string& v_prefix="v_",
-                                     const std::string& v_suffix="") {
-      return MX::zz_extractShared(ex, v, vdef, v_prefix, v_suffix);
-    }
-
-    ///@{
-    /** \brief Calculate jacobian via source code transformation
-
-        Uses casadi::MXFunction::jac
-    */
-    inline friend MX jacobian(const MX &ex, const MX &arg) {
-      return ex.zz_jacobian(arg);
-    }
-    inline friend MX gradient(const MX &ex, const MX &arg) {
-      return ex.zz_gradient(arg);
-    }
-    inline friend MX tangent(const MX &ex, const MX &arg) {
-      return ex.zz_tangent(arg);
-    }
-    ///@}
-
-    ///@{
-    // Hessian and (optionally) gradient
-    inline friend MX hessian(const MX &ex, const MX &arg) {
-      return ex.zz_hessian(arg);
-    }
-    inline friend MX hessian(const MX &ex, const MX &arg, MX& output_g) {
-      return ex.zz_hessian(arg, output_g);
-    }
-    ///@}
 
     /** \brief Expand MX graph to SXFunction call
      *

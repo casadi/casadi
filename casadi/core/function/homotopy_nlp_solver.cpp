@@ -25,7 +25,6 @@
 
 #include "homotopy_nlp_solver.hpp"
 #include "homotopy_nlp_internal.hpp"
-#include "../sx/sx_tools.hpp"
 
 using namespace std;
 namespace casadi {

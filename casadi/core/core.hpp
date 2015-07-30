@@ -40,9 +40,6 @@
 // Matrices
 #include "matrix/matrix.hpp"
 
-// Scalar expressions
-#include "sx/sx_tools.hpp"
-
 // Matrix expressions
 #include "mx/mx.hpp"
 

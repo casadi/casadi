@@ -24,12 +24,12 @@
 
 
 #include "simple_indef_dle_internal.hpp"
-#include <cassert>
+
 #include "../core/std_vector_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
+#include <cassert>
 #include <numeric>
 
 INPUTSCHEME(DLEInput)

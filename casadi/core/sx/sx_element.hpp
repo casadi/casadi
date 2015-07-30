@@ -353,10 +353,6 @@ namespace casadi {
   template<> SX SX::zz_pw_lin(const SX &tval, const SX &val) const;
   template<> SX SX::zz_if_else(const SX &if_true, const SX &if_false,
                                bool short_circuit) const;
-  template<> SX SX::zz_heaviside() const;
-  template<> SX SX::zz_rectangle() const;
-  template<> SX SX::zz_triangle() const;
-  template<> SX SX::zz_ramp() const;
   template<> SX SX::zz_gauss_quadrature(const SX &x, const SX &a,
                                         const SX &b, int order,
                                         const SX& w) const;

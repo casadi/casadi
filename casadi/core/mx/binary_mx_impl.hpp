@@ -29,7 +29,6 @@
 #include "binary_mx.hpp"
 #include <vector>
 #include <sstream>
-#include "../sx/sx_tools.hpp"
 #include "../std_vector_tools.hpp"
 #include "../casadi_options.hpp"
 

@@ -2626,26 +2626,22 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_heaviside() const {
-    throw CasadiException("\"heaviside\" not defined for instantiation");
-    return Matrix<DataType>();
+    return (1+sign(*this))/2;
   }
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_rectangle() const {
-    throw CasadiException("\"rectangle\" not defined for instantiation");
-    return Matrix<DataType>();
+    return 0.5*(sign(*this+0.5)-sign(*this-0.5));
   }
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_triangle() const {
-    throw CasadiException("\"triangle\" not defined for instantiation");
-    return Matrix<DataType>();
+    return rectangle(*this/2)*(1-fabs(*this));
   }
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_ramp() const {
-    throw CasadiException("\"ramp\" not defined for instantiation");
-    return Matrix<DataType>();
+    return *this*heaviside(*this);
   }
 
   template<typename DataType>

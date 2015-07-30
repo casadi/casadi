@@ -437,6 +437,19 @@ namespace casadi {
       return f.zz_dependsOn(arg);
     }
 
+    /** \brief  Substitute variable v with expression vdef in an expression ex */
+    friend inline MatType substitute(const MatType& ex, const MatType& v,
+                                     const MatType& vdef) {
+      return ex.zz_substitute(v, vdef);
+    }
+
+    /** \brief  Substitute variable var with expression expr in multiple expressions */
+    friend inline std::vector<MatType>
+      substitute(const std::vector<MatType>& ex, const std::vector<MatType>& v,
+                 const std::vector<MatType>& vdef) {
+      return MatType::zz_substitute(ex, v, vdef);
+    }
+
     /** \brief Inplace substitution with piggyback expressions
      * Substitute variables v out of the expressions vdef sequentially,
      * as well as out of a number of other expressions piggyback */
@@ -501,6 +514,63 @@ namespace casadi {
                                const Dict& dict = Dict()) {
       return A.zz_pinv(lsolver, dict);
     }
+
+    ///@{
+    /** \brief Calculate jacobian via source code transformation
+    */
+    inline friend MatType jacobian(const MatType &ex, const MatType &arg) {
+      return ex.zz_jacobian(arg);
+    }
+    inline friend MatType gradient(const MatType &ex, const MatType &arg) {
+      return ex.zz_gradient(arg);
+    }
+    inline friend MatType tangent(const MatType &ex, const MatType &arg) {
+      return ex.zz_tangent(arg);
+    }
+    ///@}
+
+    ///@{
+    // Hessian and (optionally) gradient
+    inline friend MatType hessian(const MatType &ex, const MatType &arg) {
+      return ex.zz_hessian(arg);
+    }
+    inline friend MatType hessian(const MatType &ex, const MatType &arg, MatType& output_g) {
+      return ex.zz_hessian(arg, output_g);
+    }
+    ///@}
+
+    /** Count number of nodes */
+    inline friend int countNodes(const MatType& A) {
+      return A.zz_countNodes();
+    }
+
+    /** \brief Get a string representation for a binary MatType, using custom arguments */
+    inline friend std::string
+      getOperatorRepresentation(const MatType& xb, const std::vector<std::string>& args) {
+      return xb.zz_getOperatorRepresentation(args);
+    }
+
+    /** \brief Extract shared subexpressions from an set of expressions */
+    inline friend void extractShared(std::vector<MatType>& ex,
+                                     std::vector<MatType>& v,
+                                     std::vector<MatType>& vdef,
+                                     const std::string& v_prefix="v_",
+                                     const std::string& v_suffix="") {
+      MatType::zz_extractShared(ex, v, vdef, v_prefix, v_suffix);
+    }
+
+    /** \brief Extract shared subexpressions from an set of expressions */
+    inline friend void extractShared(const std::vector<MatType>& ex,
+                                     std::vector<MatType>& ex_output,
+                                     std::vector<MatType>& v,
+                                     std::vector<MatType>& vdef,
+                                     const std::string& v_prefix="v_",
+                                     const std::string& v_suffix="") {
+      ex_output = ex;
+      extractShared(ex_output, v, vdef, v_prefix, v_suffix);
+    }
+
+
 #endif // SWIG
 
     /** @name Construct symbolic primitives

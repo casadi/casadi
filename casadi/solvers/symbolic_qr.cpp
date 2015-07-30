@@ -24,7 +24,7 @@
 
 
 #include "symbolic_qr.hpp"
-#include "casadi/core/sx/sx_tools.hpp"
+
 #include "casadi/core/function/sx_function.hpp"
 
 #ifdef WITH_DL

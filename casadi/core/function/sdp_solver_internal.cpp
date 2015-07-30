@@ -25,7 +25,6 @@
 
 #include "sdp_solver_internal.hpp"
 #include "sx_function.hpp"
-#include "../sx/sx_tools.hpp"
 
 INPUTSCHEME(SDPInput)
 OUTPUTSCHEME(SDPOutput)

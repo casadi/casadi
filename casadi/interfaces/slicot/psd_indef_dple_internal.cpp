@@ -24,14 +24,14 @@
 
 
 #include "psd_indef_dple_internal.hpp"
-#include <cassert>
+
 #include "../../core/std_vector_tools.hpp"
-#include "../../core/sx/sx_tools.hpp"
 #include "../../core/function/mx_function.hpp"
 #include "../../core/function/sx_function.hpp"
-
 #include "../../core/profiling.hpp"
 #include "../../core/casadi_options.hpp"
+
+#include <cassert>
 #include <ctime>
 #include <numeric>
 

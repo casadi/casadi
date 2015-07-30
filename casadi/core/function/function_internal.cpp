@@ -29,7 +29,6 @@
 #include <typeinfo>
 #include "../std_vector_tools.hpp"
 #include "mx_function.hpp"
-#include "../sx/sx_tools.hpp"
 #include "external_function.hpp"
 
 #include "../casadi_options.hpp"

@@ -23,15 +23,13 @@
  */
 
 #include "mx_function_internal.hpp"
-#include "../sx/sx_tools.hpp"
-
 #include "../std_vector_tools.hpp"
 #include "../casadi_types.hpp"
+#include "../profiling.hpp"
+#include "../casadi_options.hpp"
 
 #include <stack>
 #include <typeinfo>
-#include "../profiling.hpp"
-#include "../casadi_options.hpp"
 
 using namespace std;
 

@@ -28,7 +28,6 @@
 
 #include "setnonzeros.hpp"
 #include "../std_vector_tools.hpp"
-#include "../sx/sx_tools.hpp"
 #include "../function/sx_function.hpp"
 
 /// \cond INTERNAL

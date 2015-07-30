@@ -25,7 +25,6 @@
 
 #include "socp_solver_internal.hpp"
 #include "sx_function.hpp"
-#include "../sx/sx_tools.hpp"
 #include <numeric>
 #include <functional>
 

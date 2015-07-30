@@ -25,7 +25,6 @@
 
 #include "sdqp_solver_internal.hpp"
 #include "sx_function.hpp"
-#include "../sx/sx_tools.hpp"
 
 INPUTSCHEME(SDQPInput)
 OUTPUTSCHEME(SDQPOutput)

@@ -25,7 +25,6 @@
 
 #include "split.hpp"
 #include "../std_vector_tools.hpp"
-#include "../sx/sx_tools.hpp"
 #include "../function/sx_function.hpp"
 #include "../casadi_options.hpp"
 

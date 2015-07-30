@@ -31,7 +31,6 @@
 #include <sstream>
 #include <iomanip>
 #include "../std_vector_tools.hpp"
-#include "../sx/sx_tools.hpp"
 #include "../sx/sx_node.hpp"
 #include "../casadi_types.hpp"
 #include "../matrix/sparsity_internal.hpp"
@@ -906,7 +905,7 @@ namespace casadi {
   }
 
   Function SXFunctionInternal::getFullJacobian() {
-    SX J = casadi::jacobian(veccat(outputv_), veccat(inputv_));
+    SX J = veccat(outputv_).zz_jacobian(veccat(inputv_));
     return SXFunction(name_ + "_jac", inputv_, make_vector(J));
   }
 

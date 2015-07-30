@@ -60,7 +60,6 @@ set(CASADI_SRCS
   sx/constant_sx.hpp                                    # A constant SXElement node
   sx/unary_sx.hpp                                       # A unary operation
   sx/binary_sx.hpp                                      # A binary operation
-  sx/sx_tools.hpp                                       # Set of functions
 
   # More general graph representation with sparse matrix expressions and function evaluations
   mx/mx.hpp                  mx/mx.cpp                  # Symbolic expression class (matrix-valued atomics)

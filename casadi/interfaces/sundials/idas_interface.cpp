@@ -24,10 +24,10 @@
 
 
 #include "idas_interface.hpp"
+
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/function/linear_solver_internal.hpp"
 #include "casadi/core/function/mx_function.hpp"
-#include "casadi/core/sx/sx_tools.hpp"
 
 #ifdef WITH_SYSTEM_SUNDIALS
 #include <external_packages/sundials-2.5mod/idas/idas_spils_impl.h>
