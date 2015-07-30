@@ -28,6 +28,7 @@
 #include "../../core/std_vector_tools.hpp"
 #include "../../core/function/mx_function.hpp"
 #include "../../core/function/sx_function.hpp"
+#include "../../core/function/linear_solver.hpp"
 #include "../../core/profiling.hpp"
 #include "../../core/casadi_options.hpp"
 
