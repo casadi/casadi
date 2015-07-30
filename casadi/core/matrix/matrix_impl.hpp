@@ -2645,6 +2645,13 @@ namespace casadi {
   }
 
   template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::
+  zz_gauss_quadrature(const Matrix<DataType> &x, const Matrix<DataType> &a,
+                      const Matrix<DataType> &b, int order) const {
+    return zz_gauss_quadrature(x, a, b, order, Matrix<DataType>());
+  }
+
+  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_gauss_quadrature(const Matrix<DataType> &x,
                                                          const Matrix<DataType> &a,
                                                          const Matrix<DataType> &b, int order,

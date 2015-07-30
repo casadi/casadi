@@ -538,9 +538,7 @@ namespace casadi {
     Matrix<DataType> zz_triangle() const;
     Matrix<DataType> zz_ramp() const;
     Matrix<DataType> zz_gauss_quadrature(const Matrix<DataType> &x, const Matrix<DataType> &a,
-                                         const Matrix<DataType> &b, int order=5) const {
-      return zz_gauss_quadrature(x, a, b, order, Matrix<DataType>());
-    }
+                                         const Matrix<DataType> &b, int order=5) const;
     Matrix<DataType> zz_gauss_quadrature(const Matrix<DataType> &x, const Matrix<DataType> &a,
                                          const Matrix<DataType> &b, int order,
                                          const Matrix<DataType>& w) const;
