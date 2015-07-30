@@ -2911,17 +2911,19 @@ DECL M %SHOW(if_else)(const M& cond, const M& if_true,
                     const M& if_false, bool short_circuit=true) {
   return if_else(cond, if_true, if_false, short_circuit);   
 }
+
 DECL M %SHOW(conditional)(const M& ind, const std::vector< M > &x,
                         const M& x_default, bool short_circuit=true) {
   return conditional(ind, x, x_default, short_circuit);     
 }
+
 DECL bool %SHOW(dependsOn)(const M& f, const M& arg) {
   return dependsOn(f, arg);     
 }
 
-DECL void %SHOW(substituteInPlace)(const std::vector<M>& v,
-                                      std::vector<M>& inout_vdef,
-                                      std::vector<M>& inout_ex,
+DECL void %SHOW(substituteInPlace)(const std::vector< M >& v,
+                                      std::vector< M >& inout_vdef,
+                                      std::vector< M >& inout_ex,
                                       bool reverse=false) {
   return substituteInPlace(v, inout_vdef, inout_ex, reverse);
 }
@@ -2949,9 +2951,9 @@ DECL M %SHOW(substitute)(const M& ex, const M& v, const M& vdef) {
   return substitute(ex, v, vdef);
 }
 
-DECL std::vector<M> %SHOW(substitute)(const std::vector<M>& ex,
-                                         const std::vector<M>& v,
-                                         const std::vector<M>& vdef) {
+DECL std::vector< M > %SHOW(substitute)(const std::vector< M >& ex,
+                                         const std::vector< M >& v,
+                                         const std::vector< M >& vdef) {
   return substitute(ex, v, vdef);
 }
 
@@ -3178,26 +3180,26 @@ DECL M %SHOW(find)(const M& x) {
   return find(x);
 }
 
-DECL M %SHOW(graph_substitute)(const M& ex, const std::vector<M>& v,
-                         const std::vector<M> &vdef) {
+DECL M %SHOW(graph_substitute)(const M& ex, const std::vector< M >& v,
+                         const std::vector< M > &vdef) {
   return graph_substitute(ex, v, vdef);
 }
 
-DECL std::vector<M>
-%SHOW(graph_substitute)(const std::vector<M> &ex,
-                 const std::vector<M> &v,
-                 const std::vector<M> &vdef) {
+DECL std::vector< M >
+%SHOW(graph_substitute)(const std::vector< M > &ex,
+                 const std::vector< M > &v,
+                 const std::vector< M > &vdef) {
   return graph_substitute(ex, v, vdef);
 }
 
 DECL M %SHOW(matrix_expand)(const M& e,
-                            const std::vector<M> &boundary = std::vector<M>()) {
+                            const std::vector< M > &boundary = std::vector< M >()) {
   return matrix_expand(e, boundary);
 }
 
-DECL std::vector<M>
-%SHOW(matrix_expand)(const std::vector<M>& e,
-                     const std::vector<M> &boundary = std::vector<M>()) {
+DECL std::vector< M >
+%SHOW(matrix_expand)(const std::vector< M >& e,
+                     const std::vector< M > &boundary = std::vector< M >()) {
   return matrix_expand(e, boundary);
 }
 
