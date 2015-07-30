@@ -25,7 +25,6 @@
 
 #include "sx_element.hpp"
 #include "../matrix/matrix.hpp"
-#include "../matrix/generic_expression_tools.hpp"
 #include <stack>
 #include <cassert>
 #include "../casadi_math.hpp"

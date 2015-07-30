@@ -86,12 +86,12 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
 
     /// Logic greater than
     friend inline ExType operator>(const ExType &x, const ExType &y) {
-      return x.zz_gt(y);
+      return y.zz_lt(x);
     }
 
     /// Logic greater or equal to
     friend inline ExType operator>=(const ExType &x, const ExType &y) {
-      return x.zz_ge(y);
+      return y.zz_le(x);
     }
 
     /// Logic equal to
@@ -313,27 +313,23 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
      * expression is zero and 0 otherwise
      */
     inline ExType operator!() const { return self().zz_not(); }
+
+    /// Logical not, alternative syntax
+    friend inline ExType logic_not(const ExType& x) {
+      return !x;
+    }
+
+    /// Logical and, alternative syntax
+    friend inline ExType logic_and(const ExType& x, const ExType& y) {
+      return x && y;
+    }
+
+    /// Logical or, alterntive syntax
+    friend inline ExType logic_or(const ExType& x, const ExType& y) {
+      return x || y;
+    }
+
 #endif // SWIG
-
-#if !defined(SWIG) || !defined(SWIGMATLAB)
-
-    // \cond CLUTTER
-
-    /// No need to have both < and >
-    inline ExType zz_gt(const ExType& y) const {
-      return y.zz_lt(self());
-    }
-
-    /// No need to have both <= and >=
-    inline ExType zz_ge(const ExType& y) const {
-      return y.zz_le(self());
-    }
-
-    /// Division (with <tt>__future__.division</tt> in effect)
-    inline ExType __truediv__(const ExType& y) const {return self()/y;}
-    /// \endcond
-
-#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
 };
 
