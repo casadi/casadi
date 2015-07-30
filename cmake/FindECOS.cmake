@@ -57,4 +57,10 @@ else()
   message(STATUS "ECOS: Cound not find ecos. Try setting ECOS env var.")
 endif()
 
-
+# Standard ecos build depends on rt for profiling
+if(WIN32)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+else()
+  find_library(RT rt)
+  set(ECOS_LIBRARIES ${ECOS_LIBRARIES} "${RT}")
+endif()
