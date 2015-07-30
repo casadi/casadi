@@ -405,6 +405,7 @@ namespace casadi {
     MX zz_floor() const;
     MX zz_ceil() const;
     MX zz_erf() const;
+    MX zz_erfinv() const;
     MX zz_sign() const;
     MX zz_power(const MX& b) const;
     MX zz_mod(const MX& y) const;
@@ -442,6 +443,7 @@ namespace casadi {
     MX zz_conditional(const std::vector<MX> &x, const MX& x_default,
                       bool short_circuit=true) const;
     bool zz_dependsOn(const MX& arg) const;
+    MX zz_not() const;
     ///@}
 
     ///@{
@@ -463,6 +465,30 @@ namespace casadi {
     ///@}
 
     ///@{
+    /// Functions called by friend functions defined for GenericMatrix
+    MX zz_mpower(const MX& b) const;
+    MX zz_inner_prod(const MX& y) const;
+    MX zz_outer_prod(const MX& y) const;
+    MX zz_mrdivide(const MX& b) const;
+    MX zz_mldivide(const MX& b) const;
+    MX zz_if_else_zero(const MX& y) const;
+    MX zz_norm_2() const;
+    MX zz_norm_F() const;
+    MX zz_norm_1() const;
+    MX zz_norm_inf() const;
+    MX zz_unite(const MX& B) const;
+    MX zz_trace() const;
+    MX zz_diag() const;
+    MX zz_sumCols() const;
+    MX zz_sumRows() const;
+    MX zz_polyval(const MX& x) const;
+    MX zz_det() const;
+    MX zz_inv() const;
+    std::vector<MX> zz_symvar() const;
+    MX zz_nullspace() const;
+    ///@}
+
+    ///@{
     /// Functions called by friend functions defined for this class
     MX zz_find() const;
 
@@ -478,35 +504,7 @@ namespace casadi {
 
 #endif // SWIG
 
-#if !defined(SWIG) || !defined(SWIGMATLAB)
     MX printme(const MX& y) const;
-
-    /// \cond CLUTTER
-    MX zz_mpower(const MX& b) const;
-    MX zz_inner_prod(const MX& y) const;
-    MX zz_outer_prod(const MX& y) const;
-    MX zz_if_else_zero(const MX& y) const;
-    MX zz_mrdivide(const MX& b) const;
-    MX zz_mldivide(const MX& b) const;
-    MX zz_erfinv() const;
-    MX zz_not() const;
-    MX zz_norm_2() const;
-    MX zz_norm_F() const;
-    MX zz_norm_1() const;
-    MX zz_norm_inf() const;
-    MX zz_unite(const MX& B) const;
-    MX zz_trace() const;
-    MX zz_diag() const;
-    MX zz_sumCols() const;
-    MX zz_sumRows() const;
-    MX zz_polyval(const MX& x) const;
-    MX zz_det() const;
-    MX zz_inv() const;
-    std::vector<MX> zz_symvar() const;
-    MX zz_nullspace() const;
-    /// \endcond
-
-#endif  // !defined(SWIG) || !defined(SWIGMATLAB)
 
 #ifndef SWIG
     /** \brief Find first nonzero

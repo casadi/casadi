@@ -104,12 +104,18 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
       return x.zz_ne(y);
     }
 
-    /// Logic and
+    /** \brief Logical `and`
+     * Returns (an expression evaluating to) 1 if both
+     * expressions are nonzero and 0 otherwise
+     */
     friend inline ExType operator&&(const ExType &x, const ExType &y) {
       return x.zz_and(y);
     }
 
-    /// Logic or
+    /** \brief  Logical `or`
+     * returns (an expression evaluating to) 1 if at
+     * least one expression is nonzero and 0 otherwise
+     */
     friend inline ExType operator||(const ExType &x, const ExType &y) {
       return x.zz_or(y);
     }
@@ -219,6 +225,11 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
       return x.zz_erf();
     }
 
+    /// Invers error function
+    friend inline ExType erfinv(const ExType& x) {
+      return x.zz_erfinv();
+    }
+
     /** Sine function
         sign(x)   := -1 for x<0
         sign(x)   :=  1 for x>0,
@@ -297,7 +308,10 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
     /// In-place elementwise division
     inline ExType& operator/=(const ExType &y) {return self() = self().zz_rdivide(y);}
 
-    /// Logic not
+    /** \brief  Logical `not`
+     * Returns (an expression evaluating to) 1 if
+     * expression is zero and 0 otherwise
+     */
     inline ExType operator!() const { return self().zz_not(); }
 #endif // SWIG
 

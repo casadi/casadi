@@ -380,10 +380,6 @@ namespace casadi {
     void makeDense(const DataType& val = 0);
 #endif // SWIG
 
-#if !defined(SWIG) || !defined(SWIGMATLAB)
-    /** \brief Set sparse */
-    Matrix<DataType> zz_project(const Sparsity& sp, bool intersect=false) const;
-#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
     /** \brief  Make a matrix sparse by removing numerical zeros smaller
      * in absolute value than a specified tolerance */
@@ -443,6 +439,7 @@ namespace casadi {
     Matrix<DataType> zz_floor() const;
     Matrix<DataType> zz_ceil() const;
     Matrix<DataType> zz_erf() const;
+    Matrix<DataType> zz_erfinv() const;
     Matrix<DataType> zz_sign() const;
     Matrix<DataType> zz_power(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_mod(const Matrix<DataType>& y) const;
@@ -450,6 +447,7 @@ namespace casadi {
     bool zz_isEqual(const Matrix<DataType> &ex2, int depth=0) const;
     Matrix<DataType> zz_copysign(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_constpow(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_not() const;
     ///@}
 
     ///@{
@@ -489,6 +487,27 @@ namespace casadi {
                                     const Matrix<DataType> &x_default,
                                     bool short_circuit) const;
     bool zz_dependsOn(const Matrix<DataType> &arg) const;
+    Matrix<DataType> zz_mpower(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_mrdivide(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_mldivide(const Matrix<DataType> &y) const;
+    std::vector<Matrix<DataType> > zz_symvar() const;
+    Matrix<DataType> zz_det() const;
+    Matrix<DataType> zz_inv() const;
+    Matrix<DataType> zz_trace() const;
+    Matrix<DataType> zz_norm_1() const;
+    Matrix<DataType> zz_norm_2() const;
+    Matrix<DataType> zz_norm_F() const;
+    Matrix<DataType> zz_norm_inf() const;
+    Matrix<DataType> zz_sumCols() const;
+    Matrix<DataType> zz_sumRows() const;
+    Matrix<DataType> zz_inner_prod(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_outer_prod(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_nullspace() const;
+    Matrix<DataType> zz_diag() const;
+    Matrix<DataType> zz_unite(const Matrix<DataType>& B) const;
+    Matrix<DataType> zz_project(const Sparsity& sp, bool intersect) const;
+    Matrix<DataType> zz_if_else_zero(const Matrix<DataType>& y) const;
+    Matrix<DataType> zz_polyval(const Matrix<DataType>& x) const;
     ///@}
 
     ///@{
@@ -525,7 +544,6 @@ namespace casadi {
     Matrix<DataType> zz_gauss_quadrature(const Matrix<DataType> &x, const Matrix<DataType> &a,
                                          const Matrix<DataType> &b, int order,
                                          const Matrix<DataType>& w) const;
-    std::vector<Matrix<DataType> > zz_symvar() const;
     Matrix<DataType> zz_jacobianTimesVector(const Matrix<DataType> &arg, const Matrix<DataType> &v,
                                             bool transpose_jacobian=false) const;
     Matrix<DataType> zz_taylor(const Matrix<DataType>& x,
@@ -545,9 +563,8 @@ namespace casadi {
     Matrix<DataType> zz_cofactor(int i, int j) const;
     Matrix<DataType> zz_chol() const;
     Matrix<DataType> zz_norm_inf_mul(const Matrix<DataType> &y) const;
+    static Matrix<DataType> zz_diagcat(const std::vector< Matrix<DataType> > &A);
     ///@}
-
-
     /// \endcond
 #endif // SWIG
 
@@ -555,38 +572,6 @@ namespace casadi {
 
     /// Transpose the matrix
     Matrix<DataType> T() const;
-
-    /// \cond CLUTTER
-    ///@{
-    /// Functions called by the corresponding friend functions -- MATLAB naming
-#if !defined(SWIG) || !defined(SWIGMATLAB)
-    Matrix<DataType> zz_mpower(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_mrdivide(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_mldivide(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_erfinv() const;
-    Matrix<DataType> zz_not() const;
-    Matrix<DataType> zz_if_else_zero(const Matrix<DataType>& y) const;
-    Matrix<DataType> zz_det() const;
-    Matrix<DataType> zz_sumCols() const;
-    Matrix<DataType> zz_sumRows() const;
-    Matrix<DataType> zz_inv() const;
-    Matrix<DataType> zz_trace() const;
-    Matrix<DataType> zz_inner_prod(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_outer_prod(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_norm_1() const;
-    Matrix<DataType> zz_norm_2() const;
-    Matrix<DataType> zz_norm_F() const;
-    Matrix<DataType> zz_norm_inf() const;
-    Matrix<DataType> zz_nullspace() const;
-    Matrix<DataType> zz_diag() const;
-    static Matrix<DataType> zz_diagcat(const std::vector< Matrix<DataType> > &A);
-    Matrix<DataType> zz_unite(const Matrix<DataType>& B) const;
-    Matrix<DataType> zz_polyval(const Matrix<DataType>& x) const;
-#endif // !defined(SWIG) || !defined(SWIGMATLAB)
-    ///@}
-
-    /// \endcond
-
 
 #ifndef SWIG
     /** \brief Matrix adjoint

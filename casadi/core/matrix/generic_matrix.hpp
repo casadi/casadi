@@ -173,9 +173,7 @@ namespace casadi {
     /** \brief Access the sparsity, make a copy if there are multiple references to it */
     Sparsity& sparsityRef();
     /// \endcond
-#endif // SWIG
 
-#if !defined(SWIG) || !defined(SWIGMATLAB)
 
     /// \cond CLUTTER
     /**  @{  */
@@ -210,9 +208,6 @@ namespace casadi {
     /** @}  */
     /// \endcond
 
-#endif // !defined(SWIG) || !defined(SWIGMATLAB)
-
-#ifndef SWIG
     /** \brief  Get vector nonzero or slice of nonzeros */
     template<typename K>
     const MatType operator[](const K& k) const {
