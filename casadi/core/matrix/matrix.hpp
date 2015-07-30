@@ -490,6 +490,23 @@ namespace casadi {
     ///@}
 
     ///@{
+    /// Functions called by friend functions defined for SparsityInterface
+    static Matrix<DataType> zz_blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
+    static Matrix<DataType> zz_horzcat(const std::vector<Matrix<DataType> > &v);
+    std::vector<Matrix<DataType> > zz_horzsplit(const std::vector<int>& offset) const;
+    static Matrix<DataType> zz_vertcat(const std::vector<Matrix<DataType> > &v);
+    std::vector< Matrix<DataType> > zz_vertsplit(const std::vector<int>& offset) const;
+    std::vector< Matrix<DataType> > zz_diagsplit(const std::vector<int>& offset1,
+                                                 const std::vector<int>& offset2) const;
+    Matrix<DataType> zz_reshape(int nrow, int ncol) const;
+    Matrix<DataType> zz_reshape(const Sparsity& sp) const;
+    Matrix<DataType> zz_vecNZ() const;
+    Matrix<DataType> zz_kron(const Matrix<DataType>& b) const;
+    Matrix<DataType> zz_mtimes(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_mac(const Matrix<DataType> &y, const Matrix<DataType> &z) const;
+    ///@}
+
+    ///@{
     /// Functions called by friend functions defined here
     Matrix<DataType> zz_sparsify(double tol=0) const;
     void zz_expand(Matrix<DataType> &weights, Matrix<DataType>& terms) const;
@@ -524,6 +541,9 @@ namespace casadi {
     /// \endcond
 #endif // SWIG
 
+    Matrix<DataType> __copysign__(const Matrix<DataType>& y) const;
+    Matrix<DataType> printme(const Matrix<DataType>& y) const;
+
     /// \cond CLUTTER
     ///@{
     /// Functions called by the corresponding friend functions -- MATLAB naming
@@ -544,13 +564,9 @@ namespace casadi {
 
     ///@{
     /// Operations called by the corresponding friend functions, MATLAB naming convention
-    Matrix<DataType> __copysign__(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_erfinv() const;
-    Matrix<DataType> printme(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_not() const;
     Matrix<DataType> zz_if_else_zero(const Matrix<DataType>& y) const;
-    Matrix<DataType> zz_mtimes(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_mac(const Matrix<DataType> &y, const Matrix<DataType> &z) const;
     Matrix<DataType> zz_det() const;
     Matrix<DataType> zz_sumCols() const;
     Matrix<DataType> zz_sumRows() const;
@@ -558,17 +574,7 @@ namespace casadi {
     Matrix<DataType> zz_inv() const;
     Matrix<DataType> zz_cofactor(int i, int j) const;
     Matrix<DataType> zz_getMinor(int i, int j) const;
-    Matrix<DataType> zz_reshape(int nrow, int ncol) const;
-    Matrix<DataType> zz_reshape(const Sparsity& sp) const;
     Matrix<DataType> zz_trace() const;
-    Matrix<DataType> zz_vecNZ() const;
-    static Matrix<DataType> zz_blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
-    static Matrix<DataType> zz_horzcat(const std::vector<Matrix<DataType> > &v);
-    std::vector<Matrix<DataType> > zz_horzsplit(const std::vector<int>& offset) const;
-    static Matrix<DataType> zz_vertcat(const std::vector<Matrix<DataType> > &v);
-    std::vector< Matrix<DataType> > zz_vertsplit(const std::vector<int>& offset) const;
-    std::vector< Matrix<DataType> > zz_diagsplit(const std::vector<int>& offset1,
-                                                 const std::vector<int>& offset2) const;
     Matrix<DataType> zz_inner_prod(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_outer_prod(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_all() const;
@@ -580,7 +586,6 @@ namespace casadi {
     void zz_qr(Matrix<DataType>& SWIG_OUTPUT(Q), Matrix<DataType>& SWIG_OUTPUT(R)) const;
     Matrix<DataType> zz_chol() const;
     Matrix<DataType> zz_nullspace() const;
-    Matrix<DataType> zz_kron(const Matrix<DataType>& b) const;
     Matrix<DataType> zz_diag() const;
     static Matrix<DataType> zz_diagcat(const std::vector< Matrix<DataType> > &A);
     Matrix<DataType> zz_unite(const Matrix<DataType>& B) const;

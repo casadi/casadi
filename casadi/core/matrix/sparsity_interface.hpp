@@ -307,7 +307,7 @@ namespace casadi {
 
   public:
 
-#if !defined(SWIG) || !defined(SWIGMATLAB)
+#ifndef SWIG
 
     /// \cond CLUTTER
     std::vector< std::vector< MatType > >
@@ -326,10 +326,6 @@ namespace casadi {
     std::vector<MatType > zz_horzsplit(int incr) const;
     std::vector<MatType > zz_vertsplit(int incr) const;
     /// \endcond
-
-#endif // !defined(SWIG) || !defined(SWIGMATLAB)
-
-#ifndef SWIG
 
     /** \brief Concatenate a list of matrices horizontally
      * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]

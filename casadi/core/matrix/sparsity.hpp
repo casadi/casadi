@@ -482,9 +482,6 @@ namespace casadi {
                               bvec_t* y, const Sparsity& y_sp,
                               bvec_t* z, const Sparsity& z_sp,
                               bvec_t* w);
-#endif //SWIG
-
-#if !defined(SWIG) || !defined(SWIGMATLAB)
 
     /// \cond INTERNAL
     /// @{
@@ -520,7 +517,7 @@ namespace casadi {
     /// @}
     /// \endcond
 
-#endif // !defined(SWIG) || !defined(SWIGMATLAB)
+#endif //SWIG
 
     /** \brief Enlarge matrix
         Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros

@@ -443,6 +443,24 @@ namespace casadi {
     ///@}
 
     ///@{
+    /// Functions called by friend functions defined for SparsityInterface
+    static MX zz_horzcat(const std::vector<MX>& x);
+    static MX zz_diagcat(const std::vector<MX>& x);
+    static MX zz_vertcat(const std::vector<MX>& x);
+    std::vector<MX> zz_horzsplit(const std::vector<int>& offset) const;
+    std::vector<MX> zz_diagsplit(const std::vector<int>& offset1,
+                                 const std::vector<int>& offset2) const;
+    std::vector<MX> zz_vertsplit(const std::vector<int>& offset) const;
+    static MX zz_blockcat(const std::vector< std::vector<MX > > &v);
+    MX zz_mtimes(const MX& y) const;
+    MX zz_mac(const MX& y, const MX& z) const;
+    MX zz_reshape(int nrow, int ncol) const;
+    MX zz_reshape(const Sparsity& sp) const;
+    MX zz_vecNZ() const;
+    MX zz_kron(const MX& b) const;
+    ///@}
+
+    ///@{
     /// Functions called by friend functions defined for this class
     MX zz_find() const;
 
@@ -474,23 +492,10 @@ namespace casadi {
     MX constpow(const MX& y) const;
     MX zz_erfinv() const;
     MX zz_not() const;
-    static MX zz_horzcat(const std::vector<MX>& x);
-    static MX zz_diagcat(const std::vector<MX>& x);
-    static MX zz_vertcat(const std::vector<MX>& x);
-    std::vector<MX> zz_horzsplit(const std::vector<int>& offset) const;
-    std::vector<MX> zz_diagsplit(const std::vector<int>& offset1,
-                                 const std::vector<int>& offset2) const;
-    std::vector<MX> zz_vertsplit(const std::vector<int>& offset) const;
-    static MX zz_blockcat(const std::vector< std::vector<MX > > &v);
     MX zz_norm_2() const;
     MX zz_norm_F() const;
     MX zz_norm_1() const;
     MX zz_norm_inf() const;
-    MX zz_mtimes(const MX& y) const;
-    MX zz_mac(const MX& y, const MX& z) const;
-    MX zz_reshape(int nrow, int ncol) const;
-    MX zz_reshape(const Sparsity& sp) const;
-    MX zz_vecNZ() const;
     MX zz_unite(const MX& B) const;
     MX zz_trace() const;
     MX zz_diag() const;
@@ -500,7 +505,6 @@ namespace casadi {
     MX zz_det() const;
     MX zz_inv() const;
     std::vector<MX> zz_symvar() const;
-    MX zz_kron(const MX& b) const;
     MX zz_nullspace() const;
     /// \endcond
 

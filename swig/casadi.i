@@ -2759,114 +2759,114 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
 %define %PREF(SYM) friendwrap_ ## SYM %enddef
 
 %define SPARSITY_INTERFACE_FRIENDS(DECL, M)
- DECL M %PREFOLD(horzcat)(const std::vector< M > &v) {
+ DECL M %PREF(horzcat)(const std::vector< M > &v) {
   return horzcat(v);
  }
- DECL M %PREFOLD(vertcat)(const std::vector< M > &v) {
+ DECL M %PREF(vertcat)(const std::vector< M > &v) {
  return vertcat(v);
  }
  DECL std::vector< M >
- %PREFOLD(horzsplit)(const M& v, const std::vector<int>& offset) {
+ %PREF(horzsplit)(const M& v, const std::vector<int>& offset) {
  return horzsplit(v, offset);
  }
- DECL std::vector< M > %PREFOLD(horzsplit)(const M& v, int incr=1) {
+ DECL std::vector< M > %PREF(horzsplit)(const M& v, int incr=1) {
  return horzsplit(v, incr);
  }
  DECL std::vector< M >
- %PREFOLD(vertsplit)(const M& v, const std::vector<int>& offset) {
+ %PREF(vertsplit)(const M& v, const std::vector<int>& offset) {
  return vertsplit(v, offset);
  }
  DECL std::vector<int >
- %PREFOLD(offset)(const std::vector< M > &v, bool vert=true) {
+ %PREF(offset)(const std::vector< M > &v, bool vert=true) {
  return offset(v, vert);
  }
  DECL std::vector< M >
- %PREFOLD(vertsplit)(const M& v, int incr=1) {
+ %PREF(vertsplit)(const M& v, int incr=1) {
  return vertsplit(v, incr);
  }
- DECL M %PREFOLD(blockcat)(const std::vector< std::vector< M > > &v) {
+ DECL M %PREF(blockcat)(const std::vector< std::vector< M > > &v) {
  return blockcat(v);
  }
- DECL M %PREFOLD(blockcat)(const M& A, const M& B, const M& C, const M& D) {
+ DECL M %PREF(blockcat)(const M& A, const M& B, const M& C, const M& D) {
  return vertcat(horzcat(A, B), horzcat(C, D));
  }
  DECL std::vector< std::vector< M > >
- %PREFOLD(blocksplit)(const M& x, const std::vector<int>& vert_offset,
+ %PREF(blocksplit)(const M& x, const std::vector<int>& vert_offset,
  const std::vector<int>& horz_offset) {
  return blocksplit(x, vert_offset, horz_offset);
  }
  DECL std::vector< std::vector< M > >
- %PREFOLD(blocksplit)(const M& x, int vert_incr=1, int horz_incr=1) {
+ %PREF(blocksplit)(const M& x, int vert_incr=1, int horz_incr=1) {
  return blocksplit(x, vert_incr, horz_incr);
  }
- DECL M %PREFOLD(diagcat)(const std::vector< M > &A) {
+ DECL M %PREF(diagcat)(const std::vector< M > &A) {
  return diagcat(A);
  }
  DECL std::vector< M >
- %PREFOLD(diagsplit)(const M& x, const std::vector<int>& output_offset1,
+ %PREF(diagsplit)(const M& x, const std::vector<int>& output_offset1,
  const std::vector<int>& output_offset2) {
  return diagsplit(x, output_offset1, output_offset2);
  }
  DECL std::vector< M >
- %PREFOLD(diagsplit)(const M& x, const std::vector<int>& output_offset) {
+ %PREF(diagsplit)(const M& x, const std::vector<int>& output_offset) {
  return diagsplit(x, output_offset);
  }
- DECL std::vector< M > %PREFOLD(diagsplit)(const M& x, int incr=1) {
+ DECL std::vector< M > %PREF(diagsplit)(const M& x, int incr=1) {
  return diagsplit(x, incr);
  }
  DECL std::vector< M >
- %PREFOLD(diagsplit)(const M& x, int incr1, int incr2) {
+ %PREF(diagsplit)(const M& x, int incr1, int incr2) {
  return diagsplit(x, incr1, incr2);
  }
- DECL M %PREFOLD(veccat)(const std::vector< M >& x) {
+ DECL M %PREF(veccat)(const std::vector< M >& x) {
  return veccat(x);
  }
- DECL M %PREFOLD(mul)(const M& X, const M& Y) {
+ DECL M %PREF(mul)(const M& X, const M& Y) {
  return mul(X, Y);
  }
- DECL M %PREFOLD(mul)(const std::vector< M > &args) {
+ DECL M %PREF(mul)(const std::vector< M > &args) {
  return mul(args);
  }
- DECL M %PREFOLD(mac)(const M& X, const M& Y, const M& Z) {
+ DECL M %PREF(mac)(const M& X, const M& Y, const M& Z) {
  return mac(X, Y, Z);
  }
- DECL M %PREFOLD(transpose)(const M& X) {
+ DECL M %PREF(transpose)(const M& X) {
  return X.T();
  }
- DECL M %PREFOLD(vec)(const M& a) {
+ DECL M %PREF(vec)(const M& a) {
  return vec(a);
  }
- DECL M %PREFOLD(vecNZ)(const M& a) {
+ DECL M %PREF(vecNZ)(const M& a) {
  return vecNZ(a);
  }
- DECL M %PREFOLD(reshape)(const M& a, int nrow, int ncol) {
+ DECL M %PREF(reshape)(const M& a, int nrow, int ncol) {
  return reshape(a, nrow, ncol);
  }
- DECL M %PREFOLD(reshape)(const M& a, std::pair<int, int> rc) {
+ DECL M %PREF(reshape)(const M& a, std::pair<int, int> rc) {
  return reshape(a, rc.first, rc.second);
  }
- DECL M %PREFOLD(reshape)(const M& a, const Sparsity& sp) {
+ DECL M %PREF(reshape)(const M& a, const Sparsity& sp) {
  return reshape(a, sp);
  }
- DECL int %PREFOLD(sprank)(const M& A) {
+ DECL int %PREF(sprank)(const M& A) {
  return sprank(A);
  }
- DECL int %PREFOLD(norm_0_mul)(const M& x, const M& y) {
+ DECL int %PREF(norm_0_mul)(const M& x, const M& y) {
  return norm_0_mul(x, y);
  }
- DECL M %PREFOLD(triu)(const M& a, bool includeDiagonal=true) {
+ DECL M %PREF(triu)(const M& a, bool includeDiagonal=true) {
  return triu(a, includeDiagonal);
  }
- DECL M %PREFOLD(tril)(const M& a, bool includeDiagonal=true) {
+ DECL M %PREF(tril)(const M& a, bool includeDiagonal=true) {
  return tril(a, includeDiagonal);
  }
- DECL M %PREFOLD(kron)(const M& a, const M& b) {
+ DECL M %PREF(kron)(const M& a, const M& b) {
  return kron(a, b);
  }
- DECL M %PREFOLD(repmat)(const M& A, int n, int m=1) {
+ DECL M %PREF(repmat)(const M& A, int n, int m=1) {
  return repmat(A, n, m);
  }
- DECL M %PREFOLD(repmat)(const M& A, const std::pair<int, int>& rc) {
+ DECL M %PREF(repmat)(const M& A, const std::pair<int, int>& rc) {
  return repmat(A, rc.first, rc.second);
  }
 %enddef
@@ -3792,7 +3792,6 @@ def PyFunction(obj,inputs,outputs):
 
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)
-SPARSITY_INTERFACE_FRIENDS(friend inline, MatType)
 inline MatType simplify(const MatType &x);
 inline bool isEqual(const MatType& x, const MatType& y, int depth=0);
 inline bool iszero(const MatType& x);
@@ -3805,7 +3804,6 @@ MATRIX_FRIENDS(inline, casadi::Matrix< DataType >)
 %enddef
 
 #ifndef SWIGMATLAB
-SPARSITY_INTERFACE_FRIENDS(inline, casadi::Sparsity)
 GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(int)
 GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(double)
 GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(casadi::SXElement)
@@ -3838,6 +3836,7 @@ namespace casadi {
 
 %inline {
   namespace casadi {
+    SPARSITY_INTERFACE_ALL(inline)
     GENERIC_EXPRESSION_ALL(inline)
     MX_ALL(inline)
   }
