@@ -89,7 +89,7 @@ namespace casadi {
 
     MX A_total = DMatrix::eye(n_*n_) - kron(As, As);
 
-    MX Pf = solve(A_total, vec(Vss), getOption("linear_solver"));
+    MX Pf = A_total.zz_solve(vec(Vss), getOption("linear_solver"));
 
     MX P = reshape(Pf, n_, n_);
 
