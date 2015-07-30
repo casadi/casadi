@@ -739,6 +739,15 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         }
       }
 
+      // bool
+      {
+        bool tmp;
+        if (to_val(p, &tmp)) {
+          if (m) **m=tmp;
+          return true;
+        }
+      }
+
       // Scalar IMatrix
       {
         IMatrix *m2;
