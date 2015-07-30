@@ -190,55 +190,10 @@
 %exception  casadi::Sparsity::reCache() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Sparsity::zz_blockcat(const std::vector< std::vector< Sparsity > > &v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_diagcat(const std::vector< Sparsity > &v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_diagsplit(const std::vector< int > &offset1, const std::vector< int > &offset2) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_horzcat(const std::vector< Sparsity > &sp) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_horzsplit(const std::vector< int > &output_offset) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_kron(const Sparsity &b) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_mac(const Sparsity &Y, const Sparsity &Z) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_mtimes(const Sparsity &y) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_norm_0_mul(const Sparsity &B) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_reshape(const Sparsity &sp) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_reshape(int nrow, int ncol) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_sprank() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Sparsity::zz_tril(bool includeDiagonal=true) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Sparsity::zz_triu(bool includeDiagonal=true) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_vecNZ() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_vertcat(const std::vector< Sparsity > &sp) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_vertsplit(const std::vector< int > &output_offset) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::WeakRef::alive() const  {

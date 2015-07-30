@@ -12327,26 +12327,6 @@ Is initialized?
 
 
 // File: classcasadi_1_1GenericExpression.xml
-%feature("docstring") casadi::GenericExpression::__truediv__ "
-
-Division (with __future__.division in effect)
-
-";
-
-%feature("docstring")  casadi::GenericExpression< ExType >::zz_gt(const
-ExType &y) const  "
-
-No need to have both < and >
-
-";
-
-%feature("docstring")  casadi::GenericExpression< ExType >::zz_ge(const
-ExType &y) const  "
-
-No need to have both <= and >=.
-
-";
-
 %feature("docstring") casadi::GenericExpression "
 
 Expression interface.
@@ -12370,14 +12350,8 @@ C++ includes: generic_expression.hpp ";
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring")  casadi::GenericMatrix< MatType >::zz_triu(bool
-includeDiagonal=true) const  "
-
-Accessed by friend functions.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::issquare() const  "
+*/ %feature("docstring")  casadi::GenericMatrix< MatType >::issquare() const
+"
 
 Check if the matrix expression is square.
 
@@ -12396,23 +12370,19 @@ Get the size along a particular dimensions.
 
 ";
 
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_blocksplit(const std::vector< int > &vert_offset, const std::vector<
-int > &horz_offset) const  " ";
+%feature("docstring")  casadi::GenericMatrix< MatType >::sparse(int nrow=1,
+int ncol=1) "
 
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_blocksplit(int vert_incr, int horz_incr) const  " ";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::numel() const  "
-
-Get the number of elements.
+[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
+instead
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::numel(int i) const
-"
+%feature("docstring")  casadi::GenericMatrix< MatType >::sparse(const
+std::pair< int, int > &rc) "
 
-Get the number of elements in slice (cf. MATLAB)
+[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
+instead
 
 ";
 
@@ -12422,30 +12392,9 @@ Check if the matrix is a row vector (i.e. size1()==1)
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::zz_tril2symm()
-const  "
-
-Accessed by friend functions.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MatType >::isvector() const  "
 
 Check if the matrix is a row or column vector.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::zz_sprank() const
-"
-
-Accessed by friend functions.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::zz_sum_square()
-const  "
-
-Accessed by friend functions.
 
 ";
 
@@ -12454,20 +12403,6 @@ Accessed by friend functions.
 
 Get string representation of dimensions. The representation is (nrow x ncol
 = numel | size)
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::zz_tril(bool
-includeDiagonal=true) const  "
-
-Accessed by friend functions.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::zz_norm_0_mul(const
-MatType &A) const  "
-
-Accessed by friend functions.
 
 ";
 
@@ -12483,23 +12418,9 @@ Get get the number of non-zeros on the diagonal.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::zz_triu2symm()
-const  "
-
-Accessed by friend functions.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MatType >::sizeL() const  "
 
 Get the number of non-zeros in the lower triangular half.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::zz_densify() const
-"
-
-Accessed by friend functions.
 
 ";
 
@@ -12545,18 +12466,16 @@ with Sparsity& sparsity() Joel Andersson
 
 C++ includes: generic_matrix.hpp ";
 
-%feature("docstring")  casadi::SparsityInterface< MatType >::zz_repmat(int
-n, int m=1) const  " ";
+%feature("docstring")  casadi::GenericMatrix< MatType >::find(bool
+ind1=false) const  "
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::zz_cross(const
-MatType &b, int dim=-1) const  "
+Get the location of all non-zero elements as they would appear in a Dense
+matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
+zeros.
 
-Accessed by friend functions.
+k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
-
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_horzsplit(int incr) const  " ";
 
 %feature("docstring")  casadi::GenericMatrix< MatType >::isempty(bool
 both=false) const  "
@@ -12585,30 +12504,16 @@ Get the first dimension (i.e. number of rows)
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::sparse(int nrow=1,
-int ncol=1) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::numel() const  "
 
-[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
-instead
+Get the number of elements.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::sparse(const
-std::pair< int, int > &rc) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::numel(int i) const
+"
 
-[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
-instead
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::find(bool
-ind1=false) const  "
-
-Get the location of all non-zero elements as they would appear in a Dense
-matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
-zeros.
-
-k = A.find() A[k] will contain the elements of A that are non-zero in B
+Get the number of elements in slice (cf. MATLAB)
 
 ";
 
@@ -12636,48 +12541,15 @@ zero.
 
 ";
 
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_vertsplit(int incr) const  " ";
-
 %feature("docstring")  casadi::GenericMatrix< MatType >::iscolumn() const  "
 
 Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_diagsplit(const std::vector< int > &output_offset) const  " ";
-
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_diagsplit(int incr) const  " ";
-
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_diagsplit(int incr1, int incr2) const  " ";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::zz_linspace(const
-MatType &b, int nsteps) const  "
-
-Accessed by friend functions.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MatType >::getRow() const  "
 
 Get the sparsity pattern. See the Sparsity class for details.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::zz_quad_form(const
-MatType &A) const  "
-
-Accessed by friend functions.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::zz_quad_form()
-const  "
-
-Accessed by friend functions.
 
 ";
 
@@ -12763,9 +12635,6 @@ symbolic primitives.
 Check if the matrix is lower triangular.
 
 ";
-
-%feature("docstring")  casadi::SparsityInterface< MatType >::zz_vec() const
-" ";
 
 %feature("docstring")  casadi::GenericMatrix< MatType >::row(int el) const
 "
@@ -25542,23 +25411,10 @@ Get double value (only if integer constant)
 
 ";
 
-%feature("docstring") casadi::Matrix::__truediv__ "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::repr(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
 Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::print(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a description of the object.
 
 ";
 
@@ -25580,13 +25436,6 @@ Get a set of nonzeros
 &output_m, bool ind1, const Matrix< int > &k) const  "
 
 Get a set of nonzeros
-
-";
-
-%feature("docstring")  casadi::GenericExpression< Matrix< DataType >
->::zz_gt(const Matrix< DataType > &y) const "
-
-No need to have both < and >
 
 ";
 
@@ -25674,10 +25523,10 @@ Set all the entries without changing sparsity pattern.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_gradient(const Matrix<
-DataType > &arg) const  "
+%feature("docstring")  casadi::Matrix< DataType >::hasNonStructuralZeros()
+const  "
 
-Functions called by the corresponding friend functions MATLAB naming
+Check if the matrix has any zero entries which are not structural zeros.
 
 ";
 
@@ -25688,19 +25537,10 @@ Get the number of (structural) non-zero elements.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::setPrecision(int
-precision) "
+%feature("docstring")  casadi::Matrix< DataType >::remove(const std::vector<
+int > &rr, const std::vector< int > &cc) "
 
-Set the 'precision, width & scientific' used in printing and serializing to
-streams.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_inner_prod(const
-Matrix< DataType > &y) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
+Remove columns and rows Remove/delete rows and/or columns of a matrix.
 
 ";
 
@@ -25768,27 +25608,6 @@ Get a submatrix, two arguments
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_trace() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring") casadi::Matrix::__copysign__ "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::zz_densify() const "
-
-Accessed by friend functions.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::sparse(int nrow=1, int ncol=1) "
 
@@ -25805,33 +25624,17 @@ instead
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_all() const  "
+%feature("docstring")  casadi::Matrix< DataType >::triplet(const
+std::vector< int > &row, const std::vector< int > &col, const Matrix<
+DataType > &d) " ";
 
-Operations called by the corresponding friend functions, MATLAB naming
-convention
+%feature("docstring")  casadi::Matrix< DataType >::triplet(const
+std::vector< int > &row, const std::vector< int > &col, const Matrix<
+DataType > &d, int nrow, int ncol) " ";
 
-";
-
-%feature("docstring")  casadi::Matrix< DataType
->::zz_jacobianTimesVector(const Matrix< DataType > &arg, const Matrix<
-DataType > &v, bool transpose_jacobian=false) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_mpower(const Matrix<
-DataType > &y) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::isZero() const  "
-
-check if the matrix is 0 (note that false negative answers are possible)
-
-";
+%feature("docstring")  casadi::Matrix< DataType >::triplet(const
+std::vector< int > &row, const std::vector< int > &col, const Matrix<
+DataType > &d, const std::pair< int, int > &rc) " ";
 
 %feature("docstring")  casadi::Matrix< DataType >::printDense(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
@@ -25840,9 +25643,9 @@ Print dense matrix-stype.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_rectangle() const  "
+%feature("docstring")  casadi::Matrix< DataType >::getSparsity() const  "
 
-Functions called by the corresponding friend functions MATLAB naming
+Get an owning reference to the sparsity pattern.
 
 ";
 
@@ -25850,13 +25653,6 @@ Functions called by the corresponding friend functions MATLAB naming
 
 check if the matrix is an identity matrix (note that false negative answers
 are possible)
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_diag() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -25901,13 +25697,6 @@ Set a set of nonzeros
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_sparsify(double tol=0)
-const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::getSym(std::vector<
 double > &output_m) const  "
 
@@ -25920,25 +25709,17 @@ Matrix< DataType > &x) " [INTERNAL]  Create nodes by their ID.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::isdense() const "
+%feature("docstring")  casadi::Matrix< DataType >::setSym(const double *val)
+"
 
-Check if the matrix expression is dense.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_getMinor(int i, int j)
-const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
+Set upper triangular elements.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_det() const  "
+%feature("docstring")  casadi::Matrix< DataType >::setSym(const std::vector<
+double > &val) "
 
-Operations called by the corresponding friend functions, MATLAB naming
-convention
+Set upper triangular elements.
 
 ";
 
@@ -25956,33 +25737,6 @@ Get the number of elements in slice (cf. MATLAB)
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_horzsplit(const
-std::vector< int > &offset) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Matrix< DataType >
->::zz_horzsplit(int incr) const " ";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::zz_triu2symm() const "
-
-Accessed by friend functions.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::toSlice(bool ind1=false)
-const  "
-
-Convert to Slice (only for IMatrix)
-
-";
-
-%feature("docstring")  casadi::Matrix< int >::toSlice(bool ind1) const " ";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::find(bool ind1=false) const "
 
@@ -25994,50 +25748,14 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::triplet(const
-std::vector< int > &row, const std::vector< int > &col, const Matrix<
-DataType > &d) " ";
+%feature("docstring")  casadi::Matrix< DataType >::toSlice(bool ind1=false)
+const  "
 
-%feature("docstring")  casadi::Matrix< DataType >::triplet(const
-std::vector< int > &row, const std::vector< int > &col, const Matrix<
-DataType > &d, int nrow, int ncol) " ";
-
-%feature("docstring")  casadi::Matrix< DataType >::triplet(const
-std::vector< int > &row, const std::vector< int > &col, const Matrix<
-DataType > &d, const std::pair< int, int > &rc) " ";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_kron(const Matrix<
-DataType > &b) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
+Convert to Slice (only for IMatrix)
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType
->::zz_substituteInPlace(const std::vector< Matrix< DataType > > &v,
-std::vector< Matrix< DataType > > &INOUT, std::vector< Matrix< DataType > >
-&INOUT, bool reverse=false) "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_taylor(const Matrix<
-DataType > &x, const Matrix< DataType > &a=0, int order=1) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Matrix< DataType >
->::zz_repmat(int n, int m=1) const " ";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_countNodes() const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
+%feature("docstring")  casadi::Matrix< int >::toSlice(bool ind1) const " ";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::sparsity() const "
@@ -26054,25 +25772,10 @@ Only defined if symbolic scalar.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_vertcat(const
-std::vector< Matrix< DataType > > &v) "
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::isvector() const "
 
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_any() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_poly_coeff(const
-Matrix< DataType > &x) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
+Check if the matrix is a row or column vector.
 
 ";
 
@@ -26101,24 +25804,6 @@ call resetInput() after usage.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_qr(Matrix< DataType >
-&output_Q, Matrix< DataType > &output_R) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Matrix< DataType >
->::zz_vec() const " ";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::zz_norm_0_mul(const Matrix< DataType > &A) const "
-
-Accessed by friend functions.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::isempty(bool both=false) const "
 
@@ -26127,34 +25812,10 @@ optionally both dimensions)
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType
->::zz_extractShared(std::vector< Matrix< DataType > > &INOUT, std::vector<
-Matrix< DataType > > &output_v, std::vector< Matrix< DataType > >
-&output_vdef, const std::string &v_prefix="v_", const std::string
-&v_suffix="") "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::zz_linspace(const Matrix< DataType > &b, int nsteps) const "
-
-Accessed by friend functions.
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::printSparse(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
 Print sparse matrix style.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_norm_F() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -26192,13 +25853,6 @@ Get all nonzeros.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::remove(const std::vector<
-int > &rr, const std::vector< int > &cc) "
-
-Remove columns and rows Remove/delete rows and/or columns of a matrix.
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::setScientific(bool
 scientific) "
 
@@ -26214,22 +25868,6 @@ Check if the matrix is a row vector (i.e. size1()==1)
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_gauss_quadrature(const
-Matrix< DataType > &x, const Matrix< DataType > &a, const Matrix< DataType >
-&b, int order=5) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_gauss_quadrature(const
-Matrix< DataType > &x, const Matrix< DataType > &a, const Matrix< DataType >
-&b, int order, const Matrix< DataType > &w) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::getValue() const  "
 
 Get double value (only if constant)
@@ -26242,23 +25880,9 @@ Get double value (particular nonzero)
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_mldivide(const Matrix<
-DataType > &y) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::isOne() const  "
 
 check if the matrix is 1 (note that false negative answers are possible)
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::zz_sum_square() const "
-
-Accessed by friend functions.
 
 ";
 
@@ -26275,20 +25899,6 @@ than a specified tolerance.
 %feature("docstring")  casadi::Matrix< DataType >::reserve(int nnz, int
 ncol) " ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_norm_2() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_norm_1() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::printScalar(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -26296,10 +25906,9 @@ Print scalar.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_norm_inf() const  "
+%feature("docstring")  casadi::Matrix< DataType >::isSmooth() const  "
 
-Operations called by the corresponding friend functions, MATLAB naming
-convention
+Check if smooth.
 
 ";
 
@@ -26377,13 +25986,6 @@ one.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_chol() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::addSub(const Matrix<
 DataType > &m, RR rr, CC cc, bool ind1) "
 
@@ -26391,44 +25993,13 @@ Add a submatrix to an existing matrix (TODO: remove memory allocation)
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_erfinv() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_vertsplit(const
-std::vector< int > &offset) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Matrix< DataType >
->::zz_vertsplit(int incr) const " ";
+%feature("docstring")  casadi::Matrix< DataType >::resize(int nrow, int
+ncol) " ";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::row(int
 el) const "
 
 Get the sparsity pattern. See the Sparsity class for details.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_norm_inf_mul(const
-Matrix< DataType > &y) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_unite(const Matrix<
-DataType > &B) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -26453,13 +26024,6 @@ zero.
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 zero.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::isvector() const "
-
-Check if the matrix is a row or column vector.
 
 ";
 
@@ -26501,13 +26065,6 @@ sparsity can be accessed with Sparsity& sparsity() Joel Andersson
 
 C++ includes: casadi_types.hpp ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_pw_lin(const Matrix<
-DataType > &tval, const Matrix< DataType > &val) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::getRow() const "
 
@@ -26547,12 +26104,6 @@ Checks if expression does not contain NaN or Inf.
 
 ";
 
-%feature("docstring") casadi::Matrix::__constpow__ "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::istril() const "
 
@@ -26573,25 +26124,10 @@ Get all nonzeros.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_mtimes(const Matrix<
-DataType > &y) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::colind(int col) const "
 
 Get the sparsity pattern. See the Sparsity class for details.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_pinv() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -26607,21 +26143,6 @@ Check if the matrix expression is square.
 Check if SX is a leaf of the SX graph.
 
 Only defined if symbolic scalar.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_polyval(const Matrix<
-DataType > &x) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::hasNonStructuralZeros()
-const  "
-
-Check if the matrix has any zero entries which are not structural zeros.
 
 ";
 
@@ -26651,26 +26172,6 @@ create a matrix with all nan
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::zz_tril2symm() const "
-
-Accessed by friend functions.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_quad_form() const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_quad_form(const
-Matrix< DataType > &A) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
 %feature("docstring")  casadi::PrintableObject< Matrix< DataType >
 >::getDescription() const "
 
@@ -26678,17 +26179,9 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType
->::zz_getOperatorRepresentation(const std::vector< std::string > &args)
-const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::setZero() "
-
-Set all elements to zero.
+%feature("docstring")  casadi::Matrix< DataType >::binary(int op, const
+Matrix< DataType > &x, const Matrix< DataType > &y) " [INTERNAL]  Create
+nodes by their ID.
 
 ";
 
@@ -26706,32 +26199,11 @@ Get the size along a particular dimensions.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::isSmooth() const  "
+%feature("docstring")  casadi::Matrix< DataType >::setPrecision(int
+precision) "
 
-Check if smooth.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_eig_symbolic() const
-"
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_reshape(int nrow, int
-ncol) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_reshape(const Sparsity
-&sp) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
+Set the 'precision, width & scientific' used in printing and serializing to
+streams.
 
 ";
 
@@ -26742,42 +26214,16 @@ return true if all non-zero elements are symbolic.
 
 ";
 
-%feature("docstring")  casadi::SparsityInterface< Matrix< DataType >
->::zz_blocksplit(const std::vector< int > &vert_offset, const std::vector<
-int > &horz_offset) const " ";
+%feature("docstring")  casadi::Matrix< DataType >::isZero() const  "
 
-%feature("docstring")  casadi::SparsityInterface< Matrix< DataType >
->::zz_blocksplit(int vert_incr, int horz_incr) const " ";
-
-%feature("docstring")  casadi::Matrix< DataType >::resize(int nrow, int
-ncol) " ";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_mac(const Matrix<
-DataType > &y, const Matrix< DataType > &z) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
+check if the matrix is 0 (note that false negative answers are possible)
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::setSym(const double *val)
-"
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::size2()
+const "
 
-Set upper triangular elements.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::setSym(const std::vector<
-double > &val) "
-
-Set upper triangular elements.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_tangent(const Matrix<
-DataType > &arg) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
+Get the second dimension (i.e. number of columns)
 
 ";
 
@@ -26791,71 +26237,16 @@ See:   nnz()
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_ramp() const  "
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::isdense() const "
 
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_project(const Sparsity
-&sp, bool intersect=false) const  "
-
-Set sparse.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_sumRows() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_substitute(const
-Matrix< DataType > &v, const Matrix< DataType > &vdef) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_substitute(const
-std::vector< Matrix< DataType > > &ex, const std::vector< Matrix< DataType >
-> &v, const std::vector< Matrix< DataType > > &vdef) "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_heaviside() const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_jacobian(const Matrix<
-DataType > &arg) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
+Check if the matrix expression is dense.
 
 ";
 
 %feature("docstring") casadi::Matrix::__nonzero__ "
 
 Returns the truth value of a Matrix.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_dependsOn(const
-Matrix< DataType > &arg) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_pw_const(const Matrix<
-DataType > &tval, const Matrix< DataType > &val) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
 
 ";
 
@@ -26866,23 +26257,9 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_expand(Matrix<
-DataType > &weights, Matrix< DataType > &terms) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::isSymbolic() const  "
 
 Check if symbolic (Dense) Sparse matrices invariable return false.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_nullspace() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -26893,73 +26270,11 @@ Get the first dimension (i.e. number of rows)
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::zz_cross(const Matrix< DataType > &b, int dim=-1) const "
+%feature("docstring")  casadi::Matrix< DataType >::getElementHash() const  "
 
-Accessed by friend functions.
+Returns a number that is unique for a given symbolic scalar.
 
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_diagsplit(const
-std::vector< int > &offset1, const std::vector< int > &offset2) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Matrix< DataType >
->::zz_diagsplit(const std::vector< int > &output_offset) const " ";
-
-%feature("docstring")  casadi::SparsityInterface< Matrix< DataType >
->::zz_diagsplit(int incr) const " ";
-
-%feature("docstring")  casadi::SparsityInterface< Matrix< DataType >
->::zz_diagsplit(int incr1, int incr2) const " ";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_conditional(const
-std::vector< Matrix< DataType > > &x, const Matrix< DataType > &x_default,
-bool short_circuit=true) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_triangle() const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_symvar() const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_poly_roots() const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_not() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::getSparsity() const  "
-
-Get an owning reference to the sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::GenericExpression< Matrix< DataType >
->::zz_ge(const Matrix< DataType > &y) const "
-
-No need to have both <= and >=.
+Only defined if symbolic scalar.
 
 ";
 
@@ -26970,34 +26285,7 @@ Get name (only if symbolic scalar)
 ";
 
 %feature("docstring")  casadi::Matrix< DataType >::printme(const Matrix<
-DataType > &y) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_vecNZ() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_horzcat(const
-std::vector< Matrix< DataType > > &v) "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::zz_triu(bool includeDiagonal=true) const "
-
-Accessed by friend functions.
-
-";
+DataType > &y) const  " ";
 
 %feature("docstring")  casadi::Matrix< DataType >::enlarge(int nrow, int
 ncol, const std::vector< int > &rr, const std::vector< int > &cc, bool
@@ -27008,39 +26296,10 @@ keeping the existing non-zeros.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_mrdivide(const Matrix<
-DataType > &y) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::zz_sprank() const "
-
-Accessed by friend functions.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::iscolumn() const "
 
 Check if the matrix is a column vector (i.e. size2()==1)
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::size2()
-const "
-
-Get the second dimension (i.e. number of columns)
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_cofactor(int i, int j)
-const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
 
 ";
 
@@ -27128,21 +26387,6 @@ const DataType &val, bool dummy) " [INTERNAL] ";
 %feature("docstring") casadi::Matrix< DataType >::Matrix(const Sparsity &sp,
 const std::vector< DataType > &d, bool dummy) " [INTERNAL] ";
 
-%feature("docstring")  casadi::Matrix< DataType >::getElementHash() const  "
-
-Returns a number that is unique for a given symbolic scalar.
-
-Only defined if symbolic scalar.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::zz_tril(bool includeDiagonal=true) const "
-
-Accessed by friend functions.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::sym(const std::string &name, int nrow=1, int ncol=1) "
 
@@ -27195,38 +26439,15 @@ symbolic primitives.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_mtaylor(const Matrix<
-DataType > &x, const Matrix< DataType > &a, int order=1) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_mtaylor(const Matrix<
-DataType > &x, const Matrix< DataType > &a, int order, const std::vector<
-int > &order_contributions) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_outer_prod(const
-Matrix< DataType > &y) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::matrix_matrix(int op,
 const Matrix< DataType > &x, const Matrix< DataType > &y) " [INTERNAL]
 Create nodes by their ID.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::binary(int op, const
-Matrix< DataType > &x, const Matrix< DataType > &y) " [INTERNAL]  Create
-nodes by their ID.
+%feature("docstring")  casadi::Matrix< DataType >::setZero() "
+
+Set all elements to zero.
 
 ";
 
@@ -27244,28 +26465,6 @@ Get get the number of non-zeros on the diagonal.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_hessian(const Matrix<
-DataType > &arg, Matrix< DataType > &output_g) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_blockcat(const
-std::vector< std::vector< Matrix< DataType > > > &v) "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_diagcat(const
-std::vector< Matrix< DataType > > &A) "
-
-Construct a matrix with given block on the diagonal.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::sizeL()
 const "
 
@@ -27280,36 +26479,6 @@ Append a matrix vertically (NOTE: only efficient if vector)
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_if_else_zero(const
-Matrix< DataType > &y) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_inv() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_solve(const Matrix<
-DataType > &b) const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_adj() const  "
-
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::sizeU()
 const "
 
@@ -27317,18 +26486,10 @@ Get the number of non-zeros in the upper triangular half.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::zz_sumCols() const  "
+%feature("docstring")  casadi::Matrix< DataType >::print(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
 
-Operations called by the corresponding friend functions, MATLAB naming
-convention
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::zz_if_else(const Matrix<
-DataType > &if_true, const Matrix< DataType > &if_false, bool
-short_circuit=true) const  "
-
-Functions called by the corresponding friend functions MATLAB naming
+Print a description of the object.
 
 ";
 
@@ -27362,16 +26523,14 @@ Reset the marker for an input expression.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring")  casadi::MX::isUnary() const  "
+*/ %feature("docstring")  casadi::MX::attachAssert(const MX &y, const
+std::string &fail_message="") const  "
 
-Is unary operation.
+returns itself, but with an assertion attached
+
+If y does not evaluate to 1, a runtime error is raised
 
 ";
-
-%feature("docstring") casadi::MX::__constpow__ "";
-
-%feature("docstring")  casadi::MX::zz_hessian(const MX &arg, MX &output_g)
-const  " ";
 
 %feature("docstring")  casadi::GenericMatrix< MX  >::sizeL() const "
 
@@ -27403,19 +26562,6 @@ Joel Andersson
 
 C++ includes: mx.hpp ";
 
-%feature("docstring")  casadi::MX::zz_conditional(const std::vector< MX >
-&x, const MX &x_default, bool short_circuit=true) const  " ";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
-internal class
-
-";
-
-%feature("docstring")  casadi::MX::zz_diag() const  " ";
-
-%feature("docstring")  casadi::MX::zz_mrdivide(const MX &b) const  " ";
-
 %feature("docstring")  casadi::GenericMatrix< MX  >::sizeD() const "
 
 Get get the number of non-zeros on the diagonal.
@@ -27439,8 +26585,6 @@ point to this new object
 
 ";
 
-%feature("docstring") casadi::MX::__copysign__ "";
-
 %feature("docstring")  casadi::MX::erase(const std::vector< int > &rr, const
 std::vector< int > &cc, bool ind1=false) "
 
@@ -27457,23 +26601,6 @@ a matrix.
 
 ";
 
-%feature("docstring")  casadi::MX::zz_mldivide(const MX &b) const  " ";
-
-%feature("docstring")  casadi::MX::zz_reshape(int nrow, int ncol) const  "
-";
-
-%feature("docstring")  casadi::MX::zz_reshape(const Sparsity &sp) const  "
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::zz_norm_0_mul(const MX
-&A) const "
-
-Accessed by friend functions.
-
-";
-
-%feature("docstring")  casadi::MX::zz_polyval(const MX &x) const  " ";
-
 %feature("docstring")  casadi::MX::isValidInput() const  "
 
 Check if matrix can be used to define function inputs. Valid inputs for
@@ -27481,26 +26608,15 @@ MXFunctions are combinations of Reshape, concatenations and SymbolicMX.
 
 ";
 
-%feature("docstring")  casadi::MX::zz_det() const  " ";
+%feature("docstring")  casadi::GenericMatrix< MX  >::sizeU() const "
 
-%feature("docstring")  casadi::MX::attachAssert(const MX &y, const
-std::string &fail_message="") const  "
-
-returns itself, but with an assertion attached
-
-If y does not evaluate to 1, a runtime error is raised
+Get the number of non-zeros in the upper triangular half.
 
 ";
 
 %feature("docstring")  casadi::MX::append(const MX &y) "
 
 Append a matrix vertically (NOTE: only efficient if vector)
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::zz_sprank() const "
-
-Accessed by friend functions.
 
 ";
 
@@ -27550,27 +26666,11 @@ temporary variable
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::zeros(int nrow=1, int
-ncol=1) "
-
-Create a dense matrix or a matrix with specified sparsity with all entries
-zero.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::zeros(const Sparsity
-&sp) "
-
-Create a dense matrix or a matrix with specified sparsity with all entries
-zero.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::zeros(const std::pair<
-int, int > &rc) "
-
-Create a dense matrix or a matrix with specified sparsity with all entries
-zero.
+%feature("docstring")  casadi::MX::hasDuplicates() "[INTERNAL]  Detect
+duplicate symbolic expressions If there are symbolic primitives appearing
+more than once, the function will return true and the names of the duplicate
+expressions will be printed to userOut<true, PL_WARN>(). Note: Will mark the
+node using MX::setTemp. Make sure to call resetInput() after usage.
 
 ";
 
@@ -27599,9 +26699,11 @@ Get the first dimension (i.e. number of rows)
 
 ";
 
-%feature("docstring")  casadi::MX::zz_symvar() const  " ";
+%feature("docstring")  casadi::GenericMatrix< MX  >::iscolumn() const "
 
-%feature("docstring")  casadi::MX::zz_gradient(const MX &arg) const  " ";
+Check if the matrix is a column vector (i.e. size2()==1)
+
+";
 
 %feature("docstring")  casadi::MX::isMultiplication() const  "
 
@@ -27613,12 +26715,6 @@ Check if multiplication.
 
 ";
 
-%feature("docstring")  casadi::MX::isConstant() const  "
-
-Check if constant.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MX  >::isscalar(bool
 scalar_and_dense=false) const "
 
@@ -27626,16 +26722,9 @@ Check if the matrix expression is scalar.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::zz_quad_form(const MX
-&A) const "
+%feature("docstring")  casadi::MX::lift(const MX &x_guess) "
 
-Accessed by friend functions.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::zz_quad_form() const "
-
-Accessed by friend functions.
+Lift an expression.
 
 ";
 
@@ -27646,24 +26735,9 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::zz_sum_square() const "
-
-Accessed by friend functions.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MX  >::isrow() const "
 
 Check if the matrix is a row vector (i.e. size1()==1)
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< MX  >::zz_repmat(int n,
-int m=1) const " ";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::sizeU() const "
-
-Get the number of non-zeros in the upper triangular half.
 
 ";
 
@@ -27680,9 +26754,9 @@ Print a description of the object.
 
 ";
 
-%feature("docstring")  casadi::MX::mapping() const  "
+%feature("docstring")  casadi::MX::splitPrimitives(const MX &x) const  "
 
-Get an IMatrix representation of a GetNonzeros or SetNonzeros node.
+Split up an expression along symbolic primitives.
 
 ";
 
@@ -27708,20 +26782,6 @@ instead
 
 ";
 
-%feature("docstring")  casadi::GenericExpression< MX  >::zz_gt(const MX &y)
-const "
-
-No need to have both < and >
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::zz_cross(const MX &b,
-int dim=-1) const "
-
-Accessed by friend functions.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MX  >::ones(int nrow=1, int
 ncol=1) "
 
@@ -27743,14 +26803,6 @@ int, int > &rc) "
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 one.
-
-";
-
-%feature("docstring")  casadi::MX::zz_vecNZ() const  " ";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::zz_densify() const "
-
-Accessed by friend functions.
 
 ";
 
@@ -27803,17 +26855,11 @@ create a matrix with all inf
 
 ";
 
-%feature("docstring")  casadi::MX::zz_norm_2() const  " ";
-
-%feature("docstring")  casadi::MX::zz_norm_1() const  " ";
-
 %feature("docstring")  casadi::GenericMatrix< MX  >::getColind() const "
 
 Get the sparsity pattern. See the Sparsity class for details.
 
 ";
-
-%feature("docstring")  casadi::MX::constpow(const MX &y) const  " ";
 
 %feature("docstring")  casadi::GenericMatrix< MX  >::colind(int col) const "
 
@@ -27821,10 +26867,9 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::zz_tril(bool
-includeDiagonal=true) const "
+%feature("docstring")  casadi::MX::isRegular() const  "
 
-Accessed by friend functions.
+Checks if expression does not contain NaN or Inf.
 
 ";
 
@@ -27834,29 +26879,9 @@ Get the name.
 
 ";
 
-%feature("docstring")  casadi::MX::zz_solve(const MX &b, const std::string
-&lsolver, const Dict &dict=Dict()) const  " ";
-
-%feature("docstring")  casadi::MX::zz_norm_F() const  " ";
-
-%feature("docstring")  casadi::MX::isRegular() const  "
-
-Checks if expression does not contain NaN or Inf.
-
-";
-
 %feature("docstring")  casadi::MX::getDep(int ch=0) const  "
 
 Get the nth dependency as MX.
-
-";
-
-%feature("docstring")  casadi::MX::zz_mtimes(const MX &y) const  " ";
-
-%feature("docstring")  casadi::GenericExpression< MX  >::zz_ge(const MX &y)
-const "
-
-No need to have both <= and >=.
 
 ";
 
@@ -27866,20 +26891,9 @@ Check if the matrix is a row or column vector.
 
 ";
 
-%feature("docstring")  casadi::MX::zz_not() const  " ";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::zz_triu2symm() const "
-
-Accessed by friend functions.
-
-";
-
-%feature("docstring")  casadi::MX::zz_dependsOn(const MX &arg) const  " ";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::zz_triu(bool
-includeDiagonal=true) const "
-
-Accessed by friend functions.
+%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
+&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
+internal class
 
 ";
 
@@ -27888,8 +26902,6 @@ Accessed by friend functions.
 Get the number of (structural) non-zero elements.
 
 ";
-
-%feature("docstring") casadi::MX::__truediv__ "";
 
 %feature("docstring")  casadi::GenericMatrix< MX  >::find(bool ind1=false)
 const "
@@ -27908,48 +26920,29 @@ check if zero (note that false negative answers are possible)
 
 ";
 
-%feature("docstring")  casadi::MX::zz_nullspace() const  " ";
-
 %feature("docstring")  casadi::MX::getValue() const  "
 
 Get the value (only for scalar constant nodes)
 
 ";
 
-%feature("docstring")  casadi::MX::getEvaluationOutput() const  "
+%feature("docstring")  casadi::GenericMatrix< MX  >::shape() const "
 
-Get the index of evaluation output - only valid when isEvaluationoutput() is
-true.
+Get the shape.
 
 ";
 
-%feature("docstring")  casadi::MX::zz_jacobian(const MX &arg) const  " ";
+%feature("docstring")  casadi::GenericMatrix< MX  >::shape(int axis) const "
 
-%feature("docstring")  casadi::MX::zz_substitute(const MX &v, const MX
-&vdef) const  " ";
+Get the size along a particular dimensions.
+
+";
 
 %feature("docstring")  casadi::MX::appendColumns(const MX &y) "
 
 Append a matrix horizontally.
 
 ";
-
-%feature("docstring")  casadi::MX::zz_outer_prod(const MX &y) const  " ";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::zz_tril2symm() const "
-
-Accessed by friend functions.
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< MX  >::zz_blocksplit(const
-std::vector< int > &vert_offset, const std::vector< int > &horz_offset)
-const " ";
-
-%feature("docstring")  casadi::SparsityInterface< MX  >::zz_blocksplit(int
-vert_incr, int horz_incr) const " ";
-
-%feature("docstring")  casadi::MX::zz_inv() const  " ";
 
 %feature("docstring") casadi::MX::__hash__ "
 
@@ -27958,16 +26951,35 @@ to any node, 0 is returned.
 
 ";
 
-%feature("docstring")  casadi::MX::zz_mac(const MX &y, const MX &z) const  "
-";
-
 %feature("docstring")  casadi::MX::getOutput(int oind=0) const  "
 
 Get an output.
 
 ";
 
-%feature("docstring")  casadi::MX::zz_if_else_zero(const MX &y) const  " ";
+%feature("docstring")  casadi::GenericMatrix< MX  >::zeros(int nrow=1, int
+ncol=1) "
+
+Create a dense matrix or a matrix with specified sparsity with all entries
+zero.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX  >::zeros(const Sparsity
+&sp) "
+
+Create a dense matrix or a matrix with specified sparsity with all entries
+zero.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX  >::zeros(const std::pair<
+int, int > &rc) "
+
+Create a dense matrix or a matrix with specified sparsity with all entries
+zero.
+
+";
 
 %feature("docstring")  casadi::MX::makeDense(const MX &val=0) "
 
@@ -27992,18 +27004,10 @@ Transpose the matrix.
 
 %feature("docstring")  casadi::MX::printme(const MX &y) const  " ";
 
-%feature("docstring")  casadi::MX::zz_kron(const MX &b) const  " ";
-
 %feature("docstring")  casadi::MX::joinPrimitives(std::vector< MX > &v)
 const  "
 
 Join an expression along symbolic primitives.
-
-";
-
-%feature("docstring")  casadi::MX::lift(const MX &x_guess) "
-
-Lift an expression.
 
 ";
 
@@ -28025,15 +27029,11 @@ create a matrix with all nan
 
 ";
 
-%feature("docstring")  casadi::MX::zz_sumRows() const  " ";
-
 %feature("docstring")  casadi::MX::isTranspose() const  "
 
 Is the expression a transpose?
 
 ";
-
-%feature("docstring")  casadi::MX::zz_find() const  " ";
 
 %feature("docstring")  casadi::GenericMatrix< MX  >::row(int el) const "
 
@@ -28041,40 +27041,9 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  casadi::MX::zz_horzsplit(const std::vector< int >
-&offset) const  " ";
-
-%feature("docstring")  casadi::SparsityInterface< MX  >::zz_horzsplit(int
-incr) const " ";
-
-%feature("docstring")  casadi::MX::zz_diagsplit(const std::vector< int >
-&offset1, const std::vector< int > &offset2) const  " ";
-
-%feature("docstring")  casadi::SparsityInterface< MX  >::zz_diagsplit(const
-std::vector< int > &output_offset) const " ";
-
-%feature("docstring")  casadi::SparsityInterface< MX  >::zz_diagsplit(int
-incr) const " ";
-
-%feature("docstring")  casadi::SparsityInterface< MX  >::zz_diagsplit(int
-incr1, int incr2) const " ";
-
 %feature("docstring")  casadi::MX::isCommutative() const  "
 
 Check if commutative operation.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::iscolumn() const "
-
-Check if the matrix is a column vector (i.e. size2()==1)
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::zz_linspace(const MX
-&b, int nsteps) const "
-
-Accessed by friend functions.
 
 ";
 
@@ -28150,8 +27119,6 @@ symbolic primitives.
 
 ";
 
-%feature("docstring")  casadi::MX::zz_norm_inf() const  " ";
-
 %feature("docstring")  casadi::MX::setNZ(const MX &m, bool ind1, const Slice
 &kk) "
 
@@ -28165,9 +27132,6 @@ Matrix< int > &kk) "
 Set a set of nonzeros
 
 ";
-
-%feature("docstring")  casadi::MX::zz_graph_substitute(const std::vector< MX
-> &v, const std::vector< MX > &vdef) const  " ";
 
 %feature("docstring")  casadi::MX::isOne() const  "
 
@@ -28224,8 +27188,6 @@ Get a submatrix, two arguments
 
 ";
 
-%feature("docstring")  casadi::MX::zz_tangent(const MX &arg) const  " ";
-
 %feature("docstring")  casadi::SharedObject::repr(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -28245,8 +27207,6 @@ Number of functions.
 
 ";
 
-%feature("docstring")  casadi::MX::zz_trace() const  " ";
-
 %feature("docstring") casadi::MX::__nonzero__ "
 
 Returns the truth value of an MX expression.
@@ -28257,9 +27217,6 @@ Returns the truth value of an MX expression.
 marker for an input expression.
 
 ";
-
-%feature("docstring")  casadi::MX::zz_getOperatorRepresentation(const
-std::vector< std::string > &args) const  " ";
 
 %feature("docstring")  casadi::GenericMatrix< MX  >::istril() const "
 
@@ -28275,10 +27232,6 @@ optionally both dimensions)
 
 ";
 
-%feature("docstring")  casadi::MX::zz_countNodes() const  " ";
-
-%feature("docstring")  casadi::SparsityInterface< MX  >::zz_vec() const " ";
-
 %feature("docstring")  casadi::MX::zz_project(const Sparsity &sp, bool
 intersect=false) const  "
 
@@ -28291,8 +27244,6 @@ Set sparse.
 Check if the matrix is upper triangular.
 
 ";
-
-%feature("docstring")  casadi::MX::zz_sumCols() const  " ";
 
 %feature("docstring") casadi::MX::MX() "
 
@@ -28354,15 +27305,17 @@ Is binary operation.
 
 ";
 
-%feature("docstring")  casadi::MX::zz_inner_prod(const MX &y) const  " ";
+%feature("docstring")  casadi::MX::isUnary() const  "
+
+Is unary operation.
+
+";
 
 %feature("docstring")  casadi::MX::getOp() const  "
 
 Get operation type.
 
 ";
-
-%feature("docstring")  casadi::MX::zz_erfinv() const  " ";
 
 %feature("docstring")  casadi::MX::monitor(const std::string &comment) const
 "
@@ -28375,11 +27328,6 @@ the nonzeros along with a comment.
 %feature("docstring")  casadi::MX::isNorm() const  "
 
 Check if norm.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -28400,11 +27348,15 @@ Get the value (only for constant nodes)
 
 ";
 
-%feature("docstring")  casadi::MX::zz_mpower(const MX &b) const  " ";
+%feature("docstring")  casadi::MX::isConstant() const  "
 
-%feature("docstring")  casadi::MX::splitPrimitives(const MX &x) const  "
+Check if constant.
 
-Split up an expression along symbolic primitives.
+";
+
+%feature("docstring")  casadi::MX::mapping() const  "
+
+Get an IMatrix representation of a GetNonzeros or SetNonzeros node.
 
 ";
 
@@ -28446,15 +27398,10 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::shape() const "
+%feature("docstring")  casadi::MX::getEvaluationOutput() const  "
 
-Get the shape.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::shape(int axis) const "
-
-Get the size along a particular dimensions.
+Get the index of evaluation output - only valid when isEvaluationoutput() is
+true.
 
 ";
 
@@ -28463,11 +27410,6 @@ Get the size along a particular dimensions.
 Get the number of dependencies of a binary SXElement.
 
 ";
-
-%feature("docstring")  casadi::MX::zz_unite(const MX &B) const  " ";
-
-%feature("docstring")  casadi::MX::zz_if_else(const MX &if_true, const MX
-&if_false, bool short_circuit=true) const  " ";
 
 %feature("docstring")  casadi::MX::isSymbolic() const  "
 
@@ -28487,26 +27429,14 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::MX::zz_vertsplit(const std::vector< int >
-&offset) const  " ";
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
 
-%feature("docstring")  casadi::SparsityInterface< MX  >::zz_vertsplit(int
-incr) const " ";
+";
 
 %feature("docstring")  casadi::MX::unary(int op, const MX &x) "
 
 Create nodes by their ID.
-
-";
-
-%feature("docstring")  casadi::MX::zz_pinv(const std::string &lsolver, const
-Dict &dict=Dict()) const  " ";
-
-%feature("docstring")  casadi::MX::hasDuplicates() "[INTERNAL]  Detect
-duplicate symbolic expressions If there are symbolic primitives appearing
-more than once, the function will return true and the names of the duplicate
-expressions will be printed to userOut<true, PL_WARN>(). Note: Will mark the
-node using MX::setTemp. Make sure to call resetInput() after usage.
 
 ";
 
@@ -49625,13 +48555,8 @@ SparseStorage< DataType > &m) " [INTERNAL]  Copy constructor.
 /*  Check if two sparsity patterns are identical  */
 
 /*  Size and element counting  */ %feature("docstring")
-casadi::Sparsity::zz_mac(const Sparsity &Y, const Sparsity &Z) const  "
-[INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
+casadi::SharedObject::assertInit() const  " [INTERNAL]  Assert that it is
+initialized
 
 ";
 
@@ -49697,20 +48622,15 @@ make a shallow copy of that one.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::zz_diagsplit(const std::vector< int
-> &offset1, const std::vector< int > &offset2) const  " [INTERNAL]  Accessed
-by SparsityInterface.
+%feature("docstring")  casadi::Sparsity::getDiag(std::vector< int >
+&output_mapping) const  "
+
+Get the diagonal of the matrix/create a diagonal matrix (mapping will
+contain the nonzero mapping) When the input is square, the diagonal elements
+are returned. If the input is vector-like, a diagonal matrix is constructed
+with it.
 
 ";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity
->::zz_diagsplit(const std::vector< int > &output_offset) const " ";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity
->::zz_diagsplit(int incr) const " ";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity
->::zz_diagsplit(int incr1, int incr2) const " ";
 
 %feature("docstring")  casadi::Sparsity::issymmetric() const  "
 
@@ -49740,16 +48660,6 @@ strictly:  if true, then do not allow multiple entries
 %feature("docstring")  casadi::Sparsity::isdiag() const  "
 
 Is diagonal?
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_kron(const Sparsity &b) const  "
-[INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_horzcat(const std::vector<
-Sparsity > &sp) " [INTERNAL]  Accessed by SparsityInterface.
 
 ";
 
@@ -49850,9 +48760,6 @@ Transpose the matrix.
 
 ";
 
-%feature("docstring")  casadi::SparsityInterface< Sparsity  >::zz_repmat(int
-n, int m=1) const " ";
-
 %feature("docstring") casadi::Sparsity::Sparsity(int dummy=0) "
 
 Default constructor.
@@ -49873,14 +48780,6 @@ format.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::zz_horzsplit(const std::vector< int
-> &output_offset) const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity
->::zz_horzsplit(int incr) const " ";
-
 %feature("docstring")  casadi::Sparsity::isTranspose(const Sparsity &y)
 const  "
 
@@ -49897,11 +48796,6 @@ Order the cols by decreasing degree.
 %feature("docstring")  casadi::Sparsity::colind(int cc) const  "
 
 Get a reference to the colindex of column cc (see class description)
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_blockcat(const std::vector<
-std::vector< Sparsity > > &v) " [INTERNAL]  Accessed by SparsityInterface.
 
 ";
 
@@ -49965,18 +48859,24 @@ Get the sparsity in compressed row storage (CRS) format.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::zz_tril(bool includeDiagonal=true)
-const  " [INTERNAL]  Get lower triangular part.
+%feature("docstring")  casadi::Sparsity::dulmageMendelsohn(std::vector< int
+> &output_rowperm, std::vector< int > &output_colperm, std::vector< int >
+&output_rowblock, std::vector< int > &output_colblock, std::vector< int >
+&output_coarse_rowblock, std::vector< int > &output_coarse_colblock, int
+seed=0) const  "
 
-";
+Compute the Dulmage-Mendelsohn decomposition See Direct Methods for Sparse
+Linear Systems by Davis (2006).
 
-%feature("docstring")  casadi::Sparsity::getDiag(std::vector< int >
-&output_mapping) const  "
+Dulmage-Mendelsohn will try to bring your matrix into lower block-
+triangular (LBT) form. It will not care about the distance of off- diagonal
+elements to the diagonal: there is no guarantee you will get a block-
+diagonal matrix if you supply a randomly permuted block- diagonal matrix.
 
-Get the diagonal of the matrix/create a diagonal matrix (mapping will
-contain the nonzero mapping) When the input is square, the diagonal elements
-are returned. If the input is vector-like, a diagonal matrix is constructed
-with it.
+If your matrix is symmetrical, this method is of limited use; permutation
+can make it non-symmetric.
+
+See:   stronglyConnectedComponents
 
 ";
 
@@ -50004,17 +48904,12 @@ Sparse(nrow, ncol) instead
 
 ";
 
-%feature("docstring")  casadi::Sparsity::unidirectionalColoring(const
-Sparsity &AT=Sparsity(), int cutoff=std::numeric_limits< int >::max()) const
+%feature("docstring")  casadi::Sparsity::isReshape(const Sparsity &y) const
 "
 
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+Check if the sparsity is a reshape of another.
 
 ";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity  >::zz_vec()
-const " ";
 
 %feature("docstring")  casadi::Sparsity::getTriplet(std::vector< int >
 &output_row, std::vector< int > &output_col) const  "
@@ -50045,10 +48940,12 @@ Check whether the sparsity-pattern indicates structural singularity.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::isReshape(const Sparsity &y) const
+%feature("docstring")  casadi::Sparsity::unidirectionalColoring(const
+Sparsity &AT=Sparsity(), int cutoff=std::numeric_limits< int >::max()) const
 "
 
-Check if the sparsity is a reshape of another.
+Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
+(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
 
 ";
 
@@ -50062,10 +48959,12 @@ the same length as the number of nonzeros
 
 ";
 
-%feature("docstring")  casadi::Sparsity::makeDense(std::vector< int >
-&mapping) const  "
+%feature("docstring")  casadi::Sparsity::getRow() const  "
 
-Make a patten dense.
+Get the row for each non-zero entry Together with the column-vector, this
+vector gives the sparsity of the matrix in sparse triplet format, and
+together with the colind vector, one obtains the sparsity in column
+compressed format.
 
 ";
 
@@ -50100,16 +48999,6 @@ Create a dense rectangular sparsity pattern.
 Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_vertcat(const std::vector<
-Sparsity > &sp) " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_vecNZ() const  " [INTERNAL]
-Accessed by SparsityInterface.
 
 ";
 
@@ -50186,8 +49075,8 @@ Print a description of the object.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::zz_sprank() const  " [INTERNAL]
-Accessed by SparsityInterface.
+%feature("docstring")  casadi::Sparsity::zz_tril(bool includeDiagonal=true)
+const  " [INTERNAL]  Get lower triangular part.
 
 ";
 
@@ -50212,12 +49101,10 @@ See:   numel()
 
 ";
 
-%feature("docstring")  casadi::Sparsity::getRow() const  "
+%feature("docstring")  casadi::Sparsity::makeDense(std::vector< int >
+&mapping) const  "
 
-Get the row for each non-zero entry Together with the column-vector, this
-vector gives the sparsity of the matrix in sparse triplet format, and
-together with the colind vector, one obtains the sparsity in column
-compressed format.
+Make a patten dense.
 
 ";
 
@@ -50257,13 +49144,6 @@ point to this new object
 
 ";
 
-%feature("docstring")  casadi::SparsityInterface< Sparsity
->::zz_blocksplit(const std::vector< int > &vert_offset, const std::vector<
-int > &horz_offset) const " ";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity
->::zz_blocksplit(int vert_incr, int horz_incr) const " ";
-
 %feature("docstring")  casadi::Sparsity::bandwidthL() const  "
 
 Lower half-bandwidth.
@@ -50276,8 +49156,16 @@ Is square?
 
 ";
 
-%feature("docstring")  casadi::Sparsity::zz_diagcat(const std::vector<
-Sparsity > &v) " [INTERNAL]  Accessed by SparsityInterface.
+%feature("docstring")  casadi::Sparsity::transpose(std::vector< int >
+&mapping, bool invert_mapping=false) const  "
+
+Transpose the matrix and get the reordering of the non-zero entries.
+
+Parameters:
+-----------
+
+mapping:  the non-zeros of the original matrix for each non-zero of the new
+matrix
 
 ";
 
@@ -50322,11 +49210,6 @@ Get the dimension as a string.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::zz_mtimes(const Sparsity &y) const
-" [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
 %feature("docstring")  casadi::Sparsity::compressed(const std::vector< int >
 &v) "
 
@@ -50364,14 +49247,6 @@ B[jj, ii] == A
 
 ";
 
-%feature("docstring")  casadi::Sparsity::zz_vertsplit(const std::vector< int
-> &output_offset) const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::SparsityInterface< Sparsity
->::zz_vertsplit(int incr) const " ";
-
 %feature("docstring")  casadi::Sparsity::compress() const  "
 
 Compress a sparsity pattern.
@@ -50399,11 +49274,6 @@ Take the inverse of a sparsity pattern; flip zeros and non-zeros.
 %feature("docstring")  casadi::Sparsity::isvector() const  "
 
 Check if the pattern is a row or column vector.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_norm_0_mul(const Sparsity &B)
-const  " [INTERNAL]  Accessed by SparsityInterface.
 
 ";
 
@@ -50452,19 +49322,6 @@ Is lower triangular?
 &stream=casadi::userOut()) const  "
 
 Print a textual representation of sparsity.
-
-";
-
-%feature("docstring")  casadi::Sparsity::transpose(std::vector< int >
-&mapping, bool invert_mapping=false) const  "
-
-Transpose the matrix and get the reordering of the non-zero entries.
-
-Parameters:
------------
-
-mapping:  the non-zeros of the original matrix for each non-zero of the new
-matrix
 
 ";
 
@@ -50542,48 +49399,14 @@ true, the algorithm is equivalent to Matlab's etree(A, 'row').
 
 ";
 
-%feature("docstring")  casadi::Sparsity::dulmageMendelsohn(std::vector< int
-> &output_rowperm, std::vector< int > &output_colperm, std::vector< int >
-&output_rowblock, std::vector< int > &output_colblock, std::vector< int >
-&output_coarse_rowblock, std::vector< int > &output_coarse_colblock, int
-seed=0) const  "
-
-Compute the Dulmage-Mendelsohn decomposition See Direct Methods for Sparse
-Linear Systems by Davis (2006).
-
-Dulmage-Mendelsohn will try to bring your matrix into lower block-
-triangular (LBT) form. It will not care about the distance of off- diagonal
-elements to the diagonal: there is no guarantee you will get a block-
-diagonal matrix if you supply a randomly permuted block- diagonal matrix.
-
-If your matrix is symmetrical, this method is of limited use; permutation
-can make it non-symmetric.
-
-See:   stronglyConnectedComponents
-
-";
-
 %feature("docstring")  casadi::Sparsity::scalar(bool dense_scalar=true) "
 
 Create a scalar sparsity pattern.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::zz_reshape(int nrow, int ncol)
-const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
-%feature("docstring")  casadi::Sparsity::zz_reshape(const Sparsity &sp)
-const  " [INTERNAL]  Accessed by SparsityInterface.
-
-";
-
 
 // File: classcasadi_1_1SparsityInterface.xml
-%feature("docstring")  casadi::SparsityInterface< MatType >::zz_repmat(int
-n, int m=1) const  " ";
-
 %feature("docstring") casadi::SparsityInterface "
 
 Sparsity interface class.
@@ -50593,31 +49416,6 @@ Sparsity, introducing a uniform syntax and implementing common functionality
 using the curiously recurring template pattern (CRTP) idiom. Joel Andersson
 
 C++ includes: sparsity_interface.hpp ";
-
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_diagsplit(const std::vector< int > &output_offset) const  " ";
-
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_diagsplit(int incr) const  " ";
-
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_diagsplit(int incr1, int incr2) const  " ";
-
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_blocksplit(const std::vector< int > &vert_offset, const std::vector<
-int > &horz_offset) const  " ";
-
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_blocksplit(int vert_incr, int horz_incr) const  " ";
-
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_horzsplit(int incr) const  " ";
-
-%feature("docstring")  casadi::SparsityInterface< MatType
->::zz_vertsplit(int incr) const  " ";
-
-%feature("docstring")  casadi::SparsityInterface< MatType >::zz_vec() const
-" ";
 
 
 // File: classcasadi_1_1Split.xml
@@ -55805,19 +54603,6 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
-%feature("docstring")  casadi::pw_lin(const SX &t, const SX &tval, const SX
-&val) "
-
-t a scalar variable (e.g. time)
-
-Create a piecewise linear function Create a piecewise linear function:
-
-Inputs: tval vector with the the discrete values of t (monotonically
-increasing) val vector with the corresponding function values (same length
-as tval)
-
-";
-
 %feature("docstring")  casadi::getSchemeSize(InputOutputScheme scheme) " ";
 
 %feature("docstring")  casadi::complement(const std::vector< int > &v, int
@@ -56059,22 +54844,8 @@ int i) " ";
 %feature("docstring")  casadi::ProfilingType< ProfilingData_ENTRY >() "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::logic_not(const DataType &x) "
-
-Logical not, returns (an expression evaluating to) 1 if expression is zero
-and 0 otherwise.
-
-";
-
-%feature("docstring")  casadi::gradient(const MX &ex, const MX &arg) "
-
-Count number of nodes
-
-";
-
-%feature("docstring")  casadi::gradient(const SX &ex, const SX &arg) "
-
-Expand the expression as a weighted sum (with constant weights)
+%feature("docstring")  casadi::casadi_swap(int n, real_t *x, int inc_x,
+real_t *y, int inc_y) " [INTERNAL]  SWAP: x <-> y.
 
 ";
 
@@ -56090,45 +54861,6 @@ Output arguments of a dle solver
 +===========+=======+=================================+
 | LR_DLE_Y  | y     | Y matrix, block diagonal form . |
 +-----------+-------+---------------------------------+
-
-";
-
-%feature("docstring")  casadi::ramp(const SX &x) "
-
-ramp function
-
-\\\\[ \\\\begin {cases} R(x) = 0 & x <= 1 \\\\\\\\ R(x) = x & x > 1 \\\\\\\\
-\\\\end {cases} \\\\]
-
-Also called: slope function
-
-";
-
-%feature("docstring")  casadi::tangent(const MX &ex, const MX &arg) "
-
-Count number of nodes
-
-";
-
-%feature("docstring")  casadi::tangent(const SX &ex, const SX &arg) "
-
-Expand the expression as a weighted sum (with constant weights)
-
-";
-
-%feature("docstring")  casadi::jacobian(const MX &ex, const MX &arg) "
-
-Calculate jacobian via source code transformation.
-
-Uses casadi::MXFunction::jac
-
-";
-
-%feature("docstring")  casadi::jacobian(const SX &ex, const SX &arg) "
-
-Calculate jacobian via source code transformation.
-
-Uses casadi::SXFunction::jac
 
 ";
 
@@ -56166,34 +54898,6 @@ Input arguments of a cle solver
 ";
 
 %feature("docstring")  casadi::getSchemeName(InputOutputScheme scheme) " ";
-
-%feature("docstring")  casadi::substitute(const MX &ex, const MX &v, const
-MX &vdef) "
-
-Substitute variable v with expression vdef in an expression ex.
-
-";
-
-%feature("docstring")  casadi::substitute(const std::vector< MX > &ex, const
-std::vector< MX > &v, const std::vector< MX > &vdef) "
-
-Substitute variable var with expression expr in multiple expressions.
-
-";
-
-%feature("docstring")  casadi::substitute(const SX &ex, const SX &v, const
-SX &vdef) "
-
-Substitute variable v with expression vdef in an expression ex.
-
-";
-
-%feature("docstring")  casadi::substitute(const std::vector< SX > &ex, const
-std::vector< SX > &v, const std::vector< SX > &vdef) "
-
-Substitute variable var with expression expr in multiple expressions.
-
-";
 
 %feature("docstring")  casadi::profileWriteTime(std::ofstream &f, T *a, int
 line_number, double local, double total) " [INTERNAL] ";
@@ -56284,31 +54988,6 @@ Input arguments of a SDQP problem
 
 ";
 
-%feature("docstring")  casadi::triangle(const SX &x) "
-
-triangle function
-
-\\\\[ \\\\begin {cases} \\\\Lambda(x) = 0 & |x| >= 1 \\\\\\\\ \\\\Lambda(x)
-= 1-|x| & |x| < 1 \\\\end {cases} \\\\]
-
-";
-
-%feature("docstring")  casadi::graph_substitute(const MX &ex, const
-std::vector< MX > &v, const std::vector< MX > &vdef) "
-
-Substitute variable v with expression vdef in an expression ex, preserving
-nodes.
-
-";
-
-%feature("docstring")  casadi::graph_substitute(const std::vector< MX > &ex,
-const std::vector< MX > &v, const std::vector< MX > &vdef) "
-
-Substitute variable var with expression expr in multiple expressions,
-preserving nodes.
-
-";
-
 %feature("docstring")  casadi::read_matlab(std::istream &stream,
 std::vector< T > &v) "
 
@@ -56337,13 +55016,6 @@ Print matrix, matlab style.
 
 ";
 
-%feature("docstring")  casadi::expand(const SX &ex, SX &weights, SX &terms)
-"
-
-Expand the expression as a weighted sum (with constant weights)
-
-";
-
 %feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const
 std::vector< int > &colind, const std::vector< int > &row) " [INTERNAL]
 Hash a sparsity pattern.
@@ -56357,15 +55029,6 @@ Hash a sparsity pattern.
 "
 
 Check if the vector is strictly monotone.
-
-";
-
-%feature("docstring")  casadi::poly_roots(const SX &p) "
-
-Attempts to find the roots of a polynomial.
-
-This will only work for polynomials up to order 3 It is assumed that the
-roots are real.
 
 ";
 
@@ -56384,13 +55047,6 @@ std::string &arg_s8="", const std::string &arg_s9="", const std::string
 const std::string &arg_s13="", const std::string &arg_s14="", const
 std::string &arg_s15="", const std::string &arg_s16="", const std::string
 &arg_s17="", const std::string &arg_s18="", const std::string &arg_s19="") "
-";
-
-%feature("docstring")  casadi::dormqr_(char *side, char *trans, int *n, int
-*m, int *k, double *a, int *lda, double *tau, double *c, int *ldc, double
-*work, int *lwork, int *info) " [INTERNAL]  Multiply right hand side with
-Q-transpose (lapack)
-
 ";
 
 %feature("docstring")  casadi::isRegular(const std::vector< T > &v) "
@@ -56499,32 +55155,10 @@ Duplicates are treated by looking up last occurrence
 %feature("docstring")  casadi::ProfilingType< ProfilingData_IO >() "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::mtaylor(const SX &ex, const SX &x, const SX
-&a, int order=1) "
-
-multivariate Taylor series expansion
-
-Do Taylor expansions until the aggregated order of a term is equal to
-'order'. The aggregated order of $x^n y^m$ equals $n+m$.
-
-";
-
-%feature("docstring")  casadi::mtaylor(const SX &ex, const SX &x, const SX
-&a, int order, const std::vector< int > &order_contributions) "
-
-multivariate Taylor series expansion
-
-Do Taylor expansions until the aggregated order of a term is equal to
-'order'. The aggregated order of $x^n y^m$ equals $n+m$.
-
-The argument order_contributions can denote how match each variable
-contributes to the aggregated order. If x=[x, y] and order_contributions=[1,
-2], then the aggregated order of $x^n y^m$ equals $1n+2m$.
-
-Example usage
-
-$ \\\\sin(b+a)+\\\\cos(b+a)(x-a)+\\\\cos(b+a)(y-b) $ $ y+x-(x^3+3y x^2+3 y^2
-x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
+%feature("docstring")  casadi::dormqr_(char *side, char *trans, int *n, int
+*m, int *k, double *a, int *lda, double *tau, double *c, int *ldc, double
+*work, int *lwork, int *info) " [INTERNAL]  Multiply right hand side with
+Q-transpose (lapack)
 
 ";
 
@@ -56574,20 +55208,8 @@ Output arguments of an integrator
 
 ";
 
-%feature("docstring")  casadi::dleOut(const std::string &n0="", const M
-&x0=M()) "
-
-Output arguments of a dle solver
-
->Output scheme: casadi::DLEOutput (DLE_NUM_OUT = 1) [dleOut]
-
-+-----------+-------+-------------+
-| Full name | Short | Description |
-+===========+=======+=============+
-| DLE_P     | p     | P matrix .  |
-+-----------+-------+-------------+
-
-";
+%feature("docstring")  casadi::ProfilingType< ProfilingData_NAME >() "
+[INTERNAL] ";
 
 %feature("docstring")  casadi::operation_checker(unsigned int op) "
 [INTERNAL] ";
@@ -56668,15 +55290,6 @@ Output arguments of an NLP Hessian function
 
 ";
 
-%feature("docstring")  casadi::heaviside(const SX &x) "
-
-Heaviside function.
-
-\\\\[ \\\\begin {cases} H(x) = 0 & x<0 \\\\\\\\ H(x) = 1/2 & x=0 \\\\\\\\
-H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
-
-";
-
 %feature("docstring")  casadi::sdqpOut(const std::string &n0="", const M
 &x0=M(), const std::string &n1="", const M &x1=M(), const std::string
 &n2="", const M &x2=M(), const std::string &n3="", const M &x3=M(), const
@@ -56721,14 +55334,20 @@ Output arguments of an SDQP Solver
 
 ";
 
-%feature("docstring")  casadi::find(const MX &x) "
+%feature("docstring")  casadi::dleOut(const std::string &n0="", const M
+&x0=M()) "
 
-Find first nonzero If failed, returns the number of rows.
+Output arguments of a dle solver
+
+>Output scheme: casadi::DLEOutput (DLE_NUM_OUT = 1) [dleOut]
+
++-----------+-------+-------------+
+| Full name | Short | Description |
++===========+=======+=============+
+| DLE_P     | p     | P matrix .  |
++-----------+-------+-------------+
 
 ";
-
-%feature("docstring")  casadi::ProfilingType< ProfilingData_NAME >() "
-[INTERNAL] ";
 
 %feature("docstring")  casadi::dpleIn(const std::string &n0="", const M
 &x0=M(), const std::string &n1="", const M &x1=M()) "
@@ -56777,54 +55396,9 @@ Output arguments of an QP Solver
 
 ";
 
-%feature("docstring")  casadi::profileWriteExit(std::ofstream &f, T *a,
-double total) " [INTERNAL] ";
-
 %feature("docstring")  casadi::isNonDecreasing(const std::vector< T > &v) "
 
 Check if the vector is non-decreasing.
-
-";
-
-%feature("docstring")  casadi::solve(const Matrix< DataType > &A, const
-Matrix< DataType > &b) "
-
-Solve a system of equations: A*x = b The solve routine works similar to
-Matlab's backslash when A is square and nonsingular. The algorithm used is
-the following:
-
-A simple forward or backward substitution if A is upper or lower triangular
-
-If the linear system is at most 3-by-3, form the inverse via minor expansion
-and multiply
-
-Permute the variables and equations as to get a (structurally) nonzero
-diagonal, then perform a QR factorization without pivoting and solve the
-factorized system.
-
-Note 1: If there are entries of the linear system known to be zero, these
-will be removed. Elements that are very small, or will evaluate to be zero,
-can still cause numerical errors, due to the lack of pivoting (which is not
-possible since cannot compare the size of entries)
-
-Note 2: When permuting the linear system, a BLT (block lower triangular)
-transformation is formed. Only the permutation part of this is however used.
-An improvement would be to solve block-by-block if there are multiple BLT
-blocks.
-
-";
-
-%feature("docstring")  casadi::solve(const Matrix< double > &A, const
-Matrix< double > &b, const std::string &lsolver, const Dict &dict=Dict()) "
-
-Solve a system of equations: A*x = b.
-
-";
-
-%feature("docstring")  casadi::solve(const MX &A, const MX &b, const
-std::string &lsolver="symbolicqr", const Dict &dict=Dict()) "
-
-Solve a system of equations: A*x = b.
 
 ";
 
@@ -56848,6 +55422,9 @@ Input arguments of an Homotopy NLP function
 
 ";
 
+%feature("docstring")  casadi::profileWriteBare(std::ofstream &f, const T
+&s) " [INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_mv_t(const real_t *x, const int *sp_x,
 const real_t *y, real_t *z) " [INTERNAL]  Sparse matrix-vector
 multiplication, first factor transposed: z <- z + trans(x)*y.
@@ -56870,12 +55447,6 @@ Input arguments of an NLP function
 +-----------+-------+---------------------+
 
 ";
-
-%feature("docstring")  casadi::hessian(const MX &ex, const MX &arg, MX
-&output_g) " ";
-
-%feature("docstring")  casadi::hessian(const SX &ex, const SX &arg, SX
-&output_g) " ";
 
 %feature("docstring")  casadi::isIncreasing(const std::vector< T > &v) "
 
@@ -57035,39 +55606,9 @@ Output arguments of an LP Solver
 
 ";
 
-%feature("docstring")  casadi::logic_or(const DataType &x, const DataType
-&y) "
-
-Logical or, returns (an expression evaluating to) 1 if at least one
-expression is nonzero and 0 otherwise.
-
-";
-
 %feature("docstring")  casadi::isMonotone(const std::vector< T > &v) "
 
 Check if the vector is monotone.
-
-";
-
-%feature("docstring")  casadi::lrdleIn(const std::string &n0="", const M
-&x0=M(), const std::string &n1="", const M &x1=M(), const std::string
-&n2="", const M &x2=M(), const std::string &n3="", const M &x3=M()) "
-
-Input arguments of a dle solver
-
->Input scheme: casadi::LR_DLEInput (LR_DLE_NUM_IN = 4) [lrdleIn]
-
-+-----------+-------+----------------------------------------+
-| Full name | Short |              Description               |
-+===========+=======+========================================+
-| LR_DLE_A  | a     | A matrix .                             |
-+-----------+-------+----------------------------------------+
-| LR_DLE_V  | v     | V matrix .                             |
-+-----------+-------+----------------------------------------+
-| LR_DLE_C  | c     | C matrix .                             |
-+-----------+-------+----------------------------------------+
-| LR_DLE_H  | h     | H matrix: horizontal stack of all Hi . |
-+-----------+-------+----------------------------------------+
 
 ";
 
@@ -57184,14 +55725,6 @@ Output arguments of an DAE function
 
 ";
 
-%feature("docstring")  casadi::logic_and(const DataType &x, const DataType
-&y) "
-
-Logical and, returns (an expression evaluating to) 1 if both expressions are
-nonzero and 0 otherwise.
-
-";
-
 %feature("docstring")  casadi::getSchemeEntryEnum(InputOutputScheme scheme,
 const std::string &name) " ";
 
@@ -57228,18 +55761,6 @@ D:  interpolating coefficients to obtain end state Length: order+1
 %feature("docstring")  casadi::matrixName() "
 
 Get typename.
-
-";
-
-%feature("docstring")  casadi::rectangle(const SX &x) "
-
-rectangle function
-
-\\\\[ \\\\begin {cases} \\\\Pi(x) = 1 & |x| < 1/2 \\\\\\\\ \\\\Pi(x) = 1/2 &
-|x| = 1/2 \\\\\\\\ \\\\Pi(x) = 0 & |x| > 1/2 \\\\\\\\ \\\\end {cases} \\\\]
-
-Also called: gate function, block function, band function, pulse function,
-window function
 
 ";
 
@@ -57298,20 +55819,6 @@ Input arguments of an NLP Solver
 
 ";
 
-%feature("docstring")  casadi::getOperatorRepresentation(const MX &xb, const
-std::vector< std::string > &args) "
-
-Get a string representation for a binary MX, using custom arguments.
-
-";
-
-%feature("docstring")  casadi::getOperatorRepresentation(const SX &x, const
-std::vector< std::string > &args) "
-
-Get a string representation for a binary SX, using custom arguments.
-
-";
-
 %feature("docstring")  casadi::slicot_mb03vy(int n, int p, int ilo, int ihi,
 double *a, int lda1, int lda2, const double *tau, int ldtau, double
 *dwork=0, int ldwork=0) " [INTERNAL] ";
@@ -57326,23 +55833,8 @@ an integer.
 
 ";
 
-%feature("docstring")  casadi::pw_const(const SX &t, const SX &tval, const
-SX &val) "
-
-Create a piecewise constant function Create a piecewise constant function
-with n=val.size() intervals.
-
-Inputs:
-
-Parameters:
------------
-
-t:  a scalar variable (e.g. time)
-
-tval:  vector with the discrete values of t at the interval transitions
-(length n-1)
-
-val:  vector with the value of the function for each interval (length n)
+%feature("docstring")  casadi::casadi_copy_n(const real_t *x, int n, real_t
+*y) " [INTERNAL]  COPY: y <-x.
 
 ";
 
@@ -57358,13 +55850,8 @@ scheme:  'radau' or 'legendre'
 
 ";
 
-%feature("docstring")  casadi::profileWriteSourceLineDep(std::ofstream &f, T
-*a, int line_number, const std::string &sourceline, int opcode, T2
-*dependency) " [INTERNAL] ";
-
-%feature("docstring")  casadi::profileWriteSourceLineDep(std::ofstream &f, T
-*a, int line_number, const std::string &sourceline, T2 *dependency) "
-[INTERNAL] ";
+%feature("docstring")  casadi::getSchemeEntryEnumName(InputOutputScheme
+scheme, int i) " ";
 
 %feature("docstring")  casadi::casadi_mm_sparse_t(const real_t *x, const int
 *sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
@@ -57373,20 +55860,25 @@ transposed: z <- z + trans(x)*y.
 
 ";
 
-%feature("docstring")  casadi::substituteInPlace(const std::vector< MX > &v,
-std::vector< MX > &INOUT, std::vector< MX > &INOUT, bool reverse=false) "
+%feature("docstring")  casadi::simpleIntegrator(Function f, const
+std::string &integrator="cvodes", const Dict &integrator_options=Dict()) "
 
-Inplace substitution with piggyback expressions Substitute variables v out
-of the expressions vdef sequentially, as well as out of a number of other
-expressions piggyback.
+Simplified wrapper for the Integrator class Constructs an integrator using
+the same syntax as simpleRK and simpleIRK. The constructed function (which
+is of type MXFunction), has three inputs, corresponding to initial state
+(x0), parameter (p) and integration time (h) and one output, corresponding
+to final state (xf).
 
-";
+Parameters:
+-----------
 
-%feature("docstring")  casadi::substituteInPlace(const std::vector< SX > &v,
-std::vector< SX > &INOUT, std::vector< SX > &INOUT, bool reverse=false) "
+f:  ODE function with two inputs (x and p) and one output (xdot)
 
-Substitute variable var out of or into an expression expr, with an arbitrary
-number of other expressions piggyback.
+N:  Number of integrator steps
+
+order:  Order of interpolating polynomials
+
+scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
@@ -57452,35 +55944,14 @@ Check if the vector is non-increasing.
 
 ";
 
-%feature("docstring")  casadi::taylor(const SX &ex, const SX &x, const SX
-&a=0, int order=1) "
-
-univariate Taylor series expansion
-
-Calculate the Taylor expansion of expression 'ex' up to order 'order' with
-respect to variable 'x' around the point 'a'
-
-$(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac
-{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
-
-Example usage:
-
-::
-
->>   x
-
-
-
-";
-
 %feature("docstring")  casadi::casadi_project(const real_t *x, const int
 *sp_x, real_t *y, const int *sp_y, real_t *w) " [INTERNAL]  Sparse copy: y
 <- x, w work vector (length >= number of rows)
 
 ";
 
-%feature("docstring")  casadi::profileWriteBare(std::ofstream &f, const T
-&s) " [INTERNAL] ";
+%feature("docstring")  casadi::profileWriteExit(std::ofstream &f, T *a,
+double total) " [INTERNAL] ";
 
 %feature("docstring")  casadi::dleIn(const std::string &n0="", const M
 &x0=M(), const std::string &n1="", const M &x1=M()) "
@@ -57496,30 +55967,6 @@ Input arguments of a dle solver
 +-----------+-------+-------------+
 | DLE_V     | v     | V matrix .  |
 +-----------+-------+-------------+
-
-";
-
-%feature("docstring")  casadi::jacobianTimesVector(const SX &ex, const SX
-&arg, const SX &v, bool transpose_jacobian=false) "
-
-Calculate the Jacobian and multiply by a vector from the right This is
-equivalent to mul(jacobian(ex, arg), v) or mul(jacobian(ex, arg).T, v) for
-transpose_jacobian set to false and true respectively. If contrast to these
-expressions, it will use directional derivatives which is typically (but not
-necessarily) more efficient if the complete Jacobian is not needed and v has
-few rows.
-
-";
-
-%feature("docstring")  casadi::countNodes(const MX &A) "
-
-Count number of nodes
-
-";
-
-%feature("docstring")  casadi::countNodes(const SX &A) "
-
-Count number of nodes.
 
 ";
 
@@ -57642,19 +56089,6 @@ Input arguments of a linear solver
 
 ";
 
-%feature("docstring")  casadi::poly_coeff(const SX &ex, const SX &x) "
-
-extracts polynomial coefficients from an expression
-
-Parameters:
------------
-
-ex:  Scalar expression that represents a polynomial
-
-x:  Scalar symbol that the polynomial is build up with
-
-";
-
 %feature("docstring")  casadi::casadi_mm_sparse(const real_t *x, const int
 *sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
 *w) " [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
@@ -57676,39 +56110,25 @@ Output arguments of a linear solver
 
 ";
 
-%feature("docstring")  casadi::extractShared(std::vector< MX > &ex,
-std::vector< MX > &v, std::vector< MX > &vdef, const std::string
-&v_prefix="v_", const std::string &v_suffix="") "
+%feature("docstring")  casadi::lrdleIn(const std::string &n0="", const M
+&x0=M(), const std::string &n1="", const M &x1=M(), const std::string
+&n2="", const M &x2=M(), const std::string &n3="", const M &x3=M()) "
 
-Extract shared subexpressions from an set of expressions.
+Input arguments of a dle solver
 
-";
+>Input scheme: casadi::LR_DLEInput (LR_DLE_NUM_IN = 4) [lrdleIn]
 
-%feature("docstring")  casadi::extractShared(std::vector< SX > &ex,
-std::vector< SX > &v, std::vector< SX > &vdef, const std::string
-&v_prefix="v_", const std::string &v_suffix="") "
-
-Extract shared subexpressions from an set of expressions.
-
-";
-
-%feature("docstring")  casadi::matrix_expand(const MX &e, const std::vector<
-MX > &boundary=std::vector< MX >()) "
-
-Expand MX graph to SXFunction call.
-
-Expand the given expression e, optionally supplying expressions contained in
-it at which expansion should stop.
-
-";
-
-%feature("docstring")  casadi::matrix_expand(const std::vector< MX > &e,
-const std::vector< MX > &boundary=std::vector< MX >()) "
-
-Expand MX graph to SXFunction call.
-
-Expand the given expression e, optionally supplying expressions contained in
-it at which expansion should stop.
++-----------+-------+----------------------------------------+
+| Full name | Short |              Description               |
++===========+=======+========================================+
+| LR_DLE_A  | a     | A matrix .                             |
++-----------+-------+----------------------------------------+
+| LR_DLE_V  | v     | V matrix .                             |
++-----------+-------+----------------------------------------+
+| LR_DLE_C  | c     | C matrix .                             |
++-----------+-------+----------------------------------------+
+| LR_DLE_H  | h     | H matrix: horizontal stack of all Hi . |
++-----------+-------+----------------------------------------+
 
 ";
 
@@ -57902,25 +56322,6 @@ Input arguments of a QP problem
 
 ";
 
-%feature("docstring")  casadi::casadi_copy_n(const real_t *x, int n, real_t
-*y) " [INTERNAL]  COPY: y <-x.
-
-";
-
-%feature("docstring")  casadi::casadi_norm_inf_mul(const real_t *x, const
-int *sp_x, const real_t *y, const int *sp_y, real_t *dwork, int *iwork) "
-[INTERNAL]  Inf-norm of a Matrix-matrix product,*
-
-Parameters:
------------
-
-dwork:  A real work vector that you must allocate Minimum size: y.size1()
-
-iwork:  A integer work vector that you must allocate Minimum size:
-y.size1()+x.size2()+1
-
-";
-
 %feature("docstring")  casadi::gradFOut(const std::string &n0="", const M
 &x0=M(), const std::string &n1="", const M &x1=M(), const std::string
 &n2="", const M &x2=M()) "
@@ -57943,45 +56344,6 @@ Output arguments of an NLP objective gradient function
 
 %feature("docstring")  casadi::casadi_asum(int n, const real_t *x, int
 inc_x) " [INTERNAL]  ASUM: ||x||_1 -> return.
-
-";
-
-%feature("docstring")  casadi::pinv(const Matrix< DataType > &A) "
-
-Computes the Moore-Penrose pseudo-inverse.
-
-If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
-
-pinv(A)' = (AA')^(-1) A
-
-If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
-
-pinv(A) = (A'A)^(-1) A'
-
-";
-
-%feature("docstring")  casadi::pinv(const Matrix< double > &A, const
-std::string &lsolver, const Dict &dict=Dict()) "
-
-Computes the Moore-Penrose pseudo-inverse.
-
-If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
-matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
-
-";
-
-%feature("docstring")  casadi::pinv(const MX &A, const std::string &lsolver,
-const Dict &dict=Dict()) "
-
-Computes the Moore-Penrose pseudo-inverse.
-
-If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
-
-pinv(A)' = (AA')^(-1) A
-
-If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
-
-pinv(A) = (A'A)^(-1) A'
 
 ";
 
@@ -58053,49 +56415,27 @@ Structure specification of an SOCP
 
 %feature("docstring")  casadi::ptrToLong(T *a) " [INTERNAL] ";
 
-%feature("docstring")  casadi::getSchemeEntryEnumName(InputOutputScheme
-scheme, int i) " ";
+%feature("docstring")  casadi::profileWriteSourceLineDep(std::ofstream &f, T
+*a, int line_number, const std::string &sourceline, int opcode, T2
+*dependency) " [INTERNAL] ";
 
-%feature("docstring")  casadi::eig_symbolic(const SX &m) "
-
-Attempts to find the eigenvalues of a symbolic matrix This will only work
-for up to 3x3 matrices.
-
-";
+%feature("docstring")  casadi::profileWriteSourceLineDep(std::ofstream &f, T
+*a, int line_number, const std::string &sourceline, T2 *dependency) "
+[INTERNAL] ";
 
 %feature("docstring")  casadi::userOut() "";
 
-%feature("docstring")  casadi::casadi_swap(int n, real_t *x, int inc_x,
-real_t *y, int inc_y) " [INTERNAL]  SWAP: x <-> y.
-
-";
-
-%feature("docstring")  casadi::gauss_quadrature(const SX &f, const SX &x,
-const SX &a, const SX &b, int order=5, const SX &w=SX()) "
-
-Integrate f from a to b using Gaussian quadrature with n points.
-
-";
-
-%feature("docstring")  casadi::simpleIntegrator(Function f, const
-std::string &integrator="cvodes", const Dict &integrator_options=Dict()) "
-
-Simplified wrapper for the Integrator class Constructs an integrator using
-the same syntax as simpleRK and simpleIRK. The constructed function (which
-is of type MXFunction), has three inputs, corresponding to initial state
-(x0), parameter (p) and integration time (h) and one output, corresponding
-to final state (xf).
+%feature("docstring")  casadi::casadi_norm_inf_mul(const real_t *x, const
+int *sp_x, const real_t *y, const int *sp_y, real_t *dwork, int *iwork) "
+[INTERNAL]  Inf-norm of a Matrix-matrix product,*
 
 Parameters:
 -----------
 
-f:  ODE function with two inputs (x and p) and one output (xdot)
+dwork:  A real work vector that you must allocate Minimum size: y.size1()
 
-N:  Number of integrator steps
-
-order:  Order of interpolating polynomials
-
-scheme:  Collocation scheme, as excepted by collocationPoints function.
+iwork:  A integer work vector that you must allocate Minimum size:
+y.size1()+x.size2()+1
 
 ";
 
