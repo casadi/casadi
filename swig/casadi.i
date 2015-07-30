@@ -350,50 +350,19 @@ import_array();
 %}
 #endif // SWIGPYTHON
 
-
-#define memberbinopsr(Type,uname) \
-Type __r##uname##__(const Type& b) const{ return b.__##uname##__(*$self);}
-
-#define memberbinopsr_custom(Type,uname,custom) \
-Type __r##uname##__(const Type& b) const{ return b ##custom## (*$self);}
-
-
-#define memberbinopsr_un(Type,uname) \
-Type __r##uname##__(const Type& b) const{ return b.##uname##(*$self);}
-
-#define memberbinopsr_nn(Type,uname) \
-Type r##uname##(const Type& b) const{ return b.##uname##(*$self);}
-
 %define binopsrFull(Type)
-memberbinopsr(Type,truediv)
 Type __rmldivide__(const Type& b) const{ return b.zz_mldivide(*$self);}
 Type __rmrdivide__(const Type& b) const{ return b.zz_mrdivide(*$self);}
 Type __rmpower__(const Type& b) const{ return b.zz_mpower(*$self);}
-memberbinopsr(Type,constpow)
-Type rmul(const Type& b) const{ return b.zz_mtimes(*$self);}
-memberbinopsr(Type,copysign)
-%enddef
-
-%define memberbinops(uname,argtype,argCast,selfCast,returntype)
-returntype __##uname##__ (argtype) const{ return selfCast(*$self).__##uname##__(argCast(b));}
-returntype __r##uname##__(argtype) const{ return argCast(b).__##uname##__(selfCast(*$self));}
-%enddef
-
-%define memberbinops_custom(uname,custom,argtype,argCast,selfCast,returntype)
-returntype __##uname##__ (argtype) const{ return selfCast(*$self) ##custom## argCast(b);}
-returntype __r##uname##__(argtype) const{ return argCast(b) ##custom## selfCast(*$self);}
-%enddef
-
-%define memberbinops_un(uname,argtype,argCast,selfCast,returntype)
-returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*$self));}
+Type __rconstpow__(const Type& b) const{ return b.__constpow__(*$self);}
+Type __rcopysign__(const Type& b) const{ return b.__copysign__(*$self);}
 %enddef
 
 %define binopsFull(argtype,argCast,selfCast,returntype)
-memberbinops(constpow,argtype,argCast,selfCast,returntype)
-memberbinops(copysign,argtype,argCast,selfCast,returntype)
-returntype mul (argtype) const{ return mul(selfCast(*$self) , argCast(b));}
-returntype rmul (argtype) const{ return mul(argCast(b) , selfCast(*$self));}
-memberbinops(truediv,argtype,argCast,selfCast,returntype)
+returntype __constpow__ (argtype) const{ return selfCast(*$self).__constpow__(argCast(b));}
+returntype __rconstpow__(argtype) const{ return argCast(b).__constpow__(selfCast(*$self));}
+returntype __copysign__ (argtype) const{ return selfCast(*$self).__copysign__(argCast(b));}
+returntype __rcopysign__(argtype) const{ return argCast(b).__copysign__(selfCast(*$self));}
 returntype __mldivide__ (argtype) const{ return mldivide(selfCast(*$self), argCast(b));}
 returntype __rmldivide__(argtype) const{ return mldivide(argCast(b), selfCast(*$self));}
 returntype __mrdivide__ (argtype) const{ return mrdivide(selfCast(*$self), argCast(b));}
@@ -3862,6 +3831,8 @@ namespace casadi {
       def __rmul__(x, y) : return casadi_times(y, x)
       def __div__(x, y) : return casadi_rdivide(x, y)
       def __rdiv__(x, y) : return casadi_rdivide(y, x)
+      def __truediv__(x, y) : return casadi_rdivide(x, y)
+      def __rtruediv__(x, y) : return casadi_rdivide(y, x)
       def __lt__(x, y) : return casadi_lt(x, y)
       def __rlt__(x, y) : return casadi_lt(y, x)
       def __le__(x, y) : return casadi_le(x, y)

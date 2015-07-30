@@ -560,7 +560,6 @@ namespace casadi {
     /// Functions called by the corresponding friend functions -- MATLAB naming
 #if !defined(SWIG) || !defined(SWIGMATLAB)
     Matrix<DataType> zz_mpower(const Matrix<DataType> &y) const;
-    Matrix<DataType> __truediv__(const Matrix<DataType> &y) const {return zz_rdivide(y);}
     Matrix<DataType> __constpow__(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_mrdivide(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_mldivide(const Matrix<DataType> &y) const;

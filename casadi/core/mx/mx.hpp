@@ -484,7 +484,6 @@ namespace casadi {
     MX zz_inner_prod(const MX& y) const;
     MX zz_outer_prod(const MX& y) const;
     MX zz_if_else_zero(const MX& y) const;
-    MX __truediv__(const MX& y) const { return zz_rdivide(y);}
     MX __constpow__(const MX& b) const;
     MX zz_mrdivide(const MX& b) const;
     MX zz_mldivide(const MX& b) const;
