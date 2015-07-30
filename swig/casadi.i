@@ -2667,121 +2667,121 @@ namespace casadi{
 
 // Prefix symbols
 #ifdef SWIGMATLAB
-%define %PREFHIDE(SYM) friendwrap_ ## SYM %enddef
+%define %HIDE(SYM) friendwrap_ ## SYM %enddef
 #else
-%define %PREFHIDE(SYM) casadi_ ## SYM %enddef
+%define %HIDE(SYM) casadi_ ## SYM %enddef
 #endif
-%define %PREFSHOW(SYM) friendwrap_ ## SYM %enddef
+%define %SHOW(SYM) friendwrap_ ## SYM %enddef
 
 %define SPARSITY_INTERFACE_FRIENDS(DECL, M)
- DECL M %PREFSHOW(horzcat)(const std::vector< M > &v) {
+ DECL M %SHOW(horzcat)(const std::vector< M > &v) {
   return horzcat(v);
  }
- DECL M %PREFSHOW(vertcat)(const std::vector< M > &v) {
+ DECL M %SHOW(vertcat)(const std::vector< M > &v) {
  return vertcat(v);
  }
  DECL std::vector< M >
- %PREFSHOW(horzsplit)(const M& v, const std::vector<int>& offset) {
+ %SHOW(horzsplit)(const M& v, const std::vector<int>& offset) {
  return horzsplit(v, offset);
  }
- DECL std::vector< M > %PREFSHOW(horzsplit)(const M& v, int incr=1) {
+ DECL std::vector< M > %SHOW(horzsplit)(const M& v, int incr=1) {
  return horzsplit(v, incr);
  }
  DECL std::vector< M >
- %PREFSHOW(vertsplit)(const M& v, const std::vector<int>& offset) {
+ %SHOW(vertsplit)(const M& v, const std::vector<int>& offset) {
  return vertsplit(v, offset);
  }
  DECL std::vector<int >
- %PREFSHOW(offset)(const std::vector< M > &v, bool vert=true) {
+ %SHOW(offset)(const std::vector< M > &v, bool vert=true) {
  return offset(v, vert);
  }
  DECL std::vector< M >
- %PREFSHOW(vertsplit)(const M& v, int incr=1) {
+ %SHOW(vertsplit)(const M& v, int incr=1) {
  return vertsplit(v, incr);
  }
- DECL M %PREFSHOW(blockcat)(const std::vector< std::vector< M > > &v) {
+ DECL M %SHOW(blockcat)(const std::vector< std::vector< M > > &v) {
  return blockcat(v);
  }
- DECL M %PREFSHOW(blockcat)(const M& A, const M& B, const M& C, const M& D) {
+ DECL M %SHOW(blockcat)(const M& A, const M& B, const M& C, const M& D) {
  return vertcat(horzcat(A, B), horzcat(C, D));
  }
  DECL std::vector< std::vector< M > >
- %PREFSHOW(blocksplit)(const M& x, const std::vector<int>& vert_offset,
+ %SHOW(blocksplit)(const M& x, const std::vector<int>& vert_offset,
  const std::vector<int>& horz_offset) {
  return blocksplit(x, vert_offset, horz_offset);
  }
  DECL std::vector< std::vector< M > >
- %PREFSHOW(blocksplit)(const M& x, int vert_incr=1, int horz_incr=1) {
+ %SHOW(blocksplit)(const M& x, int vert_incr=1, int horz_incr=1) {
  return blocksplit(x, vert_incr, horz_incr);
  }
- DECL M %PREFSHOW(diagcat)(const std::vector< M > &A) {
+ DECL M %SHOW(diagcat)(const std::vector< M > &A) {
  return diagcat(A);
  }
  DECL std::vector< M >
- %PREFSHOW(diagsplit)(const M& x, const std::vector<int>& output_offset1,
+ %SHOW(diagsplit)(const M& x, const std::vector<int>& output_offset1,
  const std::vector<int>& output_offset2) {
  return diagsplit(x, output_offset1, output_offset2);
  }
  DECL std::vector< M >
- %PREFSHOW(diagsplit)(const M& x, const std::vector<int>& output_offset) {
+ %SHOW(diagsplit)(const M& x, const std::vector<int>& output_offset) {
  return diagsplit(x, output_offset);
  }
- DECL std::vector< M > %PREFSHOW(diagsplit)(const M& x, int incr=1) {
+ DECL std::vector< M > %SHOW(diagsplit)(const M& x, int incr=1) {
  return diagsplit(x, incr);
  }
  DECL std::vector< M >
- %PREFSHOW(diagsplit)(const M& x, int incr1, int incr2) {
+ %SHOW(diagsplit)(const M& x, int incr1, int incr2) {
  return diagsplit(x, incr1, incr2);
  }
- DECL M %PREFSHOW(veccat)(const std::vector< M >& x) {
+ DECL M %SHOW(veccat)(const std::vector< M >& x) {
  return veccat(x);
  }
- DECL M %PREFSHOW(mul)(const M& X, const M& Y) {
+ DECL M %SHOW(mul)(const M& X, const M& Y) {
  return mul(X, Y);
  }
- DECL M %PREFSHOW(mul)(const std::vector< M > &args) {
+ DECL M %SHOW(mul)(const std::vector< M > &args) {
  return mul(args);
  }
- DECL M %PREFSHOW(mac)(const M& X, const M& Y, const M& Z) {
+ DECL M %SHOW(mac)(const M& X, const M& Y, const M& Z) {
  return mac(X, Y, Z);
  }
- DECL M %PREFSHOW(transpose)(const M& X) {
+ DECL M %SHOW(transpose)(const M& X) {
  return X.T();
  }
- DECL M %PREFSHOW(vec)(const M& a) {
+ DECL M %SHOW(vec)(const M& a) {
  return vec(a);
  }
- DECL M %PREFSHOW(vecNZ)(const M& a) {
+ DECL M %SHOW(vecNZ)(const M& a) {
  return vecNZ(a);
  }
- DECL M %PREFSHOW(reshape)(const M& a, int nrow, int ncol) {
+ DECL M %SHOW(reshape)(const M& a, int nrow, int ncol) {
  return reshape(a, nrow, ncol);
  }
- DECL M %PREFSHOW(reshape)(const M& a, std::pair<int, int> rc) {
+ DECL M %SHOW(reshape)(const M& a, std::pair<int, int> rc) {
  return reshape(a, rc.first, rc.second);
  }
- DECL M %PREFSHOW(reshape)(const M& a, const Sparsity& sp) {
+ DECL M %SHOW(reshape)(const M& a, const Sparsity& sp) {
  return reshape(a, sp);
  }
- DECL int %PREFSHOW(sprank)(const M& A) {
+ DECL int %SHOW(sprank)(const M& A) {
  return sprank(A);
  }
- DECL int %PREFSHOW(norm_0_mul)(const M& x, const M& y) {
+ DECL int %SHOW(norm_0_mul)(const M& x, const M& y) {
  return norm_0_mul(x, y);
  }
- DECL M %PREFSHOW(triu)(const M& a, bool includeDiagonal=true) {
+ DECL M %SHOW(triu)(const M& a, bool includeDiagonal=true) {
  return triu(a, includeDiagonal);
  }
- DECL M %PREFSHOW(tril)(const M& a, bool includeDiagonal=true) {
+ DECL M %SHOW(tril)(const M& a, bool includeDiagonal=true) {
  return tril(a, includeDiagonal);
  }
- DECL M %PREFSHOW(kron)(const M& a, const M& b) {
+ DECL M %SHOW(kron)(const M& a, const M& b) {
  return kron(a, b);
  }
- DECL M %PREFSHOW(repmat)(const M& A, int n, int m=1) {
+ DECL M %SHOW(repmat)(const M& A, int n, int m=1) {
  return repmat(A, n, m);
  }
- DECL M %PREFSHOW(repmat)(const M& A, const std::pair<int, int>& rc) {
+ DECL M %SHOW(repmat)(const M& A, const std::pair<int, int>& rc) {
  return repmat(A, rc.first, rc.second);
  }
 %enddef
@@ -2795,193 +2795,193 @@ SPARSITY_INTERFACE_FRIENDS(DECL, Matrix<SXElement>)
 %enddef
 
 %define GENERIC_MATRIX_FRIENDS(DECL, M)
-DECL M %PREFSHOW(mpower)(const M& x, const M& n) {
+DECL M %SHOW(mpower)(const M& x, const M& n) {
   return mpower(x, n);
 }
 
-DECL M %PREFHIDE(mrdivide)(const M& x, const M& y) {
+DECL M %HIDE(mrdivide)(const M& x, const M& y) {
   return mrdivide(x, y);
 }
 
-DECL M %PREFHIDE(mldivide)(const M& x, const M& y) {
+DECL M %HIDE(mldivide)(const M& x, const M& y) {
   return mldivide(x, y);
 }
 
-DECL std::vector< M > %PREFSHOW(symvar)(const M& x) {
+DECL std::vector< M > %SHOW(symvar)(const M& x) {
   return symvar(x);
 }
 
-DECL M %PREFSHOW(quad_form)(const M& X, const M& A) {
+DECL M %SHOW(quad_form)(const M& X, const M& A) {
   return quad_form(X, A);
 }
 
-DECL M %PREFSHOW(quad_form)(const M& X) {
+DECL M %SHOW(quad_form)(const M& X) {
   return quad_form(X);          
 }
 
-DECL M %PREFSHOW(sum_square)(const M& X) {
+DECL M %SHOW(sum_square)(const M& X) {
   return sum_square(X);         
 }
 
-DECL M %PREFSHOW(linspace)(const M& a, const M& b, int nsteps) {
+DECL M %SHOW(linspace)(const M& a, const M& b, int nsteps) {
   return linspace(a, b, nsteps);
 }
 
-DECL M %PREFSHOW(cross)(const M& a, const M& b, int dim = -1) {
+DECL M %SHOW(cross)(const M& a, const M& b, int dim = -1) {
   return cross(a, b, dim);      
 }
 
-DECL M %PREFSHOW(det)(const M& A) {
+DECL M %SHOW(det)(const M& A) {
   return det(A);                
 }
 
-DECL M %PREFSHOW(inv)(const M& A) {
+DECL M %SHOW(inv)(const M& A) {
   return inv(A);                
 }
 
-DECL M %PREFSHOW(trace)(const M& a) {
+DECL M %SHOW(trace)(const M& a) {
   return trace(a);              
 }
 
-DECL M %PREFSHOW(tril2symm)(const M& a) {
+DECL M %SHOW(tril2symm)(const M& a) {
   return tril2symm(a);          
 }
 
-DECL M %PREFSHOW(triu2symm)(const M& a) {
+DECL M %SHOW(triu2symm)(const M& a) {
   return triu2symm(a);          
 }
 
-DECL M %PREFSHOW(norm_F)(const M& x) {
+DECL M %SHOW(norm_F)(const M& x) {
   return norm_F(x);             
 }
 
-DECL M %PREFSHOW(norm_2)(const M& x) {
+DECL M %SHOW(norm_2)(const M& x) {
   return norm_2(x);             
 }
 
-DECL M %PREFSHOW(norm_1)(const M& x) {
+DECL M %SHOW(norm_1)(const M& x) {
   return norm_1(x);             
 }
 
-DECL M %PREFSHOW(norm_inf)(const M& x) {
+DECL M %SHOW(norm_inf)(const M& x) {
   return norm_inf(x);           
 }
 
-DECL M %PREFSHOW(sumCols)(const M& x) {
+DECL M %SHOW(sumCols)(const M& x) {
   return sumCols(x);            
 }
 
-DECL M %PREFSHOW(sumRows)(const M& x) {
+DECL M %SHOW(sumRows)(const M& x) {
   return sumRows(x);            
 }
 
-DECL M %PREFSHOW(inner_prod)(const M& x, const M& y) {
+DECL M %SHOW(inner_prod)(const M& x, const M& y) {
   return inner_prod(x, y);      
 }
 
-DECL M %PREFSHOW(outer_prod)(const M& x, const M& y) {
+DECL M %SHOW(outer_prod)(const M& x, const M& y) {
   return outer_prod(x, y);      
 }
 
-DECL M %PREFSHOW(nullspace)(const M& A) {
+DECL M %SHOW(nullspace)(const M& A) {
   return nullspace(A);          
 }
 
-DECL M %PREFSHOW(polyval)(const M& p, const M& x) {
+DECL M %SHOW(polyval)(const M& p, const M& x) {
   return polyval(p, x);         
 }
 
-DECL M %PREFSHOW(diag)(const M& A) {
+DECL M %SHOW(diag)(const M& A) {
   return diag(A);               
 }
 
-DECL M %PREFSHOW(unite)(const M& A, const M& B) {
+DECL M %SHOW(unite)(const M& A, const M& B) {
   return unite(A, B);           
 }
 
-DECL M %PREFSHOW(densify)(const M& x) {
+DECL M %SHOW(densify)(const M& x) {
   return densify(x);            
 }
 
-DECL M %PREFSHOW(project)(const M& A, const Sparsity& sp, bool intersect=false) {
+DECL M %SHOW(project)(const M& A, const Sparsity& sp, bool intersect=false) {
   return project(A, sp, intersect);    
 }
 
-DECL M %PREFSHOW(if_else)(const M& cond, const M& if_true, 
+DECL M %SHOW(if_else)(const M& cond, const M& if_true, 
                     const M& if_false, bool short_circuit=true) {
   return if_else(cond, if_true, if_false, short_circuit);   
 }
-DECL M %PREFSHOW(conditional)(const M& ind, const std::vector< M > &x,
+DECL M %SHOW(conditional)(const M& ind, const std::vector< M > &x,
                         const M& x_default, bool short_circuit=true) {
   return conditional(ind, x, x_default, short_circuit);     
 }
-DECL bool %PREFSHOW(dependsOn)(const M& f, const M& arg) {
+DECL bool %SHOW(dependsOn)(const M& f, const M& arg) {
   return dependsOn(f, arg);     
 }
 
-DECL void %PREFSHOW(substituteInPlace)(const std::vector<M>& v,
+DECL void %SHOW(substituteInPlace)(const std::vector<M>& v,
                                       std::vector<M>& inout_vdef,
                                       std::vector<M>& inout_ex,
                                       bool reverse=false) {
   return substituteInPlace(v, inout_vdef, inout_ex, reverse);
 }
 
-DECL M %PREFSHOW(solve)(const M& A, const M& b) {
+DECL M %SHOW(solve)(const M& A, const M& b) {
   return solve(A, b);
 }
 
-DECL M %PREFSHOW(solve)(const M& A, const M& b,
+DECL M %SHOW(solve)(const M& A, const M& b,
                        const std::string& lsolver,
                        const casadi::Dict& opts = casadi::Dict()) {
   return solve(A, b, lsolver, opts);
 }
 
-DECL M %PREFSHOW(pinv)(const M& A) {
+DECL M %SHOW(pinv)(const M& A) {
   return pinv(A);
 }
 
-DECL M %PREFSHOW(pinv)(const M& A, const std::string& lsolver,
+DECL M %SHOW(pinv)(const M& A, const std::string& lsolver,
                       const casadi::Dict& opts = casadi::Dict()) {
   return pinv(A, lsolver, opts);
 }
 
-DECL M %PREFSHOW(substitute)(const M& ex, const M& v, const M& vdef) {
+DECL M %SHOW(substitute)(const M& ex, const M& v, const M& vdef) {
   return substitute(ex, v, vdef);
 }
 
-DECL std::vector<M> %PREFSHOW(substitute)(const std::vector<M>& ex,
+DECL std::vector<M> %SHOW(substitute)(const std::vector<M>& ex,
                                          const std::vector<M>& v,
                                          const std::vector<M>& vdef) {
   return substitute(ex, v, vdef);
 }
 
-DECL M %PREFSHOW(jacobian)(const M &ex, const M &arg) {
+DECL M %SHOW(jacobian)(const M &ex, const M &arg) {
   return jacobian(ex, arg);
 }
 
-DECL M %PREFSHOW(gradient)(const M &ex, const M &arg) {
+DECL M %SHOW(gradient)(const M &ex, const M &arg) {
   return gradient(ex, arg);
 }
 
-DECL M %PREFSHOW(tangent)(const M &ex, const M &arg) {
+DECL M %SHOW(tangent)(const M &ex, const M &arg) {
   return tangent(ex, arg);
 }
 
-DECL M %PREFSHOW(hessian)(const M& ex, const M& arg, M& output_g) {
+DECL M %SHOW(hessian)(const M& ex, const M& arg, M& output_g) {
   return hessian(ex, arg, output_g);
 }
 
-DECL int %PREFSHOW(countNodes)(const M& A) {
+DECL int %SHOW(countNodes)(const M& A) {
   return countNodes(A);
 }
 
 DECL std::string
-%PREFSHOW(getOperatorRepresentation)(const M& xb,
+%SHOW(getOperatorRepresentation)(const M& xb,
                                     const std::vector<std::string>& args) {
   return getOperatorRepresentation(xb, args);
 }
 
-DECL void %PREFSHOW(extractShared)(const std::vector< M >& ex,
+DECL void %SHOW(extractShared)(const std::vector< M >& ex,
                                   std::vector< M >& output_ex,
                                   std::vector< M >& output_v,
                                   std::vector< M >& output_vdef,
@@ -3001,52 +3001,52 @@ GENERIC_MATRIX_FRIENDS(DECL, Matrix<SXElement>)
 %enddef
 
 %define GENERIC_EXPRESSION_FRIENDS(DECL, M) 
-DECL M %PREFHIDE(plus)(const M& x, const M& y) { return x+y; }
-DECL M %PREFHIDE(minus)(const M& x, const M& y) { return x-y; }
-DECL M %PREFHIDE(times)(const M& x, const M& y) { return x*y; }
-DECL M %PREFHIDE(rdivide)(const M& x, const M& y) { return x/y; }
-DECL M %PREFHIDE(ldivide)(const M& x, const M& y) { return y/x; }
-DECL M %PREFHIDE(lt)(const M& x, const M& y) { return x<y; }
-DECL M %PREFHIDE(le)(const M& x, const M& y) { return x<=y; }
-DECL M %PREFHIDE(gt)(const M& x, const M& y) { return x>y; }
-DECL M %PREFHIDE(ge)(const M& x, const M& y) { return x>=y; }
-DECL M %PREFHIDE(eq)(const M& x, const M& y) { return x==y; }
-DECL M %PREFHIDE(ne)(const M& x, const M& y) { return x!=y; }
-DECL M %PREFSHOW(and)(const M& x, const M& y) { return x&&y; }
-DECL M %PREFSHOW(or)(const M& x, const M& y) { return x||y; }
-DECL M %PREFSHOW(not)(const M& x) { return !x; }
-DECL M %PREFHIDE(abs)(const M& x) { return fabs(x); }
-DECL M %PREFHIDE(sqrt)(const M& x) { return sqrt(x); }
-DECL M %PREFHIDE(sin)(const M& x) { return sin(x); }
-DECL M %PREFHIDE(cos)(const M& x) { return cos(x); }
-DECL M %PREFHIDE(tan)(const M& x) { return tan(x); }
-DECL M %PREFHIDE(atan)(const M& x) { return atan(x); }
-DECL M %PREFHIDE(asin)(const M& x) { return asin(x); }
-DECL M %PREFHIDE(acos)(const M& x) { return acos(x); }
-DECL M %PREFHIDE(tanh)(const M& x) { return tanh(x); }
-DECL M %PREFHIDE(sinh)(const M& x) { return sinh(x); }
-DECL M %PREFHIDE(cosh)(const M& x) { return cosh(x); }
-DECL M %PREFHIDE(atanh)(const M& x) { return atanh(x); }
-DECL M %PREFHIDE(asinh)(const M& x) { return asinh(x); }
-DECL M %PREFHIDE(acosh)(const M& x) { return acosh(x); }
-DECL M %PREFHIDE(exp)(const M& x) { return exp(x); }
-DECL M %PREFHIDE(log)(const M& x) { return log(x); }
-DECL M %PREFHIDE(log10)(const M& x) { return log10(x); }
-DECL M %PREFHIDE(floor)(const M& x) { return floor(x); }
-DECL M %PREFHIDE(ceil)(const M& x) { return ceil(x); }
-DECL M %PREFHIDE(erf)(const M& x) { return erf(x); }
-DECL M %PREFSHOW(erfinv)(const M& x) { return erfinv(x); }
-DECL M %PREFHIDE(sign)(const M& x) { return sign(x); }
-DECL M %PREFHIDE(power)(const M& x, const M& n) { return pow(x, n); }
-DECL M %PREFHIDE(mod)(const M& x, const M& y) { return fmod(x, y); }
-DECL M %PREFHIDE(atan2)(const M& x, const M& y) { return atan2(x, y); }
-DECL M %PREFHIDE(min)(const M& x, const M& y) { return fmin(x, y); }
-DECL M %PREFHIDE(max)(const M& x, const M& y) { return fmax(x, y); }
-DECL M %PREFSHOW(simplify)(const M& x) { return simplify(x); }
-DECL bool %PREFSHOW(isEqual)(const M& x, const M& y, int depth=0) { return isEqual(x, y, depth); }
-DECL bool %PREFSHOW(iszero)(const M& x) { return iszero(x); }
-DECL M %PREFHIDE(copysign)(const M& x, const M& y) { return copysign(x, y); }
-DECL M %PREFHIDE(constpow)(const M& x, const M& y) { return constpow(x, y); }
+DECL M %HIDE(plus)(const M& x, const M& y) { return x+y; }
+DECL M %HIDE(minus)(const M& x, const M& y) { return x-y; }
+DECL M %HIDE(times)(const M& x, const M& y) { return x*y; }
+DECL M %HIDE(rdivide)(const M& x, const M& y) { return x/y; }
+DECL M %HIDE(ldivide)(const M& x, const M& y) { return y/x; }
+DECL M %HIDE(lt)(const M& x, const M& y) { return x<y; }
+DECL M %HIDE(le)(const M& x, const M& y) { return x<=y; }
+DECL M %HIDE(gt)(const M& x, const M& y) { return x>y; }
+DECL M %HIDE(ge)(const M& x, const M& y) { return x>=y; }
+DECL M %HIDE(eq)(const M& x, const M& y) { return x==y; }
+DECL M %HIDE(ne)(const M& x, const M& y) { return x!=y; }
+DECL M %SHOW(and)(const M& x, const M& y) { return x&&y; }
+DECL M %SHOW(or)(const M& x, const M& y) { return x||y; }
+DECL M %SHOW(not)(const M& x) { return !x; }
+DECL M %HIDE(abs)(const M& x) { return fabs(x); }
+DECL M %HIDE(sqrt)(const M& x) { return sqrt(x); }
+DECL M %HIDE(sin)(const M& x) { return sin(x); }
+DECL M %HIDE(cos)(const M& x) { return cos(x); }
+DECL M %HIDE(tan)(const M& x) { return tan(x); }
+DECL M %HIDE(atan)(const M& x) { return atan(x); }
+DECL M %HIDE(asin)(const M& x) { return asin(x); }
+DECL M %HIDE(acos)(const M& x) { return acos(x); }
+DECL M %HIDE(tanh)(const M& x) { return tanh(x); }
+DECL M %HIDE(sinh)(const M& x) { return sinh(x); }
+DECL M %HIDE(cosh)(const M& x) { return cosh(x); }
+DECL M %HIDE(atanh)(const M& x) { return atanh(x); }
+DECL M %HIDE(asinh)(const M& x) { return asinh(x); }
+DECL M %HIDE(acosh)(const M& x) { return acosh(x); }
+DECL M %HIDE(exp)(const M& x) { return exp(x); }
+DECL M %HIDE(log)(const M& x) { return log(x); }
+DECL M %HIDE(log10)(const M& x) { return log10(x); }
+DECL M %HIDE(floor)(const M& x) { return floor(x); }
+DECL M %HIDE(ceil)(const M& x) { return ceil(x); }
+DECL M %HIDE(erf)(const M& x) { return erf(x); }
+DECL M %SHOW(erfinv)(const M& x) { return erfinv(x); }
+DECL M %HIDE(sign)(const M& x) { return sign(x); }
+DECL M %HIDE(power)(const M& x, const M& n) { return pow(x, n); }
+DECL M %HIDE(mod)(const M& x, const M& y) { return fmod(x, y); }
+DECL M %HIDE(atan2)(const M& x, const M& y) { return atan2(x, y); }
+DECL M %HIDE(min)(const M& x, const M& y) { return fmin(x, y); }
+DECL M %HIDE(max)(const M& x, const M& y) { return fmax(x, y); }
+DECL M %SHOW(simplify)(const M& x) { return simplify(x); }
+DECL bool %SHOW(isEqual)(const M& x, const M& y, int depth=0) { return isEqual(x, y, depth); }
+DECL bool %SHOW(iszero)(const M& x) { return iszero(x); }
+DECL M %HIDE(copysign)(const M& x, const M& y) { return copysign(x, y); }
+DECL M %HIDE(constpow)(const M& x, const M& y) { return constpow(x, y); }
 %enddef
 
 %define GENERIC_EXPRESSION_ALL(DECL) 
@@ -3057,104 +3057,110 @@ GENERIC_EXPRESSION_FRIENDS(DECL, Matrix<SXElement>)
 %enddef
 
 %define MATRIX_FRIENDS(DECL, M)
-DECL M %PREFSHOW(all)(const M& x) {
+DECL M %SHOW(all)(const M& x) {
   return all(x);
 }
 
-DECL M %PREFSHOW(any)(const M& x) {
+DECL M %SHOW(any)(const M& x) {
   return any(x);
 }
 
-DECL M %PREFSHOW(adj)(const M& A) {
+DECL M %SHOW(adj)(const M& A) {
   return adj(A);
 }
 
-DECL M %PREFSHOW(getMinor)(const M& x, int i, int j) {
+DECL M %SHOW(getMinor)(const M& x, int i, int j) {
   return getMinor(x, i, j);
 }
 
-DECL M %PREFSHOW(cofactor)(const M& x, int i, int j) {
+DECL M %SHOW(cofactor)(const M& x, int i, int j) {
   return cofactor(x, i, j);
 }
 
-DECL void %PREFSHOW(qr)(const M& A, M& output_Q, M& output_R) {
+DECL void %SHOW(qr)(const M& A, M& output_Q, M& output_R) {
   return qr(A, output_Q, output_R);
 }
 
-DECL M %PREFSHOW(chol)(const M& A) {
+DECL M %SHOW(chol)(const M& A) {
   return chol(A);
 }
 
-DECL M %PREFSHOW(norm_inf_mul)(const M& x, const M& y) {
+DECL M %SHOW(norm_inf_mul)(const M& x, const M& y) {
   return norm_inf_mul(x, y);
 }
 
-DECL M %PREFSHOW(sparsify)(const M& A, double tol=0) {
+DECL M %SHOW(sparsify)(const M& A, double tol=0) {
   return sparsify(A, tol);
 }
 
-DECL void %PREFSHOW(expand)(const M& ex, M& output_weights, M& output_terms) {
+DECL void %SHOW(expand)(const M& ex, M& output_weights, M& output_terms) {
   expand(ex, output_weights, output_terms);
 }
 
-DECL M %PREFSHOW(pw_const)(const M &t, const M& tval, const M& val) {
+DECL M %SHOW(pw_const)(const M &t, const M& tval, const M& val) {
   return pw_const(t, tval, val);
 }
 
-DECL M %PREFSHOW(pw_lin)(const M& t, const M& tval, const M& val) {
+DECL M %SHOW(pw_lin)(const M& t, const M& tval, const M& val) {
   return pw_lin(t, tval, val);
 }
 
-DECL M %PREFSHOW(heaviside)(const M& x) {
+DECL M %SHOW(heaviside)(const M& x) {
   return heaviside(x);
 }
 
-DECL M %PREFSHOW(rectangle)(const M& x) {
+DECL M %SHOW(rectangle)(const M& x) {
   return rectangle(x);
 }
 
-DECL M %PREFSHOW(triangle)(const M& x) {
+DECL M %SHOW(triangle)(const M& x) {
   return triangle(x);
 }
 
-DECL M %PREFSHOW(ramp)(const M& x) {
+DECL M %SHOW(ramp)(const M& x) {
   return ramp(x);
 }
 
-DECL M %PREFSHOW(gauss_quadrature)(const M& f, const M& x,
+DECL M %SHOW(gauss_quadrature)(const M& f, const M& x,
                                   const M& a, const M& b,
-                                  int order=5, const M& w=M()) {
+                                  int order=5) {
+  return gauss_quadrature(f, x, a, b, order);
+}
+
+DECL M %SHOW(gauss_quadrature)(const M& f, const M& x,
+                                  const M& a, const M& b,
+                                  int order, const M& w) {
   return gauss_quadrature(f, x, a, b, order, w);
 }
 
-DECL M %PREFSHOW(jacobianTimesVector)(const M& ex, const M& arg, const M& v,
+DECL M %SHOW(jacobianTimesVector)(const M& ex, const M& arg, const M& v,
                                      bool transpose_jacobian=false) {
   return jacobianTimesVector(ex, arg, v, transpose_jacobian);
 }
 
-DECL M %PREFSHOW(taylor)(const M& ex, const M& x, const M& a=0, int order=1) {
+DECL M %SHOW(taylor)(const M& ex, const M& x, const M& a=0, int order=1) {
   return taylor(ex, x, a, order);
 }
 
-DECL M %PREFSHOW(mtaylor)(const M& ex, const M& x, const M& a, int order=1) {
+DECL M %SHOW(mtaylor)(const M& ex, const M& x, const M& a, int order=1) {
   return mtaylor(ex, x, a, order);
 }
 
-DECL M %PREFSHOW(mtaylor)(const M& ex, const M& x, const M& a, int order,
+DECL M %SHOW(mtaylor)(const M& ex, const M& x, const M& a, int order,
                          const std::vector<int>& order_contributions) {
   return mtaylor(ex, x, a, order, order_contributions);
 }
 
-DECL M %PREFSHOW(poly_coeff)(const M& ex,
+DECL M %SHOW(poly_coeff)(const M& ex,
                          const M&x) {
   return poly_coeff(ex, x);
 }
 
-DECL M %PREFSHOW(poly_roots)(const M& p) {
+DECL M %SHOW(poly_roots)(const M& p) {
   return poly_roots(p);
 }
 
-DECL M %PREFSHOW(eig_symbolic)(const M& m) {
+DECL M %SHOW(eig_symbolic)(const M& m) {
   return eig_symbolic(m);
 }
 
@@ -3168,29 +3174,29 @@ MATRIX_FRIENDS(DECL, Matrix<SXElement>)
 
 %define MX_FRIENDS(DECL, M)
 
-DECL M %PREFSHOW(find)(const M& x) {
+DECL M %SHOW(find)(const M& x) {
   return find(x);
 }
 
-DECL M %PREFSHOW(graph_substitute)(const M& ex, const std::vector<M>& v,
+DECL M %SHOW(graph_substitute)(const M& ex, const std::vector<M>& v,
                          const std::vector<M> &vdef) {
   return graph_substitute(ex, v, vdef);
 }
 
 DECL std::vector<M>
-%PREFSHOW(graph_substitute)(const std::vector<M> &ex,
+%SHOW(graph_substitute)(const std::vector<M> &ex,
                  const std::vector<M> &v,
                  const std::vector<M> &vdef) {
   return graph_substitute(ex, v, vdef);
 }
 
-DECL M %PREFSHOW(matrix_expand)(const M& e,
+DECL M %SHOW(matrix_expand)(const M& e,
                             const std::vector<M> &boundary = std::vector<M>()) {
   return matrix_expand(e, boundary);
 }
 
 DECL std::vector<M>
-%PREFSHOW(matrix_expand)(const std::vector<M>& e,
+%SHOW(matrix_expand)(const std::vector<M>& e,
                      const std::vector<M> &boundary = std::vector<M>()) {
   return matrix_expand(e, boundary);
 }

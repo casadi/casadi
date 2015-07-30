@@ -735,13 +735,21 @@ namespace casadi {
       return x.zz_ramp();
     }
 
+    ///@{
     /** \brief  Integrate f from a to b using Gaussian quadrature with n points */
     friend inline Matrix<DataType>
       gauss_quadrature(const Matrix<DataType> &f, const Matrix<DataType> &x,
                        const Matrix<DataType> &a, const Matrix<DataType> &b,
-                       int order=5, const Matrix<DataType>& w=Matrix<DataType>()) {
+                       int order=5) {
+      return f.zz_gauss_quadrature(x, a, b, order);
+    }
+    friend inline Matrix<DataType>
+      gauss_quadrature(const Matrix<DataType> &f, const Matrix<DataType> &x,
+                       const Matrix<DataType> &a, const Matrix<DataType> &b,
+                       int order, const Matrix<DataType>& w) {
       return f.zz_gauss_quadrature(x, a, b, order, w);
     }
+    ///@}
 
     /** \brief Calculate the Jacobian and multiply by a vector from the right
         This is equivalent to <tt>mul(jacobian(ex, arg), v)</tt> or
