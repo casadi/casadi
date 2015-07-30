@@ -107,7 +107,7 @@ namespace casadi {
     Vss_shift.push_back(Vss.back());
     Vss_shift.insert(Vss_shift.end(), Vss.begin(), Vss.begin()+K_-1);
 
-    MX Pf = solve(A_total, vec(horzcat(Vss_shift)), getOption("linear_solver"));
+    MX Pf = A_total.zz_solve(vec(horzcat(Vss_shift)), getOption("linear_solver"));
     MX P = reshape(Pf, n_, K_*n_);
 
     P = P(output(DPLE_P).sparsity());
