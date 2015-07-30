@@ -259,9 +259,6 @@ namespace casadi {
     return x;
   }
 
-  /// __copysign__ function
-  template<class T> T copysign(const T &x, const T &y) {return x.__copysign__(y);}
-
   #ifdef HAS_COPYSIGN
   using std::copysign;
   #else

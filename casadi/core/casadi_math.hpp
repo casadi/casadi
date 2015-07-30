@@ -548,7 +548,6 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream) {
     case OP_AND:       stream << "(";        break;
     case OP_OR:        stream << "(";        break;
     case OP_IF_ELSE_ZERO: stream << "(";        break;
-    case OP_COPYSIGN:  stream << "__copysign__(";break;
     case OP_INV:       stream << "(1./";     break;
     default:           printName(op, stream); stream << "("; break;
   }
