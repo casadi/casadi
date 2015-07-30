@@ -3147,110 +3147,105 @@ GENERIC_EXPRESSION_FRIENDS(DECL, Matrix<SXElement>)
 %enddef
 
 %define MATRIX_FRIENDS_UNWRAPPED(DECL, M)
- DECL M %PREFOLD(all)(const M& x) {
+ DECL M %PREFHIDE(all)(const M& x) {
  return all(x);
  }
- DECL M %PREFOLD(any)(const M& x) {
+ DECL M %PREFHIDE(any)(const M& x) {
  return any(x);
  }
 %enddef
 
 %define MATRIX_FRIENDS(DECL, M)
-DECL M %PREFOLD(adj)(const M& A) {
+DECL M %PREF(adj)(const M& A) {
   return adj(A);
  }
 
-DECL M %PREFOLD(getMinor)(const M& x, int i, int j) {
+DECL M %PREF(getMinor)(const M& x, int i, int j) {
   return getMinor(x, i, j);
 }
 
-DECL M %PREFOLD(cofactor)(const M& x, int i, int j) {
+DECL M %PREF(cofactor)(const M& x, int i, int j) {
   return cofactor(x, i, j);
 }
 
-%apply M& OUTPUT { M& output_Q};
-%apply M& OUTPUT { M& output_R};
-DECL void %PREFOLD(qr)(const M& A, M& output_Q, M& output_R) {
+DECL void %PREF(qr)(const M& A, M& output_Q, M& output_R) {
   return qr(A, output_Q, output_R);
 }
 
-DECL M %PREFOLD(chol)(const M& A) {
+DECL M %PREF(chol)(const M& A) {
   return chol(A);
 }
 
-DECL M %PREFOLD(norm_inf_mul)(const M& x, const M& y) {
+DECL M %PREF(norm_inf_mul)(const M& x, const M& y) {
   return norm_inf_mul(x, y);
 }
 
-DECL M %PREFOLD(sparsify)(const M& A, double tol=0) {
+DECL M %PREF(sparsify)(const M& A, double tol=0) {
   return sparsify(A, tol);
 }
 
-
-%apply M& OUTPUT { M& output_weights};
-%apply M& OUTPUT { M& output_terms};
-DECL void %PREFOLD(expand)(const M& ex, M& output_weights, M& output_terms) {
+DECL void %PREF(expand)(const M& ex, M& output_weights, M& output_terms) {
   expand(ex, output_weights, output_terms);
 }
 
-DECL M %PREFOLD(pw_const)(const M &t, const M& tval, const M& val) {
+DECL M %PREF(pw_const)(const M &t, const M& tval, const M& val) {
   return pw_const(t, tval, val);
 }
 
-DECL M %PREFOLD(pw_lin)(const M& t, const M& tval, const M& val) {
+DECL M %PREF(pw_lin)(const M& t, const M& tval, const M& val) {
   return pw_lin(t, tval, val);
 }
 
-DECL M %PREFOLD(heaviside)(const M& x) {
+DECL M %PREF(heaviside)(const M& x) {
   return heaviside(x);
 }
 
-DECL M %PREFOLD(rectangle)(const M& x) {
+DECL M %PREF(rectangle)(const M& x) {
   return rectangle(x);
 }
 
-DECL M %PREFOLD(triangle)(const M& x) {
+DECL M %PREF(triangle)(const M& x) {
   return triangle(x);
 }
 
-DECL M %PREFOLD(ramp)(const M& x) {
+DECL M %PREF(ramp)(const M& x) {
   return ramp(x);
 }
 
-DECL M %PREFOLD(gauss_quadrature)(const M& f, const M& x,
+DECL M %PREF(gauss_quadrature)(const M& f, const M& x,
                                   const M& a, const M& b,
                                   int order=5, const M& w=M()) {
   return gauss_quadrature(f, x, a, b, order, w);
 }
 
-DECL M %PREFOLD(jacobianTimesVector)(const M& ex, const M& arg, const M& v,
+DECL M %PREF(jacobianTimesVector)(const M& ex, const M& arg, const M& v,
                                      bool transpose_jacobian=false) {
   return jacobianTimesVector(ex, arg, v, transpose_jacobian);
 }
 
-DECL M %PREFOLD(taylor)(const M& ex, const M& x, const M& a=0, int order=1) {
+DECL M %PREF(taylor)(const M& ex, const M& x, const M& a=0, int order=1) {
   return taylor(ex, x, a, order);
 }
 
-DECL M %PREFOLD(mtaylor)(const M& ex, const M& x, const M& a, int order=1) {
+DECL M %PREF(mtaylor)(const M& ex, const M& x, const M& a, int order=1) {
   return mtaylor(ex, x, a, order);
 }
 
-DECL M %PREFOLD(mtaylor)(const M& ex, const M& x, const M& a, int order,
+DECL M %PREF(mtaylor)(const M& ex, const M& x, const M& a, int order,
                          const std::vector<int>& order_contributions) {
   return mtaylor(ex, x, a, order, order_contributions);
 }
 
-DECL M %PREFOLD(poly_coeff)(const M& ex,
+DECL M %PREF(poly_coeff)(const M& ex,
                          const M&x) {
   return poly_coeff(ex, x);
 }
 
-DECL M %PREFOLD(poly_roots)(const M& p) {
+DECL M %PREF(poly_roots)(const M& p) {
   return poly_roots(p);
 }
 
-DECL M %PREFOLD(eig_symbolic)(const M& m) {
+DECL M %PREF(eig_symbolic)(const M& m) {
   return eig_symbolic(m);
 }
 
@@ -3800,7 +3795,6 @@ GENERIC_MATRIX_FRIENDS(friend inline, MatType)
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(DataType...)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix< DataType >)
-MATRIX_FRIENDS(inline, casadi::Matrix< DataType >)
 %enddef
 
 #ifndef SWIGMATLAB
@@ -3809,6 +3803,19 @@ GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(double)
 GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(casadi::SXElement)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
 #endif // SWIGMATLAB
+
+%define RENAME_FRIENDS(M)
+%apply M& OUTPUT { M& output_Q};
+%apply M& OUTPUT { M& output_R};
+%apply M& OUTPUT { M& output_weights};
+%apply M& OUTPUT { M& output_terms};
+%enddef
+
+RENAME_FRIENDS(casadi::Sparsity)
+RENAME_FRIENDS(casadi::MX)
+RENAME_FRIENDS(casadi::Matrix<int>)
+RENAME_FRIENDS(casadi::Matrix<double>)
+RENAME_FRIENDS(casadi::Matrix<casadi::SXElement>)
 
 #ifdef SWIGMATLAB
 // Wrap as static member functions
@@ -3838,6 +3845,7 @@ namespace casadi {
   namespace casadi {
     SPARSITY_INTERFACE_ALL(inline)
     GENERIC_EXPRESSION_ALL(inline)
+    MATRIX_ALL(inline)
     MX_ALL(inline)
   }
 }
