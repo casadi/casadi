@@ -199,7 +199,7 @@ namespace casadi {
 
     // Setup ECOS for new problem based on problem definition. We should be able to place
     // this in init(), it requires ECOS to do a re-initialize.
-    pwork* ecos_work =  ECOS_setup(n, m, p, l, ncones, q, nex, Gpr, Gjc, Gir, 
+    pwork* ecos_work =  ECOS_setup(n, m, p, l, ncones, q, nex, Gpr, Gjc, Gir,
                 Apr, Ajc, Air, c, h, b);
 
     // Pass all options to ECOS
