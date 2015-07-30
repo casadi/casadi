@@ -24,7 +24,7 @@ f.evaluate()
 disp(f.getOutput())
 
 res = f.getOutput()-DMatrix(cos(3))
-assert(res.isZero())
+assert(iszero(res))
 
 
 x = SX.sym('x',4);
@@ -157,3 +157,8 @@ MX(1)+DMatrix(1)
 
 MX.sym('x',5,5)*3
 MX.sym('x',5,5).*3
+
+a = SX.sym('a');
+b = substitute({sin(a), cos(a)}, {a},{a+3});
+b{1}
+b{2}

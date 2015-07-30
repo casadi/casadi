@@ -2682,7 +2682,8 @@ namespace casadi{
 #endif
 %define %SHOW(SYM) friendwrap_ ## SYM %enddef
 
-%define SPARSITY_INTERFACE_FRIENDS(DECL, M)
+%define SPARSITY_INTERFACE_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, M)
+#if WITH_MEMBER
  DECL M %SHOW(horzcat)(const std::vector< M > &v) {
   return horzcat(v);
  }
@@ -2793,17 +2794,19 @@ namespace casadi{
  DECL M %SHOW(repmat)(const M& A, const std::pair<int, int>& rc) {
  return repmat(A, rc.first, rc.second);
  }
+#endif
 %enddef
 
-%define SPARSITY_INTERFACE_ALL(DECL)
-SPARSITY_INTERFACE_FRIENDS(DECL, Sparsity)
-SPARSITY_INTERFACE_FRIENDS(DECL, MX)
-SPARSITY_INTERFACE_FRIENDS(DECL, Matrix<int>)
-SPARSITY_INTERFACE_FRIENDS(DECL, Matrix<double>)
-SPARSITY_INTERFACE_FRIENDS(DECL, Matrix<SXElement>)
+%define SPARSITY_INTERFACE_ALL(DECL, WITH_GLOBAL, WITH_MEMBER)
+SPARSITY_INTERFACE_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Sparsity)
+SPARSITY_INTERFACE_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, MX)
+SPARSITY_INTERFACE_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<int>)
+SPARSITY_INTERFACE_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<double>)
+SPARSITY_INTERFACE_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<SXElement>)
 %enddef
 
-%define GENERIC_MATRIX_FRIENDS(DECL, M)
+%define GENERIC_MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, M)
+#if WITH_MEMBER
 DECL M %SHOW(mpower)(const M& x, const M& n) {
   return mpower(x, n);
 }
@@ -2930,13 +2933,6 @@ DECL bool %SHOW(dependsOn)(const M& f, const M& arg) {
   return dependsOn(f, arg);     
 }
 
-DECL void %SHOW(substituteInPlace)(const std::vector< M >& v,
-                                      std::vector< M >& inout_vdef,
-                                      std::vector< M >& inout_ex,
-                                      bool reverse=false) {
-  return substituteInPlace(v, inout_vdef, inout_ex, reverse);
-}
-
 DECL M %SHOW(solve)(const M& A, const M& b) {
   return solve(A, b);
 }
@@ -2954,16 +2950,6 @@ DECL M %SHOW(pinv)(const M& A) {
 DECL M %SHOW(pinv)(const M& A, const std::string& lsolver,
                       const casadi::Dict& opts = casadi::Dict()) {
   return pinv(A, lsolver, opts);
-}
-
-DECL M %SHOW(substitute)(const M& ex, const M& v, const M& vdef) {
-  return substitute(ex, v, vdef);
-}
-
-DECL std::vector< M > %SHOW(substitute)(const std::vector< M >& ex,
-                                         const std::vector< M >& v,
-                                         const std::vector< M >& vdef) {
-  return substitute(ex, v, vdef);
 }
 
 DECL M %SHOW(jacobian)(const M &ex, const M &arg) {
@@ -2986,10 +2972,30 @@ DECL int %SHOW(countNodes)(const M& A) {
   return countNodes(A);
 }
 
-DECL std::string
-%SHOW(getOperatorRepresentation)(const M& xb,
-                                    const std::vector<std::string>& args) {
+DECL std::string %SHOW(getOperatorRepresentation)(const M& xb,
+                                                  const std::vector<std::string>& args) {
   return getOperatorRepresentation(xb, args);
+}
+
+
+#endif // WITH_MEMBER
+
+#if WITH_GLOBAL
+DECL M %SHOW(substitute)(const M& ex, const M& v, const M& vdef) {
+  return substitute(ex, v, vdef);
+}
+
+DECL std::vector< M > %SHOW(substitute)(const std::vector< M >& ex,
+                                         const std::vector< M >& v,
+                                         const std::vector< M >& vdef) {
+  return substitute(ex, v, vdef);
+}
+
+DECL void %SHOW(substituteInPlace)(const std::vector< M >& v,
+                                      std::vector< M >& inout_vdef,
+                                      std::vector< M >& inout_ex,
+                                      bool reverse=false) {
+  return substituteInPlace(v, inout_vdef, inout_ex, reverse);
 }
 
 DECL void %SHOW(extractShared)(const std::vector< M >& ex,
@@ -3001,17 +3007,18 @@ DECL void %SHOW(extractShared)(const std::vector< M >& ex,
   extractShared(ex, output_ex, output_v, output_vdef, v_prefix, v_suffix);
 }
 
-
+#endif // WITH_GLOBAL
 %enddef
 
-%define GENERIC_MATRIX_ALL(DECL)
-GENERIC_MATRIX_FRIENDS(DECL, MX)
-GENERIC_MATRIX_FRIENDS(DECL, Matrix<int>)
-GENERIC_MATRIX_FRIENDS(DECL, Matrix<double>)
-GENERIC_MATRIX_FRIENDS(DECL, Matrix<SXElement>)
+%define GENERIC_MATRIX_ALL(DECL, WITH_GLOBAL, WITH_MEMBER)
+GENERIC_MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, MX)
+GENERIC_MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<int>)
+GENERIC_MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<double>)
+GENERIC_MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<SXElement>)
 %enddef
 
-%define GENERIC_EXPRESSION_FRIENDS(DECL, M) 
+%define GENERIC_EXPRESSION_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, M) 
+#if WITH_MEMBER
 DECL M %HIDE(plus)(const M& x, const M& y) { return x+y; }
 DECL M %HIDE(minus)(const M& x, const M& y) { return x-y; }
 DECL M %HIDE(times)(const M& x, const M& y) { return x*y; }
@@ -3058,16 +3065,18 @@ DECL bool %SHOW(isEqual)(const M& x, const M& y, int depth=0) { return isEqual(x
 DECL bool %SHOW(iszero)(const M& x) { return iszero(x); }
 DECL M %HIDE(copysign)(const M& x, const M& y) { return copysign(x, y); }
 DECL M %HIDE(constpow)(const M& x, const M& y) { return constpow(x, y); }
+#endif // WITH_MEMBER
 %enddef
 
-%define GENERIC_EXPRESSION_ALL(DECL) 
-GENERIC_EXPRESSION_FRIENDS(DECL, MX)
-GENERIC_EXPRESSION_FRIENDS(DECL, Matrix<int>)
-GENERIC_EXPRESSION_FRIENDS(DECL, Matrix<double>)
-GENERIC_EXPRESSION_FRIENDS(DECL, Matrix<SXElement>)
+%define GENERIC_EXPRESSION_ALL(DECL, WITH_GLOBAL, WITH_MEMBER) 
+GENERIC_EXPRESSION_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, MX)
+GENERIC_EXPRESSION_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<int>)
+GENERIC_EXPRESSION_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<double>)
+GENERIC_EXPRESSION_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<SXElement>)
 %enddef
 
-%define MATRIX_FRIENDS(DECL, M)
+%define MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, M)
+#if WITH_MEMBER
 DECL M %SHOW(all)(const M& x) {
   return all(x);
 }
@@ -3133,19 +3142,19 @@ DECL M %SHOW(ramp)(const M& x) {
 }
 
 DECL M %SHOW(gauss_quadrature)(const M& f, const M& x,
-                                  const M& a, const M& b,
-                                  int order=5) {
+                               const M& a, const M& b,
+                               int order=5) {
   return gauss_quadrature(f, x, a, b, order);
 }
 
 DECL M %SHOW(gauss_quadrature)(const M& f, const M& x,
-                                  const M& a, const M& b,
-                                  int order, const M& w) {
+                               const M& a, const M& b,
+                               int order, const M& w) {
   return gauss_quadrature(f, x, a, b, order, w);
 }
 
 DECL M %SHOW(jacobianTimesVector)(const M& ex, const M& arg, const M& v,
-                                     bool transpose_jacobian=false) {
+                                  bool transpose_jacobian=false) {
   return jacobianTimesVector(ex, arg, v, transpose_jacobian);
 }
 
@@ -3158,7 +3167,7 @@ DECL M %SHOW(mtaylor)(const M& ex, const M& x, const M& a, int order=1) {
 }
 
 DECL M %SHOW(mtaylor)(const M& ex, const M& x, const M& a, int order,
-                         const std::vector<int>& order_contributions) {
+                      const std::vector<int>& order_contributions) {
   return mtaylor(ex, x, a, order, order_contributions);
 }
 
@@ -3175,18 +3184,32 @@ DECL M %SHOW(eig_symbolic)(const M& m) {
   return eig_symbolic(m);
 }
 
+#endif
 %enddef
 
-%define MATRIX_ALL(DECL)
-MATRIX_FRIENDS(DECL, Matrix<int>)
-MATRIX_FRIENDS(DECL, Matrix<double>)
-MATRIX_FRIENDS(DECL, Matrix<SXElement>)
+%define MATRIX_ALL(DECL, WITH_GLOBAL, WITH_MEMBER)
+MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<int>)
+MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<double>)
+MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<SXElement>)
 %enddef
 
-%define MX_FRIENDS(DECL, M)
-
+%define MX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, M)
+#if WITH_MEMBER
 DECL M %SHOW(find)(const M& x) {
   return find(x);
+}
+#endif // WITH_MEMBER
+
+#if WITH_GLOBAL
+DECL std::vector< M >
+%SHOW(matrix_expand)(const std::vector< M >& e,
+                     const std::vector< M > &boundary = std::vector< M >()) {
+  return matrix_expand(e, boundary);
+}
+
+DECL M %SHOW(matrix_expand)(const M& e,
+                            const std::vector< M > &boundary = std::vector< M >()) {
+  return matrix_expand(e, boundary);
 }
 
 DECL M %SHOW(graph_substitute)(const M& ex, const std::vector< M >& v,
@@ -3201,22 +3224,13 @@ DECL std::vector< M >
   return graph_substitute(ex, v, vdef);
 }
 
-DECL M %SHOW(matrix_expand)(const M& e,
-                            const std::vector< M > &boundary = std::vector< M >()) {
-  return matrix_expand(e, boundary);
-}
-
-DECL std::vector< M >
-%SHOW(matrix_expand)(const std::vector< M >& e,
-                     const std::vector< M > &boundary = std::vector< M >()) {
-  return matrix_expand(e, boundary);
-}
-
+#endif
 %enddef
 
-%define MX_ALL(DECL)
-MX_FRIENDS(DECL, MX)
+%define MX_ALL(DECL, WITH_GLOBAL, WITH_MEMBER)
+MX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, MX)
 %enddef
+
 
 // FIXME: Placing in printable_object.i does not work
 %template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;
@@ -3680,7 +3694,7 @@ def PyFunction(obj,inputs,outputs):
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/function/code_generator.hpp>
 
-%define RENAME_FRIENDS(M)
+%define RENAME_FUN(M)
 %apply M& OUTPUT { M& output_Q};
 %apply M& OUTPUT { M& output_R};
 %apply M& OUTPUT { M& output_weights};
@@ -3693,43 +3707,49 @@ def PyFunction(obj,inputs,outputs):
 %apply std::vector< M >& INOUT { std::vector< M >& inout_ex};
 %enddef
 
-RENAME_FRIENDS(casadi::Sparsity)
-RENAME_FRIENDS(casadi::MX)
-RENAME_FRIENDS(casadi::Matrix<int>)
-RENAME_FRIENDS(casadi::Matrix<double>)
-RENAME_FRIENDS(casadi::Matrix<casadi::SXElement>)
+RENAME_FUN(casadi::Sparsity)
+RENAME_FUN(casadi::MX)
+RENAME_FUN(casadi::Matrix<int>)
+RENAME_FUN(casadi::Matrix<double>)
+RENAME_FUN(casadi::Matrix<casadi::SXElement>)
 
 #ifdef SWIGMATLAB
-// Wrap as static member functions
+// Wrap (static) member functions
 %feature("nonstatic");
 namespace casadi {
   %extend SparsityInterfaceCommon {
-    SPARSITY_INTERFACE_ALL(static inline)
+    SPARSITY_INTERFACE_ALL(static inline, 0, 1)
   }
   %extend GenericExpressionCommon {
-    GENERIC_EXPRESSION_ALL(static inline)
+    GENERIC_EXPRESSION_ALL(static inline, 0, 1)
   }
   %extend GenericMatrixCommon {
-    GENERIC_MATRIX_ALL(static inline)
+    GENERIC_MATRIX_ALL(static inline, 0, 1)
   }
   %extend MatrixCommon {
-    MATRIX_ALL(static inline)
+    MATRIX_ALL(static inline, 0, 1)
   }
   %extend MX {
-    MX_ALL(static inline)
+    MX_ALL(static inline, 0, 1)
   }
 } // namespace casadi
 %feature("nonstatic", "");
+// Member functions already wrapped
+#define WITH_MEMBER 0
 #else // SWIGMATLAB
-// Wrap as stand-alone functions with casadi_ prefix or no prefix
+// Need to wrap member functions below
+#define WITH_MEMBER 1
+#endif // SWIGMATLAB
+
+// Wrap non-member functions, possibly with casadi_ prefix
 
 %inline {
   namespace casadi {
-    SPARSITY_INTERFACE_ALL(inline)
-    GENERIC_EXPRESSION_ALL(inline)
-    GENERIC_MATRIX_ALL(inline)
-    MATRIX_ALL(inline)
-    MX_ALL(inline)
+    SPARSITY_INTERFACE_ALL(inline, 1, WITH_MEMBER)
+    GENERIC_EXPRESSION_ALL(inline, 1, WITH_MEMBER)
+    GENERIC_MATRIX_ALL(inline, 1, WITH_MEMBER)
+    MATRIX_ALL(inline, 1, WITH_MEMBER)
+    MX_ALL(inline, 1, WITH_MEMBER)
   }
 }
 
@@ -3818,8 +3838,6 @@ namespace casadi {
 
 } // namespace casadi
 #endif // SWIGPYTHON
-
-#endif // SWIGMATLAB
 
 %feature("director") casadi::Callback2;
 %feature("director") casadi::DerivativeGenerator2;
