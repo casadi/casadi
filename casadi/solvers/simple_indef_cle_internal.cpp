@@ -87,7 +87,7 @@ namespace casadi {
     DMatrix e = DMatrix::eye(n_);
 
     MX A_total = -kron(As, e)-kron(e, As);
-    MX Pf = solve(A_total, vec(Vss), getOption("linear_solver"));
+    MX Pf = A_total.zz_solve(vec(Vss), getOption("linear_solver"));
 
     std::vector<MX> v_in;
     v_in.push_back(As);
