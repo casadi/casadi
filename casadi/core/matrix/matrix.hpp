@@ -759,6 +759,7 @@ namespace casadi {
       return ex.zz_jacobianTimesVector(arg, v, transpose_jacobian);
     }
 
+    ///@{
     /**
      * \brief univariate Taylor series expansion
      *
@@ -774,9 +775,13 @@ namespace casadi {
      * \verbatim >>   x \endverbatim
      */
     friend inline Matrix<DataType> taylor(const Matrix<DataType>& ex, const Matrix<DataType>& x,
-                                          const Matrix<DataType>& a=0, int order=1) {
+                                          const Matrix<DataType>& a, int order=1) {
       return ex.zz_taylor(x, a, order);
     }
+    friend inline Matrix<DataType> taylor(const Matrix<DataType>& ex, const Matrix<DataType>& x) {
+      return ex.zz_taylor(x, 0);
+    }
+    ///@}
 
     /**
      * \brief multivariate Taylor series expansion
