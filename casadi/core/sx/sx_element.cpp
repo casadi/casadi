@@ -156,7 +156,7 @@ namespace casadi {
     return UnarySX::create(OP_SIGN, *this);
   }
 
-  SXElement SXElement::__copysign__(const SXElement &y) const {
+  SXElement SXElement::zz_copysign(const SXElement &y) const {
     return BinarySX::create(OP_COPYSIGN, *this, y);
   }
 
@@ -381,8 +381,8 @@ namespace casadi {
   SX SXElement::constpow(const SX& n) const {
     return SX(*this).__constpow__(n);
   }
-  SX SXElement::__copysign__(const SX& n) const {
-    return SX(*this).__copysign__(n);
+  SX SXElement::zz_copysign(const SX& n) const {
+    return SX(*this).zz_copysign(n);
   }
 
   SX SXElement::zz_atan2(const SX& b) const {

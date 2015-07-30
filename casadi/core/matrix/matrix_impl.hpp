@@ -1200,7 +1200,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::__copysign__(const Matrix<DataType>& y) const {
+  Matrix<DataType> Matrix<DataType>::zz_copysign(const Matrix<DataType>& y) const {
     return binary(OP_COPYSIGN, *this, y);
   }
 

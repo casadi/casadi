@@ -746,7 +746,7 @@ namespace casadi {
     return (*this)->getUnary(OP_SIGN);
   }
 
-  MX MX::__copysign__(const MX& y) const {
+  MX MX::zz_copysign(const MX& y) const {
     return MX::binary(OP_COPYSIGN, *this, y);
   }
 

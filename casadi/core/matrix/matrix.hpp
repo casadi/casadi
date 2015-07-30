@@ -448,6 +448,7 @@ namespace casadi {
     Matrix<DataType> zz_mod(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_simplify() const;
     bool zz_isEqual(const Matrix<DataType> &ex2, int depth=0) const;
+    Matrix<DataType> zz_copysign(const Matrix<DataType>& y) const;
     ///@}
 
     ///@{
@@ -549,7 +550,6 @@ namespace casadi {
     /// \endcond
 #endif // SWIG
 
-    Matrix<DataType> __copysign__(const Matrix<DataType>& y) const;
     Matrix<DataType> printme(const Matrix<DataType>& y) const;
 
     /// Transpose the matrix

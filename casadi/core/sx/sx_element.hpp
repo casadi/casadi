@@ -226,7 +226,7 @@ namespace casadi {
     SXElement zz_log10() const;
     SXElement printme(const SXElement &y) const;
     SXElement zz_sign() const;
-    SXElement __copysign__(const SXElement &y) const;
+    SXElement zz_copysign(const SXElement &y) const;
     SXElement constpow(const SXElement& y) const;
     SXElement zz_not() const;
     SXElement zz_and(const SXElement& y) const;
@@ -236,7 +236,7 @@ namespace casadi {
     Matrix<SXElement> zz_min(const Matrix<SXElement>& b) const;
     Matrix<SXElement> zz_max(const Matrix<SXElement>& b) const;
     Matrix<SXElement> constpow(const Matrix<SXElement>& n) const;
-    Matrix<SXElement> __copysign__(const Matrix<SXElement>& n) const;
+    Matrix<SXElement> zz_copysign(const Matrix<SXElement>& n) const;
     Matrix<SXElement> zz_atan2(const Matrix<SXElement>& b) const;
     bool zz_isEqual(const SXElement& scalar, int depth=0) const;
     SXElement zz_simplify() const;
