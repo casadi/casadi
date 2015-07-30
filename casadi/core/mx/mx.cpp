@@ -631,7 +631,7 @@ namespace casadi {
     }
   }
 
-  MX MX::constpow(const MX& b) const {
+  MX MX::zz_constpow(const MX& b) const {
     return binary(OP_CONSTPOW, *this, b);
   }
 
@@ -809,10 +809,6 @@ namespace casadi {
 
   MX MX::zz_if_else_zero(const MX& y) const {
     return MX::binary(OP_IF_ELSE_ZERO, *this, y);
-  }
-
-  MX MX::__constpow__(const MX& b) const {
-    return (*this).constpow(b);
   }
 
   MX MX::zz_mrdivide(const MX& b) const {

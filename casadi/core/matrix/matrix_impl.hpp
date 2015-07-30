@@ -1085,7 +1085,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::__constpow__(const Matrix<DataType>& y) const {
+  Matrix<DataType> Matrix<DataType>::zz_constpow(const Matrix<DataType>& y) const {
     return binary(OP_CONSTPOW, *this, y);
   }
 

@@ -354,12 +354,9 @@ import_array();
 Type __rmldivide__(const Type& b) const{ return b.zz_mldivide(*$self);}
 Type __rmrdivide__(const Type& b) const{ return b.zz_mrdivide(*$self);}
 Type __rmpower__(const Type& b) const{ return b.zz_mpower(*$self);}
-Type __rconstpow__(const Type& b) const{ return b.__constpow__(*$self);}
 %enddef
 
 %define binopsFull(argtype,argCast,selfCast,returntype)
-returntype __constpow__ (argtype) const{ return selfCast(*$self).__constpow__(argCast(b));}
-returntype __rconstpow__(argtype) const{ return argCast(b).__constpow__(selfCast(*$self));}
 returntype __mldivide__ (argtype) const{ return mldivide(selfCast(*$self), argCast(b));}
 returntype __rmldivide__(argtype) const{ return mldivide(argCast(b), selfCast(*$self));}
 returntype __mrdivide__ (argtype) const{ return mrdivide(selfCast(*$self), argCast(b));}
@@ -2432,7 +2429,6 @@ except:
 
 // Workarounds, pending proper fix
 %rename(nonzero) __nonzero__;
-%rename(constpow) __constpow__;
 %rename(hash) __hash__;
 #endif // SWIGMATLAB
 
@@ -3102,6 +3098,7 @@ DECL M %PREFHIDE(simplify)(const M& x) { return simplify(x); }
 DECL bool %PREFHIDE(isEqual)(const M& x, const M& y, int depth=0) { return isEqual(x, y, depth); }
 DECL bool %PREFHIDE(iszero)(const M& x) { return iszero(x); }
 DECL M %PREFHIDE(copysign)(const M& x, const M& y) { return copysign(x, y); }
+DECL M %PREFHIDE(constpow)(const M& x, const M& y) { return constpow(x, y); }
 %enddef
 
 %define GENERIC_EXPRESSION_ALL(DECL) 
@@ -3743,18 +3740,7 @@ def PyFunction(obj,inputs,outputs):
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/function/code_generator.hpp>
 
-%typemap(in, noblock=1, fragment="casadi_all") const casadi::Dict& opts (casadi::Dict m) {
-  $1 = &m;
-  if (!casadi::to_ptr($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to " "Dict" ".");
- }
-%typemap(freearg, noblock=1) const casadi::GenericType::Dict & {}
-
-
-
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)
-inline MatType simplify(const MatType &x);
-inline bool isEqual(const MatType& x, const MatType& y, int depth=0);
-inline bool iszero(const MatType& x);
 GENERIC_MATRIX_FRIENDS(friend inline, MatType)
 %enddef
 
@@ -3882,6 +3868,10 @@ namespace casadi {
       def __rcopysign__(y, x): return casadi_copysign(x, y)
       def copysign(x, y): return casadi_copysign(x, y)
       def rcopysign(y, x): return casadi_copysign(x, y)
+      def __constpow__(x, y): return casadi_constpow(x, y)
+      def __rconstpow__(y, x): return casadi_constpow(x, y)
+      def constpow(x, y): return casadi_constpow(x, y)
+      def rconstpow(y, x): return casadi_constpow(x, y)
     %}
   }
 } // namespace casadi

@@ -378,8 +378,8 @@ namespace casadi {
   SX SXElement::zz_max(const SX& b) const {
     return fmax(SX(*this), b);
   }
-  SX SXElement::constpow(const SX& n) const {
-    return SX(*this).__constpow__(n);
+  SX SXElement::zz_constpow(const SX& n) const {
+    return SX(*this).zz_constpow(n);
   }
   SX SXElement::zz_copysign(const SX& n) const {
     return SX(*this).zz_copysign(n);
@@ -760,11 +760,7 @@ namespace casadi {
     }
   }
 
-  SXElement SXElement::__constpow__(const SXElement& n) const {
-    return BinarySX::create(OP_CONSTPOW, *this, n);
-  }
-
-  SXElement SXElement::constpow(const SXElement& n) const {
+  SXElement SXElement::zz_constpow(const SXElement& n) const {
     return BinarySX::create(OP_CONSTPOW, *this, n);
   }
 

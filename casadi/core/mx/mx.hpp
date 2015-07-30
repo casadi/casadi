@@ -412,6 +412,7 @@ namespace casadi {
     bool zz_isEqual(const MX& y, int depth) const;
     bool zz_isEqual(const MXNode* y, int depth) const;
     MX zz_copysign(const MX& y) const;
+    MX zz_constpow(const MX& y) const;
     ///@}
 
     ///@{
@@ -485,10 +486,8 @@ namespace casadi {
     MX zz_inner_prod(const MX& y) const;
     MX zz_outer_prod(const MX& y) const;
     MX zz_if_else_zero(const MX& y) const;
-    MX __constpow__(const MX& b) const;
     MX zz_mrdivide(const MX& b) const;
     MX zz_mldivide(const MX& b) const;
-    MX constpow(const MX& y) const;
     MX zz_erfinv() const;
     MX zz_not() const;
     MX zz_norm_2() const;

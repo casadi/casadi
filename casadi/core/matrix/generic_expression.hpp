@@ -280,6 +280,11 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
       return x.zz_copysign(n);
     }
 
+    /// Elementwise power with const power
+    friend inline ExType constpow(const ExType& x, const ExType& n) {
+      return x.zz_constpow(n);
+    }
+
     /// In-place addition
     inline ExType& operator+=(const ExType &y) { return self() = self().zz_plus(y); }
 

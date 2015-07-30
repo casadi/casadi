@@ -187,9 +187,8 @@ namespace casadi {
     SXElement zz_le(const SXElement& y) const;
     SXElement zz_eq(const SXElement& y) const;
     SXElement zz_ne(const SXElement& y) const;
-    SXElement __truediv__(const SXElement &y) const {return zz_rdivide(y);}
     SXElement zz_power(const SXElement& b) const;
-    SXElement __constpow__(const SXElement& b) const;
+    SXElement zz_constpow(const SXElement& b) const;
 
     SXElement __mrdivide__(const SXElement& b) const {  return *this / b;}
     SXElement zz_mpower(const SXElement& b) const {return pow(*this, b);}
@@ -227,7 +226,6 @@ namespace casadi {
     SXElement printme(const SXElement &y) const;
     SXElement zz_sign() const;
     SXElement zz_copysign(const SXElement &y) const;
-    SXElement constpow(const SXElement& y) const;
     SXElement zz_not() const;
     SXElement zz_and(const SXElement& y) const;
     SXElement zz_or(const SXElement& y) const;
@@ -235,7 +233,7 @@ namespace casadi {
 
     Matrix<SXElement> zz_min(const Matrix<SXElement>& b) const;
     Matrix<SXElement> zz_max(const Matrix<SXElement>& b) const;
-    Matrix<SXElement> constpow(const Matrix<SXElement>& n) const;
+    Matrix<SXElement> zz_constpow(const Matrix<SXElement>& n) const;
     Matrix<SXElement> zz_copysign(const Matrix<SXElement>& n) const;
     Matrix<SXElement> zz_atan2(const Matrix<SXElement>& b) const;
     bool zz_isEqual(const SXElement& scalar, int depth=0) const;
