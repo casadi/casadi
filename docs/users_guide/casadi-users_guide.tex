@@ -1547,22 +1547,22 @@ This will generate a \texttt{jmu}-file, which is essentially a zip file containi
   mfile = sfile.extract('modelDescription.xml','.')
 \end{verbatim}
 
-\section{The SymbolicOCP class} \label{sec:modelica_import}
-\emph{NOTE: The SymbolicOCP class is not yet stable and undergoing refactoring. Fore more information, see \htmladdnormallink{CasADi issue 1358}{https://github.com/casadi/casadi/issues/1358}.}
+\section{The DaeBuilder class} \label{sec:modelica_import}
+\emph{NOTE: The DaeBuilder class (previously called SymbolicOCP) is not yet stable and undergoing refactoring. Fore more information, see \htmladdnormallink{CasADi issue \#1358}{https://github.com/casadi/casadi/issues/1358}.}
 
-The symbolic optimal control problem representation (or just model description) contained in \texttt{modelDescription.xml} can be imported into \CasADi in the form of the SymbolicOCP class:
+The symbolic optimal control problem representation (or just model description) contained in \texttt{modelDescription.xml} can be imported into \CasADi in the form of the DaeBuilder class:
 \begin{verbatim}
-ocp = SymbolicOCP()
+ocp = DaeBuilder()
 \end{verbatim}
 
-The \texttt{SymbolicOCP} class contains symbolic representation of the optimal control problem designed to be general and allow manipulation. The basic usage of this class is to call the member function \texttt{parseFMI} with the XML file name:
+The \texttt{DaeBuilder} class contains symbolic representation of the optimal control problem designed to be general and allow manipulation. The basic usage of this class is to call the member function \texttt{parseFMI} with the XML file name:
 \begin{verbatim}
 ocp.parseFMI('modelDescription.xml')
 \end{verbatim}
 
-Symbolic expressions corresponding to the states, controls parameters etc. are directly accessible as member variables of the \texttt{SymbolicOCP} object. E.g. the free controls can be accessed as \verb|ocp.u|. Symbolic expressions for the OCP are either accessible in the same way (e.g. \verb|ocp.dae| will return the equations for the fully-implicit differential-algebraic equation formulation used by Modelica. Other equations are tied to a particular variable. E.g. the \emph{binding equations} corresponding to the set of \emph{independent parameters} can be retrieved as \verb|ocp.beq(ocp.pi)|.
+Symbolic expressions corresponding to the states, controls parameters etc. are directly accessible as member variables of the \texttt{DaeBuilder} object. E.g. the free controls can be accessed as \verb|ocp.u|. Symbolic expressions for the OCP are either accessible in the same way (e.g. \verb|ocp.dae| will return the equations for the fully-implicit differential-algebraic equation formulation used by Modelica. Other equations are tied to a particular variable. E.g. the \emph{binding equations} corresponding to the set of \emph{independent parameters} can be retrieved as \verb|ocp.beq(ocp.pi)|.
 
-Other useful commands available for an instance \texttt{ocp} of \texttt{SymbolicOCP} include:
+Other useful commands available for an instance \texttt{ocp} of \texttt{DaeBuilder} include:
 \begin{description}
 \item[print \texttt{ocp}] Print the optimal optimal control problem to screen
 \item[\texttt{ocp}.makeExplicit()] Reformulate the OCP in fully-explicit form
