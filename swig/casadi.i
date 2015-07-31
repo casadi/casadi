@@ -2682,8 +2682,17 @@ namespace casadi{
 #endif
 %define %SHOW(SYM) friendwrap_ ## SYM %enddef
 
-%define SPARSITY_INTERFACE_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, M)
-#if WITH_MEMBER
+// Flags to allow differentiating the wrapping by type
+#define IS_GLOBAL   0x1
+#define IS_MEMBER   0x10
+#define IS_SPARSITY 0x100
+#define IS_DMATRIX  0x1000
+#define IS_IMATRIX  0x10000
+#define IS_SX       0x100000
+#define IS_MX       0x1000000
+
+%define SPARSITY_INTERFACE_FUN(DECL, FLAG, M)
+#if FLAG & IS_MEMBER
  DECL M %SHOW(horzcat)(const std::vector< M > &v) {
   return horzcat(v);
  }
@@ -2797,16 +2806,16 @@ namespace casadi{
 #endif
 %enddef
 
-%define SPARSITY_INTERFACE_ALL(DECL, WITH_GLOBAL, WITH_MEMBER)
-SPARSITY_INTERFACE_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Sparsity)
-SPARSITY_INTERFACE_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, MX)
-SPARSITY_INTERFACE_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<int>)
-SPARSITY_INTERFACE_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<double>)
-SPARSITY_INTERFACE_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<SXElement>)
+%define SPARSITY_INTERFACE_ALL(DECL, FLAG)
+SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SPARSITY), Sparsity)
+SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_MX), MX)
+SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<int>)
+SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
+SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElement>)
 %enddef
 
-%define GENERIC_MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, M)
-#if WITH_MEMBER
+%define GENERIC_MATRIX_FUN(DECL, FLAG, M)
+#if FLAG & IS_MEMBER
 DECL M %SHOW(mpower)(const M& x, const M& n) {
   return mpower(x, n);
 }
@@ -2978,9 +2987,9 @@ DECL std::string %SHOW(getOperatorRepresentation)(const M& xb,
 }
 
 
-#endif // WITH_MEMBER
+#endif // FLAG & IS_MEMBER
 
-#if WITH_GLOBAL
+#if FLAG & IS_GLOBAL
 DECL M %SHOW(substitute)(const M& ex, const M& v, const M& vdef) {
   return substitute(ex, v, vdef);
 }
@@ -3007,18 +3016,18 @@ DECL void %SHOW(extractShared)(const std::vector< M >& ex,
   extractShared(ex, output_ex, output_v, output_vdef, v_prefix, v_suffix);
 }
 
-#endif // WITH_GLOBAL
+#endif // FLAG & IS_GLOBAL
 %enddef
 
-%define GENERIC_MATRIX_ALL(DECL, WITH_GLOBAL, WITH_MEMBER)
-GENERIC_MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, MX)
-GENERIC_MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<int>)
-GENERIC_MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<double>)
-GENERIC_MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<SXElement>)
+%define GENERIC_MATRIX_ALL(DECL, FLAG)
+GENERIC_MATRIX_FUN(DECL, (FLAG | IS_MX), MX)
+GENERIC_MATRIX_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<int>)
+GENERIC_MATRIX_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
+GENERIC_MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElement>)
 %enddef
 
-%define GENERIC_EXPRESSION_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, M) 
-#if WITH_MEMBER
+%define GENERIC_EXPRESSION_FUN(DECL, FLAG, M) 
+#if FLAG & IS_MEMBER
 DECL M %HIDE(plus)(const M& x, const M& y) { return x+y; }
 DECL M %HIDE(minus)(const M& x, const M& y) { return x-y; }
 DECL M %HIDE(times)(const M& x, const M& y) { return x*y; }
@@ -3065,18 +3074,18 @@ DECL bool %SHOW(isEqual)(const M& x, const M& y, int depth=0) { return isEqual(x
 DECL bool %SHOW(iszero)(const M& x) { return iszero(x); }
 DECL M %HIDE(copysign)(const M& x, const M& y) { return copysign(x, y); }
 DECL M %HIDE(constpow)(const M& x, const M& y) { return constpow(x, y); }
-#endif // WITH_MEMBER
+#endif // FLAG & IS_MEMBER
 %enddef
 
-%define GENERIC_EXPRESSION_ALL(DECL, WITH_GLOBAL, WITH_MEMBER) 
-GENERIC_EXPRESSION_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, MX)
-GENERIC_EXPRESSION_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<int>)
-GENERIC_EXPRESSION_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<double>)
-GENERIC_EXPRESSION_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<SXElement>)
+%define GENERIC_EXPRESSION_ALL(DECL, FLAG) 
+GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_MX), MX)
+GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<int>)
+GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
+GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_SX), Matrix<SXElement>)
 %enddef
 
-%define MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, M)
-#if WITH_MEMBER
+%define MATRIX_FUN(DECL, FLAG, M)
+#if FLAG & IS_MEMBER
 DECL M %SHOW(all)(const M& x) {
   return all(x);
 }
@@ -3187,20 +3196,20 @@ DECL M %SHOW(eig_symbolic)(const M& m) {
 #endif
 %enddef
 
-%define MATRIX_ALL(DECL, WITH_GLOBAL, WITH_MEMBER)
-MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<int>)
-MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<double>)
-MATRIX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, Matrix<SXElement>)
+%define MATRIX_ALL(DECL, FLAG)
+MATRIX_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<int>)
+MATRIX_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
+MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElement>)
 %enddef
 
-%define MX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, M)
-#if WITH_MEMBER
+%define MX_FUN(DECL, FLAG, M)
+#if FLAG & IS_MEMBER
 DECL M %SHOW(find)(const M& x) {
   return find(x);
 }
-#endif // WITH_MEMBER
+#endif // FLAG & IS_MEMBER
 
-#if WITH_GLOBAL
+#if FLAG & IS_GLOBAL
 DECL std::vector< M >
 %SHOW(matrix_expand)(const std::vector< M >& e,
                      const std::vector< M > &boundary = std::vector< M >()) {
@@ -3227,12 +3236,10 @@ DECL std::vector< M >
 #endif
 %enddef
 
-%define MX_ALL(DECL, WITH_GLOBAL, WITH_MEMBER)
-MX_FUN(DECL, WITH_GLOBAL, WITH_MEMBER, MX)
+%define MX_ALL(DECL, FLAG)
+MX_FUN(DECL, (FLAG | IS_MX), MX)
 %enddef
 
-
-// FIXME: Placing in printable_object.i does not work
 %template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;
 
 %include <casadi/core/matrix/matrix.hpp>
@@ -3718,38 +3725,38 @@ RENAME_FUN(casadi::Matrix<casadi::SXElement>)
 %feature("nonstatic");
 namespace casadi {
   %extend SparsityInterfaceCommon {
-    SPARSITY_INTERFACE_ALL(static inline, 0, 1)
+    SPARSITY_INTERFACE_ALL(static inline, IS_MEMBER)
   }
   %extend GenericExpressionCommon {
-    GENERIC_EXPRESSION_ALL(static inline, 0, 1)
+    GENERIC_EXPRESSION_ALL(static inline, IS_MEMBER)
   }
   %extend GenericMatrixCommon {
-    GENERIC_MATRIX_ALL(static inline, 0, 1)
+    GENERIC_MATRIX_ALL(static inline, IS_MEMBER)
   }
   %extend MatrixCommon {
-    MATRIX_ALL(static inline, 0, 1)
+    MATRIX_ALL(static inline, IS_MEMBER)
   }
   %extend MX {
-    MX_ALL(static inline, 0, 1)
+    MX_ALL(static inline, IS_MEMBER)
   }
 } // namespace casadi
 %feature("nonstatic", "");
 // Member functions already wrapped
-#define WITH_MEMBER 0
+#define FLAG IS_GLOBAL
 #else // SWIGMATLAB
 // Need to wrap member functions below
-#define WITH_MEMBER 1
+#define FLAG (IS_GLOBAL | IS_MEMBER)
 #endif // SWIGMATLAB
 
 // Wrap non-member functions, possibly with casadi_ prefix
 
 %inline {
   namespace casadi {
-    SPARSITY_INTERFACE_ALL(inline, 1, WITH_MEMBER)
-    GENERIC_EXPRESSION_ALL(inline, 1, WITH_MEMBER)
-    GENERIC_MATRIX_ALL(inline, 1, WITH_MEMBER)
-    MATRIX_ALL(inline, 1, WITH_MEMBER)
-    MX_ALL(inline, 1, WITH_MEMBER)
+    SPARSITY_INTERFACE_ALL(inline, FLAG)
+    GENERIC_EXPRESSION_ALL(inline, FLAG)
+    GENERIC_MATRIX_ALL(inline, FLAG)
+    MATRIX_ALL(inline, FLAG)
+    MX_ALL(inline, FLAG)
   }
 }
 
