@@ -1265,98 +1265,123 @@ The integrators interfaced with \CasADi assumes a DAE residual function of semi-
 
 For solvers of \emph{ordinary} differential equations, the second equation and the algebraic variables $z$ must be absent.
 
-%% \newcommand{\backward}[1]{#1^*}
-%% \begin{equation}
-%%   \begin{array}{l}
-%%     f:
-%%     \mathbb{R}^{n_x} \times \mathbb{R}^{n_u}
-%%     \times \mathbb{R}^{n_r} \times \mathbb{R}^{n_v}
-%%     \rightarrow
-%%     \mathbb{R}^{n_x} \times \mathbb{R}^{n_q}
-%%     \times \mathbb{R}^{n_r} \times \mathbb{R}^{n_p}, \\
-%%     \quad (x_0, u, r_1, v) \mapsto (x_1, q_1, r_0, p_0) \\
-%%     \noalign{\smallskip}
-%%     \left\{
-%%     \begin{array}{rcl}
-%%      \dot{x}(t) &=& \phi(x(t),z(t),u), \\
-%%               0 &=& \theta(x(t),z(t),u), \\
-%%      \dot{q}(t) &=& \psi(x(t),z(t),u), \\
-%%     -\dot{r}(t) &=& \backward{\phi}(x(t),z(t),u,r(t),s(t),v), \\
-%%               0 &=& \backward{\theta}(x(t),z(t),u,r(t),s(t),v), \\
-%%     -\dot{p}(t) &=& \backward{\psi}(x(t),z(t),u,r(t),s(t),v),
-%%     \end{array}
-%%     \right.
-%%      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~t \in [0,1], \\
-%%      \noalign{\smallskip}
-%%      x(0) = x_0, \quad r(1) = r_1, \quad q(0) = 0, \quad p(1) = 0, \\
-%%      \noalign{\smallskip}
-%%      x_1 = x(1), \quad q_1 = q(1), \quad r_0 = r(0), \quad p_0 = p(0),
-%%   \end{array}
-%% \end{equation}
-
 DAEs of form can be formed using the \verb|daeIn| and \verb|daeOut| helper functions:
 
-\begin{pytex}
-x = SX.sym("x")
-z = SX.sym("z")
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+x = SX.sym('x')
+z = SX.sym('z')
 f = -z*x
-g = z*z-2
-dae = SXFunction('dae',daeIn(x=x,z=z),daeOut(ode=f,alg=g))
+g = z**2-2
+dae = SXFunction('dae',\
+  daeIn(x=x,z=z),\
+  daeOut(ode=f,alg=g))
 print dae
-\end{pytex}
-
-%This particular problem is actually troublesome. During integration, the rootfinding problem $C(z) = 0$ will be solved, and the initial guess is $z=0$. Since $\frac{dC}{dz}(z=0)=0$, the rootfinding will fail. You cannot force a different initial guess directly, but you can transform the $z$ variable:
-%$z \rightarrow z + 1$ -- $C=z^2+2z-1$, which will work fine.
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+x = SX.sym('x');
+z = SX.sym('z');
+f = -z*x;
+g = z^2-2;
+dae = SXFunction('dae',...
+  daeIn('x',x,'z',z),...
+  daeOut('ode',f,'alg',g));
+disp(dae)
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+x = SX.sym('x')
+z = SX.sym('z')
+f = -z*x
+g = z**2-2
+dae = SXFunction('dae',\
+  daeIn(x=x,z=z),\
+  daeOut(ode=f,alg=g))
+print dae
+\end{pytexoutput}
 
 An integrator in \CasADi is a function that take the state at the initial time, a set of parameters, the state vector at the initial time and a guess for the algebraic variables (only for DAEs) and returns the state vector and algebraic variables at the final time.
-\begin{verbatim}
-integrator = Integrator("solver_name",dae)
-\end{verbatim}
 
-The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be set with the option:
-\begin{verbatim}
- integrator.setOption("tf",integration_end_time)
-\end{verbatim}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+integrator = \
+  Integrator(display_name,\
+    plugin_name,dae,options)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+integrator = ...
+  Integrator(display_name,...
+    plugin_name,dae,options);
+\end{lstlisting}
+\end{minipage}
+
+The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be changed from its default [0, 1] by setting the options "t0" and "tf".
 
 \section{Sundials integrators}
-The Sundials suite contains the two popular integrators CVodes and IDAS for ODEs and DAEs respectively. These two integrators supports forward and adjoint sensitivities and when used via \CasADi's Sundials interface, \CasADi will automatically formulate the Jacobian information, which is needed by the backward differentiation formula (BDF) that CVodes and IDAS use. Also automatically formulated will be the forward and adjoint sensitivity equations. This means that the only information that the user needs to provide is the DAE residual function:
-\begin{verbatim}
- integrator = Integrator("cvodes",dae)  # For ODEs
- integrator = Integrator("idas",dae)    # For DAEs
-\end{verbatim}
-for CVodes and IDAS respectively.
+The freely available \htmladdnormallink{SUNDIALS suite}{https://computation.llnl.gov/casc/sundials/description/description.html} (distributed along with \CasADi) contains the two popular integrators CVodes and IDAS for ODEs and DAEs respectively. These integrators have support for forward and adjoint sensitivity analysis and when used via \CasADi's Sundials interface, \CasADi will automatically formulate the Jacobian information, which is needed by the backward differentiation formula (BDF) that CVodes and IDAS use. Also automatically formulated will be the forward and adjoint sensitivity equations. This means that the only information that the user needs to provide is the DAE residual function:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+integrator = \
+  Integrator('my_idas','idas',dae)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+integrator = ...
+  Integrator('my_idas','idas',dae);
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+integrator = \
+  Integrator('my_idas','idas',dae)
+\end{pytexoutput}
+
+And equivivalently for CVodes (the "cvodes" integrator plugin in \CasADi).
 
 For a list of options for the integrators, as well as the input and output schemes of this \emph{function}, check the documentation directly from Python:
-\begin{verbatim}
-print Integrator.doc("cvodes")
-\end{verbatim}
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+print Integrator.doc('cvodes')
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+disp(Integrator.doc('cvodes'))
+\end{lstlisting}
+\end{minipage}
+
 or by consulting the online C++ API docs on the website.
 
 \section{Sensitivity analysis}
-From evaluation point of view, an integrator behaves just like the \texttt{SXFunction} introduced in the previous session. You set inputs, forward/adjoint seeds, evaluate and obtain the outputs and forward/adjoint sensitivities.
+From evaluation point of view, an integrator behaves just like the \texttt{SXFunction} introduced in the previous session. Use the member functions of in the Function class to generate new function objects corresponding to directional derivatives (forward or reverse mode) or complete Jacobians. Then evaluate these function objects numerically to obtain sensitivity information. The documented example "sensitivity\_analysis" (available in \CasADi's example collection for Python, MATLAB and C++) demonstrate how \CasADi can be used to calculate first and second order derivative information (forward-over-forward, forward-over-adjoint, adjoint-over-adjoint) for a simple DAE.
 
 \section{The \texttt{Simulator} class}
 As already mentioned, integrators in \CasADi are functions that calculates the state at the final time. Often, however, a user is interested in obtaining the solution at multiple time points. This can often be done more efficiently than by repeatedly calling \texttt{integrator.evaluate()}. The easiest way to use this functionality is to use the \texttt{Simulator} class.
 
 A \texttt{Simulator} can be created using the syntax:
-\begin{verbatim}
-  # Import numpy
-  import numpy as NP
 
+\begin{lstlisting}[language=Python]
   # Allocate an integrator instance
   integrator = ...
-  integrator.setOption("...",...)
 
   # Choose a time grid
-  tgrid = NP.linspace(0,end_time,num_time_steps)
+  tgrid = [0, 10, 20, 30, 40]
 
   # Create a simulator
-  simulator = Simulator(integrator, time_grid)
-\end{verbatim}
+  simulator = Simulator('my_simulator',integrator, time_grid)
+\end{lstlisting}
 
-A \texttt{Simulator} can be used just like an integrator, and its input scheme is the same. Its output is now matrix valued, with the the columns corresponding to different time points. The class can also be used to evaluate a particular function of the state at a set of time points. See the API documentation for more information.
+and equivalently in MATLAB and C++.
 
-\chapter{Nonlinear Programming} \label{ch:nlp}
+A \texttt{Simulator} can be used just like an integrator, and its input scheme is the same. Its output is now matrix valued, with the the columns corresponding to different time points. The class can also be used to evaluate a particular function of the state at a set of time points. See the API documentation and the documented examples for more information.
+
+\chapter{Nonlinear programming} \label{ch:nlp}
 The NLP solvers contained in or interfaced with \CasADi solves parametric NLPs of the following form:
 \begin{equation}
 \begin{array}{cc}
