@@ -597,6 +597,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1,9,str(Solver))
       
+  @memory_heavy()
   def testIPOPTnorm(self):
     self.message("IPOPT min ||x||^2_2")
     def norm_2(mx):

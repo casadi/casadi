@@ -264,6 +264,7 @@ class QpSolverTests(casadiTestCase):
 
       self.checkarray(solver.getOutput("lam_a"),DMatrix([0,0,0]),str(qpsolver),digits=max(1,4-less_digits))
 
+  @memory_heavy()
   def test_general_convex_sparse(self):
     self.message("Convex sparse QP with solvers: " + str([qpsolver for qpsolver,options,aux_options in qpsolvers]))
     H = c.diag([2,1,0.2,0.7,1.3])
@@ -588,7 +589,8 @@ class QpSolverTests(casadiTestCase):
       self.checkarray(solver.getOutput("lam_a"),DMatrix([3.4]),str(qpsolver),digits=max(1,5-less_digits))
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],-5.1,max(1,5-less_digits),str(qpsolver))
-      
+  
+  @memory_heavy()
   def test_badscaling(self):
     #return
     self.message("Badly scaled problem")

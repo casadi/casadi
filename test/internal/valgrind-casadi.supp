@@ -367,3 +367,18 @@
   fun:_IO_file_sync@@GLIBC_2.2.5
   fun:fflush
 }
+
+{
+more stuff
+Memcheck:Param
+write(buf)
+fun:__write_nocancel
+fun:_IO_file_write@@GLIBC_2.2.5
+fun:new_do_write
+fun:_IO_do_write@@GLIBC_2.2.5
+fun:_IO_new_file_xsputn
+fun:_IO_file_xsputn@@GLIBC_2.2.5
+fun:vfprintf
+fun:printf
+obj:*libworhp*
+}
