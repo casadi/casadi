@@ -1304,41 +1304,20 @@ print dae
 
 An integrator in \CasADi is a function that take the state at the initial time, a set of parameters, the state vector at the initial time and a guess for the algebraic variables (only for DAEs) and returns the state vector and algebraic variables at the final time.
 
-\begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-integrator = \
-  Integrator(display_name,\
-    plugin_name,dae,options)
+integrator = Integrator(display_name,plugin_name,dae,options)
 \end{lstlisting}
-\end{minipage}
-\begin{minipage}[t]{0.5\textwidth}
-\begin{lstlisting}[language=Matlab]
-integrator = ...
-  Integrator(display_name,...
-    plugin_name,dae,options);
-\end{lstlisting}
-\end{minipage}
 
 The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be changed from its default [0, 1] by setting the options "t0" and "tf".
 
 \section{Sundials integrators}
 The freely available \htmladdnormallink{SUNDIALS suite}{https://computation.llnl.gov/casc/sundials/description/description.html} (distributed along with \CasADi) contains the two popular integrators CVodes and IDAS for ODEs and DAEs respectively. These integrators have support for forward and adjoint sensitivity analysis and when used via \CasADi's Sundials interface, \CasADi will automatically formulate the Jacobian information, which is needed by the backward differentiation formula (BDF) that CVodes and IDAS use. Also automatically formulated will be the forward and adjoint sensitivity equations. This means that the only information that the user needs to provide is the DAE residual function:
 
-\begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-integrator = \
-  Integrator('my_idas','idas',dae)
+integrator = Integrator('my_idas','idas',dae)
 \end{lstlisting}
-\end{minipage}
-\begin{minipage}[t]{0.5\textwidth}
-\begin{lstlisting}[language=Matlab]
-integrator = ...
-  Integrator('my_idas','idas',dae);
-\end{lstlisting}
-\end{minipage}
 \begin{pytexoutput}
-integrator = \
-  Integrator('my_idas','idas',dae)
+integrator = Integrator('my_idas','idas',dae)
 \end{pytexoutput}
 
 And equivivalently for CVodes (the "cvodes" integrator plugin in \CasADi).
@@ -1404,9 +1383,9 @@ g_{\min} \le g(x,p) \le g_{\max}
 \end{equation}
 
 With a function \texttt{nlp}, which given $x$ and $p$, gives $f$ and $g$, an NLP solver instance can be allocated by:
-\begin{verbatim}
- nlp_solver = NlpSolver("solver_name",nlp)
-\end{verbatim}
+\begin{lstlisting}[language=Python]
+nlp_solver = NlpSolver(display_name,plugin_name,nlp,options)
+\end{lstlisting}
 
 The interface will then automatically generate the information that it might need to solve the NLP, which may be solver and option dependent. Typically an NLP solver will need a function that gives the Jacobian of the constraint function and a Hessian of the Lagrangian function ($L(x,\lambda) = f(x) + \lambda^{\text{T}} \, g(x))$ with respect to $x$. The interface will generate this kind of information automatically and provide to the solver.
 
