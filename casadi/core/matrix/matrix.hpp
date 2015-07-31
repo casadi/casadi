@@ -184,8 +184,6 @@ namespace casadi {
     /// Expose iterators
     typedef typename std::vector<DataType>::iterator iterator;
     typedef typename std::vector<DataType>::const_iterator const_iterator;
-    typedef typename std::vector<DataType>::reverse_iterator reverse_iterator;
-    typedef typename std::vector<DataType>::const_reverse_iterator const_reverse_iterator;
 
     /// References
     typedef DataType& reference;
@@ -194,12 +192,8 @@ namespace casadi {
     /// Get iterators to beginning and end
     iterator begin() { return data().begin();}
     const_iterator begin() const { return data().begin();}
-    reverse_iterator rbegin() { return data().rbegin();}
-    const_reverse_iterator rbegin() const { return data().rbegin();}
     iterator end() { return data().end();}
     const_iterator end() const { return data().end();}
-    reverse_iterator rend() { return data().rend();}
-    const_reverse_iterator rend() const { return data().rend();}
 
     /// Get references to beginning and end
     reference front() { return data().front();}
