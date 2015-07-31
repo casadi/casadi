@@ -785,7 +785,7 @@ namespace casadi {
       return ex.zz_taylor(x, a, order);
     }
     friend inline Matrix<DataType> taylor(const Matrix<DataType>& ex, const Matrix<DataType>& x) {
-      return ex.zz_taylor(x, 0, 0);
+      return ex.zz_taylor(x, 0, 1);
     }
     ///@}
 
