@@ -1778,6 +1778,15 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         }
       }
 
+      // Boolean scalar
+      {
+        bool tmp;
+        if (to_val(p, &tmp)) {
+          if (m) **m=tmp;
+          return true;
+        }
+      }
+
 #ifdef SWIGPYTHON
       // Object has __DMatrix__ method
       if (PyObject_HasAttrString(p,"__DMatrix__")) {
