@@ -486,8 +486,9 @@ class Matrixtests(casadiTestCase):
         self.checkarray(c>A,m([[1,1],[1,1]]),"<")
         self.checkarray(c<A,m([[0,0],[0,0]]),">")
         self.checkarray(c<=A,m([[0,0],[0,0]]),">=")
-        self.checkarray(c==A,m([[0,0],[0,0]]),"==")
-        self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
+        if args.known_bugs or not isinstance(c,matrix):
+	  self.checkarray(c==A,m([[0,0],[0,0]]),"==")
+          self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
         
       for c in [5,5.0,DMatrix([5]),IMatrix([5]),matrix(5)]:
         self.checkarray(A<=c,m([[1,1],[1,1]]),"<=")
@@ -501,23 +502,26 @@ class Matrixtests(casadiTestCase):
         self.checkarray(c>A,m([[0,1],[1,1]]),"<")
         self.checkarray(c<A,m([[0,0],[0,0]]),">")
         self.checkarray(c<=A,m([[1,0],[0,0]]),">=")
-        self.checkarray(c==A,m([[1,0],[0,0]]),"==")
-        self.checkarray(c!=A,m([[0,1],[1,1]]),"!=")
+        if args.known_bugs or not isinstance(c,matrix):
+          self.checkarray(c==A,m([[1,0],[0,0]]),"==")
+          self.checkarray(c!=A,m([[0,1],[1,1]]),"!=")
         
       for c in [4,4.0,DMatrix([4]),IMatrix([4]),matrix(4)]:
         self.checkarray(A<=c,m([[0,1],[1,1]]),"<=")
         self.checkarray(A<c,m([[0,0],[1,1]]),"<")
         self.checkarray(A>c,m([[1,0],[0,0]]),">")
         self.checkarray(A>=c,m([[1,1],[0,0]]),">=")
-        self.checkarray(A==c,m([[0,1],[0,0]]),"==")
-        self.checkarray(A!=c,m([[1,0],[1,1]]),"!=")
+        if args.known_bugs or not isinstance(c,matrix):
+          self.checkarray(A==c,m([[0,1],[0,0]]),"==")
+          self.checkarray(A!=c,m([[1,0],[1,1]]),"!=")
 
         self.checkarray(c>=A,m([[0,1],[1,1]]),"<=")
         self.checkarray(c>A,m([[0,0],[1,1]]),"<")
         self.checkarray(c<A,m([[1,0],[0,0]]),">")
         self.checkarray(c<=A,m([[1,1],[0,0]]),">=")
-        self.checkarray(c==A,m([[0,1],[0,0]]),"==")
-        self.checkarray(c!=A,m([[1,0],[1,1]]),"!=")
+        if args.known_bugs or not isinstance(c,matrix):
+          self.checkarray(c==A,m([[0,1],[0,0]]),"==")
+          self.checkarray(c!=A,m([[1,0],[1,1]]),"!=")
         
       for c in [1,1.0,DMatrix([1]),IMatrix([1]),matrix(1)]:
         self.checkarray(A<=c,m([[0,0],[0,1]]),"<=")
@@ -531,8 +535,9 @@ class Matrixtests(casadiTestCase):
         self.checkarray(c>A,m([[0,0],[0,0]]),"<")
         self.checkarray(c<A,m([[1,1],[1,0]]),">")
         self.checkarray(c<=A,m([[1,1],[1,1]]),">=")
-        self.checkarray(c==A,m([[0,0],[0,1]]),"==")
-        self.checkarray(c!=A,m([[1,1],[1,0]]),"!=")
+        if args.known_bugs or not isinstance(c,matrix):
+          self.checkarray(c==A,m([[0,0],[0,1]]),"==")
+          self.checkarray(c!=A,m([[1,1],[1,0]]),"!=")
         
       for c in [0,DMatrix([0]),IMatrix([0]),matrix(0)]:
         self.checkarray(A<=c,m([[0,0],[0,0]]),"<=")
@@ -546,8 +551,9 @@ class Matrixtests(casadiTestCase):
         self.checkarray(c>A,m([[0,0],[0,0]]),"<")
         self.checkarray(c<A,m([[1,1],[1,1]]),">")
         self.checkarray(c<=A,m([[1,1],[1,1]]),">=")
-        self.checkarray(c==A,m([[0,0],[0,0]]),"==")
-        self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
+        if args.known_bugs or not isinstance(c,matrix):
+          self.checkarray(c==A,m([[0,0],[0,0]]),"==")
+          self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
 
   def test_all_any(self):
     for m in [DMatrix,IMatrix]:
