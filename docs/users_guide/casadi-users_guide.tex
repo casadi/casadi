@@ -969,119 +969,201 @@ print jacobian(mul(A,x),x)
 \section{\texttt{Function} and derived classes} \label{sec:function}
 \CasADi allows the user to create function objects, in C++ terminology often referred to as \emph{functors}, that all derive the \texttt{Function} base class. This includes functions that are defined by a symbolic expression, ODE/DAE integrators, QP solvers, NLP solvers etc.
 
-The basic usage skeleton of all these function objects are\footnote{In C++, \texttt{getOutput} is return-by-reference}:
-\begin{verbatim}
-f = ClassName(arguments)                 # Call the constructor
-f.setOption("option_name",option_value)  # Set options
-f.init()                                 # Initialize the function
-f.setInput(value,input_index)            # Pass inputs
-f.evaluate()                             # Evaluate numerically
-... = f.getOutput(output_index)          # Get outputs
-\end{verbatim}
+Function objects are created with the syntax:
+\begin{lstlisting}[language=Python]
+f = ClassName(name, arguments, ..., [options])
+\end{lstlisting}
 
-Note that all functions are multiple (sparse, matrix-valued) input, multiple (sparse, matrix-valued) output.
+The name is mainly a display name that will show up in e.g. error messages or as comments in generated C code. This is followed by a set of arguments, which is class dependent. Finally, the user can pass an options structure for customizing the behavior of the class. The options structure is a dictionary type in Python, a struct in MATLAB or \CasADi's \texttt{Dict} type in C++.
 
-One important member of the \texttt{Function} derived classes is \texttt{SXFunction}, which is constructed with the syntax \texttt{SXFunction}(\emph{list of inputs},\emph{list of outputs}):
-\begin{pytex}
-x = SX.sym("x",2,2)
-y = SX.sym("y")
-f = SXFunction("f",[x,y],[x,sin(y)*x])
-\end{pytex}
+One important member of the \texttt{Function} derived classes is \texttt{SXFunction}, which is constructed by passing a list of input expressions and a list of output expressions:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+x = SX.sym('x',2,2)
+y = SX.sym('y')
+f = SXFunction('f',[x,y],\
+               [x,sin(y)*x])
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+x = SX.sym('x',2,2);
+y = SX.sym('y');
+f = SXFunction('f',{x,y},...
+               {x,sin(y)*x});
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+x = SX.sym('x',2,2)
+y = SX.sym('y')
+f = SXFunction('f',[x,y],\
+               [x,sin(y)*x])
+\end{pytexoutput}
+
 which defines a function $f : \mathbb{R}^{2 \times 2} \times \mathbb{R}, \quad (x,y) \mapsto (x,\sin(y) x)$.
+Note that all function objects in \CasADi, including the above, are multiple matrix-valued input, multiple, matrix-valued output.
 
 \texttt{MXFunction} works the same way, but for the \texttt{MX} expression graphs:
-\begin{pytex}
-x = MX.sym("x",2,2)
-y = MX.sym("y")
-f = MXFunction("f",[x,y],[x,sin(y)*x])
-\end{pytex}
 
-%% We can get a list of other supported function objects deriving from \texttt{Function}:
-%% \begin{pytex}
-%% import casadi
-%% import casadi.tools
-%% casadi.tools.print_subclasses(casadi.Function)
-%% \end{pytex}
-
-
-%% There is no mechanism to distinguish the nature of \texttt{Function} functions. For example, any \texttt{Function} with \texttt{DAE\_NUM\_IN} inputs and \texttt{DAE\_NUM\_OUT} outputs can be considered to represent a dae function. The \CasADi used to generate this documentation has:
-%% \begin{pytexoutput}
-%% print "DAE_NUM_IN = ", DAE_NUM_IN
-%% print "DAE_NUM_OUT = ", DAE_NUM_OUT
-%% \end{pytexoutput}
-%% There are a couple of global constants starting with \texttt{DAE\_} that together constitute the \emph{input/output scheme} of a dae. You can look these up in the API documentation or the python docstrings. You should use these constants and not replace them by the numerical values they happen to have in your version of \CasADi, as they might change in the future.\\
-
-%% For example, here is an excerpt from the documentation for the constructor of a \texttt{CVodesIntegrator}:
-%% \begin{pytexoutput}
-%% docs = CVodesIntegrator.__init__.__doc__.split("\n")
-%% start = docs.index(filter(lambda x: "DAEOutput" in x,docs)[0])
-%% print "\n".join(docs[start:start+4+2*DAE_NUM_OUT])
-%% \end{pytexoutput}
-
-%% Helper functions are available to construct lists of objects that adhere to a particular scheme. For example, to create a list of a \texttt{DAEOutput} scheme, you use \texttt{daeOut}:
-
-%% \begin{pytex}
-%% print daeOut()
-%% print daeOut(ode=SX.sym("function"))
-%% print daeOut(alg=SX.sym("fz"),ode=SX.sym("function"))
-%% \end{pytex}
-
-%% Consult the python docstrings for more information of how to use these helper functions:
-%% \begin{pytexoutput}
-%% print daeOut.__doc__
-%% \end{pytexoutput}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+x = MX.sym('x',2,2)
+y = MX.sym('y')
+f = MXFunction('f',[x,y],\
+               [x,sin(y)*x])
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+x = MX.sym('x',2,2);
+y = MX.sym('y');
+f = MXFunction('f',{x,y},...
+               {x,sin(y)*x});
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+x = MX.sym('x',2,2)
+y = MX.sym('y')
+f = MXFunction('f',[x,y],\
+               [x,sin(y)*x])
+\end{pytexoutput}
 
 All derived classes of \texttt{Function} come with a range of options that can be set. The API documentation shows the list of available options for each class, along with their default values and descriptions.
 
-%% For example, here is an excerpt from the documentation for \texttt{IpoptSolver}:
-%% \begin{pytexoutput}
-%% docs = IpoptSolver.__doc__.split("\n")
-%% start = docs.index(filter(lambda x: "List of available monitors" in x,docs)[0])
-%% print "\n".join(docs[start:start+15])
-%% print "..."
-%% \end{pytexoutput}
-
-%% Two options commonly used during debugging, are "verbose" (a boolean) and "monitor". The latter allows to specify a list of keywords that each trigger some numerical output to be dumped to the screen when the function is evaluated. E.g. to monitor the objective and constraint function values during NLP solution, set:
-%% \begin{verbatim}
-%% solver.setOption("monitor",["eval_f","eval_g"])
-%% \end{verbatim}
-
 \section{Input-output schemes for function objects}
 Most \texttt{Function}-derived classes have a particular input/output signature with them and/or take as arguments in the constructor other function objects (callback functions) with a particular input/output signature. For example, as we shall see in Chapter~\ref{ch:nlp}, a \emph{nonlinear program} (NLP) is defined by two inputs (the decision variable and a set of parameters) and two outputs (the objective and constraint functions). To make it easier to remember the number and order of the input/output arguments, \CasADi provides helper functions of the form:
-\begin{pytex}
-x = SX.sym("x")
-p = SX.sym("p")
-f = x*x
-g = log(x)-p
-nlp = SXFunction("nlp",nlpIn(x=x,p=p),nlpOut(f=f,g=g))
-\end{pytex}
 
-The last line is essentially equivalent to \verb|nlp = SXFunction([x,p],[f,g])|, but is preferred for a number of reasons:
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+x = SX.sym('x')
+p = SX.sym('p')
+f = x**2
+g = log(x)-p
+nlp = SXFunction('nlp',\
+        nlpIn(x=x,p=p),\
+        nlpOut(f=f,g=g))
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+x = SX.sym('x');
+p = SX.sym('p');
+f = x^2;
+g = log(x)-p;
+nlp = SXFunction('nlp',...
+        nlpIn('x',x,'p',p),...
+        nlpOut('f',f,'g',g));
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+x = SX.sym('x')
+p = SX.sym('p')
+f = x**2
+g = log(x)-p
+nlp = SXFunction('nlp',\
+        nlpIn(x=x,p=p),\
+        nlpOut(f=f,g=g))
+\end{pytexoutput}
+
+The last line is essentially equivalent to \lstinline[language=Python]{SXFunction('nlp',[x,p],[f,g])}, but is preferred for a number of reasons:
 \begin{itemize}
 \item No need to remember the number or order of arguments
 \item Inputs or outputs that are absent can be left unset
-\item The helper functions provide meta-information that allows inputs to be referred to by their names instead of their index. E.g. \verb|nlp.jacobian("x","g")| instead of \verb|nlp.jacobian(0,1)|.
+\item The helper functions provide meta-information that allows inputs to be referred to by their names instead of their index. E.g. \verb|nlp.jacobian('x','g')| instead of \verb|nlp.jacobian(0,1)|.
 \end{itemize}
 
 \section{Calling function objects}
-\texttt{MX} expressions may contain calls to \texttt{Function}-derived functions. To embed a call to function (e.g. \texttt{SXFunction} or \texttt{Integrator}, see Chapter~\ref{ch:integrators}), you use the syntax:
-\begin{verbatim}
-[y1,y2,...,yn] = f([x1,x2,...,xn])
-\end{verbatim}
-That is, you provide a \emph{list} of argument expressions (which may consist of a single element) and gets back a list of expressions corresponding to the result of the call. Here is a code example:
-\begin{pytex}
-A = SX.sym("A",3,3)
-x = SX.sym("x",3)
-y = mul(A,x)
-f = SXFunction("f",[A,x],[y])
-f.init()  # Must be called before symbolic or numeric evaluation
+\texttt{MX} expressions may contain calls to \texttt{Function}-derived functions. Calling a function object is both done for the numerical evaluation and, by passing symbolic arguments, for embedding a \emph{call} to the function object into an expression graph (cf. also Chapter~\ref{ch:integrators}).
 
-A2 = MX.sym("A",3,3)
-x2 = MX.sym("x",3)
-[y2] = f([A2,x2]) # Call f with argument (A2,x2)
-\end{pytex}
+There are two principle ways of calling a function object, by passing a list (in MATLAB a cell array, in C++ an \lstinline[language=C++]{std::vector<MatrixType>}) of inputs (of the same length as the number of inputs to the function) or by passing a dictionary (\texttt{dict} in Python, \texttt{struct} in MATLAB and \lstinline[language=C++]{std::map<std::string, MatrixType>} in C++).
 
-Remember to put the brackets around the output even if the function only has a single output.
+The output will be of the same type, i.e. a list of outputs and a dictionary of outputs, respectively.
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+res = nlp([1.1,3.3])
+print res[0], res[1]
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+res = nlp({1.1,3.3});
+disp res{1}, res{2}
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+res = nlp([1.1,3.3])
+print res[0], res[1]
+\end{pytexoutput}
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+res = nlp({'x':1.1,\
+           'p':3.3})
+print res['f'], res['g']
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+res = nlp(struct('x',1.1,...
+                 'p',3.3));
+disp res.f, res.g
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+res = nlp({'x':1.1,\
+           'p':3.3})
+print res['f'], res['g']
+\end{pytexoutput}
+
+The recommendation is to always work with named inputs and outputs, since it is less error prone and more maintainable. When creating a function from expressions, not from the scheme helpers as above, you can specify the input and output schemes by passing the "input\_scheme" and "output\_scheme" option to the \texttt{SXFunction} or \texttt{MXFunction} constructor:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+x = SX.sym('x')
+p = SX.sym('p')
+f = x**2
+g = log(x)-p
+op = \
+ {'input_scheme':['x','p'],\
+  'output_scheme':['f','g']}
+nlp = SXFunction('nlp',\
+          [x,p],[f,g],op)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+x = SX.sym('x');
+p = SX.sym('p');
+f = x^2;
+g = log(x)-p;
+op = struct;
+op.input_scheme=char('x','p');
+op.output_scheme=char('f','g');
+nlp = SXFunction('nlp',...
+          {x,p},{f,g},op);
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+x = SX.sym('x')
+p = SX.sym('p')
+f = x**2
+g = log(x)-p
+op = \
+ {'input_scheme':['x','p'],\
+  'output_scheme':['f','g']}
+nlp = SXFunction('nlp',\
+          [x,p],[f,g],op)
+\end{pytexoutput}
+
+Note that the dimensions (but not necessarily the sparsity pattern) of the evaluation arguments have to match those of the function inputs, with two exceptions:
+\begin{itemize}
+  \item A row vector can be passed instead of a column vector and vice versa.
+  \item A scalar argument can always be passed, regardless of the input dimension. This has the meaning of setting all elements of the input matrix to that value.
+\end{itemize}
+
+Note that the function call syntax always expects a vector of inputs, so if your function only has a single input, you need to turn it into a single element list (in Python) or cell array (in MATLAB). Similarly, the function always returns a list of outputs (in MATLAB, a cell array, in C++ an \lstinline[language=C++]{std::vector}).
 
 \section{Algorithmic differentiation}
 
@@ -1117,42 +1199,58 @@ Hessians are calculated by first calculating the gradient and then performing th
 
 \section{Generating Jacobian and Hessian function objects}
 You can generate a new function for calculating the Jacobian by calling the \texttt{Function::jacobian} member function:
-\begin{verbatim}
- J = f.jacobian(iind,oind) # function corresponding to the jacobian
-                           # of the oind-th output w.r.t. the iind-th input
-\end{verbatim}
-This will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) Jacobian as well as all the original function outputs as outputs.
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+J = f.jacobian(id_in,id_out)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+J = f.jacobian(id_in,id_out);
+\end{lstlisting}
+\end{minipage}
+
+where \texttt{id\_in} and \texttt{id\_out} are either the indices of the inputs and outputs (0-based indexing, also in MATLAB) or strings corresponding to identifier names. In either case, a new function object will be generated that calculates the Jacobian of the \texttt{id\_out}-th function output with respect to the \texttt{id\_in}-th function input. The new function object will have the same input scheme as the function \texttt{f} but with the (sparse) Jacobian as well as all the original function outputs as outputs.
 
 Similarly, the gradient of a scalar output can be called by calling the \texttt{Function::gradient} member function:
-\begin{verbatim}
- G = f.gradient(iind,oind) # function corresponding to the gradient
-                          # of the oind-th output w.r.t. the iind-th input
-\end{verbatim}
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+G = f.gradient(id_in,id_out)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+G = f.gradient(id_in,id_out);
+\end{lstlisting}
+\end{minipage}
+
 which will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) gradient and all the original function outputs as outputs.
 
 Lastly, Hessians of a scalar output can be called by calling the \texttt{Function::hessian} member function:
-\begin{verbatim}
- H = f.hessian(iind,oind) # function corresponding to the Hessian
-                          # of the oind-th output w.r.t. the iind-th input
-\end{verbatim}
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+G = f.hessian(id_in,id_out)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+G = f.hessian(id_in,id_out);
+\end{lstlisting}
+\end{minipage}
+
 which will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) Hessian, the gradient and all the original function outputs as outputs.
 
 \section{Converting \texttt{MXFunction} to \texttt{SXFunction}}
 An \texttt{MXFunction} which only contains built-in operations (e.g. elementwise operations such as addition, square root, matrix multiplications and calls to \texttt{SXFunction} instances, can be converted into an \texttt{SXFunction} using the syntax:
-\begin{verbatim}
- sx_function = SXFunction(mx_function)
-\end{verbatim}
+
+\begin{lstlisting}[language=Python]
+sx_function = SXFunction(mx_function)
+\end{lstlisting}
 
 This might speed up the calculations significantly, but might also cause extra memory overhead.
-
-
-%% \section{Calculating derivatives symbolically}
-%% Directional derivatives can also be calculated symbolically, i.e. you can generate new expressions corresponding to directional derivatives for further manipulation. This is only possible for the \texttt{SXFunction} and \texttt{MXFunction} classes.
-%% This is achieved by passing additional arguments to the \texttt{Function::eval} member function.
-
-%% Similarly, expressions corresponding to complete Jacobians and Hessians can be obtained by calling the \texttt{SXFunction::jac} and \texttt{MXFunction::jac} functions.
-
-%% We refer to the API documentation for details.
 
 \chapter{ODE/DAE integration and sensitivity analysis} \label{ch:integrators}
 \section{ODE/DAE formulation}
