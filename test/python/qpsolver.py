@@ -417,6 +417,7 @@ class QpSolverTests(casadiTestCase):
        
       self.assertAlmostEqual(solver.getOutput("cost")[0],-8.4,max(1,5-less_digits),str(qpsolver))
 
+  @memory_heavy()
   def test_degenerate_hessian(self):
     self.message("Degenerate hessian")
     
