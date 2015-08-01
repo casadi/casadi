@@ -47,6 +47,13 @@ Return a string with a representation (for SWIG)
 
 ";
 
+%feature("docstring") casadi::Callback::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::Callback "
 
 Callback.
@@ -413,6 +420,13 @@ casadi::OptionsFunctionality::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
 
 Print options to a stream.
+
+";
+
+%feature("docstring") casadi::CleSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -3634,6 +3648,13 @@ Get a list of all option names.
 
 ";
 
+%feature("docstring") casadi::ControlSimulator::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
 Propagate the sparsity pattern through a set of directional.
 
@@ -3786,6 +3807,13 @@ Return a string with a representation (for SWIG)
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
 Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::CustomEvaluate::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -4101,6 +4129,13 @@ more documentation in the node class (SharedObjectNode and derived classes)
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
 const  " [INTERNAL]  Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring") casadi::CustomFunction::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -5910,6 +5945,13 @@ In python, supply a callable, annotated with derivativegenerator decorator
 
 C++ includes: functor.hpp ";
 
+%feature("docstring") casadi::DerivativeGenerator::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring")  casadi::SharedObject::isNull() const  "
 
 Is a null pointer?
@@ -6137,6 +6179,13 @@ scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::DleSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -7961,6 +8010,13 @@ point to this new object
 %feature("docstring")  casadi::Function::evaluate() "
 
 Evaluate.
+
+";
+
+%feature("docstring") casadi::DpleSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -10397,6 +10453,13 @@ Get the description of a certain option.
 
 ";
 
+%feature("docstring") casadi::ExternalFunction::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
 int oind=0) "
 
@@ -11265,6 +11328,13 @@ returned.
 &stream=casadi::userOut()) const  "
 
 Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Function::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -12251,6 +12321,13 @@ Is a null pointer?
 
 ";
 
+%feature("docstring") casadi::Functor::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
 
 Initialize or re-initialize the object:
@@ -12758,6 +12835,13 @@ Joel Andersson
 
 C++ includes: generic_type.hpp ";
 
+%feature("docstring") casadi::GenericType::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring")  casadi::GenericType::getType() const  " ";
 
 %feature("docstring")  casadi::GenericType::isIntVectorVector() const  "
@@ -12988,7 +13072,14 @@ Convert to a type.
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::Function::nnzIn() const  "
+casadi::HomotopyNlpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring")  casadi::Function::nnzIn() const  "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
 
@@ -16051,6 +16142,13 @@ changes, the init function should be called again.
 
 ";
 
+%feature("docstring") casadi::ImplicitFunction::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring")  casadi::SharedObject::printPtr(std::ostream
 &stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
 internal class
@@ -16759,6 +16857,13 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 %feature("docstring")  casadi::SharedObject::assertInit() const  "
 [INTERNAL]  Assert that it is initialized
+
+";
+
+%feature("docstring") casadi::Integrator::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -18774,6 +18879,17 @@ Check if the numerical values of the supplied bounds make sense.
 ";
 
 
+// File: classcasadi_1_1InterruptHandler.xml
+%feature("docstring") casadi::InterruptHandler "[INTERNAL]  Takes care of
+user interrupts (Ctrl+C)
+
+This is an internal class.
+
+Joris Gillis
+
+C++ includes: casadi_interrupt.hpp ";
+
+
 // File: classcasadi_1_1Inverse.xml
 
 
@@ -20213,6 +20329,13 @@ internally
 
 ";
 
+%feature("docstring") casadi::LinearSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring")  casadi::Function::derForward(int nfwd) "
 
 Get a function that calculates nfwd forward derivatives.
@@ -20926,6 +21049,13 @@ the output elements).
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
 const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring") casadi::LpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -22989,6 +23119,13 @@ get function name with all non alphanumeric characters converted to '_'
 "
 
 Add modules to be monitored.
+
+";
+
+%feature("docstring") casadi::LrDleSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -25380,6 +25517,13 @@ Create call to (cached) derivative function, forward mode.
 
 ";
 
+%feature("docstring") casadi::LrDpleSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
 const  " [INTERNAL]  Get the enum value corresponding to th certain option.
@@ -26946,8 +27090,8 @@ Append a matrix horizontally.
 
 %feature("docstring") casadi::MX::__hash__ "
 
-Returns a number that is unique for a given MXNode. If the MX does not point
-to any node, 0 is returned.
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -28262,6 +28406,13 @@ casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
 const  "
 
 Get the description of a certain option.
+
+";
+
+%feature("docstring") casadi::MXFunction::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -34724,6 +34875,13 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
+%feature("docstring") casadi::NlpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
 const  " [INTERNAL]  Get the enum value corresponding to th certain option.
@@ -35216,6 +35374,13 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::Nullspace::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -36539,6 +36704,13 @@ C++ includes: options_functionality.hpp ";
 std::string &str) const  "
 
 Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::OptionsFunctionality::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -38222,6 +38394,13 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
+%feature("docstring") casadi::QcqpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring")  casadi::Function::symbolicOutput() const  "
 
 Get a vector of symbolic variables with the same dimensions as the outputs.
@@ -38801,6 +38980,13 @@ Return a string with a representation (for SWIG)
 %feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
 
 Get the dictionary.
+
+";
+
+%feature("docstring") casadi::QpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -40635,6 +40821,13 @@ Evaluate the function symbolically or numerically.
 %feature("docstring")  casadi::SharedObject::isNull() const  "
 
 Is a null pointer?
+
+";
+
+%feature("docstring") casadi::SdpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -43344,6 +43537,13 @@ const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
+%feature("docstring") casadi::SdqpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
 oind=0) const "
 
@@ -43911,6 +44111,13 @@ A failed shared_cast will result in a null pointer (cf. dynamic_cast)
 Joel Andersson
 
 C++ includes: shared_object.hpp ";
+
+%feature("docstring") casadi::SharedObject::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
 
 %feature("docstring")  casadi::SharedObject::assertInit() const  "
 [INTERNAL]  Assert that it is initialized
@@ -45161,6 +45368,13 @@ returned.
 
 ";
 
+%feature("docstring") casadi::Simulator::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring")  casadi::Function::printDimensions(std::ostream
 &stream=casadi::userOut()) const  "
 
@@ -46270,6 +46484,8 @@ solver:
 
 Name of a solver. It might be one of:
 
+- ecos
+
 - mosek
 
 - sdp
@@ -46311,6 +46527,8 @@ Parameters:
 solver:
 
 Name of a solver. It might be one of:
+
+- ecos
 
 - mosek
 
@@ -46701,6 +46919,8 @@ List of plugins
 
 
 
+- ecos
+
 - mosek
 
 - sdp
@@ -46709,6 +46929,122 @@ Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 SocpSolver.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+ecos
+----
+
+
+
+Interface to the SOCP solver ECOS
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| abstol          | OT_REAL         | ABSTOL          | Absolute        |
+|                 |                 |                 | tolerance on    |
+|                 |                 |                 | duality gap     |
++-----------------+-----------------+-----------------+-----------------+
+| abstol_inacc    | OT_REAL         | ATOL_INACC      | Absolute        |
+|                 |                 |                 | relaxed         |
+|                 |                 |                 | tolerance on    |
+|                 |                 |                 | duality gap     |
++-----------------+-----------------+-----------------+-----------------+
+| delta           | OT_REAL         | DELTA           | Regularization  |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| eps             | OT_REAL         | EPS             | Regularization  |
+|                 |                 |                 | threshold       |
++-----------------+-----------------+-----------------+-----------------+
+| feastol         | OT_REAL         | FEASTOL         | Primal/dual     |
+|                 |                 |                 | infeasibility   |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| feastol_inacc   | OT_REAL         | FTOL_INACC      | Primal/dual     |
+|                 |                 |                 | infeasibility   |
+|                 |                 |                 | relaxed         |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| gamma           | OT_REAL         | GAMMA           | Scaling the     |
+|                 |                 |                 | final step      |
+|                 |                 |                 | length          |
++-----------------+-----------------+-----------------+-----------------+
+| maxit           | OT_INTEGER      | MAXIT           | Maximum number  |
+|                 |                 |                 | of iterations   |
++-----------------+-----------------+-----------------+-----------------+
+| nitref          | OT_INTEGER      | NITREF          | Number of       |
+|                 |                 |                 | iterative       |
+|                 |                 |                 | refinement      |
+|                 |                 |                 | steps           |
++-----------------+-----------------+-----------------+-----------------+
+| reltol          | OT_REAL         | RELTOL          | Relative        |
+|                 |                 |                 | tolerance on    |
+|                 |                 |                 | duality gap     |
++-----------------+-----------------+-----------------+-----------------+
+| reltol_inacc    | OT_REAL         | RTOL_INACC      | Relative        |
+|                 |                 |                 | relaxed         |
+|                 |                 |                 | tolerance on    |
+|                 |                 |                 | duality gap     |
++-----------------+-----------------+-----------------+-----------------+
+| verbose         | OT_INTEGER      | VERBOSE         | Verbosity bool  |
+|                 |                 |                 | for PRINTLEVEL  |
+|                 |                 |                 | < 3             |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available stats
+
++-----------------------+
+|          Id           |
++=======================+
+| dcost                 |
++-----------------------+
+| dinf                  |
++-----------------------+
+| dinfres               |
++-----------------------+
+| dres                  |
++-----------------------+
+| exit_code             |
++-----------------------+
+| exit_code_explanation |
++-----------------------+
+| gap                   |
++-----------------------+
+| iter                  |
++-----------------------+
+| kapovert              |
++-----------------------+
+| mu                    |
++-----------------------+
+| nitref1               |
++-----------------------+
+| nitref2               |
++-----------------------+
+| nitref3               |
++-----------------------+
+| pcost                 |
++-----------------------+
+| pinf                  |
++-----------------------+
+| pinfres               |
++-----------------------+
+| pres                  |
++-----------------------+
+| relgap                |
++-----------------------+
+| sigma                 |
++-----------------------+
+| step                  |
++-----------------------+
+| step_aff              |
++-----------------------+
+
+--------------------------------------------------------------------------------
 
 
 
@@ -47754,6 +48090,13 @@ C++ includes: socp_solver.hpp ";
 
 %feature("docstring")  casadi::Function::sz_w() const  " [INTERNAL]  Get
 required length of w field.
+
+";
+
+%feature("docstring") casadi::SocpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -48956,6 +49299,13 @@ Remove duplicate entries.
 
 The same indices will be removed from the mapping vector, which must have
 the same length as the number of nonzeros
+
+";
+
+%feature("docstring") casadi::Sparsity::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -50540,6 +50890,13 @@ adjoint sensitivities, one direction at a time.
 
 ";
 
+%feature("docstring") casadi::StabilizedQpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
 &arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
 DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
@@ -51422,6 +51779,13 @@ and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
 the length of the vector being the number of adjoint directions.
+
+";
+
+%feature("docstring") casadi::Switch::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -52603,6 +52967,13 @@ oname:  output name. Only allowed when an output scheme is set.
 %feature("docstring")  casadi::Function::numelIn() const  "
 
 Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::SXFunction::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -54279,6 +54650,12 @@ Default constructor.
 
 ";
 
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const " [INTERNAL]  Return a string with a
+representation (for SWIG)
+
+";
+
 %feature("docstring")  casadi::SharedObject::printPtr(std::ostream
 &stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
 internal class
@@ -54292,9 +54669,9 @@ more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const " [INTERNAL]  Return a string with a
-representation (for SWIG)
+%feature("docstring") casadi::WeakRef::__hash__ "[INTERNAL]  Returns a
+number that is unique for a given Node. If the Object does not point to any
+node, \"0\" is returned.
 
 ";
 
@@ -54428,6 +54805,13 @@ Is initialized?
 "
 
 Get a list of all option names.
+
+";
+
+%feature("docstring") casadi::XmlFile::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 

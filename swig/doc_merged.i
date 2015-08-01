@@ -46,6 +46,13 @@ Return a string with a representation (for SWIG)
 
 ";
 
+%feature("docstring") casadi::Callback::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::Callback "
 
 Callback.
@@ -354,6 +361,13 @@ Print options to a stream.
 
 ";
 
+%feature("docstring") casadi::CleSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::CleSolver::getOptionEnumValue "[INTERNAL]
 Get the enum value corresponding to th certain option.
 
@@ -477,7 +491,7 @@ Get total number of elements in all of the matrix-valued outputs.
 
 %feature("docstring") casadi::CleSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -487,7 +501,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -1253,7 +1267,7 @@ propagating_sparsity.cpp)
 
 %feature("docstring") casadi::CleSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -1263,7 +1277,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -2165,7 +2179,7 @@ ownership, only weak references to the derivatives are kept internally.
 
 %feature("docstring") casadi::ControlSimulator::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -2175,7 +2189,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -2373,7 +2387,7 @@ Assert that it is initialized
 
 Default constructor.
 
->  ControlSimulator(str name, Function dae, Function output_fcn, array(double) grid, Dict opts=Dict())
+>  ControlSimulator(str name, Function dae, Function output_fcn, DMatrix grid, Dict opts=Dict())
 ------------------------------------------------------------------------
 
 Creates a piecewise simulator (new syntax, includes initialization)
@@ -2501,12 +2515,12 @@ Parameters:
 
 grid:  the major time grid
 
->  ControlSimulator(str name, Function dae, array(double) grid, Dict opts=Dict())
+>  ControlSimulator(str name, Function dae, DMatrix grid, Dict opts=Dict())
 ------------------------------------------------------------------------
 
 Output function equal to the state (new syntax, includes initialization)
 
->  ControlSimulator(Function dae, Function output_fcn, array(double) grid)
+>  ControlSimulator(Function dae, Function output_fcn, DMatrix grid)
 ------------------------------------------------------------------------
 
 [DEPRECATED] Creates a piecewise simulator, no initialization
@@ -2634,7 +2648,7 @@ Parameters:
 
 grid:  the major time grid
 
->  ControlSimulator(Function dae, array(double) grid)
+>  ControlSimulator(Function dae, DMatrix grid)
 ------------------------------------------------------------------------
 
 [DEPRECATED] Output function equal to the state, no initialization
@@ -2701,7 +2715,7 @@ get function name with all non alphanumeric characters converted to '_'
 
 %feature("docstring") casadi::ControlSimulator::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -2711,7 +2725,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -2794,6 +2808,13 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 %feature("docstring") casadi::ControlSimulator::getOptionNames "
 
 Get a list of all option names.
+
+";
+
+%feature("docstring") casadi::ControlSimulator::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -2935,6 +2956,13 @@ Assert that it is initialized
 %feature("docstring") casadi::CustomEvaluate::repr "
 
 Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::CustomEvaluate::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -3185,6 +3213,13 @@ more documentation in the node class (SharedObjectNode and derived classes)
 ";
 
 %feature("docstring") casadi::CustomFunction::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring") casadi::CustomFunction::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -3604,7 +3639,7 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 %feature("docstring") casadi::CustomFunction::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -3614,7 +3649,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -3799,7 +3834,7 @@ Remove modules to be monitored.
 
 %feature("docstring") casadi::CustomFunction::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -3809,7 +3844,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -4555,6 +4590,13 @@ In python, supply a callable, annotated with derivativegenerator decorator
 
 C++ includes: functor.hpp ";
 
+%feature("docstring") casadi::DerivativeGenerator::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::DerivativeGenerator::isNull "
 
 Is a null pointer?
@@ -4682,6 +4724,13 @@ scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::DleSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -5192,7 +5241,7 @@ get an option value
 
 %feature("docstring") casadi::DleSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -5202,7 +5251,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -5263,7 +5312,7 @@ Get the default of a certain option.
 
 %feature("docstring") casadi::DleSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -5273,7 +5322,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -5985,7 +6034,7 @@ more documentation in the node class (SharedObjectNode and derived classes)
 
 %feature("docstring") casadi::DpleSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -5995,7 +6044,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -6151,6 +6200,13 @@ point to this new object
 %feature("docstring") casadi::DpleSolver::evaluate "
 
 Evaluate.
+
+";
+
+%feature("docstring") casadi::DpleSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -6358,7 +6414,7 @@ Set a certain option by giving an enum value.
 
 %feature("docstring") casadi::DpleSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -6368,7 +6424,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -7847,6 +7903,13 @@ Get the description of a certain option.
 
 ";
 
+%feature("docstring") casadi::ExternalFunction::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::ExternalFunction::setOutput "
 
 >  void IOInterface< Function  >.setOutput(T val, int oind=0)
@@ -7946,7 +8009,7 @@ get function name with all non alphanumeric characters converted to '_'
 
 %feature("docstring") casadi::ExternalFunction::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -7956,7 +8019,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -8007,7 +8070,7 @@ Get input scheme name by index.
 
 %feature("docstring") casadi::ExternalFunction::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -8017,7 +8080,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -8399,7 +8462,7 @@ Get input scheme description by index.
 
 %feature("docstring") casadi::Function::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -8409,7 +8472,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -8489,6 +8552,13 @@ returned.
 %feature("docstring") casadi::Function::printDimensions "
 
 Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Function::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -8761,7 +8831,7 @@ Get sparsity of a given input.
 
 %feature("docstring") casadi::Function::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -8771,7 +8841,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -9224,6 +9294,13 @@ Is a null pointer?
 
 ";
 
+%feature("docstring") casadi::Functor::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::Functor::init "
 
 Initialize or re-initialize the object:
@@ -9656,6 +9733,13 @@ Joel Andersson
 
 C++ includes: generic_type.hpp ";
 
+%feature("docstring") casadi::GenericType::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::GenericType::getType "";
 
 %feature("docstring") casadi::GenericType::isIntVectorVector "
@@ -9846,7 +9930,14 @@ Convert to a type.
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::HomotopyNlpSolver::nnzIn "
+casadi::HomotopyNlpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::HomotopyNlpSolver::nnzIn "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
 
@@ -10244,7 +10335,7 @@ Print options to a stream.
 
 %feature("docstring") casadi::HomotopyNlpSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -10254,7 +10345,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -10813,7 +10904,7 @@ propagating_sparsity.cpp)
 
 %feature("docstring") casadi::HomotopyNlpSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -10823,7 +10914,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -10970,7 +11061,7 @@ There is no guarantee that consecutive calls return identical objects
 /*  Option Functionality  */ %feature("docstring")
 casadi::ImplicitFunction::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -10980,7 +11071,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -11121,7 +11212,7 @@ Get input scheme description by index.
 
 %feature("docstring") casadi::ImplicitFunction::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -11131,7 +11222,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -12163,6 +12254,13 @@ changes, the init function should be called again.
 
 ";
 
+%feature("docstring") casadi::ImplicitFunction::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::ImplicitFunction::printPtr "[INTERNAL]  Print
 the pointer to the internal class
 
@@ -12548,6 +12646,13 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 %feature("docstring") casadi::Integrator::assertInit "[INTERNAL]  Assert
 that it is initialized
+
+";
+
+%feature("docstring") casadi::Integrator::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -13985,7 +14090,7 @@ Get sparsity of a given input.
 
 %feature("docstring") casadi::Integrator::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -13995,7 +14100,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -14180,7 +14285,7 @@ Get output scheme description by index.
 
 %feature("docstring") casadi::Integrator::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -14190,7 +14295,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -14366,6 +14471,17 @@ the numerical values of the supplied bounds make sense.
 ";
 
 
+// File: classcasadi_1_1InterruptHandler.xml
+%feature("docstring") casadi::InterruptHandler "[INTERNAL]  Takes care of
+user interrupts (Ctrl+C)
+
+This is an internal class.
+
+Joris Gillis
+
+C++ includes: casadi_interrupt.hpp ";
+
+
 // File: classcasadi_1_1Inverse.xml
 
 
@@ -14468,7 +14584,7 @@ NULL)
 /*  Option Functionality  */ %feature("docstring")
 casadi::LinearSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -14478,7 +14594,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -15412,6 +15528,13 @@ internally
 
 ";
 
+%feature("docstring") casadi::LinearSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::LinearSolver::derForward "
 
 Get a function that calculates nfwd forward derivatives.
@@ -15576,7 +15699,7 @@ are kept internally
 
 %feature("docstring") casadi::LinearSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -15586,7 +15709,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -15911,6 +16034,13 @@ the enum value corresponding to th certain option.
 
 ";
 
+%feature("docstring") casadi::LpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::LpSolver::inputIndex "
 
 Find the index for a string describing a particular entry of an input
@@ -16044,7 +16174,7 @@ Get the type name of a certain option.
 
 %feature("docstring") casadi::LpSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -16054,7 +16184,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -16715,7 +16845,7 @@ Print options to a stream.
 
 %feature("docstring") casadi::LpSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -16725,7 +16855,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -16897,7 +17027,7 @@ Get total number of elements in all of the matrix-valued outputs.
 
 %feature("docstring") casadi::LrDleSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -16907,7 +17037,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -17458,6 +17588,13 @@ Add modules to be monitored.
 
 ";
 
+%feature("docstring") casadi::LrDleSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::LrDleSolver::hasSetOption "
 
 check if the user has there is an option str
@@ -17977,7 +18114,7 @@ more documentation in the node class (SharedObjectNode and derived classes)
 
 %feature("docstring") casadi::LrDleSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -17987,7 +18124,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -18482,7 +18619,7 @@ are kept internally
 
 %feature("docstring") casadi::LrDpleSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -18492,7 +18629,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -18661,7 +18798,7 @@ Get output scheme.
 
 %feature("docstring") casadi::LrDpleSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -18671,7 +18808,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -19245,6 +19382,13 @@ Create call to (cached) derivative function, forward mode.
 
 ";
 
+%feature("docstring") casadi::LrDpleSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::LrDpleSolver::getOptionEnumValue "[INTERNAL]
 Get the enum value corresponding to th certain option.
 
@@ -19290,7 +19434,7 @@ Get the elements numerically.
 
 >  void array(DataType) .getNZ(array(DataType) output_m, bool ind1, Slice k) const
 
->  void array(DataType) .getNZ(array(DataType) output_m, bool ind1, array(int) k) const 
+>  void array(DataType) .getNZ(array(DataType) output_m, bool ind1, IMatrix k) const 
 ------------------------------------------------------------------------
 
 Get a set of nonzeros
@@ -19316,7 +19460,7 @@ Get the elements numerically.
 
 >  void array(DataType) .set(array(DataType) m, bool ind1, Slice rr)
 
->  void array(DataType) .set(array(DataType) m, bool ind1, array(int) rr)
+>  void array(DataType) .set(array(DataType) m, bool ind1, IMatrix rr)
 
 >  void array(DataType) .set(array(DataType) m, bool ind1, Sparsity sp)
 ------------------------------------------------------------------------
@@ -19325,11 +19469,11 @@ Set a submatrix, single argument
 
 >  void array(DataType) .set(array(DataType) m, bool ind1, Slice rr, Slice cc)
 
->  void array(DataType) .set(array(DataType) m, bool ind1, Slice rr, array(int) cc)
+>  void array(DataType) .set(array(DataType) m, bool ind1, Slice rr, IMatrix cc)
 
->  void array(DataType) .set(array(DataType) m, bool ind1, array(int) rr, Slice cc)
+>  void array(DataType) .set(array(DataType) m, bool ind1, IMatrix rr, Slice cc)
 
->  void array(DataType) .set(array(DataType) m, bool ind1, array(int) rr, array(int) cc)
+>  void array(DataType) .set(array(DataType) m, bool ind1, IMatrix rr, IMatrix cc)
 ------------------------------------------------------------------------
 
 Set a submatrix, two arguments
@@ -19375,7 +19519,7 @@ Get the elements numerically.
 
 >  void array(DataType) .get(array(DataType) output_m, bool ind1, Slice rr) const
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, array(int) rr) const
+>  void array(DataType) .get(array(DataType) output_m, bool ind1, IMatrix rr) const
 
 >  void array(DataType) .get(array(DataType) output_m, bool ind1, Sparsity sp) const 
 ------------------------------------------------------------------------
@@ -19384,11 +19528,11 @@ Get a submatrix, single argument
 
 >  void array(DataType) .get(array(DataType) output_m, bool ind1, Slice rr, Slice cc) const
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, Slice rr, array(int) cc) const
+>  void array(DataType) .get(array(DataType) output_m, bool ind1, Slice rr, IMatrix cc) const
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, array(int) rr, Slice cc) const
+>  void array(DataType) .get(array(DataType) output_m, bool ind1, IMatrix rr, Slice cc) const
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, array(int) rr, array(int) cc) const 
+>  void array(DataType) .get(array(DataType) output_m, bool ind1, IMatrix rr, IMatrix cc) const 
 ------------------------------------------------------------------------
 
 Get a submatrix, two arguments
@@ -19442,7 +19586,7 @@ Set the elements numerically.
 
 >  void array(DataType) .setNZ(array(DataType) m, bool ind1, Slice k)
 
->  void array(DataType) .setNZ(array(DataType) m, bool ind1, array(int) k)
+>  void array(DataType) .setNZ(array(DataType) m, bool ind1, IMatrix k)
 ------------------------------------------------------------------------
 
 Set a set of nonzeros
@@ -19955,62 +20099,62 @@ streams.
 
 %feature("docstring") casadi::Matrix::Matrix "
 
->  array(DataType) .Matrix()
+>  array(DataType) ()
 ------------------------------------------------------------------------
 
 constructors
 
 empty 0-by-0 matrix constructor
 
->  array(DataType) .Matrix(array(DataType) m)
+>  array(DataType) (array(DataType) m)
 ------------------------------------------------------------------------
 
 Copy constructor.
 
->  array(DataType) .Matrix(int nrow, int ncol)
+>  array(DataType) (int nrow, int ncol)
 ------------------------------------------------------------------------
 
 Create a sparse matrix with all structural zeros.
 
->  array(DataType) .Matrix(Sparsity sp)
+>  array(DataType) (Sparsity sp)
 ------------------------------------------------------------------------
 
 Create a sparse matrix from a sparsity pattern. Same as
 Matrix::ones(sparsity)
 
->  array(DataType) .Matrix(Sparsity sp, array(DataType) d)
+>  array(DataType) (Sparsity sp, array(DataType) d)
 ------------------------------------------------------------------------
 
 Construct matrix with a given sparsity and nonzeros.
 
->  array(DataType) .Matrix(double val)
+>  array(DataType) (double val)
 ------------------------------------------------------------------------
 
 This constructor enables implicit type conversion from a numeric type.
 
->  array(DataType) .Matrix([[double ] ] m)
+>  array(DataType) ([[double ] ] m)
 ------------------------------------------------------------------------
 
 Dense matrix constructor with data given as vector of vectors.
 
->  array(DataType) .Matrix(array(A) x)
+>  array(DataType) (array(A) x)
 ------------------------------------------------------------------------
 
 Create a matrix from another matrix with a different entry type Assumes that
 the scalar conversion is valid.
 
->  array(DataType) .Matrix([A ] x)
+>  array(DataType) ([A ] x)
 ------------------------------------------------------------------------
 
 Create an expression from a vector.
 
->  array(DataType) .Matrix([DataType ] x)
+>  array(DataType) ([DataType ] x)
 
->  array(DataType) .Matrix((int,int) rc)
+>  array(DataType) ((int,int) rc)
 
->  array(DataType) .Matrix(Sparsity sp, DataType val, bool dummy)
+>  array(DataType) (Sparsity sp, DataType val, bool dummy)
 
->  array(DataType) .Matrix(Sparsity sp, [DataType ] d, bool dummy)
+>  array(DataType) (Sparsity sp, [DataType ] d, bool dummy)
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
@@ -20242,7 +20386,7 @@ more documentation in the node class (SharedObjectNode and derived classes)
 
 >  void MX.set(MX m, bool ind1, Slice rr)
 
->  void MX.set(MX m, bool ind1, array(int) rr)
+>  void MX.set(MX m, bool ind1, IMatrix rr)
 
 >  void MX.set(MX m, bool ind1, Sparsity sp)
 ------------------------------------------------------------------------
@@ -20493,8 +20637,8 @@ Append a matrix horizontally.
 
 %feature("docstring") casadi::MX::__hash__ "
 
-Returns a number that is unique for a given MXNode. If the MX does not point
-to any node, 0 is returned.
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -20643,7 +20787,7 @@ check if zero (note that false negative answers are possible)
 
 >  void MX.get(MX &output_m, bool ind1, Slice rr) const
 
->  void MX.get(MX &output_m, bool ind1, array(int) rr) const
+>  void MX.get(MX &output_m, bool ind1, IMatrix rr) const
 
 >  void MX.get(MX &output_m, bool ind1, Sparsity sp) const 
 ------------------------------------------------------------------------
@@ -20652,11 +20796,11 @@ Get a submatrix, single argument
 
 >  void MX.get(MX &output_m, bool ind1, Slice rr, Slice cc) const
 
->  void MX.get(MX &output_m, bool ind1, Slice rr, array(int) cc) const
+>  void MX.get(MX &output_m, bool ind1, Slice rr, IMatrix cc) const
 
->  void MX.get(MX &output_m, bool ind1, array(int) rr, Slice cc) const
+>  void MX.get(MX &output_m, bool ind1, IMatrix rr, Slice cc) const
 
->  void MX.get(MX &output_m, bool ind1, array(int) rr, array(int) cc) const 
+>  void MX.get(MX &output_m, bool ind1, IMatrix rr, IMatrix cc) const 
 ------------------------------------------------------------------------
 
 Get a submatrix, two arguments
@@ -20754,7 +20898,7 @@ Copy constructor.
 
 Create vector constant (also implicit type conversion)
 
->  MX(array(double) x)
+>  MX(DMatrix x)
 ------------------------------------------------------------------------
 
 Create sparse matrix constant (also implicit type conversion)
@@ -21004,7 +21148,7 @@ Get the type of a certain option.
 
 %feature("docstring") casadi::MXFunction::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -21014,7 +21158,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -21381,6 +21525,13 @@ Tangent via source code transformation.
 %feature("docstring") casadi::MXFunction::getOptionDescription "
 
 Get the description of a certain option.
+
+";
+
+%feature("docstring") casadi::MXFunction::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -21906,7 +22057,7 @@ pointer to the internal class
 
 %feature("docstring") casadi::MXFunction::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -21916,7 +22067,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -22044,7 +22195,7 @@ Get total number of elements in all of the matrix-valued outputs.
 
 %feature("docstring") casadi::NlpSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -22054,7 +22205,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -22098,7 +22249,7 @@ Copy all options from another object.
 
 %feature("docstring") casadi::NlpSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -22108,7 +22259,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -27298,6 +27449,13 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
+%feature("docstring") casadi::NlpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::NlpSolver::getOptionEnumValue "[INTERNAL]
 Get the enum value corresponding to th certain option.
 
@@ -27589,6 +27747,13 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
+%feature("docstring") casadi::Nullspace::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::Nullspace::setOption "
 
 >  void OptionsFunctionality.setOption(str str, GenericType val)
@@ -27865,7 +28030,7 @@ oname:  output name. Only allowed when an output scheme is set.
 
 %feature("docstring") casadi::Nullspace::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -27875,7 +28040,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -28274,7 +28439,7 @@ Is a null pointer?
 
 %feature("docstring") casadi::Nullspace::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -28284,7 +28449,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -28621,6 +28786,13 @@ C++ includes: options_functionality.hpp ";
 %feature("docstring") casadi::OptionsFunctionality::getOptionAllowed "
 
 Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::OptionsFunctionality::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -29507,7 +29679,7 @@ Get output scheme description by index.
 
 %feature("docstring") casadi::QcqpSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -29517,7 +29689,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -29793,7 +29965,7 @@ Evaluate.
 
 %feature("docstring") casadi::QcqpSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -29803,7 +29975,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -29918,6 +30090,13 @@ Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
+%feature("docstring") casadi::QcqpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -30158,7 +30337,7 @@ changes, the init function should be called again.
 
 %feature("docstring") casadi::QpSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -30168,7 +30347,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -30315,6 +30494,13 @@ Return a string with a representation (for SWIG)
 %feature("docstring") casadi::QpSolver::dictionary "
 
 Get the dictionary.
+
+";
+
+%feature("docstring") casadi::QpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -31400,7 +31586,7 @@ adjoint directions.
 
 %feature("docstring") casadi::QpSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -31410,7 +31596,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -31799,6 +31985,13 @@ Evaluate the function symbolically or numerically.
 %feature("docstring") casadi::SdpSolver::isNull "
 
 Is a null pointer?
+
+";
+
+%feature("docstring") casadi::SdpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -32827,7 +33020,7 @@ corresponding to the Jacobian and the same number of inputs.
 
 %feature("docstring") casadi::SdpSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -32837,7 +33030,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -32916,7 +33109,7 @@ Add modules to be monitored.
 
 %feature("docstring") casadi::SdpSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -32926,7 +33119,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -33508,7 +33701,7 @@ class able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::SdqpSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -33518,7 +33711,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -33775,9 +33968,16 @@ Get the enum value corresponding to th certain option.
 
 ";
 
+%feature("docstring") casadi::SdqpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::SdqpSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -33787,7 +33987,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -34298,6 +34498,13 @@ Joel Andersson
 
 C++ includes: shared_object.hpp ";
 
+%feature("docstring") casadi::SharedObject::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::SharedObject::assertInit "[INTERNAL]  Assert
 that it is initialized
 
@@ -34384,7 +34591,7 @@ Return a string with a representation (for SWIG)
 
 %feature("docstring") casadi::Simulator::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -34394,7 +34601,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -34473,7 +34680,7 @@ Get output scheme.
 
 %feature("docstring") casadi::Simulator::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -34483,7 +34690,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -35217,6 +35424,13 @@ returned.
 
 ";
 
+%feature("docstring") casadi::Simulator::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::Simulator::printDimensions "
 
 Print dimensions of inputs and outputs.
@@ -35230,7 +35444,7 @@ Print dimensions of inputs and outputs.
 
 Default constructor.
 
->  Simulator(str name, Integrator integrator, Function output_fcn, array(double) grid, Dict opts=Dict())
+>  Simulator(str name, Integrator integrator, Function output_fcn, DMatrix grid, Dict opts=Dict())
 ------------------------------------------------------------------------
 
 Constructor.
@@ -35255,12 +35469,12 @@ initialization)
 | DAE_T     | t     | Explicit time dependence . |
 +-----------+-------+----------------------------+
 
->  Simulator(str name, Integrator integrator, array(double) grid, Dict opts=Dict())
+>  Simulator(str name, Integrator integrator, DMatrix grid, Dict opts=Dict())
 ------------------------------------------------------------------------
 
 Output function equal to the state (new syntax, includes initialization)
 
->  Simulator(Integrator integrator, Function output_fcn, array(double) grid)
+>  Simulator(Integrator integrator, Function output_fcn, DMatrix grid)
 ------------------------------------------------------------------------
 
 [DEPRECATED] Constructor, no initialization
@@ -35284,7 +35498,7 @@ output_fcn:  output function which maps to n outputs.
 | DAE_T     | t     | Explicit time dependence . |
 +-----------+-------+----------------------------+
 
->  Simulator(Integrator integrator, array(double) grid)
+>  Simulator(Integrator integrator, DMatrix grid)
 ------------------------------------------------------------------------
 
 [DEPRECATED] Output function equal to the state, no initialization
@@ -35813,7 +36027,7 @@ ownership, only weak references to the derivatives are kept internally.
 
 %feature("docstring") casadi::SocpSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -35823,7 +36037,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -36011,6 +36225,8 @@ solver:
 
 Name of a solver. It might be one of:
 
+- ecos
+
 - mosek
 
 - sdp
@@ -36050,6 +36266,8 @@ Parameters:
 solver:
 
 Name of a solver. It might be one of:
+
+- ecos
 
 - mosek
 
@@ -36419,6 +36637,8 @@ List of plugins
 
 
 
+- ecos
+
 - mosek
 
 - sdp
@@ -36427,6 +36647,122 @@ Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 SocpSolver.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+ecos
+----
+
+
+
+Interface to the SOCP solver ECOS
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| abstol          | OT_REAL         | ABSTOL          | Absolute        |
+|                 |                 |                 | tolerance on    |
+|                 |                 |                 | duality gap     |
++-----------------+-----------------+-----------------+-----------------+
+| abstol_inacc    | OT_REAL         | ATOL_INACC      | Absolute        |
+|                 |                 |                 | relaxed         |
+|                 |                 |                 | tolerance on    |
+|                 |                 |                 | duality gap     |
++-----------------+-----------------+-----------------+-----------------+
+| delta           | OT_REAL         | DELTA           | Regularization  |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| eps             | OT_REAL         | EPS             | Regularization  |
+|                 |                 |                 | threshold       |
++-----------------+-----------------+-----------------+-----------------+
+| feastol         | OT_REAL         | FEASTOL         | Primal/dual     |
+|                 |                 |                 | infeasibility   |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| feastol_inacc   | OT_REAL         | FTOL_INACC      | Primal/dual     |
+|                 |                 |                 | infeasibility   |
+|                 |                 |                 | relaxed         |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| gamma           | OT_REAL         | GAMMA           | Scaling the     |
+|                 |                 |                 | final step      |
+|                 |                 |                 | length          |
++-----------------+-----------------+-----------------+-----------------+
+| maxit           | OT_INTEGER      | MAXIT           | Maximum number  |
+|                 |                 |                 | of iterations   |
++-----------------+-----------------+-----------------+-----------------+
+| nitref          | OT_INTEGER      | NITREF          | Number of       |
+|                 |                 |                 | iterative       |
+|                 |                 |                 | refinement      |
+|                 |                 |                 | steps           |
++-----------------+-----------------+-----------------+-----------------+
+| reltol          | OT_REAL         | RELTOL          | Relative        |
+|                 |                 |                 | tolerance on    |
+|                 |                 |                 | duality gap     |
++-----------------+-----------------+-----------------+-----------------+
+| reltol_inacc    | OT_REAL         | RTOL_INACC      | Relative        |
+|                 |                 |                 | relaxed         |
+|                 |                 |                 | tolerance on    |
+|                 |                 |                 | duality gap     |
++-----------------+-----------------+-----------------+-----------------+
+| verbose         | OT_INTEGER      | VERBOSE         | Verbosity bool  |
+|                 |                 |                 | for PRINTLEVEL  |
+|                 |                 |                 | < 3             |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available stats
+
++-----------------------+
+|          Id           |
++=======================+
+| dcost                 |
++-----------------------+
+| dinf                  |
++-----------------------+
+| dinfres               |
++-----------------------+
+| dres                  |
++-----------------------+
+| exit_code             |
++-----------------------+
+| exit_code_explanation |
++-----------------------+
+| gap                   |
++-----------------------+
+| iter                  |
++-----------------------+
+| kapovert              |
++-----------------------+
+| mu                    |
++-----------------------+
+| nitref1               |
++-----------------------+
+| nitref2               |
++-----------------------+
+| nitref3               |
++-----------------------+
+| pcost                 |
++-----------------------+
+| pinf                  |
++-----------------------+
+| pinfres               |
++-----------------------+
+| pres                  |
++-----------------------+
+| relgap                |
++-----------------------+
+| sigma                 |
++-----------------------+
+| step                  |
++-----------------------+
+| step_aff              |
++-----------------------+
+
+--------------------------------------------------------------------------------
 
 
 
@@ -37475,6 +37811,13 @@ length of w field.
 
 ";
 
+%feature("docstring") casadi::SocpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::SocpSolver::callForward "
 
 Create call to (cached) derivative function, forward mode.
@@ -37841,7 +38184,7 @@ Get the number of function outputs.
 
 %feature("docstring") casadi::SocpSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -37851,7 +38194,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -38374,6 +38717,13 @@ the same length as the number of nonzeros
 
 ";
 
+%feature("docstring") casadi::Sparsity::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::Sparsity::getRow "
 
 Get the row for each non-zero entry Together with the column-vector, this
@@ -38882,7 +39232,7 @@ are kept internally
 
 %feature("docstring") casadi::StabilizedQpSolver::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -38892,7 +39242,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -39606,7 +39956,7 @@ Is initialized?
 
 %feature("docstring") casadi::StabilizedQpSolver::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -39616,7 +39966,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -39667,6 +40017,13 @@ one direction at a time and the last nadj*n_in outputs corresponds to
 adjoint sensitivities, one direction at a time.
 
 (n_in = nIn(), n_out = nOut())
+
+";
+
+%feature("docstring") casadi::StabilizedQpSolver::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -40164,7 +40521,7 @@ sparsity propagation.
 
 %feature("docstring") casadi::Switch::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -40174,7 +40531,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -40314,6 +40671,13 @@ the length of the vector being the number of adjoint directions.
 
 ";
 
+%feature("docstring") casadi::Switch::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::Switch::init "
 
 Initialize or re-initialize the object:
@@ -40400,7 +40764,7 @@ length of iw field.
 
 %feature("docstring") casadi::Switch::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -40410,7 +40774,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -41132,6 +41496,13 @@ Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
+%feature("docstring") casadi::SXFunction::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
 %feature("docstring") casadi::SXFunction::getFree "
 
 Get all the free variables of the function.
@@ -41265,7 +41636,7 @@ Get output scheme name by index.
 
 %feature("docstring") casadi::SXFunction::getOutput "
 
->  array(double)  IOInterface< Function  >.getOutput(int oind=0) const
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -41275,7 +41646,7 @@ Parameters:
 
 oind:  index within the range [0..nOut()-1]
 
->  array(double)  IOInterface< Function  >.getOutput(str oname) const
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -42084,7 +42455,7 @@ more documentation in the node class (SharedObjectNode and derived classes)
 
 %feature("docstring") casadi::SXFunction::getInput "
 
->  array(double)  IOInterface< Function  >.getInput(int iind=0) const
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -42094,7 +42465,7 @@ Parameters:
 
 iind:  index within the range [0..nIn()-1]
 
->  array(double)  IOInterface< Function  >.getInput(str iname) const
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -42261,6 +42632,11 @@ Construct from a shared object (also implicit type conversion)
 
 ";
 
+%feature("docstring") casadi::WeakRef::getRepresentation "[INTERNAL]
+Return a string with a representation (for SWIG)
+
+";
+
 %feature("docstring") casadi::WeakRef::printPtr "[INTERNAL]  Print the
 pointer to the internal class
 
@@ -42273,8 +42649,9 @@ more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
-%feature("docstring") casadi::WeakRef::getRepresentation "[INTERNAL]
-Return a string with a representation (for SWIG)
+%feature("docstring") casadi::WeakRef::__hash__ "[INTERNAL]  Returns a
+number that is unique for a given Node. If the Object does not point to any
+node, \"0\" is returned.
 
 ";
 
@@ -42393,6 +42770,13 @@ Is initialized?
 %feature("docstring") casadi::XmlFile::getOptionNames "
 
 Get a list of all option names.
+
+";
+
+%feature("docstring") casadi::XmlFile::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
