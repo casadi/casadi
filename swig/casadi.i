@@ -2433,6 +2433,7 @@ except:
 %feature("varargin","1") friendwrap_vertcat;
 %feature("varargin","1") friendwrap_horzcat;
 %feature("varargin","1") friendwrap_veccat;
+%feature("optionalunpack","1") shape;
 
 // Explicit type conversion of the first argument of const member functions i.e. this/self
 %feature("convertself","1");

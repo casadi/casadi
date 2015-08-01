@@ -168,3 +168,7 @@ length(MX.sym('x',4,1))
 assert(length(MX.sym('x',4,1))==4)
 assert(length(MX.sym('x',1,3))==3)
 assert(length(MX.sym('x',4,5))==5)
+
+[n,m] = size(MX.sym('x',4,5));
+assert(n==4)
+assert(m==5)
