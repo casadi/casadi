@@ -888,15 +888,6 @@ namespace casadi {
     return operation_checker<CommChecker>(getOp());
   }
 
-  long MX::__hash__() const {
-    // TODO(Joel):
-    // This is bad coding, the pointer might on certain architectures be larger
-    // than the long, giving an error of type "error: cast from 'const SharedObjectInternal*'
-    // to 'int' loses precision". The solution is to convert to intptr_t, but this is not
-    // yet C++ standard
-    return long(get());
-  }
-
   Matrix<int> MX::mapping() const {
     return (*this)->mapping();
   }

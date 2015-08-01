@@ -23,46 +23,46 @@
  */
 
 
-#ifndef CASADI_MOSEK_SOCP_INTERFACE_HPP
-#define CASADI_MOSEK_SOCP_INTERFACE_HPP
+#ifndef CASADI_ECOS_INTERFACE_HPP
+#define CASADI_ECOS_INTERFACE_HPP
 
 #include "casadi/core/function/socp_solver_internal.hpp"
-#include <casadi/interfaces/mosek/casadi_socpsolver_mosek_export.h>
+#include <casadi/interfaces/ecos/casadi_socpsolver_ecos_export.h>
 
-#include <mosek.h>
+#include <ecos.h>
 
-/** \defgroup plugin_SocpSolver_mosek
-      Interface to the SOCP solver MOSEK
+/** \defgroup plugin_SocpSolver_ecos
+      Interface to the SOCP solver ECOS
 */
 
-/** \pluginsection{SocpSolver,mosek} */
+/** \pluginsection{SocpSolver,ecos} */
 
 /// \cond INTERNAL
 namespace casadi {
-  /** \brief \pluginbrief{SocpSolver,mosek}
+  /** \brief \pluginbrief{SocpSolver,ecos}
 
 
    \author Niels van Duijkeren
    \date 2015
    *
    @copydoc SocpSolver_doc
-   @copydoc plugin_SocpSolver_mosek
+   @copydoc plugin_SocpSolver_ecos
    * */
-  class CASADI_SOCPSOLVER_MOSEK_EXPORT MosekSocpInterface : public SocpSolverInternal {
+  class CASADI_SOCPSOLVER_ECOS_EXPORT EcosInterface : public SocpSolverInternal {
   public:
 
     /** \brief Constructor */
-    explicit MosekSocpInterface(const std::map<std::string, Sparsity> &st);
+    explicit EcosInterface(const std::map<std::string, Sparsity> &st);
 
     /** \brief Clone */
-    virtual MosekSocpInterface* clone() const;
+    virtual EcosInterface* clone() const;
 
     /** \brief  Create a new SOCP Solver */
-    static SocpSolverInternal* creator(const std::map<std::string, Sparsity>& st)
-    { return new MosekSocpInterface(st);}
+    static SocpSolverInternal* creator(const std::map<std::string, Sparsity> &st)
+    { return new EcosInterface(st);}
 
     /** \brief Destructor */
-    virtual ~MosekSocpInterface();
+    virtual ~EcosInterface();
 
     /** \brief Initialize */
     virtual void init();
@@ -75,19 +75,35 @@ namespace casadi {
 
   private:
 
-    /** Get solution status from MOSEK solsta value */
-    const std::string solutionStatus(const MSKsolstae& solsta) const;
+    /** Get string representation of ECOS exit code */
+    const std::string exitCode(const idxint& retval) const;
+    /** Get string representation of the explanation of ECOS exit code */
+    const std::string exitCodeLong(const idxint& retval) const;
 
-    /** Get problem status from MOSEK prosta value */
-    const std::string problemStatus(const MSKprostae& prosta) const;
+    /// Static ECOS input: G
+    std::vector<pfloat> ecos_Gpr_vec_;
+    std::vector<idxint> ecos_Gjc_vec_;
+    std::vector<idxint> ecos_Gir_vec_;
 
-    /** MOSEK variables */
-    MSKenv_t   mosek_env_;
-    MSKtask_t  mosek_task_;
+    /// Static-size ECOS input: A
+    std::vector<idxint> ecos_Ajc_vec_;
+    std::vector<idxint> ecos_Air_vec_;
+
+    /// Static ECOS input: h
+    std::vector<pfloat> ecos_h_vec_;
+
+    /// Static ECOS input: q
+    std::vector<idxint> ecos_q_vec_;
+
+    /// Static-size ECOS input: c
+    std::vector<pfloat> ecos_c_vec_;
+
+    /// Static-size ECOS input: b
+    std::vector<pfloat> ecos_b_vec_;
 
   };
 
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_MOSEK_SOCP_INTERFACE_HPP
+#endif // CASADI_ECOS_INTERFACE_HPP

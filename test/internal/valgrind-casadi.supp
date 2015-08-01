@@ -382,3 +382,11 @@ fun:vfprintf
 fun:printf
 obj:*libworhp*
 }
+
+{
+   Memory leak in ECOS
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:ECOS_setup
+}

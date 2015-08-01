@@ -44,6 +44,9 @@ if QpSolver.hasPlugin("ooqp"):
 # if SocpSolver.hasPlugin("mosek"):
 #   lpsolvers.append(("qp.qcqp.socp.mosek",{"qp_solver_options.qcqp_solver_options.socp_solver_options": {"MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10}},False))
 
+# if SocpSolver.hasPlugin("mosek"):
+#   lpsolvers.append(("qp.qcqp.socp.mosek",{"qp_solver_options.qcqp_solver_options.socp_solver_options": {"MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10}},False))
+
 # try:  
 #   QpSolver.loadPlugin("dsdp")
 #   def SDPLpSolver(st):

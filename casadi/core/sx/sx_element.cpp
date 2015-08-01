@@ -543,9 +543,8 @@ namespace casadi {
     return casadi_math<double>::ndeps(getOp());
   }
 
-  long SXElement::__hash__() const {
-    if (!node) return 0;
-    return (long) node;
+  size_t SXElement::__hash__() const {
+    return reinterpret_cast<size_t>(node);
   }
 
   // node corresponding to a constant 0
@@ -898,7 +897,7 @@ namespace casadi {
   }
 
   template<>
-  long SX::getElementHash() const {
+  size_t SX::getElementHash() const {
     return toScalar().__hash__();
   }
 

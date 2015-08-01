@@ -38,6 +38,9 @@ if SdpSolver.hasPlugin("dsdp"):
 if SocpSolver.hasPlugin("mosek"):
   qcqpsolvers.append(("socp",{"socp_solver": "mosek", "socp_solver_options": {"MSK_DPAR_INTPNT_CO_TOL_REL_GAP": 1e-10} },{"less_digits": 3},False))
 
+if SocpSolver.hasPlugin("ecos"):
+  qcqpsolvers.append(("socp",{"socp_solver": "ecos", "socp_solver_options": {"abstol": 1e-10,"reltol":1e-10} },{"less_digits": 1},False))
+
 class QcqpSolverTests(casadiTestCase):
 
   def testboundsviol(self):

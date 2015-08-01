@@ -59,6 +59,9 @@ if QpSolver.hasPlugin("qcqp.socp.sdp.dsdp"):
 if QpSolver.hasPlugin("qcqp.socp.mosek"):
   qpsolvers.append(("qcqp.socp.mosek",{"qcqp_solver_options.socp_solver_options": {"MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10}},{"less_digits": 3}))
 
+if QpSolver.hasPlugin("qcqp.socp.ecos"):
+  qpsolvers.append(("qcqp.socp.ecos",{"qcqp_solver_options.socp_solver_options": {"reltol":1e-10,"abstol":1e-10}},{"less_digits": 2}))
+
 print qpsolvers
 
 class QpSolverTests(casadiTestCase):

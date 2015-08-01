@@ -173,7 +173,7 @@ namespace casadi {
     /** \brief Returns a number that is unique for a given SXNode.
      * If the SXElement does not point to any node, 0 is returned.
      */
-    long __hash__() const;
+    size_t __hash__() const;
 
     /** \brief  Negation */
     SXElement operator-() const;
@@ -345,7 +345,7 @@ namespace casadi {
   template<> std::string SX::getName() const;
   template<> void SX::setEqualityCheckingDepth(int eq_depth);
   template<> int SX::getEqualityCheckingDepth();
-  template<> long SX::getElementHash() const;
+  template<> size_t SX::getElementHash() const;
   template<> void SX::zz_expand(SX &weights, SX& terms) const;
   template<> SX SX::zz_pw_const(const SX &tval, const SX &val) const;
   template<> SX SX::zz_pw_lin(const SX &tval, const SX &val) const;

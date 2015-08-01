@@ -36,6 +36,7 @@
 #include "../matrix/sparsity_internal.hpp"
 #include "../profiling.hpp"
 #include "../casadi_options.hpp"
+#include "../casadi_interrupt.hpp"
 
 namespace casadi {
 
@@ -179,6 +180,7 @@ namespace casadi {
 
     // Normal, interpreted output
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
+      InterruptHandler::check();
       if (it->op==OP_OUTPUT) {
         stream << "output[" << it->i0 << "][" << it->i2 << "] = @" << it->i1;
       } else {

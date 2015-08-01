@@ -162,3 +162,5 @@ a = SX.sym('a');
 b = substitute({sin(a), cos(a)}, {a},{a+3});
 b{1}
 b{2}
+
+veccat(MX.sym(2,3),MX.sym(4,5))

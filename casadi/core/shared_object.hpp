@@ -183,6 +183,11 @@ namespace casadi {
 #endif // SWIG
 /// \endcond
 
+    /** \brief Returns a number that is unique for a given Node.
+     * If the Object does not point to any node, "0" is returned.
+     */
+    size_t __hash__() const;
+
   private:
     SharedObjectNode *node;
     void count_up(); // increase counter of the node

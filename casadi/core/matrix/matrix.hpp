@@ -1002,7 +1002,7 @@ namespace casadi {
      * 
      * Only defined if symbolic scalar. 
      */
-    long getElementHash() const;
+    size_t getElementHash() const;
 
     /// Checks if expression does not contain NaN or Inf
     bool isRegular() const;

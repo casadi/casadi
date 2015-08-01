@@ -28,6 +28,7 @@
  // Include all public CasADi C++
 %{
 #include <casadi/casadi.hpp>
+#include <casadi/core/casadi_interrupt.hpp>
 %}
 
   /// Data structure in the target language holding data
@@ -51,13 +52,23 @@
         PySys_WriteStdout("%.*s", static_cast<int>(num), s);
       }
     }
+
+    static bool pythoncheckinterrupted() {
+      return PyErr_CheckSignals();
+    }
+
+
   }
+
 %}
 %init %{
   casadi::Logger::writeWarn = pythonlogger;
   casadi::Logger::writeProg = pythonlogger;
   casadi::Logger::writeDebug = pythonlogger;
   casadi::Logger::writeAll = pythonlogger;
+
+  casadi::InterruptHandler::checkInterrupted = pythoncheckinterrupted;
+
 %}
 #elif defined(SWIGMATLAB)
 %{
@@ -71,6 +82,13 @@
     static void mexflush(bool error) {
       mexEvalString("drawnow('update');");
     }
+
+    // Undocumented matlab feature
+    extern "C" bool utIsInterruptPending();
+
+    static bool mexcheckinterrupted() {
+      return utIsInterruptPending();
+    }
   }
 %}
 %init %{
@@ -80,6 +98,8 @@
   casadi::Logger::writeAll = mexlogger;
 
   casadi::Logger::flush = mexflush;
+
+  casadi::InterruptHandler::checkInterrupted = mexcheckinterrupted;
 %}
 #endif
 
@@ -2412,6 +2432,7 @@ except:
 %rename(mtimes) friendwrap_mul;
 %feature("varargin","1") friendwrap_vertcat;
 %feature("varargin","1") friendwrap_horzcat;
+%feature("varargin","1") friendwrap_veccat;
 
 // Explicit type conversion of the first argument of const member functions i.e. this/self
 %feature("convertself","1");
@@ -3898,13 +3919,16 @@ def swig_typename_convertor_cpp2python(s):
   s = s.replace("SXDict","str:SX")
   s = s.replace("std::string","str")
   s = s.replace(" const &","")
-  s = re.sub("(const )?Matrix< SXElement >( &)?",r"SX",s)
+  s = s.replace("friendwrap_","")
+  s = re.sub(r"\b((\w+)(< \w+ >)?)::\2\b",r"\1",s)
+  s = re.sub("(const )?Matrix< ?SXElement *>( &)?",r"SX",s)
   s = re.sub("(const )?GenericMatrix< ?(\w+) *>( ?&)?",r"\2 ",s)
+  s = re.sub("(const )?Matrix< ?int *>( ?&)?",r"IMatrix ",s)
+  s = re.sub("(const )?Matrix< ?double *>( ?&)?",r"DMatrix ",s)
   s = re.sub("(const )?Matrix< ?(\w+) *>( ?&)?",r"array(\2) ",s)
   s = re.sub("(const )?GenericMatrix< ?([\w\(\)]+) *>( ?&)?",r"\2 ",s)
   s = re.sub(r"const (\w+) &",r"\1 ",s)
   s = re.sub(r"< [\w\(\)]+ +>\(",r"(",s)
-  s = re.sub(r"\b(\w+)(< \w+ >)?::\1",r"\1",s)
   for i in range(5):
     s = re.sub(r"(const )? ?std::pair< ?([\w\(\)\]\[: ]+?) ?, ?([\w\(\)\]\[: ]+?) ?> ?&?",r"(\2,\3) ",s)
     s = re.sub(r"(const )? ?std::vector< ?([\w\(\)\[\] ]+) ?(, ?std::allocator< ?\2 ?>)? ?> ?&?",r"[\2] ",s)
@@ -3954,7 +3978,7 @@ def swig_monkeypatch(v,cl=True):
 
         s = e.args[0]
         s = s.replace("'new_","'")
-        s = re.sub(r"overloaded function '(\w+?)_(\w+)'",r"overloaded function '\1.\2'",s)
+        #s = re.sub(r"overloaded function '(\w+?)_(\w+)'",r"overloaded function '\1.\2'",s)
         m = re.search("overloaded function '([\w\.]+)'",s)
         if m:
           name = m.group(1)

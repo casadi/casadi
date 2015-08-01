@@ -66,6 +66,7 @@ option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOAS
 option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" ON)
 option(WITH_DSDP "Compile the interface to DSDP" ON)
 option(WITH_MOSEK "Compile the interface to MOSEK" OFF)
+option(WITH_ECOS "Compile the interface to ECOS" OFF)
 option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
@@ -80,7 +81,6 @@ option(WITH_COVERAGE "Create coverage report" OFF)
 option(WITH_MATLAB "Compile the MATLAB front-end (experimental)" OFF)
 option(WITH_PYTHON "Compile the Python front-end" OFF)
 option(WITH_JSON "Compile the JSON front-end" OFF)
-option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside Python front-end" OFF)
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
 option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" OFF)
 option(WITH_SELFCONTAINED "Make the install directory self-contained" OFF)
@@ -429,6 +429,12 @@ if(WITH_MOSEK)
 endif()
 add_feature_info(mosek-interface MOSEK_FOUND "Interface to the interior point SOCP solver MOSEK.")
 
+# ECOS
+if(WITH_ECOS)
+  # try to find system ecos
+  find_package(ECOS)
+endif()
+add_feature_info(ecos-interface ECOS_FOUND "Interface to the interior point SOCP solver ECOS.")
 
 # Use the included qpOASES
 if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
