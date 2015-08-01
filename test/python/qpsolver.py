@@ -612,6 +612,8 @@ class QpSolverTests(casadiTestCase):
     for qpsolver, qp_options, aux_options in qpsolvers:
       if 'cplex' in str(qpsolver):
         continue
+      if 'worhp' in str(qpsolver): # works but occasionaly throws segfaults, ulimit on travis?
+        continue
       solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
            
       solver.setOption(qp_options)
