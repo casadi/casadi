@@ -33,7 +33,7 @@ import itertools
 
 solvers= []
  
-if NlpSolver.hasPlugin("worhp"):
+if NlpSolver.hasPlugin("worhp")  and not args.ignore_memory_heavy:
   solvers.append(("worhp",{"TolOpti":1e-20}))
   #solvers.append(("worhp",{"TolOpti":1e-20,"TolFeas":1e-20,"UserHM": False}))
 

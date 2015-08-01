@@ -35,10 +35,10 @@ if NlpSolver.hasPlugin("ipopt"):
 if NlpSolver.hasPlugin("ipopt"):
   qpsolvers.append(("nlp.ipopt",{"nlp_solver_options": {"tol": 1e-12}},{}))
 
-if NlpSolver.hasPlugin("worhp"):
+if NlpSolver.hasPlugin("worhp") and not args.ignore_memory_heavy:
   qpsolvers.append(("nlp",{"nlp_solver": "worhp", "nlp_solver_options": {"TolOpti": 1e-12}},{}))
 
-if NlpSolver.hasPlugin("worhp"):
+if NlpSolver.hasPlugin("worhp") and not args.ignore_memory_heavy:
   qpsolvers.append(("nlp.worhp",{"nlp_solver_options": {"TolOpti": 1e-12}},{}))
 
 if QpSolver.hasPlugin("ooqp"):
