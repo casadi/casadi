@@ -2432,6 +2432,7 @@ except:
 %rename(mtimes) friendwrap_mul;
 %feature("varargin","1") friendwrap_vertcat;
 %feature("varargin","1") friendwrap_horzcat;
+%feature("varargin","1") friendwrap_veccat;
 
 // Explicit type conversion of the first argument of const member functions i.e. this/self
 %feature("convertself","1");
