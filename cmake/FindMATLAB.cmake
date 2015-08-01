@@ -198,6 +198,10 @@ find_library(MATLAB_ENG_LIBRARY
     ${LIBPREFIX}eng
     HINTS ${MATLAB_LIBRARIES_DIR}
     )
+find_library(MATLAB_UT_LIBRARY
+    ${LIBPREFIX}ut
+    HINTS ${MATLAB_LIBRARIES_DIR}
+    )
 
 # Get path to the include directory
 find_path(MATLAB_INCLUDE_DIR
@@ -223,7 +227,7 @@ execute_process(
     )
 
 set(MATLAB_LIBRARIES
-  ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY}
+  ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY} ${MATLAB_UT_LIBRARY}
   CACHE PATH "Libraries to link mex files"
 )
 
