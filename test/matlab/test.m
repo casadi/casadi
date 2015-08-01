@@ -163,4 +163,8 @@ b = substitute({sin(a), cos(a)}, {a},{a+3});
 b{1}
 b{2}
 
-veccat(MX.sym(2,3),MX.sym(4,5))
+veccat(MX.sym('x',2,3),MX.sym('x',4,5))
+length(MX.sym('x',4,1))
+assert(length(MX.sym('x',4,1))==4)
+assert(length(MX.sym('x',1,3))==3)
+assert(length(MX.sym('x',4,5))==5)

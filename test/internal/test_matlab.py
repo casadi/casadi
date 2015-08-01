@@ -35,7 +35,7 @@ t = TestSuite(dirname=src,
   skipdirs=[".svn","ctemplate","defs"],
    inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
     args=sys.argv[2:],
-   stderr_trigger=["Error(?! unsubscribing to signals)",r"\?\?\?",r"Undefined"],
+   stderr_trigger=["^(?!(Reference counting|Warning|$))"],
    check_depreciation=True
    )
   
