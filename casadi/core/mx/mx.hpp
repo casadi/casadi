@@ -278,11 +278,6 @@ namespace casadi {
     /// Get operation type
     int getOp() const;
 
-    /** \brief Returns a number that is unique for a given MXNode.
-     * If the MX does not point to any node, 0 is returned.
-     */
-    long __hash__() const;
-
     /// \cond INTERNAL
     /// Get the temporary variable
     int getTemp() const;

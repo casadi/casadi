@@ -1682,7 +1682,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  long Matrix<DataType>::getElementHash() const {
+  size_t Matrix<DataType>::getElementHash() const {
     throw CasadiException("\"getElementHash\" not defined for instantiation");
   }
 

@@ -259,6 +259,10 @@ namespace casadi {
     return weak_ref_;
   }
 
+  size_t SharedObject::__hash__() const {
+    return reinterpret_cast<size_t>(get());
+  }
+
 } // namespace casadi
 
 
