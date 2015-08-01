@@ -2712,8 +2712,9 @@ namespace casadi{
 #define IS_SX       0x100000
 #define IS_MX       0x1000000
 
-%define SPARSITY_INTERFACE_FUN(DECL, FLAG, M)
+%define SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
+
  DECL M %SHOW(horzcat)(const std::vector< M > &v) {
   return horzcat(v);
  }
@@ -2834,6 +2835,21 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<int>)
 SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
 SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElement>)
 %enddef
+
+#ifdef SWIGMATLAB
+  %define SPARSITY_INTERFACE_FUN(DECL, FLAG, M)
+    SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
+    #if FLAG & IS_MEMBER
+     DECL int %SHOW(length)(const M &v) {
+      return std::max(v.size1(), v.size2());
+     }
+    #endif
+  %enddef
+#else
+  %define SPARSITY_INTERFACE_FUN(DECL, FLAG, M)
+    SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
+  %enddef
+#endif
 
 %define GENERIC_MATRIX_FUN(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
