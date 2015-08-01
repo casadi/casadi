@@ -847,29 +847,29 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 	  size_t ncol = mxGetN(p);
           mxChar *data = mxGetChars(p);
 
-          // Start with all empty strings
-          **m = std::vector<std::string>(nrow);
+          // Allocate space for output
+          (**m).resize(nrow);
           std::vector<std::string> &m_ref = **m;
 
-          // Quick return if no elements
-          if (nrow==0 || ncol==0) return true;
+          // For all strings
+          for (size_t j=0; j!=nrow; ++j) {
+            // Get length without trailing spaces
+            size_t len = ncol;
+            while (len!=0 && data[j + nrow*(len-1)]==' ') --len;
 
-          // Get lengths of all null-terminated strings
-          mxChar* s = data;
-          for (size_t i=0; i!=ncol; ++i) {
-            for (size_t j=0; j!=nrow; ++j, ++s) {
-              if (m_ref[j].empty() && *s=='\0') m_ref[j].resize(i);
+            // Check if null-terminated
+            for (size_t i=0; i!=len; ++i) {
+              if (data[j + nrow*i]=='\0') {
+                len = i;
+                break;
+              }
             }
-          }
 
-          // Resize if string uses up full row
-          for (size_t j=0; j!=nrow; ++j) {
-            if (m_ref[j].empty() && data[j]!='\0') m_ref[j].resize(ncol);
-          }
+            // Create a string of the desired length
+            m_ref[j] = std::string(len, ' ');
 
-          // Get string content
-          for (size_t j=0; j!=nrow; ++j) {
-            for (size_t i=0; i<m_ref[j].size(); ++i) {
+            // Get string content
+            for (size_t i=0; i!=len; ++i) {
               m_ref[j][i] = data[j + nrow*i];
             }
           }
