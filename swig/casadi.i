@@ -525,6 +525,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     bool to_ptr(GUESTOBJECT *p, std::pair<int, int>** m);
 #endif // SWIGMATLAB
     template<typename M1, typename M2> bool to_ptr(GUESTOBJECT *p, std::pair<M1, M2>** m);
+#ifdef SWIGMATLAB
+    bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m);
+#endif // SWIGMATLAB
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
 
@@ -554,6 +557,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     GUESTOBJECT* from_ptr(const std::pair<int, int>* a);
 #endif // SWIGMATLAB
     template<typename M1, typename M2> GUESTOBJECT* from_ptr(const std::pair<M1, M2>* a);
+#ifdef SWIGMATLAB
+    GUESTOBJECT* from_ptr(const std::vector<std::string> *a);
+#endif // SWIGMATLAB
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a);
     template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a);
 
@@ -830,6 +836,51 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 %fragment("casadi_vector", "header", fragment="casadi_aux") {
   namespace casadi {
+    // MATLAB n-by-m char array mapped to vector of length m
+
+#ifdef SWIGMATLAB
+    bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m) {
+      if (mxIsChar(p)) {
+	if (m) {
+          // Get data
+	  size_t nrow = mxGetM(p);
+	  size_t ncol = mxGetN(p);
+          mxChar *data = mxGetChars(p);
+
+          // Start with all empty strings
+          **m = std::vector<std::string>(nrow);
+          std::vector<std::string> &m_ref = **m;
+
+          // Quick return if no elements
+          if (nrow==0 || ncol==0) return true;
+
+          // Get lengths of all null-terminated strings
+          mxChar* s = data;
+          for (size_t i=0; i!=ncol; ++i) {
+            for (size_t j=0; j!=nrow; ++j, ++s) {
+              if (m_ref[j].empty() && *s=='\0') m_ref[j].resize(i);
+            }
+          }
+
+          // Resize if string uses up full row
+          for (size_t j=0; j!=nrow; ++j) {
+            if (m_ref[j].empty() && data[j]!='\0') m_ref[j].resize(ncol);
+          }
+
+          // Get string content
+          for (size_t j=0; j!=nrow; ++j) {
+            for (size_t i=0; i<m_ref[j].size(); ++i) {
+              m_ref[j][i] = data[j + nrow*i];
+            }
+          }
+        }
+	return true;
+      } else {
+        return false;
+      }
+    }
+#endif // SWIGMATLAB
+
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m) {
       // Treat Null
       if (is_null(p)) return false;
@@ -956,6 +1007,17 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // No match
       return false;
     }
+
+#ifdef SWIGMATLAB
+    GUESTOBJECT* from_ptr(const std::vector<std::string> *a) {
+      // Collect arguments as char arrays
+      std::vector<const char*> str(a->size());
+      for (size_t i=0; i<str.size(); ++i) str[i] = (*a)[i].c_str();
+
+      // std::vector<string> maps to MATLAB char array with multiple columns
+      return mxCreateCharMatrixFromStrings(str.size(), str.empty() ? 0 : &str[0]);
+    }
+#endif // SWIGMATLAB
 
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
 #ifdef SWIGPYTHON
