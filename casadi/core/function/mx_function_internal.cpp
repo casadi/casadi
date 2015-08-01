@@ -27,6 +27,7 @@
 #include "../casadi_types.hpp"
 #include "../profiling.hpp"
 #include "../casadi_options.hpp"
+#include "../casadi_interrupt.hpp"
 
 #include <stack>
 #include <typeinfo>
@@ -507,6 +508,7 @@ namespace casadi {
   void MXFunctionInternal::print(ostream &stream) const {
     FunctionInternal::print(stream);
     for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+      InterruptHandler::check();
       print(stream, *it);
       stream << endl;
     }

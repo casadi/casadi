@@ -24,6 +24,7 @@ set(CASADI_SRCS
   casadi_limits.hpp
   casadi_types.hpp
   casadi_logger.hpp           casadi_logger.cpp
+  casadi_interrupt.hpp        casadi_interrupt.cpp
   casadi_exception.hpp
   casadi_calculus.hpp
   casadi_math.hpp

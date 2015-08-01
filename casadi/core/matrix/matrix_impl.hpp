@@ -29,6 +29,8 @@
 // The declaration of the class is in a separate file
 #include "matrix.hpp"
 
+#include "../casadi_interrupt.hpp"
+
 /// \cond INTERNAL
 
 namespace casadi {
@@ -736,6 +738,7 @@ namespace casadi {
         for (int el=colind(cc); el<colind(cc+1); ++el) {
           int rr=row(el);
           stream << std::endl << " (" << rr << ", " << cc << ") -> " << nz.at(el);
+          InterruptHandler::check();
         }
       }
     }

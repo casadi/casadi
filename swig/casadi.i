@@ -28,6 +28,7 @@
  // Include all public CasADi C++
 %{
 #include <casadi/casadi.hpp>
+#include <casadi/core/casadi_interrupt.hpp>
 %}
 
   /// Data structure in the target language holding data
@@ -51,13 +52,23 @@
         PySys_WriteStdout("%.*s", static_cast<int>(num), s);
       }
     }
+
+    static bool pythoncheckinterrupted() {
+      return PyErr_CheckSignals();
+    }
+
+
   }
+
 %}
 %init %{
   casadi::Logger::writeWarn = pythonlogger;
   casadi::Logger::writeProg = pythonlogger;
   casadi::Logger::writeDebug = pythonlogger;
   casadi::Logger::writeAll = pythonlogger;
+
+  casadi::InterruptHandler::checkInterrupted = pythoncheckinterrupted;
+
 %}
 #elif defined(SWIGMATLAB)
 %{
@@ -71,6 +82,13 @@
     static void mexflush(bool error) {
       mexEvalString("drawnow('update');");
     }
+
+    // Undocumented matlab feature
+    extern "C" bool utIsInterruptPending();
+
+    static bool mexcheckinterrupted() {
+      return utIsInterruptPending();
+    }
   }
 %}
 %init %{
@@ -80,6 +98,8 @@
   casadi::Logger::writeAll = mexlogger;
 
   casadi::Logger::flush = mexflush;
+
+  casadi::InterruptHandler::checkInterrupted = mexcheckinterrupted;
 %}
 #endif
 

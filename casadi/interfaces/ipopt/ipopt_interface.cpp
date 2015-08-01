@@ -29,6 +29,7 @@
 #include "casadi/core/std_vector_tools.hpp"
 #include "../../core/profiling.hpp"
 #include "../../core/casadi_options.hpp"
+#include "../../core/casadi_interrupt.hpp"
 
 #include <ctime>
 #include <stdlib.h>
@@ -706,7 +707,12 @@ namespace casadi {
   }
 
   bool IpoptInterface::eval_f(int n, const double* x, bool new_x, double& obj_value) {
+
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+
     try {
+
       log("eval_f started");
 
       // Log time
