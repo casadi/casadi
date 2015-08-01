@@ -5,14 +5,17 @@ function s = swig_typename_convertor_cpp2matlab(s)
   s = strrep(s,'SXDict','struct:SX');
   s = strrep(s,'std::string','char');
   s = strrep(s,' const &','');
-  
-  s = regexprep(s,'(const )?Matrix< SXElement >( &)?','SX');
+  s = strrep(s,'friendwrap_','');
+  s = regexprep(s,'\<(\w+)(< \w+ >)::\1\>','$1$2');
+  s = regexprep(s,'\<(\w+)::\1\>','$1');  
+  s = regexprep(s,'(const )?Matrix< ?SXElement *>( &)?','SX');
+  s = regexprep(s,'(const )?Matrix< ?double *>( &)?','DMatrix');
+  s = regexprep(s,'(const )?Matrix< ?int * >( &)?','IMatrix');
   s = regexprep(s,'(const )?GenericMatrix< ?(\w+) *>( ?&)?','$2');
-  s = regexprep(s,'(const )?Matrix< ?(\w+) *>( ?&)?','array($2) ');
   s = regexprep(s,'(const )?GenericMatrix< ?([\w\(\)]+) *>( ?&)?','$2 ');
   s = regexprep(s,'const (\w+) &','$1 ');
   s = regexprep(s,'< [\w\(\)]+ +>\(','(');
-  s = regexprep(s,'\<(\w+)(< \w+ >)?::\1','$1');
+
   for i=1:5
       s = regexprep(s,'(const )? ?std::pair< ?([\w\(\)\]\[\}\{: ]+?) ?, ?([\w\(\)\]\[\}\{: ]+?) ?> ?&?','{$2,$3} ');
       s = regexprep(s,'(const )? ?std::vector< ?([\w\(\)\[\]\}\{ ]+) ?(, ?std::allocator< ?\2 ?>)? ?> ?&?','{$2} ');

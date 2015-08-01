@@ -292,7 +292,7 @@ class Misctests(casadiTestCase):
     except NotImplementedError as e:
       print e.message
       assert "vertcat([SX]" in e.message
-      assert "vertcat([array(double)" in e.message
+      assert "vertcat([DMatrix" in e.message
       assert "You have: vertcat(int)" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
@@ -360,8 +360,22 @@ class Misctests(casadiTestCase):
     except NotImplementedError as e:
       print e.message
       assert "diagsplit(SX,int)" in e.message
-      assert "diagsplit(array(double) ,int)" in e.message
-      
+      assert "diagsplit(DMatrix ,int)" in e.message
+
+    try:
+      DMatrix("df")
+      self.assertTrue(False)
+    except NotImplementedError as e:
+      print e.message
+      assert "  DMatrix (" in e.message
+
+    try:
+      vertcat([1,SX.sym('x'),MX.sym('x')])
+      self.assertTrue(False)
+    except NotImplementedError as e:
+      print e.message
+      assert "  vertcat(" in e.message
+
   def test_callkw(self):
       x = SX.sym("x")
 
