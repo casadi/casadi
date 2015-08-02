@@ -251,7 +251,11 @@ namespace casadi {
     }
 #endif // SWIG
 
-#ifndef SWIG
+#if !defined(SWIG) || defined(DOXYGEN)
+/**
+\ingroup expression_tools
+@{
+*/
     /** \brief Matrix power x^n
      */
     inline friend MatType mpower(const MatType& x, const MatType& n) {
@@ -565,7 +569,7 @@ namespace casadi {
       extractShared(ex_output, v, vdef, v_prefix, v_suffix);
     }
 
-
+/** @} */
 #endif // SWIG
 
     /** @name Construct symbolic primitives

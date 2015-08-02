@@ -304,7 +304,12 @@ class Doxy2SWIG_X(Doxy2SWIG):
                 if first.has_key(n):
                     self.parse(first[n])
             self.end_docstring()
-      
+
+  def do_sectiondef(self, node):
+      kind = node.attributes['kind'].value
+      if kind in ('public-func', 'func', 'user-defined', '','friend'):
+          self.generic_parse(node)   
+
   def do_memberdef(self, node):
       prot = node.attributes['prot'].value
       id = node.attributes['id'].value
@@ -323,8 +328,10 @@ class Doxy2SWIG_X(Doxy2SWIG):
                  kind in ['variable', 'typedef']:
               return
 
-          defn = first['definition'].firstChild.data + first['argsstring'].firstChild.data
-
+          try:
+            defn = first['definition'].firstChild.data + first['argsstring'].firstChild.data
+          except:
+            return
           target = ""
           anc = node.parentNode.parentNode
           if cdef_kind in ('file', 'namespace'):
@@ -341,7 +348,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
               anc_node = anc.getElementsByTagName('compoundname')
               cname = anc_node[0].firstChild.data
               if kind=="friend":
-                target = name
+                target = "friendwrap_" + name
               else:
                 target = '%s::%s'%(cname, name)
               

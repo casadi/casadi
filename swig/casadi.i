@@ -525,6 +525,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     bool to_ptr(GUESTOBJECT *p, std::pair<int, int>** m);
 #endif // SWIGMATLAB
     template<typename M1, typename M2> bool to_ptr(GUESTOBJECT *p, std::pair<M1, M2>** m);
+#ifdef SWIGMATLAB
+    bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m);
+#endif // SWIGMATLAB
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
 
@@ -554,6 +557,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     GUESTOBJECT* from_ptr(const std::pair<int, int>* a);
 #endif // SWIGMATLAB
     template<typename M1, typename M2> GUESTOBJECT* from_ptr(const std::pair<M1, M2>* a);
+#ifdef SWIGMATLAB
+    GUESTOBJECT* from_ptr(const std::vector<std::string> *a);
+#endif // SWIGMATLAB
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a);
     template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a);
 
@@ -830,6 +836,51 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 %fragment("casadi_vector", "header", fragment="casadi_aux") {
   namespace casadi {
+    // MATLAB n-by-m char array mapped to vector of length m
+
+#ifdef SWIGMATLAB
+    bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m) {
+      if (mxIsChar(p)) {
+	if (m) {
+          // Get data
+	  size_t nrow = mxGetM(p);
+	  size_t ncol = mxGetN(p);
+          mxChar *data = mxGetChars(p);
+
+          // Allocate space for output
+          (**m).resize(nrow);
+          std::vector<std::string> &m_ref = **m;
+
+          // For all strings
+          for (size_t j=0; j!=nrow; ++j) {
+            // Get length without trailing spaces
+            size_t len = ncol;
+            while (len!=0 && data[j + nrow*(len-1)]==' ') --len;
+
+            // Check if null-terminated
+            for (size_t i=0; i!=len; ++i) {
+              if (data[j + nrow*i]=='\0') {
+                len = i;
+                break;
+              }
+            }
+
+            // Create a string of the desired length
+            m_ref[j] = std::string(len, ' ');
+
+            // Get string content
+            for (size_t i=0; i!=len; ++i) {
+              m_ref[j][i] = data[j + nrow*i];
+            }
+          }
+        }
+	return true;
+      } else {
+        return false;
+      }
+    }
+#endif // SWIGMATLAB
+
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m) {
       // Treat Null
       if (is_null(p)) return false;
@@ -956,6 +1007,17 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       // No match
       return false;
     }
+
+#ifdef SWIGMATLAB
+    GUESTOBJECT* from_ptr(const std::vector<std::string> *a) {
+      // Collect arguments as char arrays
+      std::vector<const char*> str(a->size());
+      for (size_t i=0; i<str.size(); ++i) str[i] = (*a)[i].c_str();
+
+      // std::vector<string> maps to MATLAB char array with multiple columns
+      return mxCreateCharMatrixFromStrings(str.size(), str.empty() ? 0 : &str[0]);
+    }
+#endif // SWIGMATLAB
 
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a) {
 #ifdef SWIGPYTHON
@@ -2433,6 +2495,7 @@ except:
 %feature("varargin","1") friendwrap_vertcat;
 %feature("varargin","1") friendwrap_horzcat;
 %feature("varargin","1") friendwrap_veccat;
+%feature("optionalunpack","1") shape;
 
 // Explicit type conversion of the first argument of const member functions i.e. this/self
 %feature("convertself","1");
@@ -2712,8 +2775,9 @@ namespace casadi{
 #define IS_SX       0x100000
 #define IS_MX       0x1000000
 
-%define SPARSITY_INTERFACE_FUN(DECL, FLAG, M)
+%define SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
+
  DECL M %SHOW(horzcat)(const std::vector< M > &v) {
   return horzcat(v);
  }
@@ -2834,6 +2898,21 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<int>)
 SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
 SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElement>)
 %enddef
+
+#ifdef SWIGMATLAB
+  %define SPARSITY_INTERFACE_FUN(DECL, FLAG, M)
+    SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
+    #if FLAG & IS_MEMBER
+     DECL int %SHOW(length)(const M &v) {
+      return std::max(v.size1(), v.size2());
+     }
+    #endif
+  %enddef
+#else
+  %define SPARSITY_INTERFACE_FUN(DECL, FLAG, M)
+    SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
+  %enddef
+#endif
 
 %define GENERIC_MATRIX_FUN(DECL, FLAG, M)
 #if FLAG & IS_MEMBER

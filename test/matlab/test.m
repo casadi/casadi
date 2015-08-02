@@ -109,7 +109,7 @@ ode = SXFunction('ode',daeIn('x',x),daeOut('ode',x));
 opts = struct
 opts.verbose = true
 
-intg = Integrator('integrator', 'rk',ode,opts);
+intg = Integrator('integrator', 'rk', ode, opts);
 intg.evaluate();
 diary OFF
 
@@ -151,16 +151,39 @@ end
 assert(~isempty(strfind(msg,'  SXFunction(char,{SX} ,{SX} ,Dict)')))
 assert(~isempty(strfind(msg,'You have: char, SX')))
 
+% Check mixing DMatrix and MX
+res = (DMatrix(1)+MX(1)) - (MX(1)+DMatrix(1))
+assert(iszero(res))
 
-DMatrix(1)+MX(1)
-MX(1)+DMatrix(1)
-
-MX.sym('x',5,5)*3
-MX.sym('x',5,5).*3
-
+% Try substitute (non-member function)
 a = SX.sym('a');
 b = substitute({sin(a), cos(a)}, {a},{a+3});
 b{1}
 b{2}
 
-veccat(MX.sym(2,3),MX.sym(4,5))
+veccat(MX.sym('x',2,3),MX.sym('x',4,5))
+length(MX.sym('x',4,1))
+assert(length(MX.sym('x',4,1))==4)
+assert(length(MX.sym('x',1,3))==3)
+assert(length(MX.sym('x',4,5))==5)
+
+[n,m] = size(MX.sym('x',4,5));
+assert(n==4)
+assert(m==5)
+
+% Create function with custom IO scheme
+x = SX.sym('x');
+p = SX.sym('p');
+f = x^2;
+g = log(x)-p;
+opts = struct('input_scheme', char('x','p'),...
+              'output_scheme', char('f','g'));
+nlp = SXFunction('nlp', {x,p}, {f,g}, opts);
+
+% Evaluate with numbered inputs and outputs
+res_vec = nlp({1.1, 3.3});
+
+% Evaluate with named inputs and outputs
+res_struct = nlp(struct('x',1.1,'p',3.3));
+assert(iszero(res_vec{1}-res_struct.f))
+assert(iszero(res_vec{2}-res_struct.g))

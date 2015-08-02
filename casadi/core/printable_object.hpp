@@ -82,8 +82,9 @@ namespace casadi {
     inline friend std::string repr(const PrintableObject<Derived>& obj) {
       return obj.getRepresentation();
     }
-#endif // !SWIG || DOXYGEN
 /** @} */
+#endif //
+
   };
 } // namespace casadi
 
