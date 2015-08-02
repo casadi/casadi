@@ -9371,6 +9371,216 @@ Is initialized?
 
 
 // File: classcasadi_1_1GenericExpression.xml
+%feature("docstring") friendwrap_floor "
+
+Round down to nearest integer.
+
+";
+
+%feature("docstring") friendwrap_acos "
+
+Arc cosine.
+
+";
+
+%feature("docstring") friendwrap_copysign "
+
+Copy sign.
+
+";
+
+%feature("docstring") friendwrap_exp "
+
+Exponential function.
+
+";
+
+%feature("docstring") friendwrap_ceil "
+
+Round up to nearest integer.
+
+";
+
+%feature("docstring") friendwrap_cos "
+
+Cosine.
+
+";
+
+%feature("docstring") friendwrap_isEqual "
+
+Check if two nodes are equivalent up to a given depth. Depth=0 checks if the
+expressions are identical, i.e. points to the same node.
+
+a = x*x b = x*x
+
+a.isEqual(b, 0) will return false, but a.isEqual(b, 1) will return true
+
+";
+
+%feature("docstring") friendwrap_asinh "
+
+Inverse hyperbolic sine.
+
+";
+
+%feature("docstring") friendwrap_atanh "
+
+Inverse hyperbolic tangent.
+
+";
+
+%feature("docstring") friendwrap_iszero "
+
+Addition.
+
+";
+
+%feature("docstring") friendwrap_tan "
+
+Tangent.
+
+";
+
+%feature("docstring") friendwrap_acosh "
+
+Inverse hyperbolic cosine.
+
+";
+
+%feature("docstring") friendwrap_erfinv "
+
+Invers error function.
+
+";
+
+%feature("docstring") friendwrap_fmod "
+
+Remainder after division.
+
+";
+
+%feature("docstring") friendwrap_log "
+
+Natural logarithm.
+
+";
+
+%feature("docstring") friendwrap_log10 "
+
+Base-10 logarithm.
+
+";
+
+%feature("docstring") friendwrap_constpow "
+
+Elementwise power with const power.
+
+";
+
+%feature("docstring") friendwrap_abs "
+
+Absolute value.
+
+";
+
+%feature("docstring") friendwrap_fmax "
+
+Largest of two values.
+
+";
+
+%feature("docstring") friendwrap_sqrt "
+
+Square root.
+
+";
+
+%feature("docstring") friendwrap_sign "
+
+Sine function sign(x) := -1 for x<0 sign(x) := 1 for x>0, sign(0) := 0
+sign(NaN) := NaN
+
+";
+
+%feature("docstring") friendwrap_logic_and "
+
+Logical and, alternative syntax.
+
+";
+
+%feature("docstring") friendwrap_fmin "
+
+Smallest of two values.
+
+";
+
+%feature("docstring") friendwrap_erf "
+
+Error function.
+
+";
+
+%feature("docstring") friendwrap_pow "
+
+Elementwise power.
+
+";
+
+%feature("docstring") friendwrap_atan2 "
+
+Two argument arc tangent.
+
+";
+
+%feature("docstring") friendwrap_logic_or "
+
+Logical or, alterntive syntax.
+
+";
+
+%feature("docstring") friendwrap_fabs "
+
+Absolute value.
+
+";
+
+%feature("docstring") friendwrap_simplify "
+
+Simplify an expression.
+
+";
+
+%feature("docstring") friendwrap_sinh "
+
+Hyperbolic sine.
+
+";
+
+%feature("docstring") friendwrap_tanh "
+
+Hyperbolic tangent.
+
+";
+
+%feature("docstring") friendwrap_cosh "
+
+Hyperbolic cosine.
+
+";
+
+%feature("docstring") friendwrap_logic_not "
+
+Logical not, alternative syntax.
+
+";
+
+%feature("docstring") friendwrap_atan "
+
+Arc tangent.
+
+";
+
 %feature("docstring") casadi::GenericExpression "
 
 Expression interface.
@@ -9380,6 +9590,18 @@ syntax and implementing common functionality using the curiously recurring
 template pattern (CRTP) idiom. Joel Andersson
 
 C++ includes: generic_expression.hpp ";
+
+%feature("docstring") friendwrap_sin "
+
+Sine.
+
+";
+
+%feature("docstring") friendwrap_asin "
+
+Arc sine.
+
+";
 
 
 // File: classcasadi_1_1GenericExternal.xml
@@ -9394,42 +9616,121 @@ C++ includes: generic_expression.hpp ";
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring") casadi::GenericMatrix::issquare "
+*/ %feature("docstring") friendwrap_sumRows "
 
-Check if the matrix expression is square.
+Return a row-wise summation of elements.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::shape "
+%feature("docstring") friendwrap_substitute "
 
->  (int,int) MatType .shape() const 
+>  MatType substitute(MatType ex, MatType v, MatType vdef)
 ------------------------------------------------------------------------
 
-Get the shape.
+Substitute variable v with expression vdef in an expression ex.
 
->  int MatType .shape(int axis) const 
+>  [MatType] substitute([MatType ] ex, [MatType ] v, [MatType ] vdef)
 ------------------------------------------------------------------------
 
-Get the size along a particular dimensions.
+Substitute variable var with expression expr in multiple expressions.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::sparse "
+%feature("docstring") casadi::GenericMatrix::numel "
 
-[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
-instead
+>  int MatType .numel() const 
+------------------------------------------------------------------------
+
+Get the number of elements.
+
+>  int MatType .numel(int i) const 
+------------------------------------------------------------------------
+
+Get the number of elements in slice (cf. MATLAB)
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::isrow "
+%feature("docstring") friendwrap_norm_inf "
 
-Check if the matrix is a row vector (i.e. size1()==1)
+Infinity-norm.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::isvector "
+%feature("docstring") friendwrap_pinv "
 
-Check if the matrix is a row or column vector.
+>  MatType pinv(MatType A)
+------------------------------------------------------------------------
+
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
+
+pinv(A)' = (AA')^(-1) A
+
+If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
+
+pinv(A) = (A'A)^(-1) A'
+
+>  MatType pinv(MatType A, str lsolver, Dict dict=Dict())
+------------------------------------------------------------------------
+
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
+matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
+
+";
+
+%feature("docstring") friendwrap_countNodes "
+
+Count number of nodes
+
+";
+
+%feature("docstring") casadi::GenericMatrix::isempty "
+
+Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
+optionally both dimensions)
+
+";
+
+%feature("docstring") friendwrap_hessian "";
+
+%feature("docstring") friendwrap_trace "
+
+Matrix trace.
+
+";
+
+%feature("docstring") friendwrap_mldivide "
+
+Matrix divide (cf. backslash '\\\\' in MATLAB)
+
+";
+
+%feature("docstring") friendwrap_jacobian "
+
+Calculate jacobian via source code transformation.
+
+";
+
+%feature("docstring") friendwrap_cross "
+
+Matlab's cross command.
+
+";
+
+%feature("docstring") friendwrap_tril2symm "
+
+Convert a lower triangular matrix to a symmetric one.
+
+";
+
+%feature("docstring") friendwrap_substituteInPlace "
+
+Inplace substitution with piggyback expressions Substitute variables v out
+of the expressions vdef sequentially, as well as out of a number of other
+expressions piggyback.
 
 ";
 
@@ -9437,6 +9738,32 @@ Check if the matrix is a row or column vector.
 
 Get string representation of dimensions. The representation is (nrow x ncol
 = numel | size)
+
+";
+
+%feature("docstring") casadi::GenericMatrix::issquare "
+
+Check if the matrix expression is square.
+
+";
+
+%feature("docstring") friendwrap_quad_form "
+
+>  MatType quad_form(MatType X, MatType A)
+------------------------------------------------------------------------
+
+Calculate quadratic form X^T A X.
+
+>  MatType quad_form(MatType X)
+------------------------------------------------------------------------
+
+Calculate quadratic form X^T X.
+
+";
+
+%feature("docstring") friendwrap_det "
+
+Matrix determinant (experimental)
 
 ";
 
@@ -9452,9 +9779,39 @@ Get get the number of non-zeros on the diagonal.
 
 ";
 
+%feature("docstring") friendwrap_dependsOn "
+
+Check if expression depends on the argument The argument must be symbolic.
+
+";
+
+%feature("docstring") friendwrap_inner_prod "
+
+Inner product of two matrices with x and y matrices of the same dimension.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::nnz "
+
+Get the number of (structural) non-zero elements.
+
+";
+
 %feature("docstring") casadi::GenericMatrix::sizeL "
 
 Get the number of non-zeros in the lower triangular half.
+
+";
+
+%feature("docstring") friendwrap_norm_F "
+
+Frobenius norm.
+
+";
+
+%feature("docstring") friendwrap_getOperatorRepresentation "
+
+Get a string representation for a binary MatType, using custom arguments.
 
 ";
 
@@ -9479,6 +9836,12 @@ See:   nnz()
 
 ";
 
+%feature("docstring") casadi::GenericMatrix::iscolumn "
+
+Check if the matrix is a column vector (i.e. size2()==1)
+
+";
+
 %feature("docstring") casadi::GenericMatrix "
 
 Matrix base class.
@@ -9499,6 +9862,12 @@ with Sparsity& sparsity() Joel Andersson
 
 C++ includes: generic_matrix.hpp ";
 
+%feature("docstring") friendwrap_tangent "
+
+Matrix power x^n.
+
+";
+
 %feature("docstring") casadi::GenericMatrix::find "
 
 Get the location of all non-zero elements as they would appear in a Dense
@@ -9509,10 +9878,105 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::isempty "
+%feature("docstring") friendwrap_polyval "
 
-Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
-optionally both dimensions)
+Evaluate a polynomial with coefficients p in x.
+
+";
+
+%feature("docstring") friendwrap_triu2symm "
+
+Convert a upper triangular matrix to a symmetric one.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::shape "
+
+>  (int,int) MatType .shape() const 
+------------------------------------------------------------------------
+
+Get the shape.
+
+>  int MatType .shape(int axis) const 
+------------------------------------------------------------------------
+
+Get the size along a particular dimensions.
+
+";
+
+%feature("docstring") friendwrap_outer_prod "
+
+Take the outer product of two vectors Equals.
+
+with x and y vectors
+
+";
+
+%feature("docstring") friendwrap_symvar "
+
+Get all symbols contained in the supplied expression Get all symbols on
+which the supplied expression depends.
+
+See:   SXFunction::getFree(), MXFunction::getFree()
+
+";
+
+%feature("docstring") friendwrap_sum_square "
+
+Calculate some of squares: sum_ij X_ij^2.
+
+";
+
+%feature("docstring") friendwrap_solve "
+
+>  MatType solve(MatType A, MatType b)
+------------------------------------------------------------------------
+
+Solve a system of equations: A*x = b The solve routine works similar to
+Matlab's backslash when A is square and nonsingular. The algorithm used is
+the following:
+
+A simple forward or backward substitution if A is upper or lower triangular
+
+If the linear system is at most 3-by-3, form the inverse via minor expansion
+and multiply
+
+Permute the variables and equations as to get a (structurally) nonzero
+diagonal, then perform a QR factorization without pivoting and solve the
+factorized system.
+
+Note 1: If there are entries of the linear system known to be zero, these
+will be removed. Elements that are very small, or will evaluate to be zero,
+can still cause numerical errors, due to the lack of pivoting (which is not
+possible since cannot compare the size of entries)
+
+Note 2: When permuting the linear system, a BLT (block lower triangular)
+transformation is formed. Only the permutation part of this is however used.
+An improvement would be to solve block-by-block if there are multiple BLT
+blocks.
+
+>  MatType solve(MatType A, MatType b, str lsolver, Dict dict=Dict())
+------------------------------------------------------------------------
+
+Solve a system of equations: A*x = b.
+
+";
+
+%feature("docstring") friendwrap_unite "
+
+Unite two matrices no overlapping sparsity.
+
+";
+
+%feature("docstring") friendwrap_mpower "
+
+Matrix power x^n.
+
+";
+
+%feature("docstring") friendwrap_gradient "
+
+Matrix power x^n.
 
 ";
 
@@ -9522,29 +9986,46 @@ Get the second dimension (i.e. number of columns)
 
 ";
 
+%feature("docstring") friendwrap_sumCols "
+
+Return a col-wise summation of elements.
+
+";
+
 %feature("docstring") casadi::GenericMatrix::getColind "
 
 Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::size1 "
+%feature("docstring") casadi::GenericMatrix::isvector "
 
-Get the first dimension (i.e. number of rows)
+Check if the matrix is a row or column vector.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::numel "
+%feature("docstring") casadi::GenericMatrix::isrow "
 
->  int MatType .numel() const 
-------------------------------------------------------------------------
+Check if the matrix is a row vector (i.e. size1()==1)
 
-Get the number of elements.
+";
 
->  int MatType .numel(int i) const 
-------------------------------------------------------------------------
+%feature("docstring") friendwrap_inv "
 
-Get the number of elements in slice (cf. MATLAB)
+Matrix inverse (experimental)
+
+";
+
+%feature("docstring") friendwrap_mrdivide "
+
+Matrix divide (cf. slash '/' in MATLAB)
+
+";
+
+%feature("docstring") casadi::GenericMatrix::sparse "
+
+[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
+instead
 
 ";
 
@@ -9555,15 +10036,63 @@ zero.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::iscolumn "
+%feature("docstring") friendwrap_conditional "
 
-Check if the matrix is a column vector (i.e. size2()==1)
+Create a switch.
+
+If the condition
+
+Parameters:
+-----------
+
+ind:  evaluates to the integer k, where 0<=k<f.size(), then x[k] will be
+returned, otherwise
+
+x_default:  will be returned.
+
+";
+
+%feature("docstring") friendwrap_norm_1 "
+
+1-norm
+
+";
+
+%feature("docstring") friendwrap_nullspace "
+
+Computes the nullspace of a matrix A.
+
+Finds Z m-by-(m-n) such that AZ = 0 with A n-by-m with m > n
+
+Assumes A is full rank
+
+Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
+
+";
+
+%feature("docstring") friendwrap_norm_2 "
+
+2-norm
+
+";
+
+%feature("docstring") friendwrap_if_else "
+
+Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
 
 ";
 
 %feature("docstring") casadi::GenericMatrix::getRow "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring") friendwrap_diag "
+
+Get the diagonal of a matrix or construct a diagonal When the input is
+square, the diagonal elements are returned. If the input is vector- like, a
+diagonal matrix is constructed with it.
 
 ";
 
@@ -9579,9 +10108,15 @@ Check if the matrix expression is scalar.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::nnz "
+%feature("docstring") friendwrap_linspace "
 
-Get the number of (structural) non-zero elements.
+Matlab's linspace command.
+
+";
+
+%feature("docstring") friendwrap_densify "
+
+Make the matrix dense if not already.
 
 ";
 
@@ -9633,9 +10168,22 @@ Check if the matrix is lower triangular.
 
 ";
 
+%feature("docstring") friendwrap_project "
+
+Create a new matrix with a given sparsity pattern but with the nonzeros
+taken from an existing matrix.
+
+";
+
 %feature("docstring") casadi::GenericMatrix::row "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring") friendwrap_extractShared "
+
+Extract shared subexpressions from an set of expressions.
 
 ";
 
@@ -9649,6 +10197,12 @@ one.
 %feature("docstring") casadi::GenericMatrix::istriu "
 
 Check if the matrix is upper triangular.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::size1 "
+
+Get the first dimension (i.e. number of rows)
 
 ";
 
@@ -19441,6 +19995,41 @@ Get a set of nonzeros
 
 ";
 
+%feature("docstring") friendwrap_expand "
+
+Expand the expression as a weighted sum (with constant weights)
+
+";
+
+%feature("docstring") friendwrap_mtaylor "
+
+>  array(DataType)  mtaylor(array(DataType) ex, array(DataType) x, array(DataType) a, int order=1)
+------------------------------------------------------------------------
+
+multivariate Taylor series expansion
+
+Do Taylor expansions until the aggregated order of a term is equal to
+'order'. The aggregated order of $x^n y^m$ equals $n+m$.
+
+>  array(DataType)  mtaylor(array(DataType) ex, array(DataType) x, array(DataType) a, int order, [int ] order_contributions)
+------------------------------------------------------------------------
+
+multivariate Taylor series expansion
+
+Do Taylor expansions until the aggregated order of a term is equal to
+'order'. The aggregated order of $x^n y^m$ equals $n+m$.
+
+The argument order_contributions can denote how match each variable
+contributes to the aggregated order. If x=[x, y] and order_contributions=[1,
+2], then the aggregated order of $x^n y^m$ equals $1n+2m$.
+
+Example usage
+
+$ \\\\sin(b+a)+\\\\cos(b+a)(x-a)+\\\\cos(b+a)(y-b) $ $ y+x-(x^3+3y x^2+3 y^2
+x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
+
+";
+
 %feature("docstring") casadi::Matrix::hasNZ "
 
 Returns true if the matrix has a non-zero at location rr, cc.
@@ -19539,6 +20128,15 @@ Get a submatrix, two arguments
 
 ";
 
+%feature("docstring") friendwrap_triangle "
+
+triangle function
+
+\\\\[ \\\\begin {cases} \\\\Lambda(x) = 0 & |x| >= 1 \\\\\\\\ \\\\Lambda(x)
+= 1-|x| & |x| < 1 \\\\end {cases} \\\\]
+
+";
+
 %feature("docstring") casadi::Matrix::sparse "
 
 [DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
@@ -19604,9 +20202,9 @@ their ID.
 
 ";
 
-%feature("docstring") casadi::Matrix::setSym "
+%feature("docstring") friendwrap_norm_inf_mul "
 
-Set upper triangular elements.
+Inf-norm of a Matrix-Matrix product.
 
 ";
 
@@ -19621,6 +20219,12 @@ Get the number of elements.
 ------------------------------------------------------------------------
 
 Get the number of elements in slice (cf. MATLAB)
+
+";
+
+%feature("docstring") friendwrap_all "
+
+Returns true only if every element in the matrix is true.
 
 ";
 
@@ -19717,6 +20321,12 @@ Transpose the matrix.
 
 ";
 
+%feature("docstring") friendwrap_any "
+
+Returns true only if any element in the matrix is true.
+
+";
+
 %feature("docstring") casadi::Matrix::isscalar "
 
 Check if the matrix expression is scalar.
@@ -19728,6 +20338,21 @@ Check if the matrix expression is scalar.
 %feature("docstring") casadi::Matrix::nonzeros_int "
 
 Get all nonzeros.
+
+";
+
+%feature("docstring") friendwrap_poly_roots "
+
+Attempts to find the roots of a polynomial.
+
+This will only work for polynomials up to order 3 It is assumed that the
+roots are real.
+
+";
+
+%feature("docstring") casadi::Matrix::printVector "
+
+Print vector-style.
 
 ";
 
@@ -19819,10 +20444,32 @@ nodes by their ID.
 
 ";
 
+%feature("docstring") friendwrap_ramp "
+
+ramp function
+
+\\\\[ \\\\begin {cases} R(x) = 0 & x <= 1 \\\\\\\\ R(x) = x & x > 1 \\\\\\\\
+\\\\end {cases} \\\\]
+
+Also called: slope function
+
+";
+
 %feature("docstring") casadi::Matrix::ones "
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 one.
+
+";
+
+%feature("docstring") friendwrap_jacobianTimesVector "
+
+Calculate the Jacobian and multiply by a vector from the right This is
+equivalent to mul(jacobian(ex, arg), v) or mul(jacobian(ex, arg).T, v) for
+transpose_jacobian set to false and true respectively. If contrast to these
+expressions, it will use directional derivatives which is typically (but not
+necessarily) more efficient if the complete Jacobian is not needed and v has
+few rows.
 
 ";
 
@@ -19833,6 +20480,15 @@ Add a submatrix to an existing matrix (TODO: remove memory allocation)
 ";
 
 %feature("docstring") casadi::Matrix::resize "";
+
+%feature("docstring") friendwrap_qr "
+
+QR factorization using the modified Gram-Schmidt algorithm More stable than
+the classical Gram-Schmidt, but may break down if the rows of A are nearly
+linearly dependent See J. Demmel: Applied Numerical Linear Algebra
+(algorithm 3.1.). Note that in SWIG, Q and R are returned by value.
+
+";
 
 %feature("docstring") casadi::Matrix::row "
 
@@ -19910,9 +20566,9 @@ check if the matrix is -1 (note that false negative answers are possible)
 
 ";
 
-%feature("docstring") casadi::Matrix::printVector "
+%feature("docstring") friendwrap_adj "
 
-Print vector-style.
+Matrix adjoint.
 
 ";
 
@@ -19928,15 +20584,34 @@ Check if the matrix is lower triangular.
 
 ";
 
+%feature("docstring") friendwrap_eig_symbolic "
+
+Attempts to find the eigenvalues of a symbolic matrix This will only work
+for up to 3x3 matrices.
+
+";
+
 %feature("docstring") casadi::Matrix::istriu "
 
 Check if the matrix is upper triangular.
 
 ";
 
+%feature("docstring") friendwrap_sparsify "
+
+Make a matrix sparse by removing numerical zeros.
+
+";
+
 %feature("docstring") casadi::Matrix::nonzeros "
 
 Get all nonzeros.
+
+";
+
+%feature("docstring") friendwrap_cofactor "
+
+Get the (i,j) cofactor matrix.
 
 ";
 
@@ -19977,6 +20652,19 @@ Return a string with a description (for SWIG)
 
 ";
 
+%feature("docstring") friendwrap_poly_coeff "
+
+extracts polynomial coefficients from an expression
+
+Parameters:
+-----------
+
+ex:  Scalar expression that represents a polynomial
+
+x:  Scalar symbol that the polynomial is build up with
+
+";
+
 %feature("docstring") casadi::Matrix::binary "[INTERNAL]  Create nodes by
 their ID.
 
@@ -19993,6 +20681,21 @@ Get the shape.
 ------------------------------------------------------------------------
 
 Get the size along a particular dimensions.
+
+";
+
+%feature("docstring") friendwrap_getMinor "
+
+Get the (i,j) minor matrix.
+
+";
+
+%feature("docstring") friendwrap_heaviside "
+
+Heaviside function.
+
+\\\\[ \\\\begin {cases} H(x) = 0 & x<0 \\\\\\\\ H(x) = 1/2 & x=0 \\\\\\\\
+H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
 
 ";
 
@@ -20016,9 +20719,9 @@ check if the matrix is 0 (note that false negative answers are possible)
 
 ";
 
-%feature("docstring") casadi::Matrix::size2 "
+%feature("docstring") casadi::Matrix::setSym "
 
-Get the second dimension (i.e. number of columns)
+Set upper triangular elements.
 
 ";
 
@@ -20049,6 +20752,26 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
+%feature("docstring") friendwrap_taylor "
+
+univariate Taylor series expansion
+
+Calculate the Taylor expansion of expression 'ex' up to order 'order' with
+respect to variable 'x' around the point 'a'
+
+$(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac
+{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
+
+Example usage:
+
+::
+
+>>   x
+
+
+
+";
+
 %feature("docstring") casadi::Matrix::isSymbolic "
 
 Check if symbolic (Dense) Sparse matrices invariable return false.
@@ -20061,11 +20784,13 @@ Get the first dimension (i.e. number of rows)
 
 ";
 
-%feature("docstring") casadi::Matrix::getElementHash "
+%feature("docstring") friendwrap_chol "
 
-Returns a number that is unique for a given symbolic scalar.
+Obtain a Cholesky factorisation of a matrix Returns an upper triangular R
+such that R'R = A. Matrix A must be positive definite.
 
-Only defined if symbolic scalar.
+At the moment, the algorithm is dense (Cholesky-Banachiewicz). There is an
+open ticket #1212 to make it sparse.
 
 ";
 
@@ -20077,6 +20802,39 @@ Get name (only if symbolic scalar)
 
 %feature("docstring") casadi::Matrix::printme "";
 
+%feature("docstring") friendwrap_gauss_quadrature "
+
+>  array(DataType)  gauss_quadrature(array(DataType) f, array(DataType) x, array(DataType) a, array(DataType) b, int order=5)
+------------------------------------------------------------------------
+
+Integrate f from a to b using Gaussian quadrature with n points.
+
+>  array(DataType)  gauss_quadrature(array(DataType) f, array(DataType) x, array(DataType) a, array(DataType) b, int order, array(DataType) w)
+------------------------------------------------------------------------
+
+Matrix adjoint.
+
+";
+
+%feature("docstring") friendwrap_pw_const "
+
+Create a piecewise constant function Create a piecewise constant function
+with n=val.size() intervals.
+
+Inputs:
+
+Parameters:
+-----------
+
+t:  a scalar variable (e.g. time)
+
+tval:  vector with the discrete values of t at the interval transitions
+(length n-1)
+
+val:  vector with the value of the function for each interval (length n)
+
+";
+
 %feature("docstring") casadi::Matrix::enlarge "
 
 Enlarge matrix Make the matrix larger by inserting empty rows and columns,
@@ -20087,6 +20845,24 @@ keeping the existing non-zeros.
 %feature("docstring") casadi::Matrix::iscolumn "
 
 Check if the matrix is a column vector (i.e. size2()==1)
+
+";
+
+%feature("docstring") casadi::Matrix::size2 "
+
+Get the second dimension (i.e. number of columns)
+
+";
+
+%feature("docstring") friendwrap_pw_lin "
+
+t a scalar variable (e.g. time)
+
+Create a piecewise linear function Create a piecewise linear function:
+
+Inputs: tval vector with the the discrete values of t (monotonically
+increasing) val vector with the corresponding function values (same length
+as tval)
 
 ";
 
@@ -20157,6 +20933,26 @@ Create an expression from a vector.
 >  array(DataType) (Sparsity sp, [DataType ] d, bool dummy)
 ------------------------------------------------------------------------
 [INTERNAL] 
+";
+
+%feature("docstring") casadi::Matrix::getElementHash "
+
+Returns a number that is unique for a given symbolic scalar.
+
+Only defined if symbolic scalar.
+
+";
+
+%feature("docstring") friendwrap_rectangle "
+
+rectangle function
+
+\\\\[ \\\\begin {cases} \\\\Pi(x) = 1 & |x| < 1/2 \\\\\\\\ \\\\Pi(x) = 1/2 &
+|x| = 1/2 \\\\\\\\ \\\\Pi(x) = 0 & |x| > 1/2 \\\\\\\\ \\\\end {cases} \\\\]
+
+Also called: gate function, block function, band function, pulse function,
+window function
+
 ";
 
 %feature("docstring") casadi::Matrix::sym "
@@ -20546,6 +21342,15 @@ create a matrix with all inf
 
 ";
 
+%feature("docstring") friendwrap_matrix_expand "
+
+Expand MX graph to SXFunction call.
+
+Expand the given expression e, optionally supplying expressions contained in
+it at which expansion should stop.
+
+";
+
 %feature("docstring") casadi::MX::getColind "
 
 Get the sparsity pattern. See the Sparsity class for details.
@@ -20603,9 +21408,31 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
+%feature("docstring") friendwrap_find "
+
+Find first nonzero If failed, returns the number of rows.
+
+";
+
 %feature("docstring") casadi::MX::isZero "
 
 check if zero (note that false negative answers are possible)
+
+";
+
+%feature("docstring") friendwrap_graph_substitute "
+
+>  MX graph_substitute(MX ex, [MX ] v, [MX ] vdef)
+------------------------------------------------------------------------
+
+Substitute single expression in graph Substitute variable v with expression
+vdef in an expression ex, preserving nodes.
+
+>  [MX] graph_substitute([MX ] ex, [MX ] v, [MX ] vdef)
+------------------------------------------------------------------------
+
+Substitute multiple expressions in graph Substitute variable var with
+expression expr in multiple expressions, preserving nodes.
 
 ";
 
@@ -28947,9 +29774,16 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::PrintableObject::getDescription "
+%feature("docstring") friendwrap_repr "
 
-Return a string with a description (for SWIG)
+Return a string with a representation of the object, cf. repr(Object) in
+Python.
+
+";
+
+%feature("docstring") friendwrap_str "
+
+Return a string with a description of the object, cf. str(Object) in Python.
 
 ";
 
@@ -28961,16 +29795,9 @@ Joel Andersson
 
 C++ includes: printable_object.hpp ";
 
-%feature("docstring") repr "
+%feature("docstring") casadi::PrintableObject::getDescription "
 
-Return a string with a representation of the object, cf. repr(Object) in
-Python.
-
-";
-
-%feature("docstring") str "
-
-Return a string with a description of the object, cf. str(Object) in Python.
+Return a string with a description (for SWIG)
 
 ";
 
@@ -39126,6 +39953,143 @@ Create a scalar sparsity pattern.
 
 
 // File: classcasadi_1_1SparsityInterface.xml
+%feature("docstring") friendwrap_diagsplit "
+
+>  [MatType ] diagsplit(MatType x, [int ] output_offset1, [int ] output_offset2)
+------------------------------------------------------------------------
+
+split diagonally, retaining square matrices
+
+Parameters:
+-----------
+
+output_offset1:  List of all start locations (row) for each group the last
+matrix will run to the end.
+
+output_offset2:  List of all start locations (row) for each group the last
+matrix will run to the end.
+
+diagcat(diagsplit(x, ...)) = x
+
+>  [MatType ] diagsplit(MatType x, [int ] output_offset)
+------------------------------------------------------------------------
+
+split diagonally, retaining square matrices
+
+Parameters:
+-----------
+
+output_offset:  List of all start locations for each group the last matrix
+will run to the end.
+
+diagcat(diagsplit(x, ...)) = x
+
+>  [MatType ] diagsplit(MatType x, int incr=1)
+------------------------------------------------------------------------
+
+split diagonally, retaining groups of square matrices
+
+Parameters:
+-----------
+
+incr:  Size of each matrix
+
+diagsplit(diagsplit(x, ...)) = x
+
+>  [MatType ] diagsplit(MatType x, int incr1, int incr2)
+------------------------------------------------------------------------
+
+split diagonally, retaining fixed-sized matrices
+
+Parameters:
+-----------
+
+incr1:  Row dimension of each matrix
+
+incr2:  Column dimension of each matrix
+
+diagsplit(diagsplit(x, ...)) = x
+
+";
+
+%feature("docstring") friendwrap_triu "
+
+Get the upper triangular part of a matrix.
+
+";
+
+%feature("docstring") friendwrap_mac "
+
+Multiply-accumulate operation Matrix product of two matrices (X and Y),
+adding the result to a third matrix Z. The result has the same sparsity
+pattern as C meaning that other entries of (X*Y) are ignored. The operation
+is equivalent to: Z+mul(X,Y).project(Z.sparsity()).
+
+";
+
+%feature("docstring") friendwrap_transpose "
+
+Transpose.
+
+";
+
+%feature("docstring") friendwrap_tril "
+
+Get the lower triangular part of a matrix.
+
+";
+
+%feature("docstring") friendwrap_offset "
+
+Helper function, get offsets corresponding to a vector of matrices.
+
+";
+
+%feature("docstring") friendwrap_vec "
+
+make a vector Reshapes/vectorizes the matrix such that the shape becomes
+(expr.numel(), 1). Columns are stacked on top of each other. Same as
+reshape(expr, expr.numel(), 1)
+
+a c b d  turns into
+
+a b c d
+
+";
+
+%feature("docstring") friendwrap_horzcat "
+
+>  MatType horzcat([MatType ] v)
+------------------------------------------------------------------------
+
+Concatenate a list of matrices horizontally Alternative terminology:
+horizontal stack, hstack, horizontal append, [a b].
+
+horzcat(horzsplit(x, ...)) = x
+
+>  MatType horzcat(MatType x, MatType y)
+------------------------------------------------------------------------
+
+Concatenate horizontally, two matrices.
+
+>  MatType horzcat(MatType x, MatType y, MatType z)
+------------------------------------------------------------------------
+
+Concatenate horizontally, three matrices.
+
+>  MatType horzcat(MatType x, MatType y, MatType z, MatType w)
+------------------------------------------------------------------------
+
+Concatenate horizontally, four matrices.
+
+";
+
+%feature("docstring") friendwrap_vecNZ "
+
+Returns a flattened version of the matrix, preserving only nonzeros.
+
+";
+
 %feature("docstring") casadi::SparsityInterface "
 
 Sparsity interface class.
@@ -39135,6 +40099,261 @@ Sparsity, introducing a uniform syntax and implementing common functionality
 using the curiously recurring template pattern (CRTP) idiom. Joel Andersson
 
 C++ includes: sparsity_interface.hpp ";
+
+%feature("docstring") friendwrap_horzsplit "
+
+>  [MatType ] horzsplit(MatType v, [int ] offset)
+------------------------------------------------------------------------
+
+split horizontally, retaining groups of columns
+
+Parameters:
+-----------
+
+offset:  List of all start columns for each group the last column group will
+run to the end.
+
+horzcat(horzsplit(x, ...)) = x
+
+>  [MatType ] horzsplit(MatType v, int incr=1)
+------------------------------------------------------------------------
+
+split horizontally, retaining fixed-sized groups of columns
+
+Parameters:
+-----------
+
+incr:  Size of each group of columns
+
+horzcat(horzsplit(x, ...)) = x
+
+";
+
+%feature("docstring") friendwrap_veccat "
+
+concatenate vertically while vectorizing all arguments with vec
+
+";
+
+%feature("docstring") friendwrap_blocksplit "
+
+>  [[MatType ] ] blocksplit(MatType x, [int ] vert_offset, [int ] horz_offset)
+------------------------------------------------------------------------
+
+chop up into blocks
+
+Parameters:
+-----------
+
+vert_offset:  Defines the boundaries of the block rows
+
+horz_offset:  Defines the boundaries of the block columns
+
+blockcat(blocksplit(x,..., ...)) = x
+
+>  [[MatType ] ] blocksplit(MatType x, int vert_incr=1, int horz_incr=1)
+------------------------------------------------------------------------
+
+chop up into blocks
+
+Parameters:
+-----------
+
+vert_incr:  Defines the increment for block boundaries in row dimension
+
+horz_incr:  Defines the increment for block boundaries in column dimension
+
+blockcat(blocksplit(x,..., ...)) = x
+
+";
+
+%feature("docstring") friendwrap_repmat "
+
+Repeat matrix A n times vertically and m times horizontally.
+
+";
+
+%feature("docstring") friendwrap_vertcat "
+
+>  MatType vertcat([MatType ] v)
+------------------------------------------------------------------------
+
+Concatenate a list of matrices vertically Alternative terminology: vertical
+stack, vstack, vertical append, [a;b].
+
+vertcat(vertsplit(x, ...)) = x
+
+>  MatType vertcat(MatType x, MatType y)
+------------------------------------------------------------------------
+
+Concatenate vertically, two matrices.
+
+>  MatType vertcat(MatType x, MatType y, MatType z)
+------------------------------------------------------------------------
+
+Concatenate vertically, three matrices.
+
+>  MatType vertcat(MatType x, MatType y, MatType z, MatType w)
+------------------------------------------------------------------------
+
+Concatenate vertically, four matrices.
+
+";
+
+%feature("docstring") friendwrap_sprank "
+
+Obtain the structural rank of a sparsity-pattern.
+
+";
+
+%feature("docstring") friendwrap_kron "
+
+Kronecker tensor product.
+
+Creates a block matrix in which each element (i, j) is a_ij*b
+
+";
+
+%feature("docstring") friendwrap_reshape "
+
+>  MatType reshape(MatType a, int nrow, int ncol)
+------------------------------------------------------------------------
+
+Returns a reshaped version of the matrix.
+
+>  MatType reshape(MatType a,(int,int) rc)
+------------------------------------------------------------------------
+
+Returns a reshaped version of the matrix, dimensions as a vector.
+
+>  MatType reshape(MatType a, Sparsity sp)
+------------------------------------------------------------------------
+
+Reshape the matrix.
+
+";
+
+%feature("docstring") friendwrap_norm_0_mul "
+
+0-norm (nonzero count) of a Matrix-matrix product
+
+";
+
+%feature("docstring") friendwrap_diagcat "
+
+>  MatType diagcat([MatType ] A)
+------------------------------------------------------------------------
+
+Construct a matrix with given block on the diagonal.
+
+>  MatType diagcat(MatType x, MatType y)
+------------------------------------------------------------------------
+
+Concatenate along diagonal, two matrices.
+
+>  MatType diagcat(MatType x, MatType y, MatType z)
+------------------------------------------------------------------------
+
+Concatenate along diagonal, three matrices.
+
+>  MatType diagcat(MatType x, MatType y, MatType z, MatType w)
+------------------------------------------------------------------------
+
+Concatenate along diagonal, four matrices.
+
+";
+
+%feature("docstring") friendwrap_vertsplit "
+
+>  [MatType ] vertsplit(MatType v, [int ] offset)
+------------------------------------------------------------------------
+
+split vertically, retaining groups of rows
+
+*
+
+Parameters:
+-----------
+
+output_offset:  List of all start rows for each group the last row group
+will run to the end.
+
+vertcat(vertsplit(x, ...)) = x
+
+>  [MatType ] vertsplit(MatType v, int incr=1)
+------------------------------------------------------------------------
+
+split vertically, retaining fixed-sized groups of rows
+
+Parameters:
+-----------
+
+incr:  Size of each group of rows
+
+vertcat(vertsplit(x, ...)) = x
+
+
+
+::
+
+  >>> print vertsplit(SX.sym(\"a\",4))
+  [SX(a_0), SX(a_1), SX(a_2), SX(a_3)]
+  
+
+
+
+
+
+::
+
+  >>> print vertsplit(SX.sym(\"a\",4),2)
+  [SX([a_0, a_1]), SX([a_2, a_3])]
+  
+
+
+
+If the number of rows is not a multiple of incr, the last entry returned
+will have a size smaller than incr.
+
+
+
+::
+
+  >>> print vertsplit(DMatrix([0,1,2,3,4]),2)
+  [DMatrix([0, 1]), DMatrix([2, 3]), DMatrix(4)]
+  
+
+
+
+";
+
+%feature("docstring") friendwrap_mul "
+
+>  MatType mul(MatType X, MatType Y)
+------------------------------------------------------------------------
+
+Matrix product of two matrices.
+
+>  MatType mul([MatType ] args)
+------------------------------------------------------------------------
+
+Matrix product of n matrices.
+
+";
+
+%feature("docstring") friendwrap_blockcat "
+
+>  MatType blockcat([[MatType ] ] v)
+------------------------------------------------------------------------
+
+Construct a matrix from a list of list of blocks.
+
+>  MatType blockcat(MatType A, MatType B, MatType C, MatType D)
+------------------------------------------------------------------------
+
+Construct a matrix from 4 blocks.
+
+";
 
 
 // File: classcasadi_1_1Split.xml

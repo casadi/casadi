@@ -12404,6 +12404,217 @@ Is initialized?
 
 
 // File: classcasadi_1_1GenericExpression.xml
+%feature("docstring")  floor(const ExType &x) "
+
+Round down to nearest integer.
+
+";
+
+%feature("docstring")  acos(const ExType &x) "
+
+Arc cosine.
+
+";
+
+%feature("docstring")  copysign(const ExType &x, const ExType &n) "
+
+Copy sign.
+
+";
+
+%feature("docstring")  exp(const ExType &x) "
+
+Exponential function.
+
+";
+
+%feature("docstring")  ceil(const ExType &x) "
+
+Round up to nearest integer.
+
+";
+
+%feature("docstring")  cos(const ExType &x) "
+
+Cosine.
+
+";
+
+%feature("docstring")  isEqual(const ExType &x, const ExType &y, int
+depth=0) "
+
+Check if two nodes are equivalent up to a given depth. Depth=0 checks if the
+expressions are identical, i.e. points to the same node.
+
+a = x*x b = x*x
+
+a.isEqual(b, 0) will return false, but a.isEqual(b, 1) will return true
+
+";
+
+%feature("docstring")  asinh(const ExType &x) "
+
+Inverse hyperbolic sine.
+
+";
+
+%feature("docstring")  atanh(const ExType &x) "
+
+Inverse hyperbolic tangent.
+
+";
+
+%feature("docstring")  iszero(const ExType &x) "
+
+Addition.
+
+";
+
+%feature("docstring")  tan(const ExType &x) "
+
+Tangent.
+
+";
+
+%feature("docstring")  acosh(const ExType &x) "
+
+Inverse hyperbolic cosine.
+
+";
+
+%feature("docstring")  erfinv(const ExType &x) "
+
+Invers error function.
+
+";
+
+%feature("docstring")  fmod(const ExType &x, const ExType &y) "
+
+Remainder after division.
+
+";
+
+%feature("docstring")  log(const ExType &x) "
+
+Natural logarithm.
+
+";
+
+%feature("docstring")  log10(const ExType &x) "
+
+Base-10 logarithm.
+
+";
+
+%feature("docstring")  constpow(const ExType &x, const ExType &n) "
+
+Elementwise power with const power.
+
+";
+
+%feature("docstring")  abs(const ExType &x) "
+
+Absolute value.
+
+";
+
+%feature("docstring")  fmax(const ExType &x, const ExType &y) "
+
+Largest of two values.
+
+";
+
+%feature("docstring")  sqrt(const ExType &x) "
+
+Square root.
+
+";
+
+%feature("docstring")  sign(const ExType &x) "
+
+Sine function sign(x) := -1 for x<0 sign(x) := 1 for x>0, sign(0) := 0
+sign(NaN) := NaN
+
+";
+
+%feature("docstring")  logic_and(const ExType &x, const ExType &y) "
+
+Logical and, alternative syntax.
+
+";
+
+%feature("docstring")  fmin(const ExType &x, const ExType &y) "
+
+Smallest of two values.
+
+";
+
+%feature("docstring")  erf(const ExType &x) "
+
+Error function.
+
+";
+
+%feature("docstring")  pow(const ExType &x, const ExType &n) "
+
+Elementwise power.
+
+";
+
+%feature("docstring")  atan2(const ExType &x, const ExType &y) "
+
+Two argument arc tangent.
+
+";
+
+%feature("docstring")  logic_or(const ExType &x, const ExType &y) "
+
+Logical or, alterntive syntax.
+
+";
+
+%feature("docstring")  fabs(const ExType &x) "
+
+Absolute value.
+
+";
+
+%feature("docstring")  simplify(const ExType &x) "
+
+Simplify an expression.
+
+";
+
+%feature("docstring")  sinh(const ExType &x) "
+
+Hyperbolic sine.
+
+";
+
+%feature("docstring")  tanh(const ExType &x) "
+
+Hyperbolic tangent.
+
+";
+
+%feature("docstring")  cosh(const ExType &x) "
+
+Hyperbolic cosine.
+
+";
+
+%feature("docstring")  logic_not(const ExType &x) "
+
+Logical not, alternative syntax.
+
+";
+
+%feature("docstring")  atan(const ExType &x) "
+
+Arc tangent.
+
+";
+
 %feature("docstring") casadi::GenericExpression "
 
 Expression interface.
@@ -12413,6 +12624,18 @@ syntax and implementing common functionality using the curiously recurring
 template pattern (CRTP) idiom. Joel Andersson
 
 C++ includes: generic_expression.hpp ";
+
+%feature("docstring")  sin(const ExType &x) "
+
+Sine.
+
+";
+
+%feature("docstring")  asin(const ExType &x) "
+
+Arc sine.
+
+";
 
 
 // File: classcasadi_1_1GenericExternal.xml
@@ -12427,51 +12650,126 @@ C++ includes: generic_expression.hpp ";
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring")  casadi::GenericMatrix< MatType >::issquare() const
+*/ %feature("docstring")  sumRows(const MatType &x) "
+
+Return a row-wise summation of elements.
+
+";
+
+%feature("docstring")  substitute(const MatType &ex, const MatType &v, const
+MatType &vdef) "
+
+Substitute variable v with expression vdef in an expression ex.
+
+";
+
+%feature("docstring")  substitute(const std::vector< MatType > &ex, const
+std::vector< MatType > &v, const std::vector< MatType > &vdef) "
+
+Substitute variable var with expression expr in multiple expressions.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::numel() const  "
+
+Get the number of elements.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::numel(int i) const
 "
 
-Check if the matrix expression is square.
+Get the number of elements in slice (cf. MATLAB)
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::shape() const  "
+%feature("docstring")  norm_inf(const MatType &x) "
 
-Get the shape.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::shape(int axis)
-const  "
-
-Get the size along a particular dimensions.
+Infinity-norm.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::sparse(int nrow=1,
-int ncol=1) "
+%feature("docstring")  pinv(const MatType &A) "
 
-[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
-instead
+Computes the Moore-Penrose pseudo-inverse.
 
-";
+If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::sparse(const
-std::pair< int, int > &rc) "
+pinv(A)' = (AA')^(-1) A
 
-[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
-instead
+If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
+
+pinv(A) = (A'A)^(-1) A'
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::isrow() const  "
+%feature("docstring")  pinv(const MatType &A, const std::string &lsolver,
+const Dict &dict=Dict()) "
 
-Check if the matrix is a row vector (i.e. size1()==1)
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
+matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::isvector() const  "
+%feature("docstring")  countNodes(const MatType &A) "
 
-Check if the matrix is a row or column vector.
+Count number of nodes
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::isempty(bool
+both=false) const  "
+
+Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
+optionally both dimensions)
+
+";
+
+%feature("docstring")  hessian(const MatType &ex, const MatType &arg) " ";
+
+%feature("docstring")  hessian(const MatType &ex, const MatType &arg,
+MatType &output_g) " ";
+
+%feature("docstring")  trace(const MatType &a) "
+
+Matrix trace.
+
+";
+
+%feature("docstring")  mldivide(const MatType &x, const MatType &n) "
+
+Matrix divide (cf. backslash '\\\\' in MATLAB)
+
+";
+
+%feature("docstring")  jacobian(const MatType &ex, const MatType &arg) "
+
+Calculate jacobian via source code transformation.
+
+";
+
+%feature("docstring")  cross(const MatType &a, const MatType &b, int dim=-1)
+"
+
+Matlab's cross command.
+
+";
+
+%feature("docstring")  tril2symm(const MatType &a) "
+
+Convert a lower triangular matrix to a symmetric one.
+
+";
+
+%feature("docstring")  substituteInPlace(const std::vector< MatType > &v,
+std::vector< MatType > &inout_vdef, std::vector< MatType > &inout_ex, bool
+reverse=false) "
+
+Inplace substitution with piggyback expressions Substitute variables v out
+of the expressions vdef sequentially, as well as out of a number of other
+expressions piggyback.
 
 ";
 
@@ -12480,6 +12778,30 @@ Check if the matrix is a row or column vector.
 
 Get string representation of dimensions. The representation is (nrow x ncol
 = numel | size)
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::issquare() const  "
+
+Check if the matrix expression is square.
+
+";
+
+%feature("docstring")  quad_form(const MatType &X, const MatType &A) "
+
+Calculate quadratic form X^T A X.
+
+";
+
+%feature("docstring")  quad_form(const MatType &X) "
+
+Calculate quadratic form X^T X.
+
+";
+
+%feature("docstring")  det(const MatType &A) "
+
+Matrix determinant (experimental)
 
 ";
 
@@ -12495,9 +12817,40 @@ Get get the number of non-zeros on the diagonal.
 
 ";
 
+%feature("docstring")  dependsOn(const MatType &f, const MatType &arg) "
+
+Check if expression depends on the argument The argument must be symbolic.
+
+";
+
+%feature("docstring")  inner_prod(const MatType &x, const MatType &y) "
+
+Inner product of two matrices with x and y matrices of the same dimension.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::nnz() const  "
+
+Get the number of (structural) non-zero elements.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::sizeL() const  "
 
 Get the number of non-zeros in the lower triangular half.
+
+";
+
+%feature("docstring")  norm_F(const MatType &x) "
+
+Frobenius norm.
+
+";
+
+%feature("docstring")  getOperatorRepresentation(const MatType &xb, const
+std::vector< std::string > &args) "
+
+Get a string representation for a binary MatType, using custom arguments.
 
 ";
 
@@ -12523,6 +12876,12 @@ See:   nnz()
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MatType >::iscolumn() const  "
+
+Check if the matrix is a column vector (i.e. size2()==1)
+
+";
+
 %feature("docstring") casadi::GenericMatrix "
 
 Matrix base class.
@@ -12543,6 +12902,12 @@ with Sparsity& sparsity() Joel Andersson
 
 C++ includes: generic_matrix.hpp ";
 
+%feature("docstring")  tangent(const MatType &ex, const MatType &arg) "
+
+Matrix power x^n.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::find(bool
 ind1=false) const  "
 
@@ -12554,17 +12919,115 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::isempty(bool
-both=false) const  "
+%feature("docstring")  polyval(const MatType &p, const MatType &x) "
 
-Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
-optionally both dimensions)
+Evaluate a polynomial with coefficients p in x.
+
+";
+
+%feature("docstring")  triu2symm(const MatType &a) "
+
+Convert a upper triangular matrix to a symmetric one.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::shape() const  "
+
+Get the shape.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::shape(int axis)
+const  "
+
+Get the size along a particular dimensions.
+
+";
+
+%feature("docstring")  outer_prod(const MatType &x, const MatType &y) "
+
+Take the outer product of two vectors Equals.
+
+with x and y vectors
+
+";
+
+%feature("docstring")  symvar(const MatType &x) "
+
+Get all symbols contained in the supplied expression Get all symbols on
+which the supplied expression depends.
+
+See:   SXFunction::getFree(), MXFunction::getFree()
+
+";
+
+%feature("docstring")  sum_square(const MatType &X) "
+
+Calculate some of squares: sum_ij X_ij^2.
+
+";
+
+%feature("docstring")  solve(const MatType &A, const MatType &b) "
+
+Solve a system of equations: A*x = b The solve routine works similar to
+Matlab's backslash when A is square and nonsingular. The algorithm used is
+the following:
+
+A simple forward or backward substitution if A is upper or lower triangular
+
+If the linear system is at most 3-by-3, form the inverse via minor expansion
+and multiply
+
+Permute the variables and equations as to get a (structurally) nonzero
+diagonal, then perform a QR factorization without pivoting and solve the
+factorized system.
+
+Note 1: If there are entries of the linear system known to be zero, these
+will be removed. Elements that are very small, or will evaluate to be zero,
+can still cause numerical errors, due to the lack of pivoting (which is not
+possible since cannot compare the size of entries)
+
+Note 2: When permuting the linear system, a BLT (block lower triangular)
+transformation is formed. Only the permutation part of this is however used.
+An improvement would be to solve block-by-block if there are multiple BLT
+blocks.
+
+";
+
+%feature("docstring")  solve(const MatType &A, const MatType &b, const
+std::string &lsolver, const Dict &dict=Dict()) "
+
+Solve a system of equations: A*x = b.
+
+";
+
+%feature("docstring")  unite(const MatType &A, const MatType &B) "
+
+Unite two matrices no overlapping sparsity.
+
+";
+
+%feature("docstring")  mpower(const MatType &x, const MatType &n) "
+
+Matrix power x^n.
+
+";
+
+%feature("docstring")  gradient(const MatType &ex, const MatType &arg) "
+
+Matrix power x^n.
 
 ";
 
 %feature("docstring")  casadi::GenericMatrix< MatType >::size2() const  "
 
 Get the second dimension (i.e. number of columns)
+
+";
+
+%feature("docstring")  sumCols(const MatType &x) "
+
+Return a col-wise summation of elements.
 
 ";
 
@@ -12575,22 +13038,43 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::size1() const  "
+%feature("docstring")  casadi::GenericMatrix< MatType >::isvector() const  "
 
-Get the first dimension (i.e. number of rows)
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::numel() const  "
-
-Get the number of elements.
+Check if the matrix is a row or column vector.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::numel(int i) const
-"
+%feature("docstring")  casadi::GenericMatrix< MatType >::isrow() const  "
 
-Get the number of elements in slice (cf. MATLAB)
+Check if the matrix is a row vector (i.e. size1()==1)
+
+";
+
+%feature("docstring")  inv(const MatType &A) "
+
+Matrix inverse (experimental)
+
+";
+
+%feature("docstring")  mrdivide(const MatType &x, const MatType &n) "
+
+Matrix divide (cf. slash '/' in MATLAB)
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::sparse(int nrow=1,
+int ncol=1) "
+
+[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
+instead
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::sparse(const
+std::pair< int, int > &rc) "
+
+[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
+instead
 
 ";
 
@@ -12618,15 +13102,65 @@ zero.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::iscolumn() const  "
+%feature("docstring")  conditional(const MatType &ind, const std::vector<
+MatType > &x, const MatType &x_default, bool short_circuit=true) "
 
-Check if the matrix is a column vector (i.e. size2()==1)
+Create a switch.
+
+If the condition
+
+Parameters:
+-----------
+
+ind:  evaluates to the integer k, where 0<=k<f.size(), then x[k] will be
+returned, otherwise
+
+x_default:  will be returned.
+
+";
+
+%feature("docstring")  norm_1(const MatType &x) "
+
+1-norm
+
+";
+
+%feature("docstring")  nullspace(const MatType &A) "
+
+Computes the nullspace of a matrix A.
+
+Finds Z m-by-(m-n) such that AZ = 0 with A n-by-m with m > n
+
+Assumes A is full rank
+
+Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
+
+";
+
+%feature("docstring")  norm_2(const MatType &x) "
+
+2-norm
+
+";
+
+%feature("docstring")  if_else(const MatType &cond, const MatType &if_true,
+const MatType &if_false, bool short_circuit=true) "
+
+Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
 
 ";
 
 %feature("docstring")  casadi::GenericMatrix< MatType >::getRow() const  "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring")  diag(const MatType &A) "
+
+Get the diagonal of a matrix or construct a diagonal When the input is
+square, the diagonal elements are returned. If the input is vector- like, a
+diagonal matrix is constructed with it.
 
 ";
 
@@ -12643,9 +13177,16 @@ Check if the matrix expression is scalar.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::nnz() const  "
+%feature("docstring")  linspace(const MatType &a, const MatType &b, int
+nsteps) "
 
-Get the number of (structural) non-zero elements.
+Matlab's linspace command.
+
+";
+
+%feature("docstring")  densify(const MatType &x) "
+
+Make the matrix dense if not already.
 
 ";
 
@@ -12713,10 +13254,35 @@ Check if the matrix is lower triangular.
 
 ";
 
+%feature("docstring")  project(const MatType &A, const Sparsity &sp, bool
+intersect=false) "
+
+Create a new matrix with a given sparsity pattern but with the nonzeros
+taken from an existing matrix.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::row(int el) const
 "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring")  extractShared(std::vector< MatType > &ex,
+std::vector< MatType > &v, std::vector< MatType > &vdef, const std::string
+&v_prefix="v_", const std::string &v_suffix="") "
+
+Extract shared subexpressions from an set of expressions.
+
+";
+
+%feature("docstring")  extractShared(const std::vector< MatType > &ex,
+std::vector< MatType > &ex_output, std::vector< MatType > &v, std::vector<
+MatType > &vdef, const std::string &v_prefix="v_", const std::string
+&v_suffix="") "
+
+Extract shared subexpressions from an set of expressions.
 
 ";
 
@@ -12747,6 +13313,12 @@ one.
 %feature("docstring")  casadi::GenericMatrix< MatType >::istriu() const  "
 
 Check if the matrix is upper triangular.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::size1() const  "
+
+Get the first dimension (i.e. number of rows)
 
 ";
 
@@ -25583,6 +26155,43 @@ Get a set of nonzeros
 
 ";
 
+%feature("docstring")  expand(const Matrix< DataType > &ex, Matrix< DataType
+> &weights, Matrix< DataType > &terms) "
+
+Expand the expression as a weighted sum (with constant weights)
+
+";
+
+%feature("docstring")  mtaylor(const Matrix< DataType > &ex, const Matrix<
+DataType > &x, const Matrix< DataType > &a, int order=1) "
+
+multivariate Taylor series expansion
+
+Do Taylor expansions until the aggregated order of a term is equal to
+'order'. The aggregated order of $x^n y^m$ equals $n+m$.
+
+";
+
+%feature("docstring")  mtaylor(const Matrix< DataType > &ex, const Matrix<
+DataType > &x, const Matrix< DataType > &a, int order, const std::vector<
+int > &order_contributions) "
+
+multivariate Taylor series expansion
+
+Do Taylor expansions until the aggregated order of a term is equal to
+'order'. The aggregated order of $x^n y^m$ equals $n+m$.
+
+The argument order_contributions can denote how match each variable
+contributes to the aggregated order. If x=[x, y] and order_contributions=[1,
+2], then the aggregated order of $x^n y^m$ equals $1n+2m$.
+
+Example usage
+
+$ \\\\sin(b+a)+\\\\cos(b+a)(x-a)+\\\\cos(b+a)(y-b) $ $ y+x-(x^3+3y x^2+3 y^2
+x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
+
+";
+
 %feature("docstring")  casadi::Matrix< DataType >::hasNZ(int rr, int cc)
 const  "
 
@@ -25752,6 +26361,15 @@ Get a submatrix, two arguments
 
 ";
 
+%feature("docstring")  triangle(const Matrix< DataType > &x) "
+
+triangle function
+
+\\\\[ \\\\begin {cases} \\\\Lambda(x) = 0 & |x| >= 1 \\\\\\\\ \\\\Lambda(x)
+= 1-|x| & |x| < 1 \\\\end {cases} \\\\]
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::sparse(int nrow=1, int ncol=1) "
 
@@ -25853,17 +26471,10 @@ Matrix< DataType > &x) " [INTERNAL]  Create nodes by their ID.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::setSym(const double *val)
-"
+%feature("docstring")  norm_inf_mul(const Matrix< DataType > &x, const
+Matrix< DataType > &y) "
 
-Set upper triangular elements.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::setSym(const std::vector<
-double > &val) "
-
-Set upper triangular elements.
+Inf-norm of a Matrix-Matrix product.
 
 ";
 
@@ -25878,6 +26489,12 @@ Get the number of elements.
 >::numel(int i) const "
 
 Get the number of elements in slice (cf. MATLAB)
+
+";
+
+%feature("docstring")  all(const Matrix< DataType > &x) "
+
+Returns true only if every element in the matrix is true.
 
 ";
 
@@ -25982,6 +26599,12 @@ Transpose the matrix.
 
 ";
 
+%feature("docstring")  any(const Matrix< DataType > &x) "
+
+Returns true only if any element in the matrix is true.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::isscalar(bool scalar_and_dense=false) const "
 
@@ -25994,6 +26617,22 @@ Check if the matrix expression is scalar.
 %feature("docstring")  casadi::Matrix< DataType >::nonzeros_int() const  "
 
 Get all nonzeros.
+
+";
+
+%feature("docstring")  poly_roots(const Matrix< DataType > &p) "
+
+Attempts to find the roots of a polynomial.
+
+This will only work for polynomials up to order 3 It is assumed that the
+roots are real.
+
+";
+
+%feature("docstring")  casadi::Matrix< DataType >::printVector(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print vector-style.
 
 ";
 
@@ -26106,6 +26745,17 @@ Create nodes by their ID.
 
 ";
 
+%feature("docstring")  ramp(const Matrix< DataType > &x) "
+
+ramp function
+
+\\\\[ \\\\begin {cases} R(x) = 0 & x <= 1 \\\\\\\\ R(x) = x & x > 1 \\\\\\\\
+\\\\end {cases} \\\\]
+
+Also called: slope function
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::ones(int nrow=1, int ncol=1) "
 
@@ -26130,6 +26780,19 @@ one.
 
 ";
 
+%feature("docstring")  jacobianTimesVector(const Matrix< DataType > &ex,
+const Matrix< DataType > &arg, const Matrix< DataType > &v, bool
+transpose_jacobian=false) "
+
+Calculate the Jacobian and multiply by a vector from the right This is
+equivalent to mul(jacobian(ex, arg), v) or mul(jacobian(ex, arg).T, v) for
+transpose_jacobian set to false and true respectively. If contrast to these
+expressions, it will use directional derivatives which is typically (but not
+necessarily) more efficient if the complete Jacobian is not needed and v has
+few rows.
+
+";
+
 %feature("docstring")  casadi::Matrix< DataType >::addSub(const Matrix<
 DataType > &m, RR rr, CC cc, bool ind1) "
 
@@ -26139,6 +26802,16 @@ Add a submatrix to an existing matrix (TODO: remove memory allocation)
 
 %feature("docstring")  casadi::Matrix< DataType >::resize(int nrow, int
 ncol) " ";
+
+%feature("docstring")  qr(const Matrix< DataType > &A, Matrix< DataType >
+&Q, Matrix< DataType > &R) "
+
+QR factorization using the modified Gram-Schmidt algorithm More stable than
+the classical Gram-Schmidt, but may break down if the rows of A are nearly
+linearly dependent See J. Demmel: Applied Numerical Linear Algebra
+(algorithm 3.1.). Note that in SWIG, Q and R are returned by value.
+
+";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::row(int
 el) const "
@@ -26235,10 +26908,9 @@ check if the matrix is -1 (note that false negative answers are possible)
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::printVector(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
+%feature("docstring")  adj(const Matrix< DataType > &A) "
 
-Print vector-style.
+Matrix adjoint.
 
 ";
 
@@ -26255,6 +26927,13 @@ Check if the matrix is lower triangular.
 
 ";
 
+%feature("docstring")  eig_symbolic(const Matrix< DataType > &m) "
+
+Attempts to find the eigenvalues of a symbolic matrix This will only work
+for up to 3x3 matrices.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::istriu() const "
 
@@ -26262,9 +26941,21 @@ Check if the matrix is upper triangular.
 
 ";
 
+%feature("docstring")  sparsify(const Matrix< DataType > &A, double tol=0) "
+
+Make a matrix sparse by removing numerical zeros.
+
+";
+
 %feature("docstring")  casadi::Matrix< DataType >::nonzeros() const  "
 
 Get all nonzeros.
+
+";
+
+%feature("docstring")  cofactor(const Matrix< DataType > &x, int i, int j) "
+
+Get the (i,j) cofactor matrix.
 
 ";
 
@@ -26323,6 +27014,20 @@ Return a string with a description (for SWIG)
 
 ";
 
+%feature("docstring")  poly_coeff(const Matrix< DataType > &ex, const
+Matrix< DataType > &x) "
+
+extracts polynomial coefficients from an expression
+
+Parameters:
+-----------
+
+ex:  Scalar expression that represents a polynomial
+
+x:  Scalar symbol that the polynomial is build up with
+
+";
+
 %feature("docstring")  casadi::Matrix< DataType >::binary(int op, const
 Matrix< DataType > &x, const Matrix< DataType > &y) " [INTERNAL]  Create
 nodes by their ID.
@@ -26340,6 +27045,21 @@ Get the shape.
 >::shape(int axis) const "
 
 Get the size along a particular dimensions.
+
+";
+
+%feature("docstring")  getMinor(const Matrix< DataType > &x, int i, int j) "
+
+Get the (i,j) minor matrix.
+
+";
+
+%feature("docstring")  heaviside(const Matrix< DataType > &x) "
+
+Heaviside function.
+
+\\\\[ \\\\begin {cases} H(x) = 0 & x<0 \\\\\\\\ H(x) = 1/2 & x=0 \\\\\\\\
+H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
 
 ";
 
@@ -26364,10 +27084,17 @@ check if the matrix is 0 (note that false negative answers are possible)
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::size2()
-const "
+%feature("docstring")  casadi::Matrix< DataType >::setSym(const double *val)
+"
 
-Get the second dimension (i.e. number of columns)
+Set upper triangular elements.
+
+";
+
+%feature("docstring")  casadi::Matrix< DataType >::setSym(const std::vector<
+double > &val) "
+
+Set upper triangular elements.
 
 ";
 
@@ -26401,6 +27128,48 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
+%feature("docstring")  taylor(const Matrix< DataType > &ex, const Matrix<
+DataType > &x, const Matrix< DataType > &a, int order=1) "
+
+univariate Taylor series expansion
+
+Calculate the Taylor expansion of expression 'ex' up to order 'order' with
+respect to variable 'x' around the point 'a'
+
+$(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac
+{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
+
+Example usage:
+
+::
+
+>>   x
+
+
+
+";
+
+%feature("docstring")  taylor(const Matrix< DataType > &ex, const Matrix<
+DataType > &x) "
+
+univariate Taylor series expansion
+
+Calculate the Taylor expansion of expression 'ex' up to order 'order' with
+respect to variable 'x' around the point 'a'
+
+$(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac
+{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
+
+Example usage:
+
+::
+
+>>   x
+
+
+
+";
+
 %feature("docstring")  casadi::Matrix< DataType >::isSymbolic() const  "
 
 Check if symbolic (Dense) Sparse matrices invariable return false.
@@ -26414,11 +27183,13 @@ Get the first dimension (i.e. number of rows)
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::getElementHash() const  "
+%feature("docstring")  chol(const Matrix< DataType > &A) "
 
-Returns a number that is unique for a given symbolic scalar.
+Obtain a Cholesky factorisation of a matrix Returns an upper triangular R
+such that R'R = A. Matrix A must be positive definite.
 
-Only defined if symbolic scalar.
+At the moment, the algorithm is dense (Cholesky-Banachiewicz). There is an
+open ticket #1212 to make it sparse.
 
 ";
 
@@ -26430,6 +27201,42 @@ Get name (only if symbolic scalar)
 
 %feature("docstring")  casadi::Matrix< DataType >::printme(const Matrix<
 DataType > &y) const  " ";
+
+%feature("docstring")  gauss_quadrature(const Matrix< DataType > &f, const
+Matrix< DataType > &x, const Matrix< DataType > &a, const Matrix< DataType >
+&b, int order=5) "
+
+Integrate f from a to b using Gaussian quadrature with n points.
+
+";
+
+%feature("docstring")  gauss_quadrature(const Matrix< DataType > &f, const
+Matrix< DataType > &x, const Matrix< DataType > &a, const Matrix< DataType >
+&b, int order, const Matrix< DataType > &w) "
+
+Matrix adjoint.
+
+";
+
+%feature("docstring")  pw_const(const Matrix< DataType > &t, const Matrix<
+DataType > &tval, const Matrix< DataType > &val) "
+
+Create a piecewise constant function Create a piecewise constant function
+with n=val.size() intervals.
+
+Inputs:
+
+Parameters:
+-----------
+
+t:  a scalar variable (e.g. time)
+
+tval:  vector with the discrete values of t at the interval transitions
+(length n-1)
+
+val:  vector with the value of the function for each interval (length n)
+
+";
 
 %feature("docstring")  casadi::Matrix< DataType >::enlarge(int nrow, int
 ncol, const std::vector< int > &rr, const std::vector< int > &cc, bool
@@ -26444,6 +27251,26 @@ keeping the existing non-zeros.
 >::iscolumn() const "
 
 Check if the matrix is a column vector (i.e. size2()==1)
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::size2()
+const "
+
+Get the second dimension (i.e. number of columns)
+
+";
+
+%feature("docstring")  pw_lin(const Matrix< DataType > &t, const Matrix<
+DataType > &tval, const Matrix< DataType > &val) "
+
+t a scalar variable (e.g. time)
+
+Create a piecewise linear function Create a piecewise linear function:
+
+Inputs: tval vector with the the discrete values of t (monotonically
+increasing) val vector with the corresponding function values (same length
+as tval)
 
 ";
 
@@ -26530,6 +27357,26 @@ const DataType &val, bool dummy) " [INTERNAL] ";
 
 %feature("docstring") casadi::Matrix< DataType >::Matrix(const Sparsity &sp,
 const std::vector< DataType > &d, bool dummy) " [INTERNAL] ";
+
+%feature("docstring")  casadi::Matrix< DataType >::getElementHash() const  "
+
+Returns a number that is unique for a given symbolic scalar.
+
+Only defined if symbolic scalar.
+
+";
+
+%feature("docstring")  rectangle(const Matrix< DataType > &x) "
+
+rectangle function
+
+\\\\[ \\\\begin {cases} \\\\Pi(x) = 1 & |x| < 1/2 \\\\\\\\ \\\\Pi(x) = 1/2 &
+|x| = 1/2 \\\\\\\\ \\\\Pi(x) = 0 & |x| > 1/2 \\\\\\\\ \\\\end {cases} \\\\]
+
+Also called: gate function, block function, band function, pulse function,
+window function
+
+";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::sym(const std::string &name, int nrow=1, int ncol=1) "
@@ -26999,6 +27846,26 @@ create a matrix with all inf
 
 ";
 
+%feature("docstring")  matrix_expand(const MX &e, const std::vector< MX >
+&boundary=std::vector< MX >()) "
+
+Expand MX graph to SXFunction call.
+
+Expand the given expression e, optionally supplying expressions contained in
+it at which expansion should stop.
+
+";
+
+%feature("docstring")  matrix_expand(const std::vector< MX > &e, const
+std::vector< MX > &boundary=std::vector< MX >()) "
+
+Expand MX graph to SXFunction call.
+
+Expand the given expression e, optionally supplying expressions contained in
+it at which expansion should stop.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MX  >::getColind() const "
 
 Get the sparsity pattern. See the Sparsity class for details.
@@ -27058,9 +27925,31 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
+%feature("docstring")  find(const MX &x) "
+
+Find first nonzero If failed, returns the number of rows.
+
+";
+
 %feature("docstring")  casadi::MX::isZero() const  "
 
 check if zero (note that false negative answers are possible)
+
+";
+
+%feature("docstring")  graph_substitute(const MX &ex, const std::vector< MX
+> &v, const std::vector< MX > &vdef) "
+
+Substitute single expression in graph Substitute variable v with expression
+vdef in an expression ex, preserving nodes.
+
+";
+
+%feature("docstring")  graph_substitute(const std::vector< MX > &ex, const
+std::vector< MX > &v, const std::vector< MX > &vdef) "
+
+Substitute multiple expressions in graph Substitute variable var with
+expression expr in multiple expressions, preserving nodes.
 
 ";
 
@@ -36885,10 +37774,16 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
-const  "
+%feature("docstring")  repr(const PrintableObject< Derived > &obj) "
 
-Return a string with a description (for SWIG)
+Return a string with a representation of the object, cf. repr(Object) in
+Python.
+
+";
+
+%feature("docstring")  str(const PrintableObject< Derived > &obj) "
+
+Return a string with a description of the object, cf. str(Object) in Python.
 
 ";
 
@@ -36900,16 +37795,10 @@ Joel Andersson
 
 C++ includes: printable_object.hpp ";
 
-%feature("docstring")  repr(const PrintableObject< Derived > &obj) "
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  "
 
-Return a string with a representation of the object, cf. repr(Object) in
-Python.
-
-";
-
-%feature("docstring")  str(const PrintableObject< Derived > &obj) "
-
-Return a string with a description of the object, cf. str(Object) in Python.
+Return a string with a description (for SWIG)
 
 ";
 
@@ -49757,6 +50646,149 @@ Create a scalar sparsity pattern.
 
 
 // File: classcasadi_1_1SparsityInterface.xml
+%feature("docstring")  diagsplit(const MatType &x, const std::vector< int >
+&output_offset1, const std::vector< int > &output_offset2) "
+
+split diagonally, retaining square matrices
+
+Parameters:
+-----------
+
+output_offset1:  List of all start locations (row) for each group the last
+matrix will run to the end.
+
+output_offset2:  List of all start locations (row) for each group the last
+matrix will run to the end.
+
+diagcat(diagsplit(x, ...)) = x
+
+";
+
+%feature("docstring")  diagsplit(const MatType &x, const std::vector< int >
+&output_offset) "
+
+split diagonally, retaining square matrices
+
+Parameters:
+-----------
+
+output_offset:  List of all start locations for each group the last matrix
+will run to the end.
+
+diagcat(diagsplit(x, ...)) = x
+
+";
+
+%feature("docstring")  diagsplit(const MatType &x, int incr=1) "
+
+split diagonally, retaining groups of square matrices
+
+Parameters:
+-----------
+
+incr:  Size of each matrix
+
+diagsplit(diagsplit(x, ...)) = x
+
+";
+
+%feature("docstring")  diagsplit(const MatType &x, int incr1, int incr2) "
+
+split diagonally, retaining fixed-sized matrices
+
+Parameters:
+-----------
+
+incr1:  Row dimension of each matrix
+
+incr2:  Column dimension of each matrix
+
+diagsplit(diagsplit(x, ...)) = x
+
+";
+
+%feature("docstring")  triu(const MatType &a, bool includeDiagonal=true) "
+
+Get the upper triangular part of a matrix.
+
+";
+
+%feature("docstring")  mac(const MatType &X, const MatType &Y, const MatType
+&Z) "
+
+Multiply-accumulate operation Matrix product of two matrices (X and Y),
+adding the result to a third matrix Z. The result has the same sparsity
+pattern as C meaning that other entries of (X*Y) are ignored. The operation
+is equivalent to: Z+mul(X,Y).project(Z.sparsity()).
+
+";
+
+%feature("docstring")  transpose(const MatType &X) "
+
+Transpose.
+
+";
+
+%feature("docstring")  tril(const MatType &a, bool includeDiagonal=true) "
+
+Get the lower triangular part of a matrix.
+
+";
+
+%feature("docstring")  offset(const std::vector< MatType > &v, bool
+vert=true) "
+
+Helper function, get offsets corresponding to a vector of matrices.
+
+";
+
+%feature("docstring")  vec(const MatType &a) "
+
+make a vector Reshapes/vectorizes the matrix such that the shape becomes
+(expr.numel(), 1). Columns are stacked on top of each other. Same as
+reshape(expr, expr.numel(), 1)
+
+a c b d  turns into
+
+a b c d
+
+";
+
+%feature("docstring")  horzcat(const std::vector< MatType > &v) "
+
+Concatenate a list of matrices horizontally Alternative terminology:
+horizontal stack, hstack, horizontal append, [a b].
+
+horzcat(horzsplit(x, ...)) = x
+
+";
+
+%feature("docstring")  horzcat(const MatType &x, const MatType &y) "
+
+Concatenate horizontally, two matrices.
+
+";
+
+%feature("docstring")  horzcat(const MatType &x, const MatType &y, const
+MatType &z) "
+
+Concatenate horizontally, three matrices.
+
+";
+
+%feature("docstring")  horzcat(const MatType &x, const MatType &y, const
+MatType &z, const MatType &w) "
+
+Concatenate horizontally, four matrices.
+
+";
+
+%feature("docstring")  vecNZ(const MatType &a) "
+
+Returns a flattened version of the matrix, preserving only nonzeros.
+
+";
+
 %feature("docstring") casadi::SparsityInterface "
 
 Sparsity interface class.
@@ -49766,6 +50798,267 @@ Sparsity, introducing a uniform syntax and implementing common functionality
 using the curiously recurring template pattern (CRTP) idiom. Joel Andersson
 
 C++ includes: sparsity_interface.hpp ";
+
+%feature("docstring")  horzsplit(const MatType &v, const std::vector< int >
+&offset) "
+
+split horizontally, retaining groups of columns
+
+Parameters:
+-----------
+
+offset:  List of all start columns for each group the last column group will
+run to the end.
+
+horzcat(horzsplit(x, ...)) = x
+
+";
+
+%feature("docstring")  horzsplit(const MatType &v, int incr=1) "
+
+split horizontally, retaining fixed-sized groups of columns
+
+Parameters:
+-----------
+
+incr:  Size of each group of columns
+
+horzcat(horzsplit(x, ...)) = x
+
+";
+
+%feature("docstring")  veccat(const std::vector< MatType > &x) "
+
+concatenate vertically while vectorizing all arguments with vec
+
+";
+
+%feature("docstring")  blocksplit(const MatType &x, const std::vector< int >
+&vert_offset, const std::vector< int > &horz_offset) "
+
+chop up into blocks
+
+Parameters:
+-----------
+
+vert_offset:  Defines the boundaries of the block rows
+
+horz_offset:  Defines the boundaries of the block columns
+
+blockcat(blocksplit(x,..., ...)) = x
+
+";
+
+%feature("docstring")  blocksplit(const MatType &x, int vert_incr=1, int
+horz_incr=1) "
+
+chop up into blocks
+
+Parameters:
+-----------
+
+vert_incr:  Defines the increment for block boundaries in row dimension
+
+horz_incr:  Defines the increment for block boundaries in column dimension
+
+blockcat(blocksplit(x,..., ...)) = x
+
+";
+
+%feature("docstring")  repmat(const MatType &A, int n, int m=1) "
+
+Repeat matrix A n times vertically and m times horizontally.
+
+";
+
+%feature("docstring")  repmat(const MatType &A, const std::pair< int, int >
+&rc) "
+
+Repeat matrix A n times vertically and m times horizontally.
+
+";
+
+%feature("docstring")  vertcat(const std::vector< MatType > &v) "
+
+Concatenate a list of matrices vertically Alternative terminology: vertical
+stack, vstack, vertical append, [a;b].
+
+vertcat(vertsplit(x, ...)) = x
+
+";
+
+%feature("docstring")  vertcat(const MatType &x, const MatType &y) "
+
+Concatenate vertically, two matrices.
+
+";
+
+%feature("docstring")  vertcat(const MatType &x, const MatType &y, const
+MatType &z) "
+
+Concatenate vertically, three matrices.
+
+";
+
+%feature("docstring")  vertcat(const MatType &x, const MatType &y, const
+MatType &z, const MatType &w) "
+
+Concatenate vertically, four matrices.
+
+";
+
+%feature("docstring")  sprank(const MatType &A) "
+
+Obtain the structural rank of a sparsity-pattern.
+
+";
+
+%feature("docstring")  kron(const MatType &a, const MatType &b) "
+
+Kronecker tensor product.
+
+Creates a block matrix in which each element (i, j) is a_ij*b
+
+";
+
+%feature("docstring")  reshape(const MatType &a, int nrow, int ncol) "
+
+Returns a reshaped version of the matrix.
+
+";
+
+%feature("docstring")  reshape(const MatType &a, std::pair< int, int > rc) "
+
+Returns a reshaped version of the matrix, dimensions as a vector.
+
+";
+
+%feature("docstring")  reshape(const MatType &a, const Sparsity &sp) "
+
+Reshape the matrix.
+
+";
+
+%feature("docstring")  norm_0_mul(const MatType &x, const MatType &y) "
+
+0-norm (nonzero count) of a Matrix-matrix product
+
+";
+
+%feature("docstring")  diagcat(const std::vector< MatType > &A) "
+
+Construct a matrix with given block on the diagonal.
+
+";
+
+%feature("docstring")  diagcat(const MatType &x, const MatType &y) "
+
+Concatenate along diagonal, two matrices.
+
+";
+
+%feature("docstring")  diagcat(const MatType &x, const MatType &y, const
+MatType &z) "
+
+Concatenate along diagonal, three matrices.
+
+";
+
+%feature("docstring")  diagcat(const MatType &x, const MatType &y, const
+MatType &z, const MatType &w) "
+
+Concatenate along diagonal, four matrices.
+
+";
+
+%feature("docstring")  vertsplit(const MatType &v, const std::vector< int >
+&offset) "
+
+split vertically, retaining groups of rows
+
+*
+
+Parameters:
+-----------
+
+output_offset:  List of all start rows for each group the last row group
+will run to the end.
+
+vertcat(vertsplit(x, ...)) = x
+
+";
+
+%feature("docstring")  vertsplit(const MatType &v, int incr=1) "
+
+split vertically, retaining fixed-sized groups of rows
+
+Parameters:
+-----------
+
+incr:  Size of each group of rows
+
+vertcat(vertsplit(x, ...)) = x
+
+
+
+::
+
+  >>> print vertsplit(SX.sym(\"a\",4))
+  [SX(a_0), SX(a_1), SX(a_2), SX(a_3)]
+  
+
+
+
+
+
+::
+
+  >>> print vertsplit(SX.sym(\"a\",4),2)
+  [SX([a_0, a_1]), SX([a_2, a_3])]
+  
+
+
+
+If the number of rows is not a multiple of incr, the last entry returned
+will have a size smaller than incr.
+
+
+
+::
+
+  >>> print vertsplit(DMatrix([0,1,2,3,4]),2)
+  [DMatrix([0, 1]), DMatrix([2, 3]), DMatrix(4)]
+  
+
+
+
+";
+
+%feature("docstring")  mul(const MatType &X, const MatType &Y) "
+
+Matrix product of two matrices.
+
+";
+
+%feature("docstring")  mul(const std::vector< MatType > &args) "
+
+Matrix product of n matrices.
+
+";
+
+%feature("docstring")  blockcat(const std::vector< std::vector< MatType > >
+&v) "
+
+Construct a matrix from a list of list of blocks.
+
+";
+
+%feature("docstring")  blockcat(const MatType &A, const MatType &B, const
+MatType &C, const MatType &D) "
+
+Construct a matrix from 4 blocks.
+
+";
 
 
 // File: classcasadi_1_1Split.xml
