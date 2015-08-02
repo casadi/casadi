@@ -758,7 +758,7 @@ x = SX.eye(4)
 print reshape(x,(2,8))
 \end{pytexoutput}
 
-\textbf{Concatenation} means stacking matrices horizontally or vertically. Due to the column-major way of storing elements in \CasADi, it is most efficient to stack matrices horizontally. Matrices that are in fact column vectors (i.e. consisting of a single column), can also be stacked efficiently vertically. Vertical and horizontal concatenation is performed using the functions \texttt{vertcat} and \text{horzcat} (that take a list of input arguments) in Python and C++ and with square brackets in MATLAB:
+\textbf{Concatenation} means stacking matrices horizontally or vertically. Due to the column-major way of storing elements in \CasADi, it is most efficient to stack matrices horizontally. Matrices that are in fact column vectors (i.e. consisting of a single column), can also be stacked efficiently vertically. Vertical and horizontal concatenation is performed using the functions \texttt{vertcat} and \texttt{horzcat} (that take a list of input arguments) in Python and C++ and with square brackets in MATLAB:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -1584,8 +1584,7 @@ For a more detailed description of this class and its functionalities, we refer 
     Printing the \emph{representation} (string representation intended to be \emph{unambiguous}) & \verb|A <ENTER>| (interactive), \verb|print repr(A)| (in scripts) & \verb|std::cout << A;|& \verb|A <ENTER>| or \verb|disp A|\\ \hline
     Printing the \emph{description} (string representation intended to be \emph{readable}) & \verb|print A| & \verb|A.print();| or \verb|A.print(stream);|& \verb|A.print()| \\ \hline
     Calling a class function & \verb|SX.zeros(3,4)| & \verb|SX::zeros(3,4)| & \verb|SX.zeros(3,4)|\\ \hline
-    Creating a dictionary (e.g. for options) & \verb|d = {'opt1':opt1}| or \verb|d = {}; a['opt1'] = opt1| & \verb|a = Dict();| \verb|a['opt1'] = opt1;| & \verb|a = Dict();| \verb|a('opt1') = opt1;| \\ \hline
-    Getting function output by value & \verb|out = f.getOutput()| & \verb|DMatrix out;| \verb|f.getOutput(out);| & \verb|out = f.getOutput()| \\ \hline
+    Creating a dictionary (e.g. for options) & \verb|d = {'opt1':opt1}| or \verb|d = {}; a['opt1'] = opt1| & \verb|a = Dict();| \verb|a['opt1'] = opt1;| & \verb|a = struct;| \verb|a.opt1 = opt1;| \\ \hline
   \end{tabular}
 \end{center}
 
