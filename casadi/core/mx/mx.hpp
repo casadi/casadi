@@ -501,7 +501,11 @@ namespace casadi {
 
     MX printme(const MX& y) const;
 
-#ifndef SWIG
+#if !defined(SWIG) || defined(DOXYGEN)
+/**
+\ingroup expression_tools
+@{
+*/
     /** \brief Find first nonzero
      * If failed, returns the number of rows
      */
@@ -550,6 +554,7 @@ namespace casadi {
                     const std::vector<MX> &boundary = std::vector<MX>()) {
       return MX::zz_matrix_expand(e, boundary);
     }
+/** @} */
 #endif // SWIG
 
     /** \brief returns itself, but with an assertion attached

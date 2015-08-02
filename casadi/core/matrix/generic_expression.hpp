@@ -53,7 +53,11 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
 #endif // SWIG
   public:
 
-#ifndef SWIG
+#if !defined(SWIG) || defined(DOXYGEN)
+/**
+\ingroup expression_tools
+@{
+*/
     /// Addition
     friend inline ExType operator+(const ExType &x, const ExType &y) {
       return x.zz_plus(y);
@@ -328,7 +332,7 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
     friend inline ExType logic_or(const ExType& x, const ExType& y) {
       return x || y;
     }
-
+/** @} */
 #endif // SWIG
 
 };

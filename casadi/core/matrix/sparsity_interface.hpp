@@ -326,7 +326,17 @@ namespace casadi {
     std::vector<MatType > zz_horzsplit(int incr) const;
     std::vector<MatType > zz_vertsplit(int incr) const;
     /// \endcond
+#endif
 
+#if !defined(SWIG) || defined(DOXYGEN)
+/** \defgroup expression_tools Expression tools
+* Functions for manipulating DMatrix, SX, MX or Sparsity
+*
+*/
+/**
+\ingroup expression_tools
+@{
+*/
     /** \brief Concatenate a list of matrices horizontally
      * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
      *
@@ -672,6 +682,7 @@ namespace casadi {
                                   const MatType &w) {
       return diagcat(make_vector(x, y, z, w));
     }
+/** \@} */
 #endif // SWIG
   };
 

@@ -565,7 +565,11 @@ namespace casadi {
     /// Transpose the matrix
     Matrix<DataType> T() const;
 
-#ifndef SWIG
+#if !defined(SWIG) || defined(DOXYGEN)
+/**
+\ingroup expression_tools
+@{
+*/
     /** \brief Matrix adjoint
     */
     friend inline Matrix<DataType> adj(const Matrix<DataType>& A) {
@@ -853,7 +857,7 @@ namespace casadi {
     friend inline Matrix<DataType> eig_symbolic(const Matrix<DataType>& m) {
       return m.zz_eig_symbolic();
     }
-
+/** @} */
 #endif
 
     /** \brief Set or reset the depth to which equalities are being checked for simplifications */
