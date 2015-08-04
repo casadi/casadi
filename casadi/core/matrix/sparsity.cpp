@@ -1082,7 +1082,15 @@ namespace casadi {
   }
 
   std::vector<int> Sparsity::compress() const {
-    return (*this)->sp();
+    if (isdense()) {
+      std::vector<int> ret;
+      ret.push_back(size1());
+      ret.push_back(size2());
+      ret.push_back(-1);
+      return ret;
+    } else {
+      return (*this)->sp();
+    }
   }
 
   Sparsity Sparsity::compressed(const std::vector<int>& v) {

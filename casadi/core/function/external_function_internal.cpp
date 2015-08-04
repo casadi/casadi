@@ -182,20 +182,25 @@ namespace casadi {
       int nrow, ncol;
       const int *colind, *row;
       int flag = sparsity(i, &nrow, &ncol, &colind, &row);
-      casadi_assert_message(flag==0, "ExternalFunctionInternal: \"sparsity\" failed");
+      Sparsity sp;
+      if (colind[0]==-1) {
+        sp = Sparsity::dense(nrow, ncol);
+      } else {
 
-      // Col offsets
-      vector<int> colindv(colind, colind+ncol+1);
+        casadi_assert_message(flag==0, "ExternalFunctionInternal: \"sparsity\" failed");
 
-      // Number of nonzeros
-      int nnz = colindv.back();
+        // Col offsets
+        vector<int> colindv(colind, colind+ncol+1);
 
-      // Rows
-      vector<int> rowv(row, row+nnz);
+        // Number of nonzeros
+        int nnz = colindv.back();
 
-      // Sparsity
-      Sparsity sp(nrow, ncol, colindv, rowv);
+        // Rows
+        vector<int> rowv(row, row+nnz);
 
+        // Sparsity
+        sp = Sparsity(nrow, ncol, colindv, rowv);
+      }
       // Save to inputs/outputs
       if (i<nIn()) {
         input(i) = Matrix<double>::zeros(sp);
