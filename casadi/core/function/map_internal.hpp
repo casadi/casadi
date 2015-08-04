@@ -57,8 +57,10 @@ namespace casadi {
     virtual void init();
 
     /// Evaluate the function (template)
-    template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w);
+    template<typename T, typename R>
+    void evalGen(const T** arg, T** res, int* iw, T* w,
+      void (FunctionInternal::*ptrEval)(const T** arg, T** res, int* iw, T* w),
+      R reduction);
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void evalD(const double** arg, double** res, int* iw, double* w);
@@ -69,6 +71,8 @@ namespace casadi {
 
     /** \brief  Evaluate symbolically, MX type */
     //virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */

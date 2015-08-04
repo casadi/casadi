@@ -141,21 +141,10 @@ namespace casadi {
     }
   }
 
-  template<typename T>
-  void fevalGen(Function &f, const T** arg, T** res, int* iw, T* w);
-
-  template<>
-  void fevalGen(Function &f, const double** arg, double** res, int* iw, double* w) {
-    f->evalD(arg, res, iw, w);
-  }
-
-  template<>
-  void fevalGen(Function &f, const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    f->evalSX(arg, res, iw, w);
-  }
-
-  template<typename T>
-  void MapInternal::evalGen(const T** arg, T** res, int* iw, T* w) {
+  template<typename T, typename R>
+  void MapInternal::evalGen(const T** arg, T** res, int* iw, T* w,
+    void (FunctionInternal::*eval)(const T** arg, T** res, int* iw, T* w),
+    R reduction) {
     int num_in = f_.nIn(), num_out = f_.nOut();
 
     const T** arg1 = arg+f_.sz_arg();
@@ -192,12 +181,13 @@ namespace casadi {
       }
 
       // Evaluate the function
-      fevalGen<T>(f_, arg1, res1, iw, w);
+      FunctionInternal *f = f_.operator->();
+      (f->*eval)(arg1, res1, iw, w);
 
       // Sum results from temporary storage to accumulator
       for (int k=0;k<num_out;++k) {
         if (res1[k] && sum[k] && !repeat_out_[k])
-          std::transform(res1[k], res1[k]+step_out_[k], sum[k], sum[k], std::plus<T>());
+          std::transform(res1[k], res1[k]+step_out_[k], sum[k], sum[k], reduction);
       }
     }
   }
@@ -205,7 +195,7 @@ namespace casadi {
   void MapInternal::evalD(const double** arg, double** res,
                                 int* iw, double* w) {
     if (parallelization_ == PARALLELIZATION_SERIAL) {
-      evalGen<double>(arg, res, iw, w);
+      evalGen<double>(arg, res, iw, w, &FunctionInternal::evalD, std::plus<double>());
     } else {
       int n_in_ = f_.nIn(), n_out_ = f_.nOut();
       #ifndef WITH_OPENMP
@@ -235,8 +225,18 @@ namespace casadi {
 
   void MapInternal::evalSX(const SXElement** arg, SXElement** res,
                                 int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+    evalGen<SXElement>(arg, res, iw, w, &FunctionInternal::evalSX, std::plus<SXElement>());
   }
+
+  static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
+
+  void MapInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    evalGen<bvec_t>(arg, res, iw, w, &FunctionInternal::spFwd, &Orring);
+  }
+
+/**void Map::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    evalGen<SXElement>(arg, res, iw, w);
+}*/
 
   /**
   void MapInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
