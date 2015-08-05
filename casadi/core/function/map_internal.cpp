@@ -165,7 +165,7 @@ namespace casadi {
 
       // Set the function inputs
       for (int j=0; j<num_in; ++j) {
-        arg1[j] = arg[j]+i*step_in_[j];
+        arg1[j] = (arg[j]==0) ? 0: arg[j]+i*step_in_[j];
       }
 
       // Set the function outputs
@@ -355,7 +355,8 @@ namespace casadi {
            << "    if (temp_res!=0)" << g.fill_n("temp_res", nnz_out_, "0") << endl;
 
     for (int j=0; j<num_in; ++j) {
-      g.body << "    arg1[" << j << "] = arg[" << j << "]+i*" << step_in_[j] << ";" << endl;
+      g.body << "    arg1[" << j << "] = (arg[" << j << "]==0)? " <<
+                "0: arg[" << j << "]+i*" << step_in_[j] << ";" << endl;
     }
     for (int j=0; j<num_out; ++j) {
       if (repeat_out_[j]) {
