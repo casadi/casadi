@@ -30,6 +30,7 @@
 
 // Bug in qpOASES?
 #define ALLOW_QPROBLEMB true
+#define ALLOW_ALL_OPTIONS
 
 using namespace std;
 namespace casadi {
