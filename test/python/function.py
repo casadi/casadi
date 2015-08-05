@@ -1752,11 +1752,12 @@ class Functiontests(casadiTestCase):
     Fref = MXFunction("f",[X,horzcat(Y),horzcat(Z),horzcat(V)],[XP,horzcat(Y0s),horzcat(Y1s)])
     print Fref([X_,horzcat(Y_),horzcat(Z_),horzcat(V_)])
 
-    for i,e in enumerate([X_,horzcat(Y_),horzcat(Z_),horzcat(V_)]):
-      F.setInput(e,i)
-      Fref.setInput(e,i)
+    for f in [F,toSXFunction(F)]:
+      for i,e in enumerate([X_,horzcat(Y_),horzcat(Z_),horzcat(V_)]):
+        f.setInput(e,i)
+        Fref.setInput(e,i)
 
-    self.checkfunction(F,Fref,jacobian=False,hessian=False,evals=False)
+      self.checkfunction(f,Fref,jacobian=False,hessian=False,evals=False)
 
 if __name__ == '__main__':
     unittest.main()

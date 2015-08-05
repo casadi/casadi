@@ -140,9 +140,13 @@ namespace casadi {
 
   void MapAccumInternal::evalSX(const SXElement** arg, SXElement** res,
                                 int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w, &FunctionInternal::evalSX, std::plus<double>());
   }
 
+  static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
+
   void MapAccumInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    evalGen<bvec_t>(arg, res, iw, w, &FunctionInternal::spFwd, &Orring);
   }
 
   Function MapAccumInternal
