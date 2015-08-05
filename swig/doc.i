@@ -1483,6 +1483,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -2750,6 +2795,51 @@ Joris Gillis
 | ptions       |              | )            | be passed to | rolSimulator |
 |              |              |              | the          | Internal     |
 |              |              |              | integrator   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | minor_grid   | OT_INTEGERVE | GenericType( | The local    | casadi::Cont |
 |              | CTOR         | )            | grid used on | rolSimulator |
@@ -4470,6 +4560,51 @@ Joel Andersson
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -7419,6 +7554,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -8945,6 +9125,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -10187,6 +10412,51 @@ Joel Andersson
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -11947,6 +12217,51 @@ Joel Andersson
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -14885,6 +15200,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -15816,6 +16176,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_fun | OT_FUNCTION  | GenericType( | Function     | casadi::Impl |
 | ction        |              | )            | object for   | icitFunction |
@@ -17962,6 +18367,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -20609,6 +21059,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -22286,6 +22781,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -24207,6 +24747,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -25949,6 +26534,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -29521,6 +30151,51 @@ Joel Andersson
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -31398,6 +32073,13 @@ General information
 |              |              |              | ogenerated   |              |
 |              |              |              | by default)  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| grad_f_optio | OT_DICT      | GenericType( | Options for  | casadi::NlpS |
+| ns           |              | )            | the autogene | olverInterna |
+|              |              |              | rated        | l            |
+|              |              |              | gradient of  |              |
+|              |              |              | the          |              |
+|              |              |              | objective.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | grad_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NlpS |
 |              |              | )            | calculating  | olverInterna |
 |              |              |              | the gradient | l            |
@@ -31407,6 +32089,13 @@ General information
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| grad_lag_opt | OT_DICT      | GenericType( | Options for  | casadi::NlpS |
+| ions         |              | )            | the autogene | olverInterna |
+|              |              |              | rated        | l            |
+|              |              |              | gradient of  |              |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | hess_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NlpS |
 |              |              | )            | calculating  | olverInterna |
 |              |              |              | the Hessian  | l            |
@@ -31415,6 +32104,13 @@ General information
 |              |              |              | autogenerate |              |
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hess_lag_opt | OT_DICT      | GenericType( | Options for  | casadi::NlpS |
+| ions         |              | )            | the autogene | olverInterna |
+|              |              |              | rated        | l            |
+|              |              |              | Hessian of   |              |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | casadi::NlpS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -31462,13 +32158,20 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 | jac_f        | OT_FUNCTION  | GenericType( | Function for | casadi::NlpS |
 |              |              | )            | calculating  | olverInterna |
-|              |              |              | the jacobian | l            |
+|              |              |              | the Jacobian | l            |
 |              |              |              | of the       |              |
 |              |              |              | objective    |              |
 |              |              |              | (sparse row, |              |
 |              |              |              | autogenerate |              |
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_f_option | OT_DICT      | GenericType( | Options for  | casadi::NlpS |
+| s            |              | )            | the autogene | olverInterna |
+|              |              |              | rated        | l            |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | objective.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_g        | OT_FUNCTION  | GenericType( | Function for | casadi::NlpS |
 |              |              | )            | calculating  | olverInterna |
@@ -31478,6 +32181,58 @@ General information
 |              |              |              | (autogenerat |              |
 |              |              |              | ed by        |              |
 |              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_g_option | OT_DICT      | GenericType( | Options for  | casadi::NlpS |
+| s            |              | )            | the autogene | olverInterna |
+|              |              |              | rated        | l            |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | constraints. |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -37135,6 +37890,51 @@ basis Joris Gillis
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -38044,6 +38844,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -40344,6 +41189,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -42137,6 +43027,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -43517,6 +44452,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -45435,6 +46415,51 @@ Joel Andersson
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -47753,6 +48778,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -51857,6 +52927,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -53868,6 +54983,51 @@ Switch statement Joel Andersson
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -55641,6 +56801,51 @@ Joel Andersson
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | just_in_time | OT_BOOLEAN   | false        | Just-in-time | casadi::SXFu |
 | _opencl      |              |              | compilation  | nctionIntern |
