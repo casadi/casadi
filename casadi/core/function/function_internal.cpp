@@ -60,8 +60,15 @@ namespace casadi {
               "Weighting factor for sparsity pattern calculation calculation."
               "Overrides default behavior. Set to 0 and 1 to force forward and "
               "reverse mode respectively. Cf. option \"ad_weight\".");
-    //addOption("ad_mode",                  OT_STRING,              "automatic",
-    //          "Deprecated option, use \"ad_weight\" instead. Ignored.");
+    addOption("jac_penalty",             OT_REAL,                 2,
+              "When requested for a number of forward/reverse directions,   "
+              "it may be cheaper to compute first the full jacobian and then "
+              "multiply with seeds, rather than obtain the requested directions "
+              "in a straightforward manner. "
+              "Casadi uses a heuristic to decide which is cheaper. "
+              "A high value of 'jac_penalty' makes it less likely for the heurstic "
+              "to chose the full Jacobian strategy. "
+              "The special value -1 indicates never to use the full Jacobian strategy");
     addOption("user_data",                OT_VOIDPTR,             GenericType(),
               "A user-defined field that can be used to identify "
               "the function or pass additional information");
@@ -2592,7 +2599,9 @@ namespace casadi {
     if (numDerForward()==0) return true;
 
     // Jacobian calculation penalty factor
-    const int jac_penalty = 2;
+    const double jac_penalty = getOption("jac_penalty");
+
+    if (jac_penalty==-1) return false;
 
     // Heuristic 1: Jac calculated via forward mode likely cheaper
     if (jac_penalty*nnzIn()<nfwd) return true;
@@ -2609,7 +2618,9 @@ namespace casadi {
     if (numDerReverse()==0) return true;
 
     // Jacobian calculation penalty factor
-    const int jac_penalty = 2;
+    const double jac_penalty = getOption("jac_penalty");
+
+    if (jac_penalty==-1) return false;
 
     // Heuristic 1: Jac calculated via reverse mode likely cheaper
     if (jac_penalty*nnzOut()<nadj) return true;
