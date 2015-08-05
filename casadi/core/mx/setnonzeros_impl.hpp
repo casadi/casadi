@@ -760,7 +760,7 @@ namespace casadi {
     // Perform the operation inplace
     g.body << "  for (cii=s" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
            << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; cii!=s" << ind
-           << "+" << this->nz_.size() << "; ++ii, ++ss)";
+           << "+" << this->nz_.size() << "; ++cii, ++ss)";
     g.body << " if (*cii>=0) rr[*cii] " << (Add?"+=":"=") << " *ss;" << endl;
   }
 
