@@ -1447,6 +1447,38 @@ class Functiontests(casadiTestCase):
         Fref.evaluate()
         
         self.checkfunction(f,Fref)
+
+  def test_issue1522(self):
+    V = MX.sym("X",2)
+
+    x =  V[0]
+    y =  V[1]
+
+    obj = (x-(x+y))**2
+
+    nlp = MXFunction("nlp",nlpIn(x=V),nlpOut(f=obj))
+
+    assertTrue(nlp.hessian(0,0).outputSparsity().issymetric())
+
+    V = MX.sym("X",6)
+
+    xs =      [ V[0:2], V[2:4] ]
+    travels = [ V[4],   V[5]   ]
+
+    dist = 0
+
+    for j in range(2):
+      dist+=sumRows((xs[0]-(xs[j]+travels[j]))**2)
+
+    nlp = MXFunction("nlp",nlpIn(x=V),nlpOut(f=-dist))
+
+    hs = []
+    for n in [nlp,SXFunction(nlp)]:
+        H = n.derivative(0,1).jacobian(0,2,False,True)
+
+        h = H(der_x=1,adj0_f=1)["jac"]
+        hs.append(h)
+    self.checkarray(*hs)
     
 if __name__ == '__main__':
     unittest.main()

@@ -1090,18 +1090,22 @@ namespace casadi {
   Sparsity FunctionInternal::getJacSparsity(int iind, int oind, bool symmetric) {
     // Check if we are able to propagate dependencies through the function
     if (spCanEvaluate(true) || spCanEvaluate(false)) {
-
+      Sparsity sp;
       if (input(iind).nnz()>3*bvec_size && output(oind).nnz()>3*bvec_size) {
         if (symmetric) {
-          return getJacSparsityHierarchicalSymm(iind, oind);
+          sp = getJacSparsityHierarchicalSymm(iind, oind);
         } else {
-          return getJacSparsityHierarchical(iind, oind);
+          sp = getJacSparsityHierarchical(iind, oind);
         }
       } else {
-        return getJacSparsityPlain(iind, oind);
+        sp = getJacSparsityPlain(iind, oind);
       }
-
-
+      // There may be false positives here that are not present
+      // in the reverse mode that precedes it.
+      // This can lead to an assymetrical result 
+      //  cf. #1522
+      if (symmetric) sp=sp*sp.T();
+      return sp;
     } else {
       // Dense sparsity by default
       return Sparsity::dense(output(oind).nnz(), input(iind).nnz());
