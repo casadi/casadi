@@ -426,7 +426,7 @@ namespace casadi {
                           << x.dimString() << " and z=" << z.dimString() << ".");
     casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got y=" << y.size1()
                           << " and x" << x.dimString() << ".");
-    if (x.isdense() && y.isdense()) {
+    if (false && x.isdense() && y.isdense()) {
       return MX::create(new DenseMultiplication(z, x, y));
     } else {
       return MX::create(new Multiplication(z, x, y));
