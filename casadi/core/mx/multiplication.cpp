@@ -113,9 +113,9 @@ namespace casadi {
 
     // Perform sparse matrix multiplication
     g.addAuxiliary(CodeGenerator::AUX_MM_SPARSE);
-    g.body << "  casadi_mm_sparse(";
+    g.body << "  mm_sparse(   ";
     g.body << g.work(arg[1], dep(1).nnz()) << ", " << g.sparsity(dep(1).sparsity()) << ", ";
-    g.body << g.work(arg[2], dep(0).nnz()) << ", " << g.sparsity(dep(2).sparsity()) << ", ";
+    g.body << g.work(arg[2], dep(2).nnz()) << ", " << g.sparsity(dep(2).sparsity()) << ", ";
     g.body << g.work(res[0], nnz()) << ", " << g.sparsity(sparsity()) << ", w);" << endl;
   }
 
