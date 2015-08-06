@@ -2569,10 +2569,6 @@ class MXtests(casadiTestCase):
       
     x = MX.sym("x",2)
 
-    g = MXFunction("g", [x],[MX.zeros(1,1)])
-
-    h = g.jacobian(0,0,False,True)
-
   def test_exprjac(self):
 
 
