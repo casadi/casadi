@@ -1102,7 +1102,7 @@ namespace casadi {
       }
       // There may be false positives here that are not present
       // in the reverse mode that precedes it.
-      // This can lead to an assymetrical result 
+      // This can lead to an assymetrical result
       //  cf. #1522
       if (symmetric) sp=sp*sp.T();
       return sp;
