@@ -92,8 +92,12 @@ matrix:
         - pushd pyreport && sudo python setup.py install && popd
         - sudo apt-get install python-lxml valgrind -y
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test && travis_wait make unittests_py_slow && popd
-        - pushd build && travis_wait make json VERBOSE=1 && popd
+        
+        # travis-wait seems to stop at 20 mins, regardless if output is being generated
+        - (while true ; do sleep 60 ; echo "ping" ; done ) &
+        
+        - pushd test && make unittests_py_slow && popd
+        - pushd build && make json VERBOSE=1 && popd
     - compiler: gcc
       os: linux
       env: TESTMODE=docs
