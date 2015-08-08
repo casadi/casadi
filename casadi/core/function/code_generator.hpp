@@ -111,7 +111,19 @@ namespace casadi {
       AUX_SQ,
       AUX_SIGN,
       AUX_MM_SPARSE,
+      AUX_MM_SPARSE_SSS,
+      AUX_MM_SPARSE_DSS,
+      AUX_MM_SPARSE_SDS,
+      AUX_MM_SPARSE_DDS,
+      AUX_MM_SPARSE_SSD,
+      AUX_MM_SPARSE_DSD,
+      AUX_MM_SPARSE_SDD,
+      AUX_MM_SPARSE_DDD,
       AUX_PROJECT,
+      AUX_PROJECT_SS,
+      AUX_PROJECT_DS,
+      AUX_PROJECT_SD,
+      AUX_PROJECT_DD,
       AUX_TRANS,
       AUX_TO_MEX,
       AUX_FROM_MEX
@@ -140,6 +152,13 @@ namespace casadi {
 
     /** \brief Create a fill_n operation */
     std::string fill_n(const std::string& res, std::size_t n, const std::string& v);
+
+    /** \brief Create mm_sparse operation */
+    std::string mm_sparse(
+                         const std::string& x, const Sparsity& sp_x,
+                         const std::string& y, const Sparsity& sp_y,
+                         const std::string& z, const Sparsity& sp_z,
+                         const std::string& w);
 
     /** \brief Sparse assignment */
     std::string project(const std::string& arg, const Sparsity& sp_arg,

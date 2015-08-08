@@ -104,6 +104,44 @@ namespace casadi {
   /// Calculates inner_prod(x, mul(A, x))
   template<typename real_t>
   real_t CASADI_PREFIX(quad_form)(const real_t* A, const int* sp_A, const real_t* x);
+  
+  // Sparisty variants
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_sss)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_ssd)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_sds)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_sdd)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_dss)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_dsd)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_dds)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_ddd)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
+
+  template<typename real_t>
+  void CASADI_PREFIX(project_ss)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w);;
+
+  template<typename real_t>
+  void CASADI_PREFIX(project_sd)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w);;
+
+  template<typename real_t>
+  void CASADI_PREFIX(project_ds)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w);;
+
+  template<typename real_t>
+  void CASADI_PREFIX(project_dd)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w);;
 }
 
 // Helper functions
@@ -144,9 +182,27 @@ namespace casadi {
       y += inc_y;
     }
   }
-
+  
   template<typename real_t>
   void CASADI_PREFIX(project)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w) {
+    if (sp_x[2]==0) {
+      if (sp_y[2]==0) {
+        CASADI_PREFIX(project_ss)(x, sp_x, y, sp_y, w);
+      } else {
+        CASADI_PREFIX(project_sd)(x, sp_x, y, sp_y, w);
+      }
+    } else {
+      if (sp_y[2]==0) {
+        CASADI_PREFIX(project_ds)(x, sp_x, y, sp_y, w);
+      } else {
+        CASADI_PREFIX(project_dd)(x, sp_x, y, sp_y, w);
+      }
+    }
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(project_ss)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w) {
+
     int ncol_x = sp_x[1];
     const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
     int ncol_y = sp_y[1];
@@ -161,6 +217,67 @@ namespace casadi {
       /* Retrieve requested entries in y */
       for (el=colind_y[i]; el<colind_y[i+1]; ++el) y[el] = w[row_y[el]];
     }
+
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(project_sd)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w) {
+
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    /* Loop over columns of x and y */
+    int i, el;
+    for (i=0; i<ncol_x; ++i) {
+      /* Zero out requested entries in y */
+      for (el=sp_y[0]*(i); el<sp_y[0]*(i+1); ++el) w[(el)%sp_y[0]] = 0;
+      /* Set x entries */
+      for (el=colind_x[i]; el<colind_x[i+1]; ++el) w[row_x[el]] = x[el];
+      /* Retrieve requested entries in y */
+      for (el=sp_y[0]*(i); el<sp_y[0]*(i+1); ++el) y[el] = w[(el)%sp_y[0]];
+    }
+
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(project_ds)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w) {
+
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    /* Loop over columns of x and y */
+    int i, el;
+    for (i=0; i<ncol_x; ++i) {
+      /* Zero out requested entries in y */
+      for (el=colind_y[i]; el<colind_y[i+1]; ++el) w[row_y[el]] = 0;
+      /* Set x entries */
+      for (el=sp_x[0]*(i); el<sp_x[0]*(i+1); ++el) w[(el)%sp_x[0]] = x[el];
+      /* Retrieve requested entries in y */
+      for (el=colind_y[i]; el<colind_y[i+1]; ++el) y[el] = w[row_y[el]];
+    }
+
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(project_dd)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w) {
+
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    /* Loop over columns of x and y */
+    int i, el;
+    for (i=0; i<ncol_x; ++i) {
+      /* Zero out requested entries in y */
+      for (el=sp_y[0]*(i); el<sp_y[0]*(i+1); ++el) w[(el)%sp_y[0]] = 0;
+      /* Set x entries */
+      for (el=sp_x[0]*(i); el<sp_x[0]*(i+1); ++el) w[(el)%sp_x[0]] = x[el];
+      /* Retrieve requested entries in y */
+      for (el=sp_y[0]*(i); el<sp_y[0]*(i+1); ++el) y[el] = w[(el)%sp_y[0]];
+    }
+
   }
 
   template<typename real_t>
@@ -226,6 +343,40 @@ namespace casadi {
 
   template<typename real_t>
   void CASADI_PREFIX(mm_sparse)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
+    if (sp_x[2]==0) {
+      if (sp_y[2]==0) {
+        if (sp_z[2]==0) {
+          CASADI_PREFIX(mm_sparse_sss)(x, sp_x, y, sp_y, z, sp_z, w);
+        } else {
+          CASADI_PREFIX(mm_sparse_ssd)(x, sp_x, y, sp_y, z, sp_z, w);
+        }
+      } else {
+        if (sp_z[2]==0) {
+          CASADI_PREFIX(mm_sparse_sds)(x, sp_x, y, sp_y, z, sp_z, w);
+        } else {
+          CASADI_PREFIX(mm_sparse_sdd)(x, sp_x, y, sp_y, z, sp_z, w);
+        }
+      }
+    } else {
+      if (sp_y[2]==0) {
+        if (sp_z[2]==0) {
+          CASADI_PREFIX(mm_sparse_dss)(x, sp_x, y, sp_y, z, sp_z, w);
+        } else {
+          CASADI_PREFIX(mm_sparse_dsd)(x, sp_x, y, sp_y, z, sp_z, w);
+        }
+      } else {
+        if (sp_z[2]==0) {
+          CASADI_PREFIX(mm_sparse_dds)(x, sp_x, y, sp_y, z, sp_z, w);
+        } else {
+          CASADI_PREFIX(mm_sparse_ddd)(x, sp_x, y, sp_y, z, sp_z, w);
+        }
+      }
+    }
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_sss)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
+
     /* Get sparsities */
     int ncol_x = sp_x[1];
     const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
@@ -233,7 +384,7 @@ namespace casadi {
     const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
     int ncol_z = sp_z[1];
     const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
-
+    
     int cc,kk, kk1;
     /* Loop over the columns of y and z */
     for (cc=0; cc<ncol_y; ++cc) {
@@ -252,6 +403,243 @@ namespace casadi {
       /* Get the sparse column of z */
       for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
         z[kk] = w[row_z[kk]];
+      }
+    }
+
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_ssd)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
+    /* Get sparsities */
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    int ncol_z = sp_z[1];
+    const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
+
+    int cc,kk, kk1;
+    /* Loop over the columns of y and z */
+    for (cc=0; cc<ncol_y; ++cc) {
+      /* Get the dense column of z */
+      for (kk=sp_z[0]*(cc); kk<sp_z[0]*(cc+1); ++kk) {
+        w[(kk)%sp_z[0]] = z[kk];
+      }
+      /* Loop over the nonzeros of y */
+      for (kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
+        int rr = row_y[kk];
+        /* Loop over corresponding columns of x */
+        for (kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
+          w[row_x[kk1]] += x[kk1]*y[kk];
+        }
+      }
+      /* Get the sparse column of z */
+      for (kk=sp_z[0]*(cc); kk<sp_z[0]*(cc+1); ++kk) {
+        z[kk] = w[(kk)%sp_z[0]];
+      }
+    }
+
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_sds)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
+
+    /* Get sparsities */
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    int ncol_z = sp_z[1];
+    const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
+    
+    int cc,kk, kk1;
+    /* Loop over the columns of y and z */
+    for (cc=0; cc<ncol_y; ++cc) {
+      /* Get the dense column of z */
+      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        w[row_z[kk]] = z[kk];
+      }
+      /* Loop over the nonzeros of y */
+      for (kk=sp_y[0]*(cc); kk<sp_y[0]*(cc+1); ++kk) {
+        int rr = (kk)%sp_y[0];
+        /* Loop over corresponding columns of x */
+        for (kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
+          w[row_x[kk1]] += x[kk1]*y[kk];
+        }
+      }
+      /* Get the sparse column of z */
+      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        z[kk] = w[row_z[kk]];
+      }
+    }
+
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_sdd)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
+
+    /* Get sparsities */
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    int ncol_z = sp_z[1];
+    const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
+    
+    int cc,kk, kk1;
+    /* Loop over the columns of y and z */
+    for (cc=0; cc<ncol_y; ++cc) {
+      /* Get the dense column of z */
+      for (kk=sp_z[0]*(cc); kk<sp_z[0]*(cc+1); ++kk) {
+        w[(kk)%sp_z[0]] = z[kk];
+      }
+      /* Loop over the nonzeros of y */
+      for (kk=sp_y[0]*(cc); kk<sp_y[0]*(cc+1); ++kk) {
+        int rr = (kk)%sp_y[0];
+        /* Loop over corresponding columns of x */
+        for (kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
+          w[row_x[kk1]] += x[kk1]*y[kk];
+        }
+      }
+      /* Get the sparse column of z */
+      for (kk=sp_z[0]*(cc); kk<sp_z[0]*(cc+1); ++kk) {
+        z[kk] = w[(kk)%sp_z[0]];
+      }
+    }
+
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_dss)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
+
+    /* Get sparsities */
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    int ncol_z = sp_z[1];
+    const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
+    
+    int cc,kk, kk1;
+    /* Loop over the columns of y and z */
+    for (cc=0; cc<ncol_y; ++cc) {
+      /* Get the dense column of z */
+      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        w[row_z[kk]] = z[kk];
+      }
+      /* Loop over the nonzeros of y */
+      for (kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
+        int rr = row_y[kk];
+        /* Loop over corresponding columns of x */
+        for (kk1=sp_x[0]*(rr); kk1<sp_x[0]*(rr+1); ++kk1) {
+          w[(kk1)%sp_x[0]] += x[kk1]*y[kk];
+        }
+      }
+      /* Get the sparse column of z */
+      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        z[kk] = w[row_z[kk]];
+      }
+    }
+
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_dsd)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
+
+    /* Get sparsities */
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    int ncol_z = sp_z[1];
+    const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
+    
+    int cc,kk, kk1;
+    /* Loop over the columns of y and z */
+    for (cc=0; cc<ncol_y; ++cc) {
+      /* Get the dense column of z */
+      for (kk=sp_z[0]*(cc); kk<sp_z[0]*(cc+1); ++kk) {
+        w[(kk)%sp_z[0]] = z[kk];
+      }
+      /* Loop over the nonzeros of y */
+      for (kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
+        int rr = row_y[kk];
+        /* Loop over corresponding columns of x */
+        for (kk1=sp_x[0]*(rr); kk1<sp_x[0]*(rr+1); ++kk1) {
+          w[(kk1)%sp_x[0]] += x[kk1]*y[kk];
+        }
+      }
+      /* Get the sparse column of z */
+      for (kk=sp_z[0]*(cc); kk<sp_z[0]*(cc+1); ++kk) {
+        z[kk] = w[(kk)%sp_z[0]];
+      }
+    }
+
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_dds)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
+
+    /* Get sparsities */
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    int ncol_z = sp_z[1];
+    const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
+    
+    int cc,kk, kk1;
+    /* Loop over the columns of y and z */
+    for (cc=0; cc<ncol_y; ++cc) {
+      /* Get the dense column of z */
+      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        w[row_z[kk]] = z[kk];
+      }
+      /* Loop over the nonzeros of y */
+      for (kk=sp_y[0]*(cc); kk<sp_y[0]*(cc+1); ++kk) {
+        int rr = (kk)%sp_y[0];
+        /* Loop over corresponding columns of x */
+        for (kk1=sp_x[0]*(rr); kk1<sp_x[0]*(rr+1); ++kk1) {
+          w[(kk1)%sp_x[0]] += x[kk1]*y[kk];
+        }
+      }
+      /* Get the sparse column of z */
+      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        z[kk] = w[row_z[kk]];
+      }
+    }
+
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(mm_sparse_ddd)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
+
+    /* Get sparsities */
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    int ncol_z = sp_z[1];
+    const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
+    
+    int cc,kk, kk1;
+    /* Loop over the columns of y and z */
+    for (cc=0; cc<ncol_y; ++cc) {
+      /* Get the dense column of z */
+      for (kk=sp_z[0]*(cc); kk<sp_z[0]*(cc+1); ++kk) {
+        w[(kk)%sp_z[0]] = z[kk];
+      }
+      /* Loop over the nonzeros of y */
+      for (kk=sp_y[0]*(cc); kk<sp_y[0]*(cc+1); ++kk) {
+        int rr = (kk)%sp_y[0];
+        /* Loop over corresponding columns of x */
+        for (kk1=sp_x[0]*(rr); kk1<sp_x[0]*(rr+1); ++kk1) {
+          w[(kk1)%sp_x[0]] += x[kk1]*y[kk];
+        }
+      }
+      /* Get the sparse column of z */
+      for (kk=sp_z[0]*(cc); kk<sp_z[0]*(cc+1); ++kk) {
+        z[kk] = w[(kk)%sp_z[0]];
       }
     }
   }

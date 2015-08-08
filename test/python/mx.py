@@ -2585,6 +2585,38 @@ class MXtests(casadiTestCase):
         fr = SXFunction("fr", [x],[op(fun(x),x)])        
 
         self.checkfunction(f,fr)
-
+        
+  def test_mm_sparse_densities(self):
+    A = Sparsity.dense(10,3)
+    B = Sparsity.dense(3,5)
+    C = Sparsity.dense(10,5)
+    
+    def make_sparser(a):
+      a = IMatrix(a,1)
+      for i in range(a.shape[0]):
+        for j in range(a.shape[1]):
+          if np.random.random() < 0.5:
+            a[i,j] = 0
+      a = sparsify(a)
+      return a.sparsity()
+          
+    for a in [A,make_sparser(A)]:
+      for b in [B,make_sparser(B)]:
+        for c in [C,make_sparser(C)]:
+        
+          c.spy()
+        
+          As = MX.sym("A",a)
+          Bs = MX.sym("B",b)
+          Cs = MX.sym("C",c)
+            
+            
+          f = MXFunction("f",[As,Bs,Cs],[mac(As,Bs,Cs)])
+          f.setInput(np.random.random(As.shape),0)
+          f.setInput(np.random.random(Bs.shape),1)
+          f.setInput(np.random.random(Cs.shape),2)
+          
+          self.check_codegen(f)
+          
 if __name__ == '__main__':
     unittest.main()

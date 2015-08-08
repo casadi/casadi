@@ -506,10 +506,56 @@ namespace casadi {
         << endl;
       break;
     case AUX_MM_SPARSE:
-      this->auxiliaries << codegen_str_mm_sparse
-        << codegen_str_mm_sparse_define
-        << endl;
+      addAuxiliary(AUX_MM_SPARSE_SSS);
+      addAuxiliary(AUX_MM_SPARSE_SSD);
+      addAuxiliary(AUX_MM_SPARSE_SDS);
+      addAuxiliary(AUX_MM_SPARSE_SDD);
+      addAuxiliary(AUX_MM_SPARSE_DSS);
+      addAuxiliary(AUX_MM_SPARSE_DSD);
+      addAuxiliary(AUX_MM_SPARSE_DDS);
+      addAuxiliary(AUX_MM_SPARSE_DDD);
+      this->auxiliaries << codegen_str_mm_sparse_define << endl;
       break;
+    case AUX_MM_SPARSE_SSS:
+      this->auxiliaries << codegen_str_mm_sparse_sss
+        << codegen_str_mm_sparse_sss_define
+        << endl;
+        break;
+    case AUX_MM_SPARSE_SSD:
+      this->auxiliaries << codegen_str_mm_sparse_ssd
+        << codegen_str_mm_sparse_ssd_define
+        << endl;
+        break;
+    case AUX_MM_SPARSE_SDS:
+      this->auxiliaries << codegen_str_mm_sparse_sds
+        << codegen_str_mm_sparse_sds_define
+        << endl;
+        break;
+    case AUX_MM_SPARSE_SDD:
+      this->auxiliaries << codegen_str_mm_sparse_sdd
+        << codegen_str_mm_sparse_sdd_define
+        << endl;
+        break;
+    case AUX_MM_SPARSE_DSS:
+      this->auxiliaries << codegen_str_mm_sparse_dss
+        << codegen_str_mm_sparse_dss_define
+        << endl;
+        break;
+    case AUX_MM_SPARSE_DSD:
+      this->auxiliaries << codegen_str_mm_sparse_dsd
+        << codegen_str_mm_sparse_dsd_define
+        << endl;
+        break;
+    case AUX_MM_SPARSE_DDS:
+      this->auxiliaries << codegen_str_mm_sparse_dds
+        << codegen_str_mm_sparse_dds_define
+        << endl;
+        break;
+    case AUX_MM_SPARSE_DDD:
+      this->auxiliaries << codegen_str_mm_sparse_ddd
+        << codegen_str_mm_sparse_ddd_define
+        << endl;
+        break;
     case AUX_SQ:
       auxSq();
       break;
@@ -517,11 +563,32 @@ namespace casadi {
       auxSign();
       break;
     case AUX_PROJECT:
-      this->auxiliaries
-        << codegen_str_project
-        << codegen_str_project_define
-        << endl << endl;
+      addAuxiliary(AUX_PROJECT_SS);
+      addAuxiliary(AUX_PROJECT_SD);
+      addAuxiliary(AUX_PROJECT_DS);
+      addAuxiliary(AUX_PROJECT_DD);
+      this->auxiliaries << codegen_str_project_define << endl;
       break;
+    case AUX_PROJECT_SS:
+      this->auxiliaries << codegen_str_project_ss
+        << codegen_str_project_ss_define
+        << endl;
+        break;
+    case AUX_PROJECT_SD:
+      this->auxiliaries << codegen_str_project_sd
+        << codegen_str_project_sd_define
+        << endl;
+        break;
+    case AUX_PROJECT_DS:
+      this->auxiliaries << codegen_str_project_ds
+        << codegen_str_project_ds_define
+        << endl;
+        break;
+    case AUX_PROJECT_DD:
+      this->auxiliaries << codegen_str_project_dd
+        << codegen_str_project_dd_define
+        << endl;
+        break;
     case AUX_TRANS:
       this->auxiliaries << codegen_str_trans
         << "#define trans(x, sp_x, y, sp_y, tmp) CASADI_PREFIX(trans)(x, sp_x, y, sp_y, tmp)"
@@ -686,18 +753,78 @@ namespace casadi {
     return s.str();
   }
 
+  std::string CodeGenerator::mm_sparse(
+                         const std::string& x, const Sparsity& sp_x,
+                         const std::string& y, const Sparsity& sp_y,
+                         const std::string& z, const Sparsity& sp_z,
+                         const std::string& w) {
+    addAuxiliary(AUX_MM_SPARSE);
+
+    std::stringstream s;
+    s << "mm_sparse_";
+    if (!sp_x.isdense()) {
+      if (!sp_y.isdense()) {
+        if (!sp_z.isdense()) {
+          s << "sss"; addAuxiliary(AUX_MM_SPARSE_SSS);
+        } else {
+          s << "ssd"; addAuxiliary(AUX_MM_SPARSE_SSD);
+        }
+      } else {
+        if (!sp_z.isdense()) {
+          s << "sds"; addAuxiliary(AUX_MM_SPARSE_SDS);
+        } else {
+          s << "sdd"; addAuxiliary(AUX_MM_SPARSE_SDD);
+        }
+      }
+    } else {
+      if (!sp_y.isdense()) {
+        if (!sp_z.isdense()) {
+          s << "dss"; addAuxiliary(AUX_MM_SPARSE_DSS);
+        } else {
+          s << "dsd"; addAuxiliary(AUX_MM_SPARSE_DSD);
+        }
+      } else {
+        if (!sp_z.isdense()) {
+          s << "dds"; addAuxiliary(AUX_MM_SPARSE_DDS);
+        } else {
+          s << "ddd"; addAuxiliary(AUX_MM_SPARSE_DDD);
+        }
+      }
+    }
+    s << "(";
+    s << x << ", " << sparsity(sp_x) << ", "
+      << y << ", " << sparsity(sp_y) << ", "
+      << z << ", " << sparsity(sp_z) << ", "
+      << w;
+    s << ");" << std::endl;
+    return s.str();
+  }
+
   std::string
-  CodeGenerator::project(const std::string& arg, const Sparsity& sp_arg,
-                         const std::string& res, const Sparsity& sp_res,
+  CodeGenerator::project(const std::string& arg, const Sparsity& sp_x,
+                         const std::string& res, const Sparsity& sp_y,
                          const std::string& w) {
     // If sparsity match, simple copy
-    if (sp_arg==sp_res) return copy_n(arg, sp_arg.nnz(), res);
+    if (sp_x==sp_y) return copy_n(arg, sp_y.nnz(), res);
 
     // Create call
-    addAuxiliary(CodeGenerator::AUX_PROJECT);
     stringstream s;
-    s << "  project(" << arg << ", " << sparsity(sp_arg) << ", " << res << ", "
-      << sparsity(sp_res) << ", " << w << ");";
+    s << "  project_";
+    if (!sp_x.isdense()) {
+      if (!sp_y.isdense()) {
+        s << "ss"; addAuxiliary(AUX_PROJECT_SS);
+      } else {
+        s << "sd"; addAuxiliary(AUX_PROJECT_SD);
+      }
+    } else {
+      if (!sp_y.isdense()) {
+        s << "ds"; addAuxiliary(AUX_PROJECT_DS);
+      } else {
+        s << "dd"; addAuxiliary(AUX_PROJECT_DD);
+      }
+    }
+    s << "(" << arg << ", " << sparsity(sp_x) << ", " << res << ", "
+      << sparsity(sp_y) << ", " << w << ");";
     return s.str();
   }
 

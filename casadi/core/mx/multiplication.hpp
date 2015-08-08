@@ -99,31 +99,6 @@ namespace casadi {
     virtual size_t sz_w() const { return sparsity().size1();}
   };
 
-
-  /** \brief An MX atomic for matrix-matrix product,
-             note that the factor must be provided transposed
-      \author Joel Andersson
-      \date 2010
-  */
-  class CASADI_EXPORT DenseMultiplication : public Multiplication{
-  public:
-
-    /** \brief  Constructor */
-    DenseMultiplication(const MX& z, const MX& x, const MX& y)
-        : Multiplication(z, x, y) {}
-
-    /** \brief  Destructor */
-    virtual ~DenseMultiplication() {}
-
-    /** \brief  Clone function */
-    virtual DenseMultiplication* clone() const { return new DenseMultiplication(*this);}
-
-    /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
-  };
-
-
 } // namespace casadi
 /// \endcond
 
