@@ -4670,9 +4670,6 @@ C++ includes: dense_io.hpp ";
 %feature("docstring") casadi::DenseIO::outputD "[INTERNAL] ";
 
 
-// File: classcasadi_1_1DenseMultiplication.xml
-
-
 // File: classcasadi_1_1DenseTranspose.xml
 
 
@@ -45360,6 +45357,10 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
+%feature("docstring") casadi::casadi_project_ss "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_project_ds "[INTERNAL] ";
+
 %feature("docstring") casadi::getSchemeSize "";
 
 %feature("docstring") casadi::complement "
@@ -45372,9 +45373,11 @@ to be monotonously increasing
 
 ";
 
-%feature("docstring") casadi::dlaqge_ "[INTERNAL]  Equilibrate the system.
+%feature("docstring") casadi::casadi_project_dd "[INTERNAL] ";
 
-";
+%feature("docstring") casadi::casadi_project_sd "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_mm_sparse_ssd "[INTERNAL] ";
 
 %feature("docstring") casadi::iszero "[INTERNAL]  Check if entry is zero
 (false negative allowed)
@@ -45518,7 +45521,7 @@ Input arguments of an integrator
 
 ";
 
-%feature("docstring") casadi::slicot_periodic_schur "[INTERNAL] ";
+%feature("docstring") casadi::casadi_mm_sparse_sss "[INTERNAL] ";
 
 %feature("docstring") casadi::profileWriteSourceLine "[INTERNAL] ";
 
@@ -45735,6 +45738,10 @@ Check if the vector is strictly monotone.
 ";
 
 %feature("docstring") casadi::IOScheme "";
+
+%feature("docstring") casadi::dlaqge_ "[INTERNAL]  Equilibrate the system.
+
+";
 
 %feature("docstring") casadi::isRegular "
 
@@ -46366,6 +46373,8 @@ Get typename.
 
 ";
 
+%feature("docstring") casadi::slicot_periodic_schur "[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_nrm2 "[INTERNAL]  NRM2: ||x||_2 ->
 return.
 
@@ -46762,6 +46771,8 @@ equation using an LU-factorized matrix (lapack)
 
 ";
 
+%feature("docstring") casadi::casadi_mm_sparse_sdd "[INTERNAL] ";
+
 %feature("docstring") casadi::ProfilingType "[INTERNAL] ";
 
 %feature("docstring") casadi::qpIn "
@@ -46805,6 +46816,8 @@ Input arguments of a QP problem
 
 %feature("docstring") casadi::ProfilingType< ProfilingData_TIMELINE > "
 [INTERNAL] ";
+
+%feature("docstring") casadi::casadi_mm_sparse_sds "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
 trans(x)
@@ -46950,11 +46963,17 @@ Structure specification of an SOCP
 
 ";
 
+%feature("docstring") casadi::casadi_mm_sparse_dsd "[INTERNAL] ";
+
 %feature("docstring") casadi::ptrToLong "[INTERNAL] ";
 
 %feature("docstring") casadi::profileWriteSourceLineDep "[INTERNAL] ";
 
+%feature("docstring") casadi::casadi_mm_sparse_ddd "[INTERNAL] ";
+
 %feature("docstring") casadi::userOut "";
+
+%feature("docstring") casadi::casadi_mm_sparse_dds "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_norm_inf_mul "[INTERNAL]  Inf-norm of
 a Matrix-matrix product,*
@@ -46968,6 +46987,8 @@ iwork:  A integer work vector that you must allocate Minimum size:
 y.size1()+x.size2()+1
 
 ";
+
+%feature("docstring") casadi::casadi_mm_sparse_dss "[INTERNAL] ";
 
 %feature("docstring") casadi::getSchemeEntryName "";
 

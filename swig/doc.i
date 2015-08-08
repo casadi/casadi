@@ -6024,9 +6024,6 @@ Initialize.
 [INTERNAL] ";
 
 
-// File: classcasadi_1_1DenseMultiplication.xml
-
-
 // File: classcasadi_1_1DenseTranspose.xml
 
 
@@ -57485,6 +57482,12 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
+%feature("docstring")  casadi::casadi_project_ss(const real_t *x, const int
+*sp_x, real_t *y, const int *sp_y, real_t *w) " [INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_project_ds(const real_t *x, const int
+*sp_x, real_t *y, const int *sp_y, real_t *w) " [INTERNAL] ";
+
 %feature("docstring")  casadi::getSchemeSize(InputOutputScheme scheme) " ";
 
 %feature("docstring")  casadi::complement(const std::vector< int > &v, int
@@ -57498,11 +57501,15 @@ to be monotonously increasing
 
 ";
 
-%feature("docstring")  casadi::dlaqge_(int *m, int *n, double *a, int *lda,
-double *r, double *c, double *colcnd, double *rowcnd, double *amax, char
-*equed) " [INTERNAL]  Equilibrate the system.
+%feature("docstring")  casadi::casadi_project_dd(const real_t *x, const int
+*sp_x, real_t *y, const int *sp_y, real_t *w) " [INTERNAL] ";
 
-";
+%feature("docstring")  casadi::casadi_project_sd(const real_t *x, const int
+*sp_x, real_t *y, const int *sp_y, real_t *w) " [INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_mm_sparse_ssd(const real_t *x, const
+int *sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z,
+real_t *w) " [INTERNAL] ";
 
 %feature("docstring")  casadi::iszero(double x) " [INTERNAL]  Check if entry
 is zero (false negative allowed)
@@ -57660,20 +57667,9 @@ Input arguments of an integrator
 
 ";
 
-%feature("docstring")  casadi::slicot_periodic_schur(int n, int K, const
-std::vector< double > &a, std::vector< double > &t, std::vector< double >
-&z, std::vector< double > &eig_real, std::vector< double > &eig_imag, double
-num_zero=0) " [INTERNAL] ";
-
-%feature("docstring")  casadi::slicot_periodic_schur(int n, int K, const
-std::vector< double > &a, std::vector< double > &t, std::vector< double >
-&z, std::vector< double > &dwork, std::vector< double > &eig_real,
-std::vector< double > &eig_imag, double num_zero=0) " [INTERNAL] ";
-
-%feature("docstring")  casadi::slicot_periodic_schur(const std::vector<
-Matrix< double > > &a, std::vector< Matrix< double > > &t, std::vector<
-Matrix< double > > &z, std::vector< double > &eig_real, std::vector< double
-> &eig_imag, double num_zero) " [INTERNAL] ";
+%feature("docstring")  casadi::casadi_mm_sparse_sss(const real_t *x, const
+int *sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z,
+real_t *w) " [INTERNAL] ";
 
 %feature("docstring")  casadi::profileWriteSourceLine(std::ofstream &f, T
 *a, int line_number, const std::string &sourceline, int opcode) " [INTERNAL]
@@ -57929,6 +57925,12 @@ std::string &arg_s8="", const std::string &arg_s9="", const std::string
 const std::string &arg_s13="", const std::string &arg_s14="", const
 std::string &arg_s15="", const std::string &arg_s16="", const std::string
 &arg_s17="", const std::string &arg_s18="", const std::string &arg_s19="") "
+";
+
+%feature("docstring")  casadi::dlaqge_(int *m, int *n, double *a, int *lda,
+double *r, double *c, double *colcnd, double *rowcnd, double *amax, char
+*equed) " [INTERNAL]  Equilibrate the system.
+
 ";
 
 %feature("docstring")  casadi::isRegular(const std::vector< T > &v) "
@@ -58646,6 +58648,21 @@ Get typename.
 
 ";
 
+%feature("docstring")  casadi::slicot_periodic_schur(int n, int K, const
+std::vector< double > &a, std::vector< double > &t, std::vector< double >
+&z, std::vector< double > &eig_real, std::vector< double > &eig_imag, double
+num_zero=0) " [INTERNAL] ";
+
+%feature("docstring")  casadi::slicot_periodic_schur(int n, int K, const
+std::vector< double > &a, std::vector< double > &t, std::vector< double >
+&z, std::vector< double > &dwork, std::vector< double > &eig_real,
+std::vector< double > &eig_imag, double num_zero=0) " [INTERNAL] ";
+
+%feature("docstring")  casadi::slicot_periodic_schur(const std::vector<
+Matrix< double > > &a, std::vector< Matrix< double > > &t, std::vector<
+Matrix< double > > &z, std::vector< double > &eig_real, std::vector< double
+> &eig_imag, double num_zero) " [INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_nrm2(int n, const real_t *x, int
 inc_x) " [INTERNAL]  NRM2: ||x||_2 -> return.
 
@@ -59088,6 +59105,10 @@ Solve a system of equation using an LU-factorized matrix (lapack)
 
 ";
 
+%feature("docstring")  casadi::casadi_mm_sparse_sdd(const real_t *x, const
+int *sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z,
+real_t *w) " [INTERNAL] ";
+
 %feature("docstring")  casadi::ProfilingType() "[INTERNAL] ";
 
 %feature("docstring")  casadi::qpIn(const std::string &n0="", const M
@@ -59136,6 +59157,10 @@ Input arguments of a QP problem
 
 %feature("docstring")  casadi::ProfilingType< ProfilingData_TIMELINE >() "
 [INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_mm_sparse_sds(const real_t *x, const
+int *sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z,
+real_t *w) " [INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_trans(const real_t *x, const int
 *sp_x, real_t *y, const int *sp_y, int *tmp) " [INTERNAL]  TRANS: y <-
@@ -59295,6 +59320,10 @@ Structure specification of an SOCP
 
 ";
 
+%feature("docstring")  casadi::casadi_mm_sparse_dsd(const real_t *x, const
+int *sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z,
+real_t *w) " [INTERNAL] ";
+
 %feature("docstring")  casadi::ptrToLong(T *a) " [INTERNAL] ";
 
 %feature("docstring")  casadi::profileWriteSourceLineDep(std::ofstream &f, T
@@ -59305,7 +59334,15 @@ Structure specification of an SOCP
 *a, int line_number, const std::string &sourceline, T2 *dependency) "
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_mm_sparse_ddd(const real_t *x, const
+int *sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z,
+real_t *w) " [INTERNAL] ";
+
 %feature("docstring")  casadi::userOut() "";
+
+%feature("docstring")  casadi::casadi_mm_sparse_dds(const real_t *x, const
+int *sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z,
+real_t *w) " [INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_norm_inf_mul(const real_t *x, const
 int *sp_x, const real_t *y, const int *sp_y, real_t *dwork, int *iwork) "
@@ -59320,6 +59357,10 @@ iwork:  A integer work vector that you must allocate Minimum size:
 y.size1()+x.size2()+1
 
 ";
+
+%feature("docstring")  casadi::casadi_mm_sparse_dss(const real_t *x, const
+int *sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z,
+real_t *w) " [INTERNAL] ";
 
 %feature("docstring")  casadi::getSchemeEntryName(InputOutputScheme scheme,
 int i) " ";
