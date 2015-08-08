@@ -446,10 +446,10 @@ namespace casadi {
     int ind = g.getConstant(nz_, true);
 
     // Codegen the assignments
-    g.body << "  for (ii=s" << ind << ", rr=" << g.work(res[0], nnz())
+    g.body << "  for (cii=s" << ind << ", rr=" << g.work(res[0], nnz())
            << ", ss=" << g.work(arg[0], dep(0).nnz())
-           << "; ii!=s" << ind << "+" << nz_.size()
-           << "; ++ii) *rr++ = *ii>=0 ? ss[*ii] : 0;" << endl;
+           << "; cii!=s" << ind << "+" << nz_.size()
+           << "; ++cii) *rr++ = *cii>=0 ? ss[*cii] : 0;" << endl;
   }
 
   void GetNonzerosSlice::simplifyMe(MX& ex) {

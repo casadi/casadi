@@ -528,7 +528,24 @@ class casadiTestCase(unittest.TestCase):
       trial.setInput(trial_inputs[k],k)
       solution.setInput(solution_inputs[k],k)
 
-      
+  def check_codegen(self,F):
+    if args.run_slow:
+      import md5
+      name = "codegen_%s" % md5.new("%f" % np.random.random()+str(F)+str(time.time())).hexdigest()
+      F.generate(name)
+      import subprocess
+      p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
+      F2 = ExternalFunction(name)
+
+      for i in range(F.nIn()):
+        F2.setInput(F.getInput(i),i)
+
+      F.evaluate()
+      F2.evaluate()
+
+      for i in range(F.nOut()):
+        self.checkarray(F2.getOutput(i),F.getOutput(i))
+
 
 class run_only(object):
   def __init__(self, args):
