@@ -42,7 +42,10 @@ namespace casadi {
   public:
 
     /** \brief Constructor (generic mapaccum) */
-    MapAccumInternal(const Function& f, int n);
+    MapAccumInternal(const Function& f, int n,
+      const std::vector<bool>& input_accum,
+      const std::vector<int>& output_accum,
+      bool reverse);
 
     /** \brief  clone function */
     virtual MapAccumInternal* clone() const { return new MapAccumInternal(*this);}
@@ -105,6 +108,14 @@ namespace casadi {
     /// Nonzero step for outputs
     std::vector<int> step_out_;
 
+    std::vector<bool> input_accum_;
+    std::vector<int> output_accum_;
+
+    /// Indicates the order of accumulation
+    bool reverse_;
+
+    /// Total number of accumulator nonzeros
+    int nnz_accum_;
 
   };
 
