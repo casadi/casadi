@@ -2484,6 +2484,25 @@ except:
 %rename(logic_not) friendwrap_not;
 %rename(logic_all) friendwrap_all;
 %rename(logic_any) friendwrap_any;
+
+// Non-fatal errors (returning NotImplemented singleton)
+%feature("python:maybecall") casadi_plus;
+%feature("python:maybecall") casadi_minus;
+%feature("python:maybecall") casadi_times;
+%feature("python:maybecall") casadi_rdivide;
+%feature("python:maybecall") casadi_lt;
+%feature("python:maybecall") casadi_le;
+%feature("python:maybecall") casadi_eq;
+%feature("python:maybecall") casadi_ne;
+%feature("python:maybecall") casadi_power;
+%feature("python:maybecall") casadi_atan2;
+%feature("python:maybecall") casadi_min;
+%feature("python:maybecall") casadi_max;
+%feature("python:maybecall") casadi_and;
+%feature("python:maybecall") casadi_or;
+%feature("python:maybecall") casadi_mod;
+%feature("python:maybecall") casadi_copysign;
+%feature("python:maybecall") casadi_constpow;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
