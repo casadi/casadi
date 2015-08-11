@@ -779,6 +779,13 @@ namespace casadi {
 
       // Construct fine sparsity pattern
       r = Sparsity::triplet(fine.size()-1, fine.size()-1, jrow, jcol);
+
+      // There may be false positives here that are not present
+      // in the reverse mode that precedes it.
+      // This can lead to an assymetrical result
+      //  cf. #1522
+      if (symmetric) r=r*r.T();
+
       coarse = fine;
       hasrun = true;
     }
