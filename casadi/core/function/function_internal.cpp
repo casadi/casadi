@@ -784,7 +784,7 @@ namespace casadi {
       // in the reverse mode that precedes it.
       // This can lead to an assymetrical result
       //  cf. #1522
-      if (symmetric) r=r*r.T();
+      r=r*r.T();
 
       coarse = fine;
       hasrun = true;
