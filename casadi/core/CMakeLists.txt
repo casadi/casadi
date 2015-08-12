@@ -72,7 +72,6 @@ set(CASADI_SRCS
   mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
   mx/casadi_call.hpp         mx/casadi_call.cpp         # Function call
   mx/casadi_find.hpp         mx/casadi_find.cpp         # Find first nonzero
-  mx/casadi_map.hpp          mx/casadi_map.cpp          # Multiple function calls at once
   mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
   mx/transpose.hpp           mx/transpose.cpp           # Transpose
   mx/concat.hpp              mx/concat.cpp              # Concatenation
@@ -124,6 +123,7 @@ set(CASADI_SRCS
   function/cle_solver.hpp          function/cle_solver.cpp          function/cle_internal.hpp      function/cle_internal.cpp
   function/wrapper.hpp             function/adaptor.hpp             function/dense_io.hpp
   function/switch.hpp              function/switch.cpp              function/switch_internal.hpp   function/switch_internal.cpp
+  function/map.hpp                 function/map.cpp                 function/map_internal.hpp      function/map_internal.cpp
 
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp

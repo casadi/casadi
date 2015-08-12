@@ -70,6 +70,7 @@
 #include "function/dple_solver.hpp"
 #include "function/cle_solver.hpp"
 #include "function/dle_solver.hpp"
+#include "function/map.hpp"
 
 // Misc
 #include "misc/integration_tools.hpp"

@@ -111,6 +111,15 @@ class FunctionPool:
   def zip(self):
     return zip(self.casadioperators,self.numpyoperators,self.names,self.flags)
 
+
+def toSXFunction(fun):
+  ins = fun.symbolicInputSX()
+  return SXFunction("f",ins,fun(ins))
+  
+def toMXFunction(fun):
+  ins = fun.symbolicInput()
+  return MXFunction("f",ins,fun(ins))
+
 class casadiTestCase(unittest.TestCase):
 
 

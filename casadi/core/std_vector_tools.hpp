@@ -115,6 +115,16 @@ namespace casadi {
   template<typename T>
   bool inBounds(const std::vector<T> &v, int lower, int upper);
 
+  /** \brief swap inner and outer indices of list of lists
+  * 
+  * \verbatim
+  * [[apple0,apple1,...],[pear0,pear1,...]] ->
+  *   [[apple0,pear0],[apple1,pear1],...]
+  * \endverbatim
+  */
+  template<typename T>
+  std::vector< std::vector<T> > swapIndices(const std::vector< std::vector<T> > &m);
+
   /** \brief Returns the list of all i in [0, size[ not found in supplied list
   *
   * The supplied vector may contain duplicates and may be non-monotonous
@@ -742,6 +752,33 @@ namespace casadi {
   template<typename T>
   const bvec_t* get_bvec_t(const std::vector<T>& v) {
     casadi_assert_message(0, "get_bvec_t only supported for double");
+  }
+
+  template<typename T>
+  std::vector< std::vector<T> > swapIndices(const std::vector< std::vector<T> > &mat) {
+
+    // Get the matrix dimensions
+    int n = mat.size();
+    int m = -1;
+    for (int i=0;i<n;++i) {
+      casadi_assert_message(m==-1 || m==mat[i].size(),
+        "swapIndices(vector<vector>) dimension mismatch.");
+      if (m==-1) m = mat[i].size();
+    }
+
+    // Allocate the result
+    std::vector< std::vector<T> > ret(m);
+    for (int i=0;i<m;++i) {
+      ret[i].resize(n);
+    }
+
+    // Assign the result
+    for (int i=0;i<n;++i) {
+      for (int j=0;j<mat[i].size();++j) {
+        ret[j][i] = mat[i][j];
+      }
+    }
+    return ret;
   }
 
 } // namespace casadi

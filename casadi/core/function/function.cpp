@@ -27,6 +27,7 @@
 #include "../function/mx_function.hpp"
 #include <typeinfo>
 #include "../std_vector_tools.hpp"
+#include "../function/map.hpp"
 
 using namespace std;
 
@@ -92,8 +93,81 @@ namespace casadi {
       return map(x_new, parallelization);
     }
 
+    vector< vector<MX> > trans = swapIndices(x);
+    vector< MX > x_cat(trans.size());
+    for (int i=0;i<trans.size();++i) {
+      x_cat[i] = horzcat(trans[i]);
+    }
+
     // Call the internal function
-    return (*this)->createMap(x, parallelization);
+    vector< MX > ret_cat = map(x_cat, parallelization);
+    vector< vector<MX> > ret;
+
+    for (int i=0;i<ret_cat.size();++i) {
+      ret.push_back(horzsplit(ret_cat[i], output(i).size2()));
+    }
+    return swapIndices(ret);
+
+  }
+
+  vector<MX> Function::map(const vector< MX > &x,
+                                    const std::string& parallelization) {
+    assertInit();
+    if (x.empty()) return x;
+
+    // Replace arguments if needed
+    if (!matchingArg(x, true)) {
+      vector< MX > x_new = replaceArg(x, true);
+      return map(x_new, parallelization);
+    }
+
+    int n = 1;
+    for (int i=0;i<x.size();++i) {
+      n = max(x[i].size2()/input(i).size2(), n);
+    }
+
+    std::vector<bool> repeat_n;
+    for (int i=0;i<x.size();++i) {
+      repeat_n.push_back(x[i].size2()/input(i).size2()==n);
+    }
+
+    // Call the internal function
+
+    Dict options;
+    options["parallelization"] = parallelization;
+    Function ms = Map("map", *this, n, repeat_n, std::vector<bool>(nOut(), true), options);
+
+    // Call the internal function
+    return ms(x);
+  }
+
+  vector<MX> Function::mapsum(const vector< MX > &x,
+                                    const std::string& parallelization) {
+    assertInit();
+    if (x.empty()) return x;
+
+    // Replace arguments if needed
+    if (!matchingArg(x, true)) {
+      vector< MX > x_new = replaceArg(x, true);
+      return mapsum(x_new, parallelization);
+    }
+
+    int n = 1;
+    for (int i=0;i<x.size();++i) {
+      n = max(x[i].size2()/input(i).size2(), n);
+    }
+
+    std::vector<bool> repeat_n;
+    for (int i=0;i<x.size();++i) {
+      repeat_n.push_back(x[i].size2()/input(i).size2()==n);
+    }
+
+    Dict options;
+    options["parallelization"] = parallelization;
+    Function ms = Map("mapsum", *this, n, repeat_n, std::vector<bool>(nOut(), false), options);
+
+    // Call the internal function
+    return ms(x);
   }
 
   void Function::evaluate() {
@@ -671,19 +745,20 @@ namespace casadi {
     return callMap(arg, always_inline, never_inline);
   }
 
-  inline bool checkMat(const Sparsity& arg, const Sparsity& inp) {
+  inline bool checkMat(const Sparsity& arg, const Sparsity& inp, bool hcat=false) {
     return arg.shape()==inp.shape() || arg.isempty() || arg.isscalar() ||
       (inp.size2()==arg.size1() && inp.size1()==arg.size2()
-       && (arg.iscolumn() || inp.iscolumn()));
+       && (arg.iscolumn() || inp.iscolumn())) ||
+      hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0;
   }
 
   template<typename M>
-  void Function::checkArg(const std::vector<M>& arg) const {
+  void Function::checkArg(const std::vector<M>& arg, bool hcat) const {
     int n_in = nIn();
     casadi_assert_message(arg.size()==n_in, "Incorrect number of inputs: Expected "
                           << n_in << ", got " << arg.size());
     for (int i=0; i<n_in; ++i) {
-      casadi_assert_message(checkMat(arg[i].sparsity(), input(i).sparsity()),
+      casadi_assert_message(checkMat(arg[i].sparsity(), input(i).sparsity(), hcat),
                             "Input " << i << " has mismatching shape. Expected "
                             << input(i).shape() << ", got " << arg[i].shape());
     }
@@ -734,11 +809,16 @@ namespace casadi {
   }
 
   template<typename M>
-  bool Function::matchingArg(const std::vector<M>& arg) const {
-    checkArg(arg);
+  bool Function::matchingArg(const std::vector<M>& arg, bool hcat) const {
+    checkArg(arg, hcat);
     int n_in = nIn();
     for (int i=0; i<n_in; ++i) {
-      if (arg.at(i).shape()!=input(i).shape()) return false;
+      if (hcat) {
+        if (arg.at(i).size1()!=input(i).size1()) return false;
+        if (arg.at(i).size2() % input(i).size2()!=0 || arg.at(i).size2()==0) return false;
+      } else {
+        if (arg.at(i).shape()!=input(i).shape()) return false;
+      }
     }
     return true;
   }
@@ -772,9 +852,13 @@ namespace casadi {
   }
 
   template<typename M>
-  M replaceMat(const M& arg, const Sparsity& inp) {
+  M replaceMat(const M& arg, const Sparsity& inp, bool hcat=false) {
     if (arg.shape()==inp.shape()) {
       // Matching dimensions already
+      return arg;
+    } else if (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0
+                    && arg.size2() >=0) {
+      // Matching horzcat dimensions
       return arg;
     } else if (arg.isempty()) {
       // Empty matrix means set zero
@@ -791,9 +875,9 @@ namespace casadi {
   }
 
   template<typename M>
-  std::vector<M> Function::replaceArg(const std::vector<M>& arg) const {
+  std::vector<M> Function::replaceArg(const std::vector<M>& arg, bool hcat) const {
     std::vector<M> r(arg.size());
-    for (int i=0; i<r.size(); ++i) r[i] = replaceMat(arg[i], input(i).sparsity());
+    for (int i=0; i<r.size(); ++i) r[i] = replaceMat(arg[i], input(i).sparsity(), hcat);
     return r;
   }
 

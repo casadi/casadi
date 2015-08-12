@@ -25,7 +25,6 @@
 
 #include "function_internal.hpp"
 #include "../mx/casadi_call.hpp"
-#include "../mx/casadi_map.hpp"
 #include <typeinfo>
 #include "../std_vector_tools.hpp"
 #include "mx_function.hpp"
@@ -2327,12 +2326,6 @@ namespace casadi {
       }
     }
     return f_gen;
-  }
-
-  std::vector<std::vector<MX> >
-  FunctionInternal::createMap(const std::vector<std::vector<MX> > &arg,
-                              const std::string& parallelization) {
-    return Map::create(shared_from_this<Function>(), arg, parallelization);
   }
 
   void FunctionInternal::spFwdSwitch(const bvec_t** arg, bvec_t** res,
