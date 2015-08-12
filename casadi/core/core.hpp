@@ -71,6 +71,7 @@
 #include "function/cle_solver.hpp"
 #include "function/dle_solver.hpp"
 #include "function/map.hpp"
+#include "function/mapaccum.hpp"
 
 // Misc
 #include "misc/integration_tools.hpp"

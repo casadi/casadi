@@ -1709,6 +1709,55 @@ class Functiontests(casadiTestCase):
 
     self.checkfunction(F,Fref)
 
+  @memory_heavy()
+  def test_mapaccum(self):
+  
+    x = SX.sym("x",2)
+    y = SX.sym("y")
+    z = SX.sym("z",2,2)
+    v = SX.sym("z",Sparsity.upper(3))
+
+    fun = SXFunction("f",[x,y,z,v],[mul(z,x)+y,sin(y*x).T,v/y])
+
+    n = 2
+
+    X = MX.sym("x",x.sparsity())
+    Y = [MX.sym("y",y.sparsity()) for i in range(n)]
+    Z = [MX.sym("z",z.sparsity()) for i in range(n)]
+    V = [MX.sym("z",v.sparsity()) for i in range(n)]
+
+    np.random.seed(0)
+    X_ = DMatrix(x.sparsity(),np.random.random(x.nnz()))
+    Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+    Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
+    V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
+
+    F = MapAccum("map",fun,n)
+
+    fun.printDimensions()
+    F.printDimensions()
+
+    print [X_,horzcat(Y_),horzcat(Z_),horzcat(V_)]
+    print F([X_,horzcat(Y_),horzcat(Z_),horzcat(V_)])
+
+    XP = X
+
+    Y0s = []
+    Y1s = []
+    for k in range(n):
+      XP, Y0,Y1 = fun([XP,Y[k],Z[k],V[k]])
+      Y0s.append(Y0)
+      Y1s.append(Y1)
+
+    Fref = MXFunction("f",[X,horzcat(Y),horzcat(Z),horzcat(V)],[XP,horzcat(Y0s),horzcat(Y1s)])
+    print Fref([X_,horzcat(Y_),horzcat(Z_),horzcat(V_)])
+
+    for i,e in enumerate([X_,horzcat(Y_),horzcat(Z_),horzcat(V_)]):
+      F.setInput(e,i)
+      Fref.setInput(e,i)
+
+    self.checkfunction(F,Fref,jacobian=False,hessian=False,evals=False)
+
 if __name__ == '__main__':
     unittest.main()
 
