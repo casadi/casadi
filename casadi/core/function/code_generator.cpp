@@ -275,7 +275,7 @@ namespace casadi {
     if (n<0 || sz==0) {
       return "0";
     } else if (sz==1 && !this->codegen_scalars) {
-      return "&w" + to_string(n);
+      return "(&w" + to_string(n) + ")";
     } else {
       return "w" + to_string(n);
     }

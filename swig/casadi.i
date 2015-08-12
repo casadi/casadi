@@ -3125,6 +3125,9 @@ DECL std::string %SHOW(getOperatorRepresentation)(const M& xb,
                                                   const std::vector<std::string>& args) {
   return getOperatorRepresentation(xb, args);
 }
+DECL M %SHOW(repsum)(const M& A, int n, int m=1) {
+  return repsum(A, n, m);
+}
 
 #endif // FLAG & IS_MEMBER
 

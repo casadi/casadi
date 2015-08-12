@@ -1479,7 +1479,57 @@ class Functiontests(casadiTestCase):
         h = H(der_x=1,adj0_f=1)["jac"]
         hs.append(h)
     self.checkarray(*hs)
+
+  def test_repmatnode(self):
+    x = MX.sym("x",2)
+
+    y = sin(repmat(x**2,1,3))
+
+    z = MX.sym("y",2,2)
+
+    F = MXFunction("f",[x,z],[sumCols(sumRows(y))])
+
+    x = SX.sym("x",2)
+
+    y = sin(repmat(x**2,1,3))
+    z = SX.sym("y",2,2)
+
+    Fref = SXFunction("f",[x,z],[sumCols(sumRows(y))])
     
+    x0 = DMatrix([1,7])
+    x1 = DMatrix([[3,0],[2,4]])
+    F.setInput(x0)
+    Fref.setInput(x0)
+    F.setInput(x1,1)
+    Fref.setInput(x1,1)
+
+    self.check_codegen(F)
+    self.checkfunction(F,Fref)
+
+  def test_repsumnode(self):
+
+    x = MX.sym("x",2)
+    z = MX.sym("y",2,2)
+
+    F = MXFunction("f",[x,z],[sin(repsum((x**2).T,1,2)),(cos(x**2)*2*x).T])
+
+    x = SX.sym("x",2)
+    z = SX.sym("y",2,2)
+
+
+    Fref = SXFunction("f",[x,z],[sin(repsum((x**2).T,1,2)),(cos(x**2)*2*x).T])
+
+    x0 = DMatrix([1,7])
+    x1 = DMatrix([[3,0],[2,4]])
+    F.setInput(x0)
+    Fref.setInput(x0)
+    F.setInput(x1,1)
+    Fref.setInput(x1,1)
+
+    self.check_codegen(F)
+
+    self.checkfunction(F,Fref)
+
 if __name__ == '__main__':
     unittest.main()
 

@@ -45,6 +45,7 @@
 #include "split.hpp"
 #include "assertion.hpp"
 #include "monitor.hpp"
+#include "repmat.hpp"
 #include "casadi_find.hpp"
 
 // Template implementations
@@ -847,6 +848,24 @@ namespace casadi {
       }
     }
     return ret;
+  }
+
+  MX MXNode::getRepmat(int n, int m) const {
+    if (n==1) {
+      return MX::create(new HorzRepmat(shared_from_this<MX>(), m));
+    } else {
+      // Fallback to generic_matrix impl
+      return shared_from_this<MX>().GenericMatrix<MX>::zz_repmat(n, m);
+    }
+  }
+
+  MX MXNode::getRepsum(int n, int m) const {
+    if (n==1) {
+      return MX::create(new HorzRepsum(shared_from_this<MX>(), m));
+    } else {
+      // Fallback to generic_matrix impl
+      return shared_from_this<MX>().GenericMatrix<MX>::zz_repsum(n, m);
+    }
   }
 
   std::vector<MX> MXNode::getDiagsplit(const std::vector<int>& offset1,

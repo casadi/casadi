@@ -1810,6 +1810,14 @@ namespace casadi {
     return blockcat(blocks);
   }
 
+  MX MX::zz_repmat(int n, int m) const {
+    return (*this)->getRepmat(n, m);
+  }
+
+  MX MX::zz_repsum(int n, int m) const {
+    return (*this)->getRepsum(n, m);
+  }
+
   MX MX::zz_solve(const MX& b, const std::string& lsolver, const Dict& dict) const {
     LinearSolver mysolver("tmp", lsolver, sparsity(), b.size2(), dict);
     return mysolver.solve(*this, b, false);

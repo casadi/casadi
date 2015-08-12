@@ -205,6 +205,7 @@ namespace casadi {
       ret.makeDense();
       return ret;
     }
+    MatType zz_repsum(int n, int m=1) const;
     /** @}  */
     /// \endcond
 
@@ -569,6 +570,13 @@ namespace casadi {
       extractShared(ex_output, v, vdef, v_prefix, v_suffix);
     }
 
+    /** \brief Given a repeated matrix, computes the sum of repeated parts
+     */
+    inline friend MatType repsum(const MatType &A, int n, int m=1) {
+      return A.zz_repsum(n, m);
+    }
+
+
 /** @} */
 #endif // SWIG
 
@@ -810,6 +818,21 @@ namespace casadi {
   }
 
   template<typename MatType>
+  MatType GenericMatrix<MatType>::zz_repsum(int n, int m) const {
+    casadi_assert(self().size1() % n==0);
+    casadi_assert(self().size2() % m==0);
+    std::vector< std::vector< MatType> > s =
+      blocksplit(self(), self().size1()/n, self().size2()/m);
+    MatType sum = 0;
+    for (int i=0;i<s.size();++i) {
+      for (int j=0;j<s[i].size();++j) {
+        sum = sum + s[i][j];
+      }
+    }
+    return sum;
+  }
+
+  template<typename MatType>
   MatType GenericMatrix<MatType>::zz_triu2symm() const {
     casadi_assert_message(self().issquare(),
                           "Shape error in triu2symm. Expecting square shape but got "
@@ -819,6 +842,7 @@ namespace casadi {
                           << self().dimString());
     return self() + self().T() - diag(diag(self()));
   }
+
 #endif
 
 } // namespace casadi

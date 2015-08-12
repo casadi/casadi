@@ -531,6 +531,8 @@ class ADtests(casadiTestCase):
           (in1,v1,x[0],DMatrix.eye(2)[0,:]),
           (in1,v1,(x**2)[0],horzcat([2*x[0],MX(1,1)])),
           (in1,v1,x[0]+x[1],DMatrix.ones(1,2)),
+          (in1,v1,sin(repmat(x**2,1,3)),repmat(cos(c.diag(x**2))*2*c.diag(x),3,1)),
+          (in1,v1,sin(repsum((x**2).T,1,2)),cos(x[0]**2+x[1]**2)*2*x.T),
           (in1,v1,vertcat([x[1],x[0]]),sparsify(DMatrix([[0,1],[1,0]]))),
           (in1,v1,vertsplit(x,[0,1,2])[1],sparsify(DMatrix([[0,1]]))),
           (in1,v1,vertcat([x[1]**2,x[0]**2]),blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
@@ -694,13 +696,13 @@ class ADtests(casadiTestCase):
               
             offset = len(res)
             for d in range(ndir):
-              seed = array(fseed[d]).ravel()
-              sens = array(vf.getOutput(offset+0)).ravel()
+              seed = array(fseed[d].T).ravel()
+              sens = array(vf.getOutput(offset+0).T).ravel()
               offset+=len(inputss)
               self.checkarray(sens,mul(J_,seed),"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
 
-              seed = array(aseed[d]).ravel()
-              sens = array(vf.getOutput(offset+0)).ravel()
+              seed = array(aseed[d].T).ravel()
+              sens = array(vf.getOutput(offset+0).T).ravel()
               offset+=len(inputss)
               
               self.checkarray(sens,mul(J_.T,seed),"eval Adj %d %s" % (d,str([vf.getOutput(i) for i in range(vf.nOut())])))

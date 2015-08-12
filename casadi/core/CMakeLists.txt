@@ -89,6 +89,7 @@ set(CASADI_SRCS
   mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
   mx/assertion.hpp           mx/assertion.cpp           # Assertion
   mx/monitor.hpp             mx/monitor.cpp             # Monitor
+  mx/repmat.hpp              mx/repmat.cpp              # RepMat
 
   # A dynamically created function with AD capabilities
   function/io_interface.hpp                                         # Input/output interface for Function and FunctionInternal
