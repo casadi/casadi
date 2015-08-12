@@ -2649,9 +2649,18 @@ class NZproxy:
 
 #ifdef SWIGMATLAB
 %define %matrix_helpers(Type)
+    
     // Get a submatrix (index-1)
     const Type paren(const Slice& rr) const { Type m; $self->get(m, true, rr); return m;}
-    const Type paren(const Matrix<int>& rr) const { Type m; $self->get(m, true, rr); return m;}
+    const Type paren(const Matrix<int>& rr) const {
+        Type m;
+        Matrix<int> r = rr;
+        if (r.isvector() && r.isdense() && $self->isvector() && (r.size1()==1 ^ $self->size1()==1)) {
+          r = r.T();
+        }
+        $self->get(m, true, r);
+        return m;
+    }
     const Type paren(const Sparsity& sp) const { Type m; $self->get(m, true, sp); return m;}
     const Type paren(const Slice& rr, const Slice& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
     const Type paren(const Slice& rr, const Matrix<int>& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
@@ -2660,7 +2669,11 @@ class NZproxy:
 
     // Set a submatrix (index-1)
     void setparen(const Type& m, const Slice& rr) { $self->set(m, true, rr);}
-    void setparen(const Type& m, const Matrix<int>& rr) { $self->set(m, true, rr);}
+    void setparen(const Type& m, const Matrix<int>& rr) {
+        Matrix<int> r = rr;
+        if (r.isvector() && r.isdense() && (r.size1()==1 ^ $self->size1()==1)) r = r.T();
+        $self->set(m, true, r);
+    }
     void setparen(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
     void setparen(const Type& m, const Slice& rr, const Slice& cc) { $self->set(m, true, rr, cc);}
     void setparen(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
@@ -2669,11 +2682,19 @@ class NZproxy:
 
     // Get nonzeros (index-1)
     const Type brace(const Slice& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
-    const Type brace(const Matrix<int>& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
+    const Type brace(const Matrix<int>& rr) const {
+      Matrix<int> r = rr;
+      if (r.isvector() && r.isdense() && (r.size1()==1 ^ $self->size1()==1)) r = r.T();
+      Type m; $self->getNZ(m, true, r); return m;
+    }
 
     // Set nonzeros (index-1)
     void setbrace(const Type& m, const Slice& rr) { $self->setNZ(m, true, rr);}
-    void setbrace(const Type& m, const Matrix<int>& rr) { $self->setNZ(m, true, rr);}
+    void setbrace(const Type& m, const Matrix<int>& rr) {
+      Matrix<int> r = rr;
+      if (r.isvector() && r.isdense() && (r.size1()==1 ^ $self->size1()==1)) r = r.T();
+      $self->setNZ(m, true, r);
+    }
 
     // 'end' function (needed for end syntax in MATLAB)
     inline int end(int i, int n) const {
@@ -3103,6 +3124,9 @@ DECL int %SHOW(countNodes)(const M& A) {
 DECL std::string %SHOW(getOperatorRepresentation)(const M& xb,
                                                   const std::vector<std::string>& args) {
   return getOperatorRepresentation(xb, args);
+}
+DECL M %SHOW(repsum)(const M& A, int n, int m=1) {
+  return repsum(A, n, m);
 }
 
 
