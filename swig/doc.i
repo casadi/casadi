@@ -13162,6 +13162,12 @@ Frobenius norm.
 
 ";
 
+%feature("docstring")  repsum(const MatType &A, int n, int m=1) "
+
+Given a repeated matrix, computes the sum of repeated parts.
+
+";
+
 %feature("docstring")  getOperatorRepresentation(const MatType &xb, const
 std::vector< std::string > &args) "
 
@@ -15534,6 +15540,12 @@ There is no guarantee that consecutive calls return identical objects
 
 
 // File: classcasadi_1_1Horzcat.xml
+
+
+// File: classcasadi_1_1HorzRepmat.xml
+
+
+// File: classcasadi_1_1HorzRepsum.xml
 
 
 // File: classcasadi_1_1Horzsplit.xml
