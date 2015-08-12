@@ -2594,8 +2594,13 @@ namespace casadi {
   std::string FunctionInternal::getSanitizedName() const {
       casadi_assert(hasSetOption("name"));
       string name = getOption("name");
-      std::replace_if(name.begin(), name.end(), isBadChar, '_');
-      return name;
+      return sanitizeName(name);
+  }
+
+  std::string FunctionInternal::sanitizeName(const std::string &name) {
+    string sname = name;
+    std::replace_if(sname.begin(), sname.end(), isBadChar, '_');
+    return sname;
   }
 
   bool FunctionInternal::hasFullJacobian() const {

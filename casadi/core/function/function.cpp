@@ -526,6 +526,10 @@ namespace casadi {
     return (*this)->getSanitizedName();
   }
 
+  std::string Function::sanitizeName(const std::string& name) {
+    return FunctionInternal::sanitizeName(name);
+  }
+
   void Function::callForward(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens,
