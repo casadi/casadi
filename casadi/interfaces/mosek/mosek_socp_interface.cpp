@@ -160,7 +160,7 @@ namespace casadi {
       for (int i=0;i<m_;++i) {
         submem[0] = i;
         for (int ii=0;ii<ni_[i];++ii) submem[ii+1] = m_ + sum_ni + ii;
-        MSK_appendcone(mosek_task_, MSK_CT_QUAD, 0.0, ni_[i]+1, &submem[0]);
+        MSK_appendcone(mosek_task_, MSK_CT_QUAD, 0.0, ni_[i]+1, getPtr(submem));
         sum_ni += ni_[i];
       }
     }
@@ -220,25 +220,25 @@ namespace casadi {
       for (int i=0;i<num_vars_to_remove;++i) {
         vars_to_remove[i] = numvar_new + num_vars_to_remove - i - 1;
       }
-      MSK_removevars(mosek_task_, num_vars_to_remove, &vars_to_remove[0]);
+      MSK_removevars(mosek_task_, num_vars_to_remove, getPtr(vars_to_remove));
     }
 
     // Add objective function
     std::vector<int> subj;
     subj.resize(numvar_new);
-    double* c_val = &dual_c_[0];
+    double* c_val = getPtr(dual_c_);
     for (int i=0;i<numvar_new;++i) subj[i] = i;
-    MSK_putclist(mosek_task_, numvar_new, &subj[0], c_val);
+    MSK_putclist(mosek_task_, numvar_new, getPtr(subj), c_val);
     for (int i=m_+N_;i<numvar_new;++i) {
       MSK_putvarbound(mosek_task_, i, MSK_BK_LO, 0.0, +MSK_INFINITY);
     }
 
     // Add equality constraints
-    int* ptrb = &dual_A_colind_[0];
-    int* ptre = &dual_A_colind_[1];
-    int* asub = &dual_A_row_[0];
-    double* aval = &dual_A_data_[0];
-    MSK_putacollist(mosek_task_, numvar_new, &subj[0], ptrb, ptre, asub, aval);
+    int* ptrb = getPtr(dual_A_colind_);
+    int* ptre = getPtr(dual_A_colind_);
+    int* asub = getPtr(dual_A_row_);
+    double* aval = getPtr(dual_A_data_);
+    MSK_putacollist(mosek_task_, numvar_new, getPtr(subj), ptrb, ptre, asub, aval);
     for (int i=0;i<n_;++i) {
       MSK_putconbound(mosek_task_, i, MSK_BK_FX, -dual_b_[i], -dual_b_[i]);
     }
@@ -256,13 +256,13 @@ namespace casadi {
     // Extract solution from MOSEK
     double primal_objective;
     double dual_objective;
-    double* primal_solution = &output(SOCP_SOLVER_X).data()[0];
+    double* primal_solution = getPtr(output(SOCP_SOLVER_X).data());
     std::vector<double> dual_solution;
     dual_solution.resize(numvar_new);
     MSK_getdualobj(mosek_task_, MSK_SOL_ITR, &primal_objective);
     MSK_getprimalobj(mosek_task_, MSK_SOL_ITR, &dual_objective);
     MSK_gety(mosek_task_, MSK_SOL_ITR, primal_solution);
-    MSK_getxx(mosek_task_, MSK_SOL_ITR, &dual_solution[0]);
+    MSK_getxx(mosek_task_, MSK_SOL_ITR, getPtr(dual_solution));
     output(SOCP_SOLVER_COST).set(primal_objective);
     output(SOCP_SOLVER_DUAL_COST).set(dual_objective);
     // Change sign of primal solution
