@@ -1782,6 +1782,14 @@ class Functiontests(casadiTestCase):
       self.checkfunction(f,Fref)
       self.check_codegen(f)
 
+  @requiresPlugin(JitFunction,"clang")
+  def test_jitfunction_clang(self):
+    x = MX.sym("x")
+    f = MXFunction("f",[x],[x**2])
+    F = JitFunction("f","clang",f)
+
+    out = F([5])
+    self.checkarray(out[0],25)        
 
 if __name__ == '__main__':
     unittest.main()

@@ -32,6 +32,7 @@ import casadi
 
 # For plugin loading
 CasadiOptions.setCasadiPath(os.path.dirname(__file__))
+CasadiOptions.setJitIncludePath(os.path.join(os.path.dirname(__file__),"..","include","casadi","jit"))
 
 import types
   

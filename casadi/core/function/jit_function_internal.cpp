@@ -23,36 +23,31 @@
  */
 
 
-#include "casadi_options.hpp"
-#include "casadi_exception.hpp"
+#include "jit_function_internal.hpp"
+#include "mx_function.hpp"
+#include "sx_function.hpp"
 
+using namespace std;
 namespace casadi {
 
-  bool CasadiOptions::catch_errors_swig = true;
-  bool CasadiOptions::simplification_on_the_fly = true;
-  bool CasadiOptions::profiling = false;
-  std::ofstream CasadiOptions::profilingLog;
-  bool CasadiOptions::profilingBinary = true;
-  bool CasadiOptions::purgeSeeds = false;
-  bool CasadiOptions::allowed_internal_api = false;
+  JitFunctionInternal::JitFunctionInternal(const Function& f) : f_(f) {
 
-  std::string CasadiOptions::casadipath = "";
-  std::string CasadiOptions::jitincludepath = "";
+    // Set default options
+    setOption("name", "unnamed JIT function"); // name of the function
 
-  void CasadiOptions::startProfiling(const std::string &filename) {
-    profilingLog.open(filename.c_str(), std::ofstream::out);
-    if (profilingLog.is_open()) {
-      profiling = true;
-    } else {
-      casadi_error("Did not manage to open file " << filename << " for logging.");
-    }
+
   }
 
-  void CasadiOptions::stopProfiling() {
-    if (profiling) {
-      profilingLog.close();
-    }
-    profiling = false;
+  JitFunctionInternal::~JitFunctionInternal() {
+
+  }
+
+  std::map<std::string, JitFunctionInternal::Plugin> JitFunctionInternal::solvers_;
+
+  const std::string JitFunctionInternal::infix_ = "jitfunction";
+
+  void JitFunctionInternal::init() {
+    FunctionInternal::init();
   }
 
 } // namespace casadi

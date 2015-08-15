@@ -125,6 +125,7 @@ set(CASADI_SRCS
   function/switch.hpp              function/switch.cpp              function/switch_internal.hpp   function/switch_internal.cpp
   function/map.hpp                 function/map.cpp                 function/map_internal.hpp      function/map_internal.cpp
   function/mapaccum.hpp            function/mapaccum.cpp            function/mapaccum_internal.hpp function/mapaccum_internal.cpp
+  function/jit_function.hpp        function/jit_function.cpp        function/jit_function_internal.hpp function/jit_function_internal.cpp
 
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp

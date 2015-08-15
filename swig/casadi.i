@@ -190,14 +190,18 @@ def _swig_repr(self):
 #ifdef SWIGMATLAB
 %matlabsetup %{
 
+
 disect_path = strsplit(mfilename('fullpath'),filesep);
 libpath = strjoin(disect_path(1:end-1),filesep);
+jitpath = strjoin({libpath,'include','casadi','jit'},filesep);
 
 import casadi.*
 
 CasadiOptions.setCasadiPath(libpath);
+CasadiOptions.setJitIncludePath(jitpath)
 
 warning('error','SWIG:OverloadError')
+
 
 %}
 #endif
@@ -3993,6 +3997,7 @@ namespace casadi {
 
 %include <casadi/core/function/sx_function.hpp>
 %include <casadi/core/function/mx_function.hpp>
+%include <casadi/core/function/jit_function.hpp>
 %include <casadi/core/function/linear_solver.hpp>
 %include <casadi/core/function/implicit_function.hpp>
 %include <casadi/core/function/integrator.hpp>

@@ -78,6 +78,7 @@ option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
 option(WITH_TINYXML "Compile the interface to TinyXML" ON)
 option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 option(WITH_COVERAGE "Create coverage report" OFF)
+option(WITH_CLANG "Compile the interface to clang JIT" OFF)
 option(WITH_MATLAB "Compile the MATLAB front-end (experimental)" OFF)
 option(WITH_PYTHON "Compile the Python front-end" OFF)
 option(WITH_JSON "Compile the JSON front-end" OFF)
@@ -428,6 +429,13 @@ if(WITH_MOSEK)
   find_package(MOSEK)
 endif()
 add_feature_info(mosek-interface MOSEK_FOUND "Interface to the interior point SOCP solver MOSEK.")
+
+# CLANG
+if(WITH_CLANG)
+  # try to find system CLANG
+  find_package(CLANG)
+endif()
+add_feature_info(clang-interface CLANG_FOUND "Interface to the Clang JIT compiler.")
 
 # ECOS
 if(WITH_ECOS)
