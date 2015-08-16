@@ -79,7 +79,7 @@ namespace casadi {
   Function Function::mapaccum(const std::string& name, int N, const Dict& options) const {
     std::vector<bool> accum_input(nIn(), false);
     accum_input[0] = true;
-    std::vector<int> accum_output(1,0);
+    std::vector<int> accum_output(1, 0);
     return MapAccum(name, *this, N, accum_input, accum_output, false, options);
   }
 
