@@ -73,7 +73,6 @@ namespace casadi {
     static std::string shortname() { return "jitfunction";}
 
   };
-
 } // namespace casadi
 /// \endcond
 #endif // CASADI_JIT_FUNCTION_INTERNAL_HPP

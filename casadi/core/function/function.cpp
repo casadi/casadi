@@ -28,6 +28,8 @@
 #include <typeinfo>
 #include "../std_vector_tools.hpp"
 #include "../function/map.hpp"
+#include "../function/mapaccum.hpp"
+
 
 using namespace std;
 
@@ -72,6 +74,19 @@ namespace casadi {
     if (!matchingArg(arg))
       return call(replaceArg(arg), res, always_inline, never_inline);
     (*this)->call(arg, res, always_inline, never_inline);
+  }
+
+  Function Function::mapaccum(const std::string& name, int N, const Dict& options) const {
+    std::vector<bool> accum_input(nIn(), false);
+    accum_input[0] = true;
+    std::vector<int> accum_output(1,0);
+    return MapAccum(name, *this, N, accum_input, accum_output, false, options);
+  }
+
+  Function Function::map(const std::string& name, int N, const Dict& options) const {
+    std::vector<bool> repeated_input(nIn(), false);
+    std::vector<bool> repeated_output(nOut(), false);
+    return Map(name, *this, N, repeated_input, repeated_output, options);
   }
 
   vector<vector<MX> > Function::map(const vector<vector<MX> > &x,

@@ -420,6 +420,60 @@ namespace casadi {
     std::vector<MX> mapsum(const std::vector<MX > &arg,
                                       const std::string& parallelization="serial");
 
+    /** \brief  Create a mapaccumulated version of this function
+
+        Suppose the function has a signature of:
+        \verbatim
+           f: (x, u) -> (x_next , y )
+        \endverbatim
+
+        The the mapaccumulated version has the signature:
+        \verbatim
+           F: (x0, U) -> (X , Y )
+
+            with
+                U: horzcat([u0, u1, ..., u_(N-1)])
+                X: horzcat([x1, x2, ..., x_N])
+                Y: horzcat([y0, y1, ..., y_(N-1)])
+
+            and
+                x1, y0 <- f(x0, u0)
+                x2, y1 <- f(x1, u1)
+                ...
+                x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+        \endverbatim
+
+
+    */
+    Function mapaccum(const std::string& name, int N, const Dict & options = Dict()) const;
+
+
+    /** \brief  Create a mapped version of this function
+
+        Suppose the function has a signature of:
+        \verbatim
+           f: (a, p) -> ( s )
+        \endverbatim
+
+        The the mapaccumulated version has the signature:
+        \verbatim
+           F: (A, P) -> (S )
+
+            with
+                a: horzcat([a0, a1, ..., a_(N-1)])
+                p: horzcat([p0, p1, ..., p_(N-1)])
+                s: horzcat([s0, s1, ..., s_(N-1)])
+            and
+                s0 <- f(a0, p0)
+                s1 <- f(a1, p1)
+                ...
+                s_(N-1) <- f(a_(N-1), p_(N-1))
+        \endverbatim
+
+
+    */
+    Function map(const std::string& name, int N,  const Dict & options = Dict()) const;
+
     /** \brief Get a function that calculates \a nfwd forward derivatives and nadj adjoint derivatives
      *         Legacy function: Use derForward and derReverse instead.
      *

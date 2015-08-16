@@ -34,12 +34,12 @@ namespace casadi {
   JitFunction::JitFunction() {
   }
 
-  JitFunction::JitFunction(const std::string& name,
+  JitFunction::JitFunction(
       const std::string& compiler,
       const Function& f,
       const Dict& opts) {
     assignNode(JitFunctionInternal::instantiatePlugin(compiler, f));
-    setOption("name", name);
+    setOption("name", f.getOption("name"));
     setOption(opts);
     init();
   }

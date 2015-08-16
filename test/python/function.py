@@ -1786,7 +1786,7 @@ class Functiontests(casadiTestCase):
   def test_jitfunction_clang(self):
     x = MX.sym("x")
     f = MXFunction("f",[x],[x**2])
-    F = JitFunction("f","clang",f)
+    F = JitFunction("clang",f)
 
     out = F([5])
     self.checkarray(out[0],25)        

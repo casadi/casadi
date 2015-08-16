@@ -212,7 +212,7 @@ assert(all(size(u(1:2,1:3))==[2 3]));
 if JitFunction.hasPlugin('clang')
   x = MX.sym('x');
   f = MXFunction('f',{x},{x^2});
-  F = JitFunction('f','clang',f);
+  F = JitFunction('clang',f);
 
   out = F({5});
   assert(full(out{1})==25)

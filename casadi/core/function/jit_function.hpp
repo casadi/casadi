@@ -51,7 +51,6 @@ namespace casadi {
 
     /// JitFunction factory (new syntax, includes initialization)
     JitFunction(
-      const std::string& name,
       const std::string& compiler,
       const Function& f,
       const Dict& opts=Dict());
