@@ -84,8 +84,8 @@ namespace casadi {
   }
 
   Function Function::map(const std::string& name, int N, const Dict& options) const {
-    std::vector<bool> repeated_input(nIn(), false);
-    std::vector<bool> repeated_output(nOut(), false);
+    std::vector<bool> repeated_input(nIn(), true);
+    std::vector<bool> repeated_output(nOut(), true);
     return Map(name, *this, N, repeated_input, repeated_output, options);
   }
 
