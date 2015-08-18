@@ -1444,12 +1444,14 @@ namespace casadi {
 
         int offset = 0;
         for (int i=0;i<nIn();++i) {
-          std::copy(input(i).data().begin(), input(i).data().begin()+input(i).nnz(),store_in.begin()+offset);
+          std::copy(input(i).data().begin(), input(i).data().begin()+input(i).nnz(),
+            store_in.begin()+offset);
           offset+=input(i).nnz();
         }
         offset = 0;
         for (int i=0;i<nOut();++i) {
-          std::copy(output(i).data().begin(), output(i).data().begin()+output(i).nnz(),store_out.begin()+offset);
+          std::copy(output(i).data().begin(), output(i).data().begin()+output(i).nnz(),
+            store_out.begin()+offset);
           offset+=output(i).nnz();
         }
 
@@ -1462,15 +1464,16 @@ namespace casadi {
         // recover the seeds/sens
         offset = 0;
         for (int i=0;i<nIn();++i) {
-          std::copy(store_in.begin()+offset, store_in.begin()+offset+input(i).nnz(),input(i).data().begin());
+          std::copy(store_in.begin()+offset, store_in.begin()+offset+input(i).nnz(),
+            input(i).data().begin());
           offset+=input(i).nnz();
         }
         offset = 0;
         for (int i=0;i<nOut();++i) {
-          std::copy(store_out.begin()+offset, store_out.begin()+offset+output(i).nnz(),output(i).data().begin());
+          std::copy(store_out.begin()+offset, store_out.begin()+offset+output(i).nnz(),
+            output(i).data().begin());
           offset+=output(i).nnz();
         }
-
 
         const int d1 = sp.size2();
         //const int d2 = sp.size1();
