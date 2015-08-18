@@ -73,4 +73,15 @@ namespace casadi {
     return new CallbackCInternal(ptr_);
   }
 
+  IterationCallbackInternal::IterationCallbackInternal(IterationCallback& cb)  : cb_(cb) {
+  }
+
+  int IterationCallbackInternal::call(Function& fcn, void* user_data) {
+    return cb_(fcn);
+  }
+
+  IterationCallbackInternal* IterationCallbackInternal::clone() const {
+    return new IterationCallbackInternal(cb_);
+  }
+
 } // namespace casadi

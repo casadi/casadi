@@ -91,6 +91,17 @@ namespace casadi {
     virtual CallbackCInternal* clone() const;
   };
 
+  class CASADI_EXPORT IterationCallbackInternal :
+        public CallbackInternal {
+    friend class Callback;
+
+    IterationCallbackInternal(IterationCallback & cb);
+    virtual int call(Function& fcn, void* user_data);
+    virtual IterationCallbackInternal* clone() const;
+
+    IterationCallback& cb_;
+  };
+
 } // namespace casadi
 /// \endcond
 

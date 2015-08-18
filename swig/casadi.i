@@ -3994,6 +3994,7 @@ namespace casadi {
 
 %feature("director") casadi::Callback2;
 %feature("director") casadi::DerivativeGenerator2;
+%feature("director") casadi::IterationCallback;
 
 %include <casadi/core/function/sx_function.hpp>
 %include <casadi/core/function/mx_function.hpp>
