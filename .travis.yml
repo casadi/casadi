@@ -29,7 +29,7 @@ matrix:
       env: TESTMODE=full_valgrind
       script:
         - sudo add-apt-repository ppa:nodakai/valgrind -y
-        - sudo apt-get update -q
+        - sudo apt-get update -qq
         - sudo apt-get install valgrind
         - mkdir build
         - pushd build
@@ -46,7 +46,7 @@ matrix:
       env: TESTMODE=full_valgrind
       script:
         - sudo add-apt-repository ppa:nodakai/valgrind -y
-        - sudo apt-get update -q
+        - sudo apt-get update -qq
         - sudo apt-get install valgrind
         - mkdir build
         - pushd build
@@ -109,7 +109,7 @@ matrix:
         - sudo make -j2 install
         - popd
         - sudo add-apt-repository ppa:kedazo/doxygen-updates-precise -y
-        - sudo apt-get update -q
+        - sudo apt-get update -qq
         - sudo pip install texttable
         - sudo pip install --allow-unverified pydot pydot==1.0.28
         - sudo apt-get install graphviz python-lxml python-ipdb python-docutils doxygen -y
@@ -148,7 +148,7 @@ matrix:
       env: TESTMODE=quick
       script:
         - sudo add-apt-repository ppa:webupd8team/java -y
-        - sudo apt-get update -q
+        - sudo apt-get update -qq
         - sudo echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
         - sudo apt-get install python-pyparsing libhunspell-dev oracle-java7-installer -y
         - sudo pip install hunspell
@@ -243,7 +243,7 @@ before_install:
   - sudo add-apt-repository ppa:umn-claoit-rce/compute-packages -y
   - sudo add-apt-repository ppa:baltix-members/ppa -y #  for libslicot-dev
   - sudo apt-get update -qq
-  - sudo apt-get install -y binutils gcc g++ gfortran git cmake liblapack-dev ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libblas-dev liblapack-dev libslicot-dev libxml2-dev
+  - sudo apt-get install -q -y binutils gcc g++ gfortran git cmake liblapack-dev ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libblas-dev liblapack-dev libslicot-dev libxml2-dev
   - sudo pip install github3.py
  
 after_failure:
