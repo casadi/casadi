@@ -1436,10 +1436,41 @@ namespace casadi {
         if (!fwd && output(oind).isempty())
           continue;
 
+
+        // Save the seeds/sens (#1532)
+        // This code should stay in place until refactored away
+        std::vector<double> store_in(nnzIn());
+        std::vector<double> store_out(nnzOut());
+
+        int offset = 0;
+        for (int i=0;i<nIn();++i) {
+          std::copy(input(i).data().begin(), input(i).data().begin()+input(i).nnz(),store_in.begin()+offset);
+          offset+=input(i).nnz();
+        }
+        offset = 0;
+        for (int i=0;i<nOut();++i) {
+          std::copy(output(i).data().begin(), output(i).data().begin()+output(i).nnz(),store_out.begin()+offset);
+          offset+=output(i).nnz();
+        }
+
+
         // Get the sparsity of the Jacobian block
         Sparsity sp = jacSparsity(iind, oind, true, false);
         if (sp.isNull() || sp.nnz() == 0)
           continue; // Skip if zero
+
+        // recover the seeds/sens
+        offset = 0;
+        for (int i=0;i<nIn();++i) {
+          std::copy(store_in.begin()+offset, store_in.begin()+offset+input(i).nnz(),input(i).data().begin());
+          offset+=input(i).nnz();
+        }
+        offset = 0;
+        for (int i=0;i<nOut();++i) {
+          std::copy(store_out.begin()+offset, store_out.begin()+offset+output(i).nnz(),output(i).data().begin());
+          offset+=output(i).nnz();
+        }
+
 
         const int d1 = sp.size2();
         //const int d2 = sp.size1();
