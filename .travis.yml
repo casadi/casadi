@@ -238,7 +238,7 @@ before_install:
   - pushd /home/travis/build/casadi/testbot && ln -s  /home/travis/build/swig_matlab  swig-matlab-install  && popd
   - export PATH=/home/travis/build/swig/bin:$PATH
   - pushd testbot/restricted/cplex && mkdir cplex && tar -xf cplex12.4.tar.gz -C cplex && mkdir concert && tar -xf cplex12.4-concert.tar.gz -C concert && popd
-  - pushd testbot/restricted && mkdir -p worhp && cd  worhp && 7za e ../libworhp_debian7_amd64_gcc47_1.7-12970f3.7z -y && popd
+  - pushd testbot/restricted && mkdir -p worhp && cd  worhp && 7za e ../libworhp_debian7_amd64_gcc47_1.7-12970f3.7z -y >/dev/null && popd
   - popd
   - sudo add-apt-repository ppa:umn-claoit-rce/compute-packages -y
   - sudo add-apt-repository ppa:baltix-members/ppa -y #  for libslicot-dev
