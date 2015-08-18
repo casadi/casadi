@@ -34,8 +34,12 @@ namespace casadi {
 
     // Set default options
     setOption("name", "unnamed JIT function"); // name of the function
-
-
+    if (f.hasSetOption("input_scheme")) {
+      setOption("input_scheme", getOption(f, "input_scheme"));
+    }
+    if (f.hasSetOption("output_scheme")) {
+      setOption("otput_scheme", getOption(f, "output_scheme"));
+    }
   }
 
   JitFunctionInternal::~JitFunctionInternal() {
