@@ -3441,7 +3441,7 @@ namespace casadi{
       mxArray *p  = mxCreateSparse($self->size1(), $self->size2(), $self->nnz(), mxREAL);
       $self->getNZ(static_cast<double*>(mxGetData(p)));
       std::copy($self->colind(), $self->colind()+$self->size2()+1, mxGetJc(p));
-      std::copy($self->row(), $self->row()+$self->size2()+1, mxGetIr(p));
+      std::copy($self->row(), $self->row()+$self->nnz(), mxGetIr(p));
       return p;
     }
 #endif

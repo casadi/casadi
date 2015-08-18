@@ -217,4 +217,8 @@ if JitFunction.hasPlugin('clang')
   out = F({5});
   assert(full(out{1})==25)
 end
-    
+
+
+a = DMatrix.ones(Sparsity.upper(5));
+i = full(full(sparse(a))-a);
+assert(any(any(i))==0);
