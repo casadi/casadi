@@ -83,6 +83,11 @@ Default constructor.
 
 Construct from C pointer.
 
+>  Callback(IterationCallback &cb)
+------------------------------------------------------------------------
+
+Construct from an IterationCallback object.
+
 ";
 
 %feature("docstring") casadi::Callback::init "
@@ -16422,6 +16427,15 @@ NULL)
 ";
 
 %feature("docstring") casadi::IpoptUserClass::IpoptUserClass "[INTERNAL] ";
+
+
+// File: classcasadi_1_1IterationCallback.xml
+%feature("docstring") casadi::IterationCallback::~IterationCallback "";
+
+%feature("docstring") casadi::IterationCallback "C++ includes: functor.hpp
+";
+
+%feature("docstring") casadi::IterationCallback::IterationCallback "";
 
 
 // File: classcasadi_1_1JitFunction.xml

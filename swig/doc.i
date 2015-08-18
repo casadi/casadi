@@ -85,6 +85,12 @@ Construct from C pointer.
 
 ";
 
+%feature("docstring") casadi::Callback::Callback(IterationCallback &cb) "
+
+Construct from an IterationCallback object.
+
+";
+
 %feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
 
 Initialize or re-initialize the object:
@@ -20989,6 +20995,15 @@ ls_trials, const IpoptData *ip_data, IpoptCalculatedQuantities *ip_cq) "
 
 %feature("docstring") casadi::IpoptUserClass::IpoptUserClass(IpoptInterface
 *ipoptInterface) " [INTERNAL] ";
+
+
+// File: classcasadi_1_1IterationCallback.xml
+%feature("docstring") casadi::IterationCallback::~IterationCallback "";
+
+%feature("docstring") casadi::IterationCallback "C++ includes: functor.hpp
+";
+
+%feature("docstring") casadi::IterationCallback::IterationCallback() "";
 
 
 // File: classcasadi_1_1JitFunction.xml
