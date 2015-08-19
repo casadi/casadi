@@ -18,7 +18,8 @@ env:
 
 before_script:
   - set -e
-  - cat /etc/sysctl.conf
+  - sudo cat /etc/sysctl.conf
+  - sudo sysctl -a
 
 matrix:
   include:
