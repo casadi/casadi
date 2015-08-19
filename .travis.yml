@@ -18,6 +18,7 @@ env:
 
 before_script:
   - set -e
+  - cat /etc/sysctl.conf
 
 matrix:
   include:
