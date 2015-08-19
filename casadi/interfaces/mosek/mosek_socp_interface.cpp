@@ -235,7 +235,7 @@ namespace casadi {
 
     // Add equality constraints
     int* ptrb = getPtr(dual_A_colind_);
-    int* ptre = getPtr(dual_A_colind_);
+    int* ptre = getPtr(dual_A_colind_)+1;
     int* asub = getPtr(dual_A_row_);
     double* aval = getPtr(dual_A_data_);
     MSK_putacollist(mosek_task_, numvar_new, getPtr(subj), ptrb, ptre, asub, aval);
