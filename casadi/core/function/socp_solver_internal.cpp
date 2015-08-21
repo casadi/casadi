@@ -292,8 +292,8 @@ namespace casadi {
     dual_A_colind_.resize(m_+N_+1);
 
     // Call to efficient transpose routine (casadi_trans)
-    casadi_trans(primal_A.ptr(),primal_A.sparsity(),primal_A_T_.ptr(),
-      primal_A_T_.sparsity(),getPtr(primal_A_T_temp_int_));
+    casadi_trans(primal_A.ptr(), primal_A.sparsity(), primal_A_T_.ptr(),
+      primal_A_T_.sparsity(), getPtr(primal_A_T_temp_int_));
     const Sparsity& primal_A_T_sparse = primal_A_T_.sparsity();
     start_idx = 0;
     end_idx = primal_E.nnz();
