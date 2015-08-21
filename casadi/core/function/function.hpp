@@ -591,7 +591,7 @@ namespace casadi {
      *
      * There is no guarantee that consecutive calls return identical objects
      */
-    std::vector<MX> symbolicInput() const;
+    std::vector<MX> symbolicInput(bool unique=false) const;
 
     /** \brief Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
      *

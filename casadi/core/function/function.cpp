@@ -275,8 +275,12 @@ namespace casadi {
     (*this)->setJacSparsity(sp, iind, oind, compact);
   }
 
-  std::vector<MX> Function::symbolicInput() const {
-    return (*this)->symbolicInput();
+  std::vector<MX> Function::symbolicInput(bool unique) const {
+    if (unique) {
+      return (*this)->FunctionInternal::symbolicInput();
+    } else {
+      return (*this)->symbolicInput();
+    }
   }
 
   std::vector<SX> Function::symbolicInputSX() const {
