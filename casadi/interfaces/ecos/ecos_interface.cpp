@@ -185,17 +185,17 @@ namespace casadi {
     idxint p        = dual_nc_;
     idxint l        = dim_pos_orthant;
     idxint ncones   = m_;
-    idxint* q       = &ecos_q_vec_[0];
+    idxint* q       = getPtr(ecos_q_vec_);
     idxint nex      = 0;
-    pfloat* Gpr     = &ecos_Gpr_vec_[0];
-    idxint* Gjc     = &ecos_Gjc_vec_[0];
-    idxint* Gir     = &ecos_Gir_vec_[0];
-    pfloat* Apr     = &dual_A_data_[0];
-    idxint* Ajc     = &ecos_Ajc_vec_[0];
-    idxint* Air     = &ecos_Air_vec_[0];
-    pfloat* c       = &ecos_c_vec_[0];
-    pfloat* h       = &ecos_h_vec_[0];
-    pfloat* b       = &ecos_b_vec_[0];
+    pfloat* Gpr     = getPtr(ecos_Gpr_vec_);
+    idxint* Gjc     = getPtr(ecos_Gjc_vec_);
+    idxint* Gir     = getPtr(ecos_Gir_vec_);
+    pfloat* Apr     = getPtr(dual_A_data_);
+    idxint* Ajc     = getPtr(ecos_Ajc_vec_);
+    idxint* Air     = getPtr(ecos_Air_vec_);
+    pfloat* c       = getPtr(ecos_c_vec_);
+    pfloat* h       = getPtr(ecos_h_vec_);
+    pfloat* b       = getPtr(ecos_b_vec_);
 
 
     // Setup ECOS for new problem based on problem definition. We should be able to place
@@ -227,8 +227,8 @@ namespace casadi {
     // Extract solution from ECOS
     double* dual_sol = ecos_work->x;
     double* primal_sol = ecos_work->y;
-    double* output_primal = &output(SOCP_SOLVER_X).data()[0];
-    double* output_lam_cone = &output(SOCP_SOLVER_LAM_CONE).data()[0];
+    double* output_primal = getPtr(output(SOCP_SOLVER_X).data());
+    double* output_lam_cone = getPtr(output(SOCP_SOLVER_LAM_CONE).data());
     std::transform(primal_sol, primal_sol + n_, output_primal, std::negate<pfloat>());
     // Primal and dual cost
     output(SOCP_SOLVER_COST).set(-ecos_work->info->dcost);
