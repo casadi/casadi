@@ -73,6 +73,7 @@
 #include "function/dle_solver.hpp"
 #include "function/map.hpp"
 #include "function/mapaccum.hpp"
+#include "function/kernel_sum_2d.hpp"
 
 // Misc
 #include "misc/integration_tools.hpp"

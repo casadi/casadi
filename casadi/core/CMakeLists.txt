@@ -126,7 +126,8 @@ set(CASADI_SRCS
   function/map.hpp                 function/map.cpp                 function/map_internal.hpp      function/map_internal.cpp
   function/mapaccum.hpp            function/mapaccum.cpp            function/mapaccum_internal.hpp function/mapaccum_internal.cpp
   function/jit_function.hpp        function/jit_function.cpp        function/jit_function_internal.hpp function/jit_function_internal.cpp
-
+  function/kernel_sum_2d.hpp       function/kernel_sum_2d.cpp       function/kernel_sum_2d_internal.hpp function/kernel_sum_2d_internal.cpp
+  
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp
   misc/nlp_builder.hpp             misc/nlp_builder.cpp

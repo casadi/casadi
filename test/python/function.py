@@ -1789,7 +1789,50 @@ class Functiontests(casadiTestCase):
     F = JitFunction("clang",f)
 
     out = F([5])
-    self.checkarray(out[0],25)        
+    self.checkarray(out[0],25)      
+    
+  @memory_heavy()
+  def test_KernelSum2D(self):
+    n = 20
+    m = 40
+ 
+    try:
+      xx, yy = np.meshgrid(range(n), range(m),indexing="ij")
+    except:
+      yy, xx = np.meshgrid(range(m), range(n))
+
+    z = np.cos(xx/4.0+yy/3.0)
+
+    p = SX.sym("p",2)
+    x = SX.sym("x",2)
+
+    v = SX.sym("v")
+
+    r = sqrt(sumRows((p-x)**2))
+
+    f = SXFunction("f",[p,v,x],[v**2*exp(-r**2)/pi])
+
+    F = KernelSum2D("test",f,(n,m),4,1,{"ad_weight": 1})
+
+    x0 = DMatrix([n/2,m/2])
+
+    Fref = Map("f",f,n*m,[True,True,False],[False])
+    
+    print Fref([horzcat([vec(xx),vec(yy)]).T,vec(z),x0])
+    print F([z,x0])
+    
+    zs = MX.sym("z", z.shape)
+    xs = MX.sym("x",2)
+    Fref = MXFunction("Fref",[zs,xs],Fref([horzcat([vec(xx),vec(yy)]).T,vec(zs),xs]))
+    
+    F.setInput(z,0)
+    Fref.setInput(z,0)
+    
+    F.setInput(x0,1)
+    Fref.setInput(x0,1)
+    
+    self.checkfunction(F,Fref,digits=5,allow_nondiff=True,evals=False)
+    self.check_codegen(F)
 
 if __name__ == '__main__':
     unittest.main()
