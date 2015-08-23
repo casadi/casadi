@@ -325,7 +325,6 @@ namespace casadi {
     if (hasSetOption("grad_lag_options")) {
       gradLag.setOption(getOption("grad_lag_options"));
     }
-    gradLag.printOptions();
     gradLag.init(false);
     log("Gradient function initialized");
     return gradLag;
