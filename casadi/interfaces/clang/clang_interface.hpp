@@ -29,6 +29,32 @@
 #include "casadi/core/function/jit_function_internal.hpp"
 #include <casadi/interfaces/clang/casadi_jitfunction_clang_export.h>
 
+#include <clang/CodeGen/CodeGenAction.h>
+#include <clang/Basic/DiagnosticOptions.h>
+#include <clang/Driver/Compilation.h>
+#include <clang/Driver/Driver.h>
+#include <clang/Driver/Tool.h>
+#include <clang/Frontend/CompilerInstance.h>
+#include <clang/Frontend/CompilerInvocation.h>
+#include <clang/Frontend/FrontendDiagnostic.h>
+#include <clang/Frontend/TextDiagnosticPrinter.h>
+
+#include <llvm/ADT/SmallString.h>
+#include <llvm/ExecutionEngine/ExecutionEngine.h>
+//#include <llvm/ExecutionEngine/MCJIT.h>
+#include "llvm/ExecutionEngine/JIT.h"
+#include <llvm/IR/Module.h>
+#include "llvm/IR/LLVMContext.h"
+//#include "llvm/IR/Verifier.h"
+#include <llvm/Support/FileSystem.h>
+#include <llvm/Support/Host.h>
+#include <llvm/Support/ManagedStatic.h>
+#include <llvm/Support/Path.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Support/raw_ostream.h>
+#include <llvm/Support/raw_os_ostream.h>
+//#include <llvm/ExecutionEngine/ExecutionEngine.h>
+
 /** \defgroup plugin_JitFunction_clang
       Interface to the JIT compiler CLANG
 */
@@ -84,6 +110,11 @@ namespace casadi {
     evalPtr eval_fun_;
     workPtr work_fun_;
     initPtr init_fun_;
+
+    llvm::ExecutionEngine* TheExecutionEngine;
+    llvm::LLVMContext* Context;
+
+    clang::EmitLLVMOnlyAction* Act;
 
   };
 

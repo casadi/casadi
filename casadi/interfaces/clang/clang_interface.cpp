@@ -29,31 +29,6 @@
 #include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/casadi_meta.hpp"
 
-#include <clang/CodeGen/CodeGenAction.h>
-#include <clang/Basic/DiagnosticOptions.h>
-#include <clang/Driver/Compilation.h>
-#include <clang/Driver/Driver.h>
-#include <clang/Driver/Tool.h>
-#include <clang/Frontend/CompilerInstance.h>
-#include <clang/Frontend/CompilerInvocation.h>
-#include <clang/Frontend/FrontendDiagnostic.h>
-#include <clang/Frontend/TextDiagnosticPrinter.h>
-
-#include <llvm/ADT/SmallString.h>
-#include <llvm/ExecutionEngine/ExecutionEngine.h>
-//#include <llvm/ExecutionEngine/MCJIT.h>
-#include "llvm/ExecutionEngine/JIT.h"
-#include <llvm/IR/Module.h>
-#include "llvm/IR/LLVMContext.h"
-//#include "llvm/IR/Verifier.h"
-#include <llvm/Support/FileSystem.h>
-#include <llvm/Support/Host.h>
-#include <llvm/Support/ManagedStatic.h>
-#include <llvm/Support/Path.h>
-#include <llvm/Support/TargetSelect.h>
-#include <llvm/Support/raw_ostream.h>
-//#include <llvm/ExecutionEngine/ExecutionEngine.h>
-
 using namespace clang;
 using namespace clang::driver;
 
@@ -93,6 +68,11 @@ namespace casadi {
   }
 
   ClangJitFunctionInterface::~ClangJitFunctionInterface() {
+    if (isInit()) {
+      if (TheExecutionEngine) delete TheExecutionEngine; TheExecutionEngine=0;
+      if (Context) delete Context;Context=0;
+    }
+    //llvm::llvm_shutdown();
 
   }
 
@@ -110,6 +90,9 @@ namespace casadi {
     // Path to the C file
     string inputPath = name + ".c";
 
+
+    Context = new llvm::LLVMContext();
+
     // Arguments to pass to the clang frontend
     vector<const char *> args;
     args.push_back(inputPath.c_str());
@@ -123,24 +106,24 @@ namespace casadi {
       args.push_back("-O3");
     }
 
-
     // The compiler invocation needs a DiagnosticsEngine so it can report problems
-    IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
-    TextDiagnosticPrinter *DiagClient =
-      new TextDiagnosticPrinter(llvm::errs(), &*DiagOpts);
+    DiagnosticOptions* DiagOpts = new DiagnosticOptions();
+    llvm::raw_ostream* myerr = new llvm::raw_os_ostream(userOut<true>());
+    TextDiagnosticPrinter *DiagClient = new TextDiagnosticPrinter(*myerr, DiagOpts);
 
-    IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
-    DiagnosticsEngine Diags(DiagID, &*DiagOpts, DiagClient);
+    DiagnosticIDs* DiagID = new DiagnosticIDs();
+    // This object takes ownerships of all three passed-in pointers
+    DiagnosticsEngine Diags(DiagID, DiagOpts, DiagClient);
 
     // Create the compiler invocation
-    OwningPtr<clang::CompilerInvocation> CI(new clang::CompilerInvocation);
+    clang::CompilerInvocation* CI = new clang::CompilerInvocation();
     clang::CompilerInvocation::CreateFromArgs(*CI, &args[0], &args[0] + args.size(), Diags);
 
     vector<string> argsFromInvocation;
 
     // Create the compiler instance
     clang::CompilerInstance Clang;
-    Clang.setInvocation(CI.take());
+    Clang.setInvocation(CI);
 
     // Get ready to report problems
     Clang.createDiagnostics();
@@ -163,13 +146,12 @@ namespace casadi {
       "include" << filesep << "casadi" << filesep << "jit";
     std::string path;
     while (std::getline(paths, path, pathsep)) {
-      userOut() << "Adding path:" << path << std::endl;
+      log("ClangInterface::init", std::string("Adding path:") + path);
       Clang.getHeaderSearchOpts().AddPath(path.c_str(), frontend::CSystem, false, false);
     }
 
     // Create an action and make the compiler instance carry it out
-    std::unique_ptr<clang::CodeGenAction> Act(
-      new clang::EmitLLVMOnlyAction(&llvm::getGlobalContext()));
+    Act = new clang::EmitLLVMOnlyAction(Context);
     if (!Clang.ExecuteAction(*Act))
       casadi_error("Cannot execute action");
 
@@ -182,7 +164,7 @@ namespace casadi {
 
     // Create the JIT.  This takes ownership of the module.
     std::string ErrStr;
-    llvm::ExecutionEngine *TheExecutionEngine =
+    TheExecutionEngine =
       llvm::EngineBuilder(std::move(module)).setEngineKind(llvm::EngineKind::JIT)
         .setErrorStr(&ErrStr).create();
     if (!TheExecutionEngine) {
@@ -190,6 +172,9 @@ namespace casadi {
     }
 
     TheExecutionEngine->finalizeObject();
+
+    delete Act; Act = 0;
+
 
     std::string name_init = name + "_init";
     std::string name_sparsity = name + "_sparsity";
@@ -231,7 +216,7 @@ namespace casadi {
       int nnz = colindv.back();
 
       // Rows
-      vector<int> rowv(row, row+nnz);
+      vector<int> rowv(row, row+nnz); 
 
       // Sparsity
       Sparsity sp(nrow, ncol, colindv, rowv);
@@ -243,6 +228,8 @@ namespace casadi {
         output(i-nIn()) = Matrix<double>::zeros(sp);
       }
     }
+
+    delete myerr;myerr=0;
 
     int n_iw, n_w;
     int flag = work_fun_(&n_iw, &n_w);
