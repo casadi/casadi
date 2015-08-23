@@ -1060,7 +1060,8 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -3771,7 +3772,8 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -4425,7 +4427,8 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -6860,7 +6863,8 @@ const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -8671,7 +8675,8 @@ get an option value
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -11373,7 +11378,8 @@ Get the number of function outputs.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -12634,7 +12640,8 @@ const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -16115,7 +16122,8 @@ internally
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -17913,7 +17921,8 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -20668,7 +20677,8 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -22575,7 +22585,8 @@ point to this new object
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -24111,7 +24122,8 @@ internal class
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -24698,7 +24710,13 @@ LpSolver.doc(\"myextraplugin\")
 
 st:
 
-Problem structure.
+Problem structure.>Struct scheme: casadi::LPStruct ( = 1) []
+
++-------------+-------+-----------------------+
+|  Full name  | Short |      Description      |
++=============+=======+=======================+
+| LP_STRUCT_A |       | The matrix A: sparse. |
++-------------+-------+-----------------------+
 
 ";
 
@@ -24723,7 +24741,13 @@ LpSolver.doc(\"myextraplugin\")
 
 st:
 
-Problem structure.
+Problem structure.>Struct scheme: casadi::LPStruct ( = 1) []
+
++-------------+-------+-----------------------+
+|  Full name  | Short |      Description      |
++=============+=======+=======================+
+| LP_STRUCT_A |       | The matrix A: sparse. |
++-------------+-------+-----------------------+
 
 ";
 
@@ -25696,7 +25720,8 @@ Get the default of a certain option.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -26735,7 +26760,8 @@ Print solver statistics.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -28927,7 +28953,8 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -31141,7 +31168,8 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -32123,7 +32151,8 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -36428,7 +36457,8 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -42776,7 +42806,8 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -43519,7 +43550,8 @@ Create call to (cached) derivative function, reverse mode.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -46087,7 +46119,8 @@ Is initialized?
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -47144,7 +47177,8 @@ Get output scheme description by index.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -49853,7 +49887,8 @@ Get the dictionary.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -52158,7 +52193,8 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -52755,7 +52791,7 @@ Return a string with a description (for SWIG)
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::Function::symbolicInput() const  "
+casadi::Function::symbolicInput(bool unique=false) const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -57680,7 +57716,8 @@ check if there is an option str
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -60137,7 +60174,8 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -61940,7 +61978,8 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -63577,7 +63616,8 @@ std::vector< std::string > > &res) "
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 

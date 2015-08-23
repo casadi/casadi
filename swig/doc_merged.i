@@ -19119,7 +19119,13 @@ LpSolver.doc(\"myextraplugin\")
 
 st:
 
-Problem structure.
+Problem structure.>Struct scheme: casadi::LPStruct ( = 1) []
+
++-------------+-------+-----------------------+
+|  Full name  | Short |      Description      |
++=============+=======+=======================+
+| LP_STRUCT_A |       | The matrix A: sparse. |
++-------------+-------+-----------------------+
 
 >  LpSolver(str solver, const std.map< str, Sparsity > &st)
 ------------------------------------------------------------------------
@@ -19142,7 +19148,13 @@ LpSolver.doc(\"myextraplugin\")
 
 st:
 
-Problem structure.
+Problem structure.>Struct scheme: casadi::LPStruct ( = 1) []
+
++-------------+-------+-----------------------+
+|  Full name  | Short |      Description      |
++=============+=======+=======================+
+| LP_STRUCT_A |       | The matrix A: sparse. |
++-------------+-------+-----------------------+
 
 ";
 
