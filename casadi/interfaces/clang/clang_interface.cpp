@@ -216,7 +216,7 @@ namespace casadi {
       int nnz = colindv.back();
 
       // Rows
-      vector<int> rowv(row, row+nnz); 
+      vrector<int> rowv(row, row+nnz);
 
       // Sparsity
       Sparsity sp(nrow, ncol, colindv, rowv);
