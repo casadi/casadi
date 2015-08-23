@@ -28,16 +28,13 @@ matrix:
       os: linux
       env: TESTMODE=full_valgrind
       script:
-        - sudo add-apt-repository ppa:nodakai/valgrind -y
-        - sudo apt-get update -qq
-        - sudo apt-get install valgrind
+        - sudo apt-get install valgrind -y
         - mkdir build
         - pushd build
-        - cmake -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - cmake -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_DOC=ON -DWITH_EXAMPLES=OFF  ..
         - make -j2
         - sudo make -j2 install
         - popd
-        - sudo apt-get install valgrind -y
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         - pushd test/python && ls -1 [n-z]*.py | grep -v helpers.py | xargs rm && popd
         - pushd test && make unittests_py_valgrind && popd
@@ -45,16 +42,13 @@ matrix:
       os: linux
       env: TESTMODE=full_valgrind
       script:
-        - sudo add-apt-repository ppa:nodakai/valgrind -y
-        - sudo apt-get update -qq
-        - sudo apt-get install valgrind
+        - sudo apt-get install valgrind -y
         - mkdir build
         - pushd build
-        - cmake -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - cmake -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_DOC=ON -DWITH_EXAMPLES=OFF ..
         - make -j2
         - sudo make -j2 install
         - popd
-        - sudo apt-get install valgrind -y
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         - pushd test/python && ls -1 [a-m]*.py | grep -v helpers.py | xargs rm && popd
         - pushd test && make unittests_py_valgrind && popd
@@ -68,14 +62,11 @@ matrix:
         - make -j2
         - sudo make -j2 install
         - popd
-        - git clone https://github.com/jgillis/pyreport.git
-        - pushd pyreport && sudo python setup.py install && popd
-        - sudo pip install texttable
+        - sudo apt-get install python-ipdb graphviz python-lxml texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
         - sudo pip install --allow-unverified pydot pydot==1.0.28
-        - sudo apt-get install python-lxml valgrind graphviz texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra latex2html doxygen python-ipdb -y
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         - pushd test && make trunktesterbot_no_unittests_py && popd
-        - pushd build && travis_wait make json VERBOSE=1 && popd
+        - pushd build && travis_wait make json && popd
 
     - compiler: gcc
       os: linux
@@ -83,20 +74,16 @@ matrix:
       script:
         - mkdir build
         - pushd build
-        - cmake -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - cmake -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_DOC=ON -DWITH_EXAMPLES=OFF -DWITH_EXTRA_WARNINGS=ON ..
         - make -j2
         - sudo make -j2 install
         - popd
-        - git clone https://github.com/jgillis/pyreport.git
-        - pushd pyreport && sudo python setup.py install && popd
-        - sudo apt-get install python-lxml valgrind -y
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
         
         - pushd test && make unittests_py_slow && popd
-        - pushd build && make json VERBOSE=1 && popd
     - compiler: gcc
       os: linux
       env: TESTMODE=docs
@@ -108,8 +95,6 @@ matrix:
         - make -j2
         - sudo make -j2 install
         - popd
-        - sudo add-apt-repository ppa:kedazo/doxygen-updates-precise -y
-        - sudo apt-get update -qq
         - sudo pip install texttable
         - sudo pip install --allow-unverified pydot pydot==1.0.28
         - sudo apt-get install graphviz python-lxml python-ipdb python-docutils doxygen -y
@@ -147,8 +132,6 @@ matrix:
       os: linux
       env: TESTMODE=quick
       script:
-        - sudo add-apt-repository ppa:webupd8team/java -y
-        - sudo apt-get update -qq
         - sudo echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
         - sudo apt-get install python-pyparsing libhunspell-dev oracle-java7-installer -y
         - sudo pip install hunspell
@@ -170,7 +153,7 @@ matrix:
       after_success:
         - cd /home/travis/build/
         - git clone git@github.com:casadi/binaries.git
-        - pushd binaries && git checkout run && git submodule init && git submodule update&& popd
+        - pushd binaries && git checkout run && git submodule init && git submodule update ; popd
         - pushd binaries/casadi && git checkout $TRAVIS_COMMIT && popd
         - pushd binaries && git commit -a -m "automatic runner commit $TRAVIS_COMMIT" && git push origin run && popd
 
@@ -196,11 +179,15 @@ matrix:
 
     - compiler: gcc
       os: linux
+      env: NEEDMATLAB=1
       script:
-        - sudo apt-get install pv
+
+        # travis-wait seems to stop at 20 mins, regardless if output is being generated
+        - (while true ; do sleep 60 ; echo "ping" ; done ) &
+
         - pushd /home/travis/build/
         - testbot/recipes/fetch.sh matlab$MATLABRELEASE.tar.gz
-        - mkdir matlab && tar -xvf matlab$MATLABRELEASE.tar.gz -C matlab | pv -r > /dev/null
+        - mkdir matlab && tar -xvf matlab$MATLABRELEASE.tar.gz -C matlab
         - popd
         - mkdir build
         - pushd build
@@ -222,6 +209,10 @@ branches:
     - /.*appveyor.*/
 
 before_install:
+  - sudo /etc/init.d/mysql stop
+  - sudo /etc/init.d/postgresql stop
+  - sync
+  - free -t -m
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
   - pushd testbot && recipes/setup.sh && popd
   - source testbot/shellhelpers
@@ -232,16 +223,24 @@ before_install:
   - git clone https://github.com/embotech/ecos.git && pushd ecos && make && popd
   - travis_retry testbot/recipes/fetch.sh snopt7.tar.gz && mkdir snopt7 && tar -xf snopt7.tar.gz -C snopt7 && rm snopt7.tar.gz
   - mkdir -p /home/travis/build/casadi/testbot
-  - travis_retry testbot/recipes/fetch.sh swig.tar.gz && mkdir swig && tar -xf swig.tar.gz -C swig && rm swig.tar.gz
-  - pushd /home/travis/build/casadi/testbot && ln -s  /home/travis/build/swig  swig-install  && popd
-  - travis_retry testbot/recipes/fetch.sh swig_matlab.tar.gz && mkdir swig_matlab && tar -xf swig_matlab.tar.gz -C swig_matlab && rm swig_matlab.tar.gz
-  - pushd /home/travis/build/casadi/testbot && ln -s  /home/travis/build/swig_matlab  swig-matlab-install  && popd
+  - |
+    if [ $NEEDMATLAB ]
+    then
+      travis_retry testbot/recipes/fetch.sh swig_matlab.tar.gz && mkdir swig_matlab && tar -xf swig_matlab.tar.gz -C swig_matlab && rm swig_matlab.tar.gz
+      pushd /home/travis/build/casadi/testbot && ln -s  /home/travis/build/swig_matlab  swig-matlab-install  && popd
+    else
+      travis_retry testbot/recipes/fetch.sh swig.tar.gz && mkdir swig && tar -xf swig.tar.gz -C swig && rm swig.tar.gz
+      pushd /home/travis/build/casadi/testbot && ln -s  /home/travis/build/swig  swig-install  && popd
+    fi
   - export PATH=/home/travis/build/swig/bin:$PATH
-  - pushd testbot/restricted/cplex && mkdir cplex && tar -xf cplex12.4.tar.gz -C cplex && mkdir concert && tar -xvf cplex12.4-concert.tar.gz -C concert && rm cplex12.4-concert.tar.gz && popd
+  - pushd testbot/restricted/cplex && mkdir cplex && tar -xf cplex12.4.tar.gz -C cplex && mkdir concert && tar -xf cplex12.4-concert.tar.gz -C concert && rm cplex12.4-concert.tar.gz && popd
   - pushd testbot/restricted && mkdir -p worhp && cd  worhp && 7za e ../libworhp_debian7_amd64_gcc47_1.7-12970f3.7z -y && popd
   - popd
   - sudo add-apt-repository ppa:umn-claoit-rce/compute-packages -y
   - sudo add-apt-repository ppa:baltix-members/ppa -y #  for libslicot-dev
+  - sudo add-apt-repository ppa:nodakai/valgrind -y
+  - sudo add-apt-repository ppa:kedazo/doxygen-updates-precise -y
+  - sudo add-apt-repository ppa:webupd8team/java -y
   - sudo apt-get update -qq
   - sudo apt-get install -q -y binutils gcc g++ gfortran git cmake liblapack-dev ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libblas-dev liblapack-dev libslicot-dev libxml2-dev
   - sudo pip install github3.py
