@@ -187,7 +187,7 @@ matrix:
 
         - pushd /home/travis/build/
         - testbot/recipes/fetch.sh matlab$MATLABRELEASE.tar.gz
-        - mkdir matlab && tar -xvf matlab$MATLABRELEASE.tar.gz -C matlab
+        - mkdir matlab && tar -xf matlab$MATLABRELEASE.tar.gz -C matlab
         - popd
         - mkdir build
         - pushd build
