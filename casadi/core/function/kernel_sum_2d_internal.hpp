@@ -88,11 +88,11 @@ namespace casadi {
     // Default case;
     Function f_;
 
-    int n_;
+    std::pair<int, int> size_;
 
     double r_;
 
-    std::pair<int, int> size_;
+    int n_;
 
     int nnz_out_;
 

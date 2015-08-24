@@ -187,6 +187,7 @@ namespace casadi {
 
     int f_type, n_in, n_out, sz_arg, sz_res;
     int myres = init_fun_(&f_type, &n_in, &n_out, &sz_arg, &sz_res);
+    casadi_assert_message(myres==0, "ClangJitFunctionInternal: \"init\" failed");
 
     ibuf_.resize(n_in);
     obuf_.resize(n_out);

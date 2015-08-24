@@ -101,9 +101,6 @@ namespace casadi {
 
     int num_in = f_.nIn(), num_out = f_.nOut();
 
-    const bvec_t* V = arg[0];
-    const bvec_t* X = arg[1];
-
     // Clear the accumulators
     bvec_t** sum = res;
     for (int k=0;k<num_out;++k) {

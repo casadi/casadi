@@ -768,7 +768,7 @@ namespace casadi {
     return arg.shape()==inp.shape() || arg.isempty() || arg.isscalar() ||
       (inp.size2()==arg.size1() && inp.size1()==arg.size2()
        && (arg.iscolumn() || inp.iscolumn())) ||
-      hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0;
+      (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0);
   }
 
   template<typename M>
