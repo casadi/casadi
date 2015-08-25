@@ -2350,10 +2350,6 @@ namespace casadi {
     casadi_assert_message(size1() == size2(), "Cholesky decomposition requires square matrix."
                                               "Got " << dimString() << " instead.");
 
-    //const int*  Arow = row();
-    //const int*  Acolind = colind();
-    const std::vector<DataType> & Adata = data();
-
     Matrix<DataType> ret = Matrix<DataType>(Sparsity::lower(size1()));
 
     for (int i=0; i<size1(); ++i) { // loop over rows
