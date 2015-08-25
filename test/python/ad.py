@@ -588,7 +588,7 @@ class ADtests(casadiTestCase):
           (in1,v1,vertcat([x,DMatrix(0,1)]),DMatrix.eye(2)),
           (in1,v1,(x**2).project(sparsify(DMatrix([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
           (in1,v1,c.inner_prod(x,y[:,0]),y[:,0].T),
-          (in1,v1,x.nz[IMatrix([[1,0]])]*y.nz[IMatrix([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]])),
+          (in1,v1,x.nz[IMatrix([[1,0]])].T*y.nz[IMatrix([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]])),
           (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX(1,1),y.nz[0]],[MX(1,1),MX(1,1)],[MX(1,1),MX(1,1)],[y.nz[2],MX(1,1)]])),
      ]:
       print out

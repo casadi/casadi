@@ -149,7 +149,7 @@ class Toolstests(casadiTestCase):
     num = S(0)
     num["P"] = DMatrix([[1,2,3],[4,5,6],[7,8,9]])
     self.checkarray(num["P",index["x"],index["y"]],DMatrix([2]))
-    self.checkarray(num["P",index["x"],:],DMatrix([1,2,3]).T)
+    self.checkarray(num["P",index["x"],:],DMatrix([1,2,3]))
     self.checkarray(num["P",:,index["y"]],DMatrix([2,5,8]))
     self.checkarray(num["P",:,:],DMatrix([[1,2,3],[4,5,6],[7,8,9]]))
     

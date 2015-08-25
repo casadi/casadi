@@ -1437,16 +1437,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         return true;
       }
 #endif // SWIGPYTHON
-#ifdef SWIGMATLAB
-      if (mxIsChar(p) && mxGetM(p)==1 && mxGetN(p)==1) {
-        char ch;
-        if(mxGetString(p, &ch,(mwSize)sizeof(&ch))) return SWIG_TypeError;
-        if (ch==':') {
-          if (m) **m = casadi::Slice();
-          return true;
-        }
-      }
-#endif // SWIGMATLAB
 
       // No match
       return false;
@@ -2652,53 +2642,67 @@ class NZproxy:
 #endif
 
 #ifdef SWIGMATLAB
+%{
+  /// Helper function: Convert ':' to Slice
+  inline Slice char2Slice(char ch) {
+    casadi_assert(ch==':');
+    return casadi::Slice();
+  }
+%}
+
 %define %matrix_helpers(Type)
-    
     // Get a submatrix (index-1)
-    const Type paren(const Slice& rr) const { Type m; $self->get(m, true, rr); return m;}
-    const Type paren(const Matrix<int>& rr) const {
-        Type m;
-        Matrix<int> r = rr;
-        if (r.isvector() && r.isdense() && $self->isvector() && (r.size1()==1 ^ $self->size1()==1)) {
-          r = r.T();
-        }
-        $self->get(m, true, r);
-        return m;
+    const Type paren(char rr) const {
+      casadi_assert(rr==':');
+      return vec(*$self);
     }
-    const Type paren(const Sparsity& sp) const { Type m; $self->get(m, true, sp); return m;}
-    const Type paren(const Slice& rr, const Slice& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
-    const Type paren(const Slice& rr, const Matrix<int>& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
-    const Type paren(const Matrix<int>& rr, const Slice& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
-    const Type paren(const Matrix<int>& rr, const Matrix<int>& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
+    const Type paren(const Matrix<int>& rr) const {
+      Type m;
+      $self->get(m, true, rr);
+      return m;
+    }
+    const Type paren(const Sparsity& sp) const {
+      Type m;
+      $self->get(m, true, sp);
+      return m;
+    }
+    const Type paren(char rr, char cc) const {
+      Type m;
+      $self->get(m, true, char2Slice(rr), char2Slice(cc));
+      return m;
+    }
+    const Type paren(char rr, const Matrix<int>& cc) const {
+      Type m;
+      $self->get(m, true, char2Slice(rr), cc);
+      return m;
+    }
+    const Type paren(const Matrix<int>& rr, char cc) const {
+      Type m;
+      $self->get(m, true, rr, char2Slice(cc));
+      return m;
+    }
+    const Type paren(const Matrix<int>& rr, const Matrix<int>& cc) const {
+      Type m;
+      $self->get(m, true, rr, cc);
+      return m;
+    }
 
     // Set a submatrix (index-1)
-    void setparen(const Type& m, const Slice& rr) { $self->set(m, true, rr);}
-    void setparen(const Type& m, const Matrix<int>& rr) {
-        Matrix<int> r = rr;
-        if (r.isvector() && r.isdense() && (r.size1()==1 ^ $self->size1()==1)) r = r.T();
-        $self->set(m, true, r);
-    }
+    void setparen(const Type& m, char rr) { $self->set(m, true, char2Slice(rr));}
+    void setparen(const Type& m, const Matrix<int>& rr) { $self->set(m, true, rr);}
     void setparen(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
-    void setparen(const Type& m, const Slice& rr, const Slice& cc) { $self->set(m, true, rr, cc);}
-    void setparen(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
-    void setparen(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->set(m, true, rr, cc);}
+    void setparen(const Type& m, char rr, char cc) { $self->set(m, true, char2Slice(rr), char2Slice(cc));}
+    void setparen(const Type& m, char rr, const Matrix<int>& cc) { $self->set(m, true, char2Slice(rr), cc);}
+    void setparen(const Type& m, const Matrix<int>& rr, char cc) { $self->set(m, true, rr, char2Slice(cc));}
     void setparen(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
 
     // Get nonzeros (index-1)
-    const Type brace(const Slice& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
-    const Type brace(const Matrix<int>& rr) const {
-      Matrix<int> r = rr;
-      if (r.isvector() && r.isdense() && (r.size1()==1 ^ $self->size1()==1)) r = r.T();
-      Type m; $self->getNZ(m, true, r); return m;
-    }
+    const Type brace(char rr) const { Type m; $self->getNZ(m, true, char2Slice(rr)); return m;}
+    const Type brace(const Matrix<int>& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
 
     // Set nonzeros (index-1)
-    void setbrace(const Type& m, const Slice& rr) { $self->setNZ(m, true, rr);}
-    void setbrace(const Type& m, const Matrix<int>& rr) {
-      Matrix<int> r = rr;
-      if (r.isvector() && r.isdense() && (r.size1()==1 ^ $self->size1()==1)) r = r.T();
-      $self->setNZ(m, true, r);
-    }
+    void setbrace(const Type& m, char rr) { $self->setNZ(m, true, char2Slice(rr));}
+    void setbrace(const Type& m, const Matrix<int>& rr) { $self->setNZ(m, true, rr);}
 
     // 'end' function (needed for end syntax in MATLAB)
     inline int end(int i, int n) const {

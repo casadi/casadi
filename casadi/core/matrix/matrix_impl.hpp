@@ -169,8 +169,11 @@ namespace casadi {
     std::vector<int> mapping;
     Sparsity sp = sparsity().sub(rr.data(), rr.sparsity(), mapping, ind1);
 
+    // If indexed matrix was a row/column vector, make sure that the result is too
+    bool tr = (iscolumn() && rr.isrow()) || (isrow() && rr.iscolumn());
+
     // Copy nonzeros
-    m = Matrix<DataType>::zeros(sp);
+    m = Matrix<DataType>::zeros(tr ? sp.T() : sp);
     for (int k=0; k<mapping.size(); ++k) m.at(k) = at(mapping[k]);
   }
 
@@ -425,8 +428,11 @@ namespace casadi {
                    << ", which is outside the range [" << -sz+ind1 << ","<< sz+ind1 <<  ").");
     }
 
+    // If indexed matrix was a row/column vector, make sure that the result is too
+    bool tr = (iscolumn() && kk.isrow()) || (isrow() && kk.iscolumn());
+
     // Copy nonzeros
-    m = zeros(kk.sparsity());
+    m = zeros(tr ? kk.sparsity().T() : kk.sparsity());
     for (int el=0; el<k.size(); ++el) {
       casadi_assert_message(!(ind1 && k[el]<=0), "Matlab is 1-based, but requested index " <<
                                                 k[el] <<  ". Note that negative slices are" <<
