@@ -163,7 +163,11 @@ endif()
 ############################################################
 
 if(WITH_SELFCONTAINED)
-set(CMAKE_INSTALL_RPATH "$ORIGIN")
+  if(APPLE)
+    set(CMAKE_INSTALL_RPATH "@loader_path/")
+  else()
+    set(CMAKE_INSTALL_RPATH "$ORIGIN")
+  endif()
 else()
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH  FALSE)
