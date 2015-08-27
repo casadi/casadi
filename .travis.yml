@@ -128,8 +128,6 @@ matrix:
         - popd
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         - pushd test && make unittests_py examples_code_py && popd
-        - echo "// CasADi core\n#include <casadi/casadi.hpp>\nusing namespace std;\nint main(){\nreturn 0;}" > test.cpp
-        - g++ test.cpp
     - compiler: gcc
       os: linux
       env: TESTMODE=quick
