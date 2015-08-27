@@ -24,6 +24,11 @@ if(MINGW)
   message("${CLANG_LIBRARIES}")
 endif()
 
+if(APPLE)
+  find_library(CLANG_EXTRA_LIBS ncurses)
+  set(CLANG_LIBRARIES "${CLANG_LIBRARIES}" ${CLANG_EXTRA_LIBS})
+endif()
+
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCLANG_ENABLE_OBJC_REWRITER -DGTEST_HAS_RTTI=0 -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -fno-common -fno-strict-aliasing")
 
