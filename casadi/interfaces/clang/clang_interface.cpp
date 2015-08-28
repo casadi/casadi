@@ -69,8 +69,14 @@ namespace casadi {
 
   ClangJitFunctionInterface::~ClangJitFunctionInterface() {
     if (isInit()) {
-      if (TheExecutionEngine) delete TheExecutionEngine; TheExecutionEngine=0;
-      if (Context) delete Context;Context=0;
+      if (TheExecutionEngine) {
+        delete TheExecutionEngine;
+        TheExecutionEngine=0;
+      }
+      if (Context) {
+        delete Context;
+        Context=0;
+      }
     }
     //llvm::llvm_shutdown();
 
