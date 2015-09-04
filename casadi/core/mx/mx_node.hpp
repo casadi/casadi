@@ -315,6 +315,12 @@ namespace casadi {
     /// Create a horizontal split node
     virtual std::vector<MX> getHorzsplit(const std::vector<int>& output_offset) const;
 
+    /// Create a repeated matrix node
+    virtual MX getRepmat(int m, int n) const;
+
+    /// Create a repeated sum node
+    virtual MX getRepsum(int m, int n) const;
+
     /// Create a vertical concatenation node (vectors only)
     virtual MX getVertcat(const std::vector<MX>& x) const;
 

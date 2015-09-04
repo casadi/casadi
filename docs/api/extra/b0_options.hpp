@@ -14,6 +14,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -48,6 +49,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -57,6 +59,44 @@
 </table>
 */
 /// \endcond
+/// \cond INTERNAL
+/** \class casadi::ClangJitFunctionInterface
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>flags</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Compile flags for the JIT compiler. Default: -O3.</td><td>casadi::ClangJitFunctionInterface</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>include_path</td><td>OT_STRING</td><td>""</td><td>Include paths for the JIT compiler. The include directory shipped with CasADi will be automatically appended.</td><td>casadi::ClangJitFunctionInterface</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_JitFunction_clang
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td>flags</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Compile flags for the JIT compiler. Default: -O3.</td></tr>
+<tr><td>include_path</td><td>OT_STRING</td><td>""</td><td>Include paths for the JIT compiler. The include directory shipped with CasADi will be automatically appended.</td></tr>
+</table>
+*/
 /// \cond INTERNAL
 /** \class casadi::CleInternal
 \n
@@ -75,6 +115,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -102,6 +143,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -133,6 +175,7 @@
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>3</td><td>Order of the interpolating polynomials</td><td>casadi::CollocationIntegrator</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
@@ -178,6 +221,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -216,6 +260,7 @@
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>integrator</td><td>OT_STRING</td><td>GenericType()</td><td>An integrator creator function</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>integrator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>casadi::ControlSimulatorInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>minor_grid</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>The local grid used on each major interval, with time normalized to 1. By default, option 'nf' is used to construct a linearly spaced grid.</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
@@ -247,6 +292,7 @@
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>integrator</td><td>OT_STRING</td><td>GenericType()</td><td>An integrator creator function</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>integrator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>casadi::ControlSimulatorInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>minor_grid</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>The local grid used on each major interval, with time normalized to 1. By default, option 'nf' is used to construct a linearly spaced grid.</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
@@ -279,6 +325,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -325,6 +372,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -358,6 +406,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -382,6 +431,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -423,6 +473,7 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>(gmres|bcgstab|tfqmr)</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>"bdf"</td><td>Integrator scheme (bdf|adams)</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
@@ -528,6 +579,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -555,6 +607,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -582,6 +635,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -618,6 +672,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -655,6 +710,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -683,6 +739,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -711,6 +768,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -757,6 +815,7 @@
 <tr><td>infinity</td><td>OT_REAL</td><td>1e30</td><td>Treat numbers higher than this as infinity</td><td>casadi::DsdpInterface</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>maxIter</td><td>OT_INTEGER</td><td>500</td><td>Maximum number of iterations</td><td>casadi::DsdpInterface</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
@@ -815,6 +874,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>maxit</td><td>OT_INTEGER</td><td>MAXIT</td><td>Maximum number of iterations</td><td>casadi::EcosInterface</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
@@ -866,6 +926,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -890,6 +951,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -918,6 +980,7 @@
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iter</td><td>OT_INTEGER</td><td>100</td><td>Number of Smith iterations</td><td>casadi::FixedSmithDleInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -957,6 +1020,7 @@
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iter</td><td>OT_INTEGER</td><td>100</td><td>Number of Smith iterations</td><td>casadi::FixedSmithLrDleInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -994,6 +1058,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
@@ -1023,6 +1088,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -1047,6 +1113,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -1071,6 +1138,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -1097,6 +1165,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -1122,6 +1191,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -1170,6 +1240,7 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>(gmres|bcgstab|tfqmr)</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
@@ -1284,6 +1355,7 @@
 <tr><td>implicit_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
@@ -1316,6 +1388,7 @@
 <tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for solving the linearized problem (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
@@ -1347,6 +1420,7 @@
 <tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for solving the linearized problem (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
@@ -1377,6 +1451,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -1406,6 +1481,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -1507,8 +1583,11 @@
 <tr><td>gamma_tilde</td><td>OT_REAL</td><td>4.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>exact</td><td>Indicates what Hessian information is to be used. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>hessian_approximation_space</td><td>OT_STRING</td><td>nonlinear-variables</td><td>Indicates in which subspace the Hessian information is to be approximated. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>hessian_constant</td><td>OT_STRING</td><td>no</td><td>Indicates whether the problem is a quadratic problem (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1522,8 +1601,11 @@
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>jac_c_constant</td><td>OT_STRING</td><td>no</td><td>Indicates whether all equality constraints are linear (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>jac_d_constant</td><td>OT_STRING</td><td>no</td><td>Indicates whether all inequality constraints are linear (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jacobian_approximation</td><td>OT_STRING</td><td>exact</td><td>Specifies technique to compute constraint Jacobian (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>jacobian_regularization_exponent</td><td>OT_REAL</td><td>0.25</td><td>Exponent for mu in the regularization for rank-deficient constraint Jacobians. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>jacobian_regularization_value</td><td>OT_REAL</td><td>1e-08</td><td>Size of the regularization for rank-deficient constraint Jacobians. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -2001,6 +2083,106 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::JitFunctionInternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup general_JitFunction
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::KernelSum2DInternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \class casadi::KernelSum2D
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::KinsolInterface
 \n
 \par
@@ -2024,6 +2206,7 @@
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>gmres|bcgstab|tfqmr</td><td>casadi::KinsolInterface</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for solving the linearized problem (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
@@ -2113,16 +2296,22 @@
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>casadi::FunctionInternal<br />casadi::KnitroInterface</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2187,6 +2376,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2222,6 +2412,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2259,6 +2450,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2298,6 +2490,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2333,6 +2526,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2357,6 +2551,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2381,6 +2576,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2405,6 +2601,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2429,6 +2626,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2464,6 +2662,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2491,6 +2690,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2518,6 +2718,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2555,6 +2756,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2583,6 +2785,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2611,6 +2814,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2649,6 +2853,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2685,6 +2890,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -2709,9 +2915,112 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::MapAccumInternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \class casadi::MapAccum
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::MapInternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp)</td><td>casadi::MapInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \class casadi::Map
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp)</td><td>casadi::MapInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3038,6 +3347,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>ni</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Provide the size of each SOC constraint. Must sum up to N.</td><td>casadi::SocpSolverInternal</td></tr>
@@ -3382,6 +3692,7 @@
 <tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for solving the linearized problem (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
@@ -3426,16 +3737,22 @@
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3462,16 +3779,22 @@
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3498,6 +3821,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3523,6 +3847,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3556,6 +3881,7 @@
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>3</td><td>Order of the interpolating polynomials</td><td>casadi::OldCollocationIntegrator</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::OldCollocationIntegrator</td></tr>
@@ -3606,6 +3932,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>mutol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setMuTol to OOQP</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
@@ -3669,6 +3996,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::PsdIndefDpleInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::PsdIndefDpleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
@@ -3709,6 +4037,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3733,6 +4062,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3757,6 +4087,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3790,6 +4121,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3814,6 +4146,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3841,6 +4174,7 @@
 <tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"csparse"</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_function</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function object for solving the linearized problem (autogenerated by default)</td><td>casadi::ImplicitFunctionInternal</td></tr>
@@ -3878,6 +4212,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3911,6 +4246,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3968,6 +4304,7 @@
 <tr><td>initialStatusBounds</td><td>OT_STRING</td><td>lower</td><td>Initial status of bounds at first iteration.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>maxDualJump</td><td>OT_REAL</td><td>100000000.0</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxPrimalJump</td><td>OT_REAL</td><td>100000000.0</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
@@ -4041,6 +4378,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
@@ -4079,6 +4417,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>just_in_time_opencl</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation using OpenCL (experimental)</td><td>casadi::SXFunctionInternal</td></tr>
 <tr><td>just_in_time_sparsity</td><td>OT_BOOLEAN</td><td>false</td><td>Propagate sparsity patterns using just-in-time compilation to a CPU or GPU using OpenCL</td><td>casadi::SXFunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
@@ -4105,6 +4444,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>just_in_time_opencl</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation using OpenCL (experimental)</td><td>casadi::SXFunctionInternal</td></tr>
 <tr><td>just_in_time_sparsity</td><td>OT_BOOLEAN</td><td>false</td><td>Propagate sparsity patterns using just-in-time compilation to a CPU or GPU using OpenCL</td><td>casadi::SXFunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
@@ -4136,8 +4476,11 @@
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>"exact"</td><td>gauss-newton|exact</td><td>casadi::Scpgen</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4145,8 +4488,11 @@
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>lbfgs_memory</td><td>OT_INTEGER</td><td>10</td><td>Size of L-BFGS memory.</td><td>casadi::Scpgen</td></tr>
 <tr><td>max_iter</td><td>OT_INTEGER</td><td>50</td><td>Maximum number of SQP iterations</td><td>casadi::Scpgen</td></tr>
 <tr><td>max_iter_ls</td><td>OT_INTEGER</td><td>1</td><td>Maximum number of linesearch iterations</td><td>casadi::Scpgen</td></tr>
@@ -4222,6 +4568,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4249,6 +4596,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4274,6 +4622,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4300,6 +4649,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4326,6 +4676,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4362,6 +4713,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>nlp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The NLP solver to be used by the Homotopy solver</td><td>casadi::SimpleHomotopyNlp</td></tr>
@@ -4403,6 +4755,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::SimpleIndefCleInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::SimpleIndefCleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
@@ -4444,6 +4797,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::SimpleIndefDleInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::SimpleIndefDleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
@@ -4486,6 +4840,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::SimpleIndefDpleInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::SimpleIndefDpleInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
@@ -4524,6 +4879,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4549,6 +4905,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(initial|step)</td><td>casadi::FunctionInternal<br />casadi::SimulatorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4573,6 +4930,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(initial|step)</td><td>casadi::FunctionInternal<br />casadi::SimulatorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4657,16 +5015,22 @@
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_nlp|setup_nlp)</td><td>casadi::FunctionInternal<br />casadi::SnoptInterface</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4771,6 +5135,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>ni</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Provide the size of each SOC constraint. Must sum up to N.</td><td>casadi::SocpSolverInternal</td></tr>
@@ -4798,6 +5163,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>ni</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Provide the size of each SOC constraint. Must sum up to N.</td><td>casadi::SocpSolverInternal</td></tr>
@@ -4825,6 +5191,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>ni</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Provide the size of each SOC constraint. Must sum up to N.</td><td>casadi::SocpSolverInternal</td></tr>
@@ -4860,6 +5227,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4896,8 +5264,11 @@
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>"exact"</td><td>limited-memory|exact</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4905,8 +5276,11 @@
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>lbfgs_memory</td><td>OT_INTEGER</td><td>10</td><td>Size of L-BFGS memory.</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>max_iter</td><td>OT_INTEGER</td><td>50</td><td>Maximum number of SQP iterations</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>max_iter_ls</td><td>OT_INTEGER</td><td>3</td><td>Maximum number of linesearch iterations</td><td>casadi::Sqpmethod</td></tr>
@@ -4968,6 +5342,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4992,6 +5367,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -5016,6 +5392,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -5053,6 +5430,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -5097,8 +5475,11 @@
 <tr><td>gamma3</td><td>OT_REAL</td><td>1.</td><td>Trust region decrease parameter</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>"exact"</td><td>limited-memory|exact</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -5106,8 +5487,11 @@
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>lbfgs_memory</td><td>OT_INTEGER</td><td>10</td><td>Size of L-BFGS memory.</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>max_iter</td><td>OT_INTEGER</td><td>100</td><td>Maximum number of SQP iterations</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>max_iter_ls</td><td>OT_INTEGER</td><td>20</td><td>Maximum number of linesearch iterations</td><td>casadi::StabilizedSqp</td></tr>
@@ -5202,6 +5586,7 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>(gmres|bcgstab|tfqmr)</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
@@ -5254,6 +5639,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -5278,6 +5664,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -5304,6 +5691,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -5512,8 +5900,11 @@
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -5521,8 +5912,11 @@
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />Monitor functions (eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>casadi::FunctionInternal<br />casadi::WorhpInterface</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -5770,6 +6164,7 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>

@@ -187,3 +187,38 @@ res_vec = nlp({1.1, 3.3});
 res_struct = nlp(struct('x',1.1,'p',3.3));
 assert(iszero(res_vec{1}-res_struct.f))
 assert(iszero(res_vec{2}-res_struct.g))
+
+u = SX.sym('u',1,5);
+
+assert(all(size(u(1:2))==[1 2]));
+assert(all(size(u([1:2]'))==[1 2]));
+
+u = SX.sym('u',5,1);
+
+assert(all(size(u(1:2))==[2 1]));
+assert(all(size(u([1:2]'))==[2 1]));
+
+u = SX.sym('u',4,5);
+
+assert(all(size(u(:,2))==[4 1]));
+assert(all(size(u(:,1:2))==[4 2]));
+
+assert(all(size(u(2,:))==[1 5]));
+assert(all(size(u(1:2,:))==[2 5]));
+
+assert(all(size(u(1:2,1:3))==[2 3]));
+
+
+if JitFunction.hasPlugin('clang')
+  x = MX.sym('x');
+  f = MXFunction('f',{x},{x^2});
+  F = JitFunction('clang',f);
+
+  out = F({5});
+  assert(full(out{1})==25)
+end
+
+
+a = DMatrix.ones(Sparsity.upper(5));
+i = full(full(sparse(a))-a);
+assert(any(any(i))==0);

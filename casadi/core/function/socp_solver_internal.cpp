@@ -123,6 +123,10 @@ namespace casadi {
 
     // Dual computation
 
+    // Pre-allocate memory for transpose of A matrix in primal problem definition
+    primal_A_T_ = DMatrix::zeros(A).T();
+    primal_A_T_temp_int_ = std::vector<int>(primal_A_T_.data().size());
+
     // Pre-allocate memory for vector indices of relevant bounds
     primal_idx_lba_.reserve(nc_);
     primal_idx_uba_.reserve(nc_);
@@ -287,9 +291,10 @@ namespace casadi {
     dual_A_row_.resize(primal_E.nnz()+primal_G.nnz());
     dual_A_colind_.resize(m_+N_+1);
 
-    // TODO(jgillis): replace T()-call by casadi_trans()
-    DMatrix primal_A_T = primal_A.T();
-    const Sparsity& primal_A_T_sparse = primal_A_T.sparsity();
+    // Call to efficient transpose routine (casadi_trans)
+    casadi_trans(primal_A.ptr(), primal_A.sparsity(), primal_A_T_.ptr(),
+      primal_A_T_.sparsity(), getPtr(primal_A_T_temp_int_));
+    const Sparsity& primal_A_T_sparse = primal_A_T_.sparsity();
     start_idx = 0;
     end_idx = primal_E.nnz();
     std::copy(primal_E.data().begin(), primal_E.data().end(), dual_A_data_.begin()+start_idx);
@@ -304,7 +309,7 @@ namespace casadi {
       begin_colind = primal_A_T_sparse.colind(i);
       end_colind = primal_A_T_sparse.colind(i+1);
       for (int ii=begin_colind; ii<end_colind;++ii) {
-        dual_A_data_.push_back(-primal_A_T.data()[ii]);
+        dual_A_data_.push_back(-primal_A_T_.data()[ii]);
         dual_A_row_.push_back(primal_A_T_sparse.getRow()[ii]);
       }
       dual_A_colind_.push_back(dual_A_colind_.back()+end_colind-begin_colind);
@@ -314,7 +319,7 @@ namespace casadi {
       begin_colind = primal_A_T_sparse.colind(i);
       end_colind = primal_A_T_sparse.colind(i+1);
       for (int ii=begin_colind; ii<end_colind;++ii) {
-        dual_A_data_.push_back(primal_A_T.data()[ii]);
+        dual_A_data_.push_back(primal_A_T_.data()[ii]);
         dual_A_row_.push_back(primal_A_T_sparse.getRow()[ii]);
       }
       dual_A_colind_.push_back(dual_A_colind_.back()+end_colind-begin_colind);
@@ -335,7 +340,7 @@ namespace casadi {
     // b-vector
     std::copy(primal_C.data().begin(), primal_C.data().end(), dual_b_.begin());
 
-    // some properties of dual problem
+    // Some properties of dual problem (not static!)
     dual_n_ = m_ + N_ + primal_idx_lba_.size() + primal_idx_uba_.size() +
                 primal_idx_lbx_.size() + primal_idx_ubx_.size();
     dual_nc_ = n_;

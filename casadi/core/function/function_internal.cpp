@@ -25,7 +25,6 @@
 
 #include "function_internal.hpp"
 #include "../mx/casadi_call.hpp"
-#include "../mx/casadi_map.hpp"
 #include <typeinfo>
 #include "../std_vector_tools.hpp"
 #include "mx_function.hpp"
@@ -60,8 +59,15 @@ namespace casadi {
               "Weighting factor for sparsity pattern calculation calculation."
               "Overrides default behavior. Set to 0 and 1 to force forward and "
               "reverse mode respectively. Cf. option \"ad_weight\".");
-    //addOption("ad_mode",                  OT_STRING,              "automatic",
-    //          "Deprecated option, use \"ad_weight\" instead. Ignored.");
+    addOption("jac_penalty",             OT_REAL,                 2,
+              "When requested for a number of forward/reverse directions,   "
+              "it may be cheaper to compute first the full jacobian and then "
+              "multiply with seeds, rather than obtain the requested directions "
+              "in a straightforward manner. "
+              "Casadi uses a heuristic to decide which is cheaper. "
+              "A high value of 'jac_penalty' makes it less likely for the heurstic "
+              "to chose the full Jacobian strategy. "
+              "The special value -1 indicates never to use the full Jacobian strategy");
     addOption("user_data",                OT_VOIDPTR,             GenericType(),
               "A user-defined field that can be used to identify "
               "the function or pass additional information");
@@ -772,6 +778,13 @@ namespace casadi {
 
       // Construct fine sparsity pattern
       r = Sparsity::triplet(fine.size()-1, fine.size()-1, jrow, jcol);
+
+      // There may be false positives here that are not present
+      // in the reverse mode that precedes it.
+      // This can lead to an assymetrical result
+      //  cf. #1522
+      r=r*r.T();
+
       coarse = fine;
       hasrun = true;
     }
@@ -1083,18 +1096,22 @@ namespace casadi {
   Sparsity FunctionInternal::getJacSparsity(int iind, int oind, bool symmetric) {
     // Check if we are able to propagate dependencies through the function
     if (spCanEvaluate(true) || spCanEvaluate(false)) {
-
+      Sparsity sp;
       if (input(iind).nnz()>3*bvec_size && output(oind).nnz()>3*bvec_size) {
         if (symmetric) {
-          return getJacSparsityHierarchicalSymm(iind, oind);
+          sp = getJacSparsityHierarchicalSymm(iind, oind);
         } else {
-          return getJacSparsityHierarchical(iind, oind);
+          sp = getJacSparsityHierarchical(iind, oind);
         }
       } else {
-        return getJacSparsityPlain(iind, oind);
+        sp = getJacSparsityPlain(iind, oind);
       }
-
-
+      // There may be false positives here that are not present
+      // in the reverse mode that precedes it.
+      // This can lead to an assymetrical result
+      //  cf. #1522
+      if (symmetric) sp=sp*sp.T();
+      return sp;
     } else {
       // Dense sparsity by default
       return Sparsity::dense(output(oind).nnz(), input(iind).nnz());
@@ -1419,10 +1436,44 @@ namespace casadi {
         if (!fwd && output(oind).isempty())
           continue;
 
+
+        // Save the seeds/sens (#1532)
+        // This code should stay in place until refactored away
+        std::vector<double> store_in(nnzIn());
+        std::vector<double> store_out(nnzOut());
+
+        int offset = 0;
+        for (int i=0;i<nIn();++i) {
+          std::copy(input(i).data().begin(), input(i).data().begin()+input(i).nnz(),
+            store_in.begin()+offset);
+          offset+=input(i).nnz();
+        }
+        offset = 0;
+        for (int i=0;i<nOut();++i) {
+          std::copy(output(i).data().begin(), output(i).data().begin()+output(i).nnz(),
+            store_out.begin()+offset);
+          offset+=output(i).nnz();
+        }
+
+
         // Get the sparsity of the Jacobian block
         Sparsity sp = jacSparsity(iind, oind, true, false);
         if (sp.isNull() || sp.nnz() == 0)
           continue; // Skip if zero
+
+        // recover the seeds/sens
+        offset = 0;
+        for (int i=0;i<nIn();++i) {
+          std::copy(store_in.begin()+offset, store_in.begin()+offset+input(i).nnz(),
+            input(i).data().begin());
+          offset+=input(i).nnz();
+        }
+        offset = 0;
+        for (int i=0;i<nOut();++i) {
+          std::copy(store_out.begin()+offset, store_out.begin()+offset+output(i).nnz(),
+            output(i).data().begin());
+          offset+=output(i).nnz();
+        }
 
         const int d1 = sp.size2();
         //const int d2 = sp.size1();
@@ -2311,12 +2362,6 @@ namespace casadi {
     return f_gen;
   }
 
-  std::vector<std::vector<MX> >
-  FunctionInternal::createMap(const std::vector<std::vector<MX> > &arg,
-                              const std::string& parallelization) {
-    return Map::create(shared_from_this<Function>(), arg, parallelization);
-  }
-
   void FunctionInternal::spFwdSwitch(const bvec_t** arg, bvec_t** res,
                                      int* iw, bvec_t* w) {
     // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
@@ -2576,8 +2621,13 @@ namespace casadi {
   std::string FunctionInternal::getSanitizedName() const {
       casadi_assert(hasSetOption("name"));
       string name = getOption("name");
-      std::replace_if(name.begin(), name.end(), isBadChar, '_');
-      return name;
+      return sanitizeName(name);
+  }
+
+  std::string FunctionInternal::sanitizeName(const std::string &name) {
+    string sname = name;
+    std::replace_if(sname.begin(), sname.end(), isBadChar, '_');
+    return sname;
   }
 
   bool FunctionInternal::hasFullJacobian() const {
@@ -2592,7 +2642,9 @@ namespace casadi {
     if (numDerForward()==0) return true;
 
     // Jacobian calculation penalty factor
-    const int jac_penalty = 2;
+    const double jac_penalty = getOption("jac_penalty");
+
+    if (jac_penalty==-1) return false;
 
     // Heuristic 1: Jac calculated via forward mode likely cheaper
     if (jac_penalty*nnzIn()<nfwd) return true;
@@ -2609,7 +2661,9 @@ namespace casadi {
     if (numDerReverse()==0) return true;
 
     // Jacobian calculation penalty factor
-    const int jac_penalty = 2;
+    const double jac_penalty = getOption("jac_penalty");
+
+    if (jac_penalty==-1) return false;
 
     // Heuristic 1: Jac calculated via reverse mode likely cheaper
     if (jac_penalty*nnzOut()<nadj) return true;

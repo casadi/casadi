@@ -234,22 +234,23 @@ namespace casadi {
     int ncol_z = sp_z[1];
     const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
 
+    int cc,kk, kk1;
     /* Loop over the columns of y and z */
-    for (int cc=0; cc<ncol_y; ++cc) {
+    for (cc=0; cc<ncol_y; ++cc) {
       /* Get the dense column of z */
-      for (int kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
         w[row_z[kk]] = z[kk];
       }
       /* Loop over the nonzeros of y */
-      for (int kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
+      for (kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
         int rr = row_y[kk];
         /* Loop over corresponding columns of x */
-        for (int kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
+        for (kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
           w[row_x[kk1]] += x[kk1]*y[kk];
         }
       }
       /* Get the sparse column of z */
-      for (int kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
         z[kk] = w[row_z[kk]];
       }
     }
@@ -265,17 +266,18 @@ namespace casadi {
     int ncol_z = sp_z[1];
     const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
 
+    int cc,kk, kk1;
     /* Loop over the columns of y and z */
-    for (int cc=0; cc<ncol_z; ++cc) {
+    for (cc=0; cc<ncol_z; ++cc) {
       /* Get the dense column of y */
-      for (int kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
+      for (kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
         w[row_y[kk]] = y[kk];
       }
       /* Loop over the nonzeros of z */
-      for (int kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
         int rr = row_z[kk];
         /* Loop over corresponding columns of x */
-        for (int kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
+        for (kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
           z[kk] += x[kk1] * w[row_x[kk1]];
         }
       }
@@ -288,10 +290,11 @@ namespace casadi {
     int ncol_x = sp_x[1];
     const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
 
+    int i, el;
     /* loop over the columns of x */
-    for (int i=0; i<ncol_x; ++i) {
+    for (i=0; i<ncol_x; ++i) {
       /* loop over the non-zeros of x */
-      for (int el=colind_x[i]; el<colind_x[i+1]; ++el) {
+      for (el=colind_x[i]; el<colind_x[i+1]; ++el) {
         z[row_x[el]] += x[el] * y[i];
       }
     }
@@ -303,10 +306,11 @@ namespace casadi {
     int ncol_x = sp_x[1];
     const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
 
+    int i, el;
     /* loop over the columns of x */
-    for (int i=0; i<ncol_x; ++i) {
+    for (i=0; i<ncol_x; ++i) {
       /* loop over the non-zeros of x */
-      for (int el=colind_x[i]; el<colind_x[i+1]; ++el) {
+      for (el=colind_x[i]; el<colind_x[i+1]; ++el) {
         z[i] += x[el] * y[row_x[el]];
       }
     }
@@ -350,15 +354,16 @@ namespace casadi {
     /* method that uses O(n) temp storage */
     int *mask = iwork + ncol_y+1;
 
+    int i,jj,kk;
     // Pass 1
-    for (int i=0; i<nrow_x; ++i) mask[i] = -1;
+    for (i=0; i<nrow_x; ++i) mask[i] = -1;
     iwork[0] = 0;
     int nnz = 0;
-    for (int i=0; i<ncol_y; ++i) {
+    for (i=0; i<ncol_y; ++i) {
       int row_nnz = 0;
-      for (int jj=colind_y[i]; jj < colind_y[i+1]; jj++) {
+      for (jj=colind_y[i]; jj < colind_y[i+1]; jj++) {
         int j = row_y[jj];
-        for (int kk=colind_x[j]; kk < colind_x[j+1]; kk++) {
+        for (kk=colind_x[j]; kk < colind_x[j+1]; kk++) {
           int k = row_x[kk];
           if (mask[k] != i) {
             mask[k] = i;
@@ -373,22 +378,22 @@ namespace casadi {
 
     // Pass 2
     int *next = iwork + ncol_y+1;
-    for (int i=0; i<nrow_x; ++i) next[i] = -1;
+    for (i=0; i<nrow_x; ++i) next[i] = -1;
     real_t* sums = dwork;
-    for (int i=0; i<nrow_x; ++i) sums[i] = 0;
+    for (i=0; i<nrow_x; ++i) sums[i] = 0;
     nnz = 0;
     iwork[0] = 0;
-    for (int i=0; i<ncol_y; ++i) {
+    for (i=0; i<ncol_y; ++i) {
       int head   = -2;
       int length =  0;
       int jj_start = colind_y[i];
       int jj_end   = colind_y[i+1];
-      for (int jj=jj_start; jj<jj_end; ++jj) {
+      for (jj=jj_start; jj<jj_end; ++jj) {
         int j = row_y[jj];
         real_t v = y[jj];
         int kk_start = colind_x[j];
         int kk_end   = colind_x[j+1];
-        for (int kk = kk_start; kk<kk_end; ++kk) {
+        for (kk = kk_start; kk<kk_end; ++kk) {
           int k = row_x[kk];
           sums[k] += v*x[kk];
           if (next[k] == -1) {
@@ -398,7 +403,7 @@ namespace casadi {
           }
         }
       }
-      for (int jj=0; jj<length; ++jj) {
+      for (jj=0; jj<length; ++jj) {
         if (!iszero(sums[head])) {
           res = fmax(res, fabs(sums[head]));
           nnz++;
@@ -423,10 +428,11 @@ namespace casadi {
     // Return value
     real_t ret=0;
 
+    int cc, el;
     // Loop over the columns of A
-    for (int cc=0; cc<ncol_A; ++cc) {
+    for (cc=0; cc<ncol_A; ++cc) {
       // Loop over the nonzeros of A
-      for (int el=colind_A[cc]; el<colind_A[cc+1]; ++el) {
+      for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {
         // Get row
         int rr = row_A[el];
 

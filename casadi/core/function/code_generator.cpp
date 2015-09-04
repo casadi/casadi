@@ -109,13 +109,15 @@ namespace casadi {
     // File(s) being generated, header is optional
     vector<ofstream> s(this->with_header ? 2 : 1);
 
+    std::string sname = Function::sanitizeName(name);
+
     for (int i=0; i<s.size(); ++i) {
       // Create file(s)
       string fname;
       if (this->cpp) {
-        fname = name + (i==0 ? ".cpp" : ".hpp");
+        fname = sname + (i==0 ? ".cpp" : ".hpp");
       } else {
-        fname = name + (i==0 ? ".c" : ".h");
+        fname = sname + (i==0 ? ".c" : ".h");
       }
       s[i].open(fname.c_str());
 
@@ -136,7 +138,7 @@ namespace casadi {
          << "  #define _NAMESPACE_CONCAT(NS, ID) NS ## ID" << endl
          << "  #define CASADI_PREFIX(ID) NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)" << endl
          << "#else /* CODEGEN_PREFIX */" << endl
-         << "  #define CASADI_PREFIX(ID) " << name << "_ ## ID" << endl
+         << "  #define CASADI_PREFIX(ID) " << sname << "_ ## ID" << endl
          << "#endif /* CODEGEN_PREFIX */" << endl << endl;
 
     s[0] << this->includes.str();
@@ -273,7 +275,7 @@ namespace casadi {
     if (n<0 || sz==0) {
       return "0";
     } else if (sz==1 && !this->codegen_scalars) {
-      return "&w" + to_string(n);
+      return "(&w" + to_string(n) + ")";
     } else {
       return "w" + to_string(n);
     }
@@ -697,7 +699,7 @@ namespace casadi {
     addAuxiliary(CodeGenerator::AUX_PROJECT);
     stringstream s;
     s << "  project(" << arg << ", " << sparsity(sp_arg) << ", " << res << ", "
-      << sparsity(sp_res) << w << ");";
+      << sparsity(sp_res) << ", " << w << ");";
     return s.str();
   }
 

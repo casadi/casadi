@@ -1486,7 +1486,7 @@ HAVE_DOT               = YES
 # explicitly to a value larger than 0 to get control over the balance 
 # between CPU load and processing speed.
 
-DOT_NUM_THREADS        = 0
+DOT_NUM_THREADS        = 4
 
 # By default doxygen will write a font called FreeSans.ttf to the output 
 # directory and reference it in all dot files that doxygen generates. This 

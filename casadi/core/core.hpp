@@ -46,6 +46,7 @@
 #include "function/code_generator.hpp"
 #include "function/sx_function.hpp"
 #include "function/mx_function.hpp"
+#include "function/jit_function.hpp"
 #include "function/external_function.hpp"
 #include "function/switch.hpp"
 #include "function/linear_solver.hpp"
@@ -70,6 +71,9 @@
 #include "function/dple_solver.hpp"
 #include "function/cle_solver.hpp"
 #include "function/dle_solver.hpp"
+#include "function/map.hpp"
+#include "function/mapaccum.hpp"
+#include "function/kernel_sum_2d.hpp"
 
 // Misc
 #include "misc/integration_tools.hpp"

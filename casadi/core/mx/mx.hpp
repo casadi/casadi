@@ -457,6 +457,7 @@ namespace casadi {
     MX zz_reshape(const Sparsity& sp) const;
     MX zz_vecNZ() const;
     MX zz_kron(const MX& b) const;
+    MX zz_repmat(int n, int m=1) const;
     ///@}
 
     ///@{
@@ -481,6 +482,7 @@ namespace casadi {
     MX zz_inv() const;
     std::vector<MX> zz_symvar() const;
     MX zz_nullspace() const;
+    MX zz_repsum(int n, int m=1) const;
     ///@}
 
     ///@{

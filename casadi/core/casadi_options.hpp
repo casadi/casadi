@@ -81,6 +81,8 @@ namespace casadi {
 
       static std::string casadipath;
 
+      static std::string jitincludepath;
+
 #endif //SWIG
       // Setter and getter for catch_errors_swig
       static void setCatchErrorsSwig(bool flag) { catch_errors_swig = flag; }
@@ -110,6 +112,10 @@ namespace casadi {
 
       static void setCasadiPath(const std::string & path) { casadipath = path; }
       static std::string getCasadiPath() { return casadipath; }
+
+      static void setJitIncludePath(const std::string & path) { jitincludepath = path; }
+      static std::string getJitIncludePath() { return jitincludepath; }
+
   };
 
 } // namespace casadi

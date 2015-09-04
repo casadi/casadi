@@ -143,6 +143,10 @@ namespace casadi {
     /// Number of linear constraints in dual problem
     int dual_nc_;
 
+    /// Transpose of A matrix in primal problem definition (fixed sparsity pattern)
+    DMatrix           primal_A_T_;
+    std::vector<int>  primal_A_T_temp_int_;
+
     /** Indices of lower bounded linear inequality constraints (LBA != -inf),
     used to set up dual SOCP variables */
     std::vector<int>  primal_idx_lba_;

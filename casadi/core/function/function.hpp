@@ -408,6 +408,72 @@ namespace casadi {
     std::vector<std::vector<MX> > map(const std::vector<std::vector<MX> > &arg,
                                       const std::string& parallelization="serial");
 
+    /** \brief  Evaluate symbolically in parallel (matrix graph)
+        \param parallelization Type of parallelization used: expand|serial|openmp
+    */
+    std::vector<MX> map(const std::vector<MX > &arg,
+                                      const std::string& parallelization="serial");
+
+    /** \brief  Evaluate symbolically in parallel and sum (matrix graph)
+        \param parallelization Type of parallelization used: expand|serial|openmp
+    */
+    std::vector<MX> mapsum(const std::vector<MX > &arg,
+                                      const std::string& parallelization="serial");
+
+    /** \brief  Create a mapaccumulated version of this function
+
+        Suppose the function has a signature of:
+        \verbatim
+           f: (x, u) -> (x_next , y )
+        \endverbatim
+
+        The the mapaccumulated version has the signature:
+        \verbatim
+           F: (x0, U) -> (X , Y )
+
+            with
+                U: horzcat([u0, u1, ..., u_(N-1)])
+                X: horzcat([x1, x2, ..., x_N])
+                Y: horzcat([y0, y1, ..., y_(N-1)])
+
+            and
+                x1, y0 <- f(x0, u0)
+                x2, y1 <- f(x1, u1)
+                ...
+                x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+        \endverbatim
+
+
+    */
+    Function mapaccum(const std::string& name, int N, const Dict & options = Dict()) const;
+
+
+    /** \brief  Create a mapped version of this function
+
+        Suppose the function has a signature of:
+        \verbatim
+           f: (a, p) -> ( s )
+        \endverbatim
+
+        The the mapaccumulated version has the signature:
+        \verbatim
+           F: (A, P) -> (S )
+
+            with
+                a: horzcat([a0, a1, ..., a_(N-1)])
+                p: horzcat([p0, p1, ..., p_(N-1)])
+                s: horzcat([s0, s1, ..., s_(N-1)])
+            and
+                s0 <- f(a0, p0)
+                s1 <- f(a1, p1)
+                ...
+                s_(N-1) <- f(a_(N-1), p_(N-1))
+        \endverbatim
+
+
+    */
+    Function map(const std::string& name, int N,  const Dict & options = Dict()) const;
+
     /** \brief Get a function that calculates \a nfwd forward derivatives and nadj adjoint derivatives
      *         Legacy function: Use derForward and derReverse instead.
      *
@@ -525,7 +591,7 @@ namespace casadi {
      *
      * There is no guarantee that consecutive calls return identical objects
      */
-    std::vector<MX> symbolicInput() const;
+    std::vector<MX> symbolicInput(bool unique=false) const;
 
     /** \brief Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
      *
@@ -595,9 +661,12 @@ namespace casadi {
     const std::map<std::string, M> callMap(const std::map<std::string, M>& arg,
                                        bool always_inline, bool never_inline);
 
-    /** \brief Check if input arguments have correct length and dimensions */
+    /** \brief Check if input arguments have correct length and dimensions
+    *
+    * \param hcat check if horizontal repetion of the function input is allowed
+    */
     template<typename M>
-    void checkArg(const std::vector<M>& arg) const;
+    void checkArg(const std::vector<M>& arg, bool hcat=false) const;
 
     /** \brief Check if output arguments have correct length and dimensions */
     template<typename M>
@@ -611,9 +680,12 @@ namespace casadi {
     template<typename M>
     void checkAdjSeed(const std::vector<std::vector<M> >& aseed) const;
 
-    /** \brief Check if input arguments that needs to be replaced */
+    /** \brief Check if input arguments that needs to be replaced
+    * 
+    * \param hcat check if horizontal repetion of the function input is allowed
+    */
     template<typename M>
-    bool matchingArg(const std::vector<M>& arg) const;
+    bool matchingArg(const std::vector<M>& arg, bool hcat=false) const;
 
     /** \brief Check if output arguments that needs to be replaced */
     template<typename M>
@@ -627,9 +699,12 @@ namespace casadi {
     template<typename M>
     bool matchingAdjSeed(const std::vector<std::vector<M> >& aseed) const;
 
-    /** \brief Replace 0-by-0 inputs */
+    /** \brief Replace 0-by-0 inputs
+    *
+    * \param hcat check if horizontal repetion of the function input is allowed
+    */
     template<typename M>
-    std::vector<M> replaceArg(const std::vector<M>& arg) const;
+    std::vector<M> replaceArg(const std::vector<M>& arg, bool hcat=false) const;
 
     /** \brief Replace 0-by-0 outputs */
     template<typename M>
@@ -692,6 +767,9 @@ namespace casadi {
 
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     std::string getSanitizedName() const;
+
+    /** \brief get function name with all non alphanumeric characters converted to '_' */
+    static std::string sanitizeName(const std::string& name);
   };
 
 } // namespace casadi

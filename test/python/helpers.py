@@ -111,6 +111,15 @@ class FunctionPool:
   def zip(self):
     return zip(self.casadioperators,self.numpyoperators,self.names,self.flags)
 
+
+def toSXFunction(fun):
+  ins = fun.symbolicInputSX()
+  return SXFunction("f",ins,fun(ins))
+  
+def toMXFunction(fun):
+  ins = fun.symbolicInput()
+  return MXFunction("f",ins,fun(ins))
+
 class casadiTestCase(unittest.TestCase):
 
 
@@ -294,7 +303,7 @@ class casadiTestCase(unittest.TestCase):
         continue
       self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod,setx0=setx0)
 
-  def checkfunction(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True):
+  def checkfunction(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True,allow_nondiff=False):
 
     if indirect:
       ins = trial.symbolicInput()
@@ -333,6 +342,7 @@ class casadiTestCase(unittest.TestCase):
     for i in range(trial.nOut()):
       message = "output(%d)" % i
       if (allow_empty and (trial.getOutput(i).isempty() or solution.getOutput(i).isempty() )): continue
+      if (allow_nondiff and (trial.getOutput(i).nnz()==0 or solution.getOutput(i).nnz()==0 )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
       
     try:
@@ -352,6 +362,7 @@ class casadiTestCase(unittest.TestCase):
     for i in range(trial.nOut()):
       message = "output(%d)" % i
       if (allow_empty and (trial.getOutput(i).isempty() or solution.getOutput(i).isempty() )): continue
+      if (allow_nondiff and (trial.getOutput(i).nnz()==0 or solution.getOutput(i).nnz()==0 )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
     
     for i in range(trial.nIn()):
@@ -374,7 +385,7 @@ class casadiTestCase(unittest.TestCase):
           self.assertEqual(solutionjac.nOut(),solution.nOut()+1)
           for k in range(solution.nIn()): solutionjac.setInput(solution_inputs[k],k)
           
-          self.checkfunction(trialjac,solutionjac,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
+          self.checkfunction(trialjac,solutionjac,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)
 
     if gradient:
       for i in range(trial.nIn()):
@@ -391,7 +402,7 @@ class casadiTestCase(unittest.TestCase):
             self.assertEqual(solutiongrad.nIn(),solution.nIn())
             self.assertEqual(solutiongrad.nOut(),solution.nOut()+1)
             for k in range(solution.nIn()): solutiongrad.setInput(solution_inputs[k],k)
-            self.checkfunction(trialgrad,solutiongrad,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
+            self.checkfunction(trialgrad,solutiongrad,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)
 
     if hessian:
       for i in range(trial.nIn()):
@@ -408,7 +419,7 @@ class casadiTestCase(unittest.TestCase):
             self.assertEqual(solutionhess.nIn(),solution.nIn())
             self.assertEqual(solutionhess.nOut(),solution.nOut()+2)
             for k in range(solution.nIn()): solutionhess.setInput(solution_inputs[k],k)
-            self.checkfunction(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)     
+            self.checkfunction(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)     
 
     for k in range(trial.nIn()):
       trial.setInput(trial_inputs[k],k)
@@ -473,8 +484,8 @@ class casadiTestCase(unittest.TestCase):
             vf.setInput(v,i)
         
           # Complete random seeding
-          random.seed(1)
           for i in range(f.nIn(),vf.nIn()):
+            random.seed(i)
             vf.setInput(DMatrix(vf.getInput(i).sparsity(),random.random(vf.getInput(i).nnz())),i)
           
           vf.evaluate()
@@ -504,8 +515,8 @@ class casadiTestCase(unittest.TestCase):
               for i,v in enumerate(values):
                 vf2.setInput(v,i)
             
-              random.seed(1)
               for i in range(f.nIn(),vf2.nIn()):
+                random.seed(i)
                 vf2.setInput(DMatrix(vf2.getInput(i).sparsity(),random.random(vf2.getInput(i).nnz())),i)
               
               vf2.evaluate()
@@ -521,6 +532,8 @@ class casadiTestCase(unittest.TestCase):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):
               if b.numel()==0 and sparsify(a).nnz()==0: continue
               if a.numel()==0 and sparsify(b).nnz()==0: continue
+              
+              if (allow_nondiff and (a.nnz()==0 or b.nnz()==0 )): continue
               #self.checkarray(IMatrix(a.sparsity(),1),IMatrix(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
               self.checkarray(a,b,("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
               
@@ -528,7 +541,24 @@ class casadiTestCase(unittest.TestCase):
       trial.setInput(trial_inputs[k],k)
       solution.setInput(solution_inputs[k],k)
 
-      
+  def check_codegen(self,F):
+    if args.run_slow:
+      import md5
+      name = "codegen_%s" % md5.new("%f" % np.random.random()+str(F)+str(time.time())).hexdigest()
+      F.generate(name)
+      import subprocess
+      p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
+      F2 = ExternalFunction(name)
+
+      for i in range(F.nIn()):
+        F2.setInput(F.getInput(i),i)
+
+      F.evaluate()
+      F2.evaluate()
+
+      for i in range(F.nOut()):
+        self.checkarray(F2.getOutput(i),F.getOutput(i))
+
 
 class run_only(object):
   def __init__(self, args):

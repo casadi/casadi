@@ -190,14 +190,18 @@ def _swig_repr(self):
 #ifdef SWIGMATLAB
 %matlabsetup %{
 
+
 disect_path = strsplit(mfilename('fullpath'),filesep);
 libpath = strjoin(disect_path(1:end-1),filesep);
+jitpath = strjoin({libpath,'include','casadi','jit'},filesep);
 
 import casadi.*
 
 CasadiOptions.setCasadiPath(libpath);
+CasadiOptions.setJitIncludePath(jitpath)
 
 warning('error','SWIG:OverloadError')
+
 
 %}
 #endif
@@ -1433,16 +1437,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
         return true;
       }
 #endif // SWIGPYTHON
-#ifdef SWIGMATLAB
-      if (mxIsChar(p) && mxGetM(p)==1 && mxGetN(p)==1) {
-        char ch;
-        if(mxGetString(p, &ch,(mwSize)sizeof(&ch))) return SWIG_TypeError;
-        if (ch==':') {
-          if (m) **m = casadi::Slice();
-          return true;
-        }
-      }
-#endif // SWIGMATLAB
 
       // No match
       return false;
@@ -2484,6 +2478,25 @@ except:
 %rename(logic_not) friendwrap_not;
 %rename(logic_all) friendwrap_all;
 %rename(logic_any) friendwrap_any;
+
+// Non-fatal errors (returning NotImplemented singleton)
+%feature("python:maybecall") casadi_plus;
+%feature("python:maybecall") casadi_minus;
+%feature("python:maybecall") casadi_times;
+%feature("python:maybecall") casadi_rdivide;
+%feature("python:maybecall") casadi_lt;
+%feature("python:maybecall") casadi_le;
+%feature("python:maybecall") casadi_eq;
+%feature("python:maybecall") casadi_ne;
+%feature("python:maybecall") casadi_power;
+%feature("python:maybecall") casadi_atan2;
+%feature("python:maybecall") casadi_min;
+%feature("python:maybecall") casadi_max;
+%feature("python:maybecall") casadi_and;
+%feature("python:maybecall") casadi_or;
+%feature("python:maybecall") casadi_mod;
+%feature("python:maybecall") casadi_copysign;
+%feature("python:maybecall") casadi_constpow;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
@@ -2629,31 +2642,66 @@ class NZproxy:
 #endif
 
 #ifdef SWIGMATLAB
+%{
+  /// Helper function: Convert ':' to Slice
+  inline Slice char2Slice(char ch) {
+    casadi_assert(ch==':');
+    return casadi::Slice();
+  }
+%}
+
 %define %matrix_helpers(Type)
     // Get a submatrix (index-1)
-    const Type paren(const Slice& rr) const { Type m; $self->get(m, true, rr); return m;}
-    const Type paren(const Matrix<int>& rr) const { Type m; $self->get(m, true, rr); return m;}
-    const Type paren(const Sparsity& sp) const { Type m; $self->get(m, true, sp); return m;}
-    const Type paren(const Slice& rr, const Slice& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
-    const Type paren(const Slice& rr, const Matrix<int>& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
-    const Type paren(const Matrix<int>& rr, const Slice& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
-    const Type paren(const Matrix<int>& rr, const Matrix<int>& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
+    const Type paren(char rr) const {
+      casadi_assert(rr==':');
+      return vec(*$self);
+    }
+    const Type paren(const Matrix<int>& rr) const {
+      Type m;
+      $self->get(m, true, rr);
+      return m;
+    }
+    const Type paren(const Sparsity& sp) const {
+      Type m;
+      $self->get(m, true, sp);
+      return m;
+    }
+    const Type paren(char rr, char cc) const {
+      Type m;
+      $self->get(m, true, char2Slice(rr), char2Slice(cc));
+      return m;
+    }
+    const Type paren(char rr, const Matrix<int>& cc) const {
+      Type m;
+      $self->get(m, true, char2Slice(rr), cc);
+      return m;
+    }
+    const Type paren(const Matrix<int>& rr, char cc) const {
+      Type m;
+      $self->get(m, true, rr, char2Slice(cc));
+      return m;
+    }
+    const Type paren(const Matrix<int>& rr, const Matrix<int>& cc) const {
+      Type m;
+      $self->get(m, true, rr, cc);
+      return m;
+    }
 
     // Set a submatrix (index-1)
-    void setparen(const Type& m, const Slice& rr) { $self->set(m, true, rr);}
+    void setparen(const Type& m, char rr) { $self->set(m, true, char2Slice(rr));}
     void setparen(const Type& m, const Matrix<int>& rr) { $self->set(m, true, rr);}
     void setparen(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
-    void setparen(const Type& m, const Slice& rr, const Slice& cc) { $self->set(m, true, rr, cc);}
-    void setparen(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
-    void setparen(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->set(m, true, rr, cc);}
+    void setparen(const Type& m, char rr, char cc) { $self->set(m, true, char2Slice(rr), char2Slice(cc));}
+    void setparen(const Type& m, char rr, const Matrix<int>& cc) { $self->set(m, true, char2Slice(rr), cc);}
+    void setparen(const Type& m, const Matrix<int>& rr, char cc) { $self->set(m, true, rr, char2Slice(cc));}
     void setparen(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
 
     // Get nonzeros (index-1)
-    const Type brace(const Slice& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
+    const Type brace(char rr) const { Type m; $self->getNZ(m, true, char2Slice(rr)); return m;}
     const Type brace(const Matrix<int>& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
 
     // Set nonzeros (index-1)
-    void setbrace(const Type& m, const Slice& rr) { $self->setNZ(m, true, rr);}
+    void setbrace(const Type& m, char rr) { $self->setNZ(m, true, char2Slice(rr));}
     void setbrace(const Type& m, const Matrix<int>& rr) { $self->setNZ(m, true, rr);}
 
     // 'end' function (needed for end syntax in MATLAB)
@@ -3085,7 +3133,9 @@ DECL std::string %SHOW(getOperatorRepresentation)(const M& xb,
                                                   const std::vector<std::string>& args) {
   return getOperatorRepresentation(xb, args);
 }
-
+DECL M %SHOW(repsum)(const M& A, int n, int m=1) {
+  return repsum(A, n, m);
+}
 
 #endif // FLAG & IS_MEMBER
 
@@ -3395,7 +3445,7 @@ namespace casadi{
       mxArray *p  = mxCreateSparse($self->size1(), $self->size2(), $self->nnz(), mxREAL);
       $self->getNZ(static_cast<double*>(mxGetData(p)));
       std::copy($self->colind(), $self->colind()+$self->size2()+1, mxGetJc(p));
-      std::copy($self->row(), $self->row()+$self->size2()+1, mxGetIr(p));
+      std::copy($self->row(), $self->row()+$self->nnz(), mxGetIr(p));
       return p;
     }
 #endif
@@ -3948,9 +3998,11 @@ namespace casadi {
 
 %feature("director") casadi::Callback2;
 %feature("director") casadi::DerivativeGenerator2;
+%feature("director") casadi::IterationCallback;
 
 %include <casadi/core/function/sx_function.hpp>
 %include <casadi/core/function/mx_function.hpp>
+%include <casadi/core/function/jit_function.hpp>
 %include <casadi/core/function/linear_solver.hpp>
 %include <casadi/core/function/implicit_function.hpp>
 %include <casadi/core/function/integrator.hpp>
@@ -3976,6 +4028,9 @@ namespace casadi {
 %include <casadi/core/function/lr_dple_solver.hpp>
 %include <casadi/core/function/lr_dle_solver.hpp>
 %include <casadi/core/function/cle_solver.hpp>
+%include <casadi/core/function/map.hpp>
+%include <casadi/core/function/mapaccum.hpp>
+%include <casadi/core/function/kernel_sum_2d.hpp>
 
 %include "autogenerated.i"
 

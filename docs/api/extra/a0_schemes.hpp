@@ -42,18 +42,6 @@
 <tr><td>LINSOL_B</td><td>B</td><td>The right-hand-side matrix b: dense, (n x m) .</td></tr>
 </table>
 */
-/** \defgroup scheme_SOCPOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::SOCPOutput  (SOCP_SOLVER_NUM_OUT = 6) [socpOut]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>SOCP_SOLVER_X</td><td>x</td><td>The primal solution (n x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_COST</td><td>cost</td><td>The primal optimal cost (1 x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_DUAL_COST</td><td>dual_cost</td><td>The dual optimal cost (1 x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_LAM_CONE</td><td>lam_cone</td><td>The dual solution correspoding to cone (2-norm) constraints (m x 1) .</td></tr>
-</table>
-*/
 /** \defgroup scheme_QpSolverInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::QpSolverInput  (QP_SOLVER_NUM_IN = 9) [qpIn]</caption>
@@ -67,6 +55,13 @@
 <tr><td>QP_SOLVER_UBX</td><td>ubx</td><td>dense, (n x 1) </td></tr>
 <tr><td>QP_SOLVER_X0</td><td>x0</td><td>dense, (n x 1) </td></tr>
 <tr><td>QP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
+</table>
+*/
+/** \defgroup scheme_LPStruct
+<a name='schemes'></a><table>
+<caption>Struct scheme: casadi::LPStruct  ( = 1) []</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>LP_STRUCT_A</td><td></td><td>The matrix A: sparse.</td></tr>
 </table>
 */
 /** \defgroup scheme_SOCPStruct
@@ -246,6 +241,18 @@
 <tr><td>SDQP_SOLVER_DUAL_COST</td><td>dual_cost</td><td>The dual optimal cost (1 x 1) .</td></tr>
 <tr><td>SDQP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
 <tr><td>SDQP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
+</table>
+*/
+/** \defgroup scheme_SOCPOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::SOCPOutput  (SOCP_SOLVER_NUM_OUT = 6) [socpOut]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>SOCP_SOLVER_X</td><td>x</td><td>The primal solution (n x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_COST</td><td>cost</td><td>The primal optimal cost (1 x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_DUAL_COST</td><td>dual_cost</td><td>The dual optimal cost (1 x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_LAM_CONE</td><td>lam_cone</td><td>The dual solution correspoding to cone (2-norm) constraints (m x 1) .</td></tr>
 </table>
 */
 /** \defgroup scheme_SDQPInput

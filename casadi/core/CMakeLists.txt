@@ -72,7 +72,6 @@ set(CASADI_SRCS
   mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
   mx/casadi_call.hpp         mx/casadi_call.cpp         # Function call
   mx/casadi_find.hpp         mx/casadi_find.cpp         # Find first nonzero
-  mx/casadi_map.hpp          mx/casadi_map.cpp          # Multiple function calls at once
   mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
   mx/transpose.hpp           mx/transpose.cpp           # Transpose
   mx/concat.hpp              mx/concat.cpp              # Concatenation
@@ -89,6 +88,7 @@ set(CASADI_SRCS
   mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
   mx/assertion.hpp           mx/assertion.cpp           # Assertion
   mx/monitor.hpp             mx/monitor.cpp             # Monitor
+  mx/repmat.hpp              mx/repmat.cpp              # RepMat
 
   # A dynamically created function with AD capabilities
   function/io_interface.hpp                                         # Input/output interface for Function and FunctionInternal
@@ -123,7 +123,11 @@ set(CASADI_SRCS
   function/cle_solver.hpp          function/cle_solver.cpp          function/cle_internal.hpp      function/cle_internal.cpp
   function/wrapper.hpp             function/adaptor.hpp             function/dense_io.hpp
   function/switch.hpp              function/switch.cpp              function/switch_internal.hpp   function/switch_internal.cpp
-
+  function/map.hpp                 function/map.cpp                 function/map_internal.hpp      function/map_internal.cpp
+  function/mapaccum.hpp            function/mapaccum.cpp            function/mapaccum_internal.hpp function/mapaccum_internal.cpp
+  function/jit_function.hpp        function/jit_function.cpp        function/jit_function_internal.hpp function/jit_function_internal.cpp
+  function/kernel_sum_2d.hpp       function/kernel_sum_2d.cpp       function/kernel_sum_2d_internal.hpp function/kernel_sum_2d_internal.cpp
+  
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp
   misc/nlp_builder.hpp             misc/nlp_builder.cpp

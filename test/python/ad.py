@@ -531,6 +531,8 @@ class ADtests(casadiTestCase):
           (in1,v1,x[0],DMatrix.eye(2)[0,:]),
           (in1,v1,(x**2)[0],horzcat([2*x[0],MX(1,1)])),
           (in1,v1,x[0]+x[1],DMatrix.ones(1,2)),
+          (in1,v1,sin(repmat(x**2,1,3)),repmat(cos(c.diag(x**2))*2*c.diag(x),3,1)),
+          (in1,v1,sin(repsum((x**2).T,1,2)),cos(x[0]**2+x[1]**2)*2*x.T),
           (in1,v1,vertcat([x[1],x[0]]),sparsify(DMatrix([[0,1],[1,0]]))),
           (in1,v1,vertsplit(x,[0,1,2])[1],sparsify(DMatrix([[0,1]]))),
           (in1,v1,vertcat([x[1]**2,x[0]**2]),blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
@@ -586,12 +588,11 @@ class ADtests(casadiTestCase):
           (in1,v1,vertcat([x,DMatrix(0,1)]),DMatrix.eye(2)),
           (in1,v1,(x**2).project(sparsify(DMatrix([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
           (in1,v1,c.inner_prod(x,y[:,0]),y[:,0].T),
-          (in1,v1,x.nz[IMatrix([[1,0]])]*y.nz[IMatrix([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]])),
+          (in1,v1,x.nz[IMatrix([[1,0]])].T*y.nz[IMatrix([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]])),
           (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX(1,1),y.nz[0]],[MX(1,1),MX(1,1)],[MX(1,1),MX(1,1)],[y.nz[2],MX(1,1)]])),
      ]:
       print out
       fun = MXFunction("fun", inputs,[out,jac])
-      
       funsx = fun.expand()
       funsx.init()
       
@@ -604,6 +605,8 @@ class ADtests(casadiTestCase):
       self.checkarray(fun.getOutput(0),funsx.getOutput(0))
       self.checkarray(fun.getOutput(1),funsx.getOutput(1))
       
+      self.check_codegen(fun)
+
       J_ = fun.getOutput(1)
       
       def vec(l):
@@ -689,16 +692,17 @@ class ADtests(casadiTestCase):
             assert(offset==vf.nIn())
             
             vf.evaluate()
+            self.check_codegen(vf)
               
             offset = len(res)
             for d in range(ndir):
-              seed = array(fseed[d]).ravel()
-              sens = array(vf.getOutput(offset+0)).ravel()
+              seed = array(fseed[d].T).ravel()
+              sens = array(vf.getOutput(offset+0).T).ravel()
               offset+=len(inputss)
               self.checkarray(sens,mul(J_,seed),"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
 
-              seed = array(aseed[d]).ravel()
-              sens = array(vf.getOutput(offset+0)).ravel()
+              seed = array(aseed[d].T).ravel()
+              sens = array(vf.getOutput(offset+0).T).ravel()
               offset+=len(inputss)
               
               self.checkarray(sens,mul(J_.T,seed),"eval Adj %d %s" % (d,str([vf.getOutput(i) for i in range(vf.nOut())])))
@@ -712,6 +716,7 @@ class ADtests(casadiTestCase):
               vf.setInput(DMatrix(vf.getInput(i).sparsity(),random.random(vf.getInput(i).nnz())),i)
             
             vf.evaluate()
+            self.check_codegen(vf)
             storagekey = (spmod,spmod2)
             if not(storagekey in storage):
               storage[storagekey] = []
@@ -745,6 +750,7 @@ class ADtests(casadiTestCase):
                 vf2.setInput(DMatrix(vf2.getInput(i).sparsity(),random.random(vf2.getInput(i).nnz())),i)
               
               vf2.evaluate()
+              self.check_codegen(vf2)
               storagekey = (spmod,spmod2)
               if not(storagekey in storage2):
                 storage2[storagekey] = []
@@ -770,6 +776,8 @@ class ADtests(casadiTestCase):
           for i,v in enumerate(values):
             Jf.setInput(v,i)
           Jf.evaluate()
+          
+          self.check_codegen(Jf)
           self.checkarray(Jf.getOutput(),J_)
           self.checkarray(DMatrix.ones(Jf.getOutput().sparsity()),DMatrix.ones(J_.sparsity()),str(out)+str(mode))
           self.checkarray(DMatrix.ones(f.jacSparsity()),DMatrix.ones(J_.sparsity()))
@@ -799,6 +807,7 @@ class ADtests(casadiTestCase):
           for i,v in enumerate(values):
             Gf.setInput(v,i)
           Gf.evaluate()
+          self.check_codegen(Gf)
           self.checkarray(Gf.getOutput(),J_,failmessage=("mode: %s" % mode))
           #self.checkarray(DMatrix(Gf.getOutput().sparsity(),1),DMatrix(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
 
@@ -815,6 +824,7 @@ class ADtests(casadiTestCase):
           for i,v in enumerate(values):
             Hf.setInput(v,i)
           Hf.evaluate()
+          self.check_codegen(Hf)
           if H_ is None:
             H_ = Hf.getOutput()
           self.checkarray(Hf.getOutput(),H_,failmessage=("mode: %s" % mode))

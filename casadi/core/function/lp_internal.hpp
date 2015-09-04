@@ -32,13 +32,15 @@
 
 /// \cond INTERNAL
 
-/// Structure specification of an LP
-enum LPStruct {
-  /// The matrix A: sparse
-  LP_STRUCT_A,
-  LP_STRUCT_NUM};
 
 namespace casadi {
+
+  /// Structure specification of an LP
+  enum LPStruct {
+    /// The matrix A: sparse
+    LP_STRUCT_A,
+    LP_STRUCT_NUM};
+
 
   /// Internal class
   class CASADI_EXPORT

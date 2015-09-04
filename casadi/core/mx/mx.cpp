@@ -168,9 +168,13 @@ namespace casadi {
       return getNZ(m, ind1, rr);
     }
 
+    // If indexed matrix was a row/column vector, make sure that the result is too
+    bool tr = (iscolumn() && rr.isrow()) || (isrow() && rr.iscolumn());
+
     // Get the sparsity pattern - does bounds checking
     std::vector<int> mapping;
-    Sparsity sp = sparsity().sub(rr.data(), rr.sparsity(), mapping, ind1);
+    Sparsity sp = sparsity().sub(rr.data(), tr ? rr.sparsity().T() : rr.sparsity(),
+                                 mapping, ind1);
 
     // Create return MX
     m = (*this)->getGetNonzeros(sp, mapping);
@@ -365,9 +369,12 @@ namespace casadi {
   }
 
   void MX::getNZ(MX& m, bool ind1, const Matrix<int>& kk) const {
+    // If indexed matrix was a row/column vector, make sure that the result is too
+    bool tr = (iscolumn() && kk.isrow()) || (isrow() && kk.iscolumn());
+
     // Quick return if no entries
     if (kk.nnz()==0) {
-      m = MX::zeros(kk.sparsity());
+      m = MX::zeros(tr ? kk.sparsity().T() : kk.sparsity());
       return;
     }
 
@@ -396,7 +403,7 @@ namespace casadi {
     }
 
     // Return reference to the nonzeros
-    m = (*this)->getGetNonzeros(kk.sparsity(), kk.data());
+    m = (*this)->getGetNonzeros(tr ? kk.sparsity().T() : kk.sparsity(), kk.data());
   }
 
   void MX::setNZ(const MX& m, bool ind1, const Slice& kk) {
@@ -1808,6 +1815,14 @@ namespace casadi {
       }
     }
     return blockcat(blocks);
+  }
+
+  MX MX::zz_repmat(int n, int m) const {
+    return (*this)->getRepmat(n, m);
+  }
+
+  MX MX::zz_repsum(int n, int m) const {
+    return (*this)->getRepsum(n, m);
   }
 
   MX MX::zz_solve(const MX& b, const std::string& lsolver, const Dict& dict) const {

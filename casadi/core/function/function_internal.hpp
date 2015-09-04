@@ -105,10 +105,6 @@ namespace casadi {
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
-    /** \brief  Create map node */
-    virtual std::vector<std::vector<MX> >
-      createMap(const std::vector<std::vector<MX> > &arg, const std::string& parallelization);
-
     /** \brief Call a function, DMatrix type (overloaded) */
     void call(const DMatrixVector& arg, DMatrixVector& res,
               bool always_inline, bool never_inline);
@@ -615,6 +611,9 @@ namespace casadi {
 
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     std::string getSanitizedName() const;
+
+    /** \brief get function name with all non alphanumeric characters converted to '_' */
+    static std::string sanitizeName(const std::string& name);
 
     /** \brief Can a derivative direction be skipped */
     template<typename MatType>

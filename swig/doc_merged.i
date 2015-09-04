@@ -83,6 +83,11 @@ Default constructor.
 
 Construct from C pointer.
 
+>  Callback(IterationCallback &cb)
+------------------------------------------------------------------------
+
+Construct from an IterationCallback object.
+
 ";
 
 %feature("docstring") casadi::Callback::init "
@@ -302,12 +307,50 @@ C++ includes: casadi_options.hpp ";
 
 %feature("docstring") casadi::CleSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -358,6 +401,41 @@ Return a string with a description (for SWIG)
 %feature("docstring") casadi::CleSolver::printOptions "
 
 Print options to a stream.
+
+";
+
+%feature("docstring") casadi::CleSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -741,6 +819,17 @@ of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
+
+";
+
+%feature("docstring") casadi::CleSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
@@ -1159,6 +1248,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -2037,6 +2171,51 @@ Joris Gillis
 |              |              |              | the          | Internal     |
 |              |              |              | integrator   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | minor_grid   | OT_INTEGERVE | GenericType( | The local    | casadi::Cont |
 |              | CTOR         | )            | grid used on | rolSimulator |
 |              |              |              | each major   | Internal     |
@@ -2177,6 +2356,17 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
+%feature("docstring") casadi::ControlSimulator::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::ControlSimulator::getOutput "
 
 >  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
@@ -2289,6 +2479,41 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::ControlSimulator::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -2796,12 +3021,50 @@ Check if the numerical values of the supplied bounds make sense.
 
 %feature("docstring") casadi::ControlSimulator::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -3233,6 +3496,11 @@ There is no guarantee that consecutive calls return identical objects
 
 %feature("docstring") casadi::CustomFunction::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
@@ -3240,11 +3508,79 @@ Parameters:
 
 parallelization:  Type of parallelization used: expand|serial|openmp
 
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
 ";
 
 %feature("docstring") casadi::CustomFunction::setJacSparsity "
 
 Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::CustomFunction::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -3459,6 +3795,51 @@ Joel Andersson
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -3634,6 +4015,17 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::CustomFunction::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
@@ -4787,12 +5179,50 @@ Get all statistics obtained at the end of the last evaluate call.
 
 %feature("docstring") casadi::DleSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -4974,6 +5404,17 @@ propagating_sparsity.cpp)
 
 ";
 
+%feature("docstring") casadi::DleSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::DleSolver::numelIn "
 
 Get total number of elements in all of the matrix-valued inputs.
@@ -5099,6 +5540,41 @@ Get a list of all option names.
 %feature("docstring") casadi::DleSolver::hasOption "
 
 check if there is an option str
+
+";
+
+%feature("docstring") casadi::DleSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -5643,6 +6119,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -6246,9 +6767,9 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::DpleSolver::outputName "
+%feature("docstring") casadi::DpleSolver::isInit "
 
-Get output scheme name by index.
+Is initialized?
 
 ";
 
@@ -6331,6 +6852,41 @@ Clone.
 
 ";
 
+%feature("docstring") casadi::DpleSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring") casadi::DpleSolver::inputName "
 
 Get input scheme name by index.
@@ -6395,9 +6951,9 @@ values.
 
 ";
 
-%feature("docstring") casadi::DpleSolver::isInit "
+%feature("docstring") casadi::DpleSolver::outputName "
 
-Is initialized?
+Get output scheme name by index.
 
 ";
 
@@ -6857,6 +7413,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -7107,6 +7708,17 @@ Is a null pointer?
 
 ";
 
+%feature("docstring") casadi::DpleSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::DpleSolver::sz_res "[INTERNAL]  Get required
 length of res field.
 
@@ -7237,12 +7849,50 @@ corresponding to the Hessian and the gradients.
 
 %feature("docstring") casadi::DpleSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -7335,9 +7985,9 @@ the pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::ExternalFunction::isNull "
+%feature("docstring") casadi::ExternalFunction::getOptionNames "
 
-Is a null pointer?
+Get a list of all option names.
 
 ";
 
@@ -7378,6 +8028,41 @@ Print options to a stream.
 %feature("docstring") casadi::ExternalFunction::getOptionType "
 
 Get the type of a certain option.
+
+";
+
+%feature("docstring") casadi::ExternalFunction::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -7515,6 +8200,17 @@ changes, the init function should be called again.
 %feature("docstring") casadi::ExternalFunction::callForward "
 
 Create call to (cached) derivative function, forward mode.
+
+";
+
+%feature("docstring") casadi::ExternalFunction::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
@@ -7724,6 +8420,51 @@ Joel Andersson
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -7805,12 +8546,50 @@ Is initialized?
 
 %feature("docstring") casadi::ExternalFunction::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -7856,9 +8635,9 @@ Export / Generate C code for the function.
 
 ";
 
-%feature("docstring") casadi::ExternalFunction::getOptionNames "
+%feature("docstring") casadi::ExternalFunction::isNull "
 
-Get a list of all option names.
+Is a null pointer?
 
 ";
 
@@ -8569,6 +9348,41 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
+%feature("docstring") casadi::Function::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring") casadi::Function::numelIn "
 
 Get total number of elements in all of the matrix-valued inputs.
@@ -8666,6 +9480,17 @@ Get input scheme.
 
 ";
 
+%feature("docstring") casadi::Function::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::Function::setOutput "
 
 >  void IOInterface< Function  >.setOutput(T val, int oind=0)
@@ -8759,12 +9584,50 @@ the output elements).
 
 %feature("docstring") casadi::Function::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -9055,6 +9918,51 @@ Joel Andersson
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -9809,6 +10717,12 @@ Frobenius norm.
 
 ";
 
+%feature("docstring") friendwrap_repsum "
+
+Given a repeated matrix, computes the sum of repeated parts.
+
+";
+
 %feature("docstring") friendwrap_getOperatorRepresentation "
 
 Get a string representation for a binary MatType, using custom arguments.
@@ -10504,6 +11418,41 @@ Is the class able to propagate seeds through the algorithm?
 
 ";
 
+%feature("docstring") casadi::HomotopyNlpSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring") casadi::HomotopyNlpSolver::HomotopyNlpSolver "
 
 Default constructor.
@@ -10518,12 +11467,50 @@ Get input scheme.
 
 %feature("docstring") casadi::HomotopyNlpSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -10947,6 +11934,17 @@ Get sparsity of a given input.
 
 ";
 
+%feature("docstring") casadi::HomotopyNlpSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::HomotopyNlpSolver::gradient "
 
 Generate a gradient function of output oind with respect to input iind.
@@ -11337,6 +12335,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -11597,6 +12640,12 @@ There is no guarantee that consecutive calls return identical objects
 
 
 // File: classcasadi_1_1Horzcat.xml
+
+
+// File: classcasadi_1_1HorzRepmat.xml
+
+
+// File: classcasadi_1_1HorzRepsum.xml
 
 
 // File: classcasadi_1_1Horzsplit.xml
@@ -11882,6 +12931,17 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
+%feature("docstring") casadi::ImplicitFunction::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::ImplicitFunction::derivative "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -12087,6 +13147,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_fun | OT_FUNCTION  | GenericType( | Function     | casadi::Impl |
 | ction        |              | )            | object for   | icitFunction |
@@ -12608,12 +13713,50 @@ Access linear solver.
 
 %feature("docstring") casadi::ImplicitFunction::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -12854,6 +13997,41 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::ImplicitFunction::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -13695,6 +14873,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -14690,6 +15913,17 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
+%feature("docstring") casadi::Integrator::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::Integrator::setJacobian "
 
 Set the Jacobian function of output oind with respect to input iind NOTE:
@@ -14764,6 +15998,41 @@ Get total number of elements in all of the matrix-valued inputs.
 %feature("docstring") casadi::Integrator::nnzIn "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::Integrator::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -14964,12 +16233,50 @@ Get a list of all option names.
 
 %feature("docstring") casadi::Integrator::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -15120,6 +16427,2314 @@ NULL)
 ";
 
 %feature("docstring") casadi::IpoptUserClass::IpoptUserClass "[INTERNAL] ";
+
+
+// File: classcasadi_1_1IterationCallback.xml
+%feature("docstring") casadi::IterationCallback::~IterationCallback "";
+
+%feature("docstring") casadi::IterationCallback "C++ includes: functor.hpp
+";
+
+%feature("docstring") casadi::IterationCallback::IterationCallback "";
+
+
+// File: classcasadi_1_1JitFunction.xml
+
+
+/*  Simple Getters & Setters  */
+
+/*  Advanced Getters  */
+
+/*  Option Functionality  */ %feature("docstring")
+casadi::JitFunction::nnzIn "
+
+Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::JitFunction::getOption "
+
+get an option value
+
+";
+
+%feature("docstring") casadi::JitFunction::getOptionType "
+
+Get the type of a certain option.
+
+";
+
+%feature("docstring") casadi::JitFunction::setDerForward "
+
+Set a function that calculates nfwd forward derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::JitFunction::assertInit "[INTERNAL]  Assert
+that it is initialized
+
+";
+
+%feature("docstring") casadi::JitFunction::getDescription "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring") casadi::JitFunction::spInit "[INTERNAL]  Reset the
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::JitFunction::hasOption "
+
+check if there is an option str
+
+";
+
+%feature("docstring") casadi::JitFunction::setJacSparsity "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::JitFunction::sz_arg "[INTERNAL]  Get required
+length of arg field.
+
+";
+
+%feature("docstring") casadi::JitFunction::printDimensions "
+
+Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::JitFunction "
+
+JitFunction.
+
+Just-in-time compilation of code
+
+General information
+===================
+
+
+
+>List of available options
+
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_weight    | OT_REAL      | GenericType( | Weighting    | casadi::Func |
+|              |              | )            | factor for   | tionInternal |
+|              |              |              | derivative c |              |
+|              |              |              | alculation.W |              |
+|              |              |              | hen there is |              |
+|              |              |              | an option of |              |
+|              |              |              | either using |              |
+|              |              |              | forward or   |              |
+|              |              |              | reverse mode |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives, |              |
+|              |              |              | the          |              |
+|              |              |              | condition ad |              |
+|              |              |              | _weight*nf<= |              |
+|              |              |              | (1-ad_weight |              |
+|              |              |              | )*na is used |              |
+|              |              |              | where nf and |              |
+|              |              |              | na are       |              |
+|              |              |              | estimates of |              |
+|              |              |              | the number   |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse mode  |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
+|              |              |              | needed. By   |              |
+|              |              |              | default,     |              |
+|              |              |              | ad_weight is |              |
+|              |              |              | calculated a |              |
+|              |              |              | utomatically |              |
+|              |              |              | , but this   |              |
+|              |              |              | can be       |              |
+|              |              |              | overridden   |              |
+|              |              |              | by setting   |              |
+|              |              |              | this option. |              |
+|              |              |              | In           |              |
+|              |              |              | particular,  |              |
+|              |              |              | 0 means      |              |
+|              |              |              | forcing      |              |
+|              |              |              | forward mode |              |
+|              |              |              | and 1        |              |
+|              |              |              | forcing      |              |
+|              |              |              | reverse      |              |
+|              |              |              | mode. Leave  |              |
+|              |              |              | unset for    |              |
+|              |              |              | (class       |              |
+|              |              |              | specific)    |              |
+|              |              |              | heuristics.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ad_weight_sp | OT_REAL      | GenericType( | Weighting    | casadi::Func |
+|              |              | )            | factor for   | tionInternal |
+|              |              |              | sparsity     |              |
+|              |              |              | pattern      |              |
+|              |              |              | calculation  |              |
+|              |              |              | calculation. |              |
+|              |              |              | Overrides    |              |
+|              |              |              | default      |              |
+|              |              |              | behavior.    |              |
+|              |              |              | Set to 0 and |              |
+|              |              |              | 1 to force   |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse mode |              |
+|              |              |              | respectively |              |
+|              |              |              | . Cf. option |              |
+|              |              |              | \"ad_weight\". |              |
++--------------+--------------+--------------+--------------+--------------+
+| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| rd           | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward mode |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives. |              |
+|              |              |              | Overrides    |              |
+|              |              |              | default      |              |
+|              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| se           | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | reverse mode |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives. |              |
+|              |              |              | Overrides    |              |
+|              |              |              | default      |              |
+|              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
+| n            |              | )            | of all       | tionInternal |
+|              |              |              | outputs with |              |
+|              |              |              | respect to   |              |
+|              |              |              | all inputs.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| input_scheme | OT_STRINGVEC | GenericType( | Custom input | casadi::Func |
+|              | TOR          | )            | scheme       | tionInternal |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
+| e            | TOR          | )            | output       | tionInternal |
+|              |              |              | scheme       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
+List of plugins
+===============
+
+
+
+- clang
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+JitFunction.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+clang
+-----
+
+
+
+Interface to the JIT compiler CLANG
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| flags           | OT_STRINGVECTOR | GenericType()   | Compile flags   |
+|                 |                 |                 | for the JIT     |
+|                 |                 |                 | compiler.       |
+|                 |                 |                 | Default: -O3.   |
++-----------------+-----------------+-----------------+-----------------+
+| include_path    | OT_STRING       | \"\"              | Include paths   |
+|                 |                 |                 | for the JIT     |
+|                 |                 |                 | compiler. The   |
+|                 |                 |                 | include         |
+|                 |                 |                 | directory       |
+|                 |                 |                 | shipped with    |
+|                 |                 |                 | CasADi will be  |
+|                 |                 |                 | automatically   |
+|                 |                 |                 | appended.       |
++-----------------+-----------------+-----------------+-----------------+
+
+--------------------------------------------------------------------------------
+
+
+
+Joris Gillis
+Diagrams
+--------
+
+
+
+C++ includes: jit_function.hpp ";
+
+%feature("docstring") casadi::JitFunction::setOutput "
+
+>  void IOInterface< Function  >.setOutput(T val, int oind=0)
+------------------------------------------------------------------------
+
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0..nOut()-1]
+
+>  void IOInterface< Function  >.setOutput(T val, str oname)
+------------------------------------------------------------------------
+
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::JitFunction::isInit "
+
+Is initialized?
+
+";
+
+%feature("docstring") casadi::JitFunction::checkInputs "[INTERNAL]  Check
+if the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring") casadi::JitFunction::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::JitFunction::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring") casadi::JitFunction::getOptionAllowed "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::JitFunction::derReverse "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = nIn(), n_out = nOut())
+
+(n_in = nIn(), n_out = nOut())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring") casadi::JitFunction::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::JitFunction::getOptionDescription "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring") casadi::JitFunction::getInput "
+
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
+------------------------------------------------------------------------
+
+Get an input by index.
+
+Parameters:
+-----------
+
+iind:  index within the range [0..nIn()-1]
+
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
+------------------------------------------------------------------------
+
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+>  void IOInterface< Function  >.getInput(T val, int iind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0..nIn()-1]
+
+>  void IOInterface< Function  >.getInput(T val, str iname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::JitFunction::JitFunction "
+
+>  JitFunction()
+------------------------------------------------------------------------
+
+Default constructor.
+
+>  JitFunction(str compiler, Function f, Dict opts=Dict())
+------------------------------------------------------------------------
+
+JitFunction factory (new syntax, includes initialization)
+
+";
+
+%feature("docstring") casadi::JitFunction::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
+%feature("docstring") casadi::JitFunction::symbolicOutput "
+
+Get a vector of symbolic variables with the same dimensions as the outputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::JitFunction::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
+%feature("docstring") casadi::JitFunction::removeMonitor "
+
+Remove modules to be monitored.
+
+";
+
+%feature("docstring") casadi::JitFunction::defaultInput "
+
+Get default input value.
+
+";
+
+%feature("docstring") casadi::JitFunction::init "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class (SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring") casadi::JitFunction::spEvaluate "[INTERNAL]
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::JitFunction::inputIndex "
+
+Find the index for a string describing a particular entry of an input
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::JitFunction::outputDescription "
+
+Get output scheme description by index.
+
+";
+
+%feature("docstring") casadi::JitFunction::map "
+
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+";
+
+%feature("docstring") casadi::JitFunction::getOutput "
+
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
+------------------------------------------------------------------------
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0..nOut()-1]
+
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
+------------------------------------------------------------------------
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+>  void IOInterface< Function  >.getOutput(T val, int oind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0..nOut()-1]
+
+>  void IOInterface< Function  >.getOutput(T val, str oname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::JitFunction::hasSetOption "
+
+check if the user has there is an option str
+
+";
+
+%feature("docstring") casadi::JitFunction::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::JitFunction::outputIndex "
+
+Find the index for a string describing a particular entry of an output
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::JitFunction::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::JitFunction::callDerivative "[INTERNAL]
+Evaluate the function symbolically or numerically with directional
+derivatives The first two arguments are the nondifferentiated inputs and
+results of the evaluation, the next two arguments are a set of forward
+directional seeds and the resulting forward directional derivatives, the
+length of the vector being the number of forward directions. The next two
+arguments are a set of adjoint directional seeds and the resulting adjoint
+directional derivatives, the length of the vector being the number of
+adjoint directions.
+
+";
+
+%feature("docstring") casadi::JitFunction::setInput "
+
+>  void IOInterface< Function  >.setInput(T val, int iind=0)
+------------------------------------------------------------------------
+
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0..nIn()-1]
+
+>  void IOInterface< Function  >.setInput(T val, str iname)
+------------------------------------------------------------------------
+
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::JitFunction::nOut "
+
+Get the number of function outputs.
+
+";
+
+%feature("docstring") casadi::JitFunction::getOptionNames "
+
+Get a list of all option names.
+
+";
+
+%feature("docstring") casadi::JitFunction::copyOptions "
+
+Copy all options from another object.
+
+";
+
+%feature("docstring") casadi::JitFunction::outputName "
+
+Get output scheme name by index.
+
+";
+
+%feature("docstring") casadi::JitFunction::sz_res "[INTERNAL]  Get required
+length of res field.
+
+";
+
+%feature("docstring") casadi::JitFunction::getStats "
+
+Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::JitFunction::getOptionTypeName "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring") casadi::JitFunction::inputName "
+
+Get input scheme name by index.
+
+";
+
+%feature("docstring") casadi::JitFunction::numelOut "
+
+Get total number of elements in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::JitFunction::printPtr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
+%feature("docstring") casadi::JitFunction::nIn "
+
+Get the number of function inputs.
+
+";
+
+%feature("docstring") casadi::JitFunction::evaluate "
+
+Evaluate.
+
+";
+
+%feature("docstring") casadi::JitFunction::setFullJacobian "
+
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
+
+";
+
+%feature("docstring") casadi::JitFunction::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::JitFunction::setJacobian "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
+
+";
+
+%feature("docstring") casadi::JitFunction::setDerReverse "
+
+Set a function that calculates nadj adjoint derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::JitFunction::numelIn "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::JitFunction::print "
+
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::JitFunction::derForward "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nfwd*n_in inputs correspond to forward seeds, one direction at a time The
+nfwd*n_out outputs correspond to forward sensitivities, one direction at a
+time. * (n_in = nIn(), n_out = nOut())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring") casadi::JitFunction::setOptionByEnumValue "[INTERNAL]
+Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring") casadi::JitFunction::tangent "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::JitFunction::sz_w "[INTERNAL]  Get required
+length of w field.
+
+";
+
+%feature("docstring") casadi::JitFunction::repr "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::JitFunction::callForward "
+
+Create call to (cached) derivative function, forward mode.
+
+";
+
+%feature("docstring") casadi::JitFunction::inputDescription "
+
+Get input scheme description by index.
+
+";
+
+%feature("docstring") casadi::JitFunction::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Legacy function: Use derForward and derReverse instead.
+
+Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
+
+(n_in = nIn(), n_out = nOut())
+
+";
+
+%feature("docstring") casadi::JitFunction::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
+values.
+
+";
+
+%feature("docstring") casadi::JitFunction::inputScheme "
+
+Get input scheme.
+
+";
+
+%feature("docstring") casadi::JitFunction::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring") casadi::JitFunction::generate "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring") casadi::JitFunction::dictionary "
+
+Get the dictionary.
+
+";
+
+%feature("docstring") casadi::JitFunction::sz_iw "[INTERNAL]  Get required
+length of iw field.
+
+";
+
+%feature("docstring") casadi::JitFunction::setOption "
+
+>  void OptionsFunctionality.setOption(str str, GenericType val)
+------------------------------------------------------------------------
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+>  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
+------------------------------------------------------------------------
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring") casadi::JitFunction::spCanEvaluate "[INTERNAL]  Is
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::JitFunction::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring") casadi::JitFunction::fullJacobian "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
+%feature("docstring") casadi::JitFunction::callReverse "
+
+Create call to (cached) derivative function, reverse mode.
+
+";
+
+%feature("docstring") casadi::JitFunction::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring") casadi::JitFunction::getOptionEnumValue "[INTERNAL]
+Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring") casadi::JitFunction::nnzOut "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::JitFunction::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
+%feature("docstring") casadi::JitFunction::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
+%feature("docstring") casadi::JitFunction::getOptionDefault "
+
+Get the default of a certain option.
+
+";
+
+%feature("docstring") casadi::JitFunction::call "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring") casadi::JitFunction::addMonitor "
+
+Add modules to be monitored.
+
+";
+
+%feature("docstring") casadi::JitFunction::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::JitFunction::outputScheme "
+
+Get output scheme.
+
+";
+
+%feature("docstring") casadi::JitFunction::makeUnique "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring") casadi::JitFunction::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::JitFunction::printOptions "
+
+Print options to a stream.
+
+";
+
+%feature("docstring") casadi::JitFunction::isNull "
+
+Is a null pointer?
+
+";
+
+
+// File: classcasadi_1_1KernelSum2D.xml
+
+
+/*  Simple Getters & Setters  */
+
+/*  Advanced Getters  */
+
+/*  Option Functionality  */ %feature("docstring")
+casadi::KernelSum2D::tangent "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::copyOptions "
+
+Copy all options from another object.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::printDimensions "
+
+Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::map "
+
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+";
+
+%feature("docstring") casadi::KernelSum2D::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::KernelSum2D::isInit "
+
+Is initialized?
+
+";
+
+%feature("docstring") casadi::KernelSum2D::print "
+
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getOutput "
+
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
+------------------------------------------------------------------------
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0..nOut()-1]
+
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
+------------------------------------------------------------------------
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+>  void IOInterface< Function  >.getOutput(T val, int oind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0..nOut()-1]
+
+>  void IOInterface< Function  >.getOutput(T val, str oname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::nnzIn "
+
+Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::spInit "[INTERNAL]  Reset the
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::KernelSum2D::callForward "
+
+Create call to (cached) derivative function, forward mode.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::spCanEvaluate "[INTERNAL]  Is
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::KernelSum2D::nOut "
+
+Get the number of function outputs.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getOptionDefault "
+
+Get the default of a certain option.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getStats "
+
+Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::assertInit "[INTERNAL]  Assert
+that it is initialized
+
+";
+
+%feature("docstring") casadi::KernelSum2D::setJacobian "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
+
+";
+
+%feature("docstring") casadi::KernelSum2D::callDerivative "[INTERNAL]
+Evaluate the function symbolically or numerically with directional
+derivatives The first two arguments are the nondifferentiated inputs and
+results of the evaluation, the next two arguments are a set of forward
+directional seeds and the resulting forward directional derivatives, the
+length of the vector being the number of forward directions. The next two
+arguments are a set of adjoint directional seeds and the resulting adjoint
+directional derivatives, the length of the vector being the number of
+adjoint directions.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getInput "
+
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
+------------------------------------------------------------------------
+
+Get an input by index.
+
+Parameters:
+-----------
+
+iind:  index within the range [0..nIn()-1]
+
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
+------------------------------------------------------------------------
+
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+>  void IOInterface< Function  >.getInput(T val, int iind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0..nIn()-1]
+
+>  void IOInterface< Function  >.getInput(T val, str iname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::symbolicOutput "
+
+Get a vector of symbolic variables with the same dimensions as the outputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getOptionType "
+
+Get the type of a certain option.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::KernelSum2D "
+
+>  KernelSum2D()
+------------------------------------------------------------------------
+
+Default constructor.
+
+>  KernelSum2D(str name, Function f, (int,int) size, double r, int n, Dict opts=Dict())
+------------------------------------------------------------------------
+
+Constructor (generic kernel_sum_2d)
+
+";
+
+%feature("docstring") casadi::KernelSum2D::setFullJacobian "
+
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
+
+";
+
+%feature("docstring") casadi::KernelSum2D::outputDescription "
+
+Get output scheme description by index.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::derReverse "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = nIn(), n_out = nOut())
+
+(n_in = nIn(), n_out = nOut())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::makeUnique "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring") casadi::KernelSum2D::setInput "
+
+>  void IOInterface< Function  >.setInput(T val, int iind=0)
+------------------------------------------------------------------------
+
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0..nIn()-1]
+
+>  void IOInterface< Function  >.setInput(T val, str iname)
+------------------------------------------------------------------------
+
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::call "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::printPtr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
+%feature("docstring") casadi::KernelSum2D::spEvaluate "[INTERNAL]
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::KernelSum2D::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
+values.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::numelIn "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Legacy function: Use derForward and derReverse instead.
+
+Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
+
+(n_in = nIn(), n_out = nOut())
+
+";
+
+%feature("docstring") casadi::KernelSum2D::setDerReverse "
+
+Set a function that calculates nadj adjoint derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::outputIndex "
+
+Find the index for a string describing a particular entry of an output
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::KernelSum2D::inputName "
+
+Get input scheme name by index.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::inputScheme "
+
+Get input scheme.
+
+";
+
+%feature("docstring") casadi::KernelSum2D "
+
+KernelSum2D
+
+Consider a dense matrix V.
+
+KernelSum computes
+
+F(V,X) = sum_i sum_j f ( [i;j], V(i,j), X)
+
+with X: [x;y]
+
+where the summation is taken for all entries (i,j) that are a distance r
+away from X.
+
+This function assumes that V is fixed: sensitivities with respect to it are
+not computed.
+
+This allows for improved speed of evaluation.
+
+Having V fixed is a common use case: V may be a large bitmap (observation),
+onto which a kernel is fitted.
+
+Joris Gillis
+
+>List of available options
+
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_weight    | OT_REAL      | GenericType( | Weighting    | casadi::Func |
+|              |              | )            | factor for   | tionInternal |
+|              |              |              | derivative c |              |
+|              |              |              | alculation.W |              |
+|              |              |              | hen there is |              |
+|              |              |              | an option of |              |
+|              |              |              | either using |              |
+|              |              |              | forward or   |              |
+|              |              |              | reverse mode |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives, |              |
+|              |              |              | the          |              |
+|              |              |              | condition ad |              |
+|              |              |              | _weight*nf<= |              |
+|              |              |              | (1-ad_weight |              |
+|              |              |              | )*na is used |              |
+|              |              |              | where nf and |              |
+|              |              |              | na are       |              |
+|              |              |              | estimates of |              |
+|              |              |              | the number   |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse mode  |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
+|              |              |              | needed. By   |              |
+|              |              |              | default,     |              |
+|              |              |              | ad_weight is |              |
+|              |              |              | calculated a |              |
+|              |              |              | utomatically |              |
+|              |              |              | , but this   |              |
+|              |              |              | can be       |              |
+|              |              |              | overridden   |              |
+|              |              |              | by setting   |              |
+|              |              |              | this option. |              |
+|              |              |              | In           |              |
+|              |              |              | particular,  |              |
+|              |              |              | 0 means      |              |
+|              |              |              | forcing      |              |
+|              |              |              | forward mode |              |
+|              |              |              | and 1        |              |
+|              |              |              | forcing      |              |
+|              |              |              | reverse      |              |
+|              |              |              | mode. Leave  |              |
+|              |              |              | unset for    |              |
+|              |              |              | (class       |              |
+|              |              |              | specific)    |              |
+|              |              |              | heuristics.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ad_weight_sp | OT_REAL      | GenericType( | Weighting    | casadi::Func |
+|              |              | )            | factor for   | tionInternal |
+|              |              |              | sparsity     |              |
+|              |              |              | pattern      |              |
+|              |              |              | calculation  |              |
+|              |              |              | calculation. |              |
+|              |              |              | Overrides    |              |
+|              |              |              | default      |              |
+|              |              |              | behavior.    |              |
+|              |              |              | Set to 0 and |              |
+|              |              |              | 1 to force   |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse mode |              |
+|              |              |              | respectively |              |
+|              |              |              | . Cf. option |              |
+|              |              |              | \"ad_weight\". |              |
++--------------+--------------+--------------+--------------+--------------+
+| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| rd           | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward mode |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives. |              |
+|              |              |              | Overrides    |              |
+|              |              |              | default      |              |
+|              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| se           | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | reverse mode |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives. |              |
+|              |              |              | Overrides    |              |
+|              |              |              | default      |              |
+|              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
+| n            |              | )            | of all       | tionInternal |
+|              |              |              | outputs with |              |
+|              |              |              | respect to   |              |
+|              |              |              | all inputs.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| input_scheme | OT_STRINGVEC | GenericType( | Custom input | casadi::Func |
+|              | TOR          | )            | scheme       | tionInternal |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
+| e            | TOR          | )            | output       | tionInternal |
+|              |              |              | scheme       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: kernel_sum_2d.hpp ";
+
+%feature("docstring") casadi::KernelSum2D::inputIndex "
+
+Find the index for a string describing a particular entry of an input
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::KernelSum2D::nIn "
+
+Get the number of function inputs.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
+%feature("docstring") casadi::KernelSum2D::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::setJacSparsity "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::KernelSum2D::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::sz_res "[INTERNAL]  Get required
+length of res field.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::fullJacobian "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getOptionDescription "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::dictionary "
+
+Get the dictionary.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getOptionTypeName "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::checkInputs "[INTERNAL]  Check
+if the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::hasOption "
+
+check if there is an option str
+
+";
+
+%feature("docstring") casadi::KernelSum2D::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::evaluate "
+
+Evaluate.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::callReverse "
+
+Create call to (cached) derivative function, reverse mode.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getOptionAllowed "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::setDerForward "
+
+Set a function that calculates nfwd forward derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::sz_w "[INTERNAL]  Get required
+length of w field.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::setOutput "
+
+>  void IOInterface< Function  >.setOutput(T val, int oind=0)
+------------------------------------------------------------------------
+
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0..nOut()-1]
+
+>  void IOInterface< Function  >.setOutput(T val, str oname)
+------------------------------------------------------------------------
+
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::defaultInput "
+
+Get default input value.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::KernelSum2D::hasSetOption "
+
+check if the user has there is an option str
+
+";
+
+%feature("docstring") casadi::KernelSum2D::outputName "
+
+Get output scheme name by index.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::derForward "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nfwd*n_in inputs correspond to forward seeds, one direction at a time The
+nfwd*n_out outputs correspond to forward sensitivities, one direction at a
+time. * (n_in = nIn(), n_out = nOut())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::init "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class (SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring") casadi::KernelSum2D::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::KernelSum2D::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring") casadi::KernelSum2D::addMonitor "
+
+Add modules to be monitored.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::numelOut "
+
+Get total number of elements in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::isNull "
+
+Is a null pointer?
+
+";
+
+%feature("docstring") casadi::KernelSum2D::repr "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getOptionNames "
+
+Get a list of all option names.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::setOptionByEnumValue "[INTERNAL]
+Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::generate "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::nnzOut "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::removeMonitor "
+
+Remove modules to be monitored.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::sz_arg "[INTERNAL]  Get required
+length of arg field.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::outputScheme "
+
+Get output scheme.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::inputDescription "
+
+Get input scheme description by index.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getOptionEnumValue "[INTERNAL]
+Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::setOption "
+
+>  void OptionsFunctionality.setOption(str str, GenericType val)
+------------------------------------------------------------------------
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+>  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
+------------------------------------------------------------------------
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getOption "
+
+get an option value
+
+";
+
+%feature("docstring") casadi::KernelSum2D::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::KernelSum2D::getDescription "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring") casadi::KernelSum2D::sz_iw "[INTERNAL]  Get required
+length of iw field.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::printOptions "
+
+Print options to a stream.
+
+";
 
 
 // File: classcasadi_1_1LapackLuDense.xml
@@ -15465,12 +19080,50 @@ corresponding to the Hessian and the gradients.
 
 %feature("docstring") casadi::LinearSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -15483,6 +19136,17 @@ Get total number of elements in all of the matrix-valued outputs.
 %feature("docstring") casadi::LinearSolver::getOptionDescription "
 
 Get the description of a certain option.
+
+";
+
+%feature("docstring") casadi::LinearSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
@@ -15582,9 +19246,38 @@ Get output scheme description by index.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::printDimensions "
+%feature("docstring") casadi::LinearSolver::mapaccum "
 
-Print dimensions of inputs and outputs.
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -15834,6 +19527,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -16013,6 +19751,12 @@ Diagrams
 
 
 C++ includes: linear_solver.hpp ";
+
+%feature("docstring") casadi::LinearSolver::printDimensions "
+
+Print dimensions of inputs and outputs.
+
+";
 
 %feature("docstring") casadi::LinearSolver::spInit "[INTERNAL]  Reset the
 sparsity propagation.
@@ -16507,7 +20251,13 @@ LpSolver.doc(\"myextraplugin\")
 
 st:
 
-Problem structure.
+Problem structure.>Struct scheme: casadi::LPStruct ( = 1) []
+
++-------------+-------+-----------------------+
+|  Full name  | Short |      Description      |
++=============+=======+=======================+
+| LP_STRUCT_A |       | The matrix A: sparse. |
++-------------+-------+-----------------------+
 
 >  LpSolver(str solver, const std.map< str, Sparsity > &st)
 ------------------------------------------------------------------------
@@ -16530,7 +20280,13 @@ LpSolver.doc(\"myextraplugin\")
 
 st:
 
-Problem structure.
+Problem structure.>Struct scheme: casadi::LPStruct ( = 1) []
+
++-------------+-------+-----------------------+
+|  Full name  | Short |      Description      |
++=============+=======+=======================+
+| LP_STRUCT_A |       | The matrix A: sparse. |
++-------------+-------+-----------------------+
 
 ";
 
@@ -16629,6 +20385,41 @@ adjoint directions.
 
 ";
 
+%feature("docstring") casadi::LpSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring") casadi::LpSolver::isInit "
 
 Is initialized?
@@ -16711,12 +20502,50 @@ oname:  output name. Only allowed when an output scheme is set.
 
 %feature("docstring") casadi::LpSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -16907,6 +20736,17 @@ of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
+
+";
+
+%feature("docstring") casadi::LpSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
@@ -17158,6 +20998,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -17698,6 +21583,17 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
+%feature("docstring") casadi::LrDleSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::LrDleSolver::callDerivative "[INTERNAL]
 Evaluate the function symbolically or numerically with directional
 derivatives The first two arguments are the nondifferentiated inputs and
@@ -18168,12 +22064,50 @@ Get output scheme name by index.
 
 %feature("docstring") casadi::LrDleSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -18264,6 +22198,41 @@ exploited by the algorithm.
 
 The generated Jacobian has one more output than the calling function
 corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring") casadi::LrDleSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -18499,6 +22468,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -19101,6 +23115,17 @@ Get the default of a certain option.
 
 ";
 
+%feature("docstring") casadi::LrDpleSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::LrDpleSolver::inputName "
 
 Get input scheme name by index.
@@ -19296,9 +23321,11 @@ get an option value
 
 ";
 
-%feature("docstring") casadi::LrDpleSolver::getSanitizedName "
+%feature("docstring") casadi::LrDpleSolver::init "
 
-get function name with all non alphanumeric characters converted to '_'
+Initialize or re-initialize the object:
+
+more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -19427,12 +23454,50 @@ Is a null pointer?
 
 %feature("docstring") casadi::LrDpleSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -19561,11 +23626,9 @@ returned.
 
 ";
 
-%feature("docstring") casadi::LrDpleSolver::init "
+%feature("docstring") casadi::LrDpleSolver::getSanitizedName "
 
-Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -19601,6 +23664,41 @@ required length of res field.
 %feature("docstring") casadi::LrDpleSolver::printOptions "
 
 Print options to a stream.
+
+";
+
+%feature("docstring") casadi::LrDpleSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -19818,6 +23916,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -19956,6 +24099,2276 @@ Get the enum value corresponding to th certain option.
 
 
 // File: classcasadi_1_1Map.xml
+
+
+/*  Simple Getters & Setters  */
+
+/*  Advanced Getters  */
+
+/*  Option Functionality  */ %feature("docstring") casadi::Map::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring") casadi::Map::isNull "
+
+Is a null pointer?
+
+";
+
+%feature("docstring") casadi::Map::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring") casadi::Map::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
+%feature("docstring") casadi::Map::printPtr "[INTERNAL]  Print the pointer
+to the internal class
+
+";
+
+%feature("docstring") casadi::Map::makeUnique "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring") casadi::Map::getOptionNames "
+
+Get a list of all option names.
+
+";
+
+%feature("docstring") casadi::Map::setDerForward "
+
+Set a function that calculates nfwd forward derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::Map::symbolicOutput "
+
+Get a vector of symbolic variables with the same dimensions as the outputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::Map::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Legacy function: Use derForward and derReverse instead.
+
+Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
+
+(n_in = nIn(), n_out = nOut())
+
+";
+
+%feature("docstring") casadi::Map::derReverse "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = nIn(), n_out = nOut())
+
+(n_in = nIn(), n_out = nOut())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring") casadi::Map "
+
+Map Joris Gillis
+
+>List of available options
+
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_weight    | OT_REAL      | GenericType( | Weighting    | casadi::Func |
+|              |              | )            | factor for   | tionInternal |
+|              |              |              | derivative c |              |
+|              |              |              | alculation.W |              |
+|              |              |              | hen there is |              |
+|              |              |              | an option of |              |
+|              |              |              | either using |              |
+|              |              |              | forward or   |              |
+|              |              |              | reverse mode |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives, |              |
+|              |              |              | the          |              |
+|              |              |              | condition ad |              |
+|              |              |              | _weight*nf<= |              |
+|              |              |              | (1-ad_weight |              |
+|              |              |              | )*na is used |              |
+|              |              |              | where nf and |              |
+|              |              |              | na are       |              |
+|              |              |              | estimates of |              |
+|              |              |              | the number   |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse mode  |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
+|              |              |              | needed. By   |              |
+|              |              |              | default,     |              |
+|              |              |              | ad_weight is |              |
+|              |              |              | calculated a |              |
+|              |              |              | utomatically |              |
+|              |              |              | , but this   |              |
+|              |              |              | can be       |              |
+|              |              |              | overridden   |              |
+|              |              |              | by setting   |              |
+|              |              |              | this option. |              |
+|              |              |              | In           |              |
+|              |              |              | particular,  |              |
+|              |              |              | 0 means      |              |
+|              |              |              | forcing      |              |
+|              |              |              | forward mode |              |
+|              |              |              | and 1        |              |
+|              |              |              | forcing      |              |
+|              |              |              | reverse      |              |
+|              |              |              | mode. Leave  |              |
+|              |              |              | unset for    |              |
+|              |              |              | (class       |              |
+|              |              |              | specific)    |              |
+|              |              |              | heuristics.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ad_weight_sp | OT_REAL      | GenericType( | Weighting    | casadi::Func |
+|              |              | )            | factor for   | tionInternal |
+|              |              |              | sparsity     |              |
+|              |              |              | pattern      |              |
+|              |              |              | calculation  |              |
+|              |              |              | calculation. |              |
+|              |              |              | Overrides    |              |
+|              |              |              | default      |              |
+|              |              |              | behavior.    |              |
+|              |              |              | Set to 0 and |              |
+|              |              |              | 1 to force   |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse mode |              |
+|              |              |              | respectively |              |
+|              |              |              | . Cf. option |              |
+|              |              |              | \"ad_weight\". |              |
++--------------+--------------+--------------+--------------+--------------+
+| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| rd           | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward mode |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives. |              |
+|              |              |              | Overrides    |              |
+|              |              |              | default      |              |
+|              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| se           | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | reverse mode |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives. |              |
+|              |              |              | Overrides    |              |
+|              |              |              | default      |              |
+|              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
+| n            |              | )            | of all       | tionInternal |
+|              |              |              | outputs with |              |
+|              |              |              | respect to   |              |
+|              |              |              | all inputs.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| input_scheme | OT_STRINGVEC | GenericType( | Custom input | casadi::Func |
+|              | TOR          | )            | scheme       | tionInternal |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
+| e            | TOR          | )            | output       | tionInternal |
+|              |              |              | scheme       |              |
++--------------+--------------+--------------+--------------+--------------+
+| parallelizat | OT_STRING    | \"serial\"     | Computationa | casadi::MapI |
+| ion          |              |              | l strategy   | nternal      |
+|              |              |              | for parallel |              |
+|              |              |              | ization (ser |              |
+|              |              |              | ial|openmp)  |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: map.hpp ";
+
+%feature("docstring") casadi::Map::inputIndex "
+
+Find the index for a string describing a particular entry of an input
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::Map::sz_iw "[INTERNAL]  Get required length
+of iw field.
+
+";
+
+%feature("docstring") casadi::Map::setOption "
+
+>  void OptionsFunctionality.setOption(str str, GenericType val)
+------------------------------------------------------------------------
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+>  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
+------------------------------------------------------------------------
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring") casadi::Map::getOption "
+
+get an option value
+
+";
+
+%feature("docstring") casadi::Map::inputScheme "
+
+Get input scheme.
+
+";
+
+%feature("docstring") casadi::Map::call "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring") casadi::Map::removeMonitor "
+
+Remove modules to be monitored.
+
+";
+
+%feature("docstring") casadi::Map::checkInputs "[INTERNAL]  Check if the
+numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring") casadi::Map::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
+%feature("docstring") casadi::Map::tangent "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::Map::map "
+
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+";
+
+%feature("docstring") casadi::Map::getOptionDescription "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring") casadi::Map::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::Map::fullJacobian "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
+%feature("docstring") casadi::Map::getOutput "
+
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
+------------------------------------------------------------------------
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0..nOut()-1]
+
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
+------------------------------------------------------------------------
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+>  void IOInterface< Function  >.getOutput(T val, int oind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0..nOut()-1]
+
+>  void IOInterface< Function  >.getOutput(T val, str oname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::Map::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
+%feature("docstring") casadi::Map::dictionary "
+
+Get the dictionary.
+
+";
+
+%feature("docstring") casadi::Map::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::Map::evaluate "
+
+Evaluate.
+
+";
+
+%feature("docstring") casadi::Map::copyOptions "
+
+Copy all options from another object.
+
+";
+
+%feature("docstring") casadi::Map::printDimensions "
+
+Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Map::setJacSparsity "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::Map::nnzIn "
+
+Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::Map::setJacobian "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
+
+";
+
+%feature("docstring") casadi::Map::sz_w "[INTERNAL]  Get required length of
+w field.
+
+";
+
+%feature("docstring") casadi::Map::hasSetOption "
+
+check if the user has there is an option str
+
+";
+
+%feature("docstring") casadi::Map::outputName "
+
+Get output scheme name by index.
+
+";
+
+%feature("docstring") casadi::Map::spCanEvaluate "[INTERNAL]  Is the class
+able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::Map::callForward "
+
+Create call to (cached) derivative function, forward mode.
+
+";
+
+%feature("docstring") casadi::Map::defaultInput "
+
+Get default input value.
+
+";
+
+%feature("docstring") casadi::Map::init "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class (SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring") casadi::Map::getOptionAllowed "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::Map::derForward "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nfwd*n_in inputs correspond to forward seeds, one direction at a time The
+nfwd*n_out outputs correspond to forward sensitivities, one direction at a
+time. * (n_in = nIn(), n_out = nOut())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring") casadi::Map::addMonitor "
+
+Add modules to be monitored.
+
+";
+
+%feature("docstring") casadi::Map::numelOut "
+
+Get total number of elements in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::Map::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::Map::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
+%feature("docstring") casadi::Map::repr "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::Map::setOutput "
+
+>  void IOInterface< Function  >.setOutput(T val, int oind=0)
+------------------------------------------------------------------------
+
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0..nOut()-1]
+
+>  void IOInterface< Function  >.setOutput(T val, str oname)
+------------------------------------------------------------------------
+
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::Map::setOptionByEnumValue "[INTERNAL]  Set a
+certain option by giving an enum value.
+
+";
+
+%feature("docstring") casadi::Map::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring") casadi::Map::nnzOut "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::Map::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::Map::outputDescription "
+
+Get output scheme description by index.
+
+";
+
+%feature("docstring") casadi::Map::getOptionType "
+
+Get the type of a certain option.
+
+";
+
+%feature("docstring") casadi::Map::generate "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring") casadi::Map::getOptionTypeName "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring") casadi::Map::printOptions "
+
+Print options to a stream.
+
+";
+
+%feature("docstring") casadi::Map::spEvaluate "[INTERNAL]  Propagate the
+sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::Map::numelIn "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::Map::setOptionByAllowedIndex "[INTERNAL]  Set
+a certain option by giving its index into the allowed values.
+
+";
+
+%feature("docstring") casadi::Map::sz_arg "[INTERNAL]  Get required length
+of arg field.
+
+";
+
+%feature("docstring") casadi::Map::getDescription "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring") casadi::Map::inputName "
+
+Get input scheme name by index.
+
+";
+
+%feature("docstring") casadi::Map::nIn "
+
+Get the number of function inputs.
+
+";
+
+%feature("docstring") casadi::Map::getOptionEnumValue "[INTERNAL]  Get the
+enum value corresponding to th certain option.
+
+";
+
+%feature("docstring") casadi::Map::setDerReverse "
+
+Set a function that calculates nadj adjoint derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::Map::outputIndex "
+
+Find the index for a string describing a particular entry of an output
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::Map::outputScheme "
+
+Get output scheme.
+
+";
+
+%feature("docstring") casadi::Map::inputDescription "
+
+Get input scheme description by index.
+
+";
+
+%feature("docstring") casadi::Map::setFullJacobian "
+
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
+
+";
+
+%feature("docstring") casadi::Map::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::Map::sz_res "[INTERNAL]  Get required length
+of res field.
+
+";
+
+%feature("docstring") casadi::Map::isInit "
+
+Is initialized?
+
+";
+
+%feature("docstring") casadi::Map::hasOption "
+
+check if there is an option str
+
+";
+
+%feature("docstring") casadi::Map::Map "
+
+>  Map()
+------------------------------------------------------------------------
+
+Default constructor.
+
+>  Map(str name, Function f, int n, [bool ] repeat_in, [bool ] repeat_out, Dict opts=Dict())
+------------------------------------------------------------------------
+
+Constructor (generic map)
+
+";
+
+%feature("docstring") casadi::Map::print "
+
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::Map::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::Map::callDerivative "[INTERNAL]  Evaluate the
+function symbolically or numerically with directional derivatives The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
+
+";
+
+%feature("docstring") casadi::Map::getOptionAllowedIndex "[INTERNAL]  Get
+the index into allowed options of a certain option.
+
+";
+
+%feature("docstring") casadi::Map::nOut "
+
+Get the number of function outputs.
+
+";
+
+%feature("docstring") casadi::Map::spInit "[INTERNAL]  Reset the sparsity
+propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::Map::getOptionDefault "
+
+Get the default of a certain option.
+
+";
+
+%feature("docstring") casadi::Map::assertInit "[INTERNAL]  Assert that it
+is initialized
+
+";
+
+%feature("docstring") casadi::Map::setInput "
+
+>  void IOInterface< Function  >.setInput(T val, int iind=0)
+------------------------------------------------------------------------
+
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0..nIn()-1]
+
+>  void IOInterface< Function  >.setInput(T val, str iname)
+------------------------------------------------------------------------
+
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::Map::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::Map::getStats "
+
+Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::Map::getInput "
+
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
+------------------------------------------------------------------------
+
+Get an input by index.
+
+Parameters:
+-----------
+
+iind:  index within the range [0..nIn()-1]
+
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
+------------------------------------------------------------------------
+
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+>  void IOInterface< Function  >.getInput(T val, int iind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0..nIn()-1]
+
+>  void IOInterface< Function  >.getInput(T val, str iname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::Map::callReverse "
+
+Create call to (cached) derivative function, reverse mode.
+
+";
+
+
+// File: classcasadi_1_1MapAccum.xml
+
+
+/*  Simple Getters & Setters  */
+
+/*  Advanced Getters  */
+
+/*  Option Functionality  */ %feature("docstring")
+casadi::MapAccum::getOptionEnumValue " [INTERNAL]  Get the enum value
+corresponding to th certain option.
+
+";
+
+%feature("docstring") casadi::MapAccum::isInit "
+
+Is initialized?
+
+";
+
+%feature("docstring") casadi::MapAccum::sz_w "[INTERNAL]  Get required
+length of w field.
+
+";
+
+%feature("docstring") casadi::MapAccum::nnzOut "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::MapAccum::checkInputs "[INTERNAL]  Check if
+the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring") casadi::MapAccum::printOptions "
+
+Print options to a stream.
+
+";
+
+%feature("docstring") casadi::MapAccum::symbolicOutput "
+
+Get a vector of symbolic variables with the same dimensions as the outputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::MapAccum::callDerivative "[INTERNAL]
+Evaluate the function symbolically or numerically with directional
+derivatives The first two arguments are the nondifferentiated inputs and
+results of the evaluation, the next two arguments are a set of forward
+directional seeds and the resulting forward directional derivatives, the
+length of the vector being the number of forward directions. The next two
+arguments are a set of adjoint directional seeds and the resulting adjoint
+directional derivatives, the length of the vector being the number of
+adjoint directions.
+
+";
+
+%feature("docstring") casadi::MapAccum::outputDescription "
+
+Get output scheme description by index.
+
+";
+
+%feature("docstring") casadi::MapAccum::spEvaluate "[INTERNAL]  Propagate
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::MapAccum::repr "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::MapAccum::setOption "
+
+>  void OptionsFunctionality.setOption(str str, GenericType val)
+------------------------------------------------------------------------
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+>  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
+------------------------------------------------------------------------
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring") casadi::MapAccum::nOut "
+
+Get the number of function outputs.
+
+";
+
+%feature("docstring") casadi::MapAccum::setDerForward "
+
+Set a function that calculates nfwd forward derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::MapAccum::derForward "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nfwd*n_in inputs correspond to forward seeds, one direction at a time The
+nfwd*n_out outputs correspond to forward sensitivities, one direction at a
+time. * (n_in = nIn(), n_out = nOut())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring") casadi::MapAccum::dictionary "
+
+Get the dictionary.
+
+";
+
+%feature("docstring") casadi::MapAccum::getOptionType "
+
+Get the type of a certain option.
+
+";
+
+%feature("docstring") casadi::MapAccum::setInput "
+
+>  void IOInterface< Function  >.setInput(T val, int iind=0)
+------------------------------------------------------------------------
+
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0..nIn()-1]
+
+>  void IOInterface< Function  >.setInput(T val, str iname)
+------------------------------------------------------------------------
+
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::MapAccum::numelOut "
+
+Get total number of elements in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::MapAccum::makeUnique "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring") casadi::MapAccum::inputDescription "
+
+Get input scheme description by index.
+
+";
+
+%feature("docstring") casadi::MapAccum::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
+%feature("docstring") casadi::MapAccum::sz_arg "[INTERNAL]  Get required
+length of arg field.
+
+";
+
+%feature("docstring") casadi::MapAccum::callForward "
+
+Create call to (cached) derivative function, forward mode.
+
+";
+
+%feature("docstring") casadi::MapAccum::hasOption "
+
+check if there is an option str
+
+";
+
+%feature("docstring") casadi::MapAccum::outputScheme "
+
+Get output scheme.
+
+";
+
+%feature("docstring") casadi::MapAccum::printPtr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
+%feature("docstring") casadi::MapAccum::MapAccum "
+
+>  MapAccum()
+------------------------------------------------------------------------
+
+Default constructor.
+
+>  MapAccum(str name, Function f, int n, [bool ] input_accum, [int ] output_accum, bool reverse=false, Dict opts=Dict())
+------------------------------------------------------------------------
+
+Constructor (generic mapaccum)
+
+";
+
+%feature("docstring") casadi::MapAccum::derReverse "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = nIn(), n_out = nOut())
+
+(n_in = nIn(), n_out = nOut())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring") casadi::MapAccum::removeMonitor "
+
+Remove modules to be monitored.
+
+";
+
+%feature("docstring") casadi::MapAccum::getOptionAllowedIndex "[INTERNAL]
+Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring") casadi::MapAccum::defaultInput "
+
+Get default input value.
+
+";
+
+%feature("docstring") casadi::MapAccum::getOutput "
+
+>  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
+------------------------------------------------------------------------
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0..nOut()-1]
+
+>  DMatrix  IOInterface< Function  >.getOutput(str oname) const
+------------------------------------------------------------------------
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+>  void IOInterface< Function  >.getOutput(T val, int oind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0..nOut()-1]
+
+>  void IOInterface< Function  >.getOutput(T val, str oname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::MapAccum::printDimensions "
+
+Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::MapAccum::tangent "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::MapAccum::getOptionDescription "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring") casadi::MapAccum::getDescription "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring") casadi::MapAccum::addMonitor "
+
+Add modules to be monitored.
+
+";
+
+%feature("docstring") casadi::MapAccum::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::MapAccum::setOutput "
+
+>  void IOInterface< Function  >.setOutput(T val, int oind=0)
+------------------------------------------------------------------------
+
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0..nOut()-1]
+
+>  void IOInterface< Function  >.setOutput(T val, str oname)
+------------------------------------------------------------------------
+
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::MapAccum::hasSetOption "
+
+check if the user has there is an option str
+
+";
+
+%feature("docstring") casadi::MapAccum::getOptionTypeName "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring") casadi::MapAccum::spCanEvaluate "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::MapAccum::inputSparsity "
+
+Get sparsity of a given input.
+
+";
+
+%feature("docstring") casadi::MapAccum::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::MapAccum::print "
+
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::MapAccum::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::MapAccum::copyOptions "
+
+Copy all options from another object.
+
+";
+
+%feature("docstring") casadi::MapAccum::spInit "[INTERNAL]  Reset the
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::MapAccum::setDerReverse "
+
+Set a function that calculates nadj adjoint derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::MapAccum::getOption "
+
+get an option value
+
+";
+
+%feature("docstring") casadi::MapAccum::setFullJacobian "
+
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
+
+";
+
+%feature("docstring") casadi::MapAccum::sz_iw "[INTERNAL]  Get required
+length of iw field.
+
+";
+
+%feature("docstring") casadi::MapAccum::fullJacobian "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
+%feature("docstring") casadi::MapAccum::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::MapAccum::setJacSparsity "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::MapAccum::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring") casadi::MapAccum::numelIn "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::MapAccum::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::MapAccum::setOptionByEnumValue "[INTERNAL]
+Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring") casadi::MapAccum::nnzIn "
+
+Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::MapAccum::getInput "
+
+>  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
+------------------------------------------------------------------------
+
+Get an input by index.
+
+Parameters:
+-----------
+
+iind:  index within the range [0..nIn()-1]
+
+>  DMatrix  IOInterface< Function  >.getInput(str iname) const
+------------------------------------------------------------------------
+
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+>  void IOInterface< Function  >.getInput(T val, int iind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0..nIn()-1]
+
+>  void IOInterface< Function  >.getInput(T val, str iname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::MapAccum::call "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring") casadi::MapAccum::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
+%feature("docstring") casadi::MapAccum::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::MapAccum::outputIndex "
+
+Find the index for a string describing a particular entry of an output
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::MapAccum::map "
+
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+";
+
+%feature("docstring") casadi::MapAccum::init "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class (SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring") casadi::MapAccum::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::MapAccum::callReverse "
+
+Create call to (cached) derivative function, reverse mode.
+
+";
+
+%feature("docstring") casadi::MapAccum::nIn "
+
+Get the number of function inputs.
+
+";
+
+%feature("docstring") casadi::MapAccum::sz_res "[INTERNAL]  Get required
+length of res field.
+
+";
+
+%feature("docstring") casadi::MapAccum "
+
+MapAccum class.
+
+Consider a function: f(x, u) -> xp, y
+
+MapAccum will evaluate this function repeatedly, feeding the output back to
+the input:
+
+
+
+::
+
+    x1, y0 <- f(x0, u0)
+    x2, y1 <- f(x1, u1)
+    x3, y2 <- f(x2, u2)
+  
+
+
+
+The inputs to MapAccum(f) are in this case: x0
+
+[u0 u1 u2] The outputs are:
+
+[x1 x2 x3]
+
+[y0 y1 y2]
+
+This class treats the general case: n repetitions
+
+any number of accumulated inputs (x)
+
+any number of regular inputs (u)
+
+a boolean list input_accum flags which inputs are accumalated.
+
+An index list output_accum indicates the indices of the outputs that are fed
+back to the inputs.
+
+This implementation is optimized for speed. There is a penalty in memory:
+the entire accumulator history is an output. This allows the forward mode to
+use this history, instead of recreating the accumulator.
+
+In reverse mode, you would need the history anyway.
+
+For a memory-optimized implementation, see Fold.
+
+Joris Gillis
+
+>List of available options
+
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_weight    | OT_REAL      | GenericType( | Weighting    | casadi::Func |
+|              |              | )            | factor for   | tionInternal |
+|              |              |              | derivative c |              |
+|              |              |              | alculation.W |              |
+|              |              |              | hen there is |              |
+|              |              |              | an option of |              |
+|              |              |              | either using |              |
+|              |              |              | forward or   |              |
+|              |              |              | reverse mode |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives, |              |
+|              |              |              | the          |              |
+|              |              |              | condition ad |              |
+|              |              |              | _weight*nf<= |              |
+|              |              |              | (1-ad_weight |              |
+|              |              |              | )*na is used |              |
+|              |              |              | where nf and |              |
+|              |              |              | na are       |              |
+|              |              |              | estimates of |              |
+|              |              |              | the number   |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse mode  |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
+|              |              |              | needed. By   |              |
+|              |              |              | default,     |              |
+|              |              |              | ad_weight is |              |
+|              |              |              | calculated a |              |
+|              |              |              | utomatically |              |
+|              |              |              | , but this   |              |
+|              |              |              | can be       |              |
+|              |              |              | overridden   |              |
+|              |              |              | by setting   |              |
+|              |              |              | this option. |              |
+|              |              |              | In           |              |
+|              |              |              | particular,  |              |
+|              |              |              | 0 means      |              |
+|              |              |              | forcing      |              |
+|              |              |              | forward mode |              |
+|              |              |              | and 1        |              |
+|              |              |              | forcing      |              |
+|              |              |              | reverse      |              |
+|              |              |              | mode. Leave  |              |
+|              |              |              | unset for    |              |
+|              |              |              | (class       |              |
+|              |              |              | specific)    |              |
+|              |              |              | heuristics.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ad_weight_sp | OT_REAL      | GenericType( | Weighting    | casadi::Func |
+|              |              | )            | factor for   | tionInternal |
+|              |              |              | sparsity     |              |
+|              |              |              | pattern      |              |
+|              |              |              | calculation  |              |
+|              |              |              | calculation. |              |
+|              |              |              | Overrides    |              |
+|              |              |              | default      |              |
+|              |              |              | behavior.    |              |
+|              |              |              | Set to 0 and |              |
+|              |              |              | 1 to force   |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse mode |              |
+|              |              |              | respectively |              |
+|              |              |              | . Cf. option |              |
+|              |              |              | \"ad_weight\". |              |
++--------------+--------------+--------------+--------------+--------------+
+| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| rd           | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward mode |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives. |              |
+|              |              |              | Overrides    |              |
+|              |              |              | default      |              |
+|              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| se           | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | reverse mode |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives. |              |
+|              |              |              | Overrides    |              |
+|              |              |              | default      |              |
+|              |              |              | routines.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
+| n            |              | )            | of all       | tionInternal |
+|              |              |              | outputs with |              |
+|              |              |              | respect to   |              |
+|              |              |              | all inputs.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| input_scheme | OT_STRINGVEC | GenericType( | Custom input | casadi::Func |
+|              | TOR          | )            | scheme       | tionInternal |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
+| e            | TOR          | )            | output       | tionInternal |
+|              |              |              | scheme       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: mapaccum.hpp ";
+
+%feature("docstring") casadi::MapAccum::getStats "
+
+Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::MapAccum::setOptionByAllowedIndex "[INTERNAL]
+Set a certain option by giving its index into the allowed values.
+
+";
+
+%feature("docstring") casadi::MapAccum::getOptionAllowed "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::MapAccum::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring") casadi::MapAccum::setJacobian "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
+
+";
+
+%feature("docstring") casadi::MapAccum::generate "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring") casadi::MapAccum::isNull "
+
+Is a null pointer?
+
+";
+
+%feature("docstring") casadi::MapAccum::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Legacy function: Use derForward and derReverse instead.
+
+Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
+
+(n_in = nIn(), n_out = nOut())
+
+";
+
+%feature("docstring") casadi::MapAccum::inputScheme "
+
+Get input scheme.
+
+";
+
+%feature("docstring") casadi::MapAccum::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring") casadi::MapAccum::outputSparsity "
+
+Get sparsity of a given output.
+
+";
+
+%feature("docstring") casadi::MapAccum::getOptionNames "
+
+Get a list of all option names.
+
+";
+
+%feature("docstring") casadi::MapAccum::getOptionDefault "
+
+Get the default of a certain option.
+
+";
+
+%feature("docstring") casadi::MapAccum::evaluate "
+
+Evaluate.
+
+";
+
+%feature("docstring") casadi::MapAccum::inputIndex "
+
+Find the index for a string describing a particular entry of an input
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::MapAccum::outputName "
+
+Get output scheme name by index.
+
+";
+
+%feature("docstring") casadi::MapAccum::assertInit "[INTERNAL]  Assert that
+it is initialized
+
+";
+
+%feature("docstring") casadi::MapAccum::inputName "
+
+Get input scheme name by index.
+
+";
 
 
 // File: singletoncasadi_1_1Matrix.xml
@@ -22090,6 +28503,17 @@ Get a list of all option names.
 
 ";
 
+%feature("docstring") casadi::MXFunction::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::MXFunction::getDescription "
 
 Return a string with a description (for SWIG)
@@ -22098,12 +28522,50 @@ Return a string with a description (for SWIG)
 
 %feature("docstring") casadi::MXFunction::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -22148,6 +28610,41 @@ Jacobian via source code transformation.
 %feature("docstring") casadi::MXFunction::getSanitizedName "
 
 get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring") casadi::MXFunction::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -22564,6 +29061,51 @@ Joel Andersson
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -23406,12 +29948,50 @@ length of iw field.
 
 %feature("docstring") casadi::NlpSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -23446,6 +30026,17 @@ oind:  The index of the output
 
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring") casadi::NlpSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
@@ -23937,6 +30528,13 @@ General information
 |              |              |              | ogenerated   |              |
 |              |              |              | by default)  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| grad_f_optio | OT_DICT      | GenericType( | Options for  | casadi::NlpS |
+| ns           |              | )            | the autogene | olverInterna |
+|              |              |              | rated        | l            |
+|              |              |              | gradient of  |              |
+|              |              |              | the          |              |
+|              |              |              | objective.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | grad_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NlpS |
 |              |              | )            | calculating  | olverInterna |
 |              |              |              | the gradient | l            |
@@ -23946,6 +30544,13 @@ General information
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| grad_lag_opt | OT_DICT      | GenericType( | Options for  | casadi::NlpS |
+| ions         |              | )            | the autogene | olverInterna |
+|              |              |              | rated        | l            |
+|              |              |              | gradient of  |              |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | hess_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NlpS |
 |              |              | )            | calculating  | olverInterna |
 |              |              |              | the Hessian  | l            |
@@ -23954,6 +30559,13 @@ General information
 |              |              |              | autogenerate |              |
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hess_lag_opt | OT_DICT      | GenericType( | Options for  | casadi::NlpS |
+| ions         |              | )            | the autogene | olverInterna |
+|              |              |              | rated        | l            |
+|              |              |              | Hessian of   |              |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | casadi::NlpS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -24001,13 +30613,20 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 | jac_f        | OT_FUNCTION  | GenericType( | Function for | casadi::NlpS |
 |              |              | )            | calculating  | olverInterna |
-|              |              |              | the jacobian | l            |
+|              |              |              | the Jacobian | l            |
 |              |              |              | of the       |              |
 |              |              |              | objective    |              |
 |              |              |              | (sparse row, |              |
 |              |              |              | autogenerate |              |
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_f_option | OT_DICT      | GenericType( | Options for  | casadi::NlpS |
+| s            |              | )            | the autogene | olverInterna |
+|              |              |              | rated        | l            |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | objective.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_g        | OT_FUNCTION  | GenericType( | Function for | casadi::NlpS |
 |              |              | )            | calculating  | olverInterna |
@@ -24017,6 +30636,58 @@ General information
 |              |              |              | (autogenerat |              |
 |              |              |              | ed by        |              |
 |              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_g_option | OT_DICT      | GenericType( | Options for  | casadi::NlpS |
+| s            |              | )            | the autogene | olverInterna |
+|              |              |              | rated        | l            |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | constraints. |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -28116,7 +34787,10 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::NlpSolver::getReportConstraints "";
+%feature("docstring") casadi::NlpSolver::setOptionByEnumValue "[INTERNAL]
+Set a certain option by giving an enum value.
+
+";
 
 %feature("docstring") casadi::NlpSolver::isNull "
 
@@ -28268,6 +34942,41 @@ Print options to a stream.
 
 ";
 
+%feature("docstring") casadi::NlpSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring") casadi::NlpSolver::symbolicInput "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
@@ -28317,10 +35026,7 @@ Get output scheme name by index.
 
 ";
 
-%feature("docstring") casadi::NlpSolver::setOptionByEnumValue "[INTERNAL]
-Set a certain option by giving an enum value.
-
-";
+%feature("docstring") casadi::NlpSolver::getReportConstraints "";
 
 %feature("docstring") casadi::NlpSolver::spInit "[INTERNAL]  Reset the
 sparsity propagation.
@@ -28574,6 +35280,17 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
+%feature("docstring") casadi::Nullspace::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::Nullspace::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
@@ -28646,9 +35363,9 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::Nullspace::numelIn "
+%feature("docstring") casadi::Nullspace::getOptionNames "
 
-Get total number of elements in all of the matrix-valued inputs.
+Get a list of all option names.
 
 ";
 
@@ -28683,9 +35400,9 @@ Get input scheme.
 
 ";
 
-%feature("docstring") casadi::Nullspace::copyOptions "
+%feature("docstring") casadi::Nullspace::numelIn "
 
-Copy all options from another object.
+Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
@@ -28973,6 +35690,12 @@ Get total number of elements in all of the matrix-valued outputs.
 
 ";
 
+%feature("docstring") casadi::Nullspace::copyOptions "
+
+Copy all options from another object.
+
+";
+
 %feature("docstring") casadi::Nullspace::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
@@ -29011,12 +35734,6 @@ adjoint sensitivities, one direction at a time.
 %feature("docstring") casadi::Nullspace::print "
 
 Print a description of the object.
-
-";
-
-%feature("docstring") casadi::Nullspace::getOptionNames "
-
-Get a list of all option names.
 
 ";
 
@@ -29180,6 +35897,51 @@ basis Joris Gillis
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -29367,6 +36129,41 @@ Default constructor.
 
 ";
 
+%feature("docstring") casadi::Nullspace::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring") casadi::Nullspace::derReverse "
 
 Get a function that calculates nadj adjoint derivatives.
@@ -29399,12 +36196,50 @@ that it is initialized
 
 %feature("docstring") casadi::Nullspace::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -29429,9 +36264,6 @@ ownership, only weak references to the derivatives are kept internally.
 
 
 // File: classcasadi_1_1OldCollocationIntegrator.xml
-
-
-// File: classcasadi_1_1OmpMap.xml
 
 
 // File: classcasadi_1_1OneSX.xml
@@ -30044,6 +36876,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -30225,6 +37102,17 @@ val:  can be double, const std::vector<double>&, const Matrix<double>&,
 double *
 
 oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::QcqpSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
@@ -30462,6 +37350,11 @@ Add modules to be monitored.
 
 ";
 
+%feature("docstring") casadi::QcqpSolver::assertInit "[INTERNAL]  Assert
+that it is initialized
+
+";
+
 %feature("docstring") casadi::QcqpSolver::outputSparsity "
 
 Get sparsity of a given output.
@@ -30586,14 +37479,6 @@ Get the type of a certain option.
 
 ";
 
-%feature("docstring") casadi::QcqpSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional.
-
-derivatives forward or backward (for usage, see the example
-propagating_sparsity.cpp)
-
-";
-
 %feature("docstring") casadi::QcqpSolver::derReverse "
 
 Get a function that calculates nadj adjoint derivatives.
@@ -30619,8 +37504,46 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::QcqpSolver::assertInit "[INTERNAL]  Assert
-that it is initialized
+%feature("docstring") casadi::QcqpSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
+%feature("docstring") casadi::QcqpSolver::spEvaluate "[INTERNAL]  Propagate
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -30911,12 +37834,50 @@ Is a null pointer?
 
 %feature("docstring") casadi::QcqpSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -31518,6 +38479,17 @@ get an option value
 
 ";
 
+%feature("docstring") casadi::QpSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::QpSolver::nnzOut "
 
 Get total number of nonzeros in all of the matrix-valued outputs.
@@ -31736,6 +38708,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -32353,12 +39370,50 @@ Print a representation of the object.
 
 %feature("docstring") casadi::QpSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -32572,6 +39627,41 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
+%feature("docstring") casadi::QpSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring") casadi::QpSolver::derivative "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -32649,7 +39739,42 @@ Get input scheme name by index.
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::SdpSolver::generate "
+casadi::SdpSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
+%feature("docstring") casadi::SdpSolver::generate "
 
 Export / Generate C code for the function.
 
@@ -33232,6 +40357,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -33919,7 +41089,56 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 %feature("docstring") casadi::SdpSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+";
+
+%feature("docstring") casadi::SdpSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
 
 Parameters:
 -----------
@@ -34262,6 +41481,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -34433,6 +41697,17 @@ more documentation in the node class (SharedObjectNode and derived classes)
 
 %feature("docstring") casadi::SdqpSolver::sz_w "[INTERNAL]  Get required
 length of w field.
+
+";
+
+%feature("docstring") casadi::SdqpSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
@@ -34670,12 +41945,50 @@ corresponding to the Hessian and the gradients.
 
 %feature("docstring") casadi::SdqpSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -35106,6 +42419,41 @@ Get sparsity of a given output.
 
 ";
 
+%feature("docstring") casadi::SdqpSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring") casadi::SdqpSolver::outputName "
 
 Get output scheme name by index.
@@ -35170,9 +42518,8 @@ Get the type of a certain option.
 
 ";
 
-%feature("docstring") casadi::SdqpSolver::outputScheme "
-
-Get output scheme.
+%feature("docstring") casadi::SdqpSolver::assertInit "[INTERNAL]  Assert
+that it is initialized
 
 ";
 
@@ -35200,8 +42547,9 @@ sparsity propagation.
 
 ";
 
-%feature("docstring") casadi::SdqpSolver::assertInit "[INTERNAL]  Assert
-that it is initialized
+%feature("docstring") casadi::SdqpSolver::outputScheme "
+
+Get output scheme.
 
 ";
 
@@ -35401,12 +42749,50 @@ the output elements).
 
 %feature("docstring") casadi::Simulator::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -35470,9 +42856,9 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::Simulator::isNull "
+%feature("docstring") casadi::Simulator::evaluate "
 
-Is a null pointer?
+Evaluate.
 
 ";
 
@@ -35729,6 +43115,51 @@ Joel Andersson
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp | casadi::Simu |
@@ -35971,9 +43402,9 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::Simulator::evaluate "
+%feature("docstring") casadi::Simulator::isNull "
 
-Evaluate.
+Is a null pointer?
 
 ";
 
@@ -36332,6 +43763,41 @@ output_fcn:  output function which maps to n outputs.
 
 ";
 
+%feature("docstring") casadi::Simulator::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring") casadi::Simulator::assertInit "[INTERNAL]  Assert
 that it is initialized
 
@@ -36414,6 +43880,17 @@ Get sparsity of a given input.
 %feature("docstring") casadi::Simulator::inputScheme "
 
 Get input scheme.
+
+";
+
+%feature("docstring") casadi::Simulator::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
@@ -36902,12 +44379,50 @@ iname:  input name. Only allowed when an input scheme is set.
 
 %feature("docstring") casadi::SocpSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -37167,6 +44682,41 @@ Print options to a stream.
 
 ";
 
+%feature("docstring") casadi::SocpSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring") casadi::SocpSolver "
 
 SocpSolver.
@@ -37409,6 +44959,51 @@ General information
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -38955,6 +46550,17 @@ Get input scheme name by index.
 
 ";
 
+%feature("docstring") casadi::SocpSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::SocpSolver::addMonitor "
 
 Add modules to be monitored.
@@ -40390,6 +47996,17 @@ internally
 
 ";
 
+%feature("docstring") casadi::StabilizedQpSolver::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::StabilizedQpSolver::derForward "
 
 Get a function that calculates nfwd forward derivatives.
@@ -40965,6 +48582,51 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -41492,12 +49154,50 @@ required length of iw field.
 
 %feature("docstring") casadi::StabilizedQpSolver::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -41563,6 +49263,41 @@ more documentation in the node class (SharedObjectNode and derived classes)
 %feature("docstring") casadi::StabilizedQpSolver::inputSparsity "
 
 Get sparsity of a given input.
+
+";
+
+%feature("docstring") casadi::StabilizedQpSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -41696,9 +49431,9 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::Switch::getSanitizedName "
+%feature("docstring") casadi::Switch::callForward "
 
-get function name with all non alphanumeric characters converted to '_'
+Create call to (cached) derivative function, forward mode.
 
 ";
 
@@ -42029,9 +49764,9 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::Switch::callForward "
+%feature("docstring") casadi::Switch::getSanitizedName "
 
-Create call to (cached) derivative function, forward mode.
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -42159,6 +49894,46 @@ the enum value corresponding to th certain option.
 
 ";
 
+%feature("docstring") casadi::Switch::printPtr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
+%feature("docstring") casadi::Switch::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring") casadi::Switch::nIn "
 
 Get the number of function inputs.
@@ -42219,12 +49994,50 @@ Get the number of function outputs.
 
 %feature("docstring") casadi::Switch::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -42271,8 +50084,14 @@ Constructor (if-else)
 
 ";
 
-%feature("docstring") casadi::Switch::printPtr "[INTERNAL]  Print the
-pointer to the internal class
+%feature("docstring") casadi::Switch::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
@@ -42477,6 +50296,51 @@ Switch statement Joel Andersson
 |              |              |              | the inputs   |              |
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -42735,6 +50599,41 @@ scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::SXFunction::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -43371,6 +51270,17 @@ Get input scheme name by index.
 
 ";
 
+%feature("docstring") casadi::SXFunction::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
 %feature("docstring") casadi::SXFunction::sz_arg "[INTERNAL]  Get required
 length of arg field.
 
@@ -43583,6 +51493,51 @@ Joel Andersson
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
 | just_in_time | OT_BOOLEAN   | false        | Just-in-time | casadi::SXFu |
 | _opencl      |              |              | compilation  | nctionIntern |
 |              |              |              | for numeric  | al           |
@@ -43745,12 +51700,50 @@ Get input scheme description by index.
 
 %feature("docstring") casadi::SXFunction::map "
 
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
 Evaluate symbolically in parallel (matrix graph)
 
 Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict options=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
 
 ";
 
@@ -44164,6 +52157,22 @@ Returns the list of all i in [0, size[ not found in supplied list.
 The supplied vector may contain duplicates and may be non-monotonous The
 supplied vector will be checked for bounds The result vector is guaranteed
 to be monotonously increasing
+
+";
+
+%feature("docstring") casadi::swapIndices "
+
+swap inner and outer indices of list of lists
+
+
+
+::
+
+  * [[apple0,apple1,...],[pear0,pear1,...]] ->
+  *   [[apple0,pear0],[apple1,pear1],...]
+  * 
+
+
 
 ";
 

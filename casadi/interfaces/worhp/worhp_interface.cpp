@@ -518,6 +518,8 @@ namespace casadi {
 
     double time1 = clock();
 
+    bool firstIteration = true;
+
     // Reverse Communication loop
     while (worhp_c_.status < TerminateSuccess &&  worhp_c_.status > TerminateError) {
       if (GetUserAction(&worhp_c_, callWorhp)) {
@@ -527,7 +529,8 @@ namespace casadi {
 
       if (GetUserAction(&worhp_c_, iterOutput)) {
 
-        if (!worhp_w_.FirstIteration) {
+        if (!firstIteration) {
+          firstIteration = true;
           if (gather_stats_) {
             Dict iterations = stats_["iterations"];
             append_to_vec(iterations["iter_sqp"], static_cast<int>(worhp_w_.MinorIter));
