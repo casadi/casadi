@@ -14,7 +14,7 @@ endif()
 find_library(MOSEK_LIBRARY
   NAMES mosek64
   PATHS ~/mosek/7/tools/platform/linux64x86/bin
-  ${MOSEK}/bin $ENV{MOSEK}/7/tools/platform/linux64x86/bin ~/local/lib /usr/local/lib
+  $ENV{MOSEK}/bin $ENV{MOSEK}/7/tools/platform/linux64x86/bin ~/local/lib /usr/local/lib
 )
 
 if(MOSEK_LIBRARY)
