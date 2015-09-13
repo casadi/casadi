@@ -103,8 +103,10 @@ namespace casadi {
     vector<const char *> args;
     args.push_back(inputPath.c_str());
 
+    std::vector<std::string> flags;
+
     if (hasSetOption("flags")) {
-      std::vector<std::string> flags = getOption("flags");
+      flags = getOption("flags");
       for (int i=0;i<flags.size();++i) {
         args.push_back(flags[i].c_str());
       }
