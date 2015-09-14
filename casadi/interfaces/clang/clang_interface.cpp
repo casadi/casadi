@@ -92,7 +92,6 @@ namespace casadi {
     // Path to the C file
     string inputPath = name + ".c";
 
-
     context_ = new llvm::LLVMContext();
 
     // Arguments to pass to the clang frontend
@@ -176,65 +175,6 @@ namespace casadi {
     }
 
     executionEngine_->finalizeObject();
-
-    std::string name_init = name + "_init";
-    std::string name_sparsity = name + "_sparsity";
-    std::string name_work = name + "_work";
-    std::string name_eval = name;
-
-    init_fun_ = initPtr(getFunction(name_init));
-    if (!init_fun_) casadi_error("Symbol " << name_init << "not found.");
-
-    int f_type, n_in, n_out, sz_arg, sz_res;
-    int myres = init_fun_(&f_type, &n_in, &n_out, &sz_arg, &sz_res);
-    casadi_assert_message(myres==0, "ClangJitCompilerInternal: \"init\" failed");
-
-    ibuf_.resize(n_in);
-    obuf_.resize(n_out);
-
-    sparsity_fun_ = sparsityPtr(getFunction(name_sparsity));
-    if (!sparsity_fun_) casadi_error("Symbol " << name_sparsity << "not found.");
-    work_fun_ = workPtr(getFunction(name_work));
-    if (!work_fun_) casadi_error("Symbol " << name_work << "not found.");
-    eval_fun_ = evalPtr(getFunction(name_eval));
-    if (!eval_fun_) casadi_error("Symbol " << name_eval << "not found.");
-
-    // Get the sparsity patterns
-    for (int i=0; i<nIn()+nOut(); ++i) {
-      // Get sparsity from file
-      int nrow, ncol;
-      const int *colind, *row;
-      int flag = sparsity_fun_(i, &nrow, &ncol, &colind, &row);
-      casadi_assert_message(flag==0, "ClangJitCompilerInternal: \"sparsity\" failed");
-
-      // Col offsets
-      vector<int> colindv(colind, colind+ncol+1);
-
-      // Number of nonzeros
-      int nnz = colindv.back();
-
-      // Rows
-      vector<int> rowv(row, row+nnz);
-
-      // Sparsity
-      Sparsity sp(nrow, ncol, colindv, rowv);
-
-      // Save to inputs/outputs
-      if (i<nIn()) {
-        input(i) = Matrix<double>::zeros(sp);
-      } else {
-        output(i-nIn()) = Matrix<double>::zeros(sp);
-      }
-    }
-
-    int n_iw, n_w;
-    int flag = work_fun_(&n_iw, &n_w);
-    casadi_assert_message(flag==0, "ClangJitCompilerInternal: \"work\" failed");
-    alloc_iw(n_iw);
-    alloc_w(n_w);
-
-    alloc_arg(max(n_in, sz_arg));
-    alloc_res(max(n_out, sz_res));
   }
 
   void* ClangJitCompilerInterface::getFunction(const std::string& symname) {
@@ -242,7 +182,7 @@ namespace casadi {
   }
 
   void ClangJitCompilerInterface::evalD(const double** arg, double** res, int* iw, double* w) {
-    eval_fun_(arg, res, iw, w);
+    casadi_assert(0);
   }
 
 

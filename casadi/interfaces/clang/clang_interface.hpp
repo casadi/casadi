@@ -107,11 +107,6 @@ namespace casadi {
     virtual void* getFunction(const std::string& symname);
 
   protected:
-    sparsityPtr sparsity_fun_;
-    evalPtr eval_fun_;
-    workPtr work_fun_;
-    initPtr init_fun_;
-
     clang::EmitLLVMOnlyAction* act_;
     llvm::ExecutionEngine* executionEngine_;
     llvm::LLVMContext* context_;

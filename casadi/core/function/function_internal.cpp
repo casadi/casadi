@@ -94,6 +94,7 @@ namespace casadi {
 
     verbose_ = false;
     jit_ = false;
+    evalD_ = 0;
     user_data_ = 0;
     monitor_inputs_ = false;
     monitor_outputs_ = false;
@@ -194,12 +195,14 @@ namespace casadi {
   void FunctionInternal::postinit() {
     if (jit_) {
       compiler_ = JitCompiler(jit_compiler_, shared_from_this<Function>());
+      evalD_ = (evalPtr)compiler_.getFunction("foo");
+      casadi_assert_message(evalD_!=0, "Cannot load JIT'ed function.");
     }
   }
 
   void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w) {
-    if (jit_) {
-      compiler_(arg, res, iw, w);
+    if (evalD_) {
+      evalD_(arg, res, iw, w);
     } else {
       evalD(arg, res, iw, w);
     }

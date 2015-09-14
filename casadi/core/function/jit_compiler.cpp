@@ -72,4 +72,8 @@ namespace casadi {
     return (*this)->plugin_name();
   }
 
+  void* JitCompiler::getFunction(const std::string& symname) {
+    return (*this)->getFunction(symname);
+  }
+
 } // namespace casadi

@@ -71,8 +71,13 @@ namespace casadi {
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
 
-    /// Queery plugin name
+    /// Query plugin name
     std::string plugin_name() const;
+
+#ifndef SWIG
+    /// Get a function pointer for numerical evaluation
+    void* getFunction(const std::string& symname);
+#endif // SWIG
   };
 
 } // namespace casadi

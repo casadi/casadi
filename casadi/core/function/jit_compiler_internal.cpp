@@ -31,15 +31,6 @@ using namespace std;
 namespace casadi {
 
   JitCompilerInternal::JitCompilerInternal(const Function& f) : f_(f) {
-
-    // Set default options
-    setOption("name", "unnamed JIT function"); // name of the function
-    if (f.hasSetOption("input_scheme")) {
-      setOption("input_scheme", f.getOption("input_scheme"));
-    }
-    if (f.hasSetOption("output_scheme")) {
-      setOption("output_scheme", f.getOption("output_scheme"));
-    }
   }
 
   JitCompilerInternal::~JitCompilerInternal() {
