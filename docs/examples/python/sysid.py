@@ -92,19 +92,8 @@ def gauss_newton(e,nlp,V):
 
   J = jacobian(e,V)
   sigma = MX.sym("sigma")
-  hessLag = MXFunction('H',hessLagIn(x=V,lam_f=sigma),hessLagOut(hess=sigma*mul(J.T,J)))
-
-  # Code-generation for extra speedup
-  nlp     = JitCompiler("clang",nlp)
-  gradF   = JitCompiler("clang",gradF)
-  jacG    = JitCompiler("clang",jacG)
-  hessLag = JitCompiler("clang",hessLag)
-
-  options = {}
-  options["hess_lag"] = hessLag
-  options["grad_f"] = gradF
-  options["jac_g"] = jacG
-  return NlpSolver("solver","ipopt", nlp, options)
+  hessLag = MXFunction('H',hessLagIn(x=V,lam_f=sigma),hessLagOut(hess=sigma*mul(J.T,J)),{'jit':True})
+  return NlpSolver("solver","ipopt", nlp, {"hess_lag":hessLag})
 
 ############ Identifying the simulated system: single shooting strategy ##########
 
@@ -114,7 +103,7 @@ def gauss_newton(e,nlp,V):
 
 e = y_data-X_symbolic[0,:].T;
 
-nlp = MXFunction("nlp", nlpIn(x=params), nlpOut(f=0.5*inner_prod(e,e)))
+nlp = MXFunction("nlp", nlpIn(x=params), nlpOut(f=0.5*inner_prod(e,e)),{'jit':True})
 
 solver = gauss_newton(e,nlp, params)
 
