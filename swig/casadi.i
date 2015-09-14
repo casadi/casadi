@@ -3376,13 +3376,15 @@ DECL M %SHOW(find)(const M& x) {
 #if FLAG & IS_GLOBAL
 DECL std::vector< M >
 %SHOW(matrix_expand)(const std::vector< M >& e,
-                     const std::vector< M > &boundary = std::vector< M >()) {
-  return matrix_expand(e, boundary);
+                     const std::vector< M > &boundary = std::vector< M >(),
+                     const Dict& options = Dict()) {
+  return matrix_expand(e, boundary, options);
 }
 
 DECL M %SHOW(matrix_expand)(const M& e,
-                            const std::vector< M > &boundary = std::vector< M >()) {
-  return matrix_expand(e, boundary);
+                            const std::vector< M > &boundary = std::vector< M >(),
+                            const Dict& options = Dict()) {
+  return matrix_expand(e, boundary, options);
 }
 
 DECL M %SHOW(graph_substitute)(const M& ex, const std::vector< M >& v,
