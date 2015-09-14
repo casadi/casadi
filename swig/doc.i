@@ -2094,6 +2094,9 @@ Generate a file, return code as string.
 // File: classcasadi_1_1CollocationIntegrator.xml
 
 
+// File: classcasadi_1_1CommonExternal.xml
+
+
 // File: classcasadi_1_1Concat.xml
 
 
@@ -11132,6 +11135,16 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+>List of available monitors
+
++---------+--------------------------+
+|   Id    |         Used in          |
++=========+==========================+
+| inputs  | casadi::FunctionInternal |
++---------+--------------------------+
+| outputs | casadi::FunctionInternal |
++---------+--------------------------+
+
 Diagrams
 --------
 
@@ -11725,6 +11738,13 @@ Load an external function File name is assumed to be ./<f_name>.so.
 std::string &name, const std::string &bin_name, const Dict &opts=Dict()) "
 
 Load an external function File name given.
+
+";
+
+%feature("docstring") casadi::ExternalFunction::ExternalFunction(const
+std::string &name, const JitCompiler &compiler, const Dict &opts=Dict()) "
+
+Load a just-in-time compiled external function File name given.
 
 ";
 
@@ -23078,6 +23098,57 @@ Print options to a stream.
 
 
 // File: classcasadi_1_1LapackQrDense.xml
+
+
+// File: classcasadi_1_1LibInfo.xml
+%feature("docstring") casadi::LibInfo "[INTERNAL]  Structure with
+information about the library.
+
+C++ includes: external_function_internal.hpp ";
+
+
+// File: classcasadi_1_1LibInfo_3_01JitCompiler_01_4.xml
+%feature("docstring") casadi::LibInfo< JitCompiler >::LibInfo() " [INTERNAL]
+";
+
+%feature("docstring") casadi::LibInfo< JitCompiler >::LibInfo(const
+JitCompiler &compiler, const std::string &name) " [INTERNAL] ";
+
+%feature("docstring") casadi::LibInfo< JitCompiler > " [INTERNAL]  Library
+that has been just-in-time compiled.
+
+C++ includes: external_function_internal.hpp ";
+
+%feature("docstring")  casadi::LibInfo< JitCompiler >::clear() " [INTERNAL]
+";
+
+%feature("docstring")  casadi::LibInfo< JitCompiler >::get(FcnPtr &fcnPtr,
+const std::string &sym) " [INTERNAL] ";
+
+%feature("docstring")  casadi::LibInfo< JitCompiler >::name() const  "
+[INTERNAL] ";
+
+
+// File: classcasadi_1_1LibInfo_3_01std_1_1string_01_4.xml
+%feature("docstring") casadi::LibInfo< std::string > " [INTERNAL]  Library
+given as a dynamically linked library.
+
+C++ includes: external_function_internal.hpp ";
+
+%feature("docstring")  casadi::LibInfo< std::string >::get(FcnPtr &fcnPtr,
+const std::string &sym) " [INTERNAL] ";
+
+%feature("docstring")  casadi::LibInfo< std::string >::clear() " [INTERNAL]
+";
+
+%feature("docstring") casadi::LibInfo< std::string >::LibInfo() " [INTERNAL]
+";
+
+%feature("docstring") casadi::LibInfo< std::string >::LibInfo(const
+std::string &bin_name, const std::string &name) " [INTERNAL] ";
+
+%feature("docstring")  casadi::LibInfo< std::string >::name() const  "
+[INTERNAL] ";
 
 
 // File: classcasadi_1_1LinearSolver.xml
