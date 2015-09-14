@@ -143,8 +143,12 @@ namespace casadi {
       casadi_error("Cannot execute action");
 
     // Grab the module built by the EmitLLVMOnlyAction
+    #if LLVM_VERSION_MAJOR>=3 && LLVM_VERSION_MINOR>=5
     std::unique_ptr<llvm::Module> module = act_->takeModule();
     module_ = module.get();
+    #else
+    module_ = act_->takeModule();
+    #endif
 
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
