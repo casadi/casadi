@@ -114,7 +114,10 @@ class CASADI_EXPORT DerivativeGenerator2 {
   public:
     DerivativeGenerator2();
 
-    virtual Function operator()(const Function& fcn, int ndir);
+    virtual Function operator()(Function& fcn, int ndir);
+
+    /// Computes the derivative as if this derivative generator does not exist
+    Function original(Function& fcn, int ndir, bool fwd);
 
     DerivativeGenerator create();
 
