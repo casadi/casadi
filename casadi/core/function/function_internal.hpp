@@ -651,6 +651,15 @@ namespace casadi {
     /** \brief  Temporary vector needed for the evaluation (real) */
     std::vector<double> w_tmp_;
 
+    ///@{
+    /** \brief  Function pointer types */
+    typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
+                               const int **colind, const int **row);
+    typedef int (*workPtr)(int *n_iw, int *n_w);
+    typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
+    typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
+    ///@}
+
   private:
     /** \brief Sizes of input and output buffers */
     size_t sz_arg_, sz_res_, sz_iw_, sz_w_;

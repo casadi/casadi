@@ -104,14 +104,6 @@ namespace casadi {
     virtual const char* plugin_name() const { return "clang";}
 
   protected:
-    typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
-                               const int **colind, const int **row);
-    typedef int (*workPtr)(int *n_iw, int *n_w);
-    typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
-
-    /** \brief Function pointer for initialization of external */
-    typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
-
     sparsityPtr sparsity_fun_;
     evalPtr eval_fun_;
     workPtr work_fun_;
