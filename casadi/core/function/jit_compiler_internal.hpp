@@ -74,6 +74,10 @@ namespace casadi {
 
     /// Queery plugin name
     virtual const char* plugin_name() const = 0;
+
+    /// Get a function pointer for numerical evaluation
+    virtual void* getFunction(const std::string& symname) = 0;
+
   };
 } // namespace casadi
 /// \endcond

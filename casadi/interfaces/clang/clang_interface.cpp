@@ -69,9 +69,11 @@ namespace casadi {
     myerr_ = 0;
     executionEngine_ = 0;
     context_ = 0;
+    act_ = 0;
   }
 
   ClangJitCompilerInterface::~ClangJitCompilerInterface() {
+    if (act_) delete act_;
     if (myerr_) delete myerr_;
     if (executionEngine_) delete executionEngine_;
     if (context_) delete context_;
@@ -159,10 +161,10 @@ namespace casadi {
 
     // Grab the module built by the EmitLLVMOnlyAction
     std::unique_ptr<llvm::Module> module = act_->takeModule();
+    module_ = module.get();
 
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
-    llvm::Module &M = *module;
 
     // Create the JIT.  This takes ownership of the module.
     std::string ErrStr;
@@ -175,16 +177,12 @@ namespace casadi {
 
     executionEngine_->finalizeObject();
 
-    if (act_) delete act_;
-    act_ = 0;
-
     std::string name_init = name + "_init";
     std::string name_sparsity = name + "_sparsity";
     std::string name_work = name + "_work";
     std::string name_eval = name;
 
-    init_fun_ = initPtr(intptr_t(
-      executionEngine_->getPointerToFunction(M.getFunction(name_init))));
+    init_fun_ = initPtr(getFunction(name_init));
     if (!init_fun_) casadi_error("Symbol " << name_init << "not found.");
 
     int f_type, n_in, n_out, sz_arg, sz_res;
@@ -194,14 +192,11 @@ namespace casadi {
     ibuf_.resize(n_in);
     obuf_.resize(n_out);
 
-    sparsity_fun_ = sparsityPtr(intptr_t(
-      executionEngine_->getPointerToFunction(M.getFunction(name_sparsity))));
+    sparsity_fun_ = sparsityPtr(getFunction(name_sparsity));
     if (!sparsity_fun_) casadi_error("Symbol " << name_sparsity << "not found.");
-    work_fun_ = workPtr(intptr_t(
-      executionEngine_->getPointerToFunction(M.getFunction(name_work))));
+    work_fun_ = workPtr(getFunction(name_work));
     if (!work_fun_) casadi_error("Symbol " << name_work << "not found.");
-    eval_fun_ = evalPtr(intptr_t(
-      executionEngine_->getPointerToFunction(M.getFunction(name_eval))));
+    eval_fun_ = evalPtr(getFunction(name_eval));
     if (!eval_fun_) casadi_error("Symbol " << name_eval << "not found.");
 
     // Get the sparsity patterns
@@ -240,6 +235,10 @@ namespace casadi {
 
     alloc_arg(max(n_in, sz_arg));
     alloc_res(max(n_out, sz_res));
+  }
+
+  void* ClangJitCompilerInterface::getFunction(const std::string& symname) {
+    return executionEngine_->getPointerToFunction(module_->getFunction(symname));
   }
 
   void ClangJitCompilerInterface::evalD(const double** arg, double** res, int* iw, double* w) {

@@ -103,6 +103,9 @@ namespace casadi {
     /// Get name of plugin
     virtual const char* plugin_name() const { return "clang";}
 
+    /// Get a function pointer for numerical evaluation
+    virtual void* getFunction(const std::string& symname);
+
   protected:
     sparsityPtr sparsity_fun_;
     evalPtr eval_fun_;
@@ -113,6 +116,7 @@ namespace casadi {
     llvm::ExecutionEngine* executionEngine_;
     llvm::LLVMContext* context_;
     llvm::raw_ostream* myerr_;
+    llvm::Module* module_; // owned by executionEngine_
   };
 
 } // namespace casadi
