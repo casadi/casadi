@@ -627,6 +627,7 @@ namespace casadi {
     /// Just-in-time compiler
     std::string jit_compiler_;
     JitCompiler compiler_;
+    Dict jit_options_;
 
     bool monitor_inputs_, monitor_outputs_;
 

@@ -102,8 +102,8 @@ def gauss_newton(e,nlp,V):
 [X_symbolic] = all_samples([x0, u_data, repmat(params*scale,1,N) ])
 
 e = y_data-X_symbolic[0,:].T;
-
-nlp = MXFunction("nlp", nlpIn(x=params), nlpOut(f=0.5*inner_prod(e,e)),{'jit':True})
+opts = {'jit':True, "jit_options":{"flags":['-O3']}}
+nlp = MXFunction("nlp", nlpIn(x=params), nlpOut(f=0.5*inner_prod(e,e)),opts)
 
 solver = gauss_newton(e,nlp, params)
 

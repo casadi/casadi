@@ -62,7 +62,7 @@ namespace casadi {
     addOption("include_path", OT_STRING, "", "Include paths for the JIT compiler."
       " The include directory shipped with CasADi will be automatically appended.");
     addOption("flags", OT_STRINGVECTOR, GenericType(),
-      "Compile flags for the JIT compiler. Default: -O3.");
+      "Compile flags for the JIT compiler. Default: None");
 
     myerr_ = 0;
     executionEngine_ = 0;
@@ -81,19 +81,17 @@ namespace casadi {
     // Initialize the base classes
     JitCompilerInternal::init();
 
+    // Create an LLVM context (NOTE: should use a static context instead?)
     context_ = new llvm::LLVMContext();
 
     // Arguments to pass to the clang frontend
     vector<const char *> args(1, name_.c_str());
     std::vector<std::string> flags;
-
     if (hasSetOption("flags")) {
       flags = getOption("flags");
-      for (int i=0;i<flags.size();++i) {
-        args.push_back(flags[i].c_str());
+      for (auto i=flags.begin(); i!=flags.end(); ++i) {
+        args.push_back(i->c_str());
       }
-    } else {
-      args.push_back("-O3");
     }
 
     // The compiler invocation needs a DiagnosticsEngine so it can report problems
