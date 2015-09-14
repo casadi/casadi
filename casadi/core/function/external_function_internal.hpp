@@ -42,12 +42,86 @@
 
 namespace casadi {
 
-  class CASADI_EXPORT ExternalFunctionInternal : public FunctionInternal {
-    friend class ExternalFunction;
+  /** \brief Structure with information about the library */
+  template<typename LibType>
+  class LibInfo {};
+
+  /** \brief Library given as a dynamically linked library */
+  template<>
+  class LibInfo<std::string> {
+  private:
+#if defined(WITH_DL) && defined(_WIN32) // also for 64-bit
+    typedef HINSTANCE handle_t;
+#else
+    typedef void* handle_t;
+#endif
+
+    std::string bin_name_;
+    std::string name_;
+    handle_t handle_;
+
   public:
-    /** \brief Creator function, use this for creating instances of the class */
+    int n_in, n_out, sz_arg, sz_res;
+
+    // Default constructor
+    LibInfo() : handle_(0) {}
+
+    // Constructor
+    explicit LibInfo(const std::string& bin_name, const std::string& name);
+
+    // Clear memory
+    void clear();
+
+    // Automatic type conversion
+    operator const std::string&() const { return bin_name_;}
+
+    // Function name
+    const std::string& name() const { return name_;}
+
+    // Get function pointer
+    template<typename FcnPtr>
+    void get(FcnPtr& fcnPtr, const std::string& sym);
+  };
+
+  /** \brief Library that has been just-in-time compiled */
+  template<>
+  class LibInfo<JitCompiler> {
+  private:
+    JitCompiler compiler_;
+    std::string name_;
+
+  public:
+    int n_in, n_out, sz_arg, sz_res;
+
+    // Default constructor
+    LibInfo() {}
+
+    // Constructor
+    explicit LibInfo(const JitCompiler& compiler, const std::string& name);
+
+    // Clear memory
+    void clear() {}
+
+    // Automatic type conversion
+    operator const JitCompiler&() const { return compiler_;}
+
+    // Function name
+    const std::string& name() const { return name_;}
+
+    // Get function pointer
+    template<typename FcnPtr>
+    void get(FcnPtr& fcnPtr, const std::string& sym);
+  };
+
+  class CASADI_EXPORT ExternalFunctionInternal : public FunctionInternal {
+  public:
+    /** \brief Creator function, dynamically linked library */
     static ExternalFunctionInternal*
-      create(const std::string& bin_name, const std::string& f_name);
+      create(const std::string& bin_name, const std::string& name);
+
+    /** \brief Creator function, just-in-time compiled library */
+    static ExternalFunctionInternal*
+      create(const JitCompiler& compiler, const std::string& name);
 
     /** \brief  clone function */
     virtual ExternalFunctionInternal* clone() const;
@@ -55,8 +129,25 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~ExternalFunctionInternal() = 0;
 
-    /** \brief  Initialize */
-    virtual void init();
+  private:
+    /** \brief Creator function, use this for creating instances of the class */
+    template<typename LibType>
+      static ExternalFunctionInternal*
+      createGeneric(const LibType& bin_name, const std::string& name);
+  };
+
+  template<typename LibType>
+  class CASADI_EXPORT CommonExternal : public ExternalFunctionInternal {
+  protected:
+
+    /** \brief Information about the library */
+    LibInfo<LibType> li_;
+
+    /** \brief  constructor is protected */
+    CommonExternal(const LibInfo<LibType>& li);
+  public:
+    /** \brief  Destructor */
+    virtual ~CommonExternal() = 0;
 
     ///@{
     /** \brief Forward mode derivatives */
@@ -75,51 +166,17 @@ namespace casadi {
     virtual bool hasFullJacobian() const;
     virtual Function getFullJacobian(const std::string& name, const Dict& opts);
     ///@}
-  protected:
-
-    /** \brief  Name of binary */
-    std::string bin_name_;
-
-    /** \brief  Name of the function inside the binary */
-    std::string f_name_;
-
-#if defined(WITH_DL) && defined(_WIN32) // also for 64-bit
-    typedef HINSTANCE handle_t;
-#else
-    typedef void* handle_t;
-#endif
-
-    /** \brief  handle to the dll */
-    handle_t handle_;
-
-    /** \brief Structure with information about the library */
-    struct LibInfo {
-      std::string bin_name;
-      std::string f_name;
-      handle_t handle;
-      int n_in, n_out, sz_arg, sz_res;
-    };
-
-    /** \brief  constructor is protected */
-    ExternalFunctionInternal(const LibInfo& li);
-
-    /** \brief  Get a library handle */
-    static handle_t getHandle(const std::string& bin_name);
-
-    /** \brief  Get function pointer */
-    template<typename FcnPtr>
-      static void getSym(FcnPtr& fcnPtr, handle_t handle, const std::string& sym);
-
-    /** \brief  Free a library handle */
-    static void freeHandle(handle_t& handle);
   };
 
-  class CASADI_EXPORT SimplifiedExternal : public ExternalFunctionInternal {
+  template<typename LibType>
+  class CASADI_EXPORT SimplifiedExternal : public CommonExternal<LibType> {
     friend class ExternalFunctionInternal;
   private:
     /** \brief Constructor is called from factory */
-    SimplifiedExternal(const LibInfo& li);
+    SimplifiedExternal(const LibInfo<LibType>& li);
   public:
+    using CommonExternal<LibType>::li_;
+
     /** \brief  Destructor */
     virtual ~SimplifiedExternal() {}
 
@@ -136,21 +193,19 @@ namespace casadi {
     /** \brief Use simplified signature */
     virtual bool simplifiedCall() const { return true;}
   protected:
-    ///@{
-    /** \brief  Function pointer types */
-    typedef void (*evalPtr)(const double* arg, double* res);
-    ///@}
-
     /** \brief  Function pointers */
-    evalPtr eval_;
+    simplifiedPtr eval_;
   };
 
-  class CASADI_EXPORT GenericExternal : public ExternalFunctionInternal {
+  template<typename LibType>
+  class CASADI_EXPORT GenericExternal : public CommonExternal<LibType> {
     friend class ExternalFunctionInternal;
   private:
     /** \brief Constructor is called from factory */
-    GenericExternal(const LibInfo& li);
+    GenericExternal(const LibInfo<LibType>& li);
   public:
+    using CommonExternal<LibType>::li_;
+
     /** \brief  Destructor */
     virtual ~GenericExternal() {}
 
@@ -172,6 +227,7 @@ namespace casadi {
     /** \brief  Function pointers */
     evalPtr eval_;
   };
+
 
 } // namespace casadi
 /// \endcond

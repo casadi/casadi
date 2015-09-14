@@ -44,6 +44,16 @@
 
 namespace casadi {
 
+  ///@{
+  /** \brief  Function pointer types */
+  typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
+                             const int **colind, const int **row);
+  typedef int (*workPtr)(int *n_iw, int *n_w);
+  typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
+  typedef void (*simplifiedPtr)(const double* arg, double* res);
+  typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
+  ///@}
+
   class MXFunction;
 
   /** \brief Internal class for Function
@@ -52,7 +62,7 @@ namespace casadi {
       A regular user should never work with any Node class. Use Function directly.
   */
   class CASADI_EXPORT FunctionInternal : public OptionsFunctionalityNode,
-                                                  public IOInterface<FunctionInternal>{
+                                         public IOInterface<FunctionInternal>{
     friend class Function;
 
   protected:
@@ -60,15 +70,6 @@ namespace casadi {
     FunctionInternal();
 
   public:
-    ///@{
-    /** \brief  Function pointer types */
-    typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
-                               const int **colind, const int **row);
-    typedef int (*workPtr)(int *n_iw, int *n_w);
-    typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
-    typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
-    ///@}
-
     /** \brief  Destructor */
     virtual ~FunctionInternal() = 0;
 
