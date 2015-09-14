@@ -24,9 +24,7 @@
 
 
 #include "clang_interface.hpp"
-
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/casadi_meta.hpp"
 
 using namespace clang;
@@ -82,7 +80,6 @@ namespace casadi {
   void ClangJitCompilerInterface::init() {
     // Initialize the base classes
     JitCompilerInternal::init();
-    log("ClangJitCompilerInterface::init", "Enter");
 
     context_ = new llvm::LLVMContext();
 
@@ -139,7 +136,6 @@ namespace casadi {
       "include" << filesep << "casadi" << filesep << "jit";
     std::string path;
     while (std::getline(paths, path, pathsep)) {
-      log("ClangInterface::init", std::string("Adding path:") + path);
       Clang.getHeaderSearchOpts().AddPath(path.c_str(), frontend::CSystem, false, false);
     }
 
@@ -169,10 +165,6 @@ namespace casadi {
 
   void* ClangJitCompilerInterface::getFunction(const std::string& symname) {
     return executionEngine_->getPointerToFunction(module_->getFunction(symname));
-  }
-
-  void ClangJitCompilerInterface::evalD(const double** arg, double** res, int* iw, double* w) {
-    casadi_assert(0);
   }
 
 

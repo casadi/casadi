@@ -30,20 +30,18 @@
 using namespace std;
 namespace casadi {
 
-  JitCompilerInternal::JitCompilerInternal(const std::string& name) {
+  JitCompilerInternal::JitCompilerInternal(const std::string& name) : name_(name) {
   }
 
   JitCompilerInternal::~JitCompilerInternal() {
+  }
 
+  void JitCompilerInternal::print(ostream &stream) const {
+    stream << "JitCompiler" << endl;
   }
 
   std::map<std::string, JitCompilerInternal::Plugin> JitCompilerInternal::solvers_;
 
   const std::string JitCompilerInternal::infix_ = "jitcompiler";
-
-  void JitCompilerInternal::init() {
-    // Initialize the base classes
-    FunctionInternal::init();
-  }
 
 } // namespace casadi

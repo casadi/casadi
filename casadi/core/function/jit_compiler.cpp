@@ -35,18 +35,17 @@ namespace casadi {
   JitCompiler::JitCompiler(const std::string& name,
                            const std::string& compiler,
                            const Dict& opts) {
-    assignNode(JitCompilerInternal::instantiatePlugin(compiler, name));
-    setOption("name", name);
+    assignNode(JitCompilerInternal::getPlugin(compiler).creator(name));
     setOption(opts);
     init();
   }
 
   JitCompilerInternal* JitCompiler::operator->() {
-    return static_cast<JitCompilerInternal*>(Function::operator->());
+    return static_cast<JitCompilerInternal*>(OptionsFunctionality::operator->());
   }
 
   const JitCompilerInternal* JitCompiler::operator->() const {
-    return static_cast<const JitCompilerInternal*>(Function::operator->());
+    return static_cast<const JitCompilerInternal*>(OptionsFunctionality::operator->());
   }
 
   bool JitCompiler::testCast(const SharedObjectNode* ptr) {

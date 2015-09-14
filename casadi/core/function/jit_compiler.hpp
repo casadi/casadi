@@ -43,7 +43,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT JitCompiler : public Function {
+  class CASADI_EXPORT JitCompiler : public OptionsFunctionality {
   public:
 
     /// Default constructor

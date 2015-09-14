@@ -41,7 +41,7 @@ namespace casadi {
   \date 2010-2013
 */
   class CASADI_EXPORT
-  JitCompilerInternal : public FunctionInternal,
+  JitCompilerInternal : public OptionsFunctionalityNode,
                         public PluginInterface<JitCompilerInternal> {
 
   public:
@@ -51,8 +51,8 @@ namespace casadi {
     /// Destructor
     virtual ~JitCompilerInternal() = 0;
 
-    /// Initialize
-    virtual void init();
+    /** \brief  Print */
+    virtual void print(std::ostream &stream) const;
 
     // Creator function for internal class
     typedef JitCompilerInternal* (*Creator)(const std::string& name);
@@ -75,7 +75,11 @@ namespace casadi {
     /// Get a function pointer for numerical evaluation
     virtual void* getFunction(const std::string& symname) = 0;
 
+    protected:
+    /// C filename
+    std::string name_;
   };
+
 } // namespace casadi
 /// \endcond
 #endif // CASADI_JIT_COMPILER_INTERNAL_HPP

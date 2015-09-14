@@ -89,9 +89,6 @@ namespace casadi {
       return new ClangJitCompilerInterface(name);
     }
 
-    /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
-
     /** \brief Destructor */
     virtual ~ClangJitCompilerInterface();
 
