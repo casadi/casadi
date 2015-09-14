@@ -11,6 +11,10 @@ set(CLANG_CXX_FLAGS "-fPIC -fvisibility-inlines-hidden -ffunction-sections -fdat
 
 else (OLD_LLVM)
 
+# LLVM needs to be linked with zlib (?)
+find_package(ZLIB REQUIRED)
+message(STATUS "ZLIB libraries ${ZLIB_LIBRARIES}")
+
 message(STATUS "Looking clang 3.5 or newer")
 
 find_package(LLVM REQUIRED CONFIG)
@@ -38,10 +42,9 @@ foreach(D ${CLANG_DEP})
   set(CLANG_LIBRARIES ${CLANG_LIBRARIES} ${CLANG_DEP_${D}})
 endforeach()
 
-# LLVM needs to be linked with zlib (?)
-find_package(ZLIB REQUIRED)
-message(STATUS "ZLIB libraries ${ZLIB_LIBRARIES}")
-set(CLANG_LIBRARIES ${CLANG_LIBRARIES} ${ZLIB_LIBRARIES})
+if (ZLIB_LIBRARIES)
+  set(CLANG_LIBRARIES ${CLANG_LIBRARIES} ${ZLIB_LIBRARIES})
+endif()
 
 if(MINGW)
   message("/usr/${PREFIX}/lib")
