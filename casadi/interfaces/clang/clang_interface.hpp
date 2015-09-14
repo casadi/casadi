@@ -109,11 +109,10 @@ namespace casadi {
     workPtr work_fun_;
     initPtr init_fun_;
 
-    llvm::ExecutionEngine* TheExecutionEngine;
-    llvm::LLVMContext* Context;
-
-    clang::EmitLLVMOnlyAction* Act;
-
+    clang::EmitLLVMOnlyAction* act_;
+    llvm::ExecutionEngine* executionEngine_;
+    llvm::LLVMContext* context_;
+    llvm::raw_ostream* myerr_;
   };
 
 } // namespace casadi

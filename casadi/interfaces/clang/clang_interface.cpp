@@ -65,28 +65,22 @@ namespace casadi {
       " The include directory shipped with CasADi will be automatically appended.");
     addOption("flags", OT_STRINGVECTOR, GenericType(),
       "Compile flags for the JIT compiler. Default: -O3.");
+
+    myerr_ = 0;
+    executionEngine_ = 0;
+    context_ = 0;
   }
 
   ClangJitCompilerInterface::~ClangJitCompilerInterface() {
-    if (isInit()) {
-      if (TheExecutionEngine) {
-        delete TheExecutionEngine;
-        TheExecutionEngine=0;
-      }
-      if (Context) {
-        delete Context;
-        Context=0;
-      }
-    }
-    //llvm::llvm_shutdown();
-
+    if (myerr_) delete myerr_;
+    if (executionEngine_) delete executionEngine_;
+    if (context_) delete context_;
   }
 
   void ClangJitCompilerInterface::init() {
     // Initialize the base classes
     JitCompilerInternal::init();
     log("ClangJitCompilerInterface::init", "Enter");
-
 
 
     std::string name = "foo";
@@ -97,7 +91,7 @@ namespace casadi {
     string inputPath = name + ".c";
 
 
-    Context = new llvm::LLVMContext();
+    context_ = new llvm::LLVMContext();
 
     // Arguments to pass to the clang frontend
     vector<const char *> args;
@@ -116,8 +110,8 @@ namespace casadi {
 
     // The compiler invocation needs a DiagnosticsEngine so it can report problems
     DiagnosticOptions* DiagOpts = new DiagnosticOptions();
-    llvm::raw_ostream* myerr = new llvm::raw_os_ostream(userOut<true>());
-    TextDiagnosticPrinter *DiagClient = new TextDiagnosticPrinter(*myerr, DiagOpts);
+    myerr_ = new llvm::raw_os_ostream(userOut<true>());
+    TextDiagnosticPrinter *DiagClient = new TextDiagnosticPrinter(*myerr_, DiagOpts);
 
     DiagnosticIDs* DiagID = new DiagnosticIDs();
     // This object takes ownerships of all three passed-in pointers
@@ -159,12 +153,12 @@ namespace casadi {
     }
 
     // Create an action and make the compiler instance carry it out
-    Act = new clang::EmitLLVMOnlyAction(Context);
-    if (!Clang.ExecuteAction(*Act))
+    act_ = new clang::EmitLLVMOnlyAction(context_);
+    if (!Clang.ExecuteAction(*act_))
       casadi_error("Cannot execute action");
 
     // Grab the module built by the EmitLLVMOnlyAction
-    std::unique_ptr<llvm::Module> module = Act->takeModule();
+    std::unique_ptr<llvm::Module> module = act_->takeModule();
 
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
@@ -172,17 +166,17 @@ namespace casadi {
 
     // Create the JIT.  This takes ownership of the module.
     std::string ErrStr;
-    TheExecutionEngine =
+    executionEngine_ =
       llvm::EngineBuilder(std::move(module)).setEngineKind(llvm::EngineKind::JIT)
-        .setErrorStr(&ErrStr).create();
-    if (!TheExecutionEngine) {
+      .setErrorStr(&ErrStr).create();
+    if (!executionEngine_) {
       casadi_error("Could not create ExecutionEngine: " << ErrStr);
     }
 
-    TheExecutionEngine->finalizeObject();
+    executionEngine_->finalizeObject();
 
-    delete Act; Act = 0;
-
+    if (act_) delete act_;
+    act_ = 0;
 
     std::string name_init = name + "_init";
     std::string name_sparsity = name + "_sparsity";
@@ -190,7 +184,7 @@ namespace casadi {
     std::string name_eval = name;
 
     init_fun_ = initPtr(intptr_t(
-      TheExecutionEngine->getPointerToFunction(M.getFunction(name_init))));
+      executionEngine_->getPointerToFunction(M.getFunction(name_init))));
     if (!init_fun_) casadi_error("Symbol " << name_init << "not found.");
 
     int f_type, n_in, n_out, sz_arg, sz_res;
@@ -201,13 +195,13 @@ namespace casadi {
     obuf_.resize(n_out);
 
     sparsity_fun_ = sparsityPtr(intptr_t(
-      TheExecutionEngine->getPointerToFunction(M.getFunction(name_sparsity))));
+      executionEngine_->getPointerToFunction(M.getFunction(name_sparsity))));
     if (!sparsity_fun_) casadi_error("Symbol " << name_sparsity << "not found.");
     work_fun_ = workPtr(intptr_t(
-      TheExecutionEngine->getPointerToFunction(M.getFunction(name_work))));
+      executionEngine_->getPointerToFunction(M.getFunction(name_work))));
     if (!work_fun_) casadi_error("Symbol " << name_work << "not found.");
     eval_fun_ = evalPtr(intptr_t(
-      TheExecutionEngine->getPointerToFunction(M.getFunction(name_eval))));
+      executionEngine_->getPointerToFunction(M.getFunction(name_eval))));
     if (!eval_fun_) casadi_error("Symbol " << name_eval << "not found.");
 
     // Get the sparsity patterns
@@ -237,8 +231,6 @@ namespace casadi {
         output(i-nIn()) = Matrix<double>::zeros(sp);
       }
     }
-
-    delete myerr;myerr=0;
 
     int n_iw, n_w;
     int flag = work_fun_(&n_iw, &n_w);
