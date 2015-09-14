@@ -147,7 +147,8 @@ namespace casadi {
     std::unique_ptr<llvm::Module> module = act_->takeModule();
     module_ = module.get();
     #else
-    module_ = act_->takeModule();
+    llvm::Module* module = act_->takeModule(); 
+    module_ = module;
     #endif
 
     llvm::InitializeNativeTarget();
