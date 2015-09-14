@@ -71,6 +71,8 @@ namespace casadi {
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
 
+    /// Queery plugin name
+    std::string plugin_name() const;
   };
 
 } // namespace casadi

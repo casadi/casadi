@@ -72,6 +72,8 @@ namespace casadi {
     /// Short name
     static std::string shortname() { return "jitcompiler";}
 
+    /// Queery plugin name
+    virtual const char* plugin_name() const = 0;
   };
 } // namespace casadi
 /// \endcond

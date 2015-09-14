@@ -928,7 +928,7 @@ namespace casadi {
   }
 
   void Function::operator()(const double** arg, double** res, int* iw, double* w) {
-    (*this)->evalD(arg, res, iw, w);
+    (*this)->eval(arg, res, iw, w);
   }
 
 } // namespace casadi

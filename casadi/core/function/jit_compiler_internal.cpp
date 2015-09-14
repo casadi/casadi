@@ -51,6 +51,7 @@ namespace casadi {
   const std::string JitCompilerInternal::infix_ = "jitcompiler";
 
   void JitCompilerInternal::init() {
+    // Initialize the base classes
     FunctionInternal::init();
   }
 

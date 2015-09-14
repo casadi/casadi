@@ -100,6 +100,9 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Get name of plugin
+    virtual const char* plugin_name() const { return "clang";}
+
   protected:
     typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
                                const int **colind, const int **row);

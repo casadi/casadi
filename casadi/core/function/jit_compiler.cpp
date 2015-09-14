@@ -68,4 +68,8 @@ namespace casadi {
     return JitCompilerInternal::getPlugin(name).doc;
   }
 
+  std::string JitCompiler::plugin_name() const {
+    return (*this)->plugin_name();
+  }
+
 } // namespace casadi

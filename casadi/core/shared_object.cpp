@@ -134,10 +134,14 @@ namespace casadi {
   void SharedObject::init(bool allow_reinit) {
     if (allow_reinit || !isInit()) {
       (*this)->init();
+      (*this)->postinit();
     }
   }
 
   void SharedObjectNode::init() {
+  }
+
+  void SharedObjectNode::postinit() {
   }
 
   void SharedObject::repr(std::ostream &stream, bool trailing_newline) const {

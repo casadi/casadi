@@ -226,6 +226,9 @@ namespace casadi {
     /// Initialize the object
     virtual void init();
 
+    /// Second pass of the initialization. To be run when init has been completed.
+    virtual void postinit();
+
     /// Check if the object has been initialized
     bool isInit() const;
 
