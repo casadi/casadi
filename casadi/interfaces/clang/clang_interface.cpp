@@ -38,7 +38,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_JITCOMPILER_CLANG_EXPORT
-  casadi_register_jitfunction_clang(JitCompilerInternal::Plugin* plugin) {
+  casadi_register_jitcompiler_clang(JitCompilerInternal::Plugin* plugin) {
     plugin->creator = ClangJitCompilerInterface::creator;
     plugin->name = "clang";
     plugin->doc = ClangJitCompilerInterface::meta_doc.c_str();
@@ -47,8 +47,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_JITCOMPILER_CLANG_EXPORT casadi_load_jitfunction_clang() {
-    JitCompilerInternal::registerPlugin(casadi_register_jitfunction_clang);
+  void CASADI_JITCOMPILER_CLANG_EXPORT casadi_load_jitcompiler_clang() {
+    JitCompilerInternal::registerPlugin(casadi_register_jitcompiler_clang);
   }
 
   ClangJitCompilerInterface* ClangJitCompilerInterface::clone() const {
