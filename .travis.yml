@@ -31,7 +31,7 @@ matrix:
         - sudo apt-get install valgrind -y
         - mkdir build
         - pushd build
-        - cmake -DOLD_LLVM=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_DOC=ON -DWITH_EXAMPLES=OFF  ..
+        - cmake -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_DOC=ON -DWITH_EXAMPLES=OFF  ..
         - make -j2
         - sudo make -j2 install
         - popd
@@ -45,7 +45,7 @@ matrix:
         - sudo apt-get install valgrind -y
         - mkdir build
         - pushd build
-        - cmake -DOLD_LLVM=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_DOC=ON -DWITH_EXAMPLES=OFF ..
+        - cmake -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_DOC=ON -DWITH_EXAMPLES=OFF ..
         - make -j2
         - sudo make -j2 install
         - popd
