@@ -50,10 +50,9 @@ namespace casadi {
     JitCompiler();
 
     /// JitCompiler factory (new syntax, includes initialization)
-    JitCompiler(
-      const std::string& compiler,
-      const Function& f,
-      const Dict& opts=Dict());
+    JitCompiler(const std::string& name,
+                const std::string& compiler,
+                const Dict& opts=Dict());
 
     /// Access functions of the node
     JitCompilerInternal* operator->();

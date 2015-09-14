@@ -42,11 +42,11 @@ namespace casadi {
 */
   class CASADI_EXPORT
   JitCompilerInternal : public FunctionInternal,
-                      public PluginInterface<JitCompilerInternal> {
+                        public PluginInterface<JitCompilerInternal> {
 
   public:
     /// Constructor
-    JitCompilerInternal(const Function& f);
+    JitCompilerInternal(const std::string& name);
 
     /// Destructor
     virtual ~JitCompilerInternal() = 0;
@@ -54,11 +54,8 @@ namespace casadi {
     /// Initialize
     virtual void init();
 
-    /// The Function to be JIT'ed
-    Function f_;
-
     // Creator function for internal class
-    typedef JitCompilerInternal* (*Creator)(const Function& f);
+    typedef JitCompilerInternal* (*Creator)(const std::string& name);
 
     // No static functions exposed
     struct Exposed{ };

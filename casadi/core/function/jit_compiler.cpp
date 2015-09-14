@@ -25,8 +25,6 @@
 
 #include "jit_compiler.hpp"
 #include "jit_compiler_internal.hpp"
-#include "sx_function.hpp"
-#include "mx_function.hpp"
 
 using namespace std;
 namespace casadi {
@@ -34,12 +32,11 @@ namespace casadi {
   JitCompiler::JitCompiler() {
   }
 
-  JitCompiler::JitCompiler(
-      const std::string& compiler,
-      const Function& f,
-      const Dict& opts) {
-    assignNode(JitCompilerInternal::instantiatePlugin(compiler, f));
-    setOption("name", f.getOption("name"));
+  JitCompiler::JitCompiler(const std::string& name,
+                           const std::string& compiler,
+                           const Dict& opts) {
+    assignNode(JitCompilerInternal::instantiatePlugin(compiler, name));
+    setOption("name", name);
     setOption(opts);
     init();
   }

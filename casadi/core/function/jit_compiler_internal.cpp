@@ -30,7 +30,7 @@
 using namespace std;
 namespace casadi {
 
-  JitCompilerInternal::JitCompilerInternal(const Function& f) : f_(f) {
+  JitCompilerInternal::JitCompilerInternal(const std::string& name) {
   }
 
   JitCompilerInternal::~JitCompilerInternal() {

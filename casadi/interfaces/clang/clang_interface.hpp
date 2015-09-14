@@ -79,14 +79,15 @@ namespace casadi {
   public:
 
     /** \brief Constructor */
-    explicit ClangJitCompilerInterface(const Function &f);
+    explicit ClangJitCompilerInterface(const std::string& name);
 
     /** \brief Clone */
     virtual ClangJitCompilerInterface* clone() const;
 
     /** \brief  Create a new JIT function */
-    static JitCompilerInternal* creator(const Function &f)
-    { return new ClangJitCompilerInterface(f);}
+    static JitCompilerInternal* creator(const std::string& name) {
+      return new ClangJitCompilerInterface(name);
+    }
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void evalD(const double** arg, double** res, int* iw, double* w);

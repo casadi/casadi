@@ -53,14 +53,14 @@ namespace casadi {
 
   ClangJitCompilerInterface* ClangJitCompilerInterface::clone() const {
     // Return a deep copy
-    ClangJitCompilerInterface* node = new ClangJitCompilerInterface(f_);
+    ClangJitCompilerInterface* node = new ClangJitCompilerInterface(name_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  ClangJitCompilerInterface::ClangJitCompilerInterface(const Function& f) :
-      JitCompilerInternal(f) {
+  ClangJitCompilerInterface::ClangJitCompilerInterface(const std::string& name) :
+    JitCompilerInternal(name) {
     addOption("include_path", OT_STRING, "", "Include paths for the JIT compiler."
       " The include directory shipped with CasADi will be automatically appended.");
     addOption("flags", OT_STRINGVECTOR, GenericType(),
@@ -84,20 +84,10 @@ namespace casadi {
     JitCompilerInternal::init();
     log("ClangJitCompilerInterface::init", "Enter");
 
-
-    std::string name = "foo";
-
-    f_.generate(name);
-
-    // Path to the C file
-    string inputPath = name + ".c";
-
     context_ = new llvm::LLVMContext();
 
     // Arguments to pass to the clang frontend
-    vector<const char *> args;
-    args.push_back(inputPath.c_str());
-
+    vector<const char *> args(1, name_.c_str());
     std::vector<std::string> flags;
 
     if (hasSetOption("flags")) {

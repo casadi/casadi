@@ -194,7 +194,10 @@ namespace casadi {
 
   void FunctionInternal::postinit() {
     if (jit_) {
-      compiler_ = JitCompiler(jit_compiler_, shared_from_this<Function>());
+      CodeGenerator gen;
+      gen.add(shared_from_this<Function>(), "foo");
+      gen.generate("foo");
+      compiler_ = JitCompiler("foo.c", jit_compiler_);
       evalD_ = (evalPtr)compiler_.getFunction("foo");
       casadi_assert_message(evalD_!=0, "Cannot load JIT'ed function.");
     }
