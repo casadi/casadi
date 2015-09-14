@@ -18,6 +18,7 @@ TRY_COMPILE(RESULT "${CMAKE_CURRENT_BINARY_DIR}/temp"
 message("${RESULT}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_BACKUP}")
 
+add_definitions(${LLVM_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_CXX_FLAGS}")
 
 # Slurp the dependecy list from the exported file

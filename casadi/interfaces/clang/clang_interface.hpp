@@ -41,8 +41,11 @@
 
 #include <llvm/ADT/SmallString.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
-//#include <llvm/ExecutionEngine/MCJIT.h>
+#if LLVM_VERSION_MAJOR>=3 && LLVM_VERSION_MINOR>=5
+#include <llvm/ExecutionEngine/MCJIT.h>
+#else
 #include "llvm/ExecutionEngine/JIT.h"
+#endif
 #include <llvm/IR/Module.h>
 #include "llvm/IR/LLVMContext.h"
 //#include "llvm/IR/Verifier.h"

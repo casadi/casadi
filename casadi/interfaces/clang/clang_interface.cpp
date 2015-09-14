@@ -164,7 +164,7 @@ namespace casadi {
       casadi_error("Cannot execute action");
 
     // Grab the module built by the EmitLLVMOnlyAction
-    llvm::Module* module = Act->takeModule();
+    std::unique_ptr<llvm::Module> module = Act->takeModule();
 
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
