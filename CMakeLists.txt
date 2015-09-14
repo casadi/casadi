@@ -78,6 +78,7 @@ option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
 option(WITH_TINYXML "Compile the interface to TinyXML" ON)
 option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 option(WITH_COVERAGE "Create coverage report" OFF)
+option(OLD_LLVM "Use pre-3.5 LLVM" OFF)
 option(WITH_CLANG "Compile the interface to clang JIT" OFF)
 option(WITH_MATLAB "Compile the MATLAB front-end (experimental)" OFF)
 option(WITH_PYTHON "Compile the Python front-end" OFF)
@@ -95,12 +96,6 @@ else()
   option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
   option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
 endif()
-# http://stackoverflow.com/questions/8709877/cmake-string-options
-# string-valued options with defaults don't work with option() so use this syntax:
-set(PLUGIN_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/lib/casadi" CACHE STRING "Where the plugins will be installed")
-
-
-
 
 ############################################################
 ####################### Fortran ############################

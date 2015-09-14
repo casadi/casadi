@@ -209,10 +209,9 @@ assert(all(size(u(1:2,:))==[2 5]));
 assert(all(size(u(1:2,1:3))==[2 3]));
 
 
-if JitFunction.hasPlugin('clang')
+if JitCompiler.hasPlugin('clang')
   x = MX.sym('x');
-  f = MXFunction('f',{x},{x^2});
-  F = JitFunction('clang',f);
+  F = MXFunction('f',{x},{x^2},struct('jit',true));
 
   out = F({5});
   assert(full(out{1})==25)

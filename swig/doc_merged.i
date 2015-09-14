@@ -1294,6 +1294,22 @@ General information
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -2215,6 +2231,22 @@ Joris Gillis
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | minor_grid   | OT_INTEGERVE | GenericType( | The local    | casadi::Cont |
 |              | CTOR         | )            | grid used on | rolSimulator |
@@ -3839,6 +3871,22 @@ Joel Andersson
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -6171,6 +6219,22 @@ General information
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -7464,6 +7528,22 @@ General information
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -8470,6 +8550,22 @@ Joel Andersson
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -9969,6 +10065,22 @@ Joel Andersson
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -12386,6 +12498,22 @@ General information
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -13206,6 +13334,22 @@ General information
 |              |              |              | (autogenerat |              |
 |              |              |              | ed by        |              |
 |              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"csparse\"    | User-defined | casadi::Impl |
 | r            |              |              | linear       | icitFunction |
@@ -14925,6 +15069,22 @@ General information
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -16444,83 +16604,69 @@ NULL)
 %feature("docstring") casadi::IterationCallback::IterationCallback "";
 
 
-// File: classcasadi_1_1JitFunction.xml
+// File: classcasadi_1_1JitCompiler.xml
 
-
-/*  Simple Getters & Setters  */
-
-/*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::JitFunction::nnzIn "
-
-Get total number of nonzeros in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring") casadi::JitFunction::getOption "
-
-get an option value
+casadi::JitCompiler::getOptionAllowedIndex " [INTERNAL]  Get the index into
+allowed options of a certain option.
 
 ";
 
-%feature("docstring") casadi::JitFunction::getOptionType "
+%feature("docstring") casadi::JitCompiler::getOptionType "
 
 Get the type of a certain option.
 
 ";
 
-%feature("docstring") casadi::JitFunction::setDerForward "
+%feature("docstring") casadi::JitCompiler::isInit "
 
-Set a function that calculates nfwd forward derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
-
-";
-
-%feature("docstring") casadi::JitFunction::assertInit "[INTERNAL]  Assert
-that it is initialized
+Is initialized?
 
 ";
 
-%feature("docstring") casadi::JitFunction::getDescription "
+%feature("docstring") casadi::JitCompiler::printOptions "
 
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::JitFunction::spInit "[INTERNAL]  Reset the
-sparsity propagation.
-
-(for usage, see the example propagating_sparsity.cpp)
+Print options to a stream.
 
 ";
 
-%feature("docstring") casadi::JitFunction::hasOption "
-
-check if there is an option str
-
-";
-
-%feature("docstring") casadi::JitFunction::setJacSparsity "
-
-Generate the sparsity of a Jacobian block
+%feature("docstring") casadi::JitCompiler::printPtr "[INTERNAL]  Print the
+pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::JitFunction::sz_arg "[INTERNAL]  Get required
-length of arg field.
+%feature("docstring") casadi::JitCompiler::getOptionDescription "
+
+Get the description of a certain option.
 
 ";
 
-%feature("docstring") casadi::JitFunction::printDimensions "
+%feature("docstring") casadi::JitCompiler::setOption "
 
-Print dimensions of inputs and outputs.
+>  void OptionsFunctionality.setOption(str str, GenericType val)
+------------------------------------------------------------------------
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+>  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
+------------------------------------------------------------------------
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
 
 ";
 
-%feature("docstring") casadi::JitFunction "
+%feature("docstring") casadi::JitCompiler "
 
-JitFunction.
+JitCompiler.
 
 Just-in-time compilation of code
 
@@ -16534,97 +16680,6 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| ad_weight    | OT_REAL      | GenericType( | Weighting    | casadi::Func |
-|              |              | )            | factor for   | tionInternal |
-|              |              |              | derivative c |              |
-|              |              |              | alculation.W |              |
-|              |              |              | hen there is |              |
-|              |              |              | an option of |              |
-|              |              |              | either using |              |
-|              |              |              | forward or   |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives, |              |
-|              |              |              | the          |              |
-|              |              |              | condition ad |              |
-|              |              |              | _weight*nf<= |              |
-|              |              |              | (1-ad_weight |              |
-|              |              |              | )*na is used |              |
-|              |              |              | where nf and |              |
-|              |              |              | na are       |              |
-|              |              |              | estimates of |              |
-|              |              |              | the number   |              |
-|              |              |              | of forward/r |              |
-|              |              |              | everse mode  |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives  |              |
-|              |              |              | needed. By   |              |
-|              |              |              | default,     |              |
-|              |              |              | ad_weight is |              |
-|              |              |              | calculated a |              |
-|              |              |              | utomatically |              |
-|              |              |              | , but this   |              |
-|              |              |              | can be       |              |
-|              |              |              | overridden   |              |
-|              |              |              | by setting   |              |
-|              |              |              | this option. |              |
-|              |              |              | In           |              |
-|              |              |              | particular,  |              |
-|              |              |              | 0 means      |              |
-|              |              |              | forcing      |              |
-|              |              |              | forward mode |              |
-|              |              |              | and 1        |              |
-|              |              |              | forcing      |              |
-|              |              |              | reverse      |              |
-|              |              |              | mode. Leave  |              |
-|              |              |              | unset for    |              |
-|              |              |              | (class       |              |
-|              |              |              | specific)    |              |
-|              |              |              | heuristics.  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| ad_weight_sp | OT_REAL      | GenericType( | Weighting    | casadi::Func |
-|              |              | )            | factor for   | tionInternal |
-|              |              |              | sparsity     |              |
-|              |              |              | pattern      |              |
-|              |              |              | calculation  |              |
-|              |              |              | calculation. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | behavior.    |              |
-|              |              |              | Set to 0 and |              |
-|              |              |              | 1 to force   |              |
-|              |              |              | forward and  |              |
-|              |              |              | reverse mode |              |
-|              |              |              | respectively |              |
-|              |              |              | . Cf. option |              |
-|              |              |              | \"ad_weight\". |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
 |              |              |              | options      | lityNode     |
@@ -16633,110 +16688,9 @@ General information
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
-|              |              |              | indicate     | tionInternal |
-|              |              |              | whether      |              |
-|              |              |              | statistics   |              |
-|              |              |              | must be      |              |
-|              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| input_scheme | OT_STRINGVEC | GenericType( | Custom input | casadi::Func |
-|              | TOR          | )            | scheme       | tionInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
-|              |              |              | exceptions   | tionInternal |
-|              |              |              | when the     |              |
-|              |              |              | numerical    |              |
-|              |              |              | values of    |              |
-|              |              |              | the inputs   |              |
-|              |              |              | don't make   |              |
-|              |              |              | sense        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
-|              |              |              | requested    | tionInternal |
-|              |              |              | for a number |              |
-|              |              |              | of forward/r |              |
-|              |              |              | everse       |              |
-|              |              |              | directions,  |              |
-|              |              |              | it may be    |              |
-|              |              |              | cheaper to   |              |
-|              |              |              | compute      |              |
-|              |              |              | first the    |              |
-|              |              |              | full         |              |
-|              |              |              | jacobian and |              |
-|              |              |              | then         |              |
-|              |              |              | multiply     |              |
-|              |              |              | with seeds,  |              |
-|              |              |              | rather than  |              |
-|              |              |              | obtain the   |              |
-|              |              |              | requested    |              |
-|              |              |              | directions   |              |
-|              |              |              | in a straigh |              |
-|              |              |              | tforward     |              |
-|              |              |              | manner.      |              |
-|              |              |              | Casadi uses  |              |
-|              |              |              | a heuristic  |              |
-|              |              |              | to decide    |              |
-|              |              |              | which is     |              |
-|              |              |              | cheaper. A   |              |
-|              |              |              | high value   |              |
-|              |              |              | of 'jac_pena |              |
-|              |              |              | lty' makes   |              |
-|              |              |              | it less      |              |
-|              |              |              | likely for   |              |
-|              |              |              | the heurstic |              |
-|              |              |              | to chose the |              |
-|              |              |              | full         |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | strategy.    |              |
-|              |              |              | The special  |              |
-|              |              |              | value -1     |              |
-|              |              |              | indicates    |              |
-|              |              |              | never to use |              |
-|              |              |              | the full     |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | strategy     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
-|              | TOR          | )            | be activated | tionInternal |
-|              |              |              | (inputs|outp |              |
-|              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
-| e            | TOR          | )            | output       | tionInternal |
-|              |              |              | scheme       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
-| heck         |              |              | exceptions   | tionInternal |
-|              |              |              | when NaN or  |              |
-|              |              |              | Inf appears  |              |
-|              |              |              | during       |              |
-|              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
-|              |              | )            | defined      | tionInternal |
-|              |              |              | field that   |              |
-|              |              |              | can be used  |              |
-|              |              |              | to identify  |              |
-|              |              |              | the function |              |
-|              |              |              | or pass      |              |
-|              |              |              | additional   |              |
-|              |              |              | information  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
-|              |              |              | evaluation   | tionInternal |
-|              |              |              | for          |              |
-|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
@@ -16749,7 +16703,7 @@ List of plugins
 Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
-JitFunction.doc(\"myextraplugin\")
+JitCompiler.doc(\"myextraplugin\")
 
 
 
@@ -16770,7 +16724,7 @@ Interface to the JIT compiler CLANG
 | flags           | OT_STRINGVECTOR | GenericType()   | Compile flags   |
 |                 |                 |                 | for the JIT     |
 |                 |                 |                 | compiler.       |
-|                 |                 |                 | Default: -O3.   |
+|                 |                 |                 | Default: None   |
 +-----------------+-----------------+-----------------+-----------------+
 | include_path    | OT_STRING       | \"\"              | Include paths   |
 |                 |                 |                 | for the JIT     |
@@ -16793,795 +16747,43 @@ Diagrams
 
 
 
-C++ includes: jit_function.hpp ";
+C++ includes: jit_compiler.hpp ";
 
-%feature("docstring") casadi::JitFunction::setOutput "
+%feature("docstring") casadi::JitCompiler::plugin_name "
 
->  void IOInterface< Function  >.setOutput(T val, int oind=0)
-------------------------------------------------------------------------
-
-Set an output by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oind:  index within the range [0..nOut()-1]
-
->  void IOInterface< Function  >.setOutput(T val, str oname)
-------------------------------------------------------------------------
-
-Set an output by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oname:  output name. Only allowed when an output scheme is set.
+Query plugin name.
 
 ";
 
-%feature("docstring") casadi::JitFunction::isInit "
+%feature("docstring") casadi::JitCompiler::isNull "
 
-Is initialized?
-
-";
-
-%feature("docstring") casadi::JitFunction::checkInputs "[INTERNAL]  Check
-if the numerical values of the supplied bounds make sense.
+Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::JitFunction::symbolicInputSX "
-
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring") casadi::JitFunction::hessian "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring") casadi::JitFunction::getOptionAllowed "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring") casadi::JitFunction::derReverse "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = nIn(), n_out = nOut())
-
-(n_in = nIn(), n_out = nOut())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
-%feature("docstring") casadi::JitFunction::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring") casadi::JitFunction::getOptionDescription "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring") casadi::JitFunction::getInput "
-
->  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
-------------------------------------------------------------------------
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0..nIn()-1]
-
->  DMatrix  IOInterface< Function  >.getInput(str iname) const
-------------------------------------------------------------------------
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
-
->  void IOInterface< Function  >.getInput(T val, int iind=0)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an input by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iind:  index within the range [0..nIn()-1]
-
->  void IOInterface< Function  >.getInput(T val, str iname)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an input by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring") casadi::JitFunction::JitFunction "
-
->  JitFunction()
-------------------------------------------------------------------------
-
-Default constructor.
-
->  JitFunction(str compiler, Function f, Dict opts=Dict())
-------------------------------------------------------------------------
-
-JitFunction factory (new syntax, includes initialization)
-
-";
-
-%feature("docstring") casadi::JitFunction::inputSparsity "
-
-Get sparsity of a given input.
-
-";
-
-%feature("docstring") casadi::JitFunction::symbolicOutput "
-
-Get a vector of symbolic variables with the same dimensions as the outputs.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring") casadi::JitFunction::mapaccum "
-
-Create a mapaccumulated version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (x, u) -> (x_next , y )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (x0, U) -> (X , Y )
-  
-      with
-          U: horzcat([u0, u1, ..., u_(N-1)])
-          X: horzcat([x1, x2, ..., x_N])
-          Y: horzcat([y0, y1, ..., y_(N-1)])
-  
-      and
-          x1, y0 <- f(x0, u0)
-          x2, y1 <- f(x1, u1)
-          ...
-          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
-  
-
-
-
-";
-
-%feature("docstring") casadi::JitFunction::removeMonitor "
-
-Remove modules to be monitored.
-
-";
-
-%feature("docstring") casadi::JitFunction::defaultInput "
-
-Get default input value.
-
-";
-
-%feature("docstring") casadi::JitFunction::init "
-
-Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
-%feature("docstring") casadi::JitFunction::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional.
-
-derivatives forward or backward (for usage, see the example
-propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") casadi::JitFunction::inputIndex "
-
-Find the index for a string describing a particular entry of an input
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring") casadi::JitFunction::outputDescription "
-
-Get output scheme description by index.
-
-";
-
-%feature("docstring") casadi::JitFunction::map "
-
->  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
-
->  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
-------------------------------------------------------------------------
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
->  Function Function.map(str name, int N, Dict options=Dict()) const 
-------------------------------------------------------------------------
-
-Create a mapped version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (a, p) -> ( s )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (A, P) -> (S )
-  
-      with
-          a: horzcat([a0, a1, ..., a_(N-1)])
-          p: horzcat([p0, p1, ..., p_(N-1)])
-          s: horzcat([s0, s1, ..., s_(N-1)])
-      and
-          s0 <- f(a0, p0)
-          s1 <- f(a1, p1)
-          ...
-          s_(N-1) <- f(a_(N-1), p_(N-1))
-  
-
-
-
-";
-
-%feature("docstring") casadi::JitFunction::getOutput "
-
->  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
-------------------------------------------------------------------------
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0..nOut()-1]
-
->  DMatrix  IOInterface< Function  >.getOutput(str oname) const
-------------------------------------------------------------------------
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
-
->  void IOInterface< Function  >.getOutput(T val, int oind=0)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0..nOut()-1]
-
->  void IOInterface< Function  >.getOutput(T val, str oname)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring") casadi::JitFunction::hasSetOption "
-
-check if the user has there is an option str
-
-";
-
-%feature("docstring") casadi::JitFunction::gradient "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring") casadi::JitFunction::outputIndex "
-
-Find the index for a string describing a particular entry of an output
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring") casadi::JitFunction::getRepresentation "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring") casadi::JitFunction::callDerivative "[INTERNAL]
-Evaluate the function symbolically or numerically with directional
-derivatives The first two arguments are the nondifferentiated inputs and
-results of the evaluation, the next two arguments are a set of forward
-directional seeds and the resulting forward directional derivatives, the
-length of the vector being the number of forward directions. The next two
-arguments are a set of adjoint directional seeds and the resulting adjoint
-directional derivatives, the length of the vector being the number of
-adjoint directions.
-
-";
-
-%feature("docstring") casadi::JitFunction::setInput "
-
->  void IOInterface< Function  >.setInput(T val, int iind=0)
-------------------------------------------------------------------------
-
-Set an input by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iind:  index within the range [0..nIn()-1]
-
->  void IOInterface< Function  >.setInput(T val, str iname)
-------------------------------------------------------------------------
-
-Set an input by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring") casadi::JitFunction::nOut "
-
-Get the number of function outputs.
-
-";
-
-%feature("docstring") casadi::JitFunction::getOptionNames "
-
-Get a list of all option names.
-
-";
-
-%feature("docstring") casadi::JitFunction::copyOptions "
-
-Copy all options from another object.
-
-";
-
-%feature("docstring") casadi::JitFunction::outputName "
-
-Get output scheme name by index.
-
-";
-
-%feature("docstring") casadi::JitFunction::sz_res "[INTERNAL]  Get required
-length of res field.
-
-";
-
-%feature("docstring") casadi::JitFunction::getStats "
-
-Get all statistics obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring") casadi::JitFunction::getOptionTypeName "
-
-Get the type name of a certain option.
-
-";
-
-%feature("docstring") casadi::JitFunction::inputName "
-
-Get input scheme name by index.
-
-";
-
-%feature("docstring") casadi::JitFunction::numelOut "
-
-Get total number of elements in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring") casadi::JitFunction::printPtr "[INTERNAL]  Print the
-pointer to the internal class
-
-";
-
-%feature("docstring") casadi::JitFunction::nIn "
-
-Get the number of function inputs.
-
-";
-
-%feature("docstring") casadi::JitFunction::evaluate "
-
-Evaluate.
-
-";
-
-%feature("docstring") casadi::JitFunction::setFullJacobian "
-
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
-
-";
-
-%feature("docstring") casadi::JitFunction::getStat "
-
-Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring") casadi::JitFunction::setJacobian "
-
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
-
-";
-
-%feature("docstring") casadi::JitFunction::setDerReverse "
-
-Set a function that calculates nadj adjoint derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
-
-";
-
-%feature("docstring") casadi::JitFunction::numelIn "
-
-Get total number of elements in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring") casadi::JitFunction::print "
-
-Print a description of the object.
-
-";
-
-%feature("docstring") casadi::JitFunction::derForward "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nfwd*n_in inputs correspond to forward seeds, one direction at a time The
-nfwd*n_out outputs correspond to forward sensitivities, one direction at a
-time. * (n_in = nIn(), n_out = nOut())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
-%feature("docstring") casadi::JitFunction::setOptionByEnumValue "[INTERNAL]
-Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring") casadi::JitFunction::tangent "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring") casadi::JitFunction::sz_w "[INTERNAL]  Get required
-length of w field.
-
-";
-
-%feature("docstring") casadi::JitFunction::repr "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring") casadi::JitFunction::callForward "
-
-Create call to (cached) derivative function, forward mode.
-
-";
-
-%feature("docstring") casadi::JitFunction::inputDescription "
-
-Get input scheme description by index.
-
-";
-
-%feature("docstring") casadi::JitFunction::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Legacy function: Use derForward and derReverse instead.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = nIn(), n_out = nOut())
-
-";
-
-%feature("docstring") casadi::JitFunction::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
+%feature("docstring") casadi::JitCompiler::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
 values.
 
 ";
 
-%feature("docstring") casadi::JitFunction::inputScheme "
+%feature("docstring") casadi::JitCompiler::getDescription "
 
-Get input scheme.
-
-";
-
-%feature("docstring") casadi::JitFunction::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
+Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::JitFunction::generate "
+%feature("docstring") casadi::JitCompiler::getOption "
 
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring") casadi::JitFunction::dictionary "
-
-Get the dictionary.
+get an option value
 
 ";
 
-%feature("docstring") casadi::JitFunction::sz_iw "[INTERNAL]  Get required
-length of iw field.
+%feature("docstring") casadi::JitCompiler::assertInit "[INTERNAL]  Assert
+that it is initialized
 
 ";
 
-%feature("docstring") casadi::JitFunction::setOption "
-
->  void OptionsFunctionality.setOption(str str, GenericType val)
-------------------------------------------------------------------------
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
->  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
-------------------------------------------------------------------------
-
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring") casadi::JitFunction::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") casadi::JitFunction::getSanitizedName "
-
-get function name with all non alphanumeric characters converted to '_'
-
-";
-
-%feature("docstring") casadi::JitFunction::fullJacobian "
-
-Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
-
-";
-
-%feature("docstring") casadi::JitFunction::callReverse "
-
-Create call to (cached) derivative function, reverse mode.
-
-";
-
-%feature("docstring") casadi::JitFunction::jacobian "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring") casadi::JitFunction::getOptionEnumValue "[INTERNAL]
-Get the enum value corresponding to th certain option.
-
-";
-
-%feature("docstring") casadi::JitFunction::nnzOut "
-
-Get total number of nonzeros in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring") casadi::JitFunction::mapsum "
-
-Evaluate symbolically in parallel and sum (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
-";
-
-%feature("docstring") casadi::JitFunction::outputSparsity "
-
-Get sparsity of a given output.
-
-";
-
-%feature("docstring") casadi::JitFunction::getOptionDefault "
-
-Get the default of a certain option.
-
-";
-
-%feature("docstring") casadi::JitFunction::call "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring") casadi::JitFunction::addMonitor "
-
-Add modules to be monitored.
-
-";
-
-%feature("docstring") casadi::JitFunction::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring") casadi::JitFunction::outputScheme "
-
-Get output scheme.
-
-";
-
-%feature("docstring") casadi::JitFunction::makeUnique "
+%feature("docstring") casadi::JitCompiler::makeUnique "
 
 Make unique.
 
@@ -17590,23 +16792,108 @@ point to this new object
 
 ";
 
-%feature("docstring") casadi::JitFunction::symbolicInput "
+%feature("docstring") casadi::JitCompiler::print "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-There is no guarantee that consecutive calls return identical objects
+Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::JitFunction::printOptions "
+%feature("docstring") casadi::JitCompiler::__hash__ "
 
-Print options to a stream.
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring") casadi::JitFunction::isNull "
+%feature("docstring") casadi::JitCompiler::getOptionEnumValue "[INTERNAL]
+Get the enum value corresponding to th certain option.
 
-Is a null pointer?
+";
+
+%feature("docstring") casadi::JitCompiler::hasOption "
+
+check if there is an option str
+
+";
+
+%feature("docstring") casadi::JitCompiler::getOptionAllowed "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::JitCompiler::copyOptions "
+
+Copy all options from another object.
+
+";
+
+%feature("docstring") casadi::JitCompiler::repr "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::JitCompiler::getOptionDefault "
+
+Get the default of a certain option.
+
+";
+
+%feature("docstring") casadi::JitCompiler::getOptionTypeName "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring") casadi::JitCompiler::JitCompiler "
+
+>  JitCompiler()
+------------------------------------------------------------------------
+
+Default constructor.
+
+>  JitCompiler(str name, str compiler, Dict opts=Dict())
+------------------------------------------------------------------------
+
+JitCompiler factory (new syntax, includes initialization)
+
+";
+
+%feature("docstring") casadi::JitCompiler::getOptionNames "
+
+Get a list of all option names.
+
+";
+
+%feature("docstring") casadi::JitCompiler::setOptionByEnumValue "[INTERNAL]
+Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring") casadi::JitCompiler::init "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class (SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring") casadi::JitCompiler::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::JitCompiler::hasSetOption "
+
+check if the user has there is an option str
+
+";
+
+%feature("docstring") casadi::JitCompiler::dictionary "
+
+Get the dictionary.
 
 ";
 
@@ -18279,6 +17566,22 @@ Joris Gillis
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -19577,6 +18880,22 @@ General information
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -21050,6 +20369,22 @@ General information
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -22520,6 +21855,22 @@ General information
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -23967,6 +23318,22 @@ General information
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -24410,6 +23777,22 @@ Map Joris Gillis
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -26182,6 +25565,22 @@ Joris Gillis
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -29113,6 +28512,22 @@ Joel Andersson
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -30694,6 +30109,22 @@ General information
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -35949,6 +35380,22 @@ basis Joris Gillis
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -36926,6 +36373,22 @@ General information
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -38760,6 +38223,22 @@ General information
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -40409,6 +39888,22 @@ General information
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -41531,6 +41026,22 @@ General information
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -43165,6 +42676,22 @@ Joel Andersson
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -45010,6 +44537,22 @@ General information
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
@@ -48633,6 +48176,22 @@ General information
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -50348,6 +49907,22 @@ Switch statement Joel Andersson
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
@@ -51543,6 +51118,22 @@ Joel Andersson
 |              |              |              | the full     |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | just_in_time | OT_BOOLEAN   | false        | Just-in-time | casadi::SXFu |
 | _opencl      |              |              | compilation  | nctionIntern |

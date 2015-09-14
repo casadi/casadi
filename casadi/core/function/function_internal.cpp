@@ -89,8 +89,13 @@ namespace casadi {
               "The Jacobian of all outputs with respect to all inputs.");
     addOption("input_scheme", OT_STRINGVECTOR, GenericType(), "Custom input scheme");
     addOption("output_scheme", OT_STRINGVECTOR, GenericType(), "Custom output scheme");
+    addOption("jit", OT_BOOLEAN, false, "Use just-in-time compiler to speed up the evaluation");
+    addOption("jit_compiler", OT_STRING, "clang", "Just-in-time compiler plugin to be used.");
+    addOption("jit_options", OT_DICT, GenericType(), "Options to be passed to the jit compiler.");
 
     verbose_ = false;
+    jit_ = false;
+    evalD_ = 0;
     user_data_ = 0;
     monitor_inputs_ = false;
     monitor_outputs_ = false;
@@ -121,6 +126,9 @@ namespace casadi {
     setDefaultOptions();
 
     verbose_ = getOption("verbose");
+    jit_ = getOption("jit");
+    jit_compiler_ = getOption("jit_compiler").toString();
+    if (hasSetOption("jit_options")) jit_options_ = getOption("jit_options");
     regularity_check_ = getOption("regularity_check");
     name_ = getOption("name").toString();
 
@@ -186,6 +194,25 @@ namespace casadi {
     is_init_ = true;
   }
 
+  void FunctionInternal::postinit() {
+    if (jit_) {
+      CodeGenerator gen;
+      gen.add(shared_from_this<Function>(), "jit_tmp");
+      gen.generate("jit_tmp");
+      compiler_ = JitCompiler("jit_tmp.c", jit_compiler_, jit_options_);
+      evalD_ = (evalPtr)compiler_.getFunction("jit_tmp");
+      casadi_assert_message(evalD_!=0, "Cannot load JIT'ed function.");
+    }
+  }
+
+  void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w) {
+    if (evalD_) {
+      evalD_(arg, res, iw, w);
+    } else {
+      evalD(arg, res, iw, w);
+    }
+  }
+
   void FunctionInternal::printDimensions(ostream &stream) const {
     casadi_assert(isInit());
     stream << " Number of inputs: " << nIn() << endl;
@@ -226,8 +253,10 @@ namespace casadi {
     }
 
     // Generate gradient function
-    return getGradient(ss.str(), iind, oind,
-                       make_dict("input_scheme", ischeme_, "output_scheme", ionames));
+    Dict opts = make_dict("input_scheme", ischeme_,
+                          "output_scheme", ionames,
+                          "jit", jit_, "jit_compiler", jit_compiler_, "jit_options", jit_options_);
+    return getGradient(ss.str(), iind, oind, opts);
   }
 
   Function FunctionInternal::tangent(int iind, int oind) {
@@ -248,8 +277,10 @@ namespace casadi {
     }
 
     // Generate gradient function
-    return getTangent(ss.str(), iind, oind,
-                      make_dict("input_scheme", ischeme_, "output_scheme", ionames));
+    Dict opts = make_dict("input_scheme", ischeme_,
+                          "output_scheme", ionames,
+                          "jit", jit_, "jit_compiler", jit_compiler_, "jit_options", jit_options_);
+    return getTangent(ss.str(), iind, oind, opts);
   }
 
   Function FunctionInternal::hessian(int iind, int oind) {
@@ -1531,10 +1562,11 @@ namespace casadi {
       }
 
       // Generate a Jacobian
-      Function ret = getJacobian(ss.str(), iind, oind, compact, symmetric,
-                                 make_dict("verbose", getOption("verbose"),
-                                           "input_scheme", ischeme_,
-                                           "output_scheme", ionames));
+      Dict opts = make_dict("verbose", verbose_,
+                            "input_scheme", ischeme_, "output_scheme", ionames,
+                            "jit", jit_, "jit_compiler", jit_compiler_,
+                            "jit_options", jit_options_);
+      Function ret = getJacobian(ss.str(), iind, oind, compact, symmetric, opts);
 
       // Save in cache
       compact ? jac_compact_.elem(oind, iind) : jac_.elem(oind, iind) = ret;
@@ -1615,7 +1647,8 @@ namespace casadi {
     }
 
     // Options
-    Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names);
+    Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names,
+                          "jit", jit_, "jit_compiler", jit_compiler_, "jit_options", jit_options_);
 
     // Return value
     Function ret;
@@ -1719,7 +1752,8 @@ namespace casadi {
     }
 
     // Options
-    Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names);
+    Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names,
+                          "jit", jit_, "jit_compiler", jit_compiler_, "jit_options", jit_options_);
 
     // Return value
     Function ret;

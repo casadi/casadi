@@ -77,9 +77,6 @@ namespace casadi {
     ///@}
   protected:
 
-    /** \brief Function pointer for initialization of external */
-    typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
-
     /** \brief  Name of binary */
     std::string bin_name_;
 
@@ -171,14 +168,6 @@ namespace casadi {
     /** \brief All inputs and outputs are scalar (default if sparsity not defined) */
     static int scalarSparsity(int i, int *n_row, int *n_col,
                               const int **colind, const int **row);
-  protected:
-    ///@{
-    /** \brief  Function pointer types */
-    typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
-                               const int **colind, const int **row);
-    typedef int (*workPtr)(int *n_iw, int *n_w);
-    typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
-    ///@}
 
     /** \brief  Function pointers */
     evalPtr eval_;

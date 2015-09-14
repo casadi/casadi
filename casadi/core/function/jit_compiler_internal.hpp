@@ -23,10 +23,10 @@
  */
 
 
-#ifndef CASADI_JIT_FUNCTION_INTERNAL_HPP
-#define CASADI_JIT_FUNCTION_INTERNAL_HPP
+#ifndef CASADI_JIT_COMPILER_INTERNAL_HPP
+#define CASADI_JIT_COMPILER_INTERNAL_HPP
 
-#include "jit_function.hpp"
+#include "jit_compiler.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 
@@ -36,29 +36,26 @@ namespace casadi {
 
 /** \brief NLP solver storage class
 
-  @copydoc JitFunction_doc
+  @copydoc JitCompiler_doc
   \author Joel Andersson
   \date 2010-2013
 */
   class CASADI_EXPORT
-  JitFunctionInternal : public FunctionInternal,
-                      public PluginInterface<JitFunctionInternal> {
+  JitCompilerInternal : public OptionsFunctionalityNode,
+                        public PluginInterface<JitCompilerInternal> {
 
   public:
     /// Constructor
-    JitFunctionInternal(const Function& f);
+    JitCompilerInternal(const std::string& name);
 
     /// Destructor
-    virtual ~JitFunctionInternal() = 0;
+    virtual ~JitCompilerInternal() = 0;
 
-    /// Initialize
-    virtual void init();
-
-    /// The Function to be JIT'ed
-    Function f_;
+    /** \brief  Print */
+    virtual void print(std::ostream &stream) const;
 
     // Creator function for internal class
-    typedef JitFunctionInternal* (*Creator)(const Function& f);
+    typedef JitCompilerInternal* (*Creator)(const std::string& name);
 
     // No static functions exposed
     struct Exposed{ };
@@ -70,9 +67,19 @@ namespace casadi {
     static const std::string infix_;
 
     /// Short name
-    static std::string shortname() { return "jitfunction";}
+    static std::string shortname() { return "jitcompiler";}
 
+    /// Queery plugin name
+    virtual const char* plugin_name() const = 0;
+
+    /// Get a function pointer for numerical evaluation
+    virtual void* getFunction(const std::string& symname) = 0;
+
+    protected:
+    /// C filename
+    std::string name_;
   };
+
 } // namespace casadi
 /// \endcond
-#endif // CASADI_JIT_FUNCTION_INTERNAL_HPP
+#endif // CASADI_JIT_COMPILER_INTERNAL_HPP
