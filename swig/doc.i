@@ -6438,6 +6438,13 @@ Destructor.
 %feature("docstring") casadi::DerivativeGenerator2 "C++ includes:
 callback.hpp ";
 
+%feature("docstring")  casadi::DerivativeGenerator2::original(Function &fcn,
+int ndir, bool fwd) "
+
+Computes the derivative as if this derivative generator does not exist.
+
+";
+
 %feature("docstring") casadi::DerivativeGenerator2::DerivativeGenerator2() "";
 
 
@@ -36136,7 +36143,7 @@ create a matrix with all inf
 ";
 
 %feature("docstring")  matrix_expand(const MX &e, const std::vector< MX >
-&boundary=std::vector< MX >()) "
+&boundary=std::vector< MX >(), const Dict &options=Dict()) "
 
 Expand MX graph to SXFunction call.
 
@@ -36146,7 +36153,8 @@ it at which expansion should stop.
 ";
 
 %feature("docstring")  matrix_expand(const std::vector< MX > &e, const
-std::vector< MX > &boundary=std::vector< MX >()) "
+std::vector< MX > &boundary=std::vector< MX >(), const Dict &options=Dict())
+"
 
 Expand MX graph to SXFunction call.
 

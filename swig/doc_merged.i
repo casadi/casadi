@@ -5041,6 +5041,12 @@ Destructor.
 %feature("docstring") casadi::DerivativeGenerator2 "C++ includes:
 callback.hpp ";
 
+%feature("docstring") casadi::DerivativeGenerator2::original "
+
+Computes the derivative as if this derivative generator does not exist.
+
+";
+
 %feature("docstring") casadi::DerivativeGenerator2::DerivativeGenerator2 "";
 
 
