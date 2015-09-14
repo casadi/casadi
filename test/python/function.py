@@ -1782,11 +1782,11 @@ class Functiontests(casadiTestCase):
       self.checkfunction(f,Fref)
       self.check_codegen(f)
 
-  @requiresPlugin(JitFunction,"clang")
+  @requiresPlugin(JitCompiler,"clang")
   def test_jitfunction_clang(self):
     x = MX.sym("x")
     f = MXFunction("f",[x],[x**2])
-    F = JitFunction("clang",f)
+    F = JitCompiler("clang",f)
 
     out = F([5])
     self.checkarray(out[0],25)      

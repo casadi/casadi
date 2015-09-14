@@ -23,10 +23,10 @@
  */
 
 
-#ifndef CASADI_JIT_FUNCTION_INTERNAL_HPP
-#define CASADI_JIT_FUNCTION_INTERNAL_HPP
+#ifndef CASADI_JIT_COMPILER_INTERNAL_HPP
+#define CASADI_JIT_COMPILER_INTERNAL_HPP
 
-#include "jit_function.hpp"
+#include "jit_compiler.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 
@@ -36,20 +36,20 @@ namespace casadi {
 
 /** \brief NLP solver storage class
 
-  @copydoc JitFunction_doc
+  @copydoc JitCompiler_doc
   \author Joel Andersson
   \date 2010-2013
 */
   class CASADI_EXPORT
-  JitFunctionInternal : public FunctionInternal,
-                      public PluginInterface<JitFunctionInternal> {
+  JitCompilerInternal : public FunctionInternal,
+                      public PluginInterface<JitCompilerInternal> {
 
   public:
     /// Constructor
-    JitFunctionInternal(const Function& f);
+    JitCompilerInternal(const Function& f);
 
     /// Destructor
-    virtual ~JitFunctionInternal() = 0;
+    virtual ~JitCompilerInternal() = 0;
 
     /// Initialize
     virtual void init();
@@ -58,7 +58,7 @@ namespace casadi {
     Function f_;
 
     // Creator function for internal class
-    typedef JitFunctionInternal* (*Creator)(const Function& f);
+    typedef JitCompilerInternal* (*Creator)(const Function& f);
 
     // No static functions exposed
     struct Exposed{ };
@@ -70,9 +70,9 @@ namespace casadi {
     static const std::string infix_;
 
     /// Short name
-    static std::string shortname() { return "jitfunction";}
+    static std::string shortname() { return "jitcompiler";}
 
   };
 } // namespace casadi
 /// \endcond
-#endif // CASADI_JIT_FUNCTION_INTERNAL_HPP
+#endif // CASADI_JIT_COMPILER_INTERNAL_HPP

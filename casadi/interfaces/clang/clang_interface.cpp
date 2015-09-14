@@ -37,37 +37,37 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_JITFUNCTION_CLANG_EXPORT
-  casadi_register_jitfunction_clang(JitFunctionInternal::Plugin* plugin) {
-    plugin->creator = ClangJitFunctionInterface::creator;
+  int CASADI_JITCOMPILER_CLANG_EXPORT
+  casadi_register_jitfunction_clang(JitCompilerInternal::Plugin* plugin) {
+    plugin->creator = ClangJitCompilerInterface::creator;
     plugin->name = "clang";
-    plugin->doc = ClangJitFunctionInterface::meta_doc.c_str();
+    plugin->doc = ClangJitCompilerInterface::meta_doc.c_str();
     plugin->version = 23;
     return 0;
   }
 
   extern "C"
-  void CASADI_JITFUNCTION_CLANG_EXPORT casadi_load_jitfunction_clang() {
-    JitFunctionInternal::registerPlugin(casadi_register_jitfunction_clang);
+  void CASADI_JITCOMPILER_CLANG_EXPORT casadi_load_jitfunction_clang() {
+    JitCompilerInternal::registerPlugin(casadi_register_jitfunction_clang);
   }
 
-  ClangJitFunctionInterface* ClangJitFunctionInterface::clone() const {
+  ClangJitCompilerInterface* ClangJitCompilerInterface::clone() const {
     // Return a deep copy
-    ClangJitFunctionInterface* node = new ClangJitFunctionInterface(f_);
+    ClangJitCompilerInterface* node = new ClangJitCompilerInterface(f_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  ClangJitFunctionInterface::ClangJitFunctionInterface(const Function& f) :
-      JitFunctionInternal(f) {
+  ClangJitCompilerInterface::ClangJitCompilerInterface(const Function& f) :
+      JitCompilerInternal(f) {
     addOption("include_path", OT_STRING, "", "Include paths for the JIT compiler."
       " The include directory shipped with CasADi will be automatically appended.");
     addOption("flags", OT_STRINGVECTOR, GenericType(),
       "Compile flags for the JIT compiler. Default: -O3.");
   }
 
-  ClangJitFunctionInterface::~ClangJitFunctionInterface() {
+  ClangJitCompilerInterface::~ClangJitCompilerInterface() {
     if (isInit()) {
       if (TheExecutionEngine) {
         delete TheExecutionEngine;
@@ -82,10 +82,10 @@ namespace casadi {
 
   }
 
-  void ClangJitFunctionInterface::init() {
+  void ClangJitCompilerInterface::init() {
     // Initialize the base classes
-    JitFunctionInternal::init();
-    log("ClangJitFunctionInterface::init", "Enter");
+    JitCompilerInternal::init();
+    log("ClangJitCompilerInterface::init", "Enter");
 
 
 
@@ -195,7 +195,7 @@ namespace casadi {
 
     int f_type, n_in, n_out, sz_arg, sz_res;
     int myres = init_fun_(&f_type, &n_in, &n_out, &sz_arg, &sz_res);
-    casadi_assert_message(myres==0, "ClangJitFunctionInternal: \"init\" failed");
+    casadi_assert_message(myres==0, "ClangJitCompilerInternal: \"init\" failed");
 
     ibuf_.resize(n_in);
     obuf_.resize(n_out);
@@ -216,7 +216,7 @@ namespace casadi {
       int nrow, ncol;
       const int *colind, *row;
       int flag = sparsity_fun_(i, &nrow, &ncol, &colind, &row);
-      casadi_assert_message(flag==0, "ClangJitFunctionInternal: \"sparsity\" failed");
+      casadi_assert_message(flag==0, "ClangJitCompilerInternal: \"sparsity\" failed");
 
       // Col offsets
       vector<int> colindv(colind, colind+ncol+1);
@@ -242,7 +242,7 @@ namespace casadi {
 
     int n_iw, n_w;
     int flag = work_fun_(&n_iw, &n_w);
-    casadi_assert_message(flag==0, "ClangJitFunctionInternal: \"work\" failed");
+    casadi_assert_message(flag==0, "ClangJitCompilerInternal: \"work\" failed");
     alloc_iw(n_iw);
     alloc_w(n_w);
 
@@ -250,7 +250,7 @@ namespace casadi {
     alloc_res(max(n_out, sz_res));
   }
 
-  void ClangJitFunctionInterface::evalD(const double** arg, double** res, int* iw, double* w) {
+  void ClangJitCompilerInterface::evalD(const double** arg, double** res, int* iw, double* w) {
     eval_fun_(arg, res, iw, w);
   }
 

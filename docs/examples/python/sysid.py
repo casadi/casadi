@@ -95,10 +95,10 @@ def gauss_newton(e,nlp,V):
   hessLag = MXFunction('H',hessLagIn(x=V,lam_f=sigma),hessLagOut(hess=sigma*mul(J.T,J)))
 
   # Code-generation for extra speedup
-  nlp     = JitFunction("clang",nlp)
-  gradF   = JitFunction("clang",gradF)
-  jacG    = JitFunction("clang",jacG)
-  hessLag = JitFunction("clang",hessLag)
+  nlp     = JitCompiler("clang",nlp)
+  gradF   = JitCompiler("clang",gradF)
+  jacG    = JitCompiler("clang",jacG)
+  hessLag = JitCompiler("clang",hessLag)
 
   options = {}
   options["hess_lag"] = hessLag

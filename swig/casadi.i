@@ -4016,7 +4016,7 @@ namespace casadi {
 
 %include <casadi/core/function/sx_function.hpp>
 %include <casadi/core/function/mx_function.hpp>
-%include <casadi/core/function/jit_function.hpp>
+%include <casadi/core/function/jit_compiler.hpp>
 %include <casadi/core/function/linear_solver.hpp>
 %include <casadi/core/function/implicit_function.hpp>
 %include <casadi/core/function/integrator.hpp>

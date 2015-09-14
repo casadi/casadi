@@ -26,8 +26,8 @@
 #ifndef CASADI_CLANG_INTERFACE_HPP
 #define CASADI_CLANG_INTERFACE_HPP
 
-#include "casadi/core/function/jit_function_internal.hpp"
-#include <casadi/interfaces/clang/casadi_jitfunction_clang_export.h>
+#include "casadi/core/function/jit_compiler_internal.hpp"
+#include <casadi/interfaces/clang/casadi_jitcompiler_clang_export.h>
 
 #include <clang/CodeGen/CodeGenAction.h>
 #include <clang/Basic/DiagnosticOptions.h>
@@ -58,41 +58,41 @@
 #include <llvm/Support/raw_os_ostream.h>
 //#include <llvm/ExecutionEngine/ExecutionEngine.h>
 
-/** \defgroup plugin_JitFunction_clang
+/** \defgroup plugin_JitCompiler_clang
       Interface to the JIT compiler CLANG
 */
 
-/** \pluginsection{JitFunction,clang} */
+/** \pluginsection{JitCompiler,clang} */
 
 /// \cond INTERNAL
 namespace casadi {
-  /** \brief \pluginbrief{JitFunction,clang}
+  /** \brief \pluginbrief{JitCompiler,clang}
 
 
    \author Joris Gillis
    \date 2015
    *
-   @copydoc JitFunction_doc
-   @copydoc plugin_JitFunction_clang
+   @copydoc JitCompiler_doc
+   @copydoc plugin_JitCompiler_clang
    * */
-  class CASADI_JITFUNCTION_CLANG_EXPORT ClangJitFunctionInterface : public JitFunctionInternal {
+  class CASADI_JITCOMPILER_CLANG_EXPORT ClangJitCompilerInterface : public JitCompilerInternal {
   public:
 
     /** \brief Constructor */
-    explicit ClangJitFunctionInterface(const Function &f);
+    explicit ClangJitCompilerInterface(const Function &f);
 
     /** \brief Clone */
-    virtual ClangJitFunctionInterface* clone() const;
+    virtual ClangJitCompilerInterface* clone() const;
 
     /** \brief  Create a new JIT function */
-    static JitFunctionInternal* creator(const Function &f)
-    { return new ClangJitFunctionInterface(f);}
+    static JitCompilerInternal* creator(const Function &f)
+    { return new ClangJitCompilerInterface(f);}
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
     /** \brief Destructor */
-    virtual ~ClangJitFunctionInterface();
+    virtual ~ClangJitCompilerInterface();
 
     /** \brief Initialize */
     virtual void init();
