@@ -134,7 +134,7 @@ namespace casadi {
       "include" << filesep << "casadi" << filesep << "jit";
     std::string path;
     while (std::getline(paths, path, pathsep)) {
-      Clang.getHeaderSearchOpts().AddPath(path.c_str(), frontend::CSystem, false, false);
+      Clang.getHeaderSearchOpts().AddPath(path.c_str(), frontend::System, false, false);
     }
 
     // Create an action and make the compiler instance carry it out
