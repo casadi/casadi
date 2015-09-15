@@ -167,7 +167,7 @@ namespace casadi {
   }
 
   void* ClangJitCompilerInterface::getFunction(const std::string& symname) {
-    return executionEngine_->getPointerToFunction(module_->getFunction(symname));
+    return (void*)(intptr_t)executionEngine_->getPointerToFunction(module_->getFunction(symname));
   }
 
 

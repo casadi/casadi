@@ -8,7 +8,15 @@ casadi_plugin(JitCompiler clang
 
 casadi_plugin_link_libraries(JitCompiler clang ${CLANG_LIBRARIES})
 
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/helper_finddep.c" "#include <math.h>")
+set(CLANG_CLIB
+  "#include <math.h>\n"
+  "#include <unistd.h>\n"
+  "#include <stddef.h>\n"
+)
+
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/helper_finddep.c" ${CLANG_CLIB})
+
+
 # Find out the dependencies of math.h
 set(CMAKE_C_FLAGS_BACKUP "${CMAKE_C_FLAGS}")
 set(CMAKE_C_FLAGS "-O3 -MD -MF ${CMAKE_CURRENT_BINARY_DIR}/helper_finddep.d")
