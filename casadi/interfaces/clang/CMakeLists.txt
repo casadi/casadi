@@ -15,7 +15,6 @@ foreach(ITEM ${CLANG_CPPLIB})
       INSTALL( DIRECTORY ${ITEM} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/casadi/jit/ )
    ELSE()
       INSTALL( FILES ${ITEM} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/casadi/jit/ )
-      LIST( APPEND FILES_TO_DEPLOY "${ITEM}" )
    ENDIF()
 endforeach()
 
