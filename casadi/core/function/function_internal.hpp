@@ -31,6 +31,7 @@
 #include "../weak_ref.hpp"
 #include <set>
 #include "code_generator.hpp"
+#include "jit_compiler.hpp"
 #include "../matrix/sparse_storage.hpp"
 
 // This macro is for documentation purposes
@@ -43,6 +44,16 @@
 
 namespace casadi {
 
+  ///@{
+  /** \brief  Function pointer types */
+  typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
+                             const int **colind, const int **row);
+  typedef int (*workPtr)(int *n_iw, int *n_w);
+  typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
+  typedef void (*simplifiedPtr)(const double* arg, double* res);
+  typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
+  ///@}
+
   class MXFunction;
 
   /** \brief Internal class for Function
@@ -51,7 +62,7 @@ namespace casadi {
       A regular user should never work with any Node class. Use Function directly.
   */
   class CASADI_EXPORT FunctionInternal : public OptionsFunctionalityNode,
-                                                  public IOInterface<FunctionInternal>{
+                                         public IOInterface<FunctionInternal>{
     friend class Function;
 
   protected:
@@ -78,6 +89,12 @@ namespace casadi {
         this function when initialized. */
     virtual void init();
 
+    /** \brief Post-initialization
+        This function, which visits the class hierarchy in reverse order is run after
+        init() has been completed.
+    */
+    virtual void postinit();
+
     /** \brief  Propagate the sparsity pattern through a set of directional
         derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
@@ -91,6 +108,9 @@ namespace casadi {
 
     /** \brief  Reset the sparsity propagation */
     virtual void spInit(bool fwd) {}
+
+    /** \brief  Evaluate numerically, possibly using just-in-time compilation */
+    void eval(const double** arg, double** res, int* iw, double* w);
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void evalD(const double** arg, double** res, int* iw, double* w);
@@ -574,6 +594,10 @@ namespace casadi {
     /** \brief  Verbose -- for debugging purposes */
     bool verbose_;
 
+    /** \brief  Use just-in-time compiler */
+    bool jit_;
+    evalPtr evalD_;
+
     /// Set of module names which are extra monitored
     std::set<std::string> monitors_;
 
@@ -600,6 +624,11 @@ namespace casadi {
 
     /// Name
     std::string name_;
+
+    /// Just-in-time compiler
+    std::string jit_compiler_;
+    JitCompiler compiler_;
+    Dict jit_options_;
 
     bool monitor_inputs_, monitor_outputs_;
 

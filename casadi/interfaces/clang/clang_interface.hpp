@@ -26,8 +26,8 @@
 #ifndef CASADI_CLANG_INTERFACE_HPP
 #define CASADI_CLANG_INTERFACE_HPP
 
-#include "casadi/core/function/jit_function_internal.hpp"
-#include <casadi/interfaces/clang/casadi_jitfunction_clang_export.h>
+#include "casadi/core/function/jit_compiler_internal.hpp"
+#include <casadi/interfaces/clang/casadi_jitcompiler_clang_export.h>
 
 #include <clang/CodeGen/CodeGenAction.h>
 #include <clang/Basic/DiagnosticOptions.h>
@@ -41,8 +41,11 @@
 
 #include <llvm/ADT/SmallString.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
-//#include <llvm/ExecutionEngine/MCJIT.h>
+#if LLVM_VERSION_MAJOR>=3 && LLVM_VERSION_MINOR>=5
+#include <llvm/ExecutionEngine/MCJIT.h>
+#else
 #include "llvm/ExecutionEngine/JIT.h"
+#endif
 #include <llvm/IR/Module.h>
 #include "llvm/IR/LLVMContext.h"
 //#include "llvm/IR/Verifier.h"
@@ -55,41 +58,39 @@
 #include <llvm/Support/raw_os_ostream.h>
 //#include <llvm/ExecutionEngine/ExecutionEngine.h>
 
-/** \defgroup plugin_JitFunction_clang
+/** \defgroup plugin_JitCompiler_clang
       Interface to the JIT compiler CLANG
 */
 
-/** \pluginsection{JitFunction,clang} */
+/** \pluginsection{JitCompiler,clang} */
 
 /// \cond INTERNAL
 namespace casadi {
-  /** \brief \pluginbrief{JitFunction,clang}
+  /** \brief \pluginbrief{JitCompiler,clang}
 
 
    \author Joris Gillis
    \date 2015
    *
-   @copydoc JitFunction_doc
-   @copydoc plugin_JitFunction_clang
+   @copydoc JitCompiler_doc
+   @copydoc plugin_JitCompiler_clang
    * */
-  class CASADI_JITFUNCTION_CLANG_EXPORT ClangJitFunctionInterface : public JitFunctionInternal {
+  class CASADI_JITCOMPILER_CLANG_EXPORT ClangJitCompilerInterface : public JitCompilerInternal {
   public:
 
     /** \brief Constructor */
-    explicit ClangJitFunctionInterface(const Function &f);
+    explicit ClangJitCompilerInterface(const std::string& name);
 
     /** \brief Clone */
-    virtual ClangJitFunctionInterface* clone() const;
+    virtual ClangJitCompilerInterface* clone() const;
 
     /** \brief  Create a new JIT function */
-    static JitFunctionInternal* creator(const Function &f)
-    { return new ClangJitFunctionInterface(f);}
-
-    /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    static JitCompilerInternal* creator(const std::string& name) {
+      return new ClangJitCompilerInterface(name);
+    }
 
     /** \brief Destructor */
-    virtual ~ClangJitFunctionInterface();
+    virtual ~ClangJitCompilerInterface();
 
     /** \brief Initialize */
     virtual void init();
@@ -97,25 +98,18 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Get name of plugin
+    virtual const char* plugin_name() const { return "clang";}
+
+    /// Get a function pointer for numerical evaluation
+    virtual void* getFunction(const std::string& symname);
+
   protected:
-    typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
-                               const int **colind, const int **row);
-    typedef int (*workPtr)(int *n_iw, int *n_w);
-    typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
-
-    /** \brief Function pointer for initialization of external */
-    typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
-
-    sparsityPtr sparsity_fun_;
-    evalPtr eval_fun_;
-    workPtr work_fun_;
-    initPtr init_fun_;
-
-    llvm::ExecutionEngine* TheExecutionEngine;
-    llvm::LLVMContext* Context;
-
-    clang::EmitLLVMOnlyAction* Act;
-
+    clang::EmitLLVMOnlyAction* act_;
+    llvm::ExecutionEngine* executionEngine_;
+    llvm::LLVMContext* context_;
+    llvm::raw_ostream* myerr_;
+    llvm::Module* module_; // owned by executionEngine_
   };
 
 } // namespace casadi

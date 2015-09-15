@@ -52,6 +52,14 @@ using namespace std;
     init();
   }
 
+  ExternalFunction::ExternalFunction(const string& name, const JitCompiler& compiler,
+                                     const Dict& opts) {
+    assignNode(ExternalFunctionInternal::create(compiler, name));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
   ExternalFunctionInternal* ExternalFunction::operator->() {
     return static_cast<ExternalFunctionInternal*>(Function::operator->());
   }

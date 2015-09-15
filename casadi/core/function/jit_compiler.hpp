@@ -23,41 +23,40 @@
  */
 
 
-#ifndef CASADI_JIT_FUNCTION_HPP
-#define CASADI_JIT_FUNCTION_HPP
+#ifndef CASADI_JIT_COMPILER_HPP
+#define CASADI_JIT_COMPILER_HPP
 
 #include "function.hpp"
 
 
 namespace casadi {
 
-  class JitFunctionInternal;
+  class JitCompilerInternal;
 
-  /** \brief JitFunction
+  /** \brief JitCompiler
 
       Just-in-time compilation of code
 
-      \generalsection{JitFunction}
-      \pluginssection{JitFunction}
+      \generalsection{JitCompiler}
+      \pluginssection{JitCompiler}
 
       \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT JitFunction : public Function {
+  class CASADI_EXPORT JitCompiler : public OptionsFunctionality {
   public:
 
     /// Default constructor
-    JitFunction();
+    JitCompiler();
 
-    /// JitFunction factory (new syntax, includes initialization)
-    JitFunction(
-      const std::string& compiler,
-      const Function& f,
-      const Dict& opts=Dict());
+    /// JitCompiler factory (new syntax, includes initialization)
+    explicit JitCompiler(const std::string& name,
+                         const std::string& compiler,
+                         const Dict& opts=Dict());
 
     /// Access functions of the node
-    JitFunctionInternal* operator->();
-    const JitFunctionInternal* operator->() const;
+    JitCompilerInternal* operator->();
+    const JitCompilerInternal* operator->() const;
 
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
@@ -71,9 +70,16 @@ namespace casadi {
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
 
+    /// Query plugin name
+    std::string plugin_name() const;
+
+#ifndef SWIG
+    /// Get a function pointer for numerical evaluation
+    void* getFunction(const std::string& symname);
+#endif // SWIG
   };
 
 } // namespace casadi
 
-#endif // CASADI_JIT_FUNCTION_HPP
+#endif // CASADI_JIT_COMPILER_HPP
 

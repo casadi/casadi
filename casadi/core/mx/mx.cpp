@@ -1772,12 +1772,13 @@ namespace casadi {
     return f.getFree();
   }
 
-  MX MX::zz_matrix_expand(const MX& e, const std::vector<MX> &boundary) {
+  MX MX::zz_matrix_expand(const MX& e, const std::vector<MX> &boundary, const Dict &options) {
     std::vector<MX> e_v(1, e);
-    return matrix_expand(e_v, boundary).at(0);
+    return matrix_expand(e_v, boundary, options).at(0);
   }
 
-  std::vector<MX> MX::zz_matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary) {
+  std::vector<MX> MX::zz_matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary,
+     const Dict &options) {
 
     // Create symbols for boundary nodes
     std::vector<MX> syms(boundary.size());
@@ -1797,6 +1798,7 @@ namespace casadi {
 
     // Expand to SXFunction
     SXFunction s = f.expand();
+    s.setOption(options);
     s.init();
 
     return s(graph_substitute(v, syms, boundary), true);

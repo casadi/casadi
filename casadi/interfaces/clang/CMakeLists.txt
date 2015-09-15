@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.8.6)
 include_directories(${CLANG_INCLUDE_DIR})
 
-casadi_plugin(JitFunction clang
+casadi_plugin(JitCompiler clang
   clang_interface.hpp
   clang_interface.cpp
   clang_interface_meta.cpp)
 
-casadi_plugin_link_libraries(JitFunction clang ${CLANG_LIBRARIES})
+casadi_plugin_link_libraries(JitCompiler clang ${CLANG_LIBRARIES})
 
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/helper_finddep.c" "#include <math.h>")
 # Find out the dependencies of math.h
@@ -18,6 +18,7 @@ TRY_COMPILE(RESULT "${CMAKE_CURRENT_BINARY_DIR}/temp"
 message("${RESULT}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_BACKUP}")
 
+add_definitions(${LLVM_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_CXX_FLAGS}")
 
 # Slurp the dependecy list from the exported file

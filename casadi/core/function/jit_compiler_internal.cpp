@@ -23,49 +23,25 @@
  */
 
 
-#include "jit_function.hpp"
-#include "jit_function_internal.hpp"
-#include "sx_function.hpp"
+#include "jit_compiler_internal.hpp"
 #include "mx_function.hpp"
+#include "sx_function.hpp"
 
 using namespace std;
 namespace casadi {
 
-  JitFunction::JitFunction() {
+  JitCompilerInternal::JitCompilerInternal(const std::string& name) : name_(name) {
   }
 
-  JitFunction::JitFunction(
-      const std::string& compiler,
-      const Function& f,
-      const Dict& opts) {
-    assignNode(JitFunctionInternal::instantiatePlugin(compiler, f));
-    setOption("name", f.getOption("name"));
-    setOption(opts);
-    init();
+  JitCompilerInternal::~JitCompilerInternal() {
   }
 
-  JitFunctionInternal* JitFunction::operator->() {
-    return static_cast<JitFunctionInternal*>(Function::operator->());
+  void JitCompilerInternal::print(ostream &stream) const {
+    stream << "JitCompiler" << endl;
   }
 
-  const JitFunctionInternal* JitFunction::operator->() const {
-    return static_cast<const JitFunctionInternal*>(Function::operator->());
-  }
+  std::map<std::string, JitCompilerInternal::Plugin> JitCompilerInternal::solvers_;
 
-  bool JitFunction::testCast(const SharedObjectNode* ptr) {
-    return dynamic_cast<const JitFunctionInternal*>(ptr)!=0;
-  }
-
-  bool JitFunction::hasPlugin(const std::string& name) {
-    return JitFunctionInternal::hasPlugin(name);
-  }
-
-  void JitFunction::loadPlugin(const std::string& name) {
-    JitFunctionInternal::loadPlugin(name);
-  }
-
-  std::string JitFunction::doc(const std::string& name) {
-    return JitFunctionInternal::getPlugin(name).doc;
-  }
+  const std::string JitCompilerInternal::infix_ = "jitcompiler";
 
 } // namespace casadi

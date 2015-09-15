@@ -62,13 +62,14 @@
 
 %}
 %init %{
+  // Set logger functions
   casadi::Logger::writeWarn = pythonlogger;
   casadi::Logger::writeProg = pythonlogger;
   casadi::Logger::writeDebug = pythonlogger;
   casadi::Logger::writeAll = pythonlogger;
 
+  // @jgillis: please document
   casadi::InterruptHandler::checkInterrupted = pythoncheckinterrupted;
-
 %}
 #elif defined(SWIGMATLAB)
 %{
@@ -92,13 +93,46 @@
   }
 %}
 %init %{
+  // Get full path
+  mxArray *fullpath, *fullpath_cmd = mxCreateString("fullpath");
+  mexCallMATLAB(1, &fullpath, 1, &fullpath_cmd, "mfilename");
+  mxDestroyArray(fullpath_cmd);
+  std::string path = mxArrayToString(fullpath);
+  mxDestroyArray(fullpath);
+
+  // Get file separator
+  mxArray *filesep;
+  mexCallMATLAB(1, &filesep, 0, 0, "filesep");
+  std::string sep = mxArrayToString(filesep);
+  mxDestroyArray(filesep);
+
+  // Truncate at separator
+  path = path.substr(0, path.rfind(sep));
+
+  // Set library path
+  casadi::CasadiOptions::setCasadiPath(path);
+
+  // Set jit include path
+  casadi::CasadiOptions::setJitIncludePath(path + sep + "include"
+                                           + sep + "casadi" + sep + "jit");
+
+  // @jgillis: please document
+  mxArray *warning_rhs[] = {mxCreateString("error"),
+
+                            mxCreateString("SWIG:OverloadError")};
+  mexCallMATLAB(0, 0, 2, warning_rhs, "warning");
+  mxDestroyArray(warning_rhs[0]);
+  mxDestroyArray(warning_rhs[1]);
+
+  
+  // Set logger functions
   casadi::Logger::writeWarn = mexlogger;
   casadi::Logger::writeProg = mexlogger;
   casadi::Logger::writeDebug = mexlogger;
   casadi::Logger::writeAll = mexlogger;
-
   casadi::Logger::flush = mexflush;
 
+  // @jgillis: please document
   casadi::InterruptHandler::checkInterrupted = mexcheckinterrupted;
 %}
 #endif
@@ -187,31 +221,11 @@ def _swig_repr(self):
 %}
 #endif // WITH_SWIGPYTHON
 
-#ifdef SWIGMATLAB
-%matlabsetup %{
-
-
-disect_path = strsplit(mfilename('fullpath'),filesep);
-libpath = strjoin(disect_path(1:end-1),filesep);
-jitpath = strjoin({libpath,'include','casadi','jit'},filesep);
-
-import casadi.*
-
-CasadiOptions.setCasadiPath(libpath);
-CasadiOptions.setJitIncludePath(jitpath)
-
-warning('error','SWIG:OverloadError')
-
-
-%}
-#endif
-
 #if defined(SWIGPYTHON) || defined(SWIGMATLAB)
 %include "doc_merged.i"
 #else
 %include "doc.i"
 #endif
-
 
 %feature("autodoc", "1");
 
@@ -233,18 +247,18 @@ warning('error','SWIG:OverloadError')
 // This is a first iteration for having
 // beautified error messages in the Matlab iterface
 %feature("matlabprepend") %{
-  try
+      try
 %}
 
 %feature("matlabappend") %{
-  catch err
-    if (strcmp(err.identifier,'SWIG:OverloadError'))
-      msg = [swig_typename_convertor_cpp2matlab(err.message) 'You have: ' strjoin(cellfun(@swig_typename_convertor_matlab2cpp,varargin,'UniformOutput',false),', ')];
-      throwAsCaller(MException(err.identifier,msg));
-    else
-      rethrow(err);
-    end
-  end
+      catch err
+        if (strcmp(err.identifier,'SWIG:OverloadError'))
+          msg = [swig_typename_convertor_cpp2matlab(err.message) 'You have: ' strjoin(cellfun(@swig_typename_convertor_matlab2cpp,varargin,'UniformOutput',false),', ')];
+          throwAsCaller(MException(err.identifier,msg));
+        else
+          rethrow(err);
+        end
+      end
 %}
 
 #endif // SWIGMATLAB
@@ -3362,13 +3376,15 @@ DECL M %SHOW(find)(const M& x) {
 #if FLAG & IS_GLOBAL
 DECL std::vector< M >
 %SHOW(matrix_expand)(const std::vector< M >& e,
-                     const std::vector< M > &boundary = std::vector< M >()) {
-  return matrix_expand(e, boundary);
+                     const std::vector< M > &boundary = std::vector< M >(),
+                     const Dict& options = Dict()) {
+  return matrix_expand(e, boundary, options);
 }
 
 DECL M %SHOW(matrix_expand)(const M& e,
-                            const std::vector< M > &boundary = std::vector< M >()) {
-  return matrix_expand(e, boundary);
+                            const std::vector< M > &boundary = std::vector< M >(),
+                            const Dict& options = Dict()) {
+  return matrix_expand(e, boundary, options);
 }
 
 DECL M %SHOW(graph_substitute)(const M& ex, const std::vector< M >& v,
@@ -4002,7 +4018,7 @@ namespace casadi {
 
 %include <casadi/core/function/sx_function.hpp>
 %include <casadi/core/function/mx_function.hpp>
-%include <casadi/core/function/jit_function.hpp>
+%include <casadi/core/function/jit_compiler.hpp>
 %include <casadi/core/function/linear_solver.hpp>
 %include <casadi/core/function/implicit_function.hpp>
 %include <casadi/core/function/integrator.hpp>

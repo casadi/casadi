@@ -10,6 +10,7 @@ include_directories(${MATLAB_INCLUDE_DIR})
 add_definitions(${MATLAB_EXTRA_CXXFLAGS})
 
 # Generate SWIG wrapper
+set(SWIG_MODULE_casadiMATLAB_wrap_EXTRA_FLAGS "-mexname" "casadiMATLAB_wrap")
 set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
 swig_add_module(casadiMATLAB_wrap matlab ../casadi.i)
 swig_link_libraries(casadiMATLAB_wrap ${MATLAB_LIBRARIES} casadi)
@@ -18,7 +19,7 @@ set_target_properties(casadiMATLAB_wrap PROPERTIES PREFIX "" SUFFIX .${MATLAB_ME
 # Install the generated front-end to ${CMAKE_INSTALL_PREFIX}/matlab_tb
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/+casadi DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigRef.m DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/casadisetup.m DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigMem.m DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(TARGETS casadiMATLAB_wrap DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 # Install matlab helper files

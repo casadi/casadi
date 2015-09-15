@@ -4,13 +4,6 @@ cmake_minimum_required(VERSION 2.8.6)
 add_definitions(-DSHARED_LIBRARY_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 add_definitions(-DSHARED_LIBRARY_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
-# Look for plugins in the installation directory
-file(TO_NATIVE_PATH ${PLUGIN_INSTALL_PATH} PLUGIN_EXTRA_SEARCH_PATH)
-string(REPLACE "\\" "\\\\" PLUGIN_EXTRA_SEARCH_PATH ${PLUGIN_EXTRA_SEARCH_PATH})
-if(NOT WITH_SELFCONTAINED)
-add_definitions(-DPLUGIN_EXTRA_SEARCH_PATH="${PLUGIN_EXTRA_SEARCH_PATH}")
-endif()
-
 add_subdirectory(runtime)
 
 set(CASADI_SRCS
@@ -125,7 +118,7 @@ set(CASADI_SRCS
   function/switch.hpp              function/switch.cpp              function/switch_internal.hpp   function/switch_internal.cpp
   function/map.hpp                 function/map.cpp                 function/map_internal.hpp      function/map_internal.cpp
   function/mapaccum.hpp            function/mapaccum.cpp            function/mapaccum_internal.hpp function/mapaccum_internal.cpp
-  function/jit_function.hpp        function/jit_function.cpp        function/jit_function_internal.hpp function/jit_function_internal.cpp
+  function/jit_compiler.hpp        function/jit_compiler.cpp        function/jit_compiler_internal.hpp function/jit_compiler_internal.cpp
   function/kernel_sum_2d.hpp       function/kernel_sum_2d.cpp       function/kernel_sum_2d_internal.hpp function/kernel_sum_2d_internal.cpp
   
   # MISC useful stuff

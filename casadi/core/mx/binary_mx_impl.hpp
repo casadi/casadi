@@ -137,18 +137,18 @@ namespace casadi {
     if (nnz()>1) {
       // Iterate over result
       g.body << "for (i=0, " << "rr=" << g.work(res[0], nnz());
-      r = "*rr++";
+      r = "(*rr++)";
 
       // Iterate over first argument?
       if (!ScX && !inplace) {
         g.body << ", cr=" << g.work(arg[0], dep(0).nnz());
-        x = "*cr++";
+        x = "(*cr++)";
       }
 
       // Iterate over second argument?
       if (!ScY) {
         g.body << ", cs=" << g.work(arg[1], dep(1).nnz());
-        y = "*cs++";
+        y = "(*cs++)";
       }
 
       // Close loop

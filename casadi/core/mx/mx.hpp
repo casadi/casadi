@@ -493,9 +493,11 @@ namespace casadi {
     static std::vector<MX> zz_graph_substitute(const std::vector<MX> &ex,
                                                const std::vector<MX> &expr,
                                                const std::vector<MX> &exprs);
-    static MX zz_matrix_expand(const MX& e, const std::vector<MX> &boundary);
+    static MX zz_matrix_expand(const MX& e, const std::vector<MX> &boundary,
+                                            const Dict& options);
     static std::vector<MX> zz_matrix_expand(const std::vector<MX>& e,
-                                            const std::vector<MX>& boundary);
+                                            const std::vector<MX>& boundary,
+                                            const Dict& options);
     ///@}
     /// \endcond
 
@@ -541,8 +543,9 @@ namespace casadi {
      *
      */
     inline friend MX
-      matrix_expand(const MX& e, const std::vector<MX> &boundary = std::vector<MX>()) {
-      return MX::zz_matrix_expand(e, boundary);
+      matrix_expand(const MX& e, const std::vector<MX> &boundary = std::vector<MX>(),
+        const Dict& options = Dict()) {
+      return MX::zz_matrix_expand(e, boundary, options);
     }
 
     /** \brief Expand MX graph to SXFunction call
@@ -553,8 +556,9 @@ namespace casadi {
      */
     inline friend std::vector<MX>
       matrix_expand(const std::vector<MX>& e,
-                    const std::vector<MX> &boundary = std::vector<MX>()) {
-      return MX::zz_matrix_expand(e, boundary);
+                    const std::vector<MX> &boundary = std::vector<MX>(),
+                    const Dict& options = Dict()) {
+      return MX::zz_matrix_expand(e, boundary, options);
     }
 /** @} */
 #endif // SWIG

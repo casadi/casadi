@@ -94,11 +94,18 @@ Function Callback2::create() {
   return ret;
 }
 
-Function DerivativeGenerator2::operator()(const Function& fcn, int ndir) {
+Function DerivativeGenerator2::operator()(Function& fcn, int ndir) {
+  return fcn->getDerForward("der", ndir, Dict());
   casadi_error("This virtual method must be implemented");
 }
 
-
+Function DerivativeGenerator2::original(Function& fcn, int ndir, bool fwd) {
+  if (fwd) {
+    return fcn->getDerForward("der", ndir, Dict());
+  } else {
+    return fcn->getDerReverse("der", ndir, Dict());
+  }
+}
 
 DerivativeGenerator DerivativeGenerator2::create() {
   DerivativeGenerator ret;

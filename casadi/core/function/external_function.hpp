@@ -27,7 +27,7 @@
 #define CASADI_EXTERNAL_FUNCTION_HPP
 
 #include "function.hpp"
-#include <string>
+#include "jit_compiler.hpp"
 
 namespace casadi {
 /** \brief  Forward declaration of internal class */
@@ -53,6 +53,12 @@ class ExternalFunctionInternal;
      * File name given
      */
     ExternalFunction(const std::string& name, const std::string& bin_name,
+                     const Dict& opts=Dict());
+
+    /** \brief  Load a just-in-time compiled external function
+     * File name given
+     */
+    ExternalFunction(const std::string& name, const JitCompiler& compiler,
                      const Dict& opts=Dict());
 
     /** \brief  Access functions of the node */
