@@ -8,16 +8,35 @@ casadi_plugin(JitCompiler clang
 
 casadi_plugin_link_libraries(JitCompiler clang ${CLANG_LIBRARIES})
 
+# Get C++ headers
+file(GLOB CLANG_CPPLIB ${LLVM_INSTALL_PREFIX}/include/c++/v1/*)
+foreach(ITEM ${CLANG_CPPLIB})
+   IF( IS_DIRECTORY "${ITEM}" )
+      INSTALL( DIRECTORY ${ITEM} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/casadi/jit/ )
+   ELSE()
+      INSTALL( FILES ${ITEM} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/casadi/jit/ )
+      LIST( APPEND FILES_TO_DEPLOY "${ITEM}" )
+   ENDIF()
+endforeach()
+
+# Get C library
 set(CLANG_CLIB
   "#include <math.h>\n"
   "#include <unistd.h>\n"
   "#include <stddef.h>\n"
 )
 
+# Make sure all C headers referenced in CLANG_CPPLIB are included
+foreach(D ${CLANG_CPPLIB})
+  # Loop over lines of the file
+  #FILE(READ "${D}" DLINES)
+  #foreach(DLINE ${DLINES})
+    # Check if line is of form "#include <*.h>\n" and if so append to CLANG_CLIB
+  #endforeach()
+endforeach()
+
+# Find the dependencies of the includes in CLANG_CLIB
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/helper_finddep.c" ${CLANG_CLIB})
-
-
-# Find out the dependencies of math.h
 set(CMAKE_C_FLAGS_BACKUP "${CMAKE_C_FLAGS}")
 set(CMAKE_C_FLAGS "-O3 -MD -MF ${CMAKE_CURRENT_BINARY_DIR}/helper_finddep.d")
 TRY_COMPILE(RESULT "${CMAKE_CURRENT_BINARY_DIR}/temp"
