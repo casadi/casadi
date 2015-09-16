@@ -27,10 +27,6 @@
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/casadi_meta.hpp"
 
-using namespace clang;
-using namespace clang::driver;
-
-
 using namespace std;
 namespace casadi {
 
@@ -81,9 +77,6 @@ namespace casadi {
     // Initialize the base classes
     JitCompilerInternal::init();
 
-    // Create an LLVM context (NOTE: should use a static context instead?)
-    context_ = new llvm::LLVMContext();
-
     // Arguments to pass to the clang frontend
     vector<const char *> args(1, name_.c_str());
     std::vector<std::string> flags;
@@ -94,28 +87,36 @@ namespace casadi {
       }
     }
 
-    // The compiler invocation needs a DiagnosticsEngine so it can report problems
-    DiagnosticOptions* DiagOpts = new DiagnosticOptions();
-    myerr_ = new llvm::raw_os_ostream(userOut<true>());
-    TextDiagnosticPrinter *DiagClient = new TextDiagnosticPrinter(*myerr_, DiagOpts);
+    // Create the compiler instance
+    clang::CompilerInstance compInst;
 
-    DiagnosticIDs* DiagID = new DiagnosticIDs();
+#if 0
+    // Initialize target info with the default triple for our platform.
+    auto targetoptions = std::make_shared<clang::TargetOptions>();
+    targetoptions->Triple = llvm::sys::getDefaultTargetTriple();
+    clang::TargetInfo *targetInfo =
+      clang::TargetInfo::CreateTargetInfo(compInst.getDiagnostics(), targetoptions);
+    compInst.setTarget(targetInfo);
+#endif
+
+    // The compiler invocation needs a DiagnosticsEngine so it can report problems
+    clang::DiagnosticOptions* diagOpts = new clang::DiagnosticOptions();
+    myerr_ = new llvm::raw_os_ostream(userOut<true>());
+    clang::TextDiagnosticPrinter *diagClient = new clang::TextDiagnosticPrinter(*myerr_, diagOpts);
+
+    clang::DiagnosticIDs* diagID = new clang::DiagnosticIDs();
     // This object takes ownerships of all three passed-in pointers
-    DiagnosticsEngine Diags(DiagID, DiagOpts, DiagClient);
+    clang::DiagnosticsEngine diags(diagID, diagOpts, diagClient);
 
     // Create the compiler invocation
-    clang::CompilerInvocation* CI = new clang::CompilerInvocation();
-    clang::CompilerInvocation::CreateFromArgs(*CI, &args[0], &args[0] + args.size(), Diags);
-
-    vector<string> argsFromInvocation;
-
-    // Create the compiler instance
-    clang::CompilerInstance Clang;
-    Clang.setInvocation(CI);
+    clang::CompilerInvocation* compInv = new clang::CompilerInvocation();
+    clang::CompilerInvocation::CreateFromArgs(*compInv, &args[0],
+                                              &args[0] + args.size(), diags);
+    compInst.setInvocation(compInv);
 
     // Get ready to report problems
-    Clang.createDiagnostics();
-    if (!Clang.hasDiagnostics())
+    compInst.createDiagnostics();
+    if (!compInst.hasDiagnostics())
       casadi_error("Cannot create diagnostics");
 
     #ifdef _WIN32
@@ -134,12 +135,15 @@ namespace casadi {
       "include" << filesep << "casadi" << filesep << "jit";
     std::string path;
     while (std::getline(paths, path, pathsep)) {
-      Clang.getHeaderSearchOpts().AddPath(path.c_str(), frontend::System, false, false);
+      compInst.getHeaderSearchOpts().AddPath(path.c_str(), clang::frontend::System, false, false);
     }
+
+    // Create an LLVM context (NOTE: should use a static context instead?)
+    context_ = new llvm::LLVMContext();
 
     // Create an action and make the compiler instance carry it out
     act_ = new clang::EmitLLVMOnlyAction(context_);
-    if (!Clang.ExecuteAction(*act_))
+    if (!compInst.ExecuteAction(*act_))
       casadi_error("Cannot execute action");
 
     // Grab the module built by the EmitLLVMOnlyAction
