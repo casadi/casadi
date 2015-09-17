@@ -37,7 +37,6 @@ namespace casadi {
   bool CasadiOptions::allowed_internal_api = false;
 
   std::string CasadiOptions::casadipath = "";
-  std::string CasadiOptions::jitincludepath = "";
 
   void CasadiOptions::startProfiling(const std::string &filename) {
     profilingLog.open(filename.c_str(), std::ofstream::out);

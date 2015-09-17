@@ -27,6 +27,14 @@
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/casadi_meta.hpp"
 
+// To be able to get the plugin path
+#ifdef _WIN32 // also for 64-bit
+#define NOMINMAX
+#include <windows.h>
+#else // _WIN32
+#include <dlfcn.h>
+#endif // _WIN32
+
 using namespace std;
 namespace casadi {
 
@@ -90,6 +98,34 @@ namespace casadi {
     // Create the compiler instance
     clang::CompilerInstance compInst;
 
+    // A symbol in the DLL
+    void *addr = reinterpret_cast<void*>(&casadi_register_jitcompiler_clang);
+
+    // Get runtime include path
+    std::string jit_include, filesep;
+#ifdef _WIN32
+    char buffer[MAX_PATH];
+    HMODULE hm = NULL;
+    if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                            GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                            (LPCSTR)addr, &hm)) {
+      casadi_error("GetModuleHandle failed");
+    }
+    GetModuleFileNameA(hm, buffer, sizeof(buffer));
+    PathRemoveFileSpecA(buffer);
+    jit_include = buffer;
+    filesep = "\\";
+#else // _WIN32
+    Dl_info dl_info;
+    if (!dladdr(addr, &dl_info)) {
+      casadi_error("dladdr failed");
+    }
+    jit_include = dl_info.dli_fname;
+    jit_include = jit_include.substr(0, jit_include.find_last_of('/'));
+    filesep = "/";
+#endif // _WIN32
+    jit_include += filesep + "casadi" + filesep + "jit";
+
 #if 0
     // Initialize target info with the default triple for our platform.
     auto targetoptions = std::make_shared<clang::TargetOptions>();
@@ -119,20 +155,27 @@ namespace casadi {
     if (!compInst.hasDiagnostics())
       casadi_error("Cannot create diagnostics");
 
-    #ifdef _WIN32
+    // Set resource directory
+    std::string resourcedir = jit_include + filesep + "clang" + filesep + CLANG_VERSION_STRING;
+    compInst.getHeaderSearchOpts().ResourceDir = resourcedir;
+
+    // Add c standard library
+    compInst.getHeaderSearchOpts().AddPath(jit_include + filesep + "clib",
+                                           clang::frontend::System, false, false);
+
+    // Add c++ standard library
+    compInst.getHeaderSearchOpts().AddPath(jit_include + filesep + "cxxlib",
+                                           clang::frontend::CXXSystem, false, false);
+
+#ifdef _WIN32
     char pathsep = ';';
-    const std::string filesep("\\");
-    #else
+#else
     char pathsep = ':';
-    const std::string filesep("/");
-    #endif
+#endif
 
     // Search path
     std::stringstream paths;
     paths << getOption("include_path").toString() << pathsep;
-    paths << CasadiOptions::getJitIncludePath() << pathsep;
-    paths << CasadiMeta::getInstallPrefix() << filesep <<
-      "include" << filesep << "casadi" << filesep << "jit";
     std::string path;
     while (std::getline(paths, path, pathsep)) {
       compInst.getHeaderSearchOpts().AddPath(path.c_str(), clang::frontend::System, false, false);

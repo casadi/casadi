@@ -112,10 +112,6 @@
   // Set library path
   casadi::CasadiOptions::setCasadiPath(path);
 
-  // Set jit include path
-  casadi::CasadiOptions::setJitIncludePath(path + sep + "include"
-                                           + sep + "casadi" + sep + "jit");
-
   // @jgillis: please document
   mxArray *warning_rhs[] = {mxCreateString("error"),
 
