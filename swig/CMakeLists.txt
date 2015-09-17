@@ -3,8 +3,7 @@ cmake_minimum_required(VERSION 2.8.6)
 find_package(SWIG REQUIRED)
 
 if (WITH_EXTENDING_CASADI)
-  # Simple library that shows how CasADi can be extended
-  add_library(extending_casadi extending_casadi.hpp extending_casadi.cpp)
+   add_subdirectory(extending_casadi)
 endif()
 
 # NOTE: you are not allowed to generate header files with configure_file in this module.

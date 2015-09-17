@@ -383,24 +383,13 @@ if (casadi::CasadiOptions::catch_errors_swig) { \
 import_array();
 %}
 
-%inline%{
-/** Check PyObjects by class name */
-bool PyObjectHasClassName(PyObject* p, const char * name) {
-  PyObject * classo = PyObject_GetAttrString( p, "__class__");
-  PyObject * classname = PyObject_GetAttrString( classo, "__name__");
-
-  bool ret = strcmp(PyString_AsString(classname),name)==0;
-  Py_DECREF(classo);Py_DECREF(classname);
-	return ret;
-}
-
-%}
 #endif // SWIGPYTHON
 
 %{
 #define SWIG_Error_return(code, msg)  { std::cerr << "Error occured in CasADi SWIG interface code:" << std::endl << "  "<< msg << std::endl;SWIG_Error(code, msg); return 0; }
 %}
 
+#ifndef CASADI_NOT_IN_DERIVED
 #ifdef SWIGPYTHON
 %{
   // Returns a new reference
@@ -503,6 +492,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   }
   %}
 #endif
+#endif // CASADI_NOT_IN_DERIVED
 
 #ifndef SWIGXML
 
@@ -532,7 +522,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     bool to_ptr(GUESTOBJECT *p, casadi::MX** m);
     bool to_ptr(GUESTOBJECT *p, casadi::Function** m);
     bool to_ptr(GUESTOBJECT *p, casadi::Callback** m);
+#ifndef CASADI_NOT_IN_DERIVED
     bool to_ptr(GUESTOBJECT *p, casadi::DerivativeGenerator** m);
+#endif
     bool to_ptr(GUESTOBJECT *p, casadi::CustomEvaluate** m);
     bool to_ptr(GUESTOBJECT *p, casadi::GenericType** m);
 #ifdef SWIGMATLAB
@@ -1106,6 +1098,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 }
 
 %fragment("casadi_derivativegenerator", "header", fragment="casadi_aux") {
+#ifndef CASADI_NOT_IN_DERIVED
   namespace casadi {
 #ifdef SWIGPYTHON
     Function DerivativeGeneratorPythonInternal::call(Function& fcn, int ndir, void* user_data) {
@@ -1166,9 +1159,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
   } // namespace casadi
+#endif // CASADI_NOT_IN_DERIVED
 }
 
 %fragment("casadi_callback", "header", fragment="casadi_aux") {
+#ifndef CASADI_NOT_IN_DERIVED
   namespace casadi {
 #ifdef SWIGPYTHON
     int CallbackPythonInternal::call(Function& fcn, void* user_data) {
@@ -1214,9 +1209,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
   } // namespace casadi
+#endif // CASADI_NOT_IN_DERIVED
 }
 
 %fragment("casadi_customevaluate", "header", fragment="casadi_aux") {
+#ifndef CASADI_NOT_IN_DERIVED
   namespace casadi {
 #ifdef SWIGPYTHON
     void CustomEvaluatePythonInternal::call(CustomFunction& fcn, void* user_data) {
@@ -1257,6 +1254,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
   } // namespace casadi
+#endif // CASADI_NOT_IN_DERIVED
 }
 
 %fragment("casadi_generictype", "header", fragment="casadi_aux") {
@@ -1287,11 +1285,14 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           || to_generic<std::vector<std::string> >(p, m)
           || to_generic<std::vector<std::vector<int> > >(p, m)
           || to_generic<casadi::Function>(p, m)
+#ifndef CASADI_NOT_IN_DERIVED
           || to_generic<casadi::DerivativeGenerator>(p, m)
+#endif
           || to_generic<casadi::GenericType::Dict>(p, m)) {
         return true;
       }
 
+#ifndef CASADI_NOT_IN_DERIVED
 #ifdef SWIGPYTHON
       if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
         PyObject *c = PyObject_GetAttrString(p,"creator");
@@ -1345,6 +1346,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       }
       return true;
 #endif // SWIGPYTHON
+#endif // CASADI_NOT_IN_DERIVED
 
       // Check if it can be converted to boolean (last as e.g. can be converted to boolean)
       if (to_generic<bool>(p, m)) return true;
@@ -1824,6 +1826,18 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 %fragment("casadi_dmatrix", "header", fragment="casadi_aux") {
   namespace casadi {
+#ifdef SWIGPYTHON
+    /** Check PyObjects by class name */
+    bool PyObjectHasClassName(PyObject* p, const char * name) {
+      PyObject * classo = PyObject_GetAttrString( p, "__class__");
+      PyObject * classname = PyObject_GetAttrString( classo, "__name__");
+
+      bool ret = strcmp(PyString_AsString(classname),name)==0;
+      Py_DECREF(classo);Py_DECREF(classname);
+      return ret;
+    }
+#endif // SWIGPYTHON
+
     bool to_ptr(GUESTOBJECT *p, DMatrix** m) {
       // Treat Null
       if (is_null(p)) return false;
