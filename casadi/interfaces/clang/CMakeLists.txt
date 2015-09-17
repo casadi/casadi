@@ -14,5 +14,5 @@ casadi_plugin_link_libraries(JitCompiler clang ${CLANG_LIBRARIES})
 INSTALL( DIRECTORY ${LLVM_INSTALL_PREFIX}/lib/clang DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/casadi/jit/)
 
 # Install libc++
-INSTALL( DIRECTORY ${LLVM_INSTALL_PREFIX}/include/c++ DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/casadi/jit/)
+INSTALL( DIRECTORY ${LLVM_INSTALL_PREFIX}/include/c++/v1/ DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/casadi/jit/c++)
 
