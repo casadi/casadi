@@ -14,5 +14,14 @@ casadi_plugin_link_libraries(JitCompiler clang ${CLANG_LIBRARIES})
 INSTALL( DIRECTORY ${LLVM_INSTALL_PREFIX}/lib/clang DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/casadi/jit/)
 
 # Install libc++
-INSTALL( DIRECTORY ${LLVM_INSTALL_PREFIX}/include/c++/v1/ DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/casadi/jit/c++)
+INSTALL( DIRECTORY ${LLVM_INSTALL_PREFIX}/include/c++/v1/ DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/casadi/jit/cxxlib)
 
+# Locate C standard library
+if (NOT WIN32)
+find_path(STDLIB_LOC stdio.h)
+INSTALL(CODE
+  "
+    EXECUTE_PROCESS(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"${STDLIB_LOC}\" \"${CMAKE_INSTALL_PREFIX}/lib/casadi/jit/clib\")
+  "
+)
+endif()
