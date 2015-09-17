@@ -273,7 +273,10 @@ for d in r.findall('*//namespace/cdecl'):
   if d.find('attributelist/attribute[@name="kind"]').attrib["value"]!="function": continue
 
   dname = d.find('attributelist/attribute[@name="sym_name"]').attrib["value"]
+  name = d.find('attributelist/attribute[@name="name"]').attrib["value"]
   if dname == "dummy": continue
+  friend = False
+  if "friendwrap" in name: friend = True
   if my_module != getModule(d): continue
   if isInternal(d,msg="functions"):
     numInternalFunctions += 1
@@ -291,7 +294,7 @@ for d in r.findall('*//namespace/cdecl'):
     continue
   docs = getDocstring(d)
 
-  functions.append((dname,params,rettype,docs))
+  functions.append((dname,params,rettype,docs,friend))
 
 
 
@@ -331,8 +334,8 @@ for k,v in classes.items():
 print "elpased", time.time()-t0
 t0 = time.time()
 print "functions"
-for (name,pars,rettype,docs) in functions:
-  treedata["treeFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":docs,"funDocslink":""})
+for (name,pars,rettype,docs,friend) in functions:
+  treedata["treeFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":docs,"funDocslink":"","friend":friend})
 print "elpased", time.time()-t0
 t0 = time.time()
 print "enums"
