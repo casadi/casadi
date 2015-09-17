@@ -524,17 +524,17 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     bool to_ptr(GUESTOBJECT *p, int** m);
     bool to_ptr(GUESTOBJECT *p, double** m);
     bool to_ptr(GUESTOBJECT *p, std::string** m);
-    bool to_ptr(GUESTOBJECT *p, Slice** m);
-    bool to_ptr(GUESTOBJECT *p, Sparsity** m);
-    bool to_ptr(GUESTOBJECT *p, DMatrix** m);
-    bool to_ptr(GUESTOBJECT *p, IMatrix** m);
-    bool to_ptr(GUESTOBJECT *p, SX** m);
-    bool to_ptr(GUESTOBJECT *p, MX** m);
-    bool to_ptr(GUESTOBJECT *p, Function** m);
-    bool to_ptr(GUESTOBJECT *p, Callback** m);
-    bool to_ptr(GUESTOBJECT *p, DerivativeGenerator** m);
-    bool to_ptr(GUESTOBJECT *p, CustomEvaluate** m);
-    bool to_ptr(GUESTOBJECT *p, GenericType** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::Slice** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::Sparsity** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::DMatrix** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::IMatrix** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::SX** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::MX** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::Function** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::Callback** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::DerivativeGenerator** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::CustomEvaluate** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::GenericType** m);
 #ifdef SWIGMATLAB
     bool to_ptr(GUESTOBJECT *p, std::pair<int, int>** m);
 #endif // SWIGMATLAB
@@ -560,13 +560,13 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     GUESTOBJECT* from_ptr(const int *a);
     GUESTOBJECT* from_ptr(const double *a);
     GUESTOBJECT* from_ptr(const std::string *a);
-    GUESTOBJECT* from_ptr(const Slice *a);
-    GUESTOBJECT* from_ptr(const Sparsity *a);
-    GUESTOBJECT* from_ptr(const DMatrix *a);
-    GUESTOBJECT* from_ptr(const IMatrix *a);
-    GUESTOBJECT* from_ptr(const SX *a);
-    GUESTOBJECT* from_ptr(const MX *a);
-    GUESTOBJECT* from_ptr(const Function *a);
+    GUESTOBJECT* from_ptr(const casadi::Slice *a);
+    GUESTOBJECT* from_ptr(const casadi::Sparsity *a);
+    GUESTOBJECT* from_ptr(const casadi::DMatrix *a);
+    GUESTOBJECT* from_ptr(const casadi::IMatrix *a);
+    GUESTOBJECT* from_ptr(const casadi::SX *a);
+    GUESTOBJECT* from_ptr(const casadi::MX *a);
+    GUESTOBJECT* from_ptr(const casadi::Function *a);
 #ifdef SWIGMATLAB
     GUESTOBJECT* from_ptr(const std::pair<int, int>* a);
 #endif // SWIGMATLAB
@@ -741,10 +741,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     }
 
     GUESTOBJECT * from_ptr(const bool *a) {
-      return SWIG_From_bool(*a);
+#ifdef SWIGPYTHON
+      return PyBool_FromLong(*a);
+#elif defined(SWIGMATLAB)
+      return mxCreateLogicalScalar(*a);
+#else
+      return 0;
+#endif
     }
   } // namespace casadi
-  }
+ }
 
 %fragment("casadi_int", "header", fragment="casadi_aux", fragment=SWIG_AsVal_frag(int), fragment=SWIG_AsVal_frag(long)) {
   namespace casadi {
@@ -841,8 +847,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     GUESTOBJECT * from_ptr(const double *a) {
 #ifdef SWIGPYTHON
       return PyFloat_FromDouble(*a);
-#endif // SWIGPYTHON
+#elif defined(SWIGMATLAB)
+      return mxCreateDoubleScalar(*a);
+#else
       return 0;
+#endif
     }
   } // namespace casadi
  }
@@ -4230,3 +4239,8 @@ for name,v in locals().items():
 %}
 
 #endif
+
+// Cleanup for dependent modules
+%exception {
+  $action
+}
