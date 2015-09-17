@@ -63,13 +63,13 @@
 %}
 %init %{
   // Set logger functions
-  casadi::Logger::writeWarn = pythonlogger;
-  casadi::Logger::writeProg = pythonlogger;
-  casadi::Logger::writeDebug = pythonlogger;
-  casadi::Logger::writeAll = pythonlogger;
+  casadi::Logger::writeWarn = casadi::pythonlogger;
+  casadi::Logger::writeProg = casadi::pythonlogger;
+  casadi::Logger::writeDebug = casadi::pythonlogger;
+  casadi::Logger::writeAll = casadi::pythonlogger;
 
   // @jgillis: please document
-  casadi::InterruptHandler::checkInterrupted = pythoncheckinterrupted;
+  casadi::InterruptHandler::checkInterrupted = casadi::pythoncheckinterrupted;
 %}
 #elif defined(SWIGMATLAB)
 %{
@@ -122,14 +122,14 @@
 
   
   // Set logger functions
-  casadi::Logger::writeWarn = mexlogger;
-  casadi::Logger::writeProg = mexlogger;
-  casadi::Logger::writeDebug = mexlogger;
-  casadi::Logger::writeAll = mexlogger;
-  casadi::Logger::flush = mexflush;
+  casadi::Logger::writeWarn = casadi::mexlogger;
+  casadi::Logger::writeProg = casadi::mexlogger;
+  casadi::Logger::writeDebug = casadi::mexlogger;
+  casadi::Logger::writeAll = casadi::mexlogger;
+  casadi::Logger::flush = casadi::mexflush;
 
   // @jgillis: please document
-  casadi::InterruptHandler::checkInterrupted = mexcheckinterrupted;
+  casadi::InterruptHandler::checkInterrupted = casadi::mexcheckinterrupted;
 %}
 #endif
 
@@ -285,7 +285,7 @@ int deprecated(const std::string & c,const std::string & a) {
   return PyErr_WarnEx(PyExc_DeprecationWarning,msg.c_str(),3);
 }
 int internal(const std::string & c) {
-  if (CasadiOptions::allowed_internal_api) return 0;
+  if (casadi::CasadiOptions::allowed_internal_api) return 0;
   std::string msg = "This CasADi function (" + c + ") is not part of the public API. Use at your own risk.";
   return PyErr_WarnEx(PyExc_SyntaxWarning,msg.c_str(),3);
 }
@@ -300,7 +300,7 @@ int deprecated(const std::string & c,const std::string & a) {
   return 0;
 }
 int internal(const std::string & c) {
-  if (CasadiOptions::allowed_internal_api) return 0;
+  if (casadi::CasadiOptions::allowed_internal_api) return 0;
   std::string msg = "This CasADi function (" + c + ") is not part of the public API. Use at your own risk.";
   mexWarnMsgIdAndTxt("SWIG:SyntaxWarning",msg.c_str());
   return 0;
@@ -2394,10 +2394,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 #endif // SWIGXML
 
-%{
-using namespace casadi;
-%}
-
 #ifdef SWIGPYTHON
 %pythoncode %{
 if __name__ != "casadi.casadi":
@@ -2653,11 +2649,13 @@ class NZproxy:
 
 #ifdef SWIGMATLAB
 %{
-  /// Helper function: Convert ':' to Slice
-  inline Slice char2Slice(char ch) {
-    casadi_assert(ch==':');
-    return casadi::Slice();
-  }
+  namespace casadi {
+    /// Helper function: Convert ':' to Slice
+    inline Slice char2Slice(char ch) {
+      casadi_assert(ch==':');
+      return Slice();
+    }
+  } // namespace casadi
 %}
 
 %define %matrix_helpers(Type)
@@ -2678,17 +2676,17 @@ class NZproxy:
     }
     const Type paren(char rr, char cc) const {
       Type m;
-      $self->get(m, true, char2Slice(rr), char2Slice(cc));
+      $self->get(m, true, casadi::char2Slice(rr), casadi::char2Slice(cc));
       return m;
     }
     const Type paren(char rr, const Matrix<int>& cc) const {
       Type m;
-      $self->get(m, true, char2Slice(rr), cc);
+      $self->get(m, true, casadi::char2Slice(rr), cc);
       return m;
     }
     const Type paren(const Matrix<int>& rr, char cc) const {
       Type m;
-      $self->get(m, true, rr, char2Slice(cc));
+      $self->get(m, true, rr, casadi::char2Slice(cc));
       return m;
     }
     const Type paren(const Matrix<int>& rr, const Matrix<int>& cc) const {
@@ -2698,20 +2696,20 @@ class NZproxy:
     }
 
     // Set a submatrix (index-1)
-    void setparen(const Type& m, char rr) { $self->set(m, true, char2Slice(rr));}
+    void setparen(const Type& m, char rr) { $self->set(m, true, casadi::char2Slice(rr));}
     void setparen(const Type& m, const Matrix<int>& rr) { $self->set(m, true, rr);}
     void setparen(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
-    void setparen(const Type& m, char rr, char cc) { $self->set(m, true, char2Slice(rr), char2Slice(cc));}
-    void setparen(const Type& m, char rr, const Matrix<int>& cc) { $self->set(m, true, char2Slice(rr), cc);}
-    void setparen(const Type& m, const Matrix<int>& rr, char cc) { $self->set(m, true, rr, char2Slice(cc));}
+    void setparen(const Type& m, char rr, char cc) { $self->set(m, true, casadi::char2Slice(rr), casadi::char2Slice(cc));}
+    void setparen(const Type& m, char rr, const Matrix<int>& cc) { $self->set(m, true, casadi::char2Slice(rr), cc);}
+    void setparen(const Type& m, const Matrix<int>& rr, char cc) { $self->set(m, true, rr, casadi::char2Slice(cc));}
     void setparen(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
 
     // Get nonzeros (index-1)
-    const Type brace(char rr) const { Type m; $self->getNZ(m, true, char2Slice(rr)); return m;}
+    const Type brace(char rr) const { Type m; $self->getNZ(m, true, casadi::char2Slice(rr)); return m;}
     const Type brace(const Matrix<int>& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
 
     // Set nonzeros (index-1)
-    void setbrace(const Type& m, char rr) { $self->setNZ(m, true, char2Slice(rr));}
+    void setbrace(const Type& m, char rr) { $self->setNZ(m, true, casadi::char2Slice(rr));}
     void setbrace(const Type& m, const Matrix<int>& rr) { $self->setNZ(m, true, rr);}
 
     // 'end' function (needed for end syntax in MATLAB)
