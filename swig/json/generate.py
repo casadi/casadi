@@ -335,7 +335,7 @@ print "elpased", time.time()-t0
 t0 = time.time()
 print "functions"
 for (name,pars,rettype,docs,friend) in functions:
-  treedata["treeFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":docs,"funDocslink":"","friend":friend})
+  treedata["treeFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":docs,"funDocslink":"","funFriend":friend})
 print "elpased", time.time()-t0
 t0 = time.time()
 print "enums"
