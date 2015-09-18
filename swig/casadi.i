@@ -2719,13 +2719,13 @@ class NZproxy:
     }
 
     // Set a submatrix (index-1)
-    void setparen(const Type& m, char rr) { $self->set(m, true, casadi::char2Slice(rr));}
-    void setparen(const Type& m, const Matrix<int>& rr) { $self->set(m, true, rr);}
-    void setparen(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
-    void setparen(const Type& m, char rr, char cc) { $self->set(m, true, casadi::char2Slice(rr), casadi::char2Slice(cc));}
-    void setparen(const Type& m, char rr, const Matrix<int>& cc) { $self->set(m, true, casadi::char2Slice(rr), cc);}
-    void setparen(const Type& m, const Matrix<int>& rr, char cc) { $self->set(m, true, rr, casadi::char2Slice(cc));}
-    void setparen(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
+    void paren_asgn(const Type& m, char rr) { $self->set(m, true, casadi::char2Slice(rr));}
+    void paren_asgn(const Type& m, const Matrix<int>& rr) { $self->set(m, true, rr);}
+    void paren_asgn(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
+    void paren_asgn(const Type& m, char rr, char cc) { $self->set(m, true, casadi::char2Slice(rr), casadi::char2Slice(cc));}
+    void paren_asgn(const Type& m, char rr, const Matrix<int>& cc) { $self->set(m, true, casadi::char2Slice(rr), cc);}
+    void paren_asgn(const Type& m, const Matrix<int>& rr, char cc) { $self->set(m, true, rr, casadi::char2Slice(cc));}
+    void paren_asgn(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
 
     // Get nonzeros (index-1)
     const Type brace(char rr) const { Type m; $self->getNZ(m, true, casadi::char2Slice(rr)); return m;}
