@@ -2821,7 +2821,7 @@ namespace casadi{
 %template(ExpMX)             casadi::GenericExpression<casadi::MX>;
 
 // Prefix symbols
-#ifdef SWIGMATLAB
+#if defined(SWIGMATLAB) || defined(SWIGXML)
 %define %HIDE(SYM) friendwrap_ ## SYM %enddef
 #else
 %define %HIDE(SYM) casadi_ ## SYM %enddef
