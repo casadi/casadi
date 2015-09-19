@@ -534,7 +534,16 @@ endif()
 ######################################################
 #set(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+
+if(WITH_SELFCONTAINED)
+if (WITH_MATLAB)
+  set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/)
+else()
+  set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/casadi/)  
+endif()
+else()
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
+endif()
 
 #####################################################
 ################# include the rest ##################
