@@ -1,5 +1,4 @@
 #include <cmath>
-#include <iostream>
 #include <vector>
 
 extern "C"
@@ -12,7 +11,7 @@ int helloworld_cxx_init(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz
 
 extern "C"
 void helloworld_cxx(const double* arg, double* res) {
-  std::cout << "hello, C++ world!" << std::endl;
+  //printf("hello, C++ world!\n");
 
   std::vector<double> v;
   for (size_t i=0; i<10; ++i) {
@@ -26,6 +25,6 @@ void helloworld_cxx(const double* arg, double* res) {
     res[0] += v[i];
   }
 
-  std::cout << "returning " << res[0] << std::endl;
+  //printf("returning %f\n", res[0]);
 }
 
