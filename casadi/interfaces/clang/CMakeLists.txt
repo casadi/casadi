@@ -64,10 +64,10 @@ file(COPY system_includes.txt csystem_includes.txt cxxsystem_includes.txt
 if(WITH_SELFCONTAINED)
 if (WITH_MATLAB)
 install(DIRECTORY ${LIBRARY_OUTPUT_PATH}/casadi/jit
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/)
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/casadi)
 else()
 install(DIRECTORY ${LIBRARY_OUTPUT_PATH}/casadi/jit
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/casadi)
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/casadi/casadi)
 endif()
 else()
 install(DIRECTORY ${LIBRARY_OUTPUT_PATH}/casadi/jit
