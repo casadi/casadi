@@ -1793,6 +1793,20 @@ class Functiontests(casadiTestCase):
 
     out = F([5])
     self.checkarray(out[0],25)      
+
+  @requiresPlugin(JitCompiler,"clang")
+  def test_clang_c(self):
+    compiler = JitCompiler('../data/helloworld.c', 'clang')
+    f = ExternalFunction("helloworld_c", compiler)
+    [v] = f([])
+    self.checkarray(2.37683, v, digits=4)
+
+  @requiresPlugin(JitCompiler,"clang")
+  def test_clang_cxx(self):
+    compiler = JitCompiler('../data/helloworld.cxx', 'clang')
+    f = ExternalFunction("helloworld_cxx", compiler)
+    [v] = f([])
+    self.checkarray(2.37683, v, digits=4)
     
   @memory_heavy()
   def test_KernelSum2D(self):
