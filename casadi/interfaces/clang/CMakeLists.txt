@@ -10,6 +10,11 @@ casadi_plugin(JitCompiler clang
 
 casadi_plugin_link_libraries(JitCompiler clang ${CLANG_LIBRARIES})
 
+if(MINGW)
+  find_library(SHLWAPI libshlwapi /usr/${PREFIX}/lib)
+  casadi_plugin_link_libraries(JitCompiler clang ${SHLWAPI})
+endif()
+
 # Install resource directory
 INSTALL( DIRECTORY ${LLVM_INSTALL_PREFIX}/lib/clang DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/casadi/jit/)
 
