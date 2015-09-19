@@ -31,6 +31,7 @@
 #ifdef _WIN32 // also for 64-bit
 #define NOMINMAX
 #include <windows.h>
+#include <shlwapi.h>
 #else // _WIN32
 #include <dlfcn.h>
 #endif // _WIN32
