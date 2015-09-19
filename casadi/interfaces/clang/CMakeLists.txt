@@ -60,5 +60,16 @@ endif()
 file(COPY system_includes.txt csystem_includes.txt cxxsystem_includes.txt
           system_flags.txt csystem_flags.txt cxxsystem_flags.txt
      DESTINATION ${LIBRARY_OUTPUT_PATH}/casadi/jit)
+
+if(WITH_SELFCONTAINED)
+if (WITH_MATLAB)
+install(DIRECTORY ${LIBRARY_OUTPUT_PATH}/casadi/jit
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/)
+else()
+install(DIRECTORY ${LIBRARY_OUTPUT_PATH}/casadi/jit
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/casadi)
+endif()
+else()
 install(DIRECTORY ${LIBRARY_OUTPUT_PATH}/casadi/jit
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/casadi)
+endif()
