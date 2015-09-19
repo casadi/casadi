@@ -26,6 +26,7 @@
 #include "clang_interface.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/casadi_meta.hpp"
+#include <fstream>
 
 // To be able to get the plugin path
 #ifdef _WIN32 // also for 64-bit
@@ -160,13 +161,26 @@ namespace casadi {
     std::string resourcedir = jit_include + filesep + "clang" + filesep + CLANG_VERSION_STRING;
     compInst.getHeaderSearchOpts().ResourceDir = resourcedir;
 
-    // Add c standard library
-    compInst.getHeaderSearchOpts().AddPath(jit_include + filesep + "clib",
-                                           clang::frontend::System, false, false);
+    // Read the system includes (C or C++)
+    vector<pair<string, bool> > system_include = getIncludes("system_includes.txt", jit_include);
+    for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
+      compInst.getHeaderSearchOpts().AddPath(i->first,
+                                             clang::frontend::System, i->second, false);
+    }
 
-    // Add c++ standard library
-    compInst.getHeaderSearchOpts().AddPath(jit_include + filesep + "cxxlib",
-                                           clang::frontend::CXXSystem, false, false);
+    // Read the system includes (C only)
+    system_include = getIncludes("csystem_includes.txt", jit_include);
+    for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
+      compInst.getHeaderSearchOpts().AddPath(i->first,
+                                             clang::frontend::CSystem, i->second, false);
+    }
+
+    // Read the system includes (C++ only)
+    system_include = getIncludes("cxxsystem_includes.txt", jit_include);
+    for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
+      compInst.getHeaderSearchOpts().AddPath(i->first,
+                                             clang::frontend::CXXSystem, i->second, false);
+    }
 
 #ifdef _WIN32
     char pathsep = ';';
@@ -219,5 +233,44 @@ namespace casadi {
                                    ->getPointerToFunction(module_->getFunction(symname)));
   }
 
+  std::vector<std::pair<std::string, bool> > ClangJitCompilerInterface::
+  getIncludes(const std::string& file, const std::string& path) {
+    // File separator
+#ifdef _WIN32
+    const char sep = '\\';
+#else // _WIN32
+    const char sep = '/';
+#endif // _WIN32
+
+    // Return value
+    vector<pair<string, bool> > ret;
+
+    // Read line-by-line
+    std::ifstream setup_file(path + sep + file);
+    std::string line;
+    while (std::getline(setup_file, line)) {
+      // Skip empty lines
+      if (line.empty()) continue;
+
+      // Check if framework
+      size_t loc = line.find(" (framework directory)");
+      bool isframework = loc != string::npos;
+      if (isframework) {
+        // Truncate path
+        line = line.substr(0, loc);
+      }
+
+      // If first character is a line separator, path is absolute
+      if (line.at(0)==sep) {
+        // Absolute path
+        ret.push_back(make_pair(line, isframework));
+      } else {
+        // Relative path, make absolute
+        ret.push_back(make_pair(path + sep + line, isframework));
+      }
+    }
+
+    return ret;
+  }
 
 } // namespace casadi

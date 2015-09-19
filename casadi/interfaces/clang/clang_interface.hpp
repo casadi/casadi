@@ -106,6 +106,10 @@ namespace casadi {
     /// Get a function pointer for numerical evaluation
     virtual void* getFunction(const std::string& symname);
 
+    // Helper function for reading includes
+    static std::vector<std::pair<std::string, bool> >
+      getIncludes(const std::string& file, const std::string& path);
+
   protected:
     clang::EmitLLVMOnlyAction* act_;
     llvm::ExecutionEngine* executionEngine_;

@@ -15,18 +15,50 @@ if(MINGW)
   casadi_plugin_link_libraries(JitCompiler clang ${SHLWAPI})
 endif()
 
-# Install resource directory
-INSTALL( DIRECTORY ${LLVM_INSTALL_PREFIX}/lib/clang DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/casadi/jit/)
+# Get resource directory
+file(COPY ${LLVM_INSTALL_PREFIX}/lib/clang DESTINATION ${LIBRARY_OUTPUT_PATH}/casadi/jit)
 
-# Install libc++
-INSTALL( DIRECTORY ${LLVM_INSTALL_PREFIX}/include/c++/v1/ DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/casadi/jit/cxxlib)
+# Create text files containing system paths
+file(WRITE system_includes.txt) # for both C and C++
+file(WRITE csystem_includes.txt) # Only C
+file(WRITE cxxsystem_includes.txt) # Only C++
 
-# Locate C standard library
-if (NOT WIN32)
-find_path(STDLIB_LOC stdio.h)
-INSTALL(CODE
-  "
-    EXECUTE_PROCESS(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"${STDLIB_LOC}\" \"${CMAKE_INSTALL_PREFIX}/lib/casadi/jit/clib\")
-  "
-)
+# Create text files containing default options
+file(WRITE system_flags.txt) # for both C and C++
+file(WRITE csystem_flags.txt) # Only C
+file(WRITE cxxsystem_flags.txt) # Only C++
+
+# On Windows, use relative paths
+if (WIN32)
+  file(APPEND system_includes.txt "mingw\n")
+  file(APPEND cxxsystem_includes.txt "mingw/c++\n")
+else()
+  # Get C and C++ system includes
+  # Note on OSX, "gcc" is often an alias for clang
+  set(GET_SYSTEM_INCLUDES_SH ${CMAKE_CURRENT_SOURCE_DIR}/../../../misc/get_system_includes.sh)
+  execute_process(COMMAND ${GET_SYSTEM_INCLUDES_SH} gcc c
+                  OUTPUT_VARIABLE CSYSTEM_INCLUDES)
+  file(APPEND csystem_includes.txt "${CSYSTEM_INCLUDES}")
+  execute_process(COMMAND ${GET_SYSTEM_INCLUDES_SH} gcc c++
+                  OUTPUT_VARIABLE CXXSYSTEM_INCLUDES)
+  file(APPEND cxxsystem_includes.txt "${CXXSYSTEM_INCLUDES}")
+
+  # Printout
+  message(STATUS "Clang JIT uses the following C includes:\n"
+                 ${CSYSTEM_INCLUDES}
+                 "  and the following C++ includes:\n"
+                 ${CXXSYSTEM_INCLUDES}
+                 "  To change this, manually edit csystem_paths.txt and cxxsystem_paths.txt\n"
+                 "  located in the <installation dir>/lib/casadi/jit/ directory\n"
+                 "  or use the accompanied get_system_includes.sh shell script.")
+
+  # Copy the shell script to the same directory
+  file(COPY ${GET_SYSTEM_INCLUDES_SH} DESTINATION ${LIBRARY_OUTPUT_PATH}/casadi/jit)
 endif()
+
+# Copy text files with paths to the designated location
+file(COPY system_includes.txt csystem_includes.txt cxxsystem_includes.txt
+          system_flags.txt csystem_flags.txt cxxsystem_flags.txt
+     DESTINATION ${LIBRARY_OUTPUT_PATH}/casadi/jit)
+install(DIRECTORY ${LIBRARY_OUTPUT_PATH}/casadi/jit
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/casadi)
