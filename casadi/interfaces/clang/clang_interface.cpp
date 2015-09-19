@@ -260,13 +260,19 @@ namespace casadi {
         line = line.substr(0, loc);
       }
 
-      // If first character is a line separator, path is absolute
-      if (line.at(0)==sep) {
-        // Absolute path
-        ret.push_back(make_pair(line, isframework));
-      } else {
+      // Check if the path is absolute or relative
+#ifdef _WIN32
+      bool relative = PathIsRelative(TEXT(line.c_str()));
+#else // _WIN32
+      bool relative = line.at(0)!=sep;
+#endif // _WIN32
+
+      if (relative) {
         // Relative path, make absolute
         ret.push_back(make_pair(path + sep + line, isframework));
+      } else {
+        // Absolute path
+        ret.push_back(make_pair(line, isframework));
       }
     }
 
