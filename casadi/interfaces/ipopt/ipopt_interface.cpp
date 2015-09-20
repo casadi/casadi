@@ -451,7 +451,8 @@ namespace casadi {
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ =
         t_callback_prepare_ = t_mainloop_ = {0, 0};
 
-    n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = n_iter_ = 0;
+    n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ =
+        n_eval_callack_ = n_iter_ = 0;
 
     // Get back the smart pointers
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass =
@@ -511,9 +512,9 @@ namespace casadi {
 
       // These guys get -1 calls to supress that part of the printout.
       times.push_back(
-        std::make_tuple("callback prep", -1, t_callback_prepare_));
+        std::make_tuple("callback prep", n_eval_callack_, t_callback_prepare_));
       times.push_back(
-        std::make_tuple("callback", -1, t_callback_fun_));
+        std::make_tuple("callback", n_eval_callback_, t_callback_fun_));
       times.push_back(
         std::make_tuple("main loop", -1, t_mainloop_));
 
@@ -577,6 +578,7 @@ namespace casadi {
     stats_["n_eval_g"] = n_eval_g_;
     stats_["n_eval_jac_g"] = n_eval_jac_g_;
     stats_["n_eval_h"] = n_eval_h_;
+    stats_["n_eval_callback"] = n_eval_callback_;
 
     stats_["iter_count"] = n_iter_-1;
 
@@ -641,6 +643,7 @@ namespace casadi {
 
         output(NLP_SOLVER_F).at(0) = obj_value;
 
+        n_eval_callback_ += 1;
         int ret = callback_(ref_, user_data_);
 
         const diffTime delta = diffTimers(getTimerTime(), time0);
