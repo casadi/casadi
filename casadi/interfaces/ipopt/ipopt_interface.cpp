@@ -144,7 +144,7 @@ namespace casadi {
           out
             << " "
             << formatFloat(1000.0*dt.proc/n, 10, 2, 3) << " [ms]  "
-            << formatFloat(1000.0*dt.proc/n, 10, 2, 3) << " [ms]"
+            << formatFloat(1000.0*dt.wall/n, 10, 2, 3) << " [ms]"
             << endl;
         }
       }
