@@ -1807,6 +1807,21 @@ class Functiontests(casadiTestCase):
     f = ExternalFunction("helloworld_cxx", compiler)
     [v] = f([])
     self.checkarray(2.37683, v, digits=4)
+
+  @requiresPlugin(JitCompiler,"commandline")
+  def test_commandline_c(self):
+    compiler = JitCompiler('../data/helloworld.c', 'commandline')
+    f = ExternalFunction("helloworld_c", compiler)
+    [v] = f([])
+    self.checkarray(2.37683, v, digits=4)
+
+  @requiresPlugin(JitCompiler,"commandline")
+  def test_commandline_cxx(self):
+    opts = {'compiler':'g++'}
+    compiler = JitCompiler('../data/helloworld.cxx', 'commandline', opts)
+    f = ExternalFunction("helloworld_cxx", compiler)
+    [v] = f([])
+    self.checkarray(2.37683, v, digits=4)
     
   @memory_heavy()
   def test_KernelSum2D(self):
