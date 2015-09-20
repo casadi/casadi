@@ -122,6 +122,10 @@ namespace casadi {
       const int n = std::get<1>(x);
       const diffTime dt = std::get<2>(x);
 
+      // don't print out this row if there were 0 calls
+      if (n == 0)
+        continue;
+
       out
         << setw(maxNameLen) << name << " "
         << formatFloat(dt.proc, 9, 3, 3) << " [s]  "
