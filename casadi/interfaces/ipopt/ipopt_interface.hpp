@@ -161,6 +161,8 @@ public:
   static timer getTimerTime(void);
   static diffTime diffTimers(const timer t1, const timer t0);
   static void timerPlusEq(diffTime & t, const diffTime diff);
+  static void timingSummary(
+    std::vector<std::tuple<std::string, int, diffTime> >& xs);
 
   // Accumulated time since last reset:
   diffTime t_eval_f_; // time spent in eval_f
@@ -178,6 +180,7 @@ public:
   int n_eval_g_; // number of calls to eval_g
   int n_eval_jac_g_; // number of calls to eval_jac_g
   int n_eval_h_; // number of calls to eval_h
+  int n_eval_callback_; // number of calls to callback
   int n_iter_; // number of iterations
 
   // For parametric sensitivities with sIPOPT
