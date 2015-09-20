@@ -92,7 +92,7 @@ Construct from an IterationCallback object.
 
 %feature("docstring") casadi::Callback::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -805,8 +805,8 @@ returned.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -814,8 +814,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -869,7 +869,7 @@ There is no guarantee that consecutive calls return identical objects
 
 %feature("docstring") casadi::CleSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -3032,8 +3032,8 @@ Get the description of a certain option.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -3041,8 +3041,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -3143,7 +3143,7 @@ Get the type name of a certain option.
 
 %feature("docstring") casadi::ControlSimulator::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -3266,7 +3266,7 @@ point to any node, \"0\" is returned.
 
 %feature("docstring") casadi::CustomEvaluate::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -3504,7 +3504,7 @@ point to this new object
 
 %feature("docstring") casadi::CustomFunction::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -4133,8 +4133,8 @@ oname:  output name. Only allowed when an output scheme is set.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -4142,8 +4142,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -5001,7 +5001,7 @@ Construct from C pointer.
 
 %feature("docstring") casadi::DerivativeGenerator::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -5126,7 +5126,7 @@ Is a null pointer?
 
 %feature("docstring") casadi::DleSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -5571,8 +5571,8 @@ adheres to SCHEME_NLPINput
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -5580,8 +5580,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -6620,7 +6620,7 @@ Copy all options from another object.
 
 %feature("docstring") casadi::DpleSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -7152,8 +7152,8 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -7161,8 +7161,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -8269,8 +8269,8 @@ Add modules to be monitored.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -8278,8 +8278,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -8632,7 +8632,7 @@ the output elements).
 
 %feature("docstring") casadi::ExternalFunction::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -9336,8 +9336,8 @@ Print options to a stream.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -9345,8 +9345,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -10299,7 +10299,7 @@ Get output scheme name by index.
 
 %feature("docstring") casadi::Function::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -10347,7 +10347,7 @@ point to any node, \"0\" is returned.
 
 %feature("docstring") casadi::Functor::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -11360,7 +11360,7 @@ Is a null pointer?
 
 %feature("docstring") casadi::GenericType::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -11673,8 +11673,8 @@ Print dimensions of inputs and outputs.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -11682,8 +11682,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -12747,7 +12747,7 @@ There is no guarantee that consecutive calls return identical objects
 
 %feature("docstring") casadi::HomotopyNlpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -13059,7 +13059,7 @@ Print a description of the object.
 
 %feature("docstring") casadi::ImplicitFunction::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -14102,8 +14102,8 @@ Access Jacobian.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -14111,8 +14111,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -16259,8 +16259,8 @@ adjoint directions.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -16268,8 +16268,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -16504,7 +16504,7 @@ propagating_sparsity.cpp)
 
 %feature("docstring") casadi::Integrator::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -16665,8 +16665,8 @@ Get the description of a certain option.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -16674,8 +16674,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -16891,7 +16891,7 @@ Set a certain option by giving an enum value.
 
 %feature("docstring") casadi::JitCompiler::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -17850,7 +17850,7 @@ returned.
 
 %feature("docstring") casadi::KernelSum2D::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -18015,8 +18015,8 @@ Get the enum value corresponding to th certain option.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -18024,8 +18024,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -18196,7 +18196,7 @@ propagating_sparsity.cpp)
 
 %feature("docstring") casadi::LinearSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -19285,8 +19285,8 @@ Get input scheme.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -19294,8 +19294,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -20104,8 +20104,8 @@ Set a certain option by giving its index into the allowed values.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -20113,8 +20113,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -20161,7 +20161,7 @@ There is no guarantee that consecutive calls return identical objects
 
 %feature("docstring") casadi::LpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -21537,8 +21537,8 @@ adheres to SCHEME_NLPINput
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -21546,8 +21546,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -22088,7 +22088,7 @@ length of res field.
 
 %feature("docstring") casadi::LrDleSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -22737,7 +22737,7 @@ get an option value
 
 %feature("docstring") casadi::LrDpleSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -22938,8 +22938,8 @@ Return a string with a description (for SWIG)
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -22947,8 +22947,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -23920,8 +23920,8 @@ of iw field.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -23929,8 +23929,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -24216,7 +24216,7 @@ Get default input value.
 
 %feature("docstring") casadi::Map::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -24746,8 +24746,8 @@ Print a representation of the object.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -24755,8 +24755,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -25370,7 +25370,7 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring") casadi::MapAccum::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -26153,7 +26153,7 @@ Is the Matrix a Slice (only for IMatrix)
 
 %feature("docstring") casadi::Matrix::appendColumns "
 
-Append a matrix horizontally.
+[DEPRECATED] Append a matrix horizontally
 
 ";
 
@@ -26266,8 +26266,8 @@ check if the matrix is 1 (note that false negative answers are possible)
 
 %feature("docstring") casadi::Matrix::makeSparse "
 
-Make a matrix sparse by removing numerical zeros smaller in absolute value
-than a specified tolerance.
+[DEPRECATED: use sparsify instead] Make a matrix sparse by removing
+numerical zeros smaller in absolute value than a specified tolerance
 
 ";
 
@@ -26879,7 +26879,7 @@ nodes by their ID.
 
 %feature("docstring") casadi::Matrix::setZero "
 
-Set all elements to zero.
+[DEPRECATED] Set all elements to zero
 
 ";
 
@@ -26904,7 +26904,7 @@ Get the number of non-zeros in the lower triangular half.
 
 %feature("docstring") casadi::Matrix::append "
 
-Append a matrix vertically (NOTE: only efficient if vector)
+[DEPRECATED] Append a matrix vertically (NOTE: only efficient if vector)
 
 ";
 
@@ -27041,13 +27041,13 @@ Get the number of non-zeros in the upper triangular half.
 
 %feature("docstring") casadi::MX::append "
 
-Append a matrix vertically (NOTE: only efficient if vector)
+[DEPRECATED] Append a matrix vertically (NOTE: only efficient if vector)
 
 ";
 
 %feature("docstring") casadi::MX::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -27127,7 +27127,7 @@ Check if the matrix expression is scalar.
 
 %feature("docstring") casadi::MX::lift "
 
-Lift an expression.
+[DEPRECATED] Lift an expression
 
 ";
 
@@ -27333,7 +27333,7 @@ Get the size along a particular dimensions.
 
 %feature("docstring") casadi::MX::appendColumns "
 
-Append a matrix horizontally.
+[DEPRECATED] Append a matrix horizontally
 
 ";
 
@@ -27359,7 +27359,7 @@ zero.
 
 %feature("docstring") casadi::MX::makeDense "
 
-Make the matrix dense.
+[DEPRECATED: Use densify instead] Make the matrix dense
 
 ";
 
@@ -27825,8 +27825,8 @@ Get default input value.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -27834,8 +27834,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -28873,7 +28873,7 @@ ownership, only weak references to the derivatives are kept internally.
 
 %feature("docstring") casadi::MXFunction::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -29536,7 +29536,7 @@ adheres to SCHEME_NLPINput
 
 %feature("docstring") casadi::NlpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -34407,8 +34407,8 @@ Get the description of a certain option.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -34416,8 +34416,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -34797,8 +34797,8 @@ point to any node, \"0\" is returned.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -34806,8 +34806,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -34876,7 +34876,7 @@ Evaluate.
 
 %feature("docstring") casadi::Nullspace::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -35821,8 +35821,8 @@ Assert that it is initialized
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -35830,8 +35830,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -35864,7 +35864,7 @@ get an option value
 
 %feature("docstring") casadi::OptionsFunctionality::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -37129,8 +37129,8 @@ the output elements).
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -37138,8 +37138,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -37221,7 +37221,7 @@ Get the type name of a certain option.
 
 %feature("docstring") casadi::QcqpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -37632,8 +37632,8 @@ propagating_sparsity.cpp)
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -37641,8 +37641,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -38874,7 +38874,7 @@ Evaluate the function symbolically or numerically.
 
 %feature("docstring") casadi::QpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -39324,7 +39324,7 @@ Export / Generate C code for the function.
 
 %feature("docstring") casadi::SdpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -40385,8 +40385,8 @@ adjoint sensitivities, one direction at a time.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -40394,8 +40394,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -41263,7 +41263,7 @@ Evaluate.
 
 %feature("docstring") casadi::SdqpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -42063,8 +42063,8 @@ Get total number of elements in all of the matrix-valued outputs.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -42072,8 +42072,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -42191,7 +42191,7 @@ Return a string with a representation (for SWIG)
 
 %feature("docstring") casadi::SharedObject::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -42975,7 +42975,7 @@ Get output scheme name by index.
 
 %feature("docstring") casadi::Simulator::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -43147,8 +43147,8 @@ ownership, only weak references to the derivatives are kept internally.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -43156,8 +43156,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -44051,8 +44051,8 @@ Return a string with a description (for SWIG)
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -44060,8 +44060,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -44132,7 +44132,7 @@ Get sparsity of a given output.
 
 %feature("docstring") casadi::SocpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -46792,7 +46792,7 @@ Create a dense rectangular sparsity pattern.
 
 %feature("docstring") casadi::Sparsity::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -47889,8 +47889,8 @@ Evaluate the function symbolically or numerically.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -47898,8 +47898,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -48876,7 +48876,7 @@ Is the class able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::StabilizedQpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -49256,7 +49256,7 @@ point to any node, \"0\" is returned.
 
 %feature("docstring") casadi::Switch::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -49567,8 +49567,8 @@ Get the number of function inputs.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -49576,8 +49576,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -50593,8 +50593,8 @@ Generate the sparsity of a Jacobian block
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -50602,8 +50602,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -51275,7 +51275,7 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 %feature("docstring") casadi::SXFunction::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -51508,8 +51508,9 @@ pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::WeakRef::init "[INTERNAL]  Initialize or re-
-initialize the object:
+%feature("docstring") casadi::WeakRef::init "
+
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -51665,8 +51666,8 @@ Is a null pointer?
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -51674,8 +51675,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -51695,7 +51696,7 @@ Print options to a stream.
 
 %feature("docstring") casadi::XmlFile::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
