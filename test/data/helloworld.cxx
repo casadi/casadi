@@ -1,5 +1,10 @@
 #include <cmath>
 #include <vector>
+#ifdef WITH_IOSTREAM
+#include <iostream>
+#else
+#include <stdio.h>
+#endif
 
 extern "C"
 int helloworld_cxx_init(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res) {
@@ -11,7 +16,11 @@ int helloworld_cxx_init(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz
 
 extern "C"
 void helloworld_cxx(const double* arg, double* res) {
-  //printf("hello, C++ world!\n");
+#ifdef WITH_IOSTREAM
+  std::cout << "hello, C++ world!" << std::endl;
+#else
+  printf("hello, C++ world!\n");
+#endif
 
   std::vector<double> v;
   for (size_t i=0; i<10; ++i) {
@@ -25,6 +34,9 @@ void helloworld_cxx(const double* arg, double* res) {
     res[0] += v[i];
   }
 
-  //printf("returning %f\n", res[0]);
+#ifdef WITH_IOSTREAM
+  std::cout << "returning " << res[0] << std::endl;
+#else
+  printf("returning %f\n", res[0]);
+#endif
 }
-

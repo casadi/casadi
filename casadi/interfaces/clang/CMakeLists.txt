@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.6)
 include_directories(${CLANG_INCLUDE_DIR})
-add_definitions(${LLVM_DEFINITIONS})
+add_definitions(${CLANG_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_CXX_FLAGS}")
 
 casadi_plugin(JitCompiler clang
@@ -16,7 +16,7 @@ if(MINGW)
 endif()
 
 # Get resource directory
-file(COPY ${LLVM_INSTALL_PREFIX}/lib/clang DESTINATION ${LIBRARY_OUTPUT_PATH}/casadi/jit)
+file(COPY ${CLANG_LLVM_LIB_DIR}/clang DESTINATION ${LIBRARY_OUTPUT_PATH}/casadi/jit)
 
 # Create text files containing system paths
 file(WRITE system_includes.txt) # for both C and C++
