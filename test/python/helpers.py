@@ -250,7 +250,6 @@ class casadiTestCase(unittest.TestCase):
     else:
       f = MXFunction("f", x, yt)
     
-    f.init()
     if (not(fmod is None)):
       f=fmod(f,x)
     if not(type(x0)==list):
@@ -375,12 +374,10 @@ class casadiTestCase(unittest.TestCase):
         if (allow_empty and (trial.getInput(i).isempty() or solution.getInput(i).isempty() )): continue
         for j in range(trial.nOut()):
           trialjac = trial.jacobian(i,j)
-          trialjac.init()
           self.assertEqual(trialjac.nIn(),trial.nIn())
           self.assertEqual(trialjac.nOut(),trial.nOut()+1)
           for k in range(trial.nIn()): trialjac.setInput(trial_inputs[k],k)
           solutionjac = solution.jacobian(i,j)
-          solutionjac.init()
           self.assertEqual(solutionjac.nIn(),solution.nIn())
           self.assertEqual(solutionjac.nOut(),solution.nOut()+1)
           for k in range(solution.nIn()): solutionjac.setInput(solution_inputs[k],k)
@@ -393,12 +390,10 @@ class casadiTestCase(unittest.TestCase):
         for j in range(trial.nOut()):
           if trial.getOutput(j).isscalar() and solution.getOutput(j).isscalar():
             trialgrad = trial.gradient(i,j)
-            trialgrad.init()
             self.assertEqual(trialgrad.nIn(),trial.nIn())
             self.assertEqual(trialgrad.nOut(),trial.nOut()+1)
             for k in range(trial.nIn()): trialgrad.setInput(trial_inputs[k],k)
             solutiongrad = solution.gradient(i,j)
-            solutiongrad.init()
             self.assertEqual(solutiongrad.nIn(),solution.nIn())
             self.assertEqual(solutiongrad.nOut(),solution.nOut()+1)
             for k in range(solution.nIn()): solutiongrad.setInput(solution_inputs[k],k)
@@ -410,12 +405,10 @@ class casadiTestCase(unittest.TestCase):
         for j in range(trial.nOut()):
           if trial.getOutput(j).isscalar() and solution.getOutput(j).isscalar():
             trialhess = trial.hessian(i,j)
-            trialhess.init()
             self.assertEqual(trialhess.nIn(),trial.nIn())
             self.assertEqual(trialhess.nOut(),trial.nOut()+2)
             for k in range(trial.nIn()): trialhess.setInput(trial_inputs[k],k)
             solutionhess = solution.hessian(i,j)
-            solutionhess.init()
             self.assertEqual(solutionhess.nIn(),solution.nIn())
             self.assertEqual(solutionhess.nOut(),solution.nOut()+2)
             for k in range(solution.nIn()): solutionhess.setInput(solution_inputs[k],k)

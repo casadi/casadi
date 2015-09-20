@@ -29,6 +29,8 @@ from types import *
 from helpers import *
 import itertools
 
+warnings.filterwarnings("ignore",category=DeprecationWarning)
+
 class ADtests(casadiTestCase):
 
   def setUp(self):

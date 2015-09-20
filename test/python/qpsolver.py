@@ -615,9 +615,6 @@ class QpSolverTests(casadiTestCase):
       if 'worhp' in str(qpsolver): # works but occasionaly throws segfaults, ulimit on travis?
         continue
       solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
-           
-      solver.setOption(qp_options)
-      solver.init()
 
       try:
         less_digits=aux_options["less_digits"]

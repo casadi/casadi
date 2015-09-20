@@ -3760,9 +3760,9 @@ def pyfunction(inputs,outputs):
 
     with warnings.catch_warnings():
       warnings.filterwarnings("ignore",category=DeprecationWarning)
-      Fun = CustomFunction(fcustom,inputs,outputs)
-      Fun.setOption("name","CustomFunction")
+      Fun = CustomFunction("CustomFunction",fcustom,inputs,outputs)
       return Fun
+
   return wrap
 
 def PyFunction(obj,inputs,outputs):
@@ -3847,6 +3847,10 @@ def PyFunction(obj,inputs,outputs):
             return DerFun
 
         Fun.setOption("custom_reverse",derivativewrapAdj)
+      with warnings.catch_warnings():
+        warnings.filterwarnings("ignore",category=DeprecationWarning)
+        Fun.init()
+
       return Fun
 
 %}

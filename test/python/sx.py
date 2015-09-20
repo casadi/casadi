@@ -134,7 +134,6 @@ class SXtests(casadiTestCase):
 
       def fmod(f,x):
         J=f.jacobian()
-        J.init()
         return J
       
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
@@ -158,7 +157,6 @@ class SXtests(casadiTestCase):
 
       def fmod(f,x):
         J=f.jacobian()
-        J.init()
         return J
       
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
@@ -171,7 +169,6 @@ class SXtests(casadiTestCase):
 
       def fmod(f,x):
         J=f.jacobian()
-        J.init()
         return J
       
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
@@ -316,7 +313,6 @@ class SXtests(casadiTestCase):
       self.assertAlmostEqual(z[i], zr[i],10,'SXfunction output in correct')
     self.message("SXFunction jacobian evaluation")
     J=f.jacobian()
-    J.init()
     J.setInput(L)
     J.evaluate()
     Jr=matrix([[1,1],[3,2],[4,27]])
@@ -337,12 +333,7 @@ class SXtests(casadiTestCase):
       self.assertEqual(str(f),'[SX(((3-sin((x*x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong'+str(f))
     fcn = SXFunction("fcn", [vertcat([x,y])],[vertcat(f)])
 
-    # Set some options
-    fcn.setOption("name","f")
-
-    self.assertEqual(repr(fcn),'f','SX representation is wrong')
-    # Initialize the function for numerical calculations
-    fcn.init()
+    self.assertEqual(repr(fcn),'fcn','SX representation is wrong')
 
     # Pass inputs
     L=[2,3]
@@ -1064,7 +1055,6 @@ class SXtests(casadiTestCase):
     H *= 2
 
     h = f.hessian()
-    h.init()
     h.evaluate()
     
     self.assertTrue(h.getOutput().sparsity()==H.sparsity())
@@ -1159,7 +1149,6 @@ class SXtests(casadiTestCase):
     self.checkarray(f.getOutput(),DMatrix([2]))
     
     J = f.jacobian()
-    J.init()
     
     J.setInput(2,0)
     J.setInput(0.5,1)
@@ -1187,7 +1176,6 @@ class SXtests(casadiTestCase):
     self.checkarray(J.getOutput(),DMatrix([1]))
 
     J = f.jacobian(1)
-    J.init()
     
     J.setInput(2,0)
     J.setInput(0.5,1)
