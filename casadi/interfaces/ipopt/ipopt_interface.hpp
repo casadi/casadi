@@ -161,6 +161,8 @@ public:
   static timer getTimerTime(void);
   static diffTime diffTimers(const timer t1, const timer t0);
   static void timerPlusEq(diffTime & t, const diffTime diff);
+  static void timingSummary(
+    std::vector<std::tuple<std::string, int, diffTime> >& xs);
 
   // Accumulated time since last reset:
   diffTime t_eval_f_; // time spent in eval_f

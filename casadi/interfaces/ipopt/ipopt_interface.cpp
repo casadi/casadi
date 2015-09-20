@@ -33,6 +33,8 @@
 
 #include <ctime>
 #include <stdlib.h>
+#include <iostream>
+#include <iomanip>
 
 using namespace std;
 #include <IpIpoptApplication.hpp>
@@ -66,6 +68,90 @@ namespace casadi {
   void IpoptInterface::timerPlusEq(diffTime & t, const diffTime diff) {
     t.proc += diff.proc;
     t.wall += diff.wall;
+  }
+
+  // Convert a float to a string of an exact length.
+  // First it tries fixed precision, then falls back to exponential notation.
+  //
+  // todo(jaeandersson,jgillis): needs either review or unit tests
+  // because it throws exceptions if it fail.
+  std::string formatFloat(double x, int totalWidth, int maxPrecision, int fallbackPrecision) {
+    std::ostringstream out0;
+    out0 << fixed << setw(totalWidth) << setprecision(maxPrecision) << x;
+    std::string ret0 = out0.str();
+    if (ret0.length() == totalWidth) {
+      return ret0;
+    } else if (ret0.length() > totalWidth) {
+      std::ostringstream out1;
+      out1 << setw(totalWidth) << setprecision(fallbackPrecision) << x;
+      std::string ret1 = out1.str();
+      if (ret1.length() != totalWidth)
+        casadi_error(
+          "ipopt timing formatting fallback is bugged, sorry about that."
+          << "expected " << totalWidth <<  " digits, but got " << ret1.length()
+          << ", string: \"" << ret1 << "\", number: " << x);
+      return ret1;
+    } else {
+      casadi_error("ipopt timing formatting is bugged, sorry about that.");
+    }
+  }
+
+  // Print out a beautiful timing summary.
+  // Will print one row per tuple in the input vector.
+  // The tuple must contain {name, # evals, total time in seconds}.
+  void IpoptInterface::timingSummary(
+    std::vector<std::tuple<std::string, int, diffTime> > & xs) {
+    // get padding of names
+    int maxNameLen = 0;
+    for (int k=0; k < xs.size(); ++k) {
+      const int len = std::get<0>(xs[k]).length();
+      maxNameLen = max(maxNameLen, len);
+    }
+
+    std::ostringstream out;
+    std::string blankName(maxNameLen, ' ');
+    out
+      << blankName
+      << "      proc           wall      num           mean             mean"
+      << endl << blankName
+      << "      time           time     evals       proc time        wall time"
+      << endl;
+    for (int k=0; k < xs.size(); ++k) {
+      const std::tuple<std::string, int, diffTime> x = xs[k];
+      const std::string name = std::get<0>(x);
+      const int n = std::get<1>(x);
+      const diffTime dt = std::get<2>(x);
+
+      out
+        << setw(maxNameLen) << name << " "
+        << formatFloat(dt.proc, 9, 3, 3) << " [s]  "
+        << formatFloat(dt.wall, 9, 3, 3) << " [s]";
+      if (n == -1) {
+        // things like main loop don't have # evals
+        out << endl;
+      } else {
+        out
+          << " "
+          << setw(5) << n;
+        if (n < 2) {
+          out << endl;
+        } else {
+          // only print averages if there is more than 1 eval
+          out
+            << " "
+            << formatFloat(1000.0*dt.proc/n, 10, 2, 3) << " [ms]  "
+            << formatFloat(1000.0*dt.proc/n, 10, 2, 3) << " [ms]"
+            << endl;
+        }
+      }
+    }
+    // I'm worried that the following will set stdout stream state:
+    // userOut() << out;
+
+    // Just convert it to a string first to be safe.
+    // todo(jaeandersson/jgillis): please review.
+    const std::string ret = out.str();
+    userOut() << ret;
   }
 
   extern "C"
@@ -363,7 +449,7 @@ namespace casadi {
 
     // Reset the counters
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ =
-        t_callback_prepare_ = t_mainloop_ = {0,0};
+        t_callback_prepare_ = t_mainloop_ = {0, 0};
 
     n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = n_iter_ = 0;
 
@@ -411,66 +497,28 @@ namespace casadi {
 
     if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
       // Write timings
-      if (n_eval_f_>0) {
-        userOut()
-          << "time spent in eval_f: "
-          << t_eval_f_.proc << " s. proc, "
-          << t_eval_f_.wall << " s. wall"
-          << " (" << n_eval_f_ << " calls, average: "
-          << (t_eval_f_.proc/n_eval_f_)*1000 << " ms. proc, "
-          << (t_eval_f_.wall/n_eval_f_)*1000 << " ms. wall)"
-          << endl;
-      }
-      if (n_eval_grad_f_>0) {
-        userOut()
-          << "time spent in eval_grad_f: "
-          << t_eval_grad_f_.proc << " s. proc, "
-          << t_eval_grad_f_.wall << " s. wall"
-          << " (" << n_eval_grad_f_ << " calls, average: "
-          << (t_eval_grad_f_.proc/n_eval_grad_f_)*1000 << " ms. proc, "
-          << (t_eval_grad_f_.wall/n_eval_grad_f_)*1000 << " ms. wall)"
-          << endl;
-      }
-      if (n_eval_g_>0) {
-        userOut()
-          << "time spent in eval_g: "
-          << t_eval_g_.proc << " s. proc, "
-          << t_eval_g_.wall << " s. wall"
-          << " (" << n_eval_g_ << " calls, average: "
-          << (t_eval_g_.proc/n_eval_g_)*1000 << " ms. proc, "
-          << (t_eval_g_.wall/n_eval_g_)*1000 << " ms. wall)"
-          << endl;
-      }
-      if (n_eval_jac_g_>0) {
-        userOut()
-          << "time spent in eval_jac_g: "
-          << t_eval_jac_g_.proc << " s. proc, "
-          << t_eval_jac_g_.wall << " s. wall"
-          << " (" << n_eval_jac_g_ << " calls, average: "
-          << (t_eval_jac_g_.proc/n_eval_jac_g_)*1000 << " ms. proc, "
-          << (t_eval_jac_g_.wall/n_eval_jac_g_)*1000 << " ms. wall)"
-          << endl;
-      }
-      if (n_eval_h_>0) {
-        userOut()
-          << "time spent in eval_h: "
-          << t_eval_h_.proc << " s. proc, "
-          << t_eval_h_.wall << " s. wall"
-          << " (" << n_eval_h_ << " calls, average: "
-          << (t_eval_h_.proc/n_eval_h_)*1000 << " ms. proc, "
-          << (t_eval_h_.wall/n_eval_h_)*1000 << " ms. wall)"
-          << endl;
-      }
-      userOut()
-        << "time spent in main loop: "
-        << t_mainloop_.proc << " s. proc, "
-        << t_mainloop_.wall << " s. wall" << endl
-        << "time spent in callback function: "
-        << t_callback_fun_.proc << " s. proc, "
-        << t_callback_fun_.wall << " s. wall" << endl
-        << "time spent in callback preparation: "
-        << t_callback_prepare_.proc << " s. proc, "
-        << t_callback_prepare_.wall << " s. wall" << endl;
+      std::vector<std::tuple<std::string, int, diffTime> > times;
+      times.push_back(
+        std::make_tuple("eval_f", n_eval_f_, t_eval_f_));
+      times.push_back(
+        std::make_tuple("eval_grad_f", n_eval_grad_f_, t_eval_grad_f_));
+      times.push_back(
+        std::make_tuple("eval_g", n_eval_g_, t_eval_g_));
+      times.push_back(
+        std::make_tuple("eval_jac_g", n_eval_jac_g_, t_eval_jac_g_));
+      times.push_back(
+        std::make_tuple("eval_h", n_eval_h_, t_eval_h_));
+
+      // These guys get -1 calls to supress that part of the printout.
+      times.push_back(
+        std::make_tuple("callback prep", -1, t_callback_prepare_));
+      times.push_back(
+        std::make_tuple("callback", -1, t_callback_fun_));
+      times.push_back(
+        std::make_tuple("main loop", -1, t_mainloop_));
+
+      // do the summary
+      timingSummary(times);
     }
 
     if (status == Solve_Succeeded)
