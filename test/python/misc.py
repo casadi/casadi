@@ -460,7 +460,7 @@ class Misctests(casadiTestCase):
 
     assert "Number of nonzeros in equality constraint" in result[0]
     assert "iter    objective    inf_pr" in result[0]
-    assert "time spent in main loop" in result[0]
+    assert "main loop" in result[0]
 
     with capture_stdout() as result:
       try:    
