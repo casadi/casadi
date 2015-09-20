@@ -34,8 +34,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_JITCOMPILER_SHELL_EXPORT
-  casadi_register_jitcompiler_shell(JitCompilerInternal::Plugin* plugin) {
+  int CASADI_COMPILER_SHELL_EXPORT
+  casadi_register_compiler_shell(CompilerInternal::Plugin* plugin) {
     plugin->creator = ShellCompiler::creator;
     plugin->name = "shell";
     plugin->doc = ShellCompiler::meta_doc.c_str();
@@ -44,8 +44,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_JITCOMPILER_SHELL_EXPORT casadi_load_jitcompiler_shell() {
-    JitCompilerInternal::registerPlugin(casadi_register_jitcompiler_shell);
+  void CASADI_COMPILER_SHELL_EXPORT casadi_load_compiler_shell() {
+    CompilerInternal::registerPlugin(casadi_register_compiler_shell);
   }
 
   ShellCompiler* ShellCompiler::clone() const {
@@ -57,7 +57,7 @@ namespace casadi {
   }
 
   ShellCompiler::ShellCompiler(const std::string& name) :
-    JitCompilerInternal(name) {
+    CompilerInternal(name) {
     addOption("compiler", OT_STRING, "gcc", "Compiler command");
     addOption("compiler_setup", OT_STRING, "-fPIC -shared", "Compiler setup command");
     addOption("flags", OT_STRINGVECTOR, GenericType(),
@@ -76,7 +76,7 @@ namespace casadi {
 
   void ShellCompiler::init() {
     // Initialize the base classes
-    JitCompilerInternal::init();
+    CompilerInternal::init();
 
     // Read options
     string compiler = getOption("compiler").toString();
@@ -95,7 +95,7 @@ namespace casadi {
     cmd << " " << name_;
 
     // Temporary file
-    char bin_name[] = "tmp_casadi_jitcompiler_shell_XXXXXX.so";
+    char bin_name[] = "tmp_casadi_compiler_shell_XXXXXX.so";
     int flag = mkstemps(bin_name, 3);
     bin_name_ = bin_name;
     cmd << " -o " << bin_name_;

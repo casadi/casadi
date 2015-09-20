@@ -41,8 +41,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_JITCOMPILER_CLANG_EXPORT
-  casadi_register_jitcompiler_clang(JitCompilerInternal::Plugin* plugin) {
+  int CASADI_COMPILER_CLANG_EXPORT
+  casadi_register_compiler_clang(CompilerInternal::Plugin* plugin) {
     plugin->creator = ClangCompiler::creator;
     plugin->name = "clang";
     plugin->doc = ClangCompiler::meta_doc.c_str();
@@ -51,8 +51,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_JITCOMPILER_CLANG_EXPORT casadi_load_jitcompiler_clang() {
-    JitCompilerInternal::registerPlugin(casadi_register_jitcompiler_clang);
+  void CASADI_COMPILER_CLANG_EXPORT casadi_load_compiler_clang() {
+    CompilerInternal::registerPlugin(casadi_register_compiler_clang);
   }
 
   ClangCompiler* ClangCompiler::clone() const {
@@ -64,7 +64,7 @@ namespace casadi {
   }
 
   ClangCompiler::ClangCompiler(const std::string& name) :
-    JitCompilerInternal(name) {
+    CompilerInternal(name) {
     addOption("include_path", OT_STRING, "", "Include paths for the JIT compiler."
       " The include directory shipped with CasADi will be automatically appended.");
     addOption("flags", OT_STRINGVECTOR, GenericType(),
@@ -85,7 +85,7 @@ namespace casadi {
 
   void ClangCompiler::init() {
     // Initialize the base classes
-    JitCompilerInternal::init();
+    CompilerInternal::init();
 
     // Arguments to pass to the clang frontend
     vector<const char *> args(1, name_.c_str());
@@ -101,7 +101,7 @@ namespace casadi {
     clang::CompilerInstance compInst;
 
     // A symbol in the DLL
-    void *addr = reinterpret_cast<void*>(&casadi_register_jitcompiler_clang);
+    void *addr = reinterpret_cast<void*>(&casadi_register_compiler_clang);
 
     // Get runtime include path
     std::string jit_include, filesep;

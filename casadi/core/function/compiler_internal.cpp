@@ -23,25 +23,25 @@
  */
 
 
-#include "jit_compiler_internal.hpp"
+#include "compiler_internal.hpp"
 #include "mx_function.hpp"
 #include "sx_function.hpp"
 
 using namespace std;
 namespace casadi {
 
-  JitCompilerInternal::JitCompilerInternal(const std::string& name) : name_(name) {
+  CompilerInternal::CompilerInternal(const std::string& name) : name_(name) {
   }
 
-  JitCompilerInternal::~JitCompilerInternal() {
+  CompilerInternal::~CompilerInternal() {
   }
 
-  void JitCompilerInternal::print(ostream &stream) const {
-    stream << "JitCompiler" << endl;
+  void CompilerInternal::print(ostream &stream) const {
+    stream << "Compiler" << endl;
   }
 
-  std::map<std::string, JitCompilerInternal::Plugin> JitCompilerInternal::solvers_;
+  std::map<std::string, CompilerInternal::Plugin> CompilerInternal::solvers_;
 
-  const std::string JitCompilerInternal::infix_ = "jitcompiler";
+  const std::string CompilerInternal::infix_ = "compiler";
 
 } // namespace casadi

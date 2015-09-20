@@ -31,7 +31,7 @@
 #include "../weak_ref.hpp"
 #include <set>
 #include "code_generator.hpp"
-#include "jit_compiler.hpp"
+#include "compiler.hpp"
 #include "../matrix/sparse_storage.hpp"
 
 // This macro is for documentation purposes
@@ -626,8 +626,8 @@ namespace casadi {
     std::string name_;
 
     /// Just-in-time compiler
-    std::string jit_compiler_;
-    JitCompiler compiler_;
+    std::string compilerplugin_;
+    Compiler compiler_;
     Dict jit_options_;
 
     bool monitor_inputs_, monitor_outputs_;

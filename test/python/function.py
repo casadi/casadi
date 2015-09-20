@@ -1786,7 +1786,7 @@ class Functiontests(casadiTestCase):
       self.checkfunction(f,Fref)
       self.check_codegen(f)
 
-  @requiresPlugin(JitCompiler,"clang")
+  @requiresPlugin(Compiler,"clang")
   def test_jitfunction_clang(self):
     x = MX.sym("x")
     F = MXFunction("f",[x],[x**2],{'jit':True})
@@ -1794,31 +1794,31 @@ class Functiontests(casadiTestCase):
     out = F([5])
     self.checkarray(out[0],25)      
 
-  @requiresPlugin(JitCompiler,"clang")
+  @requiresPlugin(Compiler,"clang")
   def test_clang_c(self):
-    compiler = JitCompiler('../data/helloworld.c', 'clang')
+    compiler = Compiler('../data/helloworld.c', 'clang')
     f = ExternalFunction("helloworld_c", compiler)
     [v] = f([])
     self.checkarray(2.37683, v, digits=4)
 
-  @requiresPlugin(JitCompiler,"clang")
+  @requiresPlugin(Compiler,"clang")
   def test_clang_cxx(self):
-    compiler = JitCompiler('../data/helloworld.cxx', 'clang')
+    compiler = Compiler('../data/helloworld.cxx', 'clang')
     f = ExternalFunction("helloworld_cxx", compiler)
     [v] = f([])
     self.checkarray(2.37683, v, digits=4)
 
-  @requiresPlugin(JitCompiler,"shell")
+  @requiresPlugin(Compiler,"shell")
   def test_shell_c(self):
-    compiler = JitCompiler('../data/helloworld.c', 'shell')
+    compiler = Compiler('../data/helloworld.c', 'shell')
     f = ExternalFunction("helloworld_c", compiler)
     [v] = f([])
     self.checkarray(2.37683, v, digits=4)
 
-  @requiresPlugin(JitCompiler,"shell")
+  @requiresPlugin(Compiler,"shell")
   def test_shell_cxx(self):
     opts = {'compiler':'g++'}
-    compiler = JitCompiler('../data/helloworld.cxx', 'shell', opts)
+    compiler = Compiler('../data/helloworld.cxx', 'shell', opts)
     f = ExternalFunction("helloworld_cxx", compiler)
     [v] = f([])
     self.checkarray(2.37683, v, digits=4)

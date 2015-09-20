@@ -26,27 +26,27 @@
 #ifndef CASADI_SHELL_INTERFACE_HPP
 #define CASADI_SHELL_INTERFACE_HPP
 
-#include "casadi/core/function/jit_compiler_internal.hpp"
-#include <casadi/solvers/casadi_jitcompiler_shell_export.h>
+#include "casadi/core/function/compiler_internal.hpp"
+#include <casadi/solvers/casadi_compiler_shell_export.h>
 
-/** \defgroup plugin_JitCompiler_shell
+/** \defgroup plugin_Compiler_shell
       Interface to the JIT compiler SHELL
 */
 
-/** \pluginsection{JitCompiler,shell} */
+/** \pluginsection{Compiler,shell} */
 
 /// \cond INTERNAL
 namespace casadi {
-  /** \brief \pluginbrief{JitCompiler,shell}
+  /** \brief \pluginbrief{Compiler,shell}
 
 
    \author Joris Gillis
    \date 2015
    *
-   @copydoc JitCompiler_doc
-   @copydoc plugin_JitCompiler_shell
+   @copydoc Compiler_doc
+   @copydoc plugin_Compiler_shell
    * */
-  class CASADI_JITCOMPILER_SHELL_EXPORT ShellCompiler : public JitCompilerInternal {
+  class CASADI_COMPILER_SHELL_EXPORT ShellCompiler : public CompilerInternal {
   public:
 
     /** \brief Constructor */
@@ -56,7 +56,7 @@ namespace casadi {
     virtual ShellCompiler* clone() const;
 
     /** \brief  Create a new JIT function */
-    static JitCompilerInternal* creator(const std::string& name) {
+    static CompilerInternal* creator(const std::string& name) {
       return new ShellCompiler(name);
     }
 

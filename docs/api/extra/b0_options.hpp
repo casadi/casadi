@@ -66,20 +66,20 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::ClangJitCompilerInterface
+/** \class casadi::ClangCompilerInterface
 \n
 \par
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>flags</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ClangJitCompilerInterface</td></tr>
-<tr><td>include_path</td><td>OT_STRING</td><td>""</td><td>Include paths for the JIT compiler. The include directory shipped with CasADi will be automatically appended.</td><td>casadi::ClangJitCompilerInterface</td></tr>
+<tr><td>flags</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ClangCompilerInterface</td></tr>
+<tr><td>include_path</td><td>OT_STRING</td><td>""</td><td>Include paths for the JIT compiler. The include directory shipped with CasADi will be automatically appended.</td><td>casadi::ClangCompilerInterface</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_JitCompiler_clang
+/** \addtogroup plugin_Compiler_clang
 \n
 \par
 <a name='options'></a><table>
@@ -2215,7 +2215,7 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::JitCompilerInternal
+/** \class casadi::CompilerInternal
 \n
 \par
 <a name='options'></a><table>
@@ -2226,7 +2226,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup general_JitCompiler
+/** \addtogroup general_Compiler
 \n
 \par
 <a name='options'></a><table>

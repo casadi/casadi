@@ -140,7 +140,7 @@ endif()
 
 if(WITH_DL AND NOT WIN32)
   # Simple just-in-time compiler, using shell commands
-  casadi_plugin(JitCompiler shell
+  casadi_plugin(Compiler shell
     shell_compiler.hpp
     shell_compiler.cpp
     shell_compiler_meta.cpp)

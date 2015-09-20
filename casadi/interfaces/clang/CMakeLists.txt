@@ -3,16 +3,16 @@ include_directories(${CLANG_INCLUDE_DIR})
 add_definitions(${CLANG_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_CXX_FLAGS}")
 
-casadi_plugin(JitCompiler clang
+casadi_plugin(Compiler clang
   clang_compiler.hpp
   clang_compiler.cpp
   clang_compiler_meta.cpp)
 
-casadi_plugin_link_libraries(JitCompiler clang ${CLANG_LIBRARIES})
+casadi_plugin_link_libraries(Compiler clang ${CLANG_LIBRARIES})
 
 if(MINGW)
   find_library(SHLWAPI libshlwapi /usr/${PREFIX}/lib)
-  casadi_plugin_link_libraries(JitCompiler clang ${SHLWAPI})
+  casadi_plugin_link_libraries(Compiler clang ${SHLWAPI})
 endif()
 
 # Get resource directory

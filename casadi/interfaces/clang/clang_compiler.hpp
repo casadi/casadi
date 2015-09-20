@@ -26,8 +26,8 @@
 #ifndef CASADI_CLANG_COMPILER_HPP
 #define CASADI_CLANG_COMPILER_HPP
 
-#include "casadi/core/function/jit_compiler_internal.hpp"
-#include <casadi/interfaces/clang/casadi_jitcompiler_clang_export.h>
+#include "casadi/core/function/compiler_internal.hpp"
+#include <casadi/interfaces/clang/casadi_compiler_clang_export.h>
 
 #include <clang/CodeGen/CodeGenAction.h>
 #include <clang/Basic/DiagnosticOptions.h>
@@ -60,24 +60,24 @@
 #include <llvm/Support/raw_os_ostream.h>
 //#include <llvm/ExecutionEngine/ExecutionEngine.h>
 
-/** \defgroup plugin_JitCompiler_clang
+/** \defgroup plugin_Compiler_clang
       Interface to the JIT compiler CLANG
 */
 
-/** \pluginsection{JitCompiler,clang} */
+/** \pluginsection{Compiler,clang} */
 
 /// \cond INTERNAL
 namespace casadi {
-  /** \brief \pluginbrief{JitCompiler,clang}
+  /** \brief \pluginbrief{Compiler,clang}
 
 
    \author Joris Gillis
    \date 2015
    *
-   @copydoc JitCompiler_doc
-   @copydoc plugin_JitCompiler_clang
+   @copydoc Compiler_doc
+   @copydoc plugin_Compiler_clang
    * */
-  class CASADI_JITCOMPILER_CLANG_EXPORT ClangCompiler : public JitCompilerInternal {
+  class CASADI_COMPILER_CLANG_EXPORT ClangCompiler : public CompilerInternal {
   public:
 
     /** \brief Constructor */
@@ -87,7 +87,7 @@ namespace casadi {
     virtual ClangCompiler* clone() const;
 
     /** \brief  Create a new JIT function */
-    static JitCompilerInternal* creator(const std::string& name) {
+    static CompilerInternal* creator(const std::string& name) {
       return new ClangCompiler(name);
     }
 
