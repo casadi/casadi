@@ -70,7 +70,6 @@ f.setInput(2)
 f.evaluate()
 print f.getOutput()
 print type(f.getOutput())
-#! Reevaluation does not require the init call.
 f.setInput(3)
 f.evaluate()
 print f.getOutput()
@@ -87,7 +86,7 @@ x = SX.sym("x") # 1 by 1 matrix serves as scalar
 y = SX.sym("y") # 1 by 1 matrix serves as scalar
 f = SXFunction('f', [x , y ], [x*y, x+y])
 print "%d -> %d" % (f.nIn(),f.nOut())
-f.init()
+
 f.setInput(2,0)
 f.setInput(3,1)
 
@@ -131,7 +130,6 @@ print G
 #$ Notice how G is a 2-nd order tensor $ {\buildrel\leftrightarrow\over{G}} = \vec{\nabla}{\vec{f}} = \frac{\partial [x*y, x+y]}{\partial [x , y]}$
 #$ Let's define $ \vec{v} = {\buildrel\leftrightarrow\over{G}} . \vec{p} $
 #! The evaluation of v can be efficiently achieved by automatic differentiation as follows:
-f.init()
 df = f.derivative(1,0)
 df.setInput([2,3],0)
 df.setInput([7,6],1)
@@ -146,7 +144,6 @@ print x*y # Not a dot product
 f = SXFunction('f', [x,y], [x*y])
 print "%d -> %d" % (f.nIn(),f.nOut())
 print f([x,y])
-f.init()
 f.setInput(DMatrix([[1,2],[3,4]]),0)
 f.setInput(DMatrix([[4,5],[6,7]]),1)
 f.evaluate()
