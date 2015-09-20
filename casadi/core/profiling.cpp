@@ -27,8 +27,6 @@
 
 namespace casadi {
 
-#ifdef WITH_PROFILING
-
 /*
  * Author:  David Robert Nadeau
  * Site:    http://NadeauSoftware.com/
@@ -50,7 +48,8 @@ namespace casadi {
 #endif
 
 #else
-#error "Unable to define getRealTime( ) for an unknown OS."
+#warning "Unable to define getRealTime( ) for an unknown OS."
+double getRealTime() { return 0; }
 #endif
 
 double getRealTime() {
@@ -121,9 +120,5 @@ double getRealTime() {
     return -1.0;        /* Failed. */
 #endif
 }
-
-#else //WITH_PROFILING
- double getRealTime() { return 0; }
-#endif
 
 } // namespace casadi

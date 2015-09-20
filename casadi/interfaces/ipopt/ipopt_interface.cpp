@@ -51,7 +51,6 @@ namespace casadi {
     timer ret;
     ret.proc = clock();
     ret.wall = getRealTime();
-    userOut() << "current wall time: " << ret.wall << endl;
     return ret;
   }
 
