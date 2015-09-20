@@ -4,9 +4,9 @@ add_definitions(${CLANG_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_CXX_FLAGS}")
 
 casadi_plugin(JitCompiler clang
-  clang_interface.hpp
-  clang_interface.cpp
-  clang_interface_meta.cpp)
+  clang_compiler.hpp
+  clang_compiler.cpp
+  clang_compiler_meta.cpp)
 
 casadi_plugin_link_libraries(JitCompiler clang ${CLANG_LIBRARIES})
 

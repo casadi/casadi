@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_CLANG_INTERFACE_HPP
-#define CASADI_CLANG_INTERFACE_HPP
+#ifndef CASADI_CLANG_COMPILER_HPP
+#define CASADI_CLANG_COMPILER_HPP
 
 #include "casadi/core/function/jit_compiler_internal.hpp"
 #include <casadi/interfaces/clang/casadi_jitcompiler_clang_export.h>
@@ -77,22 +77,22 @@ namespace casadi {
    @copydoc JitCompiler_doc
    @copydoc plugin_JitCompiler_clang
    * */
-  class CASADI_JITCOMPILER_CLANG_EXPORT ClangJitCompilerInterface : public JitCompilerInternal {
+  class CASADI_JITCOMPILER_CLANG_EXPORT ClangCompiler : public JitCompilerInternal {
   public:
 
     /** \brief Constructor */
-    explicit ClangJitCompilerInterface(const std::string& name);
+    explicit ClangCompiler(const std::string& name);
 
     /** \brief Clone */
-    virtual ClangJitCompilerInterface* clone() const;
+    virtual ClangCompiler* clone() const;
 
     /** \brief  Create a new JIT function */
     static JitCompilerInternal* creator(const std::string& name) {
-      return new ClangJitCompilerInterface(name);
+      return new ClangCompiler(name);
     }
 
     /** \brief Destructor */
-    virtual ~ClangJitCompilerInterface();
+    virtual ~ClangCompiler();
 
     /** \brief Initialize */
     virtual void init();
@@ -121,4 +121,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_CLANG_INTERFACE_HPP
+#endif // CASADI_CLANG_COMPILER_HPP

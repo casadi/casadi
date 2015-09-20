@@ -23,7 +23,7 @@
  */
 
 
-#include "clang_interface.hpp"
+#include "clang_compiler.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/casadi_meta.hpp"
 #include <fstream>
@@ -43,9 +43,9 @@ namespace casadi {
   extern "C"
   int CASADI_JITCOMPILER_CLANG_EXPORT
   casadi_register_jitcompiler_clang(JitCompilerInternal::Plugin* plugin) {
-    plugin->creator = ClangJitCompilerInterface::creator;
+    plugin->creator = ClangCompiler::creator;
     plugin->name = "clang";
-    plugin->doc = ClangJitCompilerInterface::meta_doc.c_str();
+    plugin->doc = ClangCompiler::meta_doc.c_str();
     plugin->version = 23;
     return 0;
   }
@@ -55,15 +55,15 @@ namespace casadi {
     JitCompilerInternal::registerPlugin(casadi_register_jitcompiler_clang);
   }
 
-  ClangJitCompilerInterface* ClangJitCompilerInterface::clone() const {
+  ClangCompiler* ClangCompiler::clone() const {
     // Return a deep copy
-    ClangJitCompilerInterface* node = new ClangJitCompilerInterface(name_);
+    ClangCompiler* node = new ClangCompiler(name_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  ClangJitCompilerInterface::ClangJitCompilerInterface(const std::string& name) :
+  ClangCompiler::ClangCompiler(const std::string& name) :
     JitCompilerInternal(name) {
     addOption("include_path", OT_STRING, "", "Include paths for the JIT compiler."
       " The include directory shipped with CasADi will be automatically appended.");
@@ -76,14 +76,14 @@ namespace casadi {
     act_ = 0;
   }
 
-  ClangJitCompilerInterface::~ClangJitCompilerInterface() {
+  ClangCompiler::~ClangCompiler() {
     if (act_) delete act_;
     if (myerr_) delete myerr_;
     if (executionEngine_) delete executionEngine_;
     if (context_) delete context_;
   }
 
-  void ClangJitCompilerInterface::init() {
+  void ClangCompiler::init() {
     // Initialize the base classes
     JitCompilerInternal::init();
 
@@ -228,12 +228,12 @@ namespace casadi {
     executionEngine_->finalizeObject();
   }
 
-  void* ClangJitCompilerInterface::getFunction(const std::string& symname) {
+  void* ClangCompiler::getFunction(const std::string& symname) {
     return reinterpret_cast<void*>((intptr_t)executionEngine_
                                    ->getPointerToFunction(module_->getFunction(symname)));
   }
 
-  std::vector<std::pair<std::string, bool> > ClangJitCompilerInterface::
+  std::vector<std::pair<std::string, bool> > ClangCompiler::
   getIncludes(const std::string& file, const std::string& path) {
     // File separator
 #ifdef _WIN32
