@@ -22,10 +22,10 @@
  *
  */
 
-      #include "commandline_interface.hpp"
+      #include "shell_compiler.hpp"
       #include <string>
 
-      const std::string casadi::CommandlineJitCompiler::meta_doc=
+      const std::string casadi::ShellCompiler::meta_doc=
       "\n"
 "\n"
 ;

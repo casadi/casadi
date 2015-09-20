@@ -23,45 +23,45 @@
  */
 
 
-#ifndef CASADI_COMMANDLINE_INTERFACE_HPP
-#define CASADI_COMMANDLINE_INTERFACE_HPP
+#ifndef CASADI_SHELL_INTERFACE_HPP
+#define CASADI_SHELL_INTERFACE_HPP
 
 #include "casadi/core/function/jit_compiler_internal.hpp"
-#include <casadi/solvers/casadi_jitcompiler_commandline_export.h>
+#include <casadi/solvers/casadi_jitcompiler_shell_export.h>
 
-/** \defgroup plugin_JitCompiler_commandline
-      Interface to the JIT compiler COMMANDLINE
+/** \defgroup plugin_JitCompiler_shell
+      Interface to the JIT compiler SHELL
 */
 
-/** \pluginsection{JitCompiler,commandline} */
+/** \pluginsection{JitCompiler,shell} */
 
 /// \cond INTERNAL
 namespace casadi {
-  /** \brief \pluginbrief{JitCompiler,commandline}
+  /** \brief \pluginbrief{JitCompiler,shell}
 
 
    \author Joris Gillis
    \date 2015
    *
    @copydoc JitCompiler_doc
-   @copydoc plugin_JitCompiler_commandline
+   @copydoc plugin_JitCompiler_shell
    * */
-  class CASADI_JITCOMPILER_COMMANDLINE_EXPORT CommandlineJitCompiler : public JitCompilerInternal {
+  class CASADI_JITCOMPILER_SHELL_EXPORT ShellCompiler : public JitCompilerInternal {
   public:
 
     /** \brief Constructor */
-    explicit CommandlineJitCompiler(const std::string& name);
+    explicit ShellCompiler(const std::string& name);
 
     /** \brief Clone */
-    virtual CommandlineJitCompiler* clone() const;
+    virtual ShellCompiler* clone() const;
 
     /** \brief  Create a new JIT function */
     static JitCompilerInternal* creator(const std::string& name) {
-      return new CommandlineJitCompiler(name);
+      return new ShellCompiler(name);
     }
 
     /** \brief Destructor */
-    virtual ~CommandlineJitCompiler();
+    virtual ~ShellCompiler();
 
     /** \brief Initialize */
     virtual void init();
@@ -70,7 +70,7 @@ namespace casadi {
     static const std::string meta_doc;
 
     /// Get name of plugin
-    virtual const char* plugin_name() const { return "commandline";}
+    virtual const char* plugin_name() const { return "shell";}
 
     /// Get a function pointer for numerical evaluation
     virtual void* getFunction(const std::string& symname);
@@ -87,4 +87,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_COMMANDLINE_INTERFACE_HPP
+#endif // CASADI_SHELL_INTERFACE_HPP

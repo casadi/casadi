@@ -23,7 +23,7 @@
  */
 
 
-#include "commandline_interface.hpp"
+#include "shell_compiler.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/casadi_meta.hpp"
 #include <fstream>
@@ -34,29 +34,29 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_JITCOMPILER_COMMANDLINE_EXPORT
-  casadi_register_jitcompiler_commandline(JitCompilerInternal::Plugin* plugin) {
-    plugin->creator = CommandlineJitCompiler::creator;
-    plugin->name = "commandline";
-    plugin->doc = CommandlineJitCompiler::meta_doc.c_str();
+  int CASADI_JITCOMPILER_SHELL_EXPORT
+  casadi_register_jitcompiler_shell(JitCompilerInternal::Plugin* plugin) {
+    plugin->creator = ShellCompiler::creator;
+    plugin->name = "shell";
+    plugin->doc = ShellCompiler::meta_doc.c_str();
     plugin->version = 23;
     return 0;
   }
 
   extern "C"
-  void CASADI_JITCOMPILER_COMMANDLINE_EXPORT casadi_load_jitcompiler_commandline() {
-    JitCompilerInternal::registerPlugin(casadi_register_jitcompiler_commandline);
+  void CASADI_JITCOMPILER_SHELL_EXPORT casadi_load_jitcompiler_shell() {
+    JitCompilerInternal::registerPlugin(casadi_register_jitcompiler_shell);
   }
 
-  CommandlineJitCompiler* CommandlineJitCompiler::clone() const {
+  ShellCompiler* ShellCompiler::clone() const {
     // Return a deep copy
-    CommandlineJitCompiler* node = new CommandlineJitCompiler(name_);
+    ShellCompiler* node = new ShellCompiler(name_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  CommandlineJitCompiler::CommandlineJitCompiler(const std::string& name) :
+  ShellCompiler::ShellCompiler(const std::string& name) :
     JitCompilerInternal(name) {
     addOption("compiler", OT_STRING, "gcc", "Compiler command");
     addOption("compiler_setup", OT_STRING, "-fPIC -shared", "Compiler setup command");
@@ -64,7 +64,7 @@ namespace casadi {
       "Compile flags for the JIT compiler. Default: None");
   }
 
-  CommandlineJitCompiler::~CommandlineJitCompiler() {
+  ShellCompiler::~ShellCompiler() {
     // Unload
     if (handle_) dlclose(handle_);
 
@@ -74,7 +74,7 @@ namespace casadi {
     casadi_assert_warning(flag==0, "Failed to delete temporary file");
   }
 
-  void CommandlineJitCompiler::init() {
+  void ShellCompiler::init() {
     // Initialize the base classes
     JitCompilerInternal::init();
 
@@ -95,7 +95,7 @@ namespace casadi {
     cmd << " " << name_;
 
     // Temporary file
-    char bin_name[] = "tmp_casadi_jitcompiler_commandline_XXXXXX.so";
+    char bin_name[] = "tmp_casadi_jitcompiler_shell_XXXXXX.so";
     int flag = mkstemps(bin_name, 3);
     bin_name_ = bin_name;
     cmd << " -o " << bin_name_;
@@ -114,7 +114,7 @@ namespace casadi {
     dlerror();
   }
 
-  void* CommandlineJitCompiler::getFunction(const std::string& symname) {
+  void* ShellCompiler::getFunction(const std::string& symname) {
     void* ret;
     ret = reinterpret_cast<void*>(dlsym(handle_, symname.c_str()));
     if (dlerror()) {

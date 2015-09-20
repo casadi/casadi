@@ -139,9 +139,9 @@ if(WITH_CSPARSE)
 endif()
 
 if(WITH_DL AND NOT WIN32)
-  # Simple just-in-time compiler, calling command line
-  casadi_plugin(JitCompiler commandline
-    commandline_interface.hpp
-    commandline_interface.cpp
-    commandline_interface_meta.cpp)
+  # Simple just-in-time compiler, using shell commands
+  casadi_plugin(JitCompiler shell
+    shell_compiler.hpp
+    shell_compiler.cpp
+    shell_compiler_meta.cpp)
 endif()
