@@ -47,6 +47,27 @@ using namespace std;
 #endif // WITH_SIPOPT
 
 namespace casadi {
+  timer IpoptInterface::getTimerTime() {
+    timer ret;
+    ret.proc = clock();
+    ret.wall = getRealTime();
+    userOut() << "current wall time: " << ret.wall << endl;
+    return ret;
+  }
+
+  // ret = t1 - t0
+  diffTime IpoptInterface::diffTimers(const timer t1, const timer t0) {
+    diffTime ret;
+    ret.proc = (t1.proc - t0.proc)/CLOCKS_PER_SEC;
+    ret.wall = t1.wall - t0.wall;
+    return ret;
+  }
+
+  // t += diff
+  void IpoptInterface::timerPlusEq(diffTime & t, const diffTime diff) {
+    t.proc += diff.proc;
+    t.wall += diff.wall;
+  }
 
   extern "C"
   int CASADI_NLPSOLVER_IPOPT_EXPORT
@@ -343,7 +364,7 @@ namespace casadi {
 
     // Reset the counters
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ =
-        t_callback_prepare_ = t_mainloop_ = t_mainloop_wall_ = 0;
+        t_callback_prepare_ = t_mainloop_ = {0,0};
 
     n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = n_iter_ = 0;
 
@@ -353,12 +374,10 @@ namespace casadi {
     Ipopt::SmartPtr<Ipopt::IpoptApplication> *app =
         static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(app_);
 
-    const double procTime0 = clock();
-    const double wallTime0 = getRealTime();
+    const timer time0 = getTimerTime();
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
-    t_mainloop_ = (clock()-procTime0)/CLOCKS_PER_SEC;
-    t_mainloop_wall_ = getRealTime() - wallTime0;
+    t_mainloop_ = diffTimers(getTimerTime(), time0);
 
 #ifdef WITH_SIPOPT
     if (run_sens_ || compute_red_hessian_) {
@@ -388,46 +407,71 @@ namespace casadi {
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       profileWriteExit(CasadiOptions::profilingLog, this,
-        t_mainloop_ - (t_callback_fun_-t_callback_prepare_));
+        t_mainloop_.proc - (t_callback_fun_.proc-t_callback_prepare_.proc));
     }
 
     if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
       // Write timings
-      userOut() << "time spent in eval_f: " << t_eval_f_ << " s.";
       if (n_eval_f_>0) {
         userOut()
-          << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)"
-          << endl
-          << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
+          << "time spent in eval_f: "
+          << t_eval_f_.proc << " s. proc, "
+          << t_eval_f_.wall << " s. wall"
+          << " (" << n_eval_f_ << " calls, average: "
+          << (t_eval_f_.proc/n_eval_f_)*1000 << " ms. proc, "
+          << (t_eval_f_.wall/n_eval_f_)*1000 << " ms. wall)"
+          << endl;
       }
       if (n_eval_grad_f_>0) {
         userOut()
-          << " (" << n_eval_grad_f_ << " calls, "
-          << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)"
-          << endl
-          << "time spent in eval_g: " << t_eval_g_ << " s.";
+          << "time spent in eval_grad_f: "
+          << t_eval_grad_f_.proc << " s. proc, "
+          << t_eval_grad_f_.wall << " s. wall"
+          << " (" << n_eval_grad_f_ << " calls, average: "
+          << (t_eval_grad_f_.proc/n_eval_grad_f_)*1000 << " ms. proc, "
+          << (t_eval_grad_f_.wall/n_eval_grad_f_)*1000 << " ms. wall)"
+          << endl;
       }
       if (n_eval_g_>0) {
         userOut()
-          << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
+          << "time spent in eval_g: "
+          << t_eval_g_.proc << " s. proc, "
+          << t_eval_g_.wall << " s. wall"
+          << " (" << n_eval_g_ << " calls, average: "
+          << (t_eval_g_.proc/n_eval_g_)*1000 << " ms. proc, "
+          << (t_eval_g_.wall/n_eval_g_)*1000 << " ms. wall)"
+          << endl;
       }
-      userOut() << endl
-                << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
       if (n_eval_jac_g_>0) {
-        userOut() << " (" << n_eval_jac_g_ << " calls, "
-                  << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
-      }
-      userOut() << endl
-                << "time spent in eval_h: " << t_eval_h_ << " s.";
-      if (n_eval_h_>1) {
         userOut()
-          << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
+          << "time spent in eval_jac_g: "
+          << t_eval_jac_g_.proc << " s. proc, "
+          << t_eval_jac_g_.wall << " s. wall"
+          << " (" << n_eval_jac_g_ << " calls, average: "
+          << (t_eval_jac_g_.proc/n_eval_jac_g_)*1000 << " ms. proc, "
+          << (t_eval_jac_g_.wall/n_eval_jac_g_)*1000 << " ms. wall)"
+          << endl;
       }
-      userOut() << endl
-                << "time spent in main loop (proc): " << t_mainloop_ << " s." << endl
-                << "time spent in main loop (wall): " << t_mainloop_wall_ << " s." << endl
-                << "time spent in callback function: " << t_callback_fun_ << " s." << endl
-                << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
+      if (n_eval_h_>0) {
+        userOut()
+          << "time spent in eval_h: "
+          << t_eval_h_.proc << " s. proc, "
+          << t_eval_h_.wall << " s. wall"
+          << " (" << n_eval_h_ << " calls, average: "
+          << (t_eval_h_.proc/n_eval_h_)*1000 << " ms. proc, "
+          << (t_eval_h_.wall/n_eval_h_)*1000 << " ms. wall)"
+          << endl;
+      }
+      userOut()
+        << "time spent in main loop: "
+        << t_mainloop_.proc << " s. proc, "
+        << t_mainloop_.wall << " s. wall" << endl
+        << "time spent in callback function: "
+        << t_callback_fun_.proc << " s. proc, "
+        << t_callback_fun_.wall << " s. wall" << endl
+        << "time spent in callback preparation: "
+        << t_callback_prepare_.proc << " s. proc, "
+        << t_callback_prepare_.wall << " s. wall" << endl;
     }
 
     if (status == Solve_Succeeded)
@@ -463,15 +507,24 @@ namespace casadi {
     if (status == Insufficient_Memory)
       stats_["return_status"] = "Insufficient_Memory";
 
-    stats_["t_eval_f"] = t_eval_f_;
-    stats_["t_eval_grad_f"] = t_eval_grad_f_;
-    stats_["t_eval_g"] = t_eval_g_;
-    stats_["t_eval_jac_g"] = t_eval_jac_g_;
-    stats_["t_eval_h"] = t_eval_h_;
-    stats_["t_mainloop"] = t_mainloop_;
-    stats_["t_mainloop_wall"] = t_mainloop_wall_;
-    stats_["t_callback_fun"] = t_callback_fun_;
-    stats_["t_callback_prepare"] = t_callback_prepare_;
+    stats_["t_eval_f.proc"] = t_eval_f_.proc;
+    stats_["t_eval_grad_f.proc"] = t_eval_grad_f_.proc;
+    stats_["t_eval_g.proc"] = t_eval_g_.proc;
+    stats_["t_eval_jac_g.proc"] = t_eval_jac_g_.proc;
+    stats_["t_eval_h.proc"] = t_eval_h_.proc;
+    stats_["t_mainloop.proc"] = t_mainloop_.proc;
+    stats_["t_callback_fun.proc"] = t_callback_fun_.proc;
+    stats_["t_callback_prepare.proc"] = t_callback_prepare_.proc;
+
+    stats_["t_eval_f.wall"] = t_eval_f_.wall;
+    stats_["t_eval_grad_f.wall"] = t_eval_grad_f_.wall;
+    stats_["t_eval_g.wall"] = t_eval_g_.wall;
+    stats_["t_eval_jac_g.wall"] = t_eval_jac_g_.wall;
+    stats_["t_eval_h.wall"] = t_eval_h_.wall;
+    stats_["t_mainloop.wall"] = t_mainloop_.wall;
+    stats_["t_callback_fun.wall"] = t_callback_fun_.wall;
+    stats_["t_callback_prepare.wall"] = t_callback_prepare_.wall;
+
     stats_["n_eval_f"] = n_eval_f_;
     stats_["n_eval_grad_f"] = n_eval_grad_f_;
     stats_["n_eval_g"] = n_eval_g_;
@@ -504,7 +557,7 @@ namespace casadi {
         append_to_vec(iterations["obj"], obj_value);
         stats_["iterations"] = iterations;
       }
-      const double time1 = clock();
+      const timer time0 = getTimerTime();
       if (!callback_.isNull()) {
         if (full_callback) {
           if (!output(NLP_SOLVER_X).isempty()) copy(x, x+nx_, output(NLP_SOLVER_X).begin());
@@ -543,8 +596,8 @@ namespace casadi {
 
         int ret = callback_(ref_, user_data_);
 
-        const double time2 = clock();
-        t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
+        const diffTime delta = diffTimers(getTimerTime(), time0);
+        timerPlusEq(t_callback_fun_, delta);
         return  !ret;
       } else {
         return 1;
@@ -594,7 +647,7 @@ namespace casadi {
                              int* iRow, int* jCol, double* values) {
     try {
       log("eval_h started");
-      const double time1 = clock();
+      const timer time0 = getTimerTime();
       if (values == NULL) {
         int nz=0;
         const int* colind = hessLag_.output().colind();
@@ -629,10 +682,10 @@ namespace casadi {
             casadi_error("IpoptInterface::h: NaN or Inf detected.");
 
       }
-      const double delta = (clock()-time1)/CLOCKS_PER_SEC;
-      t_eval_h_ += delta;
+      const diffTime delta = diffTimers(getTimerTime(), time0);
+      timerPlusEq(t_eval_h_, delta);
       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 4, delta);
+        profileWriteTime(CasadiOptions::profilingLog, this, 4, delta.proc);
       }
       n_eval_h_ += 1;
       log("eval_h ok");
@@ -658,7 +711,7 @@ namespace casadi {
       // Get function
       Function& jacG = this->jacG();
 
-      const double time1 = clock();
+      const timer time0 = getTimerTime();
       if (values == NULL) {
         int nz=0;
         const int* colind = jacG.output().colind();
@@ -691,10 +744,10 @@ namespace casadi {
             casadi_error("IpoptInterface::jac_g: NaN or Inf detected.");
       }
 
-      const double delta = (clock()-time1)/CLOCKS_PER_SEC;
-      t_eval_jac_g_ += delta;
+      const diffTime delta = diffTimers(getTimerTime(), time0);
+      timerPlusEq(t_eval_jac_g_, delta);
       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 3, delta);
+        profileWriteTime(CasadiOptions::profilingLog, this, 3, delta.proc);
       }
       n_eval_jac_g_ += 1;
       log("eval_jac_g ok");
@@ -716,7 +769,7 @@ namespace casadi {
       log("eval_f started");
 
       // Log time
-      const double time1 = clock();
+      const timer time0 = getTimerTime();
       casadi_assert(n == nx_);
 
       // Pass the argument to the function
@@ -738,11 +791,11 @@ namespace casadi {
       if (regularity_check_ && !isRegular(nlp_.output(NL_F).data()))
           casadi_error("IpoptInterface::f: NaN or Inf detected.");
 
-      const double delta = (clock()-time1)/CLOCKS_PER_SEC;
-      t_eval_f_ += delta;
+      const diffTime delta = diffTimers(getTimerTime(), time0);
+      timerPlusEq(t_eval_f_, delta);
       n_eval_f_ += 1;
       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 0, delta);
+        profileWriteTime(CasadiOptions::profilingLog, this, 0, delta.proc);
       }
       log("eval_f ok");
       return true;
@@ -757,7 +810,7 @@ namespace casadi {
   bool IpoptInterface::eval_g(int n, const double* x, bool new_x, int m, double* g) {
     try {
       log("eval_g started");
-      const double time1 = clock();
+      const timer time0 = getTimerTime();
 
       if (m>0) {
         // Pass the argument to the function
@@ -780,10 +833,10 @@ namespace casadi {
       if (regularity_check_ && !isRegular(nlp_.output(NL_G).data()))
           casadi_error("IpoptInterface::g: NaN or Inf detected.");
 
-      const double delta = (clock()-time1)/CLOCKS_PER_SEC;
-      t_eval_g_ += delta;
+      const diffTime delta = diffTimers(getTimerTime(), time0);
+      timerPlusEq(t_eval_g_, delta);
       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 2, delta);
+        profileWriteTime(CasadiOptions::profilingLog, this, 2, delta.proc);
       }
       n_eval_g_ += 1;
       log("eval_g ok");
@@ -798,7 +851,7 @@ namespace casadi {
   bool IpoptInterface::eval_grad_f(int n, const double* x, bool new_x, double* grad_f) {
     try {
       log("eval_grad_f started");
-      const double time1 = clock();
+      const timer time0 = getTimerTime();
       casadi_assert(n == nx_);
 
       // Pass the argument to the function
@@ -820,10 +873,10 @@ namespace casadi {
       if (regularity_check_ && !isRegular(gradF_.output().data()))
           casadi_error("IpoptInterface::grad_f: NaN or Inf detected.");
 
-      const double delta = (clock()-time1)/CLOCKS_PER_SEC;
-      t_eval_grad_f_ += delta;
+      const diffTime delta = diffTimers(getTimerTime(), time0);
+      timerPlusEq(t_eval_grad_f_, delta);
       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 1, delta);
+        profileWriteTime(CasadiOptions::profilingLog, this, 1, delta.proc);
       }
       n_eval_grad_f_ += 1;
       log("eval_grad_f ok");

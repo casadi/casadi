@@ -140,7 +140,7 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
   bool full_callback = false;
 
 #ifdef WITH_IPOPT_CALLBACK
-  double time1 = clock();
+  const timer time0 = IpoptInterface::getTimerTime();
   OrigIpoptNLP* orignlp = dynamic_cast<OrigIpoptNLP*>(GetRawPtr(ip_cq->GetIpoptNLP()));
   if (!orignlp) return true;
   TNLPAdapter* tnlp_adapter = dynamic_cast<TNLPAdapter*>(GetRawPtr(orignlp->nlp()));
@@ -192,8 +192,9 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
       }
     }
   }
-  double time2 = clock();
-  solver->t_callback_prepare_ += (time2-time1)/CLOCKS_PER_SEC;
+  const diffTime diff =
+    IpoptInterface::diffTimers(IpoptInterface::getTimerTime(), time0);
+  IpoptInterface::timerPlusEq(solver->t_callback_prepare_, diff);
   full_callback = true;
 #endif // WITH_IPOPT_CALLBACK
 
