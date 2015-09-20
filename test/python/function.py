@@ -1801,6 +1801,7 @@ class Functiontests(casadiTestCase):
     [v] = f([])
     self.checkarray(2.37683, v, digits=4)
 
+  @known_bug()
   @requiresPlugin(Compiler,"clang")
   def test_clang_cxx(self):
     compiler = Compiler('../data/helloworld.cxx', 'clang')
