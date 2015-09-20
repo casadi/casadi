@@ -364,7 +364,7 @@ namespace casadi {
 
     // Reset the counters
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ =
-        t_callback_prepare_ = t_mainloop_ = {0,0};
+        t_callback_prepare_ = t_mainloop_ = {0, 0};
 
     n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = n_iter_ = 0;
 
