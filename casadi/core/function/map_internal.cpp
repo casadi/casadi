@@ -76,6 +76,13 @@ namespace casadi {
                      "Falling back to serial mode.");
       parallelization_ = PARALLELIZATION_SERIAL;
     }
+    #ifndef WITH_OPENMP
+    if (parallelization_ == PARALLELIZATION_OMP) {
+      casadi_warning("CasADi was not compiled with OpenMP." <<
+                     "Falling back to serial mode.");
+      parallelization_ = PARALLELIZATION_SERIAL;
+    }
+    #endif // WITH_OPENMP
 
     int num_in = f_.nIn(), num_out = f_.nOut();
 
@@ -199,26 +206,25 @@ namespace casadi {
     } else {
       int n_in_ = f_.nIn(), n_out_ = f_.nOut();
       #ifndef WITH_OPENMP
-          // Not available, switching to serial mode
-          evalGen<double>(arg, res, iw, w, &FunctionInternal::evalD, std::plus<double>());
-      #else // WITH_OPENMP
-          size_t sz_arg, sz_res, sz_iw, sz_w;
-          f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-      #pragma omp parallel for
-          for (int i=0; i<n_; ++i) {
-            const double** arg_i = arg + n_in_ + sz_arg*i;
-            for (int j=0; j<n_in_; ++j) {
-              arg_i[j] = arg[j]+i*step_in_[j];
-            }
-            double** res_i = res + n_out_ + sz_res*i;
-            for (int j=0; j<n_out_; ++j) {
-              res_i[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
-            }
-            int* iw_i = iw + i*sz_iw;
-            double* w_i = w + i*sz_w;
-            f_->evalD(arg_i, res_i, iw_i, w_i);
-          }
+          casadi_error("the \"impossible\" happened: " <<
+                       "should have fallen back to serial in init.");
       #endif // WITH_OPENMP
+      size_t sz_arg, sz_res, sz_iw, sz_w;
+      f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+      #pragma omp parallel for
+      for (int i=0; i<n_; ++i) {
+        const double** arg_i = arg + n_in_ + sz_arg*i;
+        for (int j=0; j<n_in_; ++j) {
+          arg_i[j] = arg[j]+i*step_in_[j];
+        }
+        double** res_i = res + n_out_ + sz_res*i;
+        for (int j=0; j<n_out_; ++j) {
+          res_i[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
+        }
+        int* iw_i = iw + i*sz_iw;
+        double* w_i = w + i*sz_w;
+        f_->evalD(arg_i, res_i, iw_i, w_i);
+      }
     }
 
   }
