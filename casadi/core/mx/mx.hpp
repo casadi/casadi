@@ -357,10 +357,10 @@ namespace casadi {
     void setNZ(const MX& m, bool ind1, const Matrix<int>& kk);
     ///@}
 
-    /** \brief Append a matrix vertically (NOTE: only efficient if vector) */
+    /** \brief [DEPRECATED] Append a matrix vertically (NOTE: only efficient if vector) */
     void append(const MX& y);
 
-    /** \brief Append a matrix horizontally */
+    /** \brief [DEPRECATED] Append a matrix horizontally */
     void appendColumns(const MX& y);
 
 #ifndef SWIG
@@ -581,10 +581,10 @@ namespace casadi {
 
 #endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
-    /// Make the matrix dense
+    /// [DEPRECATED: Use densify instead] Make the matrix dense
     void makeDense(const MX& val = 0);
 
-    /// Lift an expression
+    /// [DEPRECATED] Lift an expression
     void lift(const MX& x_guess);
 
     /// Transpose the matrix

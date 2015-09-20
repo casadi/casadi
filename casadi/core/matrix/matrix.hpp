@@ -357,13 +357,13 @@ namespace casadi {
     void setNZ(const Matrix<DataType>& m, bool ind1, const Matrix<int>& k);
     ///@}
 
-    /// Append a matrix vertically (NOTE: only efficient if vector)
+    /// [DEPRECATED] Append a matrix vertically (NOTE: only efficient if vector)
     void append(const Matrix<DataType>& y);
 
-    /// Append a matrix horizontally
+    /// [DEPRECATED] Append a matrix horizontally
     void appendColumns(const Matrix<DataType>& y);
 
-    /// Set all elements to zero
+    /// [DEPRECATED] Set all elements to zero
     void setZero();
 
 #ifndef SWIG
@@ -375,7 +375,8 @@ namespace casadi {
 #endif // SWIG
 
 
-    /** \brief  Make a matrix sparse by removing numerical zeros smaller
+    /** \brief [DEPRECATED: use sparsify instead]
+       Make a matrix sparse by removing numerical zeros smaller
      * in absolute value than a specified tolerance */
     void makeSparse(double tol=0);
 
