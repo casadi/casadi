@@ -75,7 +75,6 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       solver = NlpSolver("mysolver", Solver, nlp, solver_options)
-      solver.setOption(solver_options)
 
       solver.setInput([-10],"lbx")
       solver.setInput([-20],"ubx")
@@ -242,7 +241,6 @@ class NLPtests(casadiTestCase):
     
     obj = (1-x)**2+100*(y-x**2)**2
     nlp=SXFunction("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=x**2+y**2))
-    nlp.init()
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -264,7 +262,7 @@ class NLPtests(casadiTestCase):
       options["hess_lag"] = h      
       solver = NlpSolver("mysolver", Solver, nlp, options)
           
-      solver.init()
+
       solver.setInput([0.5,0.5],"x0")
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
@@ -401,7 +399,6 @@ class NLPtests(casadiTestCase):
     
     obj = (p-x)**2+100*(y-x**2)**2
     nlp=SXFunction("nlp", nlpIn(x=vertcat([x,y]),p=p),nlpOut(f=obj,g=x**2+y**2))
-    nlp.init()
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -916,7 +913,6 @@ class NLPtests(casadiTestCase):
         if solver.hasOption(k):
           solver.setOption(k,v)
           
-      solver.init()
       solver.setInput(LBX,"lbx")
       solver.setInput(UBX,"ubx")
       solver.setInput(LBA,"lbg")
@@ -1037,7 +1033,6 @@ class NLPtests(casadiTestCase):
 
       solver = NlpSolver("mysolver", Solver, nlp, options)
           
-      solver.init()
       solver.setInput(LBX,"lbx")
       solver.setInput(UBX,"ubx")
       solver.setInput(LBA,"lbg")
@@ -1059,7 +1054,7 @@ class NLPtests(casadiTestCase):
     x = MX.sym("x", 3)
     y = MX.sym("y", 2)
     f = MXFunction("f", [x, y], [1.])
-    f.init()
+
     aa = MX.sym("aa", 5)
     a = aa[:3]
     b = aa[3:]
@@ -1081,10 +1076,8 @@ class NLPtests(casadiTestCase):
               2*x1+4*x2]
           f= (x1+x2+x3)**2+3*x3+5*x4
           F= SXFunction("nlp", nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
-          F.init()
           
           solver = NlpSolver("mysolver",Solver,F,solver_options)
-          solver.setOption(solver_options)
           
           ubx = solver.getInput("ubx")
           ubx[permute_x]= DMatrix([inf,inf,inf,inf])
@@ -1127,7 +1120,6 @@ class NLPtests(casadiTestCase):
               2*x1+4*x2]
           f= x1**2+x3**2
           F= SXFunction("nlp", nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
-          F.init()
           
           solver = NlpSolver("mysolver",Solver,F,solver_options)
 
@@ -1168,8 +1160,7 @@ class NLPtests(casadiTestCase):
               2*x1+4*x2]
           f= x1**2+x3**2+2*x2
           F= SXFunction("nlp", nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
-          F.init()
-          
+
           solver = NlpSolver("mysolver",Solver,F,solver_options)
           
           ubx = solver.getInput("ubx")

@@ -67,13 +67,15 @@ class Misctests(casadiTestCase):
     self.message("option errors")
     x = SX.sym("x")
     f = SXFunction('foobar', [x],[x])
+    with warnings.catch_warnings():
+      warnings.filterwarnings("ignore",category=DeprecationWarning)
     
-    self.assertRaises(RuntimeError,lambda : f.getOption("foobar"))
-    self.assertRaises(RuntimeError,lambda : f.setOption("foobar",123))
-    self.assertRaises(RuntimeError,lambda : f.setOption("name",123))
-    
-    self.assertRaises(RuntimeError,lambda : f.setOption("ad_weight","foo"))
-    
+      self.assertRaises(RuntimeError,lambda : f.getOption("foobar"))
+      self.assertRaises(RuntimeError,lambda : f.setOption("foobar",123))
+      self.assertRaises(RuntimeError,lambda : f.setOption("name",123))
+      
+      self.assertRaises(RuntimeError,lambda : f.setOption("ad_weight","foo"))
+      
     x = SX.sym("x")
     nlp = SXFunction('nlp', nlpIn(x=x),nlpOut(f=x))
 
@@ -82,10 +84,12 @@ class Misctests(casadiTestCase):
         g = NlpSolver('g', "ipopt", nlp)
     except:
         return
-    
-    self.assertRaises(RuntimeError,lambda : g.setOption("monitor",["abc"]))
-    self.assertRaises(RuntimeError,lambda : g.setOption("monitor",["eval_f","abc"]))
-    g.setOption("monitor",["eval_f"])
+
+    with warnings.catch_warnings():
+      warnings.filterwarnings("ignore",category=DeprecationWarning)
+      self.assertRaises(RuntimeError,lambda : g.setOption("monitor",["abc"]))
+      self.assertRaises(RuntimeError,lambda : g.setOption("monitor",["eval_f","abc"]))
+      g.setOption("monitor",["eval_f"])
     
     
   def test_copyconstr_norefcount(self):
@@ -240,7 +244,9 @@ class Misctests(casadiTestCase):
     self.message("Segfault regression check")
     f = ControlSimulator()
     try:
-      f.setOption("integrator_options",None) # This should not give a segfault
+      with warnings.catch_warnings():
+        warnings.filterwarnings("ignore",category=DeprecationWarning)
+        f.setOption("integrator_options",None) # This should not give a segfault
     except:
       pass
               

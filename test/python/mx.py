@@ -29,6 +29,8 @@ from types import *
 from helpers import *
 from copy import deepcopy
 
+warnings.filterwarnings("ignore",category=DeprecationWarning)
+
 scipy_available = True
 try:
 	from scipy.sparse import csr_matrix
@@ -547,9 +549,7 @@ class MXtests(casadiTestCase):
     x0=array([[0.738]])
     
     def fmod(f,x):
-      f.init()
       J=f.jacobian()
-      J.init()
       return J
       
     self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
@@ -561,9 +561,7 @@ class MXtests(casadiTestCase):
       x0=array([0.738,0.9,0.3])
       
       def fmod(f,x):
-        f.init()
         J=f.jacobian()
-        J.init()
         return J
         
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
@@ -783,7 +781,6 @@ class MXtests(casadiTestCase):
       f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
       f.init()
       J = f.jacobian()
-      J.init()
       J.setInput(x_,0)
       J.setInput(A_,1)
       J.setInput(b_,2)
@@ -855,7 +852,6 @@ class MXtests(casadiTestCase):
       f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
       f.init()
       J = f.jacobian()
-      J.init()
       J.setInput(x_,0)
       J.setInput(A_,1)
       J.setInput(b_,2)
@@ -931,7 +927,6 @@ class MXtests(casadiTestCase):
       f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
       f.init()
       J = f.jacobian()
-      J.init()
       J.setInput(x_,0)
       J.setInput(A_,1)
       J.setInput(b_,2)
@@ -949,7 +944,6 @@ class MXtests(casadiTestCase):
     y=x**3
     f=SXFunction("f", [x],[y])
     J=f.jacobian()
-    J.init()
     
     X=MX.sym("X")
     F=MXFunction("F", [X],J.call([X]))
@@ -1063,7 +1057,6 @@ class MXtests(casadiTestCase):
     def grad(y,x):
       f = MXFunction("f", ins,[x])
       J = f.jacobian([i for i in range(len(ins)) if ins[i] is y][0])
-      J.init()
       if x.shape[0]==1 and x.shape[1]==1:
         return (J.call(ins)[0].T).reshape(y.shape)
       return J.call(ins)[0].T
@@ -1371,7 +1364,6 @@ class MXtests(casadiTestCase):
       else:
         gfcn = MXFunction("gfcn", [U],[G], {"ad_weight":1})
       J = gfcn.jacobian()
-      J.init()
       J.setInput(1)
       J.evaluate()
       self.assertAlmostEqual(J.getOutput(),1,9)
@@ -1420,7 +1412,6 @@ class MXtests(casadiTestCase):
     self.checkarray(IMatrix([0,1,9,4,16,25]),ff.getOutput())
     
     J = MXFunction("J", [X],[f.jac()])
-    J.init()
     J.setInput(range(10))
     J.evaluate()
     
@@ -2440,7 +2431,6 @@ class MXtests(casadiTestCase):
     f = MXFunction("f", [x],[y])
 
     H = f.hessian()
-    H.init()
     
   def test_bug_1042(self):
 
@@ -2449,13 +2439,10 @@ class MXtests(casadiTestCase):
     mf = MXFunction("mf", [x],[x*x[0,0]])
     
     mfunction = mf.expand()
-    mfunction.init()
     
     mfg = mf.derivative(0,1)
-    mfg.init()
     
     mfunctiong = mfunction.derivative(0,1)
-    mfunctiong.init()
     
     for f in [mfg,mfunctiong]:
       f.setInput([1,2],0)
@@ -2476,7 +2463,6 @@ class MXtests(casadiTestCase):
     d.setInput([3,4],1)
 
     dx = d.expand()
-    dx.init()
     dx.setInput([1,2],0)
     dx.setInput([3,4],1)
     
@@ -2490,7 +2476,6 @@ class MXtests(casadiTestCase):
     d.setInput([3,4],1)
 
     dx = d.expand()
-    dx.init()
     dx.setInput([1,2],0)
     dx.setInput([3,4],1)
     

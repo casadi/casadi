@@ -280,7 +280,6 @@ class Functiontests(casadiTestCase):
       self.assertTrue(sp==sp.T)
       f = SXFunction("f", [x],[mul([x.T,DMatrix.ones(sp),x])])
       J = f.hessian()
-      J.init()
       sp2 = J.getOutput().sparsity()
       self.checkarray(sp.row(),sp2.row())
       self.checkarray(sp.colind(),sp2.colind())
@@ -404,15 +403,19 @@ class Functiontests(casadiTestCase):
     x = SX.sym("x")
     f = SXFunction("f", [x],[x])
     
-    with self.assertRaises(Exception):
-      f.setOption({"fooo": False},False)
+    with warnings.catch_warnings():
+      warnings.filterwarnings("ignore",category=DeprecationWarning)
+
     
-    f.setOption({"fooo": False},True)
-    
-    f.setOption({"name": "abc"},False)
-    self.assertTrue(f.getOption("name")=="abc")
-    f.setOption({"name": "def"},True)
-    self.assertTrue(f.getOption("name")=="def")
+      with self.assertRaises(Exception):
+        f.setOption({"fooo": False},False)
+      
+      f.setOption({"fooo": False},True)
+      
+      f.setOption({"name": "abc"},False)
+      self.assertTrue(f.getOption("name")=="abc")
+      f.setOption({"name": "def"},True)
+      self.assertTrue(f.getOption("name")=="def")
   
   @skip("WITH_DEPRECATED_FEATURES" not in CasadiMeta.getCompilerFlags())
   def test_CustomFunctionHard(self):
@@ -515,11 +518,13 @@ class Functiontests(casadiTestCase):
           
 
       Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
-      if max_adj and not max_fwd:
-        Fun.setOption("ad_weight", 1)
-      elif max_fwd and not max_adj:
-        Fun.setOption("ad_weight", 0)
-      Fun.init()
+      with warnings.catch_warnings():
+        warnings.filterwarnings("ignore",category=DeprecationWarning)
+        if max_adj and not max_fwd:
+          Fun.setOption("ad_weight", 1)
+        elif max_fwd and not max_adj:
+          Fun.setOption("ad_weight", 0)
+        Fun.init()
       
       if not indirect: 
         Fun.setInput(0.2,0)
@@ -568,8 +573,10 @@ class Functiontests(casadiTestCase):
         z1 = x+z0
         z2 = sin(z1)
         return [z2]
-          
-      Fun.init()
+
+      with warnings.catch_warnings():
+        warnings.filterwarnings("ignore",category=DeprecationWarning)
+        Fun.init()
       
       if not indirect: 
         Fun.setInput(0.2,0)
@@ -641,11 +648,13 @@ class Functiontests(casadiTestCase):
             y_bar.set(by)
 
       Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
-      if max_adj and not max_fwd:
-        Fun.setOption("ad_weight", 1)
-      elif max_fwd and not max_adj:
-        Fun.setOption("ad_weight", 0)
-      Fun.init()
+      with warnings.catch_warnings():
+        warnings.filterwarnings("ignore",category=DeprecationWarning)
+        if max_adj and not max_fwd:
+          Fun.setOption("ad_weight", 1)
+        elif max_fwd and not max_adj:
+          Fun.setOption("ad_weight", 0)
+        Fun.init()
       
       if not indirect: 
         Fun.setInput(0.2,0)
@@ -717,8 +726,10 @@ class Functiontests(casadiTestCase):
               y_bar.set(by)
 
       Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
-      Fun.init()
-      
+      with warnings.catch_warnings():
+        warnings.filterwarnings("ignore",category=DeprecationWarning)
+        Fun.init()
+              
       if not indirect: 
         Fun.setInput(0.2,0)
         Fun.setInput(0.7,1)
@@ -825,12 +836,14 @@ class Functiontests(casadiTestCase):
             x_bar.set([bx0,bx1])
             y_bar.set(by)
 
-      Fun = PyFunction(Fun(),[Sparsity.dense(2,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
-      if max_adj and not max_fwd:
-        Fun.setOption("ad_weight", 1)
-      elif max_fwd and not max_adj:
-        Fun.setOption("ad_weight", 0)
-      Fun.init()
+      with warnings.catch_warnings():
+        warnings.filterwarnings("ignore",category=DeprecationWarning)
+        Fun = PyFunction(Fun(),[Sparsity.dense(2,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
+        if max_adj and not max_fwd:
+          Fun.setOption("ad_weight", 1)
+        elif max_fwd and not max_adj:
+          Fun.setOption("ad_weight", 0)
+        Fun.init()
 
       if not indirect: 
         Fun.setInput([0.2,0.6],0)
@@ -897,11 +910,13 @@ class Functiontests(casadiTestCase):
               X_bar.set([2*x*xb+y*yb,xb+x*yb])
           
       c = PyFunction(Squares(),[Sparsity.dense(2,1)], [Sparsity.dense(2,1)])
-      if max_adj and not max_fwd:
-        c.setOption("ad_weight", 1)
-      elif max_fwd and not max_adj:
-        c.setOption("ad_weight", 0)
-      c.init()
+      with warnings.catch_warnings():
+        warnings.filterwarnings("ignore",category=DeprecationWarning)
+        if max_adj and not max_fwd:
+          c.setOption("ad_weight", 1)
+        elif max_fwd and not max_adj:
+          c.setOption("ad_weight", 0)
+        c.init()
 
       if not indirect: 
         c.setInput([0.2,0.6],0)
@@ -933,7 +948,6 @@ class Functiontests(casadiTestCase):
     f = MXFunction("f", [x],[x])
     
     J = f.jacobian()
-    J.init()
     J.evaluate()
     
     self.assertEqual(J.getOutput().nnz(),4)
@@ -942,7 +956,6 @@ class Functiontests(casadiTestCase):
     f.setJacSparsity(Sparsity.dense(4,4),0,0,True)
     
     J = f.jacobian()
-    J.init()
     J.evaluate()
     
     self.assertEqual(J.getOutput().nnz(),16)
@@ -1000,7 +1013,6 @@ class Functiontests(casadiTestCase):
     Pf = MXFunction("P", [X,P],[mul(M_X,P)])
 
     P_P = Pf.jacobian(1)
-    P_P.init()
 
     
     self.assertFalse("derivative" in str(P_P))
@@ -1045,7 +1057,6 @@ class Functiontests(casadiTestCase):
     f = MXFunction("f", [x], [y], {"verbose":True})
 
     J = f.gradient()
-    J.init()
 
     J.setInput([0.1])
     J.evaluate()
@@ -1056,7 +1067,6 @@ class Functiontests(casadiTestCase):
 
 
     J = f.jacobian()
-    J.init()
 
     J.setInput([0.1])
     J.evaluate()
@@ -1066,7 +1076,6 @@ class Functiontests(casadiTestCase):
     self.assertFalse("derivative" in str(J))
     
     H = f.hessian()
-    H.init()
     
     H.setInput([0.1])
     H.evaluate()
@@ -1155,7 +1164,6 @@ class Functiontests(casadiTestCase):
     N = 9
 
     rk4 = SXFunction("f",[x,u],[x+u])
-    rk4.init()
 
     for XX,XFunction in [(SX,SXFunction),(MX,MXFunction)]:
 
@@ -1182,15 +1190,11 @@ class Functiontests(casadiTestCase):
           g2.append(xf-VXk[k+1])
 
       for i in range(2):
-        f = XFunction("nlp",[V],[vertcat(g)])
-        f.setOption("ad_weight_sp",i)
-        f.init()
+        f = XFunction("nlp",[V],[vertcat(g)],{"ad_weight_sp":i})
 
         assert f.jacSparsity().nnz()==162
 
-        f2 = XFunction("nlp",[V],[vertcat(g2)])
-        f2.setOption("ad_weight_sp",i)
-        f2.init()
+        f2 = XFunction("nlp",[V],[vertcat(g2)],{"ad_weight_sp":i})
 
         assert f2.jacSparsity().nnz()==162
 
