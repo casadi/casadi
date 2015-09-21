@@ -1819,13 +1819,13 @@ namespace casadi {
     derivative_adj_[nadj] = fcn;
   }
 
-  Function FunctionInternal::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
+  Function FunctionInternal::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     // TODO(@jaeandersson): Fallback on finite differences
     casadi_error("FunctionInternal::getDerForward not defined for class "
                  << typeid(*this).name());
   }
 
-  Function FunctionInternal::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
+  Function FunctionInternal::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     casadi_error("FunctionInternal::getDerReverse not defined for class "
                  << typeid(*this).name());
   }

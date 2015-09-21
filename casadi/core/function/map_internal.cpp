@@ -290,7 +290,7 @@ namespace casadi {
 */
 
   Function MapInternal
-  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
 
     // Differentiate mapped function
     Function df = f_.derForward(nfwd);
@@ -312,7 +312,7 @@ namespace casadi {
   }
 
   Function MapInternal
-  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.derReverse(nadj);
 

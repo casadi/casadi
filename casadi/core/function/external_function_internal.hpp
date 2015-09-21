@@ -151,13 +151,13 @@ namespace casadi {
 
     ///@{
     /** \brief Forward mode derivatives */
-    virtual Function getDerForward(const std::string& name, int nfwd, const Dict& opts);
+    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
     virtual int numDerForward() const;
     ///@}
 
     ///@{
     /** \brief Reverse mode derivatives */
-    virtual Function getDerReverse(const std::string& name, int nadj, const Dict& opts);
+    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
     virtual int numDerReverse() const;
     ///@}
 

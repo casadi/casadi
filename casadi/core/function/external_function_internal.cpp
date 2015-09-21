@@ -340,7 +340,7 @@ namespace casadi {
 
   template<typename LibType>
   Function CommonExternal<LibType>
-  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     // Consistency check
     int n=1;
     while (n<nfwd) n*=2;
@@ -365,7 +365,7 @@ namespace casadi {
 
   template<typename LibType>
   Function CommonExternal<LibType>
-  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     // Consistency check
     int n=1;
     while (n<nadj) n*=2;

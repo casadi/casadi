@@ -226,7 +226,7 @@ namespace casadi {
   }
 
   Function MapAccumInternal
-  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
 
     // Obtain forward mode of the primitive function
     /*  
@@ -354,7 +354,7 @@ namespace casadi {
   }
 
   Function MapAccumInternal
-  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
 
     // Obtain Reverse mode of the primitive function
     /*  

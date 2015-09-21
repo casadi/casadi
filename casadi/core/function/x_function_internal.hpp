@@ -92,13 +92,13 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function getDerForward(const std::string& name, int nfwd, const Dict& opts);
+    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
     virtual int numDerForward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function getDerReverse(const std::string& name, int nadj, const Dict& opts);
+    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
     virtual int numDerReverse() const { return 64;}
     ///@}
 
@@ -989,7 +989,7 @@ namespace casadi {
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
-  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     // Seeds
     std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd, inputv_), fsens;
 
@@ -1026,7 +1026,7 @@ namespace casadi {
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
-  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     // Seeds
     std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadj, outputv_), asens;
 
