@@ -100,9 +100,11 @@ Function DerivativeGenerator2::operator()(Function& fcn, int ndir) {
 
 Function DerivativeGenerator2::original(Function& fcn, int ndir, bool fwd) {
   if (fwd) {
-    return fcn.derForward(ndir);
+    Dict opts;
+    return fcn->getDerForward("der",ndir,opts);
   } else {
-    return fcn.derReverse(ndir);
+    Dict opts;
+    return fcn->getDerReverse("der",ndir,opts);
   }
 }
 
