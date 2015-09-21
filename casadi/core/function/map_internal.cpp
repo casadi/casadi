@@ -295,6 +295,14 @@ namespace casadi {
     // Differentiate mapped function
     Function df = f_.derForward(nfwd);
 
+    // Propagate options (if not set already)
+    if (opts.find("parallelization")==opts.end()) {
+      switch (parallelization_) {
+      case PARALLELIZATION_SERIAL: opts["parallelization"] = "serial"; break;
+      case PARALLELIZATION_OMP: opts["parallelization"] = "openmp"; break;
+      }
+    }
+
     std::vector<bool> repeat_in;
     repeat_in.insert(repeat_in.end(), repeat_in_.begin(), repeat_in_.end());
     repeat_in.insert(repeat_in.end(), repeat_out_.begin(), repeat_out_.end());
@@ -315,6 +323,14 @@ namespace casadi {
   ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.derReverse(nadj);
+
+    // Propagate options (if not set already)
+    if (opts.find("parallelization")==opts.end()) {
+      switch (parallelization_) {
+      case PARALLELIZATION_SERIAL: opts["parallelization"] = "serial"; break;
+      case PARALLELIZATION_OMP: opts["parallelization"] = "openmp"; break;
+      }
+    }
 
     std::vector<bool> repeat_in;
     repeat_in.insert(repeat_in.end(), repeat_in_.begin(), repeat_in_.end());
