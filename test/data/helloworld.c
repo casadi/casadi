@@ -16,14 +16,15 @@ void helloworld_c(const double* arg, double* res) {
   printf("hello, C world!\n");
 
   double v[10];
-  for (size_t i=0; i<10; ++i) {
+  size_t i;
+  for (i=0; i<10; ++i) {
     v[i] = i;
   }
-  for (size_t i=0; i<10; ++i) {
+  for (i=0; i<10; ++i) {
     v[i] = sin(v[i])+cos(v[i]);
   }
   res[0] = 0;
-  for (size_t i=0; i<10; ++i) {
+  for (i=0; i<10; ++i) {
     res[0] += v[i];
   }
 
