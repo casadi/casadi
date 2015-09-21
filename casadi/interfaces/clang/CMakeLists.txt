@@ -19,29 +19,27 @@ endif()
 file(COPY ${CLANG_LLVM_LIB_DIR}/clang DESTINATION ${LIBRARY_OUTPUT_PATH}/casadi/jit)
 
 # Create text files containing system paths
-file(WRITE system_includes.txt) # for both C and C++
-file(WRITE csystem_includes.txt) # Only C
-file(WRITE cxxsystem_includes.txt) # Only C++
-
-# Create text files containing default options
-file(WRITE system_flags.txt) # for both C and C++
-file(WRITE csystem_flags.txt) # Only C
-file(WRITE cxxsystem_flags.txt) # Only C++
+set(SYSTEM_FILE ${CMAKE_CURRENT_BINARY_DIR}/system_includes.txt)
+set(CSYSTEM_FILE ${CMAKE_CURRENT_BINARY_DIR}/system_includes.txt)
+set(CXXSYSTEM_FILE ${CMAKE_CURRENT_BINARY_DIR}/system_includes.txt)
+file(WRITE ${SYSTEM_FILE}) # for both C and C++
+file(WRITE ${CSYSTEM_FILE}) # Only C
+file(WRITE ${CXXSYSTEM_FILE}) # Only C++
 
 # On Windows, use relative paths
 if (WIN32)
-  file(APPEND system_includes.txt "mingw\n")
-  file(APPEND cxxsystem_includes.txt "mingw/c++\n")
+  file(APPEND ${SYSTEM_FILE} "mingw\n")
+  file(APPEND ${CXXSYSTEM_FILE} "mingw/c++\n")
 else()
   # Get C and C++ system includes
   # Note on OSX, "gcc" is often an alias for clang
   set(GET_SYSTEM_INCLUDES_SH ${CMAKE_CURRENT_SOURCE_DIR}/../../../misc/get_system_includes.sh)
   execute_process(COMMAND ${GET_SYSTEM_INCLUDES_SH} gcc c
                   OUTPUT_VARIABLE CSYSTEM_INCLUDES)
-  file(APPEND csystem_includes.txt "${CSYSTEM_INCLUDES}")
+  file(APPEND ${CSYSTEM_FILE} "${CSYSTEM_INCLUDES}")
   execute_process(COMMAND ${GET_SYSTEM_INCLUDES_SH} gcc c++
                   OUTPUT_VARIABLE CXXSYSTEM_INCLUDES)
-  file(APPEND cxxsystem_includes.txt "${CXXSYSTEM_INCLUDES}")
+  file(APPEND ${CXXSYSTEM_FILE} "${CXXSYSTEM_INCLUDES}")
 
   # Printout
   message(STATUS "Clang JIT uses the following C includes:\n"
@@ -57,8 +55,7 @@ else()
 endif()
 
 # Copy text files with paths to the designated location
-file(COPY system_includes.txt csystem_includes.txt cxxsystem_includes.txt
-          system_flags.txt csystem_flags.txt cxxsystem_flags.txt
+file(COPY ${SYSTEM_FILE} ${CSYSTEM_FILE} ${CXXSYSTEM_FILE}
      DESTINATION ${LIBRARY_OUTPUT_PATH}/casadi/jit)
 
 if(WITH_SELFCONTAINED)
