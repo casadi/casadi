@@ -258,16 +258,22 @@ if(CXX11FLAG)
 endif()
 
 # Check if mkstemps is available
-file(WRITE ${CMAKE_BINARY_DIR}/mkstemps_test.cxx
-    "#include <unistd.h>\n"
-    "int main() {\n"
-    "  char tmp[] = \"mkstempstestXXXXXX.so\";\n"
-    "  int flag = mkstemps(tmp, 3);\n"
-    "  return flag;\n"
-    "}\n")
-try_compile(HAVE_MKSTEMPS ${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/mkstemps_test.cxx)
-if (HAVE_MKSTEMPS)
-  add_definitions(-DHAVE_MKSTEMPS)
+if(NOT WIN32)
+  file(WRITE ${CMAKE_BINARY_DIR}/mkstemps_test.cxx
+      "#include <unistd.h>\n"
+      "int main() {\n"
+      "  char tmp[] = \"mkstempstestXXXXXX.so\";\n"
+      "  int flag = mkstemps(tmp, 3);\n"
+      "  return flag;\n"
+      "}\n")
+  try_compile(HAVE_MKSTEMPS ${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/mkstemps_test.cxx
+              OUTPUT_VARIABLE HAVE_MKSTEMPS_OUTPUT)
+  if(HAVE_MKSTEMPS)
+    add_definitions(-DHAVE_MKSTEMPS)
+  else()
+    message(WARNING "mkstemp not available, falling back on tmpnam.")
+    message(WARNING "mkstemp compilation failure: ${HAVE_MKSTEMPS_OUTPUT}")
+  endif()
 endif()
 
 ################################################################################

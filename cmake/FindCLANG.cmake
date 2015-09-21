@@ -138,13 +138,11 @@ execute_process(COMMAND ${CLANG_LLVM_CONFIG} --cxxflags
 separate_arguments(CLANG_LLVM_CXXFLAGS)
 foreach(D ${CLANG_LLVM_CXXFLAGS})
   if(${D} MATCHES "-D")
-  set(CLANG_DEFINITIONS ${CLANG_DEFINITIONS} ${D})
-   message(STATUS "Found LLVM C++ flag '${D}'")
+    set(CLANG_DEFINITIONS ${CLANG_DEFINITIONS} ${D})
   else()
-   message(STATUS "Ignoring LLVM C++ flag '${D}'")
+    message(STATUS "Ignoring LLVM C++ flag '${D}'")
   endif()
 endforeach()
-
 
 endif (OLD_LLVM)
 
