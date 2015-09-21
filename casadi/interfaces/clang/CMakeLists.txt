@@ -36,10 +36,10 @@ else()
   # Get C and C++ system includes
   # Note on OSX, "gcc" is often an alias for clang
   set(GET_SYSTEM_INCLUDES_SH ${CMAKE_CURRENT_SOURCE_DIR}/../../../misc/get_system_includes.sh)
-  execute_process(COMMAND ${GET_SYSTEM_INCLUDES_SH} clang c
+  execute_process(COMMAND ${GET_SYSTEM_INCLUDES_SH} gcc c
                   OUTPUT_VARIABLE CSYSTEM_INCLUDES)
   file(APPEND csystem_includes.txt "${CSYSTEM_INCLUDES}")
-  execute_process(COMMAND ${GET_SYSTEM_INCLUDES_SH} clang++ c++
+  execute_process(COMMAND ${GET_SYSTEM_INCLUDES_SH} gcc c++
                   OUTPUT_VARIABLE CXXSYSTEM_INCLUDES)
   file(APPEND cxxsystem_includes.txt "${CXXSYSTEM_INCLUDES}")
 
