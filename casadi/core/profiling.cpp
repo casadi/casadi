@@ -34,7 +34,7 @@ namespace casadi {
  *          http://creativecommons.org/licenses/by/3.0/deed.en_US
  */
 #if defined(_WIN32)
-#include <Windows.h>
+#include <windows.h>
 
 #elif defined(__unix__) || defined(__unix) || defined(unix) || \
     (defined(__APPLE__) && defined(__MACH__))
