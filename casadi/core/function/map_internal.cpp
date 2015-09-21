@@ -292,6 +292,7 @@ namespace casadi {
   Function MapInternal
   ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
 
+    // Differentiate mapped function
     Function df = f_.derForward(nfwd);
 
     std::vector<bool> repeat_in;
@@ -306,33 +307,29 @@ namespace casadi {
       repeat_out.insert(repeat_out.end(), repeat_out_.begin(), repeat_out_.end());
     }
 
-    Map ret("forward", df, n_, repeat_in, repeat_out, opts);
-
-    return ret;
-
+    // Construct and return
+    return Map(name, df, n_, repeat_in, repeat_out, opts);
   }
 
   Function MapInternal
   ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
-
+    // Differentiate mapped function
     Function df = f_.derReverse(nadj);
 
     std::vector<bool> repeat_in;
     repeat_in.insert(repeat_in.end(), repeat_in_.begin(), repeat_in_.end());
     repeat_in.insert(repeat_in.end(), repeat_out_.begin(), repeat_out_.end());
-    for (int i=0;i<nadj;++i) {
+    for (int i=0; i<nadj; ++i) {
       repeat_in.insert(repeat_in.end(), repeat_out_.begin(), repeat_out_.end());
     }
 
     std::vector<bool> repeat_out;
-    for (int i=0;i<nadj;++i) {
+    for (int i=0; i<nadj; ++i) {
       repeat_out.insert(repeat_out.end(), repeat_in_.begin(), repeat_in_.end());
     }
 
-    Map ret("adjoint", df, n_, repeat_in, repeat_out, opts);
-
-    return ret;
-
+    // Construct and return
+    return Map(name, df, n_, repeat_in, repeat_out, opts);
   }
 
   void MapInternal::generateDeclarations(CodeGenerator& g) const {
