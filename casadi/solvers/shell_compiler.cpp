@@ -97,7 +97,7 @@ namespace casadi {
     // C/C++ source file
     cmd << " " << name_;
 
-    // Temporary file
+    // Name of temporary file
 #ifdef HAVE_MKSTEMPS
     // Preferred solution
     char bin_name[] = "tmp_casadi_compiler_shell_XXXXXX.so";
@@ -112,6 +112,12 @@ namespace casadi {
     free(bin_name);
 #endif
 
+    // Have relative paths start with ./
+    if (bin_name_.at(0)!='/') {
+      bin_name_ = "./" + bin_name_;
+    }
+
+    // Temporary file
     cmd << " -o " << bin_name_;
 
     // Compile into a shared library
