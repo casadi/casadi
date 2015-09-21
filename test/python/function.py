@@ -1809,6 +1809,7 @@ class Functiontests(casadiTestCase):
     [v] = f([])
     self.checkarray(2.37683, v, digits=4)
 
+  @known_bug()
   @requiresPlugin(Compiler,"shell")
   def test_shell_c(self):
     compiler = Compiler('../data/helloworld.c', 'shell')
@@ -1816,6 +1817,7 @@ class Functiontests(casadiTestCase):
     [v] = f([])
     self.checkarray(2.37683, v, digits=4)
 
+  @known_bug()
   @requiresPlugin(Compiler,"shell")
   def test_shell_cxx(self):
     opts = {'compiler':'g++'}
