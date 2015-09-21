@@ -107,13 +107,11 @@ namespace casadi {
     bin_name_ = bin_name;
 #else
     // Fallback, may result in deprecation warnings
-    bin_name_ = tmpnam(0);
-    bin_name_ += "_tmp_casadi_compiler_shell.so";
-    if (bin_name_.at(0)!='/') {
-      // Relative path, place in /tmp
-      bin_name_ = "./" + bin_name_;
-    }
+    char* bin_name = tempnam(0, "tmp_casadi_compiler_shell_");
+    bin_name_ = bin_name;
+    free(bin_name);
 #endif
+
     cmd << " -o " << bin_name_;
 
     // Compile into a shared library
