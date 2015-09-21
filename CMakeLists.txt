@@ -257,6 +257,18 @@ if(CXX11FLAG)
   endif()
 endif()
 
+# Check if mkstemps is available
+file(WRITE ${CMAKE_BINARY_DIR}/mkstemps_test.cxx
+    "#include <unistd.h>\n"
+    "int main() {\n"
+    "  char tmp[] = \"mkstempstestXXXXXX.so\";\n"
+    "  int flag = mkstemps(tmp, 3);\n"
+    "  return flag;\n"
+    "}\n")
+try_compile(HAVE_MKSTEMPS ${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/mkstemps_test.cxx)
+if (HAVE_MKSTEMPS)
+  add_definitions(-DHAVE_MKSTEMPS)
+endif()
 
 ################################################################################
 ############################### compiler warnings ##############################

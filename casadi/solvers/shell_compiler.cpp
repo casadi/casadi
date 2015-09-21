@@ -29,6 +29,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <dlfcn.h>
+#include <unistd.h>
 
 using namespace std;
 namespace casadi {
@@ -69,9 +70,10 @@ namespace casadi {
     if (handle_) dlclose(handle_);
 
     // Delete the temporary file
-    std::string cmd = "rm " + bin_name_;
-    int flag = system(cmd.c_str());
-    casadi_assert_warning(flag==0, "Failed to delete temporary file");
+    std::string rmcmd = "rm " + bin_name_;
+    if (system(rmcmd.c_str())) {
+      casadi_warning("Failed to delete temporary file:" + bin_name_);
+    }
   }
 
   void ShellCompiler::init() {
@@ -95,14 +97,22 @@ namespace casadi {
     cmd << " " << name_;
 
     // Temporary file
+#ifdef HAVE_MKSTEMPS
+    // Preferred solution
     char bin_name[] = "tmp_casadi_compiler_shell_XXXXXX.so";
-    int flag = mkstemps(bin_name, 3);
+    if (mkstemps(bin_name, 3) == -1) {
+      casadi_error("Failed to create a temporary file name");
+    }
     bin_name_ = bin_name;
+#else
+    // Fallback, may result in deprecation warnings
+    bin_name_ = tmpnam(0);
+    bin_name_ += "_tmp_casadi_compiler_shell.so";
+#endif
     cmd << " -o " << bin_name_;
 
     // Compile into a shared library
-    flag = system(cmd.str().c_str());
-    if (flag!=0) {
+    if (system(cmd.str().c_str())) {
       casadi_error("Compilation failed. Tried \"" + cmd.str() + "\"");
     }
 
