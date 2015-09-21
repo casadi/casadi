@@ -297,6 +297,9 @@ Joris Gillis
 C++ includes: casadi_options.hpp ";
 
 
+// File: classcasadi_1_1ClangCompiler.xml
+
+
 // File: classcasadi_1_1CleSolver.xml
 
 
@@ -1510,6 +1513,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -1635,11 +1643,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -2095,6 +2098,354 @@ Generate a file, return code as string.
 
 
 // File: classcasadi_1_1CommonExternal.xml
+
+
+// File: classcasadi_1_1Compiler.xml
+
+
+/*  Option Functionality  */ %feature("docstring")
+casadi::OptionsFunctionality::hasOption(const std::string &str) const  "
+
+check if there is an option str
+
+";
+
+%feature("docstring")  casadi::Compiler::plugin_name() const  "
+
+Query plugin name.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
+"
+
+Get a list of all option names.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class (SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
+std::string &str) const  "
+
+check if the user has there is an option str
+
+";
+
+%feature("docstring")  casadi::SharedObject::isNull() const  "
+
+Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
+std::string &str) const  "
+
+Get the type of a certain option.
+
+";
+
+%feature("docstring") casadi::Compiler::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::printOptions(std::ostream
+&stream=casadi::userOut()) const  "
+
+Print options to a stream.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOption(const
+std::string &str) const  "
+
+get an option value
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
+std::string &str) const  "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
+int v) " [INTERNAL]  Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
+&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
+internal class
+
+";
+
+%feature("docstring") casadi::Compiler "
+
+Compiler.
+
+Just-in-time compilation of code
+
+General information
+===================
+
+
+
+>List of available options
+
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+
+List of plugins
+===============
+
+
+
+- clang
+
+- shell
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Compiler.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+clang
+-----
+
+
+
+Interface to the JIT compiler CLANG
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| flags           | OT_STRINGVECTOR | GenericType()   | Compile flags   |
+|                 |                 |                 | for the JIT     |
+|                 |                 |                 | compiler.       |
+|                 |                 |                 | Default: None   |
++-----------------+-----------------+-----------------+-----------------+
+| include_path    | OT_STRING       | \"\"              | Include paths   |
+|                 |                 |                 | for the JIT     |
+|                 |                 |                 | compiler. The   |
+|                 |                 |                 | include         |
+|                 |                 |                 | directory       |
+|                 |                 |                 | shipped with    |
+|                 |                 |                 | CasADi will be  |
+|                 |                 |                 | automatically   |
+|                 |                 |                 | appended.       |
++-----------------+-----------------+-----------------+-----------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+shell
+-----
+
+
+
+Interface to the JIT compiler SHELL
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| compiler        | OT_STRING       | \"gcc\"           | Compiler        |
+|                 |                 |                 | command         |
++-----------------+-----------------+-----------------+-----------------+
+| compiler_setup  | OT_STRING       | \"-fPIC -shared\" | Compiler setup  |
+|                 |                 |                 | command         |
++-----------------+-----------------+-----------------+-----------------+
+| flags           | OT_STRINGVECTOR | GenericType()   | Compile flags   |
+|                 |                 |                 | for the JIT     |
+|                 |                 |                 | compiler.       |
+|                 |                 |                 | Default: None   |
++-----------------+-----------------+-----------------+-----------------+
+
+--------------------------------------------------------------------------------
+
+
+
+Joris Gillis
+Diagrams
+--------
+
+
+
+C++ includes: compiler.hpp ";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
+const  " [INTERNAL]  Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
+&name, int i) " [INTERNAL]  Set a certain option by giving its index into
+the allowed values.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
+const  "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
+std::string &str) const  "
+
+Get the default of a certain option.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
+std::string &str) const  "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(bool
+clone_members=true) "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
+const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+std::string &str, const GenericType &val) "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
+&dict, bool skipUnknown=false) "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring") casadi::Compiler::Compiler() "
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::Compiler::Compiler(const std::string &name,
+const std::string &compiler, const Dict &opts=Dict()) "
+
+Compiler factory (new syntax, includes initialization)
+
+";
+
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
+OptionsFunctionality &obj, bool skipUnknown=false) "
+
+Copy all options from another object.
+
+";
+
+%feature("docstring")  casadi::SharedObject::isInit() const  "
+
+Is initialized?
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
+
+Get the dictionary.
+
+";
 
 
 // File: classcasadi_1_1Concat.xml
@@ -2835,6 +3186,11 @@ Joris Gillis
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | control_endp | OT_BOOLEAN   | false        | Include a    | casadi::Cont |
 | oint         |              |              | control      | rolSimulator |
 |              |              |              | value at the | Internal     |
@@ -2967,11 +3323,6 @@ Joris Gillis
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -4819,6 +5170,11 @@ Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -4928,11 +5284,6 @@ Joel Andersson
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -7927,6 +8278,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -8052,11 +8408,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -9546,6 +9897,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | const_dim    | OT_BOOLEAN   | true         | Assume       | casadi::Dple |
 |              |              |              | constant     | Internal     |
 |              |              |              | dimension of |              |
@@ -9676,11 +10032,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -10979,6 +11330,11 @@ Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -11088,11 +11444,6 @@ Joel Andersson
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -11742,7 +12093,7 @@ Load an external function File name given.
 ";
 
 %feature("docstring") casadi::ExternalFunction::ExternalFunction(const
-std::string &name, const JitCompiler &compiler, const Dict &opts=Dict()) "
+std::string &name, const Compiler &compiler, const Dict &opts=Dict()) "
 
 Load a just-in-time compiled external function File name given.
 
@@ -12960,6 +13311,11 @@ Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -13069,11 +13425,6 @@ Joel Andersson
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -16052,6 +16403,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -16168,11 +16524,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -17044,6 +17395,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | constraints  | OT_INTEGERVE | GenericType( | Constrain    | casadi::Impl |
 |              | CTOR         | )            | the          | icitFunction |
 |              |              |              | unknowns. 0  | Internal     |
@@ -17188,11 +17544,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -19350,6 +19701,11 @@ General information
 |              |              |              | if one is    |              |
 |              |              |              | constructed. |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -19471,11 +19827,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -21203,6 +21554,7 @@ ls_trials, const IpoptData *ip_data, IpoptCalculatedQuantities *ip_cq) "
 %feature("docstring") casadi::IterationCallback::IterationCallback() "";
 
 
+<<<<<<< HEAD
 // File: classcasadi_1_1JitCompiler.xml
 
 
@@ -21519,6 +21871,8 @@ Get the dictionary.
 ";
 
 
+=======
+>>>>>>> automatic documentation update
 // File: classcasadi_1_1KernelSum2D.xml
 
 
@@ -22298,6 +22652,11 @@ Joris Gillis
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -22407,11 +22766,6 @@ Joris Gillis
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -23107,26 +23461,24 @@ information about the library.
 C++ includes: external_function_internal.hpp ";
 
 
-// File: classcasadi_1_1LibInfo_3_01JitCompiler_01_4.xml
-%feature("docstring") casadi::LibInfo< JitCompiler >::LibInfo() " [INTERNAL]
-";
+// File: classcasadi_1_1LibInfo_3_01Compiler_01_4.xml
+%feature("docstring") casadi::LibInfo< Compiler >::LibInfo() " [INTERNAL] ";
 
-%feature("docstring") casadi::LibInfo< JitCompiler >::LibInfo(const
-JitCompiler &compiler, const std::string &name) " [INTERNAL] ";
+%feature("docstring") casadi::LibInfo< Compiler >::LibInfo(const Compiler
+&compiler, const std::string &name) " [INTERNAL] ";
 
-%feature("docstring") casadi::LibInfo< JitCompiler > " [INTERNAL]  Library
-that has been just-in-time compiled.
+%feature("docstring")  casadi::LibInfo< Compiler >::name() const  "
+[INTERNAL] ";
+
+%feature("docstring") casadi::LibInfo< Compiler > " [INTERNAL]  Library that
+has been just-in-time compiled.
 
 C++ includes: external_function_internal.hpp ";
 
-%feature("docstring")  casadi::LibInfo< JitCompiler >::clear() " [INTERNAL]
-";
-
-%feature("docstring")  casadi::LibInfo< JitCompiler >::get(FcnPtr &fcnPtr,
+%feature("docstring")  casadi::LibInfo< Compiler >::get(FcnPtr &fcnPtr,
 const std::string &sym) " [INTERNAL] ";
 
-%feature("docstring")  casadi::LibInfo< JitCompiler >::name() const  "
-[INTERNAL] ";
+%feature("docstring")  casadi::LibInfo< Compiler >::clear() " [INTERNAL] ";
 
 
 // File: classcasadi_1_1LibInfo_3_01std_1_1string_01_4.xml
@@ -24204,6 +24556,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -24313,11 +24670,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -26058,6 +26410,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -26167,11 +26524,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -28120,6 +28472,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -28245,11 +28602,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -30015,6 +30367,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | const_dim    | OT_BOOLEAN   | true         | Assume       | casadi::LrDp |
 |              |              |              | constant     | leInternal   |
 |              |              |              | dimension of |              |
@@ -30145,11 +30502,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -30651,6 +31003,11 @@ Map Joris Gillis
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -30760,11 +31117,6 @@ Map Joris Gillis
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -33018,6 +33370,11 @@ Joris Gillis
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -33127,11 +33484,6 @@ Joris Gillis
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -36920,6 +37272,11 @@ Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -37029,11 +37386,6 @@ Joel Andersson
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -38906,6 +39258,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -39143,11 +39500,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -44812,6 +45164,11 @@ basis Joris Gillis
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -44926,11 +45283,6 @@ basis Joris Gillis
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -45868,6 +46220,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -45977,11 +46334,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -48337,6 +48689,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -48446,11 +48803,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -50309,6 +50661,11 @@ General information
 |              |              |              | always dense |              |
 |              |              |              | (m x m).     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -50419,11 +50776,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -51811,6 +52163,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -51921,11 +52278,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -53538,6 +53890,9 @@ Return a string with a description (for SWIG)
 ";
 
 
+// File: classcasadi_1_1ShellCompiler.xml
+
+
 // File: classcasadi_1_1SimpleHomotopyNlp.xml
 
 
@@ -53934,6 +54289,11 @@ Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -54043,11 +54403,6 @@ Joel Andersson
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -56438,6 +56793,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -56553,11 +56913,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -60633,6 +60988,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -60742,11 +61102,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -62885,6 +63240,11 @@ Switch statement Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -62994,11 +63354,6 @@ Switch statement Joel Andersson
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -64769,6 +65124,11 @@ Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -64878,11 +65238,6 @@ Joel Andersson
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
