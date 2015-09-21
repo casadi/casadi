@@ -260,6 +260,7 @@ endif()
 # Check if mkstemps is available
 if(NOT WIN32)
   file(WRITE ${CMAKE_BINARY_DIR}/mkstemps_test.cxx
+      "#include <cstdlib>\n"
       "#include <unistd.h>\n"
       "int main() {\n"
       "  char tmp[] = \"mkstempstestXXXXXX.so\";\n"
@@ -271,8 +272,9 @@ if(NOT WIN32)
   if(HAVE_MKSTEMPS)
     add_definitions(-DHAVE_MKSTEMPS)
   else()
-    message(WARNING "mkstemp not available, falling back on tmpnam.")
-    message(WARNING "mkstemp compilation failure: ${HAVE_MKSTEMPS_OUTPUT}")
+    message(WARNING "mkstemp is not available, falling back on tmpnam. "
+                    "Test compilation returned the following:\n"
+                    "${HAVE_MKSTEMPS_OUTPUT}")
   endif()
 endif()
 

@@ -29,6 +29,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <dlfcn.h>
+#include <cstdlib>
 #include <unistd.h>
 
 using namespace std;
