@@ -1694,7 +1694,7 @@ Return a string with a description (for SWIG)
 
 %feature("docstring") casadi::Compiler::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -1935,8 +1935,8 @@ Print a representation of the object.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -1944,8 +1944,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -16949,6 +16949,7 @@ NULL)
 ";
 
 %feature("docstring") casadi::IterationCallback::IterationCallback "";
+
 
 // File: classcasadi_1_1KernelSum2D.xml
 
