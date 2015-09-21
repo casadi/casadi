@@ -109,6 +109,10 @@ namespace casadi {
     // Fallback, may result in deprecation warnings
     bin_name_ = tmpnam(0);
     bin_name_ += "_tmp_casadi_compiler_shell.so";
+    if (bin_name_.at(0)!='/') {
+      // Relative path, place in /tmp
+      bin_name_ = "./" + bin_name_;
+    }
 #endif
     cmd << " -o " << bin_name_;
 
