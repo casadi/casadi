@@ -35,32 +35,32 @@ if NlpSolver.hasPlugin("ipopt"):
 if NlpSolver.hasPlugin("ipopt"):
   qpsolvers.append(("nlp.ipopt",{"nlp_solver_options": {"tol": 1e-12}},{}))
 
-if NlpSolver.hasPlugin("worhp") and not args.ignore_memory_heavy:
-  qpsolvers.append(("nlp",{"nlp_solver": "worhp", "nlp_solver_options": {"TolOpti": 1e-12}},{}))
+# if NlpSolver.hasPlugin("worhp") and not args.ignore_memory_heavy:
+#   qpsolvers.append(("nlp",{"nlp_solver": "worhp", "nlp_solver_options": {"TolOpti": 1e-12}},{}))
 
-if NlpSolver.hasPlugin("worhp") and not args.ignore_memory_heavy:
-  qpsolvers.append(("nlp.worhp",{"nlp_solver_options": {"TolOpti": 1e-12}},{}))
+# if NlpSolver.hasPlugin("worhp") and not args.ignore_memory_heavy:
+#   qpsolvers.append(("nlp.worhp",{"nlp_solver_options": {"TolOpti": 1e-12}},{}))
 
-if QpSolver.hasPlugin("ooqp"):
-  qpsolvers.append(("ooqp",{},{}))
+# if QpSolver.hasPlugin("ooqp"):
+#   qpsolvers.append(("ooqp",{},{}))
 
-if QpSolver.hasPlugin("qpoases"):
-  qpsolvers.append(("qpoases",{},{}))
+# if QpSolver.hasPlugin("qpoases"):
+#   qpsolvers.append(("qpoases",{},{}))
 
-if QpSolver.hasPlugin("cplex"):
-  qpsolvers.append(("cplex",{},{}))
+# if QpSolver.hasPlugin("cplex"):
+#   qpsolvers.append(("cplex",{},{}))
 
-if QpSolver.hasPlugin("sqic"):
-  qpsolvers.append(("sqic",{},{}))
+# if QpSolver.hasPlugin("sqic"):
+#   qpsolvers.append(("sqic",{},{}))
 
-if QpSolver.hasPlugin("qcqp.socp.sdp.dsdp"):
-  qpsolvers.append(("qcqp.socp.sdp.dsdp",{"qcqp_solver_options.socp_solver_options.sdp_solver_options": {"gapTol":1e-10}},{}))
+# if QpSolver.hasPlugin("qcqp.socp.sdp.dsdp"):
+#   qpsolvers.append(("qcqp.socp.sdp.dsdp",{"qcqp_solver_options.socp_solver_options.sdp_solver_options": {"gapTol":1e-10}},{}))
 
-if QpSolver.hasPlugin("qcqp.socp.mosek"):
-  qpsolvers.append(("qcqp.socp.mosek",{"qcqp_solver_options.socp_solver_options": {"MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10}},{"less_digits": 3}))
+# if QpSolver.hasPlugin("qcqp.socp.mosek"):
+#   qpsolvers.append(("qcqp.socp.mosek",{"qcqp_solver_options.socp_solver_options": {"MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10}},{"less_digits": 3}))
 
-if QpSolver.hasPlugin("qcqp.socp.ecos"):
-  qpsolvers.append(("qcqp.socp.ecos",{"qcqp_solver_options.socp_solver_options": {"reltol":1e-10,"abstol":1e-10}},{"less_digits": 2}))
+# if QpSolver.hasPlugin("qcqp.socp.ecos"):
+#   qpsolvers.append(("qcqp.socp.ecos",{"qcqp_solver_options.socp_solver_options": {"reltol":1e-10,"abstol":1e-10}},{"less_digits": 2}))
 
 print qpsolvers
 
