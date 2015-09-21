@@ -1786,45 +1786,42 @@ class Functiontests(casadiTestCase):
       self.checkfunction(f,Fref)
       self.check_codegen(f)
 
-  @requiresPlugin(Compiler,"clang")
-  def test_jitfunction_clang(self):
-    x = MX.sym("x")
-    F = MXFunction("f",[x],[x**2],{'jit':True})
+  # @requiresPlugin(Compiler,"clang")
+  # def test_jitfunction_clang(self):
+  #   x = MX.sym("x")
+  #   F = MXFunction("f",[x],[x**2],{'jit':True})
 
-    out = F([5])
-    self.checkarray(out[0],25)      
+  #   out = F([5])
+  #   self.checkarray(out[0],25)
 
-  @requiresPlugin(Compiler,"clang")
-  def test_clang_c(self):
-    compiler = Compiler('../data/helloworld.c', 'clang')
-    f = ExternalFunction("helloworld_c", compiler)
-    [v] = f([])
-    self.checkarray(2.37683, v, digits=4)
+  # @requiresPlugin(Compiler,"clang")
+  # def test_clang_c(self):
+  #   compiler = Compiler('../data/helloworld.c', 'clang')
+  #   f = ExternalFunction("helloworld_c", compiler)
+  #   [v] = f([])
+  #   self.checkarray(2.37683, v, digits=4)
 
-  @known_bug()
-  @requiresPlugin(Compiler,"clang")
-  def test_clang_cxx(self):
-    compiler = Compiler('../data/helloworld.cxx', 'clang')
-    f = ExternalFunction("helloworld_cxx", compiler)
-    [v] = f([])
-    self.checkarray(2.37683, v, digits=4)
+  # @requiresPlugin(Compiler,"clang")
+  # def test_clang_cxx(self):
+  #   compiler = Compiler('../data/helloworld.cxx', 'clang')
+  #   f = ExternalFunction("helloworld_cxx", compiler)
+  #   [v] = f([])
+  #   self.checkarray(2.37683, v, digits=4)
 
-  @known_bug()
-  @requiresPlugin(Compiler,"shell")
-  def test_shell_c(self):
-    compiler = Compiler('../data/helloworld.c', 'shell')
-    f = ExternalFunction("helloworld_c", compiler)
-    [v] = f([])
-    self.checkarray(2.37683, v, digits=4)
+  # @requiresPlugin(Compiler,"shell")
+  # def test_shell_c(self):
+  #   compiler = Compiler('../data/helloworld.c', 'shell')
+  #   f = ExternalFunction("helloworld_c", compiler)
+  #   [v] = f([])
+  #   self.checkarray(2.37683, v, digits=4)
 
-  @known_bug()
-  @requiresPlugin(Compiler,"shell")
-  def test_shell_cxx(self):
-    opts = {'compiler':'g++'}
-    compiler = Compiler('../data/helloworld.cxx', 'shell', opts)
-    f = ExternalFunction("helloworld_cxx", compiler)
-    [v] = f([])
-    self.checkarray(2.37683, v, digits=4)
+  # @requiresPlugin(Compiler,"shell")
+  # def test_shell_cxx(self):
+  #   opts = {'compiler':'g++'}
+  #   compiler = Compiler('../data/helloworld.cxx', 'shell', opts)
+  #   f = ExternalFunction("helloworld_cxx", compiler)
+  #   [v] = f([])
+  #   self.checkarray(2.37683, v, digits=4)
     
   @memory_heavy()
   def test_KernelSum2D(self):
