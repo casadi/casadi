@@ -204,7 +204,7 @@ namespace casadi {
 
   void MapAccumInternal::evalD(const double** arg, double** res,
                                 int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w, &FunctionInternal::evalD, std::plus<double>());
+    evalGen<double>(arg, res, iw, w, &FunctionInternal::eval, std::plus<double>());
   }
 
   void MapAccumInternal::evalSX(const SXElement** arg, SXElement** res,

@@ -209,7 +209,7 @@ namespace casadi {
         value[0] = V[I+J*size_.first];
 
         // Evaluate the function
-        f_->evalD(arg1, res1, iw, w);
+        f_->eval(arg1, res1, iw, w);
 
         // Sum results from temporary storage to accumulator
         for (int k=0;k<num_out;++k) {

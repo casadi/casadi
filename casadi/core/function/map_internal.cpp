@@ -202,7 +202,7 @@ namespace casadi {
   void MapInternal::evalD(const double** arg, double** res,
                                 int* iw, double* w) {
     if (parallelization_ == PARALLELIZATION_SERIAL) {
-      evalGen<double>(arg, res, iw, w, &FunctionInternal::evalD, std::plus<double>());
+      evalGen<double>(arg, res, iw, w, &FunctionInternal::eval, std::plus<double>());
     } else {
       int n_in_ = f_.nIn(), n_out_ = f_.nOut();
       #ifndef WITH_OPENMP
@@ -223,7 +223,7 @@ namespace casadi {
         }
         int* iw_i = iw + i*sz_iw;
         double* w_i = w + i*sz_w;
-        f_->evalD(arg_i, res_i, iw_i, w_i);
+        f_->eval(arg_i, res_i, iw_i, w_i);
       }
     }
 

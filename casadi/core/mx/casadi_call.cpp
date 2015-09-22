@@ -89,7 +89,7 @@ namespace casadi {
 
   void Call::evalD(const double** arg, double** res,
                            int* iw, double* w) {
-    fcn_->evalD(arg, res, iw, w);
+    fcn_->eval(arg, res, iw, w);
   }
 
   int Call::nout() const {

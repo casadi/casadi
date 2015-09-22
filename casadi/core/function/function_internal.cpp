@@ -326,22 +326,32 @@ namespace casadi {
   }
 
   MXFunction FunctionInternal::wrapMXFunction() {
+    // Construct options of the wrapping MXFunction
+    Dict opts;
+
+    // Propagate naming of inputs and outputs
+    opts["input_scheme"] = ischeme_;
+    opts["output_scheme"] = oscheme_;
+    opts["output_scheme"] = oscheme_;
+
+    // Propagate AD parameters
+    opts["ad_weight"] = adWeight();
+    opts["ad_weight_sp"] = adWeightSp();
+
+    // Propagate AD rules (options to be deprecated)
+    const char* oname[] = {"custom_forward", "custom_reverse",  "full_jacobian"};
+    for (int i=0; i<3; ++i) {
+      if (hasSetOption(oname[i])) opts[oname[i]] = getOption(oname[i]);
+    }
+
+    // Propagate JIT
+    opts["jit"] = jit_;
+    opts["compiler"] = compilerplugin_;
+    opts["jit_options"] = jit_options_;
+
+    // Wrap the function
     vector<MX> arg = symbolicInput();
     vector<MX> res = shared_from_this<Function>()(arg);
-
-    Dict opts = make_dict("input_scheme", ischeme_,
-                          "output_scheme", oscheme_,
-                          "ad_weight", adWeight(),
-                          "ad_weight_sp", adWeightSp());
-    for (int i=0; i<3; ++i) {
-      string n;
-      switch (i) {
-      case 0: n="custom_forward"; break;
-      case 1: n="custom_reverse"; break;
-      case 2: n="full_jacobian"; break;
-      }
-      if (hasSetOption(n)) opts[n] = getOption(n);
-    }
     return MXFunction("wrap_" + name_, arg, res, opts);
   }
 
@@ -1311,7 +1321,7 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
 
     // Call memory-less
-    evalD(getPtr(arg), getPtr(res), getPtr(iw_tmp_), getPtr(w_tmp_));
+    eval(getPtr(arg), getPtr(res), getPtr(iw_tmp_), getPtr(w_tmp_));
   }
 
   void FunctionInternal::evalD(const double** arg,

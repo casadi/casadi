@@ -136,7 +136,7 @@ namespace casadi {
     }
 
     // Evaluate the corresponding function
-    fk->evalD(arg+1, res, iw, w);
+    fk->eval(arg+1, res, iw, w);
   }
 
   Function SwitchInternal
