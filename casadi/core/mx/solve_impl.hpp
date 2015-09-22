@@ -43,115 +43,71 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "(";
-    } else if (part==1) {
-      stream << "'/";
-    } else {
-      if (!Tr) stream << "'";
-      stream << ")'";
-    }
+  std::string Solve<Tr>::print(const std::vector<std::string>& arg) const {
+    std::stringstream ss;
+    ss << "(" << arg.at(1);
+    if (Tr) ss << "'";
+    ss << "\\" << arg.at(0) << ")";
+    return ss.str();
   }
 
   template<bool Tr>
-  void Solve<Tr>::print(std::ostream &stream, long& remaining_calls) const {
-    if (remaining_calls>0) {
-      remaining_calls--;
-      stream << "(";
-      dep(1)->print(stream, remaining_calls);
-      if (Tr) stream << "'";
-      stream << "\\";
-      dep(0)->print(stream, remaining_calls);
-      stream << ")";
-    } else {
-      stream << "...";
-    }
-  }
-
-  template<bool Tr>
-  void Solve<Tr>::evalD(const cpv_double& arg, const pv_double& res,
-                        int* itmp, double* rtmp) {
+  void Solve<Tr>::evalD(const double** arg, double** res,
+                        int* iw, double* w) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-    linear_solver_.setInput(arg[1], LINSOL_A);
+    linear_solver_.setInputNZ(arg[1], LINSOL_A);
     linear_solver_.prepare();
     linear_solver_.solve(res[0], dep(0).size2(), Tr);
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
-                         int* itmp, SXElement* rtmp) {
-    linear_solver_->evalSXLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
+  void Solve<Tr>::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+    linear_solver_->evalSXLinsol(arg, res, iw, w, Tr, dep(0).size2());
   }
 
   template<bool Tr>
-  void Solve<Tr>::eval(const cpv_MX& arg, const pv_MX& res) {
-    if (arg[0]->isZero()) {
-      *res[0] = MX(arg[0]->shape());
+  void Solve<Tr>::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    if (arg[0].isZero()) {
+      res[0] = MX(arg[0].shape());
     } else {
-      *res[0] = linear_solver_->solve(*arg[1], *arg[0], Tr);
+      res[0] = linear_solver_->solve(arg[1], arg[0], Tr);
     }
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
+  void Solve<Tr>::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                          std::vector<std::vector<MX> >& fsens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
-
-    // Collect seeds
-    vector<vector<MX> > fseed(getVector(fwdSeed, ndep())), fsens;
 
     // Call the cached functions
     linear_solver_->callForwardLinsol(arg, res, fseed, fsens, Tr);
-
-    // Store the forward sensitivities
-    for (int d=0; d<fwdSens.size(); ++d) {
-      for (int i=0; i<fwdSens[d].size(); ++i) {
-        if (fwdSens[d][i]!=0) {
-          *fwdSens[d][i] = fsens[d][i];
-        }
-      }
-    }
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
+  void Solve<Tr>::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                          std::vector<std::vector<MX> >& asens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
-    // Collect seeds
-    vector<vector<MX> > aseed(getVector(adjSeed, nout())), asens;
-    clearVector(adjSeed, nout());
-
     // Call the cached functions
     linear_solver_->callReverseLinsol(arg, res, aseed, asens, Tr);
-
-    // Store the adjoint sensitivities
-    for (int d=0; d<adjSens.size(); ++d) {
-      for (int i=0; i<adjSens[d].size(); ++i) {
-        if (adjSens[d][i]!=0) {
-          adjSens[d][i]->addToSum(asens[d][i]);
-        }
-      }
-    }
   }
 
   template<bool Tr>
-  void Solve<Tr>::spFwd(const cpv_bvec_t& arg,
-                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
-    linear_solver_->spFwdLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
+  void Solve<Tr>::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    linear_solver_->spFwdLinsol(arg, res, iw, w, Tr, dep(0).size2());
   }
 
   template<bool Tr>
-  void Solve<Tr>::spAdj(const pv_bvec_t& arg,
-                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
-    linear_solver_->spAdjLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
+  void Solve<Tr>::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    linear_solver_->spAdjLinsol(arg, res, iw, w, Tr, dep(0).size2());
   }
 
   template<bool Tr>

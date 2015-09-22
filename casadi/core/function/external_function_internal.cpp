@@ -31,66 +31,176 @@
 #include <sstream>
 
 namespace casadi {
-
   using namespace std;
 
-  ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) :
-    bin_name_(bin_name) {
+  LibInfo<std::string>::LibInfo(const std::string& bin_name,
+                                const std::string& name)
+    : bin_name_(bin_name), name_(name), handle_(0) {
+    n_in = n_out = sz_arg = sz_res = 0;
 #ifdef WITH_DL
-
-    // Load the dll
 #ifdef _WIN32
     handle_ = LoadLibrary(TEXT(bin_name_.c_str()));
-    casadi_assert_message(handle_!=0, "ExternalFunctionInternal: Cannot open function: "
+    casadi_assert_message(handle_!=0, "CommonExternal: Cannot open function: "
                           << bin_name_ << ". error code (WIN32): "<< GetLastError());
-
-    initPtr init = (initPtr)GetProcAddress(handle_, TEXT("init"));
-    if (init==0) throw CasadiException("ExternalFunctionInternal: no \"init\" found");
-    getSparsityPtr getSparsity = (getSparsityPtr)GetProcAddress(handle_, TEXT("getSparsity"));
-    if (getSparsity==0) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");
-    eval_ = (evalPtr) GetProcAddress(handle_, TEXT("eval"));
-    if (eval_==0) throw CasadiException("ExternalFunctionInternal: no \"eval\" found");
-    nworkPtr nwork = (nworkPtr)GetProcAddress(handle_, TEXT("nwork"));
-    if (nwork==0) throw CasadiException("ExternalFunctionInternal: no \"nwork\" found");
-
 #else // _WIN32
     handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
-    casadi_assert_message(handle_!=0, "ExternalFunctionInternal: Cannot open function: "
+    casadi_assert_message(handle_!=0, "CommonExternal: Cannot open function: "
                           << bin_name_ << ". error code: "<< dlerror());
-
     // reset error
     dlerror();
-
-    // Load symbols
-    initPtr init = (initPtr)dlsym(handle_, "init");
-    casadi_assert_message(!dlerror(), "ExternalFunctionInternal: no \"init\" found. "
-                          "Possible cause: If the function was generated from CasADi, "
-                          "make sure that it was compiled with a C compiler. If the "
-                          "function is C++, make sure to use extern \"C\" linkage.");
-    getSparsityPtr getSparsity = (getSparsityPtr)dlsym(handle_, "getSparsity");
-    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");
-    eval_ = (evalPtr) dlsym(handle_, "eval");
-    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"eval\" found");
-    nworkPtr nwork = (nworkPtr)dlsym(handle_, "nwork");
-    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"nwork\" found");
-
 #endif // _WIN32
+#else // WITH_DL
+    casadi_error("CommonExternal: WITH_DL  not activated");
+#endif // WITH_DL
+  }
+
+  LibInfo<Compiler>::LibInfo(const Compiler& compiler,
+                                const std::string& name)
+    : compiler_(compiler), name_(name) {
+    n_in = n_out = sz_arg = sz_res = 0;
+  }
+
+  void LibInfo<std::string>::clear() {
+#ifdef WITH_DL
+    // close the dll
+#ifdef _WIN32
+    if (handle_) FreeLibrary(handle_);
+#else // _WIN32
+    if (handle_) dlclose(handle_);
+#endif // _WIN32
+    handle_ = 0;
+#endif // WITH_DL
+  }
+
+  template<typename FcnPtr>
+  void LibInfo<std::string>::get(FcnPtr& fcnPtr, const std::string& sym) {
+#ifdef WITH_DL
+#ifdef _WIN32
+    fcnPtr = (FcnPtr)GetProcAddress(handle_, TEXT(sym.c_str()));
+#else // _WIN32
+    fcnPtr = (FcnPtr)dlsym(handle_, sym.c_str());
+    if (dlerror()) {
+      fcnPtr=0;
+      dlerror(); // Reset error flags
+    }
+#endif // _WIN32
+#else // WITH_DL
+#endif // WITH_DL
+  }
+
+  template<typename FcnPtr>
+  void LibInfo<Compiler>::get(FcnPtr& fcnPtr, const std::string& sym) {
+    fcnPtr = (FcnPtr)compiler_.getFunction(sym);
+  }
+
+  ExternalFunctionInternal*
+  ExternalFunctionInternal::create(const std::string& bin_name, const std::string& name) {
+    return createGeneric(bin_name, name);
+  }
+
+  ExternalFunctionInternal*
+  ExternalFunctionInternal::create(const Compiler& compiler, const std::string& name) {
+    return createGeneric(compiler, name);
+  }
+
+  template<typename LibType>
+  ExternalFunctionInternal* ExternalFunctionInternal::
+  createGeneric(const LibType& libtype, const std::string& f_name) {
+    // Structure with info about the library to be passed to the constructor
+    LibInfo<LibType> li(libtype, f_name);
+
+    // Function to retrieving number of inputs and outputs
+    initPtr init;
+    string init_s = f_name + "_init";
+    li.get(init, init_s);
+    if (init==0) {
+      li.clear();
+      casadi_error("CommonExternal: no \""+init_s+"\" found. "
+                   "Possible cause: If the function was generated from CasADi, "
+                   "make sure that it was compiled with a C compiler. If the "
+                   "function is C++, make sure to use extern \"C\" linkage.");
+    }
 
     // Initialize and get the number of inputs and outputs
-    int n_in=-1, n_out=-1;
-    int flag = init(&n_in, &n_out);
-    if (flag) throw CasadiException("ExternalFunctionInternal: \"init\" failed");
+    int f_type=0;
+    int flag = init(&f_type, &li.n_in, &li.n_out, &li.sz_arg, &li.sz_res);
+    if (flag) {
+      li.clear();
+      casadi_error("CommonExternal: \"init\" failed");
+    }
+    li.sz_arg = max(li.sz_arg, li.n_in);
+    li.sz_res = max(li.sz_res, li.n_out);
 
-    // Pass to casadi
-    setNumInputs(n_in);
-    setNumOutputs(n_out);
+    // Call the constructor
+    switch (f_type) {
+    case 0:
+      // Simplified, lower overhead external
+      return new SimplifiedExternal<LibType>(li);
+    case 1:
+      // Full information external
+      return new GenericExternal<LibType>(li);
+    default:
+      li.clear();
+      casadi_error("CommonExternal: Function type " << f_type << " not supported.");
+    }
+    return 0;
+  }
 
-    // Get the sparsity pattern
-    for (int i=0; i<n_in+n_out; ++i) {
+  template<typename LibType>
+  CommonExternal<LibType>::CommonExternal(const LibInfo<LibType>& li)
+    : li_(li) {
+    ibuf_.resize(li.n_in);
+    obuf_.resize(li.n_out);
+    alloc_arg(li.sz_arg);
+    alloc_res(li.sz_res);
+
+    // Set name TODO(@jaeandersson): remove 'name' from options
+    setOption("name", li_.name());
+  }
+
+  template<typename LibType>
+  SimplifiedExternal<LibType>::SimplifiedExternal(const LibInfo<LibType>& li)
+    : CommonExternal<LibType>(li) {
+    // Function for numerical evaluation
+    li_.get(eval_, li_.name());
+    casadi_assert_message(eval_!=0, "SimplifiedExternal: no \""+li_.name()+"\" found");
+
+    // All inputs are scalars
+    for (int i=0; i<this->nIn(); ++i) {
+      this->input(i) = 0;
+    }
+
+    // All outputs are scalars
+    for (int i=0; i<this->nOut(); ++i) {
+      this->output(i) = 0;
+    }
+
+    // Arrays for holding inputs and outputs
+    this->alloc_w(this->nIn() + this->nOut());
+  }
+
+  template<typename LibType>
+  GenericExternal<LibType>::GenericExternal(const LibInfo<LibType>& li)
+    : CommonExternal<LibType>(li) {
+    // Function for numerical evaluation
+    li_.get(eval_, li_.name());
+    casadi_assert_message(eval_!=0, "GenericExternal: no \""+li_.name()+"\" found");
+
+    // Function for retrieving sparsities of inputs and outputs
+    sparsityPtr sparsity;
+    li_.get(sparsity, li_.name() + "_sparsity");
+    if (sparsity==0) {
+      // Fall back to scalar sparsity
+      sparsity = scalarSparsity;
+    }
+
+    // Get the sparsity patterns
+    for (int i=0; i<this->nIn()+this->nOut(); ++i) {
       // Get sparsity from file
-      int nrow, ncol, *colind, *row;
-      flag = getSparsity(i, &nrow, &ncol, &colind, &row);
-      if (flag) throw CasadiException("ExternalFunctionInternal: \"getSparsity\" failed");
+      int nrow, ncol;
+      const int *colind, *row;
+      int flag = sparsity(i, &nrow, &ncol, &colind, &row);
+      casadi_assert_message(flag==0, "CommonExternal: \"sparsity\" failed");
 
       // Col offsets
       vector<int> colindv(colind, colind+ncol+1);
@@ -102,26 +212,26 @@ namespace casadi {
       vector<int> rowv(row, row+nnz);
 
       // Sparsity
-      Sparsity sp = Sparsity(nrow, ncol, colindv, rowv);
+      Sparsity sp(nrow, ncol, colindv, rowv);
 
       // Save to inputs/outputs
-      if (i<n_in) {
-        input(i) = Matrix<double>::zeros(sp);
+      if (i<this->nIn()) {
+        this->input(i) = Matrix<double>::zeros(sp);
       } else {
-        output(i-n_in) = Matrix<double>::zeros(sp);
+        this->output(i-this->nIn()) = Matrix<double>::zeros(sp);
       }
     }
 
     // Get number of temporaries
-    int ni, nr;
-    flag = nwork(&ni, &nr);
-    if (flag) throw CasadiException("ExternalFunctionInternal: \"nwork\" failed");
-    ni_ = static_cast<size_t>(ni);
-    nr_ = static_cast<size_t>(nr);
-#else // WITH_DL
-    throw CasadiException("WITH_DL  not activated");
-#endif // WITH_DL
-
+    workPtr work;
+    li_.get(work, li_.name() + "_work");
+    if (work!=0) {
+      int n_iw, n_w;
+      int flag = work(&n_iw, &n_w);
+      casadi_assert_message(flag==0, "CommonExternal: \"work\" failed");
+      this->alloc_iw(n_iw);
+      this->alloc_w(n_w);
+    }
   }
 
   ExternalFunctionInternal* ExternalFunctionInternal::clone() const {
@@ -129,34 +239,154 @@ namespace casadi {
   }
 
   ExternalFunctionInternal::~ExternalFunctionInternal() {
-#ifdef WITH_DL
-    // close the dll
-#ifdef _WIN32
-    if (handle_) FreeLibrary(handle_);
-#else // _WIN32
-    if (handle_) dlclose(handle_);
-#endif // _WIN32
-#endif // WITH_DL
   }
 
-  void ExternalFunctionInternal::evalD(const cpv_double& arg, const pv_double& res,
-                                       int* itmp, double* rtmp) {
-#ifdef WITH_DL
-    int flag = eval_(getPtr(arg), getPtr(res), itmp, rtmp);
-    if (flag) throw CasadiException("ExternalFunctionInternal: \"eval\" failed");
-#endif // WITH_DL
+  template<typename LibType>
+  CommonExternal<LibType>::~CommonExternal() {
+    li_.clear();
   }
 
-  void ExternalFunctionInternal::init() {
-    // Call the init function of the base class
-    FunctionInternal::init();
+  template<typename LibType>
+  void SimplifiedExternal<LibType>::evalD(const double** arg, double** res,
+                                          int* iw, double* w) {
+    // Copy arguments to input buffers
+    const double* arg1=w;
+    for (int i=0; i<this->nIn(); ++i) {
+      *w++ = arg[i] ? *arg[i] : 0;
+    }
+
+    // Evaluate
+    eval_(arg1, w);
+
+    // Get outputs
+    for (int i=0; i<this->nOut(); ++i) {
+      if (res[i]) *res[i] = *w;
+      ++w;
+    }
   }
 
-  void ExternalFunctionInternal::nTmp(size_t& ni, size_t& nr) {
-    ni=ni_;
-    nr=nr_;
+  template<typename LibType>
+  void GenericExternal<LibType>::evalD(const double** arg, double** res,
+                                       int* iw, double* w) {
+    int flag = eval_(arg, res, iw, w);
+    if (flag) throw CasadiException("CommonExternal: \""+li_.name()+"\" failed");
   }
 
+  template<typename LibType>
+  void SimplifiedExternal<LibType>::addDependency(CodeGenerator& g) const {
+    g.addExternal("void " + li_.name() + "(const real_t* arg, real_t* res);");
+  }
+
+  template<typename LibType>
+  void GenericExternal<LibType>::addDependency(CodeGenerator& g) const {
+    g.addExternal("int " + li_.name() + "(const real_t** arg, real_t** res, int* iw, real_t* w);");
+  }
+
+  template<typename LibType>
+  std::string SimplifiedExternal<LibType>::generateCall(const CodeGenerator& g,
+                                                        const std::string& arg,
+                                                        const std::string& res) const {
+    // Create a function call
+    stringstream ss;
+    ss << li_.name() << "(" << arg << ", " << res << ")";
+    return ss.str();
+  }
+
+  template<typename LibType>
+  std::string GenericExternal<LibType>::
+  generateCall(const CodeGenerator& g,
+               const std::string& arg, const std::string& res,
+               const std::string& iw, const std::string& w) const {
+
+    // Create a function call
+    stringstream ss;
+    ss << li_.name() << "(" << arg << ", " << res << ", " << iw << ", " << w << ")";
+    return ss.str();
+  }
+
+  template<typename LibType>
+  int GenericExternal<LibType>::scalarSparsity(int i, int *n_row, int *n_col,
+                                               const int **colind, const int **row) {
+    // Dense scalar
+    static const int colind_scalar[] = {0, 1};
+    static const int row_scalar[] = {0};
+
+    // Return to user
+    if (n_row) *n_row=1;
+    if (n_col) *n_col=1;
+    if (colind) *colind=colind_scalar;
+    if (row) *row=row_scalar;
+    return 0;
+  }
+
+  template<typename LibType>
+  bool CommonExternal<LibType>::hasFullJacobian() const {
+    if (FunctionInternal::hasFullJacobian()) return true;
+    // Init function for Jacobian?
+    initPtr jac_init;
+    const_cast<LibInfo<LibType>&>(li_).get(jac_init, li_.name() + "_jac_init");
+    return jac_init!=0;
+  }
+
+  template<typename LibType>
+  Function CommonExternal<LibType>
+  ::getFullJacobian(const std::string& name, const Dict& opts) {
+    if (hasFullJacobian()) {
+      return ExternalFunction(name, li_, opts);
+    } else {
+      return FunctionInternal::getFullJacobian(name, opts);
+    }
+  }
+
+  template<typename LibType>
+  Function CommonExternal<LibType>
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
+    // Consistency check
+    int n=1;
+    while (n<nfwd) n*=2;
+    if (n!=nfwd || nfwd>numDerForward()) {
+      casadi_error("Internal error: Refactoring needed, cf. #1055");
+    }
+    return ExternalFunction(name, li_, opts);
+  }
+
+  template<typename LibType>
+  int CommonExternal<LibType>::numDerForward() const {
+    // Will try 64, 32, 16, 8, 4, 2, 1 directions
+    initPtr fwd_init;
+    for (int i=64; i>0; i/=2) {
+      stringstream ss;
+      ss << "fwd" << i << "_" << li_.name();
+      const_cast<LibInfo<LibType>&>(li_).get(fwd_init, ss.str());
+      if (fwd_init!=0) return i;
+    }
+    return 0;
+  }
+
+  template<typename LibType>
+  Function CommonExternal<LibType>
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
+    // Consistency check
+    int n=1;
+    while (n<nadj) n*=2;
+    if (n!=nadj || nadj>numDerReverse()) {
+      casadi_error("Internal error: Refactoring needed, cf. #1055");
+    }
+    return ExternalFunction(name, li_, opts);
+  }
+
+  template<typename LibType>
+  int CommonExternal<LibType>::numDerReverse() const {
+    // Will try 64, 32, 16, 8, 4, 2, 1 directions
+    initPtr adj_init;
+    for (int i=64; i>0; i/=2) {
+      stringstream ss;
+      ss << "adj" << i << "_" << li_.name();
+      const_cast<LibInfo<LibType>&>(li_).get(adj_init, ss.str());
+      if (adj_init!=0) return i;
+    }
+    return 0;
+  }
 
 } // namespace casadi
 

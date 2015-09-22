@@ -36,35 +36,79 @@ using namespace std;
   CustomFunction::CustomFunction() {
   }
 
-  CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity> &inputscheme,
-                                 const  vector<Sparsity> &outputscheme) {
+  CustomFunction::CustomFunction(const std::string& name, const CustomEvaluate &c_fcn,
+                                 const std::vector<Sparsity>& inputscheme,
+                                 const std::vector<Sparsity>& outputscheme,
+                                 const Dict& opts) {
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  CustomFunction::CustomFunction(const std::string& name, const CustomEvaluate &c_fcn,
+                                 const pair<SparsityDict, vector<string> >& inputscheme,
+                                 const vector<Sparsity>& outputscheme,
+                                 const Dict& opts) {
+    assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme), outputscheme));
+    setOption("name", name);
+    setOption("input_scheme", inputscheme.second);
+    setOption(opts);
+    init();
+  }
+
+  CustomFunction::CustomFunction(const std::string& name, const CustomEvaluate &c_fcn,
+                                 const vector<Sparsity> &inputscheme,
+                                 const pair<SparsityDict, vector<string> > &outputscheme,
+                                 const Dict& opts) {
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, make_vector(outputscheme)));
+    setOption("name", name);
+    setOption("output_scheme", outputscheme.second);
+    setOption(opts);
+    init();
+  }
+
+  CustomFunction::CustomFunction(const std::string& name, const CustomEvaluate &c_fcn,
+                                 const pair<SparsityDict, vector<string> > &inputscheme,
+                                 const pair<SparsityDict, vector<string> > &outputscheme,
+                                 const Dict& opts) {
+    assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme),
+                                          make_vector(outputscheme)));
+    setOption("name", name);
+    setOption("input_scheme", inputscheme.second);
+    setOption("output_scheme", outputscheme.second);
+    setOption(opts);
+    init();
+  }
+
+#ifdef WITH_DEPRECATED_FEATURES
+  CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity>& inputscheme,
+                                 const vector<Sparsity>& outputscheme) {
     assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
-                                 const IOSchemeVector< Sparsity > &inputscheme,
-                                 const  vector<Sparsity> &outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
-    setInputScheme(inputscheme.scheme);
+                                 const pair<SparsityDict, vector<string> >& inputscheme,
+                                 const vector<Sparsity>& outputscheme) {
+    assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme), outputscheme));
+    setOption("input_scheme", inputscheme.second);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity> &inputscheme,
-                                 const  IOSchemeVector< Sparsity > &outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
-    setOutputScheme(outputscheme.scheme);
+                                 const pair<SparsityDict, vector<string> > &outputscheme) {
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, make_vector(outputscheme)));
+    setOption("output_scheme", outputscheme.second);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
-                                 const IOSchemeVector< Sparsity > &inputscheme,
-                                 const IOSchemeVector< Sparsity > &outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
-    setInputScheme(inputscheme.scheme);
-    setOutputScheme(outputscheme.scheme);
+                                 const pair<SparsityDict, vector<string> > &inputscheme,
+                                 const pair<SparsityDict, vector<string> > &outputscheme) {
+    assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme),
+                                          make_vector(outputscheme)));
+    setOption("input_scheme", inputscheme.second);
+    setOption("output_scheme", outputscheme.second);
   }
-
-  CustomFunction::CustomFunction(const CustomEvaluate &c_fcn) {
-    assignNode(new CustomFunctionInternal(c_fcn, vector<Sparsity>(), vector<Sparsity>()));
-  }
+#endif // WITH_DEPRECATED_FEATURES
 
   CustomFunctionInternal* CustomFunction::operator->() {
     return static_cast<CustomFunctionInternal*>(Function::operator->());

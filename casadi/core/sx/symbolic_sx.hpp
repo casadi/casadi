@@ -54,9 +54,9 @@ public:
 
 protected:
 
-  /** \brief  print */
-  virtual void print(std::ostream &stream, long& remaining_calls) const {
-    stream << name;
+  /** \brief  Print expression */
+  virtual std::string print(const std::string& arg1, const std::string& arg2) const {
+    return name;
   }
 };
 

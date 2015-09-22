@@ -24,9 +24,7 @@
 
 
 #include "socp_solver_internal.hpp"
-#include "../matrix/matrix_tools.hpp"
 #include "sx_function.hpp"
-#include "../sx/sx_tools.hpp"
 #include <numeric>
 #include <functional>
 
@@ -37,14 +35,30 @@ using namespace std;
 namespace casadi {
 
   // Constructor
-  SocpSolverInternal::SocpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
+  SocpSolverInternal::SocpSolverInternal(const std::map<std::string, Sparsity> &st) {
+    st_.resize(SOCP_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[SOCP_STRUCT_A]=i->second;
+      } else if (i->first=="g") {
+        st_[SOCP_STRUCT_G]=i->second;
+      } else if (i->first=="e") {
+        st_[SOCP_STRUCT_E]=i->second;
+      } else {
+        casadi_error("Unrecognized field in SOCP structure: " << i->first);
+      }
+    }
+
+    addOption("defaults_recipe",    OT_STRING, GenericType(),
+                                                   "Changes default options in a given way",
+                                                   "qcqp");
+
     addOption("ni", OT_INTEGERVECTOR, GenericType(),
               "Provide the size of each SOC constraint. Must sum up to N.");
     addOption("print_problem", OT_BOOLEAN, false, "Print out problem statement for debugging.");
 
-    input_.scheme = SCHEME_SOCPInput;
-    output_.scheme = SCHEME_SOCPOutput;
-
+    ischeme_ = IOScheme(SCHEME_SOCPInput);
+    oscheme_ = IOScheme(SCHEME_SOCPOutput);
   }
 
   void SocpSolverInternal::init() {
@@ -85,7 +99,7 @@ namespace casadi {
         <<  ") must match number of decision variables (cols of A): " << n_ << ".");
 
     // Input arguments
-    setNumInputs(SOCP_SOLVER_NUM_IN);
+    ibuf_.resize(SOCP_SOLVER_NUM_IN);
     input(SOCP_SOLVER_G) = DMatrix::zeros(G);
     input(SOCP_SOLVER_H) = DMatrix::zeros(N_, 1);
     input(SOCP_SOLVER_E) = DMatrix::zeros(E);
@@ -98,13 +112,54 @@ namespace casadi {
     input(SOCP_SOLVER_UBA) = DMatrix::inf(nc_);
 
     // Output arguments
-    setNumOutputs(SOCP_SOLVER_NUM_OUT);
+    obuf_.resize(SOCP_SOLVER_NUM_OUT);
     output(SOCP_SOLVER_X) = DMatrix::zeros(n_, 1);
     output(SOCP_SOLVER_COST) = 0.0;
     output(SOCP_SOLVER_DUAL_COST) = 0.0;
     output(SOCP_SOLVER_LAM_X) = DMatrix::zeros(n_, 1);
     output(SOCP_SOLVER_LAM_A) = DMatrix::zeros(nc_, 1);
     output(SOCP_SOLVER_LAM_CONE) = DMatrix::zeros(m_, 1);
+
+
+    // Dual computation
+
+    // Pre-allocate memory for transpose of A matrix in primal problem definition
+    primal_A_T_ = DMatrix::zeros(A).T();
+    primal_A_T_temp_int_ = std::vector<int>(primal_A_T_.data().size());
+
+    // Pre-allocate memory for vector indices of relevant bounds
+    primal_idx_lba_.reserve(nc_);
+    primal_idx_uba_.reserve(nc_);
+    primal_idx_lbx_.reserve(n_);
+    primal_idx_ubx_.reserve(n_);
+
+    // Start to construct base of dual_c_
+    std::vector<DMatrix> dual_c_v;
+    dual_c_v.push_back(input(SOCP_SOLVER_F));
+    dual_c_v.push_back(input(SOCP_SOLVER_H));
+    dual_c_ = vertcat(dual_c_v).data();
+    // Reserve maximum size of dual_c_
+    int sizeof_c = m_+N_+2*nc_+2*n_;
+    dual_c_.reserve(sizeof_c);
+
+    // Start to construct base of dual_A_
+    std::vector<DMatrix> dual_A_v;
+    DMatrix dual_A_DMatrix;
+    dual_A_v.push_back(input(SOCP_SOLVER_E));
+    dual_A_v.push_back(input(SOCP_SOLVER_G));
+    dual_A_DMatrix = horzcat(dual_A_v);
+    dual_A_data_ = dual_A_DMatrix.data();
+    dual_A_row_ = dual_A_DMatrix.sparsity().getRow();
+    dual_A_colind_ = dual_A_DMatrix.sparsity().getColind();
+    // Reserve memory for maximum size of dual_A_
+    int sizeof_A = input(SOCP_SOLVER_E).size() + input(SOCP_SOLVER_G).size() +
+                     2*input(SOCP_SOLVER_A).size()+2*n_;
+    dual_A_data_.reserve(sizeof_A);
+    dual_A_row_.reserve(sizeof_A);
+    dual_A_colind_.reserve(m_+N_+2*nc_+2*n_+1);
+
+    // Start to construct base of dual_b_
+    dual_b_ = input(SOCP_SOLVER_C).data();
   }
 
   SocpSolverInternal::~SocpSolverInternal() {
@@ -232,28 +287,29 @@ namespace casadi {
     // A-matrix: [-ei Gi -Alba' Auba' -Ilbx Iubx]
     int begin_colind;
     int end_colind;
-    dual_A_data_.resize(primal_E.size()+primal_G.size());
-    dual_A_row_.resize(primal_E.size()+primal_G.size());
+    dual_A_data_.resize(primal_E.nnz()+primal_G.nnz());
+    dual_A_row_.resize(primal_E.nnz()+primal_G.nnz());
     dual_A_colind_.resize(m_+N_+1);
 
-    // TODO(jgillis): replace T()-call by casadi_trans()
-    DMatrix primal_A_T = primal_A.T();
-    const Sparsity& primal_A_T_sparse = primal_A_T.sparsity();
+    // Call to efficient transpose routine (casadi_trans)
+    casadi_trans(primal_A.ptr(), primal_A.sparsity(), primal_A_T_.ptr(),
+      primal_A_T_.sparsity(), getPtr(primal_A_T_temp_int_));
+    const Sparsity& primal_A_T_sparse = primal_A_T_.sparsity();
     start_idx = 0;
-    end_idx = primal_E.size();
+    end_idx = primal_E.nnz();
     std::copy(primal_E.data().begin(), primal_E.data().end(), dual_A_data_.begin()+start_idx);
     std::transform(
       primal_E.data().begin(), primal_E.data().end(),
       dual_A_data_.begin()+start_idx, std::negate<double>());
     start_idx = end_idx;
-    end_idx += primal_G.size();
+    end_idx += primal_G.nnz();
     std::copy(primal_G.data().begin(), primal_G.data().end(), dual_A_data_.begin()+start_idx);
     for (int k=0;k<primal_idx_lba_.size();++k) {
       int i = primal_idx_lba_[k];
       begin_colind = primal_A_T_sparse.colind(i);
       end_colind = primal_A_T_sparse.colind(i+1);
       for (int ii=begin_colind; ii<end_colind;++ii) {
-        dual_A_data_.push_back(-primal_A_T.data()[ii]);
+        dual_A_data_.push_back(-primal_A_T_.data()[ii]);
         dual_A_row_.push_back(primal_A_T_sparse.getRow()[ii]);
       }
       dual_A_colind_.push_back(dual_A_colind_.back()+end_colind-begin_colind);
@@ -263,7 +319,7 @@ namespace casadi {
       begin_colind = primal_A_T_sparse.colind(i);
       end_colind = primal_A_T_sparse.colind(i+1);
       for (int ii=begin_colind; ii<end_colind;++ii) {
-        dual_A_data_.push_back(primal_A_T.data()[ii]);
+        dual_A_data_.push_back(primal_A_T_.data()[ii]);
         dual_A_row_.push_back(primal_A_T_sparse.getRow()[ii]);
       }
       dual_A_colind_.push_back(dual_A_colind_.back()+end_colind-begin_colind);
@@ -283,6 +339,11 @@ namespace casadi {
 
     // b-vector
     std::copy(primal_C.data().begin(), primal_C.data().end(), dual_b_.begin());
+
+    // Some properties of dual problem (not static!)
+    dual_n_ = m_ + N_ + primal_idx_lba_.size() + primal_idx_uba_.size() +
+                primal_idx_lbx_.size() + primal_idx_ubx_.size();
+    dual_nc_ = n_;
 
   }
 

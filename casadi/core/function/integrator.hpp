@@ -61,6 +61,7 @@
     \endverbatim
 */
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of an ODE/DAE function [daeIn]
   enum DAEInput {
@@ -155,6 +156,7 @@ namespace casadi {
     /// Number of output arguments of an integrator
     INTEGRATOR_NUM_OUT
   };
+#endif // SWIG
 
   /// Forward declaration of internal class
   class IntegratorInternal;
@@ -180,7 +182,28 @@ namespace casadi {
     /// Default constructor
     Integrator();
 
-    /** \brief  Integrator factory
+    ///@}
+    /** \brief  Integrator factory (new syntax, includes initialization)
+    *
+    * \param solver \pluginargument{Integrator}
+    * \param f dynamical system
+    * \parblock
+    * \copydoc scheme_DAEInput
+    * \copydoc scheme_DAEOutput
+    * \endparblock
+    */
+    Integrator(const std::string& name, const std::string& solver, const Function& f,
+               const Dict& opts=Dict());
+    Integrator(const std::string& name, const std::string& solver,
+               const std::pair<Function, Function>& fg, const Dict& opts=Dict());
+    Integrator(const std::string& name, const std::string& solver,
+               const SXDict& dae, const Dict& opts=Dict());
+    Integrator(const std::string& name, const std::string& solver,
+               const MXDict& dae, const Dict& opts=Dict());
+    ///@}
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Integrator factory, no initialization
     *
     * \param name \pluginargument{Integrator}
     * \param f dynamical system
@@ -194,13 +217,14 @@ namespace casadi {
     * \copydoc scheme_RDAEOutput
     * \endparblock
     */
-    Integrator(const std::string& name, const Function& f, const Function& g=Function());
+    Integrator(const std::string& solver, const Function& f, const Function& g=Function());
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Clone
     Integrator clone() const;
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=CASADI_COUT) const;
+    void printStats(std::ostream &stream=casadi::userOut()) const;
 
     /// Access functions of the node
     IntegratorInternal* operator->();

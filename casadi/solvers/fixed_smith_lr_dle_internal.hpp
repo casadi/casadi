@@ -53,7 +53,7 @@ namespace casadi {
     /** \brief  Constructor
      * \param st \structargument{Dle}
      */
-    FixedSmithLrDleInternal(const LrDleStructure& st);
+    explicit FixedSmithLrDleInternal(const std::map<std::string, Sparsity>& st);
 
     /** \brief  Destructor */
     virtual ~FixedSmithLrDleInternal();
@@ -65,12 +65,14 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual FixedSmithLrDleInternal* create(const LrDleStructure& st) const {
-        return new FixedSmithLrDleInternal(st);}
+    virtual FixedSmithLrDleInternal* create(const std::map<std::string, Sparsity>& st) const {
+      return new FixedSmithLrDleInternal(st);
+    }
 
     /** \brief  Create a new DLE Solver */
-    static LrDleInternal* creator(const LrDleStructure& st)
-    { return new FixedSmithLrDleInternal(st);}
+    static LrDleInternal* creator(const std::map<std::string, Sparsity>& st) {
+      return new FixedSmithLrDleInternal(st);
+    }
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -83,14 +85,14 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function getDerForward(int nfwd);
-    virtual bool hasDerForward() const { return true;}
+    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
+    virtual int numDerForward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function getDerReverse(int nadj);
-    virtual bool hasDerReverse() const { return true;}
+    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
+    virtual int numDerReverse() const { return 64;}
     ///@}
 
     /// A documentation string

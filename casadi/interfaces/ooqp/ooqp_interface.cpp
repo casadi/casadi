@@ -25,7 +25,6 @@
 
 #include "ooqp_interface.hpp"
 #include "casadi/core/function/qp_solver.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 
 // OOQP headers
@@ -55,7 +54,8 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_ooqp);
   }
 
-  OoqpInterface::OoqpInterface(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
+  OoqpInterface::OoqpInterface(const std::map<std::string, Sparsity>& st)
+    : QpSolverInternal(st) {
     addOption("print_level", OT_INTEGER, 0,
               "Print level. OOQP listens to print_level 0, 10 and 100");
     addOption("mutol", OT_REAL, 1e-8, "tolerance as provided with setMuTol to OOQP");
@@ -277,35 +277,35 @@ namespace casadi {
 
     // Print problem
     if (verbose()) {
-      cout << "Attempting to solve the QP:" << endl;
-      cout << "   minimize    1/2*x'*Q*x + c'*x" << endl;
-      cout << "   subject to  A*x = b,  d <= C*x <= f, l <= x <= u" << endl;
-      cout << "with" << endl;
-      cout << "Q = " <<
+      userOut() << "Attempting to solve the QP:" << endl;
+      userOut() << "   minimize    1/2*x'*Q*x + c'*x" << endl;
+      userOut() << "   subject to  A*x = b,  d <= C*x <= f, l <= x <= u" << endl;
+      userOut() << "with" << endl;
+      userOut() << "Q = " <<
           tril2symm(DMatrix::triplet(vector<int>(irowQ_.begin(), irowQ_.begin()+nnzQ),
                                      vector<int>(jcolQ_.begin(), jcolQ_.begin()+nnzQ),
                                      vector<double>(dQ_.begin(), dQ_.begin()+nnzQ),
                                      nx, nx)) << endl;
-      cout << "c = " << vector<double>(c_.begin(), c_.begin()+nx) << endl;
-      cout << "A = " << DMatrix::triplet(vector<int>(irowA_.begin(),
+      userOut() << "c = " << vector<double>(c_.begin(), c_.begin()+nx) << endl;
+      userOut() << "A = " << DMatrix::triplet(vector<int>(irowA_.begin(),
                                                      irowA_.begin()+nnzA),
                                         vector<int>(jcolA_.begin(),
                                                     jcolA_.begin()+nnzA),
                                         vector<double>(dA_.begin(),
                                                        dA_.begin()+nnzA),
                                          nA, nx) << endl;
-      cout << "b = " << vector<double>(bA_.begin(), bA_.begin()+nA) << endl;
-      cout << "C = " << DMatrix::triplet(vector<int>(irowC_.begin(),
+      userOut() << "b = " << vector<double>(bA_.begin(), bA_.begin()+nA) << endl;
+      userOut() << "C = " << DMatrix::triplet(vector<int>(irowC_.begin(),
                                                      irowC_.begin()+nnzC),
                                         vector<int>(jcolC_.begin(),
                                                     jcolC_.begin()+nnzC),
                                         vector<double>(dC_.begin(),
                                                        dC_.begin()+nnzC),
                                          nC, nx) << endl;
-      cout << "d = " << printBounds(clow_, iclow_, nC, "-") << endl;
-      cout << "f = " << printBounds(cupp_, icupp_, nC, "") << endl;
-      cout << "l = " << printBounds(xlow_, ixlow_, nx, "-") << endl;
-      cout << "u = " << printBounds(xupp_, ixupp_, nx, "") << endl;
+      userOut() << "d = " << printBounds(clow_, iclow_, nC, "-") << endl;
+      userOut() << "f = " << printBounds(cupp_, icupp_, nC, "") << endl;
+      userOut() << "l = " << printBounds(xlow_, ixlow_, nx, "-") << endl;
+      userOut() << "u = " << printBounds(xupp_, ixupp_, nx, "") << endl;
     }
 
     // Reset the solution

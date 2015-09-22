@@ -39,6 +39,23 @@
 
 namespace casadi {
 
+#ifndef SWIG
+  /** \brief  An element of the algorithm, namely an MX node */
+  struct MXAlgEl {
+    /// Operator index
+    int op;
+
+    /// Data associated with the operation
+    MX data;
+
+    /// Work vector indices of the arguments
+    std::vector<int> arg;
+
+    /// Work vector indices of the results
+    std::vector<int> res;
+  };
+#endif // SWIG
+
   /** \brief  Internal node class for MXFunction
       \author Joel Andersson
       \date 2010-2015
@@ -54,11 +71,8 @@ namespace casadi {
     /** \brief  All the runtime elements in the order of evaluation */
     std::vector<AlgEl> algorithm_;
 
-    /** \brief Offsets for elements in the rtmp_ vector */
+    /** \brief Offsets for elements in the w_ vector */
     std::vector<int> workloc_;
-
-    // Length of pointer arrays needed during evaluation
-    std::size_t max_arg_, max_res_;
 
     /// Free variables
     std::vector<MX> free_vars_;
@@ -77,7 +91,7 @@ namespace casadi {
     virtual ~MXFunctionInternal();
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const cpv_double& arg, const pv_double& res, int* itmp, double* rtmp);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const;
@@ -86,25 +100,25 @@ namespace casadi {
     virtual void init();
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(std::ostream &stream, const std::string& type,
-                                      CodeGenerator& gen) const;
+    virtual void generateDeclarations(CodeGenerator& g) const;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(std::ostream &stream, const std::string& type,
-                              CodeGenerator& gen) const;
+    virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief Extract the residual function G and the modified function Z out of an expression
      * (see Albersmeyer2010 paper) */
     void generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn);
 
     /** \brief Generate a function that calculates a Jacobian function by operator overloading */
-    virtual Function getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
+    virtual Function getNumericJacobian(const std::string& name, int iind, int oind,
+                                        bool compact, bool symmetric, const Dict& opts);
 
     /** \brief Evaluate symbolically, SX type*/
-    virtual void evalSX(const std::vector<SX>& input, std::vector<SX>& output);
+    virtual void evalSX(const SXElement** arg, SXElement** res,
+                        int* iw, SXElement* w);
 
     /** \brief Evaluate symbolically, MX type */
-    virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output);
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fwdSeed,
@@ -123,8 +137,11 @@ namespace casadi {
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
 
-    /// Propagate a sparsity pattern through the algorithm
-    virtual void spEvaluate(bool fwd);
+    /** \brief  Propagate sparsity forward */
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd) { return true;}
@@ -133,7 +150,7 @@ namespace casadi {
     virtual void spInit(bool fwd);
 
     /// Print work vector
-    void printWork(std::ostream &stream=std::cout);
+    void printWork(std::ostream &stream=casadi::userOut());
 
     // print an element of an algorithm
     void print(std::ostream &stream, const AlgEl& el) const;

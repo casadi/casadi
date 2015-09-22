@@ -47,15 +47,12 @@ for N in range(1,11):
   
   # Differential equation
   z = SX.sym("z")
-  F = SXFunction([z],[z*z - 2*z + 1])
-  F.setOption("name","dz/dt")
-  F.init()
+  F = SXFunction("dz/dt", [z],[z*z - 2*z + 1])
   
   z0 = -3
   
   # Analytic solution
-  z_analytic = SXFunction([t], [(4*t-3)/(3*t+1)])
-  z_analytic.setOption("name","analytic solution")
+  z_analytic = SXFunction("analytic solution", [t], [(4*t-3)/(3*t+1)])
   
   # Collocation point
   tau = SX.sym("tau")
@@ -73,30 +70,23 @@ for N in range(1,11):
 
     print "l(", j, ") = ", L
 
-    f = SXFunction([tau],[L])
-    f.setOption("name", "l(" + str(j) + ")")
+    f = SXFunction("l(" + str(j) + ")", [tau],[L])
     
     # initialize
-    f.init()
     l.append(f)
   
   # Get the coefficients of the continuity equation
   D = DMatrix.zeros(K+1)
   for j in range(K+1):
-    l[j].setInput(1.)
-    l[j].evaluate()
-    D[j] = l[j].getOutput()
+    [D[j]] = l[j]([1.])[0]
   print "D = ", D
 
   # Get the coefficients of the collocation equation using AD
   C = DMatrix.zeros(K+1,K+1)
   for j in range(K+1):
     tfcn = l[j].tangent()
-    tfcn.init()
     for k in range(K+1):
-      tfcn.setInput(tau_root[k])
-      tfcn.evaluate()
-      C[j,k] = tfcn.getOutput()
+      C[j,k], _ = tfcn([tau_root[k]])
   print "C = ", C
   
   # Collocated states
@@ -125,39 +115,35 @@ for N in range(1,11):
   print "g = ", g
 
   # NLP
-  nlp = SXFunction(nlpIn(x=x),nlpOut(f=x[0]**2,g=g))
+  nlp = SXFunction('nlp', nlpIn(x=x),nlpOut(f=x[0]**2,g=g))
 
   ## ----
   ## SOLVE THE NLP
   ## ----
   
-  # Allocate an NLP solver
-  solver = NlpSolver("ipopt", nlp)
+  # NLP solver options
+  opts = {"tol" : 1e-10}
 
-  # Set options
-  solver.setOption("tol",1e-10)
-
-  # initialize the solver
-  solver.init()
+  # Allocate an NLP solver and buffer
+  solver = NlpSolver("solver", "ipopt", nlp, opts)
+  arg = {}
 
   # Initial condition
-  xinit = x.size() * [0]
-  solver.setInput(xinit,"x0")
+  arg["x0"] = x.nnz() * [0]
 
   # Bounds on x
-  lbx = x.size()*[-100]
-  ubx = x.size()*[100]
+  lbx = x.nnz()*[-100]
+  ubx = x.nnz()*[100]
   lbx[0] = ubx[0] = z0
-  solver.setInput(lbx,"lbx")
-  solver.setInput(ubx,"ubx")
+  arg["lbx"] = lbx
+  arg["ubx"] = ubx
   
   # Bounds on the constraints
-  lubg = g.size()*[0]
-  solver.setInput(lubg,"lbg")
-  solver.setInput(lubg,"ubg")
+  arg["lbg"] = 0
+  arg["ubg"] = 0
   
   # Solve the problem
-  solver.evaluate()
+  res = solver(arg)
   
   ## Print the time points
   t_opt = N*(K+1) * [0]
@@ -168,10 +154,10 @@ for N in range(1,11):
   print "time points: ", t_opt
 
   # Print the optimal cost
-  print "optimal cost: ", float(solver.getOutput("f"))
+  print "optimal cost: ", float(res["f"])
 
   # Print the optimal solution
-  xopt = solver.output("x").nonzeros()
+  xopt = res["x"].nonzeros()
   print "optimal solution: ", xopt
  
   # plot to screen

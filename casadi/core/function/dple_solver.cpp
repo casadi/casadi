@@ -67,17 +67,21 @@ namespace casadi {
     return DpleInternal::getPlugin(name).doc;
   }
 
-  DpleSolver::DpleSolver(const std::string& name,
-               const std::vector<Sparsity> & A,
-               const std::vector<Sparsity> & V) {
-    DpleStructure st = dpleStruct("a", A, "v", V);
-    assignNode(DpleInternal::instantiatePlugin(name, st));
+  DpleSolver::DpleSolver(const std::string& name, const std::string& solver,
+                         const std::map<std::string, std::vector<Sparsity> >& st,
+                         const Dict& opts) {
+    assignNode(DpleInternal::instantiatePlugin(solver, st));
+    setOption("name", name);
+    setOption(opts);
+    init();
   }
 
-  DpleSolver::DpleSolver(const std::string& name,
-                         const DpleStructure & st) {
-    assignNode(DpleInternal::instantiatePlugin(name, st));
+#ifdef WITH_DEPRECATED_FEATURES
+  DpleSolver::DpleSolver(const std::string& solver,
+                         const std::map<std::string, std::vector<Sparsity> >& st) {
+    assignNode(DpleInternal::instantiatePlugin(solver, st));
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   void DpleSolver::periodic_schur(const std::string& name,
                                   const std::vector< Matrix<double> > & A,

@@ -42,7 +42,7 @@
 "|                 |                 |                 | for             |\n"
 "|                 |                 |                 | sensitivities.  |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"
-"| linear_solver_o | OT_DICTIONARY   | GenericType()   | Options to be   |\n"
+"| linear_solver_o | OT_DICT   | GenericType()   | Options to be   |\n"
 "| ptions          |                 |                 | passed to the   |\n"
 "|                 |                 |                 | linear solver.  |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"

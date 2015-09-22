@@ -24,10 +24,8 @@
 
 
 #include "mx_node.hpp"
-#include "mx_tools.hpp"
 #include "../std_vector_tools.hpp"
 #include <typeinfo>
-#include "../matrix/matrix_tools.hpp"
 #include "transpose.hpp"
 #include "reshape.hpp"
 #include "multiplication.hpp"
@@ -35,7 +33,7 @@
 #include "subassign.hpp"
 #include "getnonzeros.hpp"
 #include "setnonzeros.hpp"
-#include "set_sparse.hpp"
+#include "project.hpp"
 #include "solve.hpp"
 #include "unary_mx.hpp"
 #include "binary_mx.hpp"
@@ -46,6 +44,9 @@
 #include "concat.hpp"
 #include "split.hpp"
 #include "assertion.hpp"
+#include "monitor.hpp"
+#include "repmat.hpp"
+#include "casadi_find.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -117,6 +118,36 @@ namespace casadi {
         }
       }
     }
+  }
+
+  int MXNode::numPrimitives() const {
+    throw CasadiException(string("MXNode::numPrimitives() not defined for class ")
+                          + typeid(*this).name());
+  }
+
+  bool MXNode::hasDuplicates() {
+    throw CasadiException(string("MXNode::hasDuplicates() not defined for class ")
+                          + typeid(*this).name());
+  }
+
+  void MXNode::resetInput() {
+    throw CasadiException(string("MXNode::resetInput() not defined for class ")
+                          + typeid(*this).name());
+  }
+
+  void MXNode::getPrimitives(std::vector<MX>::iterator& it) const {
+    throw CasadiException(string("MXNode::getPrimitives() not defined for class ")
+                          + typeid(*this).name());
+  }
+
+  void MXNode::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+    throw CasadiException(string("MXNode::splitPrimitives() not defined for class ")
+                          + typeid(*this).name());
+  }
+
+  MX MXNode::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+    throw CasadiException(string("MXNode::joinPrimitives() not defined for class ")
+                          + typeid(*this).name());
   }
 
   const string& MXNode::getName() const {
@@ -193,31 +224,69 @@ namespace casadi {
   }
 
   void MXNode::print(std::ostream &stream) const {
-    long remaining_calls = MX::getMaxNumCallsInPrint();
-    print(stream, remaining_calls);
+    // Find out which noded can be inlined
+    std::map<const MXNode*, int> nodeind;
+    canInline(nodeind);
+
+    // Print expression
+    vector<string> intermed;
+    string s = printCompact(nodeind, intermed);
+
+    // Print intermediate expressions
+    for (int i=0; i<intermed.size(); ++i)
+      stream << "@" << (i+1) << "=" << intermed[i] << ", ";
+
+    // Print this
+    stream << s;
   }
 
-  void MXNode::print(std::ostream &stream, long& remaining_calls) const {
-    if (remaining_calls>0) {
-      remaining_calls--;
-      printPart(stream, 0);
+  void MXNode::canInline(std::map<const MXNode*, int>& nodeind) const {
+    // Add or mark node in map
+    std::map<const MXNode*, int>::iterator it=nodeind.find(this);
+    if (it==nodeind.end()) {
+      // First time encountered, mark inlined
+      nodeind.insert(it, make_pair(this, 0));
+
+      // Handle dependencies with recursion
       for (int i=0; i<ndep(); ++i) {
-        dep(i)->print(stream, remaining_calls);
-        printPart(stream, i+1);
+        dep(i)->canInline(nodeind);
       }
-    } else {
-      stream << "...";
+    } else if (it->second==0 && getOp()!=OP_PARAMETER) {
+      // Node encountered before, do not inline (except if symbolic primitive)
+      it->second = -1;
     }
   }
 
-  void MXNode::printPart(std::ostream &stream, int part) const {
-    casadi_assert(ndep()>1);
-    casadi_assert(part>0);
-    casadi_assert(part<ndep());
-    stream << ", ";
+  std::string MXNode::printCompact(std::map<const MXNode*, int>& nodeind,
+                                   std::vector<std::string>& intermed) const {
+    // Get reference to node index
+    int& ind = nodeind[this];
+
+    // If positive, already in intermediate expressions
+    if (ind>0) return "@" + CodeGenerator::to_string(ind);
+
+    // Get expressions for dependencies
+    vector<string> arg(ndep());
+    for (int i=0; i<arg.size(); ++i) {
+      arg[i] = dep(i)->printCompact(nodeind, intermed);
+    }
+
+    // Get expression for this
+    string s = print(arg);
+
+    // Decide what to do with the expression
+    if (ind==0) {
+      // Inline expression
+      return s;
+    } else {
+      // Add to list of intermediate expressions and return reference
+      intermed.push_back(s);
+      ind = intermed.size(); // For subsequent references
+      return "@" + CodeGenerator::to_string(ind);
+    }
   }
 
-  Function& MXNode::getFunction() {
+  const Function& MXNode::getFunction(int i) const {
     throw CasadiException(string("MXNode::getFunction() not defined for class ") +
                           typeid(*this).name());
   }
@@ -232,34 +301,34 @@ namespace casadi {
                           typeid(*this).name());
   }
 
-  void MXNode::evalD(const cpv_double& input, const pv_double& output, int* itmp, double* rtmp) {
+  void MXNode::evalD(const double** arg, double** res, int* iw, double* w) {
     throw CasadiException(string("MXNode::evalD not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                          int* itmp, SXElement* rtmp) {
+  void MXNode::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
     throw CasadiException(string("MXNode::evalSX not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::eval(const cpv_MX& input, const pv_MX& output) {
-    throw CasadiException(string("MXNode::eval not defined for class ")
+  void MXNode::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    throw CasadiException(string("MXNode::evalMX not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
+  void MXNode::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                       std::vector<std::vector<MX> >& fsens) {
     throw CasadiException(string("MXNode::evalFwd not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
+  void MXNode::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                       std::vector<std::vector<MX> >& asens) {
     throw CasadiException(string("MXNode::evalAdj not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::spFwd(const cpv_bvec_t& arg,
-                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void MXNode::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -280,8 +349,7 @@ namespace casadi {
     }
   }
 
-  void MXNode::spAdj(const pv_bvec_t& arg,
-                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void MXNode::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -313,9 +381,9 @@ namespace casadi {
     return shared_from_this<MX>();
   }
 
-  void MXNode::generate(std::ostream &stream, const std::vector<int>& arg,
-                                 const std::vector<int>& res, CodeGenerator& gen) const {
-    stream << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
+  void MXNode::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                        CodeGenerator& g) const {
+    g.body << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
   }
 
   double MXNode::getValue() const {
@@ -328,11 +396,11 @@ namespace casadi {
   }
 
   MX MXNode::getTranspose() const {
-    if (sparsity().isScalar()) {
+    if (sparsity().isscalar()) {
       return shared_from_this<MX>();
-    } else if (sparsity().isVector(true)) {
+    } else if (sparsity().isvector()) {
       return getReshape(sparsity().T());
-    } else if (sparsity().isDense()) {
+    } else if (sparsity().isdense()) {
       return MX::create(new DenseTranspose(shared_from_this<MX>()));
     } else {
       return MX::create(new Transpose(shared_from_this<MX>()));
@@ -359,7 +427,7 @@ namespace casadi {
                           << x.dimString() << " and z=" << z.dimString() << ".");
     casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got y=" << y.size1()
                           << " and x" << x.dimString() << ".");
-    if (x.isDense() && y.isDense()) {
+    if (x.isdense() && y.isdense() && z.isdense()) {
       return MX::create(new DenseMultiplication(z, x, y));
     } else {
       return MX::create(new Multiplication(z, x, y));
@@ -437,13 +505,13 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getSetSparse(const Sparsity& sp) const {
+  MX MXNode::getProject(const Sparsity& sp) const {
     if (sp==sparsity()) {
       return shared_from_this<MX>();
     } else if (sp.nnz()==0) {
       return MX::zeros(sp);
     } else {
-      return MX::create(new SetSparse(shared_from_this<MX>(), sp));
+      return MX::create(new Project(shared_from_this<MX>(), sp));
     }
   }
 
@@ -467,18 +535,18 @@ namespace casadi {
 
   MX MXNode::getBinarySwitch(int op, const MX& y) const {
     // Make sure that dimensions match
-    casadi_assert_message(sparsity().isScalar() || y.isScalar() || sparsity().shape()==y.shape(),
+    casadi_assert_message(sparsity().isscalar() || y.isscalar() || sparsity().shape()==y.shape(),
                           "Dimension mismatch." << "lhs is " << sparsity().dimString()
                           << ", while rhs is " << y.dimString());
 
     // Create binary node
-    if (sparsity().isScalar(false)) {
+    if (sparsity().isscalar(false)) {
       if (nnz()==0) {
         return toMatrix(MX(0)->getBinary(op, y, true, false), y.sparsity());
       } else {
         return toMatrix(getBinary(op, y, true, false), y.sparsity());
       }
-    } else if (y.isScalar()) {
+    } else if (y.isscalar()) {
       if (y.nnz()==0) {
         return toMatrix(getBinary(op, MX(0), false, true), sparsity());
       } else {
@@ -498,8 +566,8 @@ namespace casadi {
                                             operation_checker<Function0Checker>(op));
 
         // Project the arguments to this sparsity
-        MX xx = shared_from_this<MX>().setSparse(r_sp);
-        MX yy = y.setSparse(r_sp);
+        MX xx = project(shared_from_this<MX>(), r_sp);
+        MX yy = project(y, r_sp);
         return xx->getBinary(op, yy, false, false);
       }
     }
@@ -594,7 +662,7 @@ namespace casadi {
 
     if (scX) {
       // Check if it is ok to loop over nonzeros only
-      if (y.isDense() || operation_checker<Function0Checker>(op)) {
+      if (y.isdense() || operation_checker<Function0Checker>(op)) {
         // Loop over nonzeros
         return MX::create(new BinaryMX<true, false>(Operation(op), shared_from_this<MX>(), y));
       } else {
@@ -603,7 +671,7 @@ namespace casadi {
       }
     } else if (scY) {
       // Check if it is ok to loop over nonzeros only
-      if (sparsity().isDense() || operation_checker<F0XChecker>(op)) {
+      if (sparsity().isdense() || operation_checker<F0XChecker>(op)) {
         // Loop over nonzeros
         return MX::create(new BinaryMX<false, true>(Operation(op), shared_from_this<MX>(), y));
       } else {
@@ -615,7 +683,7 @@ namespace casadi {
       MX rr = MX::create(new BinaryMX<false, false>(Operation(op), shared_from_this<MX>(), y));
 
       // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
-      if (!rr.isDense() && !operation_checker<F00Checker>(op)) {
+      if (!rr.isdense() && !operation_checker<F00Checker>(op)) {
         // Get the value for the structural zeros
         double fcn_0(0);
         casadi_math<double>::fun(op, 0, 0, fcn_0);
@@ -639,8 +707,20 @@ namespace casadi {
     return true;
   }
 
-  MX MXNode::getAssertion(const MX& y, const std::string &fail_message) const {
+  MX MXNode::getAssertion(const MX& y, const std::string& fail_message) const {
     return MX::create(new Assertion(shared_from_this<MX>(), y, fail_message));
+  }
+
+  MX MXNode::getMonitor(const std::string& comment) const {
+    if (nnz()==0) {
+      return shared_from_this<MX>();
+    } else {
+      return MX::create(new Monitor(shared_from_this<MX>(), comment));
+    }
+  }
+
+  MX MXNode::getFind() const {
+    return MX::create(new Find(shared_from_this<MX>()));
   }
 
   MX MXNode::getDeterminant() const {
@@ -662,7 +742,7 @@ namespace casadi {
     if (sparsity()==y.sparsity()) {
       if (sparsity().nnz()==0) {
         return 0;
-      } else if (sparsity().isScalar()) {
+      } else if (sparsity().isscalar()) {
         return getBinarySwitch(OP_MUL, y);
       } else {
         return MX::create(new InnerProd(shared_from_this<MX>(), y));
@@ -670,8 +750,8 @@ namespace casadi {
     } else {
       // Project to pattern intersection
       Sparsity sp = sparsity().patternIntersection(y.sparsity());
-      MX xx = shared_from_this<MX>().setSparse(sp);
-      MX yy = y.setSparse(sp);
+      MX xx = project(shared_from_this<MX>(), sp);
+      MX yy = project(y, sp);
       return xx->getInnerProd(yy);
     }
   }
@@ -770,6 +850,24 @@ namespace casadi {
     return ret;
   }
 
+  MX MXNode::getRepmat(int n, int m) const {
+    if (n==1) {
+      return MX::create(new HorzRepmat(shared_from_this<MX>(), m));
+    } else {
+      // Fallback to generic_matrix impl
+      return shared_from_this<MX>().GenericMatrix<MX>::zz_repmat(n, m);
+    }
+  }
+
+  MX MXNode::getRepsum(int n, int m) const {
+    if (n==1) {
+      return MX::create(new HorzRepsum(shared_from_this<MX>(), m));
+    } else {
+      // Fallback to generic_matrix impl
+      return shared_from_this<MX>().GenericMatrix<MX>::zz_repsum(n, m);
+    }
+  }
+
   std::vector<MX> MXNode::getDiagsplit(const std::vector<int>& offset1,
                                        const std::vector<int>& offset2) const {
     if (isZero()) {
@@ -814,52 +912,6 @@ namespace casadi {
           }
         }
       }
-    }
-    return ret;
-  }
-
-  void MXNode::clearVector(const pv_MX& v, int len) {
-    for (int j=0; j<len; ++j) {
-      if (v[j]!= 0) *v[j] = MX();
-    }
-  }
-
-  void MXNode::clearVector(const std::vector<pv_MX>& v, int len) {
-    for (int i=0; i<v.size(); ++i) {
-      clearVector(v[i], len);
-    }
-  }
-
-  std::vector<MX> MXNode::getVector(const cpv_MX& v, int len) {
-    casadi_assert(v.size()>=len);
-    std::vector<MX> ret(len);
-    for (int i=0; i<len; i++) {
-      if (v[i]!=0) ret[i] = *v[i];
-    }
-    return ret;
-  }
-
-  std::vector<MX> MXNode::getVector(const pv_MX& v, int len) {
-    casadi_assert(v.size()>=len);
-    std::vector<MX> ret(len);
-    for (int i=0; i<len; i++) {
-      if (v[i]!=0) ret[i] = *v[i];
-    }
-    return ret;
-  }
-
-  std::vector<std::vector<MX> > MXNode::getVector(const std::vector<pv_MX>& v, int len) {
-    std::vector<std::vector<MX> > ret(v.size());
-    for (int i=0; i<v.size(); i++) {
-      ret[i] = getVector(v[i], len);
-    }
-    return ret;
-  }
-
-  std::vector<std::vector<MX> > MXNode::getVector(const std::vector<cpv_MX>& v, int len) {
-    std::vector<std::vector<MX> > ret(v.size());
-    for (int i=0; i<v.size(); i++) {
-      ret[i] = getVector(v[i], len);
     }
     return ret;
   }

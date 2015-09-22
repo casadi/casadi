@@ -24,6 +24,7 @@
 from casadi import *
 import numpy as NP
 import matplotlib.pyplot as plt
+from operator import itemgetter
 
 nk = 20    # Control discretization
 tf = 10.0  # End time
@@ -37,12 +38,10 @@ xdot = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, x[0]] )
 qdot = x[0]*x[0] + x[1]*x[1] + u*u
 
 # DAE residual function
-dae = SXFunction(daeIn(x=x,p=u),daeOut(ode=xdot, quad=qdot))
+dae = SXFunction("dae", daeIn(x=x, p=u),daeOut(ode=xdot, quad=qdot))
 
 # Create an integrator
-integrator = Integrator("cvodes", dae)
-integrator.setOption("tf",tf/nk) # final time
-integrator.init()
+integrator = Integrator("integrator", "cvodes", dae, {"tf":tf/nk})
 
 # All controls (use matrix graph)
 x = MX.sym("x",nk) # nk-by-1 symbolic variable
@@ -56,29 +55,25 @@ f = 0
 
 # Build a graph of integrator calls
 for k in range(nk):
-  X,QF = integratorOut(integrator(integratorIn(x0=X,p=U[k])),"xf","qf")
+  X,QF = itemgetter('xf','qf')(integrator({'x0':X,'p':U[k]}))
   f += QF
 
 # Terminal constraints: x_0(T)=x_1(T)=0
 g = X
 
 # Allocate an NLP solver
-nlp = MXFunction(nlpIn(x=x),nlpOut(f=f,g=g))
-solver = NlpSolver("ipopt", nlp)
-solver.init()
-
-# Set bounds and initial guess
-solver.setInput(-0.75, "lbx")
-solver.setInput( 1.,   "ubx")
-solver.setInput( 0.,   "x0")
-solver.setInput( 0.,   "lbg")
-solver.setInput( 0.,   "ubg")
+nlp = MXFunction("nlp", nlpIn(x=x),nlpOut(f=f,g=g))
+solver = NlpSolver("solver", "ipopt", nlp)
 
 # Solve the problem
-solver.evaluate()
-
+sol = solver({"lbx" : -0.75,
+              "ubx" : 1,
+              "x0" : 0,
+              "lbg" : 0,
+              "ubg" : 0})
+              
 # Retrieve the solution
-u_opt = NP.array(solver.getOutput("x"))
+u_opt = NP.array(sol["x"])
 
 # Time grid
 tgrid_x = NP.linspace(0,10,nk+1)

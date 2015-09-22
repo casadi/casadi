@@ -78,8 +78,8 @@ namespace casadi {
     // Solve the NLP
     virtual void evaluate();
 
-
-    virtual void setQPOptions();
+    /// Set default options for a given recipe
+    virtual void setDefaultOptions(const std::vector<std::string>& recipes);
 
     /// Read options from worhp parameter xml
     virtual void setOptionsFromFile(const std::string & file);
@@ -93,7 +93,7 @@ namespace casadi {
     Control   worhp_c_;
 
     std::map<int, std::string> status_;
-    std::map<std::string, opt_type> ops_;
+    std::map<std::string, TypeID> ops_;
 
     // Worhp callback functions
     bool eval_f(const double* x, double scale, double& obj_value);

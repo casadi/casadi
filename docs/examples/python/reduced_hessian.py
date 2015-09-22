@@ -55,36 +55,37 @@ ubx = [ inf,  inf,  inf]
 lbg = [0.00]
 ubg = [0.00]
 
-# Create NLP solver
-nlp = SXFunction(nlpIn(x=x),nlpOut(f=f,g=g))
-solver = NlpSolver("ipopt", nlp)
+# Create NLP
+nlp = SXFunction("nlp", nlpIn(x=x), nlpOut(f=f, g=g))
+
+# NLP solver options
+opts = {}
 
 # Mark the parameters amongst the variables (see sIPOPT documentation)
 var_integer_md = {}
 var_integer_md["red_hessian"] = [0,1,2]
-solver.setOption("var_integer_md",var_integer_md)
+opts["var_integer_md"] = var_integer_md
 
 # Enable reduced hessian calculation
-solver.setOption("compute_red_hessian","yes")
+opts["compute_red_hessian"] = "yes"
 
-# Initialize solver
-solver.init()
+# Create an NLP solver
+solver = NlpSolver("solver", "ipopt", nlp, opts)
 
 # Solve NLP
-solver.setInput( x0, "x0")
-solver.setInput(lbx, "lbx")
-solver.setInput(ubx, "ubx")
-solver.setInput(lbg, "lbg")
-solver.setInput(ubg, "ubg")
-solver.evaluate()
+res = solver({"x0" : x0,
+              "lbx" : lbx,
+              "ubx" : ubx,
+              "lbg" : lbg,
+              "ubg" : ubg})
 
 # Print the solution
 print "----" 
-print "Minimal cost " , solver.getOutput("f") 
+print "Minimal cost " , res["f"] 
 print "----" 
 
 print "Solution" 
-print "x = " , solver.output("x").nonzeros() 
+print "x = " , res["x"].nonzeros() 
 print "----" 
 
 # Obtain the reduced Hessian

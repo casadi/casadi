@@ -36,6 +36,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a SDQP problem [sdqpIn]
   enum SDQPInput {
@@ -76,18 +77,7 @@ namespace casadi {
     /// The dual solution corresponding to simple bounds  (n x 1) [lam_x]
     SDQP_SOLVER_LAM_X,
     SDQP_SOLVER_NUM_OUT};
-
-  /// Structure specification of an SDQP [sdqpStruct]
-  enum SDQPStruct {
-    /// The matrix H: sparse ( n x n) [h]
-    SDQP_STRUCT_H,
-    /// The horizontal stack of all matrices F_i: ( m x nm) [f]
-    SDQP_STRUCT_F,
-    /// The matrix G: ( m x m) [g]
-    SDQP_STRUCT_G,
-    /// The matrix A: ( nc x n) [a]
-    SDQP_STRUCT_A,
-    SDQP_STRUCT_NUM};
+#endif // SWIG
 
   // Forward declaration of internal class
   class SdqpSolverInternal;
@@ -109,11 +99,20 @@ namespace casadi {
     /// Default constructor
     SdqpSolver();
 
-    /** \brief Constructor
-     *  \param name \pluginargument{SdqpSolver}
+    /** \brief Constructor (new syntax, includes initialization)
+     *  \param solver \pluginargument{SdqpSolver}
      *  \param st \structargument{SDQP}
      */
-    SdqpSolver(const std::string& name, const SDQPStructure& st);
+    SdqpSolver(const std::string& name, const std::string& solver,
+               const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor (no initialization)
+     *  \param solver \pluginargument{SdqpSolver}
+     *  \param st \structargument{SDQP}
+     */
+    SdqpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
+#endif //WITH_DEPRECATED_FEATURES
 
     /// Access functions of the node
     SdqpSolverInternal* operator->();
@@ -127,9 +126,6 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
-
-    /// Set options that make the SDQP solver more suitable for solving SOCPs
-    void setSOCQPOptions();
 
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);

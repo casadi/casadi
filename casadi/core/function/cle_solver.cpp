@@ -67,10 +67,20 @@ namespace casadi {
     return CleInternal::getPlugin(name).doc;
   }
 
-  CleSolver::CleSolver(const std::string& name,
-                         const CleStructure& st) {
-    assignNode(CleInternal::instantiatePlugin(name, st));
+  CleSolver::CleSolver(const std::string& name, const std::string& solver,
+                       const std::map<std::string, Sparsity>& st, const Dict& opts) {
+    assignNode(CleInternal::instantiatePlugin(solver, st));
+    setOption("name", name);
+    setOption(opts);
+    init();
   }
+
+#ifdef WITH_DEPRECATED_FEATURES
+  CleSolver::CleSolver(const std::string& solver,
+                       const std::map<std::string, Sparsity>& st) {
+    assignNode(CleInternal::instantiatePlugin(solver, st));
+  }
+#endif // WITH_DEPRECATED_FEATURES
 
 } // namespace casadi
 

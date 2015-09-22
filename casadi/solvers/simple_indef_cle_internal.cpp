@@ -24,14 +24,12 @@
 
 
 #include "simple_indef_cle_internal.hpp"
-#include <cassert>
+
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
+#include <cassert>
 #include <numeric>
 
 INPUTSCHEME(CLEInput)
@@ -55,15 +53,15 @@ namespace casadi {
     CleInternal::registerPlugin(casadi_register_clesolver_simple);
   }
 
-  SimpleIndefCleInternal::SimpleIndefCleInternal(
-      const CleStructure& st) : CleInternal(st) {
+  SimpleIndefCleInternal::
+  SimpleIndefCleInternal(const std::map<std::string, Sparsity>& st) : CleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_simple_indef_cle_solver"); // name of the function
 
     addOption("linear_solver",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linear_solver_options",    OT_DICT,   GenericType(),
               "Options to be passed to the linear solver.");
 
   }
@@ -89,34 +87,33 @@ namespace casadi {
     DMatrix e = DMatrix::eye(n_);
 
     MX A_total = -kron(As, e)-kron(e, As);
-    MX Pf = solve(A_total, vec(Vss), getOption("linear_solver"));
+    MX Pf = A_total.zz_solve(vec(Vss), getOption("linear_solver"));
 
     std::vector<MX> v_in;
     v_in.push_back(As);
     v_in.push_back(Vs);
-    f_ = MXFunction(v_in, reshape(Pf, n_, n_));
-    f_.setInputScheme(SCHEME_CLEInput);
-    f_.setOutputScheme(SCHEME_CLEOutput);
-    f_.init();
+    f_ = MXFunction(name_, v_in, make_vector(reshape(Pf, n_, n_)),
+                    make_dict("input_scheme", IOScheme(SCHEME_CLEInput),
+                              "output_scheme", IOScheme(SCHEME_CLEOutput)));
   }
 
-
-
   void SimpleIndefCleInternal::evaluate() {
-    for (int i=0;i<getNumInputs();++i) {
+    for (int i=0;i<nIn();++i) {
       std::copy(input(i).begin(), input(i).end(), f_.input(i).begin());
     }
     f_.evaluate();
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       std::copy(f_.output(i).begin(), f_.output(i).end(), output(i).begin());
     }
   }
 
-  Function SimpleIndefCleInternal::getDerForward(int nfwd) {
+  Function SimpleIndefCleInternal
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function SimpleIndefCleInternal::getDerReverse(int nadj) {
+  Function SimpleIndefCleInternal
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     return f_.derReverse(nadj);
   }
 
@@ -127,7 +124,10 @@ namespace casadi {
 
   SimpleIndefCleInternal* SimpleIndefCleInternal::clone() const {
     // Return a deep copy
-    SimpleIndefCleInternal* node = new SimpleIndefCleInternal(st_);
+    SimpleIndefCleInternal* node =
+      new SimpleIndefCleInternal(make_map("a", st_[Cle_STRUCT_A],
+                                          "v", st_[Cle_STRUCT_V],
+                                          "c", st_[Cle_STRUCT_C]));
     node->setOption(dictionary());
     return node;
   }

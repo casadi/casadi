@@ -29,39 +29,13 @@
 %include "casadi/core/function/schemes_helpers.hpp"
 #ifdef SWIGPYTHON
 %pythoncode %{
-
-def IOSchemeVector(arg,io_scheme):
-  try:
-    return IOSchemeVectorD(arg,io_scheme)
-  except:
-    pass
-  try:
-    return IOSchemeVectorSX(arg,io_scheme)
-  except:
-    pass
-  try:
-    return IOSchemeVectorMX(arg,io_scheme)
-  except:
-    pass
-  try:
-    arg = map(lambda x: sp_dense(0,0) if isinstance(x,list) and len(x)==0 else x,arg)
-    return IOSchemeVectorSparsity(arg,io_scheme)
-  except:
-    pass
-  raise TypeError("IOSchemeVector called with faulty arguments. Individual values must be SX, MX or Sparsity.")
-%}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
-def cleIn(*dummy,**kwargs):
+def cleIn(**kwargs):
   """
   Helper function for 'CLEInput'
 
-  Two use cases:
-     a) arg = cleIn(a=my_a, v=my_v)
-          all arguments optional
-     b) a, v = cleIn(arg,"a", "v")
-          all arguments after the first optional
+  Usage:
+    arg = cleIn(a=my_a, v=my_v)
+        all arguments optional
   Input arguments of a \e cle solver
   
   Keyword arguments::
@@ -69,18 +43,10 @@ def cleIn(*dummy,**kwargs):
     a -- A matrix [CLE_A]
     v -- V matrix [CLE_V]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of cleIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_CLEInput,n)] for n in dummy[1:]]
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
   for k in kwargs.keys():
-    if not(k in ['a','v']):
-      raise Exception("Keyword error in cleIn: '%s' is not recognized. Available keywords are: a, v" % k )
-  return IOSchemeVector([a,v], IOScheme(SCHEME_CLEInput))
+    if k not in ['a', 'v']:
+      raise Exception("Error in 'cleIn' arguments. You supplied key '%s'. Allowed keys are: 'a', 'v'" % k)
+  return (kwargs, ['a', 'v'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -89,44 +55,27 @@ namespace casadi {
 %template(cleIn) cleIn<casadi::MX>;
 %template(cleIn) cleIn<casadi::Matrix<double> >;
 %template(cleIn) cleIn<casadi::Sparsity>;
-%template(IOSchemeVectorCLEInputSX) CLEInputIOSchemeVector<SX>;
-%template(IOSchemeVectorCLEInputMX) CLEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorCLEInputD) CLEInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorCLEInputSparsity) CLEInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorCLEInput) IOSchemeVectorCLEInputSX;
-%rename(IOSchemeVectorCLEInput) IOSchemeVectorCLEInputMX;
-%rename(IOSchemeVectorCLEInput) IOSchemeVectorCLEInputD;
-%rename(IOSchemeVectorCLEInput) IOSchemeVectorCLEInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def cleOut(*dummy,**kwargs):
+def cleOut(**kwargs):
   """
   Helper function for 'CLEOutput'
 
-  Two use cases:
-     a) arg = cleOut(p=my_p)
-          all arguments optional
-     b) p = cleOut(arg,"p")
-          all arguments after the first optional
+  Usage:
+    arg = cleOut(p=my_p)
+        all arguments optional
   Output arguments of a \e cle solver
   
   Keyword arguments::
 
     p -- Lyapunov matrix [CLE_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of cleOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_CLEOutput,n)] for n in dummy[1:]]
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
   for k in kwargs.keys():
-    if not(k in ['p']):
-      raise Exception("Keyword error in cleOut: '%s' is not recognized. Available keywords are: p" % k )
-  return IOSchemeVector([p], IOScheme(SCHEME_CLEOutput))
+    if k not in ['p']:
+      raise Exception("Error in 'cleOut' arguments. You supplied key '%s'. Allowed keys are: 'p'" % k)
+  return (kwargs, ['p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -135,73 +84,17 @@ namespace casadi {
 %template(cleOut) cleOut<casadi::MX>;
 %template(cleOut) cleOut<casadi::Matrix<double> >;
 %template(cleOut) cleOut<casadi::Sparsity>;
-%template(IOSchemeVectorCLEOutputSX) CLEOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorCLEOutputMX) CLEOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorCLEOutputD) CLEOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorCLEOutputSparsity) CLEOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorCLEOutput) IOSchemeVectorCLEOutputSX;
-%rename(IOSchemeVectorCLEOutput) IOSchemeVectorCLEOutputMX;
-%rename(IOSchemeVectorCLEOutput) IOSchemeVectorCLEOutputD;
-%rename(IOSchemeVectorCLEOutput) IOSchemeVectorCLEOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def cleStruct(*dummy,**kwargs):
-  """
-  Helper function for 'CleStruct'
-
-  Two use cases:
-     a) arg = cleStruct(a=my_a, v=my_v, c=my_c)
-          all arguments optional
-     b) a, v, c = cleStruct(arg,"a", "v", "c")
-          all arguments after the first optional
-  Structure specification of a CLE
-  
-  Keyword arguments::
-
-    a -- The matrix A [Cle_STRUCT_A]
-    v -- The matrix V [Cle_STRUCT_V]
-    c -- The matrix C (defaults to unity) [Cle_STRUCT_C]
-  """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of cleStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_CleStruct,n)] for n in dummy[1:]]
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = Sparsity()
-  if 'v' in kwargs:
-    v = kwargs['v']
-  c = Sparsity()
-  if 'c' in kwargs:
-    c = kwargs['c']
-  for k in kwargs.keys():
-    if not(k in ['a','v','c']):
-      raise Exception("Keyword error in cleStruct: '%s' is not recognized. Available keywords are: a, v, c" % k )
-  return CleStructure([a,v,c])
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(cleStruct) cleStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-namespace casadi {
-%template(CleStructure) CleStructIOSchemeVector<Sparsity>;
-}
-#ifdef SWIGPYTHON
-%pythoncode %{
-def controldaeIn(*dummy,**kwargs):
+def controldaeIn(**kwargs):
   """
   Helper function for 'ControlledDAEInput'
 
-  Two use cases:
-     a) arg = controldaeIn(t=my_t, x=my_x, z=my_z, p=my_p, u=my_u, u_interp=my_u_interp, x_major=my_x_major, t0=my_t0, tf=my_tf)
-          all arguments optional
-     b) t, x, z, p, u, u_interp, x_major, t0, tf = controldaeIn(arg,"t", "x", "z", "p", "u", "u_interp", "x_major", "t0", "tf")
-          all arguments after the first optional
+  Usage:
+    arg = controldaeIn(t=my_t, x=my_x, z=my_z, p=my_p, u=my_u, u_interp=my_u_interp, x_major=my_x_major, t0=my_t0, tf=my_tf)
+        all arguments optional
   Input arguments of an ODE/DAE function
   
   Keyword arguments::
@@ -216,39 +109,10 @@ def controldaeIn(*dummy,**kwargs):
     t0       -- Time at start of control interval (1-by-1) [CONTROL_DAE_T0]
     tf       -- Time at end of control interval (1-by-1) [CONTROL_DAE_TF]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of controldaeIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ControlledDAEInput,n)] for n in dummy[1:]]
-  t = []
-  if 't' in kwargs:
-    t = kwargs['t']
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  z = []
-  if 'z' in kwargs:
-    z = kwargs['z']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  u = []
-  if 'u' in kwargs:
-    u = kwargs['u']
-  u_interp = []
-  if 'u_interp' in kwargs:
-    u_interp = kwargs['u_interp']
-  x_major = []
-  if 'x_major' in kwargs:
-    x_major = kwargs['x_major']
-  t0 = []
-  if 't0' in kwargs:
-    t0 = kwargs['t0']
-  tf = []
-  if 'tf' in kwargs:
-    tf = kwargs['tf']
   for k in kwargs.keys():
-    if not(k in ['t','x','z','p','u','u_interp','x_major','t0','tf']):
-      raise Exception("Keyword error in controldaeIn: '%s' is not recognized. Available keywords are: t, x, z, p, u, u_interp, x_major, t0, tf" % k )
-  return IOSchemeVector([t,x,z,p,u,u_interp,x_major,t0,tf], IOScheme(SCHEME_ControlledDAEInput))
+    if k not in ['t', 'x', 'z', 'p', 'u', 'u_interp', 'x_major', 't0', 'tf']:
+      raise Exception("Error in 'controldaeIn' arguments. You supplied key '%s'. Allowed keys are: 't', 'x', 'z', 'p', 'u', 'u_interp', 'x_major', 't0', 'tf'" % k)
+  return (kwargs, ['t', 'x', 'z', 'p', 'u', 'u_interp', 'x_major', 't0', 'tf'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -257,29 +121,17 @@ namespace casadi {
 %template(controldaeIn) controldaeIn<casadi::MX>;
 %template(controldaeIn) controldaeIn<casadi::Matrix<double> >;
 %template(controldaeIn) controldaeIn<casadi::Sparsity>;
-%template(IOSchemeVectorControlledDAEInputSX) ControlledDAEInputIOSchemeVector<SX>;
-%template(IOSchemeVectorControlledDAEInputMX) ControlledDAEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorControlledDAEInputD) ControlledDAEInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorControlledDAEInputSparsity) ControlledDAEInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorControlledDAEInput) IOSchemeVectorControlledDAEInputSX;
-%rename(IOSchemeVectorControlledDAEInput) IOSchemeVectorControlledDAEInputMX;
-%rename(IOSchemeVectorControlledDAEInput) IOSchemeVectorControlledDAEInputD;
-%rename(IOSchemeVectorControlledDAEInput) IOSchemeVectorControlledDAEInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def controlsimulatorIn(*dummy,**kwargs):
+def controlsimulatorIn(**kwargs):
   """
   Helper function for 'ControlSimulatorInput'
 
-  Two use cases:
-     a) arg = controlsimulatorIn(x0=my_x0, p=my_p, u=my_u)
-          all arguments optional
-     b) x0, p, u = controlsimulatorIn(arg,"x0", "p", "u")
-          all arguments after the first optional
+  Usage:
+    arg = controlsimulatorIn(x0=my_x0, p=my_p, u=my_u)
+        all arguments optional
   Input arguments of a control simulator
   
   Keyword arguments::
@@ -288,21 +140,10 @@ def controlsimulatorIn(*dummy,**kwargs):
     p  -- Parameters that are fixed over the entire horizon  (dimension np-by-1) [CONTROLSIMULATOR_P]
     u  -- Parameters that change over the integration intervals (dimension nu-by-(ns-1)) [CONTROLSIMULATOR_U]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of controlsimulatorIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ControlSimulatorInput,n)] for n in dummy[1:]]
-  x0 = []
-  if 'x0' in kwargs:
-    x0 = kwargs['x0']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  u = []
-  if 'u' in kwargs:
-    u = kwargs['u']
   for k in kwargs.keys():
-    if not(k in ['x0','p','u']):
-      raise Exception("Keyword error in controlsimulatorIn: '%s' is not recognized. Available keywords are: x0, p, u" % k )
-  return IOSchemeVector([x0,p,u], IOScheme(SCHEME_ControlSimulatorInput))
+    if k not in ['x0', 'p', 'u']:
+      raise Exception("Error in 'controlsimulatorIn' arguments. You supplied key '%s'. Allowed keys are: 'x0', 'p', 'u'" % k)
+  return (kwargs, ['x0', 'p', 'u'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -311,29 +152,17 @@ namespace casadi {
 %template(controlsimulatorIn) controlsimulatorIn<casadi::MX>;
 %template(controlsimulatorIn) controlsimulatorIn<casadi::Matrix<double> >;
 %template(controlsimulatorIn) controlsimulatorIn<casadi::Sparsity>;
-%template(IOSchemeVectorControlSimulatorInputSX) ControlSimulatorInputIOSchemeVector<SX>;
-%template(IOSchemeVectorControlSimulatorInputMX) ControlSimulatorInputIOSchemeVector<MX>;
-%template(IOSchemeVectorControlSimulatorInputD) ControlSimulatorInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorControlSimulatorInputSparsity) ControlSimulatorInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorControlSimulatorInput) IOSchemeVectorControlSimulatorInputSX;
-%rename(IOSchemeVectorControlSimulatorInput) IOSchemeVectorControlSimulatorInputMX;
-%rename(IOSchemeVectorControlSimulatorInput) IOSchemeVectorControlSimulatorInputD;
-%rename(IOSchemeVectorControlSimulatorInput) IOSchemeVectorControlSimulatorInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def dleIn(*dummy,**kwargs):
+def dleIn(**kwargs):
   """
   Helper function for 'DLEInput'
 
-  Two use cases:
-     a) arg = dleIn(a=my_a, v=my_v)
-          all arguments optional
-     b) a, v = dleIn(arg,"a", "v")
-          all arguments after the first optional
+  Usage:
+    arg = dleIn(a=my_a, v=my_v)
+        all arguments optional
   Input arguments of a \e dle solver
   
   Keyword arguments::
@@ -341,18 +170,10 @@ def dleIn(*dummy,**kwargs):
     a -- A matrix [DLE_A]
     v -- V matrix [DLE_V]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dleIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DLEInput,n)] for n in dummy[1:]]
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
   for k in kwargs.keys():
-    if not(k in ['a','v']):
-      raise Exception("Keyword error in dleIn: '%s' is not recognized. Available keywords are: a, v" % k )
-  return IOSchemeVector([a,v], IOScheme(SCHEME_DLEInput))
+    if k not in ['a', 'v']:
+      raise Exception("Error in 'dleIn' arguments. You supplied key '%s'. Allowed keys are: 'a', 'v'" % k)
+  return (kwargs, ['a', 'v'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -361,44 +182,27 @@ namespace casadi {
 %template(dleIn) dleIn<casadi::MX>;
 %template(dleIn) dleIn<casadi::Matrix<double> >;
 %template(dleIn) dleIn<casadi::Sparsity>;
-%template(IOSchemeVectorDLEInputSX) DLEInputIOSchemeVector<SX>;
-%template(IOSchemeVectorDLEInputMX) DLEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorDLEInputD) DLEInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorDLEInputSparsity) DLEInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorDLEInput) IOSchemeVectorDLEInputSX;
-%rename(IOSchemeVectorDLEInput) IOSchemeVectorDLEInputMX;
-%rename(IOSchemeVectorDLEInput) IOSchemeVectorDLEInputD;
-%rename(IOSchemeVectorDLEInput) IOSchemeVectorDLEInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def dleOut(*dummy,**kwargs):
+def dleOut(**kwargs):
   """
   Helper function for 'DLEOutput'
 
-  Two use cases:
-     a) arg = dleOut(p=my_p)
-          all arguments optional
-     b) p = dleOut(arg,"p")
-          all arguments after the first optional
+  Usage:
+    arg = dleOut(p=my_p)
+        all arguments optional
   Output arguments of a \e dle solver
   
   Keyword arguments::
 
     p -- P matrix [DLE_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dleOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DLEOutput,n)] for n in dummy[1:]]
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
   for k in kwargs.keys():
-    if not(k in ['p']):
-      raise Exception("Keyword error in dleOut: '%s' is not recognized. Available keywords are: p" % k )
-  return IOSchemeVector([p], IOScheme(SCHEME_DLEOutput))
+    if k not in ['p']:
+      raise Exception("Error in 'dleOut' arguments. You supplied key '%s'. Allowed keys are: 'p'" % k)
+  return (kwargs, ['p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -407,69 +211,17 @@ namespace casadi {
 %template(dleOut) dleOut<casadi::MX>;
 %template(dleOut) dleOut<casadi::Matrix<double> >;
 %template(dleOut) dleOut<casadi::Sparsity>;
-%template(IOSchemeVectorDLEOutputSX) DLEOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorDLEOutputMX) DLEOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorDLEOutputD) DLEOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorDLEOutputSparsity) DLEOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorDLEOutput) IOSchemeVectorDLEOutputSX;
-%rename(IOSchemeVectorDLEOutput) IOSchemeVectorDLEOutputMX;
-%rename(IOSchemeVectorDLEOutput) IOSchemeVectorDLEOutputD;
-%rename(IOSchemeVectorDLEOutput) IOSchemeVectorDLEOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def dleStruct(*dummy,**kwargs):
-  """
-  Helper function for 'DleStruct'
-
-  Two use cases:
-     a) arg = dleStruct(a=my_a, v=my_v)
-          all arguments optional
-     b) a, v = dleStruct(arg,"a", "v")
-          all arguments after the first optional
-  Structure specification of a DLE
-  
-  Keyword arguments::
-
-    a -- The matrix A [Dle_STRUCT_A]
-    v -- The matrix V [Dle_STRUCT_V]
-  """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dleStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DleStruct,n)] for n in dummy[1:]]
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = Sparsity()
-  if 'v' in kwargs:
-    v = kwargs['v']
-  for k in kwargs.keys():
-    if not(k in ['a','v']):
-      raise Exception("Keyword error in dleStruct: '%s' is not recognized. Available keywords are: a, v" % k )
-  return DleStructure([a,v])
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(dleStruct) dleStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-namespace casadi {
-%template(DleStructure) DleStructIOSchemeVector<Sparsity>;
-}
-#ifdef SWIGPYTHON
-%pythoncode %{
-def dpleIn(*dummy,**kwargs):
+def dpleIn(**kwargs):
   """
   Helper function for 'DPLEInput'
 
-  Two use cases:
-     a) arg = dpleIn(a=my_a, v=my_v)
-          all arguments optional
-     b) a, v = dpleIn(arg,"a", "v")
-          all arguments after the first optional
+  Usage:
+    arg = dpleIn(a=my_a, v=my_v)
+        all arguments optional
   Input arguments of a \e dple solver
   
   Keyword arguments::
@@ -477,18 +229,10 @@ def dpleIn(*dummy,**kwargs):
     a -- A matrices (horzcat when const_dim, diagcat otherwise) [DPLE_A]
     v -- V matrices (horzcat when const_dim, diagcat otherwise) [DPLE_V]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DPLEInput,n)] for n in dummy[1:]]
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
   for k in kwargs.keys():
-    if not(k in ['a','v']):
-      raise Exception("Keyword error in dpleIn: '%s' is not recognized. Available keywords are: a, v" % k )
-  return IOSchemeVector([a,v], IOScheme(SCHEME_DPLEInput))
+    if k not in ['a', 'v']:
+      raise Exception("Error in 'dpleIn' arguments. You supplied key '%s'. Allowed keys are: 'a', 'v'" % k)
+  return (kwargs, ['a', 'v'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -497,44 +241,27 @@ namespace casadi {
 %template(dpleIn) dpleIn<casadi::MX>;
 %template(dpleIn) dpleIn<casadi::Matrix<double> >;
 %template(dpleIn) dpleIn<casadi::Sparsity>;
-%template(IOSchemeVectorDPLEInputSX) DPLEInputIOSchemeVector<SX>;
-%template(IOSchemeVectorDPLEInputMX) DPLEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorDPLEInputD) DPLEInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorDPLEInputSparsity) DPLEInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorDPLEInput) IOSchemeVectorDPLEInputSX;
-%rename(IOSchemeVectorDPLEInput) IOSchemeVectorDPLEInputMX;
-%rename(IOSchemeVectorDPLEInput) IOSchemeVectorDPLEInputD;
-%rename(IOSchemeVectorDPLEInput) IOSchemeVectorDPLEInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def dpleOut(*dummy,**kwargs):
+def dpleOut(**kwargs):
   """
   Helper function for 'DPLEOutput'
 
-  Two use cases:
-     a) arg = dpleOut(p=my_p)
-          all arguments optional
-     b) p = dpleOut(arg,"p")
-          all arguments after the first optional
+  Usage:
+    arg = dpleOut(p=my_p)
+        all arguments optional
   Output arguments of a \e dple solver
   
   Keyword arguments::
 
     p -- Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [DPLE_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DPLEOutput,n)] for n in dummy[1:]]
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
   for k in kwargs.keys():
-    if not(k in ['p']):
-      raise Exception("Keyword error in dpleOut: '%s' is not recognized. Available keywords are: p" % k )
-  return IOSchemeVector([p], IOScheme(SCHEME_DPLEOutput))
+    if k not in ['p']:
+      raise Exception("Error in 'dpleOut' arguments. You supplied key '%s'. Allowed keys are: 'p'" % k)
+  return (kwargs, ['p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -543,69 +270,17 @@ namespace casadi {
 %template(dpleOut) dpleOut<casadi::MX>;
 %template(dpleOut) dpleOut<casadi::Matrix<double> >;
 %template(dpleOut) dpleOut<casadi::Sparsity>;
-%template(IOSchemeVectorDPLEOutputSX) DPLEOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorDPLEOutputMX) DPLEOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorDPLEOutputD) DPLEOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorDPLEOutputSparsity) DPLEOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorDPLEOutput) IOSchemeVectorDPLEOutputSX;
-%rename(IOSchemeVectorDPLEOutput) IOSchemeVectorDPLEOutputMX;
-%rename(IOSchemeVectorDPLEOutput) IOSchemeVectorDPLEOutputD;
-%rename(IOSchemeVectorDPLEOutput) IOSchemeVectorDPLEOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def dpleStruct(*dummy,**kwargs):
-  """
-  Helper function for 'DpleVecStruct'
-
-  Two use cases:
-     a) arg = dpleStruct(a=my_a, v=my_v)
-          all arguments optional
-     b) a, v = dpleStruct(arg,"a", "v")
-          all arguments after the first optional
-  Structure specification of a DPLE
-  
-  Keyword arguments::
-
-    a -- Sparsities for A_i, block diagonal form [Dple_STRUCT_A]
-    v -- Sparsities for V_i, block diagonal form [Dple_STRUCT_V]
-  """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DpleVecStruct,n)] for n in dummy[1:]]
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
-  for k in kwargs.keys():
-    if not(k in ['a','v']):
-      raise Exception("Keyword error in dpleStruct: '%s' is not recognized. Available keywords are: a, v" % k )
-  return DpleVecStructure([a,v])
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(dpleStruct) dpleStruct< std::vector<casadi::Sparsity> >;
-}
-#endif //SWIGPYTHON
-namespace casadi {
-%template(DpleVecStructure) DpleVecStructIOSchemeVector< std::vector<Sparsity> >;
-}
-#ifdef SWIGPYTHON
-%pythoncode %{
-def hnlpIn(*dummy,**kwargs):
+def hnlpIn(**kwargs):
   """
   Helper function for 'HNLPInput'
 
-  Two use cases:
-     a) arg = hnlpIn(x=my_x, p=my_p, tau=my_tau)
-          all arguments optional
-     b) x, p, tau = hnlpIn(arg,"x", "p", "tau")
-          all arguments after the first optional
+  Usage:
+    arg = hnlpIn(x=my_x, p=my_p, tau=my_tau)
+        all arguments optional
   Input arguments of an Homotopy NLP function
   
   Keyword arguments::
@@ -614,21 +289,10 @@ def hnlpIn(*dummy,**kwargs):
     p   -- Fixed parameter [HNL_P]
     tau -- Homotopy parameter [HNL_TAU]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hnlpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_HNLPInput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  tau = []
-  if 'tau' in kwargs:
-    tau = kwargs['tau']
   for k in kwargs.keys():
-    if not(k in ['x','p','tau']):
-      raise Exception("Keyword error in hnlpIn: '%s' is not recognized. Available keywords are: x, p, tau" % k )
-  return IOSchemeVector([x,p,tau], IOScheme(SCHEME_HNLPInput))
+    if k not in ['x', 'p', 'tau']:
+      raise Exception("Error in 'hnlpIn' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p', 'tau'" % k)
+  return (kwargs, ['x', 'p', 'tau'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -637,29 +301,17 @@ namespace casadi {
 %template(hnlpIn) hnlpIn<casadi::MX>;
 %template(hnlpIn) hnlpIn<casadi::Matrix<double> >;
 %template(hnlpIn) hnlpIn<casadi::Sparsity>;
-%template(IOSchemeVectorHNLPInputSX) HNLPInputIOSchemeVector<SX>;
-%template(IOSchemeVectorHNLPInputMX) HNLPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorHNLPInputD) HNLPInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorHNLPInputSparsity) HNLPInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorHNLPInput) IOSchemeVectorHNLPInputSX;
-%rename(IOSchemeVectorHNLPInput) IOSchemeVectorHNLPInputMX;
-%rename(IOSchemeVectorHNLPInput) IOSchemeVectorHNLPInputD;
-%rename(IOSchemeVectorHNLPInput) IOSchemeVectorHNLPInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def daeIn(*dummy,**kwargs):
+def daeIn(**kwargs):
   """
   Helper function for 'DAEInput'
 
-  Two use cases:
-     a) arg = daeIn(x=my_x, z=my_z, p=my_p, t=my_t)
-          all arguments optional
-     b) x, z, p, t = daeIn(arg,"x", "z", "p", "t")
-          all arguments after the first optional
+  Usage:
+    arg = daeIn(x=my_x, z=my_z, p=my_p, t=my_t)
+        all arguments optional
   Input arguments of an ODE/DAE function
   
   Keyword arguments::
@@ -669,24 +321,10 @@ def daeIn(*dummy,**kwargs):
     p -- Parameter [DAE_P]
     t -- Explicit time dependence [DAE_T]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of daeIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DAEInput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  z = []
-  if 'z' in kwargs:
-    z = kwargs['z']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  t = []
-  if 't' in kwargs:
-    t = kwargs['t']
   for k in kwargs.keys():
-    if not(k in ['x','z','p','t']):
-      raise Exception("Keyword error in daeIn: '%s' is not recognized. Available keywords are: x, z, p, t" % k )
-  return IOSchemeVector([x,z,p,t], IOScheme(SCHEME_DAEInput))
+    if k not in ['x', 'z', 'p', 't']:
+      raise Exception("Error in 'daeIn' arguments. You supplied key '%s'. Allowed keys are: 'x', 'z', 'p', 't'" % k)
+  return (kwargs, ['x', 'z', 'p', 't'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -695,29 +333,17 @@ namespace casadi {
 %template(daeIn) daeIn<casadi::MX>;
 %template(daeIn) daeIn<casadi::Matrix<double> >;
 %template(daeIn) daeIn<casadi::Sparsity>;
-%template(IOSchemeVectorDAEInputSX) DAEInputIOSchemeVector<SX>;
-%template(IOSchemeVectorDAEInputMX) DAEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorDAEInputD) DAEInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorDAEInputSparsity) DAEInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorDAEInput) IOSchemeVectorDAEInputSX;
-%rename(IOSchemeVectorDAEInput) IOSchemeVectorDAEInputMX;
-%rename(IOSchemeVectorDAEInput) IOSchemeVectorDAEInputD;
-%rename(IOSchemeVectorDAEInput) IOSchemeVectorDAEInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def daeOut(*dummy,**kwargs):
+def daeOut(**kwargs):
   """
   Helper function for 'DAEOutput'
 
-  Two use cases:
-     a) arg = daeOut(ode=my_ode, alg=my_alg, quad=my_quad)
-          all arguments optional
-     b) ode, alg, quad = daeOut(arg,"ode", "alg", "quad")
-          all arguments after the first optional
+  Usage:
+    arg = daeOut(ode=my_ode, alg=my_alg, quad=my_quad)
+        all arguments optional
   Output arguments of an DAE function
   
   Keyword arguments::
@@ -726,21 +352,10 @@ def daeOut(*dummy,**kwargs):
     alg  -- Right hand side of algebraic equations [DAE_ALG]
     quad -- Right hand side of quadratures equations [DAE_QUAD]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of daeOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DAEOutput,n)] for n in dummy[1:]]
-  ode = []
-  if 'ode' in kwargs:
-    ode = kwargs['ode']
-  alg = []
-  if 'alg' in kwargs:
-    alg = kwargs['alg']
-  quad = []
-  if 'quad' in kwargs:
-    quad = kwargs['quad']
   for k in kwargs.keys():
-    if not(k in ['ode','alg','quad']):
-      raise Exception("Keyword error in daeOut: '%s' is not recognized. Available keywords are: ode, alg, quad" % k )
-  return IOSchemeVector([ode,alg,quad], IOScheme(SCHEME_DAEOutput))
+    if k not in ['ode', 'alg', 'quad']:
+      raise Exception("Error in 'daeOut' arguments. You supplied key '%s'. Allowed keys are: 'ode', 'alg', 'quad'" % k)
+  return (kwargs, ['ode', 'alg', 'quad'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -749,29 +364,17 @@ namespace casadi {
 %template(daeOut) daeOut<casadi::MX>;
 %template(daeOut) daeOut<casadi::Matrix<double> >;
 %template(daeOut) daeOut<casadi::Sparsity>;
-%template(IOSchemeVectorDAEOutputSX) DAEOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorDAEOutputMX) DAEOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorDAEOutputD) DAEOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorDAEOutputSparsity) DAEOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorDAEOutput) IOSchemeVectorDAEOutputSX;
-%rename(IOSchemeVectorDAEOutput) IOSchemeVectorDAEOutputMX;
-%rename(IOSchemeVectorDAEOutput) IOSchemeVectorDAEOutputD;
-%rename(IOSchemeVectorDAEOutput) IOSchemeVectorDAEOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def rdaeIn(*dummy,**kwargs):
+def rdaeIn(**kwargs):
   """
   Helper function for 'RDAEInput'
 
-  Two use cases:
-     a) arg = rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t)
-          all arguments optional
-     b) rx, rz, rp, x, z, p, t = rdaeIn(arg,"rx", "rz", "rp", "x", "z", "p", "t")
-          all arguments after the first optional
+  Usage:
+    arg = rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t)
+        all arguments optional
   Input arguments of an ODE/DAE backward integration function
   
   Keyword arguments::
@@ -784,33 +387,10 @@ def rdaeIn(*dummy,**kwargs):
     p  -- Parameter vector [RDAE_P]
     t  -- Explicit time dependence [RDAE_T]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of rdaeIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_RDAEInput,n)] for n in dummy[1:]]
-  rx = []
-  if 'rx' in kwargs:
-    rx = kwargs['rx']
-  rz = []
-  if 'rz' in kwargs:
-    rz = kwargs['rz']
-  rp = []
-  if 'rp' in kwargs:
-    rp = kwargs['rp']
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  z = []
-  if 'z' in kwargs:
-    z = kwargs['z']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  t = []
-  if 't' in kwargs:
-    t = kwargs['t']
   for k in kwargs.keys():
-    if not(k in ['rx','rz','rp','x','z','p','t']):
-      raise Exception("Keyword error in rdaeIn: '%s' is not recognized. Available keywords are: rx, rz, rp, x, z, p, t" % k )
-  return IOSchemeVector([rx,rz,rp,x,z,p,t], IOScheme(SCHEME_RDAEInput))
+    if k not in ['rx', 'rz', 'rp', 'x', 'z', 'p', 't']:
+      raise Exception("Error in 'rdaeIn' arguments. You supplied key '%s'. Allowed keys are: 'rx', 'rz', 'rp', 'x', 'z', 'p', 't'" % k)
+  return (kwargs, ['rx', 'rz', 'rp', 'x', 'z', 'p', 't'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -819,29 +399,17 @@ namespace casadi {
 %template(rdaeIn) rdaeIn<casadi::MX>;
 %template(rdaeIn) rdaeIn<casadi::Matrix<double> >;
 %template(rdaeIn) rdaeIn<casadi::Sparsity>;
-%template(IOSchemeVectorRDAEInputSX) RDAEInputIOSchemeVector<SX>;
-%template(IOSchemeVectorRDAEInputMX) RDAEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorRDAEInputD) RDAEInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorRDAEInputSparsity) RDAEInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorRDAEInput) IOSchemeVectorRDAEInputSX;
-%rename(IOSchemeVectorRDAEInput) IOSchemeVectorRDAEInputMX;
-%rename(IOSchemeVectorRDAEInput) IOSchemeVectorRDAEInputD;
-%rename(IOSchemeVectorRDAEInput) IOSchemeVectorRDAEInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def rdaeOut(*dummy,**kwargs):
+def rdaeOut(**kwargs):
   """
   Helper function for 'RDAEOutput'
 
-  Two use cases:
-     a) arg = rdaeOut(ode=my_ode, alg=my_alg, quad=my_quad)
-          all arguments optional
-     b) ode, alg, quad = rdaeOut(arg,"ode", "alg", "quad")
-          all arguments after the first optional
+  Usage:
+    arg = rdaeOut(ode=my_ode, alg=my_alg, quad=my_quad)
+        all arguments optional
   Output arguments of an ODE/DAE backward integration function
   
   Keyword arguments::
@@ -850,21 +418,10 @@ def rdaeOut(*dummy,**kwargs):
     alg  -- Right hand side of algebraic equations. [RDAE_ALG]
     quad -- Right hand side of quadratures. [RDAE_QUAD]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of rdaeOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_RDAEOutput,n)] for n in dummy[1:]]
-  ode = []
-  if 'ode' in kwargs:
-    ode = kwargs['ode']
-  alg = []
-  if 'alg' in kwargs:
-    alg = kwargs['alg']
-  quad = []
-  if 'quad' in kwargs:
-    quad = kwargs['quad']
   for k in kwargs.keys():
-    if not(k in ['ode','alg','quad']):
-      raise Exception("Keyword error in rdaeOut: '%s' is not recognized. Available keywords are: ode, alg, quad" % k )
-  return IOSchemeVector([ode,alg,quad], IOScheme(SCHEME_RDAEOutput))
+    if k not in ['ode', 'alg', 'quad']:
+      raise Exception("Error in 'rdaeOut' arguments. You supplied key '%s'. Allowed keys are: 'ode', 'alg', 'quad'" % k)
+  return (kwargs, ['ode', 'alg', 'quad'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -873,29 +430,17 @@ namespace casadi {
 %template(rdaeOut) rdaeOut<casadi::MX>;
 %template(rdaeOut) rdaeOut<casadi::Matrix<double> >;
 %template(rdaeOut) rdaeOut<casadi::Sparsity>;
-%template(IOSchemeVectorRDAEOutputSX) RDAEOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorRDAEOutputMX) RDAEOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorRDAEOutputD) RDAEOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorRDAEOutputSparsity) RDAEOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorRDAEOutput) IOSchemeVectorRDAEOutputSX;
-%rename(IOSchemeVectorRDAEOutput) IOSchemeVectorRDAEOutputMX;
-%rename(IOSchemeVectorRDAEOutput) IOSchemeVectorRDAEOutputD;
-%rename(IOSchemeVectorRDAEOutput) IOSchemeVectorRDAEOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def integratorIn(*dummy,**kwargs):
+def integratorIn(**kwargs):
   """
   Helper function for 'IntegratorInput'
 
-  Two use cases:
-     a) arg = integratorIn(x0=my_x0, p=my_p, z0=my_z0, rx0=my_rx0, rp=my_rp, rz0=my_rz0)
-          all arguments optional
-     b) x0, p, z0, rx0, rp, rz0 = integratorIn(arg,"x0", "p", "z0", "rx0", "rp", "rz0")
-          all arguments after the first optional
+  Usage:
+    arg = integratorIn(x0=my_x0, p=my_p, z0=my_z0, rx0=my_rx0, rp=my_rp, rz0=my_rz0)
+        all arguments optional
   Input arguments of an integrator
   
   Keyword arguments::
@@ -907,30 +452,10 @@ def integratorIn(*dummy,**kwargs):
     rp  -- Backward parameter vector [INTEGRATOR_RP]
     rz0 -- Initial guess for the backwards algebraic variable [INTEGRATOR_RZ0]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_IntegratorInput,n)] for n in dummy[1:]]
-  x0 = []
-  if 'x0' in kwargs:
-    x0 = kwargs['x0']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  z0 = []
-  if 'z0' in kwargs:
-    z0 = kwargs['z0']
-  rx0 = []
-  if 'rx0' in kwargs:
-    rx0 = kwargs['rx0']
-  rp = []
-  if 'rp' in kwargs:
-    rp = kwargs['rp']
-  rz0 = []
-  if 'rz0' in kwargs:
-    rz0 = kwargs['rz0']
   for k in kwargs.keys():
-    if not(k in ['x0','p','z0','rx0','rp','rz0']):
-      raise Exception("Keyword error in integratorIn: '%s' is not recognized. Available keywords are: x0, p, z0, rx0, rp, rz0" % k )
-  return IOSchemeVector([x0,p,z0,rx0,rp,rz0], IOScheme(SCHEME_IntegratorInput))
+    if k not in ['x0', 'p', 'z0', 'rx0', 'rp', 'rz0']:
+      raise Exception("Error in 'integratorIn' arguments. You supplied key '%s'. Allowed keys are: 'x0', 'p', 'z0', 'rx0', 'rp', 'rz0'" % k)
+  return (kwargs, ['x0', 'p', 'z0', 'rx0', 'rp', 'rz0'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -939,29 +464,17 @@ namespace casadi {
 %template(integratorIn) integratorIn<casadi::MX>;
 %template(integratorIn) integratorIn<casadi::Matrix<double> >;
 %template(integratorIn) integratorIn<casadi::Sparsity>;
-%template(IOSchemeVectorIntegratorInputSX) IntegratorInputIOSchemeVector<SX>;
-%template(IOSchemeVectorIntegratorInputMX) IntegratorInputIOSchemeVector<MX>;
-%template(IOSchemeVectorIntegratorInputD) IntegratorInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorIntegratorInputSparsity) IntegratorInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorIntegratorInput) IOSchemeVectorIntegratorInputSX;
-%rename(IOSchemeVectorIntegratorInput) IOSchemeVectorIntegratorInputMX;
-%rename(IOSchemeVectorIntegratorInput) IOSchemeVectorIntegratorInputD;
-%rename(IOSchemeVectorIntegratorInput) IOSchemeVectorIntegratorInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def integratorOut(*dummy,**kwargs):
+def integratorOut(**kwargs):
   """
   Helper function for 'IntegratorOutput'
 
-  Two use cases:
-     a) arg = integratorOut(xf=my_xf, qf=my_qf, zf=my_zf, rxf=my_rxf, rqf=my_rqf, rzf=my_rzf)
-          all arguments optional
-     b) xf, qf, zf, rxf, rqf, rzf = integratorOut(arg,"xf", "qf", "zf", "rxf", "rqf", "rzf")
-          all arguments after the first optional
+  Usage:
+    arg = integratorOut(xf=my_xf, qf=my_qf, zf=my_zf, rxf=my_rxf, rqf=my_rqf, rzf=my_rzf)
+        all arguments optional
   Output arguments of an integrator
   
   Keyword arguments::
@@ -973,30 +486,10 @@ def integratorOut(*dummy,**kwargs):
     rqf -- Backward quadrature state at the initial time [INTEGRATOR_RQF]
     rzf -- Backward algebraic variable at the initial time [INTEGRATOR_RZF]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_IntegratorOutput,n)] for n in dummy[1:]]
-  xf = []
-  if 'xf' in kwargs:
-    xf = kwargs['xf']
-  qf = []
-  if 'qf' in kwargs:
-    qf = kwargs['qf']
-  zf = []
-  if 'zf' in kwargs:
-    zf = kwargs['zf']
-  rxf = []
-  if 'rxf' in kwargs:
-    rxf = kwargs['rxf']
-  rqf = []
-  if 'rqf' in kwargs:
-    rqf = kwargs['rqf']
-  rzf = []
-  if 'rzf' in kwargs:
-    rzf = kwargs['rzf']
   for k in kwargs.keys():
-    if not(k in ['xf','qf','zf','rxf','rqf','rzf']):
-      raise Exception("Keyword error in integratorOut: '%s' is not recognized. Available keywords are: xf, qf, zf, rxf, rqf, rzf" % k )
-  return IOSchemeVector([xf,qf,zf,rxf,rqf,rzf], IOScheme(SCHEME_IntegratorOutput))
+    if k not in ['xf', 'qf', 'zf', 'rxf', 'rqf', 'rzf']:
+      raise Exception("Error in 'integratorOut' arguments. You supplied key '%s'. Allowed keys are: 'xf', 'qf', 'zf', 'rxf', 'rqf', 'rzf'" % k)
+  return (kwargs, ['xf', 'qf', 'zf', 'rxf', 'rqf', 'rzf'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1005,29 +498,17 @@ namespace casadi {
 %template(integratorOut) integratorOut<casadi::MX>;
 %template(integratorOut) integratorOut<casadi::Matrix<double> >;
 %template(integratorOut) integratorOut<casadi::Sparsity>;
-%template(IOSchemeVectorIntegratorOutputSX) IntegratorOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorIntegratorOutputMX) IntegratorOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorIntegratorOutputD) IntegratorOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorIntegratorOutputSparsity) IntegratorOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorIntegratorOutput) IOSchemeVectorIntegratorOutputSX;
-%rename(IOSchemeVectorIntegratorOutput) IOSchemeVectorIntegratorOutputMX;
-%rename(IOSchemeVectorIntegratorOutput) IOSchemeVectorIntegratorOutputD;
-%rename(IOSchemeVectorIntegratorOutput) IOSchemeVectorIntegratorOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def linsolIn(*dummy,**kwargs):
+def linsolIn(**kwargs):
   """
   Helper function for 'LinsolInput'
 
-  Two use cases:
-     a) arg = linsolIn(A=my_A, B=my_B)
-          all arguments optional
-     b) A, B = linsolIn(arg,"A", "B")
-          all arguments after the first optional
+  Usage:
+    arg = linsolIn(A=my_A, B=my_B)
+        all arguments optional
   Input arguments of a linear solver
   
   Keyword arguments::
@@ -1035,18 +516,10 @@ def linsolIn(*dummy,**kwargs):
     A -- The square matrix A: sparse, (n x n). [LINSOL_A]
     B -- The right-hand-side matrix b: dense,  (n x m) [LINSOL_B]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LinsolInput,n)] for n in dummy[1:]]
-  A = []
-  if 'A' in kwargs:
-    A = kwargs['A']
-  B = []
-  if 'B' in kwargs:
-    B = kwargs['B']
   for k in kwargs.keys():
-    if not(k in ['A','B']):
-      raise Exception("Keyword error in linsolIn: '%s' is not recognized. Available keywords are: A, B" % k )
-  return IOSchemeVector([A,B], IOScheme(SCHEME_LinsolInput))
+    if k not in ['A', 'B']:
+      raise Exception("Error in 'linsolIn' arguments. You supplied key '%s'. Allowed keys are: 'A', 'B'" % k)
+  return (kwargs, ['A', 'B'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1055,44 +528,27 @@ namespace casadi {
 %template(linsolIn) linsolIn<casadi::MX>;
 %template(linsolIn) linsolIn<casadi::Matrix<double> >;
 %template(linsolIn) linsolIn<casadi::Sparsity>;
-%template(IOSchemeVectorLinsolInputSX) LinsolInputIOSchemeVector<SX>;
-%template(IOSchemeVectorLinsolInputMX) LinsolInputIOSchemeVector<MX>;
-%template(IOSchemeVectorLinsolInputD) LinsolInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorLinsolInputSparsity) LinsolInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorLinsolInput) IOSchemeVectorLinsolInputSX;
-%rename(IOSchemeVectorLinsolInput) IOSchemeVectorLinsolInputMX;
-%rename(IOSchemeVectorLinsolInput) IOSchemeVectorLinsolInputD;
-%rename(IOSchemeVectorLinsolInput) IOSchemeVectorLinsolInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def linsolOut(*dummy,**kwargs):
+def linsolOut(**kwargs):
   """
   Helper function for 'LinsolOutput'
 
-  Two use cases:
-     a) arg = linsolOut(X=my_X)
-          all arguments optional
-     b) X = linsolOut(arg,"X")
-          all arguments after the first optional
+  Usage:
+    arg = linsolOut(X=my_X)
+        all arguments optional
   Output arguments of a linear solver
   
   Keyword arguments::
 
     X -- Solution to the linear system of equations [LINSOL_X]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LinsolOutput,n)] for n in dummy[1:]]
-  X = []
-  if 'X' in kwargs:
-    X = kwargs['X']
   for k in kwargs.keys():
-    if not(k in ['X']):
-      raise Exception("Keyword error in linsolOut: '%s' is not recognized. Available keywords are: X" % k )
-  return IOSchemeVector([X], IOScheme(SCHEME_LinsolOutput))
+    if k not in ['X']:
+      raise Exception("Error in 'linsolOut' arguments. You supplied key '%s'. Allowed keys are: 'X'" % k)
+  return (kwargs, ['X'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1101,29 +557,17 @@ namespace casadi {
 %template(linsolOut) linsolOut<casadi::MX>;
 %template(linsolOut) linsolOut<casadi::Matrix<double> >;
 %template(linsolOut) linsolOut<casadi::Sparsity>;
-%template(IOSchemeVectorLinsolOutputSX) LinsolOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorLinsolOutputMX) LinsolOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorLinsolOutputD) LinsolOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorLinsolOutputSparsity) LinsolOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorLinsolOutput) IOSchemeVectorLinsolOutputSX;
-%rename(IOSchemeVectorLinsolOutput) IOSchemeVectorLinsolOutputMX;
-%rename(IOSchemeVectorLinsolOutput) IOSchemeVectorLinsolOutputD;
-%rename(IOSchemeVectorLinsolOutput) IOSchemeVectorLinsolOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lpIn(*dummy,**kwargs):
+def lpIn(**kwargs):
   """
   Helper function for 'LpSolverInput'
 
-  Two use cases:
-     a) arg = lpIn(c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
-          all arguments optional
-     b) c, a, lba, uba, lbx, ubx = lpIn(arg,"c", "a", "lba", "uba", "lbx", "ubx")
-          all arguments after the first optional
+  Usage:
+    arg = lpIn(c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
+        all arguments optional
   Input arguments of a LP problem
   
   Keyword arguments::
@@ -1135,30 +579,10 @@ def lpIn(*dummy,**kwargs):
     lbx -- dense, (n x 1) [LP_SOLVER_LBX]
     ubx -- dense, (n x 1) [LP_SOLVER_UBX]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LpSolverInput,n)] for n in dummy[1:]]
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
   for k in kwargs.keys():
-    if not(k in ['c','a','lba','uba','lbx','ubx']):
-      raise Exception("Keyword error in lpIn: '%s' is not recognized. Available keywords are: c, a, lba, uba, lbx, ubx" % k )
-  return IOSchemeVector([c,a,lba,uba,lbx,ubx], IOScheme(SCHEME_LpSolverInput))
+    if k not in ['c', 'a', 'lba', 'uba', 'lbx', 'ubx']:
+      raise Exception("Error in 'lpIn' arguments. You supplied key '%s'. Allowed keys are: 'c', 'a', 'lba', 'uba', 'lbx', 'ubx'" % k)
+  return (kwargs, ['c', 'a', 'lba', 'uba', 'lbx', 'ubx'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1167,29 +591,17 @@ namespace casadi {
 %template(lpIn) lpIn<casadi::MX>;
 %template(lpIn) lpIn<casadi::Matrix<double> >;
 %template(lpIn) lpIn<casadi::Sparsity>;
-%template(IOSchemeVectorLpSolverInputSX) LpSolverInputIOSchemeVector<SX>;
-%template(IOSchemeVectorLpSolverInputMX) LpSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorLpSolverInputD) LpSolverInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorLpSolverInputSparsity) LpSolverInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorLpSolverInput) IOSchemeVectorLpSolverInputSX;
-%rename(IOSchemeVectorLpSolverInput) IOSchemeVectorLpSolverInputMX;
-%rename(IOSchemeVectorLpSolverInput) IOSchemeVectorLpSolverInputD;
-%rename(IOSchemeVectorLpSolverInput) IOSchemeVectorLpSolverInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lpOut(*dummy,**kwargs):
+def lpOut(**kwargs):
   """
   Helper function for 'LpSolverOutput'
 
-  Two use cases:
-     a) arg = lpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
-          all arguments optional
-     b) x, cost, lam_a, lam_x = lpOut(arg,"x", "cost", "lam_a", "lam_x")
-          all arguments after the first optional
+  Usage:
+    arg = lpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+        all arguments optional
   Output arguments of an LP Solver
   
   Keyword arguments::
@@ -1199,24 +611,10 @@ def lpOut(*dummy,**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [LP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [LP_SOLVER_LAM_X]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LpSolverOutput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  lam_a = []
-  if 'lam_a' in kwargs:
-    lam_a = kwargs['lam_a']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
   for k in kwargs.keys():
-    if not(k in ['x','cost','lam_a','lam_x']):
-      raise Exception("Keyword error in lpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_LpSolverOutput))
+    if k not in ['x', 'cost', 'lam_a', 'lam_x']:
+      raise Exception("Error in 'lpOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'cost', 'lam_a', 'lam_x'" % k)
+  return (kwargs, ['x', 'cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1225,65 +623,17 @@ namespace casadi {
 %template(lpOut) lpOut<casadi::MX>;
 %template(lpOut) lpOut<casadi::Matrix<double> >;
 %template(lpOut) lpOut<casadi::Sparsity>;
-%template(IOSchemeVectorLpSolverOutputSX) LpSolverOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorLpSolverOutputMX) LpSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorLpSolverOutputD) LpSolverOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorLpSolverOutputSparsity) LpSolverOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorLpSolverOutput) IOSchemeVectorLpSolverOutputSX;
-%rename(IOSchemeVectorLpSolverOutput) IOSchemeVectorLpSolverOutputMX;
-%rename(IOSchemeVectorLpSolverOutput) IOSchemeVectorLpSolverOutputD;
-%rename(IOSchemeVectorLpSolverOutput) IOSchemeVectorLpSolverOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lpStruct(*dummy,**kwargs):
-  """
-  Helper function for 'LPStruct'
-
-  Two use cases:
-     a) arg = lpStruct(a=my_a)
-          all arguments optional
-     b) a = lpStruct(arg,"a")
-          all arguments after the first optional
-  Structure specification of an LP
-  
-  Keyword arguments::
-
-    a -- The matrix A: sparse [LP_STRUCT_A]
-  """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LPStruct,n)] for n in dummy[1:]]
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  for k in kwargs.keys():
-    if not(k in ['a']):
-      raise Exception("Keyword error in lpStruct: '%s' is not recognized. Available keywords are: a" % k )
-  return LPStructure([a])
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(lpStruct) lpStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-namespace casadi {
-%template(LPStructure) LPStructIOSchemeVector<Sparsity>;
-}
-#ifdef SWIGPYTHON
-%pythoncode %{
-def lrdleIn(*dummy,**kwargs):
+def lrdleIn(**kwargs):
   """
   Helper function for 'LR_DLEInput'
 
-  Two use cases:
-     a) arg = lrdleIn(a=my_a, v=my_v, c=my_c, h=my_h)
-          all arguments optional
-     b) a, v, c, h = lrdleIn(arg,"a", "v", "c", "h")
-          all arguments after the first optional
+  Usage:
+    arg = lrdleIn(a=my_a, v=my_v, c=my_c, h=my_h)
+        all arguments optional
   Input arguments of a \e dle solver
   
   Keyword arguments::
@@ -1293,24 +643,10 @@ def lrdleIn(*dummy,**kwargs):
     c -- C matrix [LR_DLE_C]
     h -- H matrix: horizontal stack of all Hi [LR_DLE_H]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdleIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DLEInput,n)] for n in dummy[1:]]
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
   for k in kwargs.keys():
-    if not(k in ['a','v','c','h']):
-      raise Exception("Keyword error in lrdleIn: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
-  return IOSchemeVector([a,v,c,h], IOScheme(SCHEME_LR_DLEInput))
+    if k not in ['a', 'v', 'c', 'h']:
+      raise Exception("Error in 'lrdleIn' arguments. You supplied key '%s'. Allowed keys are: 'a', 'v', 'c', 'h'" % k)
+  return (kwargs, ['a', 'v', 'c', 'h'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1319,44 +655,27 @@ namespace casadi {
 %template(lrdleIn) lrdleIn<casadi::MX>;
 %template(lrdleIn) lrdleIn<casadi::Matrix<double> >;
 %template(lrdleIn) lrdleIn<casadi::Sparsity>;
-%template(IOSchemeVectorLR_DLEInputSX) LR_DLEInputIOSchemeVector<SX>;
-%template(IOSchemeVectorLR_DLEInputMX) LR_DLEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorLR_DLEInputD) LR_DLEInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorLR_DLEInputSparsity) LR_DLEInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorLR_DLEInput) IOSchemeVectorLR_DLEInputSX;
-%rename(IOSchemeVectorLR_DLEInput) IOSchemeVectorLR_DLEInputMX;
-%rename(IOSchemeVectorLR_DLEInput) IOSchemeVectorLR_DLEInputD;
-%rename(IOSchemeVectorLR_DLEInput) IOSchemeVectorLR_DLEInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lrdleOut(*dummy,**kwargs):
+def lrdleOut(**kwargs):
   """
   Helper function for 'LR_DLEOutput'
 
-  Two use cases:
-     a) arg = lrdleOut(y=my_y)
-          all arguments optional
-     b) y = lrdleOut(arg,"y")
-          all arguments after the first optional
+  Usage:
+    arg = lrdleOut(y=my_y)
+        all arguments optional
   Output arguments of a \e dle solver
   
   Keyword arguments::
 
     y -- Y matrix, block diagonal form [LR_DLE_Y]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdleOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DLEOutput,n)] for n in dummy[1:]]
-  y = []
-  if 'y' in kwargs:
-    y = kwargs['y']
   for k in kwargs.keys():
-    if not(k in ['y']):
-      raise Exception("Keyword error in lrdleOut: '%s' is not recognized. Available keywords are: y" % k )
-  return IOSchemeVector([y], IOScheme(SCHEME_LR_DLEOutput))
+    if k not in ['y']:
+      raise Exception("Error in 'lrdleOut' arguments. You supplied key '%s'. Allowed keys are: 'y'" % k)
+  return (kwargs, ['y'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1365,77 +684,17 @@ namespace casadi {
 %template(lrdleOut) lrdleOut<casadi::MX>;
 %template(lrdleOut) lrdleOut<casadi::Matrix<double> >;
 %template(lrdleOut) lrdleOut<casadi::Sparsity>;
-%template(IOSchemeVectorLR_DLEOutputSX) LR_DLEOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorLR_DLEOutputMX) LR_DLEOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorLR_DLEOutputD) LR_DLEOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorLR_DLEOutputSparsity) LR_DLEOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorLR_DLEOutput) IOSchemeVectorLR_DLEOutputSX;
-%rename(IOSchemeVectorLR_DLEOutput) IOSchemeVectorLR_DLEOutputMX;
-%rename(IOSchemeVectorLR_DLEOutput) IOSchemeVectorLR_DLEOutputD;
-%rename(IOSchemeVectorLR_DLEOutput) IOSchemeVectorLR_DLEOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lrdleStruct(*dummy,**kwargs):
-  """
-  Helper function for 'LrDleStruct'
-
-  Two use cases:
-     a) arg = lrdleStruct(a=my_a, v=my_v, c=my_c, h=my_h)
-          all arguments optional
-     b) a, v, c, h = lrdleStruct(arg,"a", "v", "c", "h")
-          all arguments after the first optional
-  Structure specification of a DLE
-  
-  Keyword arguments::
-
-    a -- The matrix A [LR_DLE_STRUCT_A]
-    v -- The matrix V [LR_DLE_STRUCT_V]
-    c -- The matrix C (defaults to unity) [LR_DLE_STRUCT_C]
-    h -- H matrix: horizontal stack of all Hi [LR_DLE_STRUCT_H]
-  """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdleStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LrDleStruct,n)] for n in dummy[1:]]
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = Sparsity()
-  if 'v' in kwargs:
-    v = kwargs['v']
-  c = Sparsity()
-  if 'c' in kwargs:
-    c = kwargs['c']
-  h = Sparsity()
-  if 'h' in kwargs:
-    h = kwargs['h']
-  for k in kwargs.keys():
-    if not(k in ['a','v','c','h']):
-      raise Exception("Keyword error in lrdleStruct: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
-  return LrDleStructure([a,v,c,h])
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(lrdleStruct) lrdleStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-namespace casadi {
-%template(LrDleStructure) LrDleStructIOSchemeVector<Sparsity>;
-}
-#ifdef SWIGPYTHON
-%pythoncode %{
-def lrdpleIn(*dummy,**kwargs):
+def lrdpleIn(**kwargs):
   """
   Helper function for 'LR_DPLEInput'
 
-  Two use cases:
-     a) arg = lrdpleIn(a=my_a, v=my_v, c=my_c, h=my_h)
-          all arguments optional
-     b) a, v, c, h = lrdpleIn(arg,"a", "v", "c", "h")
-          all arguments after the first optional
+  Usage:
+    arg = lrdpleIn(a=my_a, v=my_v, c=my_c, h=my_h)
+        all arguments optional
   Input arguments of a \e dple solver
   
   Keyword arguments::
@@ -1445,24 +704,10 @@ def lrdpleIn(*dummy,**kwargs):
     c -- C matrix [LR_DPLE_C]
     h -- H matrix: horizontal stack of all Hi [LR_DPLE_H]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdpleIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DPLEInput,n)] for n in dummy[1:]]
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
   for k in kwargs.keys():
-    if not(k in ['a','v','c','h']):
-      raise Exception("Keyword error in lrdpleIn: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
-  return IOSchemeVector([a,v,c,h], IOScheme(SCHEME_LR_DPLEInput))
+    if k not in ['a', 'v', 'c', 'h']:
+      raise Exception("Error in 'lrdpleIn' arguments. You supplied key '%s'. Allowed keys are: 'a', 'v', 'c', 'h'" % k)
+  return (kwargs, ['a', 'v', 'c', 'h'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1471,44 +716,27 @@ namespace casadi {
 %template(lrdpleIn) lrdpleIn<casadi::MX>;
 %template(lrdpleIn) lrdpleIn<casadi::Matrix<double> >;
 %template(lrdpleIn) lrdpleIn<casadi::Sparsity>;
-%template(IOSchemeVectorLR_DPLEInputSX) LR_DPLEInputIOSchemeVector<SX>;
-%template(IOSchemeVectorLR_DPLEInputMX) LR_DPLEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorLR_DPLEInputD) LR_DPLEInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorLR_DPLEInputSparsity) LR_DPLEInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorLR_DPLEInput) IOSchemeVectorLR_DPLEInputSX;
-%rename(IOSchemeVectorLR_DPLEInput) IOSchemeVectorLR_DPLEInputMX;
-%rename(IOSchemeVectorLR_DPLEInput) IOSchemeVectorLR_DPLEInputD;
-%rename(IOSchemeVectorLR_DPLEInput) IOSchemeVectorLR_DPLEInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lrdpleOut(*dummy,**kwargs):
+def lrdpleOut(**kwargs):
   """
   Helper function for 'LR_DPLEOutput'
 
-  Two use cases:
-     a) arg = lrdpleOut(y=my_y)
-          all arguments optional
-     b) y = lrdpleOut(arg,"y")
-          all arguments after the first optional
+  Usage:
+    arg = lrdpleOut(y=my_y)
+        all arguments optional
   Output arguments of a \e dple solver
   
   Keyword arguments::
 
     y -- Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [LR_DPLE_Y]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdpleOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DPLEOutput,n)] for n in dummy[1:]]
-  y = []
-  if 'y' in kwargs:
-    y = kwargs['y']
   for k in kwargs.keys():
-    if not(k in ['y']):
-      raise Exception("Keyword error in lrdpleOut: '%s' is not recognized. Available keywords are: y" % k )
-  return IOSchemeVector([y], IOScheme(SCHEME_LR_DPLEOutput))
+    if k not in ['y']:
+      raise Exception("Error in 'lrdpleOut' arguments. You supplied key '%s'. Allowed keys are: 'y'" % k)
+  return (kwargs, ['y'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1517,77 +745,17 @@ namespace casadi {
 %template(lrdpleOut) lrdpleOut<casadi::MX>;
 %template(lrdpleOut) lrdpleOut<casadi::Matrix<double> >;
 %template(lrdpleOut) lrdpleOut<casadi::Sparsity>;
-%template(IOSchemeVectorLR_DPLEOutputSX) LR_DPLEOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorLR_DPLEOutputMX) LR_DPLEOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorLR_DPLEOutputD) LR_DPLEOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorLR_DPLEOutputSparsity) LR_DPLEOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorLR_DPLEOutput) IOSchemeVectorLR_DPLEOutputSX;
-%rename(IOSchemeVectorLR_DPLEOutput) IOSchemeVectorLR_DPLEOutputMX;
-%rename(IOSchemeVectorLR_DPLEOutput) IOSchemeVectorLR_DPLEOutputD;
-%rename(IOSchemeVectorLR_DPLEOutput) IOSchemeVectorLR_DPLEOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lrdpleStruct(*dummy,**kwargs):
-  """
-  Helper function for 'LrDpleVecStruct'
-
-  Two use cases:
-     a) arg = lrdpleStruct(a=my_a, v=my_v, c=my_c, h=my_h)
-          all arguments optional
-     b) a, v, c, h = lrdpleStruct(arg,"a", "v", "c", "h")
-          all arguments after the first optional
-  Structure specification of a DPLE
-  
-  Keyword arguments::
-
-    a -- Sparsities for A_i, block diagonal form [LR_Dple_STRUCT_A]
-    v -- Sparsities for V_i, block diagonal form [LR_Dple_STRUCT_V]
-    c -- Sparsities for C_i (defaults to unity), block diagonal form [LR_Dple_STRUCT_C]
-    h -- Sparsities for H_i (defaults to unity), block diagonal form [LR_Dple_STRUCT_H]
-  """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdpleStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LrDpleVecStruct,n)] for n in dummy[1:]]
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  v = []
-  if 'v' in kwargs:
-    v = kwargs['v']
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  for k in kwargs.keys():
-    if not(k in ['a','v','c','h']):
-      raise Exception("Keyword error in lrdpleStruct: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
-  return LrDpleVecStructure([a,v,c,h])
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(lrdpleStruct) lrdpleStruct< std::vector<casadi::Sparsity> >;
-}
-#endif //SWIGPYTHON
-namespace casadi {
-%template(LrDpleVecStructure) LrDpleVecStructIOSchemeVector< std::vector<Sparsity> >;
-}
-#ifdef SWIGPYTHON
-%pythoncode %{
-def nlpIn(*dummy,**kwargs):
+def nlpIn(**kwargs):
   """
   Helper function for 'NLPInput'
 
-  Two use cases:
-     a) arg = nlpIn(x=my_x, p=my_p)
-          all arguments optional
-     b) x, p = nlpIn(arg,"x", "p")
-          all arguments after the first optional
+  Usage:
+    arg = nlpIn(x=my_x, p=my_p)
+        all arguments optional
   Input arguments of an NLP function
   
   Keyword arguments::
@@ -1595,18 +763,10 @@ def nlpIn(*dummy,**kwargs):
     x -- Decision variable [NL_X]
     p -- Fixed parameter [NL_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPInput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
   for k in kwargs.keys():
-    if not(k in ['x','p']):
-      raise Exception("Keyword error in nlpIn: '%s' is not recognized. Available keywords are: x, p" % k )
-  return IOSchemeVector([x,p], IOScheme(SCHEME_NLPInput))
+    if k not in ['x', 'p']:
+      raise Exception("Error in 'nlpIn' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p'" % k)
+  return (kwargs, ['x', 'p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1615,29 +775,17 @@ namespace casadi {
 %template(nlpIn) nlpIn<casadi::MX>;
 %template(nlpIn) nlpIn<casadi::Matrix<double> >;
 %template(nlpIn) nlpIn<casadi::Sparsity>;
-%template(IOSchemeVectorNLPInputSX) NLPInputIOSchemeVector<SX>;
-%template(IOSchemeVectorNLPInputMX) NLPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorNLPInputD) NLPInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorNLPInputSparsity) NLPInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorNLPInput) IOSchemeVectorNLPInputSX;
-%rename(IOSchemeVectorNLPInput) IOSchemeVectorNLPInputMX;
-%rename(IOSchemeVectorNLPInput) IOSchemeVectorNLPInputD;
-%rename(IOSchemeVectorNLPInput) IOSchemeVectorNLPInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def nlpOut(*dummy,**kwargs):
+def nlpOut(**kwargs):
   """
   Helper function for 'NLPOutput'
 
-  Two use cases:
-     a) arg = nlpOut(f=my_f, g=my_g)
-          all arguments optional
-     b) f, g = nlpOut(arg,"f", "g")
-          all arguments after the first optional
+  Usage:
+    arg = nlpOut(f=my_f, g=my_g)
+        all arguments optional
   Output arguments of an NLP function
   
   Keyword arguments::
@@ -1645,18 +793,10 @@ def nlpOut(*dummy,**kwargs):
     f -- Objective function [NL_F]
     g -- Constraint function [NL_G]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPOutput,n)] for n in dummy[1:]]
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
   for k in kwargs.keys():
-    if not(k in ['f','g']):
-      raise Exception("Keyword error in nlpOut: '%s' is not recognized. Available keywords are: f, g" % k )
-  return IOSchemeVector([f,g], IOScheme(SCHEME_NLPOutput))
+    if k not in ['f', 'g']:
+      raise Exception("Error in 'nlpOut' arguments. You supplied key '%s'. Allowed keys are: 'f', 'g'" % k)
+  return (kwargs, ['f', 'g'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1665,29 +805,17 @@ namespace casadi {
 %template(nlpOut) nlpOut<casadi::MX>;
 %template(nlpOut) nlpOut<casadi::Matrix<double> >;
 %template(nlpOut) nlpOut<casadi::Sparsity>;
-%template(IOSchemeVectorNLPOutputSX) NLPOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorNLPOutputMX) NLPOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorNLPOutputD) NLPOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorNLPOutputSparsity) NLPOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorNLPOutput) IOSchemeVectorNLPOutputSX;
-%rename(IOSchemeVectorNLPOutput) IOSchemeVectorNLPOutputMX;
-%rename(IOSchemeVectorNLPOutput) IOSchemeVectorNLPOutputD;
-%rename(IOSchemeVectorNLPOutput) IOSchemeVectorNLPOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def gradFIn(*dummy,**kwargs):
+def gradFIn(**kwargs):
   """
   Helper function for 'GradFInput'
 
-  Two use cases:
-     a) arg = gradFIn(x=my_x, p=my_p)
-          all arguments optional
-     b) x, p = gradFIn(arg,"x", "p")
-          all arguments after the first optional
+  Usage:
+    arg = gradFIn(x=my_x, p=my_p)
+        all arguments optional
   Input arguments of an NLP objective gradient function
   
   Keyword arguments::
@@ -1695,18 +823,10 @@ def gradFIn(*dummy,**kwargs):
     x -- Decision variable [GRADF_X]
     p -- Fixed parameter [GRADF_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of gradFIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_GradFInput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
   for k in kwargs.keys():
-    if not(k in ['x','p']):
-      raise Exception("Keyword error in gradFIn: '%s' is not recognized. Available keywords are: x, p" % k )
-  return IOSchemeVector([x,p], IOScheme(SCHEME_GradFInput))
+    if k not in ['x', 'p']:
+      raise Exception("Error in 'gradFIn' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p'" % k)
+  return (kwargs, ['x', 'p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1715,29 +835,17 @@ namespace casadi {
 %template(gradFIn) gradFIn<casadi::MX>;
 %template(gradFIn) gradFIn<casadi::Matrix<double> >;
 %template(gradFIn) gradFIn<casadi::Sparsity>;
-%template(IOSchemeVectorGradFInputSX) GradFInputIOSchemeVector<SX>;
-%template(IOSchemeVectorGradFInputMX) GradFInputIOSchemeVector<MX>;
-%template(IOSchemeVectorGradFInputD) GradFInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorGradFInputSparsity) GradFInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorGradFInput) IOSchemeVectorGradFInputSX;
-%rename(IOSchemeVectorGradFInput) IOSchemeVectorGradFInputMX;
-%rename(IOSchemeVectorGradFInput) IOSchemeVectorGradFInputD;
-%rename(IOSchemeVectorGradFInput) IOSchemeVectorGradFInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def gradFOut(*dummy,**kwargs):
+def gradFOut(**kwargs):
   """
   Helper function for 'GradFOutput'
 
-  Two use cases:
-     a) arg = gradFOut(grad=my_grad, f=my_f, g=my_g)
-          all arguments optional
-     b) grad, f, g = gradFOut(arg,"grad", "f", "g")
-          all arguments after the first optional
+  Usage:
+    arg = gradFOut(grad=my_grad, f=my_f, g=my_g)
+        all arguments optional
   Output arguments of an NLP objective gradient function
   
   Keyword arguments::
@@ -1746,21 +854,10 @@ def gradFOut(*dummy,**kwargs):
     f    -- Objective function [GRADF_F]
     g    -- Constraint function [GRADF_G]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of gradFOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_GradFOutput,n)] for n in dummy[1:]]
-  grad = []
-  if 'grad' in kwargs:
-    grad = kwargs['grad']
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
   for k in kwargs.keys():
-    if not(k in ['grad','f','g']):
-      raise Exception("Keyword error in gradFOut: '%s' is not recognized. Available keywords are: grad, f, g" % k )
-  return IOSchemeVector([grad,f,g], IOScheme(SCHEME_GradFOutput))
+    if k not in ['grad', 'f', 'g']:
+      raise Exception("Error in 'gradFOut' arguments. You supplied key '%s'. Allowed keys are: 'grad', 'f', 'g'" % k)
+  return (kwargs, ['grad', 'f', 'g'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1769,29 +866,17 @@ namespace casadi {
 %template(gradFOut) gradFOut<casadi::MX>;
 %template(gradFOut) gradFOut<casadi::Matrix<double> >;
 %template(gradFOut) gradFOut<casadi::Sparsity>;
-%template(IOSchemeVectorGradFOutputSX) GradFOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorGradFOutputMX) GradFOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorGradFOutputD) GradFOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorGradFOutputSparsity) GradFOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorGradFOutput) IOSchemeVectorGradFOutputSX;
-%rename(IOSchemeVectorGradFOutput) IOSchemeVectorGradFOutputMX;
-%rename(IOSchemeVectorGradFOutput) IOSchemeVectorGradFOutputD;
-%rename(IOSchemeVectorGradFOutput) IOSchemeVectorGradFOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def jacGIn(*dummy,**kwargs):
+def jacGIn(**kwargs):
   """
   Helper function for 'JacGInput'
 
-  Two use cases:
-     a) arg = jacGIn(x=my_x, p=my_p)
-          all arguments optional
-     b) x, p = jacGIn(arg,"x", "p")
-          all arguments after the first optional
+  Usage:
+    arg = jacGIn(x=my_x, p=my_p)
+        all arguments optional
   Input arguments of an NLP Jacobian function
   
   Keyword arguments::
@@ -1799,18 +884,10 @@ def jacGIn(*dummy,**kwargs):
     x -- Decision variable [JACG_X]
     p -- Fixed parameter [JACG_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of jacGIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_JacGInput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
   for k in kwargs.keys():
-    if not(k in ['x','p']):
-      raise Exception("Keyword error in jacGIn: '%s' is not recognized. Available keywords are: x, p" % k )
-  return IOSchemeVector([x,p], IOScheme(SCHEME_JacGInput))
+    if k not in ['x', 'p']:
+      raise Exception("Error in 'jacGIn' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p'" % k)
+  return (kwargs, ['x', 'p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1819,29 +896,17 @@ namespace casadi {
 %template(jacGIn) jacGIn<casadi::MX>;
 %template(jacGIn) jacGIn<casadi::Matrix<double> >;
 %template(jacGIn) jacGIn<casadi::Sparsity>;
-%template(IOSchemeVectorJacGInputSX) JacGInputIOSchemeVector<SX>;
-%template(IOSchemeVectorJacGInputMX) JacGInputIOSchemeVector<MX>;
-%template(IOSchemeVectorJacGInputD) JacGInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorJacGInputSparsity) JacGInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorJacGInput) IOSchemeVectorJacGInputSX;
-%rename(IOSchemeVectorJacGInput) IOSchemeVectorJacGInputMX;
-%rename(IOSchemeVectorJacGInput) IOSchemeVectorJacGInputD;
-%rename(IOSchemeVectorJacGInput) IOSchemeVectorJacGInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def jacGOut(*dummy,**kwargs):
+def jacGOut(**kwargs):
   """
   Helper function for 'JacGOutput'
 
-  Two use cases:
-     a) arg = jacGOut(jac=my_jac, f=my_f, g=my_g)
-          all arguments optional
-     b) jac, f, g = jacGOut(arg,"jac", "f", "g")
-          all arguments after the first optional
+  Usage:
+    arg = jacGOut(jac=my_jac, f=my_f, g=my_g)
+        all arguments optional
   Output arguments of an NLP Jacobian function
   
   Keyword arguments::
@@ -1850,21 +915,10 @@ def jacGOut(*dummy,**kwargs):
     f   -- Objective function [JACG_F]
     g   -- Constraint function [JACG_G]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of jacGOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_JacGOutput,n)] for n in dummy[1:]]
-  jac = []
-  if 'jac' in kwargs:
-    jac = kwargs['jac']
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
   for k in kwargs.keys():
-    if not(k in ['jac','f','g']):
-      raise Exception("Keyword error in jacGOut: '%s' is not recognized. Available keywords are: jac, f, g" % k )
-  return IOSchemeVector([jac,f,g], IOScheme(SCHEME_JacGOutput))
+    if k not in ['jac', 'f', 'g']:
+      raise Exception("Error in 'jacGOut' arguments. You supplied key '%s'. Allowed keys are: 'jac', 'f', 'g'" % k)
+  return (kwargs, ['jac', 'f', 'g'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1873,29 +927,17 @@ namespace casadi {
 %template(jacGOut) jacGOut<casadi::MX>;
 %template(jacGOut) jacGOut<casadi::Matrix<double> >;
 %template(jacGOut) jacGOut<casadi::Sparsity>;
-%template(IOSchemeVectorJacGOutputSX) JacGOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorJacGOutputMX) JacGOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorJacGOutputD) JacGOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorJacGOutputSparsity) JacGOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorJacGOutput) IOSchemeVectorJacGOutputSX;
-%rename(IOSchemeVectorJacGOutput) IOSchemeVectorJacGOutputMX;
-%rename(IOSchemeVectorJacGOutput) IOSchemeVectorJacGOutputD;
-%rename(IOSchemeVectorJacGOutput) IOSchemeVectorJacGOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def hessLagIn(*dummy,**kwargs):
+def hessLagIn(**kwargs):
   """
   Helper function for 'HessLagInput'
 
-  Two use cases:
-     a) arg = hessLagIn(x=my_x, p=my_p, lam_f=my_lam_f, lam_g=my_lam_g)
-          all arguments optional
-     b) x, p, lam_f, lam_g = hessLagIn(arg,"x", "p", "lam_f", "lam_g")
-          all arguments after the first optional
+  Usage:
+    arg = hessLagIn(x=my_x, p=my_p, lam_f=my_lam_f, lam_g=my_lam_g)
+        all arguments optional
   Input arguments of an NLP Hessian function
   
   Keyword arguments::
@@ -1905,24 +947,10 @@ def hessLagIn(*dummy,**kwargs):
     lam_f -- NLP solver might use to scale the objective. [HESSLAG_LAM_F]
     lam_g -- Multiplier for g [HESSLAG_LAM_G]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hessLagIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_HessLagInput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  lam_f = []
-  if 'lam_f' in kwargs:
-    lam_f = kwargs['lam_f']
-  lam_g = []
-  if 'lam_g' in kwargs:
-    lam_g = kwargs['lam_g']
   for k in kwargs.keys():
-    if not(k in ['x','p','lam_f','lam_g']):
-      raise Exception("Keyword error in hessLagIn: '%s' is not recognized. Available keywords are: x, p, lam_f, lam_g" % k )
-  return IOSchemeVector([x,p,lam_f,lam_g], IOScheme(SCHEME_HessLagInput))
+    if k not in ['x', 'p', 'lam_f', 'lam_g']:
+      raise Exception("Error in 'hessLagIn' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p', 'lam_f', 'lam_g'" % k)
+  return (kwargs, ['x', 'p', 'lam_f', 'lam_g'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1931,29 +959,17 @@ namespace casadi {
 %template(hessLagIn) hessLagIn<casadi::MX>;
 %template(hessLagIn) hessLagIn<casadi::Matrix<double> >;
 %template(hessLagIn) hessLagIn<casadi::Sparsity>;
-%template(IOSchemeVectorHessLagInputSX) HessLagInputIOSchemeVector<SX>;
-%template(IOSchemeVectorHessLagInputMX) HessLagInputIOSchemeVector<MX>;
-%template(IOSchemeVectorHessLagInputD) HessLagInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorHessLagInputSparsity) HessLagInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorHessLagInput) IOSchemeVectorHessLagInputSX;
-%rename(IOSchemeVectorHessLagInput) IOSchemeVectorHessLagInputMX;
-%rename(IOSchemeVectorHessLagInput) IOSchemeVectorHessLagInputD;
-%rename(IOSchemeVectorHessLagInput) IOSchemeVectorHessLagInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def hessLagOut(*dummy,**kwargs):
+def hessLagOut(**kwargs):
   """
   Helper function for 'HessLagOutput'
 
-  Two use cases:
-     a) arg = hessLagOut(hess=my_hess, f=my_f, g=my_g, grad_x=my_grad_x, grad_p=my_grad_p)
-          all arguments optional
-     b) hess, f, g, grad_x, grad_p = hessLagOut(arg,"hess", "f", "g", "grad_x", "grad_p")
-          all arguments after the first optional
+  Usage:
+    arg = hessLagOut(hess=my_hess, f=my_f, g=my_g, grad_x=my_grad_x, grad_p=my_grad_p)
+        all arguments optional
   Output arguments of an NLP Hessian function
   
   Keyword arguments::
@@ -1964,27 +980,10 @@ def hessLagOut(*dummy,**kwargs):
     grad_x -- Gradient of the Lagrangian with respect to x [HESSLAG_GRAD_X]
     grad_p -- Gradient of the Lagrangian with respect to p [HESSLAG_GRAD_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hessLagOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_HessLagOutput,n)] for n in dummy[1:]]
-  hess = []
-  if 'hess' in kwargs:
-    hess = kwargs['hess']
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  grad_x = []
-  if 'grad_x' in kwargs:
-    grad_x = kwargs['grad_x']
-  grad_p = []
-  if 'grad_p' in kwargs:
-    grad_p = kwargs['grad_p']
   for k in kwargs.keys():
-    if not(k in ['hess','f','g','grad_x','grad_p']):
-      raise Exception("Keyword error in hessLagOut: '%s' is not recognized. Available keywords are: hess, f, g, grad_x, grad_p" % k )
-  return IOSchemeVector([hess,f,g,grad_x,grad_p], IOScheme(SCHEME_HessLagOutput))
+    if k not in ['hess', 'f', 'g', 'grad_x', 'grad_p']:
+      raise Exception("Error in 'hessLagOut' arguments. You supplied key '%s'. Allowed keys are: 'hess', 'f', 'g', 'grad_x', 'grad_p'" % k)
+  return (kwargs, ['hess', 'f', 'g', 'grad_x', 'grad_p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1993,29 +992,17 @@ namespace casadi {
 %template(hessLagOut) hessLagOut<casadi::MX>;
 %template(hessLagOut) hessLagOut<casadi::Matrix<double> >;
 %template(hessLagOut) hessLagOut<casadi::Sparsity>;
-%template(IOSchemeVectorHessLagOutputSX) HessLagOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorHessLagOutputMX) HessLagOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorHessLagOutputD) HessLagOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorHessLagOutputSparsity) HessLagOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorHessLagOutput) IOSchemeVectorHessLagOutputSX;
-%rename(IOSchemeVectorHessLagOutput) IOSchemeVectorHessLagOutputMX;
-%rename(IOSchemeVectorHessLagOutput) IOSchemeVectorHessLagOutputD;
-%rename(IOSchemeVectorHessLagOutput) IOSchemeVectorHessLagOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def nlpSolverIn(*dummy,**kwargs):
+def nlpSolverIn(**kwargs):
   """
   Helper function for 'NlpSolverInput'
 
-  Two use cases:
-     a) arg = nlpSolverIn(x0=my_x0, p=my_p, lbx=my_lbx, ubx=my_ubx, lbg=my_lbg, ubg=my_ubg, lam_x0=my_lam_x0, lam_g0=my_lam_g0)
-          all arguments optional
-     b) x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0 = nlpSolverIn(arg,"x0", "p", "lbx", "ubx", "lbg", "ubg", "lam_x0", "lam_g0")
-          all arguments after the first optional
+  Usage:
+    arg = nlpSolverIn(x0=my_x0, p=my_p, lbx=my_lbx, ubx=my_ubx, lbg=my_lbg, ubg=my_ubg, lam_x0=my_lam_x0, lam_g0=my_lam_g0)
+        all arguments optional
   Input arguments of an NLP Solver
   
   Keyword arguments::
@@ -2029,36 +1016,10 @@ def nlpSolverIn(*dummy,**kwargs):
     lam_x0 -- Lagrange multipliers for bounds on X, initial guess (nx x 1) [NLP_SOLVER_LAM_X0]
     lam_g0 -- Lagrange multipliers for bounds on G, initial guess (ng x 1) [NLP_SOLVER_LAM_G0]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpSolverIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NlpSolverInput,n)] for n in dummy[1:]]
-  x0 = []
-  if 'x0' in kwargs:
-    x0 = kwargs['x0']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  lbg = []
-  if 'lbg' in kwargs:
-    lbg = kwargs['lbg']
-  ubg = []
-  if 'ubg' in kwargs:
-    ubg = kwargs['ubg']
-  lam_x0 = []
-  if 'lam_x0' in kwargs:
-    lam_x0 = kwargs['lam_x0']
-  lam_g0 = []
-  if 'lam_g0' in kwargs:
-    lam_g0 = kwargs['lam_g0']
   for k in kwargs.keys():
-    if not(k in ['x0','p','lbx','ubx','lbg','ubg','lam_x0','lam_g0']):
-      raise Exception("Keyword error in nlpSolverIn: '%s' is not recognized. Available keywords are: x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0" % k )
-  return IOSchemeVector([x0,p,lbx,ubx,lbg,ubg,lam_x0,lam_g0], IOScheme(SCHEME_NlpSolverInput))
+    if k not in ['x0', 'p', 'lbx', 'ubx', 'lbg', 'ubg', 'lam_x0', 'lam_g0']:
+      raise Exception("Error in 'nlpSolverIn' arguments. You supplied key '%s'. Allowed keys are: 'x0', 'p', 'lbx', 'ubx', 'lbg', 'ubg', 'lam_x0', 'lam_g0'" % k)
+  return (kwargs, ['x0', 'p', 'lbx', 'ubx', 'lbg', 'ubg', 'lam_x0', 'lam_g0'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2067,29 +1028,17 @@ namespace casadi {
 %template(nlpSolverIn) nlpSolverIn<casadi::MX>;
 %template(nlpSolverIn) nlpSolverIn<casadi::Matrix<double> >;
 %template(nlpSolverIn) nlpSolverIn<casadi::Sparsity>;
-%template(IOSchemeVectorNlpSolverInputSX) NlpSolverInputIOSchemeVector<SX>;
-%template(IOSchemeVectorNlpSolverInputMX) NlpSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorNlpSolverInputD) NlpSolverInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorNlpSolverInputSparsity) NlpSolverInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorNlpSolverInput) IOSchemeVectorNlpSolverInputSX;
-%rename(IOSchemeVectorNlpSolverInput) IOSchemeVectorNlpSolverInputMX;
-%rename(IOSchemeVectorNlpSolverInput) IOSchemeVectorNlpSolverInputD;
-%rename(IOSchemeVectorNlpSolverInput) IOSchemeVectorNlpSolverInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def nlpSolverOut(*dummy,**kwargs):
+def nlpSolverOut(**kwargs):
   """
   Helper function for 'NlpSolverOutput'
 
-  Two use cases:
-     a) arg = nlpSolverOut(x=my_x, f=my_f, g=my_g, lam_x=my_lam_x, lam_g=my_lam_g, lam_p=my_lam_p)
-          all arguments optional
-     b) x, f, g, lam_x, lam_g, lam_p = nlpSolverOut(arg,"x", "f", "g", "lam_x", "lam_g", "lam_p")
-          all arguments after the first optional
+  Usage:
+    arg = nlpSolverOut(x=my_x, f=my_f, g=my_g, lam_x=my_lam_x, lam_g=my_lam_g, lam_p=my_lam_p)
+        all arguments optional
   Output arguments of an NLP Solver
   
   Keyword arguments::
@@ -2101,30 +1050,10 @@ def nlpSolverOut(*dummy,**kwargs):
     lam_g -- Lagrange multipliers for bounds on G at the solution (ng x 1) [NLP_SOLVER_LAM_G]
     lam_p -- Lagrange multipliers for bounds on P at the solution (np x 1) [NLP_SOLVER_LAM_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpSolverOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NlpSolverOutput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
-  lam_g = []
-  if 'lam_g' in kwargs:
-    lam_g = kwargs['lam_g']
-  lam_p = []
-  if 'lam_p' in kwargs:
-    lam_p = kwargs['lam_p']
   for k in kwargs.keys():
-    if not(k in ['x','f','g','lam_x','lam_g','lam_p']):
-      raise Exception("Keyword error in nlpSolverOut: '%s' is not recognized. Available keywords are: x, f, g, lam_x, lam_g, lam_p" % k )
-  return IOSchemeVector([x,f,g,lam_x,lam_g,lam_p], IOScheme(SCHEME_NlpSolverOutput))
+    if k not in ['x', 'f', 'g', 'lam_x', 'lam_g', 'lam_p']:
+      raise Exception("Error in 'nlpSolverOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'f', 'g', 'lam_x', 'lam_g', 'lam_p'" % k)
+  return (kwargs, ['x', 'f', 'g', 'lam_x', 'lam_g', 'lam_p'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2133,29 +1062,17 @@ namespace casadi {
 %template(nlpSolverOut) nlpSolverOut<casadi::MX>;
 %template(nlpSolverOut) nlpSolverOut<casadi::Matrix<double> >;
 %template(nlpSolverOut) nlpSolverOut<casadi::Sparsity>;
-%template(IOSchemeVectorNlpSolverOutputSX) NlpSolverOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorNlpSolverOutputMX) NlpSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorNlpSolverOutputD) NlpSolverOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorNlpSolverOutputSparsity) NlpSolverOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorNlpSolverOutput) IOSchemeVectorNlpSolverOutputSX;
-%rename(IOSchemeVectorNlpSolverOutput) IOSchemeVectorNlpSolverOutputMX;
-%rename(IOSchemeVectorNlpSolverOutput) IOSchemeVectorNlpSolverOutputD;
-%rename(IOSchemeVectorNlpSolverOutput) IOSchemeVectorNlpSolverOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qcqpIn(*dummy,**kwargs):
+def qcqpIn(**kwargs):
   """
   Helper function for 'QcqpSolverInput'
 
-  Two use cases:
-     a) arg = qcqpIn(h=my_h, g=my_g, p=my_p, q=my_q, r=my_r, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0)
-          all arguments optional
-     b) h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0 = qcqpIn(arg,"h", "g", "p", "q", "r", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0")
-          all arguments after the first optional
+  Usage:
+    arg = qcqpIn(h=my_h, g=my_g, p=my_p, q=my_q, r=my_r, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0)
+        all arguments optional
   Input arguments of a QP problem
   
   Keyword arguments::
@@ -2173,48 +1090,10 @@ def qcqpIn(*dummy,**kwargs):
     x0     -- dense, (n x 1) [QCQP_SOLVER_X0]
     lam_x0 -- dense [QCQP_SOLVER_LAM_X0]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QcqpSolverInput,n)] for n in dummy[1:]]
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  q = []
-  if 'q' in kwargs:
-    q = kwargs['q']
-  r = []
-  if 'r' in kwargs:
-    r = kwargs['r']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  x0 = []
-  if 'x0' in kwargs:
-    x0 = kwargs['x0']
-  lam_x0 = []
-  if 'lam_x0' in kwargs:
-    lam_x0 = kwargs['lam_x0']
   for k in kwargs.keys():
-    if not(k in ['h','g','p','q','r','a','lba','uba','lbx','ubx','x0','lam_x0']):
-      raise Exception("Keyword error in qcqpIn: '%s' is not recognized. Available keywords are: h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0" % k )
-  return IOSchemeVector([h,g,p,q,r,a,lba,uba,lbx,ubx,x0,lam_x0], IOScheme(SCHEME_QcqpSolverInput))
+    if k not in ['h', 'g', 'p', 'q', 'r', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0']:
+      raise Exception("Error in 'qcqpIn' arguments. You supplied key '%s'. Allowed keys are: 'h', 'g', 'p', 'q', 'r', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0'" % k)
+  return (kwargs, ['h', 'g', 'p', 'q', 'r', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2223,29 +1102,17 @@ namespace casadi {
 %template(qcqpIn) qcqpIn<casadi::MX>;
 %template(qcqpIn) qcqpIn<casadi::Matrix<double> >;
 %template(qcqpIn) qcqpIn<casadi::Sparsity>;
-%template(IOSchemeVectorQcqpSolverInputSX) QcqpSolverInputIOSchemeVector<SX>;
-%template(IOSchemeVectorQcqpSolverInputMX) QcqpSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorQcqpSolverInputD) QcqpSolverInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorQcqpSolverInputSparsity) QcqpSolverInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorQcqpSolverInput) IOSchemeVectorQcqpSolverInputSX;
-%rename(IOSchemeVectorQcqpSolverInput) IOSchemeVectorQcqpSolverInputMX;
-%rename(IOSchemeVectorQcqpSolverInput) IOSchemeVectorQcqpSolverInputD;
-%rename(IOSchemeVectorQcqpSolverInput) IOSchemeVectorQcqpSolverInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qcqpOut(*dummy,**kwargs):
+def qcqpOut(**kwargs):
   """
   Helper function for 'QcqpSolverOutput'
 
-  Two use cases:
-     a) arg = qcqpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
-          all arguments optional
-     b) x, cost, lam_a, lam_x = qcqpOut(arg,"x", "cost", "lam_a", "lam_x")
-          all arguments after the first optional
+  Usage:
+    arg = qcqpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+        all arguments optional
   Output arguments of an QP Solver
   
   Keyword arguments::
@@ -2255,24 +1122,10 @@ def qcqpOut(*dummy,**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [QCQP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [QCQP_SOLVER_LAM_X]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QcqpSolverOutput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  lam_a = []
-  if 'lam_a' in kwargs:
-    lam_a = kwargs['lam_a']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
   for k in kwargs.keys():
-    if not(k in ['x','cost','lam_a','lam_x']):
-      raise Exception("Keyword error in qcqpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_QcqpSolverOutput))
+    if k not in ['x', 'cost', 'lam_a', 'lam_x']:
+      raise Exception("Error in 'qcqpOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'cost', 'lam_a', 'lam_x'" % k)
+  return (kwargs, ['x', 'cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2281,73 +1134,17 @@ namespace casadi {
 %template(qcqpOut) qcqpOut<casadi::MX>;
 %template(qcqpOut) qcqpOut<casadi::Matrix<double> >;
 %template(qcqpOut) qcqpOut<casadi::Sparsity>;
-%template(IOSchemeVectorQcqpSolverOutputSX) QcqpSolverOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorQcqpSolverOutputMX) QcqpSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorQcqpSolverOutputD) QcqpSolverOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorQcqpSolverOutputSparsity) QcqpSolverOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorQcqpSolverOutput) IOSchemeVectorQcqpSolverOutputSX;
-%rename(IOSchemeVectorQcqpSolverOutput) IOSchemeVectorQcqpSolverOutputMX;
-%rename(IOSchemeVectorQcqpSolverOutput) IOSchemeVectorQcqpSolverOutputD;
-%rename(IOSchemeVectorQcqpSolverOutput) IOSchemeVectorQcqpSolverOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qcqpStruct(*dummy,**kwargs):
-  """
-  Helper function for 'QCQPStruct'
-
-  Two use cases:
-     a) arg = qcqpStruct(h=my_h, p=my_p, a=my_a)
-          all arguments optional
-     b) h, p, a = qcqpStruct(arg,"h", "p", "a")
-          all arguments after the first optional
-  Structure specification of a QP
-  
-  Keyword arguments::
-
-    h -- The matrix is assumed to be symmetrical. [QCQP_STRUCT_H]
-    p -- triangular part is actually used. The matrix is assumed to be symmetrical. [QCQP_STRUCT_P]
-    a -- The matrix A: sparse, (nc x n) - product with x must be dense. [QCQP_STRUCT_A]
-  """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QCQPStruct,n)] for n in dummy[1:]]
-  h = Sparsity()
-  if 'h' in kwargs:
-    h = kwargs['h']
-  p = Sparsity()
-  if 'p' in kwargs:
-    p = kwargs['p']
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  for k in kwargs.keys():
-    if not(k in ['h','p','a']):
-      raise Exception("Keyword error in qcqpStruct: '%s' is not recognized. Available keywords are: h, p, a" % k )
-  return QCQPStructure([h,p,a])
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(qcqpStruct) qcqpStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-namespace casadi {
-%template(QCQPStructure) QCQPStructIOSchemeVector<Sparsity>;
-}
-#ifdef SWIGPYTHON
-%pythoncode %{
-def qpIn(*dummy,**kwargs):
+def qpIn(**kwargs):
   """
   Helper function for 'QpSolverInput'
 
-  Two use cases:
-     a) arg = qpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0)
-          all arguments optional
-     b) h, g, a, lba, uba, lbx, ubx, x0, lam_x0 = qpIn(arg,"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0")
-          all arguments after the first optional
+  Usage:
+    arg = qpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0)
+        all arguments optional
   Input arguments of a QP problem
   
   Keyword arguments::
@@ -2362,39 +1159,10 @@ def qpIn(*dummy,**kwargs):
     x0     -- dense, (n x 1) [QP_SOLVER_X0]
     lam_x0 -- dense [QP_SOLVER_LAM_X0]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QpSolverInput,n)] for n in dummy[1:]]
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  x0 = []
-  if 'x0' in kwargs:
-    x0 = kwargs['x0']
-  lam_x0 = []
-  if 'lam_x0' in kwargs:
-    lam_x0 = kwargs['lam_x0']
   for k in kwargs.keys():
-    if not(k in ['h','g','a','lba','uba','lbx','ubx','x0','lam_x0']):
-      raise Exception("Keyword error in qpIn: '%s' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x0, lam_x0" % k )
-  return IOSchemeVector([h,g,a,lba,uba,lbx,ubx,x0,lam_x0], IOScheme(SCHEME_QpSolverInput))
+    if k not in ['h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0']:
+      raise Exception("Error in 'qpIn' arguments. You supplied key '%s'. Allowed keys are: 'h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0'" % k)
+  return (kwargs, ['h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2403,29 +1171,17 @@ namespace casadi {
 %template(qpIn) qpIn<casadi::MX>;
 %template(qpIn) qpIn<casadi::Matrix<double> >;
 %template(qpIn) qpIn<casadi::Sparsity>;
-%template(IOSchemeVectorQpSolverInputSX) QpSolverInputIOSchemeVector<SX>;
-%template(IOSchemeVectorQpSolverInputMX) QpSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorQpSolverInputD) QpSolverInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorQpSolverInputSparsity) QpSolverInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorQpSolverInput) IOSchemeVectorQpSolverInputSX;
-%rename(IOSchemeVectorQpSolverInput) IOSchemeVectorQpSolverInputMX;
-%rename(IOSchemeVectorQpSolverInput) IOSchemeVectorQpSolverInputD;
-%rename(IOSchemeVectorQpSolverInput) IOSchemeVectorQpSolverInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qpOut(*dummy,**kwargs):
+def qpOut(**kwargs):
   """
   Helper function for 'QpSolverOutput'
 
-  Two use cases:
-     a) arg = qpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
-          all arguments optional
-     b) x, cost, lam_a, lam_x = qpOut(arg,"x", "cost", "lam_a", "lam_x")
-          all arguments after the first optional
+  Usage:
+    arg = qpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+        all arguments optional
   Output arguments of an QP Solver
   
   Keyword arguments::
@@ -2435,24 +1191,10 @@ def qpOut(*dummy,**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [QP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [QP_SOLVER_LAM_X]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QpSolverOutput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  lam_a = []
-  if 'lam_a' in kwargs:
-    lam_a = kwargs['lam_a']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
   for k in kwargs.keys():
-    if not(k in ['x','cost','lam_a','lam_x']):
-      raise Exception("Keyword error in qpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_QpSolverOutput))
+    if k not in ['x', 'cost', 'lam_a', 'lam_x']:
+      raise Exception("Error in 'qpOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'cost', 'lam_a', 'lam_x'" % k)
+  return (kwargs, ['x', 'cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2461,69 +1203,17 @@ namespace casadi {
 %template(qpOut) qpOut<casadi::MX>;
 %template(qpOut) qpOut<casadi::Matrix<double> >;
 %template(qpOut) qpOut<casadi::Sparsity>;
-%template(IOSchemeVectorQpSolverOutputSX) QpSolverOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorQpSolverOutputMX) QpSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorQpSolverOutputD) QpSolverOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorQpSolverOutputSparsity) QpSolverOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorQpSolverOutput) IOSchemeVectorQpSolverOutputSX;
-%rename(IOSchemeVectorQpSolverOutput) IOSchemeVectorQpSolverOutputMX;
-%rename(IOSchemeVectorQpSolverOutput) IOSchemeVectorQpSolverOutputD;
-%rename(IOSchemeVectorQpSolverOutput) IOSchemeVectorQpSolverOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qpStruct(*dummy,**kwargs):
-  """
-  Helper function for 'QPStruct'
-
-  Two use cases:
-     a) arg = qpStruct(h=my_h, a=my_a)
-          all arguments optional
-     b) h, a = qpStruct(arg,"h", "a")
-          all arguments after the first optional
-  Structure specification of a QP
-  
-  Keyword arguments::
-
-    h -- The matrix is assumed to be symmetrical. [QP_STRUCT_H]
-    a -- The matrix A: sparse, (nc x n) - product with x must be dense. [QP_STRUCT_A]
-  """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPStruct,n)] for n in dummy[1:]]
-  h = Sparsity()
-  if 'h' in kwargs:
-    h = kwargs['h']
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  for k in kwargs.keys():
-    if not(k in ['h','a']):
-      raise Exception("Keyword error in qpStruct: '%s' is not recognized. Available keywords are: h, a" % k )
-  return QPStructure([h,a])
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(qpStruct) qpStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-namespace casadi {
-%template(QPStructure) QPStructIOSchemeVector<Sparsity>;
-}
-#ifdef SWIGPYTHON
-%pythoncode %{
-def sdpIn(*dummy,**kwargs):
+def sdpIn(**kwargs):
   """
   Helper function for 'SDPInput'
 
-  Two use cases:
-     a) arg = sdpIn(f=my_f, c=my_c, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
-          all arguments optional
-     b) f, c, g, a, lba, uba, lbx, ubx = sdpIn(arg,"f", "c", "g", "a", "lba", "uba", "lbx", "ubx")
-          all arguments after the first optional
+  Usage:
+    arg = sdpIn(f=my_f, c=my_c, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
+        all arguments optional
   Input arguments of a SDP problem
   
   Keyword arguments::
@@ -2537,36 +1227,10 @@ def sdpIn(*dummy,**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SDP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SDP_SOLVER_UBX]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPInput,n)] for n in dummy[1:]]
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
   for k in kwargs.keys():
-    if not(k in ['f','c','g','a','lba','uba','lbx','ubx']):
-      raise Exception("Keyword error in sdpIn: '%s' is not recognized. Available keywords are: f, c, g, a, lba, uba, lbx, ubx" % k )
-  return IOSchemeVector([f,c,g,a,lba,uba,lbx,ubx], IOScheme(SCHEME_SDPInput))
+    if k not in ['f', 'c', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx']:
+      raise Exception("Error in 'sdpIn' arguments. You supplied key '%s'. Allowed keys are: 'f', 'c', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx'" % k)
+  return (kwargs, ['f', 'c', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2575,29 +1239,17 @@ namespace casadi {
 %template(sdpIn) sdpIn<casadi::MX>;
 %template(sdpIn) sdpIn<casadi::Matrix<double> >;
 %template(sdpIn) sdpIn<casadi::Sparsity>;
-%template(IOSchemeVectorSDPInputSX) SDPInputIOSchemeVector<SX>;
-%template(IOSchemeVectorSDPInputMX) SDPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorSDPInputD) SDPInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorSDPInputSparsity) SDPInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorSDPInput) IOSchemeVectorSDPInputSX;
-%rename(IOSchemeVectorSDPInput) IOSchemeVectorSDPInputMX;
-%rename(IOSchemeVectorSDPInput) IOSchemeVectorSDPInputD;
-%rename(IOSchemeVectorSDPInput) IOSchemeVectorSDPInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def sdpOut(*dummy,**kwargs):
+def sdpOut(**kwargs):
   """
   Helper function for 'SDPOutput'
 
-  Two use cases:
-     a) arg = sdpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x)
-          all arguments optional
-     b) x, p, dual, cost, dual_cost, lam_a, lam_x = sdpOut(arg,"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x")
-          all arguments after the first optional
+  Usage:
+    arg = sdpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+        all arguments optional
   Output arguments of an SDP Solver
   
   Keyword arguments::
@@ -2610,33 +1262,10 @@ def sdpOut(*dummy,**kwargs):
     lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDP_SOLVER_LAM_A]
     lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDP_SOLVER_LAM_X]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPOutput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  dual = []
-  if 'dual' in kwargs:
-    dual = kwargs['dual']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  dual_cost = []
-  if 'dual_cost' in kwargs:
-    dual_cost = kwargs['dual_cost']
-  lam_a = []
-  if 'lam_a' in kwargs:
-    lam_a = kwargs['lam_a']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
   for k in kwargs.keys():
-    if not(k in ['x','p','dual','cost','dual_cost','lam_a','lam_x']):
-      raise Exception("Keyword error in sdpOut: '%s' is not recognized. Available keywords are: x, p, dual, cost, dual_cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,p,dual,cost,dual_cost,lam_a,lam_x], IOScheme(SCHEME_SDPOutput))
+    if k not in ['x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x']:
+      raise Exception("Error in 'sdpOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x'" % k)
+  return (kwargs, ['x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2645,73 +1274,17 @@ namespace casadi {
 %template(sdpOut) sdpOut<casadi::MX>;
 %template(sdpOut) sdpOut<casadi::Matrix<double> >;
 %template(sdpOut) sdpOut<casadi::Sparsity>;
-%template(IOSchemeVectorSDPOutputSX) SDPOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorSDPOutputMX) SDPOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorSDPOutputD) SDPOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorSDPOutputSparsity) SDPOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorSDPOutput) IOSchemeVectorSDPOutputSX;
-%rename(IOSchemeVectorSDPOutput) IOSchemeVectorSDPOutputMX;
-%rename(IOSchemeVectorSDPOutput) IOSchemeVectorSDPOutputD;
-%rename(IOSchemeVectorSDPOutput) IOSchemeVectorSDPOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def sdpStruct(*dummy,**kwargs):
-  """
-  Helper function for 'SDPStruct'
-
-  Two use cases:
-     a) arg = sdpStruct(f=my_f, g=my_g, a=my_a)
-          all arguments optional
-     b) f, g, a = sdpStruct(arg,"f", "g", "a")
-          all arguments after the first optional
-  Structure specification of an SDP
-  
-  Keyword arguments::
-
-    f -- The horizontal stack of all matrices F_i: ( m x nm) [SDP_STRUCT_F]
-    g -- The matrix G: ( m x m) [SDP_STRUCT_G]
-    a -- The matrix A: ( nc x n) [SDP_STRUCT_A]
-  """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPStruct,n)] for n in dummy[1:]]
-  f = Sparsity()
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = Sparsity()
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  for k in kwargs.keys():
-    if not(k in ['f','g','a']):
-      raise Exception("Keyword error in sdpStruct: '%s' is not recognized. Available keywords are: f, g, a" % k )
-  return SDPStructure([f,g,a])
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(sdpStruct) sdpStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-namespace casadi {
-%template(SDPStructure) SDPStructIOSchemeVector<Sparsity>;
-}
-#ifdef SWIGPYTHON
-%pythoncode %{
-def sdqpIn(*dummy,**kwargs):
+def sdqpIn(**kwargs):
   """
   Helper function for 'SDQPInput'
 
-  Two use cases:
-     a) arg = sdqpIn(h=my_h, c=my_c, f=my_f, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
-          all arguments optional
-     b) h, c, f, g, a, lba, uba, lbx, ubx = sdqpIn(arg,"h", "c", "f", "g", "a", "lba", "uba", "lbx", "ubx")
-          all arguments after the first optional
+  Usage:
+    arg = sdqpIn(h=my_h, c=my_c, f=my_f, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
+        all arguments optional
   Input arguments of a SDQP problem
   
   Keyword arguments::
@@ -2726,39 +1299,10 @@ def sdqpIn(*dummy,**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SDQP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SDQP_SOLVER_UBX]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPInput,n)] for n in dummy[1:]]
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
   for k in kwargs.keys():
-    if not(k in ['h','c','f','g','a','lba','uba','lbx','ubx']):
-      raise Exception("Keyword error in sdqpIn: '%s' is not recognized. Available keywords are: h, c, f, g, a, lba, uba, lbx, ubx" % k )
-  return IOSchemeVector([h,c,f,g,a,lba,uba,lbx,ubx], IOScheme(SCHEME_SDQPInput))
+    if k not in ['h', 'c', 'f', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx']:
+      raise Exception("Error in 'sdqpIn' arguments. You supplied key '%s'. Allowed keys are: 'h', 'c', 'f', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx'" % k)
+  return (kwargs, ['h', 'c', 'f', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2767,29 +1311,17 @@ namespace casadi {
 %template(sdqpIn) sdqpIn<casadi::MX>;
 %template(sdqpIn) sdqpIn<casadi::Matrix<double> >;
 %template(sdqpIn) sdqpIn<casadi::Sparsity>;
-%template(IOSchemeVectorSDQPInputSX) SDQPInputIOSchemeVector<SX>;
-%template(IOSchemeVectorSDQPInputMX) SDQPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorSDQPInputD) SDQPInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorSDQPInputSparsity) SDQPInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorSDQPInput) IOSchemeVectorSDQPInputSX;
-%rename(IOSchemeVectorSDQPInput) IOSchemeVectorSDQPInputMX;
-%rename(IOSchemeVectorSDQPInput) IOSchemeVectorSDQPInputD;
-%rename(IOSchemeVectorSDQPInput) IOSchemeVectorSDQPInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def sdqpOut(*dummy,**kwargs):
+def sdqpOut(**kwargs):
   """
   Helper function for 'SDQPOutput'
 
-  Two use cases:
-     a) arg = sdqpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x)
-          all arguments optional
-     b) x, p, dual, cost, dual_cost, lam_a, lam_x = sdqpOut(arg,"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x")
-          all arguments after the first optional
+  Usage:
+    arg = sdqpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+        all arguments optional
   Output arguments of an SDQP Solver
   
   Keyword arguments::
@@ -2802,33 +1334,10 @@ def sdqpOut(*dummy,**kwargs):
     lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDQP_SOLVER_LAM_A]
     lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDQP_SOLVER_LAM_X]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPOutput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  dual = []
-  if 'dual' in kwargs:
-    dual = kwargs['dual']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  dual_cost = []
-  if 'dual_cost' in kwargs:
-    dual_cost = kwargs['dual_cost']
-  lam_a = []
-  if 'lam_a' in kwargs:
-    lam_a = kwargs['lam_a']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
   for k in kwargs.keys():
-    if not(k in ['x','p','dual','cost','dual_cost','lam_a','lam_x']):
-      raise Exception("Keyword error in sdqpOut: '%s' is not recognized. Available keywords are: x, p, dual, cost, dual_cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,p,dual,cost,dual_cost,lam_a,lam_x], IOScheme(SCHEME_SDQPOutput))
+    if k not in ['x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x']:
+      raise Exception("Error in 'sdqpOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x'" % k)
+  return (kwargs, ['x', 'p', 'dual', 'cost', 'dual_cost', 'lam_a', 'lam_x'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2837,77 +1346,17 @@ namespace casadi {
 %template(sdqpOut) sdqpOut<casadi::MX>;
 %template(sdqpOut) sdqpOut<casadi::Matrix<double> >;
 %template(sdqpOut) sdqpOut<casadi::Sparsity>;
-%template(IOSchemeVectorSDQPOutputSX) SDQPOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorSDQPOutputMX) SDQPOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorSDQPOutputD) SDQPOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorSDQPOutputSparsity) SDQPOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorSDQPOutput) IOSchemeVectorSDQPOutputSX;
-%rename(IOSchemeVectorSDQPOutput) IOSchemeVectorSDQPOutputMX;
-%rename(IOSchemeVectorSDQPOutput) IOSchemeVectorSDQPOutputD;
-%rename(IOSchemeVectorSDQPOutput) IOSchemeVectorSDQPOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def sdqpStruct(*dummy,**kwargs):
-  """
-  Helper function for 'SDQPStruct'
-
-  Two use cases:
-     a) arg = sdqpStruct(h=my_h, f=my_f, g=my_g, a=my_a)
-          all arguments optional
-     b) h, f, g, a = sdqpStruct(arg,"h", "f", "g", "a")
-          all arguments after the first optional
-  Structure specification of an SDQP
-  
-  Keyword arguments::
-
-    h -- The matrix H: sparse ( n x n) [SDQP_STRUCT_H]
-    f -- The horizontal stack of all matrices F_i: ( m x nm) [SDQP_STRUCT_F]
-    g -- The matrix G: ( m x m) [SDQP_STRUCT_G]
-    a -- The matrix A: ( nc x n) [SDQP_STRUCT_A]
-  """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPStruct,n)] for n in dummy[1:]]
-  h = Sparsity()
-  if 'h' in kwargs:
-    h = kwargs['h']
-  f = Sparsity()
-  if 'f' in kwargs:
-    f = kwargs['f']
-  g = Sparsity()
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
-  for k in kwargs.keys():
-    if not(k in ['h','f','g','a']):
-      raise Exception("Keyword error in sdqpStruct: '%s' is not recognized. Available keywords are: h, f, g, a" % k )
-  return SDQPStructure([h,f,g,a])
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(sdqpStruct) sdqpStruct<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-namespace casadi {
-%template(SDQPStructure) SDQPStructIOSchemeVector<Sparsity>;
-}
-#ifdef SWIGPYTHON
-%pythoncode %{
-def socpIn(*dummy,**kwargs):
+def socpIn(**kwargs):
   """
   Helper function for 'SOCPInput'
 
-  Two use cases:
-     a) arg = socpIn(g=my_g, h=my_h, e=my_e, f=my_f, c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
-          all arguments optional
-     b) g, h, e, f, c, a, lba, uba, lbx, ubx = socpIn(arg,"g", "h", "e", "f", "c", "a", "lba", "uba", "lbx", "ubx")
-          all arguments after the first optional
+  Usage:
+    arg = socpIn(g=my_g, h=my_h, e=my_e, f=my_f, c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
+        all arguments optional
   Input arguments of a SOCP problem
   
   Keyword arguments::
@@ -2923,42 +1372,10 @@ def socpIn(*dummy,**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SOCP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SOCP_SOLVER_UBX]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPInput,n)] for n in dummy[1:]]
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  e = []
-  if 'e' in kwargs:
-    e = kwargs['e']
-  f = []
-  if 'f' in kwargs:
-    f = kwargs['f']
-  c = []
-  if 'c' in kwargs:
-    c = kwargs['c']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
   for k in kwargs.keys():
-    if not(k in ['g','h','e','f','c','a','lba','uba','lbx','ubx']):
-      raise Exception("Keyword error in socpIn: '%s' is not recognized. Available keywords are: g, h, e, f, c, a, lba, uba, lbx, ubx" % k )
-  return IOSchemeVector([g,h,e,f,c,a,lba,uba,lbx,ubx], IOScheme(SCHEME_SOCPInput))
+    if k not in ['g', 'h', 'e', 'f', 'c', 'a', 'lba', 'uba', 'lbx', 'ubx']:
+      raise Exception("Error in 'socpIn' arguments. You supplied key '%s'. Allowed keys are: 'g', 'h', 'e', 'f', 'c', 'a', 'lba', 'uba', 'lbx', 'ubx'" % k)
+  return (kwargs, ['g', 'h', 'e', 'f', 'c', 'a', 'lba', 'uba', 'lbx', 'ubx'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2967,29 +1384,17 @@ namespace casadi {
 %template(socpIn) socpIn<casadi::MX>;
 %template(socpIn) socpIn<casadi::Matrix<double> >;
 %template(socpIn) socpIn<casadi::Sparsity>;
-%template(IOSchemeVectorSOCPInputSX) SOCPInputIOSchemeVector<SX>;
-%template(IOSchemeVectorSOCPInputMX) SOCPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorSOCPInputD) SOCPInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorSOCPInputSparsity) SOCPInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorSOCPInput) IOSchemeVectorSOCPInputSX;
-%rename(IOSchemeVectorSOCPInput) IOSchemeVectorSOCPInputMX;
-%rename(IOSchemeVectorSOCPInput) IOSchemeVectorSOCPInputD;
-%rename(IOSchemeVectorSOCPInput) IOSchemeVectorSOCPInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def socpOut(*dummy,**kwargs):
+def socpOut(**kwargs):
   """
   Helper function for 'SOCPOutput'
 
-  Two use cases:
-     a) arg = socpOut(x=my_x, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x, lam_cone=my_lam_cone)
-          all arguments optional
-     b) x, cost, dual_cost, lam_a, lam_x, lam_cone = socpOut(arg,"x", "cost", "dual_cost", "lam_a", "lam_x", "lam_cone")
-          all arguments after the first optional
+  Usage:
+    arg = socpOut(x=my_x, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x, lam_cone=my_lam_cone)
+        all arguments optional
   Output arguments of an SOCP Solver
   
   Keyword arguments::
@@ -3001,30 +1406,10 @@ def socpOut(*dummy,**kwargs):
     lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SOCP_SOLVER_LAM_X]
     lam_cone  -- The dual solution correspoding to cone (2-norm) constraints (m x 1) [SOCP_SOLVER_LAM_CONE]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPOutput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  dual_cost = []
-  if 'dual_cost' in kwargs:
-    dual_cost = kwargs['dual_cost']
-  lam_a = []
-  if 'lam_a' in kwargs:
-    lam_a = kwargs['lam_a']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
-  lam_cone = []
-  if 'lam_cone' in kwargs:
-    lam_cone = kwargs['lam_cone']
   for k in kwargs.keys():
-    if not(k in ['x','cost','dual_cost','lam_a','lam_x','lam_cone']):
-      raise Exception("Keyword error in socpOut: '%s' is not recognized. Available keywords are: x, cost, dual_cost, lam_a, lam_x, lam_cone" % k )
-  return IOSchemeVector([x,cost,dual_cost,lam_a,lam_x,lam_cone], IOScheme(SCHEME_SOCPOutput))
+    if k not in ['x', 'cost', 'dual_cost', 'lam_a', 'lam_x', 'lam_cone']:
+      raise Exception("Error in 'socpOut' arguments. You supplied key '%s'. Allowed keys are: 'x', 'cost', 'dual_cost', 'lam_a', 'lam_x', 'lam_cone'" % k)
+  return (kwargs, ['x', 'cost', 'dual_cost', 'lam_a', 'lam_x', 'lam_cone'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -3033,29 +1418,17 @@ namespace casadi {
 %template(socpOut) socpOut<casadi::MX>;
 %template(socpOut) socpOut<casadi::Matrix<double> >;
 %template(socpOut) socpOut<casadi::Sparsity>;
-%template(IOSchemeVectorSOCPOutputSX) SOCPOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorSOCPOutputMX) SOCPOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorSOCPOutputD) SOCPOutputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorSOCPOutputSparsity) SOCPOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorSOCPOutput) IOSchemeVectorSOCPOutputSX;
-%rename(IOSchemeVectorSOCPOutput) IOSchemeVectorSOCPOutputMX;
-%rename(IOSchemeVectorSOCPOutput) IOSchemeVectorSOCPOutputD;
-%rename(IOSchemeVectorSOCPOutput) IOSchemeVectorSOCPOutputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def socpStruct(*dummy,**kwargs):
+def socpStruct(**kwargs):
   """
   Helper function for 'SOCPStruct'
 
-  Two use cases:
-     a) arg = socpStruct(g=my_g, e=my_e, a=my_a)
-          all arguments optional
-     b) g, e, a = socpStruct(arg,"g", "e", "a")
-          all arguments after the first optional
+  Usage:
+    arg = socpStruct(g=my_g, e=my_e, a=my_a)
+        all arguments optional
   Structure specification of an SOCP
   
   Keyword arguments::
@@ -3064,21 +1437,10 @@ def socpStruct(*dummy,**kwargs):
     e -- The horizontal stack of all vectors ei: ( n x m) [SOCP_STRUCT_E]
     a -- The matrix A: ( nc x n) [SOCP_STRUCT_A]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPStruct,n)] for n in dummy[1:]]
-  g = Sparsity()
-  if 'g' in kwargs:
-    g = kwargs['g']
-  e = Sparsity()
-  if 'e' in kwargs:
-    e = kwargs['e']
-  a = Sparsity()
-  if 'a' in kwargs:
-    a = kwargs['a']
   for k in kwargs.keys():
-    if not(k in ['g','e','a']):
-      raise Exception("Keyword error in socpStruct: '%s' is not recognized. Available keywords are: g, e, a" % k )
-  return SOCPStructure([g,e,a])
+    if k not in ['g', 'e', 'a']:
+      raise Exception("Error in 'socpStruct' arguments. You supplied key '%s'. Allowed keys are: 'g', 'e', 'a'" % k)
+  return (kwargs, ['g', 'e', 'a'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -3086,20 +1448,15 @@ namespace casadi {
 %template(socpStruct) socpStruct<casadi::Sparsity>;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-%template(SOCPStructure) SOCPStructIOSchemeVector<Sparsity>;
-}
 #ifdef SWIGPYTHON
 %pythoncode %{
-def stabilizedQpIn(*dummy,**kwargs):
+def stabilizedQpIn(**kwargs):
   """
   Helper function for 'StabilizedQpSolverInput'
 
-  Two use cases:
-     a) arg = stabilizedQpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0, muR=my_muR, muE=my_muE, mu=my_mu)
-          all arguments optional
-     b) h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu = stabilizedQpIn(arg,"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0", "muR", "muE", "mu")
-          all arguments after the first optional
+  Usage:
+    arg = stabilizedQpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0, muR=my_muR, muE=my_muE, mu=my_mu)
+        all arguments optional
   Input arguments of a QP problem
   
   Keyword arguments::
@@ -3117,48 +1474,10 @@ def stabilizedQpIn(*dummy,**kwargs):
     muE    -- dense (nc x 1) [STABILIZED_QP_SOLVER_MUE]
     mu     -- dense (nc x 1) [STABILIZED_QP_SOLVER_MU]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of stabilizedQpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput,n)] for n in dummy[1:]]
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  x0 = []
-  if 'x0' in kwargs:
-    x0 = kwargs['x0']
-  lam_x0 = []
-  if 'lam_x0' in kwargs:
-    lam_x0 = kwargs['lam_x0']
-  muR = []
-  if 'muR' in kwargs:
-    muR = kwargs['muR']
-  muE = []
-  if 'muE' in kwargs:
-    muE = kwargs['muE']
-  mu = []
-  if 'mu' in kwargs:
-    mu = kwargs['mu']
   for k in kwargs.keys():
-    if not(k in ['h','g','a','lba','uba','lbx','ubx','x0','lam_x0','muR','muE','mu']):
-      raise Exception("Keyword error in stabilizedQpIn: '%s' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu" % k )
-  return IOSchemeVector([h,g,a,lba,uba,lbx,ubx,x0,lam_x0,muR,muE,mu], IOScheme(SCHEME_StabilizedQpSolverInput))
+    if k not in ['h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0', 'muR', 'muE', 'mu']:
+      raise Exception("Error in 'stabilizedQpIn' arguments. You supplied key '%s'. Allowed keys are: 'h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0', 'muR', 'muE', 'mu'" % k)
+  return (kwargs, ['h', 'g', 'a', 'lba', 'uba', 'lbx', 'ubx', 'x0', 'lam_x0', 'muR', 'muE', 'mu'])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -3167,17 +1486,7 @@ namespace casadi {
 %template(stabilizedQpIn) stabilizedQpIn<casadi::MX>;
 %template(stabilizedQpIn) stabilizedQpIn<casadi::Matrix<double> >;
 %template(stabilizedQpIn) stabilizedQpIn<casadi::Sparsity>;
-%template(IOSchemeVectorStabilizedQpSolverInputSX) StabilizedQpSolverInputIOSchemeVector<SX>;
-%template(IOSchemeVectorStabilizedQpSolverInputMX) StabilizedQpSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorStabilizedQpSolverInputD) StabilizedQpSolverInputIOSchemeVector< Matrix<double> >;
-%template(IOSchemeVectorStabilizedQpSolverInputSparsity) StabilizedQpSolverInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorStabilizedQpSolverInput) IOSchemeVectorStabilizedQpSolverInputSX;
-%rename(IOSchemeVectorStabilizedQpSolverInput) IOSchemeVectorStabilizedQpSolverInputMX;
-%rename(IOSchemeVectorStabilizedQpSolverInput) IOSchemeVectorStabilizedQpSolverInputD;
-%rename(IOSchemeVectorStabilizedQpSolverInput) IOSchemeVectorStabilizedQpSolverInputSparsity;
 }
 #endif //SWIGPYTHON
-namespace casadi {
-}
 #endif //AUTOGENERATED_I
 

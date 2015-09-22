@@ -25,9 +25,6 @@
 
 #include "integrator_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "../mx/mx_tools.hpp"
-#include "../sx/sx_tools.hpp"
 #include "mx_function.hpp"
 #include "sx_function.hpp"
 
@@ -48,7 +45,7 @@ namespace casadi {
               "Beginning of the time horizon");
     addOption("tf",                       OT_REAL,        1.0,
               "End of the time horizon");
-    addOption("augmented_options",        OT_DICTIONARY,  GenericType(),
+    addOption("augmented_options",        OT_DICT,  GenericType(),
               "Options to be passed down to the augmented integrator, if one is constructed.");
     addOption("expand_augmented",         OT_BOOLEAN,     true,
               "If DAE callback functions are SXFunction, have augmented"
@@ -57,8 +54,8 @@ namespace casadi {
     // Negative number of parameters for consistancy checking
     np_ = -1;
 
-    input_.scheme = SCHEME_IntegratorInput;
-    output_.scheme = SCHEME_IntegratorOutput;
+    ischeme_ = IOScheme(SCHEME_IntegratorInput);
+    oscheme_ = IOScheme(SCHEME_IntegratorOutput);
   }
 
   IntegratorInternal::~IntegratorInternal() {
@@ -82,7 +79,7 @@ namespace casadi {
     }
 
     // Print statistics
-    if (print_stats_) printStats(std::cout);
+    if (print_stats_) printStats(userOut());
   }
 
   void IntegratorInternal::init() {
@@ -92,9 +89,9 @@ namespace casadi {
 
     // Initialize and get dimensions for the forward integration
     if (!f_.isInit()) f_.init();
-    casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN,
+    casadi_assert_message(f_.nIn()==DAE_NUM_IN,
                           "Wrong number of inputs for the DAE callback function");
-    casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT,
+    casadi_assert_message(f_.nOut()==DAE_NUM_OUT,
                           "Wrong number of outputs for the DAE callback function");
     nx_ = f_.input(DAE_X).nnz();
     nz_ = f_.input(DAE_Z).nnz();
@@ -107,9 +104,9 @@ namespace casadi {
       nrx_ = nrz_ = nrq_ = nrp_ = 0;
     } else {
       if (!g_.isInit()) g_.init();
-      casadi_assert_message(g_.getNumInputs()==RDAE_NUM_IN,
+      casadi_assert_message(g_.nIn()==RDAE_NUM_IN,
                             "Wrong number of inputs for the backwards DAE callback function");
-      casadi_assert_message(g_.getNumOutputs()==RDAE_NUM_OUT,
+      casadi_assert_message(g_.nOut()==RDAE_NUM_OUT,
                             "Wrong number of outputs for the backwards DAE callback function");
       nrx_ = g_.input(RDAE_RX).nnz();
       nrz_ = g_.input(RDAE_RZ).nnz();
@@ -118,7 +115,7 @@ namespace casadi {
     }
 
     // Allocate space for inputs
-    setNumInputs(INTEGRATOR_NUM_IN);
+    ibuf_.resize(INTEGRATOR_NUM_IN);
     x0()  = DMatrix::zeros(f_.input(DAE_X).sparsity());
     p()   = DMatrix::zeros(f_.input(DAE_P).sparsity());
     z0()   = DMatrix::zeros(f_.input(DAE_Z).sparsity());
@@ -129,7 +126,7 @@ namespace casadi {
     }
 
     // Allocate space for outputs
-    setNumOutputs(INTEGRATOR_NUM_OUT);
+    obuf_.resize(INTEGRATOR_NUM_OUT);
     xf() = x0();
     qf() = DMatrix::zeros(f_.output(DAE_QUAD).sparsity());
     zf() = z0();
@@ -140,7 +137,7 @@ namespace casadi {
     }
 
     // Warn if sparse inputs (was previously an error)
-    casadi_assert_warning(f_.input(DAE_X).isDense(),
+    casadi_assert_warning(f_.input(DAE_X).isdense(),
                           "Sparse states in integrators are experimental");
 
     // Consistency checks
@@ -178,12 +175,21 @@ namespace casadi {
     print_stats_ = getOption("print_stats");
 
     // Form a linear solver for the sparsity propagation
-    linsol_f_ = LinearSolver(spJacF());
-    linsol_f_.init();
+    linsol_f_ = LinearSolver("linsol_f", "none", spJacF());
     if (!g_.isNull()) {
-      linsol_g_ = LinearSolver(spJacG());
-      linsol_g_.init();
+      linsol_g_ = LinearSolver("linsol_g", "none", spJacG());
     }
+
+    // Allocate sufficiently large work vectors
+    size_t sz_w = f_.sz_w();
+    alloc(f_);
+    if (!g_.isNull()) {
+      alloc(g_);
+      sz_w = max(sz_w, g_.sz_w());
+    }
+    sz_w = max(sz_w, static_cast<size_t>(nx_+nz_));
+    sz_w = max(sz_w, static_cast<size_t>(nrx_+nrz_));
+    alloc_w(sz_w + nx_ + nz_ + nrx_ + nrz_);
   }
 
   void IntegratorInternal::deepCopyMembers(
@@ -199,7 +205,7 @@ namespace casadi {
                                                                 AugOffset& offset) {
     log("IntegratorInternal::getAugmented", "call");
 
-    //    cout << "here" << endl;
+    //    userOut() << "here" << endl;
 
     // Return object
     std::pair<Function, Function> ret;
@@ -242,7 +248,7 @@ namespace casadi {
     // Forward derivatives of f
     Function d = f_.derivative(nfwd, 0);
     vector<MX> f_arg;
-    f_arg.reserve(d.getNumInputs());
+    f_arg.reserve(d.nIn());
     tmp.resize(DAE_NUM_IN);
     fill(tmp.begin(), tmp.end(), MX());
 
@@ -278,7 +284,7 @@ namespace casadi {
 
       // Forward derivatives of g
       d = g_.derivative(nfwd, 0);
-      g_arg.reserve(d.getNumInputs());
+      g_arg.reserve(d.nIn());
       tmp.resize(RDAE_NUM_IN);
       fill(tmp.begin(), tmp.end(), MX());
 
@@ -323,7 +329,7 @@ namespace casadi {
       // Adjoint derivatives of f
       d = f_.derivative(0, nadj);
       f_arg.resize(DAE_NUM_IN);
-      f_arg.reserve(d.getNumInputs());
+      f_arg.reserve(d.nIn());
 
       // Collect arguments for calling d
       tmp.resize(DAE_NUM_OUT);
@@ -362,7 +368,7 @@ namespace casadi {
         // Adjoint derivatives of g
         d = g_.derivative(0, nadj);
         g_arg.resize(RDAE_NUM_IN);
-        g_arg.reserve(d.getNumInputs());
+        g_arg.reserve(d.nIn());
 
         // Collect arguments for calling der
         tmp.resize(RDAE_NUM_OUT);
@@ -435,11 +441,10 @@ namespace casadi {
       if (!f_ode.empty()) f_out[DAE_ODE] = densify(horzcat(f_ode));
       if (!f_alg.empty()) f_out[DAE_ALG] = densify(horzcat(f_alg));
       if (!f_quad.empty()) f_out[DAE_QUAD] = densify(horzcat(f_quad));
-      MXFunction f_mx(f_in, f_out);
+      MXFunction f_mx("dae", f_in, f_out);
 
       // Expand to SXFuncion?
       if (expand) {
-        f_mx.init();
         ret.first = SXFunction(f_mx);
       } else {
         ret.first = f_mx;
@@ -459,11 +464,10 @@ namespace casadi {
       if (!g_ode.empty()) g_out[RDAE_ODE] = densify(horzcat(g_ode));
       if (!g_alg.empty()) g_out[RDAE_ALG] = densify(horzcat(g_alg));
       if (!g_quad.empty()) g_out[RDAE_QUAD] = densify(horzcat(g_quad));
-      MXFunction g_mx(g_in, g_out);
+      MXFunction g_mx("rdae", g_in, g_out);
 
       // Expand to SXFuncion?
       if (expand) {
-        g_mx.init();
         ret.second = SXFunction(g_mx);
       } else {
         ret.second = g_mx;
@@ -482,157 +486,189 @@ namespace casadi {
     return ret;
   }
 
-  void IntegratorInternal::spEvaluate(bool fwd) {
-    log("IntegratorInternal::spEvaluate", "begin");
+  void IntegratorInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    log("IntegratorInternal::spFwd", "begin");
 
-    // Temporary vectors
-    bvec_t *tmp_f1, *tmp_f2, *tmp_g1= NULL, *tmp_g2=NULL;
+    // Work vectors
+    bvec_t *tmp_x = w; w += nx_;
+    bvec_t *tmp_z = w; w += nz_;
+    bvec_t *tmp_rx = w; w += nrx_;
+    bvec_t *tmp_rz = w; w += nrz_;
+
+    // Propagate through f
+    const bvec_t** arg1 = arg+nIn();
+    fill(arg1, arg1+DAE_NUM_IN, static_cast<bvec_t*>(0));
+    arg1[DAE_X] = arg[INTEGRATOR_X0];
+    arg1[DAE_P] = arg[INTEGRATOR_P];
+    bvec_t** res1 = res+nOut();
+    fill(res1, res1+DAE_NUM_OUT, static_cast<bvec_t*>(0));
+    res1[DAE_ODE] = tmp_x;
+    res1[DAE_ALG] = tmp_z;
+    f_.spFwd(arg1, res1, iw, w);
+    if (arg[INTEGRATOR_X0]) {
+      const bvec_t *tmp = arg[INTEGRATOR_X0];
+      for (int i=0; i<nx_; ++i) tmp_x[i] |= *tmp++;
+    }
+
+    // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
+    copy(tmp_x, tmp_x+nx_+nz_, w);
+    fill_n(tmp_x, nx_+nz_, 0);
     casadi_assert(!linsol_f_.isNull());
-    tmp_f1 = reinterpret_cast<bvec_t*>(linsol_f_.input(LINSOL_B).ptr());
-    tmp_f2 = reinterpret_cast<bvec_t*>(linsol_f_.output(LINSOL_X).ptr());
+    linsol_f_.spSolve(tmp_x, w, false);
+
+    // Get xf and zf
+    if (res[INTEGRATOR_XF])
+      copy(tmp_x, tmp_x+nx_, res[INTEGRATOR_XF]);
+    if (res[INTEGRATOR_ZF])
+      copy(tmp_z, tmp_z+nz_, res[INTEGRATOR_ZF]);
+
+    // Propagate to quadratures
+    if (nq_>0 && res[INTEGRATOR_QF]) {
+      arg1[DAE_X] = tmp_x;
+      arg1[DAE_Z] = tmp_z;
+      res1[DAE_ODE] = res1[DAE_ALG] = 0;
+      res1[DAE_QUAD] = res[INTEGRATOR_QF];
+      f_.spFwd(arg1, res1, iw, w);
+    }
+
     if (!g_.isNull()) {
+      // Propagate through g
+      fill(arg1, arg1+RDAE_NUM_IN, static_cast<bvec_t*>(0));
+      arg1[RDAE_X] = tmp_x;
+      arg1[RDAE_P] = arg[INTEGRATOR_P];
+      arg1[RDAE_Z] = tmp_z;
+      arg1[RDAE_RX] = arg[INTEGRATOR_X0];
+      arg1[RDAE_RX] = arg[INTEGRATOR_RX0];
+      arg1[RDAE_RP] = arg[INTEGRATOR_RP];
+      fill(res1, res1+RDAE_NUM_OUT, static_cast<bvec_t*>(0));
+      res1[RDAE_ODE] = tmp_rx;
+      res1[RDAE_ALG] = tmp_rz;
+      g_.spFwd(arg1, res1, iw, w);
+      if (arg[INTEGRATOR_RX0]) {
+        const bvec_t *tmp = arg[INTEGRATOR_RX0];
+        for (int i=0; i<nrx_; ++i) tmp_rx[i] |= *tmp++;
+      }
+
+      // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
+      copy(tmp_rx, tmp_rx+nrx_+nrz_, w);
+      fill_n(tmp_rx, nrx_+nrz_, 0);
       casadi_assert(!linsol_g_.isNull());
-      tmp_g1 = reinterpret_cast<bvec_t*>(linsol_g_.input(LINSOL_B).ptr());
-      tmp_g2 = reinterpret_cast<bvec_t*>(linsol_g_.output(LINSOL_X).ptr());
+      linsol_g_.spSolve(tmp_rx, w, false);
+
+      // Get rxf and rzf
+      if (res[INTEGRATOR_RXF])
+        copy(tmp_rx, tmp_rx+nrx_, res[INTEGRATOR_RXF]);
+      if (res[INTEGRATOR_RZF])
+        copy(tmp_rz, tmp_rz+nrz_, res[INTEGRATOR_RZF]);
+
+      // Propagate to quadratures
+      if (nrq_>0 && res[INTEGRATOR_RQF]) {
+        arg1[RDAE_RX] = tmp_rx;
+        arg1[RDAE_RZ] = tmp_rz;
+        res1[RDAE_ODE] = res1[RDAE_ALG] = 0;
+        res1[RDAE_QUAD] = res[INTEGRATOR_RQF];
+        g_.spFwd(arg1, res1, iw, w);
+      }
+    }
+    log("IntegratorInternal::spFwd", "end");
+  }
+
+  void IntegratorInternal::spAdj(bvec_t** arg, bvec_t** res,
+                                 int* iw, bvec_t* w) {
+    log("IntegratorInternal::spAdj", "begin");
+
+    // Work vectors
+    bvec_t *tmp_x = w; w += nx_;
+    bvec_t *tmp_z = w; w += nz_;
+    bvec_t *tmp_rx = w; w += nrx_;
+    bvec_t *tmp_rz = w; w += nrz_;
+    bvec_t** arg1 = arg+nIn();
+    bvec_t** res1 = res+nOut();
+
+    // Get & clear seeds (forward integration)
+    if (res[INTEGRATOR_XF]) {
+      copy(res[INTEGRATOR_XF], res[INTEGRATOR_XF]+nx_, tmp_x);
+      fill_n(res[INTEGRATOR_XF], nx_, 0);
+    } else {
+      fill_n(tmp_x, nx_, 0);
+    }
+    if (res[INTEGRATOR_ZF]) {
+      copy(res[INTEGRATOR_ZF], res[INTEGRATOR_ZF]+nz_, tmp_z);
+      fill_n(res[INTEGRATOR_ZF], nz_, 0);
+    } else {
+      fill_n(tmp_z, nz_, 0);
     }
 
-    // Initialize the callback functions for sparsity propagation
-    f_.spInit(fwd);
     if (!g_.isNull()) {
-      g_.spInit(fwd);
-    }
-
-    if (fwd) {
-
-      // Propagate through the DAE
-      f_.input(DAE_T).setZeroBV();
-      f_.input(DAE_X).setBV(x0());
-      f_.input(DAE_P).setBV(p());
-      f_.input(DAE_Z).setZeroBV();
-      f_.spEvaluate(true);
-      f_.output(DAE_ODE).getArrayBV(tmp_f1, nx_);
-      f_.output(DAE_ALG).getArrayBV(tmp_f1+nx_, nz_);
-
-      // Propagate interdependencies
-      x0().getArrayBV(tmp_f2, nx_);
-      std::fill(tmp_f2+nx_, tmp_f2+nx_+nz_, 0);
-      linsol_f_.spSolve(tmp_f2, tmp_f1, true);
-      xf().setArrayBV(tmp_f2, nx_);
-      zf().setArrayBV(tmp_f2+nx_, nz_);
-
-      // Get influence on the quadratures
-      if (nq_>0) {
-        f_.input(DAE_X).setArrayBV(tmp_f2, nx_);
-        f_.input(DAE_Z).setBV(zf());
-        f_.spEvaluate(true);
-        f_.output(DAE_QUAD).getBV(qf());
+      // Get & clear seeds (backward integration)
+      if (res[INTEGRATOR_RXF]) {
+        copy(res[INTEGRATOR_RXF], res[INTEGRATOR_RXF]+nrx_, tmp_rx);
+        fill_n(res[INTEGRATOR_RXF], nrx_, 0);
+      } else {
+        fill_n(tmp_rx, nrx_, 0);
       }
+      if (res[INTEGRATOR_RZF]) {
+        copy(res[INTEGRATOR_RZF], res[INTEGRATOR_RZF]+nrz_, tmp_rz);
+        fill_n(res[INTEGRATOR_RZF], nrz_, 0);
+      } else {
+        fill_n(tmp_rz, nrz_, 0);
+      }
+
+      // Propagate dependencies from quadratures
+      fill(res1, res1+RDAE_NUM_OUT, static_cast<bvec_t*>(0));
+      res1[RDAE_QUAD] = res[INTEGRATOR_RQF];
+      fill(arg1, arg1+RDAE_NUM_IN, static_cast<bvec_t*>(0));
+      arg1[RDAE_X] = tmp_x;
+      arg1[RDAE_Z] = tmp_z;
+      arg1[RDAE_P] = arg[INTEGRATOR_P];
+      arg1[RDAE_RX] = tmp_rx;
+      arg1[RDAE_RZ] = tmp_rz;
+      arg1[RDAE_RP] = arg[INTEGRATOR_RP];
+      if (nrq_>0 && res[INTEGRATOR_RQF]) {
+        g_.spAdj(arg1, res1, iw, w);
+      }
+
+      // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
+      copy(tmp_rx, tmp_rx+nrx_+nrz_, w);
+      fill_n(tmp_rx, nrx_+nrz_, 0);
+      casadi_assert(!linsol_g_.isNull());
+      linsol_g_.spSolve(tmp_rx, w, true);
 
       // Propagate through g
-      if (!g_.isNull()) {
-
-        // Propagate through the backward DAE
-        g_.input(RDAE_T).setZeroBV();
-        g_.input(RDAE_X).setBV(xf());
-        g_.input(RDAE_P).setBV(p());
-        g_.input(RDAE_Z).setBV(zf());
-        g_.input(RDAE_RX).setBV(rx0());
-        g_.input(RDAE_RP).setBV(rp());
-        g_.input(RDAE_RZ).setZeroBV();
-        g_.spEvaluate(true);
-        g_.output(RDAE_ODE).getArrayBV(tmp_g1, nrx_);
-        g_.output(RDAE_ALG).getArrayBV(tmp_g1+nrx_, nrz_);
-
-        // Propagate interdependencies
-        rx0().getArrayBV(tmp_g2, nrx_);
-        std::fill(tmp_g2+nrx_, tmp_g2+nrx_+nrz_, 0);
-        linsol_g_.spSolve(tmp_g2, tmp_g1, true);
-        rxf().setArrayBV(tmp_g2, nrx_);
-        rzf().setArrayBV(tmp_g2+nrx_, nrz_);
-
-        // Get influence on the backward quadratures
-        if (nrq_>0) {
-          g_.input(RDAE_RX).setBV(rxf());
-          g_.input(RDAE_RZ).setBV(rzf());
-          g_.spEvaluate(true);
-          g_.output(RDAE_QUAD).getBV(rqf());
-        }
-      }
-    } else { // reverse mode
-
-      // Clear adjoint sensitivities
-      x0().setBV(xf());
-      p().setZeroBV();
-      z0().setBV(zf());
-      rx0().setBV(rxf());
-      rp().setZeroBV();
-      rz0().setBV(rzf());
-
-      // Propagate through g
-      if (!g_.isNull()) {
-
-        // Propagate influence from the backward quadratures
-        if (nrq_>0) {
-          g_.output(RDAE_ODE).setZeroBV();
-          g_.output(RDAE_ALG).setZeroBV();
-          g_.output(RDAE_QUAD).setBV(rqf());
-          g_.spEvaluate(false);
-          rx0().borBV(g_.input(RDAE_RX));
-          rz0().borBV(g_.input(RDAE_RZ));
-        }
-
-        // Propagate interdependencies
-        rx0().getArrayBV(tmp_g2, nrx_);
-        rz0().getArrayBV(tmp_g2+nrx_, nrz_);
-        std::fill(tmp_g1, tmp_g1+nrx_+nrz_, 0);
-        linsol_g_.spSolve(tmp_g1, tmp_g2, false);
-
-        // Propagate through the backward DAE
-        g_.output(RDAE_ODE).setArrayBV(tmp_g1, nrx_);
-        g_.output(RDAE_ODE).borBV(rx0());
-        g_.output(RDAE_ALG).setArrayBV(tmp_g1+nrx_, nrz_);
-        g_.output(RDAE_ALG).borBV(rz0());
-        g_.spEvaluate(false);
-        x0().borBV(g_.input(RDAE_X));
-        p().borBV(g_.input(RDAE_P));
-        z0().borBV(g_.input(RDAE_Z));
-        rx0().borBV(g_.input(RDAE_RX));
-        rp().borBV(g_.input(RDAE_RP));
-
-        // No dependency on initial guess
-        rz0().setZeroBV();
-      }
-
-      // Propagate influence from the quadratures
-      if (nq_>0) {
-        f_.output(DAE_ODE).setZeroBV();
-        f_.output(DAE_ALG).setZeroBV();
-        f_.output(DAE_QUAD).setBV(qf());
-        f_.spEvaluate(false);
-        x0().borBV(f_.input(DAE_X));
-        z0().borBV(f_.input(DAE_Z));
-      }
-
-      // Propagate interdependencies
-      x0().getArrayBV(tmp_f2, nx_);
-      z0().getArrayBV(tmp_f2+nx_, nz_);
-      std::fill(tmp_f1, tmp_f1+nx_+nz_, 0);
-      linsol_f_.spSolve(tmp_f1, tmp_f2, false);
-
-      // Propagate through the DAE
-      f_.output(DAE_ODE).setArrayBV(tmp_f1, nx_);
-      f_.output(DAE_ODE).borBV(x0());
-      f_.output(DAE_ALG).setArrayBV(tmp_f1+nx_, nz_);
-      f_.output(DAE_ALG).borBV(z0());
-      f_.spEvaluate(false);
-      x0().borBV(f_.input(DAE_X));
-      p().borBV(f_.input(DAE_P));
-
-      // No dependency on initial guess
-      z0().setZeroBV();
+      res1[RDAE_ODE] = tmp_rx;
+      res1[RDAE_ALG] = tmp_rx + nrx_;
+      res1[RDAE_QUAD] = 0;
+      arg1[RDAE_X] = arg[INTEGRATOR_RX0];
+      arg1[RDAE_Z] = 0;
+      g_.spAdj(arg1, res1, iw, w);
     }
 
-    log("IntegratorInternal::spEvaluate", "end");
+    // Propagate dependencies from quadratures
+    fill(res1, res1+DAE_NUM_OUT, static_cast<bvec_t*>(0));
+    res1[DAE_QUAD] = res[INTEGRATOR_QF];
+    fill(arg1, arg1+DAE_NUM_IN, static_cast<bvec_t*>(0));
+    arg1[DAE_X] = tmp_x;
+    arg1[DAE_Z] = tmp_z;
+    arg1[DAE_P] = arg[INTEGRATOR_P];
+    if (nq_>0 && res[INTEGRATOR_QF]) {
+      f_.spAdj(arg1, res1, iw, w);
+    }
+
+    // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
+    copy(tmp_x, tmp_x+nx_+nz_, w);
+    fill_n(tmp_x, nx_+nz_, 0);
+    casadi_assert(!linsol_f_.isNull());
+    linsol_f_.spSolve(tmp_x, w, true);
+
+    // Propagate through f
+    res1[DAE_ODE] = tmp_x;
+    res1[DAE_ALG] = tmp_x + nx_;
+    res1[DAE_QUAD] = 0;
+    arg1[DAE_X] = arg[INTEGRATOR_X0];
+    arg1[DAE_Z] = 0; // Note: Ignored, just a guess
+    f_.spAdj(arg1, res1, iw, w);
+
+    log("IntegratorInternal::spAdj", "end");
   }
 
   IntegratorInternal::AugOffset IntegratorInternal::getAugOffset(int nfwd, int nadj) {
@@ -685,7 +721,7 @@ namespace casadi {
     return ret;
   }
 
-  Function IntegratorInternal::getDerForward(int nfwd) {
+  Function IntegratorInternal::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     log("IntegratorInternal::getDerForward", "begin");
 
     // Form the augmented DAE
@@ -825,10 +861,10 @@ namespace casadi {
     log("IntegratorInternal::getDerForward", "end");
 
     // Create derivative function and return
-    return MXFunction(ret_in, ret_out);
+    return MXFunction(name, ret_in, ret_out, opts);
   }
 
-  Function IntegratorInternal::getDerReverse(int nadj) {
+  Function IntegratorInternal::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     log("IntegratorInternal::getDerReverse", "begin");
 
     // Form the augmented DAE
@@ -1004,7 +1040,7 @@ namespace casadi {
     log("IntegratorInternal::getDerivative", "end");
 
     // Create derivative function and return
-    return MXFunction(ret_in, ret_out);
+    return MXFunction(name, ret_in, ret_out, opts);
   }
 
   void IntegratorInternal::reset() {
@@ -1046,40 +1082,38 @@ namespace casadi {
 
   Sparsity IntegratorInternal::spJacF() {
     // Start with the sparsity pattern of the ODE part
-    Sparsity ret = f_.jacSparsity(DAE_X, DAE_ODE).T();
+    Sparsity jac_ode_x = f_.jacSparsity(DAE_X, DAE_ODE);
 
     // Add diagonal to get interdependencies
-    ret = ret.patternUnion(Sparsity::diag(nx_));
+    jac_ode_x = jac_ode_x + Sparsity::diag(nx_);
 
     // Quick return if no algebraic variables
-    if (nz_==0) return ret;
+    if (nz_==0) return jac_ode_x;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = f_.jacSparsity(DAE_Z, DAE_ODE).T();
-    Sparsity jac_alg_x = f_.jacSparsity(DAE_X, DAE_ALG).T();
-    Sparsity jac_alg_z = f_.jacSparsity(DAE_Z, DAE_ALG).T();
-    ret = vertcat(ret, jac_ode_z);
-    ret.appendColumns(vertcat(jac_alg_x, jac_alg_z));
-    return ret;
+    Sparsity jac_ode_z = f_.jacSparsity(DAE_Z, DAE_ODE);
+    Sparsity jac_alg_x = f_.jacSparsity(DAE_X, DAE_ALG);
+    Sparsity jac_alg_z = f_.jacSparsity(DAE_Z, DAE_ALG);
+    return blockcat(jac_ode_x, jac_ode_z,
+                    jac_alg_x, jac_alg_z);
   }
 
   Sparsity IntegratorInternal::spJacG() {
     // Start with the sparsity pattern of the ODE part
-    Sparsity ret = g_.jacSparsity(RDAE_RX, RDAE_ODE).T();
+    Sparsity jac_ode_x = g_.jacSparsity(RDAE_RX, RDAE_ODE);
 
     // Add diagonal to get interdependencies
-    ret = ret.patternUnion(Sparsity::diag(nrx_));
+    jac_ode_x = jac_ode_x + Sparsity::diag(nrx_);
 
     // Quick return if no algebraic variables
-    if (nrz_==0) return ret;
+    if (nrz_==0) return jac_ode_x;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = g_.jacSparsity(RDAE_RZ, RDAE_ODE).T();
-    Sparsity jac_alg_x = g_.jacSparsity(RDAE_RX, RDAE_ALG).T();
-    Sparsity jac_alg_z = g_.jacSparsity(RDAE_RZ, RDAE_ALG).T();
-    ret = vertcat(ret, jac_ode_z);
-    ret.appendColumns(vertcat(jac_alg_x, jac_alg_z));
-    return ret;
+    Sparsity jac_ode_z = g_.jacSparsity(RDAE_RZ, RDAE_ODE);
+    Sparsity jac_alg_x = g_.jacSparsity(RDAE_RX, RDAE_ALG);
+    Sparsity jac_alg_z = g_.jacSparsity(RDAE_RZ, RDAE_ALG);
+    return blockcat(jac_ode_x, jac_ode_z,
+                    jac_alg_x, jac_alg_z);
   }
 
   std::map<std::string, IntegratorInternal::Plugin> IntegratorInternal::solvers_;

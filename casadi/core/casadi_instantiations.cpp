@@ -78,11 +78,6 @@ namespace casadi {
   template class SparseStorage<Sparsity>;
   template class SparseStorage<WeakRef>;
 
-
-  INSTANTIATE_IOSCHEME_HELPERS(SX)
-  INSTANTIATE_IOSCHEME_HELPERS(MX)
-  INSTANTIATE_IOSCHEME_HELPERS(Sparsity)
-
 } // namespace casadi
 
 namespace std {

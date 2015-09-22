@@ -120,40 +120,70 @@ namespace casadi {
     /** \brief  Print a description */
     virtual void print(std::ostream &stream) const;
 
-    /** \brief  Print expression (make sure number of calls is not exceeded) */
-    virtual void print(std::ostream &stream, long& remaining_calls) const;
+    /** \brief Find out which nodes can be inlined */
+    void canInline(std::map<const MXNode*, int>& nodeind) const;
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const = 0;
+    /** \brief Print compact */
+    std::string printCompact(std::map<const MXNode*, int>& nodeind,
+                             std::vector<std::string>& intermed) const;
+
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const = 0;
+
+    /** \brief Add a dependent function */
+    virtual void addDependency(CodeGenerator& g) const {}
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                          const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
 
     /** \brief  Evaluate numerically */
-    virtual void evalD(const cpv_double& arg, const pv_double& res, int* itmp, double* rtmp);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
     /** \brief  Evaluate symbolically (SX) */
-    virtual void evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
-                        int* itmp, SXElement* rtmp);
+    virtual void evalSX(const SXElement** arg, SXElement** res,
+                        int* iw, SXElement* w);
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void eval(const cpv_MX& arg, const pv_MX& res);
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens);
+    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& fsens);
+    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const pv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Get the name */
     virtual const std::string& getName() const;
+
+    /** \brief  Check if valid function input */
+    virtual bool isValidInput() const { return false;}
+
+    /** \brief Get the number of symbolic primitives */
+    virtual int numPrimitives() const;
+
+    /** \brief Get symbolic primitives */
+    virtual void getPrimitives(std::vector<MX>::iterator& it) const;
+
+    /** \brief Split up an expression along symbolic primitives */
+    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+
+    /** \brief Join an expression along symbolic primitives */
+    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+
+    /** \brief Detect duplicate symbolic expressions */
+    virtual bool hasDuplicates();
+
+    /** \brief Reset the marker for an input expression */
+    virtual void resetInput();
 
     /** \brief  Check if evaluation output */
     virtual bool isOutputNode() const {return false;}
@@ -161,11 +191,11 @@ namespace casadi {
     /** \brief  Check if a multiple output node */
     virtual bool isMultipleOutput() const {return false;}
 
-    /** \brief  Get function reference */
-    virtual Function& getFunction();
+    /** \brief  Number of functions */
+    virtual int numFunctions() const {return 0;}
 
     /** \brief  Get function reference */
-    virtual const Function& getFunction() const { return const_cast<MXNode*>(this)->getFunction();}
+    virtual const Function& getFunction(int i) const;
 
     /** \brief  Get function input */
     virtual int getFunctionInput() const;
@@ -210,7 +240,7 @@ namespace casadi {
 
     /// Get shape
     int numel() const { return sparsity().numel(); }
-    int nnz() const { return sparsity().nnz(); }
+    int nnz(int i=0) const { return sparsity(i).nnz(); }
     int size1() const { return sparsity().size1(); }
     int size2() const { return sparsity().size2(); }
     std::pair<int, int> shape() const { return sparsity().shape();}
@@ -221,8 +251,17 @@ namespace casadi {
     /// Set the sparsity
     void setSparsity(const Sparsity& sparsity);
 
-    /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr) { ni=0; nr=0;}
+    /** \brief Get required length of arg field */
+    virtual size_t sz_arg() const { return ndep();}
+
+    /** \brief Get required length of res field */
+    virtual size_t sz_res() const { return nout();}
+
+    /** \brief Get required length of iw field */
+    virtual size_t sz_iw() const { return 0;}
+
+    /** \brief Get required length of w field */
+    virtual size_t sz_w() const { return 0;}
 
     /// Set unary dependency
     void setDependencies(const MX& dep);
@@ -276,6 +315,12 @@ namespace casadi {
     /// Create a horizontal split node
     virtual std::vector<MX> getHorzsplit(const std::vector<int>& output_offset) const;
 
+    /// Create a repeated matrix node
+    virtual MX getRepmat(int m, int n) const;
+
+    /// Create a repeated sum node
+    virtual MX getRepsum(int m, int n) const;
+
     /// Create a vertical concatenation node (vectors only)
     virtual MX getVertcat(const std::vector<MX>& x) const;
 
@@ -323,7 +368,7 @@ namespace casadi {
     virtual MX getAssign(const MX& y, const Slice& i, const Slice& j) const;
 
     /// Create set sparse
-    virtual MX getSetSparse(const Sparsity& sp) const;
+    virtual MX getProject(const Sparsity& sp) const;
 
     /// Get a unary operation
     virtual MX getUnary(int op) const;
@@ -356,7 +401,13 @@ namespace casadi {
     virtual MX getNorm1() const;
 
     /// Assertion
-    MX getAssertion(const MX& y, const std::string & fail_message="") const;
+    MX getAssertion(const MX& y, const std::string& fail_message) const;
+
+    /// Monitor
+    MX getMonitor(const std::string& comment) const;
+
+    /// Find
+    MX getFind() const;
 
     /** Temporary variables to be used in user algorithms like sorting,
         the user is responsible of making sure that use is thread-safe
@@ -369,24 +420,6 @@ namespace casadi {
 
     /** \brief  The sparsity pattern */
     Sparsity sparsity_;
-
-    /// Convert vector of const MX pointers to vector of MX
-    static std::vector<MX> getVector(const cpv_MX& v, int len);
-
-    /// Convert vector of const MX pointers to vector of MX
-    static std::vector<MX> getVector(const pv_MX& v, int len);
-
-    /// Convert vector of vectors of pointers to vector of vectors of objects
-    static std::vector<std::vector<MX> > getVector(const std::vector<pv_MX>& v, int len);
-
-    /// Convert vector of vectors of pointers to vector of vectors of objects
-    static std::vector<std::vector<MX> > getVector(const std::vector<cpv_MX>& v, int len);
-
-    /** \brief Free adjoint memory (MX) */
-    static void clearVector(const pv_MX& v, int len);
-
-    /** \brief Free adjoint memory (MX) */
-    static void clearVector(const std::vector<pv_MX>& v, int len);
 
     /** \brief Propagate sparsities forward through a copy operation */
     static void copyFwd(const bvec_t* arg, bvec_t* res, int len);

@@ -592,7 +592,7 @@ class SetterDispatcher(Dispatcher):
           self.master[i] = payload_
         elif type=="symm":
           iflip = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry,flip=True)
-          if payload_.isScalar():
+          if payload_.isscalar():
             self.master[i] = payload_
             self.master[iflip] = payload_
           else:
@@ -792,7 +792,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
           hmap[a] = [m]
     self.size = k
     for k,v in hmap.iteritems():
-      hmap[k] = vecNZcat(v)
+      hmap[k] = vertcat([i.nz[:] for i in v])
     
     self.map.update(hmap)
     
@@ -927,7 +927,7 @@ class ssymStruct(CasadiStructured,MasterGettable):
       e = self.struct.getStructEntryByCanonicalIndex(i)
       s.append(SX.sym("_".join(map(str,i)),e.sparsity.nnz()))
         
-    self.master = vecNZcat(s)
+    self.master = vertcat([i.nz[:] for i in s])
 
     for e in self.entries:
       if e.sym is not None:
@@ -1103,7 +1103,7 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
       raise Exception("Problem in MX vecNZcat structure cat: missing expressions. The following entries are missing: %s" % str(missing))
       
     if self.dirty:
-      self.master_cached = vecNZcat(self.storage)
+      self.master_cached = vertcat([i.nz[:] for i in self.storage])
 
     return self.master_cached
     
@@ -1210,7 +1210,7 @@ class CasadiStructEntry(StructEntry):
     self.sym = None
     if 'sym' in kwargs:
       sym = kwargs["sym"]
-      if isinstance(sym,SX) and sym.isSymbolicSparse():
+      if isinstance(sym,SX) and sym.isValidInput():
         self.sym = sym
       elif isinstance(sym,Structured): 
         self.struct = sym.struct
@@ -1363,7 +1363,7 @@ class DataReference:
   
 class DataReferenceRepeated(DataReference):
   def __init__(self,a,n):
-    assert(a.isDense())
+    assert(a.isdense())
     self.a = a
     self.n = n
     self.v = a.reshape((n*a.size1(),1))
@@ -1378,7 +1378,7 @@ class DataReferenceRepeated(DataReference):
 
 class DataReferenceSquared(DataReference):
   def __init__(self,a,n):
-    assert(a.isDense())
+    assert(a.isdense())
     self.a = a
     self.v = a
     self.n = n
@@ -1395,7 +1395,7 @@ class DataReferenceSquared(DataReference):
     
 class DataReferenceProduct(DataReference):
   def __init__(self,a,n,m):
-    assert(a.isDense())
+    assert(a.isdense())
     self.a = a
     self.v = a
     self.n = n
@@ -1419,7 +1419,7 @@ class DataReferenceProduct(DataReference):
 
 class DataReferenceSquaredRepeated(DataReference):
   def __init__(self,a,n,N):
-    assert(a.isDense())
+    assert(a.isdense())
     self.a = a
     self.n = n
     self.N = N

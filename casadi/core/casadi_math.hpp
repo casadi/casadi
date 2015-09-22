@@ -459,8 +459,8 @@ inline void casadi_math<T>::printName(unsigned char op, std::ostream &stream) {
     case OP_NEG:                 stream << "neg";                 break;
     case OP_EXP:                 stream << "exp";                 break;
     case OP_LOG:                 stream << "log";                 break;
+    case OP_CONSTPOW:
     case OP_POW:                 stream << "pow";                 break;
-    case OP_CONSTPOW:            stream << "constpow";            break;
     case OP_SQRT:                stream << "sqrt";                break;
     case OP_SQ:                  stream << "sq";                  break;
     case OP_TWICE:               stream << "twice";               break;
@@ -518,7 +518,7 @@ inline void casadi_math<T>::printName(unsigned char op, std::ostream &stream) {
     case OP_GETNONZEROS:         stream << "getnonzeros";         break;
     case OP_ADDNONZEROS:         stream << "addnonzeros";         break;
     case OP_SETNONZEROS:         stream << "setnonzeros";         break;
-    case OP_SET_SPARSE:          stream << "set_sparse";          break;
+    case OP_PROJECT:             stream << "project";             break;
     case OP_ASSERTION:           stream << "assertion";           break;
     case OP_NORM2:               stream << "norm2";               break;
     case OP_NORM1:               stream << "norm1";               break;
@@ -548,7 +548,6 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream) {
     case OP_AND:       stream << "(";        break;
     case OP_OR:        stream << "(";        break;
     case OP_IF_ELSE_ZERO: stream << "(";        break;
-    case OP_COPYSIGN:  stream << "__copysign__(";break;
     case OP_INV:       stream << "(1./";     break;
     default:           printName(op, stream); stream << "("; break;
   }

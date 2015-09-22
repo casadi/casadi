@@ -47,6 +47,7 @@
 
 */
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a \e dle solver [dleIn]
   enum DLEInput {
@@ -63,16 +64,9 @@ namespace casadi {
     DLE_P,
     DLE_NUM_OUT
   };
+#endif // SWIG
 
-  /// Structure specification of a DLE [dleStruct]
-  enum DleStruct {
-    /// The matrix A [a]
-    Dle_STRUCT_A,
-    /// The matrix V [v]
-    Dle_STRUCT_V,
-    Dle_STRUCT_NUM};
-
-  /// Forward declaration of internal class
+ /// Forward declaration of internal class
   class DleInternal;
 
   /**  \brief Base class for Discrete Lyapunov Equation Solvers
@@ -94,14 +88,23 @@ namespace casadi {
     /// Clone
     DleSolver clone() const;
 
-    /** \brief DleSolver solver factory
-    * \param name \pluginargument{DleSolver}
-    * \param st \structargument{Dle}
-    */
-    DleSolver(const std::string& name, const DleStructure& st);
+    /** \brief Constructor (new syntax, includes initialization)
+     * \param solver \pluginargument{DleSolver}
+     * \param st \structargument{Dle}
+     */
+    DleSolver(const std::string& name, const std::string& solver,
+              const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor (no initialization)
+     * \param solver \pluginargument{DleSolver}
+     * \param st \structargument{Dle}
+     */
+    DleSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=CASADI_COUT) const;
+    void printStats(std::ostream &stream=casadi::userOut()) const;
 
     /// Access functions of the node
     DleInternal* operator->();
@@ -122,7 +125,7 @@ namespace casadi {
     static std::string doc(const std::string& name);
 
     /// Get the resulting sparsity
-    static Sparsity getSparsity(const DleStructure& st);
+    static Sparsity getSparsity(const std::map<std::string, Sparsity>& st);
   };
 
 } // namespace casadi

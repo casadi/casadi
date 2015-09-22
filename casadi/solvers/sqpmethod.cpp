@@ -24,11 +24,11 @@
 
 
 #include "sqpmethod.hpp"
+
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
-#include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/casadi_calculus.hpp"
+
 #include <ctime>
 #include <iomanip>
 #include <fstream>
@@ -57,7 +57,7 @@ namespace casadi {
     casadi_warning("The SQP method is under development");
     addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
-    addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
+    addOption("qp_solver_options", OT_DICT, GenericType(),
               "Options to be passed to the QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",
               "limited-memory|exact");
@@ -126,16 +126,16 @@ namespace casadi {
     Sparsity A_sparsity = jacG().isNull() ? Sparsity(0, nx_)
         : jacG().output().sparsity();
 
-    std::string qp_solver_name = getOption("qp_solver");
-    qp_solver_ = QpSolver(qp_solver_name,
-                          qpStruct("h", H_sparsity, "a", A_sparsity));
-
-    // Set options if provided
+    // QP solver options
+    Dict qp_solver_options;
     if (hasSetOption("qp_solver_options")) {
-      Dictionary qp_solver_options = getOption("qp_solver_options");
-      qp_solver_.setOption(qp_solver_options);
+      qp_solver_options = getOption("qp_solver_options");
     }
-    qp_solver_.init();
+
+    // Allocate a QP solver
+    qp_solver_ = QpSolver("qp_solver", getOption("qp_solver"),
+                          make_map("h", H_sparsity, "a", A_sparsity),
+                          qp_solver_options);
 
     // Lagrange multipliers of the NLP
     mu_.resize(ng_);
@@ -155,10 +155,10 @@ namespace casadi {
     gk_cand_.resize(ng_);
 
     // Hessian approximation
-    Bk_ = DMatrix(H_sparsity);
+    Bk_ = DMatrix::zeros(H_sparsity);
 
     // Jacobian
-    Jk_ = DMatrix(A_sparsity);
+    Jk_ = DMatrix::zeros(A_sparsity);
 
     // Bounds of the QP
     qp_LBA_.resize(ng_);
@@ -204,8 +204,7 @@ namespace casadi {
       bfgs_in[BFGS_X_OLD] = x_old;
       bfgs_in[BFGS_GLAG] = gLag;
       bfgs_in[BFGS_GLAG_OLD] = gLag_old;
-      bfgs_ = SXFunction(bfgs_in, Bk_new);
-      bfgs_.init();
+      bfgs_ = SXFunction("bfgs", bfgs_in, make_vector(Bk_new));
 
       // Initial Hessian approximation
       B_init_ = DMatrix::eye(nx_);
@@ -213,19 +212,21 @@ namespace casadi {
 
     // Header
     if (static_cast<bool>(getOption("print_header"))) {
-      cout << "-------------------------------------------" << endl;
-      cout << "This is casadi::SQPMethod." << endl;
+      userOut()
+        << "-------------------------------------------" << endl
+        << "This is casadi::SQPMethod." << endl;
       if (exact_hessian_) {
-        cout << "Using exact Hessian" << endl;
+        userOut() << "Using exact Hessian" << endl;
       } else {
-        cout << "Using limited memory BFGS Hessian approximation" << endl;
+        userOut() << "Using limited memory BFGS Hessian approximation" << endl;
       }
-      cout << endl;
-      cout << "Number of variables:                       " << setw(9) << nx_ << endl;
-      cout << "Number of constraints:                     " << setw(9) << ng_ << endl;
-      cout << "Number of nonzeros in constraint Jacobian: " << setw(9) << A_sparsity.nnz() << endl;
-      cout << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << H_sparsity.nnz() << endl;
-      cout << endl;
+      userOut()
+        << endl
+        << "Number of variables:                       " << setw(9) << nx_ << endl
+        << "Number of constraints:                     " << setw(9) << ng_ << endl
+        << "Number of nonzeros in constraint Jacobian: " << setw(9) << A_sparsity.nnz() << endl
+        << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << H_sparsity.nnz() << endl
+        << endl;
     }
   }
 
@@ -234,7 +235,7 @@ namespace casadi {
     checkInitialBounds();
 
     if (gather_stats_) {
-      Dictionary iterations;
+      Dict iterations;
       iterations["inf_pr"] = std::vector<double>();
       iterations["inf_du"] = std::vector<double>();
       iterations["ls_trials"] = std::vector<double>();
@@ -314,31 +315,48 @@ namespace casadi {
       double dx_norminf = norm_inf(dx_);
 
       // Print header occasionally
-      if (iter % 10 == 0) printIteration(cout);
+      if (iter % 10 == 0) printIteration(userOut());
 
       // Printing information about the actual iterate
-      printIteration(cout, iter, fk_, pr_inf, gLag_norminf, dx_norminf, reg_, ls_iter, ls_success);
+      printIteration(userOut(), iter, fk_, pr_inf, gLag_norminf, dx_norminf,
+                     reg_, ls_iter, ls_success);
 
       if (gather_stats_) {
-        Dictionary & iterations = stats_["iterations"];
-        static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(pr_inf);
-        static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(gLag_norminf);
-        static_cast<std::vector<double> &>(iterations["d_norm"]).push_back(dx_norminf);
-        static_cast<std::vector<double> &>(iterations["ls_trials"]).push_back(ls_iter);
-        static_cast<std::vector<double> &>(iterations["obj"]).push_back(fk_);
+        Dict iterations = stats_["iterations"];
+        std::vector<double> tmp=iterations["inf_pr"];
+        tmp.push_back(pr_inf);
+        iterations["inf_pr"] = tmp;
+
+        tmp=iterations["inf_du"];
+        tmp.push_back(gLag_norminf);
+        iterations["inf_du"] = tmp;
+
+        tmp=iterations["d_norm"];
+        tmp.push_back(dx_norminf);
+        iterations["d_norm"] = tmp;
+
+        std::vector<int> tmp2=iterations["ls_trials"];
+        tmp2.push_back(ls_iter);
+        iterations["ls_trials"] = tmp2;
+
+        tmp=iterations["obj"];
+        tmp.push_back(fk_);
+        iterations["obj"] = tmp;
+
+        stats_["iterations"] = iterations;
       }
 
       // Call callback function if present
       if (!callback_.isNull()) {
         double time1 = clock();
 
-        if (!output(NLP_SOLVER_F).isEmpty()) output(NLP_SOLVER_F).set(fk_);
-        if (!output(NLP_SOLVER_X).isEmpty()) output(NLP_SOLVER_X).setNZ(x_);
-        if (!output(NLP_SOLVER_LAM_G).isEmpty()) output(NLP_SOLVER_LAM_G).setNZ(mu_);
-        if (!output(NLP_SOLVER_LAM_X).isEmpty()) output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
-        if (!output(NLP_SOLVER_G).isEmpty()) output(NLP_SOLVER_G).setNZ(gk_);
+        if (!output(NLP_SOLVER_F).isempty()) output(NLP_SOLVER_F).set(fk_);
+        if (!output(NLP_SOLVER_X).isempty()) output(NLP_SOLVER_X).setNZ(x_);
+        if (!output(NLP_SOLVER_LAM_G).isempty()) output(NLP_SOLVER_LAM_G).setNZ(mu_);
+        if (!output(NLP_SOLVER_LAM_X).isempty()) output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
+        if (!output(NLP_SOLVER_G).isempty()) output(NLP_SOLVER_G).setNZ(gk_);
 
-        Dictionary iteration;
+        Dict iteration;
         iteration["iter"] = iter;
         iteration["inf_pr"] = pr_inf;
         iteration["inf_du"] = gLag_norminf;
@@ -354,8 +372,8 @@ namespace casadi {
         time2 = clock();
         t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
         if (ret) {
-          cout << endl;
-          cout << "casadi::SQPMethod: aborted by callback..." << endl;
+          userOut() << endl;
+          userOut() << "casadi::SQPMethod: aborted by callback..." << endl;
           stats_["return_status"] = "User_Requested_Stop";
           break;
         }
@@ -363,22 +381,23 @@ namespace casadi {
 
       // Checking convergence criteria
       if (pr_inf < tol_pr_ && gLag_norminf < tol_du_) {
-        cout << endl;
-        cout << "casadi::SQPMethod: Convergence achieved after " << iter << " iterations." << endl;
+        userOut() << endl;
+        userOut() << "casadi::SQPMethod: Convergence achieved after "
+                  << iter << " iterations." << endl;
         stats_["return_status"] = "Solve_Succeeded";
         break;
       }
 
       if (iter >= max_iter_) {
-        cout << endl;
-        cout << "casadi::SQPMethod: Maximum number of iterations reached." << endl;
+        userOut() << endl;
+        userOut() << "casadi::SQPMethod: Maximum number of iterations reached." << endl;
         stats_["return_status"] = "Maximum_Iterations_Exceeded";
         break;
       }
 
       if (iter > 0 && dx_norminf <= min_step_size_) {
-        cout << endl;
-        cout << "casadi::SQPMethod: Search direction becomes too small without "
+        userOut() << endl;
+        userOut() << "casadi::SQPMethod: Search direction becomes too small without "
             "convergence criteria being met." << endl;
         stats_["return_status"] = "Search_Direction_Becomes_Too_Small";
         break;
@@ -538,10 +557,10 @@ namespace casadi {
 
         // Pass to BFGS update function
         bfgs_.setInput(Bk_, BFGS_BK);
-        bfgs_.setInput(x_, BFGS_X);
-        bfgs_.setInput(x_old_, BFGS_X_OLD);
-        bfgs_.setInput(gLag_, BFGS_GLAG);
-        bfgs_.setInput(gLag_old_, BFGS_GLAG_OLD);
+        bfgs_.setInputNZ(x_, BFGS_X);
+        bfgs_.setInputNZ(x_old_, BFGS_X_OLD);
+        bfgs_.setInputNZ(gLag_, BFGS_GLAG);
+        bfgs_.setInputNZ(gLag_old_, BFGS_GLAG_OLD);
 
         // Update the Hessian approximation
         bfgs_.evaluate();
@@ -549,8 +568,8 @@ namespace casadi {
         // Get the updated Hessian
         bfgs_.getOutput(Bk_);
         if (monitored("bfgs")) {
-          cout << "x = " << x_ << endl;
-          cout << "BFGS = "  << endl;
+          userOut() << "x = " << x_ << endl;
+          userOut() << "BFGS = "  << endl;
           Bk_.printSparse();
         }
       } else {
@@ -572,31 +591,34 @@ namespace casadi {
 
     if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
       // Write timings
-      cout << "time spent in eval_f: " << t_eval_f_ << " s.";
+      userOut() << "time spent in eval_f: " << t_eval_f_ << " s.";
       if (n_eval_f_>0)
-        cout << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
+        userOut() << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000
+                  << " ms. average)";
+      userOut() << endl;
+      userOut() << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
       if (n_eval_grad_f_>0)
-        cout << " (" << n_eval_grad_f_ << " calls, "
+        userOut() << " (" << n_eval_grad_f_ << " calls, "
              << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_g: " << t_eval_g_ << " s.";
+      userOut() << endl;
+      userOut() << "time spent in eval_g: " << t_eval_g_ << " s.";
       if (n_eval_g_>0)
-        cout << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
+        userOut() << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000
+                  << " ms. average)";
+      userOut() << endl;
+      userOut() << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
       if (n_eval_jac_g_>0)
-        cout << " (" << n_eval_jac_g_ << " calls, "
+        userOut() << " (" << n_eval_jac_g_ << " calls, "
              << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_h: " << t_eval_h_ << " s.";
+      userOut() << endl;
+      userOut() << "time spent in eval_h: " << t_eval_h_ << " s.";
       if (n_eval_h_>1)
-        cout << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
-      cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
-      cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
+        userOut() << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000
+                  << " ms. average)";
+      userOut() << endl;
+      userOut() << "time spent in main loop: " << t_mainloop_ << " s." << endl;
+      userOut() << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
+      userOut() << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
     }
 
     // Save statistics
@@ -656,8 +678,8 @@ namespace casadi {
     }
 
     if (monitored("eval_h")) {
-      cout << "x = " << x_ << endl;
-      cout << "H = " << endl;
+      userOut() << "x = " << x_ << endl;
+      userOut() << "H = " << endl;
       Bk_.printSparse();
     }
   }
@@ -707,10 +729,10 @@ namespace casadi {
       Function& hessLag = this->hessLag();
 
       // Pass the argument to the function
-      hessLag.setInput(x, HESSLAG_X);
+      hessLag.setInputNZ(x, HESSLAG_X);
       hessLag.setInput(input(NLP_SOLVER_P), HESSLAG_P);
       hessLag.setInput(sigma, HESSLAG_LAM_F);
-      hessLag.setInput(lambda, HESSLAG_LAM_G);
+      hessLag.setInputNZ(lambda, HESSLAG_LAM_G);
 
       // Evaluate
       hessLag.evaluate();
@@ -719,8 +741,8 @@ namespace casadi {
       hessLag.getOutput(H);
 
       if (monitored("eval_h")) {
-        cout << "x = " << x << endl;
-        cout << "H = " << endl;
+        userOut() << "x = " << x << endl;
+        userOut() << "H = " << endl;
         H.printSparse();
       }
 
@@ -733,7 +755,7 @@ namespace casadi {
       }
 
     } catch(exception& ex) {
-      cerr << "eval_h failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_h failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -746,7 +768,7 @@ namespace casadi {
       if (ng_==0) return;
 
       // Pass the argument to the function
-      nlp_.setInput(x, NL_X);
+      nlp_.setInputNZ(x, NL_X);
       nlp_.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate the function and tape
@@ -757,15 +779,15 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_g")) {
-        cout << "x = " << nlp_.input(NL_X) << endl;
-        cout << "g = " << nlp_.output(NL_G) << endl;
+        userOut() << "x = " << nlp_.input(NL_X) << endl;
+        userOut() << "g = " << nlp_.output(NL_G) << endl;
       }
 
       double time2 = clock();
       t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_g_ += 1;
     } catch(exception& ex) {
-      cerr << "eval_g failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_g failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -782,7 +804,7 @@ namespace casadi {
       Function& jacG = this->jacG();
 
       // Pass the argument to the function
-      jacG.setInput(x, NL_X);
+      jacG.setInputNZ(x, NL_X);
       jacG.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate the function
@@ -793,9 +815,9 @@ namespace casadi {
       jacG.output().get(J);
 
       if (monitored("eval_jac_g")) {
-        cout << "x = " << x << endl;
-        cout << "g = " << g << endl;
-        cout << "J = " << endl;
+        userOut() << "x = " << x << endl;
+        userOut() << "g = " << g << endl;
+        userOut() << "J = " << endl;
         J.printSparse();
       }
 
@@ -804,7 +826,7 @@ namespace casadi {
       n_eval_jac_g_ += 1;
 
     } catch(exception& ex) {
-      cerr << "eval_jac_g failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -818,7 +840,7 @@ namespace casadi {
       Function& gradF = this->gradF();
 
       // Pass the argument to the function
-      gradF.setInput(x, NL_X);
+      gradF.setInputNZ(x, NL_X);
       gradF.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate, adjoint mode
@@ -830,20 +852,20 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_f")) {
-        cout << "x = " << x << endl;
-        cout << "f = " << f << endl;
+        userOut() << "x = " << x << endl;
+        userOut() << "f = " << f << endl;
       }
 
       if (monitored("eval_grad_f")) {
-        cout << "x      = " << x << endl;
-        cout << "grad_f = " << grad_f << endl;
+        userOut() << "x      = " << x << endl;
+        userOut() << "grad_f = " << grad_f << endl;
       }
       double time2 = clock();
       t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_grad_f_ += 1;
 
     } catch(exception& ex) {
-      cerr << "eval_grad_f failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_grad_f failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -854,7 +876,7 @@ namespace casadi {
       double time1 = clock();
 
       // Pass the argument to the function
-      nlp_.setInput(x, NL_X);
+      nlp_.setInputNZ(x, NL_X);
       nlp_.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate the function
@@ -865,15 +887,15 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_f")) {
-        cout << "x = " << nlp_.input(NL_X) << endl;
-        cout << "f = " << f << endl;
+        userOut() << "x = " << nlp_.input(NL_X) << endl;
+        userOut() << "f = " << f << endl;
       }
       double time2 = clock();
       t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_f_ += 1;
 
     } catch(exception& ex) {
-      cerr << "eval_f failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_f failed: " << ex.what() << endl;
       throw;
     }
   }
@@ -887,46 +909,46 @@ namespace casadi {
 
     // Pass data to QP solver
     qp_solver_.setInput(H, QP_SOLVER_H);
-    qp_solver_.setInput(g, QP_SOLVER_G);
+    qp_solver_.setInputNZ(g, QP_SOLVER_G);
 
     // Hot-starting if possible
-    qp_solver_.setInput(x_opt, QP_SOLVER_X0);
+    qp_solver_.setInputNZ(x_opt, QP_SOLVER_X0);
 
     //TODO(Joel): Fix hot-starting of dual variables
     //qp_solver_.setInput(lambda_A_opt, QP_SOLVER_LAMBDA_INIT);
 
     // Pass simple bounds
-    qp_solver_.setInput(lbx, QP_SOLVER_LBX);
-    qp_solver_.setInput(ubx, QP_SOLVER_UBX);
+    qp_solver_.setInputNZ(lbx, QP_SOLVER_LBX);
+    qp_solver_.setInputNZ(ubx, QP_SOLVER_UBX);
 
     // Pass linear bounds
     if (ng_>0) {
       qp_solver_.setInput(A, QP_SOLVER_A);
-      qp_solver_.setInput(lbA, QP_SOLVER_LBA);
-      qp_solver_.setInput(ubA, QP_SOLVER_UBA);
+      qp_solver_.setInputNZ(lbA, QP_SOLVER_LBA);
+      qp_solver_.setInputNZ(ubA, QP_SOLVER_UBA);
     }
 
     if (monitored("qp")) {
-      cout << "H = " << endl;
+      userOut() << "H = " << endl;
       H.printDense();
-      cout << "A = " << endl;
+      userOut() << "A = " << endl;
       A.printDense();
-      cout << "g = " << g << endl;
-      cout << "lbx = " << lbx << endl;
-      cout << "ubx = " << ubx << endl;
-      cout << "lbA = " << lbA << endl;
-      cout << "ubA = " << ubA << endl;
+      userOut() << "g = " << g << endl;
+      userOut() << "lbx = " << lbx << endl;
+      userOut() << "ubx = " << ubx << endl;
+      userOut() << "lbA = " << lbA << endl;
+      userOut() << "ubA = " << ubA << endl;
     }
 
     // Solve the QP
     qp_solver_.evaluate();
 
     // Get the optimal solution
-    qp_solver_.getOutput(x_opt, QP_SOLVER_X);
-    qp_solver_.getOutput(lambda_x_opt, QP_SOLVER_LAM_X);
-    qp_solver_.getOutput(lambda_A_opt, QP_SOLVER_LAM_A);
+    qp_solver_.getOutputNZ(x_opt, QP_SOLVER_X);
+    qp_solver_.getOutputNZ(lambda_x_opt, QP_SOLVER_LAM_X);
+    qp_solver_.getOutputNZ(lambda_A_opt, QP_SOLVER_LAM_A);
     if (monitored("dx")) {
-      cout << "dx = " << x_opt << endl;
+      userOut() << "dx = " << x_opt << endl;
     }
   }
 

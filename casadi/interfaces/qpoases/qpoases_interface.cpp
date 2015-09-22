@@ -26,10 +26,10 @@
 #include "qpoases_interface.hpp"
 
 #include "../../core/std_vector_tools.hpp"
-#include "../../core/matrix/matrix_tools.hpp"
 
 // Bug in qpOASES?
 #define ALLOW_QPROBLEMB true
+#define ALLOW_ALL_OPTIONS
 
 using namespace std;
 namespace casadi {
@@ -51,13 +51,15 @@ namespace casadi {
 
   QpoasesInterface* QpoasesInterface::clone() const {
     // Return a deep copy
-    QpoasesInterface* node = new QpoasesInterface(st_);
+    QpoasesInterface* node =
+      new QpoasesInterface(make_map("h", st_[QP_STRUCT_H], "a", st_[QP_STRUCT_A]));
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  QpoasesInterface::QpoasesInterface(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
+  QpoasesInterface::QpoasesInterface(const std::map<std::string, Sparsity>& st)
+    : QpSolverInternal(st) {
     addOption("nWSR",                   OT_INTEGER,     GenericType(),
               "The maximum number of working set recalculations to be performed during "
               "the initial homotopy. Default is 5(nx + nc)");
@@ -162,7 +164,7 @@ namespace casadi {
     }
 
     // Create data for H if not dense
-    if (!input(QP_SOLVER_H).sparsity().isDense()) h_data_.resize(n_*n_);
+    if (!input(QP_SOLVER_H).sparsity().isdense()) h_data_.resize(n_*n_);
 
     // Create data for A
     a_data_.resize(n_*nc_);
@@ -172,14 +174,13 @@ namespace casadi {
 
     // Create qpOASES instance
     if (qp_) delete qp_;
-    if (ALLOW_QPROBLEMB && nc_==0) {
+    if (nc_==0) {
       qp_ = new qpOASES::QProblemB(n_);
     } else {
       qp_ = new qpOASES::SQProblem(n_, nc_);
     }
     called_once_ = false;
 
-#ifdef ALLOW_ALL_OPTIONS
     qpOASES::Options ops;
     ops.setToDefault();
     ops.printLevel = string_to_PrintLevel(getOption("printLevel"));
@@ -215,21 +216,18 @@ namespace casadi {
 
     // Pass to qpOASES
     qp_->setOptions(ops);
-#else // ALLOW_ALL_OPTIONS
-    qp_->setPrintLevel(string_to_PrintLevel(getOption("printLevel")));
-#endif // ALLOW_ALL_OPTIONS
   }
 
   void QpoasesInterface::evaluate() {
     if (inputs_check_) checkInputs();
 
     if (verbose()) {
-      //     cout << "X_INIT = " << input(QP_SOLVER_X_INIT) << endl;
-      //     cout << "LAMBDA_INIT = " << input(QP_SOLVER_LAMBDA_INIT) << endl;
-      cout << "LBX = " << input(QP_SOLVER_LBX) << endl;
-      cout << "UBX = " << input(QP_SOLVER_UBX) << endl;
-      cout << "LBA = " << input(QP_SOLVER_LBA) << endl;
-      cout << "UBA = " << input(QP_SOLVER_UBA) << endl;
+      //     userOut() << "X_INIT = " << input(QP_SOLVER_X_INIT) << endl;
+      //     userOut() << "LAMBDA_INIT = " << input(QP_SOLVER_LAMBDA_INIT) << endl;
+      userOut() << "LBX = " << input(QP_SOLVER_LBX) << endl;
+      userOut() << "UBX = " << input(QP_SOLVER_UBX) << endl;
+      userOut() << "LBA = " << input(QP_SOLVER_LBA) << endl;
+      userOut() << "UBA = " << input(QP_SOLVER_UBA) << endl;
     }
 
     // Get pointer to H
@@ -265,7 +263,7 @@ namespace casadi {
 
     int flag;
     if (!called_once_) {
-      if (ALLOW_QPROBLEMB && nc_==0) {
+      if (nc_==0) {
         flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h, g, lb, ub, nWSR, cputime_ptr);
       } else {
         flag = static_cast<qpOASES::SQProblem*>(qp_)->init(h, g, a, lb, ub, lbA, ubA,
@@ -273,7 +271,7 @@ namespace casadi {
       }
       called_once_ = true;
     } else {
-      if (ALLOW_QPROBLEMB && nc_==0) {
+      if (nc_==0) {
         static_cast<qpOASES::QProblemB*>(qp_)->reset();
         flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h, g, lb, ub, nWSR, cputime_ptr);
         //flag = static_cast<qpOASES::QProblemB*>(qp_)->hotstart(g, lb, ub, nWSR, cputime_ptr);

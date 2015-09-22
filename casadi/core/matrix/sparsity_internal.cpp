@@ -48,11 +48,11 @@ namespace casadi {
     stream << size1() << "x" << size2();
 
     // Print shape
-    if (isEmpty()) {
+    if (isempty()) {
       // Print nothing, shape clear anyway
-    } else if (isDense()) {
+    } else if (isdense()) {
       stream << ", dense";
-    } else if (isDiagonal()) {
+    } else if (isdiag()) {
       stream << ", diagonal";
     } else {
       stream << ", " << nnz() << " nnz";
@@ -1901,16 +1901,16 @@ namespace casadi {
     int d2 = y.size2();
 
     // Quick return if both are dense
-    if (isDense() && y.isDense()) {
-      return !isEmpty() && !y.isEmpty() ? Sparsity::dense(d1, d2) :
+    if (isdense() && y.isdense()) {
+      return !isempty() && !y.isempty() ? Sparsity::dense(d1, d2) :
         Sparsity(d1, d2);
     }
 
     // Quick return if first factor is diagonal
-    if (isDiagonal()) return y;
+    if (isdiag()) return y;
 
     // Quick return if second factor is diagonal
-    if (y.isDiagonal()) return shared_from_this<Sparsity>();
+    if (y.isdiag()) return shared_from_this<Sparsity>();
 
     // Direct access to the vectors
     const int* x_row = row();
@@ -1947,23 +1947,31 @@ namespace casadi {
     return Sparsity::triplet(d1, d2, row, col);
   }
 
-  bool SparsityInternal::isScalar(bool scalar_and_dense) const {
+  bool SparsityInternal::isscalar(bool scalar_and_dense) const {
     return size2()==1 && size1()==1 && (!scalar_and_dense || nnz()==1);
   }
 
-  bool SparsityInternal::isDense() const {
+  bool SparsityInternal::isdense() const {
     return nnz() == numel();
   }
 
-  bool SparsityInternal::isVector(bool row_or_col) const {
-    return size2()==1 || (row_or_col && size1()==1);
+  bool SparsityInternal::isrow() const {
+    return size1()==1;
   }
 
-  bool SparsityInternal::isEmpty(bool both) const {
+  bool SparsityInternal::iscolumn() const {
+    return size2()==1;
+  }
+
+  bool SparsityInternal::isvector() const {
+    return isrow() || iscolumn();
+  }
+
+  bool SparsityInternal::isempty(bool both) const {
     return both ? size2()==0 && size1()==0 : size2()==0 || size1()==0;
   }
 
-  bool SparsityInternal::isDiagonal() const {
+  bool SparsityInternal::isdiag() const {
     const int* colind = this->colind();
     const int* row = this->row();
 
@@ -1989,11 +1997,11 @@ namespace casadi {
     return true;
   }
 
-  bool SparsityInternal::isSquare() const {
+  bool SparsityInternal::issquare() const {
     return size2() == size1();
   }
 
-  bool SparsityInternal::isSymmetric() const {
+  bool SparsityInternal::issymmetric() const {
     return isTranspose(*this);
   }
 
@@ -2306,6 +2314,10 @@ namespace casadi {
     if (ind1 || hasNegative(rr)) {
       std::vector<int> rr_mod = rr;
       for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+        casadi_assert_message(!(ind1 && (*i)<=0), "Matlab is 1-based, but requested index " <<
+                                                (*i) <<  ". Note that negative slices are" <<
+                                                " disabled in the Matlab interface. " <<
+                                                "Possibly you may want to use 'end'.");
         if (ind1) (*i)--;
         if (*i<0) *i += numel();
       }
@@ -2587,8 +2599,8 @@ namespace casadi {
 
   Sparsity SparsityInternal::patternInverse() const {
     // Quick return clauses
-    if (isEmpty()) return Sparsity::dense(size1(), size2());
-    if (isDense()) return Sparsity(size1(), size2());
+    if (isempty()) return Sparsity::dense(size1(), size2());
+    if (isdense()) return Sparsity(size1(), size2());
 
     // Sparsity of the result
     std::vector<int> row_ret;
@@ -2801,7 +2813,7 @@ namespace casadi {
                           << " out of bounds [0, " << size2() << ")");
 
     // Quick return if matrix is dense
-    if (isDense()) return rr+cc*size1();
+    if (isdense()) return rr+cc*size1();
 
     // Quick return if past the end
     if (colind[cc]==nnz() || (colind[cc+1]==nnz() && row[nnz()-1]<rr)) return -1;
@@ -3592,7 +3604,7 @@ namespace casadi {
       return false;
 
     // Quick return if empty interior or dense
-    if (nnz()==0 || isDense())
+    if (nnz()==0 || isdense())
       return true;
 
     // Run algorithm on the pattern with the least number of rows
@@ -3640,7 +3652,7 @@ namespace casadi {
     if (numel()!=y.numel() || nnz()!=y.nnz()) return false;
 
     // Quick return if empty interior or dense
-    if (nnz()==0 || isDense()) return true;
+    if (nnz()==0 || isdense()) return true;
 
     // Get Pattern
     const int* colind = this->colind();
@@ -3750,7 +3762,7 @@ namespace casadi {
     return hash_sparsity(size1(), size2(), colind(), row());
   }
 
-  bool SparsityInternal::isTril() const {
+  bool SparsityInternal::istril() const {
     const int* colind = this->colind();
     const int* row = this->row();
     // loop over columns
@@ -3767,7 +3779,7 @@ namespace casadi {
     return true;
   }
 
-  bool SparsityInternal::isTriu() const {
+  bool SparsityInternal::istriu() const {
     const int* colind = this->colind();
     const int* row = this->row();
     // loop over columns

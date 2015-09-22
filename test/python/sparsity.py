@@ -49,16 +49,7 @@ class Sparsitytests(casadiTestCase):
     for i in nzb:
       b.addNZ(i[0],i[1])
       
-    c,w =a.patternUnion(b)
-    self.assertEquals(len(w),len(nza.union(nzb)))
-    for k in range(len(w)):
-      ind = (c.row(k),c.getCol()[k])
-      if (ind in nza and ind in nzb):
-        self.assertEquals(w[k],1 | 2)
-      elif (ind in nza):
-        self.assertEquals(w[k],1)
-      elif (ind in nzb):
-        self.assertEquals(w[k],2)
+    c =a.patternUnion(b)
         
     c = a + b
     self.assertEquals(c.nnz(),len(nza.union(nzb)))
@@ -86,7 +77,7 @@ class Sparsitytests(casadiTestCase):
     for i in nzb:
       b.addNZ(i[0],i[1])
     
-    c,_=a.patternIntersection(b)
+    c=a.patternIntersection(b)
     for k in range(c.nnz()):
       ind = (c.row(k),c.getCol()[k])
       self.assertTrue(ind in nza and ind in nzb)
@@ -289,8 +280,7 @@ class Sparsitytests(casadiTestCase):
 
     self.assertTrue(c.sparsity()==d)
     
-    f = SXFunction([b],[c])
-    f.init()
+    f = SXFunction('f', [b],[c])
     f.setInput(range(1,len(nza)+1))
     f.evaluate()
     
@@ -322,9 +312,8 @@ class Sparsitytests(casadiTestCase):
 
     self.assertTrue(c.sparsity()==d)
     
-    f = MXFunction([b],[c])
-    f.init()
-    f.setInput(range(1,len(nza)+1))
+    f = MXFunction('f', [b],[c])
+    f.setInputNZ(range(1,len(nza)+1))
     f.evaluate()
     
     self.checkarray(DMatrix(f.getOutput().nonzeros()),DMatrix([1,0,0,7,0]),"sparsity index")
@@ -498,13 +487,9 @@ class Sparsitytests(casadiTestCase):
 
     p = SX.sym("p")
 
-    g = SXFunction([optvar,p],[X*p])
-    g.setOption("verbose",True)
-    g.init()
+    g = SXFunction('g', [optvar,p],[X*p], {'verbose':True})
 
     J = g.jacobian()
-    J.setOption("verbose",True)
-    J.init()
     
     self.assertTrue(J.getOutput()[:,:X.nnz()].sparsity()==Sparsity.diag(100))
 
@@ -513,13 +498,9 @@ class Sparsitytests(casadiTestCase):
 
     p = SX.sym("p")
 
-    g = SXFunction([X,p],[vertcat([X*p,P])])
-    g.setOption("verbose",True)
-    g.init()
+    g = SXFunction('g', [X,p],[vertcat([X*p,P])], {'verbose':True})
 
     J = g.jacobian()
-    J.setOption("verbose",True)
-    J.init()
     
     self.assertTrue(J.getOutput()[:X.nnz(),:].sparsity()==Sparsity.diag(100))
     

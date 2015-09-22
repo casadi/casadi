@@ -50,7 +50,7 @@ p = vertcat([x,y])
 q = vertcat([u,v])
 
 # System dynamics
-F = -k*(p-q) - beta*v*sqrt(sumAll(vel**2)+c**2)
+F = -k*(p-q) - beta*v*sqrt(sum_square(vel) + c**2)
 
 # System right hand side
 rhs = struct_SX(states)
@@ -59,8 +59,7 @@ rhs["y"]  = dy
 rhs["dx"] = F[0]
 rhs["dy"] = F[1]
 
-f = SXFunction(controldaeIn(x=states,p=parameters,u=controls),daeOut(ode=rhs))
-f.init()
+f = SXFunction("f", controldaeIn(x=states,p=parameters,u=controls),daeOut(ode=rhs))
 
 
 # Simulation output grid
@@ -68,10 +67,10 @@ N = 100
 tgrid = linspace(0,10.0,N)
 
 # ControlSimulator will output on each node of the timegrid
-csim = ControlSimulator(f,tgrid)
-csim.setOption("integrator", "cvodes")
-csim.setOption("integrator_options",{"abstol":1e-10,"reltol":1e-10})
-csim.init()
+opts = {}
+opts["integrator"] = "cvodes"
+opts["integrator_options"] = {"abstol":1e-10,"reltol":1e-10}
+csim = ControlSimulator("csim", f, tgrid, opts)
 
 x0 = states(0)
 
@@ -107,7 +106,6 @@ P0["x","dy"] = P0["dy","x"] = 0.002
 
 # Not supported in current revision, cf. #929
 # J = csim.jacobian("x0","xf")
-# J.init()
 # J.setInput(x0,"x0")
 # J.setInput(parameters_,"p")
 # J.setInput(controls_,"u")
@@ -133,15 +131,12 @@ rhs_aug = struct_SX(states_aug)
 rhs_aug["orig"]  = rhs
 rhs_aug["P"]  = mul(A,states_aug["P"]) + mul(states_aug["P"],A.T)
 
-f_aug = SXFunction(controldaeIn(x=states_aug,p=parameters,u=controls),daeOut(ode=rhs_aug))
-f_aug.init()
+f_aug = SXFunction("f_aug", controldaeIn(x=states_aug,p=parameters,u=controls),daeOut(ode=rhs_aug))
 
-csim_aug = ControlSimulator(f_aug,tgrid)
-csim_aug.setOption("integrator", "cvodes")
-csim_aug.init()
+csim_aug = ControlSimulator("csim_aug", f_aug, tgrid, {"integrator":"cvodes"})
 
-states_aug(csim_aug.input("x0"))["orig"] = x0
-states_aug(csim_aug.input("x0"))["P"] = P0
+states_aug(csim_aug.getInput("x0"))["orig"] = x0
+states_aug(csim_aug.getInput("x0"))["P"] = P0
 
 csim_aug.setInput(parameters_,"p")
 csim_aug.setInput(controls_,"u")

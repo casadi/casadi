@@ -24,7 +24,6 @@
 
 
 #include "norm.hpp"
-#include "mx_tools.hpp"
 #include "../runtime/runtime.hpp"
 
 using namespace std;
@@ -35,83 +34,60 @@ namespace casadi {
     setSparsity(Sparsity::scalar());
   }
 
-  void NormF::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "||";
-    } else {
-      stream << "||_F";
-    }
+  std::string NormF::print(const std::vector<std::string>& arg) const {
+    return "||" + arg.at(0) + "||_F";
   }
 
-  void NormF::evalD(const cpv_double& input, const pv_double& output,
-                    int* itmp, double* rtmp) {
-    evalGen<double>(input, output, itmp, rtmp);
+  void NormF::evalD(const double** arg, double** res, int* iw, double* w) {
+    evalGen<double>(arg, res, iw, w);
   }
 
-  void NormF::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                         int* itmp, SXElement* rtmp) {
-    evalGen<SXElement>(input, output, itmp, rtmp);
+  void NormF::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<typename T>
-  void NormF::evalGen(const std::vector<const T*>& input,
-                      const std::vector<T*>& output, int* itmp, T* rtmp) {
-    // Get data
-    T* res = output[0];
-    const T* arg = input[0];
-
-    // Perform the inner product
-    *res = sqrt(casadi_dot(dep().nnz(), arg, 1, arg, 1));
+  void NormF::evalGen(const T** arg, T** res, int* iw, T* w) {
+    *res[0] = sqrt(casadi_inner_prod(dep().nnz(), arg[0], arg[0]));
   }
 
-  void NormF::eval(const cpv_MX& input, const pv_MX& output) {
-    *output[0] = (*input[0])->getNormF();
+  void NormF::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = arg[0]->getNormF();
   }
 
-  void NormF::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
+  void NormF::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                      std::vector<std::vector<MX> >& fsens) {
     MX self = shared_from_this<MX>();
-    for (int d=0; d<fwdSens.size(); ++d) {
-      *fwdSens[d][0] = dep(0)->getInnerProd(*fwdSeed[d][0]) / self;
+    for (int d=0; d<fsens.size(); ++d) {
+      fsens[d][0] = dep(0)->getInnerProd(fseed[d][0]) / self;
     }
   }
 
-  void NormF::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
+  void NormF::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                      std::vector<std::vector<MX> >& asens) {
     MX self = shared_from_this<MX>();
-    for (int d=0; d<adjSeed.size(); ++d) {
-      adjSens[d][0]->addToSum(((*adjSeed[d][0])/self) * dep(0));
-      *adjSeed[d][0] = MX();
+    for (int d=0; d<aseed.size(); ++d) {
+      asens[d][0] += (aseed[d][0]/self) * dep(0);
     }
   }
 
-  void NormF::generate(std::ostream &stream, const std::vector<int>& arg,
-                                const std::vector<int>& res, CodeGenerator& gen) const {
-    gen.assign(stream, gen.workelement(res[0]),
-               "sqrt(" + gen.casadi_dot(dep().nnz(), gen.work(arg[0]), 1,
-                                        gen.work(arg[0]), 1) + ")");
+  void NormF::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                       CodeGenerator& g) const {
+    g.assign(g.body, g.workel(res[0]),
+             "sqrt(" + g.inner_prod(dep().nnz(), g.work(arg[0], dep(0).nnz()),
+                                      g.work(arg[0], dep(0).nnz())) + ")");
   }
 
-  void Norm2::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "||";
-    } else {
-      stream << "||_2";
-    }
+  std::string Norm2::print(const std::vector<std::string>& arg) const {
+    return "||" + arg.at(0) + "||_2";
   }
 
-  void Norm1::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "||";
-    } else {
-      stream << "||_1";
-    }
+  std::string Norm1::print(const std::vector<std::string>& arg) const {
+    return "||" + arg.at(0) + "||_1";
   }
 
-  void NormInf::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "||";
-    } else {
-      stream << "||_inf";
-    }
+  std::string NormInf::print(const std::vector<std::string>& arg) const {
+    return "||" + arg.at(0) + "||_inf";
   }
 
 } // namespace casadi

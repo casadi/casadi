@@ -65,27 +65,16 @@ macro(casadi_library_or_plugin name is_plugin)
       )
     endif()
   else()
-    # If it's a plugin, we install to lib/casadi and
-    # don't use a symlink to a versioned .so.
-    # This seems to be standard practice. --Greg Horn
-    if(${is_plugin})
-      install(TARGETS ${name}
-        LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH}
-        ARCHIVE DESTINATION ${PLUGIN_INSTALL_PATH}
-        RUNTIME DESTINATION ${PLUGIN_INSTALL_PATH}
-      )
-    else()
-      install(TARGETS ${name}
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION lib
-      )
-      SET_TARGET_PROPERTIES(
-        ${name}
-      PROPERTIES
-        SOVERSION ${PACKAGE_SO_VERSION}
-      )
-    endif()
+    install(TARGETS ${name}
+      LIBRARY DESTINATION lib
+      ARCHIVE DESTINATION lib
+      RUNTIME DESTINATION lib
+    )
+    SET_TARGET_PROPERTIES(
+      ${name}
+    PROPERTIES
+      SOVERSION ${PACKAGE_SO_VERSION}
+    )
   endif()
 
   add_style_check_target(${name} "${ARGN}")

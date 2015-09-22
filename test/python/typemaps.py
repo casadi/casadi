@@ -258,14 +258,12 @@ class typemaptests(casadiTestCase):
       if hasNum:
         dummy = [1.3,2.7,9.4,1.0]
 
-        f=function([z],[r])
-        f.init()
-        f.setInput(dummy[0:f.input().nnz()])
+        f=function("f", [z],[r])
+        f.setInputNZ(dummy[0:f.getInput().nnz()])
         f.evaluate()
         
-        f_=function([z],[z])
-        f_.init()
-        f_.setInput(dummy[0:f.input().nnz()])
+        f_=function("f", [z],[z])
+        f_.setInputNZ(dummy[0:f.getInput().nnz()])
         f_.evaluate()
         
 
@@ -274,16 +272,14 @@ class typemaptests(casadiTestCase):
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
         
-        f=function([z,s],[r])
-        f.init()
-        f.setInput(dummy[0:f.input(0).nnz()],0)
-        f.setInput(dummy2[0:f.input(1).nnz()],1)
+        f=function("f", [z,s],[r])
+        f.setInputNZ(dummy[0:f.getInput(0).nnz()],0)
+        f.setInputNZ(dummy2[0:f.getInput(1).nnz()],1)
         f.evaluate()
         
-        f_=function([z,s],[z,s])
-        f_.init()
-        f_.setInput(dummy[0:f.input(0).nnz()],0)
-        f_.setInput(dummy2[0:f.input(1).nnz()],1)
+        f_=function("f", [z,s],[z,s])
+        f_.setInputNZ(dummy[0:f.getInput(0).nnz()],0)
+        f_.setInputNZ(dummy2[0:f.getInput(1).nnz()],1)
         f_.evaluate()
 
         self.checkarray(fun(f_.getOutput(0),f_.getOutput(1)),f.getOutput(),"operation"+str(f_.getOutput(0))+","+str(f_.getOutput(1))+":"+str(f.getOutput()))
@@ -424,8 +420,7 @@ class typemaptests(casadiTestCase):
       "list" : goallist,
       "tuple" : tuple(goallist),
       "array1ddouble" : array(goallist,dtype=double),
-      "array1dint" : array(goallist),
-      "mixed" : [1,DMatrix(2),array(3)]
+      "array1dint" : array(goallist)
     }
     w=DMatrix(goal)
     self.checkarray(w,goal,"Constructor")
@@ -447,21 +442,22 @@ class typemaptests(casadiTestCase):
       
       
   def testGenericType(self):
-    self.message("Generic type")
-    x=SX.sym("x")
-    f=SXFunction([x],[2*x])
-    f.setOption("name","foo")
-    self.assertEquals(f.getOption("name"),"foo")
-    f.setOption("verbose",True)
-    #self.assertTrue(isinstance(f.getOption("verbose"),bool))
-    self.assertTrue(f.getOption("verbose"))
-    f.setOption("verbose",False)
-    self.assertTrue(not(f.getOption("verbose")))
-    d=f.dictionary()
-    self.assertTrue(isinstance(d,dict))
-    d["verbose"]=True
-    f.setOption(d)
-    self.assertTrue(f.getOption("verbose"))
+    with warnings.catch_warnings():
+      warnings.filterwarnings("ignore",category=DeprecationWarning)
+      self.message("Generic type")
+      x=SX.sym("x")
+      f=SXFunction("foo", [x],[2*x])
+      self.assertEquals(f.getOption("name"),"foo")
+      f.setOption("verbose",True)
+      #self.assertTrue(isinstance(f.getOption("verbose"),bool))
+      self.assertTrue(f.getOption("verbose"))
+      f.setOption("verbose",False)
+      self.assertTrue(not(f.getOption("verbose")))
+      d=f.dictionary()
+      self.assertTrue(isinstance(d,dict))
+      d["verbose"]=True
+      f.setOption(d)
+      self.assertTrue(f.getOption("verbose"))
 
   def testGenericType2(self):
     self.message("Generic type 2")
@@ -508,29 +504,14 @@ class typemaptests(casadiTestCase):
     a = GenericType(["foo","bar"])
     self.assertTrue(a.isStringVector())
     x = SX.sym("x")
-    f = SXFunction([x],[x])
+    f = SXFunction("f", [x],[x])
     #f.setOption("monitor",["foo","bar"])
     #self.assertEqual(f.getOption("monitor")[0],"foo")
     #self.assertEqual(f.getOption("monitor")[1],"bar")
     #f.setOption("monitor",["foo"])
     #self.assertEqual(f.getOption("monitor")[0],"foo")
     #f.setOption("monitor",[])
-    
-  @requiresPlugin(Integrator,"cvodes")
-  def testGenericType2bis(self):
-  
-    t=SX.sym("t")
-
-    x=SX.sym("x") 
-    dx=SX.sym("dx")
-
-    f=SXFunction(daeIn(t=t, x=vertcat([x,dx])),[vertcat([dx,-x])])
-    f.init()
-   
-    integrator = Integrator("cvodes", f)
-    integrator.setOption("fsens_scaling_factors",[5.0,7])
-    integrator.setOption("fsens_scaling_factors",[])
-    
+        
   def testGenericType3(self):
     self.message("Generic type 3")
     
@@ -542,13 +523,14 @@ class typemaptests(casadiTestCase):
   def testGenericTypeBoolean(self):
     x=SX.sym("x")
 
-    nlp = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
-    nlp.init()
+    nlp = SXFunction("nlp", nlpIn(x=x),nlpOut(f=x**2))
 
-    nlp_solver = NlpSolver("ipopt", nlp)
-    
-    self.assertRaises(RuntimeError,lambda : nlp_solver.setOption('acceptable_tol',SX.sym("x")))
-    nlp_solver.setOption('acceptable_tol',DMatrix(1))
+    nlp_solver = NlpSolver("mysolver","ipopt", nlp)
+
+    with warnings.catch_warnings():
+      warnings.filterwarnings("ignore",category=DeprecationWarning)
+      self.assertRaises(RuntimeError,lambda : nlp_solver.setOption('acceptable_tol',SX.sym("x")))
+      nlp_solver.setOption('acceptable_tol',DMatrix(1))
 
   def test_DMatrixSXcast(self):
     self.message("Casting DMatrix to SX")
@@ -571,7 +553,7 @@ class typemaptests(casadiTestCase):
     w = DMatrix([[1,2,3],[4,5,6]])
     x = SX.sym("x")
     
-    f = SXFunction([x],[w])
+    f = SXFunction("f", [x],[w])
     
     W = f.outputExpr(0)
     self.assertEqual(W.size1(),2)
@@ -582,7 +564,7 @@ class typemaptests(casadiTestCase):
     w = DMatrix([[1,2,3],[4,5,6]])
     x = MX.sym("x")
     
-    f = MXFunction([x],[w])
+    f = MXFunction("f", [x],[w])
     
     W = f.outputExpr(0)
 
@@ -625,7 +607,7 @@ class typemaptests(casadiTestCase):
     
     w.set(A[0,:])
     self.checkarray(w,A[0,:],"set")
-    w.get(B[0,:])
+    B[0,:] = w
     self.checkarray(B[0,:],A[0,:],"get")
     
     w = DMatrix([[0],[0]])
@@ -633,13 +615,13 @@ class typemaptests(casadiTestCase):
 
     w.set(A[:,0])
     self.checkarray(w,A[:,0],"set")
-    w.get(B[:,0])
+    B[:,0] = w
     self.checkarray(B[:,0],A[:,0],"get")
     
     w = DMatrix([[1,2],[3,4]])
     A = zeros((8,7))
     B = zeros((8,7))
-    w.get(A[2:7:3,:7:4])
+    A[2:7:3,:7:4] = w
     B[2:7:3,:7:4] = w
     self.checkarray(A,B,"get")
     
@@ -711,8 +693,7 @@ class typemaptests(casadiTestCase):
     self.message("casting DMatrix")
     
     x = SX.sym("x")
-    f = SXFunction([x],[x])
-    f.init()
+    f = SXFunction("f", [x],[x])
     class Foo:
       def __DMatrix__(self):
         return DMatrix([4])
@@ -773,24 +754,24 @@ class typemaptests(casadiTestCase):
       def __SX__(self):
         return x
         
-    SXFunction([x],[Foo()])
+    SXFunction("tmp", [x],[Foo()])
     
     class Foo:
       def __SX__(self):
         return MX.sym("x")
         
-    self.assertRaises(NotImplementedError,lambda : SXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : SXFunction("tmp", [x],[Foo()]))
     
     class Foo:
       def __SX__(self):
         raise Exception("15")
         
-    self.assertRaises(NotImplementedError,lambda : SXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : SXFunction("tmp", [x],[Foo()]))
 
     class Foo:
       pass
         
-    self.assertRaises(NotImplementedError,lambda :SXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda :SXFunction("tmp", [x],[Foo()]))
 
 
   def test_casting_MX(self):
@@ -803,24 +784,24 @@ class typemaptests(casadiTestCase):
       def __MX__(self):
         return x
         
-    MXFunction([x],[Foo()])
+    MXFunction("tmp", [x],[Foo()])
     
     class Foo:
       def __MX__(self):
         return SX.sym("x")
         
-    self.assertRaises(NotImplementedError,lambda : MXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : MXFunction("tmp", [x],[Foo()]))
     
     class Foo:
       def __MX__(self):
         raise Exception("15")
         
-    self.assertRaises(NotImplementedError,lambda : MXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : MXFunction("tmp", [x],[Foo()]))
 
     class Foo:
       pass
         
-    self.assertRaises(NotImplementedError,lambda :MXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda :MXFunction("tmp", [x],[Foo()]))
     
   def test_OUTPUT(self):
     self.message("OUTPUT typemap")
@@ -841,10 +822,9 @@ class typemaptests(casadiTestCase):
   def test_sxmatrix(self):
 
     def val(a):
-      f = SXFunction([],[a])
-      f.init()
+      f = SXFunction("f", [],[a])
       f.evaluate()
-      return f.output()
+      return f.getOutput()
       
     for i in [SX(1),1,1.0]:
       a = numpy.array([[1,2],[3,4]])
@@ -891,8 +871,7 @@ class typemaptests(casadiTestCase):
       d = DMatrix.ones(2,2)
       
       x = SX.sym("x",d.sparsity())
-      f = SXFunction([x],[x])
-      f.init()
+      f = SXFunction("f", [x],[x])
       f.setInput(D)
 
       self.checkarray(f.getInput(),DMatrix([[1,2],[3,4]]))
@@ -904,30 +883,12 @@ class typemaptests(casadiTestCase):
 
     print if_else(0,a,a)
 
-  def test_vector_generic_return(self):
-
-    states = SX.sym("x",2)
-
-    ode = SXFunction([states],[states**2])
-    ode.init()
-
-    sol = Integrator("idas",ode);
-    a = sol.getOptionAllowed("linear_solver_type")
-    
-    self.assertTrue(isinstance(a,list))
-    for i in a:
-      self.assertTrue(isinstance(i,str))
-
   def test_issue1373(self):
     print np.array(casadi.DMatrix([2]))
     print np.array(casadi.DMatrix([1,2,3.0]))
 
   def test_None(self):
-    self.assertFalse(None==DMatrix(3))
-    x = SX.sym('x')
-    f = SXFunction([x],[x])
-    f.setOption('verbose', None)
-
+    #self.assertFalse(None==DMatrix(3))
     b = atleast_2d(None)
     with self.assertRaises(NotImplementedError):
       c = repmat(b, 1, 1)

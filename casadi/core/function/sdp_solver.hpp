@@ -112,6 +112,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a SDP problem [sdpIn]
   enum SDPInput {
@@ -150,16 +151,7 @@ namespace casadi {
     /// The dual solution corresponding to simple bounds  (n x 1) [lam_x]
     SDP_SOLVER_LAM_X,
     SDP_SOLVER_NUM_OUT};
-
-  /// Structure specification of an SDP [sdpStruct]
-  enum SDPStruct {
-    /// The horizontal stack of all matrices F_i: ( m x nm) [f]
-    SDP_STRUCT_F,
-    /// The matrix G: ( m x m) [g]
-    SDP_STRUCT_G,
-    /// The matrix A: ( nc x n) [a]
-    SDP_STRUCT_A,
-    SDP_STRUCT_NUM};
+#endif // SWIG
 
   // Forward declaration of internal class
   class SdpSolverInternal;
@@ -181,11 +173,20 @@ namespace casadi {
     /// Default constructor
     SdpSolver();
 
-    /** \brief Constructor
-     *  \param name \pluginargument{SdpSolver}
+    /** \brief Constructor (new syntax, includes initialization)
+     *  \param solver \pluginargument{SdpSolver}
      *  \param st \structargument{SDP}
      */
-    SdpSolver(const std::string& name, const SDPStructure& st);
+    SdpSolver(const std::string& name, const std::string& solver,
+              const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor
+     *  \param solver \pluginargument{SdpSolver}
+     *  \param st \structargument{SDP}
+     */
+    SdpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Access functions of the node
     SdpSolverInternal* operator->();
@@ -199,9 +200,6 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
-
-    /// Set options that make the SDP solver more suitable for solving SOCPs
-    void setSOCPOptions();
 
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);

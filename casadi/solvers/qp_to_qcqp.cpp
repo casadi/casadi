@@ -25,7 +25,6 @@
 
 #include "qp_to_qcqp.hpp"
 
-#include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
 
 using namespace std;
@@ -49,13 +48,14 @@ namespace casadi {
 
   QpToQcqp* QpToQcqp::clone() const {
     // Return a deep copy
-    QpToQcqp* node = new QpToQcqp(st_);
+    QpToQcqp* node =
+      new QpToQcqp(make_map("h", st_[QP_STRUCT_H], "a", st_[QP_STRUCT_A]));
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  QpToQcqp::QpToQcqp(const std::vector<Sparsity> &st) : QpSolverInternal(st) {
+  QpToQcqp::QpToQcqp(const std::map<std::string, Sparsity> &st) : QpSolverInternal(st) {
     Adaptor<QpToQcqp, QcqpSolverInternal>::addOptions();
   }
 
@@ -92,14 +92,16 @@ namespace casadi {
     // Initialize the base classes
     QpSolverInternal::init();
 
+    Dict options;
+    if (hasSetOption(optionsname())) options = getOption(optionsname());
+    options = OptionsFunctionality::addOptionRecipe(options, "qp");
+
     // Create an QcqpSolver instance
-    solver_ = QcqpSolver(getOption(solvername()),
-                         qcqpStruct("h", input(QP_SOLVER_H).sparsity(),
-                                    "p", Sparsity(n_, 0),
-                                    "a", input(QP_SOLVER_A).sparsity()));
-    solver_.setQPOptions();
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    solver_ = QcqpSolver("qcqpsolver", getOption(solvername()),
+                         make_map("h", input(QP_SOLVER_H).sparsity(),
+                                  "p", Sparsity(n_, 0),
+                                  "a", input(QP_SOLVER_A).sparsity()),
+                         options);
   }
 
 } // namespace casadi

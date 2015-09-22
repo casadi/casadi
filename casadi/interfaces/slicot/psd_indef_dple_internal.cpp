@@ -24,16 +24,15 @@
 
 
 #include "psd_indef_dple_internal.hpp"
-#include <cassert>
+
 #include "../../core/std_vector_tools.hpp"
-#include "../../core/matrix/matrix_tools.hpp"
-#include "../../core/mx/mx_tools.hpp"
-#include "../../core/sx/sx_tools.hpp"
 #include "../../core/function/mx_function.hpp"
 #include "../../core/function/sx_function.hpp"
-
+#include "../../core/function/linear_solver.hpp"
 #include "../../core/profiling.hpp"
 #include "../../core/casadi_options.hpp"
+
+#include <cassert>
 #include <ctime>
 #include <numeric>
 
@@ -72,10 +71,9 @@ namespace casadi {
     DpleInternal::registerPlugin(casadi_register_dplesolver_slicot);
   }
 
-  PsdIndefDpleInternal::PsdIndefDpleInternal(const DpleStructure & st,
-                                             int nrhs,
-                                             bool transp)
-      : DpleInternal(st, nrhs, transp) {
+  PsdIndefDpleInternal::
+  PsdIndefDpleInternal(const std::map<std::string, std::vector<Sparsity> > & st,
+                       int nrhs, bool transp) : DpleInternal(st, nrhs, transp) {
 
     // set default options
     setOption("name", "unnamed_psd_indef_dple_solver"); // name of the function
@@ -85,7 +83,7 @@ namespace casadi {
 
     addOption("linear_solver",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linear_solver_options",    OT_DICT,   GenericType(),
               "Options to be passed to the linear solver.");
     addOption("psd_num_zero",             OT_REAL,         1e-12,
               "Numerical zero used in Periodic Schur decomposition with slicot."
@@ -109,8 +107,8 @@ namespace casadi {
     DenseIO::init();
 
     //for (int k=0;k<K_;k++) {
-    //  casadi_assert_message(A_[k].isDense(), "Solver requires arguments to be dense.");
-    //  casadi_assert_message(V_[k].isDense(), "Solver requires arguments to be dense.");
+    //  casadi_assert_message(A_[k].isdense(), "Solver requires arguments to be dense.");
+    //  casadi_assert_message(V_[k].isdense(), "Solver requires arguments to be dense.");
     //}
 
     n_ = A_[0].size1();
@@ -181,8 +179,7 @@ namespace casadi {
 
           sp = Sparsity(np*K_, np*K_, row_ind, col);
         }
-        LinearSolver solver(linear_solver_name, sp, 1);
-        solver.init();
+        LinearSolver solver("solver", linear_solver_name, sp);
 
         dpse_solvers_[i].resize(n_*(n_+1)/2, solver);
         for (int k=0;k<n_*(n_+1)/2;++k) {
@@ -846,7 +843,8 @@ namespace casadi {
 
   }
 
-  Function PsdIndefDpleInternal::getDerForward(int nfwd) {
+  Function PsdIndefDpleInternal
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
 
     // Base:
     // P_0 P_1 P_2 .. P_{nrhs-1} = f( A Q_0 Q_1 Q_2 .. Q_{nrhs-1})
@@ -893,7 +891,10 @@ namespace casadi {
     }
 
     // Prepare a solver for forward seeds
-    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(st_, nfwd, transp_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[Dple_STRUCT_A];
+    tmp["v"] = st_[Dple_STRUCT_V];
+    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(tmp, nfwd, transp_);
     node->setOption(dictionary());
 
     DpleSolver f;
@@ -944,14 +945,11 @@ namespace casadi {
 
     }
 
-    MXFunction ret(ins_new, outs_new);
-    ret.init();
-
-    return ret;
-
+    return MXFunction(name, ins_new, outs_new, opts);
   }
 
-  Function PsdIndefDpleInternal::getDerReverse(int nadj) {
+  Function PsdIndefDpleInternal
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
 
     // Base:
     // P_0 P_1 P_2 .. P_{nrhs-1} = f( A Q_0 Q_1 Q_2 .. Q_{nrhs-1})
@@ -997,7 +995,10 @@ namespace casadi {
     }
 
     // Prepare a solver for adjoint seeds
-    PsdIndefDpleInternal* node2 = new PsdIndefDpleInternal(st_, nadj, !transp_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[Dple_STRUCT_A];
+    tmp["v"] = st_[Dple_STRUCT_V];
+    PsdIndefDpleInternal* node2 = new PsdIndefDpleInternal(tmp, nadj, !transp_);
     node2->setOption(dictionary());
 
     DpleSolver b;
@@ -1055,10 +1056,7 @@ namespace casadi {
 
     }
 
-    MXFunction ret(ins_new, outs_new);
-    ret.init();
-
-    return ret;
+    return MXFunction(name, ins_new, outs_new, opts);
   }
 
   void PsdIndefDpleInternal::deepCopyMembers(
@@ -1068,7 +1066,10 @@ namespace casadi {
 
   PsdIndefDpleInternal* PsdIndefDpleInternal::clone() const {
     // Return a deep copy
-    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(st_, nrhs_, transp_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[Dple_STRUCT_A];
+    tmp["v"] = st_[Dple_STRUCT_V];
+    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(tmp, nrhs_, transp_);
     node->setOption(dictionary());
     return node;
   }
@@ -1221,9 +1222,9 @@ if (dwork==0) {
     int K = a.size();
     int n = a[0].size1();
     for (int k=0;k<K;++k) {
-      casadi_assert_message(a[k].isSquare(), "a must be square");
+      casadi_assert_message(a[k].issquare(), "a must be square");
       casadi_assert_message(a[k].size1()==n, "a must be n-by-n");
-      casadi_assert_message(a[k].isDense(), "a must be dense");
+      casadi_assert_message(a[k].isdense(), "a must be dense");
     }
 
 

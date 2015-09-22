@@ -57,7 +57,7 @@ namespace casadi {
      * \param st \structargument{LrDle}
      * \param Hs Column-sizes of H_i
      */
-    LrDleToDle(const LrDleStructure& st);
+    LrDleToDle(const std::map<std::string, Sparsity>& st);
 
     /** \brief  Destructor */
     virtual ~LrDleToDle();
@@ -69,12 +69,13 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual LrDleToDle* create(const LrDleStructure& st) const {
+    virtual LrDleToDle* create(const std::map<std::string, Sparsity>& st) const {
         return new LrDleToDle(st);}
 
     /** \brief  Create a new DLE Solver */
-    static LrDleInternal* creator(const LrDleStructure& st)
-    { return new LrDleToDle(st);}
+    static LrDleInternal* creator(const std::map<std::string, Sparsity>& st) {
+      return new LrDleToDle(st);
+    }
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -87,14 +88,14 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function getDerForward(int nfwd);
-    virtual bool hasDerForward() const { return true;}
+    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
+    virtual int numDerForward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function getDerReverse(int nadj);
-    virtual bool hasDerReverse() const { return true;}
+    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
+    virtual int numDerReverse() const { return 64;}
     ///@}
 
     /// A documentation string

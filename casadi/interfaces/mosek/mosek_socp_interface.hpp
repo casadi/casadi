@@ -52,13 +52,13 @@ namespace casadi {
   public:
 
     /** \brief Constructor */
-    explicit MosekSocpInterface(const std::vector<Sparsity> &st);
+    explicit MosekSocpInterface(const std::map<std::string, Sparsity> &st);
 
     /** \brief Clone */
     virtual MosekSocpInterface* clone() const;
 
     /** \brief  Create a new SOCP Solver */
-    static SocpSolverInternal* creator(const SOCPStructure& st)
+    static SocpSolverInternal* creator(const std::map<std::string, Sparsity>& st)
     { return new MosekSocpInterface(st);}
 
     /** \brief Destructor */
@@ -70,22 +70,16 @@ namespace casadi {
     /** \brief Solve the SOCP */
     virtual void evaluate();
 
-    /** Get termination reason from flag */
-    static const char* terminationReason(int flag);
-
-    /** Get solution type from flag */
-    static const char* solutionType(int flag);
-
     /// A documentation string
     static const std::string meta_doc;
 
   private:
 
     /** Get solution status from MOSEK solsta value */
-    std::string solutionStatus(MSKsolstae& solsta);
+    const std::string solutionStatus(const MSKsolstae& solsta) const;
 
     /** Get problem status from MOSEK prosta value */
-    std::string problemStatus(MSKprostae& prosta);
+    const std::string problemStatus(const MSKprostae& prosta) const;
 
     /** MOSEK variables */
     MSKenv_t   mosek_env_;

@@ -53,23 +53,11 @@ Function create_integrator(int nj, int nu){
   }
 
   // State vector
-  SX x, x0;
-  x.append(s);
-  x.append(v);
-  x.append(m);
-  x0.append(s0);
-  x0.append(v0);
-  x0.append(m0);
+  SX x = vertcat(s, v, m);
+  SX x0 = vertcat(s0, v0, m0);
 
   // Integrator
-  vector<SX> input(2);
-  input[0] = u;
-  input[1] = x0;
-  SX output = x;
-  SXFunction integrator(input,output);
-  integrator.init();
-
-  return integrator;
+  return SXFunction("integrator", {u, x0}, {x});
 }
 
 
@@ -109,42 +97,31 @@ int main(){
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  MXFunction nlp(nlpIn("x",U),nlpOut("f",F,"g",G));
+  MXFunction nlp("nlp", nlpIn("x",U),nlpOut("f",F,"g",G));
 
-  // Allocate an NLP solver
-  NlpSolver solver("ipopt", nlp);
-  
-  // Set options
-  solver.setOption("tol",1e-10);
-  solver.setOption("hessian_approximation","limited-memory");
-
-  // initialize the solver
-  solver.init();
+  // Allocate an NLP solver and buffers
+  Dict opts = make_dict("tol", 1e-10,
+                        "hessian_approximation", "limited-memory");
+  NlpSolver solver("solver", "ipopt", nlp, opts);
+  std::map<std::string, DMatrix> arg, res;
 
   // Bounds on u and initial condition
-  vector<double> Umin(nu), Umax(nu), Usol(nu);
-  for(int i=0; i<nu; ++i){
-    Umin[i] = -10;
-    Umax[i] =  10;
-    Usol[i] = 0.4;
-  }
-  solver.setInput(Umin,"lbx");
-  solver.setInput(Umax,"ubx");
-  solver.setInput(Usol,"x0");
+  arg["lbx"] = -10;
+  arg["ubx"] = 10;
+  arg["x0"] = 0.4;
 
   // Bounds on g
   vector<double> Gmin(2), Gmax(2);
   Gmin[0] = Gmax[0] = 10;
   Gmin[1] = Gmax[1] =  0;
-  solver.setInput(Gmin,"lbg");
-  solver.setInput(Gmax,"ubg");
+  arg["lbg"] = Gmin;
+  arg["ubg"] = Gmax;
 
   // Solve the problem
-  solver.evaluate();
+  res = solver(arg);
 
   // Get the solution
-  solver.getOutput(Usol,"x");
-  cout << "optimal solution: " << Usol << endl;
+  cout << "optimal solution: " << res.at("x") << endl;
 
   return 0;
 }

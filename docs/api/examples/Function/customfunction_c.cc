@@ -21,8 +21,7 @@ int main(int argc, char *argv[])
   std::vector<Sparsity> outs;
   outs.push_back(Sparsity::dense(1,1));
   
-  CustomFunction f(myEvaluate,ins,outs);
-  f.init();
+  CustomFunction f("f",myEvaluate,ins,outs);
   
   f.setInput(2);
   f.evaluate();

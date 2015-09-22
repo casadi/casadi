@@ -26,8 +26,6 @@
 #include "homotopy_nlp_internal.hpp"
 #include "mx_function.hpp"
 #include "sx_function.hpp"
-#include "../sx/sx_tools.hpp"
-#include "../mx/mx_tools.hpp"
 
 INPUTSCHEME(NlpSolverInput)
 OUTPUTSCHEME(NlpSolverOutput)
@@ -41,9 +39,8 @@ namespace casadi {
               "Expand the NLP function in terms of scalar operations, i.e. MX->SX");
 
     // Enable string notation for IO
-    input_.scheme = SCHEME_NlpSolverInput;
-    output_.scheme = SCHEME_NlpSolverOutput;
-
+    ischeme_ = IOScheme(SCHEME_NlpSolverInput);
+    oscheme_ = IOScheme(SCHEME_NlpSolverOutput);
   }
 
   HomotopyNLPInternal::~HomotopyNLPInternal() {
@@ -53,9 +50,9 @@ namespace casadi {
     // Initialize the Homotopy NLP
     hnlp_.init(false);
 
-    casadi_assert_message(hnlp_.getNumInputs()==HNL_NUM_IN,
+    casadi_assert_message(hnlp_.nIn()==HNL_NUM_IN,
                           "The HNLP function must have exactly three input");
-    casadi_assert_message(hnlp_.getNumOutputs()==NL_NUM_OUT,
+    casadi_assert_message(hnlp_.nOut()==NL_NUM_OUT,
                           "The HNLP function must have exactly two outputs");
 
     // Sparsity patterns
@@ -69,7 +66,7 @@ namespace casadi {
     ng_ = g_sparsity.nnz();
 
     // Allocate space for inputs
-    setNumInputs(NLP_SOLVER_NUM_IN);
+    ibuf_.resize(NLP_SOLVER_NUM_IN);
     input(NLP_SOLVER_X0)       =  DMatrix::zeros(x_sparsity);
     input(NLP_SOLVER_LBX)      = -DMatrix::inf(x_sparsity);
     input(NLP_SOLVER_UBX)      =  DMatrix::inf(x_sparsity);
@@ -80,7 +77,7 @@ namespace casadi {
     input(NLP_SOLVER_P)        =  DMatrix::zeros(p_sparsity);
 
     // Allocate space for outputs
-    setNumOutputs(NLP_SOLVER_NUM_OUT);
+    obuf_.resize(NLP_SOLVER_NUM_OUT);
     output(NLP_SOLVER_X)       = DMatrix::zeros(x_sparsity);
     output(NLP_SOLVER_F)       = DMatrix::zeros(1);
     output(NLP_SOLVER_LAM_X)   = DMatrix::zeros(x_sparsity);

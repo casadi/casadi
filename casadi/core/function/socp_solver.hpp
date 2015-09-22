@@ -60,6 +60,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a SOCP problem [socpIn]
   enum SOCPInput {
@@ -110,6 +111,7 @@ namespace casadi {
     /// The matrix A: ( nc x n) [a]
     SOCP_STRUCT_A,
     SOCP_STRUCT_NUM};
+#endif // SWIG
 
   // Forward declaration of internal class
   class SocpSolverInternal;
@@ -131,12 +133,20 @@ namespace casadi {
     /// Default constructor
     SocpSolver();
 
-    /** \brief Constructor
-     *  \param name \pluginargument{SocpSolver}
+    /** \brief Constructor (new syntax, includes initialization)
+     *  \param solver \pluginargument{SocpSolver}
      *  \param st \structargument{SOCP}
      */
-    SocpSolver(const std::string& name, const SOCPStructure& st);
+    SocpSolver(const std::string& name, const std::string& solver,
+               const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor (no initialization)
+     *  \param solver \pluginargument{SocpSolver}
+     *  \param st \structargument{SOCP}
+     */
+    SocpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
+#endif // WITH_DEPRECATED_FEATURES
     /// Access functions of the node
     SocpSolverInternal* operator->();
     const SocpSolverInternal* operator->() const;

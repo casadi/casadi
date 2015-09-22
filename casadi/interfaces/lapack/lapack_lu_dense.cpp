@@ -120,11 +120,11 @@ namespace casadi {
         if (info<=ncol_)  ss << (info-1) << "-th row (zero-based) is exactly zero";
         else             ss << (info-1-ncol_) << "-th col (zero-based) is exactly zero";
 
-        cout << "Warning: " << ss.str() << endl;
+        userOut() << "Warning: " << ss.str() << endl;
 
 
 
-        if (allow_equilibration_failure_)  cout << "Warning: " << ss.str() << endl;
+        if (allow_equilibration_failure_)  userOut() << "Warning: " << ss.str() << endl;
         else                              casadi_error(ss.str());
       }
 

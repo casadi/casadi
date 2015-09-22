@@ -48,6 +48,7 @@
 
 */
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a \e dple solver [lrdpleIn]
   enum LR_DPLEInput {
@@ -69,18 +70,7 @@ namespace casadi {
     /// Number of arguments.
     LR_DPLE_NUM_OUT
   };
-
-  /// Structure specification of a DPLE [lrdpleStruct]
-  enum LrDpleVecStruct {
-    /// Sparsities for A_i, block diagonal form [a]
-    LR_Dple_STRUCT_A,
-    /// Sparsities for V_i, block diagonal form [v]
-    LR_Dple_STRUCT_V,
-    /// Sparsities for C_i (defaults to unity), block diagonal form [c]
-    LR_Dple_STRUCT_C,
-    /// Sparsities for H_i (defaults to unity), block diagonal form [h]
-    LR_Dple_STRUCT_H,
-    LR_Dple_STRUCT_NUM};
+#endif // SWIG
 
   /// Forward declaration of internal class
   class LrDpleInternal;
@@ -104,15 +94,25 @@ namespace casadi {
     /// Clone
     LrDpleSolver clone() const;
 
-    /** \brief LrDpleSolver solver factory
-    * \param name \pluginargument{LrDpleSolver}
-    * \param st \structargument{LrDple}
-    */
-    LrDpleSolver(const std::string& name,
-               const LrDpleStructure & st);
+    /** \brief Constructor (new syntax, includes initialization)
+     * \param solver \pluginargument{LrDpleSolver}
+     * \param st \structargument{LrDple}
+     */
+    LrDpleSolver(const std::string& name, const std::string& solver,
+                 const std::map<std::string, std::vector<Sparsity> >& st,
+                 const Dict& opts=Dict());
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor (no initialization)
+     * \param solver \pluginargument{LrDpleSolver}
+     * \param st \structargument{LrDple}
+     */
+    LrDpleSolver(const std::string& solver,
+                 const std::map<std::string, std::vector<Sparsity> >& st);
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=CASADI_COUT) const;
+    void printStats(std::ostream &stream=casadi::userOut()) const;
 
     /// Access functions of the node
     LrDpleInternal* operator->();

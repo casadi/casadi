@@ -38,26 +38,23 @@ x  = SX.sym("x",3)  # state
 ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
        x[0], \
        x[0]*x[0] + x[1]*x[1] + u*u])
-dae = SXFunction(daeIn(x=x,p=u,t=t),daeOut(ode=ode))
+dae = SXFunction("dae", daeIn(x=x, p=u, t=t), daeOut(ode=ode))
 
 # Create an integrator
+opts = {"tf":tf/nk} # final time
 if coll:
-  integrator = OldCollocationIntegrator(dae)
-  integrator.setOption("number_of_finite_elements",5)
-  integrator.setOption("interpolation_order",5)
-  integrator.setOption("collocation_scheme","legendre")
-  integrator.setOption("implicit_solver","kinsol")
-  integrator.setOption("implicit_solver_options",\
-    {'linear_solver' : CSparse})
-  integrator.setOption("expand_f",True)
+  opts["number_of_finite_elements"] = 5
+  opts["interpolation_order"] = 5
+  opts["collocation_scheme"] = "legendre"
+  opts["implicit_solver"] = "kinsol"
+  opts["implicit_solver_options"] =  {'linear_solver' : 'csparse'}
+  opts["expand_f"] = True
+  integrator = Integrator("integrator", "oldcollocation", dae, opts)
 else:
-  integrator = Integrator("cvodes", dae)
-  integrator.setOption("abstol",1e-8) # tolerance
-  integrator.setOption("reltol",1e-8) # tolerance
-  integrator.setOption("steps_per_checkpoint",1000)
-
-integrator.setOption("tf",tf/nk) # final time
-integrator.init()
+  opts["abstol"] = 1e-8 # tolerance
+  opts["reltol"] = 1e-8 # tolerance
+  opts["steps_per_checkpoint"] = 1000
+  integrator = Integrator("integrator", "cvodes", dae, opts)
 
 # Total number of variables
 nv = 1*nk + 3*(nk+1)
@@ -101,12 +98,12 @@ for k in range(nk):
   Xk_next = vertcat((X0[k+1],X1[k+1],X2[k+1]))
   
   # Call the integrator
-  Xk_end, = integratorOut(integrator(integratorIn(x0=Xk,p=U[k])),"xf")
+  Xk_end = integrator({'x0':Xk,'p':U[k]})["xf"]
   
   # append continuity constraints
   g.append(Xk_next - Xk_end)
-  g_min.append(NP.zeros(Xk.size()))
-  g_max.append(NP.zeros(Xk.size()))
+  g_min.append(NP.zeros(Xk.nnz()))
+  g_max.append(NP.zeros(Xk.nnz()))
 
 # Objective function: L(T)
 f = X2[nk]
@@ -115,24 +112,18 @@ f = X2[nk]
 g = vertcat(g)
 
 # Create NLP solver instance
-nlp = MXFunction(nlpIn(x=V),nlpOut(f=f,g=g))
-solver = NlpSolver("ipopt", nlp)
-
-#solver.setOption("verbose",True)
-solver.init()
-
-# Set bounds and initial guess
-solver.setInput(VMIN,  "lbx")
-solver.setInput(VMAX,  "ubx")
-solver.setInput(VINIT, "x0")
-solver.setInput(NP.concatenate(g_min),"lbg")
-solver.setInput(NP.concatenate(g_max),"ubg")
+nlp = MXFunction("nlp", nlpIn(x=V), nlpOut(f=f,g=g))
+solver = NlpSolver("solver", "ipopt", nlp)
 
 # Solve the problem
-solver.evaluate()
+sol = solver({"lbx" : VMIN,
+              "ubx" : VMAX,
+              "x0" : VINIT,
+              "lbg" : NP.concatenate(g_min),
+              "ubg" : NP.concatenate(g_max)})
 
 # Retrieve the solution
-v_opt = solver.getOutput("x")
+v_opt = sol["x"]
 u_opt = v_opt[0:nk]
 x0_opt = v_opt[nk+0::3]
 x1_opt = v_opt[nk+1::3]

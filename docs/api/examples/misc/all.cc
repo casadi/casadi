@@ -1,5 +1,4 @@
-#include "casadi/core/matrix/matrix_tools.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include <casadi/casadi.hpp>
 #include <limits>
 
 using namespace casadi;

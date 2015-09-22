@@ -57,18 +57,29 @@ public:
   Simulator();
 
   /** \brief Constructor
+  * \param output_fcn output function which maps to n outputs. (new syntax, includes initialization)
+  * \copydoc scheme_DAEInput
+  *
+  */
+  Simulator(const std::string& name, const Integrator& integrator, const Function& output_fcn,
+            const Matrix<double>& grid, const Dict& opts=Dict());
+
+  /// Output function equal to the state (new syntax, includes initialization)
+  Simulator(const std::string& name, const Integrator& integrator,
+            const Matrix<double>& grid, const Dict& opts=Dict());
+
+#ifdef WITH_DEPRECATED_FEATURES
+  /** \brief [DEPRECATED] Constructor, no initialization
   * \param output_fcn output function which maps to n outputs.
   * \copydoc scheme_DAEInput
   *
   */
   Simulator(const Integrator& integrator, const Function& output_fcn,
-            const std::vector<double>& grid);
-  Simulator(const Integrator& integrator, const Function& output_fcn,
             const Matrix<double>& grid);
 
-  /// Output function equal to the state
-  Simulator(const Integrator& integrator, const std::vector<double>& grid);
+  /// [DEPRECATED] Output function equal to the state, no initialization
   Simulator(const Integrator& integrator, const Matrix<double>& grid);
+#endif // WITH_DEPRECATED_FEATURES
 
   /// Access functions of the node.
   SimulatorInternal* operator->();

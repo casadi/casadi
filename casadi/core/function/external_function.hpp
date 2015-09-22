@@ -27,39 +27,49 @@
 #define CASADI_EXTERNAL_FUNCTION_HPP
 
 #include "function.hpp"
-#include <string>
+#include "compiler.hpp"
 
 namespace casadi {
-
-
 /** \brief  Forward declaration of internal class */
 class ExternalFunctionInternal;
 
-/** \brief  Interface for a function that is not implemented by CasADi symbolics
-  \author Joel Andersson
-  \date 2011
+  /** \brief  Interface for a function that is not implemented by CasADi symbolics
+      \author Joel Andersson
+      \date 2011-2015
   */
-class CASADI_EXPORT ExternalFunction : public Function {
+  class CASADI_EXPORT ExternalFunction : public Function {
+  public:
 
-public:
+    /** \brief  CONSTRUCTORS: */
+    /** \brief  default constructor */
+    ExternalFunction();
 
-/** \brief  CONSTRUCTORS: */
-/** \brief  default constructor */
-  ExternalFunction();
+    /** \brief  Load an external function 
+     * File name is assumed to be ./<f_name>.so
+     */
+    explicit ExternalFunction(const std::string& name, const Dict& opts=Dict());
 
-  /** \brief  Create an empty function */
-  explicit ExternalFunction(const std::string& bin_name);
+    /** \brief  Load an external function 
+     * File name given
+     */
+    ExternalFunction(const std::string& name, const std::string& bin_name,
+                     const Dict& opts=Dict());
 
-  /** \brief  Access functions of the node */
-  ExternalFunctionInternal* operator->();
+    /** \brief  Load a just-in-time compiled external function
+     * File name given
+     */
+    ExternalFunction(const std::string& name, const Compiler& compiler,
+                     const Dict& opts=Dict());
 
-  /** \brief  Const access functions of the node */
-  const ExternalFunctionInternal* operator->() const;
+    /** \brief  Access functions of the node */
+    ExternalFunctionInternal* operator->();
 
-  /// Check if a particular cast is allowed
-  static bool testCast(const SharedObjectNode* ptr);
+    /** \brief  Const access functions of the node */
+    const ExternalFunctionInternal* operator->() const;
 
-};
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
+  };
 
 } // namespace casadi
 

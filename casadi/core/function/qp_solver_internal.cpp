@@ -24,7 +24,6 @@
 
 
 #include "qp_solver_internal.hpp"
-#include "../matrix/matrix_tools.hpp"
 #include <typeinfo>
 
 INPUTSCHEME(QpSolverInput)
@@ -34,9 +33,20 @@ using namespace std;
 namespace casadi {
 
   // Constructor
-  QpSolverInternal::QpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
+  QpSolverInternal::QpSolverInternal(const std::map<std::string, Sparsity> &st) {
+    st_.resize(QP_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[QP_STRUCT_A]=i->second;
+      } else if (i->first=="h") {
+        st_[QP_STRUCT_H]=i->second;
+      } else {
+        casadi_error("Unrecognized field in QP structure: " << i->first);
+      }
+    }
 
-    casadi_assert_message(st_.size()==QP_STRUCT_NUM, "Problem structure mismatch");
+    addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "",
+                                                       "lp", true);
 
     const Sparsity& A = st_[QP_STRUCT_A];
     const Sparsity& H = st_[QP_STRUCT_H];
@@ -52,7 +62,7 @@ namespace casadi {
         "We need: H.size2()==A.size2()" << std::endl);
     }
 
-    casadi_assert_message(H.isSymmetric(),
+    casadi_assert_message(H.issymmetric(),
       "Got incompatible dimensions.   min          x'Hx + G'x" << std::endl <<
       "H: " << H.dimString() <<
       "We need H square & symmetric" << std::endl);
@@ -62,7 +72,7 @@ namespace casadi {
     Sparsity bounds_sparsity = Sparsity::dense(nc_, 1);
 
     // Input arguments
-    setNumInputs(QP_SOLVER_NUM_IN);
+    ibuf_.resize(QP_SOLVER_NUM_IN);
     input(QP_SOLVER_X0) = DMatrix::zeros(x_sparsity);
     input(QP_SOLVER_H) = DMatrix::zeros(H);
     input(QP_SOLVER_G) = DMatrix::zeros(x_sparsity);
@@ -75,14 +85,14 @@ namespace casadi {
     //input(QP_SOLVER_LAM_A0) = DMatrix::zeros(x_sparsity);
 
     // Output arguments
-    setNumOutputs(QP_SOLVER_NUM_OUT);
+    obuf_.resize(QP_SOLVER_NUM_OUT);
     output(QP_SOLVER_X) = DMatrix::zeros(x_sparsity);
     output(QP_SOLVER_COST) = 0.0;
     output(QP_SOLVER_LAM_X) = DMatrix::zeros(x_sparsity);
     output(QP_SOLVER_LAM_A) = DMatrix::zeros(bounds_sparsity);
 
-    input_.scheme = SCHEME_QpSolverInput;
-    output_.scheme = SCHEME_QpSolverOutput;
+    ischeme_ = IOScheme(SCHEME_QpSolverInput);
+    oscheme_ = IOScheme(SCHEME_QpSolverOutput);
   }
 
   void QpSolverInternal::init() {
@@ -124,6 +134,19 @@ namespace casadi {
   std::map<std::string, QpSolverInternal::Plugin> QpSolverInternal::solvers_;
 
   const std::string QpSolverInternal::infix_ = "qpsolver";
+
+  double QpSolverInternal::defaultInput(int ind) const {
+    switch (ind) {
+    case QP_SOLVER_LBX:
+    case QP_SOLVER_LBA:
+      return -std::numeric_limits<double>::infinity();
+    case QP_SOLVER_UBX:
+    case QP_SOLVER_UBA:
+      return std::numeric_limits<double>::infinity();
+    default:
+      return 0;
+    }
+  }
 
 } // namespace casadi
 

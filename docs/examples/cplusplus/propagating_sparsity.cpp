@@ -61,14 +61,13 @@ int main(){
       cout << "SXFunction:" << endl;
       SX x = SX::sym("x",3);
       SX z = x[0]*x[0]+x[2] + 3;
-      f = SXFunction(x,z);
+      f = SXFunction("f", make_vector(x), make_vector(z));
     } else {
       cout << "MXFunction:" << endl;
       MX x = MX::sym("x",3);
       MX z = x[0]*x[0]+x[2] + 3;
-      f = MXFunction(x,z);
+      f = MXFunction("f", make_vector(x), make_vector(z));
     }
-    f.init();
     
     // Get arrays for the inputs and outputs, reinterpreting the vector of double as an array of unsigned integers
     bvec_t* f_in = get_bvec_t(f.input().data());

@@ -127,8 +127,8 @@ namespace casadi {
     return (*this)->numel();
   }
 
-  bool Sparsity::isEmpty(bool both) const {
-    return (*this)->isEmpty(both);
+  bool Sparsity::isempty(bool both) const {
+    return (*this)->isempty(both);
   }
 
   int Sparsity::nnz() const {
@@ -185,7 +185,7 @@ namespace casadi {
     casadi_assert_message(cc>=0 && cc<size2(), "Column index out of bounds");
 
     // Quick return if matrix is dense
-    if (isDense()) return rr+cc*size1();
+    if (isdense()) return rr+cc*size1();
 
     // Quick return if we are adding an element to the end
     if (colind(cc)==nnz() || (colind(cc+1)==nnz() && row(nnz()-1)<rr)) {
@@ -243,36 +243,44 @@ namespace casadi {
     return (*this)->getNZ(rr, cc);
   }
 
-  bool Sparsity::isScalar(bool scalar_and_dense) const {
-    return (*this)->isScalar(scalar_and_dense);
+  bool Sparsity::isscalar(bool scalar_and_dense) const {
+    return (*this)->isscalar(scalar_and_dense);
   }
 
-  bool Sparsity::isDense() const {
-    return (*this)->isDense();
+  bool Sparsity::isdense() const {
+    return (*this)->isdense();
   }
 
-  bool Sparsity::isDiagonal() const {
-    return (*this)->isDiagonal();
+  bool Sparsity::isdiag() const {
+    return (*this)->isdiag();
   }
 
-  bool Sparsity::isVector(bool row_or_col) const {
-    return (*this)->isVector(row_or_col);
+  bool Sparsity::isrow() const {
+    return (*this)->isrow();
   }
 
-  bool Sparsity::isSquare() const {
-    return (*this)->isSquare();
+  bool Sparsity::iscolumn() const {
+    return (*this)->iscolumn();
   }
 
-  bool Sparsity::isSymmetric() const {
-    return (*this)->isSymmetric();
+  bool Sparsity::isvector() const {
+    return (*this)->isvector();
   }
 
-  bool Sparsity::isTril() const {
-    return (*this)->isTril();
+  bool Sparsity::issquare() const {
+    return (*this)->issquare();
   }
 
-  bool Sparsity::isTriu() const {
-    return (*this)->isTriu();
+  bool Sparsity::issymmetric() const {
+    return (*this)->issymmetric();
+  }
+
+  bool Sparsity::istril() const {
+    return (*this)->istril();
+  }
+
+  bool Sparsity::istriu() const {
+    return (*this)->istriu();
   }
 
   Sparsity Sparsity::sub(const std::vector<int>& rr, const Sparsity& sp,
@@ -322,25 +330,18 @@ namespace casadi {
     return (*this)->getRow();
   }
 
-  void Sparsity::getCCS(std::vector<int>& cind, std::vector<int>& r) const {
-    cind.resize(size2()+1);
-    const int* colind = this->colind();
-    copy(colind, colind+cind.size(), cind.begin());
-    r.resize(nnz());
-    const int* row = this->row();
-    copy(row, row+r.size(), r.begin());
+  void Sparsity::getCCS(std::vector<int>& colind, std::vector<int>& row) const {
+    colind = getColind();
+    row = getRow();
   }
 
-  void Sparsity::getCRS(std::vector<int>& rind, std::vector<int>& c) const {
-    T().getCCS(rind, c);
+  void Sparsity::getCRS(std::vector<int>& rowind, std::vector<int>& col) const {
+    T().getCCS(rowind, col);
   }
 
-
-  void Sparsity::getTriplet(std::vector<int>& r, std::vector<int>& c) const {
-    r.resize(nnz());
-    const int* row = this->row();
-    copy(row, row+r.size(), r.begin());
-    c = this->getCol();
+  void Sparsity::getTriplet(std::vector<int>& row, std::vector<int>& col) const {
+    row = getRow();
+    col = getCol();
   }
 
   Sparsity Sparsity::transpose(std::vector<int>& mapping, bool invert_mapping) const {
@@ -428,7 +429,7 @@ namespace casadi {
       } else if (size1()==0) {
         // No rows before
         *this = sp;
-      } else if (isVector()) {
+      } else if (iscolumn()) {
         // Append to vector (inefficient)
         *this = (*this)->zz_appendVector(*sp);
       } else {
@@ -1074,8 +1075,8 @@ namespace casadi {
     return Sparsity::triplet(nrow, ncol, row, col, mapping, false);
   }
 
-  bool Sparsity::isSingular() const {
-    casadi_assert_message(isSquare(), "isSingular: only defined for square matrices, but got "
+  bool Sparsity::issingular() const {
+    casadi_assert_message(issquare(), "issingular: only defined for square matrices, but got "
                           << dimString());
     return sprank(*this)!=size2();
   }
@@ -1181,7 +1182,7 @@ namespace casadi {
 
   Sparsity Sparsity::zz_vertcat(const std::vector<Sparsity> & sp) {
     // Quick return if possible
-    if (sp.empty()) return Sparsity();
+    if (sp.empty()) return Sparsity(0, 0);
     if (sp.size()==1) return sp.front();
 
     // Count total nnz

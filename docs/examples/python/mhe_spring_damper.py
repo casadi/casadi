@@ -86,8 +86,7 @@ rhs = struct_SX(states)
 rhs["x"] = dx
 rhs["dx"] = (-k*x-c*dx+F)/m+w
 
-f = SXFunction([states,controls,disturbances],[rhs])
-f.init()
+f = SXFunction('f', [states,controls,disturbances],[rhs])
 
 # Build an integrator for this system: Runge Kutta 4 integrator
 k1 = f([states,controls,disturbances])[0]
@@ -96,15 +95,11 @@ k3 = f([states+dt/2.0*k2,controls,disturbances])[0]
 k4 = f([states+dt*k3,controls,disturbances])[0]
 
 states_1 = states+dt/6.0*(k1+2*k2+2*k3+k4)
-phi = SXFunction([states,controls,disturbances],[states_1])
-phi.init()
+phi = SXFunction('phi', [states,controls,disturbances],[states_1])
 PHI = phi.jacobian()
-PHI.init()
 # Define the measurement system
-h = SXFunction([states],[x]) # We have measurements of the position
-h.init()
+h = SXFunction('h', [states],[x]) # We have measurements of the position
 H = h.jacobian()
-H.init()
 # Build the objective
 obj = 0
 # First the arrival cost
@@ -123,7 +118,7 @@ for i in range(N-1):
   g.append( shooting["X",i+1] - phi([shooting["X",i],parameters["U",i],shooting["W",i]])[0] )
 
 # Formulate the NLP
-nlp = SXFunction(nlpIn(x=shooting,p=parameters),nlpOut(f=obj,g=vertcat(g)))
+nlp = SXFunction('nlp', nlpIn(x=shooting,p=parameters),nlpOut(f=obj,g=vertcat(g)))
 
 # Make a simulation to create the data for the problem
 simulated_X = DMatrix.zeros(Nstates,Nsimulation)
@@ -152,10 +147,8 @@ sigma_x0 = 0.01
 P = sigma_x0**2*DMatrix.eye(Nstates)
 x0 = simulated_X[:,0] + sigma_x0*NP.random.randn(Nstates,1)
 # Create the solver
-nlp_solver = NlpSolver("ipopt", nlp)
-nlp_solver.setOption({"print_level":0, "print_time": False})
-nlp_solver.setOption('max_iter',100)
-nlp_solver.init()
+opts = {"print_level":0, "print_time": False, 'max_iter':100}
+nlp_solver = NlpSolver("nlp_solver", "ipopt", nlp, opts)
 
 # Set the bounds for the constraints: we only have the multiple shooting constraints, so all constraints have upper and lower bound of zero
 nlp_solver.setInput(0,"lbg")
@@ -178,12 +171,13 @@ nlp_solver.setInput(initialisation_state,"x0")
 
 nlp_solver.evaluate()
 # Get the solution
-solution = shooting(nlp_solver.output("x"))
+solution = shooting(nlp_solver.getOutput("x"))
 estimated_X[:,0:N] = solution["X",horzcat]
 estimated_W[:,0:N-1] = solution["W",horzcat]
 
 # Now make a loop for the rest of the simulation
 for i in range(1,Nsimulation-N+1):
+
   # Update the arrival cost, using linearisations around the estimate of MHE at the beginning of the horizon (according to the 'Smoothed EKF Update'): first update the state and covariance with the measurement that will be deleted, and next propagate the state and covariance because of the shifting of the horizon
   print "step %d/%d (%s)" % (i, Nsimulation-N , nlp_solver.getStat("return_status"))
   H.setInput(solution["X",0],0)
@@ -225,6 +219,9 @@ for i in range(1,Nsimulation-N+1):
   nlp_solver.setInput(current_parameters,"p")
   nlp_solver.setInput(initialisation_state,"x0")
   nlp_solver.evaluate()
+
+  solution = shooting(nlp_solver.getOutput("x"))
+
   # Now get the state estimate. Note that we are only interested in the last node of the horizon
   estimated_X[:,N-1+i] = solution["X",N-1]
   estimated_W[:,N-2+i] = solution["W",N-2]

@@ -33,32 +33,13 @@
 #include <list>
 #include <limits>
 
-#ifdef SWIG
-#define SWIG_OUTPUT(arg) OUTPUT
-#define SWIG_INOUT(arg) INOUT
-#ifdef SWIGMATLAB
-#define SWIG_IND1 true
-#else // SWIGMATLAB
-#define SWIG_IND1 false
-#endif // SWIGMATLAB
-#else // SWIG
-#define SWIG_OUTPUT(arg) arg
-#define SWIG_INOUT(arg) arg
-#define SWIG_IND1 false
-#endif // SWIG
-
 // Cashing requires a multimap (preferably a hash map)
 #ifdef USE_CXX11
 // Using C++11 unordered_multimap (hash map)
-#ifdef USE_TR1_HASHMAP
-#include <tr1/unordered_map>
-#define CACHING_MULTIMAP std::tr1::unordered_multimap
-#else // USE_TR1_HASHMAP
 #include <unordered_map>
 #define CACHING_MULTIMAP std::unordered_multimap
-#endif // USE_TR1_HASHMAP
 #else // USE_CXX11
-// Falling back to std::map (binary search tree)
+// Falling back to std::multimap (binary search tree)
 #include <map>
 #define CACHING_MULTIMAP std::multimap
 #endif // USE_CXX11
@@ -124,6 +105,14 @@ namespace casadi {
 #ifndef SWIG
     /** \brief  Create from node */
     static Sparsity create(SparsityInternal *node);
+
+    /// Base class
+    typedef SparsityInterface<Sparsity> B;
+
+    /// Expose base class functions
+    using B::zz_horzsplit;
+    using B::zz_diagsplit;
+    using B::zz_vertsplit;
 #endif
 
     /** \brief Create a scalar sparsity pattern **/
@@ -139,8 +128,8 @@ namespace casadi {
     ///@}
 
 #if !defined(SWIG) || !defined(SWIGMATLAB)
-    /** \brief Create a sparse (empty) rectangular sparsity pattern
-        DEPRECATED: Use Sparse(nrow, ncol) instead **/
+    /** \brief [DEPRECATED] Create a sparse (empty) rectangular sparsity pattern
+        Use Sparse(nrow, ncol) instead **/
     ///@{
     static Sparsity sparse(int nrow, int ncol=1);
     static Sparsity sparse(const std::pair<int, int> &rc) { return sparse(rc.first, rc.second);}
@@ -292,16 +281,11 @@ namespace casadi {
     * A sparsity is considered empty if one of the dimensions is zero
     * (or optionally both dimensions)
     */
-    bool isEmpty(bool both=false) const;
+    bool isempty(bool both=false) const;
 
     /** \brief Get the number of (structural) non-zeros
         \see numel() */
     int nnz() const;
-
-    /** \brief DEPRECATED: Alias for nnz
-        \see nnz()
-    */
-    int size() const { return nnz();}
 
     /** \brief Number of non-zeros in the upper triangular half,
      * i.e. the number of elements (i, j) with j>=i */
@@ -387,13 +371,16 @@ namespace casadi {
     std::vector<int> getUpperNZ() const;
 
     /// Get the sparsity in compressed column storage (CCS) format
-    void getCCS(std::vector<int>& SWIG_OUTPUT(colind), std::vector<int>& SWIG_OUTPUT(row)) const;
+    void getCCS(std::vector<int>& SWIG_OUTPUT(colind),
+                std::vector<int>& SWIG_OUTPUT(row)) const;
 
     /// Get the sparsity in compressed row storage (CRS) format
-    void getCRS(std::vector<int>& SWIG_OUTPUT(rowind), std::vector<int>& SWIG_OUTPUT(col)) const;
+    void getCRS(std::vector<int>& SWIG_OUTPUT(rowind),
+                std::vector<int>& SWIG_OUTPUT(col)) const;
 
     /// Get the sparsity in sparse triplet format
-    void getTriplet(std::vector<int>& SWIG_OUTPUT(row), std::vector<int>& SWIG_OUTPUT(col)) const;
+    void getTriplet(std::vector<int>& SWIG_OUTPUT(row),
+                    std::vector<int>& SWIG_OUTPUT(col)) const;
 
     /** \brief Get a submatrix
      *
@@ -436,15 +423,18 @@ namespace casadi {
         if the first argument is nonzero,
         the second bit indicates if the second argument is nonzero (note that none of,
         one of or both of the arguments can be nonzero) */
+#ifndef SWIG
     Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero,
-                            std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
+                            std::vector<unsigned char>& mapping) const;
+#endif // SWIG
     Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
     /// @}
 
     /// @{
     /** \brief Union of two sparsity patterns */
-    Sparsity patternUnion(const Sparsity& y,
-                          std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
+#ifndef SWIG
+    Sparsity patternUnion(const Sparsity& y, std::vector<unsigned char>& mapping) const;
+#endif // SWIG
     Sparsity patternUnion(const Sparsity& y) const;
     Sparsity operator+(const Sparsity& b) const;
     /// @}
@@ -455,8 +445,10 @@ namespace casadi {
         number of non-zero elements
         The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if it is from
         the second and 3 (i.e. 1 | 2) if from both */
+#ifndef SWIG
     Sparsity patternIntersection(const Sparsity& y,
-                                 std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
+                                 std::vector<unsigned char>& mapping) const;
+#endif // SWIG
     Sparsity patternIntersection(const Sparsity& y) const;
     Sparsity operator*(const Sparsity& b) const;
     /// @}
@@ -490,7 +482,6 @@ namespace casadi {
                               bvec_t* y, const Sparsity& y_sp,
                               bvec_t* z, const Sparsity& z_sp,
                               bvec_t* w);
-#endif //SWIG
 
     /// \cond INTERNAL
     /// @{
@@ -504,10 +495,10 @@ namespace casadi {
     std::vector<Sparsity> zz_diagsplit(const std::vector<int>& offset1,
                                        const std::vector<int>& offset2) const;
     Sparsity zz_mtimes(const Sparsity& y) const {
-      if (isScalar()) {
-        return isDense() ? y : Sparsity(y.shape());
-      } else if (y.isScalar()) {
-        return y.isDense() ? *this : Sparsity(shape());
+      if (isscalar()) {
+        return isdense() ? y : Sparsity(y.shape());
+      } else if (y.isscalar()) {
+        return y.isdense() ? *this : Sparsity(shape());
       } else {
         // Check dimensions
         casadi_assert_message(size2()==y.size1(),
@@ -516,7 +507,7 @@ namespace casadi {
         return patternProduct(y);
       }
     }
-    Sparsity zz_mtimes(const Sparsity& Y, const Sparsity& Z) const { return Z;}
+    Sparsity zz_mac(const Sparsity& Y, const Sparsity& Z) const { return Z;}
     Sparsity zz_vecNZ() const;
     Sparsity zz_reshape(int nrow, int ncol) const;
     Sparsity zz_reshape(const Sparsity& sp) const;
@@ -525,6 +516,8 @@ namespace casadi {
     Sparsity zz_kron(const Sparsity& b) const;
     /// @}
     /// \endcond
+
+#endif //SWIG
 
     /** \brief Enlarge matrix
         Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros
@@ -562,39 +555,45 @@ namespace casadi {
     /// Append another sparsity patten horizontally
     void appendColumns(const Sparsity& sp);
 
-    /// DEPRECATED: Reserve space
+    /// [DEPRECATED]: Reserve space
     void reserve(int nnz, int ncol) {
       casadi_warning("Sparsity::reserve: Deprecated function. Ignored.");
     }
 
     /// Is scalar?
-    bool isScalar(bool scalar_and_dense=false) const;
+    bool isscalar(bool scalar_and_dense=false) const;
 
     /// Is dense?
-    bool isDense() const;
+    bool isdense() const;
 
-    /** \brief Check if the pattern is a column vector (i.e. size2()==1)
-        Optionally, checks if either row or column vector.
-     */
-    bool isVector(bool row_or_col=false) const;
+    /** \brief  Check if the pattern is a row vector (i.e. size1()==1) */
+    bool isrow() const;
+
+    /** \brief  Check if the pattern is a column vector (i.e. size2()==1) */
+    bool iscolumn() const;
+
+    /** \brief  Check if the pattern is a row or column vector */
+    bool isvector() const;
 
     /// Is diagonal?
-    bool isDiagonal() const;
+    bool isdiag() const;
 
     /// Is square?
-    bool isSquare() const;
+    bool issquare() const;
 
     /// Is symmetric?
-    bool isSymmetric() const;
+    bool issymmetric() const;
 
     /// Is upper triangular?
-    bool isTriu() const;
+    bool istriu() const;
 
     /// Is lower triangular?
-    bool isTril() const;
+    bool istril() const;
 
     /// Check whether the sparsity-pattern indicates structural singularity
-    bool isSingular() const;
+    bool issingular() const;
+
+#if !defined(SWIG) || !defined(SWIGMATLAB)
 
     /// \cond INTERNAL
     /// Get upper triangular part
@@ -603,6 +602,7 @@ namespace casadi {
     /// Get lower triangular part
     Sparsity zz_tril(bool includeDiagonal=true) const;
     /// \endcond
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
     /** \brief Do the rows appear sequentially on each column
     *
@@ -714,14 +714,22 @@ namespace casadi {
 
     /** \brief Perform a star coloring of a symmetric matrix:
         A greedy distance-2 coloring algorithm
-        (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+        Algorithm 4.1 in
+          What Color Is Your Jacobian? Graph Coloring for Computing Derivatives
+          A. H. GEBREMEDHIN, F. MANNE, A. POTHEN
+          SIAM Rev., 47(4), 629–705 (2006)
+
         Ordering options: None (0), largest first (1)
     */
     Sparsity starColoring(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
 
     /** \brief Perform a star coloring of a symmetric matrix:
         A new greedy distance-2 coloring algorithm
-        (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN)
+        Algorithm 4.1 in
+          NEW ACYCLIC AND STAR COLORING ALGORITHMS WITH APPLICATION TO COMPUTING HESSIANS
+          A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN
+          SIAM J. SCI. COMPUT. Vol. 29, No. 3, pp. 1042–1072 (2007)
+
         Ordering options: None (0), largest first (1)
     */
     Sparsity starColoring2(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
@@ -742,14 +750,14 @@ namespace casadi {
 
     /** \brief Print a textual representation of sparsity
      */
-    void spy(std::ostream &stream=CASADI_COUT) const;
+    void spy(std::ostream &stream=casadi::userOut()) const;
 
     /** \brief Generate a script for Matlab or Octave which visualizes
      * the sparsity using the spy command  */
     void spyMatlab(const std::string& mfile) const;
 
     /** \brief Print a compact description of the sparsity pattern */
-    void printCompact(std::ostream &stream=CASADI_COUT) const;
+    void printCompact(std::ostream &stream=casadi::userOut()) const;
 
     // Hash the sparsity pattern
     std::size_t hash() const;
@@ -834,10 +842,10 @@ namespace casadi {
     // Check if sparsity matches
     if (val_sp==*this) {
       std::copy(val_data, val_data+sz, data);
-    } else if (this->isEmpty()) {
+    } else if (this->isempty()) {
       // Quick return
       return;
-    } else if (val_sp.isEmpty()) {
+    } else if (val_sp.isempty()) {
       // Quick return
       return;
     } else if (val_nel==1) { // if scalar
@@ -928,10 +936,10 @@ namespace casadi {
       for (int k=0; k<sz; ++k) {
         data[k] += val_data[k];
       }
-    } else if (this->isEmpty()) {
+    } else if (this->isempty()) {
       // Quick return
       return;
-    } else if (val_sp.isEmpty()) {
+    } else if (val_sp.isempty()) {
       // Quick return
       return;
     }  else if (val_nel==1) { // if scalar
@@ -1009,10 +1017,10 @@ namespace casadi {
       for (int k=0; k<sz; ++k) {
         data[k] |= val_data[k];
       }
-    } else if (this->isEmpty()) {
+    } else if (this->isempty()) {
       // Quick return
       return;
-    } else if (val_sp.isEmpty()) {
+    } else if (val_sp.isempty()) {
       // Quick return
       return;
     }  else if (val_nel==1) { // if scalar
@@ -1072,8 +1080,10 @@ namespace casadi {
 
 #endif //SWIG
 
-  /** Sparsity format for getting and setting inputs and outputs */
-  enum SparsityType {SP_SPARSE, SP_SPARSESYM, SP_DENSE, SP_DENSESYM, SP_DENSETRANS};
+  ///@{
+  /// Readability typedefs
+  typedef std::map<std::string, Sparsity> SparsityDict;
+  ///@}
 
 } // namespace casadi
 

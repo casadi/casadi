@@ -45,7 +45,7 @@ namespace casadi {
     Slice();
 
     /// A single element (explicit to avoid ambiguity with IMatrix overload
-    explicit Slice(int i);
+    explicit Slice(int i, bool ind1=false);
 
     /// A slice
     Slice(int start, int stop, int step=1);
@@ -69,9 +69,9 @@ namespace casadi {
     std::vector<int> getAll(const Slice& outer, int len) const;
 
     /// Is the slice a scalar
-    bool isScalar(int len) const;
+    bool isscalar(int len) const;
 
-    /// Get scalar (if isScalar)
+    /// Get scalar (if isscalar)
     int toScalar(int len) const;
 
     /// Check equality
@@ -82,10 +82,10 @@ namespace casadi {
     bool operator!=(const Slice& other) const { return !(*this == other);}
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
+    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// start value: negative values will get added to length
     int start_;
@@ -99,12 +99,5 @@ namespace casadi {
 #endif // SWIG
 
 } // namespace casadi
-
-
-#ifdef SWIG
-%template(Pair_Slice_Int) std::pair<casadi::Slice, int>;
-%template(Pair_Int_Slice) std::pair<int, casadi::Slice>;
-%template(Pair_Slice_Slice) std::pair<casadi::Slice, casadi::Slice>;
-#endif // SWIG
 
 #endif // CASADI_SLICE_HPP

@@ -1383,9 +1383,9 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = DOXYGENPROC = \
                          "SWIG_OUTPUT(myarg) = output_ ## myarg"
-PREDEFINED+=             WITHOUT_PRE_1_9_X
 PREDEFINED+=             SWIG
 PREDEFINED+=             DOXYGEN
+PREDEFINED+=             WITH_DEPRECATED_FEATURES
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
@@ -1486,7 +1486,7 @@ HAVE_DOT               = YES
 # explicitly to a value larger than 0 to get control over the balance 
 # between CPU load and processing speed.
 
-DOT_NUM_THREADS        = 0
+DOT_NUM_THREADS        = 1
 
 # By default doxygen will write a font called FreeSans.ttf to the output 
 # directory and reference it in all dot files that doxygen generates. This 

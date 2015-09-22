@@ -29,6 +29,7 @@
 #include "integrator.hpp"
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of an ODE/DAE function [controldaeIn]
   enum ControlledDAEInput {
@@ -66,6 +67,7 @@ namespace casadi {
     CONTROLSIMULATOR_U,
     /// Number of input arguments of a piecewise simulator
     CONTROLSIMULATOR_NUM_IN};
+#endif // SWIG
 
   // Forward declaration of internal class
   class ControlSimulatorInternal;
@@ -102,7 +104,26 @@ namespace casadi {
     /// Default constructor
     ControlSimulator();
 
-    /** \brief Creates a piecewise simulator
+    /** \brief Creates a piecewise simulator (new syntax, includes initialization)
+     * \param ffcn Continuous time dynamics, an casadi::Function with the following mapping:
+     * \copydoc scheme_ControlledDAEInput
+     * \copydoc scheme_DAEOutput
+     *
+     *
+     * \param output_fcn output function which maps ControlledDAEInput or DAEInput to n outputs.
+     * \copydoc scheme_DAEInput
+     * \copydoc scheme_ControlledDAEInput
+     * \param grid the major time grid
+     */
+    ControlSimulator(const std::string& name, const Function& dae, const Function& output_fcn,
+                     const Matrix<double>& grid, const Dict& opts=Dict());
+
+    /// Output function equal to the state (new syntax, includes initialization)
+    ControlSimulator(const std::string& name, const Function& dae,
+                     const Matrix<double>& grid, const Dict& opts=Dict());
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Creates a piecewise simulator, no initialization
      * \param ffcn Continuous time dynamics, an casadi::Function with the following mapping:
      * \copydoc scheme_ControlledDAEInput
      * \copydoc scheme_DAEOutput
@@ -114,13 +135,11 @@ namespace casadi {
      * \param grid the major time grid
      */
     ControlSimulator(const Function& dae, const Function& output_fcn,
-                     const std::vector<double>& grid);
-    ControlSimulator(const Function& dae, const Function& output_fcn,
                      const Matrix<double>& grid);
 
-    /// Output function equal to the state
-    ControlSimulator(const Function& dae, const std::vector<double>& grid);
+    /// [DEPRECATED] Output function equal to the state, no initialization
     ControlSimulator(const Function& dae, const Matrix<double>& grid);
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Access functions of the node.
     ControlSimulatorInternal* operator->();

@@ -47,27 +47,24 @@ tf = 40
 params = vertcat([w0,a3,a5,mu1,mu3,ff])
 rhs    = vertcat([x2,(-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * x2**3))/100+ff])
 
-f=SXFunction(daeIn(x=x,p=params),daeOut(ode=rhs))
-f.init()
+f=SXFunction("f", daeIn(x=x,p=params),daeOut(ode=rhs))
 
 t = SX.sym("t")
-cf=SXFunction(controldaeIn(t=t, x=x, p=vertcat([w0,a3,a5,mu1,mu3]), u=ff),[rhs])
-cf.init()
+cf=SXFunction("cf", controldaeIn(t=t, x=x, p=vertcat([w0,a3,a5,mu1,mu3]), u=ff),[rhs])
 
-integrator = Integrator("cvodes", f)
-integrator.setOption("tf",tf)
-integrator.setOption("reltol",1e-10)
-integrator.setOption("abstol",1e-10)
-integrator.setOption("fsens_err_con",True)
-integrator.init()
+opts = {}
+opts["tf"] = tf
+opts["reltol"] = 1e-10
+opts["abstol"] = 1e-10
+opts["fsens_err_con"] = True
+integrator = Integrator("integrator", "cvodes", f, opts)
 
 N = 500
 
 #! Let's get acquainted with the system by drawing a phase portrait
 ts = linspace(0,tf,N)
 
-sim = Simulator(integrator,ts)
-sim.init()
+sim = Simulator("sim", integrator,ts)
 
 w0_ = 5.278
 params_ = [ w0_, -1.402*w0_**2,  0.271*w0_**2,0,0,0 ]
@@ -93,7 +90,6 @@ x0 = DMatrix([-3.1,0])
 #! ===============================================
 #! First argument is input index, second argument is output index
 jac = integrator.jacobian("x0","xf")
-jac.init()
 
 jac.setInput(x0,"x0")
 jac.setInput(params_,"p")
@@ -111,14 +107,13 @@ print Ji
 # #! =============================================================
 
 # jacsim = sim.jacobian(INTEGRATOR_X0,0)
-# jacsim.init()
 
 # jacsim.setInput(x0,"x0")
 # jacsim.setInput(params_,"p")
 # jacsim.evaluate()
 
 # #! For each of the 500 intervals, we have a 2-by-2 matrix as output
-# print "jacsim.output().shape = ", jacsim.output().shape
+# print "jacsim.getOutput().shape = ", jacsim.getOutput().shape
 
 # #! Show only the last 3 intervals.
 # print jacsim.getOutput()[-3*2:,:]
@@ -134,21 +129,20 @@ print Ji
 # #! Monodromy matrix at various instances - Jacobian of ControlSimulator
 # #! ====================================================================
 
-# csim = ControlSimulator(cf,linspace(0,tf,50))
-# csim.setOption("nf",10)
-# csim.setOption("integrator","cvodes")
-# csim.setOption("integrator_options",{"reltol":1e-11,"abstol":1e-11, "fsens_err_con": True})
-# csim.init()
+# opts = {}
+# opts["nf"] = 10
+# opts["integrator"] = "cvodes"
+# opts["integrator_options"] = {"reltol":1e-11,"abstol":1e-11, "fsens_err_con": True}
+# csim = ControlSimulator("csim", cf, linspace(0, tf, 50), opts)
 
 # jaccsim = csim.jacobian(CONTROLSIMULATOR_X0,0)
-# jaccsim.init()
 # jaccsim.setInput(params_[:-1],"p")
 # jaccsim.setInput(x0,"x0")
 # jaccsim.setInput(0,"u")
 # jaccsim.evaluate()
 
 # #! For each of the 500 intervals, we have a 2-by-2 matrix as output
-# print "jaccsim.output().shape = ", jaccsim.output().shape
+# print "jaccsim.getOutput().shape = ", jaccsim.getOutput().shape
 
 # #! Show only the last 3 intervals.
 # print jaccsim.getOutput()[-3*2:,:]

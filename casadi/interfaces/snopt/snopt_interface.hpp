@@ -66,9 +66,6 @@ namespace casadi {
     // Solve the NLP
     virtual void evaluate();
 
-
-    virtual void setQPOptions();
-
     /// Read options from snopt parameter xml
     virtual void setOptionsFromFile(const std::string & file);
 
@@ -76,7 +73,7 @@ namespace casadi {
     bool exact_hessian_;
 
     std::map<int, std::string> status_;
-    std::map<std::string, opt_type> ops_;
+    std::map<std::string, TypeID> ops_;
 
     std::string formatStatus(int status) const;
 

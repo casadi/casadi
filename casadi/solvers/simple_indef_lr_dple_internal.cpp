@@ -24,14 +24,12 @@
 
 
 #include "simple_indef_dple_internal.hpp"
-#include <cassert>
+
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
+#include <cassert>
 #include <numeric>
 
 INPUTSCHEME(DPLEInput)
@@ -64,7 +62,7 @@ namespace casadi {
 
     addOption("linear_solver",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linear_solver_options",    OT_DICT,   GenericType(),
               "Options to be passed to the linear solver.");
 
   }
@@ -125,20 +123,22 @@ namespace casadi {
 
 
   void SimpleIndefDpleInternal::evaluate() {
-    for (int i=0;i<getNumInputs();++i) {
+    for (int i=0;i<nIn();++i) {
       std::copy(input(i).begin(), input(i).end(), f_.input(i).begin());
     }
     f_.evaluate();
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       std::copy(f_.output(i).begin(), f_.output(i).end(), output(i).begin());
     }
   }
 
-  Function SimpleIndefDpleInternal::getDerForward(int nfwd) {
+  Function SimpleIndefDpleInternal
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function SimpleIndefDpleInternal::getDerReverse(int nadj) {
+  Function SimpleIndefDpleInternal
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     return f_.derReverse(nadj);
   }
 

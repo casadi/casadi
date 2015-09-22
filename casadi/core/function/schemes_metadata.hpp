@@ -31,20 +31,16 @@
 #include <map>
 #include "../casadi_exception.hpp"
 namespace casadi {
-template <class T>
-class IOSchemeVector;class Sparsity;
+class Sparsity;
 enum InputOutputScheme {
   SCHEME_CLEInput,
   SCHEME_CLEOutput,
-  SCHEME_CleStruct,
   SCHEME_ControlledDAEInput,
   SCHEME_ControlSimulatorInput,
   SCHEME_DLEInput,
   SCHEME_DLEOutput,
-  SCHEME_DleStruct,
   SCHEME_DPLEInput,
   SCHEME_DPLEOutput,
-  SCHEME_DpleVecStruct,
   SCHEME_HNLPInput,
   SCHEME_DAEInput,
   SCHEME_DAEOutput,
@@ -56,13 +52,10 @@ enum InputOutputScheme {
   SCHEME_LinsolOutput,
   SCHEME_LpSolverInput,
   SCHEME_LpSolverOutput,
-  SCHEME_LPStruct,
   SCHEME_LR_DLEInput,
   SCHEME_LR_DLEOutput,
-  SCHEME_LrDleStruct,
   SCHEME_LR_DPLEInput,
   SCHEME_LR_DPLEOutput,
-  SCHEME_LrDpleVecStruct,
   SCHEME_NLPInput,
   SCHEME_NLPOutput,
   SCHEME_GradFInput,
@@ -75,16 +68,12 @@ enum InputOutputScheme {
   SCHEME_NlpSolverOutput,
   SCHEME_QcqpSolverInput,
   SCHEME_QcqpSolverOutput,
-  SCHEME_QCQPStruct,
   SCHEME_QpSolverInput,
   SCHEME_QpSolverOutput,
-  SCHEME_QPStruct,
   SCHEME_SDPInput,
   SCHEME_SDPOutput,
-  SCHEME_SDPStruct,
   SCHEME_SDQPInput,
   SCHEME_SDQPOutput,
-  SCHEME_SDQPStruct,
   SCHEME_SOCPInput,
   SCHEME_SOCPOutput,
   SCHEME_SOCPStruct,

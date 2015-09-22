@@ -26,8 +26,6 @@
 #include "implicit_function_internal.hpp"
 #include "mx_function.hpp"
 #include "../mx/mx_node.hpp"
-#include "../mx/mx_tools.hpp"
-#include "../matrix/matrix_tools.hpp"
 #include <iterator>
 
 #include "../casadi_options.hpp"
@@ -39,7 +37,7 @@ namespace casadi {
   ImplicitFunctionInternal::ImplicitFunctionInternal(const Function& f) : f_(f) {
     addOption("linear_solver",            OT_STRING, "csparse",
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linear_solver_options",    OT_DICT,   GenericType(),
               "Options to be passed to the linear solver.");
     addOption("constraints",              OT_INTEGERVECTOR, GenericType(),
               "Constrain the unknowns. 0 (default): no constraint on ui, "
@@ -75,13 +73,13 @@ namespace casadi {
     iout_ = getOption("implicit_output");
 
     // Get the number of equations and check consistency
-    casadi_assert_message(iin_>=0 && iin_<f_.getNumInputs() && f_.getNumInputs()>0,
+    casadi_assert_message(iin_>=0 && iin_<f_.nIn() && f_.nIn()>0,
                           "Implicit input not in range");
-    casadi_assert_message(iout_>=0 && iout_<f_.getNumOutputs() && f_.getNumOutputs()>0,
+    casadi_assert_message(iout_>=0 && iout_<f_.nOut() && f_.nOut()>0,
                           "Implicit output not in range");
-    casadi_assert_message(f_.output(iout_).isDense() && f_.output(iout_).isVector(),
+    casadi_assert_message(f_.output(iout_).isdense() && f_.output(iout_).iscolumn(),
                           "Residual must be a dense vector");
-    casadi_assert_message(f_.input(iin_).isDense() && f_.input(iin_).isVector(),
+    casadi_assert_message(f_.input(iin_).isdense() && f_.input(iin_).iscolumn(),
                           "Unknown must be a dense vector");
     n_ = f_.output(iout_).nnz();
     casadi_assert_message(n_ == f_.input(iin_).nnz(),
@@ -91,20 +89,20 @@ namespace casadi {
                           << f_.output(iout_).nnz());
 
     // Allocate inputs
-    setNumInputs(f_.getNumInputs());
-    for (int i=0; i<getNumInputs(); ++i) {
+    ibuf_.resize(f_.nIn());
+    for (int i=0; i<nIn(); ++i) {
       input(i) = f_.input(i);
     }
 
     // Allocate output
-    setNumOutputs(f_.getNumOutputs());
-    for (int i=0; i<getNumOutputs(); ++i) {
+    obuf_.resize(f_.nOut());
+    for (int i=0; i<nOut(); ++i) {
       output(i) = f_.output(i);
     }
 
     // Same input and output schemes
-    setInputScheme(f_.getInputScheme());
-    setOutputScheme(f_.getOutputScheme());
+    setOption("input_scheme", f_.inputScheme());
+    setOption("output_scheme", f_.outputScheme());
 
     // Call the base class initializer
     FunctionInternal::init();
@@ -120,7 +118,7 @@ namespace casadi {
 
     // Check for structural singularity in the Jacobian
     casadi_assert_message(
-      !jac_.output().sparsity().isSingular(),
+      !jac_.output().sparsity().issingular(),
       "ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. "
       "sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.output().size1() << ")");
 
@@ -133,19 +131,15 @@ namespace casadi {
     // Get the linear solver creator function
     if (linsol_.isNull()) {
       if (hasSetOption("linear_solver")) {
-        std::string linear_solver_name = getOption("linear_solver");
-
-        // Allocate an NLP solver
-        linsol_ = LinearSolver(linear_solver_name, jac_.output().sparsity(), 1);
-
         // Pass options
+        Dict linear_solver_options;
         if (hasSetOption("linear_solver_options")) {
-          const Dictionary& linear_solver_options = getOption("linear_solver_options");
-          linsol_.setOption(linear_solver_options);
+          linear_solver_options = getOption("linear_solver_options");
         }
 
-        // Initialize
-        linsol_.init();
+        // Allocate an NLP solver
+        linsol_ = LinearSolver("linsol", getOption("linear_solver"),
+                               jac_.output().sparsity(), 1, linear_solver_options);
       }
     } else {
       // Initialize the linear solver, if provided
@@ -162,6 +156,15 @@ namespace casadi {
     casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),
                           "Constraint vector if supplied, must be of length n, but got "
                           << u_c_.size() << " and n = " << n_);
+
+    // Allocate sufficiently large work vectors
+    alloc(f_);
+    size_t sz_w = f_.sz_w();
+    if (!jac_.isNull()) {
+      alloc(jac_);
+      sz_w = max(sz_w, jac_.sz_w());
+    }
+    alloc_w(sz_w + 2*static_cast<size_t>(n_));
   }
 
   void ImplicitFunctionInternal::evaluate() {
@@ -176,7 +179,8 @@ namespace casadi {
     solveNonLinear();
   }
 
-  Function ImplicitFunctionInternal::getDerForward(int nfwd) {
+  Function ImplicitFunctionInternal
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = symbolicInput();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
@@ -190,10 +194,11 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) arg.insert(arg.end(), fseed[d].begin(), fseed[d].end());
     res.clear();
     for (int d=0; d<nfwd; ++d) res.insert(res.end(), fsens[d].begin(), fsens[d].end());
-    return MXFunction(arg, res);
+    return MXFunction(name, arg, res, opts);
   }
 
-  Function ImplicitFunctionInternal::getDerReverse(int nadj) {
+  Function ImplicitFunctionInternal
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = symbolicInput();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
@@ -207,74 +212,74 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) arg.insert(arg.end(), aseed[d].begin(), aseed[d].end());
     res.clear();
     for (int d=0; d<nadj; ++d) res.insert(res.end(), asens[d].begin(), asens[d].end());
-    return MXFunction(arg, res);
+    return MXFunction(name, arg, res, opts);
   }
 
-  void ImplicitFunctionInternal::spEvaluate(bool fwd) {
+  void ImplicitFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
+                                       int* iw, bvec_t* w) {
+    int num_out = nOut();
+    int num_in = nIn();
+    bvec_t* tmp1 = w; w += n_;
+    bvec_t* tmp2 = w; w += n_;
 
-    // Initialize the callback for sparsity propagation
-    f_.spInit(fwd);
+    // Propagate dependencies through the function
+    const bvec_t** arg1 = arg+nIn();
+    copy(arg, arg+num_in, arg1);
+    arg1[iin_] = 0;
+    bvec_t** res1 = res+nOut();
+    fill_n(res1, num_out, static_cast<bvec_t*>(0));
+    res1[iout_] = tmp1;
+    f_.spFwd(arg1, res1, iw, w);
 
-    if (fwd) {
+    // "Solve" in order to propagate to z
+    fill_n(tmp2, n_, 0);
+    linsol_.spSolve(tmp2, tmp1, false);
+    if (res[iout_]) copy(tmp2, tmp2+n_, res[iout_]);
 
-      // Pass inputs to function
-      f_.input(iin_).setZeroBV();
-      for (int i=0; i<getNumInputs(); ++i) {
-        if (i!=iin_) f_.input(i).setBV(input(i));
-      }
-
-      // Propagate dependencies through the function
-      f_.spEvaluate(true);
-
-      // "Solve" in order to propagate to z
-      output(iout_).setZeroBV();
-      linsol_.spSolve(output(iout_), f_.output(iout_), false);
-
-      // Propagate to auxiliary outputs
-      if (getNumOutputs()>1) {
-        f_.input(iin_).setBV(output(iout_));
-        f_.spEvaluate(true);
-        for (int i=0; i<getNumOutputs(); ++i) {
-          if (i!=iout_) output(i).setBV(f_.output(i));
-        }
-      }
-
-    } else {
-
-      // Propagate dependencies from auxiliary outputs
-      if (getNumOutputs()>1) {
-        f_.output(iout_).setZeroBV();
-        for (int i=0; i<getNumOutputs(); ++i) {
-          if (i!=iout_) f_.output(i).setBV(output(i));
-        }
-        f_.spEvaluate(false);
-        for (int i=0; i<getNumInputs(); ++i) {
-          input(i).setBV(f_.input(i));
-        }
-      } else {
-        for (int i=0; i<getNumInputs(); ++i) {
-          input(i).setZeroBV();
-        }
-      }
-
-      // Add dependency on implicitly defined variable
-      input(iin_).borBV(output(iout_));
-
-      // "Solve" in order to get seed
-      f_.output(iout_).setZeroBV();
-      linsol_.spSolve(f_.output(iout_), input(iin_), true);
-
-      // Propagate dependencies through the function
-      f_.spEvaluate(false);
-
-      // Collect influence on inputs
-      for (int i=0; i<getNumInputs(); ++i) {
-        if (i!=iin_) input(i).borBV(f_.input(i));
-      }
-
-      // No dependency on the initial guess
-      input(iin_).setZeroBV();
+    // Propagate to auxiliary outputs
+    if (num_out>1) {
+      arg1[iin_] = tmp2;
+      copy(res, res+num_out, res1);
+      res1[iout_] = 0;
+      f_.spFwd(arg1, res1, iw, w);
     }
+  }
+
+  void ImplicitFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
+                                       int* iw, bvec_t* w) {
+    int num_out = nOut();
+    int num_in = nIn();
+    bvec_t* tmp1 = w; w += n_;
+    bvec_t* tmp2 = w; w += n_;
+
+    // Get & clear seed corresponding to implicitly defined variable
+    if (res[iout_]) {
+      copy(res[iout_], res[iout_]+n_, tmp1);
+      fill_n(res[iout_], n_, 0);
+    } else {
+      fill_n(tmp1, n_, 0);
+    }
+
+    // Propagate dependencies from auxiliary outputs to z
+    bvec_t** res1 = res+num_out;
+    copy(res, res+num_out, res1);
+    res1[iout_] = 0;
+    bvec_t** arg1 = arg+num_in;
+    copy(arg, arg+num_in, arg1);
+    arg1[iin_] = tmp1;
+    if (num_out>1) {
+      f_.spAdj(arg1, res1, iw, w);
+    }
+
+    // "Solve" in order to get seed
+    fill_n(tmp2, n_, 0);
+    linsol_.spSolve(tmp2, tmp1, true);
+
+    // Propagate dependencies through the function
+    for (int i=0; i<num_out; ++i) res1[i] = 0;
+    res1[iout_] = tmp2;
+    arg1[iin_] = 0; // just a guess
+    f_.spAdj(arg1, res1, iw, w);
   }
 
   std::map<std::string, ImplicitFunctionInternal::Plugin> ImplicitFunctionInternal::solvers_;
@@ -314,7 +319,7 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) fsens[d][iout_] = reshape(rhs[d], input(iin_).shape());
 
     // Propagate to auxiliary outputs
-    int num_out = getNumOutputs();
+    int num_out = nOut();
     if (num_out>1) {
       for (int d=0; d<nfwd; ++d) f_fseed[d][iin_] = fsens[d][iout_];
       f_.callForward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
@@ -341,8 +346,8 @@ namespace casadi {
     MX J = jac_(f_arg).front();
 
     // Get adjoint seeds for calling f
-    int num_out = getNumOutputs();
-    int num_in = getNumInputs();
+    int num_out = nOut();
+    int num_in = nIn();
     vector<MX> f_res(res);
     f_res[iout_] = MX(input(iin_).shape()); // zero residual
     vector<vector<MX> > f_aseed(nadj);
@@ -374,12 +379,19 @@ namespace casadi {
       }
     }
 
+    // No dependency on guess (1)
+    vector<MX> tmp(nadj);
+    for (int d=0; d<nadj; ++d) {
+      asens[d].resize(num_in);
+      tmp[d] = asens[d][iin_].isempty(true) ? MX(input(iin_).shape()) : asens[d][iin_];
+    }
+
     // Propagate through f_
     f_.callReverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
 
-    // No dependency on guess
+    // No dependency on guess (2)
     for (int d=0; d<nadj; ++d) {
-      asens[d][iin_] = MX(input(iin_).shape());
+      asens[d][iin_] = tmp[d];
     }
 
     // Add contribution from auxiliary outputs

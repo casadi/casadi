@@ -25,8 +25,6 @@
 
 #include "worhp_interface.hpp"
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
 #include <ctime>
 #include <cstring>
@@ -284,7 +282,7 @@ namespace casadi {
     // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.
     worhp_w_.DF.nnz = nx_;
     if (worhp_o_.m>0) {
-      worhp_w_.DG.nnz = jacG_.output().size();  // Jacobian of G
+      worhp_w_.DG.nnz = jacG_.output().nnz();  // Jacobian of G
     } else {
       worhp_w_.DG.nnz = 0;
     }
@@ -364,8 +362,12 @@ namespace casadi {
     }
   }
 
-  void WorhpInterface::setQPOptions() {
-    setOption("UserHM", true);
+  void WorhpInterface::setDefaultOptions(const std::vector<std::string>& recipes) {
+    for (int i=0;i<recipes.size();++i) {
+      if (recipes[i]=="qp") {
+        setOption("UserHM", true);
+      }
+    }
   }
 
   void WorhpInterface::passOptions() {
@@ -441,7 +443,7 @@ namespace casadi {
     log("WorhpInterface::evaluate");
 
     if (gather_stats_) {
-      Dictionary iterations;
+      Dict iterations;
       iterations["iter_sqp"] = std::vector<int>();
       iterations["inf_pr"] = std::vector<double>();
       iterations["inf_du"] = std::vector<double>();
@@ -481,7 +483,7 @@ namespace casadi {
       "Reformulate your problem by using a parameter for the corresponding variable.");
     }
 
-    for (int i=0;i<lbg.size();++i) {
+    for (int i=0;i<lbg.nnz();++i) {
       casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),
       "WorhpInterface::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite."
       "You have that case at non-zero " << i << "."
@@ -516,6 +518,8 @@ namespace casadi {
 
     double time1 = clock();
 
+    bool firstIteration = true;
+
     // Reverse Communication loop
     while (worhp_c_.status < TerminateSuccess &&  worhp_c_.status > TerminateError) {
       if (GetUserAction(&worhp_c_, callWorhp)) {
@@ -525,33 +529,34 @@ namespace casadi {
 
       if (GetUserAction(&worhp_c_, iterOutput)) {
 
-        if (!worhp_w_.FirstIteration) {
+        if (!firstIteration) {
+          firstIteration = true;
           if (gather_stats_) {
-            Dictionary & iterations = stats_["iterations"];
-            static_cast<std::vector<int> &>(iterations["iter_sqp"]).push_back(worhp_w_.MinorIter);
-            static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(worhp_w_.NormMax_CV);
-            static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(worhp_w_.ScaledKKT);
-            static_cast<std::vector<double> &>(iterations["obj"]).push_back(worhp_o_.F);
-            static_cast<std::vector<double> &>(
-              iterations["alpha_pr"]).push_back(worhp_w_.ArmijoAlpha);
+            Dict iterations = stats_["iterations"];
+            append_to_vec(iterations["iter_sqp"], static_cast<int>(worhp_w_.MinorIter));
+            append_to_vec(iterations["inf_pr"], static_cast<double>(worhp_w_.NormMax_CV));
+            append_to_vec(iterations["inf_du"], static_cast<double>(worhp_w_.ScaledKKT));
+            append_to_vec(iterations["obj"], static_cast<double>(worhp_o_.F));
+            append_to_vec(iterations["alpha_pr"], static_cast<double>(worhp_w_.ArmijoAlpha));
+            stats_["iterations"] = iterations;
           }
 
           if (!callback_.isNull()) {
             double time1 = clock();
             // Copy outputs
-            if (!output(NLP_SOLVER_X).isEmpty()) {
+            if (!output(NLP_SOLVER_X).isempty()) {
               output(NLP_SOLVER_X).setNZ(worhp_o_.X);
             }
-            if (!output(NLP_SOLVER_F).isEmpty())
+            if (!output(NLP_SOLVER_F).isempty())
               output(NLP_SOLVER_F).set(worhp_o_.F);
-            if (!output(NLP_SOLVER_G).isEmpty())
+            if (!output(NLP_SOLVER_G).isempty())
               output(NLP_SOLVER_G).setNZ(worhp_o_.G);
-            if (!output(NLP_SOLVER_LAM_X).isEmpty())
+            if (!output(NLP_SOLVER_LAM_X).isempty())
               output(NLP_SOLVER_LAM_X).setNZ(worhp_o_.Lambda);
-            if (!output(NLP_SOLVER_LAM_G).isEmpty())
+            if (!output(NLP_SOLVER_LAM_G).isempty())
               output(NLP_SOLVER_LAM_G).setNZ(worhp_o_.Mu);
 
-            Dictionary iteration;
+            Dict iteration;
             iteration["iter"] = worhp_w_.MajorIter;
             iteration["iter_sqp"] = worhp_w_.MinorIter;
             iteration["inf_pr"] = worhp_w_.NormMax_CV;
@@ -621,31 +626,34 @@ namespace casadi {
 
     if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
       // Write timings
-      cout << "time spent in eval_f: " << t_eval_f_ << " s.";
+      userOut() << "time spent in eval_f: " << t_eval_f_ << " s.";
       if (n_eval_f_>0)
-        cout << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
+        userOut() << " (" << n_eval_f_ << " calls, " <<
+          (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
+      userOut() << endl;
+      userOut() << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
       if (n_eval_grad_f_>0)
-        cout << " (" << n_eval_grad_f_ << " calls, "
+        userOut() << " (" << n_eval_grad_f_ << " calls, "
              << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_g: " << t_eval_g_ << " s.";
+      userOut() << endl;
+      userOut() << "time spent in eval_g: " << t_eval_g_ << " s.";
       if (n_eval_g_>0)
-        cout << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
+        userOut() << " (" << n_eval_g_ << " calls, " <<
+          (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
+      userOut() << endl;
+      userOut() << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
       if (n_eval_jac_g_>0)
-        cout << " (" << n_eval_jac_g_ << " calls, "
+        userOut() << " (" << n_eval_jac_g_ << " calls, "
              << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in eval_h: " << t_eval_h_ << " s.";
+      userOut() << endl;
+      userOut() << "time spent in eval_h: " << t_eval_h_ << " s.";
       if (n_eval_h_>1)
-        cout << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
-      cout << endl;
-      cout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
-      cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
-      cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
+        userOut() << " (" << n_eval_h_ << " calls, " <<
+          (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
+      userOut() << endl;
+      userOut() << "time spent in main loop: " << t_mainloop_ << " s." << endl;
+      userOut() << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
+      userOut() << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
     }
 
     stats_["t_eval_f"] = t_eval_f_;
@@ -681,10 +689,10 @@ namespace casadi {
       Function& hessLag = this->hessLag();
 
       // Pass input
-      hessLag.setInput(x, HESSLAG_X);
+      hessLag.setInputNZ(x, HESSLAG_X);
       hessLag.setInput(input(NLP_SOLVER_P), HESSLAG_P);
       hessLag.setInput(obj_factor, HESSLAG_LAM_F);
-      hessLag.setInput(lambda, HESSLAG_LAM_G);
+      hessLag.setInputNZ(lambda, HESSLAG_LAM_G);
 
       // Evaluate
       hessLag.evaluate();
@@ -718,10 +726,10 @@ namespace casadi {
       }
 
       if (monitored("eval_h")) {
-        std::cout << "x = " <<  hessLag.input(HESSLAG_X) << std::endl;
-        std::cout << "obj_factor= " << obj_factor << std::endl;
-        std::cout << "lambda = " << hessLag.input(HESSLAG_LAM_G) << std::endl;
-        std::cout << "H = " << hessLag.output(HESSLAG_HESS) << std::endl;
+        userOut() << "x = " <<  hessLag.input(HESSLAG_X) << std::endl;
+        userOut() << "obj_factor= " << obj_factor << std::endl;
+        userOut() << "lambda = " << hessLag.input(HESSLAG_LAM_G) << std::endl;
+        userOut() << "H = " << hessLag.output(HESSLAG_HESS) << std::endl;
       }
 
       if (regularity_check_ && !isRegular(hessLag.output(HESSLAG_HESS).data()))
@@ -733,7 +741,7 @@ namespace casadi {
       log("eval_h ok");
       return true;
     } catch(exception& ex) {
-      cerr << "eval_h failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_h failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -757,7 +765,7 @@ namespace casadi {
       double time1 = clock();
 
       // Pass the argument to the function
-      jacG.setInput(x, JACG_X);
+      jacG.setInputNZ(x, JACG_X);
       jacG.setInput(input(NLP_SOLVER_P), JACG_P);
 
       // Evaluate the function
@@ -768,8 +776,8 @@ namespace casadi {
       std::copy(J.data().begin(), J.data().end(), values);
 
       if (monitored("eval_jac_g")) {
-        cout << "x = " << jacG_.input().data() << endl;
-        cout << "J = " << endl;
+        userOut() << "x = " << jacG_.input().data() << endl;
+        userOut() << "J = " << endl;
         jacG_.output().printSparse();
       }
 
@@ -779,7 +787,7 @@ namespace casadi {
       log("eval_jac_g ok");
       return true;
     } catch(exception& ex) {
-      cerr << "eval_jac_g failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -792,7 +800,7 @@ namespace casadi {
       double time1 = clock();
 
       // Pass the argument to the function
-      nlp_.setInput(x, NL_X);
+      nlp_.setInputNZ(x, NL_X);
       nlp_.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate the function
@@ -803,8 +811,8 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_f")) {
-        cout << "x = " << nlp_.input(NL_X) << endl;
-        cout << "obj_value = " << obj_value << endl;
+        userOut() << "x = " << nlp_.input(NL_X) << endl;
+        userOut() << "obj_value = " << obj_value << endl;
       }
       obj_value *= scale;
 
@@ -817,7 +825,7 @@ namespace casadi {
       log("eval_f ok");
       return true;
     } catch(exception& ex) {
-      cerr << "eval_f failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_f failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -829,19 +837,19 @@ namespace casadi {
 
       if (worhp_o_.m>0) {
         // Pass the argument to the function
-        nlp_.setInput(x, NL_X);
+        nlp_.setInputNZ(x, NL_X);
         nlp_.setInput(input(NLP_SOLVER_P), NL_P);
 
         // Evaluate the function and tape
         nlp_.evaluate();
 
         // Ge the result
-        nlp_.getOutput(g, NL_G);
+        nlp_.getOutputNZ(g, NL_G);
 
         // Printing
         if (monitored("eval_g")) {
-          cout << "x = " << nlp_.input(NL_X) << endl;
-          cout << "g = " << nlp_.output(NL_G) << endl;
+          userOut() << "x = " << nlp_.input(NL_X) << endl;
+          userOut() << "g = " << nlp_.output(NL_G) << endl;
         }
       }
 
@@ -854,7 +862,7 @@ namespace casadi {
       log("eval_g ok");
       return true;
     } catch(exception& ex) {
-      cerr << "eval_g failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_g failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -865,7 +873,7 @@ namespace casadi {
       double time1 = clock();
 
       // Pass the argument to the function
-      gradF_.setInput(x, NL_X);
+      gradF_.setInputNZ(x, NL_X);
       gradF_.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate, adjoint mode
@@ -881,7 +889,7 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_grad_f")) {
-        cout << "grad_f = " << gradF_.output() << endl;
+        userOut() << "grad_f = " << gradF_.output() << endl;
       }
 
       if (regularity_check_ && !isRegular(gradF_.output().data()))
@@ -901,7 +909,7 @@ namespace casadi {
       log("eval_grad_f ok");
       return true;
     } catch(exception& ex) {
-      cerr << "eval_jac_f failed: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "eval_jac_f failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -970,7 +978,7 @@ namespace casadi {
     setOption("qp_scaleIntern", worhp_p_.qp.scaleIntern);
     setOption("qp_strict", worhp_p_.qp.strict);
 
-    std::cout << "readparams status: " << status << std::endl;
+    userOut() << "readparams status: " << status << std::endl;
   }
 
   map<int, string> WorhpInterface::calc_flagmap() {

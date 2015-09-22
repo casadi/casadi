@@ -24,14 +24,11 @@
 
 
 #include "lifting_indef_dple_internal.hpp"
-#include <cassert>
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
+#include <cassert>
 #include <numeric>
 
 INPUTSCHEME(DPLEInput)
@@ -56,8 +53,9 @@ namespace casadi {
     DpleInternal::registerPlugin(casadi_register_dplesolver_lifting);
   }
 
-  LiftingIndefDpleInternal::LiftingIndefDpleInternal(
-      const DpleStructure & st) : DpleInternal(st) {
+  LiftingIndefDpleInternal::LiftingIndefDpleInternal(const std::map<std::string,
+                                                     std::vector<Sparsity> > & st)
+    : DpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_lifting_indef_dple_solver"); // name of the function
@@ -123,17 +121,17 @@ namespace casadi {
       V = diagcat(diagcat(reverse(vector_slice(Vs_, range(Vs_.size()-1)))), Vs_.back());
     }
 
+    // Solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
+
     // Create an dlesolver instance
-    solver_ = DleSolver(getOption(solvername()),
-                        dleStruct("a", A.sparsity(), "v", V.sparsity()));
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
+    solver_ = DleSolver("solver", getOption(solvername()),
+                        make_map("a", A.sparsity(), "v", V.sparsity()), options);
 
-    // Initialize the NLP solver
-    solver_.init();
-
-    std::vector<MX> Pr = solver_(dleIn("a", A, "v" , V));
-
-    MX Pf = Pr[0];
+    MX Pf = solver_(make_map("a", A, "v" , V)).at("p");
 
     std::vector<MX> Ps = diagsplit(Pf, n_);
 
@@ -141,8 +139,7 @@ namespace casadi {
       Ps = reverse(Ps);
     }
 
-    f_ = MXFunction(dpleIn("a", As, "v", Vs), dpleOut("p", horzcat(Ps)));
-    f_.init();
+    f_ = MXFunction(name_, dpleIn("a", As, "v", Vs), dpleOut("p", horzcat(Ps)));
 
     Wrapper<LiftingIndefDpleInternal>::checkDimensions();
 
@@ -154,11 +151,13 @@ namespace casadi {
     Wrapper<LiftingIndefDpleInternal>::evaluate();
   }
 
-  Function LiftingIndefDpleInternal::getDerForward(int nfwd) {
+  Function LiftingIndefDpleInternal
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function LiftingIndefDpleInternal::getDerReverse(int nadj) {
+  Function LiftingIndefDpleInternal
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     return f_.derReverse(nadj);
   }
 
@@ -169,7 +168,10 @@ namespace casadi {
 
   LiftingIndefDpleInternal* LiftingIndefDpleInternal::clone() const {
     // Return a deep copy
-    LiftingIndefDpleInternal* node = new LiftingIndefDpleInternal(st_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[Dple_STRUCT_A];
+    tmp["v"] = st_[Dple_STRUCT_V];
+    LiftingIndefDpleInternal* node = new LiftingIndefDpleInternal(tmp);
     node->setOption(dictionary());
     return node;
   }

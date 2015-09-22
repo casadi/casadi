@@ -26,9 +26,6 @@
 #include "condensing_indef_dple_internal.hpp"
 #include <cassert>
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
@@ -56,8 +53,9 @@ namespace casadi {
     DpleInternal::registerPlugin(casadi_register_dplesolver_condensing);
   }
 
-  CondensingIndefDpleInternal::CondensingIndefDpleInternal(
-      const DpleStructure& st) : DpleInternal(st) {
+  CondensingIndefDpleInternal::
+  CondensingIndefDpleInternal(const std::map<std::string, std::vector<Sparsity> >& st)
+    : DpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_condensing_indef_dple_solver"); // name of the function
@@ -103,40 +101,40 @@ namespace casadi {
 
     MX Ap = mul(Assr);
 
+    // Solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
+
     // Create an dlesolver instance
-    solver_ = DleSolver(getOption(solvername()), dleStruct("a", Ap.sparsity(), "v", R.sparsity()));
-    solver_.setOption(getOption(optionsname()));
-
-    // Initialize the NLP solver
-    solver_.init();
-
-    std::vector<MX> Pr = solver_(dpleIn("a", Ap, "v", R));
+    solver_ = DleSolver("solver", getOption(solvername()),
+                        make_map("a", Ap.sparsity(), "v", R.sparsity()), options);
 
     std::vector<MX> Ps(K_);
-    Ps[0] = Pr[0];
+    Ps[0] = solver_(make_map("a", Ap, "v", R)).at("p");
 
     for (int k=0;k<K_-1;++k) {
       Ps[k+1] = mul(mul(Ass[k], Ps[k]), Ass[k].T()) + Vss[k];
     }
 
-    f_ = MXFunction(dpleIn("a", As, "v", Vs), dpleOut("p", horzcat(Ps)));
-    f_.init();
-
+    f_ = MXFunction(name_, dpleIn("a", As, "v", Vs), dpleOut("p", horzcat(Ps)),
+                    make_dict("input_scheme", ischeme_, "output_scheme", oscheme_));
     Wrapper<CondensingIndefDpleInternal>::checkDimensions();
 
   }
-
-
 
   void CondensingIndefDpleInternal::evaluate() {
     Wrapper<CondensingIndefDpleInternal>::evaluate();
   }
 
-  Function CondensingIndefDpleInternal::getDerForward(int nfwd) {
+  Function CondensingIndefDpleInternal
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function CondensingIndefDpleInternal::getDerReverse(int nadj) {
+  Function CondensingIndefDpleInternal
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     return f_.derReverse(nadj);
   }
 
@@ -147,7 +145,10 @@ namespace casadi {
 
   CondensingIndefDpleInternal* CondensingIndefDpleInternal::clone() const {
     // Return a deep copy
-    CondensingIndefDpleInternal* node = new CondensingIndefDpleInternal(st_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[Dple_STRUCT_A];
+    tmp["v"] = st_[Dple_STRUCT_V];
+    CondensingIndefDpleInternal* node = new CondensingIndefDpleInternal(tmp);
     node->setOption(dictionary());
     return node;
   }

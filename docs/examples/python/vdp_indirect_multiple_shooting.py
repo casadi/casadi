@@ -68,7 +68,7 @@ f = substitute(f,u,u_opt)
 
 # Create the right hand side function
 rhs_in = daeIn(x=vertcat((x,lam)))
-rhs = SXFunction(rhs_in,daeOut(ode=f))
+rhs = SXFunction('rhs', rhs_in,daeOut(ode=f))
 
 # Augmented DAE state dimension
 nX = 4
@@ -80,12 +80,12 @@ tf = 10.0
 num_nodes = 20
 
 # Create an integrator (CVodes)
-I = Integrator("cvodes", rhs)
-I.setOption("abstol",1e-8) # abs. tolerance
-I.setOption("reltol",1e-8) # rel. tolerance
-I.setOption("t0",0.0)
-I.setOption("tf",tf/num_nodes)
-I.init()
+iopts = {}
+iopts["abstol"] = 1e-8 # abs. tolerance
+iopts["reltol"] = 1e-8 # rel. tolerance
+iopts["t0"] = 0.0
+iopts["tf"] = tf/num_nodes
+I = Integrator("I", "cvodes", rhs, iopts)
 
 # Variables in the root finding problem
 NV = nX*(num_nodes+1)
@@ -102,70 +102,54 @@ for k in range(num_nodes+1):
 G = []
 G.append(X[0][:2] - NP.array([0,1])) # states fixed, costates free at initial time
 for k in range(num_nodes):
-  XF, = integratorOut(I.call(integratorIn(x0=X[k])),"xf")
+  XF = I({'x0':X[k]})["xf"]
   G.append(XF-X[k+1])
 G.append(X[num_nodes][2:] - NP.array([0,0])) # costates fixed, states free at final time
 
 # Terminal constraints: lam = 0
-rfp = MXFunction([V],[vertcat(G)])
+rfp = MXFunction('rfp', [V], [vertcat(G)])
 
 # Select a solver for the root-finding problem
 Solver = "nlp"
 #Solver = "newton"
 #Solver = "kinsol"
 
-# Allocate an implict solver
-solver = ImplicitFunction(Solver, rfp)
+# Solver options
+opts = {}
 if Solver=="nlp":
-    solver.setOption("nlp_solver", "ipopt")
-    solver.setOption("nlp_solver_options",{"hessian_approximation":"limited-memory"})
+    opts["nlp_solver"] = "ipopt"
+    opts["nlp_solver_options"] = {"hessian_approximation":"limited-memory"}
 elif Solver=="newton":
-    solver.setOption("linear_solver",CSparse)
+    opts["linear_solver"] = CSparse
 elif Solver=="kinsol":
-    solver.setOption("linear_solver_type","user_defined")
-    solver.setOption("linear_solver",CSparse)
-    solver.setOption("max_iter",1000)
+    opts["linear_solver_type"] = "user_defined"
+    opts["linear_solver"] = CSparse
+    opts["max_iter"] = 1000
 
-# Initialize the solver
-solver.init()
-
-# Set bounds and initial guess
-#solver.setInput([   0,   0,   0,   0] + (num_nodes-1)*[   0,   0,   0,   0] + [   0,   0,   0,   0], "x0")
+# Allocate a solver
+solver = ImplicitFunction('solver', Solver, rfp, opts)
 
 # Solve the problem
-solver.evaluate()
+V_sol, = solver([0])
 
 # Time grid for visualization
 tgrid = NP.linspace(0,tf,100)
 
 # Output functions
-output_fcn = SXFunction(rhs_in,[x0,x1,u_opt])
-
-# Increase the end time for the integrator
-I.setOption("tf",tf)
-I.init()
+output_fcn = SXFunction("output", rhs_in, [x0,x1,u_opt])
 
 # Simulator to get optimal state and control trajectories
-simulator = Simulator(I, output_fcn, tgrid)
-simulator.init()
-
-# Pass initial conditions to the simulator
-simulator.setInput(solver.getOutput()[0:4],"x0")
+simulator = Simulator("simulator", I, output_fcn, tgrid)
 
 # Simulate to get the trajectories
-simulator.evaluate()
-
-# Get optimal control
-x_opt = simulator.getOutput(0).T
-y_opt = simulator.getOutput(1).T
-u_opt = simulator.getOutput(2).T
+sol = simulator({"x0" : V_sol[0:4]})
 
 # Plot the results
 plt.figure(1)
 plt.clf()
-plt.plot(tgrid,x_opt,'--')
-plt.plot(tgrid,y_opt,'-')
-plt.plot(tgrid,u_opt,'-.')
+plt.plot(tgrid, sol["o0"].T, '--')
+plt.plot(tgrid, sol["o1"].T, '-')
+plt.plot(tgrid, sol["o2"].T, '-.')
 plt.title("Van der Pol optimization - indirect multiple shooting")
 plt.xlabel('time')
 plt.legend(['x trajectory','y trajectory','u trajectory'])

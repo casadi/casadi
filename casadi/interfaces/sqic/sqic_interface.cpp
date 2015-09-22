@@ -25,11 +25,7 @@
 
 #include "sqic_interface.hpp"
 #include "casadi/core/function/qp_solver.hpp"
-
-#include "casadi/core/matrix/matrix_tools.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
-
 #include "casadi/core/std_vector_tools.hpp"
 
 #include "wsqic.hpp"
@@ -61,7 +57,7 @@ namespace casadi {
     return node;
   }
 
-  SqicInterface::SqicInterface(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
+  SqicInterface::SqicInterface(const std::map<std::string, Sparsity>& st) : QpSolverInternal(st) {
     is_init_ = false;
   }
 
@@ -270,7 +266,7 @@ namespace casadi {
     for (int i=0;i<pi_.size();++i) {
       file << "  pi(" << i +1 << ") = " <<  0 << std::endl; //pi_[i] << std::endl;
     }
-    std::cout << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
+    userOut() << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
     for (int i=0;i<rc_.size();++i) {
       file << "  rc(" << i +1 << ") = "
            << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)
@@ -285,7 +281,7 @@ namespace casadi {
        for (int i=0;i<pi_.size();++i) {
        file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
        }
-       std::cout << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
+       userOut() << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
        for (int i=0;i<rc_.size();++i) {
        file << "  rc(" << i +1 << ") = "
        << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)
@@ -299,7 +295,7 @@ namespace casadi {
        for (int i=0;i<pi_.size();++i) {
        file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
        }
-       std::cout << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
+       userOut() << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
        for (int i=0;i<rc_.size();++i) {
        file << "  rc(" << i +1 << ") = "
        << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)

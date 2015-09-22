@@ -257,35 +257,41 @@ namespace casadi {
     std::pair<int, int> shape() const;
 
     /// Is scalar?
-    bool isScalar(bool scalar_and_dense) const;
+    bool isscalar(bool scalar_and_dense) const;
 
     /** \brief Check if the sparsity is empty
      *
      * A sparsity is considered empty if one of the dimensions is zero
      * (or optionally both dimensions)
      */
-    bool isEmpty(bool both=false) const;
+    bool isempty(bool both=false) const;
 
     /// Is dense?
-    bool isDense() const;
+    bool isdense() const;
 
-    /// Is column vector? (Optionally row or column  vector)
-    bool isVector(bool row_or_col) const;
+    /** \brief  Check if the pattern is a row vector (i.e. size1()==1) */
+    bool isrow() const;
+
+    /** \brief  Check if the pattern is a column vector (i.e. size2()==1) */
+    bool iscolumn() const;
+
+    /** \brief  Check if the pattern is a row or column vector */
+    bool isvector() const;
 
     /// Is diagonal?
-    bool isDiagonal() const;
+    bool isdiag() const;
 
     /// Is square?
-    bool isSquare() const;
+    bool issquare() const;
 
     /// Is symmetric?
-    bool isSymmetric() const;
+    bool issymmetric() const;
 
     /// Is lower triangular?
-    bool isTril() const;
+    bool istril() const;
 
     /// is upper triangular?
-    bool isTriu() const;
+    bool istriu() const;
 
     /// Get upper triangular part
     Sparsity zz_triu(bool includeDiagonal) const;
@@ -410,17 +416,13 @@ namespace casadi {
      */
     Sparsity unidirectionalColoring(const Sparsity& AT, int cutoff) const;
 
-    /** \brief Perform a star coloring of a symmetric matrix
-     *
-     * A greedy distance-2 coloring algorithm
-     * (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+    /** \brief A greedy distance-2 coloring algorithm
+     * See description in public class.
      */
     Sparsity starColoring(int ordering, int cutoff) const;
 
-    /** \brief Perform a star coloring of a symmetric matrix
-     *
-     * An improved distance-2 coloring algorithm
-     * (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN)
+    /** \brief An improved distance-2 coloring algorithm
+     * See description in public class.
      */
     Sparsity starColoring2(int ordering, int cutoff) const;
 

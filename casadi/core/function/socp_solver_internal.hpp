@@ -41,7 +41,7 @@ namespace casadi {
   public:
 
     // Constructor
-    SocpSolverInternal(const std::vector<Sparsity>& st);
+    SocpSolverInternal(const std::map<std::string, Sparsity>& st);
 
     // Destructor
     virtual ~SocpSolverInternal() = 0;
@@ -59,10 +59,10 @@ namespace casadi {
     virtual void checkInputs() const;
 
     /// Print out problem statement for debugging
-    void printProblem(std::ostream &stream=std::cout) const;
+    void printProblem(std::ostream &stream=casadi::userOut()) const;
 
     // Creator function for internal class
-    typedef SocpSolverInternal* (*Creator)(const SOCPStructure& st);
+    typedef SocpSolverInternal* (*Creator)(const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
     struct Exposed{ };
@@ -119,7 +119,7 @@ namespace casadi {
     A  sparse ( n x nx )             | [-ei Gi -Alba' Auba' -Ilbx Iubx]
     b  dense ( n x 1 )               | [c]
     lbx dense ( nx x 1 )             | [-inf' 0']'
-    nx = m + N + nlba + nuba + nlbx + nubx
+    nx = m + N + nlba + nuba + nlbx + nubx (alias: dual_n_)
     \endverbatim
     */
     void convertToDualSocp();
@@ -136,6 +136,16 @@ namespace casadi {
 
     /// Vector of affine terms in linear inequality constraint in dual SOCP
     std::vector<double>  dual_b_;
+
+    /// Size of dual decision variable vector
+    int dual_n_;
+
+    /// Number of linear constraints in dual problem
+    int dual_nc_;
+
+    /// Transpose of A matrix in primal problem definition (fixed sparsity pattern)
+    DMatrix           primal_A_T_;
+    std::vector<int>  primal_A_T_temp_int_;
 
     /** Indices of lower bounded linear inequality constraints (LBA != -inf),
     used to set up dual SOCP variables */

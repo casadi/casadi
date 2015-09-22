@@ -25,7 +25,6 @@
 
 #include "qcqp_to_socp.hpp"
 
-#include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
 
 using namespace std;
@@ -49,13 +48,16 @@ namespace casadi {
 
   QcqpToSocp* QcqpToSocp::clone() const {
     // Return a deep copy
-    QcqpToSocp* node = new QcqpToSocp(st_);
+    QcqpToSocp* node =
+      new QcqpToSocp(make_map("h", st_[QCQP_STRUCT_H],
+                              "a", st_[QCQP_STRUCT_A],
+                              "p", st_[QCQP_STRUCT_P]));
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  QcqpToSocp::QcqpToSocp(const std::vector<Sparsity> &st) : QcqpSolverInternal(st) {
+  QcqpToSocp::QcqpToSocp(const std::map<std::string, Sparsity> &st) : QcqpSolverInternal(st) {
     Adaptor<QcqpToSocp, SocpSolverInternal>::addOptions();
   }
 
@@ -175,17 +177,14 @@ namespace casadi {
     std::vector<Sparsity> socp_g;
 
     // Allocate Cholesky solvers
-    cholesky_.push_back(LinearSolver("csparsecholesky", st_[QCQP_STRUCT_H]));
+    cholesky_.push_back(LinearSolver("cholesky", "csparsecholesky", st_[QCQP_STRUCT_H]));
     for (int i=0;i<nq_;++i) {
-      cholesky_.push_back(
-        LinearSolver("csparsecholesky",
-          DMatrix(st_[QCQP_STRUCT_P])(range(i*n_, (i+1)*n_), ALL).sparsity()));
+      LinearSolver ls("cholesky", "csparsecholesky",
+                      DMatrix::zeros(st_[QCQP_STRUCT_P])(range(i*n_, (i+1)*n_), ALL).sparsity());
+      cholesky_.push_back(ls);
     }
 
     for (int i=0;i<nq_+1;++i) {
-      // Initialize Cholesky solve
-      cholesky_[i].init();
-
       // Harvest Cholsesky sparsity patterns
       // Note that we add extra scalar to make room for the epigraph-reformulation variable
       socp_g.push_back(diagcat(
@@ -200,23 +199,22 @@ namespace casadi {
     socp_e_row.push_back(n_);
     Sparsity socp_e(n_+1, nq_+1, socp_e_colind, socp_e_row);
 
-    // Create an SocpSolver instance
-    solver_ = SocpSolver(getOption(solvername()),
-                         socpStruct("g", horzcat(socp_g),
-                                    "e", socp_e,
-                                    "a", horzcat(input(QCQP_SOLVER_A).sparsity(),
-                                                 Sparsity(nc_, 1))));
-    //solver_.setQCQPOptions();
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
 
+    Dict options;
+    if (hasSetOption(optionsname())) options = getOption(optionsname());
     std::vector<int> ni(nq_+1);
     for (int i=0;i<nq_+1;++i) {
       ni[i] = n_+1;
     }
-    solver_.setOption("ni", ni);
+    options["ni"] = ni;
 
-    // Initialize the SocpSolver
-    solver_.init();
+    // Create an SocpSolver instance
+    solver_ = SocpSolver("socpsolver", getOption(solvername()),
+                         make_map("g", horzcat(socp_g),
+                                  "e", socp_e,
+                                  "a", horzcat(input(QCQP_SOLVER_A).sparsity(),
+                                               Sparsity(nc_, 1))),
+                         options);
   }
 
 } // namespace casadi

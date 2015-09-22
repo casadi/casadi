@@ -228,22 +228,19 @@ class ControlTests(casadiTestCase):
           if with_H:
             for i in Y:
               i.sparsity().spy()
-            f = MXFunction(lrdpleIn(a=A,c=C,v=Vs,h=H),[horzcat(Y)])
+            f = MXFunction("reference", lrdpleIn(a=A,c=C,v=Vs,h=H),[horzcat(Y)])
           else:
-            f = MXFunction(lrdpleIn(a=A,c=C,v=Vs),[horzcat(Y)])
+            f = MXFunction("reference", lrdpleIn(a=A,c=C,v=Vs),[horzcat(Y)])
         else:
           if with_H:
-            f = MXFunction(lrdpleIn(a=A,v=Vs,h=H),[horzcat(Y)])
+            f = MXFunction("reference", lrdpleIn(a=A,v=Vs,h=H),[horzcat(Y)])
           else:
-            f = MXFunction(lrdpleIn(a=A,v=Vs),[horzcat(Y)])
-        f.setOption("name","reference")
-        f.init()
+            f = MXFunction("reference", lrdpleIn(a=A,v=Vs),[horzcat(Y)])
         
         print "f",f
         
         
-        temp = MXFunction([A],[An])
-        temp.init()
+        temp = MXFunction("temp", [A],[An])
         Af_ = temp([horzcat(A_)])[0]
         print "Af"
         Af_.printDense()
@@ -264,13 +261,9 @@ class ControlTests(casadiTestCase):
         for Solver, options in lrdplesolvers:
           print Solver, options
           print "c", [i.sparsity() for i in Cs_]
-          g = LrDpleSolver(Solver,lrdpleStruct(a=[i.sparsity() for i in As_],c=[i.sparsity() for i in Cs_],v=[ i.sparsity() for i in Vs_],h=[i.sparsity() for i in Hs_]if with_H else [])  )
-          
-          print g.dictionary()
-          g.setOption("Hs",[h]*K)
-          print options
-          g.setOption(options)
-          g.init()
+          op = options.copy()
+          op["Hs"] = [h]*K
+          g = LrDpleSolver("g", Solver,{'a':[i.sparsity() for i in As_],'c':[i.sparsity() for i in Cs_],'v':[ i.sparsity() for i in Vs_],'h':[i.sparsity() for i in Hs_]if with_H else []}, op)
           
           for i in [f,g]:
             i.setInput(horzcat(A_),"a")
@@ -341,24 +334,22 @@ class ControlTests(casadiTestCase):
         
         if with_C:
           if with_H:
-            f = MXFunction(lrdleIn(a=A,c=C,v=Vs,h=H),[diagcat(Y)])
+            f = MXFunction("f", lrdleIn(a=A,c=C,v=Vs,h=H),[diagcat(Y)])
           else:
-            f = MXFunction(lrdleIn(a=A,c=C,v=Vs),[diagcat(Y)])
+            f = MXFunction("f", lrdleIn(a=A,c=C,v=Vs),[diagcat(Y)])
         else:
           if with_H:
-            f = MXFunction(lrdleIn(a=A,v=Vs,h=H),[diagcat(Y)])
+            f = MXFunction("f", lrdleIn(a=A,v=Vs,h=H),[diagcat(Y)])
           else:
-            f = MXFunction(lrdleIn(a=A,v=Vs),[diagcat(Y)])
-        f.init()
+            f = MXFunction("f", lrdleIn(a=A,v=Vs),[diagcat(Y)])
         
         
         for Solver, options in lrdlesolvers:
           print Solver
-          g = LrDleSolver(Solver,lrdleStruct(a=A.sparsity(),c=C.sparsity(),v=Vs.sparsity(),h=H.sparsity()))
-          g.setOption("Hs",h  if with_H else [])
-          g.setOption(options)
-          g.init()
-          
+          op = options.copy()
+          op["Hs"] = h if with_H else []
+          g = LrDleSolver("g", Solver,{'a':A.sparsity(),'c':C.sparsity(),'v':Vs.sparsity(),'h':H.sparsity()}, op)
+
           for i in [f,g]:
             i.setInput(A_,"a")
             i.setInput(V_,"v")
@@ -395,9 +386,7 @@ class ControlTests(casadiTestCase):
           V_ = mul(v,v.T)
           
           
-          solver = DleSolver(Solver,dleStruct(a=Sparsity.dense(n,n),v=Sparsity.dense(n,n)))
-          solver.setOption(options)
-          solver.init()
+          solver = DleSolver("solver", Solver,{'a':Sparsity.dense(n,n),'v':Sparsity.dense(n,n)}, options)
           solver.setInput(A_,"a")
           solver.setInput(V_,"v")
           
@@ -411,8 +400,7 @@ class ControlTests(casadiTestCase):
           
           Pf = solve(A_total,vec(Vss),"csparse")
           
-          refsol = MXFunction(dleIn(a=As,v=Vs),dleOut(p=Pf.reshape((n,n))))
-          refsol.init()
+          refsol = MXFunction("refsol", dleIn(a=As,v=Vs),dleOut(p=Pf.reshape((n,n))))
           
           refsol.setInput(A_,"a")
           refsol.setInput(V_,"v")
@@ -455,9 +443,7 @@ class ControlTests(casadiTestCase):
           V_ = mul(v,v.T)
           
           
-          solver = CleSolver(Solver,cleStruct(a=Sparsity.dense(n,n),v=Sparsity.dense(n,n)))
-          solver.setOption(options)
-          solver.init()
+          solver = CleSolver("solver", Solver,{'a':Sparsity.dense(n,n),'v':Sparsity.dense(n,n)}, options)
           solver.setInput(A_,"a")
           solver.setInput(V_,"v")
           
@@ -473,8 +459,7 @@ class ControlTests(casadiTestCase):
           
           Pf = solve(A_total,vec(Vss),"csparse")
           
-          refsol = MXFunction(dleIn(a=As,v=Vs),dleOut(p=Pf.reshape((n,n))))
-          refsol.init()
+          refsol = MXFunction("refsol", dleIn(a=As,v=Vs),dleOut(p=Pf.reshape((n,n))))
           
           refsol.setInput(A_,"a")
           refsol.setInput(V_,"v")
@@ -507,9 +492,7 @@ class ControlTests(casadiTestCase):
           V_ = [mul(v,v.T) for v in [DMatrix(numpy.random.random((n,n))) for i in range(K)]]
           
           
-          solver = DpleSolver(Solver,dpleStruct(a=[Sparsity.dense(n,n) for i in range(K)],v=[Sparsity.dense(n,n) for i in range(K)]))
-          solver.setOption(options)
-          solver.init()
+          solver = DpleSolver("solver", Solver,{'a':[Sparsity.dense(n,n) for i in range(K)],'v':[Sparsity.dense(n,n) for i in range(K)]}, options)
           solver.setInput(horzcat(A_),"a")
           solver.setInput(horzcat(V_),"v")
           
@@ -533,8 +516,7 @@ class ControlTests(casadiTestCase):
           Pf = solve(A_total,vec(Vss),"csparse")
           P = Pf.reshape((n,K*n))
           
-          refsol = MXFunction(dpleIn(a=As,v=Vs),dpleOut(p=P))
-          refsol.init()
+          refsol = MXFunction("refsol", dpleIn(a=As,v=Vs),dpleOut(p=P))
           
           refsol.setInput(horzcat(A_),"a")
           refsol.setInput(horzcat(V_),"v")
@@ -583,9 +565,7 @@ class ControlTests(casadiTestCase):
           V_ = [mul(v,v.T) for v in [DMatrix(numpy.random.random((n,n))) for i in range(K)]]
           
           
-          solver = DpleSolver(Solver,dpleStruct(a=[Sparsity.dense(n,n) for i in range(K)],v=[Sparsity.dense(n,n) for i in range(K)]))
-          solver.setOption(options)
-          solver.init()
+          solver = DpleSolver("solver", Solver,{'a':[Sparsity.dense(n,n) for i in range(K)],'v':[Sparsity.dense(n,n) for i in range(K)]}, options)
           solver.setInput(horzcat(A_),"a")
           solver.setInput(horzcat(V_),"v")
           
@@ -610,7 +590,7 @@ class ControlTests(casadiTestCase):
         def sigma(a):
           return a[1:] + [a[0]]
               
-        for z,zp,a,t in zip(Z,sigma(Z),A,T):
+        for z,zp,a,t in zip(Z,sigma(list(Z)),A,T):
           self.checkarray(mul([z.T,a,zp]),t,digits=7)
           
         hess = Sparsity.band(n,1)+Sparsity.upper(n)

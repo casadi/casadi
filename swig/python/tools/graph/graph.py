@@ -67,11 +67,11 @@ def addDependencies(master,slaves,dep={},invdep={}):
 
 def isLeaf(s):
   return s.isLeaf()
-  #return s.isScalar(True) and (s.isConstant() or s.isSymbolic())
+  #return s.isscalar(True) and (s.isConstant() or s.isSymbolic())
 
 def dependencyGraph(s,dep = {},invdep = {}):
   if isinstance(s,SX):
-    if s.isScalar(True):
+    if s.isscalar(True):
       if not(isLeaf(s)):
         addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
     else:
@@ -82,12 +82,13 @@ def dependencyGraph(s,dep = {},invdep = {}):
   
 class DotArtist:
   sparsitycol = "#eeeeee"
-  def __init__(self,s,dep={},invdep={},graph=None,artists={}):
+  def __init__(self,s,dep={},invdep={},graph=None,artists={},**kwargs):
     self.s = s
     self.dep = dep
     self.invdep = invdep
     self.graph = graph
     self.artists = artists
+    self.kwargs = kwargs
     
   def hasPorts(self):
     return False
@@ -102,9 +103,9 @@ class DotArtist:
     sp = s.sparsity()
     deps = getDeps(s)
     if nzlabels is None:
-      nzlabels = map(str,range(sp.size()))
+      nzlabels = map(str,range(sp.nnz()))
     nzlabelcounter = 0
-    if s.size()==s.numel():
+    if s.nnz()==s.numel():
       graph.add_node(pydot.Node(id,label="%d x %d" % (s.size1(),s.size2()),shape='rectangle',color=self.sparsitycol,style="filled"))
     else:
       label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
@@ -133,7 +134,7 @@ class MXSymbolicArtist(DotArtist):
     sp = s.sparsity()
     row = sp.row()
     col = "#990000"
-    if s.size() == s.numel() and s.size()==1:
+    if s.nnz() == s.numel() and s.nnz()==1:
       # The Matrix grid is represented by a html table with 'ports'
       graph.add_node(pydot.Node(str(self.s.__hash__())+":f0",label=s.getName(),shape='rectangle',color=col))
     else:
@@ -187,7 +188,7 @@ class MXSymbolicArtist(DotArtist):
 #       candidates.sort()
 #       if candidates[0] == hash(s):
 #         label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="#0000aa">'
-#         if not(d.numel()==1 and d.numel()==d.size()): 
+#         if not(d.numel()==1 and d.numel()==d.nnz()): 
 #           label+="<TR><TD COLSPAN='%d' BGCOLOR='#dddddd'><font>%s</font></TD></TR>" % (d.size2(), d.dimString())
 #         for i in range(d.size1()):
 #           label+="<TR>"
@@ -204,7 +205,7 @@ class MXSymbolicArtist(DotArtist):
       
 #     # The Matrix grid is represented by a html table with 'ports'
 #     label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
-#     if not(s.numel()==1 and s.numel()==s.size()): 
+#     if not(s.numel()==1 and s.numel()==s.nnz()): 
 #       label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
 #     for i in range(s.size1()):
 #       label+="<TR>"
@@ -237,10 +238,10 @@ class MXEvaluationArtist(DotArtist):
     graph = pydot.Cluster(str(s.__hash__()), rank='max', label='Function:\n %s' % f.getOption("name"))
     self.graph.add_subgraph(graph)
     
-    s = (" %d inputs: |" % f.getNumInputs()) + " | ".join("<f%d> %d" % (i,i) for i in range(f.getNumInputs()))
+    s = (" %d inputs: |" % f.nIn()) + " | ".join("<f%d> %d" % (i,i) for i in range(f.nIn()))
     graph.add_node(pydot.Node("funinput" + str(self.s.__hash__()),label=s,shape='Mrecord'))
 
-    s = (" %d outputs: |" % f.getNumOutputs())+ " | ".join("<f%d> %d" % (i,i) for i in range(f.getNumOutputs()))
+    s = (" %d outputs: |" % f.nOut())+ " | ".join("<f%d> %d" % (i,i) for i in range(f.nOut()))
     graph.add_node(pydot.Node(str(self.s.__hash__()),label=s,shape='Mrecord'))
     
     
@@ -254,21 +255,22 @@ class MXConstantArtist(DotArtist):
     row = sp.row()
     M = s.getMatrixValue()
     col = "#009900"
-    if s.size() == s.numel() and s.size() == 1:
+    if s.nnz() == s.numel() and s.nnz() == 1:
       graph.add_node(pydot.Node(str(self.s.__hash__())+":f0",label=M[0,0],shape='rectangle',color=col))
     else:
       # The Matrix grid is represented by a html table with 'ports'
       label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="%s">' % col
       label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
-      for i in range(s.size1()):
-        label+="<TR>"
-        for j in range(s.size2()):
-          k = sp.getNZ(i,j)
-          if k==-1:
-            label+="<TD>.</TD>"
-          else:
-            label+="<TD PORT='f%d' BGCOLOR='#eeeeee'> %s </TD>" % (k,M[i,j])
-        label+="</TR>"
+      if not "max_numel" in self.kwargs or s.numel() < self.kwargs["max_numel"]:
+        for i in range(s.size1()):
+          label+="<TR>"
+          for j in range(s.size2()):
+            k = sp.getNZ(i,j)
+            if k==-1:
+              label+="<TD>.</TD>"
+            else:
+              label+="<TD PORT='f%d' BGCOLOR='#eeeeee'> %s </TD>" % (k,M[i,j])
+          label+="</TR>"
       label+="</TABLE>>"
       graph.add_node(pydot.Node(str(self.s.__hash__()),label=label,shape='plaintext'))
 
@@ -309,7 +311,7 @@ class MXGetNonzerosArtist(DotArtist):
     n = getDeps(s)[0]
     
     
-    show_sp = not(s.size() == s.numel() and s.size() == 1)
+    show_sp = not(s.nnz() == s.numel() and s.nnz() == 1)
     
     if show_sp:
       op = "op"
@@ -321,21 +323,22 @@ class MXGetNonzerosArtist(DotArtist):
     row = sp.row()
     M = s.mapping()
     col = "#333333"
-    if s.size() == s.numel() and s.size() == 1:
+    if s.nnz() == s.numel() and s.nnz() == 1:
       graph.add_node(pydot.Node(op+str(s.__hash__())+":f0",label="[%s]" % str(M[0,0]),shape='rectangle',style="filled",fillcolor='#eeeeff'))
     else:
       # The Matrix grid is represented by a html table with 'ports'
       label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="%s">' % col
       label+="<TR><TD COLSPAN='%d' PORT='entry'>getNonzeros</TD></TR>" % (s.size2())
-      for i in range(s.size1()):
-        label+="<TR>"
-        for j in range(s.size2()):
-          k = sp.getNZ(i,j)
-          if k==-1:
-            label+="<TD>.</TD>"
-          else:
-            label+="<TD PORT='f%d' BGCOLOR='#eeeeff'> %s </TD>" % (k,M[i,j])
-        label+="</TR>"
+      if not "max_nnz" in self.kwargs or s.nnz() < self.kwargs["max_nnz"]:
+        for i in range(s.size1()):
+          label+="<TR>"
+          for j in range(s.size2()):
+            k = sp.getNZ(i,j)
+            if k==-1:
+              label+="<TD>.</TD>"
+            else:
+              label+="<TD PORT='f%d' BGCOLOR='#eeeeff'> %s </TD>" % (k,M[i,j])
+          label+="</TR>"
       label+="</TABLE>>"
       graph.add_node(pydot.Node(op+str(s.__hash__()),label=label,shape='plaintext'))
     self.graph.add_edge(pydot.Edge(str(n.__hash__()),op+str(s.__hash__())))
@@ -585,42 +588,42 @@ class SXNonLeafArtist(DotArtist):
         
         
   
-def createArtist(node,dep={},invdep={},graph=None,artists={}):
+def createArtist(node,dep={},invdep={},graph=None,artists={},**kwargs):
   if isinstance(node,SX):
-    if node.isScalar(True):
+    if node.isscalar(True):
       if isLeaf(node):
-        return SXLeafArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+        return SXLeafArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
       else:
-        return SXNonLeafArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+        return SXNonLeafArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     else:
-      return SXArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+      return SXArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     
     
   elif isinstance(node,MX):
     if node.isSymbolic():
-      return MXSymbolicArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+      return MXSymbolicArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     elif node.isBinary() or node.isUnary():
-      return MXOperationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+      return MXOperationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     elif node.isConstant():
-      return MXConstantArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+      return MXConstantArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     elif node.isEvaluation():
-      return MXEvaluationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+      return MXEvaluationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     elif node.isEvaluationOutput():
-      return MXEvaluationOutputArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+      return MXEvaluationOutputArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     elif node.isNorm():
-      return MXNormArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+      return MXNormArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     elif node.isOperation(C.OP_GETNONZEROS):
-      return MXGetNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+      return MXGetNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     elif node.isOperation(C.OP_SETNONZEROS):
-      return MXSetNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+      return MXSetNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     elif node.isOperation(C.OP_ADDNONZEROS):
-      return MXAddNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+      return MXAddNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     else:
-      return MXGenericArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+      return MXGenericArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
   else:
     raise Exception("Cannot create artist for %s" % str(type(s)))
         
-def dotgraph(s,direction="BT"):
+def dotgraph(s,direction="BT",**kwargs):
   """
   Creates and returns a pydot graph structure that represents an SX.
   
@@ -653,7 +656,7 @@ def dotgraph(s,direction="BT"):
     graph = pydot.Dot('G', graph_type='digraph',rankdir=direction)
       
     for node in allnodes:
-      artists[node] = createArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+      artists[node] = createArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
       
     for artist in artists.itervalues():
       if artist is None: continue
@@ -665,7 +668,7 @@ def dotgraph(s,direction="BT"):
   return graph
 
 
-def dotsave(s,format='ps',filename="temp",direction="RL"):
+def dotsave(s,format='ps',filename="temp",direction="RL",**kwargs):
   """
   Make a drawing of an SX and save it.
   
@@ -677,7 +680,7 @@ def dotsave(s,format='ps',filename="temp",direction="RL"):
   direction   one of "BT", "LR", "TB", "RL"
   
   """
-  g = dotgraph(s,direction=direction)
+  g = dotgraph(s,direction=direction,**kwargs)
   if hasattr(g,'write_'+format):
     getattr(g,'write_'+format)(filename)
   else:
@@ -689,7 +692,7 @@ def dotsave(s,format='ps',filename="temp",direction="RL"):
     s+= " ".join(l)
     raise Exception(s)
   
-def dotdraw(s,direction="RL"):
+def dotdraw(s,direction="RL",**kwargs):
   """
   Make a drawing of an SX and display it.
   
@@ -701,20 +704,20 @@ def dotdraw(s,direction="RL"):
   except:
     # We don't have pylab, so just write out to file
     print "casadi.tools.graph.dotdraw: no pylab detected, will not show drawing on screen."
-    dotgraph(s,direction=direction).write_ps("temp.ps")
+    dotgraph(s,direction=direction,**kwargs).write_ps("temp.ps")
     return
    
   if hasattr(show,'__class__') and show.__class__.__name__=='PylabShow':  
     # catch pyreport case, so we have true vector graphics
     figure_name = '%s%d.%s' % ( show.basename, len(show.figure_list), show.figure_extension )
     show.figure_list += (figure_name, )
-    dotgraph(s,direction=direction).write_pdf(figure_name)
+    dotgraph(s,direction=direction,**kwargs).write_pdf(figure_name)
     print "Here goes figure %s (dotdraw)" % figure_name
   else:
     # Matplotlib does not allow to display vector graphics on screen, 
     # so we fall back to png
     temp="_temp.png"
-    dotgraph(s,direction=direction).write_png(temp)
+    dotgraph(s,direction=direction,**kwargs).write_png(temp)
     im = imread(temp)
     figure()
     ax = axes([0,0,1,1], frameon=False)

@@ -33,7 +33,7 @@ from numpy import *
 x=SX.sym("x")
 y=SX.sym("y")
 
-nlp=SXFunction(nlpIn(x=vertcat((x,y))),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
+nlp=SXFunction("nlp", nlpIn(x=vertcat((x,y))),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     
 #! Simple callback
 #! ===============
@@ -54,11 +54,11 @@ def simplecallback(f):
   else:
     return 0
 
-solver = NlpSolver("ipopt", nlp)
-solver.setOption("iteration_callback",simplecallback)
-solver.setOption("tol",1e-8)
-solver.setOption("max_iter",20)
-solver.init()
+opts = {}
+opts["iteration_callback"] = simplecallback
+opts["tol"] = 1e-8
+opts["max_iter"] = 20
+solver = NlpSolver("solver", "ipopt", nlp, opts)
 solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([-10],"lbg")
@@ -112,12 +112,11 @@ class MyCallback:
     draw()
     time.sleep(0.25)
 
-
-solver = NlpSolver("ipopt", nlp)
-solver.setOption("iteration_callback",MyCallback())
-solver.setOption("tol",1e-8)
-solver.setOption("max_iter",50)
-solver.init()
+opts = {}
+opts["iteration_callback"] = MyCallback()
+opts["tol"] = 1e-8
+opts["max_iter"] = 50
+solver = NlpSolver("solver", "ipopt", nlp, opts)
 solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([-10],"lbg")

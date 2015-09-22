@@ -33,8 +33,7 @@ d = c**2
 
 print d
 
-f = SXFunction([a,b],[d])
-f.init()
+f = SXFunction("f", [a,b],[d])
 f.setInput(4,0)
 f.setInput(3,1)
 
@@ -44,9 +43,7 @@ f.setInput(3,1)
 f.evaluate()
 
 J = f.jacobian(0,0)
-J.init()
 
-J.init()
 J.setInput(2,0)
 J.setInput(9,1)
 
@@ -56,9 +53,7 @@ J.evaluate()
 
 
 J = J.jacobian(0,0)
-J.init()
 
-J.init()
 J.setInput(2,0)
 J.setInput(9,1)
 #! second derivative doesn't, so we don't get a printout

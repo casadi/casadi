@@ -31,17 +31,45 @@
 #include <map>
 #include <set>
 
-/// \cond INTERNAL
-
 namespace casadi {
 
   class CASADI_EXPORT CodeGenerator {
   public:
+    /// Constructor
+    CodeGenerator(const Dict& opts = Dict());
+
+    /// Add a function (name generated)
+    void add(const Function& f);
+
+    /// Add a function
+    void add(const Function& f, const std::string& fname);
+
+#ifndef SWIG
+    /// Generate the code to a stream
+    void generate(std::ostream& s) const;
+#endif // SWIG
+
+    /// Generate a file
+    void generate(const std::string& name) const;
+
+    /// Generate a file, return code as string
+    std::string generate() const;
+
+    /// Compile and load function
+    std::string compile(const std::string& name, const std::string& compiler="gcc -fPIC -O2");
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
-    void addInclude(const std::string& new_include, bool relative_path = false);
+    void addInclude(const std::string& new_include, bool relative_path=false,
+                    const std::string& use_ifdef=std::string());
 
-    /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
+#ifndef SWIG
+    /// Add an external function declaration
+    void addExternal(const std::string& new_external);
+
+    // Add a sparsity pattern
+    std::string sparsity(const Sparsity& sp);
+
+    // Add a sparsity pattern, get index
     int addSparsity(const Sparsity& sp);
 
     /** \brief Get the index of an existing sparsity pattern */
@@ -53,53 +81,53 @@ namespace casadi {
     /** \brief Get or add an integer constant */
     int getConstant(const std::vector<int>& v, bool allow_adding=false);
 
-    /** \brief Add a dependent function */
-    int addDependency(const Function& f);
+    /** \brief Use simplified signature */
+    static bool simplifiedCall(const Function& f);
 
-    /** \brief Get the index of an existing dependency */
-    int getDependency(const Function& f) const;
+    /** \brief Generate a call to a function (generic signature) */
+    std::string call(const Function& f, const std::string& arg, const std::string& res,
+                     const std::string& iw, const std::string& w) const;
+
+    /** \brief Generate a call to a function (simplified signature) */
+    std::string call(const Function& f, const std::string& arg, const std::string& res) const;
 
     /** \brief Print a constant in a lossless but compact manner */
-    static void printConstant(std::ostream& s, double v);
+    static std::string constant(double v);
 
-    /** \brief Codegen casadi_dot */
-    std::string casadi_dot(int n, const std::string& x, int inc_x, const std::string& y, int inc_y);
+    /** \brief Codegen inner product */
+    std::string inner_prod(int n, const std::string& x, const std::string& y);
 
     /** \brief Auxiliary functions */
     enum Auxiliary {
-      // BLAS Level 1
-      AUX_COPY,
+      AUX_COPY_N,
       AUX_SWAP,
       AUX_SCAL,
       AUX_AXPY,
-      AUX_DOT,
+      AUX_INNER_PROD,
       AUX_NRM2,
       AUX_IAMAX,
-      AUX_FILL,
+      AUX_FILL_N,
       AUX_ASUM,
-
-      // Misc
       AUX_SQ,
       AUX_SIGN,
       AUX_MM_SPARSE,
       AUX_PROJECT,
-      AUX_TRANS
+      AUX_TRANS,
+      AUX_TO_MEX,
+      AUX_FROM_MEX
     };
 
     /** \brief Add a built-in auxiliary function */
     void addAuxiliary(Auxiliary f);
 
-    /// Flush generated file to a stream
-    void flush(std::ostream& s) const;
-
     /** Convert in integer to a string */
-    static std::string numToString(int n);
+    static std::string to_string(int n);
 
     /** Get work vector name from index */
-    static std::string work(int n);
+    std::string work(int n, int sz) const;
 
     /** Get work vector element from index */
-    static std::string workelement(int n);
+    std::string workel(int n) const;
 
     /** \brief  Print int vector to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<int>& v);
@@ -107,13 +135,35 @@ namespace casadi {
     /** \brief  Print real vector to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<double>& v);
 
-    /** \brief Copy a vector to another */
-    void copyVector(std::ostream &s, const std::string& arg, std::size_t n, const std::string& res,
-                    const std::string& it="i", bool only_if_exists=false) const;
+    /** \brief Create a copy_n operation */
+    std::string copy_n(const std::string& arg, std::size_t n, const std::string& res);
+
+    /** \brief Create a fill_n operation */
+    std::string fill_n(const std::string& res, std::size_t n, const std::string& v);
+
+    /** \brief Sparse assignment */
+    std::string project(const std::string& arg, const Sparsity& sp_arg,
+                        const std::string& res, const Sparsity& sp_res,
+                        const std::string& w);
+
+    /** \brief Create matrix in MATLAB's MEX format */
+    std::string to_mex(const Sparsity& sp, const std::string& arg);
+
+    /** \brief Get matrix from MATLAB's MEX format */
+    std::string from_mex(std::string& arg,
+                         const std::string& res, std::size_t res_off, const Sparsity& sp_res,
+                         const std::string& w);
 
     /** \brief Assignment */
     static void assign(std::ostream &s, const std::string& lhs, const std::string& rhs);
 
+    /** \brief Printf */
+    std::string printf(const std::string& str,
+                       const std::vector<std::string>& arg=std::vector<std::string>());
+    std::string printf(const std::string& str, const std::string& arg1);
+    std::string printf(const std::string& str, const std::string& arg1, const std::string& arg2);
+    std::string printf(const std::string& str, const std::string& arg1, const std::string& arg2,
+                       const std::string& arg3);
   private:
 
     /// SQUARE
@@ -124,17 +174,45 @@ namespace casadi {
 
     //  private:
   public:
+    /// \cond INTERNAL
+
+    // Real-type used for the codegen
+    std::string real_t;
+
+    // Generate header file?
+    bool with_header;
+
+    // Are we creating a MEX file?
+    bool mex;
+
+    // Verbose codegen?
+    bool verbose;
+
+    // Are we generating C++?
+    bool cpp;
+
+    // Should we generate a main (allowing evaluation from command line)
+    bool main;
+
+    /** \brief Codegen scalar
+     * Use the work vector for storing work vector elements of length 1
+     * (typically scalar) instead of using local variables
+     */
+    bool codegen_scalars;
 
     // Stringstreams holding the different parts of the file being generated
-    std::stringstream includes_;
-    std::stringstream auxiliaries_;
-    std::stringstream dependencies_;
-    std::stringstream function_;
-    std::stringstream finalization_;
+    std::stringstream includes;
+    std::stringstream auxiliaries;
+    std::stringstream body;
+    std::stringstream header;
+
+    // Names of exposed functions
+    std::vector<std::string> exposed_fname;
 
     // Set of already included header files
     typedef std::map<const void*, int> PointerMap;
     std::set<std::string> added_includes_;
+    std::set<std::string> added_externals_;
     std::set<Auxiliary> added_auxiliaries_;
     PointerMap added_sparsities_;
     PointerMap added_dependencies_;
@@ -158,12 +236,12 @@ namespace casadi {
       }
       return true;
     }
+    /// \endcond
+#endif // SWIG
   };
 
 
 } // namespace casadi
-
-/// \endcond
 
 #endif // CASADI_CODE_GENERATOR_HPP
 

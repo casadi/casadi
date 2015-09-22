@@ -106,19 +106,20 @@ class CASADI_EXPORT CasadiException : public std::exception {
 #define CASADI_ASSERT_WHERE " on line " CASADI_ASSERT_STR(__LINE__) \
     " of file " CASADI_ASSERT_STR(__FILE__)
 
-#define casadi_log(msg) \
-  if (verbose()) { \
-    std::stringstream ss_internal_; \
-    ss_internal_ << msg; \
-    std::cout << "CasADi log message: " << ss_internal_.str() << std::endl; \
+  // Should be removed, cf. #890
+#define casadi_msg(msg)                                                 \
+  if (verbose()) {                                                      \
+    std::stringstream ss;                                               \
+    ss << msg;                                                          \
+    log(ss.str());                                                      \
   }
 
-#define casadi_error(msg) \
- {\
-  std::stringstream ss_internal_; \
-  ss_internal_ << CASADI_ASSERT_WHERE << std::endl << msg  <<  std::endl; \
-  throw casadi::CasadiException(ss_internal_.str()); \
- }
+#define casadi_error(msg)                                               \
+  {                                                                     \
+    std::stringstream ss_internal_;                                     \
+    ss_internal_ << CASADI_ASSERT_WHERE << std::endl << msg  <<  std::endl; \
+    throw casadi::CasadiException(ss_internal_.str());                  \
+  }
 
 // This assertion checks for illegal user inputs. It will not be checked if CASADI_NDEBUG is defined
 #define casadi_assert_message(x, msg) \
@@ -144,21 +145,22 @@ class CASADI_EXPORT CasadiException : public std::exception {
 #define casadi_assert(x) casadi_assert_message(x, "Please notify the CasADi developers.")
 #else
 #define casadi_assert(x) casadi_assert_message(x, \
-    "(Hint for developers: CasadiOptions.setCatchErrorsPython(False)" \
+    "(Hint for developers: CasadiOptions.setCatchErrorsSwig(False)" \
     " to obtain gdb stacktrace in python.)" \
     << std::endl << "Please notify the CasADi developers.")
 #endif
 
 // This is for warnings to be issued when casadi is not in release mode and an assertion fails
-#define casadi_assert_warning(x, msg) \
-if ((x)==false) { \
-  std::cerr << "CasADi warning: \"" << msg << "\" (assertion \"" CASADI_ASSERT_STR(x) \
-    "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl;  \
-}
+#define casadi_assert_warning(x, msg)                                   \
+  if ((x)==false) {                                                     \
+    casadi::userOut<true, casadi::PL_WARN>() << "CasADi warning: \"" << msg << "\" (assertion \"" \
+      CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl; \
+  }
 
 // This is for warnings to be issued when casadi is not in release mode
-#define casadi_warning(msg) \
-std::cerr << "CasADi warning: \"" << msg << "\" issued " CASADI_ASSERT_WHERE ". " << std::endl;
+#define casadi_warning(msg)                                                       \
+  casadi::userOut<true, casadi::PL_WARN>() << "CasADi warning: \"" << msg << "\" issued " \
+  CASADI_ASSERT_WHERE ". " << std::endl;
 
 // http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
 #define STRING(ITEMS) \

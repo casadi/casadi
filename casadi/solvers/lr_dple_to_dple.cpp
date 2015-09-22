@@ -24,14 +24,11 @@
 
 
 #include "lr_dple_to_dple.hpp"
-#include <cassert>
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
+#include <cassert>
 #include <numeric>
 
 INPUTSCHEME(LR_DPLEInput)
@@ -55,15 +52,13 @@ namespace casadi {
     LrDpleInternal::registerPlugin(casadi_register_lrdplesolver_dple);
   }
 
-  LrDpleToDple::LrDpleToDple(
-         const LrDpleStructure& st) :
-          LrDpleInternal(st) {
+  LrDpleToDple::LrDpleToDple(const std::map<std::string, std::vector<Sparsity> >& st) :
+    LrDpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_lr_dple_to_dple"); // name of the function
 
     Adaptor<LrDpleToDple, DpleInternal>::addOptions();
-
   }
 
   LrDpleToDple::~LrDpleToDple() {
@@ -98,14 +93,20 @@ namespace casadi {
       Vsp[k] = V_[k].sparsity();
     }
 
-    // Create an dplesolver instance
-    solver_ = DpleSolver(getOption(solvername()),
-                         dpleStruct("a", A_, "v", Vsp));
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    // Solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
 
-    std::vector<MX> Pr = solver_(dpleIn("a", horzcat(As_), "v", horzcat(V_)));
-    std::vector<MX> Ps_ = horzsplit(Pr[DPLE_P], n_);
+    // Create an dplesolver instance
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = A_;
+    tmp["v"] = Vsp;
+    solver_ = DpleSolver("solver", getOption(solvername()), tmp, options);
+
+    MX P = solver_(make_map("a", horzcat(As_), "v", horzcat(V_))).at("p");
+    std::vector<MX> Ps_ = horzsplit(P, n_);
 
     std::vector<MX> HPH(K_);
 
@@ -119,9 +120,8 @@ namespace casadi {
     }
 
 
-    f_ = MXFunction(lrdpleIn("a", As, "v", Vs, "c", Cs, "h", Hs),
+    f_ = MXFunction(name_, lrdpleIn("a", As, "v", Vs, "c", Cs, "h", Hs),
                     lrdpleOut("y", horzcat(HPH)));
-    f_.init();
 
     Wrapper<LrDpleToDple>::checkDimensions();
   }
@@ -132,11 +132,13 @@ namespace casadi {
     Wrapper<LrDpleToDple>::evaluate();
   }
 
-  Function LrDpleToDple::getDerForward(int nfwd) {
+  Function LrDpleToDple
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function LrDpleToDple::getDerReverse(int nadj) {
+  Function LrDpleToDple
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     return f_.derReverse(nadj);
   }
 
@@ -147,7 +149,12 @@ namespace casadi {
 
   LrDpleToDple* LrDpleToDple::clone() const {
     // Return a deep copy
-    LrDpleToDple* node = new LrDpleToDple(st_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[LR_Dple_STRUCT_A];
+    tmp["v"] = st_[LR_Dple_STRUCT_V];
+    tmp["c"] = st_[LR_Dple_STRUCT_C];
+    tmp["h"] = st_[LR_Dple_STRUCT_H];
+    LrDpleToDple* node = new LrDpleToDple(tmp);
     node->setOption(dictionary());
     return node;
   }

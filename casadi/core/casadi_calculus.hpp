@@ -74,6 +74,12 @@ namespace casadi {
     // Embedded function call
     OP_CALL,
 
+    // Find first nonzero in a vector
+    OP_FIND,
+
+    // Embedded function call in parallel
+    OP_MAP,
+
     // Matrix multiplication
     OP_MATMUL,
 
@@ -129,13 +135,22 @@ namespace casadi {
     OP_SETNONZEROS,
 
     // Set sparse
-    OP_SET_SPARSE,
+    OP_PROJECT,
 
     // Assertion
     OP_ASSERTION,
 
+    // Monitor
+    OP_MONITOR,
+
     // Norms
     OP_NORM2, OP_NORM1, OP_NORMINF, OP_NORMF,
+
+    // Horizontal repeat
+    OP_HORZREPMAT,
+
+    // Horizontal repeat sum
+    OP_HORZREPSUM,
 
     OP_ERFINV,
     OP_PRINTME,
@@ -249,9 +264,6 @@ namespace casadi {
     std::cout << "|> " << y << " : " << x << std::endl;
     return x;
   }
-
-  /// __copysign__ function
-  template<class T> T copysign(const T &x, const T &y) {return x.__copysign__(y);}
 
   #ifdef HAS_COPYSIGN
   using std::copysign;

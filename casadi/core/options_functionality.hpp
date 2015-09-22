@@ -66,7 +66,8 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
 /// \name Option Functionality
 /// @{
 
-    /** \brief  set an option.
+    /** \brief [DEPRECATED: pass option dictionary to function constructor]
+    Set an option.
     For a list of options, check the class documentation of this class.
 
     The setOptions are only considered before the init function.
@@ -74,13 +75,14 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
     */
     void setOption(const std::string &str, const GenericType& val);
 
-    /** \brief  set a set of options.
+    /** \brief [DEPRECATED: pass option dictionary to function constructor]
+    Set a set of options.
     For a list of options, check the class documentation of this class.
 
     The setOptions are only considered before the init function.
     If properties changes, the init function should be called again.
     */
-    void setOption(const Dictionary& dict, bool skipUnknown = false);
+    void setOption(const Dict& dict, bool skipUnknown = false);
 
     /** \brief  get an option value */
     GenericType getOption(const std::string &str) const;
@@ -92,13 +94,13 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
     bool hasSetOption(const std::string &str) const;
 
     /** \brief  Print options to a stream */
-    void printOptions(std::ostream &stream=CASADI_COUT) const;
+    void printOptions(std::ostream &stream=casadi::userOut()) const;
 
     /** \brief  Copy all options from another object*/
     void copyOptions(const OptionsFunctionality& obj, bool skipUnknown = false);
 
     /** \brief  Get the dictionary */
-    const Dictionary& dictionary() const;
+    const Dict& dictionary() const;
 
 /// @}
     /** \brief Get a list of all option names */
@@ -108,7 +110,7 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
     std::string getOptionDescription(const std::string &str) const;
 
     /** \brief Get the type of a certain option */
-    opt_type getOptionType(const std::string &str) const;
+    TypeID getOptionType(const std::string &str) const;
 
     /** \brief Get the type name of a certain option */
     std::string getOptionTypeName(const std::string &str) const;
@@ -135,6 +137,10 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
 
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
+
+    // Add an option to the recipe list
+    static Dict addOptionRecipe(const Dict& dict, const std::string& recipe);
+
 };
 
 /// \cond INTERNAL
@@ -164,7 +170,7 @@ virtual ~OptionsFunctionalityNode();
   If properties changes, the init function should be called again.
   (Ticket #54)
   */
-  void setOption(const Dictionary& dict, bool skipUnknown = false);
+  void setOption(const Dict& dict, bool skipUnknown = false);
 
   /** \brief Get a list of all option names */
   std::vector<std::string> getOptionNames() const;
@@ -173,7 +179,7 @@ virtual ~OptionsFunctionalityNode();
   std::string getOptionDescription(const std::string &str) const;
 
   /** \brief Get the type of a certain option */
-  opt_type getOptionType(const std::string &str) const;
+  TypeID getOptionType(const std::string &str) const;
 
   /** \brief Get the type name of a certain option */
   std::string getOptionTypeName(const std::string &str) const;
@@ -205,10 +211,10 @@ virtual ~OptionsFunctionalityNode();
   bool hasSetOption(const std::string &str) const;
 
   /** \brief  Print options to a stream */
-  void printOptions(std::ostream &stream=CASADI_COUT) const;
+  void printOptions(std::ostream &stream=casadi::userOut()) const;
 
   /** \brief  Print all information there is to know about a certain option */
-  void printOption(const std::string &name, std::ostream &stream = CASADI_COUT) const;
+  void printOption(const std::string &name, std::ostream &stream = userOut()) const;
 
   /** \brief  get an option value */
   GenericType getOption(const std::string &str) const;
@@ -223,7 +229,7 @@ virtual ~OptionsFunctionalityNode();
   void copyOptions(const OptionsFunctionality& obj, bool skipUnknown = false);
 
   /** \brief  Get the dictionary */
-  const Dictionary& dictionary() const;
+  const Dict& dictionary() const;
 
   /** \brief Get the best suggestions for a misspelled word using a dictionary
   *
@@ -249,7 +255,7 @@ virtual ~OptionsFunctionalityNode();
 
 
   void addOption(
-    const std::string &str, const opt_type& type,
+    const std::string &str, const TypeID& type,
     const GenericType &def_val=GenericType(), const std::string& desc="n/a",
     const std::vector<GenericType> &allowed_vals = std::vector<GenericType>(),
     bool inherit = false, std::vector<int> enum_values= std::vector<int>(),
@@ -263,8 +269,14 @@ virtual ~OptionsFunctionalityNode();
   *    "foo:5:description_foo|bar:6:description_bar|" -> same as above, but specifies documentation
   *
   **/
-  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val,
+  void addOption(const std::string &str, const TypeID& type, const GenericType &def_val,
                  const std::string& desc, const std::string &allowed_vals, bool inherit = false);
+
+  // Set default options according to defaults_recipe
+  void setDefaultOptions();
+
+  /// Set a recipe to populate default options
+  virtual void setDefaultOptions(const std::vector<std::string>& recipes) {}
 
 protected:
 
@@ -278,13 +290,13 @@ void setDefault(const std::string &str, const GenericType &def_val);
 private:
 
 /** \brief  Allowed options  */
-  std::map<std::string, opt_type> allowed_options;
+  std::map<std::string, TypeID> allowed_options;
 
 /** \brief  User-set options */
-  Dictionary dictionary_;
+  Dict dictionary_;
 
 /** \brief  Option defaults */
-  Dictionary defaults_;
+  Dict defaults_;
 
 /** \brief  Description for the options */
   std::map<std::string, std::string> description_;

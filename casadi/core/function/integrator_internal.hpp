@@ -80,23 +80,25 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief  Propagate the sparsity pattern through a set of
-     * directional derivatives forward or backward */
-    virtual void spEvaluate(bool fwd);
+    /** \brief  Propagate sparsity forward */
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd) { return true;}
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function getDerForward(int nfwd);
-    virtual bool hasDerForward() const { return true;}
+    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
+    virtual int numDerForward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function getDerReverse(int nadj);
-    virtual bool hasDerReverse() const { return true;}
+    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
+    virtual int numDerReverse() const { return 64;}
     ///@}
 
     /** \brief  Set stop time for the integration */

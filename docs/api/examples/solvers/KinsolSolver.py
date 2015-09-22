@@ -60,14 +60,14 @@ k_     = 0.2
 params_ = [0.1,0.1,alpha_,k_,sigma_]
 
 #! We create a ImplicitFunction instance
-f=SXFunction([vertcat([a,gamma]),vertcat(params)],[vertcat([res0,res1])])
-s=ImplicitFunction("kinsol", f)
-s.setOption("strategy","linesearch")
-s.setOption("abstol",1e-14)
+f=SXFunction("f", [vertcat([a,gamma]),vertcat(params)],[vertcat([res0,res1])])
+opts = {}
+opts["strategy"] = "linesearch"
+opts["abstol"] = 1e-14
 
 #$ Require $a > 0$ and $\gamma < 0$
-s.setOption("constraints",[2,-2])
-s.init()
+opts["constraints"] = [2,-2]
+s=ImplicitFunction("s", "kinsol", f, opts)
 s.setInput(params_,1)
 
 #$ Initialize [$a$,$\gamma$] with a guess and solve

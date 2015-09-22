@@ -64,40 +64,39 @@ def comp(name):
 comp("BasicVolumeMassConservation")
 
 # Read a model from XML
-ocp = SymbolicOCP()
-ocp.parseFMI('BasicVolumeMassConservation.xml')
+ivp = DaeBuilder()
+ivp.parseFMI('BasicVolumeMassConservation.xml')
 
 # Transform into an explicit ODE
-ocp.makeExplicit()
+ivp.makeExplicit()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
-  t = ocp.t,
-  x = ocp.x,
-  p = ocp.p
+  t = ivp.t,
+  x = vertcat(ivp.x),
+  p = vertcat(ivp.p)
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
-integrator = Integrator("cvodes", dae)
+dae = MXFunction('dae', dae_fcn_in, daeOut(ode=vertcat(ivp.ode)))
+integrator = Integrator("integrator", "cvodes", dae)
 
 # Output function
-output_fcn_out = substitute([ocp("m"),ocp("P")], [ocp.i], [ocp.idef])
+output_fcn_out = substitute([ivp("m"),ivp("P")], ivp.d, ivp.ddef)
 output_fcn_in = daeIn(
-  t=ocp.t,
-  x = ocp.x,
-  z = ocp.z,
-  p = vertcat((ocp.p,ocp.u))
+  t=ivp.t,
+  x = vertcat(ivp.x),
+  z = vertcat(ivp.z),
+  p = vertcat(ivp.p + ivp.u)
 )
-output_fcn = SXFunction(output_fcn_in,output_fcn_out)
+output_fcn = MXFunction("output",output_fcn_in,output_fcn_out)
 
 # Create a simulator
 grid = NP.linspace(0,1,100)
-simulator = Simulator(integrator,output_fcn,grid)
-simulator.init()
+simulator = Simulator("simulator", integrator,output_fcn,grid)
 
 # Pass initial conditions
-x0 = ocp.start(ocp.x)
+x0 = ivp.start(vertcat(ivp.x))
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -123,40 +122,39 @@ plt.draw()
 comp("BasicVolumeEnergyConservation")
 
 # Allocate a parser and load the xml
-ocp = SymbolicOCP()
-ocp.parseFMI('BasicVolumeEnergyConservation.xml')
+ivp = DaeBuilder()
+ivp.parseFMI('BasicVolumeEnergyConservation.xml')
 
 # Transform into an explicit ODE
-ocp.makeExplicit()
+ivp.makeExplicit()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
-  t = ocp.t,
-  x = ocp.x,
-  p = ocp.p
+  t = ivp.t,
+  x = vertcat(ivp.x),
+  p = vertcat(ivp.p)
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
-integrator = Integrator("cvodes", dae)
+dae = MXFunction("dae",dae_fcn_in,daeOut(ode=vertcat(ivp.ode)))
+integrator = Integrator("integrator", "cvodes", dae)
 
 # Output function
-output_fcn_out = substitute([ocp("T")], [ocp.i], [ocp.idef])
+output_fcn_out = substitute([ivp("T")], ivp.d, ivp.ddef)
 output_fcn_in = daeIn(
-  t=ocp.t,
-  x = ocp.x,
-  z = ocp.z,
-  p = vertcat((ocp.p,ocp.u))
+  t=ivp.t,
+  x = vertcat(ivp.x),
+  z = vertcat(ivp.z),
+  p = vertcat(ivp.p + ivp.u)
 )
-output_fcn = SXFunction(output_fcn_in,output_fcn_out)
+output_fcn = MXFunction("output",output_fcn_in,output_fcn_out)
 
 # Create a simulator
 grid = NP.linspace(0,10,100)
-simulator = Simulator(integrator,output_fcn,grid)
-simulator.init()
+simulator = Simulator("simulator", integrator,output_fcn,grid)
 
 # Pass initial conditions
-x0 = ocp.start(ocp.x)
+x0 = ivp.start(vertcat(ivp.x))
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -175,40 +173,39 @@ plt.draw()
 comp("BasicVolumeTest")
 
 # Allocate a parser and load the xml
-ocp = SymbolicOCP()
-ocp.parseFMI('BasicVolumeTest.xml')
+ivp = DaeBuilder()
+ivp.parseFMI('BasicVolumeTest.xml')
 
 # Transform into an explicit ODE
-ocp.makeExplicit()
+ivp.makeExplicit()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
-  t = ocp.t,
-  x = ocp.x,
-  p = ocp.p
+  t = ivp.t,
+  x = vertcat(ivp.x),
+  p = vertcat(ivp.p)
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
-integrator = Integrator("cvodes", dae)
+dae = MXFunction("dae",dae_fcn_in,daeOut(ode=densify(vertcat(ivp.ode))))
+integrator = Integrator("integrator", "cvodes", dae)
 
 # Output function
-output_fcn_out = substitute([ocp("T"),ocp("U"),ocp("V")], [ocp.i], [ocp.idef])
+output_fcn_out = substitute([ivp("T"),ivp("U"),ivp("V")], ivp.d, ivp.ddef)
 output_fcn_in = daeIn(
-  t=ocp.t,
-  x = ocp.x,
-  z = ocp.z,
-  p = vertcat((ocp.p,ocp.u))
+  t=ivp.t,
+  x = vertcat(ivp.x),
+  z = vertcat(ivp.z),
+  p = vertcat(ivp.p + ivp.u)
 )
-output_fcn = SXFunction(output_fcn_in,output_fcn_out)
+output_fcn = MXFunction("output",output_fcn_in,output_fcn_out)
 
 # Create a simulator
 grid = NP.linspace(0,2,100)
-simulator = Simulator(integrator,output_fcn,grid)
-simulator.init()
+simulator = Simulator("simulator", integrator, output_fcn, grid)
 
 # Pass initial conditions
-x0 = ocp.start(ocp.x)
+x0 = ivp.start(vertcat(ivp.x))
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -235,14 +232,14 @@ plt.draw()
 comp("CtrlFlowSystem")
 
 # Allocate a parser and load the xml
-ocp = SymbolicOCP()
-ocp.parseFMI('CtrlFlowSystem.xml')
+ivp = DaeBuilder()
+ivp.parseFMI('CtrlFlowSystem.xml')
 
 # Transform into a semi-explicit ODE
-ocp.makeSemiExplicit()
+ivp.makeSemiExplicit()
 
-# Print the ocp
-print ocp
+# Print the ivp
+print ivp
 
 # The problem has no differential states, so instead of integrating, we just solve for mdot...
 

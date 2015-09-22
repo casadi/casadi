@@ -91,7 +91,7 @@ if (NOT MATLAB_ROOT)
     elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")   # Check if this is a Mac
       # we look in the applications folder
       # Search for a version of Matlab available, starting from the most modern one to older versions
-      foreach(MATVER "2015b" "2015a" "R2014b" "R2014a" "R2013b" "R2013a" "R2012b" "R2012a" "R2011b" "R2011a" "R2010b" "R2010a" "R2009b" "R2009a" "R2008b")
+      foreach(MATVER "R2015b" "R2015a" "R2014b" "R2014a" "R2013b" "R2013a" "R2012b" "R2012a" "R2011b" "R2011a" "R2010b" "R2010a" "R2009b" "R2009a" "R2008b")
         if((NOT DEFINED MATLAB_ROOT) OR ("${MATLAB_ROOT}" STREQUAL ""))
           if(EXISTS /Applications/MATLAB_${MATVER}.app)
             set(MATLAB_ROOT /Applications/MATLAB_${MATVER}.app)
@@ -184,19 +184,23 @@ endif()
 # Get paths to the Matlab MEX libraries
 find_library(MATLAB_MEX_LIBRARY
     ${LIBPREFIX}mex
-    ${MATLAB_LIBRARIES_DIR}
+    HINTS ${MATLAB_LIBRARIES_DIR}
     )
 find_library(MATLAB_MX_LIBRARY
     ${LIBPREFIX}mx
-    ${MATLAB_LIBRARIES_DIR}
+    HINTS ${MATLAB_LIBRARIES_DIR}
     )
 find_library(MATLAB_MAT_LIBRARY
     ${LIBPREFIX}mat
-    ${MATLAB_LIBRARIES_DIR}
+    HINTS ${MATLAB_LIBRARIES_DIR}
     )
 find_library(MATLAB_ENG_LIBRARY
     ${LIBPREFIX}eng
-    ${MATLAB_LIBRARIES_DIR}
+    HINTS ${MATLAB_LIBRARIES_DIR}
+    )
+find_library(MATLAB_UT_LIBRARY
+    ${LIBPREFIX}ut
+    HINTS ${MATLAB_LIBRARIES_DIR}
     )
 
 # Get path to the include directory
@@ -223,7 +227,7 @@ execute_process(
     )
 
 set(MATLAB_LIBRARIES
-  ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY}
+  ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY} ${MATLAB_UT_LIBRARY}
   CACHE PATH "Libraries to link mex files"
 )
 

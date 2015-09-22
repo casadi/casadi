@@ -25,9 +25,6 @@
 
 #include "cle_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "../mx/mx_tools.hpp"
-#include "../sx/sx_tools.hpp"
 #include "../function/mx_function.hpp"
 #include "../function/sx_function.hpp"
 
@@ -37,10 +34,9 @@ OUTPUTSCHEME(CLEOutput)
 using namespace std;
 namespace casadi {
 
-  CleInternal::CleInternal(const CleStructure& st,
-                             int nrhs,
-                             bool transp) :
-      st_(st), nrhs_(nrhs), transp_(transp) {
+  CleInternal::CleInternal(const std::map<std::string, Sparsity>& st,
+                           int nrhs, bool transp) :
+    nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -52,11 +48,23 @@ namespace casadi {
               "has eigenvalues greater than 1-eps_unstable");
     addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
 
-    if (nrhs_==1) {
-      input_.scheme = SCHEME_CLEInput;
-      output_.scheme = SCHEME_CLEOutput;
+    st_.resize(Cle_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[Cle_STRUCT_A]=i->second;
+      } else if (i->first=="v") {
+        st_[Cle_STRUCT_V]=i->second;
+      } else if (i->first=="c") {
+        st_[Cle_STRUCT_C]=i->second;
+      } else {
+        casadi_error("Unrecognized field in Cle structure: " << i->first);
+      }
     }
 
+    if (nrhs_==1) {
+      ischeme_ = IOScheme(SCHEME_CLEInput);
+      oscheme_ = IOScheme(SCHEME_CLEOutput);
+    }
   }
 
   CleInternal::~CleInternal() {
@@ -72,7 +80,7 @@ namespace casadi {
     A_ = st_[Cle_STRUCT_A];
     V_ = st_[Cle_STRUCT_V];
 
-    casadi_assert_message(V_.isSymmetric(), "V must be symmetric but got "
+    casadi_assert_message(V_.issymmetric(), "V must be symmetric but got "
                           << V_.dimString() << ".");
 
     casadi_assert_message(A_.size1()==V_.size1(), "First dimension of A ("
@@ -85,18 +93,15 @@ namespace casadi {
                            << " ) deviating from n = " << n << ".");
 
     // Allocate inputs
-    setNumInputs(1+nrhs_);
-
+    ibuf_.resize(1+nrhs_);
     input(0)  = DMatrix::zeros(A_);
-
     for (int i=0;i<nrhs_;++i) {
       input(1+i)  = DMatrix::zeros(V_);
     }
 
     // Allocate outputs
     Sparsity P = Sparsity::dense(V_.size1(), V_.size1());
-
-    setNumOutputs(nrhs_);
+    obuf_.resize(nrhs_);
     for (int i=0;i<nrhs_;++i) {
       output(i) = DMatrix::zeros(P);
     }

@@ -60,7 +60,7 @@ void simpleODE(Function& ffcn, double& tf, vector<double>& x0, double& u0){
   SX quad = pow(v,3) + pow((3-sin(t))-u,2);
 
   // Callback function
-  ffcn = SXFunction(daeIn("t",t,"x",x,"p",u),daeOut("ode",ode,"quad",quad));
+  ffcn = SXFunction("simple_ode", daeIn("t", t, "x", x, "p", u), daeOut("ode", ode, "quad", quad));
 
   // End time
   tf = 0.5;
@@ -96,8 +96,9 @@ void simpleDAE(Function& ffcn, double& tf, vector<double>& x0, double& u0){
   SX quad = x*x + 3.0*u*u;
   
   // Callback function
-  ffcn = SXFunction(daeIn("x",x,"z",z,"p",u),daeOut("ode",ode,"alg",alg,"quad",quad));
-  
+  ffcn = SXFunction("simple_dae", daeIn("x", x, "z", z, "p", u),
+                    daeOut("ode", ode, "alg", alg, "quad", quad));
+
   // End time
   tf = 5;
 
@@ -136,129 +137,117 @@ int main(){
     enum Integrators{CVODES,IDAS,RK,COLLOCATION,OLD_COLLOCATION,NUM_INTEGRATORS};
     for(int integrator=0; integrator<NUM_INTEGRATORS; ++integrator){
 
+      // Integrator options
+      Dict opts = make_dict("tf", tf);
+
       // Get integrator
       Integrator I;
       switch(integrator){
       case CVODES:
         if(problem==DAE) continue; // Skip if DAE
         cout << endl << "== cvodes == " << endl;
-        I = Integrator("cvodes", ffcn);
+        I = Integrator("I", "cvodes", ffcn, opts);
         break;
       case IDAS:
         cout << endl << "== idas == " << endl;
-        I = Integrator("idas", ffcn);
+        I = Integrator("I", "idas", ffcn, opts);
         break;
       case RK:
         if(problem==DAE) continue; // Skip if DAE
         cout << endl << "== RKIntegrator == " << endl;
-        I = Integrator("rk", ffcn);
+        I = Integrator("I", "rk", ffcn, opts);
         break;
-      case COLLOCATION:        
+      case COLLOCATION:
         cout << endl << "== CollocationIntegrator == " << endl;
-        I = Integrator("collocation", ffcn);
-
-        // Set collocation integrator specific options
-        I.setOption("implicit_solver","kinsol");
-        I.setOption("collocation_scheme","legendre");
-
-        {
-          Dictionary kinsol_options;
-          kinsol_options["linear_solver"] = "csparse";
-          I.setOption("implicit_solver_options",kinsol_options);
-        }
+        opts["implicit_solver"] = "kinsol";
+        opts["collocation_scheme"] = "legendre";
+        opts["implicit_solver_options"] = make_dict("linear_solver", "csparse");
+        I = Integrator("I", "collocation", ffcn, opts);
         break;
       case OLD_COLLOCATION:        
         cout << endl << "== OldCollocationIntegrator == " << endl;
-        I = Integrator("oldcollocation", ffcn);
-
-        // Set collocation integrator specific options
-        I.setOption("expand_f",true);
-        I.setOption("collocation_scheme","legendre");
-        I.setOption("implicit_solver", "kinsol");
-        {
-          Dictionary kinsol_options;
-          kinsol_options["linear_solver"] = "csparse";
-          I.setOption("implicit_solver_options",kinsol_options);
-        }
+        opts["expand_f"] = true;
+        opts["collocation_scheme"] = "legendre";
+        opts["implicit_solver"] = "kinsol";
+        opts["implicit_solver_options"] = make_dict("linear_solver", "csparse");
+        I = Integrator("I", "oldcollocation", ffcn, opts);
         break;
       }
-      
-      // Set common options
-      I.setOption("tf",tf);
-      
-      // Initialize the integrator
-      I.init();
+
+      // Buffers for evaluation
+      std::map<std::string, DMatrix> arg, res;
       
       // Integrate to get results
-      I.setInput(x0,"x0");
-      I.setInput(u0,"p");
-      I.evaluate();
-      DMatrix xf = I.output("xf");
-      DMatrix qf = I.output("qf");
+      arg["x0"] = x0;
+      arg["p"] = u0;
+      res = I(arg);
+      vector<double> xf(res.at("xf"));
+      vector<double> qf(res.at("qf"));
       cout << setw(50) << "Unperturbed solution: " << "xf  = " << xf <<  ", qf  = " << qf << endl;
 
       // Perturb solution to get a finite difference approximation
       double h = 0.001;
-      I.setInput(u0+h,"p");
-      I.evaluate();
-      DMatrix xf_pert = I.output("xf");
-      DMatrix qf_pert = I.output("qf");
-      cout << setw(50) << "Finite difference approximation: " << "d(xf)/d(p) = " << (xf_pert-xf)/h << ", d(qf)/d(p) = " << (qf_pert-qf)/h << endl;
+      arg["p"] = u0+h;
+      res = I(arg);
+      vector<double> fd_xf((res.at("xf")-xf)/h);
+      vector<double> fd_qf((res.at("qf")-qf)/h);
+      cout << setw(50) << "Finite difference approximation: " << "d(xf)/d(p) = " << fd_xf << ", d(qf)/d(p) = " << fd_qf << endl;
 
       // Calculate once, forward
-      Function I_fwd = I.derivative(1,0);
-      I_fwd.setInput(x0,"der_x0");
-      I_fwd.setInput(u0,"der_p");
-      I_fwd.setInput(0.0,"fwd0_x0");
-      I_fwd.setInput(1.0,"fwd0_p");
-      I_fwd.evaluate();
-      DMatrix fwd_xf = I_fwd.output("fwd0_xf");
-      DMatrix fwd_qf = I_fwd.output("fwd0_qf");
+      Function I_fwd = I.derivative(1, 0);
+      arg.clear();
+      arg["der_x0"] = x0;
+      arg["der_p"] = u0;
+      arg["fwd0_x0"] = 0;
+      arg["fwd0_p"] = 1;
+      res = I_fwd(arg);
+      vector<double> fwd_xf(res.at("fwd0_xf"));
+      vector<double> fwd_qf(res.at("fwd0_qf"));
       cout << setw(50) << "Forward sensitivities: " << "d(xf)/d(p) = " << fwd_xf << ", d(qf)/d(p) = " << fwd_qf << endl;
 
       // Calculate once, adjoint
-      Function I_adj = I.derivative(0,1);
-      I_adj.setInput(x0,"der_x0");
-      I_adj.setInput(u0,"der_p");
-      I_adj.setInput(0.0,"adj0_xf");
-      I_adj.setInput(1.0,"adj0_qf");
-      I_adj.evaluate();
-      DMatrix adj_x0 = I_adj.output("adj0_x0");
-      DMatrix adj_p = I_adj.output("adj0_p");
+      Function I_adj = I.derivative(0, 1);
+      arg.clear();
+      arg["der_x0"] = x0;
+      arg["der_p"] = u0;
+      arg["adj0_xf"] = 0;
+      arg["adj0_qf"] = 1;
+      res = I_adj(arg);
+      vector<double> adj_x0(res.at("adj0_x0"));
+      vector<double> adj_p(res.at("adj0_p"));
       cout << setw(50) << "Adjoint sensitivities: " << "d(qf)/d(x0) = " << adj_x0 << ", d(qf)/d(p) = " << adj_p << endl;
 
       // Perturb adjoint solution to get a finite difference approximation of the second order sensitivities
-      I_adj.setInput(x0,"der_x0");
-      I_adj.setInput(u0+h,"der_p");
-      I_adj.setInput(0.0,"adj0_xf");
-      I_adj.setInput(1.0,"adj0_qf");
-      I_adj.evaluate();
-      DMatrix adj_x0_pert = I_adj.output("adj0_x0");
-      DMatrix adj_p_pert = I_adj.output("adj0_p");
-      cout << setw(50) << "FD of adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << (adj_x0_pert-adj_x0)/h << ", d2(qf)/d(p)d(p) = " << (adj_p_pert-adj_p)/h << endl;
+      arg["der_p"] = u0+h;
+      res = I_adj(arg);
+      vector<double> fd_adj_x0((res.at("adj0_x0")-adj_x0)/h);
+      vector<double> fd_adj_p((res.at("adj0_p")-adj_p)/h);
+      cout << setw(50) << "FD of adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fd_adj_x0 << ", d2(qf)/d(p)d(p) = " << fd_adj_p << endl;
       
       // Forward over adjoint to get the second order sensitivities
-      Function I_foa = I_adj.derivative(1,0);
-      I_foa.setInput(x0,"der_der_x0");
-      I_foa.setInput(u0,"der_der_p");
-      I_foa.setInput(1.0,"fwd0_der_p");
-      I_foa.setInput(0.0,"der_adj0_xf");
-      I_foa.setInput(1.0,"der_adj0_qf");
-      I_foa.evaluate();
-      DMatrix fwd_adj_x0 = I_foa.output("fwd0_adj0_x0");
-      DMatrix fwd_adj_p = I_foa.output("fwd0_adj0_p");
+      Function I_foa = I_adj.derivative(1, 0);
+      arg.clear();
+      arg["der_der_x0"] = x0;
+      arg["der_der_p"] = u0;
+      arg["fwd0_der_p"] = 1;
+      arg["der_adj0_xf"] = 0;
+      arg["der_adj0_qf"] = 1;
+      res = I_foa(arg);
+      vector<double> fwd_adj_x0(res.at("fwd0_adj0_x0"));
+      vector<double> fwd_adj_p(res.at("fwd0_adj0_p"));
       cout << setw(50) << "Forward over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fwd_adj_x0 << ", d2(qf)/d(p)d(p) = " << fwd_adj_p << endl;
 
       // Adjoint over adjoint to get the second order sensitivities
-      Function I_aoa = I_adj.derivative(0,1);
-      I_aoa.setInput(x0,"der_der_x0");
-      I_aoa.setInput(u0,"der_der_p");
-      I_aoa.setInput(0.0,"der_adj0_xf");
-      I_aoa.setInput(1.0,"der_adj0_qf");
-      I_aoa.setInput(1.0,"adj0_adj0_p");
-      I_aoa.evaluate();
-      DMatrix adj_adj_x0 = I_aoa.output("adj0_der_x0");
-      DMatrix adj_adj_p = I_aoa.output("adj0_der_p");
+      Function I_aoa = I_adj.derivative(0, 1);
+      arg.clear();
+      arg["der_der_x0"] = x0;
+      arg["der_der_p"] = u0;
+      arg["der_adj0_xf"] = 0;
+      arg["der_adj0_qf"] = 1;
+      arg["adj0_adj0_p"] = 1;
+      res = I_aoa(arg);
+      vector<double> adj_adj_x0(res.at("adj0_der_x0"));
+      vector<double> adj_adj_p(res.at("adj0_der_p"));
       cout << setw(50) << "Adjoint over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << adj_adj_x0 << ", d2(qf)/d(p)d(p) = " << adj_adj_p << endl;
     }
   }

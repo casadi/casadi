@@ -62,18 +62,18 @@ int main(){
   int nu = u.size1();
 
   // Bounds and initial guess for the control
-  double u_min[] =  { -0.75 };
-  double u_max[]  = {  1.0  };
-  double u_init[] = {  0.0  };
+  vector<double> u_min =  { -0.75 };
+  vector<double> u_max  = {  1.0  };
+  vector<double> u_init = {  0.0  };
 
   // Bounds and initial guess for the state
-  double x0_min[] = {   0,    1 };
-  double x0_max[] = {   0,    1 };
-  double x_min[]  = {-inf, -inf };
-  double x_max[]  = { inf,  inf };
-  double xf_min[] = {   0,    0 };
-  double xf_max[] = {   0,    0 };
-  double x_init[] = {   0,    0 };
+  vector<double> x0_min = {   0,    1 };
+  vector<double> x0_max = {   0,    1 };
+  vector<double> x_min  = {-inf, -inf };
+  vector<double> x_max  = { inf,  inf };
+  vector<double> xf_min = {   0,    0 };
+  vector<double> xf_max = {   0,    0 };
+  vector<double> x_init = {   0,    0 };
 
   // Final time
   double tf = 20.0;
@@ -84,13 +84,10 @@ int main(){
   // ODE right hand side and quadrature
   SX ode = vertcat((1 - s*s)*r - s + u, r);
   SX quad = r*r + s*s + u*u;
-  SXFunction rhs(daeIn("x",x,"p",u),daeOut("ode",ode,"quad",quad));
+  SXFunction rhs("rhs", daeIn("x", x, "p", u), daeOut("ode", ode, "quad", quad));
 
   // Create an integrator (CVodes)
-  Integrator integrator("cvodes", rhs);
-  integrator.setOption("t0",0);
-  integrator.setOption("tf",tf/ns);
-  integrator.init();
+  Integrator integrator("integrator", "cvodes", rhs, make_dict("t0", 0, "tf", tf/ns));
   
   // Total number of NLP variables
   int NV = nx*(ns+1) + nu*ns;
@@ -110,28 +107,28 @@ int main(){
     // Local state
     X.push_back( V[Slice(offset,offset+nx)] );
     if(k==0){
-      v_min.insert(v_min.end(),x0_min,x0_min+nx);
-      v_max.insert(v_max.end(),x0_max,x0_max+nx);
+      v_min.insert(v_min.end(), x0_min.begin(), x0_min.end());
+      v_max.insert(v_max.end(), x0_max.begin(), x0_max.end());
     } else {
-      v_min.insert(v_min.end(),x_min,x_min+nx);
-      v_max.insert(v_max.end(),x_max,x_max+nx);
+      v_min.insert(v_min.end(), x_min.begin(), x_min.end());
+      v_max.insert(v_max.end(), x_max.begin(), x_max.end());
     }
-    v_init.insert(v_init.end(),x_init,x_init+nx);    
+    v_init.insert(v_init.end(), x_init.begin(), x_init.end());
     offset += nx;
     
     // Local control
     U.push_back( V[Slice(offset,offset+nu)] );
-    v_min.insert(v_min.end(),u_min,u_min+nu);
-    v_max.insert(v_max.end(),u_max,u_max+nu);
-    v_init.insert(v_init.end(),u_init,u_init+nu);    
+    v_min.insert(v_min.end(), u_min.begin(), u_min.end());
+    v_max.insert(v_max.end(), u_max.begin(), u_max.end());
+    v_init.insert(v_init.end(), u_init.begin(), u_init.end());
     offset += nu;
   }
   
   // State at end
   X.push_back(V[Slice(offset,offset+nx)]);
-  v_min.insert(v_min.end(),xf_min,xf_min+nx);
-  v_max.insert(v_max.end(),xf_max,xf_max+nx);
-  v_init.insert(v_init.end(),x_init,x_init+nx);    
+  v_min.insert(v_min.end(), xf_min.begin(), xf_min.end());
+  v_max.insert(v_max.end(), xf_max.begin(), xf_max.end());
+  v_init.insert(v_init.end(), x_init.begin(), x_init.end());    
   offset += nx;
   
   // Make sure that the size of the variable vector is consistent with the number of variables that we have referenced
@@ -145,45 +142,41 @@ int main(){
 
   // Loop over shooting nodes
   for(int k=0; k<ns; ++k){
-    // Input to the integrator
-    vector<MX> int_in(INTEGRATOR_NUM_IN);
-    int_in[INTEGRATOR_P] = U[k];
-    int_in[INTEGRATOR_X0] = X[k];
-
     // Create an evaluation node
-    vector<MX> I_out = integrator(int_in);
+    map<string, MX> I_out = integrator(make_map("x0", X[k], "p", U[k]));
 
     // Save continuity constraints
-    g.push_back( I_out[INTEGRATOR_XF] - X[k+1] );
+    g.push_back( I_out.at("xf") - X[k+1] );
     
     // Add objective function contribution
-    J += I_out[INTEGRATOR_QF];
+    J += I_out.at("qf");
   }
   
   // NLP 
-  MXFunction nlp(nlpIn("x",V),nlpOut("f",J,"g",vertcat(g)));
-  
-  // Create an NLP solver instance
-  NlpSolver nlp_solver("ipopt", nlp);
-  nlp_solver.setOption("tol",1e-5);
-  nlp_solver.setOption("max_iter",100);
-  nlp_solver.setOption("linear_solver","ma57");
-  nlp_solver.init();
-    
-  // Initial guess and bounds on variables
-  nlp_solver.setInput(v_init,"x0");
-  nlp_solver.setInput(v_min,"lbx");
-  nlp_solver.setInput(v_max,"ubx");
-  
-  // All nonlinear constraints are equality constraints
-  nlp_solver.setInput(0.,"lbg");
-  nlp_solver.setInput(0.,"ubg");
-  
-  // Solve the problem
-  nlp_solver.evaluate();
+  MXFunction nlp("nlp", nlpIn("x", V), nlpOut("f", J, "g", vertcat(g)));
 
+  // Set options
+  Dict opts;
+  opts["tol"] = 1e-5;
+  opts["max_iter"] = 100;
+  opts["linear_solver"] = "ma27";
+
+  // Create an NLP solver and buffers
+  NlpSolver nlp_solver("nlp_solver", "ipopt", nlp, opts);
+  std::map<std::string, DMatrix> arg, res;
+
+  // Bounds and initial guess
+  arg["lbx"] = v_min;
+  arg["ubx"] = v_max;
+  arg["lbg"] = 0;
+  arg["ubg"] = 0;
+  arg["x0"] = v_init;
+
+  // Solve the problem
+  res = nlp_solver(arg);
+    
   // Optimal solution of the NLP
-  const Matrix<double>& V_opt = nlp_solver.output("x");
+  const Matrix<double>& V_opt = res.at("x");
   
   // Get the optimal state trajectory
   vector<double> r_opt(ns+1), s_opt(ns+1);

@@ -59,11 +59,12 @@ namespace casadi {
     virtual CplexInterface* clone() const;
 
     /** \brief  Create a new QP Solver */
-    static QpSolverInternal* creator(const QPStructure& st)
-    { return new CplexInterface(st);}
+    static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
+      return new CplexInterface(st);
+    }
 
     /// Constructor using sparsity patterns
-    explicit CplexInterface(const std::vector<Sparsity>& st);
+    explicit CplexInterface(const std::map<std::string, Sparsity>& st);
 
     /// Destructor
     virtual ~CplexInterface();

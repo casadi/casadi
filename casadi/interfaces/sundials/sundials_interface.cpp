@@ -24,10 +24,8 @@
 
 
 #include "sundials_interface.hpp"
+
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
-#include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/function/sx_function.hpp"
 
@@ -117,12 +115,12 @@ SundialsInterface::SundialsInterface(const Function& f, const Function& g)
             "Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]");
   addOption("linear_solver",               OT_STRING,     GenericType(),
             "A custom linear solver creator function");
-  addOption("linear_solver_options",       OT_DICTIONARY,       GenericType(),
+  addOption("linear_solver_options",       OT_DICT,       GenericType(),
             "Options to be passed to the linear solver");
   addOption("linear_solverB",              OT_STRING,     GenericType(),
             "A custom linear solver creator function for backwards integration "
             "[default: equal to linear_solver]");
-  addOption("linear_solver_optionsB",      OT_DICTIONARY,       GenericType(),
+  addOption("linear_solver_optionsB",      OT_DICT,       GenericType(),
             "Options to be passed to the linear solver for backwards integration "
             "[default: equal to linear_solver_options]");
 }
@@ -242,7 +240,7 @@ void SundialsInterface::init() {
       "be square but got " << jac_.output().dimString());
 
     casadi_assert_message(
-      !jac_.output().sparsity().isSingular(),
+      !jac_.output().sparsity().issingular(),
       "SundialsInterface::init: singularity - the jacobian of the forward "
       "problem is structurally rank-deficient. sprank(J)="
       << sprank(jac_.output()) << " (in stead of "<< jac_.output().size2()
@@ -261,7 +259,7 @@ void SundialsInterface::init() {
       "square but got " << jacB_.output().dimString());
 
     casadi_assert_message(
-      !jacB_.output().sparsity().isSingular(),
+      !jacB_.output().sparsity().issingular(),
       "SundialsInterface::init: singularity - the jacobian of the backward"
       " problem is structurally rank-deficient. sprank(J)="
       << sprank(jacB_.output()) << " (instead of "
@@ -269,28 +267,31 @@ void SundialsInterface::init() {
   }
 
   if (hasSetOption("linear_solver") && !jac_.isNull()) {
-    // Create a linear solver
-    std::string linear_solver_name = getOption("linear_solver");
-    linsol_ = LinearSolver(linear_solver_name, jac_.output().sparsity(), 1);
-    // Pass options
+    // Options
+    Dict linear_solver_options;
     if (hasSetOption("linear_solver_options")) {
-      linsol_.setOption(getOption("linear_solver_options"));
+      linear_solver_options = getOption("linear_solver_options");
     }
-    linsol_.init();
+
+    // Create a linear solver
+    linsol_ = LinearSolver("linsol", getOption("linear_solver"), jac_.output().sparsity(),
+                           1, linear_solver_options);
   }
 
   if ((hasSetOption("linear_solverB") || hasSetOption("linear_solver")) && !jacB_.isNull()) {
+    // Linear solver options
+    Dict opts;
+    if (hasSetOption("linear_solver_optionsB")) {
+      opts = getOption("linear_solver_optionsB");
+    } else if (hasSetOption("linear_solver_options")) {
+      opts = getOption("linear_solver_options");
+    }
+
     // Create a linear solver
     std::string linear_solver_name =
-        hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
-    linsolB_ = LinearSolver(linear_solver_name, jacB_.output().sparsity(), 1);
-    // Pass options
-    if (hasSetOption("linear_solver_optionsB")) {
-      linsolB_.setOption(getOption("linear_solver_optionsB"));
-    } else if (hasSetOption("linear_solver_options")) {
-      linsolB_.setOption(getOption("linear_solver_options"));
-    }
-    linsolB_.init();
+      hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
+    linsolB_ = LinearSolver("linsolB", linear_solver_name, jacB_.output().sparsity(),
+                            1, opts);
   }
 }
 

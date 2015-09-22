@@ -35,7 +35,7 @@ doxpublish:
 	python extra/generate_overview.py
 	perl -n -i~ -w -e 'if (/<div class="contents">/) { print qq|<div class="contents"> <img src="overview.png" border="0" alt="" usemap="#overview"/>|; open(IN, "<overview.map"); print while(<IN>); } else {print;}' html/index.html
 	cp overview.png html/overview.png
-	patch -u Doxyfile.in publish.patch -o - | sed 's/PROJECT_NUMBER         = /PROJECT_NUMBER         = $(REVISION)/' |    sed 's/PROJECT_BRIEF          = /PROJECT_BRIEF          = $(READABLEREVISION)/' |    sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/HTML_OUTPUT            = html/HTML_OUTPUT            = internal/' | sed 's/COLLABORATION_GRAPH    = NO/COLLABORATION_GRAPH    = YES/' | sed 's/INLINE_SOURCES         = NO/INLINE_SOURCES         = YES/' | sed 's/REFERENCED_BY_RELATION = NO/REFERENCED_BY_RELATION = YES/' | sed 's/REFERENCES_RELATION    = NO/REFERENCES_RELATION    = YES/'| sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/style\/header.html/style\/header_internal.html/'| sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             WITHOUT_PRE_1_9_X//' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
+	patch -u Doxyfile.in publish.patch -o - | sed 's/PROJECT_NUMBER         = /PROJECT_NUMBER         = $(REVISION)/' |    sed 's/PROJECT_BRIEF          = /PROJECT_BRIEF          = $(READABLEREVISION)/' |    sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/HTML_OUTPUT            = html/HTML_OUTPUT            = internal/' | sed 's/COLLABORATION_GRAPH    = NO/COLLABORATION_GRAPH    = YES/' | sed 's/INLINE_SOURCES         = NO/INLINE_SOURCES         = YES/' | sed 's/REFERENCED_BY_RELATION = NO/REFERENCED_BY_RELATION = YES/' | sed 's/REFERENCES_RELATION    = NO/REFERENCES_RELATION    = YES/'| sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/style\/header.html/style\/header_internal.html/'| sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
 	sed -i.bak "s/q:query/q:query,db:dbLocation/g" internal/search/search.js 
 	doxyindexer searchdata.xml -o internal
 	cp style/casadi.png internal/casadi.png
@@ -53,7 +53,7 @@ doxpublishlocal:
 	python extra/generate_overview.py
 	perl -n -i~ -w -e 'if (/<div class="contents">/) { print qq|<div class="contents"> <img src="overview.png" border="0" alt="" usemap="#overview"/>|; open(IN, "<overview.map"); print while(<IN>); } else {print;}' html/index.html
 	cp overview.png html/overview.png
-	cat Doxyfile.in | sed 's/PROJECT_NUMBER         = /PROJECT_NUMBER         = $(REVISION)/' |    sed 's/PROJECT_BRIEF          = /PROJECT_BRIEF          = $(READABLEREVISION)/' |    sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/HTML_OUTPUT            = html/HTML_OUTPUT            = internal/' | sed 's/COLLABORATION_GRAPH    = NO/COLLABORATION_GRAPH    = YES/' | sed 's/INLINE_SOURCES         = NO/INLINE_SOURCES         = YES/' | sed 's/REFERENCED_BY_RELATION = NO/REFERENCED_BY_RELATION = YES/' | sed 's/REFERENCES_RELATION    = NO/REFERENCES_RELATION    = YES/'| sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/style\/header.html/style\/header_internal.html/'| sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             WITHOUT_PRE_1_9_X//' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
+	cat Doxyfile.in | sed 's/PROJECT_NUMBER         = /PROJECT_NUMBER         = $(REVISION)/' |    sed 's/PROJECT_BRIEF          = /PROJECT_BRIEF          = $(READABLEREVISION)/' |    sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/HTML_OUTPUT            = html/HTML_OUTPUT            = internal/' | sed 's/COLLABORATION_GRAPH    = NO/COLLABORATION_GRAPH    = YES/' | sed 's/INLINE_SOURCES         = NO/INLINE_SOURCES         = YES/' | sed 's/REFERENCED_BY_RELATION = NO/REFERENCED_BY_RELATION = YES/' | sed 's/REFERENCES_RELATION    = NO/REFERENCES_RELATION    = YES/'| sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/style\/header.html/style\/header_internal.html/'| sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
 	cp style/casadi.png internal/casadi.png
 	python extra/generate_overview.py
 	perl -n -i~ -w -e 'if (/<div class="contents">/) { print qq|<div class="contents"> <img src="overview.png" border="0" alt="" usemap="#overview"/>|; open(IN, "<overview.map"); print while(<IN>); } else {print;}' internal/index.html
@@ -70,11 +70,11 @@ doxtest:
 
 doxexport:
 	rm -rf XML XML_internal XML_clutter
-	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             WITHOUT_PRE_1_9_X//' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
+	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
 	python extra/generate_options_doc.py
 	rm -rf XML XML_internal XML_clutter
-	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_cluttered /' | doxygen -
-	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             WITHOUT_PRE_1_9_X//' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
+	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_cluttered /' | sed 's/PREDEFINED+=             WITH_DEPRECATED_FEATURES//' | sed 's/EXPAND_ONLY_PREDEF     = YES/EXPAND_ONLY_PREDEF     = NO/' | doxygen -
+	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' |  sed 's/EXPAND_ONLY_PREDEF     = YES/EXPAND_ONLY_PREDEF     = NO/' | doxygen -
 	sh extra/doc2swig.sh
 
 full: 
@@ -84,7 +84,7 @@ full:
 	#cd ../tutorials/cpp && make
 	cd ../users_guide && make
 	cd ../cheatsheet && make
-	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             WITHOUT_PRE_1_9_X//' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
+	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
 	python extra/fetch_examples_pdf.py
 	make doxpublish
 	cd ../example_pack && make
@@ -96,7 +96,7 @@ fulllocal:
 	#cd ../tutorials/cpp && make
 	cd ../users_guide && make
 	cd ../cheatsheet && make
-	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             WITHOUT_PRE_1_9_X//' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
+	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
 	python extra/fetch_examples_pdf.py
 	make doxpublishlocal
 	cd ../example_pack && make

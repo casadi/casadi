@@ -46,7 +46,7 @@
 "| implicit_solver | OT_STRING       | GenericType()   | An implicit     |\n"
 "|                 |                 |                 | function solver |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"
-"| implicit_solver | OT_DICTIONARY   | GenericType()   | Options to be   |\n"
+"| implicit_solver | OT_DICT   | GenericType()   | Options to be   |\n"
 "| _options        |                 |                 | passed to the   |\n"
 "|                 |                 |                 | NLP Solver      |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"

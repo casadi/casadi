@@ -25,10 +25,7 @@
 
 #include "sdqp_to_sdp.hpp"
 
-#include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
-
-#include "casadi/core/mx/mx_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
 
 using namespace std;
@@ -50,7 +47,7 @@ namespace casadi {
     SdqpSolverInternal::registerPlugin(casadi_register_sdqpsolver_sdp);
   }
 
-  SdqpToSdp::SdqpToSdp(const std::vector<Sparsity> &st) : SdqpSolverInternal(st) {
+  SdqpToSdp::SdqpToSdp(const std::map<std::string, Sparsity> &st) : SdqpSolverInternal(st) {
     Adaptor<SdqpToSdp, SdpSolverInternal>::addOptions();
   }
 
@@ -68,8 +65,7 @@ namespace casadi {
     // Initialize the base classes
     SdqpSolverInternal::init();
 
-    cholesky_ = LinearSolver("csparsecholesky", st_[SDQP_STRUCT_H]);
-    cholesky_.init();
+    cholesky_ = LinearSolver("cholesky", "csparsecholesky", st_[SDQP_STRUCT_H]);
 
     MX g_socp = MX::sym("x", cholesky_.getFactorizationSparsity(true));
     MX h_socp = MX::sym("h", n_);
@@ -99,33 +95,32 @@ namespace casadi {
 
     g = diagcat(g_sdqp, g);
 
-    IOScheme mappingIn("g_socp", "h_socp", "f_sdqp", "g_sdqp");
-    IOScheme mappingOut("f", "g");
+    Dict opts;
+    opts["input_scheme"] = IOScheme("g_socp", "h_socp", "f_sdqp", "g_sdqp");
+    opts["output_scheme"] = IOScheme("f", "g");
+    mapping_ = MXFunction("mapping", make_vector(g_socp, h_socp, f_sdqp, g_sdqp),
+                          make_vector(horzcat(fi), g), opts);
 
-    mapping_ = MXFunction(mappingIn("g_socp", g_socp, "h_socp", h_socp,
-                                    "f_sdqp", f_sdqp, "g_sdqp", g_sdqp),
-                          mappingOut("f", horzcat(fi), "g", g));
-    mapping_.init();
-
+    Dict options;
+    if (hasSetOption(optionsname())) options = getOption(optionsname());
     // Create an SdpSolver instance
-    solver_ = SdpSolver(getOption(solvername()),
-                        sdpStruct("g", mapping_.output("g").sparsity(),
-                                  "f", mapping_.output("f").sparsity(),
-                                  "a", horzcat(input(SDQP_SOLVER_A).sparsity(),
-                                               Sparsity(nc_, 1))));
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    solver_ = SdpSolver("sdpsolver", getOption(solvername()),
+                        make_map("g", mapping_.output("g").sparsity(),
+                                 "f", mapping_.output("f").sparsity(),
+                                 "a", horzcat(input(SDQP_SOLVER_A).sparsity(),
+                                              Sparsity(nc_, 1))),
+                        options);
 
     solver_.input(SDP_SOLVER_C).at(n_)=1;
 
     // Output arguments
-    setNumOutputs(SDQP_SOLVER_NUM_OUT);
+    obuf_.resize(SDQP_SOLVER_NUM_OUT);
     output(SDQP_SOLVER_X) = DMatrix::zeros(n_, 1);
 
     std::vector<int> r = range(input(SDQP_SOLVER_G).size1());
-    output(SDQP_SOLVER_P) = solver_.output(SDP_SOLVER_P).isEmpty() ? DMatrix() :
+    output(SDQP_SOLVER_P) = solver_.output(SDP_SOLVER_P).isempty() ? DMatrix() :
         solver_.output(SDP_SOLVER_P)(r, r);
-    output(SDQP_SOLVER_DUAL) = solver_.output(SDP_SOLVER_DUAL).isEmpty() ? DMatrix() :
+    output(SDQP_SOLVER_DUAL) = solver_.output(SDP_SOLVER_DUAL).isempty() ? DMatrix() :
         solver_.output(SDP_SOLVER_DUAL)(r, r);
     output(SDQP_SOLVER_COST) = 0.0;
     output(SDQP_SOLVER_DUAL_COST) = 0.0;
@@ -183,11 +178,11 @@ namespace casadi {
               SDQP_SOLVER_COST);
     setOutput(solver_.output(SDP_SOLVER_DUAL_COST),
               SDQP_SOLVER_DUAL_COST);
-    if (!output(SDQP_SOLVER_DUAL).isEmpty())
+    if (!output(SDQP_SOLVER_DUAL).isempty())
         std::copy(solver_.output(SDP_SOLVER_DUAL).begin(),
                   solver_.output(SDP_SOLVER_DUAL).begin()+output(SDQP_SOLVER_DUAL).nnz(),
                   output(SDQP_SOLVER_DUAL).begin());
-    if (!output(SDQP_SOLVER_P).isEmpty())
+    if (!output(SDQP_SOLVER_P).isempty())
         std::copy(solver_.output(SDP_SOLVER_P).begin(),
                   solver_.output(SDP_SOLVER_P).begin()+output(SDQP_SOLVER_P).nnz(),
                   output(SDQP_SOLVER_P).begin());

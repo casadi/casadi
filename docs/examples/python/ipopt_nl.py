@@ -34,33 +34,31 @@ Joel Andersson
 """
 
 # Create an NLP instance
-nl = SymbolicNLP()
+nl = NlpBuilder()
 
 # Parse an NL-file
 nl.parseNL("../nl_files/hs107.nl",{"verbose":False})
 
 # NLP function
-nlp = SXFunction(nlpIn(x=nl.x),nlpOut(f=nl.f,g=nl.g))
-  
-# NLP solver
-nlp_solver = NlpSolver("ipopt", nlp)
-  
-# Set options
-# nlp_solver.setOption("max_iter",10)
-#nlp_solver.setOption("verbose",True)
-# nlp_solver.setOption("linear_solver","ma57")
-# nlp_solver.setOption("hessian_approximation","limited-memory")
-  
-# Initialize NLP solver
-nlp_solver.init()
+nlp = SXFunction("nlp", nlpIn(x=nl.x),nlpOut(f=nl.f,g=nl.g))
+
+# NLP solver options
+opts = {}
+# opts["max_iter"] = 10
+# opts["verbose"] = True
+# opts["linear_solver"] = "ma57"
+# opts["hessian_approximation"] = "limited-memory"
+
+# Create an NLP solver
+nlp_solver = NlpSolver("nlp_solver", "ipopt", nlp, opts)
   
 # Pass the bounds and initial guess
-nlp_solver.setInput(nl.x_lb,"lbx")
-nlp_solver.setInput(nl.x_ub,"ubx")
-nlp_solver.setInput(nl.g_lb,"lbg")
-nlp_solver.setInput(nl.g_ub,"ubg")
-nlp_solver.setInput(nl.x_init,"x0")
+arg = {"lbx" : nl.x_lb, 
+       "ubx" : nl.x_ub,
+       "lbg" : nl.g_lb,
+       "ubg" : nl.g_ub,
+       "x0" : nl.x_init}
   
 # Solve NLP
-nlp_solver.evaluate()
+res = nlp_solver(arg)
 

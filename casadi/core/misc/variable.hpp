@@ -73,16 +73,16 @@ namespace casadi {
     Variable() {}
 
     /// Constructor
-    explicit Variable(const std::string& name);
+    explicit Variable(const std::string& name, const Sparsity& sp = Sparsity::scalar());
 
     /// Variable name
     std::string name() const;
 
     /// Variable expression
-    SXElement v;
+    MX v;
 
     /// Derivative expression
-    SXElement d;
+    MX d;
 
     /// Nominal value
     double nominal;
@@ -130,10 +130,10 @@ namespace casadi {
     bool free;
 
     /// Print a description of the object
-    void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
+    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
   };
 } // namespace casadi
 

@@ -78,20 +78,14 @@ for j in range(deg+1):
         if j2 != j:
             L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
 
-    lfcn = SXFunction([tau],[L])
-    lfcn.init()
+    lfcn = SXFunction('lfcn', [tau],[L])
     # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-    lfcn.setInput(1.0)
-    lfcn.evaluate()
-    D[j] = lfcn.getOutput()
+    [D[j]] = lfcn([1.0])
 
     # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
     tfcn = lfcn.tangent()
-    tfcn.init()
     for j2 in range(deg+1):
-        tfcn.setInput(tau_root[j2])
-        tfcn.evaluate()
-        C[j][j2] = tfcn.getOutput()
+        C[j][j2], _ = tfcn([tau_root[j2]])
 
 
 
@@ -133,11 +127,11 @@ xd[5] = dw
                    
 
 # System dynamics (implicit formulation)
-ffcn = SXFunction([t,xddot,xd,xa,u,p],[res])
+ffcn = SXFunction('ffcn', [t,xddot,xd,xa,u,p],[res])
 
 # Objective function 
-MayerTerm = SXFunction([t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
-LagrangeTerm = SXFunction([t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
+MayerTerm = SXFunction('mayer', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
+LagrangeTerm = SXFunction('lagrange', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
 
 # Control bounds
 u_min = np.array([-2])
@@ -183,37 +177,29 @@ ic_min = np.array([])
 ic_max = np.array([])
 ic = SX()
 #ic.append();       ic_min = append(ic_min, 0.);         ic_max = append(ic_max, 0.)
-icfcn = SXFunction([t,xd,xa,u,p],[ic])
+icfcn = SXFunction('icfcn', [t,xd,xa,u,p],[ic])
 # Path constraint
 pc_min = np.array([])
 pc_max = np.array([])
 pc = SX()
 #pc.append();       pc_min = append(pc_min, 0.);         pc_max = append(pc_max, 0.)
-pcfcn = SXFunction([t,xd,xa,u,p],[pc])
+pcfcn = SXFunction('pcfcn', [t,xd,xa,u,p],[pc])
 # Final constraint
 fc_min = np.array([])
 fc_max = np.array([])
 fc = SX()
 #fc.append();       fc_min = append(fc_min, 0.);         fc_max = append(fc_max, 0.)
-fcfcn = SXFunction([t,xd,xa,u,p],[fc])
-
-# Initialize the functions
-ffcn.init()
-icfcn.init()
-pcfcn.init()
-fcfcn.init()
-LagrangeTerm.init()
-MayerTerm.init()
+fcfcn = SXFunction('fcfcn', [t,xd,xa,u,p],[fc])
 
 # -----------------------------------------------------------------------------
 # NLP setup
 # -----------------------------------------------------------------------------
 # Dimensions of the problem
-nx = xd.size() + xa.size()  # total number of states        #MODIF
-ndiff = xd.size()           # number of differential states #MODIF
-nalg = xa.size()            # number of algebraic states
-nu = u.size()               # number of controls
-NP  = p.size()              # number of parameters
+nx = xd.nnz() + xa.nnz()  # total number of states        #MODIF
+ndiff = xd.nnz()           # number of differential states #MODIF
+nalg = xa.nnz()            # number of algebraic states
+nu = u.nnz()               # number of controls
+NP  = p.nnz()              # number of parameters
 
 # Total number of variables
 NXD = nicp*nk*(deg+1)*ndiff # Collocated differential states
@@ -375,42 +361,42 @@ for k in range(nk):
 Obj += lagrangeTerm        
 
 # NLP
-nlp = MXFunction(nlpIn(x=V),nlpOut(f=Obj,g=vertcat(g)))
+nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=Obj,g=vertcat(g)))
 
 ## ----
 ## SOLVE THE NLP
 ## ----
-  
+
+# NLP solver options
+opts = {}
+opts["expand"] = True
+opts["max_iter"] = 1000
+opts["tol"] = 1e-4
+opts["linear_solver"] = 'ma27'
+
 # Allocate an NLP solver
-solver = NlpSolver("ipopt", nlp)
+solver = NlpSolver("solver", "ipopt", nlp, opts)
+arg = {}
 
-# Set options
-solver.setOption("expand",True)
-solver.setOption("max_iter",1000)
-solver.setOption("tol",1e-4)
-
-# initialize the solver
-solver.init()
-  
 # Initial condition
-solver.setInput(vars_init,"x0")
+arg["x0"] = vars_init
 
 # Bounds on x
-solver.setInput(vars_lb,"lbx")
-solver.setInput(vars_ub,"ubx")
+arg["lbx"] = vars_lb
+arg["ubx"] = vars_ub
 
 # Bounds on g
-solver.setInput(np.concatenate(lbg),"lbg")
-solver.setInput(np.concatenate(ubg),"ubg")
+arg["lbg"] = np.concatenate(lbg)
+arg["ubg"] = np.concatenate(ubg)
 
 # Solve the problem
-solver.evaluate()
+res = solver(arg)
 
 # Print the optimal cost
-print "optimal cost: ", float(solver.getOutput("f"))
+print "optimal cost: ", float(res["f"])
 
 # Retrieve the solution
-v_opt = np.array(solver.getOutput("x"))
+v_opt = np.array(res["x"])
     
 
 ## ----
@@ -455,11 +441,8 @@ for j in range(1,deg+1):
     for j2 in range(1,deg+1):
         if j2 != j:
             La *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
-    lafcn = SXFunction([tau],[La])
-    lafcn.init()
-    lafcn.setInput(tau_root[0])
-    lafcn.evaluate()
-    Da[j-1] = lafcn.getOutput()
+    lafcn = SXFunction('lafcn', [tau], [La])
+    [Da[j-1]] = lafcn([tau_root[0]])
 
 xA_plt = np.resize(np.array([],dtype=MX),(nalg,(deg+1)*nicp*(nk)+1))
 offset4=0

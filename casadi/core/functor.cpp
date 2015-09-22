@@ -58,4 +58,13 @@ Callback::Callback(CallbackCPtr ptr) {
   assignNode(new CallbackCInternal(ptr));
 }
 
+Callback::Callback(IterationCallback& cb) {
+  assignNode(new IterationCallbackInternal(cb));
+}
+
+int IterationCallback::operator()(Function& fcn) {
+  casadi_error("This virtual method must be implemented");
+}
+
+
 } // namespace casadi

@@ -101,17 +101,21 @@ namespace casadi {
     /** \brief  print */
     virtual void print(std::ostream &stream) const;
 
-    /** \brief  print */
-    virtual void print(std::ostream &stream, long& remaining_calls) const = 0;
+    /** \brief Find out which nodes can be inlined */
+    void canInline(std::map<const SXNode*, int>& nodeind) const;
+
+    /** \brief Print compact */
+    std::string printCompact(std::map<const SXNode*, int>& nodeind,
+                             std::vector<std::string>& intermed) const;
+
+    /** \brief  Print expression */
+    virtual std::string print(const std::string& arg1, const std::string& arg2) const = 0;
 
     // Check if marked (i.e. temporary is negative)
     bool marked() const;
 
     // Mark by flipping the sign of the temporary and decreasing by one
     void mark();
-
-    // Maximum number of calls
-    static long max_num_calls_in_print_;
 
     // Depth when checking equalities
     static int eq_depth_;

@@ -42,11 +42,10 @@ Function generateCodeAndCompile(Function fcn, const std::string& name, bool expa
   // Convert to an SXFunction (may or may not improve efficiency)
   if(expand && is_a<MXFunction>(fcn)){
     fcn = SXFunction(shared_cast<MXFunction>(fcn));
-    fcn.init();
   }
 
   // Generate C code
-  fcn.generateCode(name + ".c");
+  fcn.generate(name);
 
   // Compilation command
   string compile_command = "gcc -fPIC -shared -O3 " + name + ".c -o " + name + ".so";
@@ -56,7 +55,7 @@ Function generateCodeAndCompile(Function fcn, const std::string& name, bool expa
   casadi_assert_message(flag==0, "Compilation failed");
 
   // Load the generated function for evaluation
-  ExternalFunction fcn_e("./" + name + ".so");
+  ExternalFunction fcn_e(name);
   return fcn_e;
 }
 
@@ -80,21 +79,17 @@ int main(){
   bool expand = true;
 
   // NLP function
-  Function nlp = MXFunction(nlpIn("x",x),nlpOut("f",f,"g",g));
-  nlp.init();
+  Function nlp = MXFunction("nlp", nlpIn("x", x),nlpOut("f", f, "g", g));
 
   // Gradient of the objective
-  Function grad_f = nlp.gradient("x","f");
-  grad_f.init();
+  Function grad_f = nlp.gradient("x", "f");
 
   // Jacobian of the constraints
-  Function jac_g = nlp.jacobian("x","g");
-  jac_g.init();
+  Function jac_g = nlp.jacobian("x", "g");
 
   // Hessian of the lagrangian
-  Function grad_lag = nlp.derivative(0,1);
-  Function hess_lag = grad_lag.jacobian(NL_X,NL_NUM_OUT+NL_X,false,true);
-  hess_lag.init();
+  Function grad_lag = nlp.derivative(0, 1);
+  Function hess_lag = grad_lag.jacobian(NL_X, NL_NUM_OUT+NL_X, false, true);
 
   // Codegen and compile
   nlp = generateCodeAndCompile(nlp,"nlp", expand);
@@ -103,24 +98,26 @@ int main(){
   hess_lag = generateCodeAndCompile(hess_lag,"hess_lag", expand);
 
   // Create an NLP solver passing derivative information
-  NlpSolver solver("ipopt", nlp);
-  solver.setOption("grad_f",grad_f);
-  solver.setOption("jac_g",jac_g);
-  solver.setOption("hess_lag",hess_lag);
-  solver.init();
+  NlpSolver solver("solver", "ipopt", nlp,
+                   make_dict("grad_f", grad_f, "jac_g", jac_g, "hess_lag",hess_lag));
 
-  // Set constraint bounds
-  solver.setInput(0.,"lbg");
+  // Bounds and initial guess
+  std::map<std::string, DMatrix> arg, res;
+  arg["lbx"] = -DMatrix::inf();
+  arg["ubx"] =  DMatrix::inf();
+  arg["lbg"] =  0;
+  arg["ubg"] =  DMatrix::inf();
+  arg["x0"] = 0;
 
   // Solve the NLP
-  solver.evaluate();
+  res = solver(arg);
 
   // Print solution
   cout << "-----" << endl;
-  cout << "objective at solution = " << solver.output("f") << endl;
-  cout << "primal solution = " << solver.output("x") << endl;
-  cout << "dual solution (x) = " << solver.output("lam_x") << endl;
-  cout << "dual solution (g) = " << solver.output("lam_g") << endl;
+  cout << "objective at solution = " << res.at("f") << endl;
+  cout << "primal solution = " << res.at("x") << endl;
+  cout << "dual solution (x) = " << res.at("lam_x") << endl;
+  cout << "dual solution (g) = " << res.at("lam_g") << endl;
   
   return 0;
 }

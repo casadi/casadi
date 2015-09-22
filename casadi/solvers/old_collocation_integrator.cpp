@@ -24,13 +24,10 @@
 
 
 #include "old_collocation_integrator.hpp"
+
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/polynomial.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
-#include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
-
 #include "casadi/core/profiling.hpp"
 #include "casadi/core/casadi_options.hpp"
 
@@ -63,7 +60,7 @@ namespace casadi {
               "Collocation scheme", "radau|legendre");
     addOption("implicit_solver",               OT_STRING,  GenericType(),
               "An implicit function solver");
-    addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(),
+    addOption("implicit_solver_options",       OT_DICT, GenericType(),
               "Options to be passed to the implicit solver");
     addOption("expand_f",                      OT_BOOLEAN,  false,
               "Expand the ODE/DAE residual function in an SX graph");
@@ -73,7 +70,7 @@ namespace casadi {
               "Initialize the trajectory at the previous solution");
     addOption("startup_integrator",            OT_STRING,  GenericType(),
               "An ODE/DAE integrator that can be used to generate a startup trajectory");
-    addOption("startup_integrator_options",    OT_DICTIONARY, GenericType(),
+    addOption("startup_integrator_options",    OT_DICT, GenericType(),
               "Options to be passed to the startup integrator");
     setOption("name", "unnamed_old_collocation_integrator");
   }
@@ -161,8 +158,10 @@ namespace casadi {
     C_num(std::vector<int>(1, 0), ALL) = 0;
     C_num(0, 0)   = 1;
 
-    casadi_assert_message(fabs(sumAll(Q)-1).at(0)<1e-9, "Check on quadrature coefficients");
-    casadi_assert_message(fabs(sumAll(D_num)-1).at(0)<1e-9, "Check on collocation coefficients");
+    casadi_assert_message(fabs(inner_prod(Q, DMatrix::ones(Q.sparsity()))-1).at(0)<1e-9,
+                          "Check on quadrature coefficients");
+    casadi_assert_message(fabs(inner_prod(D_num, DMatrix::ones(D_num.sparsity()))-1).at(0)<1e-9,
+                          "Check on collocation coefficients");
 
     // Initial state
     MX X0 = MX::sym("X0", x0().sparsity());
@@ -362,59 +361,37 @@ namespace casadi {
     ifcn_out[1+INTEGRATOR_QF] = QF;
     ifcn_out[1+INTEGRATOR_RXF] = RX[0][0];
     ifcn_out[1+INTEGRATOR_RQF] = RQF;
-    Function ifcn = MXFunction(ifcn_in, ifcn_out);
     std::stringstream ss_ifcn;
     ss_ifcn << "collocation_implicit_residual_" << getOption("name");
-    ifcn.setOption("name", ss_ifcn.str());
-    ifcn.init();
+    Function ifcn = MXFunction(ss_ifcn.str(), ifcn_in, ifcn_out);
     if (expand_f) {
       ifcn = SXFunction(shared_cast<MXFunction>(ifcn));
-      ifcn.setOption("name", ss_ifcn.str());
-      ifcn.init();
     }
 
-    // Get the root-finding solver creator function
-    std::string implicit_function_name = getOption("implicit_solver");
+    // Options
+    Dict implicit_solver_options;
+    if (hasSetOption("implicit_solver_options")) {
+      implicit_solver_options = getOption("implicit_solver_options");
+    }
 
     // Allocate a root-finding solver
-    implicit_solver_ = ImplicitFunction(implicit_function_name,
-                                        ifcn, Function(), LinearSolver());
-    std::stringstream ss_implicit_solver;
-    ss_implicit_solver << "collocation_implicitsolver_" << getOption("name");
-    implicit_solver_.setOption("name", ss_implicit_solver.str());
-
-    // Pass options
-    if (hasSetOption("implicit_solver_options")) {
-      const Dictionary& implicit_solver_options = getOption("implicit_solver_options");
-      implicit_solver_.setOption(implicit_solver_options);
-    }
-
-    // Initialize the solver
-    implicit_solver_.init();
+    implicit_solver_ =
+      ImplicitFunction("collocation_implicitsolver_" + name_, getOption("implicit_solver"),
+                       ifcn, implicit_solver_options);
 
     if (hasSetOption("startup_integrator")) {
-
-      // Create the linear solver
-      std::string startup_integrator_name = getOption("startup_integrator");
+      Dict startup_integrator_options;
+      if (hasSetOption("startup_integrator_options")) {
+        startup_integrator_options = getOption("startup_integrator_options");
+      }
+      // Pass options
+      startup_integrator_options["t0"] = coll_time_.front().front();
+      startup_integrator_options["tf"] = coll_time_.back().back();
 
       // Allocate a root-finding solver
-      startup_integrator_ = Integrator(startup_integrator_name, f_, g_);
-
-      // Pass options
-      startup_integrator_.setOption("t0", coll_time_.front().front());
-      startup_integrator_.setOption("tf", coll_time_.back().back());
-
-      std::stringstream ss_startup_integrator;
-      ss_startup_integrator << "collocation_startup_" << getOption("name");
-      startup_integrator_.setOption("name", ss_startup_integrator.str());
-
-      if (hasSetOption("startup_integrator_options")) {
-        const Dictionary& startup_integrator_options = getOption("startup_integrator_options");
-        startup_integrator_.setOption(startup_integrator_options);
-      }
-
-      // Initialize the startup integrator
-      startup_integrator_.init();
+      startup_integrator_ =
+        Integrator("collocation_startup_" + name_, getOption("startup_integrator"),
+                   make_pair(f_, g_), startup_integrator_options);
     }
 
     // Mark the system not yet integrated
@@ -500,7 +477,7 @@ namespace casadi {
 
       // Print
       if (has_startup_integrator && verbose()) {
-        cout << "startup trajectory generated, statistics:" << endl;
+        userOut() << "startup trajectory generated, statistics:" << endl;
         startup_integrator_.printStats();
       }
 

@@ -24,14 +24,12 @@
 
 
 #include "simple_indef_dle_internal.hpp"
-#include <cassert>
+
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
+#include <cassert>
 #include <numeric>
 
 INPUTSCHEME(DLEInput)
@@ -55,8 +53,8 @@ namespace casadi {
     DleInternal::registerPlugin(casadi_register_dlesolver_simple);
   }
 
-  SimpleIndefDleInternal::SimpleIndefDleInternal(
-      const DleStructure& st) : DleInternal(st) {
+  SimpleIndefDleInternal::
+  SimpleIndefDleInternal(const std::map<std::string, Sparsity>& st) : DleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_simple_indef_dle_solver"); // name of the function
@@ -66,7 +64,7 @@ namespace casadi {
               "a smaller system with dense rhs.");
     addOption("linear_solver",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linear_solver_options",    OT_DICT,   GenericType(),
               "Options to be passed to the linear solver.");
 
   }
@@ -91,22 +89,20 @@ namespace casadi {
 
     MX A_total = DMatrix::eye(n_*n_) - kron(As, As);
 
-    MX Pf = solve(A_total, vec(Vss), getOption("linear_solver"));
+    MX Pf = A_total.zz_solve(vec(Vss), getOption("linear_solver"));
 
     MX P = reshape(Pf, n_, n_);
 
-    f_ = MXFunction(dleIn("a", As, "v", Vs),
-      dleOut("p", MX(P(output().sparsity()))));
+    f_ = MXFunction(name_, dleIn("a", As, "v", Vs),
+                    dleOut("p", MX(P(output().sparsity()))));
 
-    f_.init();
-
-    casadi_assert(getNumOutputs()==f_.getNumOutputs());
-    for (int i=0;i<getNumInputs();++i) {
+    casadi_assert(nOut()==f_.nOut());
+    for (int i=0;i<nIn();++i) {
       casadi_assert_message(input(i).sparsity()==f_.input(i).sparsity(),
         "Sparsity mismatch for input " << i << ":" <<
         input(i).dimString() << " <-> " << f_.input(i).dimString() << ".");
     }
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       casadi_assert_message(output(i).sparsity()==f_.output(i).sparsity(),
         "Sparsity mismatch for output " << i << ":" <<
         output(i).dimString() << " <-> " << f_.output(i).dimString() << ".");
@@ -116,20 +112,22 @@ namespace casadi {
 
 
   void SimpleIndefDleInternal::evaluate() {
-    for (int i=0;i<getNumInputs();++i) {
+    for (int i=0;i<nIn();++i) {
       std::copy(input(i).begin(), input(i).end(), f_.input(i).begin());
     }
     f_.evaluate();
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       std::copy(f_.output(i).begin(), f_.output(i).end(), output(i).begin());
     }
   }
 
-  Function SimpleIndefDleInternal::getDerForward(int nfwd) {
+  Function SimpleIndefDleInternal
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function SimpleIndefDleInternal::getDerReverse(int nadj) {
+  Function SimpleIndefDleInternal
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     return f_.derReverse(nadj);
   }
 
@@ -140,7 +138,9 @@ namespace casadi {
 
   SimpleIndefDleInternal* SimpleIndefDleInternal::clone() const {
     // Return a deep copy
-    SimpleIndefDleInternal* node = new SimpleIndefDleInternal(st_);
+    SimpleIndefDleInternal* node =
+      new SimpleIndefDleInternal(make_map("a", st_[Dle_STRUCT_A],
+                                          "v", st_[Dle_STRUCT_V]));
     node->setOption(dictionary());
     return node;
   }

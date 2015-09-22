@@ -31,8 +31,7 @@ x=SX.sym("x")
 dx=SX.sym("dx")
 states = vertcat([x,dx])
 
-f=SXFunction(daeIn(x=states),daeOut(ode=vertcat([dx,-x])))
-f.init()
+f=SXFunction("f", daeIn(x=states),daeOut(ode=vertcat([dx,-x])))
 
 tend = 2*pi*3
 ts = linspace(0,tend,1000)
@@ -42,13 +41,8 @@ tolerances = [-10,-5,-4,-3,-2,-1]
 figure()
 
 for tol in tolerances:
-  integrator = Integrator("cvodes", f)
-  integrator.setOption("reltol",10.0**tol)
-  integrator.setOption("abstol",10.0**tol)
-  integrator.init()
-
-  sim=Simulator(integrator,ts)
-  sim.init()
+  integrator = Integrator("integrator", "cvodes", f, {"reltol":10.0**tol, "abstol":10.0**tol})
+  sim=Simulator("sim", integrator, ts)
   sim.setInput([1,0],"x0")
   sim.evaluate()
 
@@ -64,11 +58,11 @@ tolerances = logspace(-15,1,500)
 endresult=[]
 
 for tol in tolerances:
-  integrator = Integrator("cvodes", f)
-  integrator.setOption("reltol",tol)
-  integrator.setOption("abstol",tol)
-  integrator.setOption("tf",tend)
-  integrator.init()
+  opts = {}
+  opts["reltol"] = tol
+  opts["abstol"] = tol
+  opts["tf"] = tend
+  integrator = Integrator("integrator", "cvodes", f, opts)
   integrator.setInput([1,0],"x0")
   integrator.evaluate()
   endresult.append(integrator.getOutput()[0])

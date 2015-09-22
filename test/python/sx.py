@@ -134,7 +134,6 @@ class SXtests(casadiTestCase):
 
       def fmod(f,x):
         J=f.jacobian()
-        J.init()
         return J
       
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
@@ -146,8 +145,7 @@ class SXtests(casadiTestCase):
 
       def fmod(f,x):
         j=f.jac()
-        J=SXFunction(x,[j])
-        J.init()
+        J=SXFunction("J", x,[j])
         return J
       
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jac",fmod=fmod)
@@ -159,7 +157,6 @@ class SXtests(casadiTestCase):
 
       def fmod(f,x):
         J=f.jacobian()
-        J.init()
         return J
       
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
@@ -172,7 +169,6 @@ class SXtests(casadiTestCase):
 
       def fmod(f,x):
         J=f.jacobian()
-        J.init()
         return J
       
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
@@ -248,6 +244,7 @@ class SXtests(casadiTestCase):
       self.assertRaises(RuntimeError, lambda : mul(xx,yy))
 
 
+  @known_bug()  # Test refactoring, cf. #1436
   def test_SXslicing(self):
       self.message("SX slicing/indexing")
       x=SX.sym("x",3,2)
@@ -306,18 +303,16 @@ class SXtests(casadiTestCase):
     fun=lambda x,y: [x+y,x*y,x**2+y**3]
     x=SX.sym("x")
     y=SX.sym("y")
-    f=SXFunction([vertcat([x,y])],[vertcat(fun(x,y))])
-    f.init()
+    f=SXFunction("f", [vertcat([x,y])],[vertcat(fun(x,y))])
     L=[2,3]
     f.setInput(L)
     f.evaluate()
-    z=f.output(0).toArray()
+    z=f.getOutput(0).toArray()
     zr=fun(*L)
     for i in range(3):
       self.assertAlmostEqual(z[i], zr[i],10,'SXfunction output in correct')
     self.message("SXFunction jacobian evaluation")
     J=f.jacobian()
-    J.init()
     J.setInput(L)
     J.evaluate()
     Jr=matrix([[1,1],[3,2],[4,27]])
@@ -336,14 +331,9 @@ class SXtests(casadiTestCase):
       self.assertEqual(str(f),'[SX(((3-sin(sq(x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong')
     else:
       self.assertEqual(str(f),'[SX(((3-sin((x*x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong'+str(f))
-    fcn = SXFunction([vertcat([x,y])],[vertcat(f)])
+    fcn = SXFunction("fcn", [vertcat([x,y])],[vertcat(f)])
 
-    # Set some options
-    fcn.setOption("name","f")
-
-    self.assertEqual(repr(fcn),'function("f")','SX representation is wrong')
-    # Initialize the function for numerical calculations
-    fcn.init()
+    self.assertEqual(repr(fcn),'fcn','SX representation is wrong')
 
     # Pass inputs
     L=[2,3]
@@ -353,7 +343,7 @@ class SXtests(casadiTestCase):
     fcn.evaluate()
 
     # Get the results
-    res = tuple(fcn.output().nonzeros())
+    res = tuple(fcn.getOutput().nonzeros())
     self.assertAlmostEqual(res[0], fun(*L)[0],10,'SXfunction evaluation wrong')
     self.assertAlmostEqual(res[1], fun(*L)[1],10,'SXfunction evaluation wrong')
     
@@ -368,18 +358,17 @@ class SXtests(casadiTestCase):
     x6=SX.sym("x")
     y=SX.sym("y",2,3)
     
-    f=SXFunction([y],[y])
-    self.checkarray(f.input(0).shape,(2,3),"SXFunction constructors")
-    self.checkarray(f.output(0).shape,(2,3),"SXFunction constructors")
+    f=SXFunction("f", [y],[y])
+    self.checkarray(f.getInput(0).shape,(2,3),"SXFunction constructors")
+    self.checkarray(f.getOutput(0).shape,(2,3),"SXFunction constructors")
     
-    self.assertRaises(NotImplementedError,lambda: SXFunction(y,[y,y]))
-    self.assertRaises(NotImplementedError,lambda: SXFunction(x0,[x0,x1]))
+    self.assertRaises(NotImplementedError,lambda: SXFunction("f", y,[y,y]))
+    self.assertRaises(NotImplementedError,lambda: SXFunction("f", x0,[x0,x1]))
 
   def test_evalfail(self):
     self.message("eval fail test")
     x = SX.sym("x",2,2)
-    f = SXFunction([x], [x])
-    f.init()
+    f = SXFunction("f", [x], [x])
     self.assertRaises(NotImplementedError,lambda: f.call(x))
 
   def test_SXconversion(self):
@@ -398,8 +387,7 @@ class SXtests(casadiTestCase):
     x = SX.sym("x")
     y = SX.sym("y")
     
-    f = SXFunction([vertcat([x,y])],[vertcat([logic_and(x,y),logic_or(x,y),logic_not(x)])])
-    f.init()
+    f = SXFunction("f", [vertcat([x,y])],[vertcat([logic_and(x,y),logic_or(x,y),logic_not(x)])])
     
     
     for t1 in [0,1]:
@@ -416,8 +404,7 @@ class SXtests(casadiTestCase):
     x = SX.sym("x")
     y = SX.sym("y")
     
-    f = SXFunction([vertcat([x,y])],[vertcat([x<y,x<=y,x>=y,x==y,x!=y])])
-    f.init()
+    f = SXFunction("f", [vertcat([x,y])],[vertcat([x<y,x<=y,x>=y,x==y,x!=y])])
     
     
     for t1 in [-10,0.1,0,1,10]:
@@ -442,7 +429,7 @@ class SXtests(casadiTestCase):
       i=c.transpose(c.transpose(arg))
       self.assertEqual(i.shape[0],shape[0],"shape mismatch")
       self.assertEqual(i.shape[1],shape[1],"shape mismatch")
-      SX(arg).isEmpty()
+      SX(arg).isempty()
           
   def test_SXFunctionc3(self):
     self.message("vector(SXmatrix) typemaps constructors")
@@ -456,13 +443,12 @@ class SXtests(casadiTestCase):
     self.message("SXFunction eval")
     x=SX.sym("x",2,2)
     y=SX.sym("y",2,2)
-    f  = SXFunction([x,y], [x*y])
-    f.init()
+    f  = SXFunction("f", [x,y], [x*y])
     f.call([x,y])
     
   def test_symbolcheck(self):
     self.message("Check if non-symbolic inputs are caught")
-    self.assertRaises(RuntimeError, lambda : SXFunction([SX(0)],[SX.sym("x")]))
+    self.assertRaises(RuntimeError, lambda : SXFunction("f", [SX(0)],[SX.sym("x")]))
       
   def test_sparseconstr(self):
     self.message("Check sparsity constructors")
@@ -531,8 +517,7 @@ class SXtests(casadiTestCase):
     
     def test(fun,comment,nums,reference):
       self.message(":"+comment)
-      f = SXFunction([x],[fun(x)])
-      f.init()
+      f = SXFunction("f", [x],[fun(x)])
       for n,r in zip(nums,reference):
         f.setInput(n)
         f.evaluate()
@@ -558,8 +543,7 @@ class SXtests(casadiTestCase):
     a = SX.sym("a") 
     
     def test(e,r):
-      f = SXFunction([x,a],[e])
-      f.init()
+      f = SXFunction("f", [x,a],[e])
       f.setInput(x_,0)
       f.setInput(a_,1)
       f.evaluate()
@@ -571,8 +555,7 @@ class SXtests(casadiTestCase):
     test(taylor(sin(x),x,a,3),sin(a_)+cos(a_)*(x_-a_)-(sin(a_)*(x_-a_)**2)/2.0-(cos(a_)*(x_-a_)**3)/6.0)
     
     M=blockcat([[a*sin(x),a*cos(x)],[exp(a*x),a*x**2],[cos(x),0]])    
-    f = SXFunction([x,a],[taylor(M,x)])
-    f.init()
+    f = SXFunction("f", [x,a],[taylor(M,x)])
     f.setInput(x_,0)
     f.setInput(a_,1)
     f.evaluate()
@@ -582,28 +565,26 @@ class SXtests(casadiTestCase):
     self.message("SXFunction null")
     x = SX.sym("x")
 
-    f = SXFunction([x],[x**2,[]])
-    f.init()
+    f = SXFunction("f", [x],[x**2,[]])
 
-    self.assertTrue(f.output(1).isEmpty())
+    self.assertTrue(f.getOutput(1).isempty())
     
-    f = SXFunction([x,[]],[x**2,[]])
-    f.init()
+    f = SXFunction("f", [x,[]],[x**2,[]])
 
-    self.assertTrue(f.output(1).isEmpty())
+    self.assertTrue(f.getOutput(1).isempty())
     f.evaluate()
     
     r = f.call([x,[]])
-    self.assertTrue(r[1].isEmpty())
+    self.assertTrue(r[1].isempty())
 
     r = f.call([x,[]])
-    self.assertTrue(r[1].isEmpty())
+    self.assertTrue(r[1].isempty())
     
     r = f.call([x,SX(0,1)])
-    self.assertTrue(r[1].isEmpty())
+    self.assertTrue(r[1].isempty())
 
     r = f.call([x,SX(1,0)])
-    self.assertTrue(r[1].isEmpty())
+    self.assertTrue(r[1].isempty())
     
     #self.assertRaises(Exception,lambda : f.call([x,x]))
     #self.assertRaises(Exception,lambda : f.call([[],[]]))
@@ -622,8 +603,7 @@ class SXtests(casadiTestCase):
     y_=0.75
     
     def test(e,r):
-      f = SXFunction([vertcat([x,y]),vertcat([a,b])],[e])
-      f.init()
+      f = SXFunction("f", [vertcat([x,y]),vertcat([a,b])],[e])
       f.setInput([x_,y_],0)
       f.setInput([a_,b_],1)
       f.evaluate()
@@ -676,8 +656,7 @@ class SXtests(casadiTestCase):
     z = SX.sym("z",5,1)
     q = SX.sym("z",1,6)
     
-    f = SXFunction([x],[x**2])
-    f.init()
+    f = SXFunction("f", [x],[x**2])
     
     self.assertRaises(RuntimeError, lambda : f.call([y]))
     self.assertRaises(RuntimeError, lambda : f.call([q]))
@@ -699,23 +678,8 @@ class SXtests(casadiTestCase):
     self.message("Regression test #181")
     x = SX.sym("x")
     #self.assertRaises(TypeError,lambda : SX([x,None]))  # FIXME: this is leaking memory
-    self.assertRaises(NotImplementedError,lambda: SXFunction([[x], [None]], [[2 * x]]))
-    
-  def test_printLimiting(self):
-    self.message("printLimiting")
+    self.assertRaises(NotImplementedError,lambda: SXFunction("f", [[x], [None]], [[2 * x]]))
 
-    x = SX.sym("x")
-    for i in range(100):
-      x = sin(x)*x
-      
-      
-    self.assertTrue(len(str(x)) <  4*SX.getMaxNumCallsInPrint())
-    
-    SX.setMaxNumCallsInPrint(5)
-    self.assertTrue(len(str(x)) <  100)
-    
-    SX.getMaxNumCallsInPrint()
-    
   @known_bug()  # Not implemented
   def test_isEqual(self):
     self.message("equivalent")
@@ -807,34 +771,18 @@ class SXtests(casadiTestCase):
 
     for op in ops:
       y = op(x)
-      f = SXFunction([x],[y])
-      f.init()
+      f = SXFunction("f", [x],[y])
       f.setInput(0.3)
       f.evaluate()
       self.checkarray(f.getOutput(),array(op(0.3)),"simplifications")
       self.assertEqual(str(y),"x")
       
       y = op(-x)
-      f = SXFunction([x],[y])
-      f.init()
+      f = SXFunction("f", [x],[y])
       f.setInput(0.3)
       f.evaluate()
       self.checkarray(f.getOutput(),array(op(-0.3)),"simplifications")
       self.assertEqual(str(y),"(-x)")
-
-  def test_evalf(self):
-    x = SX(3)
-    y = SX(5)
-    z = evalf(x+y)
-    self.assertEqual(type(z),DMatrix)
-    self.assertEqual(z,8)
-
-  def test_evalfs(self):
-    x = SX.sym("x")
-    y = SX(5)
-    z = evalf(x+y,x,3)
-    self.assertEqual(type(z),DMatrix)
-    self.assertEqual(z,8)
   
   def test_truth(self):
     self.message("Truth values")
@@ -855,8 +803,7 @@ class SXtests(casadiTestCase):
   def test_if_else(self):
     x = SX.sym("x")
     y = if_else(x,1,2)
-    f = SXFunction([x],[y])
-    f.init()
+    f = SXFunction("f", [x],[y])
     f.setInput(1)
     f.evaluate()
     self.assertTrue(f.getOutput()==1,"if_else")
@@ -866,8 +813,7 @@ class SXtests(casadiTestCase):
     
     x0 = 2.1
     y = if_else(x>1,x**2,x**3)
-    f = SXFunction([x],[y])
-    f.init()
+    f = SXFunction("f", [x],[y])
     f.setInput(x0)
     f.evaluate()
     self.checkarray(f.getOutput(),x0**2,"if_else sens")
@@ -880,8 +826,7 @@ class SXtests(casadiTestCase):
     
   def test_issue548(self):
     x = SX.sym('x',100)
-    f = SXFunction([x],[sum(x)**2])
-    f.init()
+    f = SXFunction("f", [x],[sum(x)**2])
     h = f.hessian()
 
 
@@ -900,13 +845,13 @@ class SXtests(casadiTestCase):
       self.assertFalse(vertcat([x,x]).isRegular())
       
       
-  def test_getSymbols(self):
+  def test_symvar(self):
     a = SX.sym("a")
     b = SX.sym("b")
     c = SX.sym("c")
     e = cos(a*b) + c
-    w = getSymbols(e)
-    self.assertEqual(w.nnz(),3)
+    w = symvar(e)
+    self.assertEqual(len(w),3)
     if CasadiOptions.getSimplificationOnTheFly():
       self.assertTrue(isEqual(w[0],a))
       self.assertTrue(isEqual(w[1],b))
@@ -932,91 +877,82 @@ class SXtests(casadiTestCase):
     p = SX.sym("[a,b]")
     r = poly_roots(p)
     
-    f = SXFunction([p],[r])
-    f.init()
+    f = SXFunction("f", [p],[r])
     f.setInput([2,7])
-    a_,b_ = f.input()
+    a_,b_ = f.getInput()
     f.evaluate()
-    f.output()
-    self.checkarray(f.output(),vertcat([-b_/a_]))
+    f.getOutput()
+    self.checkarray(f.getOutput(),vertcat([-b_/a_]))
 
     p = SX.sym("[a,b]")
     r = poly_roots(vertcat([p,0]))
     
-    f = SXFunction([p],[r])
-    f.init()
+    f = SXFunction("f", [p],[r])
     f.setInput([2,7])
-    a_,b_ = f.input()
+    a_,b_ = f.getInput()
     f.evaluate()
-    f.output()
-    self.checkarray(f.output(),vertcat([-b_/a_,0]))
+    f.getOutput()
+    self.checkarray(f.getOutput(),vertcat([-b_/a_,0]))
     
     p = SX.sym("[a,b,c]")
     r = poly_roots(p)
     
-    f = SXFunction([p],[r])
-    f.init()
+    f = SXFunction("f", [p],[r])
     f.setInput([1.13,7,3])
-    a_,b_,c_ = f.input()
+    a_,b_,c_ = f.getInput()
     d = b_**2-4*a_*c_
     f.evaluate()
     x0 = (-b_-sqrt(d))/2/a_
     x1 = (-b_+sqrt(d))/2/a_
-    f.output()
-    self.checkarray(f.output(),vertcat([x0,x1]))
+    f.getOutput()
+    self.checkarray(f.getOutput(),vertcat([x0,x1]))
 
     p = SX.sym("[a,b,c,d]")
     r = poly_roots(p)
     
-    f = SXFunction([p],[r])
-    f.init()
+    f = SXFunction("f", [p],[r])
     f.setInput([11,1.3,-1.7,0.1])
     f.evaluate()
-    f.output()
-    self.checkarray(f.output(),DMatrix([0.298028,-0.479787,0.0635774]),digits=5)
+    f.getOutput()
+    self.checkarray(f.getOutput(),DMatrix([0.298028,-0.479787,0.0635774]),digits=5)
     
     p = SX.sym("[a,b,c,d,e]")
     r = poly_roots(p)
     
-    f = SXFunction([p],[r])
-    f.init()
+    f = SXFunction("f", [p],[r])
     f.setInput([3,6,-123,  -126,1080])
     f.evaluate()
-    f.output()
-    self.checkarray(f.output(),DMatrix([5,3,-4,-6]),digits=5)
+    f.getOutput()
+    self.checkarray(f.getOutput(),DMatrix([5,3,-4,-6]),digits=5)
     
   def test_eig_symbolic(self):
     x = SX.sym("x",2,2)
-    f = SXFunction([x],[eig_symbolic(x)])
-    f.init()
+    f = SXFunction("f", [x],[eig_symbolic(x)])
     f.setInput(DMatrix([[2,0.1],[0.3,0.7]]))
     f.evaluate()
-    self.checkarray(f.output(),DMatrix([0.67732,2.02268]),digits=5)
+    self.checkarray(f.getOutput(),DMatrix([0.67732,2.02268]),digits=5)
     
     
     x = SX.sym("x",2)
-    f = SXFunction([x],[eig_symbolic(c.diag(x))])
-    f.init()
+    f = SXFunction("f", [x],[eig_symbolic(c.diag(x))])
     f.setInput([3,7])
     f.evaluate()
-    self.checkarray(f.output(),f.input())
+    self.checkarray(f.getOutput(),f.getInput())
 
     
     x = SX.sym("x",5)
-    f = SXFunction([x],[eig_symbolic(c.diag(x))])
-    f.init()
+    f = SXFunction("f", [x],[eig_symbolic(c.diag(x))])
     f.setInput([3,7,2,1,6])
     f.evaluate()
-    self.checkarray(f.output(),f.input())
+    self.checkarray(f.getOutput(),f.getInput())
     
     x = SX.sym("x",2,2)
     y = SX.sym("y",2)
-    f = SXFunction([x,y],[eig_symbolic(diagcat([x,c.diag(y)]))])
-    f.init()
+    f = SXFunction("f", [x,y],[eig_symbolic(diagcat([x,c.diag(y)]))])
     f.setInput(DMatrix([[2,0.1],[0.3,0.7]]),0)
     f.setInput([3,7],1)
     f.evaluate()
-    self.checkarray(f.output(),DMatrix([0.67732,2.02268,3,7]),digits=5)
+    self.checkarray(f.getOutput(),DMatrix([0.67732,2.02268,3,7]),digits=5)
 
     x = SX.sym("x",3,3)
     x[2,0] = 0
@@ -1026,12 +962,11 @@ class SXtests(casadiTestCase):
 
     e = eig_symbolic(x)
     
-    f = SXFunction([x],[e])
-    f.init()
-    f.setInput(range(1,8))
-    f.input().printDense()
+    f = SXFunction("f", [x],[e])
+    f.setInputNZ(range(1,8))
+    f.getInput().printDense()
     f.evaluate()
-    self.checkarray(f.output(),DMatrix([1,-0.29150,10.29150]),digits=5)
+    self.checkarray(f.getOutput(),DMatrix([1,-0.29150,10.29150]),digits=5)
     
     
     x = SX.sym("x",3,3)
@@ -1043,21 +978,21 @@ class SXtests(casadiTestCase):
 
     e = eig_symbolic(x)
     
-    f = SXFunction([x],[e])
-    f.init()
-    f.setInput(range(1,7))
-    f.input().printDense()
+    f = SXFunction("f", [x],[e])
+    f.setInputNZ(range(1,7))
+    f.getInput().printDense()
     f.evaluate()
-    self.checkarray(f.output(),DMatrix([1,3,6]),digits=5)
+    self.checkarray(f.getOutput(),DMatrix([1,3,6]),digits=5)
 
     x = SX.sym("x",Sparsity.upper(5))
   
-    f = SXFunction([x],[eig_symbolic(x)])
-    f.init()
+    f = SXFunction("f", [x],[eig_symbolic(x)])
     f.setInput(6)
-    f.input()[Sparsity.diag(5)] = c.diag(range(5))
+    tmp = f.getInput()
+    tmp[Sparsity.diag(5)] = c.diag(range(5))
+    f.setInput(tmp)
     f.evaluate()
-    self.checkarray(f.output(),DMatrix(range(5)))
+    self.checkarray(f.getOutput(),DMatrix(range(5)))
     
   def test_jacobian_empty(self):
     x = SX.sym("x",3)
@@ -1088,21 +1023,19 @@ class SXtests(casadiTestCase):
 
     filt = Sparsity.diag(N)+Sparsity.triplet(N,N,[1],[3])
 
-    f = SXFunction([x,y],[mul(x,y)])
-    f.init()
+    f = SXFunction("f", [x,y],[mul(x,y)])
     f.setInput(x_,0)
     f.setInput(y_,1)
-    g = SXFunction([x,y],[mul(x,y,SX.zeros(filt))])
-    g.init()
+    g = SXFunction("g", [x,y],[mac(x,y,SX.zeros(filt))])
     g.setInput(x_,0)
     g.setInput(y_,1)
     
     f.evaluate()
     g.evaluate()
     
-    self.checkarray(IMatrix.ones(filt),IMatrix.ones(g.output().sparsity()))
+    self.checkarray(IMatrix.ones(filt),IMatrix.ones(g.getOutput().sparsity()))
     
-    self.checkarray(f.output()[filt],g.output())
+    self.checkarray(f.getOutput()[filt],g.getOutput())
     
   @skip(platform_arch==32)
   @memory_heavy()
@@ -1118,26 +1051,22 @@ class SXtests(casadiTestCase):
     
     x = SX.sym("x",H.size1())
     
-    f = SXFunction([x],[mul([x.T,H,x])])
+    f = SXFunction("f", [x],[mul([x.T,H,x])], {'verbose':True})
     H *= 2
-    f.setOption("verbose",True)
-    f.init()
 
     h = f.hessian()
-    h.init()
     h.evaluate()
     
-    self.assertTrue(h.output().sparsity()==H.sparsity())
+    self.assertTrue(h.getOutput().sparsity()==H.sparsity())
     
-    self.checkarray(h.output().nonzeros(),H.nonzeros())
+    self.checkarray(h.getOutput().nonzeros(),H.nonzeros())
 
   def test_mxnulloutput(self):
      a = SX(5,0)
      b = SX.sym("x",2)
      bm = MX.sym("x",2)
      
-     f = SXFunction([b],[a])
-     f.init()
+     f = SXFunction("f", [b],[a])
      c = f.call([bm])[0]
 
      self.assertEqual(c.size1(),5)
@@ -1150,8 +1079,7 @@ class SXtests(casadiTestCase):
      
      a = SX(0,0)
      
-     f = SXFunction([b],[a])
-     f.init()
+     f = SXFunction("f", [b],[a])
      
      c = f.call([bm])[0]
 
@@ -1193,89 +1121,86 @@ class SXtests(casadiTestCase):
     y = SX.sym("y")
     z = copysign(x,y)
     
-    f = SXFunction([x,y],[z])
-    f.init()
+    f = SXFunction("f", [x,y],[z])
     
     f.setInput(2,0)
     f.setInput(0.5,1)
     f.evaluate()
-    self.checkarray(f.output(),DMatrix([2]))
+    self.checkarray(f.getOutput(),DMatrix([2]))
 
     f.setInput(2,0)
     f.setInput(-0.5,1)
     f.evaluate()
-    self.checkarray(f.output(),DMatrix([-2]))
+    self.checkarray(f.getOutput(),DMatrix([-2]))
     
     f.setInput(-2,0)
     f.setInput(0.5,1)
     f.evaluate()
-    self.checkarray(f.output(),DMatrix([2]))
+    self.checkarray(f.getOutput(),DMatrix([2]))
 
     f.setInput(-2,0)
     f.setInput(-0.5,1)
     f.evaluate()
-    self.checkarray(f.output(),DMatrix([-2]))
+    self.checkarray(f.getOutput(),DMatrix([-2]))
     
     f.setInput(2,0)
     f.setInput(0,1)
     f.evaluate()
-    self.checkarray(f.output(),DMatrix([2]))
+    self.checkarray(f.getOutput(),DMatrix([2]))
     
     J = f.jacobian()
-    J.init()
     
     J.setInput(2,0)
     J.setInput(0.5,1)
     J.evaluate()
-    self.checkarray(J.output(),DMatrix([1]))
+    self.checkarray(J.getOutput(),DMatrix([1]))
 
     J.setInput(2,0)
     J.setInput(-0.5,1)
     J.evaluate()
-    self.checkarray(J.output(),DMatrix([-1]))
+    self.checkarray(J.getOutput(),DMatrix([-1]))
     
     J.setInput(-2,0)
     J.setInput(0.5,1)
     J.evaluate()
-    self.checkarray(J.output(),DMatrix([1]))
+    self.checkarray(J.getOutput(),DMatrix([1]))
 
     J.setInput(-2,0)
     J.setInput(-0.5,1)
     J.evaluate()
-    self.checkarray(J.output(),DMatrix([-1]))
+    self.checkarray(J.getOutput(),DMatrix([-1]))
     
     J.setInput(2,0)
     J.setInput(0,1)
     J.evaluate()
-    self.checkarray(J.output(),DMatrix([1]))
+    self.checkarray(J.getOutput(),DMatrix([1]))
 
     J = f.jacobian(1)
-    J.init()
     
     J.setInput(2,0)
     J.setInput(0.5,1)
     J.evaluate()
-    self.checkarray(J.output(),DMatrix([0]))
+    self.checkarray(J.getOutput(),DMatrix([0]))
 
     J.setInput(2,0)
     J.setInput(-0.5,1)
     J.evaluate()
-    self.checkarray(J.output(),DMatrix([0]))
+    self.checkarray(J.getOutput(),DMatrix([0]))
     
     J.setInput(-2,0)
     J.setInput(0.5,1)
     J.evaluate()
-    self.checkarray(J.output(),DMatrix([0]))
+    self.checkarray(J.getOutput(),DMatrix([0]))
 
     J.setInput(-2,0)
     J.setInput(-0.5,1)
     J.evaluate()
-    self.checkarray(J.output(),DMatrix([0]))
+    self.checkarray(J.getOutput(),DMatrix([0]))
     
     J.setInput(2,0)
     J.setInput(0,1)
     J.evaluate()
-    self.checkarray(J.output(),DMatrix([0]))
+    self.checkarray(J.getOutput(),DMatrix([0]))
     
   def test_dependsOn(self):
     a = SX.sym("a")

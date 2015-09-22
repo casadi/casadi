@@ -55,7 +55,7 @@ namespace casadi {
   }
 
   void Polynomial::repr(std::ostream &stream, bool trailing_newline) const {
-    cout << "poly(" << p_ << ")" << endl;
+    userOut() << "poly(" << p_ << ")" << endl;
     if (trailing_newline) stream << std::endl;
   }
 

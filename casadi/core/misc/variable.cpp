@@ -29,9 +29,9 @@
 using namespace std;
 namespace casadi {
 
-  Variable::Variable(const std::string& name) {
-    this->v = SXElement::sym(name);
-    this->d = SXElement::sym("der_" + name);
+  Variable::Variable(const std::string& name, const Sparsity& sp) {
+    this->v = MX::sym(name, sp);
+    this->d = MX::sym("der_" + name, sp);
     this->variability = CONTINUOUS;
     this->causality = INTERNAL;
     this->category = CAT_UNKNOWN;

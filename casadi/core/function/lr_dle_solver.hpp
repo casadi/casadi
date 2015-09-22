@@ -51,6 +51,7 @@
 
 */
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a \e dle solver [lrdleIn]
   enum LR_DLEInput {
@@ -71,18 +72,7 @@ namespace casadi {
     LR_DLE_Y,
     LR_DLE_NUM_OUT
   };
-
-  /// Structure specification of a DLE [lrdleStruct]
-  enum LrDleStruct {
-    /// The matrix A [a]
-    LR_DLE_STRUCT_A,
-    /// The matrix V [v]
-    LR_DLE_STRUCT_V,
-    /// The matrix C (defaults to unity) [c]
-    LR_DLE_STRUCT_C,
-    /// H matrix: horizontal stack of all Hi [h]
-    LR_DLE_STRUCT_H,
-    LR_DLE_STRUCT_NUM};
+#endif // SWIG
 
   /// Forward declaration of internal class
   class LrDleInternal;
@@ -106,14 +96,24 @@ namespace casadi {
     /// Clone
     LrDleSolver clone() const;
 
-    /** \brief LrDleSolver solver factory
-    * \param name \pluginargument{LrDleSolver}
+    /** \brief Constructor (new syntax, includes initialization)
+    * \param solver \pluginargument{LrDleSolver}
     * \param st \structargument{LrDle}
     */
-    LrDleSolver(const std::string& name, const LrDleStructure& st);
+    LrDleSolver(const std::string& name, const std::string& solver,
+                const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor (no initialization)
+    * \param solver \pluginargument{LrDleSolver}
+    * \param st \structargument{LrDle}
+    */
+    LrDleSolver(const std::string& solver,
+                const std::map<std::string, Sparsity>& st);
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=CASADI_COUT) const;
+    void printStats(std::ostream &stream=casadi::userOut()) const;
 
     /// Access functions of the node
     LrDleInternal* operator->();
@@ -134,7 +134,7 @@ namespace casadi {
     static std::string doc(const std::string& name);
 
     /// Get the resulting sparsity
-    static Sparsity getSparsity(const LrDleStructure& st,
+    static Sparsity getSparsity(const std::map<std::string, Sparsity>& st,
       const std::vector<int> &Hs=std::vector<int>());
   };
 

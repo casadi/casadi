@@ -55,6 +55,16 @@
 
 /** \pluginsection{NlpSolver,ipopt} **/
 
+  typedef struct {
+    double proc;
+    double wall;
+  } timer;
+
+  typedef struct {
+    double proc;
+    double wall;
+  } diffTime;
+
 /// \cond INTERNAL
 namespace casadi {
 
@@ -81,7 +91,8 @@ public:
   virtual void init();
   virtual void evaluate();
 
-  virtual void setQPOptions();
+  /// Set default options for a given recipe
+  virtual void setDefaultOptions(const std::vector<std::string>& recipes);
 
   // Get reduced Hessian
   virtual DMatrix getReducedHessian();
@@ -105,7 +116,7 @@ public:
   #endif // WITH_SIPOPT
 
   /// All IPOPT options
-  std::map<std::string, opt_type> ops_;
+  std::map<std::string, TypeID> ops_;
 
   // Ipopt callback functions
   bool eval_f(int n, const double* x, bool new_x, double& obj_value);
@@ -147,15 +158,21 @@ public:
                           const std::map<std::string, std::vector<int> >& con_integer_md,
                           const std::map<std::string, std::vector<double> >& con_numeric_md);
 
+  static timer getTimerTime(void);
+  static diffTime diffTimers(const timer t1, const timer t0);
+  static void timerPlusEq(diffTime & t, const diffTime diff);
+  static void timingSummary(
+    std::vector<std::tuple<std::string, int, diffTime> >& xs);
+
   // Accumulated time since last reset:
-  double t_eval_f_; // time spent in eval_f
-  double t_eval_grad_f_; // time spent in eval_grad_f
-  double t_eval_g_; // time spent in eval_g
-  double t_eval_jac_g_; // time spent in eval_jac_g
-  double t_eval_h_; // time spent in eval_h
-  double t_callback_fun_;  // time spent in callback function
-  double t_callback_prepare_; // time spent in callback preparation
-  double t_mainloop_; // time spent in the main loop of the solver
+  diffTime t_eval_f_; // time spent in eval_f
+  diffTime t_eval_grad_f_; // time spent in eval_grad_f
+  diffTime t_eval_g_; // time spent in eval_g
+  diffTime t_eval_jac_g_; // time spent in eval_jac_g
+  diffTime t_eval_h_; // time spent in eval_h
+  diffTime t_callback_fun_;  // time spent in callback function
+  diffTime t_callback_prepare_; // time spent in callback preparation
+  diffTime t_mainloop_; // time spent in the main loop of the solver
 
   // Accumulated counts since last reset:
   int n_eval_f_; // number of calls to eval_f
@@ -163,6 +180,7 @@ public:
   int n_eval_g_; // number of calls to eval_g
   int n_eval_jac_g_; // number of calls to eval_jac_g
   int n_eval_h_; // number of calls to eval_h
+  int n_eval_callback_; // number of calls to callback
   int n_iter_; // number of iterations
 
   // For parametric sensitivities with sIPOPT

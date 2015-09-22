@@ -120,9 +120,11 @@ namespace casadi {
   }
 
   SharedObjectNode::~SharedObjectNode() {
-    casadi_assert_warning(count==0,
-                          "Reference counting failure. "
-                          "Possible cause: Circular dependency in user code.");
+    if (count!=0) {
+      // Note that casadi_assert_warning cannot be used in destructors
+      std::cerr << "Reference counting failure." <<
+                   "Possible cause: Circular dependency in user code." << std::endl;
+    }
     if (weak_ref_!=0) {
       weak_ref_->kill();
       delete weak_ref_;
@@ -132,10 +134,14 @@ namespace casadi {
   void SharedObject::init(bool allow_reinit) {
     if (allow_reinit || !isInit()) {
       (*this)->init();
+      (*this)->postinit();
     }
   }
 
   void SharedObjectNode::init() {
+  }
+
+  void SharedObjectNode::postinit() {
   }
 
   void SharedObject::repr(std::ostream &stream, bool trailing_newline) const {
@@ -255,6 +261,10 @@ namespace casadi {
       weak_ref_ = new WeakRef(this);
     }
     return weak_ref_;
+  }
+
+  size_t SharedObject::__hash__() const {
+    return reinterpret_cast<size_t>(get());
   }
 
 } // namespace casadi

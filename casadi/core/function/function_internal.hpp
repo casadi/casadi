@@ -31,6 +31,7 @@
 #include "../weak_ref.hpp"
 #include <set>
 #include "code_generator.hpp"
+#include "compiler.hpp"
 #include "../matrix/sparse_storage.hpp"
 
 // This macro is for documentation purposes
@@ -43,6 +44,16 @@
 
 namespace casadi {
 
+  ///@{
+  /** \brief  Function pointer types */
+  typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
+                             const int **colind, const int **row);
+  typedef int (*workPtr)(int *n_iw, int *n_w);
+  typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
+  typedef void (*simplifiedPtr)(const double* arg, double* res);
+  typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
+  ///@}
+
   class MXFunction;
 
   /** \brief Internal class for Function
@@ -51,7 +62,7 @@ namespace casadi {
       A regular user should never work with any Node class. Use Function directly.
   */
   class CASADI_EXPORT FunctionInternal : public OptionsFunctionalityNode,
-                                                  public IOInterface<FunctionInternal>{
+                                         public IOInterface<FunctionInternal>{
     friend class Function;
 
   protected:
@@ -78,6 +89,12 @@ namespace casadi {
         this function when initialized. */
     virtual void init();
 
+    /** \brief Post-initialization
+        This function, which visits the class hierarchy in reverse order is run after
+        init() has been completed.
+    */
+    virtual void postinit();
+
     /** \brief  Propagate the sparsity pattern through a set of directional
         derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
@@ -92,17 +109,21 @@ namespace casadi {
     /** \brief  Reset the sparsity propagation */
     virtual void spInit(bool fwd) {}
 
+    /** \brief  Evaluate numerically, possibly using just-in-time compilation */
+    void eval(const double** arg, double** res, int* iw, double* w);
+
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const cpv_double& arg, const pv_double& res, int* itmp, double* rtmp);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief  Evaluate symbolically, SXElement type, possibly nonmatching sparsity patterns */
+    virtual void evalSX(const SXElement** arg, SXElement** res,
+                        int* iw, SXElement* w);
 
     /** \brief  Evaluate symbolically, SXElement type, possibly nonmatching sparsity patterns */
     virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res);
 
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
-
-    /** \brief  Create function call node */
-    virtual std::vector<MX> createCall(const std::vector<MX>& arg);
 
     /** \brief Call a function, DMatrix type (overloaded) */
     void call(const DMatrixVector& arg, DMatrixVector& res,
@@ -160,27 +181,30 @@ namespace casadi {
     ///@{
     /** \brief Return gradient function */
     Function gradient(int iind, int oind);
-    virtual Function getGradient(int iind, int oind);
+    virtual Function getGradient(const std::string& name, int iind, int oind, const Dict& opts);
     ///@}
 
     ///@{
     /** \brief Return tangent function */
     Function tangent(int iind, int oind);
-    virtual Function getTangent(int iind, int oind);
+    virtual Function getTangent(const std::string& name, int iind, int oind, const Dict& opts);
     ///@}
 
     ///@{
     /** \brief Return Jacobian function */
     Function jacobian(int iind, int oind, bool compact, bool symmetric);
     void setJacobian(const Function& jac, int iind, int oind, bool compact);
-    virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
-    virtual Function getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
+    virtual Function getJacobian(const std::string& name, int iind, int oind,
+                                 bool compact, bool symmetric, const Dict& opts);
+    virtual Function getNumericJacobian(const std::string& name, int iind, int oind,
+                                        bool compact, bool symmetric, const Dict& opts);
     ///@}
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     Function fullJacobian();
-    virtual Function getFullJacobian();
+    virtual bool hasFullJacobian() const;
+    virtual Function getFullJacobian(const std::string& name, const Dict& opts);
     ///@}
 
     ///@{
@@ -190,8 +214,8 @@ namespace casadi {
      *    if no cached version is available.
      */
     Function derForward(int nfwd);
-    virtual Function getDerForward(int nfwd);
-    virtual bool hasDerForward() const { return hasSetOption("custom_forward");}
+    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
+    virtual int numDerForward() const { return hasSetOption("custom_forward") ? 64 : 0;}
     void setDerForward(const Function& fcn, int nfwd);
     ///@}
 
@@ -202,8 +226,8 @@ namespace casadi {
      *    if no cached version is available.
      */
     Function derReverse(int nadj);
-    virtual Function getDerReverse(int nadj);
-    virtual bool hasDerReverse() const { return hasSetOption("custom_reverse");}
+    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
+    virtual int numDerReverse() const { return hasSetOption("custom_reverse") ? 64 : 0;}
     void setDerReverse(const Function& fcn, int nadj);
     ///@}
 
@@ -228,23 +252,37 @@ namespace casadi {
     */
     MXFunction wrapMXFunction();
 
-    /** \brief  Print to a stream */
-    virtual void generateCode(std::ostream &cfile, bool generate_main);
-
-    /** \brief Generate code for function inputs and outputs */
-    void generateIO(CodeGenerator& gen);
+    /** \brief Generate function call */
+    virtual void generate(CodeGenerator& g, const std::vector<int>& arg,
+                          const std::vector<int>& res) const;
 
     /** \brief Generate code the function */
-    virtual void generateFunction(std::ostream &stream, const std::string& fname,
-                                  const std::string& type, CodeGenerator& gen) const;
+    virtual void generateFunction(CodeGenerator& g, const std::string& fname,
+                                  bool decl_static) const;
+
+    /** \brief Generate meta-information allowing a user to evaluate a generated function */
+    void generateMeta(CodeGenerator& g, const std::string& fname) const;
+
+    /** \brief Use simplified signature */
+    virtual bool simplifiedCall() const { return false;}
+
+    /** \brief Generate a call to a function (generic signature) */
+    virtual std::string generateCall(const CodeGenerator& g,
+                                     const std::string& arg, const std::string& res,
+                                     const std::string& iw, const std::string& w) const;
+
+    /** \brief Generate a call to a function (simplified signature) */
+    virtual std::string generateCall(const CodeGenerator& g,
+                                     const std::string& arg, const std::string& res) const;
+
+    /** \brief Add a dependent function */
+    virtual void addDependency(CodeGenerator& g) const;
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(std::ostream &stream, const std::string& type,
-                                      CodeGenerator& gen) const;
+    virtual void generateDeclarations(CodeGenerator& g) const;
 
     /** \brief Generate code for the function body */
-    virtual void generateBody(std::ostream &stream, const std::string& type,
-                              CodeGenerator& gen) const;
+    virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
@@ -255,6 +293,9 @@ namespace casadi {
     /** \brief Check if the numerical values of the supplied bounds make sense */
     virtual void checkInputs() const {}
 
+    /** \brief  Print dimensions of inputs and outputs */
+    void printDimensions(std::ostream &stream) const;
+
     /** \brief Get the unidirectional or bidirectional partition */
     void getPartition(int iind, int oind, Sparsity& D1, Sparsity& D2, bool compact, bool symmetric);
 
@@ -264,20 +305,26 @@ namespace casadi {
     /// Is function fcn being monitored
     bool monitored(const std::string& mod) const;
 
+    /** \brief Get the number of function inputs */
+    inline int nIn() const { return ibuf_.size();}
+
+    /** \brief Get the number of function outputs */
+    inline int nOut() const { return obuf_.size();}
+
     /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
-    int getNumInputNonzeros() const;
+    int nnzIn() const;
 
     /** \brief  Get total number of nonzeros in all of the matrix-valued outputs */
-    int getNumOutputNonzeros() const;
+    int nnzOut() const;
 
     /** \brief  Get total number of elements in all of the matrix-valued inputs */
-    int getNumInputElements() const;
+    int numelIn() const;
 
     /** \brief  Get total number of elements in all of the matrix-valued outputs */
-    int getNumOutputElements() const;
+    int numelOut() const;
 
     /// Get all statistics obtained at the end of the last evaluate call
-    const Dictionary & getStats() const;
+    const Dict & getStats() const;
 
     /// Get single statistic obtained at the end of the last evaluate call
     GenericType getStat(const std::string & name) const;
@@ -314,30 +361,145 @@ namespace casadi {
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<SX> symbolicInputSX() const;
 
-    ///@{
-    /** \brief Access input/output scheme */
-    inline const IOScheme& inputScheme() const { return input_.scheme;}
-    inline const IOScheme& outputScheme() const { return output_.scheme;}
-    inline IOScheme& inputScheme() { return input_.scheme;}
-    inline IOScheme& outputScheme() { return output_.scheme;}
-    ///@}
+    /** \brief Get input scheme index by name */
+    virtual int inputIndex(const std::string &name) const {
+      const std::vector<std::string>& v=ischeme_;
+      for (std::vector<std::string>::const_iterator i=v.begin(); i!=v.end(); ++i) {
+        size_t col = i->find(':');
+        if (i->compare(0, col, name)==0) return i-v.begin();
+      }
+      casadi_error("FunctionInternal::inputIndex: could not find entry \""
+                   << name << "\". Available names are: " << v << ".");
+      return -1;
+    }
 
-    ///@{
-    /// Input/output structures of the function */
-    inline const IOSchemeVector<DMatrix>& input_struct() const { return input_;}
-    inline const IOSchemeVector<DMatrix>& output_struct() const { return output_;}
-    inline IOSchemeVector<DMatrix>& input_struct() { return input_;}
-    inline IOSchemeVector<DMatrix>& output_struct() { return output_;}
-    ///@}
+    /** \brief Get output scheme index by name */
+    virtual int outputIndex(const std::string &name) const {
+      const std::vector<std::string>& v=oscheme_;
+      for (std::vector<std::string>::const_iterator i=v.begin(); i!=v.end(); ++i) {
+        size_t col = i->find(':');
+        if (i->compare(0, col, name)==0) return i-v.begin();
+      }
+      casadi_error("FunctionInternal::outputIndex: could not find entry \""
+                   << name << "\". Available names are: " << v << ".");
+      return -1;
+    }
 
-    ///@{
-    /// Input/output access without checking (faster, but unsafe)
-    inline const Matrix<double>& inputNoCheck(int iind=0) const { return inputS<false>(iind);}
-    inline const Matrix<double>& outputNoCheck(int oind=0) const { return outputS<false>(oind);}
+    /** \brief Get input scheme name by index */
+    virtual std::string inputName(int ind) const {
+      const std::string& s=ischeme_.at(ind);
+      size_t col = s.find(':'); // Colon seprates name from description
+      return s.substr(0, col);
+    }
 
-    inline Matrix<double>& inputNoCheck(int iind=0) { return inputS<false>(iind);}
-    inline Matrix<double>& outputNoCheck(int oind=0) { return outputS<false>(oind);}
-    ///@}
+    /** \brief Get output scheme name by index */
+    virtual std::string outputName(int ind) const {
+      const std::string& s=oscheme_.at(ind);
+      size_t col = s.find(':'); // Colon seprates name from description
+      return s.substr(0, col);
+    }
+
+    /** \brief Get input scheme description by index */
+    virtual std::string inputDescription(int ind) const {
+      const std::string& s=ischeme_.at(ind);
+      size_t col = s.find(':'); // Colon seprates name from description
+      if (col==std::string::npos) {
+        return std::string("No description available");
+      } else {
+        return s.substr(col+1);
+      }
+    }
+
+    /** \brief Get output scheme description by index */
+    virtual std::string outputDescription(int ind) const {
+      const std::string& s=oscheme_.at(ind);
+      size_t col = s.find(':'); // Colon seprates name from description
+      if (col==std::string::npos) {
+        return std::string("No description available");
+      } else {
+        return s.substr(col+1);
+      }
+    }
+
+    /** \brief Get default input value */
+    virtual double defaultInput(int ind) const { return 0;}
+
+    /** \brief Get sparsity of a given input */
+    /// @{
+    inline Sparsity inputSparsity(int ind=0) const {
+      return input(ind).sparsity();
+    }
+    inline Sparsity inputSparsity(const std::string& iname) const {
+      return input(inputIndex(iname)).sparsity();
+    }
+    /// @}
+
+    /** \brief Get sparsity of a given output */
+    /// @{
+    inline Sparsity outputSparsity(int ind=0) const {
+      return output(ind).sparsity();
+    }
+    inline Sparsity outputSparsity(const std::string& iname) const {
+      return output(outputIndex(iname)).sparsity();
+    }
+    /// @}
+
+
+    /// Access input argument by index
+    inline Matrix<double>& input(int i=0) {
+      try {
+        return ibuf_.at(i);
+      } catch(std::out_of_range&) {
+        std::stringstream ss;
+        ss <<  "In function " << getOption("name")
+           << ": input " << i << " not in interval [0, " << nIn() << ")";
+        if (!isInit()) ss << std::endl << "Did you forget to initialize?";
+        throw CasadiException(ss.str());
+      }
+    }
+
+    /// Access input argument by name
+    inline Matrix<double>& input(const std::string &iname) {
+      return input(inputIndex(iname));
+    }
+
+    /// Const access input argument by index
+    inline const Matrix<double>& input(int i=0) const {
+      return const_cast<FunctionInternal*>(this)->input(i);
+    }
+
+    /// Const access input argument by name
+    inline const Matrix<double>& input(const std::string &iname) const {
+      return const_cast<FunctionInternal*>(this)->input(iname);
+    }
+
+    /// Access output argument by index
+    inline Matrix<double>& output(int i=0) {
+      try {
+        return obuf_.at(i);
+      } catch(std::out_of_range&) {
+        std::stringstream ss;
+        ss <<  "In function " << getOption("name")
+           << ": output " << i << " not in interval [0, " << nOut() << ")";
+        if (!isInit()) ss << std::endl << "Did you forget to initialize?";
+        throw CasadiException(ss.str());
+      }
+    }
+
+    /// Access output argument by name
+    inline Matrix<double>& output(const std::string &oname) {
+      return output(outputIndex(oname));
+    }
+
+    /// Const access output argument by index
+    inline const Matrix<double>& output(int i=0) const {
+      return const_cast<FunctionInternal*>(this)->output(i);
+    }
+
+    /// Const access output argument by name
+    inline const Matrix<double>& output(const std::string &oname) const {
+      return const_cast<FunctionInternal*>(this)->output(oname);
+    }
 
     /** \brief  Log the status of the solver */
     void log(const std::string& msg) const;
@@ -353,17 +515,49 @@ namespace casadi {
     /// For documentation, see the MXNode class
     ///@{
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const std::vector<const bvec_t*>& arg,
-                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+    virtual void spFwdSwitch(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const std::vector<bvec_t*>& arg,
-                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+    virtual void spAdjSwitch(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
-    virtual void nTmp(size_t& ni, size_t& nr);
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                          const std::vector<int>& res, CodeGenerator& gen) const;
-    virtual void printPart(const MXNode* node, std::ostream &stream, int part) const;
+    /** \brief  Propagate sparsity forward */
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+
+    /** \brief Get number of temporary variables needed */
+    void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
+
+    /** \brief Get required length of arg field */
+    size_t sz_arg() const { return sz_arg_;}
+
+    /** \brief Get required length of res field */
+    size_t sz_res() const { return sz_res_;}
+
+    /** \brief Get required length of iw field */
+    size_t sz_iw() const { return sz_iw_;}
+
+    /** \brief Get required length of w field */
+    size_t sz_w() const { return sz_w_;}
+
+    /** \brief Ensure required length of arg field */
+    void alloc_arg(size_t sz_arg);
+
+    /** \brief Ensure required length of res field */
+    void alloc_res(size_t sz_res);
+
+    /** \brief Ensure required length of iw field */
+    void alloc_iw(size_t sz_iw);
+
+    /** \brief Ensure required length of w field */
+    void alloc_w(size_t sz_w);
+
+    /** \brief Ensure work vectors long enough to evaluate function */
+    void alloc(const Function& f);
+
+    /** \brief Update lengths of temporary work vectors */
+    void alloc();
     ///@}
 
     /** \brief Prints out a human readable report about possible constraint violations
@@ -391,20 +585,24 @@ namespace casadi {
     virtual bool adjViaJac(int nadj);
     ///@}
 
-    /** \brief  Inputs of the function */
-    IOSchemeVector<DMatrix> input_;
+    /// Input and output buffers
+    std::vector<DMatrix> ibuf_, obuf_;
 
-    /** \brief  Output of the function */
-    IOSchemeVector<DMatrix> output_;
+    /// Input and output scheme
+    std::vector<std::string> ischeme_, oscheme_;
 
     /** \brief  Verbose -- for debugging purposes */
     bool verbose_;
 
+    /** \brief  Use just-in-time compiler */
+    bool jit_;
+    evalPtr evalD_;
+
     /// Set of module names which are extra monitored
     std::set<std::string> monitors_;
 
-    /** \brief  Dictionary of statistics (resulting from evaluate) */
-    Dictionary stats_;
+    /** \brief  Dict of statistics (resulting from evaluate) */
+    Dict stats_;
 
     /** \brief  Flag to indicate whether statistics must be gathered */
     bool gather_stats_;
@@ -421,14 +619,16 @@ namespace casadi {
     /// Cache for Jacobians
     SparseStorage<WeakRef> jac_, jac_compact_;
 
-    /** \brief  Temporary vector needed for the evaluation (integer) */
-    std::vector<int> itmp_;
-
-    /** \brief  Temporary vector needed for the evaluation (real) */
-    std::vector<double> rtmp_;
-
     /// User-set field
     void* user_data_;
+
+    /// Name
+    std::string name_;
+
+    /// Just-in-time compiler
+    std::string compilerplugin_;
+    Compiler compiler_;
+    Dict jit_options_;
 
     bool monitor_inputs_, monitor_outputs_;
 
@@ -441,6 +641,9 @@ namespace casadi {
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     std::string getSanitizedName() const;
 
+    /** \brief get function name with all non alphanumeric characters converted to '_' */
+    static std::string sanitizeName(const std::string& name);
+
     /** \brief Can a derivative direction be skipped */
     template<typename MatType>
     static bool purgable(const std::vector<MatType>& seed);
@@ -452,6 +655,17 @@ namespace casadi {
     /** \brief Symbolic expressions for the adjoint seeds */
     template<typename MatType>
     std::vector<std::vector<MatType> > symbolicAdjSeed(int nadj, const std::vector<MatType>& v);
+
+  protected:
+    /** \brief  Temporary vector needed for the evaluation (integer) */
+    std::vector<int> iw_tmp_;
+
+    /** \brief  Temporary vector needed for the evaluation (real) */
+    std::vector<double> w_tmp_;
+
+  private:
+    /** \brief Sizes of input and output buffers */
+    size_t sz_arg_, sz_res_, sz_iw_, sz_w_;
   };
 
   // Template implementations

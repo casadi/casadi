@@ -124,53 +124,26 @@ class Enum:
     return str(len(self.entries))
 
   def hppcode(self):
-    s= "/// \cond INTERNAL\n/// Helper function for '" + self.enum + "'\n"
-    s+="""
-template<class M>
-class CASADI_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit %sIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_%s) {}
-};
-/// \endcond
-""" % (self.enum,self.enum,self.enum)
-    #if self.enum.endswith("Struct"):
-    #  s+="typedef %sIOSchemeVector<Sparsity> %sure;\n" % (self.enum,self.enum)
-    s+= "\n".join(map(lambda x: ("/// " + x).rstrip(),self.doc.split("\n")))+"\n"
+    s= "\n".join(map(lambda x: ("/// " + x).rstrip(),self.doc.split("\n")))+"\n"
     s+= "/// \\copydoc scheme_" + self.enum +  "\n"
     s+= "template<class M>" + "\n"
-    s+= self.enum + "IOSchemeVector<M> " + self.name + "("
+    s+= "std::pair<std::map<std::string, M>, std::vector<std::string> > " + self.name + "("
     for i, (name, doc, enum) in enumerate(self.entries):
-      s+="""\n    const std::string &arg_s%d ="", const M &arg_m%d =M()""" % (i,i) + ","
+      s+="""\n    const std::string &n%d ="", const M &x%d =M()""" % (i,i) + ","
     s=s[:-1] + ") {\n"
-    s+= "  std::vector<M> ret(%d);\n" % len(self.entries)
 
-
-    s+= "  std::map<std::string, M> arg;\n"
+    s+= "  std::map<std::string, M> m;\n"
     for i,_ in enumerate(self.entries):
-      s+="""  if (arg_s%d != "") arg.insert(make_pair(arg_s%d, arg_m%d));\n""" % (i,i,i)
-    s+="""  typedef typename std::map<std::string, M>::const_iterator it_type;\n"""
-    s+="""  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_%s, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in %s: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "%s");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-"""  % (self.enum,self.enum,", ".join([name for name, doc, enum in self.entries]))
-    s+= "  return %sIOSchemeVector<M>(ret);" % self.enum
-    s+="\n}\n"
-    s+= "template<class M>" + "\n"
-    s+= "std::vector<M> " + self.name + "(const std::vector<M>& args,"
-    for i, (name, doc, enum) in enumerate(self.entries):
-      s+='\n    const std::string &arg_s%d=""' % i + ","
-    s=s[:-1] + ") {\n"
-    s+= "  std::vector<M> ret;\n"
-    for i,_ in enumerate(self.entries):
-      s+="""  if (arg_s%d != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_%s, arg_s%d))); // NOLINT(whitespace/line_length)\n""" % (i,self.enum,i)
-    s+= "  return ret;\n"
-    s+="\n}\n"
+      s+="""  if (!n%d.empty()) m[n%d]=x%d;\n""" % (i,i,i)
+    s+="""  std::string s[] = {%s};\n""" % ", ".join(['"'+name+'"' for name, doc, enum in self.entries])
+    s+="""  std::vector<std::string> sv = std::vector<std::string>(s, s+%d);\n"""  % len(self.entries)
+    s+="""  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {\n"""
+    s+="""    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())\n"""
+    s+="""      casadi_error("Error in '%s' arguments. You supplied key '"\n""" % self.name
+    s+="""        << it->first << "'. Allowed keys are: " << sv << ".");\n"""
+    s+="""  }\n"""
+    s+= "  return std::make_pair(m, sv);\n"
+    s+="}\n"
 
     return s
     
@@ -190,60 +163,26 @@ class CASADI_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
       s+="%template(" + self.name + ") " + self.name + "<casadi::MX>;\n"
       s+="%template(" + self.name + ") " + self.name + "<casadi::Matrix<double> >;\n"
       s+="%template(" + self.name + ") " + self.name + "<casadi::Sparsity>;\n"
-      s+="%template(" +  "IOSchemeVector" + self.enum + "SX) " + self.enum + "IOSchemeVector<SX>;\n"
-      s+="%template(" +  "IOSchemeVector" + self.enum + "MX) " + self.enum + "IOSchemeVector<MX>;\n"
-      s+="%template(" +  "IOSchemeVector" + self.enum + "D) " + self.enum + "IOSchemeVector< Matrix<double> >;\n"
-      s+="%template(" +  "IOSchemeVector" + self.enum + "Sparsity) " + self.enum + "IOSchemeVector<Sparsity>;\n"
-      #s+="%rename(" + self.name + ") " + self.name + "<casadi::SX>;\n"
-      #s+="%rename(" + self.name + ") " + self.name + "<casadi::MX>;\n"
-      #s+="%rename(" + self.name + ") " + self.name + "<casadi::Sparsity>;\n"
-      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "SX;\n"
-      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "MX;\n"
-      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "D;\n"
-      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum+ "Sparsity;\n"
-    s+="}\n"
-    return s
-
-  def pureswigcode(self):
-    s="namespace casadi {\n"
-    if self.enum.endswith('VecStruct'):
-      s+="%template(" + self.enum + "ure) " + self.enum + "IOSchemeVector< std::vector<Sparsity> >;\n"
-    elif self.enum.endswith('Struct'):
-      s+="%template(" + self.enum + "ure) " + self.enum + "IOSchemeVector<Sparsity>;\n"
     s+="}\n"
     return s
 
   def pycode(self):
-    s="def " + self.name + "(*dummy,**kwargs):\n"
+    s="def " + self.name + "(**kwargs):\n"
     s+='  """\n'
     s+= "  Helper function for '" + self.enum + "'\n\n"
-    s+= "  Two use cases:\n"
-    s+= "     a) arg = %s(%s)\n" % (self.name , ", ".join(["%s=my_%s" % (name,name) for name, doc, enum in self.entries]))
-    s+= "          all arguments optional\n"
-    s+= "     b) %s = %s(arg,%s)\n" % ( ", ".join([name for name, doc, enum in self.entries]), self.name , ", ".join(['"' + name+'"' for name, doc, enum in self.entries]))
-    s+= "          all arguments after the first optional\n"
+    s+= "  Usage:\n"
+    s+= "    arg = %s(%s)\n" % (self.name , ", ".join(["%s=my_%s" % (name,name) for name, doc, enum in self.entries]))
+    s+= "        all arguments optional\n"
     s+= "\n".join(map(lambda x: "  " + x.rstrip(),self.getDoc().split("\n"))) + "\n"
     s+= "  Keyword arguments::\n\n"
     maxlenname = max([len(name) for name, doc, enum in self.entries])
     for name, doc, enum in self.entries:
       s+="    " + name + (" "*(maxlenname-len(name))) +  " -- " +  doc + " [" + enum + "]\n"
     s+='  """\n'
-    s+="""  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of %s. Either use keywords or non-keywords ")\n""" % self.name
-    s+="""  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_%s,n)] for n in dummy[1:]]\n""" % self.enum
-    for name, doc, enum in self.entries:
-      s+="  %s = %s\n  if '%s' in kwargs:\n    %s = kwargs['%s']\n" % (name,"Sparsity()" if self.enum.endswith("Struct") and not self.enum.endswith("VecStruct") else "[]",name,name,name)
-    s+="""  for k in kwargs.keys():\n    if not(k in [%s]):\n      raise Exception("Keyword error in %s: '%%s' is not recognized. Available keywords are: %s" %% k )\n""" % (",".join(["'%s'" % name for name, doc, enum in self.entries]),self.name,", ".join([name for name, doc, enum in self.entries]))
-
-    if (self.enum.endswith("Struct")):
-      s+="  return %sure([" % self.enum
-      for name, doc, enum in self.entries:
-        s+=name+","
-      s=s[:-1] + "])\n"
-    else:
-      s+="  return IOSchemeVector(["
-      for name, doc, enum in self.entries:
-        s+=name+","
-      s=s[:-1] + "], IOScheme(SCHEME_%s))\n" % self.enum
+    s+="  for k in kwargs.keys():\n"
+    s+="    if k not in [%s]:\n" % ", ".join(["'"+i[0]+"'" for i in self.entries])
+    s+="""      raise Exception("Error in '%s' arguments. You supplied key '%%s'. Allowed keys are: %s" %% k)\n""" %  (self.name,", ".join(["'"+i[0]+"'" for i in self.entries]))
+    s+="  return (kwargs, [%s])\n" % ", ".join(["'"+i[0]+"'" for i in self.entries])
     return s
 
 class Input(Enum):
@@ -306,11 +245,10 @@ autogencpp = LazyFile(os.path.join(os.curdir,"..","casadi","core","function","sc
 
 autogenmetadatahpp.write(file('license_header.txt','r').read())
 autogenmetadatahpp.write("/** All edits to this file will be lost - autogenerated by misc/autogencode.py */\n")
-autogenmetadatahpp.write("""#ifndef SCHEMES_METADATA_HPP\n#define SCHEMES_METADATA_HPP\n#include <vector>\n#include <string>\n#include <utility>\n#include <map>\n#include "../casadi_exception.hpp"\nnamespace casadi {\ntemplate <class T>
-class IOSchemeVector;class Sparsity;\n""")
+autogenmetadatahpp.write("""#ifndef SCHEMES_METADATA_HPP\n#define SCHEMES_METADATA_HPP\n#include <vector>\n#include <string>\n#include <utility>\n#include <map>\n#include "../casadi_exception.hpp"\nnamespace casadi {\nclass Sparsity;\n""")
 autogenhelpershpp.write(file('license_header.txt','r').read())
 autogenhelpershpp.write("/** All edits to this file will be lost - autogenerated by misc/autogencode.py */\n")
-autogenhelpershpp.write("""#ifndef SCHEMES_HELPERS_HPP\n#define SCHEMES_HELPERS_HPP\n#include <vector>\n#include <string>\n#include <utility>\n#include <map>\n#include "io_scheme_vector.hpp"\nnamespace casadi {\n\n""")
+autogenhelpershpp.write("""#ifndef SCHEMES_HELPERS_HPP\n#define SCHEMES_HELPERS_HPP\n#include <vector>\n#include <string>\n#include <utility>\n#include <map>\nnamespace casadi {\n\n""")
 autogencpp.write(file('license_header.txt','r').read())
 autogencpp.write("/** All edits to this file will be lost - autogenerated by misc/autogencode.py */\n")
 autogencpp.write("""#include "schemes_metadata.hpp"\n#include <string>\nnamespace casadi {\n""")
@@ -369,31 +307,6 @@ autogenmetadatahpp.write("CASADI_EXPORT int getSchemeSize(InputOutputScheme sche
 autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeName(InputOutputScheme scheme);\n")
 autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeEntryNames(InputOutputScheme scheme);\n")
 
-autogenpy.write("#ifdef SWIGPYTHON\n")
-autogenpy.write("%pythoncode %{\n")
-autogenpy.write("""
-def IOSchemeVector(arg,io_scheme):
-  try:
-    return IOSchemeVectorD(arg,io_scheme)
-  except:
-    pass
-  try:
-    return IOSchemeVectorSX(arg,io_scheme)
-  except:
-    pass
-  try:
-    return IOSchemeVectorMX(arg,io_scheme)
-  except:
-    pass
-  try:
-    arg = map(lambda x: sp_dense(0,0) if isinstance(x,list) and len(x)==0 else x,arg)
-    return IOSchemeVectorSparsity(arg,io_scheme)
-  except:
-    pass
-  raise TypeError("IOSchemeVector called with faulty arguments. Individual values must be SX, MX or Sparsity.")
-""")
-autogenpy.write("%}\n")
-autogenpy.write("#endif //SWIGPYTHON\n")
 for p in schemes:
   print p.name
   autogencpp.write(p.cppcode())
@@ -406,13 +319,7 @@ for p in schemes:
   autogenpy.write("#ifndef SWIGPYTHON\n")
   autogenpy.write(p.swigcode())
   autogenpy.write("#endif //SWIGPYTHON\n")
-  autogenpy.write(p.pureswigcode())
   
-autogenhelpershpp.write("#define INSTANTIATE_IOSCHEME_HELPERS(T) \\\n")
-for p in schemes:
-  autogenhelpershpp.write("template class %sIOSchemeVector<T>;\\\n" % p.enum)
-autogenhelpershpp.write("\n")
-
 autogencpp.write("std::string getSchemeName(InputOutputScheme scheme) {\n  switch (scheme) {\n")
 for p in schemes:
   autogencpp.write("""    case SCHEME_%s: return "%s";\n""" % (p.enum,p.enum))

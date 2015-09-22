@@ -22,6 +22,7 @@
 #
 #
 from doxy2swig import *
+from casadi import swig_typename_convertor_cpp2python
 
 import sys
 
@@ -186,6 +187,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
           filtered = False          
           for f in filters:
             if f in refid or f.capitalize() in refid: filtered = True
+          if "SparsityInterface" in refid: filtered = False
           if filtered: continue
 
           print c.attributes['refid'].value, c.attributes['kind'].value
@@ -302,7 +304,12 @@ class Doxy2SWIG_X(Doxy2SWIG):
                 if first.has_key(n):
                     self.parse(first[n])
             self.end_docstring()
-      
+
+  def do_sectiondef(self, node):
+      kind = node.attributes['kind'].value
+      if kind in ('public-func', 'func', 'user-defined', '','friend'):
+          self.generic_parse(node)   
+
   def do_memberdef(self, node):
       prot = node.attributes['prot'].value
       id = node.attributes['id'].value
@@ -321,8 +328,10 @@ class Doxy2SWIG_X(Doxy2SWIG):
                  kind in ['variable', 'typedef']:
               return
 
-          defn = first['definition'].firstChild.data + first['argsstring'].firstChild.data
-
+          try:
+            defn = first['definition'].firstChild.data + first['argsstring'].firstChild.data
+          except:
+            return
           target = ""
           anc = node.parentNode.parentNode
           if cdef_kind in ('file', 'namespace'):
@@ -339,7 +348,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
               anc_node = anc.getElementsByTagName('compoundname')
               cname = anc_node[0].firstChild.data
               if kind=="friend":
-                target = name
+                target = "friendwrap_" + name
               else:
                 target = '%s::%s'%(cname, name)
               
@@ -436,7 +445,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
             self.internal[swigname] = ""
             
           if deprecated is not None:
-            self.deprecated[swigname] = "%exception " + swigname + " {\n CATCH_OR_NOT(DEPRECATED_MSG(\"%s\")) \n}" % deprecated
+            self.deprecated[swigname] = "%exception " + swigname + " {\n CATCH_OR_NOT(DEPRECATED_MSG(\"%s\") $action)\n}" % deprecated
           else:
             self.deprecated[swigname] = ""
               
@@ -460,7 +469,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
             self.add_text_original(["%feature(\"docstring\") ",k , " \"\n"])
             for (origin,pieces) in grouped_list:
               if len(u"".join(pieces).rstrip())>0:
-                self.add_text_original(["\n"]+["\n>  " + o.replace('"',r'\"') + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
+                self.add_text_original(["\n"]+["\n>  " + swig_typename_convertor_cpp2python(o.replace('"',r'\"')) + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
             self.add_text_original(["\";\n","\n"])
   
 

@@ -42,56 +42,192 @@
 
 namespace casadi {
 
-  class CASADI_EXPORT ExternalFunctionInternal : public FunctionInternal {
-    friend class ExternalFunction;
-  public:
+  /** \brief Structure with information about the library */
+  template<typename LibType>
+  class LibInfo {};
 
-    /** \brief  constructor */
-    explicit ExternalFunctionInternal(const std::string& bin_name);
-
-    /** \brief  clone function */
-    virtual ExternalFunctionInternal* clone() const;
-
-    /** \brief  Destructor */
-    virtual ~ExternalFunctionInternal();
-
-    /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const cpv_double& arg, const pv_double& res, int* itmp, double* rtmp);
-
-    /** \brief  Work vector sizes */
-    virtual void nTmp(size_t& ni, size_t& nr);
-
-    /** \brief  Initialize */
-    virtual void init();
-
-  protected:
-
-    ///@{
-    /** \brief  Function pointer types */
-    typedef int (*evalPtr)(const double* const* arg, double* const* res, int* iw, double* w);
-    typedef int (*initPtr)(int *n_in, int *n_out);
-    typedef int (*getSparsityPtr)(int n_in, int *n_row, int *n_col, int **colind, int **row);
-    typedef int (*nworkPtr)(int *ni, int *nr);
-    ///@}
-
-    /** \brief  Name of binary */
-    std::string bin_name_;
-
-    /** \brief  Function pointers */
-    evalPtr eval_;
-
+  /** \brief Library given as a dynamically linked library */
+  template<>
+  class LibInfo<std::string> {
+  private:
 #if defined(WITH_DL) && defined(_WIN32) // also for 64-bit
     typedef HINSTANCE handle_t;
 #else
     typedef void* handle_t;
 #endif
 
-    /** \brief  handle to the dll */
+    std::string bin_name_;
+    std::string name_;
     handle_t handle_;
 
-    /** \brief Work vector sizes */
-    size_t ni_, nr_;
+  public:
+    int n_in, n_out, sz_arg, sz_res;
+
+    // Default constructor
+    LibInfo() : handle_(0) {}
+
+    // Constructor
+    explicit LibInfo(const std::string& bin_name, const std::string& name);
+
+    // Clear memory
+    void clear();
+
+    // Automatic type conversion
+    operator const std::string&() const { return bin_name_;}
+
+    // Function name
+    const std::string& name() const { return name_;}
+
+    // Get function pointer
+    template<typename FcnPtr>
+    void get(FcnPtr& fcnPtr, const std::string& sym);
   };
+
+  /** \brief Library that has been just-in-time compiled */
+  template<>
+  class LibInfo<Compiler> {
+  private:
+    Compiler compiler_;
+    std::string name_;
+
+  public:
+    int n_in, n_out, sz_arg, sz_res;
+
+    // Default constructor
+    LibInfo() {}
+
+    // Constructor
+    explicit LibInfo(const Compiler& compiler, const std::string& name);
+
+    // Clear memory
+    void clear() {}
+
+    // Automatic type conversion
+    operator const Compiler&() const { return compiler_;}
+
+    // Function name
+    const std::string& name() const { return name_;}
+
+    // Get function pointer
+    template<typename FcnPtr>
+    void get(FcnPtr& fcnPtr, const std::string& sym);
+  };
+
+  class CASADI_EXPORT ExternalFunctionInternal : public FunctionInternal {
+  public:
+    /** \brief Creator function, dynamically linked library */
+    static ExternalFunctionInternal*
+      create(const std::string& bin_name, const std::string& name);
+
+    /** \brief Creator function, just-in-time compiled library */
+    static ExternalFunctionInternal*
+      create(const Compiler& compiler, const std::string& name);
+
+    /** \brief  clone function */
+    virtual ExternalFunctionInternal* clone() const;
+
+    /** \brief  Destructor */
+    virtual ~ExternalFunctionInternal() = 0;
+
+  private:
+    /** \brief Creator function, use this for creating instances of the class */
+    template<typename LibType>
+      static ExternalFunctionInternal*
+      createGeneric(const LibType& bin_name, const std::string& name);
+  };
+
+  template<typename LibType>
+  class CASADI_EXPORT CommonExternal : public ExternalFunctionInternal {
+  protected:
+
+    /** \brief Information about the library */
+    LibInfo<LibType> li_;
+
+    /** \brief  constructor is protected */
+    CommonExternal(const LibInfo<LibType>& li);
+  public:
+    /** \brief  Destructor */
+    virtual ~CommonExternal() = 0;
+
+    ///@{
+    /** \brief Forward mode derivatives */
+    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
+    virtual int numDerForward() const;
+    ///@}
+
+    ///@{
+    /** \brief Reverse mode derivatives */
+    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
+    virtual int numDerReverse() const;
+    ///@}
+
+    ///@{
+    /** \brief Full Jacobian */
+    virtual bool hasFullJacobian() const;
+    virtual Function getFullJacobian(const std::string& name, const Dict& opts);
+    ///@}
+  };
+
+  template<typename LibType>
+  class CASADI_EXPORT SimplifiedExternal : public CommonExternal<LibType> {
+    friend class ExternalFunctionInternal;
+  private:
+    /** \brief Constructor is called from factory */
+    SimplifiedExternal(const LibInfo<LibType>& li);
+  public:
+    using CommonExternal<LibType>::li_;
+
+    /** \brief  Destructor */
+    virtual ~SimplifiedExternal() {}
+
+    /** \brief  Evaluate numerically, work vectors given */
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief Add a dependent function */
+    virtual void addDependency(CodeGenerator& g) const;
+
+    /** \brief Generate a call to a function (simplified signature) */
+    virtual std::string generateCall(const CodeGenerator& g,
+                                     const std::string& arg, const std::string& res) const;
+
+    /** \brief Use simplified signature */
+    virtual bool simplifiedCall() const { return true;}
+  protected:
+    /** \brief  Function pointers */
+    simplifiedPtr eval_;
+  };
+
+  template<typename LibType>
+  class CASADI_EXPORT GenericExternal : public CommonExternal<LibType> {
+    friend class ExternalFunctionInternal;
+  private:
+    /** \brief Constructor is called from factory */
+    GenericExternal(const LibInfo<LibType>& li);
+  public:
+    using CommonExternal<LibType>::li_;
+
+    /** \brief  Destructor */
+    virtual ~GenericExternal() {}
+
+    /** \brief  Evaluate numerically, work vectors given */
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief Add a dependent function */
+    virtual void addDependency(CodeGenerator& g) const;
+
+    /** \brief Generate a call to a function (generic signature) */
+    virtual std::string generateCall(const CodeGenerator& g,
+                                     const std::string& arg, const std::string& res,
+                                     const std::string& iw, const std::string& w) const;
+
+    /** \brief All inputs and outputs are scalar (default if sparsity not defined) */
+    static int scalarSparsity(int i, int *n_row, int *n_col,
+                              const int **colind, const int **row);
+
+    /** \brief  Function pointers */
+    evalPtr eval_;
+  };
+
 
 } // namespace casadi
 /// \endcond

@@ -25,8 +25,6 @@
 
 #include "linear_solver_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "../mx/mx_tools.hpp"
 #include "../mx/mx_node.hpp"
 #include <typeinfo>
 
@@ -42,7 +40,7 @@ namespace casadi {
     casadi_assert_message(sparsity.size2()==sparsity.size1(),
                           "LinearSolverInternal::init: the matrix must be square but got "
                           << sparsity.dimString());
-    casadi_assert_message(!sparsity.isSingular(),
+    casadi_assert_message(!sparsity.issingular(),
                           "LinearSolverInternal::init: singularity - the matrix is structurally "
                           "rank-deficient. sprank(J)=" << sprank(sparsity)
                           << " (in stead of "<< sparsity.size2() << ")");
@@ -53,16 +51,16 @@ namespace casadi {
                                coarse_rowblock, coarse_colblock);
 
     // Allocate inputs
-    setNumInputs(LINSOL_NUM_IN);
-    input(LINSOL_A) = DMatrix(sparsity);
+    ibuf_.resize(LINSOL_NUM_IN);
+    input(LINSOL_A) = DMatrix::zeros(sparsity);
     input(LINSOL_B) = DMatrix::zeros(sparsity.size2(), nrhs);
 
     // Allocate outputs
-    setNumOutputs(LINSOL_NUM_OUT);
+    obuf_.resize(LINSOL_NUM_OUT);
     output(LINSOL_X) = input(LINSOL_B);
 
-    input_.scheme = SCHEME_LinsolInput;
-    output_.scheme = SCHEME_LinsolOutput;
+    ischeme_ = IOScheme(SCHEME_LinsolInput);
+    oscheme_ = IOScheme(SCHEME_LinsolOutput);
   }
 
   void LinearSolverInternal::init() {
@@ -172,21 +170,30 @@ namespace casadi {
       asens[d].resize(2);
 
       // Propagate to A
+      MX a;
       if (!tr) {
-        asens[d][1] = -mul(rhs[d], X.T(), MX::zeros(A.sparsity()));
+        a = -mac(rhs[d], X.T(), MX::zeros(A.sparsity()));
       } else {
-        asens[d][1] = -mul(X, rhs[d].T(), MX::zeros(A.sparsity()));
+        a = -mac(X, rhs[d].T(), MX::zeros(A.sparsity()));
+      }
+      if (asens[d][1].isempty(true)) {
+        asens[d][1] = a;
+      } else {
+        asens[d][1] += a;
       }
 
       // Propagate to B
-      asens[d][0] = rhs[d];
+      if (asens[d][0].isempty(true)) {
+        asens[d][0] = rhs[d];
+      } else {
+        asens[d][0] += rhs[d];
+      }
     }
   }
 
   void LinearSolverInternal::
-  spFwdLinsol(const std::vector<const bvec_t*>& arg,
-              const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp,
-              bool tr, int nrhs) {
+  spFwdLinsol(const bvec_t** arg, bvec_t** res,
+              int* iw, bvec_t* w, bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
     const int* A_colind = A_sp.colind();
@@ -196,7 +203,7 @@ namespace casadi {
     // Get pointers to data
     const bvec_t *B=arg[0], *A = arg[1];
     bvec_t* X = res[0];
-    bvec_t* tmp = rtmp;
+    bvec_t* tmp = w;
 
     // For all right-hand-sides
     for (int r=0; r<nrhs; ++r) {
@@ -222,9 +229,8 @@ namespace casadi {
   }
 
   void LinearSolverInternal::
-  spAdjLinsol(const std::vector<bvec_t*>& arg,
-              const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp,
-              bool tr, int nrhs) {
+  spAdjLinsol(bvec_t** arg, bvec_t** res,
+              int* iw, bvec_t* w, bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
     const int* A_colind = A_sp.colind();
@@ -233,7 +239,7 @@ namespace casadi {
 
     // Get pointers to data
     bvec_t *B=arg[0], *A=arg[1], *X=res[0];
-    bvec_t* tmp = rtmp;
+    bvec_t* tmp = w;
 
     // For all right-hand-sides
     for (int r=0; r<nrhs; ++r) {
@@ -332,8 +338,8 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::evalSXLinsol(const cpv_SXElement& arg, const pv_SXElement& res,
-                                           int* itmp, SXElement* rtmp, bool tr, int nrhs) {
+  void LinearSolverInternal::evalSXLinsol(const SXElement** arg, SXElement** res,
+                                           int* iw, SXElement* w, bool tr, int nrhs) {
     casadi_error("LinearSolverInternal::evalSXLinsol not defined for class "
                  << typeid(*this).name());
   }

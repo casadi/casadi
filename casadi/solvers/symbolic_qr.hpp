@@ -79,15 +79,14 @@ namespace casadi {
     virtual void solve(double* x, int nrhs, bool transpose);
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(std::ostream &stream, const std::string& type,
-                                      CodeGenerator& gen) const;
+    virtual void generateDeclarations(CodeGenerator& g) const;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(std::ostream &stream, const std::string& type,
-                              CodeGenerator& gen) const;
+    virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief Evaluate symbolically (SX) */
-    virtual void evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr);
+    virtual void evalSXLinsol(const SXElement** arg, SXElement** res,
+                              int* iw, SXElement* w, bool tr, int nrhs);
 
     // Factorization function
     Function fact_fcn_;

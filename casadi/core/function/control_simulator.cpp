@@ -32,31 +32,33 @@ namespace casadi {
   ControlSimulator::ControlSimulator() {
   }
 
+  ControlSimulator::ControlSimulator(const std::string& name, const Function& dae,
+                                     const Function& output_fcn,
+                                     const Matrix<double>& grid, const Dict& opts) {
+    assignNode(new ControlSimulatorInternal(dae, output_fcn, grid));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  ControlSimulator::ControlSimulator(const std::string& name, const Function& dae,
+                                     const Matrix<double>& grid, const Dict& opts) {
+    assignNode(new ControlSimulatorInternal(dae, Function(), grid));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+#ifdef WITH_DEPRECATED_FEATURES
   ControlSimulator::ControlSimulator(const Function& dae, const Function& output_fcn,
-                                     const vector<double>& grid) {
+                                     const Matrix<double>& grid) {
     assignNode(new ControlSimulatorInternal(dae, output_fcn, grid));
   }
 
-  ControlSimulator::ControlSimulator(const Function& dae, const Function& output_fcn,
-                                     const Matrix<double>& grid) {
-    casadi_assert_message(grid.isVector(), "ControlSimulator::ControlSimulator: grid must be a "
-                          "column vector, but got " << grid.dimString());
-    casadi_assert_message(grid.isDense(), "ControlSimulator::ControlSimulator: grid must be dense, "
-                          "but got " << grid.dimString());
-    assignNode(new ControlSimulatorInternal(dae, output_fcn, grid.data()));
-  }
-
-  ControlSimulator::ControlSimulator(const Function& dae, const vector<double>& grid) {
+  ControlSimulator::ControlSimulator(const Function& dae, const Matrix<double>& grid) {
     assignNode(new ControlSimulatorInternal(dae, Function(), grid));
   }
-
-  ControlSimulator::ControlSimulator(const Function& dae, const Matrix<double>& grid) {
-    casadi_assert_message(grid.isVector(), "ControlSimulator::ControlSimulator: grid must be a "
-                          "column vector, but got " << grid.dimString());
-    casadi_assert_message(grid.isDense(), "ControlSimulator::ControlSimulator: grid must be dense, "
-                          "but got " << grid.dimString());
-    assignNode(new ControlSimulatorInternal(dae, Function(), grid.data()));
-  }
+#endif // WITH_DEPRECATED_FEATURES
 
   ControlSimulatorInternal* ControlSimulator::operator->() {
     return static_cast<ControlSimulatorInternal*>(Function::operator->());

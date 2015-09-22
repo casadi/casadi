@@ -82,17 +82,20 @@ class CASADI_EXPORT UnarySX : public SXNode {
     /** \brief  Get the operation */
     virtual int getOp() const { return op_;}
 
-    /** \brief  Print the expression (recursively with a maximum number of levels) */
-    virtual void print(std::ostream &stream, long& remaining_calls) const {
+    /** \brief  Print expression */
+    virtual std::string print(const std::string& arg1, const std::string& arg2) const {
+      std::stringstream ss;
 
       // Print the prefix
-      casadi_math<double>::printPre(op_, stream);
+      casadi_math<double>::printPre(op_, ss);
 
       // Print the dependency
-      dep_.print(stream, remaining_calls);
+      ss << arg1;
 
       // Print the suffix
-      casadi_math<double>::printPost(op_, stream);
+      casadi_math<double>::printPost(op_, ss);
+
+      return ss.str();
     }
 
     /** \brief  The binary operation as an 1 byte integer (allows 256 values) */

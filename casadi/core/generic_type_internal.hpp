@@ -33,23 +33,22 @@
 
 namespace casadi {
 
-  template<typename T>
-  class CASADI_EXPORT GenericTypeInternal : public SharedObjectNode {
-    public:
-      explicit GenericTypeInternal(const T& d) : d_(d) {}
-      virtual ~GenericTypeInternal() {}
-      virtual GenericTypeInternal<T>* clone() const { return new GenericTypeInternal(d_);}
-      virtual void print(std::ostream &stream) const { stream << d_; }
-      T d_;
+  class CASADI_EXPORT GenericTypeBase : public SharedObjectNode {
+  public:
+    virtual ~GenericTypeBase() {}
+    virtual TypeID getType() const = 0;
   };
 
-  //template<> GenericTypeInternal<bool>::type = OT_BOOLEAN;
-
-  // Implementations of public functions
-  template<typename T>
-  bool GenericType::is_a() const {
-    return dynamic_cast<const GenericTypeInternal<T>*>(get()) != 0;
-  }
+  template<TypeID ID, typename T>
+  class CASADI_EXPORT GenericTypeInternal : public GenericTypeBase {
+  public:
+    explicit GenericTypeInternal(const T& d) : d_(d) {}
+    virtual ~GenericTypeInternal() {}
+    virtual GenericTypeInternal<ID, T>* clone() const { return new GenericTypeInternal(d_);}
+    virtual void print(std::ostream &stream) const { stream << d_; }
+    virtual TypeID getType() const { return ID;}
+    T d_;
+  };
 
 } // namespace casadi
 /// \endcond

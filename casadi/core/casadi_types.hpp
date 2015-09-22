@@ -31,6 +31,23 @@
 #include <utility>
 
 #include "casadi_common.hpp"
+#include "casadi_logger.hpp"
+
+#ifdef SWIG
+#define SWIG_OUTPUT(arg) OUTPUT
+#define SWIG_INOUT(arg) INOUT
+#define SWIG_CONSTREF(arg) const arg
+#ifdef SWIGMATLAB
+#define SWIG_IND1 true
+#else // SWIGMATLAB
+#define SWIG_IND1 false
+#endif // SWIGMATLAB
+#else // SWIG
+#define SWIG_OUTPUT(arg) arg
+#define SWIG_INOUT(arg) arg
+#define SWIG_CONSTREF(arg) const arg &
+#define SWIG_IND1 false
+#endif // SWIG
 
 namespace casadi {
 
@@ -41,31 +58,6 @@ namespace casadi {
   class Function;
   class Sparsity;
   class CodeGenerator;
-
-  /// \cond INTERNAL
-  template<class T> class LPStructIOSchemeVector;
-  template<class T> class QPStructIOSchemeVector;
-  template<class T> class QCQPStructIOSchemeVector;
-  template<class T> class SDPStructIOSchemeVector;
-  template<class T> class SOCPStructIOSchemeVector;
-  template<class T> class SDQPStructIOSchemeVector;
-  template<class T> class DleStructIOSchemeVector;
-  template<class T> class DpleVecStructIOSchemeVector;
-  template<class T> class LrDleStructIOSchemeVector;
-  template<class T> class LrDpleVecStructIOSchemeVector;
-  template<class T> class CleStructIOSchemeVector;
-  /// \endcond
-  typedef LPStructIOSchemeVector<Sparsity> LPStructure;
-  typedef QPStructIOSchemeVector<Sparsity> QPStructure;
-  typedef QCQPStructIOSchemeVector<Sparsity> QCQPStructure;
-  typedef SDPStructIOSchemeVector<Sparsity> SDPStructure;
-  typedef SOCPStructIOSchemeVector<Sparsity> SOCPStructure;
-  typedef SDQPStructIOSchemeVector<Sparsity> SDQPStructure;
-  typedef DleStructIOSchemeVector<Sparsity> DleStructure;
-  typedef LrDleStructIOSchemeVector<Sparsity> LrDleStructure;
-  typedef CleStructIOSchemeVector<Sparsity> CleStructure;
-  typedef DpleVecStructIOSchemeVector< std::vector<Sparsity> > DpleStructure;
-  typedef LrDpleVecStructIOSchemeVector< std::vector<Sparsity> > LrDpleStructure;
   class NlpSolver;
   class LinearSolver;
   class Integrator;
@@ -84,9 +76,9 @@ namespace casadi {
   class Callback;
   class CustomEvaluate;
   class CustomFunction;
-  class SymbolicNLP;
+  class NlpBuilder;
   class Variable;
-  class SymbolicOCP;
+  class DaeBuilder;
   class XmlFile;
 
 #ifndef SWIG
@@ -108,28 +100,7 @@ namespace casadi {
 
   // Make sure that the integer datatype is indeed smaller or equal to the double
   //assert(sizeof(bvec_t) <= sizeof(double)); // doesn't work - very strange
-
-
-  /** Pointer shorthands */
-  typedef std::vector<SXElement*> pv_SXElement;
-  typedef std::vector<const SXElement*> cpv_SXElement;
-  typedef std::vector<double*> pv_double;
-  typedef std::vector<const double*> cpv_double;
-  typedef std::vector<bvec_t*> pv_bvec_t;
-  typedef std::vector<const bvec_t*> cpv_bvec_t;
-  typedef std::vector<MX*> pv_MX;
-  typedef std::vector<const MX*> cpv_MX;
 #endif // SWIG
-
-  /* Standard stream used for printing
-     Allows MATLAB front-end to direct printing calls through mexPrintf
-   */
-#if defined(SWIG) && defined(SWIGMATLAB)
-#define CASADI_COUT casadi::mexout
-#else
-#define CASADI_COUT std::cout
-#endif
-
 
 } // namespace casadi
 

@@ -42,7 +42,7 @@ namespace casadi {
 
     /** \brief  Constructor */
     SimulatorInternal(const Integrator& integrator, const Function& output_fcn,
-                      const std::vector<double>& grid);
+                      const DMatrix& grid);
 
     /** \brief  Destructor */
     virtual ~SimulatorInternal();

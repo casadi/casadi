@@ -597,3 +597,131 @@
    fun:PyFrame_New
 }
 
+
+{
+  Travis errors (3)
+  Memcheck:Addr4
+  obj:/usr/bin/python2.7
+  fun:_PyString_Resize
+  fun:PyString_Format
+  fun:PyEval_EvalFrameEx
+}
+
+{
+  Travis errors (4)
+  Memcheck:Addr4
+  ...
+  fun:PyAST_Compile
+}
+
+{
+  Travis errors (5)
+  Memcheck:Value8
+  ...
+  fun:PyAST_Compile
+}
+
+
+{
+  Travis errors (5)
+  Memcheck:Cond
+  ...
+  fun:PyAST_Compile
+}
+
+
+{
+
+another weird error
+Memcheck:Addr4
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+}
+
+{
+
+another weird error (bis)
+Memcheck:Cond
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+}
+
+
+{
+
+another weird error (tris)
+Memcheck:Value8
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+obj:/usr/bin/python2.7
+}
+
+
+{
+numpy issues
+Memcheck:Addr4
+...
+obj:*umath.so
+}
+
+{
+more numpy issues
+Memcheck:Cond
+...
+obj:*umath.so
+}
+
+{
+othe assorted issues 1
+Memcheck:Value8
+...
+fun:PyParser_ASTFromFile
+}
+
+{
+othe assorted issues 2
+Memcheck:Addr4
+...
+fun:PyParser_ASTFromFile
+}
+
+
+{
+othe assorted issues 3
+Memcheck:Cond
+...
+fun:PyParser_ASTFromFile
+}
+
+{
+   more issues
+   Memcheck:Value8
+   obj:/usr/bin/python2.7
+   fun:_PyString_Resize
+   fun:PyString_FromFormatV
+   fun:PyString_FromFormat
+   obj:*umath*
+}

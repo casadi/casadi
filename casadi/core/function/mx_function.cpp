@@ -26,7 +26,6 @@
 #include "mx_function_internal.hpp"
 #include "../mx/mx_node.hpp"
 #include "../std_vector_tools.hpp"
-#include "../mx/mx_tools.hpp"
 
 #include <stack>
 #include <typeinfo>
@@ -35,120 +34,147 @@ using namespace std;
 
 namespace casadi {
 
-bool MXFunction::testCast(const SharedObjectNode* ptr) {
-  return dynamic_cast<const MXFunctionInternal*>(ptr)!=0;
-}
+  bool MXFunction::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const MXFunctionInternal*>(ptr)!=0;
+  }
 
-MXFunction::MXFunction() {
-}
+  MXFunction::MXFunction() {
+  }
 
-MXFunction::MXFunction(const Function& function) {
-  const MXFunctionInternal* temp = dynamic_cast<const MXFunctionInternal*>(function.get());
-  if (!temp) casadi_error("MXFunction(Function)::input Function cannot be cast into MXFunction");
-  assignNode(temp->clone());
-}
+  MXFunction::MXFunction(const Function& function) {
+    const MXFunctionInternal* temp = dynamic_cast<const MXFunctionInternal*>(function.get());
+    if (!temp) casadi_error("MXFunction(Function)::input Function cannot be cast into MXFunction");
+    assignNode(temp->clone());
+  }
 
-MXFunction::MXFunction(const MX& inputm, const MX& outputm) {
-  vector<MX> inputv(1);
-  inputv[0] = inputm;
-  vector<MX> outputv(1);
-  outputv[0] = outputm;
-  assignNode(new MXFunctionInternal(inputv, outputv));
-}
+#ifdef WITH_DEPRECATED_FEATURES
+  MXFunction::MXFunction(const std::vector<MX>& arg, const std::vector<MX>& res) {
+    assignNode(new MXFunctionInternal(arg, res));
+  }
 
-MXFunction::MXFunction(const MX& inputm, const std::vector<MX>& outputv) {
-  vector<MX> inputv(1);
-  inputv[0] = inputm;
-  assignNode(new MXFunctionInternal(inputv, outputv));
-}
+  MXFunction::MXFunction(const std::vector<MX>& arg,
+                         const pair<MXDict, vector<string> >& res) {
+    assignNode(new MXFunctionInternal(arg, make_vector(res)));
+    setOption("output_scheme", res.second);
+  }
 
-MXFunction::MXFunction(const std::vector<MX>& inputv, const MX& outputm) {
-  vector<MX> outputv(1);
-  outputv[0] = outputm;
-  assignNode(new MXFunctionInternal(inputv, outputv));
-}
+  MXFunction::MXFunction(const pair<MXDict, vector<string> >& arg,
+                         const std::vector<MX>& res) {
+    assignNode(new MXFunctionInternal(make_vector(arg), res));
+    setOption("input_scheme", arg.second);
+  }
 
-MXFunction::MXFunction(const std::vector<MX>& inputv, const std::vector<MX>& outputv) {
-  assignNode(new MXFunctionInternal(inputv, outputv));
-}
+  MXFunction::MXFunction(const pair<MXDict, vector<string> >& arg,
+                         const pair<MXDict, vector<string> >& res) {
+    assignNode(new MXFunctionInternal(make_vector(arg), make_vector(res)));
+    setOption("input_scheme", arg.second);
+    setOption("output_scheme", res.second);
+  }
+#endif // WITH_DEPRECATED_FEATURES
 
-MXFunction::MXFunction(const std::vector<MX>& inputv, const IOSchemeVector< MX >& outputv) {
-  assignNode(new MXFunctionInternal(inputv, outputv));
-  setOutputScheme(outputv.scheme);
-}
+  void MXFunction::construct(const std::string& name,
+                             const std::vector<MX>& arg,
+                             const std::vector<MX>& res,
+                             const Dict& opts,
+                             const std::vector<std::string>& ischeme,
+                             const std::vector<std::string>& oscheme) {
+    assignNode(new MXFunctionInternal(arg, res));
+    setOption("name", name);
+    if (!ischeme.empty()) setOption("input_scheme", ischeme);
+    if (!oscheme.empty()) setOption("output_scheme", oscheme);
+    setOption(opts);
+    init();
+  }
 
-MXFunction::MXFunction(const IOSchemeVector< MX >& inputv, const std::vector<MX>& outputv) {
-  assignNode(new MXFunctionInternal(inputv, outputv));
-  setInputScheme(inputv.scheme);
-}
+  MXFunction::MXFunction(const std::string& name, const std::vector<MX>& arg,
+                         const std::vector<MX>& res, const Dict& opts) {
+    construct(name, arg, res, opts);
+  }
 
+  MXFunction::MXFunction(const std::string& name, const pair<MXDict, vector<string> >& arg,
+                         const std::vector<MX>& res, const Dict& opts) {
+    construct(name, make_vector(arg), res, opts, arg.second);
+  }
 
-MXFunction::MXFunction(const IOSchemeVector< MX >& inputv, const IOSchemeVector< MX >& outputv) {
-  assignNode(new MXFunctionInternal(inputv, outputv));
-  setInputScheme(inputv.scheme);
-  setOutputScheme(outputv.scheme);
-}
+  MXFunction::MXFunction(const std::string& name, const std::vector<MX>& arg,
+                         const pair<MXDict, vector<string> >& res, const Dict& opts) {
+    construct(name, arg, make_vector(res), opts, std::vector<string>(), res.second);
+  }
 
-const MXFunctionInternal* MXFunction::operator->() const {
-  return static_cast<const MXFunctionInternal*>(Function::operator->());
-}
+  MXFunction::MXFunction(const std::string& name, const pair<MXDict, vector<string> >& arg,
+                         const pair<MXDict, vector<string> >& res, const Dict& opts) {
+    construct(name, make_vector(arg), make_vector(res), opts, arg.second, res.second);
+  }
 
-MXFunctionInternal* MXFunction::operator->() {
-  return static_cast<MXFunctionInternal*>(Function::operator->());
-}
+#ifdef USE_CXX11
+  MXFunction::MXFunction(const std::string& name, std::initializer_list<MX> arg,
+                         std::initializer_list<MX> res, const Dict& opts) {
+    construct(name, vector<MX>(arg), vector<MX>(res), opts);
+  }
 
-const MX& MXFunction::inputExpr(int ind) const {
-  return (*this)->inputv_.at(ind);
-}
+  MXFunction::MXFunction(const std::string& name, std::vector<MX> arg,
+                         std::initializer_list<MX> res, const Dict& opts) {
+    construct(name, arg, vector<MX>(res), opts);
+  }
 
-const MX& MXFunction::outputExpr(int ind) const {
-  return (*this)->outputv_.at(ind);
-}
+  MXFunction::MXFunction(const std::string& name, std::initializer_list<MX> arg,
+                         std::vector<MX> res, const Dict& opts) {
+    construct(name, vector<MX>(arg), res, opts);
+  }
+#endif // USE_CXX11
 
-const std::vector<MX>& MXFunction::inputExpr() const {
-  return (*this)->inputv_;
-}
+  const MXFunctionInternal* MXFunction::operator->() const {
+    return static_cast<const MXFunctionInternal*>(Function::operator->());
+  }
 
-const std::vector<MX> & MXFunction::outputExpr() const {
-  return (*this)->outputv_;
-}
+  MXFunctionInternal* MXFunction::operator->() {
+    return static_cast<MXFunctionInternal*>(Function::operator->());
+  }
 
-const std::vector<MXAlgEl>& MXFunction::algorithm() const {
-  return (*this)->algorithm_;
-}
+  const MX MXFunction::inputExpr(int ind) const {
+    return (*this)->inputv_.at(ind);
+  }
 
-int MXFunction::countNodes() const {
-  assertInit();
-  return algorithm().size();
-}
+  const MX MXFunction::outputExpr(int ind) const {
+    return (*this)->outputv_.at(ind);
+  }
 
-MX MXFunction::jac(int iind, int oind, bool compact, bool symmetric) {
-  return (*this)->jac(iind, oind, compact, symmetric);
-}
+  const std::vector<MX> MXFunction::inputExpr() const {
+    return (*this)->inputv_;
+  }
 
-MX MXFunction::grad(int iind, int oind) {
-  return (*this)->grad(iind, oind);
-}
+  const std::vector<MX> MXFunction::outputExpr() const {
+    return (*this)->outputv_;
+  }
 
-MX MXFunction::tang(int iind, int oind) {
-  return (*this)->tang(iind, oind);
-}
+  int MXFunction::countNodes() const {
+    assertInit();
+    return (*this)->algorithm_.size();
+  }
 
-SXFunction MXFunction::expand(const std::vector<SX>& inputv) {
-  return (*this)->expand(inputv);
-}
+  MX MXFunction::jac(int iind, int oind, bool compact, bool symmetric) {
+    return (*this)->jac(iind, oind, compact, symmetric);
+  }
 
-std::vector<MX> MXFunction::getFree() const {
-  return (*this)->free_vars_;
-}
+  MX MXFunction::grad(int iind, int oind) {
+    return (*this)->grad(iind, oind);
+  }
 
-int MXFunction::getWorkSize() const {
-  return (*this)->workloc_.size()-1;
-}
+  MX MXFunction::tang(int iind, int oind) {
+    return (*this)->tang(iind, oind);
+  }
 
-void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn) {
-  (*this)->generateLiftingFunctions(vdef_fcn, vinit_fcn);
-}
+  SXFunction MXFunction::expand(const std::vector<SX>& inputv) {
+    return (*this)->expand(inputv);
+  }
+
+  std::vector<MX> MXFunction::getFree() const {
+    return (*this)->free_vars_;
+  }
+
+  void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn) {
+    (*this)->generateLiftingFunctions(vdef_fcn, vinit_fcn);
+  }
 
 
 } // namespace casadi

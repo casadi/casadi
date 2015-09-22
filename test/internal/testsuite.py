@@ -301,8 +301,10 @@ class TestSuite:
       else:
         m = re.search("no leaks are possible",stdoutdata)
         if not(m):
-          print stdoutdata
-          raise Exception("valgrind output is not like expected: %s")
+          if p.returncode==0:
+            return
+          debug = str(stdoutdata) + " -- " + str(stderrdata) + " -- " + str(f.returncode)
+          raise Exception("valgrind output is not like expected: %s" % debug)
           
       m = re.search('ERROR SUMMARY: (.*) errors', stdoutdata)
       errors = "0"

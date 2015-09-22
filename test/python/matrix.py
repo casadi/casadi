@@ -43,6 +43,7 @@ class Matrixtests(casadiTestCase):
     self.checkarray(c.sumRows(D),array([[12,15,18]]),'sum()')
     self.checkarray(c.sumCols(D),array([[6,15,24]]).T,'sum()')
     
+
   def test_inv(self):
     self.message("Matrix inverse")
     a = DMatrix([[1,2],[1,3]])
@@ -103,12 +104,10 @@ class Matrixtests(casadiTestCase):
     
     L = [x,y,z]
 
-    fMX = MXFunction(L,[diagcat(L)])
-    fMX.init()
+    fMX = MXFunction("fMX", L,[diagcat(L)])
     
     LSX = [ SX.sym("",i.sparsity()) for i in L ]
-    fSX = SXFunction(LSX,[diagcat(LSX)])
-    fSX.init()
+    fSX = SXFunction("fSX", LSX,[diagcat(LSX)])
 
     for f in [fMX,fSX]:
       for i in range(3):
@@ -213,23 +212,6 @@ class Matrixtests(casadiTestCase):
     
     B = A[0,[0,2,1]]
     self.checkarray(DMatrix([1,3,2]).T,B,"non-monotonous")
-    
-  def test_vecNZcat(self):
-    self.message("vecNZcat")
-    A = DMatrix(2,3)
-    A[0,1] = 2
-    A[1,0] = 1
-    A[1,2] = 3
-    B = DMatrix(3,1)
-    B[0,0] = 4
-    B[1,0] = 5
-    B[2,0] = 6
-    C = vecNZcat([A,B])
-    
-    self.checkarray(C.shape,(6,1),"vecNZcat shape")
-    self.assertEqual(C.nnz(),A.nnz()+B.nnz(),"vecNZcat size")
-    
-    self.checkarray(tuple(C.nonzeros()),tuple(arange(1,7)),"numbers shape")
     
   def test_IMatrix_indexing(self):
     self.message("IMatrix")
@@ -504,8 +486,9 @@ class Matrixtests(casadiTestCase):
         self.checkarray(c>A,m([[1,1],[1,1]]),"<")
         self.checkarray(c<A,m([[0,0],[0,0]]),">")
         self.checkarray(c<=A,m([[0,0],[0,0]]),">=")
-        self.checkarray(c==A,m([[0,0],[0,0]]),"==")
-        self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
+        if args.known_bugs or not isinstance(c,matrix):
+	  self.checkarray(c==A,m([[0,0],[0,0]]),"==")
+          self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
         
       for c in [5,5.0,DMatrix([5]),IMatrix([5]),matrix(5)]:
         self.checkarray(A<=c,m([[1,1],[1,1]]),"<=")
@@ -519,23 +502,26 @@ class Matrixtests(casadiTestCase):
         self.checkarray(c>A,m([[0,1],[1,1]]),"<")
         self.checkarray(c<A,m([[0,0],[0,0]]),">")
         self.checkarray(c<=A,m([[1,0],[0,0]]),">=")
-        self.checkarray(c==A,m([[1,0],[0,0]]),"==")
-        self.checkarray(c!=A,m([[0,1],[1,1]]),"!=")
+        if args.known_bugs or not isinstance(c,matrix):
+          self.checkarray(c==A,m([[1,0],[0,0]]),"==")
+          self.checkarray(c!=A,m([[0,1],[1,1]]),"!=")
         
       for c in [4,4.0,DMatrix([4]),IMatrix([4]),matrix(4)]:
         self.checkarray(A<=c,m([[0,1],[1,1]]),"<=")
         self.checkarray(A<c,m([[0,0],[1,1]]),"<")
         self.checkarray(A>c,m([[1,0],[0,0]]),">")
         self.checkarray(A>=c,m([[1,1],[0,0]]),">=")
-        self.checkarray(A==c,m([[0,1],[0,0]]),"==")
-        self.checkarray(A!=c,m([[1,0],[1,1]]),"!=")
+        if args.known_bugs or not isinstance(c,matrix):
+          self.checkarray(A==c,m([[0,1],[0,0]]),"==")
+          self.checkarray(A!=c,m([[1,0],[1,1]]),"!=")
 
         self.checkarray(c>=A,m([[0,1],[1,1]]),"<=")
         self.checkarray(c>A,m([[0,0],[1,1]]),"<")
         self.checkarray(c<A,m([[1,0],[0,0]]),">")
         self.checkarray(c<=A,m([[1,1],[0,0]]),">=")
-        self.checkarray(c==A,m([[0,1],[0,0]]),"==")
-        self.checkarray(c!=A,m([[1,0],[1,1]]),"!=")
+        if args.known_bugs or not isinstance(c,matrix):
+          self.checkarray(c==A,m([[0,1],[0,0]]),"==")
+          self.checkarray(c!=A,m([[1,0],[1,1]]),"!=")
         
       for c in [1,1.0,DMatrix([1]),IMatrix([1]),matrix(1)]:
         self.checkarray(A<=c,m([[0,0],[0,1]]),"<=")
@@ -549,8 +535,9 @@ class Matrixtests(casadiTestCase):
         self.checkarray(c>A,m([[0,0],[0,0]]),"<")
         self.checkarray(c<A,m([[1,1],[1,0]]),">")
         self.checkarray(c<=A,m([[1,1],[1,1]]),">=")
-        self.checkarray(c==A,m([[0,0],[0,1]]),"==")
-        self.checkarray(c!=A,m([[1,1],[1,0]]),"!=")
+        if args.known_bugs or not isinstance(c,matrix):
+          self.checkarray(c==A,m([[0,0],[0,1]]),"==")
+          self.checkarray(c!=A,m([[1,1],[1,0]]),"!=")
         
       for c in [0,DMatrix([0]),IMatrix([0]),matrix(0)]:
         self.checkarray(A<=c,m([[0,0],[0,0]]),"<=")
@@ -564,8 +551,9 @@ class Matrixtests(casadiTestCase):
         self.checkarray(c>A,m([[0,0],[0,0]]),"<")
         self.checkarray(c<A,m([[1,1],[1,1]]),">")
         self.checkarray(c<=A,m([[1,1],[1,1]]),">=")
-        self.checkarray(c==A,m([[0,0],[0,0]]),"==")
-        self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
+        if args.known_bugs or not isinstance(c,matrix):
+          self.checkarray(c==A,m([[0,0],[0,0]]),"==")
+          self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
 
   def test_all_any(self):
     for m in [DMatrix,IMatrix]:
@@ -751,8 +739,7 @@ class Matrixtests(casadiTestCase):
     x = MX.sym('x',10,1)
     sp = Sparsity.upper(2)
     y = triu2symm(MX(sp,x[1:4]))
-    f = MXFunction([x],[y])
-    f.init()
+    f = MXFunction("f", [x],[y])
       
   def test_append_empty(self):
     a = DMatrix(0,0)
@@ -885,8 +872,7 @@ class Matrixtests(casadiTestCase):
         B = SX.sym("B",b.sparsity())
         C = solve(A,B)
         
-        f = SXFunction([A,B],[C])
-        f.init()
+        f = SXFunction("f", [A,B],[C])
         
         f.setInput(a,0)
         f.setInput(b,1)
@@ -931,11 +917,9 @@ class Matrixtests(casadiTestCase):
     B = SX.sym("B",4,5)
     P = SX.sym("P",A.size2(),B.size1())
 
-    f = SXFunction([vec(P.T),A,B],[vec(mul([A,P,B]).T)])
-    f.init()
+    f = SXFunction("f", [vec(P.T),A,B],[vec(mul([A,P,B]).T)])
 
     J = f.jacobian()
-    J.init()
     J.setInput(numpy.random.rand(*vec(P.T).shape),0)
     J.setInput(numpy.random.rand(*A.shape),1)
     J.setInput(numpy.random.rand(*B.shape),2)
@@ -1007,6 +991,24 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(norm_inf_mul(A,B),norm_inf(mul(A,B)))
     self.checkarray(DMatrix(norm_0_mul(A,B)),mul(A,B).nnz())
+
+  def  test_mul3_issue_1465(self):
+    with self.assertRaises(Exception):
+      w = SX.sym("w",2,1)
+      Q = np.eye(2)
+      mul(w.T,Q,w)
+      
+  def test_chol(self):
+    numpy.random.seed(0)
+    
+    for i in range(4):
+      A = numpy.random.random((3,3))
+      H = mul(A,A.T)
+      
+      R = chol(H)
+      
+      assert R.istriu()
+      self.checkarray(mul(R.T,R),H)
     
 if __name__ == '__main__':
     unittest.main()

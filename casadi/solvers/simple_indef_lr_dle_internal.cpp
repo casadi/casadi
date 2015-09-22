@@ -24,14 +24,12 @@
 
 
 #include "simple_indef_dle_internal.hpp"
-#include <cassert>
+
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
+#include <cassert>
 #include <numeric>
 
 INPUTSCHEME(DLEInput)
@@ -65,7 +63,7 @@ namespace casadi {
               "a smaller system with dense rhs.");
     addOption("linear_solver",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linear_solver_options",    OT_DICT,   GenericType(),
               "Options to be passed to the linear solver.");
 
   }
@@ -124,13 +122,13 @@ namespace casadi {
 
     f_.init();
 
-    casadi_assert(getNumOutputs()==f_.getNumOutputs());
-    for (int i=0;i<getNumInputs();++i) {
+    casadi_assert(nOut()==f_.nOut());
+    for (int i=0;i<nIn();++i) {
       casadi_assert_message(input(i).sparsity()==f_.input(i).sparsity(),
         "Sparsity mismatch for input " << i << ":" <<
         input(i).dimString() << " <-> " << f_.input(i).dimString() << ".");
     }
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       casadi_assert_message(output(i).sparsity()==f_.output(i).sparsity(),
         "Sparsity mismatch for output " << i << ":" <<
         output(i).dimString() << " <-> " << f_.output(i).dimString() << ".");
@@ -140,22 +138,24 @@ namespace casadi {
 
 
   void SimpleIndefDleInternal::evaluate() {
-    std::cout << "eval" << std::endl;
+    userOut() << "eval" << std::endl;
     input(DLE_A).printDense();
-    for (int i=0;i<getNumInputs();++i) {
+    for (int i=0;i<nIn();++i) {
       std::copy(input(i).begin(), input(i).end(), f_.input(i).begin());
     }
     f_.evaluate();
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       std::copy(f_.output(i).begin(), f_.output(i).end(), output(i).begin());
     }
   }
 
-  Function SimpleIndefDleInternal::getDerForward(int nfwd) {
+  Function SimpleIndefDleInternal
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function SimpleIndefDleInternal::getDerReverse(int nadj) {
+  Function SimpleIndefDleInternal
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     return f_.derReverse(nadj);
   }
 

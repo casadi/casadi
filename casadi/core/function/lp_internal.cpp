@@ -24,7 +24,6 @@
 
 
 #include "lp_internal.hpp"
-#include "../matrix/matrix_tools.hpp"
 
 INPUTSCHEME(LpSolverInput)
 OUTPUTSCHEME(LpSolverOutput)
@@ -33,8 +32,15 @@ using namespace std;
 namespace casadi {
 
   // Constructor
-  LpSolverInternal::LpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
-    casadi_assert_message(st_.size()==LP_STRUCT_NUM, "Problem structure mismatch");
+  LpSolverInternal::LpSolverInternal(const std::map<std::string, Sparsity> &st) {
+    st_.resize(LP_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[LP_STRUCT_A]=i->second;
+      } else {
+        casadi_error("Unrecognized field in LP structure: " << i->first);
+      }
+    }
 
     const Sparsity& A = st_[LP_STRUCT_A];
 
@@ -43,8 +49,8 @@ namespace casadi {
 
 
     // Input arguments
-    setNumInputs(LP_SOLVER_NUM_IN);
-    input(LP_SOLVER_A) = DMatrix(A);
+    ibuf_.resize(LP_SOLVER_NUM_IN);
+    input(LP_SOLVER_A) = DMatrix::zeros(A);
     input(LP_SOLVER_C) = DMatrix::zeros(n_);
     input(LP_SOLVER_LBA) = -DMatrix::inf(nc_);
     input(LP_SOLVER_UBA) = DMatrix::inf(nc_);
@@ -52,14 +58,14 @@ namespace casadi {
     input(LP_SOLVER_UBX) = DMatrix::inf(n_);
 
     // Output arguments
-    setNumOutputs(LP_SOLVER_NUM_OUT);
+    obuf_.resize(LP_SOLVER_NUM_OUT);
     output(LP_SOLVER_X) = DMatrix::zeros(n_);
     output(LP_SOLVER_COST) = 0.0;
     output(LP_SOLVER_LAM_X) = DMatrix::zeros(n_);
     output(LP_SOLVER_LAM_A) = DMatrix::zeros(nc_);
 
-    input_.scheme = SCHEME_LpSolverInput;
-    output_.scheme = SCHEME_LpSolverOutput;
+    ischeme_ = IOScheme(SCHEME_LpSolverInput);
+    oscheme_ = IOScheme(SCHEME_LpSolverOutput);
   }
 
   void LpSolverInternal::init() {
@@ -97,9 +103,17 @@ namespace casadi {
 
   const std::string LpSolverInternal::infix_ = "lpsolver";
 
+  double LpSolverInternal::defaultInput(int ind) const {
+    switch (ind) {
+    case LP_SOLVER_LBX:
+    case LP_SOLVER_LBA:
+      return -std::numeric_limits<double>::infinity();
+    case LP_SOLVER_UBX:
+    case LP_SOLVER_UBA:
+      return std::numeric_limits<double>::infinity();
+    default:
+      return 0;
+    }
+  }
 
 } // namespace casadi
-
-
-
-

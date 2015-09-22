@@ -166,19 +166,14 @@ void Tester::model(){
   f_step_out[0] = u;
   f_step_out[1] = v;
   f_step_out[2] = h;
-  MXFunction f_step_mx(f_step_in,f_step_out);
-  f_step_mx.init();
-  cout << "generated single step dynamics (" << f_step_mx.getAlgorithmSize() << " nodes)" << endl;
+  MXFunction f_step_mx("f_step_mx", f_step_in,f_step_out);
+  cout << "generated single step dynamics (" << f_step_mx.countNodes() << " nodes)" << endl;
   
-  f_step_mx.generateCode("f_step.c");
-
-
   // Expand the discrete dynamics?
   Function f_step = f_step_mx;
   if(false){
     SXFunction f_step_sx(f_step_mx);
-    f_step_sx.init();
-    cout << "generated single step dynamics, SX (" << f_step_sx.getAlgorithmSize() << " nodes)" << endl;
+    cout << "generated single step dynamics, SX (" << f_step_sx.countNodes() << " nodes)" << endl;
     f_step = f_step_sx;
   }
 
@@ -205,8 +200,7 @@ void Tester::model(){
   }
   
   // Create an integrator function
-  MXFunction f_mx(f_in,f_out);
-  f_mx.init();
+  MXFunction f_mx("f_mx", f_in, f_out);
   cout << "generated discrete dynamics for one finite element (" << f_mx.countNodes() << " MX nodes)" << endl;
   
   // Integrate over the complete interval
@@ -227,16 +221,14 @@ void Tester::model(){
     }
     
     // Create an integrator function
-    f_mx = MXFunction(f_in,f_out);
-    f_mx.init();
+    f_mx = MXFunction("f_mx", f_in, f_out);
     cout << "generated discrete dynamics for complete interval (" << f_mx.countNodes() << " MX nodes)" << endl;    
   }
     
   // Expand the discrete dynamics
   if(false){
     SXFunction f_sx(f_mx);
-    f_sx.init();
-    cout << "generated discrete dynamics, SX (" << f_sx.getAlgorithmSize() << " nodes)" << endl;
+    cout << "generated discrete dynamics, SX (" << f_sx.countNodes() << " nodes)" << endl;
     f_ = f_sx;
   } else {
     f_ = f_mx;
@@ -255,7 +247,7 @@ void Tester::simulate(double drag_true, double depth_true){
   }
 
   // Simulate once to generate "measurements"
-  f_.setInput(p_true,0);
+  f_.setInputNZ(p_true,0);
   f_.setInput(u0_,1);
   f_.setInput(v0_,2);
   f_.setInput(h0_,3);
@@ -329,7 +321,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
     nlp_g.append(vec(H));
   }
 
-  MXFunction nlp(nlpIn("x",P),nlpOut("f",nlp_f,"g",nlp_g));
+  MXFunction nlp("nlp", nlpIn("x",P), nlpOut("f",nlp_f,"g",nlp_g));
   cout << "Generated single-shooting NLP" << endl;
   
   // NLP Solver
@@ -357,11 +349,11 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   // Print both of the variables
   nlp_solver_.setOption("print_x",range(2));
 
-  Dictionary qp_solver_options;
+  Dict qp_solver_options;
   if(ipopt_as_qp_solver){
     nlp_solver_.setOption("qp_solver","nlp");
     qp_solver_options["nlp_solver"] = "ipopt";
-    Dictionary nlp_solver_options;
+    Dict nlp_solver_options;
     nlp_solver_options["tol"] = 1e-12;
     nlp_solver_options["print_level"] = 0;
     nlp_solver_options["print_time"] = false;
@@ -383,17 +375,17 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   vector<double> p_init(2);
   p_init[0] = drag_guess/p_scale_[0];
   p_init[1] = depth_guess/p_scale_[1];
-  nlp_solver_.setInput(p_init,"x0");
+  nlp_solver_.setInputNZ(p_init,"x0");
 
   // Bounds on the variables
   vector<double> lbu(2), ubu(2);  
   lbu.at(0) = 1.0e-1 / p_scale_[0]; // drag positive
   lbu.at(1) = 5.0e-4 / p_scale_[1]; // depth positive
-  nlp_solver_.setInput(lbu,"lbx");
+  nlp_solver_.setInputNZ(lbu,"lbx");
 
   ubu.at(0) = 100.0 / p_scale_[0]; // max drag
   ubu.at(1) =  0.10 / p_scale_[1]; // max depth
-  nlp_solver_.setInput(ubu,"ubx");
+  nlp_solver_.setInputNZ(ubu,"ubx");
 
   // Constraint bounds
   nlp_solver_.setInput(-spheight_, "lbg");

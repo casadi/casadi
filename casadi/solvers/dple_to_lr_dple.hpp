@@ -56,7 +56,7 @@ namespace casadi {
     /** \brief  Constructor
      * \param st \structargument{LrDple}
      */
-    DpleToLrDple(const DpleStructure & st);
+    DpleToLrDple(const std::map<std::string, std::vector<Sparsity> >& st);
 
     /** \brief  Destructor */
     virtual ~DpleToLrDple();
@@ -68,12 +68,15 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual DpleToLrDple* create(const DpleStructure& st) const {
-        return new DpleToLrDple(st);}
+    virtual DpleToLrDple* create(const std::map<std::string,
+                                 std::vector<Sparsity> >& st) const {
+      return new DpleToLrDple(st);
+    }
 
     /** \brief  Create a new DLE Solver */
-    static DpleInternal* creator(const DpleStructure& st)
-    { return new DpleToLrDple(st);}
+    static DpleInternal* creator(const std::map<std::string, std::vector<Sparsity> >& st) {
+      return new DpleToLrDple(st);
+    }
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -86,14 +89,14 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function getDerForward(int nfwd);
-    virtual bool hasDerForward() const { return true;}
+    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
+    virtual int numDerForward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function getDerReverse(int nadj);
-    virtual bool hasDerReverse() const { return true;}
+    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
+    virtual int numDerReverse() const { return 64;}
     ///@}
 
     /// A documentation string

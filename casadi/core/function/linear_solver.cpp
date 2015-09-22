@@ -31,10 +31,6 @@ namespace casadi {
   LinearSolver::LinearSolver() {
   }
 
-  LinearSolver::LinearSolver(const Sparsity& sp, int nrhs) {
-    assignNode(new LinearSolverInternal(sp, nrhs));
-  }
-
   LinearSolverInternal* LinearSolver::operator->() {
     return static_cast<LinearSolverInternal*>(Function::operator->());
   }
@@ -80,8 +76,38 @@ namespace casadi {
     (*this)->spSolve(X, B, transpose);
   }
 
-  LinearSolver::LinearSolver(const std::string& name, const Sparsity& sp, int nrhs) {
-    assignNode(LinearSolverInternal::getPlugin(name).creator(sp, nrhs));
+#ifdef WITH_DEPRECATED_FEATURES
+  LinearSolver::LinearSolver(const std::string& solver, const Sparsity& sp, int nrhs) {
+    if (solver=="none") {
+      assignNode(new LinearSolverInternal(sp, nrhs));
+    } else {
+      assignNode(LinearSolverInternal::getPlugin(solver).creator(sp, nrhs));
+    }
+  }
+#endif // WITH_DEPRECATED_FEATURES
+
+  LinearSolver::LinearSolver(const std::string& name, const std::string& solver,
+                             const Sparsity& sp, int nrhs, const Dict& opts) {
+    if (solver=="none") {
+      assignNode(new LinearSolverInternal(sp, nrhs));
+    } else {
+      assignNode(LinearSolverInternal::getPlugin(solver).creator(sp, nrhs));
+    }
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  LinearSolver::LinearSolver(const std::string& name, const std::string& solver,
+                             const Sparsity& sp, const Dict& opts) {
+    if (solver=="none") {
+      assignNode(new LinearSolverInternal(sp, 1));
+    } else {
+      assignNode(LinearSolverInternal::getPlugin(solver).creator(sp, 1));
+    }
+    setOption("name", name);
+    setOption(opts);
+    init();
   }
 
   bool LinearSolver::hasPlugin(const std::string& name) {

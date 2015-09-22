@@ -25,7 +25,6 @@
 
 #include "lp_to_qp.hpp"
 
-#include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
 
 using namespace std;
@@ -49,13 +48,15 @@ namespace casadi {
 
   LpToQp* LpToQp::clone() const {
     // Return a deep copy
-    LpToQp* node = new LpToQp(st_);
+    LpToQp* node =
+      new LpToQp(make_map("h", st_[QP_SOLVER_H], "a", st_[QP_SOLVER_A]));
+
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  LpToQp::LpToQp(const std::vector<Sparsity> &st) : LpSolverInternal(st) {
+  LpToQp::LpToQp(const std::map<std::string, Sparsity> &st) : LpSolverInternal(st) {
     Adaptor<LpToQp, QpSolverInternal>::addOptions();
   }
 
@@ -91,12 +92,17 @@ namespace casadi {
     // Initialize the base classes
     LpSolverInternal::init();
 
+    // QP solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
+
     // Create a QpSolver instance
-    solver_ = QpSolver(getOption(solvername()),
-                       qpStruct("h", Sparsity(n_, n_),
-                                "a", input(LP_SOLVER_A).sparsity()));
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    solver_ = QpSolver("solver", getOption(solvername()),
+                       make_map("h", Sparsity(n_, n_),
+                                "a", input(LP_SOLVER_A).sparsity()),
+                       options);
   }
 
 } // namespace casadi

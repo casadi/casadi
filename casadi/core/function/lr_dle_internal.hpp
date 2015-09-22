@@ -35,6 +35,18 @@
 
 namespace casadi {
 
+  /// Structure specification of a DLE
+  enum LrDleStruct {
+    /// The matrix A
+    LR_DLE_STRUCT_A,
+    /// The matrix V
+    LR_DLE_STRUCT_V,
+    /// The matrix C (defaults to unity)
+    LR_DLE_STRUCT_C,
+    /// H matrix: horizontal stack of all Hi
+    LR_DLE_STRUCT_H,
+    LR_DLE_STRUCT_NUM};
+
   /** \brief Internal storage for LrDleSolver related data
 
       @copydoc DLE_doc
@@ -43,13 +55,12 @@ namespace casadi {
   */
   class CASADI_EXPORT
   LrDleInternal : public FunctionInternal,
-                 public PluginInterface<LrDleInternal> {
+                  public PluginInterface<LrDleInternal> {
   public:
     /** \brief  Constructor
      *  \param st \structargument{Dle}
      */
-    LrDleInternal(const LrDleStructure& st,
-                 int nrhs=1, bool transp=false);
+    LrDleInternal(const std::map<std::string, Sparsity>& st, int nrhs=1, bool transp=false);
 
     /** \brief  Destructor */
     virtual ~LrDleInternal()=0;
@@ -61,7 +72,7 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual LrDleInternal* create(const LrDleStructure& st) const = 0;
+    virtual LrDleInternal* create(const std::map<std::string, Sparsity>& st) const = 0;
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -73,7 +84,7 @@ namespace casadi {
     virtual void init();
 
     /// Problem structure
-    LrDleStructure st_;
+    std::vector<Sparsity> st_;
 
     /// Sparsity of A
     Sparsity A_;
@@ -109,7 +120,7 @@ namespace casadi {
     bool transp_;
 
     // Creator function for internal class
-    typedef LrDleInternal* (*Creator)(const LrDleStructure& st);
+    typedef LrDleInternal* (*Creator)(const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
     struct Exposed{ };
@@ -134,7 +145,7 @@ namespace casadi {
     std::vector<int> Pi_;
 
     /// Get the resulting sparsity
-    static Sparsity getSparsity(const LrDleStructure& st,
+    static Sparsity getSparsity(const std::map<std::string, Sparsity>& st,
       const std::vector<int> &Hs=std::vector<int>());
 
   };

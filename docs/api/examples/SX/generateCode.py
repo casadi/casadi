@@ -32,9 +32,7 @@ z = x*y+2*y
 z += 4*z
 
 #! An SXFunction is needed to inspect the graph
-f = SXFunction([x,y],[z])
-f.init()
-
+f = SXFunction("f", [x,y],[z])
 
 #! The default representation is just the name of the function
 print f.__repr__()
@@ -43,9 +41,9 @@ print f.__repr__()
 #! The result will look like a node-by-node tree evaluation
 print f
 
-#! The generateCode method will insert this node-by-node evaluation in exported C code
-f.generateCode("generateCode.txt")
+#! The generate method will insert this node-by-node evaluation in exported C code
+f.generate("f_generated")
 
 #! This is how the exported code looks like:
-print file('generateCode.txt').read()
+print file('f_generated.c').read()
 

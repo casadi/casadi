@@ -24,14 +24,11 @@
 
 
 #include "dle_to_lr_dle.hpp"
-#include <cassert>
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
+#include <cassert>
 #include <numeric>
 
 INPUTSCHEME(DLEInput)
@@ -55,8 +52,7 @@ namespace casadi {
     DleInternal::registerPlugin(casadi_register_dlesolver_lrdle);
   }
 
-  DleToLrDle::DleToLrDle(
-         const DleStructure& st) : DleInternal(st) {
+  DleToLrDle::DleToLrDle(const std::map<std::string, Sparsity>& st) : DleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_lr_dle_to_dle"); // name of the function
@@ -75,17 +71,19 @@ namespace casadi {
     MX A = MX::sym("A", A_);
     MX V = MX::sym("V", V_);
 
+    // Solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
+
     // Create an LrDleSolver instance
-    solver_ = LrDleSolver(getOption(solvername()),
-                          lrdleStruct("a", A_, "v", V_));
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    solver_ = LrDleSolver("solver", getOption(solvername()),
+                          make_map("a", A_, "v", V_), options);
 
-    std::vector<MX> Pr = solver_(lrdleIn("a", A, "v", V));
+    MX P = solver_(make_map("a", A, "v", V)).at("y");
 
-    f_ = MXFunction(dleIn("a", A, "v", V),
-                    dleOut("p", Pr[DLE_P]));
-    f_.init();
+    f_ = MXFunction(name_, dleIn("a", A, "v", V), dleOut("p", P));
 
     Wrapper<DleToLrDle>::checkDimensions();
 
@@ -95,11 +93,13 @@ namespace casadi {
     Wrapper<DleToLrDle>::evaluate();
   }
 
-  Function DleToLrDle::getDerForward(int nfwd) {
+  Function DleToLrDle
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function DleToLrDle::getDerReverse(int nadj) {
+  Function DleToLrDle
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     return f_.derReverse(nadj);
   }
 
@@ -110,7 +110,8 @@ namespace casadi {
 
   DleToLrDle* DleToLrDle::clone() const {
     // Return a deep copy
-    DleToLrDle* node = new DleToLrDle(st_);
+    DleToLrDle* node =
+      new DleToLrDle(make_map("a", st_[Dle_STRUCT_A], "v", st_[Dle_STRUCT_V]));
     node->setOption(dictionary());
     return node;
   }

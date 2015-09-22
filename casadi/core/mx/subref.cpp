@@ -37,54 +37,49 @@ namespace casadi {
     return new SubRef(*this);
   }
 
-  void SubRef::evalD(const cpv_double& input, const pv_double& output,
-                         int* itmp, double* rtmp) {
-    evalGen<double>(input, output, itmp, rtmp);
+  void SubRef::evalD(const double** arg, double** res, int* iw, double* w) {
+    evalGen<double>(arg, res, iw, w);
   }
 
-  void SubRef::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                          int* itmp, SXElement* rtmp) {
-    evalGen<SXElement>(input, output, itmp, rtmp);
+  void SubRef::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<typename T>
-  void SubRef::evalGen(const std::vector<const T*>& input,
-                       const std::vector<T*>& output, int* itmp, T* rtmp) {
+  void SubRef::evalGen(const T* const* arg, T* const* res, int* iw, T* w) {
     casadi_error("not ready");
   }
 
-  void SubRef::spFwd(const cpv_bvec_t& arg,
-                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void SubRef::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     casadi_error("not ready");
   }
 
-  void SubRef::spAdj(const pv_bvec_t& arg,
-                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void SubRef::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     casadi_error("not ready");
   }
 
-  void SubRef::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "(";
-    } else {
-      stream << "[" << i_ << ", " << j_ << "])";
-    }
+  std::string SubRef::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << arg.at(0) << "[" << i_ << ", " << j_ << "]";
+    return ss.str();
   }
 
-  void SubRef::eval(const cpv_MX& input, const pv_MX& output) {
+  void SubRef::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     casadi_error("not ready");
   }
 
-  void SubRef::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
+  void SubRef::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                       std::vector<std::vector<MX> >& fsens) {
     casadi_error("not ready");
   }
 
-  void SubRef::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
+  void SubRef::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                       std::vector<std::vector<MX> >& asens) {
     casadi_error("not ready");
   }
 
-  void SubRef::generate(std::ostream &stream, const std::vector<int>& arg,
-                                 const std::vector<int>& res, CodeGenerator& gen) const {
+  void SubRef::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                        CodeGenerator& g) const {
     casadi_error("not ready");
   }
 

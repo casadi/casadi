@@ -26,9 +26,6 @@
 #include "dple_internal.hpp"
 #include "dle_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "../mx/mx_tools.hpp"
-#include "../sx/sx_tools.hpp"
 #include "../function/mx_function.hpp"
 #include "../function/sx_function.hpp"
 
@@ -38,10 +35,9 @@ OUTPUTSCHEME(DPLEOutput)
 using namespace std;
 namespace casadi {
 
-  DpleInternal::DpleInternal(const DpleStructure & st,
-                             int nrhs,
-                             bool transp) :
-      st_(st), nrhs_(nrhs), transp_(transp) {
+  DpleInternal::DpleInternal(const std::map<std::string, std::vector<Sparsity> > &st,
+                             int nrhs, bool transp) :
+    nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -54,11 +50,22 @@ namespace casadi {
               "has eigenvalues greater than 1-eps_unstable");
     addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
 
-    if (nrhs_==1) {
-      input_.scheme = SCHEME_DPLEInput;
-      output_.scheme = SCHEME_DPLEOutput;
+    st_.resize(Dple_STRUCT_NUM);
+    for (std::map<std::string, std::vector<Sparsity> >::const_iterator i=st.begin();
+         i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[Dple_STRUCT_A]=i->second;
+      } else if (i->first=="v") {
+        st_[Dple_STRUCT_V]=i->second;
+      } else {
+        casadi_error("Unrecognized field in Dple structure: " << i->first);
+      }
     }
 
+    if (nrhs_==1) {
+      ischeme_ = IOScheme(SCHEME_DPLEInput);
+      oscheme_ = IOScheme(SCHEME_DPLEOutput);
+    }
   }
 
   DpleInternal::~DpleInternal() {
@@ -79,7 +86,7 @@ namespace casadi {
                           << A_.size() << " and " << V_.size() << ".");
     K_ = A_.size();
     for (int k=0;k<K_;++k) {
-      casadi_assert_message(V_[k].isSymmetric(), "V_i must be symmetric but got "
+      casadi_assert_message(V_[k].issymmetric(), "V_i must be symmetric but got "
                             << V_[k].dimString() << " for i = " << k << ".");
 
       casadi_assert_message(A_[k].size1()==V_[k].size1(), "First dimension of A ("
@@ -97,7 +104,7 @@ namespace casadi {
     }
 
     // Allocate inputs
-    setNumInputs(1+nrhs_);
+    ibuf_.resize(1+nrhs_);
 
     if (const_dim_) {
       input(0)  = DMatrix::zeros(horzcat(A_));
@@ -114,9 +121,11 @@ namespace casadi {
     }
 
     // Allocate outputs
-    std::vector<Sparsity> P = LrDpleInternal::getSparsity(lrdpleStruct("a", A_, "v", V_));
-
-    setNumOutputs(nrhs_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = A_;
+    tmp["v"] = V_;
+    std::vector<Sparsity> P = LrDpleInternal::getSparsity(tmp);
+    obuf_.resize(nrhs_);
     for (int i=0;i<nrhs_;++i) {
       if (const_dim_) {
         output(i) = DMatrix::zeros(horzcat(P));

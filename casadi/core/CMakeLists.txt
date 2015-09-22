@@ -4,13 +4,6 @@ cmake_minimum_required(VERSION 2.8.6)
 add_definitions(-DSHARED_LIBRARY_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 add_definitions(-DSHARED_LIBRARY_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
-# Look for plugins in the installation directory
-file(TO_NATIVE_PATH ${PLUGIN_INSTALL_PATH} PLUGIN_EXTRA_SEARCH_PATH)
-string(REPLACE "\\" "\\\\" PLUGIN_EXTRA_SEARCH_PATH ${PLUGIN_EXTRA_SEARCH_PATH})
-if(NOT WITH_SELFCONTAINED)
-add_definitions(-DPLUGIN_EXTRA_SEARCH_PATH="${PLUGIN_EXTRA_SEARCH_PATH}")
-endif()
-
 add_subdirectory(runtime)
 
 set(CASADI_SRCS
@@ -23,6 +16,8 @@ set(CASADI_SRCS
   # MISC
   casadi_limits.hpp
   casadi_types.hpp
+  casadi_logger.hpp           casadi_logger.cpp
+  casadi_interrupt.hpp        casadi_interrupt.cpp
   casadi_exception.hpp
   casadi_calculus.hpp
   casadi_math.hpp
@@ -42,7 +37,6 @@ set(CASADI_SRCS
 
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
   matrix/generic_expression.hpp                         # Base class for SXElement MX and Matrix<>
-  matrix/generic_expression_tools.hpp                   # Tools for SXElement MX and Matrix<>
   matrix/generic_matrix.hpp                             # Base class for Matrix<> and MX
   matrix/matrix.hpp           matrix/matrix_impl.hpp   matrix/matrix.cpp    # The Matrix template class
   matrix/sparse_storage.hpp   matrix/sparse_storage_impl.hpp
@@ -51,7 +45,6 @@ set(CASADI_SRCS
   matrix/slice.hpp            matrix/slice.cpp          # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
   matrix/submatrix.hpp                                  # A reference to a block of the matrix to allow operations such as A(:,3) = ...
   matrix/nonzeros.hpp                                   # A reference to a set of nonzeros of the matrix to allow operations such as A[3] = ...
-  matrix/matrix_tools.hpp     matrix/matrix_tools.cpp   # Set of functions
 
   # Directed, acyclic graph representation with scalar expressions
   sx/sx_element.hpp          sx/sx_element.cpp          # Symbolic expression class (scalar-valued atomics)
@@ -60,7 +53,6 @@ set(CASADI_SRCS
   sx/constant_sx.hpp                                    # A constant SXElement node
   sx/unary_sx.hpp                                       # A unary operation
   sx/binary_sx.hpp                                      # A binary operation
-  sx/sx_tools.cpp            sx/sx_tools.hpp            # Set of functions
 
   # More general graph representation with sparse matrix expressions and function evaluations
   mx/mx.hpp                  mx/mx.cpp                  # Symbolic expression class (matrix-valued atomics)
@@ -71,7 +63,8 @@ set(CASADI_SRCS
   mx/binary_mx.hpp           mx/binary_mx_impl.hpp      # Binary operation
   mx/multiplication.hpp      mx/multiplication.cpp      # Matrix multiplication
   mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
-  mx/call_function.hpp       mx/call_function.cpp       # Function evaluation node
+  mx/casadi_call.hpp         mx/casadi_call.cpp         # Function call
+  mx/casadi_find.hpp         mx/casadi_find.cpp         # Find first nonzero
   mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
   mx/transpose.hpp           mx/transpose.cpp           # Transpose
   mx/concat.hpp              mx/concat.cpp              # Concatenation
@@ -81,17 +74,18 @@ set(CASADI_SRCS
   mx/subassign.hpp           mx/subassign.cpp           # Submatrix assignment
   mx/getnonzeros.hpp         mx/getnonzeros.cpp         # Get the nonzeros of matrix
   mx/setnonzeros.hpp         mx/setnonzeros_impl.hpp    # Assign the nonzeros of a matrix to another matrix
-  mx/set_sparse.hpp          mx/set_sparse.cpp          # Sparse copy
+  mx/project.hpp             mx/project.cpp             # Sparse copy to another sparsity pattern
   mx/determinant.hpp         mx/determinant.cpp         # Determinant
   mx/inverse.hpp             mx/inverse.cpp             # Matrix inverse
   mx/inner_prod.hpp          mx/inner_prod.cpp          # Inner product
   mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
   mx/assertion.hpp           mx/assertion.cpp           # Assertion
-  mx/mx_tools.hpp
+  mx/monitor.hpp             mx/monitor.cpp             # Monitor
+  mx/repmat.hpp              mx/repmat.cpp              # RepMat
 
   # A dynamically created function with AD capabilities
   function/io_interface.hpp                                         # Input/output interface for Function and FunctionInternal
-  function/io_scheme.hpp           function/io_scheme.cpp           function/io_scheme_internal.hpp           function/io_scheme_internal.cpp
+  function/io_scheme.hpp
   function/function.hpp            function/function.cpp            function/function_internal.hpp            function/function_internal.cpp
   function/plugin_interface.hpp                                     # Plugin interface for Function
   function/x_function_internal.hpp                                  # Base class for SXFunction and MXFunction
@@ -106,7 +100,6 @@ set(CASADI_SRCS
   function/homotopy_nlp_solver.hpp function/homotopy_nlp_solver.cpp function/homotopy_nlp_internal.hpp function/homotopy_nlp_internal.cpp
   function/simulator.hpp           function/simulator.cpp           function/simulator_internal.hpp           function/simulator_internal.cpp
   function/control_simulator.hpp   function/control_simulator.cpp   function/control_simulator_internal.hpp   function/control_simulator_internal.cpp
-  function/parallelizer.hpp        function/parallelizer.cpp        function/parallelizer_internal.hpp        function/parallelizer_internal.cpp
   function/qp_solver.hpp           function/qp_solver.cpp           function/qp_solver_internal.hpp           function/qp_solver_internal.cpp
   function/stabilized_qp_solver.hpp    function/stabilized_qp_solver.cpp    function/stabilized_qp_solver_internal.hpp function/stabilized_qp_solver_internal.cpp
   function/sdp_solver.hpp          function/sdp_solver.cpp          function/sdp_solver_internal.hpp          function/sdp_solver_internal.cpp
@@ -122,19 +115,26 @@ set(CASADI_SRCS
   function/lr_dle_solver.hpp       function/lr_dle_solver.cpp       function/lr_dle_internal.hpp   function/lr_dle_internal.cpp
   function/cle_solver.hpp          function/cle_solver.cpp          function/cle_internal.hpp      function/cle_internal.cpp
   function/wrapper.hpp             function/adaptor.hpp             function/dense_io.hpp
-
+  function/switch.hpp              function/switch.cpp              function/switch_internal.hpp   function/switch_internal.cpp
+  function/map.hpp                 function/map.cpp                 function/map_internal.hpp      function/map_internal.cpp
+  function/mapaccum.hpp            function/mapaccum.cpp            function/mapaccum_internal.hpp function/mapaccum_internal.cpp
+  function/compiler.hpp            function/compiler.cpp            function/compiler_internal.hpp function/compiler_internal.cpp
+  function/kernel_sum_2d.hpp       function/kernel_sum_2d.cpp       function/kernel_sum_2d_internal.hpp function/kernel_sum_2d_internal.cpp
+  
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp
-  misc/symbolic_nlp.hpp            misc/symbolic_nlp.cpp
+  misc/nlp_builder.hpp             misc/nlp_builder.cpp
   misc/xml_node.hpp                misc/xml_node.cpp
   misc/xml_file.hpp                misc/xml_file.cpp                misc/xml_file_internal.hpp                misc/xml_file_internal.cpp
   misc/variable.hpp                misc/variable.cpp
-  misc/symbolic_ocp.hpp            misc/symbolic_ocp.cpp
+  misc/dae_builder.hpp             misc/dae_builder.cpp
 
   # User include class with the most essential includes
   core.hpp
 
   function/schemes_metadata.hpp function/schemes_metadata.cpp function/schemes_helpers.hpp
+
+  function/callback.cpp            function/callback.hpp
 
 )
 

@@ -33,23 +33,22 @@ from pylab import *
 u = SX.sym("u")
 x = SX.sym("x")
 y = SX.sym("y")
-f  = SXFunction([vertcat([x,y]),u], [vertcat([(1-y*y)*x-y+u,x])])
+f  = SXFunction('f', [vertcat([x,y]),u], [vertcat([(1-y*y)*x-y+u,x])])
 #! Manipulate the function to adhere to the integrator's
 #! input/output signature
 #! f(time;states;parameters)
-fmod=SXFunction(daeIn(x=f.inputExpr(0),p=f.inputExpr(1)),daeOut(ode=f.outputExpr(0)))
-fmod.setOption("name","ODE right hand side")
-#! Create the Integrator
-integrator = Integrator("cvodes", fmod)
+fmod=SXFunction('ODE_right_hand_side', daeIn(x=f.inputExpr(0),p=f.inputExpr(1)),daeOut(ode=f.outputExpr(0)))
 #! The whole series of sundials options are available for the user
-integrator.setOption("fsens_err_con",True)
-integrator.setOption("quad_err_con",True)
-integrator.setOption("abstol",1e-6)
-integrator.setOption("reltol",1e-6)
+opts = {}
+opts["fsens_err_con"] = True
+opts["quad_err_con"] = True
+opts["abstol"] = 1e-6
+opts["reltol"] = 1e-6
 tend=10
-integrator.setOption("t0",0)
-integrator.setOption("tf",tend)
-integrator.init()
+opts["t0"] = 0
+opts["tf"] = tend
+#! Create the Integrator
+integrator = Integrator("integrator", "cvodes", fmod, opts)
 #$ The integrator is really just a special kind of Function. Assume that we have an ODE/DAE in either explicit form:
 #$ \begin{verbatim}
 #$   der(x) = fx(x,z,p,t)
@@ -89,7 +88,7 @@ integrator.init()
 #$ \end{verbatim}
 #$ 
 print isinstance(integrator,Function)
-print "%d -> %d" % (integrator.getNumInputs(),integrator.getNumOutputs())
+print "%d -> %d" % (integrator.nIn(),integrator.nOut())
 #! Setup the Integrator to integrate from 0 to t=tend, starting at [x0,y0]
 #! The output of Integrator is the state at the end of integration.
 #! There are two basic mechanisms two retrieve the whole trajectory of states:
@@ -107,7 +106,7 @@ integrator.reset()
 #! Define a convenience function to acces x(t)
 def out(t):
 	integrator.integrate(t)
-	return integrator.output().toArray()
+	return integrator.getOutput().toArray()
 
 sol = array([out(t) for t in ts]).squeeze()
 	
@@ -120,13 +119,12 @@ ylabel('y')
 show()
 
 #! We demonstrate method B:
-sim=Simulator(integrator,ts)
-sim.init()
+sim=Simulator("sim", integrator, ts)
 sim.setInput([x0,y0],"x0")
 sim.setInput(0,"p")
 sim.evaluate()
 
-sol2 = sim.output().toArray().T
+sol2 = sim.getOutput().toArray().T
 #! sol and sol2 are exactly the same
 print linalg.norm(sol-sol2)
 
@@ -139,7 +137,7 @@ print linalg.norm(sol-sol2)
 def out(dx0):
 	integrator.setInput([x0+dx0,y0],"x0")
 	integrator.evaluate()
-	return integrator.output().toArray()
+	return integrator.getOutput().toArray()
 dx0=numpy.linspace(-2,2,100)
 
 out = array([out(dx) for dx in dx0]).squeeze()
@@ -171,10 +169,10 @@ show()
 def out(t):
 	dintegrator.setInput([1,0],"fwd0_x0")
         dintegrator.evaluate()
-	A=dintegrator.output("fwd0_xf").toArray()
+	A=dintegrator.getOutput("fwd0_xf").toArray()
 	dintegrator.setInput([0,1],"fwd0_x0")
 	dintegrator.evaluate()
-	B=dintegrator.output("fwd0_xf").toArray()
+	B=dintegrator.getOutput("fwd0_xf").toArray()
 	return array([A,B]).squeeze().T
 
 circle = array([[sin(x),cos(x)] for x in numpy.linspace(0,2*pi,100)]).T
@@ -193,13 +191,12 @@ show()
 #J=integrator.jacobian(INTEGRATOR_X0,0)
 #print J
 #print type(J)
-#J.init()
 #J.setInput(0,"t0")
 #J.setInput(tend,"tf")
 #J.setInput([x0,y0],"x0")
 #J.setInput(0,"p")
 #J.evaluate()
-#print J.output().toArray()
+#print J.getOutput().toArray()
 
 #! The figure reveals that perturbations perpendicular to the phase space trajectory shrink.
 
@@ -214,16 +211,15 @@ show()
 #! - a fixed initial condition (1,0)
 #! - a free symbolic input, held constant during integration interval
 u=MX.sym("u")
-w, = integratorOut(integrator.call(integratorIn(x0=MX([1,0]),p=u)),"xf")
+w = integrator({'x0':MX([1,0]),'p':u})["xf"]
 
 #! We construct an MXfunction and a python help function 'out'
-f=MXFunction([u],[w])
-f.init()
+f=MXFunction('f', [u],[w])
 
 def out(u):
 	f.setInput(u)
 	f.evaluate()
-	return f.output().toArray()
+	return f.getOutput().toArray()
 
 print out(0)
 print out(1)

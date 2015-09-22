@@ -29,2864 +29,1091 @@
 #include <string>
 #include <utility>
 #include <map>
-#include "io_scheme_vector.hpp"
 namespace casadi {
 
-/// \cond INTERNAL
-/// Helper function for 'CLEInput'
-
-template<class M>
-class CASADI_EXPORT CLEInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit CLEInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_CLEInput) {}
-};
-/// \endcond
 /// Input arguments of a \e cle solver
 ///
 /// \copydoc scheme_CLEInput
 template<class M>
-CLEInputIOSchemeVector<M> cleIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
-  std::vector<M> ret(2);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_CLEInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in CLEInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "a, v");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > cleIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  std::string s[] = {"a", "v"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'cleIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return CLEInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> cleIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_CLEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_CLEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'CLEOutput'
-
-template<class M>
-class CASADI_EXPORT CLEOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit CLEOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_CLEOutput) {}
-};
-/// \endcond
 /// Output arguments of a \e cle solver
 ///
 /// \copydoc scheme_CLEOutput
 template<class M>
-CLEOutputIOSchemeVector<M> cleOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M()) {
-  std::vector<M> ret(1);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_CLEOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in CLEOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "p");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > cleOut(
+    const std::string &n0 ="", const M &x0 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  std::string s[] = {"p"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'cleOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return CLEOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> cleOut(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_CLEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'CleStruct'
-
-template<class M>
-class CASADI_EXPORT CleStructIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit CleStructIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_CleStruct) {}
-};
-/// \endcond
-/// Structure specification of a CLE
-///
-/// \copydoc scheme_CleStruct
-template<class M>
-CleStructIOSchemeVector<M> cleStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M()) {
-  std::vector<M> ret(3);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_CleStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in CleStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "a, v, c");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-  return CleStructIOSchemeVector<M>(ret);
-}
-template<class M>
-std::vector<M> cleStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_CleStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_CleStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_CleStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'ControlledDAEInput'
-
-template<class M>
-class CASADI_EXPORT ControlledDAEInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit ControlledDAEInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_ControlledDAEInput) {}
-};
-/// \endcond
 /// Input arguments of an ODE/DAE function
 ///
 /// \copydoc scheme_ControlledDAEInput
 template<class M>
-ControlledDAEInputIOSchemeVector<M> controldaeIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M(),
-    const std::string &arg_s6 ="", const M &arg_m6 =M(),
-    const std::string &arg_s7 ="", const M &arg_m7 =M(),
-    const std::string &arg_s8 ="", const M &arg_m8 =M()) {
-  std::vector<M> ret(9);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
-  if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_ControlledDAEInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in ControlledDAEInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "t, x, z, p, u, u_interp, x_major, t0, tf");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > controldaeIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M(),
+    const std::string &n6 ="", const M &x6 =M(),
+    const std::string &n7 ="", const M &x7 =M(),
+    const std::string &n8 ="", const M &x8 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  if (!n6.empty()) m[n6]=x6;
+  if (!n7.empty()) m[n7]=x7;
+  if (!n8.empty()) m[n8]=x8;
+  std::string s[] = {"t", "x", "z", "p", "u", "u_interp", "x_major", "t0", "tf"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+9);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'controldaeIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return ControlledDAEInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> controldaeIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="",
-    const std::string &arg_s8="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s8))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'ControlSimulatorInput'
-
-template<class M>
-class CASADI_EXPORT ControlSimulatorInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit ControlSimulatorInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_ControlSimulatorInput) {}
-};
-/// \endcond
 /// Input arguments of a control simulator
 ///
 /// \copydoc scheme_ControlSimulatorInput
 template<class M>
-ControlSimulatorInputIOSchemeVector<M> controlsimulatorIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M()) {
-  std::vector<M> ret(3);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_ControlSimulatorInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in ControlSimulatorInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x0, p, u");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > controlsimulatorIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  std::string s[] = {"x0", "p", "u"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'controlsimulatorIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return ControlSimulatorInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> controlsimulatorIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'DLEInput'
-
-template<class M>
-class CASADI_EXPORT DLEInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit DLEInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_DLEInput) {}
-};
-/// \endcond
 /// Input arguments of a \e dle solver
 ///
 /// \copydoc scheme_DLEInput
 template<class M>
-DLEInputIOSchemeVector<M> dleIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
-  std::vector<M> ret(2);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_DLEInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in DLEInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "a, v");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > dleIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  std::string s[] = {"a", "v"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'dleIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return DLEInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> dleIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DLEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DLEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'DLEOutput'
-
-template<class M>
-class CASADI_EXPORT DLEOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit DLEOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_DLEOutput) {}
-};
-/// \endcond
 /// Output arguments of a \e dle solver
 ///
 /// \copydoc scheme_DLEOutput
 template<class M>
-DLEOutputIOSchemeVector<M> dleOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M()) {
-  std::vector<M> ret(1);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_DLEOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in DLEOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "p");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > dleOut(
+    const std::string &n0 ="", const M &x0 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  std::string s[] = {"p"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'dleOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return DLEOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> dleOut(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DLEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'DleStruct'
-
-template<class M>
-class CASADI_EXPORT DleStructIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit DleStructIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_DleStruct) {}
-};
-/// \endcond
-/// Structure specification of a DLE
-///
-/// \copydoc scheme_DleStruct
-template<class M>
-DleStructIOSchemeVector<M> dleStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
-  std::vector<M> ret(2);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_DleStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in DleStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "a, v");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-  return DleStructIOSchemeVector<M>(ret);
-}
-template<class M>
-std::vector<M> dleStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DleStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DleStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'DPLEInput'
-
-template<class M>
-class CASADI_EXPORT DPLEInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit DPLEInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_DPLEInput) {}
-};
-/// \endcond
 /// Input arguments of a \e dple solver
 ///
 /// \copydoc scheme_DPLEInput
 template<class M>
-DPLEInputIOSchemeVector<M> dpleIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
-  std::vector<M> ret(2);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_DPLEInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in DPLEInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "a, v");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > dpleIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  std::string s[] = {"a", "v"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'dpleIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return DPLEInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> dpleIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'DPLEOutput'
-
-template<class M>
-class CASADI_EXPORT DPLEOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit DPLEOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_DPLEOutput) {}
-};
-/// \endcond
 /// Output arguments of a \e dple solver
 ///
 /// \copydoc scheme_DPLEOutput
 template<class M>
-DPLEOutputIOSchemeVector<M> dpleOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M()) {
-  std::vector<M> ret(1);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_DPLEOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in DPLEOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "p");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > dpleOut(
+    const std::string &n0 ="", const M &x0 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  std::string s[] = {"p"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'dpleOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return DPLEOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> dpleOut(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'DpleVecStruct'
-
-template<class M>
-class CASADI_EXPORT DpleVecStructIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit DpleVecStructIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_DpleVecStruct) {}
-};
-/// \endcond
-/// Structure specification of a DPLE
-///
-/// \copydoc scheme_DpleVecStruct
-template<class M>
-DpleVecStructIOSchemeVector<M> dpleStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
-  std::vector<M> ret(2);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_DpleVecStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in DpleVecStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "a, v");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-  return DpleVecStructIOSchemeVector<M>(ret);
-}
-template<class M>
-std::vector<M> dpleStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DpleVecStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DpleVecStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'HNLPInput'
-
-template<class M>
-class CASADI_EXPORT HNLPInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit HNLPInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_HNLPInput) {}
-};
-/// \endcond
 /// Input arguments of an Homotopy NLP function
 ///
 /// \copydoc scheme_HNLPInput
 template<class M>
-HNLPInputIOSchemeVector<M> hnlpIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M()) {
-  std::vector<M> ret(3);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_HNLPInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in HNLPInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x, p, tau");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > hnlpIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  std::string s[] = {"x", "p", "tau"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'hnlpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return HNLPInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> hnlpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'DAEInput'
-
-template<class M>
-class CASADI_EXPORT DAEInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit DAEInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_DAEInput) {}
-};
-/// \endcond
 /// Input arguments of an ODE/DAE function
 ///
 /// \copydoc scheme_DAEInput
 template<class M>
-DAEInputIOSchemeVector<M> daeIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M()) {
-  std::vector<M> ret(4);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_DAEInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in DAEInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x, z, p, t");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > daeIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  std::string s[] = {"x", "z", "p", "t"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'daeIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return DAEInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> daeIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'DAEOutput'
-
-template<class M>
-class CASADI_EXPORT DAEOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit DAEOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_DAEOutput) {}
-};
-/// \endcond
 /// Output arguments of an DAE function
 ///
 /// \copydoc scheme_DAEOutput
 template<class M>
-DAEOutputIOSchemeVector<M> daeOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M()) {
-  std::vector<M> ret(3);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_DAEOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in DAEOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "ode, alg, quad");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > daeOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  std::string s[] = {"ode", "alg", "quad"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'daeOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return DAEOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> daeOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'RDAEInput'
-
-template<class M>
-class CASADI_EXPORT RDAEInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit RDAEInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_RDAEInput) {}
-};
-/// \endcond
 /// Input arguments of an ODE/DAE backward integration function
 ///
 /// \copydoc scheme_RDAEInput
 template<class M>
-RDAEInputIOSchemeVector<M> rdaeIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M(),
-    const std::string &arg_s6 ="", const M &arg_m6 =M()) {
-  std::vector<M> ret(7);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_RDAEInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in RDAEInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "rx, rz, rp, x, z, p, t");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > rdaeIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M(),
+    const std::string &n6 ="", const M &x6 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  if (!n6.empty()) m[n6]=x6;
+  std::string s[] = {"rx", "rz", "rp", "x", "z", "p", "t"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+7);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'rdaeIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return RDAEInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> rdaeIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s6))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'RDAEOutput'
-
-template<class M>
-class CASADI_EXPORT RDAEOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit RDAEOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_RDAEOutput) {}
-};
-/// \endcond
 /// Output arguments of an ODE/DAE backward integration function
 ///
 /// \copydoc scheme_RDAEOutput
 template<class M>
-RDAEOutputIOSchemeVector<M> rdaeOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M()) {
-  std::vector<M> ret(3);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_RDAEOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in RDAEOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "ode, alg, quad");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > rdaeOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  std::string s[] = {"ode", "alg", "quad"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'rdaeOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return RDAEOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> rdaeOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'IntegratorInput'
-
-template<class M>
-class CASADI_EXPORT IntegratorInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit IntegratorInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_IntegratorInput) {}
-};
-/// \endcond
 /// Input arguments of an integrator
 ///
 /// \copydoc scheme_IntegratorInput
 template<class M>
-IntegratorInputIOSchemeVector<M> integratorIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M()) {
-  std::vector<M> ret(6);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_IntegratorInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in IntegratorInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x0, p, z0, rx0, rp, rz0");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > integratorIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  std::string s[] = {"x0", "p", "z0", "rx0", "rp", "rz0"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+6);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'integratorIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return IntegratorInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> integratorIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s5))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'IntegratorOutput'
-
-template<class M>
-class CASADI_EXPORT IntegratorOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit IntegratorOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_IntegratorOutput) {}
-};
-/// \endcond
 /// Output arguments of an integrator
 ///
 /// \copydoc scheme_IntegratorOutput
 template<class M>
-IntegratorOutputIOSchemeVector<M> integratorOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M()) {
-  std::vector<M> ret(6);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_IntegratorOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in IntegratorOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "xf, qf, zf, rxf, rqf, rzf");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > integratorOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  std::string s[] = {"xf", "qf", "zf", "rxf", "rqf", "rzf"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+6);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'integratorOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return IntegratorOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> integratorOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s5))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'LinsolInput'
-
-template<class M>
-class CASADI_EXPORT LinsolInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit LinsolInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_LinsolInput) {}
-};
-/// \endcond
 /// Input arguments of a linear solver
 ///
 /// \copydoc scheme_LinsolInput
 template<class M>
-LinsolInputIOSchemeVector<M> linsolIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
-  std::vector<M> ret(2);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LinsolInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in LinsolInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "A, B");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > linsolIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  std::string s[] = {"A", "B"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'linsolIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return LinsolInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> linsolIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'LinsolOutput'
-
-template<class M>
-class CASADI_EXPORT LinsolOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit LinsolOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_LinsolOutput) {}
-};
-/// \endcond
 /// Output arguments of a linear solver
 ///
 /// \copydoc scheme_LinsolOutput
 template<class M>
-LinsolOutputIOSchemeVector<M> linsolOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M()) {
-  std::vector<M> ret(1);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LinsolOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in LinsolOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "X");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > linsolOut(
+    const std::string &n0 ="", const M &x0 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  std::string s[] = {"X"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'linsolOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return LinsolOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> linsolOut(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'LpSolverInput'
-
-template<class M>
-class CASADI_EXPORT LpSolverInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit LpSolverInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_LpSolverInput) {}
-};
-/// \endcond
 /// Input arguments of a LP problem
 ///
 /// \copydoc scheme_LpSolverInput
 template<class M>
-LpSolverInputIOSchemeVector<M> lpIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M()) {
-  std::vector<M> ret(6);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LpSolverInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in LpSolverInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "c, a, lba, uba, lbx, ubx");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > lpIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  std::string s[] = {"c", "a", "lba", "uba", "lbx", "ubx"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+6);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'lpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return LpSolverInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> lpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'LpSolverOutput'
-
-template<class M>
-class CASADI_EXPORT LpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit LpSolverOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_LpSolverOutput) {}
-};
-/// \endcond
 /// Output arguments of an LP Solver
 ///
 /// \copydoc scheme_LpSolverOutput
 template<class M>
-LpSolverOutputIOSchemeVector<M> lpOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M()) {
-  std::vector<M> ret(4);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LpSolverOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in LpSolverOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x, cost, lam_a, lam_x");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > lpOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  std::string s[] = {"x", "cost", "lam_a", "lam_x"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'lpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return LpSolverOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> lpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'LPStruct'
-
-template<class M>
-class CASADI_EXPORT LPStructIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit LPStructIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_LPStruct) {}
-};
-/// \endcond
-/// Structure specification of an LP
-///
-/// \copydoc scheme_LPStruct
-template<class M>
-LPStructIOSchemeVector<M> lpStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M()) {
-  std::vector<M> ret(1);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LPStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in LPStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "a");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-  return LPStructIOSchemeVector<M>(ret);
-}
-template<class M>
-std::vector<M> lpStruct(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'LR_DLEInput'
-
-template<class M>
-class CASADI_EXPORT LR_DLEInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit LR_DLEInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_LR_DLEInput) {}
-};
-/// \endcond
 /// Input arguments of a \e dle solver
 ///
 /// \copydoc scheme_LR_DLEInput
 template<class M>
-LR_DLEInputIOSchemeVector<M> lrdleIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M()) {
-  std::vector<M> ret(4);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LR_DLEInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in LR_DLEInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "a, v, c, h");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > lrdleIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  std::string s[] = {"a", "v", "c", "h"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'lrdleIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return LR_DLEInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> lrdleIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DLEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DLEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DLEInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DLEInput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'LR_DLEOutput'
-
-template<class M>
-class CASADI_EXPORT LR_DLEOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit LR_DLEOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_LR_DLEOutput) {}
-};
-/// \endcond
 /// Output arguments of a \e dle solver
 ///
 /// \copydoc scheme_LR_DLEOutput
 template<class M>
-LR_DLEOutputIOSchemeVector<M> lrdleOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M()) {
-  std::vector<M> ret(1);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LR_DLEOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in LR_DLEOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "y");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > lrdleOut(
+    const std::string &n0 ="", const M &x0 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  std::string s[] = {"y"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'lrdleOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return LR_DLEOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> lrdleOut(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DLEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'LrDleStruct'
-
-template<class M>
-class CASADI_EXPORT LrDleStructIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit LrDleStructIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_LrDleStruct) {}
-};
-/// \endcond
-/// Structure specification of a DLE
-///
-/// \copydoc scheme_LrDleStruct
-template<class M>
-LrDleStructIOSchemeVector<M> lrdleStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M()) {
-  std::vector<M> ret(4);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LrDleStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in LrDleStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "a, v, c, h");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-  return LrDleStructIOSchemeVector<M>(ret);
-}
-template<class M>
-std::vector<M> lrdleStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDleStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDleStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDleStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDleStruct, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'LR_DPLEInput'
-
-template<class M>
-class CASADI_EXPORT LR_DPLEInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit LR_DPLEInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_LR_DPLEInput) {}
-};
-/// \endcond
 /// Input arguments of a \e dple solver
 ///
 /// \copydoc scheme_LR_DPLEInput
 template<class M>
-LR_DPLEInputIOSchemeVector<M> lrdpleIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M()) {
-  std::vector<M> ret(4);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LR_DPLEInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in LR_DPLEInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "a, v, c, h");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > lrdpleIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  std::string s[] = {"a", "v", "c", "h"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'lrdpleIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return LR_DPLEInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> lrdpleIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DPLEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DPLEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DPLEInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DPLEInput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'LR_DPLEOutput'
-
-template<class M>
-class CASADI_EXPORT LR_DPLEOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit LR_DPLEOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_LR_DPLEOutput) {}
-};
-/// \endcond
 /// Output arguments of a \e dple solver
 ///
 /// \copydoc scheme_LR_DPLEOutput
 template<class M>
-LR_DPLEOutputIOSchemeVector<M> lrdpleOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M()) {
-  std::vector<M> ret(1);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LR_DPLEOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in LR_DPLEOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "y");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > lrdpleOut(
+    const std::string &n0 ="", const M &x0 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  std::string s[] = {"y"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'lrdpleOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return LR_DPLEOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> lrdpleOut(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DPLEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'LrDpleVecStruct'
-
-template<class M>
-class CASADI_EXPORT LrDpleVecStructIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit LrDpleVecStructIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_LrDpleVecStruct) {}
-};
-/// \endcond
-/// Structure specification of a DPLE
-///
-/// \copydoc scheme_LrDpleVecStruct
-template<class M>
-LrDpleVecStructIOSchemeVector<M> lrdpleStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M()) {
-  std::vector<M> ret(4);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LrDpleVecStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in LrDpleVecStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "a, v, c, h");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-  return LrDpleVecStructIOSchemeVector<M>(ret);
-}
-template<class M>
-std::vector<M> lrdpleStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDpleVecStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDpleVecStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDpleVecStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDpleVecStruct, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'NLPInput'
-
-template<class M>
-class CASADI_EXPORT NLPInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit NLPInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_NLPInput) {}
-};
-/// \endcond
 /// Input arguments of an NLP function
 ///
 /// \copydoc scheme_NLPInput
 template<class M>
-NLPInputIOSchemeVector<M> nlpIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
-  std::vector<M> ret(2);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_NLPInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in NLPInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x, p");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > nlpIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  std::string s[] = {"x", "p"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'nlpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return NLPInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> nlpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'NLPOutput'
-
-template<class M>
-class CASADI_EXPORT NLPOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit NLPOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_NLPOutput) {}
-};
-/// \endcond
 /// Output arguments of an NLP function
 ///
 /// \copydoc scheme_NLPOutput
 template<class M>
-NLPOutputIOSchemeVector<M> nlpOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
-  std::vector<M> ret(2);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_NLPOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in NLPOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "f, g");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > nlpOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  std::string s[] = {"f", "g"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'nlpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return NLPOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> nlpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'GradFInput'
-
-template<class M>
-class CASADI_EXPORT GradFInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit GradFInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_GradFInput) {}
-};
-/// \endcond
 /// Input arguments of an NLP objective gradient function
 ///
 /// \copydoc scheme_GradFInput
 template<class M>
-GradFInputIOSchemeVector<M> gradFIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
-  std::vector<M> ret(2);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_GradFInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in GradFInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x, p");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > gradFIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  std::string s[] = {"x", "p"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'gradFIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return GradFInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> gradFIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'GradFOutput'
-
-template<class M>
-class CASADI_EXPORT GradFOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit GradFOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_GradFOutput) {}
-};
-/// \endcond
 /// Output arguments of an NLP objective gradient function
 ///
 /// \copydoc scheme_GradFOutput
 template<class M>
-GradFOutputIOSchemeVector<M> gradFOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M()) {
-  std::vector<M> ret(3);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_GradFOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in GradFOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "grad, f, g");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > gradFOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  std::string s[] = {"grad", "f", "g"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'gradFOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return GradFOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> gradFOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'JacGInput'
-
-template<class M>
-class CASADI_EXPORT JacGInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit JacGInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_JacGInput) {}
-};
-/// \endcond
 /// Input arguments of an NLP Jacobian function
 ///
 /// \copydoc scheme_JacGInput
 template<class M>
-JacGInputIOSchemeVector<M> jacGIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
-  std::vector<M> ret(2);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_JacGInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in JacGInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x, p");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > jacGIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  std::string s[] = {"x", "p"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'jacGIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return JacGInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> jacGIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'JacGOutput'
-
-template<class M>
-class CASADI_EXPORT JacGOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit JacGOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_JacGOutput) {}
-};
-/// \endcond
 /// Output arguments of an NLP Jacobian function
 ///
 /// \copydoc scheme_JacGOutput
 template<class M>
-JacGOutputIOSchemeVector<M> jacGOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M()) {
-  std::vector<M> ret(3);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_JacGOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in JacGOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "jac, f, g");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > jacGOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  std::string s[] = {"jac", "f", "g"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'jacGOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return JacGOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> jacGOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'HessLagInput'
-
-template<class M>
-class CASADI_EXPORT HessLagInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit HessLagInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_HessLagInput) {}
-};
-/// \endcond
 /// Input arguments of an NLP Hessian function
 ///
 /// \copydoc scheme_HessLagInput
 template<class M>
-HessLagInputIOSchemeVector<M> hessLagIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M()) {
-  std::vector<M> ret(4);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_HessLagInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in HessLagInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x, p, lam_f, lam_g");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > hessLagIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  std::string s[] = {"x", "p", "lam_f", "lam_g"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'hessLagIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return HessLagInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> hessLagIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'HessLagOutput'
-
-template<class M>
-class CASADI_EXPORT HessLagOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit HessLagOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_HessLagOutput) {}
-};
-/// \endcond
 /// Output arguments of an NLP Hessian function
 ///
 /// \copydoc scheme_HessLagOutput
 template<class M>
-HessLagOutputIOSchemeVector<M> hessLagOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M()) {
-  std::vector<M> ret(5);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_HessLagOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in HessLagOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "hess, f, g, grad_x, grad_p");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > hessLagOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  std::string s[] = {"hess", "f", "g", "grad_x", "grad_p"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+5);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'hessLagOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return HessLagOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> hessLagOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'NlpSolverInput'
-
-template<class M>
-class CASADI_EXPORT NlpSolverInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit NlpSolverInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_NlpSolverInput) {}
-};
-/// \endcond
 /// Input arguments of an NLP Solver
 ///
 /// \copydoc scheme_NlpSolverInput
 template<class M>
-NlpSolverInputIOSchemeVector<M> nlpSolverIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M(),
-    const std::string &arg_s6 ="", const M &arg_m6 =M(),
-    const std::string &arg_s7 ="", const M &arg_m7 =M()) {
-  std::vector<M> ret(8);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_NlpSolverInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in NlpSolverInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > nlpSolverIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M(),
+    const std::string &n6 ="", const M &x6 =M(),
+    const std::string &n7 ="", const M &x7 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  if (!n6.empty()) m[n6]=x6;
+  if (!n7.empty()) m[n7]=x7;
+  std::string s[] = {"x0", "p", "lbx", "ubx", "lbg", "ubg", "lam_x0", "lam_g0"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+8);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'nlpSolverIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return NlpSolverInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> nlpSolverIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'NlpSolverOutput'
-
-template<class M>
-class CASADI_EXPORT NlpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit NlpSolverOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_NlpSolverOutput) {}
-};
-/// \endcond
 /// Output arguments of an NLP Solver
 ///
 /// \copydoc scheme_NlpSolverOutput
 template<class M>
-NlpSolverOutputIOSchemeVector<M> nlpSolverOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M()) {
-  std::vector<M> ret(6);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_NlpSolverOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in NlpSolverOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x, f, g, lam_x, lam_g, lam_p");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > nlpSolverOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  std::string s[] = {"x", "f", "g", "lam_x", "lam_g", "lam_p"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+6);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'nlpSolverOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return NlpSolverOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> nlpSolverOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s5))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'QcqpSolverInput'
-
-template<class M>
-class CASADI_EXPORT QcqpSolverInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit QcqpSolverInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_QcqpSolverInput) {}
-};
-/// \endcond
 /// Input arguments of a QP problem
 ///
 /// \copydoc scheme_QcqpSolverInput
 template<class M>
-QcqpSolverInputIOSchemeVector<M> qcqpIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M(),
-    const std::string &arg_s6 ="", const M &arg_m6 =M(),
-    const std::string &arg_s7 ="", const M &arg_m7 =M(),
-    const std::string &arg_s8 ="", const M &arg_m8 =M(),
-    const std::string &arg_s9 ="", const M &arg_m9 =M(),
-    const std::string &arg_s10 ="", const M &arg_m10 =M(),
-    const std::string &arg_s11 ="", const M &arg_m11 =M()) {
-  std::vector<M> ret(12);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
-  if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
-  if (arg_s9 != "") arg.insert(make_pair(arg_s9, arg_m9));
-  if (arg_s10 != "") arg.insert(make_pair(arg_s10, arg_m10));
-  if (arg_s11 != "") arg.insert(make_pair(arg_s11, arg_m11));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_QcqpSolverInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in QcqpSolverInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > qcqpIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M(),
+    const std::string &n6 ="", const M &x6 =M(),
+    const std::string &n7 ="", const M &x7 =M(),
+    const std::string &n8 ="", const M &x8 =M(),
+    const std::string &n9 ="", const M &x9 =M(),
+    const std::string &n10 ="", const M &x10 =M(),
+    const std::string &n11 ="", const M &x11 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  if (!n6.empty()) m[n6]=x6;
+  if (!n7.empty()) m[n7]=x7;
+  if (!n8.empty()) m[n8]=x8;
+  if (!n9.empty()) m[n9]=x9;
+  if (!n10.empty()) m[n10]=x10;
+  if (!n11.empty()) m[n11]=x11;
+  std::string s[] = {"h", "g", "p", "q", "r", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+12);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'qcqpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return QcqpSolverInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> qcqpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="",
-    const std::string &arg_s8="",
-    const std::string &arg_s9="",
-    const std::string &arg_s10="",
-    const std::string &arg_s11="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
-  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s9))); // NOLINT(whitespace/line_length)
-  if (arg_s10 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s10))); // NOLINT(whitespace/line_length)
-  if (arg_s11 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s11))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'QcqpSolverOutput'
-
-template<class M>
-class CASADI_EXPORT QcqpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit QcqpSolverOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_QcqpSolverOutput) {}
-};
-/// \endcond
 /// Output arguments of an QP Solver
 ///
 /// \copydoc scheme_QcqpSolverOutput
 template<class M>
-QcqpSolverOutputIOSchemeVector<M> qcqpOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M()) {
-  std::vector<M> ret(4);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_QcqpSolverOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in QcqpSolverOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x, cost, lam_a, lam_x");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > qcqpOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  std::string s[] = {"x", "cost", "lam_a", "lam_x"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'qcqpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return QcqpSolverOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> qcqpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'QCQPStruct'
-
-template<class M>
-class CASADI_EXPORT QCQPStructIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit QCQPStructIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_QCQPStruct) {}
-};
-/// \endcond
-/// Structure specification of a QP
-///
-/// \copydoc scheme_QCQPStruct
-template<class M>
-QCQPStructIOSchemeVector<M> qcqpStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M()) {
-  std::vector<M> ret(3);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_QCQPStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in QCQPStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "h, p, a");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-  return QCQPStructIOSchemeVector<M>(ret);
-}
-template<class M>
-std::vector<M> qcqpStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'QpSolverInput'
-
-template<class M>
-class CASADI_EXPORT QpSolverInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit QpSolverInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_QpSolverInput) {}
-};
-/// \endcond
 /// Input arguments of a QP problem
 ///
 /// \copydoc scheme_QpSolverInput
 template<class M>
-QpSolverInputIOSchemeVector<M> qpIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M(),
-    const std::string &arg_s6 ="", const M &arg_m6 =M(),
-    const std::string &arg_s7 ="", const M &arg_m7 =M(),
-    const std::string &arg_s8 ="", const M &arg_m8 =M()) {
-  std::vector<M> ret(9);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
-  if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_QpSolverInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in QpSolverInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "h, g, a, lba, uba, lbx, ubx, x0, lam_x0");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > qpIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M(),
+    const std::string &n6 ="", const M &x6 =M(),
+    const std::string &n7 ="", const M &x7 =M(),
+    const std::string &n8 ="", const M &x8 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  if (!n6.empty()) m[n6]=x6;
+  if (!n7.empty()) m[n7]=x7;
+  if (!n8.empty()) m[n8]=x8;
+  std::string s[] = {"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+9);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'qpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return QpSolverInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> qpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="",
-    const std::string &arg_s8="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'QpSolverOutput'
-
-template<class M>
-class CASADI_EXPORT QpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit QpSolverOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_QpSolverOutput) {}
-};
-/// \endcond
 /// Output arguments of an QP Solver
 ///
 /// \copydoc scheme_QpSolverOutput
 template<class M>
-QpSolverOutputIOSchemeVector<M> qpOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M()) {
-  std::vector<M> ret(4);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_QpSolverOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in QpSolverOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x, cost, lam_a, lam_x");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > qpOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  std::string s[] = {"x", "cost", "lam_a", "lam_x"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'qpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return QpSolverOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> qpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'QPStruct'
-
-template<class M>
-class CASADI_EXPORT QPStructIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit QPStructIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_QPStruct) {}
-};
-/// \endcond
-/// Structure specification of a QP
-///
-/// \copydoc scheme_QPStruct
-template<class M>
-QPStructIOSchemeVector<M> qpStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
-  std::vector<M> ret(2);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_QPStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in QPStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "h, a");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-  return QPStructIOSchemeVector<M>(ret);
-}
-template<class M>
-std::vector<M> qpStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'SDPInput'
-
-template<class M>
-class CASADI_EXPORT SDPInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit SDPInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_SDPInput) {}
-};
-/// \endcond
 /// Input arguments of a SDP problem
 ///
 /// \copydoc scheme_SDPInput
 template<class M>
-SDPInputIOSchemeVector<M> sdpIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M(),
-    const std::string &arg_s6 ="", const M &arg_m6 =M(),
-    const std::string &arg_s7 ="", const M &arg_m7 =M()) {
-  std::vector<M> ret(8);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_SDPInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in SDPInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "f, c, g, a, lba, uba, lbx, ubx");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > sdpIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M(),
+    const std::string &n6 ="", const M &x6 =M(),
+    const std::string &n7 ="", const M &x7 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  if (!n6.empty()) m[n6]=x6;
+  if (!n7.empty()) m[n7]=x7;
+  std::string s[] = {"f", "c", "g", "a", "lba", "uba", "lbx", "ubx"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+8);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'sdpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return SDPInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> sdpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s7))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'SDPOutput'
-
-template<class M>
-class CASADI_EXPORT SDPOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit SDPOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_SDPOutput) {}
-};
-/// \endcond
 /// Output arguments of an SDP Solver
 ///
 /// \copydoc scheme_SDPOutput
 template<class M>
-SDPOutputIOSchemeVector<M> sdpOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M(),
-    const std::string &arg_s6 ="", const M &arg_m6 =M()) {
-  std::vector<M> ret(7);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_SDPOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in SDPOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x, p, dual, cost, dual_cost, lam_a, lam_x");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > sdpOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M(),
+    const std::string &n6 ="", const M &x6 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  if (!n6.empty()) m[n6]=x6;
+  std::string s[] = {"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+7);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'sdpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return SDPOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> sdpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s6))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'SDPStruct'
-
-template<class M>
-class CASADI_EXPORT SDPStructIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit SDPStructIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_SDPStruct) {}
-};
-/// \endcond
-/// Structure specification of an SDP
-///
-/// \copydoc scheme_SDPStruct
-template<class M>
-SDPStructIOSchemeVector<M> sdpStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M()) {
-  std::vector<M> ret(3);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_SDPStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in SDPStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "f, g, a");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-  return SDPStructIOSchemeVector<M>(ret);
-}
-template<class M>
-std::vector<M> sdpStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'SDQPInput'
-
-template<class M>
-class CASADI_EXPORT SDQPInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit SDQPInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_SDQPInput) {}
-};
-/// \endcond
 /// Input arguments of a SDQP problem
 ///
 /// \copydoc scheme_SDQPInput
 template<class M>
-SDQPInputIOSchemeVector<M> sdqpIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M(),
-    const std::string &arg_s6 ="", const M &arg_m6 =M(),
-    const std::string &arg_s7 ="", const M &arg_m7 =M(),
-    const std::string &arg_s8 ="", const M &arg_m8 =M()) {
-  std::vector<M> ret(9);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
-  if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_SDQPInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in SDQPInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "h, c, f, g, a, lba, uba, lbx, ubx");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > sdqpIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M(),
+    const std::string &n6 ="", const M &x6 =M(),
+    const std::string &n7 ="", const M &x7 =M(),
+    const std::string &n8 ="", const M &x8 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  if (!n6.empty()) m[n6]=x6;
+  if (!n7.empty()) m[n7]=x7;
+  if (!n8.empty()) m[n8]=x8;
+  std::string s[] = {"h", "c", "f", "g", "a", "lba", "uba", "lbx", "ubx"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+9);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'sdqpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return SDQPInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> sdqpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="",
-    const std::string &arg_s8="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s8))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'SDQPOutput'
-
-template<class M>
-class CASADI_EXPORT SDQPOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit SDQPOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_SDQPOutput) {}
-};
-/// \endcond
 /// Output arguments of an SDQP Solver
 ///
 /// \copydoc scheme_SDQPOutput
 template<class M>
-SDQPOutputIOSchemeVector<M> sdqpOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M(),
-    const std::string &arg_s6 ="", const M &arg_m6 =M()) {
-  std::vector<M> ret(7);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_SDQPOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in SDQPOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x, p, dual, cost, dual_cost, lam_a, lam_x");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > sdqpOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M(),
+    const std::string &n6 ="", const M &x6 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  if (!n6.empty()) m[n6]=x6;
+  std::string s[] = {"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+7);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'sdqpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return SDQPOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> sdqpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s6))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'SDQPStruct'
-
-template<class M>
-class CASADI_EXPORT SDQPStructIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit SDQPStructIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_SDQPStruct) {}
-};
-/// \endcond
-/// Structure specification of an SDQP
-///
-/// \copydoc scheme_SDQPStruct
-template<class M>
-SDQPStructIOSchemeVector<M> sdqpStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M()) {
-  std::vector<M> ret(4);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_SDQPStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in SDQPStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "h, f, g, a");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
-  }
-  return SDQPStructIOSchemeVector<M>(ret);
-}
-template<class M>
-std::vector<M> sdqpStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'SOCPInput'
-
-template<class M>
-class CASADI_EXPORT SOCPInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit SOCPInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_SOCPInput) {}
-};
-/// \endcond
 /// Input arguments of a SOCP problem
 ///
 /// \copydoc scheme_SOCPInput
 template<class M>
-SOCPInputIOSchemeVector<M> socpIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M(),
-    const std::string &arg_s6 ="", const M &arg_m6 =M(),
-    const std::string &arg_s7 ="", const M &arg_m7 =M(),
-    const std::string &arg_s8 ="", const M &arg_m8 =M(),
-    const std::string &arg_s9 ="", const M &arg_m9 =M()) {
-  std::vector<M> ret(10);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
-  if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
-  if (arg_s9 != "") arg.insert(make_pair(arg_s9, arg_m9));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_SOCPInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in SOCPInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "g, h, e, f, c, a, lba, uba, lbx, ubx");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > socpIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M(),
+    const std::string &n6 ="", const M &x6 =M(),
+    const std::string &n7 ="", const M &x7 =M(),
+    const std::string &n8 ="", const M &x8 =M(),
+    const std::string &n9 ="", const M &x9 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  if (!n6.empty()) m[n6]=x6;
+  if (!n7.empty()) m[n7]=x7;
+  if (!n8.empty()) m[n8]=x8;
+  if (!n9.empty()) m[n9]=x9;
+  std::string s[] = {"g", "h", "e", "f", "c", "a", "lba", "uba", "lbx", "ubx"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+10);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'socpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return SOCPInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> socpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="",
-    const std::string &arg_s8="",
-    const std::string &arg_s9="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s8))); // NOLINT(whitespace/line_length)
-  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s9))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'SOCPOutput'
-
-template<class M>
-class CASADI_EXPORT SOCPOutputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit SOCPOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_SOCPOutput) {}
-};
-/// \endcond
 /// Output arguments of an SOCP Solver
 ///
 /// \copydoc scheme_SOCPOutput
 template<class M>
-SOCPOutputIOSchemeVector<M> socpOut(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M()) {
-  std::vector<M> ret(6);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_SOCPOutput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in SOCPOutput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "x, cost, dual_cost, lam_a, lam_x, lam_cone");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > socpOut(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  std::string s[] = {"x", "cost", "dual_cost", "lam_a", "lam_x", "lam_cone"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+6);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'socpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return SOCPOutputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> socpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s5))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'SOCPStruct'
-
-template<class M>
-class CASADI_EXPORT SOCPStructIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit SOCPStructIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_SOCPStruct) {}
-};
-/// \endcond
 /// Structure specification of an SOCP
 ///
 /// \copydoc scheme_SOCPStruct
 template<class M>
-SOCPStructIOSchemeVector<M> socpStruct(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M()) {
-  std::vector<M> ret(3);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_SOCPStruct, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in SOCPStruct: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "g, e, a");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > socpStruct(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  std::string s[] = {"g", "e", "a"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'socpStruct' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return SOCPStructIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> socpStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-/// \cond INTERNAL
-/// Helper function for 'StabilizedQpSolverInput'
-
-template<class M>
-class CASADI_EXPORT StabilizedQpSolverInputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit StabilizedQpSolverInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_StabilizedQpSolverInput) {}
-};
-/// \endcond
 /// Input arguments of a QP problem
 ///
 /// \copydoc scheme_StabilizedQpSolverInput
 template<class M>
-StabilizedQpSolverInputIOSchemeVector<M> stabilizedQpIn(
-    const std::string &arg_s0 ="", const M &arg_m0 =M(),
-    const std::string &arg_s1 ="", const M &arg_m1 =M(),
-    const std::string &arg_s2 ="", const M &arg_m2 =M(),
-    const std::string &arg_s3 ="", const M &arg_m3 =M(),
-    const std::string &arg_s4 ="", const M &arg_m4 =M(),
-    const std::string &arg_s5 ="", const M &arg_m5 =M(),
-    const std::string &arg_s6 ="", const M &arg_m6 =M(),
-    const std::string &arg_s7 ="", const M &arg_m7 =M(),
-    const std::string &arg_s8 ="", const M &arg_m8 =M(),
-    const std::string &arg_s9 ="", const M &arg_m9 =M(),
-    const std::string &arg_s10 ="", const M &arg_m10 =M(),
-    const std::string &arg_s11 ="", const M &arg_m11 =M()) {
-  std::vector<M> ret(12);
-  std::map<std::string, M> arg;
-  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
-  if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
-  if (arg_s9 != "") arg.insert(make_pair(arg_s9, arg_m9));
-  if (arg_s10 != "") arg.insert(make_pair(arg_s10, arg_m10));
-  if (arg_s11 != "") arg.insert(make_pair(arg_s11, arg_m11));
-  typedef typename std::map<std::string, M>::const_iterator it_type;
-  for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, it->first);
-    if (n==-1)
-      casadi_error("Keyword error in StabilizedQpSolverInput: '" << it->first
-        << "' is not recognized. Available keywords are: "
-        "h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu");  // NOLINT(whitespace/line_length)
-    ret[n] = it->second;
+std::pair<std::map<std::string, M>, std::vector<std::string> > stabilizedQpIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M(),
+    const std::string &n2 ="", const M &x2 =M(),
+    const std::string &n3 ="", const M &x3 =M(),
+    const std::string &n4 ="", const M &x4 =M(),
+    const std::string &n5 ="", const M &x5 =M(),
+    const std::string &n6 ="", const M &x6 =M(),
+    const std::string &n7 ="", const M &x7 =M(),
+    const std::string &n8 ="", const M &x8 =M(),
+    const std::string &n9 ="", const M &x9 =M(),
+    const std::string &n10 ="", const M &x10 =M(),
+    const std::string &n11 ="", const M &x11 =M()) {
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  if (!n2.empty()) m[n2]=x2;
+  if (!n3.empty()) m[n3]=x3;
+  if (!n4.empty()) m[n4]=x4;
+  if (!n5.empty()) m[n5]=x5;
+  if (!n6.empty()) m[n6]=x6;
+  if (!n7.empty()) m[n7]=x7;
+  if (!n8.empty()) m[n8]=x8;
+  if (!n9.empty()) m[n9]=x9;
+  if (!n10.empty()) m[n10]=x10;
+  if (!n11.empty()) m[n11]=x11;
+  std::string s[] = {"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0", "muR", "muE", "mu"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+12);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'stabilizedQpIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
   }
-  return StabilizedQpSolverInputIOSchemeVector<M>(ret);
+  return std::make_pair(m, sv);
 }
-template<class M>
-std::vector<M> stabilizedQpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="",
-    const std::string &arg_s8="",
-    const std::string &arg_s9="",
-    const std::string &arg_s10="",
-    const std::string &arg_s11="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
-  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s9))); // NOLINT(whitespace/line_length)
-  if (arg_s10 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s10))); // NOLINT(whitespace/line_length)
-  if (arg_s11 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s11))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
-#define INSTANTIATE_IOSCHEME_HELPERS(T) \
-template class CLEInputIOSchemeVector<T>;\
-template class CLEOutputIOSchemeVector<T>;\
-template class CleStructIOSchemeVector<T>;\
-template class ControlledDAEInputIOSchemeVector<T>;\
-template class ControlSimulatorInputIOSchemeVector<T>;\
-template class DLEInputIOSchemeVector<T>;\
-template class DLEOutputIOSchemeVector<T>;\
-template class DleStructIOSchemeVector<T>;\
-template class DPLEInputIOSchemeVector<T>;\
-template class DPLEOutputIOSchemeVector<T>;\
-template class DpleVecStructIOSchemeVector<T>;\
-template class HNLPInputIOSchemeVector<T>;\
-template class DAEInputIOSchemeVector<T>;\
-template class DAEOutputIOSchemeVector<T>;\
-template class RDAEInputIOSchemeVector<T>;\
-template class RDAEOutputIOSchemeVector<T>;\
-template class IntegratorInputIOSchemeVector<T>;\
-template class IntegratorOutputIOSchemeVector<T>;\
-template class LinsolInputIOSchemeVector<T>;\
-template class LinsolOutputIOSchemeVector<T>;\
-template class LpSolverInputIOSchemeVector<T>;\
-template class LpSolverOutputIOSchemeVector<T>;\
-template class LPStructIOSchemeVector<T>;\
-template class LR_DLEInputIOSchemeVector<T>;\
-template class LR_DLEOutputIOSchemeVector<T>;\
-template class LrDleStructIOSchemeVector<T>;\
-template class LR_DPLEInputIOSchemeVector<T>;\
-template class LR_DPLEOutputIOSchemeVector<T>;\
-template class LrDpleVecStructIOSchemeVector<T>;\
-template class NLPInputIOSchemeVector<T>;\
-template class NLPOutputIOSchemeVector<T>;\
-template class GradFInputIOSchemeVector<T>;\
-template class GradFOutputIOSchemeVector<T>;\
-template class JacGInputIOSchemeVector<T>;\
-template class JacGOutputIOSchemeVector<T>;\
-template class HessLagInputIOSchemeVector<T>;\
-template class HessLagOutputIOSchemeVector<T>;\
-template class NlpSolverInputIOSchemeVector<T>;\
-template class NlpSolverOutputIOSchemeVector<T>;\
-template class QcqpSolverInputIOSchemeVector<T>;\
-template class QcqpSolverOutputIOSchemeVector<T>;\
-template class QCQPStructIOSchemeVector<T>;\
-template class QpSolverInputIOSchemeVector<T>;\
-template class QpSolverOutputIOSchemeVector<T>;\
-template class QPStructIOSchemeVector<T>;\
-template class SDPInputIOSchemeVector<T>;\
-template class SDPOutputIOSchemeVector<T>;\
-template class SDPStructIOSchemeVector<T>;\
-template class SDQPInputIOSchemeVector<T>;\
-template class SDQPOutputIOSchemeVector<T>;\
-template class SDQPStructIOSchemeVector<T>;\
-template class SOCPInputIOSchemeVector<T>;\
-template class SOCPOutputIOSchemeVector<T>;\
-template class SOCPStructIOSchemeVector<T>;\
-template class StabilizedQpSolverInputIOSchemeVector<T>;\
-
 } // namespace casadi
 #endif //SCHEMES_HELPERS_HPP
 

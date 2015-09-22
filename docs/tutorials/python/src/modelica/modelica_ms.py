@@ -32,25 +32,25 @@ import os
 fmux = zipfile.ZipFile("CSTR_CSTR_Opt2.fmux",'r')
 fmux.extract('modelDescription.xml','.')
 #$ This file can be imported into CasADi, building up a symbolic representation of the model
-#$ The logic for importing Modelica models is located in the SymbolicOCP class:
+#$ The logic for importing Modelica models is located in the DaeBuilder class:
 from casadi import *
-ocp = SymbolicOCP()
-ocp.parseFMI("modelDescription.xml")
+ivp = DaeBuilder()
+ivp.parseFMI("modelDescription.xml")
 #! Let us have a look at the flat optimal control problem:
-print ocp
-#$ As we see, the optimal control problem (OCP) has two differential states (cstr.c and cstr.T),
-#$ two algebraic variables (cstr.Tc and q) and one free control.
+print ivp
+#$ As we see, the initial-value problem (IVP) has two differential states (cstr.c and cstr.T),
+#$ two algebraic variables (cstr.Tc and q) and one control.
 #$
 #$ By insprecting the equations, we see that it is relatively both straightforward to eliminate 
 #$ the algebraic variables from the problem and to rewrite the DAE as an explicit ODE.
 #$ Indeed, for cases like this one, CasADi can do this reformulation automatically:
-ocp.makeExplicit()
+ivp.makeExplicit()
 #! Let us extract variables for the states, the control and equations
-x = ocp.x
-u = ocp.u
-f = ocp.ode
-L = ocp.lterm
-I = ocp.init
+x = vertcat(ivp.x)
+u = vertcat(ivp.u)
+f = vertcat(ivp.ode)
+L = vertcat(ivp.quad)
+I = vertcat(ivp.init)
 #$ These are expressions that can be visualized or manipulated using CasADi's 
 #$ symbolic framework:
 print 5*sin(f[0])
@@ -65,13 +65,14 @@ print hessian(L,x)
 #$
 #$ We can also retrieve other information from the model such as the end time,
 #$ variable bounds and initial guess:
-tf = ocp.tf
-ubx = ocp.max(x)
-lbx = ocp.min(x)
-ubu = ocp.max(u)
-lbu = ocp.min(u)
-x0 = ocp.initialGuess(x)
-u0 = ocp.initialGuess(u)
+ubx = ivp.max(x)
+lbx = ivp.min(x)
+ubu = ivp.max(u)
+lbu = ivp.min(u)
+x0 = ivp.initialGuess(x)
+u0 = ivp.initialGuess(u)
+#$ Formulate the optimal control problem
+tf = 150.
 #$ We now proceeed to solve the optimal control problem, which can be written more compactly as:
 #$  $$ \begin{array}{cl}   \textbf{minimize}    &  \displaystyle\int_{t=0}^{\texttt{tf}}{\texttt{L} \, dt} \\ \\
 #$                         \textbf{subject to}  &  \texttt{I}(t) = 0, \quad \text{for} \quad t=0 \\
@@ -87,15 +88,15 @@ print "lbx = ", lbx, "ubx = ", ubx, "lbu = ", lbu, "ubu = ", ubu
 #$ From the symbolic expressions, we can create functions (functors) for evaluating the 
 #$ ODE right hand side numerically or symbolically. The following code creates a function
 #$ with two inputs (x and u) and two outputs (f and L):
-ode_fcn = SXFunction([x,u],[f,L])
-ode_fcn.setOption("name","ode_fcn")
-ode_fcn.init()
+ode_fcn = MXFunction('ode_fcn', [x,u],[f,L])
 #$ We also create a function for evaluating the initial conditions:
-init_fcn = SXFunction([x],[I])
-init_fcn.setOption("name","init_fcn")
-init_fcn.init()
+init_fcn = MXFunction('init_fcn', [x],[I])
+#$ Increased speed is often possible by converting the MXFunction instances to SXFunction instances.
+#$ This is possible when the symbolic expressions do not contain any exotic operators:
+ode_fcn = SXFunction(ode_fcn)
+init_fcn = SXFunction(init_fcn)
 #$ We shall use the "direct multiple shooting" method with 20 shooting intervals of equal length
-#$ to solve the OCP. 
+#$ to solve the IVP. 
 nk = 20
 dt = tf/nk
 #$ The first step of this method is to make a finite-dimensional representation of the control trajectory. 
@@ -126,20 +127,20 @@ dt = tf/nk
 #$ For more details, a good starting point is the Wikipedia entry on Runge-Kutta methods.
 #$
 #$ The CasADi code for implementing an integrator that takes 10 steps using the above method is:
+nx = x.size1()
+nu = u.size1()
 nj = 10; h = dt/nj
-xk = MX.sym("xk",2)
-uk = MX.sym("uk")
+xk = MX.sym("xk",nx)
+uk = MX.sym("uk",nu)
 xkj = xk; xkj_L = 0
 for j in range(nj):
-   [k1,k1_L] = ode_fcn.call([xkj,uk])
-   [k2,k2_L] = ode_fcn.call([xkj + h/2*k1,uk]) 
-   [k3,k3_L] = ode_fcn.call([xkj + h/2*k2,uk])
-   [k4,k4_L] = ode_fcn.call([xkj + h*k3,uk])
+   [k1,k1_L] = ode_fcn([xkj,uk])
+   [k2,k2_L] = ode_fcn([xkj + h/2*k1,uk])
+   [k3,k3_L] = ode_fcn([xkj + h/2*k2,uk])
+   [k4,k4_L] = ode_fcn([xkj + h*k3,uk])
    xkj   += h/6 * (k1   + 2*k2   + 2*k3   + k4)
    xkj_L += h/6 * (k1_L + 2*k2_L + 2*k3_L + k4_L)
-integrator = MXFunction([xk,uk],[xkj,xkj_L])
-integrator.setOption("name","integrator")
-integrator.init()
+integrator = MXFunction('integrator', [xk,uk],[xkj,xkj_L])
 #$ where we have applied the method both the the ODE and to the \emph{quadrature} $\frac{d}{dt}{x_{\text{L}}}(t) = L, \quad x_{\text{L}}(0) = 0$. The code above include "calls" the previously created ODE right-hand-side function (\verb|ode_fcn|).
 #$
 #$ The next step is to formulate a nonlinear program (NLP) for solving the discrete time optimal control problem. 
@@ -152,42 +153,49 @@ integrator.init()
 #$ $\pm \infty$ if absent and equality constraints are imposed by having upper and lower bounds equal to each other.
 #$ 
 #$ For the direct multiple shooting method, the degrees of freedom of the NLP are the parametrized controls and 
-#$ the state at the beginning of each interval.  Since we have one control and two states and we have nk intervals, 
-#$ there are in total 3*nk intervals.
+#$ the state at the beginning of each interval. We also include the state at the end time.
 #$
-#$ Let us declare a vector-valued CasADi symbolic primitive corresponding to these degrees of freedom:
-v = MX.sym("v",3*nk)
-#$ Next, we split up this $3 \, \texttt{nk}$-by-1 matrix vertically into \texttt{nk} vectors of length 3 and 
-#$ then get expressions for the state and control for each interval:
-vk = vertsplit(v,3)
-xk = [i[:2] for i in vk]
-uk = [i[2]  for i in vk]
-#$ We are now ready to construct the NLP. We begin by getting numerical values for the initial guess as well as
-#$ upper and lower bounds on the decision variable. For simplicity, we shall only impose the state bounds
-#$ at the beginning of each interval:
-lbv = repmat(vertcat((lbx,lbu)),nk,1)
-ubv = repmat(vertcat((ubx,ubu)),nk,1)
-v0 = repmat(vertcat((x0,u0)),nk,1)
+#$ Let us declare symbolic primitives corresponding to these degrees of freedom:
+xk = [MX.sym("x" + str(k), nx) for k in range(nk+1)]
+uk = [MX.sym("u" + str(k), nu) for k in range(nk)]
+#$ We gather all degrees of freedom of the NLP as well as bounds and initial guess for the decision variable:
+v = []; lbv = []; ubv = []; v0 = []
+#$ Length of v
+nv = 0
+#$ Indices corresponding to the different parts of the the variable vector:
+vind = {'x':[], 'u':[]}
+def valloc(n, nv): return range(nv, nv+n), nv+n
+for k in range(nk):
+   #$ States
+   ind, nv = valloc(nx, nv)
+   v.append(xk[k]); lbv.append(lbx); ubv.append(ubx); v0.append(x0); vind['x'].append(ind)
+   #$ Control
+   ind, nv = valloc(nu, nv)
+   v.append(uk[k]); lbv.append(lbu); ubv.append(ubu); v0.append(u0); vind['u'].append(ind)
+#$ State at end
+ind, nv = valloc(nx, nv)
+v.append(xk[-1]); lbv.append(lbx); ubv.append(ubx); v0.append(x0); vind['x'].append(ind)
+#$ Concatenate lists
+v = vertcat(v); lbv = vertcat(lbv); ubv = vertcat(ubv); v0 = vertcat(v0)
 #$ Next, let us build up expressions for the objective (cost) function and the nonlinear constraints,
 #$ starting with zero cost and and empty list of constraints:
 J = 0;  eq = []
 #$ We begin by adding to the NLP, the equations corresponding to the initial conditions. For this we
 #$ "call" the above created \verb|init_fcn| with the expression for the state at the first interval:
-[eq0] = init_fcn.call([xk[0]])
+[eq0] = init_fcn([xk[0]])
 eq.append(eq0)
 #$ Next, we loop over the shooting intervals, imposing continuity of the trajectory and summing up the
 #$ the cost contributions:
 for k in range(nk):
-    [xk_end,Jk] = integrator.call([xk[k],uk[k]])
+    [xk_end,Jk] = integrator([xk[k],uk[k]])
     J += Jk
     if k+1<nk: eq.append(xk_end - xk[k+1])
 #$ Now form the NLP callback function and create an NLP solver. We shall use the open-source solver IPOPT
 #$ which is able to solve large-scale NLPs efficiently. CasADi will automatically and efficiently generate
 #$ the derivative information needed by IPOPT, including the Jacobian of the NLP constraints and the 
 #$ Hessian of the Lagrangian function:
-nlp = MXFunction(nlpIn(x=v),nlpOut(f=J,g=vertcat(eq)))
-solver = NlpSolver("ipopt", nlp)
-solver.init()
+nlp = MXFunction('nlp', nlpIn(x=v),nlpOut(f=J,g=vertcat(eq)))
+solver = NlpSolver("solver", "ipopt", nlp)
 #$ Pass bounds on the variables and constraints. The upper and lower bounds on the equality constraints are 0:
 solver.setInput(lbv,"lbx")
 solver.setInput(ubv,"ubx")
@@ -198,14 +206,14 @@ solver.setInput(0,"ubg")
 solver.evaluate()
 #$ After making sure that the solution was successful, we retrieve the solution:
 v_opt  = solver.getOutput("x")
-x0_opt = v_opt[0::3]
-x1_opt = v_opt[1::3]
-u_opt  = v_opt[2::3]
+x0_opt = v_opt[[vind['x'][k][0] for k in range(nk+1)]]
+x1_opt = v_opt[[vind['x'][k][1] for k in range(nk+1)]]
+u_opt = v_opt[[vind['u'][k][0] for k in range(nk)]]
 #$ Finally, we use the python package \emph{matplotlib} to visualize the solution. matplotlib uses a syntax
 #$ which should look famliar to MATLAB users:
 from pylab import *
 from numpy import *
-tgrid = linspace(0,tf,nk)
+tgrid = linspace(0,tf,nk+1)
 figure(1)
 plot(tgrid,x0_opt)
 title(str(x[0]))
@@ -217,8 +225,7 @@ title(str(x[1]))
 grid()
 show()
 figure(3)
-#step(tgrid,u_opt)
-plot(tgrid,u_opt)
+step(tgrid,vertcat((u_opt[0],u_opt)))
 title(str(u))
 grid()
 show()
@@ -227,6 +234,4 @@ show()
 #$ As an example, the following code will generate C-code for the Hessian of the objective function
 #$ with respect to the decision variables:
 hess_f = nlp.hessian("x","f")
-hess_f.init()
-hess_f.generateCode("hess_f.c")
-
+hess_f.generate("hess_f")

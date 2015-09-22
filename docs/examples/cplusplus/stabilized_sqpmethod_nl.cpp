@@ -44,7 +44,7 @@
 *
 */
 #include <casadi/casadi.hpp>
-#include <casadi/core/misc/symbolic_nlp.hpp> 
+
 /**
  * This example demonstrates how NL-files, which can be generated
  * by AMPl or Pyomo, can be imported in CasADi and solved using
@@ -62,43 +62,36 @@ int main(int argc, char **argv){
   std::string problem = (argc==2) ? argv[1] : "../docs/examples/nl_files/hs107.nl";
 
   // Parse an NL-file
-  SymbolicNLP nl;
+  NlpBuilder nl;
   nl.parseNL(problem);
 
   // NLP
-  SXFunction nlp(nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
+  SXFunction nlp("nlp", nlpIn("x", nl.x), nlpOut("f", nl.f," g", nl.g));
  
-  // Allocate NLP solver
-  NlpSolver nlp_solver("stabilizedsqp", nlp);
-
-  // Set options
-  // nlp_solver.setOption("max_iter",10);
-  // nlp_solver.setOption("verbose",true);
-  // nlp_solver.setOption("linear_solver","ma57");
-  nlp_solver.setOption("hessian_approximation","exact");
-  // nlp_solver.setOption("derivative_test","second-order");
+  // NLP solver options
+  Dict opts;
+  // opts["max_iter"] = 10;
+  // opts["verbose"] = true;
+  // opts["linear_solver"] = "ma57";
+  opts["hessian_approximation"] = "exact";
+  // opts["derivative_test"] = "second-order";
 
   /// Unstabilized SQIC Solver
-  
-  nlp_solver.setOption("stabilized_qp_solver","qp");
-  Dictionary stabilized_qp_solver_options;
-  stabilized_qp_solver_options["qp_solver"] = "sqic";
-  nlp_solver.setOption("stabilized_qp_solver_options",stabilized_qp_solver_options);
+  opts["stabilized_qp_solver"] = "qp";
+  opts["stabilized_qp_solver_options"] = make_dict("qp_solver", "sqic");
   
   /// Stabilized SQIC Solver
-  
-  //nlp_solver.setOption("stabilized_qp_solver","sqic");
+  //opts["stabilized_qp_solver"] = "sqic";
   
   /// Ipopt QP Solver 
-  
     
   /**
-  nlp_solver.setOption("stabilized_qp_solver","qp");
-  Dictionary stabilized_qp_solver_options;
+  opts["stabilized_qp_solver"] = "qp";
+  Dict stabilized_qp_solver_options;
   stabilized_qp_solver_options["qp_solver"] = "nlp";
-  Dictionary qp_solver_options;
+  Dict qp_solver_options;
   qp_solver_options["nlp_solver"]= "ipopt";
-  Dictionary nlp_solver_options;
+  Dict nlp_solver_options;
   nlp_solver_options["print_level"] = 0;
   nlp_solver_options["print_time"] = 0;
   nlp_solver_options["tol"] = 1e-16;
@@ -107,20 +100,20 @@ int main(int argc, char **argv){
   nlp_solver_options["compl_inf_tol"] = 1e-16;
   qp_solver_options["nlp_solver_options"] = nlp_solver_options;
   stabilized_qp_solver_options["qp_solver_options"] = qp_solver_options;
-  nlp_solver.setOption("stabilized_qp_solver_options",stabilized_qp_solver_options);
+  opts["stabilized_qp_solver_options"] = stabilized_qp_solver_options;
   */
   
-  // Initialize NLP solver
-  nlp_solver.init();
-
-  // Pass the bounds and initial guess
-  nlp_solver.setInput(nl.x_lb,"lbx");
-  nlp_solver.setInput(nl.x_ub,"ubx");
-  nlp_solver.setInput(nl.g_lb,"lbg");
-  nlp_solver.setInput(nl.g_ub,"ubg");
-  nlp_solver.setInput(nl.x_init,"x0");
+  // Allocate NLP solver and buffers
+  NlpSolver nlp_solver("nlp_solver", "stabilizedsqp", nlp, opts);
+  std::map<std::string, DMatrix> arg, res;
 
   // Solve NLP
-  nlp_solver.evaluate();
+  arg["lbx"] = nl.x_lb;
+  arg["ubx"] = nl.x_ub;
+  arg["lbg"] = nl.g_lb;
+  arg["ubg"] = nl.g_ub;
+  arg["x0"] = nl.x_init;
+  res = nlp_solver(arg);
+
   return 0;
 }

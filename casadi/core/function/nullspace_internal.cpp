@@ -27,8 +27,6 @@
 #include "function_internal.hpp"
 #include "../std_vector_tools.hpp"
 #include "sx_function.hpp"
-#include "../sx/sx_tools.hpp"
-#include "../mx/mx_tools.hpp"
 #include <utility>
 #include <string>
 
@@ -50,7 +48,7 @@ namespace casadi {
 
     dense_ = getOption("dense");
 
-    casadi_assert(!dense_ || A_sp_.isDense());
+    casadi_assert(!dense_ || A_sp_.isdense());
 
     m_ = A_sp_.size1();
     n_ = A_sp_.size2();
@@ -64,10 +62,10 @@ namespace casadi {
 
     FunctionInternal::init();
 
-    setNumInputs(1);
+    ibuf_.resize(1);
     input(0)  = DMatrix::zeros(A_sp_);
 
-    setNumOutputs(1);
+    obuf_.resize(1);
     if (dense_) {
       output(0)  = DMatrix::zeros(dense);
     }

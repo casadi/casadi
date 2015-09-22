@@ -72,71 +72,64 @@ int main(){
   double inf = numeric_limits<double>::infinity();
   
   // Original parameter values
-  double p_a_[] = {5.00,1.00};
-  vector<double> p_a(p_a_,p_a_+2);
+  vector<double> p_a = {5.00, 1.00};
   
   // Perturbed parameter values
-  double p_b_[] = {4.50,1.00};
-  vector<double> p_b(p_b_,p_b_+2);
+  vector<double> p_b = {4.50, 1.00};
 
   // Initial guess and bounds for the optimization variables
-  double x0_[]  = {0.15, 0.15, 0.00, p_a[0], p_a[1]};
-  double lbx_[] = {0.00, 0.00, 0.00,   -inf,   -inf};
-  double ubx_[] = { inf,  inf,  inf,    inf,    inf};
-  vector<double> x0(x0_,x0_+5);
-  vector<double> lbx(lbx_,lbx_+5);
-  vector<double> ubx(ubx_,ubx_+5);
+  vector<double> x0  = {0.15, 0.15, 0.00, p_a[0], p_a[1]};
+  vector<double> lbx = {0.00, 0.00, 0.00,   -inf,   -inf};
+  vector<double> ubx = { inf,  inf,  inf,    inf,    inf};
   
   // Nonlinear bounds
-  double lbg_[] = {0.00, 0.00, p_a[0], p_a[1]};
-  double ubg_[] = {0.00, 0.00, p_a[0], p_a[1]};
-  vector<double> lbg(lbg_,lbg_+4);
-  vector<double> ubg(ubg_,ubg_+4);
+  vector<double> lbg = {0.00, 0.00, p_a[0], p_a[1]};
+  vector<double> ubg = {0.00, 0.00, p_a[0], p_a[1]};
     
-  // Create NLP solver
-  SXFunction nlp(nlpIn("x",x),nlpOut("f",f,"g",g));
-  NlpSolver solver("ipopt", nlp);
+  // Create NLP
+  SXFunction nlp("nlp", nlpIn("x", x), nlpOut("f", f, "g", g));
+
+  // NLP solver options
+  Dict opts;
   
   // Mark the parameters amongst the constraints (see sIPOPT documentation)
-  Dictionary con_integer_md;
-  int sens_init_constr[] = {0,0,1,2};
-  con_integer_md["sens_init_constr"] = vector<int>(sens_init_constr,sens_init_constr+4);
-  solver.setOption("con_integer_md",con_integer_md);
+  Dict con_integer_md;
+  con_integer_md["sens_init_constr"] = vector<int>{0, 0, 1, 2};
+  opts["con_integer_md"] = con_integer_md;
   
   // Mark the parameters amongst the variables (see sIPOPT documentation)
-  Dictionary var_integer_md;
-  int sens_state_1[] = {0,0,0,1,2};
-  var_integer_md["sens_state_1"] = vector<int>(sens_state_1,sens_state_1+5);
-  solver.setOption("var_integer_md",var_integer_md);
+  Dict var_integer_md;
+  var_integer_md["sens_state_1"] = vector<int>{0, 0, 0, 1, 2};
+  opts["var_integer_md"] = var_integer_md;
 
   // Pass the perturbed values (see sIPOPT documentation)
-  Dictionary var_numeric_md;
-  double sens_state_value_1[] = {0,0,0,p_b[0],p_b[1]};
-  var_numeric_md["sens_state_value_1"] = vector<double>(sens_state_value_1,sens_state_value_1+5);
-  solver.setOption("var_numeric_md",var_numeric_md);
+  Dict var_numeric_md;
+  var_numeric_md["sens_state_value_1"] = vector<double>{0,0,0,p_b[0],p_b[1]};
+  opts["var_numeric_md"] = var_numeric_md;
   
   // Enable sensitivities
-  solver.setOption("run_sens","yes");
-  solver.setOption("n_sens_steps", 1);
+  opts["run_sens"] = "yes";
+  opts["n_sens_steps"] = 1;
   
-  // Initialize solver
-  solver.init();
+  // Create NLP solver and buffers
+  NlpSolver solver("solver", "ipopt", nlp, opts);
+  std::map<std::string, DMatrix> arg, res;
   
   // Solve NLP
-  solver.setInput( x0, "x0");
-  solver.setInput(lbx, "lbx");
-  solver.setInput(ubx, "ubx");
-  solver.setInput(lbg, "lbg");
-  solver.setInput(ubg, "ubg");
-  solver.evaluate();
+  arg["lbx"] = lbx;
+  arg["ubx"] = ubx;
+  arg["lbg"] = lbg;
+  arg["ubg"] = ubg;
+  arg["x0"] = x0;
+  res = solver(arg);
   
   // Print the solution
   cout << "----" << endl;
-  cout << "Minimal cost " << solver.output("f") << endl;
+  cout << "Minimal cost " << res.at("f") << endl;
   cout << "----" << endl;
 
   cout << "Nominal solution" << endl;
-  cout << "x = " << solver.output("x").data() << endl;
+  cout << "x = " << res.at("x") << endl;
   cout << "----" << endl;
   
   cout << "perturbed solution" << endl;
@@ -150,7 +143,7 @@ int main(){
   cout << "----" << endl;
   
   cout << "Constraint multipliers" << endl;
-  Dictionary con_numeric_md = solver.getStat("con_numeric_md");
+  Dict con_numeric_md = solver.getStat("con_numeric_md");
   cout << "lambda = " << con_numeric_md["sens_sol_state_1"] << endl;
   cout << "----" << endl;
   

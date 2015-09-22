@@ -51,10 +51,10 @@ int main(){
    */
   
   // Optimization variables
-  SX x = SX::sym("x",3);
+  SX x = SX::sym("x", 3);
   
   // Parameters
-  SX p = SX::sym("p",2);
+  SX p = SX::sym("p", 2);
   
   // Objective
   SX f = x[0]*x[0] + x[1]*x[1] + x[2]*x[2];
@@ -69,61 +69,52 @@ int main(){
   double inf = numeric_limits<double>::infinity();
   
   // Initial guess and bounds for the optimization variables
-  double x0_[]  = {0.15, 0.15, 0.00};
-  double lbx_[] = {0.00, 0.00, 0.00};
-  double ubx_[] = { inf,  inf,  inf};
-  vector<double> x0(x0_,x0_+3);
-  vector<double> lbx(lbx_,lbx_+3);
-  vector<double> ubx(ubx_,ubx_+3);
+  vector<double> x0  = {0.15, 0.15, 0.00};
+  vector<double> lbx = {0.00, 0.00, 0.00};
+  vector<double> ubx = { inf,  inf,  inf};
   
   // Nonlinear bounds
-  double lbg_[] = {0.00, 0.00};
-  double ubg_[] = {0.00, 0.00};
-  vector<double> lbg(lbg_,lbg_+2);
-  vector<double> ubg(ubg_,ubg_+2);
+  vector<double> lbg = {0.00, 0.00};
+  vector<double> ubg = {0.00, 0.00};
   
   // Original parameter values
-  double p0_[]  = {5.00,1.00};
-  vector<double> p0(p0_,p0_+2);
+  vector<double> p0  = {5.00, 1.00};
 
   // NLP
-  SXFunction nlp(nlpIn("x",x,"p",p),nlpOut("f",f,"g",g));
+  SXFunction nlp("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
 
-  // Create NLP solver
-  NlpSolver solver("ipopt", nlp);
-  
-  // Set options and initialize solver
-  solver.init();
-  
-  // Solve NLP
-  solver.setInput( x0, "x0");
-  solver.setInput( p0, "p");
-  solver.setInput(lbx, "lbx");
-  solver.setInput(ubx, "ubx");
-  solver.setInput(lbg, "lbg");
-  solver.setInput(ubg, "ubg");
-  solver.evaluate();
+  // Create NLP solver and buffers
+  NlpSolver solver("solver", "ipopt", nlp);
+  std::map<std::string, DMatrix> arg, res;
+
+  // Solve the NLP
+  arg["lbx"] = lbx;
+  arg["ubx"] = ubx;
+  arg["lbg"] = lbg;
+  arg["ubg"] = ubg;
+  arg["x0"] = x0;
+  arg["p"] = p0;
+  res = solver(arg);
   
   // Print the solution
   cout << "-----" << endl;
-  cout << "Optimal solution for p = " << str(solver.input("p")) << ":" << endl;
-  cout << setw(30) << "Objective: " << str(solver.output("f")) << endl;
-  cout << setw(30) << "Primal solution: " << str(solver.output("x")) << endl;
-  cout << setw(30) << "Dual solution (x): " << str(solver.output("lam_x")) << endl;
-  cout << setw(30) << "Dual solution (g): " << str(solver.output("lam_g")) << endl;
-  
+  cout << "Optimal solution for p = " << str(arg.at("p")) << ":" << endl;
+  cout << setw(30) << "Objective: " << str(res.at("f")) << endl;
+  cout << setw(30) << "Primal solution: " << str(res.at("x")) << endl;
+  cout << setw(30) << "Dual solution (x): " << str(res.at("lam_x")) << endl;
+  cout << setw(30) << "Dual solution (g): " << str(res.at("lam_g")) << endl;
+
   // Change the parameter and resolve
-  p0[0] = 4.5;
-  solver.setInput( p0, "p");
-  solver.evaluate();
+  arg["p"] = 4.5;
+  res = solver(arg);
   
   // Print the new solution
   cout << "-----" << endl;
-  cout << "Optimal solution for p = " << str(solver.input("p")) << ":" << endl;
-  cout << setw(30) << "Objective: " << str(solver.output("f")) << endl;
-  cout << setw(30) << "Primal solution: " << str(solver.output("x")) << endl;
-  cout << setw(30) << "Dual solution (x): " << str(solver.output("lam_x")) << endl;
-  cout << setw(30) << "Dual solution (g): " << str(solver.output("lam_g")) << endl;
+  cout << "Optimal solution for p = " << str(arg.at("p")) << ":" << endl;
+  cout << setw(30) << "Objective: " << str(res.at("f")) << endl;
+  cout << setw(30) << "Primal solution: " << str(res.at("x")) << endl;
+  cout << setw(30) << "Dual solution (x): " << str(res.at("lam_x")) << endl;
+  cout << setw(30) << "Dual solution (g): " << str(res.at("lam_g")) << endl;
   
   return 0;
 }

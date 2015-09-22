@@ -38,6 +38,9 @@ if SdpSolver.hasPlugin("dsdp"):
 if SocpSolver.hasPlugin("mosek"):
   socpsolvers.append(("mosek",{ "MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10 },{"less_digits": 1},False))
 
+if SocpSolver.hasPlugin("ecos"):
+  socpsolvers.append(("ecos",{"abstol":1e-10,"reltol":1e-10},{"less_digits": 1},False))
+
 print socpsolvers
   
 class SocpSolverTests(casadiTestCase):
@@ -63,10 +66,9 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, aux_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
-      solver.setOption(socp_options)
-      solver.setOption("ni",[2])
-      solver.init()
+      allopts = dict(socp_options)
+      allopts["ni"] = [2]
+      solver = SocpSolver("mysolver",socpsolver,{'g':G.sparsity(),'e':E.sparsity(),'a':A.sparsity()},allopts)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -107,10 +109,9 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, aux_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
-      solver.setOption(socp_options)
-      solver.setOption("ni",[2])
-      solver.init()
+      allopts = dict(socp_options)
+      allopts["ni"] = [2]
+      solver = SocpSolver("mysolver",socpsolver,{"g": G.sparsity(),"e":E.sparsity(),"a":A.sparsity()},allopts)
 
       solver.setInput(c,"c")
       solver.setInput(A,"a")
@@ -147,10 +148,9 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, aux_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
-      solver.setOption(socp_options)
-      solver.setOption("ni",[2])
-      solver.init()
+      allopts = dict(socp_options)
+      allopts["ni"] = [2]
+      solver = SocpSolver("mysolver",socpsolver,{'g':G.sparsity(),'e':E.sparsity(),'a':A.sparsity()},allopts)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -196,10 +196,9 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, aux_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
-      solver.setOption(socp_options)
-      solver.setOption("ni",[2,2])
-      solver.init()
+      allopts = dict(socp_options)
+      allopts["ni"] = [2,2]
+      solver = SocpSolver("mysolver",socpsolver,{'g':G.sparsity(),'e':E.sparsity(),'a':A.sparsity()},allopts)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -241,10 +240,9 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, aux_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
-      solver.setOption(socp_options)
-      solver.setOption("ni",[2,3])
-      solver.init()
+      allopts = dict(socp_options)
+      allopts["ni"] = [2,3]
+      solver = SocpSolver("mysolver",socpsolver,{'g':G.sparsity(),'e':E.sparsity(),'a':A.sparsity()},allopts)
 
       try:
         less_digits=aux_options["less_digits"]

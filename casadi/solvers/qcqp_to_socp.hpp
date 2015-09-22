@@ -83,7 +83,7 @@ namespace casadi {
   public:
 
     /** \brief  Create a new Solver */
-    explicit QcqpToSocp(const std::vector<Sparsity> &st);
+    explicit QcqpToSocp(const std::map<std::string, Sparsity> &st);
 
     /** \brief  Destructor */
     virtual ~QcqpToSocp();
@@ -92,8 +92,9 @@ namespace casadi {
     virtual QcqpToSocp* clone() const;
 
     /** \brief  Create a new QP Solver */
-    static QcqpSolverInternal* creator(const QCQPStructure& st)
-    { return new QcqpToSocp(st);}
+    static QcqpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
+      return new QcqpToSocp(st);
+    }
 
     /** \brief  Initialize */
     virtual void init();

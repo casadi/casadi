@@ -25,7 +25,6 @@
 
 #include "stabilized_qp_to_qp.hpp"
 
-#include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
 
 using namespace std;
@@ -46,11 +45,11 @@ namespace casadi {
     StabilizedQpSolverInternal::registerPlugin(casadi_register_stabilizedqpsolver_qp);
   }
 
-  StabilizedQpToQp::StabilizedQpToQp(const std::vector<Sparsity> &st)
+  StabilizedQpToQp::StabilizedQpToQp(const std::map<std::string, Sparsity> &st)
       : StabilizedQpSolverInternal(st) {
     addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver used to solve the stabilized QPs.");
-    addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
+    addOption("qp_solver_options", OT_DICT, GenericType(),
               "Options to be passed to the QP solver instance");
   }
 
@@ -67,21 +66,18 @@ namespace casadi {
     // Initialize the base classes
     StabilizedQpSolverInternal::init();
 
-    // Form augmented QP
-    Sparsity H_sparsity_qp = diagcat(st_[QP_STRUCT_H], Sparsity::diag(nc_));
-    Sparsity A_sparsity_qp = horzcat(st_[QP_STRUCT_A], Sparsity::diag(nc_));
-    std::string qp_solver_name = getOption("qp_solver");
-    qp_solver_ = QpSolver(qp_solver_name,
-                          qpStruct("h", H_sparsity_qp, "a", A_sparsity_qp));
-
-    // Pass options if provided
+    // QP solver options
+    Dict qp_solver_options;
     if (hasSetOption("qp_solver_options")) {
-      Dictionary qp_solver_options = getOption("qp_solver_options");
-      qp_solver_.setOption(qp_solver_options);
+      qp_solver_options = getOption("qp_solver_options");
     }
 
-    // Initialize the QP solver
-    qp_solver_.init();
+    // QP solver options
+    Sparsity H_sparsity_qp = diagcat(st_[QP_STRUCT_H], Sparsity::diag(nc_));
+    Sparsity A_sparsity_qp = horzcat(st_[QP_STRUCT_A], Sparsity::diag(nc_));
+    qp_solver_ = QpSolver("qp_solver", getOption("qp_solver"),
+                          make_map("h", H_sparsity_qp, "a", A_sparsity_qp),
+                          qp_solver_options);
   }
 
   void StabilizedQpToQp::evaluate() {

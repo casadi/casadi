@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.6)
 project(casadi C CXX)
 set(PACKAGE_NAME "CasADi")
-set(PACKAGE_VERSION "2.3.0")
-set(PACKAGE_SO_VERSION "2.4")
+set(PACKAGE_VERSION "2.4.0")
+set(PACKAGE_SO_VERSION "2.5")
 set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differentation and numeric optimization")
 set(PACKAGE_AUTHOR "Joel Andersson")
 set(PACKAGE_MAINTAINER "Joris Gillis")
@@ -66,24 +66,28 @@ option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOAS
 option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" ON)
 option(WITH_DSDP "Compile the interface to DSDP" ON)
 option(WITH_MOSEK "Compile the interface to MOSEK" OFF)
+option(WITH_ECOS "Compile the interface to ECOS" OFF)
 option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
 option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
 option(WITH_LAPACK "Compile the interface to LAPACK" ON)
-option(WITH_OPENCL "Compile with OpenCL support" OFF)
+option(WITH_OPENCL "Compile with OpenCL support (experimental)" OFF)
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
 option(WITH_TINYXML "Compile the interface to TinyXML" ON)
 option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 option(WITH_COVERAGE "Create coverage report" OFF)
+option(OLD_LLVM "Use pre-3.5 LLVM" OFF)
+option(WITH_CLANG "Compile the interface to clang JIT" OFF)
 option(WITH_MATLAB "Compile the MATLAB front-end (experimental)" OFF)
 option(WITH_PYTHON "Compile the Python front-end" OFF)
 option(WITH_JSON "Compile the JSON front-end" OFF)
-option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside Python front-end" OFF)
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
 option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" OFF)
 option(WITH_SELFCONTAINED "Make the install directory self-contained" OFF)
+option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" ON)
+option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
 
 # static on windows, shared on linux/osx by default
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -93,12 +97,6 @@ else()
   option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
   option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
 endif()
-# http://stackoverflow.com/questions/8709877/cmake-string-options
-# string-valued options with defaults don't work with option() so use this syntax:
-set(PLUGIN_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/lib/casadi" CACHE STRING "Where the plugins will be installed")
-
-
-
 
 ############################################################
 ####################### Fortran ############################
@@ -161,7 +159,11 @@ endif()
 ############################################################
 
 if(WITH_SELFCONTAINED)
-set(CMAKE_INSTALL_RPATH "$ORIGIN")
+  if(APPLE)
+    set(CMAKE_INSTALL_RPATH "@loader_path/")
+  else()
+    set(CMAKE_INSTALL_RPATH "$ORIGIN")
+  endif()
 else()
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH  FALSE)
@@ -196,7 +198,7 @@ string(TOUPPER ${CMAKE_BUILD_TYPE} UPPER_CMAKE_BUILD_TYPE)
 ############################# C++11 ####################################
 ########################################################################
 # Check if the compiler supports C++11
-foreach(CXX11FLAG_TEST "" "-std=gnu++11" "-std=c++11" "-std=gnu++0x" "-std=c++0x" "-std=c++11 --DUSE_TR1_HASHMAP" "-std=c++0x -DUSE_TR1_HASHMAP")
+foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x")
   if(NOT USE_CXX11)
     # Try to compile test with the proposed flag
     try_compile(USE_CXX11
@@ -221,6 +223,8 @@ if(USE_CXX11)
     message(STATUS "No flag needed for enabling C++11 features.")
   endif()
   add_definitions(-DUSE_CXX11)
+else()
+  message(STATUS "Cannot enable C++11 features.")
 endif()
 add_feature_info(using-c++11 USE_CXX11 "Using C++11 features (improves efficiency and is required for some examples).")
 
@@ -253,6 +257,26 @@ if(CXX11FLAG)
   endif()
 endif()
 
+# Check if mkstemps is available
+if(NOT WIN32)
+  file(WRITE ${CMAKE_BINARY_DIR}/mkstemps_test.cxx
+      "#include <cstdlib>\n"
+      "#include <unistd.h>\n"
+      "int main() {\n"
+      "  char tmp[] = \"mkstempstestXXXXXX.so\";\n"
+      "  int flag = mkstemps(tmp, 3);\n"
+      "  return flag;\n"
+      "}\n")
+  try_compile(HAVE_MKSTEMPS ${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/mkstemps_test.cxx
+              OUTPUT_VARIABLE HAVE_MKSTEMPS_OUTPUT)
+  if(HAVE_MKSTEMPS)
+    add_definitions(-DHAVE_MKSTEMPS)
+  else()
+    message(WARNING "mkstemp is not available, falling back on tmpnam. "
+                    "Test compilation returned the following:\n"
+                    "${HAVE_MKSTEMPS_OUTPUT}")
+  endif()
+endif()
 
 ################################################################################
 ############################### compiler warnings ##############################
@@ -335,6 +359,10 @@ endif()
 
 if(WITH_DEBIAN_BUILD)
   add_definitions(-DWITH_DEBIAN_BUILD)
+endif()
+
+if (WITH_DEPRECATED_FEATURES)
+  add_definitions(-DWITH_DEPRECATED_FEATURES)
 endif()
 
 include_directories(.)
@@ -422,6 +450,19 @@ if(WITH_MOSEK)
 endif()
 add_feature_info(mosek-interface MOSEK_FOUND "Interface to the interior point SOCP solver MOSEK.")
 
+# CLANG
+if(WITH_CLANG)
+  # try to find system CLANG
+  find_package(CLANG)
+endif()
+add_feature_info(clang-interface CLANG_FOUND "Interface to the Clang JIT compiler.")
+
+# ECOS
+if(WITH_ECOS)
+  # try to find system ecos
+  find_package(ECOS)
+endif()
+add_feature_info(ecos-interface ECOS_FOUND "Interface to the interior point SOCP solver ECOS.")
 
 # Use the included qpOASES
 if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
@@ -557,6 +598,11 @@ feature_summary(WHAT ALL)
 feature_summary(WHAT ENABLED_FEATURES VAR feature_list)
 
 string(REPLACE "\n" "\\n" feature_list "${feature_list}")
+get_directory_property( compiler_definitions COMPILE_DEFINITIONS )
+set(EXTRA_CXX_FLAGS_FROM_DEFS "")
+foreach(DEF ${compiler_definitions})
+  set(EXTRA_CXX_FLAGS_FROM_DEFS "${EXTRA_CXX_FLAGS_FROM_DEFS} -D${DEF}")
+endforeach()
 
 # Pass meta information
 configure_file(

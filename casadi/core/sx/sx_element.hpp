@@ -108,13 +108,10 @@ namespace casadi {
     operator Matrix<SXElement>() const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
-
-    /** \brief  print to stream, limited */
-    void print(std::ostream &stream, long& remaining_calls) const;
+    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// \cond INTERNAL
     /** \brief  Get a pointer to the node */
@@ -176,7 +173,7 @@ namespace casadi {
     /** \brief Returns a number that is unique for a given SXNode.
      * If the SXElement does not point to any node, 0 is returned.
      */
-    long __hash__() const;
+    size_t __hash__() const;
 
     /** \brief  Negation */
     SXElement operator-() const;
@@ -190,9 +187,8 @@ namespace casadi {
     SXElement zz_le(const SXElement& y) const;
     SXElement zz_eq(const SXElement& y) const;
     SXElement zz_ne(const SXElement& y) const;
-    SXElement __truediv__(const SXElement &y) const {return zz_rdivide(y);}
     SXElement zz_power(const SXElement& b) const;
-    SXElement __constpow__(const SXElement& b) const;
+    SXElement zz_constpow(const SXElement& b) const;
 
     SXElement __mrdivide__(const SXElement& b) const {  return *this / b;}
     SXElement zz_mpower(const SXElement& b) const {return pow(*this, b);}
@@ -229,8 +225,7 @@ namespace casadi {
     SXElement zz_log10() const;
     SXElement printme(const SXElement &y) const;
     SXElement zz_sign() const;
-    SXElement __copysign__(const SXElement &y) const;
-    SXElement constpow(const SXElement& y) const;
+    SXElement zz_copysign(const SXElement &y) const;
     SXElement zz_not() const;
     SXElement zz_and(const SXElement& y) const;
     SXElement zz_or(const SXElement& y) const;
@@ -238,8 +233,8 @@ namespace casadi {
 
     Matrix<SXElement> zz_min(const Matrix<SXElement>& b) const;
     Matrix<SXElement> zz_max(const Matrix<SXElement>& b) const;
-    Matrix<SXElement> constpow(const Matrix<SXElement>& n) const;
-    Matrix<SXElement> __copysign__(const Matrix<SXElement>& n) const;
+    Matrix<SXElement> zz_constpow(const Matrix<SXElement>& n) const;
+    Matrix<SXElement> zz_copysign(const Matrix<SXElement>& n) const;
     Matrix<SXElement> zz_atan2(const Matrix<SXElement>& b) const;
     bool zz_isEqual(const SXElement& scalar, int depth=0) const;
     SXElement zz_simplify() const;
@@ -280,12 +275,21 @@ namespace casadi {
     /** \brief inline if-test */
     /// replaces the ternary conditional operator "?:", which cannot be overloaded
     friend SXElement if_else(const SXElement& cond, const SXElement& if_true,
-                             const SXElement& if_false);
+                             const SXElement& if_false, bool short_circuit);
     /** @} */
   };
 
   /// \cond INTERNAL
   // Template specializations
+  template<>
+  CASADI_EXPORT Matrix<double> Matrix<double>::
+  zz_solve(const Matrix<double>& b,
+           const std::string& lsolver, const Dict& dict) const;
+
+  template<>
+  CASADI_EXPORT Matrix<double> Matrix<double>::
+  zz_pinv(const std::string& lsolver, const Dict& dict) const;
+
   template<>
   CASADI_EXPORT bool Matrix<SXElement>::__nonzero__() const;
 
@@ -313,12 +317,14 @@ namespace casadi {
 
 #endif // SWIG
 /// \endcond
-  typedef std::vector<SXElement> SXElementVector;
-  typedef std::vector<std::vector<SXElement> > SXElementVectorVector;
-  typedef std::vector< std::vector<std::vector<SXElement> > > SXElementVectorVectorVector;
+
+  ///@{
+  /// Readability typedefs
   typedef Matrix<SXElement> SX;
-  typedef std::vector<Matrix<SXElement> > SXVector;
-  typedef std::vector< std::vector<Matrix<SXElement> > > SXVectorVector;
+  typedef std::vector<SX> SXVector;
+  typedef std::vector<SXVector> SXVectorVector;
+  typedef std::map<std::string, SX> SXDict;
+  ///@}
 
   // Specialize functions in GenericMatrix<SX> and SX
   template<> SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
@@ -327,7 +333,9 @@ namespace casadi {
   template<> bool SX::isLeaf() const;
   template<> bool SX::isCommutative() const;
   template<> bool SX::isSymbolic() const;
-  template<> bool SX::isSymbolicSparse() const;
+  template<> bool SX::isValidInput() const;
+  template<> bool SX::hasDuplicates();
+  template<> void SX::resetInput();
   template<> double SX::getValue(int k) const;
   template<> int SX::getIntValue() const;
   template<> std::vector<double> SX::nonzeros() const;
@@ -335,20 +343,14 @@ namespace casadi {
   template<> SX SX::getDep(int ch) const;
   template<> int SX::getNdeps() const;
   template<> std::string SX::getName() const;
-  template<> void SX::setMaxNumCallsInPrint(long num);
-  template<> long SX::getMaxNumCallsInPrint();
   template<> void SX::setEqualityCheckingDepth(int eq_depth);
   template<> int SX::getEqualityCheckingDepth();
-  template<> long SX::getElementHash() const;
+  template<> size_t SX::getElementHash() const;
   template<> void SX::zz_expand(SX &weights, SX& terms) const;
   template<> SX SX::zz_pw_const(const SX &tval, const SX &val) const;
   template<> SX SX::zz_pw_lin(const SX &tval, const SX &val) const;
-  template<> SX SX::zz_if_else(const SX &if_true,
-                               const SX &if_false) const;
-  template<> SX SX::zz_heaviside() const;
-  template<> SX SX::zz_rectangle() const;
-  template<> SX SX::zz_triangle() const;
-  template<> SX SX::zz_ramp() const;
+  template<> SX SX::zz_if_else(const SX &if_true, const SX &if_false,
+                               bool short_circuit) const;
   template<> SX SX::zz_gauss_quadrature(const SX &x, const SX &a,
                                         const SX &b, int order,
                                         const SX& w) const;
@@ -361,15 +363,13 @@ namespace casadi {
                                            std::vector<SX >& vdef,
                                            std::vector<SX >& ex,
                                            bool reverse);
-  template<> SX SX::zz_spy() const;
   template<> bool SX::zz_dependsOn(const SX &arg) const;
-  template<> std::vector<SX > SX::zz_getSymbols() const;
-  template<> std::vector<SX > SX::zz_getSymbols(const std::vector<SX >& e);
+  template<> std::vector<SX > SX::zz_symvar() const;
   template<> SX SX::zz_jacobian(const SX &arg) const;
   template<> SX SX::zz_gradient(const SX &arg) const;
   template<> SX SX::zz_tangent(const SX &arg) const;
   template<> SX SX::zz_hessian(const SX &arg) const;
-  template<> void SX::zz_hessian(const SX &arg, SX &H, SX &g) const;
+  template<> SX SX::zz_hessian(const SX &arg, SX &g) const;
   template<> SX SX::zz_jacobianTimesVector(const SX &arg, const SX &v,
                                            bool transpose_jacobian) const;
   template<> SX SX::zz_taylor(const SX& x, const SX& a, int order) const;
@@ -384,10 +384,11 @@ namespace casadi {
                                        std::vector<SX >& vdef,
                                        const std::string& v_prefix,
                                        const std::string& v_suffix);
-  template<> void SX::zz_printCompact(std::ostream &stream) const;
   template<> SX SX::zz_poly_coeff(const SX&x) const;
   template<> SX SX::zz_poly_roots() const;
   template<> SX SX::zz_eig_symbolic() const;
+  template<> void SX::printSplit(std::vector<std::string>& nz,
+                                 std::vector<std::string>& inter) const;
 } // namespace casadi
 
 #ifndef SWIG

@@ -42,171 +42,13 @@ namespace casadi {
   */
   template<class Derived>
   class CASADI_EXPORT IOInterface {
+#ifndef SWIG
+  protected:
+    // Helper functions
+    inline const Derived& self() const { return static_cast<const Derived&>(*this); }
+    inline Derived& self() { return static_cast<Derived&>(*this); }
+#endif // SWIG
   public:
-
-    /// \cond UNSAFE
-    /** \brief [UNSAFE] Obtain reference to inputs
-     * \sa getInput, setInput
-     */
-    ///@{
-    /// Access input argument
-    inline const Matrix<double>& input(int iind=0) const { return inputS<true>(iind);}
-    inline const Matrix<double>& input(const std::string &iname) const
-    { return input(inputSchemeEntry(iname)); }
-#ifdef SWIG
-    %rename(inputRef) input;
-#endif
-    inline Matrix<double>& input(int iind=0) { return inputS<true>(iind);}
-    inline Matrix<double>& input(const std::string &iname) { return input(inputSchemeEntry(iname));}
-    ///@}
-
-    /** \brief [UNSAFE] Obtain reference to outputs
-     * \sa getOutput, getOutput
-     */
-    ///@{
-    /// Access output argument
-    inline const Matrix<double>& output(int oind=0) const { return outputS<true>(oind);}
-    inline const Matrix<double>& output(const std::string &oname) const
-    { return output(outputSchemeEntry(oname));}
-#ifdef SWIG
-    %rename(outputRef) output;
-#endif
-    inline Matrix<double>& output(int oind=0) { return outputS<true>(oind);}
-    inline Matrix<double>& output(const std::string &oname)
-    { return output(outputSchemeEntry(oname));}
-    ///@}
-    /// \endcond
-
-    /// Get the number of function inputs
-    inline int getNumInputs() const
-    { return static_cast<const Derived*>(this)->input_struct().data.size();}
-
-    /// Get the number of function outputs
-    inline int getNumOutputs() const
-    { return static_cast<const Derived*>(this)->output_struct().data.size();}
-
-    /// Set the number of function inputs
-    inline void setNumInputs(int num_in)
-    { static_cast<Derived*>(this)->input_struct().data.resize(num_in); }
-
-    /// Set the number of function outputs
-    inline void setNumOutputs(int num_out)
-    { static_cast<Derived*>(this)->output_struct().data.resize(num_out); }
-
-    /// \cond INTERNAL
-
-    /** \brief  Access an input */
-    template<bool check>
-    DMatrix& inputS(int i) {
-      if (check) {
-        try {
-          return static_cast<Derived*>(this)->input_struct().data.at(i);
-        } catch(std::out_of_range&) {
-          std::stringstream ss;
-          ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name")
-             << ": input " << i << " not in interval [0, " << getNumInputs() << ")";
-          if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl
-                                                               << "Did you forget to initialize?";
-          throw CasadiException(ss.str());
-        }
-      } else {
-        return static_cast<Derived*>(this)->input_struct().data[i];
-      }
-    }
-
-    /** \brief  Const access an input */
-    template<bool check>
-    inline const DMatrix& inputS(int i) const {
-      return const_cast<IOInterface<Derived>*>(this)->inputS<check>(i);
-    }
-
-    /** \brief  Access an output*/
-    template<bool check>
-    DMatrix& outputS(int i) {
-      if (check) {
-        try {
-          return static_cast<Derived*>(this)->output_struct().data.at(i);
-        } catch(std::out_of_range&) {
-          std::stringstream ss;
-          ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name")
-             << ": output " << i << " not in interval [0, " << getNumOutputs() << ")";
-          if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl
-                                                               << "Did you forget to initialize?";
-          throw CasadiException(ss.str());
-        }
-      } else {
-        return static_cast<Derived*>(this)->output_struct().data[i];
-      }
-    }
-
-    /** \brief  Const access an output*/
-    template<bool check>
-    inline const DMatrix& outputS(int i) const {
-      return const_cast<IOInterface<Derived>*>(this)->outputS<check>(i);
-    }
-
-    /// \endcond
-
-    /** \brief Set input scheme */
-    void setInputScheme(const casadi::IOScheme &scheme) {
-      casadi_assert(scheme.compatibleSize(getNumInputs()));
-      static_cast<Derived*>(this)->inputScheme() = scheme;
-    }
-
-    /** \brief Set output scheme */
-    void setOutputScheme(const casadi::IOScheme &scheme) {
-      casadi_assert(scheme.compatibleSize(getNumOutputs()));
-      static_cast<Derived*>(this)->outputScheme() = scheme;
-    }
-
-    /** \brief Get input scheme */
-    casadi::IOScheme getInputScheme() const
-    { return static_cast<const Derived*>(this)->inputScheme(); }
-
-    /** \brief Get output scheme */
-    casadi::IOScheme getOutputScheme() const
-    { return static_cast<const Derived*>(this)->outputScheme(); }
-
-    /// \cond INTERNAL
-    /** \brief Find the index for a string describing a particular entry of an input scheme
-     *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
-     * SCHEME_NLPINput
-     */
-    int inputSchemeEntry(const std::string &name) const
-    { return schemeEntry(static_cast<const Derived*>(this)->inputScheme(), name, true);}
-
-    /** \brief Find the index for a string describing a particular entry of an output scheme
-     *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
-     * SCHEME_NLPINput
-     */
-    int outputSchemeEntry(const std::string &name) const
-    { return schemeEntry(static_cast<const Derived*>(this)->outputScheme(), name, false);}
-
-    /** \brief Find the index for a string describing a particular entry of a scheme
-     *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
-     * SCHEME_NLPINput
-     */
-    int schemeEntry(const casadi::IOScheme &scheme, const std::string &name, bool input) const {
-      if (scheme.isNull()) casadi_error("Unable to look up '" <<  name<< "' in "
-                                        << (input? "input": "output") << "scheme, as the "
-                                        <<  (input? "input": "output")
-                                        << " scheme of this function is unknown. "
-                                        "You can only index with integers.");
-      if (name=="") casadi_error("FunctionInternal::schemeEntry: you supplied an empty "
-                                 "string as the name of a entry in "
-                                 << scheme.name() << ". Available names are: "
-                                 << scheme.entryNames() << ".");
-      int n = scheme.index(name);
-      if (n==-1) casadi_error("FunctionInternal::schemeEntry: could not find entry '"
-                              << name << "' in " << scheme.name() << ". Available names are: "
-                              << scheme.entryNames() << ".");
-      return n;
-    }
-    /// \endcond
-
     /**
     * \defgroup  iname
     *   \param[in] iname input name. Only allowed when an input scheme is set.
@@ -219,12 +61,12 @@ namespace casadi {
 
     /**
     * \defgroup  iind
-    *   \param[in] iind index within the range [0..getNumInputs()-1]
+    *   \param[in] iind index within the range [0..nIn()-1]
     */
 
     /**
     * \defgroup  oind
-    *   \param[in] oind index within the range [0..getNumOutputs()-1]
+    *   \param[in] oind index within the range [0..nOut()-1]
     */
 
     /**
@@ -244,25 +86,25 @@ namespace casadi {
     *
     *  @copydoc iind
     */
-    Matrix<double> getInput(int iind=0) const { return input(iind); }
+    Matrix<double> getInput(int iind=0) const { return self().input(iind); }
     /** \brief Get an input by name
     *
     *  @copydoc iname
     *
      */
-    Matrix<double> getInput(const std::string &iname) const  { return input(iname); }
+    Matrix<double> getInput(const std::string &iname) const  { return self().input(iname); }
 
     /** \brief Get an output by index
     *
     *  @copydoc oind
     */
-    Matrix<double> getOutput(int oind=0) const  { return output(oind); }
+    Matrix<double> getOutput(int oind=0) const  { return self().output(oind); }
     /** \brief Get an output by name
     *
     *  @copydoc oname
     *
      */
-    Matrix<double> getOutput(const std::string &oname) const  { return output(oname); }
+    Matrix<double> getOutput(const std::string &oname) const  { return self().output(oname); }
 
 #ifdef DOXYGENPROC
     /** \brief Set an input by index
@@ -340,73 +182,99 @@ namespace casadi {
 /// \endcond
 
 
-#define SETTERS_NZ(T)                                                              \
-    void setInput(T val, int iind=0)                                            \
-    { static_cast<const Derived*>(this)->assertInit();                          \
-      try { input(iind).setNZ(val); }                                             \
-      catch(std::exception& e) {                                                \
-        casadi_error(e.what() << "Occurred at iind = " << iind << ".");         \
-      }                                                                         \
-    }                                                                           \
-    void setOutput(T val, int oind=0)                                           \
-    { static_cast<const Derived*>(this)->assertInit(); output(oind).setNZ(val); } \
-    void setInput(T val, const std::string &iname)                              \
-    { setInput(val, inputSchemeEntry(iname));  }                                 \
-    void setOutput(T val, const std::string &oname)                             \
-    { setOutput(val, outputSchemeEntry(oname)); }                                \
+#define SETTERS_SUB_DUMMY(T) \
+    void setInput(T val, int iind=0);                                   \
+    void setOutput(T val, int oind=0);                                  \
+    void setInput(T val, const std::string &iname);                     \
+    void setOutput(T val, const std::string &oname);
 
-#define SETTERS_SUB(T)                                                              \
-    void setInput(T val, int iind=0)                                            \
-    { static_cast<const Derived*>(this)->assertInit();                          \
-      try { input(iind).set(val); }                                             \
-      catch(std::exception& e) {                                                \
-        casadi_error(e.what() << "Occurred at iind = " << iind << ".");         \
-      }                                                                         \
-    }                                                                           \
-    void setOutput(T val, int oind=0)                                           \
-    { static_cast<const Derived*>(this)->assertInit(); output(oind).set(val); } \
-    void setInput(T val, const std::string &iname)                              \
-    { setInput(val, inputSchemeEntry(iname));  }                                 \
-    void setOutput(T val, const std::string &oname)                             \
-    { setOutput(val, outputSchemeEntry(oname)); }                                \
+#define SETTERS_NZ(T) \
+    void setInputNZ(T val, int iind=0) {                                \
+      self().assertInit();                                              \
+      try {                                                             \
+        self().input(iind).setNZ(val);                                  \
+      } catch(std::exception& e) {                                      \
+        casadi_error(e.what() << "Occurred at iind = " << iind << "."); \
+      }                                                                 \
+    }                                                                   \
+    void setOutputNZ(T val, int oind=0) {                               \
+      self().assertInit(); self().output(oind).setNZ(val);              \
+    }                                                                   \
+    void setInputNZ(T val, const std::string &iname) {                  \
+      setInputNZ(val, self().inputIndex(iname));                        \
+    }                                                                   \
+    void setOutputNZ(T val, const std::string &oname) {                 \
+      setOutputNZ(val, self().outputIndex(oname));                      \
+    }
+
+#define SETTERS_SUB(T)                                                  \
+    void setInput(T val, int iind=0) {                                  \
+      self().assertInit();                                              \
+      try {                                                             \
+        self().input(iind).set(val);                                    \
+      } catch(std::exception& e) {                                      \
+        casadi_error(e.what() << "Occurred at iind = " << iind << "."); \
+      }                                                                 \
+    }                                                                   \
+    void setOutput(T val, int oind=0) {                                 \
+      self().assertInit(); self().output(oind).set(val);                \
+    }                                                                   \
+    void setInput(T val, const std::string &iname) {                    \
+      setInput(val, self().inputIndex(iname));                          \
+    }                                                                   \
+    void setOutput(T val, const std::string &oname) {                   \
+      setOutput(val, self().outputIndex(oname));                        \
+    }
 
 #ifndef DOXYGENPROC
-    SETTERS_SUB(double) // NOLINT(readability/casting) - false positive
 #ifndef SWIG
-    SETTERS_NZ(const double*)
+    SETTERS_SUB_DUMMY(const double*)
+    SETTERS_SUB_DUMMY(const std::vector<double>&)
+    SETTERS_NZ(const double*) // NOLINT(readability/casting) - false positive
 #endif // SWIG
-    SETTERS_NZ(const std::vector<double>&)
     SETTERS_SUB(const Matrix<double>&)
+    SETTERS_NZ(const Matrix<double>&)
 #endif // DOXYGENPROC
 
 #undef SETTERS_NZ
 #undef SETTERS_SUB
+#undef SETTERS_SUB_DUMMY
 
-#define GETTERS_NZ(T)                                                             \
-    void getInput(T val, int iind=0) const                                     \
-    { static_cast<const Derived*>(this)->assertInit(); input(iind).getNZ(val);}  \
-    void getOutput(T val, int oind=0) const                                    \
-    { static_cast<const Derived*>(this)->assertInit(); output(oind).getNZ(val);} \
-    void getInput(T val, const std::string &iname) const                       \
-    { getInput(val, inputSchemeEntry(iname)); }                                 \
-    void getOutput(T val, const std::string &oname) const                      \
-    { getOutput(val, outputSchemeEntry(oname)); }                               \
+#define GETTERS_NZ(T)                                           \
+      void getInputNZ(T val, int iind=0) const {                \
+        self().assertInit(); self().input(iind).getNZ(val);     \
+      }                                                         \
+      void getOutputNZ(T val, int oind=0) const {               \
+        self().assertInit(); self().output(oind).getNZ(val);    \
+      }                                                         \
+      void getInputNZ(T val, const std::string &iname) const {  \
+        getInputNZ(val, self().inputIndex(iname));              \
+      }                                                         \
+      void getOutputNZ(T val, const std::string &oname) const { \
+        getOutputNZ(val, self().outputIndex(oname));            \
+      }
 
-#define GETTERS_SUB(T)                                                             \
-    void getInput(T val, int iind=0) const                                     \
-    { static_cast<const Derived*>(this)->assertInit(); input(iind).get(val);}  \
-    void getOutput(T val, int oind=0) const                                    \
-    { static_cast<const Derived*>(this)->assertInit(); output(oind).get(val);} \
-    void getInput(T val, const std::string &iname) const                       \
-    { getInput(val, inputSchemeEntry(iname)); }                                 \
-    void getOutput(T val, const std::string &oname) const                      \
-    { getOutput(val, outputSchemeEntry(oname)); }                               \
+#define GETTERS_SUB(T)                                                  \
+      void getInput(T val, int iind=0) const {                          \
+        self().assertInit(); self().input(iind).get(val);               \
+      }                                                                 \
+      void getOutput(T val, int oind=0) const {                         \
+        self().assertInit(); self().output(oind).get(val);              \
+      }                                                                 \
+      void getInput(T val, const std::string &iname) const {            \
+        getInput(val, self().inputIndex(iname));                        \
+      }                                                                 \
+      void getOutput(T val, const std::string &oname) const {           \
+        getOutput(val, self().outputIndex(oname));                      \
+      }
 
 #ifndef DOXYGENPROC
 #ifndef SWIG
 GETTERS_SUB(double&)
+#ifndef SWIG
 GETTERS_NZ(double*) // NOLINT(readability/casting) - false positive
 GETTERS_NZ(std::vector<double>&)
+#endif // SWIG
 GETTERS_SUB(Matrix<double>&)
 #endif // SWIG
 #endif // DOXYGENPROC

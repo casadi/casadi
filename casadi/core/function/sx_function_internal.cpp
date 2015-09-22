@@ -31,12 +31,12 @@
 #include <sstream>
 #include <iomanip>
 #include "../std_vector_tools.hpp"
-#include "../sx/sx_tools.hpp"
 #include "../sx/sx_node.hpp"
 #include "../casadi_types.hpp"
 #include "../matrix/sparsity_internal.hpp"
 #include "../profiling.hpp"
 #include "../casadi_options.hpp"
+#include "../casadi_interrupt.hpp"
 
 namespace casadi {
 
@@ -51,34 +51,6 @@ namespace casadi {
               "compilation to a CPU or GPU using OpenCL");
     addOption("just_in_time_opencl", OT_BOOLEAN, false,
               "Just-in-time compilation for numeric evaluation using OpenCL (experimental)");
-
-    // Check for duplicate entries among the input expressions
-    bool has_duplicates = false;
-    for (vector<SX >::iterator it = inputv_.begin(); it != inputv_.end(); ++it) {
-      for (vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc) {
-        bool is_duplicate = itc->getTemp()!=0;
-        if (is_duplicate) {
-          cerr << "Duplicate expression: " << *itc << endl;
-        }
-        has_duplicates = has_duplicates || is_duplicate;
-        itc->setTemp(1);
-      }
-    }
-
-    // Reset temporaries
-    for (vector<SX >::iterator it = inputv_.begin(); it != inputv_.end(); ++it) {
-      for (vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc) {
-        itc->setTemp(0);
-      }
-    }
-
-    if (has_duplicates) {
-      cout << "Input expressions:" << endl;
-      for (int iind=0; iind<inputv_.size(); ++iind) {
-        cout << iind << ": " << inputv_[iind] << endl;
-      }
-      casadi_error("The input expressions are not independent (or were not reset properly).");
-    }
 
     casadi_assert(!outputv_.empty()); // NOTE: Remove?
 
@@ -100,8 +72,8 @@ namespace casadi {
 #endif // WITH_OPENCL
   }
 
-  void SXFunctionInternal::evalD(const cpv_double& arg, const pv_double& res,
-                                 int* itmp, double* rtmp) {
+  void SXFunctionInternal::evalD(const double** arg, double** res,
+                                 int* iw, double* w) {
     double time_start=0;
     double time_stop=0;
     if (CasadiOptions::profiling) {
@@ -113,7 +85,7 @@ namespace casadi {
       }
     }
 
-    casadi_log("SXFunctionInternal::evaluate():begin  " << getOption("name"));
+    casadi_msg("SXFunctionInternal::evaluate():begin  " << getOption("name"));
 
     // NOTE: The implementation of this function is very delicate. Small changes in the
     // class structure can cause large performance losses. For this reason,
@@ -135,21 +107,17 @@ namespace casadi {
     // Evaluate the algorithm
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
-        // Start by adding all of the built operations
-        CASADI_MATH_FUN_BUILTIN(rtmp[it->i1], rtmp[it->i2], rtmp[it->i0])
+        CASADI_MATH_FUN_BUILTIN(w[it->i1], w[it->i2], w[it->i0])
 
-        // Constant
-        case OP_CONST: rtmp[it->i0] = it->d; break;
-
-        // Load function input to work vector
-        case OP_INPUT: rtmp[it->i0] = arg[it->i1][it->i2]; break;
-
-        // Get function output from work vector
-        case OP_OUTPUT: if (res[it->i0]) res[it->i0][it->i2] = rtmp[it->i1]; break;
+      case OP_CONST: w[it->i0] = it->d; break;
+      case OP_INPUT: w[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2]; break;
+      case OP_OUTPUT: if (res[it->i0]!=0) res[it->i0][it->i2] = w[it->i1]; break;
+      default:
+        casadi_error("SXFunctionInternal::evalD: Unknown operation" << it->op);
       }
     }
 
-    casadi_log("SXFunctionInternal::evalD():end " << getOption("name"));
+    casadi_msg("SXFunctionInternal::evalD():end " << getOption("name"));
 
     if (CasadiOptions::profiling) {
       time_stop = getRealTime();
@@ -171,20 +139,21 @@ namespace casadi {
     casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
     SX g = grad(iind, oind);
     g.makeDense();
-    if (verbose())  cout << "SXFunctionInternal::hess: calculating gradient done " << endl;
+    if (verbose())  userOut() << "SXFunctionInternal::hess: calculating gradient done " << endl;
 
     // Create function
-    SXFunction gfcn(inputv_.at(iind), g);
-    gfcn.setOption("verbose", getOption("verbose"));
-    gfcn.init();
+    Dict opts;
+    opts["verbose"] = getOption("verbose");
+    SXFunction gfcn("gfcn", make_vector(inputv_.at(iind)),
+                    make_vector(g), opts);
 
     // Calculate jacobian of gradient
     if (verbose()) {
-      cout << "SXFunctionInternal::hess: calculating Jacobian " << endl;
+      userOut() << "SXFunctionInternal::hess: calculating Jacobian " << endl;
     }
     SX ret = gfcn.jac(0, 0, false, true);
     if (verbose()) {
-      cout << "SXFunctionInternal::hess: calculating Jacobian done" << endl;
+      userOut() << "SXFunctionInternal::hess: calculating Jacobian done" << endl;
     }
 
     // Return jacobian of the gradient
@@ -206,17 +175,12 @@ namespace casadi {
   void SXFunctionInternal::print(ostream &stream) const {
     FunctionInternal::print(stream);
 
-    // Quick return if not initialized
-    if (!isInit()) {
-      stream << "Function not initialized" << endl;
-      return;
-    }
-
     // Iterator to free variables
     vector<SXElement>::const_iterator p_it = free_vars_.begin();
 
     // Normal, interpreted output
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
+      InterruptHandler::check();
       if (it->op==OP_OUTPUT) {
         stream << "output[" << it->i0 << "][" << it->i2 << "] = @" << it->i1;
       } else {
@@ -248,8 +212,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::generateDeclarations(std::ostream &stream, const std::string& type,
-                                                CodeGenerator& gen) const {
+  void SXFunctionInternal::generateDeclarations(CodeGenerator& g) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -258,50 +221,49 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& type,
-                                        CodeGenerator& gen) const {
+  void SXFunctionInternal::generateBody(CodeGenerator& g) const {
 
     // Which variables have been declared
-    vector<bool> declared(rtmp_.size(), false);
+    vector<bool> declared(sz_w(), false);
 
     // Run the algorithm
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       // Indent
-      stream << "  ";
+      g.body << "  ";
 
       if (it->op==OP_OUTPUT) {
-        stream << "if (res[" << it->i0 << "]!=0) "
-               << "res["<< it->i0 << "][" << it->i2 << "]=" << "a" << it->i1;
+        g.body << "if (res[" << it->i0 << "]!=0) "
+                      << "res["<< it->i0 << "][" << it->i2 << "]=" << "a" << it->i1;
       } else {
         // Declare result if not already declared
         if (!declared[it->i0]) {
-          stream << type << " ";
+          g.body << "real_t ";
           declared[it->i0]=true;
         }
 
         // Where to store the result
-        stream << "a" << it->i0 << "=";
+        g.body << "a" << it->i0 << "=";
 
         // What to store
         if (it->op==OP_CONST) {
-          gen.printConstant(stream, it->d);
+          g.body << g.constant(it->d);
         } else if (it->op==OP_INPUT) {
-          stream << "arg[" << it->i1 << "][" << it->i2 << "]";
+          g.body << "arg[" << it->i1 << "] ? arg[" << it->i1 << "][" << it->i2 << "] : 0";
         } else {
           int ndep = casadi_math<double>::ndeps(it->op);
-          casadi_math<double>::printPre(it->op, stream);
+          casadi_math<double>::printPre(it->op, g.body);
           for (int c=0; c<ndep; ++c) {
             if (c==0) {
-              stream << "a" << it->i1;
+              g.body << "a" << it->i1;
             } else {
-              casadi_math<double>::printSep(it->op, stream);
-              stream << "a" << it->i2;
+              casadi_math<double>::printSep(it->op, g.body);
+              g.body << "a" << it->i2;
             }
           }
-          casadi_math<double>::printPost(it->op, stream);
+          casadi_math<double>::printPost(it->op, g.body);
         }
       }
-      stream  << ";" << endl;
+      g.body  << ";" << endl;
     }
   }
 
@@ -327,15 +289,6 @@ namespace casadi {
 
         // A null pointer means an output instruction
         nodes.push_back(static_cast<SXNode*>(0));
-      }
-    }
-
-    // Make sure that all inputs have been added also // TODO REMOVE THIS
-    for (vector<SX >::iterator it = inputv_.begin(); it != inputv_.end(); ++it) {
-      for (vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc) {
-        if (!itc->getTemp()) {
-          nodes.push_back(itc->get());
-        }
       }
     }
 
@@ -440,7 +393,7 @@ namespace casadi {
     stack<int> unused;
 
     // Work vector size
-    int worksize = 0;
+    size_t worksize = 0;
 
     // Find a place in the work vector for the operation
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -486,15 +439,16 @@ namespace casadi {
 
     if (verbose()) {
       if (live_variables) {
-        cout << "Using live variables: work array is "
+        userOut() << "Using live variables: work array is "
              <<  worksize << " instead of " << nodes.size() << endl;
       } else {
-        cout << "Live variables disabled." << endl;
+        userOut() << "Live variables disabled." << endl;
       }
     }
 
     // Allocate work vectors (symbolic/numeric)
-    rtmp_.resize(worksize, numeric_limits<double>::quiet_NaN());
+    alloc_w(worksize);
+    alloc();
     s_work_.resize(worksize);
 
     // Reset the temporary variables
@@ -615,47 +569,14 @@ namespace casadi {
 
     // Print
     if (verbose()) {
-      cout << "SXFunctionInternal::init Initialized " << getOption("name") << " ("
+      userOut() << "SXFunctionInternal::init Initialized " << getOption("name") << " ("
            << algorithm_.size() << " elementary operations)" << endl;
     }
   }
 
-  void SXFunctionInternal::evalSX(const vector<SX>& arg, vector<SX>& res) {
-    if (verbose()) cout << "SXFunctionInternal::evalSXsparse begin" << endl;
-
-    // Get the number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
-
-    // Make sure matching sparsity of fseed
-    bool matching_sparsity = true;
-    casadi_assert(arg.size()==num_in);
-    for (int i=0; matching_sparsity && i<num_in; ++i)
-      matching_sparsity = arg[i].sparsity()==input(i).sparsity();
-
-    // Correct sparsity if needed
-    if (!matching_sparsity) {
-      vector<SX> arg2(arg);
-      for (int i=0; i<num_in; ++i)
-        if (arg2[i].sparsity()!=input(i).sparsity())
-          arg2[i] = arg2[i].setSparse(input(i).sparsity());
-      return evalSX(arg2, res);
-    }
-
-    // Allocate results
-    res.resize(num_out);
-    for (int i=0; i<num_out; ++i)
-      if (res[i].sparsity()!=output(i).sparsity())
-        res[i] = SX::zeros(output(i).sparsity());
-
-    // Copy output if known
-    bool output_given = isInput(arg);
-    if (output_given) {
-      for (int i=0; i<res.size(); ++i) {
-        copy(outputv_[i].begin(), outputv_[i].end(), res[i].begin());
-      }
-      return;
-    }
+  void SXFunctionInternal::evalSX(const SXElement** arg, SXElement** res,
+                                  int* iw, SXElement* w) {
+    if (verbose()) userOut() << "SXFunctionInternal::evalSXsparse begin" << endl;
 
     // Iterator to the binary operations
     vector<SXElement>::const_iterator b_it=operations_.begin();
@@ -667,47 +588,46 @@ namespace casadi {
     vector<SXElement>::const_iterator p_it = free_vars_.begin();
 
     // Evaluate algorithm
-    if (verbose()) cout << "SXFunctionInternal::evalSXsparse evaluating algorithm forward" << endl;
+    if (verbose()) {
+      userOut() << "SXFunctionInternal::evalSXsparse evaluating algorithm forward" << endl;
+    }
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
       case OP_INPUT:
-        s_work_[it->i0] = arg[it->i1].data()[it->i2]; break;
+        w[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2];
+        break;
       case OP_OUTPUT:
-        res[it->i0].data()[it->i2] = s_work_[it->i1];
+        if (res[it->i0]!=0) res[it->i0][it->i2] = w[it->i1];
         break;
       case OP_CONST:
-        s_work_[it->i0] = *c_it++;
+        w[it->i0] = *c_it++;
         break;
       case OP_PARAMETER:
-        s_work_[it->i0] = *p_it++; break;
+        w[it->i0] = *p_it++; break;
       default:
         {
           // Evaluate the function to a temporary value
           // (as it might overwrite the children in the work vector)
           SXElement f;
-          if (output_given) {
-            f = *b_it++;
-          } else {
-            switch (it->op) {
-              CASADI_MATH_FUN_BUILTIN(s_work_[it->i1], s_work_[it->i2], f)
-            }
-
-            // If this new expression is identical to the expression used
-            // to define the algorithm, then reuse
-            const int depth = 2; // NOTE: a higher depth could possibly give more savings
-            f.assignIfDuplicate(*b_it++, depth);
+          switch (it->op) {
+            CASADI_MATH_FUN_BUILTIN(w[it->i1], w[it->i2], f)
           }
 
+          // If this new expression is identical to the expression used
+          // to define the algorithm, then reuse
+          const int depth = 2; // NOTE: a higher depth could possibly give more savings
+          f.assignIfDuplicate(*b_it++, depth);
+
           // Finally save the function value
-          s_work_[it->i0] = f;
+          w[it->i0] = f;
         }
       }
     }
-    if (verbose()) cout << "SXFunctionInternal::evalSX end" << endl;
+    if (verbose()) userOut() << "SXFunctionInternal::evalSX end" << endl;
   }
 
   void SXFunctionInternal::evalFwd(const vector<vector<SX> >& fseed, vector<vector<SX> >& fsens) {
-    if (verbose()) cout << "SXFunctionInternal::evalFwd begin" << endl;
+    if (verbose()) userOut() << "SXFunctionInternal::evalFwd begin" << endl;
 
     // Number of forward seeds
     int nfwd = fseed.size();
@@ -717,8 +637,8 @@ namespace casadi {
     if (nfwd==0) return;
 
     // Get the number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int num_in = nIn();
+    int num_out = nOut();
 
     // Make sure matching sparsity of fseed
     bool matching_sparsity = true;
@@ -734,7 +654,7 @@ namespace casadi {
       for (int d=0; d<nfwd; ++d)
         for (int i=0; i<num_in; ++i)
           if (fseed2[d][i].sparsity()!=input(i).sparsity())
-            fseed2[d][i] = fseed2[d][i].setSparse(input(i).sparsity());
+            fseed2[d][i] = project(fseed2[d][i], input(i).sparsity());
       return evalFwd(fseed2, fsens);
     }
 
@@ -754,7 +674,7 @@ namespace casadi {
     vector<TapeEl<SXElement> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose()) cout << "SXFunctionInternal::evalFwd evaluating algorithm forward" << endl;
+    if (verbose()) userOut() << "SXFunctionInternal::evalFwd evaluating algorithm forward" << endl;
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
       case OP_INPUT:
@@ -774,7 +694,7 @@ namespace casadi {
 
     // Calculate forward sensitivities
     if (verbose())
-      cout << "SXFunctionInternal::evalFwd calculating forward derivatives" << endl;
+      userOut() << "SXFunctionInternal::evalFwd calculating forward derivatives" << endl;
     for (int dir=0; dir<nfwd; ++dir) {
       vector<TapeEl<SXElement> >::const_iterator it2 = s_pdwork.begin();
       for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -794,11 +714,11 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) cout << "SXFunctionInternal::evalFwd end" << endl;
+    if (verbose()) userOut() << "SXFunctionInternal::evalFwd end" << endl;
   }
 
   void SXFunctionInternal::evalAdj(const vector<vector<SX> >& aseed, vector<vector<SX> >& asens) {
-    if (verbose()) cout << "SXFunctionInternal::evalAdj begin" << endl;
+    if (verbose()) userOut() << "SXFunctionInternal::evalAdj begin" << endl;
 
     // number of adjoint seeds
     int nadj = aseed.size();
@@ -808,8 +728,8 @@ namespace casadi {
     if (nadj==0) return;
 
     // Get the number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int num_in = nIn();
+    int num_out = nOut();
 
     // Make sure matching sparsity of fseed
     bool matching_sparsity = true;
@@ -825,16 +745,20 @@ namespace casadi {
       for (int d=0; d<nadj; ++d)
         for (int i=0; i<num_out; ++i)
           if (aseed2[d][i].sparsity()!=output(i).sparsity())
-            aseed2[d][i] = aseed2[d][i].setSparse(output(i).sparsity());
+            aseed2[d][i] = project(aseed2[d][i], output(i).sparsity());
       return evalAdj(aseed2, asens);
     }
 
     // Allocate results if needed
     for (int d=0; d<nadj; ++d) {
       asens[d].resize(num_in);
-      for (int i=0; i<asens[d].size(); ++i)
-        if (asens[d][i].sparsity()!=input(i).sparsity())
+      for (int i=0; i<asens[d].size(); ++i) {
+        if (asens[d][i].sparsity()!=input(i).sparsity()) {
           asens[d][i] = SX::zeros(input(i).sparsity());
+        } else {
+          fill(asens[d][i].begin(), asens[d][i].end(), 0);
+        }
+      }
     }
 
     // Iterator to the binary operations
@@ -845,7 +769,7 @@ namespace casadi {
     vector<TapeEl<SXElement> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose()) cout << "SXFunctionInternal::evalFwd evaluating algorithm forward" << endl;
+    if (verbose()) userOut() << "SXFunctionInternal::evalFwd evaluating algorithm forward" << endl;
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
       case OP_INPUT:
@@ -864,7 +788,7 @@ namespace casadi {
     }
 
     // Calculate adjoint sensitivities
-    if (verbose()) cout << "SXFunctionInternal::evalAdj calculating adjoint derivatives"
+    if (verbose()) userOut() << "SXFunctionInternal::evalAdj calculating adjoint derivatives"
                        << endl;
     fill(s_work_.begin(), s_work_.end(), 0);
     for (int dir=0; dir<nadj; ++dir) {
@@ -899,7 +823,7 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) cout << "SXFunctionInternal::evalAdj end" << endl;
+    if (verbose()) userOut() << "SXFunctionInternal::evalAdj end" << endl;
   }
 
   SXFunctionInternal* SXFunctionInternal::clone() const {
@@ -925,71 +849,66 @@ namespace casadi {
     // We need a work array containing unsigned long rather than doubles.
     // Since the two datatypes have the same size (64 bits)
     // we can save overhead by reusing the double array
-    bvec_t *iwork = get_bvec_t(rtmp_);
-    if (!fwd) fill_n(iwork, rtmp_.size(), bvec_t(0));
+    alloc();
+    bvec_t *iwork = get_bvec_t(w_tmp_);
+    if (!fwd) fill_n(iwork, sz_w(), bvec_t(0));
   }
 
-  void SXFunctionInternal::spEvaluate(bool fwd) {
-#ifdef WITH_OPENCL
-    if (just_in_time_sparsity_) {
-      // Evaluate with OpenCL
-      spEvaluateOpenCL(fwd);
-      return; // Quick return
-    }
-#endif // WITH_OPENCL
-
-    // Get work array
-    bvec_t *iwork = get_bvec_t(rtmp_);
-
-    if (fwd) {
-      // Propagate sparsity forward
-      for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-        switch (it->op) {
-        case OP_CONST:
-        case OP_PARAMETER:
-          iwork[it->i0] = bvec_t(0); break;
-        case OP_INPUT:
-          iwork[it->i0] = reinterpret_cast<bvec_t*>(&inputNoCheck(it->i1).front())[it->i2]; break;
-        case OP_OUTPUT:
-          reinterpret_cast<bvec_t*>(&outputNoCheck(it->i0).front())[it->i2] = iwork[it->i1]; break;
-        default: // Unary or binary operation
-          iwork[it->i0] = iwork[it->i1] | iwork[it->i2]; break;
-        }
+  void SXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
+                                 int* iw, bvec_t* w) {
+    // Propagate sparsity forward
+    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+      switch (it->op) {
+      case OP_CONST:
+      case OP_PARAMETER:
+        w[it->i0] = 0; break;
+      case OP_INPUT:
+        w[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2]; break;
+      case OP_OUTPUT:
+        if (res[it->i0]!=0) res[it->i0][it->i2] = w[it->i1]; break;
+      default: // Unary or binary operation
+        w[it->i0] = w[it->i1] | w[it->i2]; break;
       }
+    }
+  }
 
-    } else { // Backward propagation
+  void SXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
+                                 int* iw, bvec_t* w) {
+    fill_n(w, sz_w(), 0);
 
-      // Propagate sparsity backward
-      for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
-        // Temp seed
-        bvec_t seed;
+    // Propagate sparsity backward
+    for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
+      // Temp seed
+      bvec_t seed;
 
-        // Propagate seeds
-        switch (it->op) {
-        case OP_CONST:
-        case OP_PARAMETER:
-          iwork[it->i0] = 0;
-          break;
-        case OP_INPUT:
-          reinterpret_cast<bvec_t*>(&inputNoCheck(it->i1).front())[it->i2] = iwork[it->i0];
-          iwork[it->i0] = 0;
-          break;
-        case OP_OUTPUT:
-          iwork[it->i1] |= reinterpret_cast<bvec_t*>(&outputNoCheck(it->i0).front())[it->i2];
-          break;
-        default: // Unary or binary operation
-          seed = iwork[it->i0];
-          iwork[it->i0] = 0;
-          iwork[it->i1] |= seed;
-          iwork[it->i2] |= seed;
+      // Propagate seeds
+      switch (it->op) {
+      case OP_CONST:
+      case OP_PARAMETER:
+        w[it->i0] = 0;
+        break;
+      case OP_INPUT:
+        if (arg[it->i1]!=0) arg[it->i1][it->i2] |= w[it->i0];
+        w[it->i0] = 0;
+        break;
+      case OP_OUTPUT:
+        if (res[it->i0]!=0) {
+          w[it->i1] |= res[it->i0][it->i2];
+          res[it->i0][it->i2] = 0;
         }
+        break;
+      default: // Unary or binary operation
+        seed = w[it->i0];
+        w[it->i0] = 0;
+        w[it->i1] |= seed;
+        w[it->i2] |= seed;
       }
     }
   }
 
   Function SXFunctionInternal::getFullJacobian() {
-    SX J = casadi::jacobian(veccat(outputv_), veccat(inputv_));
-    return SXFunction(inputv_, J);
+    SX J = veccat(outputv_).zz_jacobian(veccat(inputv_));
+    return SXFunction(name_ + "_jac", inputv_, make_vector(J));
   }
 
 
@@ -1041,12 +960,12 @@ namespace casadi {
       bool use_fwd = kernel==0;
       ss << "__kernel void " << fcn_name[kernel] << "(";
       bool first=true;
-      for (int i=0; i<getNumInputs(); ++i) {
+      for (int i=0; i<nIn(); ++i) {
         if (first) first=false;
         else      ss << ", ";
         ss << "__global unsigned long *x" << i;
       }
-      for (int i=0; i<getNumOutputs(); ++i) {
+      for (int i=0; i<nOut(); ++i) {
         if (first) first=false;
         else      ss << ", ";
         ss << "__global unsigned long *r" << i;
@@ -1055,7 +974,7 @@ namespace casadi {
 
       if (use_fwd) {
         // Which variables have been declared
-        vector<bool> declared(rtmp_.size(), false);
+        vector<bool> declared(n_w_, false);
 
         // Propagate sparsity forward
         for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -1096,7 +1015,7 @@ namespace casadi {
         ss << "ulong t;" << endl;
 
         // Declare and initialize work vector
-        for (int i=0; i<rtmp_.size(); ++i) {
+        for (int i=0; i<n_w_; ++i) {
           ss << "ulong a" << i << "=0;"<< endl;
         }
 
@@ -1130,10 +1049,10 @@ namespace casadi {
     // Form c-string
     std::string s = ss.str();
     if (verbose()) {
-      cout << "Kernel source code for sparsity propagation:" << endl;
-      cout << " ***** " << endl;
-      cout << s;
-      cout << " ***** " << endl;
+      userOut() << "Kernel source code for sparsity propagation:" << endl;
+      userOut() << " ***** " << endl;
+      userOut() << s;
+      userOut() << " ***** " << endl;
     }
     const char* cstr = s.c_str();
 
@@ -1155,7 +1074,7 @@ namespace casadi {
     casadi_assert(ret == CL_SUCCESS);
 
     // Memory buffer for each of the input arrays
-    sp_input_memobj_.resize(getNumInputs(), static_cast<cl_mem>(0));
+    sp_input_memobj_.resize(nIn(), static_cast<cl_mem>(0));
     for (int i=0; i<sp_input_memobj_.size(); ++i) {
       sp_input_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
                                            CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
@@ -1165,7 +1084,7 @@ namespace casadi {
     }
 
     // Memory buffer for each of the output arrays
-    sp_output_memobj_.resize(getNumOutputs(), static_cast<cl_mem>(0));
+    sp_output_memobj_.resize(nOut(), static_cast<cl_mem>(0));
     for (int i=0; i<sp_output_memobj_.size(); ++i) {
       sp_output_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
                                             CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
@@ -1186,14 +1105,14 @@ namespace casadi {
     int kernel_arg = 0;
 
     // Pass inputs
-    for (int i=0; i<getNumInputs(); ++i) {
+    for (int i=0; i<nIn(); ++i) {
       ret = clSetKernelArg(kernel, kernel_arg++,
                            sizeof(cl_mem), static_cast<void *>(&sp_input_memobj_[i]));
       casadi_assert(ret == CL_SUCCESS);
     }
 
     // Pass outputs
-    for (int i=0; i<getNumOutputs(); ++i) {
+    for (int i=0; i<nOut(); ++i) {
       ret = clSetKernelArg(kernel, kernel_arg++,
                            sizeof(cl_mem), static_cast<void *>(&sp_output_memobj_[i]));
       casadi_assert(ret == CL_SUCCESS);
@@ -1282,10 +1201,10 @@ namespace casadi {
     // Form c-string
     std::string s = ss.str();
     if (verbose()) {
-      cout << "Kernel source code for numerical evaluation:" << endl;
-      cout << " ***** " << endl;
-      cout << s;
-      cout << " ***** " << endl;
+      userOut() << "Kernel source code for numerical evaluation:" << endl;
+      userOut() << " ***** " << endl;
+      userOut() << s;
+      userOut() << " ***** " << endl;
     }
     const char* cstr = s.c_str();
 
@@ -1303,7 +1222,7 @@ namespace casadi {
     casadi_assert(ret == CL_SUCCESS);
 
     // Memory buffer for each of the input arrays
-    input_memobj_.resize(getNumInputs(), static_cast<cl_mem>(0));
+    input_memobj_.resize(nIn(), static_cast<cl_mem>(0));
     for (int i=0; i<input_memobj_.size(); ++i) {
       input_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
                                         CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,
@@ -1313,7 +1232,7 @@ namespace casadi {
     }
 
     // Memory buffer for each of the output arrays
-    output_memobj_.resize(getNumOutputs(), static_cast<cl_mem>(0));
+    output_memobj_.resize(nOut(), static_cast<cl_mem>(0));
     for (int i=0; i<output_memobj_.size(); ++i) {
       output_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
                                          CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR,
@@ -1333,14 +1252,14 @@ namespace casadi {
     int kernel_arg = 0;
 
     // Pass inputs
-    for (int i=0; i<getNumInputs(); ++i) {
+    for (int i=0; i<nIn(); ++i) {
       ret = clSetKernelArg(kernel_, kernel_arg++,
                            sizeof(cl_mem), static_cast<void *>(&input_memobj_[i]));
       casadi_assert(ret == CL_SUCCESS);
     }
 
     // Pass outputs
-    for (int i=0; i<getNumOutputs(); ++i) {
+    for (int i=0; i<nOut(); ++i) {
       ret = clSetKernelArg(kernel_, kernel_arg++, sizeof(cl_mem),
                            static_cast<void *>(&output_memobj_[i]));
       casadi_assert(ret == CL_SUCCESS);
@@ -1436,7 +1355,7 @@ namespace casadi {
         // Print the log
         clGetProgramBuildInfo(program, sparsity_propagation_kernel_.device_id,
                               CL_PROGRAM_BUILD_LOG, log_size, &(log[0]), NULL);
-        cerr << log << endl;
+        userOut<true, PL_WARN>() << log << endl;
         break;
       }
       case CL_OUT_OF_RESOURCES: msg = "There is a failure to allocate resources required by the "

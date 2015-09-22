@@ -24,9 +24,7 @@
 
 
 #include "sdqp_solver_internal.hpp"
-#include "../matrix/matrix_tools.hpp"
 #include "sx_function.hpp"
-#include "../sx/sx_tools.hpp"
 
 INPUTSCHEME(SDQPInput)
 OUTPUTSCHEME(SDQPOutput)
@@ -35,14 +33,30 @@ using namespace std;
 namespace casadi {
 
   // Constructor
-  SdqpSolverInternal::SdqpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
+  SdqpSolverInternal::SdqpSolverInternal(const std::map<std::string, Sparsity> &st) {
 
     addOption("sdp_solver",       OT_STRING, GenericType(),
               "The SdqpSolver used to solve the SDPs.");
-    addOption("sdp_solver_options",       OT_DICTIONARY, GenericType(),
+    addOption("sdp_solver_options",       OT_DICT, GenericType(),
               "Options to be passed to the SDPSOlver");
 
-    casadi_assert_message(st_.size()==SDQP_STRUCT_NUM, "Problem structure mismatch");
+    addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "",
+                                                       "socqp", true);
+
+    st_.resize(SDQP_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[SDQP_STRUCT_A]=i->second;
+      } else if (i->first=="g") {
+        st_[SDQP_STRUCT_G]=i->second;
+      } else if (i->first=="f") {
+        st_[SDQP_STRUCT_F]=i->second;
+      } else if (i->first=="h") {
+        st_[SDQP_STRUCT_H]=i->second;
+      } else {
+        casadi_error("Unrecognized field in SDQP structure: " << i->first);
+      }
+    }
 
     const Sparsity& A = st_[SDQP_STRUCT_A];
     const Sparsity& G = st_[SDQP_STRUCT_G];
@@ -75,7 +89,7 @@ namespace casadi {
                           << n_ << "), but got remainder " << F.size2()%n_);
 
     // Input arguments
-    setNumInputs(SDQP_SOLVER_NUM_IN);
+    ibuf_.resize(SDQP_SOLVER_NUM_IN);
     input(SDQP_SOLVER_H) = DMatrix::zeros(H);
     input(SDQP_SOLVER_G) = DMatrix::zeros(G);
     input(SDQP_SOLVER_F) = DMatrix::zeros(F);
@@ -93,9 +107,8 @@ namespace casadi {
                             "But got " << s.dimString() <<  " for i = " << i << ".");
     }
 
-    input_.scheme = SCHEME_SDQPInput;
-    output_.scheme = SCHEME_SDQPOutput;
-
+    ischeme_ = IOScheme(SCHEME_SDQPInput);
+    oscheme_ = IOScheme(SCHEME_SDQPOutput);
   }
 
   void SdqpSolverInternal::init() {

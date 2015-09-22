@@ -67,10 +67,21 @@ namespace casadi {
     return LrDpleInternal::getPlugin(name).doc;
   }
 
-  LrDpleSolver::LrDpleSolver(const std::string& name,
-                         const LrDpleStructure & st) {
-    assignNode(LrDpleInternal::instantiatePlugin(name, st));
+  LrDpleSolver::LrDpleSolver(const std::string& name, const std::string& solver,
+                             const std::map<std::string, std::vector<Sparsity> >& st,
+                             const Dict& opts) {
+    assignNode(LrDpleInternal::instantiatePlugin(solver, st));
+    setOption("name", name);
+    setOption(opts);
+    init();
   }
+
+#ifdef WITH_DEPRECATED_FEATURES
+  LrDpleSolver::LrDpleSolver(const std::string& solver,
+                             const std::map<std::string, std::vector<Sparsity> >& st) {
+    assignNode(LrDpleInternal::instantiatePlugin(solver, st));
+  }
+#endif // WITH_DEPRECATED_FEATURES
 
 } // namespace casadi
 

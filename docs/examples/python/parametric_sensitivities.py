@@ -74,47 +74,48 @@ ubx = [ inf,  inf,  inf,    inf,    inf]
 lbg = [0.00, 0.00, p_a[0], p_a[1]]
 ubg = [0.00, 0.00, p_a[0], p_a[1]]
     
-# Create NLP solver
-nlp = SXFunction(nlpIn(x=x),nlpOut(f=f,g=g))
-solver = NlpSolver("ipopt", nlp)
-  
+# Create NLP
+nlp = SXFunction("nlp", nlpIn(x=x),nlpOut(f=f,g=g))
+
+# NLP solver options
+opts = {}
+
 # Mark the parameters amongst the constraints (see sIPOPT documentation)
 con_integer_md = {}
 con_integer_md["sens_init_constr"] = [0,0,1,2]
-solver.setOption("con_integer_md",con_integer_md)
-  
+opts["con_integer_md"] = con_integer_md
+
 # Mark the parameters amongst the variables (see sIPOPT documentation)
 var_integer_md = {}
 var_integer_md["sens_state_1"] = [0,0,0,1,2]
-solver.setOption("var_integer_md",var_integer_md)
+opts["var_integer_md"] = var_integer_md
 
 # Pass the perturbed values (see sIPOPT documentation)
 var_numeric_md = {}
 var_numeric_md["sens_state_value_1"] = [0,0,0,p_b[0],p_b[1]]
-solver.setOption("var_numeric_md",var_numeric_md)
+opts["var_numeric_md"] = var_numeric_md
   
 # Enable sensitivities
-solver.setOption("run_sens","yes")
-solver.setOption("n_sens_steps", 1)
+opts["run_sens"] = "yes"
+opts["n_sens_steps"] = 1
   
-# Initialize solver
-solver.init()
+# Create NLP solver
+solver = NlpSolver("solver", "ipopt", nlp, opts)
   
 # Solve NLP
-solver.setInput( x0, "x0")
-solver.setInput(lbx, "lbx")
-solver.setInput(ubx, "ubx")
-solver.setInput(lbg, "lbg")
-solver.setInput(ubg, "ubg")
-solver.evaluate()
+res = solver({"x0" : x0,
+              "lbx" : lbx,
+              "ubx" : ubx,
+              "lbg" : lbg,
+              "ubg" : ubg})
   
 # Print the solution
 print "----"
-print "Minimal cost " , solver.getOutput("f")
+print "Minimal cost " , res["f"]
 print "----"
 
 print "Nominal solution"
-print "x = " , solver.output("x").nonzeros()
+print "x = " , res["x"].nonzeros()
 print "----"
   
 print "perturbed solution"

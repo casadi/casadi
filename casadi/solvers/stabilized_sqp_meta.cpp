@@ -140,7 +140,7 @@
 "|                 |                 |                 | used by the SQP |\n"
 "|                 |                 |                 | method          |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"
-"| stabilized_qp_s | OT_DICTIONARY   | GenericType()   | Options to be   |\n"
+"| stabilized_qp_s | OT_DICT   | GenericType()   | Options to be   |\n"
 "| olver_options   |                 |                 | passed to the   |\n"
 "|                 |                 |                 | Stabilized QP   |\n"
 "|                 |                 |                 | solver          |\n"

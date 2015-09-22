@@ -51,6 +51,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of an Homotopy NLP function [hnlpIn]
   enum HNLPInput {
@@ -63,6 +64,7 @@ namespace casadi {
     /// Number of NLP inputs
     HNL_NUM_IN
   };
+#endif // SWIG
 
   class HomotopyNLPInternal;
 

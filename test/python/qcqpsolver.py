@@ -38,6 +38,9 @@ if SdpSolver.hasPlugin("dsdp"):
 if SocpSolver.hasPlugin("mosek"):
   qcqpsolvers.append(("socp",{"socp_solver": "mosek", "socp_solver_options": {"MSK_DPAR_INTPNT_CO_TOL_REL_GAP": 1e-10} },{"less_digits": 3},False))
 
+if SocpSolver.hasPlugin("ecos"):
+  qcqpsolvers.append(("socp",{"socp_solver": "ecos", "socp_solver_options": {"abstol": 1e-10,"reltol":1e-10} },{"less_digits": 1},False))
+
 class QcqpSolverTests(casadiTestCase):
 
   def testboundsviol(self):
@@ -51,9 +54,7 @@ class QcqpSolverTests(casadiTestCase):
     UBX = DMatrix([ inf, -inf ])
     
     for qcqpsolver, qcqp_options, aux_options, re_init in qcqpsolvers:
-      solver = QcqpSolver(qcqpsolver,qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
-      solver.setOption(qcqp_options)
-      solver.init()
+      solver = QcqpSolver("mysolver",qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()},qcqp_options)
 
       solver.setInput(H,"h")
       solver.setInput(G,"g")
@@ -84,9 +85,7 @@ class QcqpSolverTests(casadiTestCase):
     for qcqpsolver, qcqp_options, aux_options, re_init in qcqpsolvers:
       self.message("qcqpsolver: " + str(qcqpsolver))
 
-      solver = QcqpSolver(qcqpsolver,qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
-      solver.setOption(qcqp_options)
-      solver.init()
+      solver = QcqpSolver("mysolver",qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()},qcqp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -129,9 +128,7 @@ class QcqpSolverTests(casadiTestCase):
     for qcqpsolver, qcqp_options, aux_options, re_init in qcqpsolvers:
       self.message("qcqpsolver: " + str(qcqpsolver))
 
-      solver = QcqpSolver(qcqpsolver,qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
-      solver.setOption(qcqp_options)
-      solver.init()
+      solver = QcqpSolver("mysolver",qcqpsolver,{'a':A.sparsity(),'p':P.sparsity(),'h':H.sparsity()},qcqp_options)
 
       try:
         less_digits=aux_options["less_digits"]

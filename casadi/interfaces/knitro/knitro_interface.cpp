@@ -25,7 +25,6 @@
 
 #include "knitro_interface.hpp"
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
@@ -346,14 +345,14 @@ namespace casadi {
 
       return 0;
     } catch(exception& ex) {
-      cerr << "KnitroInterface::callback caugth exception: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "KnitroInterface::callback caugth exception: " << ex.what() << endl;
       return -1;
     }
   }
 
   void KnitroInterface::evalfc(const double* x, double& obj, double *c) {
     // Pass the argument to the function
-    nlp_.setInput(x, NL_X);
+    nlp_.setInputNZ(x, NL_X);
     nlp_.setInput(input(NLP_SOLVER_P), NL_P);
 
     // Evaluate the function
@@ -365,18 +364,18 @@ namespace casadi {
 
     // Printing
     if (monitored("eval_f")) {
-      cout << "x = " << nlp_.input(NL_X) << endl;
-      cout << "f = " << nlp_.output(NL_F) << endl;
+      userOut() << "x = " << nlp_.input(NL_X) << endl;
+      userOut() << "f = " << nlp_.output(NL_F) << endl;
     }
     if (monitored("eval_g")) {
-      cout << "x = " << nlp_.input(NL_X) << endl;
-      cout << "g = " << nlp_.output(NL_G) << endl;
+      userOut() << "x = " << nlp_.input(NL_X) << endl;
+      userOut() << "g = " << nlp_.output(NL_G) << endl;
     }
   }
 
   void KnitroInterface::evalga(const double* x, double* objGrad, double* jac) {
     // Pass the argument to the function
-    gradF_.setInput(x, NL_X);
+    gradF_.setInputNZ(x, NL_X);
     gradF_.setInput(input(NLP_SOLVER_P), NL_P);
 
     // Evaluate the function using adjoint mode AD
@@ -387,13 +386,13 @@ namespace casadi {
 
     // Printing
     if (monitored("eval_grad_f")) {
-      cout << "x = " << gradF_.input(NL_X) << endl;
-      cout << "grad_f = " << gradF_.output() << endl;
+      userOut() << "x = " << gradF_.input(NL_X) << endl;
+      userOut() << "grad_f = " << gradF_.output() << endl;
     }
 
     if (!jacG_.isNull()) {
       // Pass the argument to the Jacobian function
-      jacG_.setInput(x, NL_X);
+      jacG_.setInputNZ(x, NL_X);
       jacG_.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate the Jacobian function
@@ -404,18 +403,18 @@ namespace casadi {
 
       // Printing
       if (monitored("eval_jac_g")) {
-        cout << "x = " << jacG_.input(NL_X) << endl;
-        cout << "jac_g = " << jacG_.output() << endl;
+        userOut() << "x = " << jacG_.input(NL_X) << endl;
+        userOut() << "jac_g = " << jacG_.output() << endl;
       }
     }
   }
 
   void KnitroInterface::evalh(const double* x, const double* lambda, double* hessian) {
     // Pass the argument to the function
-    hessLag_.setInput(x, NL_X);
+    hessLag_.setInputNZ(x, NL_X);
     hessLag_.setInput(input(NLP_SOLVER_P), NL_P);
     hessLag_.setInput(1.0, NL_NUM_IN+NL_F);
-    hessLag_.setInput(lambda, NL_NUM_IN+NL_G);
+    hessLag_.setInputNZ(lambda, NL_NUM_IN+NL_G);
 
     // Evaluate
     hessLag_.evaluate();
@@ -425,11 +424,11 @@ namespace casadi {
 
     // Printing
     if (monitored("eval_h")) {
-      cout << "eval_h" << endl;
-      cout << "x = " << hessLag_.input(0) << endl;
-      cout << "lambda = " << hessLag_.input(1) << endl;
-      cout << "scale = " << hessLag_.input(2) << endl;
-      cout << "H = " << hessLag_ << endl;
+      userOut() << "eval_h" << endl;
+      userOut() << "x = " << hessLag_.input(0) << endl;
+      userOut() << "lambda = " << hessLag_.input(1) << endl;
+      userOut() << "scale = " << hessLag_.input(2) << endl;
+      userOut() << "H = " << hessLag_ << endl;
     }
   }
 

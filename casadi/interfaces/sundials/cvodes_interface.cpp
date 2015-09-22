@@ -24,11 +24,10 @@
 
 
 #include "cvodes_interface.hpp"
+
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/function/linear_solver_internal.hpp"
 #include "casadi/core/function/mx_function.hpp"
-#include "casadi/core/sx/sx_tools.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
 
 using namespace std;
 
@@ -113,6 +112,10 @@ namespace casadi {
 
     // Initialize the base classes
     SundialsInterface::init();
+
+    // Algebraic variables not supported
+    casadi_assert_message(nz_==0 && nrz_==0,
+                          "CVODES does not support algebraic variables");
 
     // Read options
     monitor_rhsB_  = monitored("resB");
@@ -376,24 +379,24 @@ namespace casadi {
     time1 = clock();
 
     // Pass input
-    f_.setInput(&t, DAE_T);
-    f_.setInput(x, DAE_X);
+    f_.setInputNZ(&t, DAE_T);
+    f_.setInputNZ(x, DAE_X);
     f_.setInput(input(INTEGRATOR_P), DAE_P);
 
     if (monitor_rhs_) {
-      cout << "t       = " << t << endl;
-      cout << "x       = " << f_.input(DAE_X) << endl;
-      cout << "p       = " << f_.input(DAE_P) << endl;
+      userOut() << "t       = " << t << endl;
+      userOut() << "x       = " << f_.input(DAE_X) << endl;
+      userOut() << "p       = " << f_.input(DAE_P) << endl;
     }
     // Evaluate
     f_.evaluate();
 
     if (monitor_rhs_) {
-      cout << "xdot       = " << f_.output(DAE_ODE)<< endl;
+      userOut() << "xdot       = " << f_.output(DAE_ODE)<< endl;
     }
 
     // Get results
-    f_.getOutput(xdot);
+    f_.getOutputNZ(xdot);
 
     // Log time
     time2 = clock();
@@ -410,21 +413,21 @@ namespace casadi {
       this_->rhs(t, NV_DATA_S(x), NV_DATA_S(xdot));
       return 0;
     } catch(exception& e) {
-      cerr << "rhs failed: " << e.what() << endl;
+      userOut<true, PL_WARN>() << "rhs failed: " << e.what() << endl;
       return 1;
     }
   }
 
   void CvodesInterface::reset() {
-    casadi_log("CvodesInterface::reset begin");
+    casadi_msg("CvodesInterface::reset begin");
 
     // Reset the base classes
     SundialsInterface::reset();
 
     if (monitored("reset")) {
-      cout << "initial state: " << endl;
-      cout << "p = " << input(INTEGRATOR_P) << endl;
-      cout << "x0 = " << input(INTEGRATOR_X0) << endl;
+      userOut() << "initial state: " << endl;
+      userOut() << "p = " << input(INTEGRATOR_P) << endl;
+      userOut() << "x0 = " << input(INTEGRATOR_X0) << endl;
     }
 
     // Reset timers
@@ -465,11 +468,11 @@ namespace casadi {
 
     // Set the stop time of the integration -- don't integrate past this point
     if (stop_at_end_) setStopTime(tf_);
-    casadi_log("CvodesInterface::reset end");
+    casadi_msg("CvodesInterface::reset end");
   }
 
   void CvodesInterface::integrate(double t_out) {
-    casadi_log("CvodesInterface::integrate(" << t_out << ") begin");
+    casadi_msg("CvodesInterface::integrate(" << t_out << ") begin");
 
     casadi_assert_message(t_out>=t0_,
                           "CvodesInterface::integrate(" << t_out << "): "
@@ -516,7 +519,7 @@ namespace casadi {
 
 
     // Print statistics
-    if (getOption("print_stats")) printStats(std::cout);
+    if (getOption("print_stats")) printStats(userOut());
 
     if (gather_stats_) {
       long nsteps, nfevals, nlinsetups, netfails;
@@ -531,11 +534,11 @@ namespace casadi {
 
     }
 
-    casadi_log("CvodesInterface::integrate(" << t_out << ") end");
+    casadi_msg("CvodesInterface::integrate(" << t_out << ") end");
   }
 
   void CvodesInterface::resetB() {
-    casadi_log("CvodesInterface::resetB begin");
+    casadi_msg("CvodesInterface::resetB begin");
 
     // Reset the base classes
     SundialsInterface::resetB();
@@ -554,11 +557,11 @@ namespace casadi {
       // Initialize the adjoint integration
       initAdj();
     }
-    casadi_log("CvodesInterface::resetB end");
+    casadi_msg("CvodesInterface::resetB end");
   }
 
   void CvodesInterface::integrateB(double t_out) {
-    casadi_log("CvodesInterface::integrateB(" << t_out << ") begin");
+    casadi_msg("CvodesInterface::integrateB(" << t_out << ") begin");
     int flag;
 
     // Integrate backward to t_out
@@ -591,7 +594,7 @@ namespace casadi {
       stats_["nlinsetupsB"] = 1.0*nlinsetups;
 
     }
-    casadi_log("CvodesInterface::integrateB(" << t_out << ") end");
+    casadi_msg("CvodesInterface::integrateB(" << t_out << ") end");
   }
 
   void CvodesInterface::printStats(std::ostream &stream) const {
@@ -722,13 +725,13 @@ namespace casadi {
       CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->ehfun(error_code, module, function, msg);
     } catch(exception& e) {
-      cerr << "ehfun failed: " << e.what() << endl;
+      userOut<true, PL_WARN>() << "ehfun failed: " << e.what() << endl;
     }
   }
 
   void CvodesInterface::ehfun(int error_code, const char *module, const char *function, char *msg) {
     if (!disable_internal_warnings_) {
-      cerr << msg << endl;
+      userOut<true, PL_WARN>() << msg << endl;
     }
   }
 
@@ -743,8 +746,8 @@ namespace casadi {
     casadi_error("Commented out, #884, #794.");
 
     //   // Pass input
-    // f_.setInput(&t, DAE_T);
-    // f_.setInput(NV_DATA_S(x), DAE_X);
+    // f_.setInputNZ(&t, DAE_T);
+    // f_.setInputNZ(NV_DATA_S(x), DAE_X);
     // f_.setInput(input(INTEGRATOR_P), DAE_P);
 
     //  // Calculate the forward sensitivities, nfdir_f_ directions at a time
@@ -778,7 +781,7 @@ namespace casadi {
       this_->rhsS(Ns, t, x, xdot, xF, xdotF, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
-      cerr << "fs failed: " << e.what() << endl;
+      userOut<true, PL_WARN>() << "fs failed: " << e.what() << endl;
       return 1;
     }
   }
@@ -791,8 +794,8 @@ namespace casadi {
     casadi_error("Commented out, #884, #794.");
 
     // // Pass input
-    // f_.setInput(&t, DAE_T);
-    // f_.setInput(NV_DATA_S(x), DAE_X);
+    // f_.setInputNZ(&t, DAE_T);
+    // f_.setInputNZ(NV_DATA_S(x), DAE_X);
     // f_.setInput(input(INTEGRATOR_P), DAE_P);
 
     // // Pass forward seeds
@@ -816,7 +819,7 @@ namespace casadi {
       this_->rhsS1(Ns, t, x, xdot, iS, xF, xdotF, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
-      cerr << "fs failed: " << e.what() << endl;
+      userOut<true, PL_WARN>() << "fs failed: " << e.what() << endl;
       return 1;
     }
   }
@@ -828,22 +831,22 @@ namespace casadi {
       this_->rhsQ(t, NV_DATA_S(x), NV_DATA_S(qdot));
       return 0;
     } catch(exception& e) {
-      cerr << "rhsQ failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "rhsQ failed: " << e.what() << endl;;
       return 1;
     }
   }
 
   void CvodesInterface::rhsQ(double t, const double* x, double* qdot) {
     // Pass input
-    f_.setInput(&t, DAE_T);
-    f_.setInput(x, DAE_X);
+    f_.setInputNZ(&t, DAE_T);
+    f_.setInputNZ(x, DAE_X);
     f_.setInput(input(INTEGRATOR_P), DAE_P);
 
     // Evaluate
     f_.evaluate();
 
     // Get results
-    f_.getOutput(qdot, DAE_QUAD);
+    f_.getOutputNZ(qdot, DAE_QUAD);
   }
 
   void CvodesInterface::rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
@@ -854,8 +857,8 @@ namespace casadi {
     casadi_error("Commented out, #884, #794.");
 
     // // Pass input
-    // f_.setInput(&t, DAE_T);
-    // f_.setInput(NV_DATA_S(x), DAE_X);
+    // f_.setInputNZ(&t, DAE_T);
+    // f_.setInputNZ(NV_DATA_S(x), DAE_X);
     // f_.setInput(input(INTEGRATOR_P), DAE_P);
 
     // for (int i=0; i<nfdir_; ++i) {
@@ -886,7 +889,7 @@ namespace casadi {
       this_->rhsQS(Ns, t, x, xF, qdot, qdotF, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
-      cerr << "rhsQS failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "rhsQS failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -895,28 +898,28 @@ namespace casadi {
     log("CvodesInterface::rhsB", "begin");
 
     // Pass inputs
-    g_.setInput(&t, RDAE_T);
-    g_.setInput(x, RDAE_X);
+    g_.setInputNZ(&t, RDAE_T);
+    g_.setInputNZ(x, RDAE_X);
     g_.setInput(input(INTEGRATOR_P), RDAE_P);
     g_.setInput(input(INTEGRATOR_RP), RDAE_RP);
-    g_.setInput(rx, RDAE_RX);
+    g_.setInputNZ(rx, RDAE_RX);
 
     if (monitor_rhsB_) {
-      cout << "t       = " << t << endl;
-      cout << "x       = " << g_.input(RDAE_X) << endl;
-      cout << "p       = " << g_.input(RDAE_P) << endl;
-      cout << "rx      = " << g_.input(RDAE_RX) << endl;
-      cout << "rp      = " << g_.input(RDAE_RP) << endl;
+      userOut() << "t       = " << t << endl;
+      userOut() << "x       = " << g_.input(RDAE_X) << endl;
+      userOut() << "p       = " << g_.input(RDAE_P) << endl;
+      userOut() << "rx      = " << g_.input(RDAE_RX) << endl;
+      userOut() << "rp      = " << g_.input(RDAE_RP) << endl;
     }
 
     // Evaluate
     g_.evaluate();
 
     // Save to output
-    g_.getOutput(rxdot, RDAE_ODE);
+    g_.getOutputNZ(rxdot, RDAE_ODE);
 
     if (monitor_rhsB_) {
-      cout << "xdotB = " << g_.output(RDAE_ODE) << endl;
+      userOut() << "xdotB = " << g_.output(RDAE_ODE) << endl;
     }
 
     // Negate (note definition of g)
@@ -932,8 +935,8 @@ namespace casadi {
     casadi_error("Commented out, #884, #794.");
 
     // // Pass input
-    // g_.setInput(&t, RDAE_T);
-    // g_.setInput(NV_DATA_S(x), RDAE_X);
+    // g_.setInputNZ(&t, RDAE_T);
+    // g_.setInputNZ(NV_DATA_S(x), RDAE_X);
     // g_.setInput(input(INTEGRATOR_P), RDAE_P);
     // g_.setInput(input(INTEGRATOR_RP), RDAE_RP);
 
@@ -941,7 +944,7 @@ namespace casadi {
     // const double *rx_data = NV_DATA_S(rx);
 
     // // Pass backward state
-    // g_.setInput(rx_data, RDAE_RX); rx_data += nrx_;
+    // g_.setInputNZ(rx_data, RDAE_RX); rx_data += nrx_;
 
     // // Pass forward seeds
     // for (int dir=0; dir<nfdir_; ++dir) {
@@ -959,7 +962,7 @@ namespace casadi {
     // double *rxdot_data = NV_DATA_S(rxdot);
 
     // // Get the backward right hand side
-    // g_.getOutput(rxdot_data, RDAE_ODE); rxdot_data += nrx_;
+    // g_.getOutputNZ(rxdot_data, RDAE_ODE); rxdot_data += nrx_;
 
     // // Get forward sensitivities
     // for (int dir=0; dir<nfdir_; ++dir) {
@@ -975,7 +978,7 @@ namespace casadi {
       this_->rhsB(t, NV_DATA_S(x), NV_DATA_S(rx), NV_DATA_S(rxdot));
       return 0;
     } catch(exception& e) {
-      cerr << "rhsB failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "rhsB failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -988,7 +991,7 @@ namespace casadi {
       this_->rhsBS(t, x, xF, xB, xdotB);
       return 0;
     } catch(exception& e) {
-      cerr << "rhsBS failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "rhsBS failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1001,39 +1004,39 @@ namespace casadi {
       this_->rhsQB(t, NV_DATA_S(x), NV_DATA_S(rx), NV_DATA_S(rqdot));
       return 0;
     } catch(exception& e) {
-      cerr << "rhsQB failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "rhsQB failed: " << e.what() << endl;;
       return 1;
     }
   }
 
   void CvodesInterface::rhsQB(double t, const double* x, const double* rx, double* rqdot) {
     if (monitor_rhsQB_) {
-      cout << "CvodesInterface::rhsQB: begin" << endl;
+      userOut() << "CvodesInterface::rhsQB: begin" << endl;
     }
 
     // Pass inputs
-    g_.setInput(&t, RDAE_T);
-    g_.setInput(x, RDAE_X);
+    g_.setInputNZ(&t, RDAE_T);
+    g_.setInputNZ(x, RDAE_X);
     g_.setInput(input(INTEGRATOR_P), RDAE_P);
     g_.setInput(input(INTEGRATOR_RP), RDAE_RP);
-    g_.setInput(rx, RDAE_RX);
+    g_.setInputNZ(rx, RDAE_RX);
 
     if (monitor_rhsB_) {
-      cout << "t       = " << t << endl;
-      cout << "x       = " << g_.input(RDAE_X) << endl;
-      cout << "p       = " << g_.input(RDAE_P) << endl;
-      cout << "rx      = " << g_.input(RDAE_RX) << endl;
-      cout << "rp      = " << g_.input(RDAE_RP) << endl;
+      userOut() << "t       = " << t << endl;
+      userOut() << "x       = " << g_.input(RDAE_X) << endl;
+      userOut() << "p       = " << g_.input(RDAE_P) << endl;
+      userOut() << "rx      = " << g_.input(RDAE_RX) << endl;
+      userOut() << "rp      = " << g_.input(RDAE_RP) << endl;
     }
 
     // Evaluate
     g_.evaluate();
 
     // Save to output
-    g_.getOutput(rqdot, RDAE_QUAD);
+    g_.getOutputNZ(rqdot, RDAE_QUAD);
 
     if (monitor_rhsB_) {
-      cout << "qdotB = " << g_.output(RDAE_QUAD) << endl;
+      userOut() << "qdotB = " << g_.output(RDAE_QUAD) << endl;
     }
 
     // Negate (note definition of g)
@@ -1041,7 +1044,7 @@ namespace casadi {
       rqdot[i] *= -1;
 
     if (monitor_rhsQB_) {
-      cout << "CvodesInterface::rhsQB: end" << endl;
+      userOut() << "CvodesInterface::rhsQB: end" << endl;
     }
   }
 
@@ -1053,7 +1056,7 @@ namespace casadi {
       this_->jtimes(v, Jv, t, x, xdot, tmp);
       return 0;
     } catch(exception& e) {
-      cerr << "jtimes failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1067,7 +1070,7 @@ namespace casadi {
       this_->jtimesB(vB, JvB, t, x, xB, xdotB, tmpB);
       return 0;
     } catch(exception& e) {
-      cerr << "jtimes failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1079,20 +1082,20 @@ namespace casadi {
     time1 = clock();
 
     // Pass input
-    f_fwd_.setInput(&t,                 DAE_T);
-    f_fwd_.setInput(NV_DATA_S(x),       DAE_X);
+    f_fwd_.setInputNZ(&t,                 DAE_T);
+    f_fwd_.setInputNZ(NV_DATA_S(x),       DAE_X);
     f_fwd_.setInput(input(INTEGRATOR_P), DAE_P);
 
     // Pass input seeds
     f_fwd_.setInput(0.0,          DAE_NUM_IN + DAE_T);
-    f_fwd_.setInput(NV_DATA_S(v), DAE_NUM_IN + DAE_X);
+    f_fwd_.setInputNZ(NV_DATA_S(v), DAE_NUM_IN + DAE_X);
     f_fwd_.setInput(0.0,          DAE_NUM_IN + DAE_P);
 
     // Evaluate
     f_fwd_.evaluate();
 
     // Get the output seeds
-    f_fwd_.getOutput(NV_DATA_S(Jv), DAE_NUM_OUT + DAE_ODE);
+    f_fwd_.getOutputNZ(NV_DATA_S(Jv), DAE_NUM_OUT + DAE_ODE);
 
     // Log time duration
     time2 = clock();
@@ -1108,24 +1111,24 @@ namespace casadi {
     time1 = clock();
 
     // Pass input
-    g_fwd_.setInput(&t,                  RDAE_T);
-    g_fwd_.setInput(NV_DATA_S(x),        RDAE_X);
+    g_fwd_.setInputNZ(&t,                  RDAE_T);
+    g_fwd_.setInputNZ(NV_DATA_S(x),        RDAE_X);
     g_fwd_.setInput(input(INTEGRATOR_P), RDAE_P);
-    g_fwd_.setInput(NV_DATA_S(xB),       RDAE_RX);
+    g_fwd_.setInputNZ(NV_DATA_S(xB),       RDAE_RX);
     g_fwd_.setInput(input(INTEGRATOR_RP), RDAE_RP);
 
     // Pass input seeds
     g_fwd_.setInput(0.0,           RDAE_NUM_IN + RDAE_T);
     g_fwd_.setInput(0.0,           RDAE_NUM_IN + RDAE_X);
     g_fwd_.setInput(0.0,           RDAE_NUM_IN + RDAE_P);
-    g_fwd_.setInput(NV_DATA_S(vB), RDAE_NUM_IN + RDAE_RX);
+    g_fwd_.setInputNZ(NV_DATA_S(vB), RDAE_NUM_IN + RDAE_RX);
     g_fwd_.setInput(0.0,           RDAE_NUM_IN + RDAE_RP);
 
     // Evaluate
     g_fwd_.evaluate();
 
     // Get the output seeds
-    g_fwd_.getOutput(NV_DATA_S(JvB), RDAE_NUM_OUT + RDAE_ODE);
+    g_fwd_.getOutputNZ(NV_DATA_S(JvB), RDAE_NUM_OUT + RDAE_ODE);
 
     // Log time duration
     time2 = clock();
@@ -1141,7 +1144,7 @@ namespace casadi {
       this_->djac(N, t, x, xdot, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
-      cerr << "djac failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "djac failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1155,7 +1158,7 @@ namespace casadi {
       this_->djacB(NeqB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
-      cerr << "djacB failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "djacB failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1168,26 +1171,26 @@ namespace casadi {
     time1 = clock();
 
     // Pass inputs to the jacobian function
-    jac_.setInput(&t, DAE_T);
-    jac_.setInput(NV_DATA_S(x), DAE_X);
+    jac_.setInputNZ(&t, DAE_T);
+    jac_.setInputNZ(NV_DATA_S(x), DAE_X);
     jac_.setInput(f_.input(DAE_P), DAE_P);
     jac_.setInput(1.0, DAE_NUM_IN);
     jac_.setInput(0.0, DAE_NUM_IN+1);
 
 
     if (monitored("djac")) {
-      cout << "DAE_T    = " << t << endl;
-      cout << "DAE_X    = " << jac_.input(DAE_X) << endl;
-      cout << "RDAE_P    = " << jac_.input(DAE_P) << endl;
-      cout << "c_x = " << jac_.input(DAE_NUM_IN) << endl;
-      cout << "c_xdot = " << jac_.input(DAE_NUM_IN+1) << endl;
+      userOut() << "DAE_T    = " << t << endl;
+      userOut() << "DAE_X    = " << jac_.input(DAE_X) << endl;
+      userOut() << "RDAE_P    = " << jac_.input(DAE_P) << endl;
+      userOut() << "c_x = " << jac_.input(DAE_NUM_IN) << endl;
+      userOut() << "c_xdot = " << jac_.input(DAE_NUM_IN+1) << endl;
     }
 
     // Evaluate
     jac_.evaluate();
 
     if (monitored("djac")) {
-      cout << "jac = " << jac_.output() << endl;
+      userOut() << "jac = " << jac_.output() << endl;
     }
 
     // Get sparsity and non-zero elements
@@ -1222,30 +1225,30 @@ namespace casadi {
     time1 = clock();
 
     // Pass inputs to the jacobian function
-    jacB_.setInput(&t, RDAE_T);
-    jacB_.setInput(NV_DATA_S(x), RDAE_X);
+    jacB_.setInputNZ(&t, RDAE_T);
+    jacB_.setInputNZ(NV_DATA_S(x), RDAE_X);
     jacB_.setInput(input(INTEGRATOR_P), RDAE_P);
-    jacB_.setInput(NV_DATA_S(xB), RDAE_RX);
+    jacB_.setInputNZ(NV_DATA_S(xB), RDAE_RX);
     jacB_.setInput(input(INTEGRATOR_RP), RDAE_RP);
     jacB_.setInput(-1.0, RDAE_NUM_IN); // validated
     jacB_.setInput(0.0, RDAE_NUM_IN+1);
 
 
     if (monitored("djacB")) {
-      cout << "RDAE_T    = " << t << endl;
-      cout << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
-      cout << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
-      cout << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
-      cout << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
-      cout << "c_x = " << jacB_.input(RDAE_NUM_IN) << endl;
-      cout << "c_xdot = " << jacB_.input(RDAE_NUM_IN+1) << endl;
+      userOut() << "RDAE_T    = " << t << endl;
+      userOut() << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
+      userOut() << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
+      userOut() << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
+      userOut() << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
+      userOut() << "c_x = " << jacB_.input(RDAE_NUM_IN) << endl;
+      userOut() << "c_xdot = " << jacB_.input(RDAE_NUM_IN+1) << endl;
     }
 
     // Evaluate
     jacB_.evaluate();
 
     if (monitored("djacB")) {
-      cout << "jacB = " << jacB_.output() << endl;
+      userOut() << "jacB = " << jacB_.output() << endl;
     }
 
     // Get sparsity and non-zero elements
@@ -1281,7 +1284,7 @@ namespace casadi {
       this_->bjac(N, mupper, mlower, t, x, xdot, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
-      cerr << "bjac failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "bjac failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1295,7 +1298,7 @@ namespace casadi {
       this_->bjacB(NeqB, mupperB, mlowerB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
-      cerr << "bjacB failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "bjacB failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1308,8 +1311,8 @@ namespace casadi {
     time1 = clock();
 
     // Pass inputs to the jacobian function
-    jac_.setInput(&t, DAE_T);
-    jac_.setInput(NV_DATA_S(x), DAE_X);
+    jac_.setInputNZ(&t, DAE_T);
+    jac_.setInputNZ(NV_DATA_S(x), DAE_X);
     jac_.setInput(f_.input(DAE_P), DAE_P);
     jac_.setInput(1.0, DAE_NUM_IN);
     jac_.setInput(0.0, DAE_NUM_IN+1);
@@ -1352,29 +1355,29 @@ namespace casadi {
     time1 = clock();
 
     // Pass inputs to the jacobian function
-    jacB_.setInput(&t, RDAE_T);
-    jacB_.setInput(NV_DATA_S(x), RDAE_X);
+    jacB_.setInputNZ(&t, RDAE_T);
+    jacB_.setInputNZ(NV_DATA_S(x), RDAE_X);
     jacB_.setInput(input(INTEGRATOR_P), RDAE_P);
-    jacB_.setInput(NV_DATA_S(xB), RDAE_RX);
+    jacB_.setInputNZ(NV_DATA_S(xB), RDAE_RX);
     jacB_.setInput(input(INTEGRATOR_RP), RDAE_RP);
     jacB_.setInput(-1.0, RDAE_NUM_IN);
     jacB_.setInput(0.0, RDAE_NUM_IN+1);
 
     if (monitored("bjacB")) {
-      cout << "RDAE_T    = " << t << endl;
-      cout << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
-      cout << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
-      cout << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
-      cout << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
-      cout << "c_x = " << jacB_.input(RDAE_NUM_IN) << endl;
-      cout << "c_xdot = " << jacB_.input(RDAE_NUM_IN+1) << endl;
+      userOut() << "RDAE_T    = " << t << endl;
+      userOut() << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
+      userOut() << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
+      userOut() << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
+      userOut() << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
+      userOut() << "c_x = " << jacB_.input(RDAE_NUM_IN) << endl;
+      userOut() << "c_xdot = " << jacB_.input(RDAE_NUM_IN+1) << endl;
     }
 
     // Evaluate
     jacB_.evaluate();
 
     if (monitored("bjacB")) {
-      cout << "jacB = " << jacB_.output() << endl;
+      userOut() << "jacB = " << jacB_.output() << endl;
     }
 
     // Get sparsity and non-zero elements
@@ -1418,7 +1421,7 @@ namespace casadi {
       this_->psolve(t, x, xdot, r, z, gamma, delta, lr, tmp);
       return 0;
     } catch(exception& e) {
-      cerr << "psolve failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "psolve failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1432,7 +1435,7 @@ namespace casadi {
       this_->psolveB(t, x, xB, xdotB, rvecB, zvecB, gammaB, deltaB, lr, tmpB);
       return 0;
     } catch(exception& e) {
-      cerr << "psolveB failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1446,7 +1449,7 @@ namespace casadi {
       this_->psetup(t, x, xdot, jok, jcurPtr, gamma, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
-      cerr << "psetup failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "psetup failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1461,7 +1464,7 @@ namespace casadi {
       this_->psetupB(t, x, xB, xdotB, jokB, jcurPtrB, gammaB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
-      cerr << "psetupB failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "psetupB failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1513,8 +1516,8 @@ namespace casadi {
     time1 = clock();
 
     // Pass input to the jacobian function
-    jac_.setInput(&t, DAE_T);
-    jac_.setInput(NV_DATA_S(x), DAE_X);
+    jac_.setInputNZ(&t, DAE_T);
+    jac_.setInputNZ(NV_DATA_S(x), DAE_X);
     jac_.setInput(input(INTEGRATOR_P), DAE_P);
     jac_.setInput(-gamma, DAE_NUM_IN);
     jac_.setInput(1.0, DAE_NUM_IN+1);
@@ -1548,28 +1551,28 @@ namespace casadi {
     time1 = clock();
 
     // Pass inputs to the jacobian function
-    jacB_.setInput(&t, RDAE_T);
-    jacB_.setInput(NV_DATA_S(x), RDAE_X);
+    jacB_.setInputNZ(&t, RDAE_T);
+    jacB_.setInputNZ(NV_DATA_S(x), RDAE_X);
     jacB_.setInput(input(INTEGRATOR_P), RDAE_P);
-    jacB_.setInput(NV_DATA_S(xB), RDAE_RX);
+    jacB_.setInputNZ(NV_DATA_S(xB), RDAE_RX);
     jacB_.setInput(input(INTEGRATOR_RP), RDAE_RP);
     jacB_.setInput(gammaB, RDAE_NUM_IN); // validated
     jacB_.setInput(1.0, RDAE_NUM_IN+1); // validated
 
     if (monitored("psetupB")) {
-      cout << "RDAE_T    = " << t << endl;
-      cout << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
-      cout << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
-      cout << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
-      cout << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
-      cout << "gamma = " << gammaB << endl;
+      userOut() << "RDAE_T    = " << t << endl;
+      userOut() << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
+      userOut() << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
+      userOut() << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
+      userOut() << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
+      userOut() << "gamma = " << gammaB << endl;
     }
 
     // Evaluate jacobian
     jacB_.evaluate();
 
     if (monitored("psetupB")) {
-      cout << "psetupB = " << jacB_.output() << endl;
+      userOut() << "psetupB = " << jacB_.output() << endl;
     }
 
     // Log time duration
@@ -1618,7 +1621,7 @@ namespace casadi {
       this_->lsetup(cv_mem, convfail, x, xdot, jcurPtr, vtemp1, vtemp2, vtemp3);
       return 0;
     } catch(exception& e) {
-      cerr << "lsetup failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "lsetup failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1650,7 +1653,7 @@ namespace casadi {
       this_->lsetupB(t, gamma, convfail, ca_mem->ca_ytmp, x, xdot, jcurPtr, vtemp1, vtemp2, vtemp3);
       return 0;
     } catch(exception& e) {
-      cerr << "lsetupB failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "lsetupB failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1700,7 +1703,7 @@ namespace casadi {
       this_->lsolve(cv_mem, b, weight, x, xdot);
       return 0;
     } catch(exception& e) {
-      cerr << "lsolve failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "lsolve failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1731,7 +1734,7 @@ namespace casadi {
       this_->lsolveB(t, gamma, b, weight, ca_mem->ca_ytmp, x, xdot);
       return 0;
     } catch(exception& e) {
-      cerr << "lsolveB failed: " << e.what() << endl;;
+      userOut<true, PL_WARN>() << "lsolveB failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -1925,7 +1928,7 @@ namespace casadi {
     jac_in.push_back(c_xdot);
 
     // Return generated function
-    return FunctionType(jac_in, jac);
+    return FunctionType("jac", jac_in, make_vector(jac));
   }
 
   template<typename FunctionType>
@@ -1945,7 +1948,7 @@ namespace casadi {
     jac_in.push_back(c_xdot);
 
     // return generated function
-    return FunctionType(jac_in, jac);
+    return FunctionType("jacB", jac_in, make_vector(jac));
   }
 
   Function CvodesInterface::getJacB() {

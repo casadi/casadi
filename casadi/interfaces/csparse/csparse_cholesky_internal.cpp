@@ -24,7 +24,6 @@
 
 
 #include "csparse_cholesky_internal.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
 
 /// \cond INTERNAL
 
@@ -51,7 +50,7 @@ namespace casadi {
     L_ = 0;
     S_ = 0;
 
-    casadi_assert_message(sparsity.isSymmetric(),
+    casadi_assert_message(sparsity.issymmetric(),
                           "CSparseCholeskyInternal: supplied sparsity must be symmetric, got "
                           << sparsity.dimString() << ".");
   }
@@ -84,7 +83,7 @@ namespace casadi {
     temp_.resize(AT_.n);
 
     if (verbose()) {
-      cout << "CSparseCholeskyInternal::prepare: symbolic factorization" << endl;
+      userOut() << "CSparseCholeskyInternal::prepare: symbolic factorization" << endl;
     }
 
     // ordering and symbolic analysis
@@ -157,8 +156,8 @@ namespace casadi {
     }
 
     if (verbose()) {
-      cout << "CSparseCholeskyInternal::prepare: numeric factorization" << endl;
-      cout << "linear system to be factorized = " << endl;
+      userOut() << "CSparseCholeskyInternal::prepare: numeric factorization" << endl;
+      userOut() << "linear system to be factorized = " << endl;
       input(0).printSparse();
     }
 
@@ -167,7 +166,7 @@ namespace casadi {
     if (L_==0) {
       DMatrix temp = input();
       temp.makeSparse();
-      if (temp.sparsity().isSingular()) {
+      if (temp.sparsity().issingular()) {
         stringstream ss;
         ss << "CSparseCholeskyInternal::prepare: factorization failed due "
           "to matrix being singular. Matrix contains numerical zeros which are"

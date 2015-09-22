@@ -26,8 +26,6 @@
 #include "control_simulator_internal.hpp"
 #include "integrator_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "../sx/sx_tools.hpp"
-#include "../mx/mx_tools.hpp"
 #include "sx_function.hpp"
 #include "mx_function.hpp"
 #include <utility>
@@ -37,11 +35,14 @@ INPUTSCHEME(ControlSimulatorInput)
 
 using namespace std;
 namespace casadi {
-
-
-  ControlSimulatorInternal::ControlSimulatorInternal(
-      const Function& control_dae, const Function& output_fcn, const vector<double>& gridc) :
-      control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(gridc) {
+  ControlSimulatorInternal::
+  ControlSimulatorInternal(const Function& control_dae, const Function& output_fcn,
+                           const DMatrix& grid) :
+    control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(grid.data()) {
+    casadi_assert_message(grid.iscolumn(), "ControlSimulator::ControlSimulator: grid must be a "
+                          "column vector, but got " << grid.dimString());
+    casadi_assert_message(grid.isdense(), "ControlSimulator::ControlSimulator: grid must be dense, "
+                          "but got " << grid.dimString());
     setOption("name", "unnamed controlsimulator");
     addOption("nf", OT_INTEGER, 1, "Number of minor grained integration steps per major interval. "
               "nf>0 must hold. This option is not used when 'minor_grid' is provided.");
@@ -51,16 +52,16 @@ namespace casadi {
               "construct a linearly spaced grid.");
     addOption("integrator",               OT_STRING, GenericType(),
               "An integrator creator function");
-    addOption("integrator_options",       OT_DICTIONARY, GenericType(),
+    addOption("integrator_options",       OT_DICT, GenericType(),
               "Options to be passed to the integrator");
-    addOption("simulator_options",       OT_DICTIONARY, GenericType(),
+    addOption("simulator_options",       OT_DICT, GenericType(),
               "Options to be passed to the simulator");
     addOption("control_interpolation",   OT_STRING,     "none", "none|nearest|linear");
     addOption("control_endpoint",        OT_BOOLEAN,       false,
               "Include a control value at the end of the simulation domain. "
               "Used for interpolation.");
 
-    input_.scheme = SCHEME_ControlSimulatorInput;
+    ischeme_ = IOScheme(SCHEME_ControlSimulatorInput);
   }
 
   ControlSimulatorInternal::~ControlSimulatorInternal() {
@@ -79,17 +80,16 @@ namespace casadi {
                           "The supplied time grid must be strictly increasing. "
                           "Notably, you cannot have a time instance repeating.");
 
-    if (control_dae_.getNumInputs()==DAE_NUM_IN) {
+    if (control_dae_.nIn()==DAE_NUM_IN) {
       vector<MX> control_dae_in_(CONTROL_DAE_NUM_IN);
       vector<MX> dae_in_ = control_dae_.symbolicInput();
       control_dae_in_[CONTROL_DAE_T]    = dae_in_[DAE_T];
       control_dae_in_[CONTROL_DAE_X]    = dae_in_[DAE_X];
       control_dae_in_[CONTROL_DAE_Z]    = dae_in_[DAE_Z];
       control_dae_in_[CONTROL_DAE_P]    = dae_in_[DAE_P];
-      control_dae_ = MXFunction(control_dae_in_, control_dae_(dae_in_));
-      control_dae_.init();
+      control_dae_ = MXFunction("control_dae", control_dae_in_, control_dae_(dae_in_));
     }
-    casadi_assert_message(control_dae_.getNumInputs()==CONTROL_DAE_NUM_IN,
+    casadi_assert_message(control_dae_.nIn()==CONTROL_DAE_NUM_IN,
                           "ControlSimulatorInternal::init: supplied control_dae does not "
                           "conform to the CONTROL_DAE or DAE input scheme.");
 
@@ -109,7 +109,7 @@ namespace casadi {
 
     nu_ = control_dae_.input(CONTROL_DAE_U).nnz();
 
-    if (!control_dae_.input(CONTROL_DAE_U_INTERP).isEmpty() && nu_!=0) {
+    if (!control_dae_.input(CONTROL_DAE_U_INTERP).isempty() && nu_!=0) {
       casadi_assert_message(
         control_dae_.input(CONTROL_DAE_U).sparsity() ==
         control_dae_.input(CONTROL_DAE_U_INTERP).sparsity(),
@@ -135,53 +135,44 @@ namespace casadi {
     IMatrix iUend    = 2+np_ + nu_ + IMatrix(control_dae_.input(CONTROL_DAE_U_INTERP).sparsity(),
                                              range(nu_end), false);
     IMatrix iYM;
-    if (!control_dae_.input(CONTROL_DAE_X_MAJOR).isEmpty()) {
+    if (!control_dae_.input(CONTROL_DAE_X_MAJOR).isempty()) {
       iYM = 2+np_ + nu_ + nu_end + IMatrix(control_dae_.input(CONTROL_DAE_X_MAJOR).sparsity(),
                                            range(ny_), false);
     }
 
     vector<MX> control_dae_in_(CONTROL_DAE_NUM_IN);
 
-    if (!control_dae_.input(CONTROL_DAE_T).isEmpty())
+    if (!control_dae_.input(CONTROL_DAE_T).isempty())
       control_dae_in_[CONTROL_DAE_T]        = dae_in_[DAE_P](iT0) +
           (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*dae_in_[DAE_T];
-    if (!control_dae_.input(CONTROL_DAE_T0).isEmpty())
+    if (!control_dae_.input(CONTROL_DAE_T0).isempty())
       control_dae_in_[CONTROL_DAE_T0]       = dae_in_[DAE_P](iT0);
-    if (!control_dae_.input(CONTROL_DAE_TF).isEmpty())
+    if (!control_dae_.input(CONTROL_DAE_TF).isempty())
       control_dae_in_[CONTROL_DAE_TF]       = dae_in_[DAE_P](iTF);
     control_dae_in_[CONTROL_DAE_X]        = dae_in_[DAE_X];
-    if (!control_dae_.input(CONTROL_DAE_Z).isEmpty())
+    if (!control_dae_.input(CONTROL_DAE_Z).isempty())
       control_dae_in_[CONTROL_DAE_Z]        = dae_in_[DAE_Z];
     control_dae_in_[CONTROL_DAE_P]        = dae_in_[DAE_P](iP);
-    if (!control_dae_.input(CONTROL_DAE_U).isEmpty())
+    if (!control_dae_.input(CONTROL_DAE_U).isempty())
       control_dae_in_[CONTROL_DAE_U]        = dae_in_[DAE_P](iUstart);
-    if (!control_dae_.input(CONTROL_DAE_U_INTERP).isEmpty()) {
+    if (!control_dae_.input(CONTROL_DAE_U_INTERP).isempty()) {
       MX tau = (dae_in_[DAE_P](iTF)-dae_in_[DAE_T])/(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0));
       control_dae_in_[CONTROL_DAE_U_INTERP] = dae_in_[DAE_P](iUstart) * (1-tau) +
           tau* dae_in_[DAE_P](iUend);
     }
-    if (!control_dae_.input(CONTROL_DAE_X_MAJOR).isEmpty())
+    if (!control_dae_.input(CONTROL_DAE_X_MAJOR).isempty())
       control_dae_in_[CONTROL_DAE_X_MAJOR] = dae_in_[DAE_P](iYM);
 
     std::vector<MX> control_dae_call = control_dae_(control_dae_in_);
 
-
-    std::vector<MX> dae_out(
-      daeOut("ode", (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_call[DAE_ODE]));
+    std::vector<MX> dae_out =
+      make_vector(daeOut("ode",
+                         (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_call[DAE_ODE]));
 
     int i=1;
     while ( control_dae_call.size()>i && dae_out.size()>i) {dae_out[i] = control_dae_call[i];i++;}
 
-    dae_ = MXFunction(dae_in_, dae_out);
-
-    dae_.init();
-
-    // Create an integrator instance
-    std::string integrator_name = getOption("integrator");
-    integrator_ = Integrator(integrator_name, dae_, Function());
-    if (hasSetOption("integrator_options")) {
-      integrator_.setOption(getOption("integrator_options"));
-    }
+    dae_ = MXFunction("dae", dae_in_, dae_out);
 
     // Size of the coarse grid
     ns_ = gridc_.size();
@@ -218,11 +209,17 @@ namespace casadi {
       grid_[grid_.size()-1] = gridc_[gridc_.size()-1];
     }
 
-    // Let the integration time start from the np_first point of the time grid.
-    if (!gridc_.empty()) integrator_.setOption("t0", gridc_[0]);
+    // Create an integrator instance
+    Dict integrator_options;
+    if (hasSetOption("integrator_options")) {
+      integrator_options = getOption("integrator_options");
+    }
 
-    // Initialize the integrator
-    integrator_.init();
+    // Let the integration time start from the np_first point of the time grid.
+    if (!gridc_.empty()) integrator_options["t0"] =  gridc_[0];
+
+    std::string integrator_name = getOption("integrator");
+    integrator_ = Integrator("integrator", integrator_name, dae_, integrator_options);
 
     // Generate an output function if there is none (returns the whole state)
     if (orig_output_fcn_.isNull()) {
@@ -252,48 +249,43 @@ namespace casadi {
       out[INTEGRATOR_XF] = x;
 
       // Create the output function
-      output_fcn_ = SXFunction(arg, out);
+      output_fcn_ = SXFunction("ofcn", arg, out);
       output_fcn_.setOption("name", "output");
-      output_.scheme = SCHEME_IntegratorOutput;
+      oscheme_ = IOScheme(SCHEME_IntegratorOutput);
     } else {
       output_fcn_ = orig_output_fcn_;
+
+      // Initialize the output function
+      output_fcn_.init();
     }
 
-
-
-    // Initialize the output function
-    output_fcn_.init();
-
-    casadi_assert_message(output_fcn_.getNumInputs()==CONTROL_DAE_NUM_IN,
+    casadi_assert_message(output_fcn_.nIn()==CONTROL_DAE_NUM_IN,
                      "Output function, if supplied, must adhere to ControlledDAEInput scheme.");
 
     // Extend the output function two extra outputs at the start: DAE_X and DAE_XDOT
     vector<MX> output_fcn_in_ = output_fcn_.symbolicInput();
 
-    vector<MX> output_fcn_out_(2 + output_fcn_.getNumOutputs());
+    vector<MX> output_fcn_out_(2 + output_fcn_.nOut());
     output_fcn_out_[0] = output_fcn_in_[CONTROL_DAE_X];
 
     vector<MX> output_fcn_call_ = output_fcn_(output_fcn_in_);
 
     copy(output_fcn_call_.begin(), output_fcn_call_.end(), output_fcn_out_.begin()+2);
 
-    output_fcn_ = MXFunction(output_fcn_in_, output_fcn_out_);
+    output_fcn_ = MXFunction("output_fcn", output_fcn_in_, output_fcn_out_);
 
-    // Initialize the output function again
-    output_fcn_.init();
-
-    if (!output_fcn_.input(CONTROL_DAE_U).isEmpty() &&
-        control_dae_.input(CONTROL_DAE_U).isEmpty()) {
+    if (!output_fcn_.input(CONTROL_DAE_U).isempty() &&
+        control_dae_.input(CONTROL_DAE_U).isempty()) {
       casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_U input. "
                    "The supplied DAE should have it as well.");
     }
-    if (!output_fcn_.input(CONTROL_DAE_U_INTERP).isEmpty() &&
-        control_dae_.input(CONTROL_DAE_U_INTERP).isEmpty()) {
+    if (!output_fcn_.input(CONTROL_DAE_U_INTERP).isempty() &&
+        control_dae_.input(CONTROL_DAE_U_INTERP).isempty()) {
       casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_U_INTERP input."
                    " The supplied DAE should have it as well.");
     }
-    if (!output_fcn_.input(CONTROL_DAE_X_MAJOR).isEmpty() &&
-        control_dae_.input(CONTROL_DAE_X_MAJOR).isEmpty()) {
+    if (!output_fcn_.input(CONTROL_DAE_X_MAJOR).isempty() &&
+        control_dae_.input(CONTROL_DAE_X_MAJOR).isempty()) {
       casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_X_MAJOR "
                    "input. The supplied DAE should have it as well.");
     }
@@ -301,47 +293,45 @@ namespace casadi {
     output_fcn_in_ = vector<MX>(CONTROL_DAE_NUM_IN);
 
     dae_in_[DAE_T] = MX::sym("tau");
-    if (!output_fcn_.input(CONTROL_DAE_T).isEmpty()) {
+    if (!output_fcn_.input(CONTROL_DAE_T).isempty()) {
       output_fcn_in_[CONTROL_DAE_T]        =
           dae_in_[DAE_P](iT0) + (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*dae_in_[DAE_T];
     }
-    if (!output_fcn_.input(CONTROL_DAE_T0).isEmpty())
+    if (!output_fcn_.input(CONTROL_DAE_T0).isempty())
       output_fcn_in_[CONTROL_DAE_T0]       = dae_in_[DAE_P](iT0);
-    if (!output_fcn_.input(CONTROL_DAE_TF).isEmpty())
+    if (!output_fcn_.input(CONTROL_DAE_TF).isempty())
       output_fcn_in_[CONTROL_DAE_TF]       = dae_in_[DAE_P](iTF);
     output_fcn_in_[CONTROL_DAE_X]        = dae_in_[DAE_X];
     output_fcn_in_[CONTROL_DAE_P]        = dae_in_[DAE_P](iP);
-    if (!output_fcn_.input(CONTROL_DAE_U).isEmpty())
+    if (!output_fcn_.input(CONTROL_DAE_U).isempty())
       output_fcn_in_[CONTROL_DAE_U]        = dae_in_[DAE_P](iUstart);
-    if (!output_fcn_.input(CONTROL_DAE_U_INTERP).isEmpty()) {
+    if (!output_fcn_.input(CONTROL_DAE_U_INTERP).isempty()) {
       output_fcn_in_[CONTROL_DAE_U_INTERP] =
           dae_in_[DAE_P](iUstart) * (1-dae_in_[DAE_T]) + dae_in_[DAE_T]* dae_in_[DAE_P](iUend);
     }
-    if (!output_fcn_.input(CONTROL_DAE_X_MAJOR).isEmpty())
+    if (!output_fcn_.input(CONTROL_DAE_X_MAJOR).isempty())
       output_fcn_in_[CONTROL_DAE_X_MAJOR] = dae_in_[DAE_P](iYM);
 
     // Transform the output_fcn_ with CONTROL_DAE input scheme to a DAE input scheme
-    output_fcn_ = MXFunction(dae_in_, output_fcn_(output_fcn_in_));
+    output_fcn_ = MXFunction("output_function", dae_in_, output_fcn_(output_fcn_in_));
 
-    // Initialize the output function again
-    output_fcn_.init();
-
-    // Create the simulator
-    simulator_ = Simulator(integrator_, output_fcn_, gridlocal_);
+    // Simulator options
+    Dict simulator_options;
     if (hasSetOption("simulator_options")) {
-      simulator_.setOption(getOption("simulator_options"));
+      simulator_options = getOption("simulator_options");
     }
-    simulator_.init();
+    // Create the simulator
+    simulator_ = Simulator("simulator", integrator_, output_fcn_, gridlocal_, simulator_options);
 
     // Allocate inputs
-    setNumInputs(CONTROLSIMULATOR_NUM_IN);
+    ibuf_.resize(CONTROLSIMULATOR_NUM_IN);
     input(CONTROLSIMULATOR_X0)  = DMatrix(dae_.input(DAE_X));
     input(CONTROLSIMULATOR_P)   = control_dae_.input(CONTROL_DAE_P);
     input(CONTROLSIMULATOR_U)   = DMatrix::zeros(nu_, ns_-1+(control_endpoint?1:0));
 
     // Allocate outputs
-    setNumOutputs(output_fcn_.getNumOutputs()-2);
-    for (int i=0; i<getNumOutputs(); ++i)
+    obuf_.resize(output_fcn_.nOut()-2);
+    for (int i=0; i<nOut(); ++i)
       output(i) = Matrix<double>::zeros(output_fcn_.output(i+2).numel(), (ns_-1)*nf_+1);
 
     // Call base class method
@@ -364,7 +354,7 @@ namespace casadi {
     P_eval[2] = P; // We can already set the fixed part in advance.
 
     // Placeholder to collect the outputs of all simulators (but not those 2 extra we introduced)
-    vector< vector<MX> > simulator_outputs(output_fcn_.getNumOutputs()-2);
+    vector< vector<MX> > simulator_outputs(output_fcn_.nOut()-2);
 
     // Input arguments to simulator.call
     vector<MX> simulator_in(INTEGRATOR_NUM_IN);
@@ -413,22 +403,20 @@ namespace casadi {
     }
 
     // Finally, construct all_output_
-    all_output_ = MXFunction(all_output_in, all_output_out);
-    all_output_.init();
-
+    all_output_ = MXFunction("all_output", all_output_in, all_output_out);
   }
 
   void ControlSimulatorInternal::evaluate() {
 
     // Copy all inputs
-    for (int i=0;i<getNumInputs();++i) {
+    for (int i=0;i<nIn();++i) {
       all_output_.input(i).set(input(i));
     }
 
     all_output_.evaluate();
 
     // Copy all outputs
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       output(i).set(all_output_.output(i));
     }
 

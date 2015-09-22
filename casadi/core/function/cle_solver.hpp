@@ -47,6 +47,7 @@
 
 */
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a \e cle solver [cleIn]
   enum CLEInput {
@@ -64,17 +65,7 @@ namespace casadi {
     /// Number of arguments.
     CLE_NUM_OUT
   };
-
-  /// Structure specification of a CLE [cleStruct]
-  enum CleStruct {
-    /// The matrix A [a]
-    Cle_STRUCT_A,
-    /// The matrix V [v]
-    Cle_STRUCT_V,
-    /// The matrix C (defaults to unity) [c]
-    Cle_STRUCT_C,
-    Cle_STRUCT_NUM};
-
+#endif // SWIG
 
   /// Forward declaration of internal class
   class CleInternal;
@@ -98,15 +89,23 @@ namespace casadi {
     /// Clone
     CleSolver clone() const;
 
-    /** \brief CleSolver solver factory
-    * \param name \pluginargument{CleSolver}
-    * \param st \structargument{Cle}
-    */
-    CleSolver(const std::string& name,
-               const CleStructure& st);
+    /** \brief Constructor (new syntax, includes initialization)
+     * \param solver \pluginargument{CleSolver}
+     * \param st \structargument{Cle}
+     */
+    CleSolver(const std::string& name, const std::string& solver,
+              const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor (no initialization)
+     * \param solver \pluginargument{CleSolver}
+     * \param st \structargument{Cle}
+     */
+    CleSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=CASADI_COUT) const;
+    void printStats(std::ostream &stream=casadi::userOut()) const;
 
     /// Access functions of the node
     CleInternal* operator->();

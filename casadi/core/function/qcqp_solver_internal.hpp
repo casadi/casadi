@@ -33,6 +33,18 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  /// Structure specification of a QP
+  enum QCQPStruct {
+    /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
+    /// The matrix is assumed to be symmetrical.
+    QCQP_STRUCT_H,
+    /// The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower
+    /// triangular part is actually used. The matrix is assumed to be symmetrical.
+    QCQP_STRUCT_P,
+    /// The matrix A: sparse, (nc x n) - product with x must be dense.
+    QCQP_STRUCT_A,
+    QCQP_STRUCT_NUM};
+
 /// Internal class
   class CASADI_EXPORT
   QcqpSolverInternal : public FunctionInternal,
@@ -41,7 +53,7 @@ namespace casadi {
   public:
 
     // Constructor
-    QcqpSolverInternal(const std::vector<Sparsity> &st);
+    QcqpSolverInternal(const std::map<std::string, Sparsity> &st);
 
 
 
@@ -57,14 +69,11 @@ namespace casadi {
     // Solve the system of equations
     virtual void solve();
 
-    /// Set options that make the QP solver more suitable for solving LPs
-    virtual void setQPOptions() {}
-
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
 
     // Creator function for internal class
-    typedef QcqpSolverInternal* (*Creator)(const QCQPStructure& st);
+    typedef QcqpSolverInternal* (*Creator)(const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
     struct Exposed{ };

@@ -137,3 +137,11 @@ if(WITH_CSPARSE)
   casadi_plugin(SdqpSolver sdp
     sdqp_to_sdp.cpp sdqp_to_sdp.hpp sdqp_to_sdp_meta.cpp)
 endif()
+
+if(WITH_DL AND NOT WIN32)
+  # Simple just-in-time compiler, using shell commands
+  casadi_plugin(Compiler shell
+    shell_compiler.hpp
+    shell_compiler.cpp
+    shell_compiler_meta.cpp)
+endif()

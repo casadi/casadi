@@ -48,36 +48,41 @@ namespace casadi {
     /// Destructor
     virtual ~Assertion() {}
 
-    /// Evaluate the function symbolically (MX)
-    virtual void eval(const cpv_MX& input, const pv_MX& output);
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens);
+    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens);
+    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens);
 
     /// Evaluate the function numerically
-    virtual void evalD(const cpv_double& input, const pv_double& output, int* itmp, double* rtmp);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                            int* itmp, SXElement* rtmp);
+    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
 
-    /// Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Propagate sparsity forward */
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+
+    /** \brief Generate code for the operation */
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
+
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_ASSERTION;}
 
-    /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const cpv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
-
-    /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const pv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
-
+    /// Can the operation be performed inplace (i.e. overwrite the result)
+    virtual int numInplace() const { return 1;}
 
   private:
     std::string fail_message_;

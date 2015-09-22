@@ -100,11 +100,11 @@ namespace casadi {
 
   /// Print representation
   template<typename T>
-  void repr(const std::vector<T> &v, std::ostream &stream=CASADI_COUT);
+  void repr(const std::vector<T> &v, std::ostream &stream=casadi::userOut());
 
   /// Print description
   template<typename T>
-  void print(const std::vector<T> &v, std::ostream &stream=CASADI_COUT);
+  void print(const std::vector<T> &v, std::ostream &stream=casadi::userOut());
   #endif // SWIG
 
   /// Check if for each element of v holds: v_i < upper
@@ -114,6 +114,16 @@ namespace casadi {
   /// Check if for each element of v holds: lower <= v_i < upper
   template<typename T>
   bool inBounds(const std::vector<T> &v, int lower, int upper);
+
+  /** \brief swap inner and outer indices of list of lists
+  * 
+  * \verbatim
+  * [[apple0,apple1,...],[pear0,pear1,...]] ->
+  *   [[apple0,pear0],[apple1,pear1],...]
+  * \endverbatim
+  */
+  template<typename T>
+  std::vector< std::vector<T> > swapIndices(const std::vector< std::vector<T> > &m);
 
   /** \brief Returns the list of all i in [0, size[ not found in supplied list
   *
@@ -257,70 +267,7 @@ namespace casadi {
   */
   template<typename T>
   std::vector<T> cumsum0(const std::vector<T> &values);
-
 #endif //SWIG
-
-  /** \brief Make a vector of a certain length with its entries specified
-  * Usage C++:
-  *   makeVector<ClassName>(LENGTH, ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2, ...)
-  * Usage Python:
-  *   makeVector(ClassName,(LENGTH, ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...)
-  */
-#ifndef SWIG
-  template<typename T>
-  std::vector<T> makeVector(int size,
-                            int ind0=-1, const T& val0=T(),
-                            int ind1=-1, const T& val1=T(),
-                            int ind2=-1, const T& val2=T(),
-                            int ind3=-1, const T& val3=T(),
-                            int ind4=-1, const T& val4=T(),
-                            int ind5=-1, const T& val5=T(),
-                            int ind6=-1, const T& val6=T(),
-                            int ind7=-1, const T& val7=T(),
-                            int ind8=-1, const T& val8=T(),
-                            int ind9=-1, const T& val9=T(),
-                            int ind10=-1, const T& val10=T(),
-                            int ind11=-1, const T& val11=T(),
-                            int ind12=-1, const T& val12=T(),
-                            int ind13=-1, const T& val13=T(),
-                            int ind14=-1, const T& val14=T(),
-                            int ind15=-1, const T& val15=T(),
-                            int ind16=-1, const T& val16=T(),
-                            int ind17=-1, const T& val17=T(),
-                            int ind18=-1, const T& val18=T(),
-                            int ind19=-1, const T& val19=T());
-#else // SWIG
-#ifdef SWIGPYTHON
-%pythoncode %{ #NOLINT(whitespace/braces)
- def makeVector(T, size, *elems):
-     assert len(elems) % 2 == 0, \
-         "The number of provided indices does not the number of provided values"
-     num_elem = len(elems)/2
-     ret = [T()]*size
-     for i in range(num_elem):
-         ind = elems[2*i]
-         val = elems[2*i+1]
-         ret[ind] = val
-     return ret
-%}
-#endif // SWIGPYTHON
-#endif // SWIG
-
-#ifndef SWIG
-  // Create a vector of length 1
-  template<typename T>
-  std::vector<T> toVector(const T& v0);
-
-  // Create a vector of length 2
-  template<typename T>
-  std::vector<T> toVector(const T& v0, const T& v1);
-
-  // Create a vector of length 3
-  template<typename T>
-  std::vector<T> toVector(const T& v0, const T& v1, const T& v2);
-
-#endif // SWIG
-
 
   /// Checks if vector does not contain NaN or Inf
   template<typename T>
@@ -807,27 +754,34 @@ namespace casadi {
     casadi_assert_message(0, "get_bvec_t only supported for double");
   }
 
+  template<typename T>
+  std::vector< std::vector<T> > swapIndices(const std::vector< std::vector<T> > &mat) {
+
+    // Get the matrix dimensions
+    int n = mat.size();
+    int m = -1;
+    for (int i=0;i<n;++i) {
+      casadi_assert_message(m==-1 || m==mat[i].size(),
+        "swapIndices(vector<vector>) dimension mismatch.");
+      if (m==-1) m = mat[i].size();
+    }
+
+    // Allocate the result
+    std::vector< std::vector<T> > ret(m);
+    for (int i=0;i<m;++i) {
+      ret[i].resize(n);
+    }
+
+    // Assign the result
+    for (int i=0;i<n;++i) {
+      for (int j=0;j<mat[i].size();++j) {
+        ret[j][i] = mat[i][j];
+      }
+    }
+    return ret;
+  }
+
 } // namespace casadi
-
-//#endif
 #endif // SWIG
-
-#ifdef SWIG
-
-// map the template name to the instantiated name
-#define VTT_INST(T, function_name) \
-%template(function_name) casadi::function_name<T>;
-
-// Define template instantiations
-#define VECTOR_TOOLS_TEMPLATES(T) \
-VTT_INST(T, isIncreasing) \
-VTT_INST(T, isDecreasing) \
-VTT_INST(T, isNonIncreasing) \
-VTT_INST(T, isNonDecreasing) \
-VTT_INST(T, isMonotone) \
-VTT_INST(T, isStrictlyMonotone) \
-VTT_INST(T, isRegular) \
-
-#endif //SWIG
 
 #endif // CASADI_STD_VECTOR_TOOLS_HPP

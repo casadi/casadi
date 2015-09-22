@@ -24,7 +24,6 @@
 
 #include "cplex_interface.hpp"
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
@@ -52,7 +51,7 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_cplex);
   }
 
-  CplexInterface::CplexInterface(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
+  CplexInterface::CplexInterface(const std::map<std::string, Sparsity>& st) : QpSolverInternal(st) {
     // Options available
     addOption("qp_method",    OT_STRING, "automatic", "Determines which CPLEX algorithm to use.",
               "automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover");
@@ -100,7 +99,7 @@ namespace casadi {
       CPXsetintparam(env_, CPX_PARAM_SCRIND, CPX_OFF);
     }
     if (status) {
-      std::cout << "CPLEX: Problem with setting parameter... ERROR: " << status << std::endl;
+      userOut() << "CPLEX: Problem with setting parameter... ERROR: " << status << std::endl;
     }
 
     /* SETTING OPTIONS */
@@ -263,7 +262,7 @@ namespace casadi {
                           output(QP_SOLVER_LAM_X).ptr());
 
     if (status) {
-      cout << "CPLEX: Failed to get solution.\n";
+      userOut() << "CPLEX: Failed to get solution.\n";
     }
     // Retrieving the basis
     if (qp_method_ != 0 && qp_method_ != 4) {
@@ -277,7 +276,8 @@ namespace casadi {
         it!=output(QP_SOLVER_LAM_X).end(); ++it) *it = -*it;
 
     int solnstat = CPXgetstat(env_, lp_);
-    stringstream errormsg; // NOTE: Why not print directly to cout and cerr?
+    stringstream errormsg;
+    // NOTE: Why not print directly to userOut() and userOut<true, PL_WARN>()?
     if (verbose()) {
       if (solnstat == CPX_STAT_OPTIMAL) {
         errormsg << "CPLEX: solution status: Optimal solution found.\n";
@@ -299,12 +299,12 @@ namespace casadi {
       } else {
         errormsg << "CPLEX: solution status: " <<  solnstat << "\n";
       }
-      cout << errormsg.str();
+      userOut() << errormsg.str();
 
       // Printing basis condition number
       //double cn;
       //status = CPXgetdblquality(env_, lp_, &cn, CPX_KAPPA);
-      //cout << "CPLEX: Basis condition number: " << cn << endl;
+      //userOut() << "CPLEX: Basis condition number: " << cn << endl;
     }
     if (solnstat != CPX_STAT_OPTIMAL) {
       //    throw CasadiException(errormsg.c_str());
@@ -319,7 +319,8 @@ namespace casadi {
 
   CplexInterface* CplexInterface::clone() const {
     // Return a deepcopy
-    CplexInterface* node = new CplexInterface(st_);
+    CplexInterface* node =
+      new CplexInterface(make_map("h", st_[QP_STRUCT_H], "a", st_[QP_STRUCT_A]));
     if (!node->is_init_)
       node->init();
     return node;
@@ -337,7 +338,7 @@ namespace casadi {
     if (lp_!=0) {
       status = CPXfreeprob(env_, &lp_);
       if (status!=0) {
-        std::cerr << "CPXfreeprob failed, error code " << status << ".\n";
+        userOut<true, PL_WARN>() << "CPXfreeprob failed, error code " << status << ".\n";
       }
       lp_ = 0;
     }
@@ -346,7 +347,7 @@ namespace casadi {
     if (env_!=0) {
       status = CPXcloseCPLEX(&env_);
       if (status!=0) {
-        std::cerr << "CPXcloseCPLEX failed, error code " << status << ".\n";
+        userOut<true, PL_WARN>() << "CPXcloseCPLEX failed, error code " << status << ".\n";
       }
       env_ = 0;
     }

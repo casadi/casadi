@@ -27,11 +27,11 @@
 *
 *
 * \pythonexample{SX/generateCode}
-* \include SX/generateCode.txt
+* \include SX/f_generated.c
 *
 * \sa
 * \code
-* casadi::SXFunction::generateCode(const std::string&);
+* casadi::SXFunction::generate(const std::string&);
 * casadi::SXFunction::repr(std::ostream &stream);
 * casadi::SXFunction::print(std::ostream &stream);
 * \endcode

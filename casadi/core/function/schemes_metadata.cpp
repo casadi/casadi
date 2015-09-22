@@ -30,15 +30,12 @@ std::string getSchemeName(InputOutputScheme scheme) {
   switch (scheme) {
     case SCHEME_CLEInput: return "CLEInput";
     case SCHEME_CLEOutput: return "CLEOutput";
-    case SCHEME_CleStruct: return "CleStruct";
     case SCHEME_ControlledDAEInput: return "ControlledDAEInput";
     case SCHEME_ControlSimulatorInput: return "ControlSimulatorInput";
     case SCHEME_DLEInput: return "DLEInput";
     case SCHEME_DLEOutput: return "DLEOutput";
-    case SCHEME_DleStruct: return "DleStruct";
     case SCHEME_DPLEInput: return "DPLEInput";
     case SCHEME_DPLEOutput: return "DPLEOutput";
-    case SCHEME_DpleVecStruct: return "DpleVecStruct";
     case SCHEME_HNLPInput: return "HNLPInput";
     case SCHEME_DAEInput: return "DAEInput";
     case SCHEME_DAEOutput: return "DAEOutput";
@@ -50,13 +47,10 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_LinsolOutput: return "LinsolOutput";
     case SCHEME_LpSolverInput: return "LpSolverInput";
     case SCHEME_LpSolverOutput: return "LpSolverOutput";
-    case SCHEME_LPStruct: return "LPStruct";
     case SCHEME_LR_DLEInput: return "LR_DLEInput";
     case SCHEME_LR_DLEOutput: return "LR_DLEOutput";
-    case SCHEME_LrDleStruct: return "LrDleStruct";
     case SCHEME_LR_DPLEInput: return "LR_DPLEInput";
     case SCHEME_LR_DPLEOutput: return "LR_DPLEOutput";
-    case SCHEME_LrDpleVecStruct: return "LrDpleVecStruct";
     case SCHEME_NLPInput: return "NLPInput";
     case SCHEME_NLPOutput: return "NLPOutput";
     case SCHEME_GradFInput: return "GradFInput";
@@ -69,16 +63,12 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_NlpSolverOutput: return "NlpSolverOutput";
     case SCHEME_QcqpSolverInput: return "QcqpSolverInput";
     case SCHEME_QcqpSolverOutput: return "QcqpSolverOutput";
-    case SCHEME_QCQPStruct: return "QCQPStruct";
     case SCHEME_QpSolverInput: return "QpSolverInput";
     case SCHEME_QpSolverOutput: return "QpSolverOutput";
-    case SCHEME_QPStruct: return "QPStruct";
     case SCHEME_SDPInput: return "SDPInput";
     case SCHEME_SDPOutput: return "SDPOutput";
-    case SCHEME_SDPStruct: return "SDPStruct";
     case SCHEME_SDQPInput: return "SDQPInput";
     case SCHEME_SDQPOutput: return "SDQPOutput";
-    case SCHEME_SDQPStruct: return "SDQPStruct";
     case SCHEME_SOCPInput: return "SOCPInput";
     case SCHEME_SOCPOutput: return "SOCPOutput";
     case SCHEME_SOCPStruct: return "SOCPStruct";
@@ -92,8 +82,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "a, v";
     case SCHEME_CLEOutput:
       return "p";
-    case SCHEME_CleStruct:
-      return "a, v, c";
     case SCHEME_ControlledDAEInput:
       return "t, x, z, p, u, u_interp, x_major, t0, tf";
     case SCHEME_ControlSimulatorInput:
@@ -102,14 +90,10 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "a, v";
     case SCHEME_DLEOutput:
       return "p";
-    case SCHEME_DleStruct:
-      return "a, v";
     case SCHEME_DPLEInput:
       return "a, v";
     case SCHEME_DPLEOutput:
       return "p";
-    case SCHEME_DpleVecStruct:
-      return "a, v";
     case SCHEME_HNLPInput:
       return "x, p, tau";
     case SCHEME_DAEInput:
@@ -132,20 +116,14 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "c, a, lba, uba, lbx, ubx";
     case SCHEME_LpSolverOutput:
       return "x, cost, lam_a, lam_x";
-    case SCHEME_LPStruct:
-      return "a";
     case SCHEME_LR_DLEInput:
       return "a, v, c, h";
     case SCHEME_LR_DLEOutput:
       return "y";
-    case SCHEME_LrDleStruct:
-      return "a, v, c, h";
     case SCHEME_LR_DPLEInput:
       return "a, v, c, h";
     case SCHEME_LR_DPLEOutput:
       return "y";
-    case SCHEME_LrDpleVecStruct:
-      return "a, v, c, h";
     case SCHEME_NLPInput:
       return "x, p";
     case SCHEME_NLPOutput:
@@ -170,26 +148,18 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0";
     case SCHEME_QcqpSolverOutput:
       return "x, cost, lam_a, lam_x";
-    case SCHEME_QCQPStruct:
-      return "h, p, a";
     case SCHEME_QpSolverInput:
       return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0";
     case SCHEME_QpSolverOutput:
       return "x, cost, lam_a, lam_x";
-    case SCHEME_QPStruct:
-      return "h, a";
     case SCHEME_SDPInput:
       return "f, c, g, a, lba, uba, lbx, ubx";
     case SCHEME_SDPOutput:
       return "x, p, dual, cost, dual_cost, lam_a, lam_x";
-    case SCHEME_SDPStruct:
-      return "f, g, a";
     case SCHEME_SDQPInput:
       return "h, c, f, g, a, lba, uba, lbx, ubx";
     case SCHEME_SDQPOutput:
       return "x, p, dual, cost, dual_cost, lam_a, lam_x";
-    case SCHEME_SDQPStruct:
-      return "h, f, g, a";
     case SCHEME_SOCPInput:
       return "g, h, e, f, c, a, lba, uba, lbx, ubx";
     case SCHEME_SOCPOutput:
@@ -209,11 +179,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_CLEOutput:
       if (i==0) return "p";
-      break;
-    case SCHEME_CleStruct:
-      if (i==0) return "a";
-      if (i==1) return "v";
-      if (i==2) return "c";
       break;
     case SCHEME_ControlledDAEInput:
       if (i==0) return "t";
@@ -238,20 +203,12 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
     case SCHEME_DLEOutput:
       if (i==0) return "p";
       break;
-    case SCHEME_DleStruct:
-      if (i==0) return "a";
-      if (i==1) return "v";
-      break;
     case SCHEME_DPLEInput:
       if (i==0) return "a";
       if (i==1) return "v";
       break;
     case SCHEME_DPLEOutput:
       if (i==0) return "p";
-      break;
-    case SCHEME_DpleVecStruct:
-      if (i==0) return "a";
-      if (i==1) return "v";
       break;
     case SCHEME_HNLPInput:
       if (i==0) return "x";
@@ -320,9 +277,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==2) return "lam_a";
       if (i==3) return "lam_x";
       break;
-    case SCHEME_LPStruct:
-      if (i==0) return "a";
-      break;
     case SCHEME_LR_DLEInput:
       if (i==0) return "a";
       if (i==1) return "v";
@@ -332,12 +286,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
     case SCHEME_LR_DLEOutput:
       if (i==0) return "y";
       break;
-    case SCHEME_LrDleStruct:
-      if (i==0) return "a";
-      if (i==1) return "v";
-      if (i==2) return "c";
-      if (i==3) return "h";
-      break;
     case SCHEME_LR_DPLEInput:
       if (i==0) return "a";
       if (i==1) return "v";
@@ -346,12 +294,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_LR_DPLEOutput:
       if (i==0) return "y";
-      break;
-    case SCHEME_LrDpleVecStruct:
-      if (i==0) return "a";
-      if (i==1) return "v";
-      if (i==2) return "c";
-      if (i==3) return "h";
       break;
     case SCHEME_NLPInput:
       if (i==0) return "x";
@@ -430,11 +372,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==2) return "lam_a";
       if (i==3) return "lam_x";
       break;
-    case SCHEME_QCQPStruct:
-      if (i==0) return "h";
-      if (i==1) return "p";
-      if (i==2) return "a";
-      break;
     case SCHEME_QpSolverInput:
       if (i==0) return "h";
       if (i==1) return "g";
@@ -451,10 +388,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==1) return "cost";
       if (i==2) return "lam_a";
       if (i==3) return "lam_x";
-      break;
-    case SCHEME_QPStruct:
-      if (i==0) return "h";
-      if (i==1) return "a";
       break;
     case SCHEME_SDPInput:
       if (i==0) return "f";
@@ -475,11 +408,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==5) return "lam_a";
       if (i==6) return "lam_x";
       break;
-    case SCHEME_SDPStruct:
-      if (i==0) return "f";
-      if (i==1) return "g";
-      if (i==2) return "a";
-      break;
     case SCHEME_SDQPInput:
       if (i==0) return "h";
       if (i==1) return "c";
@@ -499,12 +427,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==4) return "dual_cost";
       if (i==5) return "lam_a";
       if (i==6) return "lam_x";
-      break;
-    case SCHEME_SDQPStruct:
-      if (i==0) return "h";
-      if (i==1) return "f";
-      if (i==2) return "g";
-      if (i==3) return "a";
       break;
     case SCHEME_SOCPInput:
       if (i==0) return "g";
@@ -559,11 +481,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_CLEOutput:
       if (i==0) return "Lyapunov matrix";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_CleStruct:
-      if (i==0) return "The matrix A";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The matrix V";  // NOLINT(whitespace/line_length)
-      if (i==2) return "The matrix C (defaults to unity)";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_ControlledDAEInput:
       if (i==0) return "Global physical time. (1-by-1)";  // NOLINT(whitespace/line_length)
       if (i==1) return "non-zeros as DAEOutput:DAE_RES";  // NOLINT(whitespace/line_length)
@@ -587,20 +504,12 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_DLEOutput:
       if (i==0) return "P matrix";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_DleStruct:
-      if (i==0) return "The matrix A";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The matrix V";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_DPLEInput:
       if (i==0) return "A matrices (horzcat when const_dim, diagcat otherwise)";  // NOLINT(whitespace/line_length)
       if (i==1) return "V matrices (horzcat when const_dim, diagcat otherwise)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_DPLEOutput:
       if (i==0) return "Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def)";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_DpleVecStruct:
-      if (i==0) return "Sparsities for A_i, block diagonal form";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Sparsities for V_i, block diagonal form";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_HNLPInput:
       if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
@@ -669,9 +578,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
       if (i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_LPStruct:
-      if (i==0) return "The matrix A: sparse";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_LR_DLEInput:
       if (i==0) return "A matrix";  // NOLINT(whitespace/line_length)
       if (i==1) return "V matrix";  // NOLINT(whitespace/line_length)
@@ -681,12 +587,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_LR_DLEOutput:
       if (i==0) return "Y matrix, block diagonal form";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_LrDleStruct:
-      if (i==0) return "The matrix A";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The matrix V";  // NOLINT(whitespace/line_length)
-      if (i==2) return "The matrix C (defaults to unity)";  // NOLINT(whitespace/line_length)
-      if (i==3) return "H matrix: horizontal stack of all Hi";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_LR_DPLEInput:
       if (i==0) return "A matrices (horzcat when const_dim, diagcat otherwise)";  // NOLINT(whitespace/line_length)
       if (i==1) return "V matrices (horzcat when const_dim, diagcat otherwise)";  // NOLINT(whitespace/line_length)
@@ -695,12 +595,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_LR_DPLEOutput:
       if (i==0) return "Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def)";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_LrDpleVecStruct:
-      if (i==0) return "Sparsities for A_i, block diagonal form";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Sparsities for V_i, block diagonal form";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Sparsities for C_i (defaults to unity), block diagonal form";  // NOLINT(whitespace/line_length)
-      if (i==3) return "Sparsities for H_i (defaults to unity), block diagonal form";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_NLPInput:
       if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
@@ -779,11 +673,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
       if (i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_QCQPStruct:
-      if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if (i==1) return "triangular part is actually used. The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if (i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_QpSolverInput:
       if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
       if (i==1) return "The vector g: dense,  (n x 1)";  // NOLINT(whitespace/line_length)
@@ -800,10 +689,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==1) return "The optimal cost";  // NOLINT(whitespace/line_length)
       if (i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
       if (i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_QPStruct:
-      if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SDPInput:
       if (i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
@@ -824,11 +709,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==5) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
       if (i==6) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_SDPStruct:
-      if (i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
-      if (i==2) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_SDQPInput:
       if (i==0) return "The matrix H: sparse ( n x n)";  // NOLINT(whitespace/line_length)
       if (i==1) return "The vector c: ( n x 1)";  // NOLINT(whitespace/line_length)
@@ -848,12 +728,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==4) return "The dual optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
       if (i==5) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
       if (i==6) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_SDQPStruct:
-      if (i==0) return "The matrix H: sparse ( n x n)";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
-      if (i==2) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
-      if (i==3) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SOCPInput:
       if (i==0) return "The horizontal stack of all matrices Gi: ( n x N)";  // NOLINT(whitespace/line_length)
@@ -908,11 +782,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
     case SCHEME_CLEOutput:
       if (i==0) return "CLE_P";
       break;
-    case SCHEME_CleStruct:
-      if (i==0) return "Cle_STRUCT_A";
-      if (i==1) return "Cle_STRUCT_V";
-      if (i==2) return "Cle_STRUCT_C";
-      break;
     case SCHEME_ControlledDAEInput:
       if (i==0) return "CONTROL_DAE_T";
       if (i==1) return "CONTROL_DAE_X";
@@ -936,20 +805,12 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
     case SCHEME_DLEOutput:
       if (i==0) return "DLE_P";
       break;
-    case SCHEME_DleStruct:
-      if (i==0) return "Dle_STRUCT_A";
-      if (i==1) return "Dle_STRUCT_V";
-      break;
     case SCHEME_DPLEInput:
       if (i==0) return "DPLE_A";
       if (i==1) return "DPLE_V";
       break;
     case SCHEME_DPLEOutput:
       if (i==0) return "DPLE_P";
-      break;
-    case SCHEME_DpleVecStruct:
-      if (i==0) return "Dple_STRUCT_A";
-      if (i==1) return "Dple_STRUCT_V";
       break;
     case SCHEME_HNLPInput:
       if (i==0) return "HNL_X";
@@ -1018,9 +879,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==2) return "LP_SOLVER_LAM_A";
       if (i==3) return "LP_SOLVER_LAM_X";
       break;
-    case SCHEME_LPStruct:
-      if (i==0) return "LP_STRUCT_A";
-      break;
     case SCHEME_LR_DLEInput:
       if (i==0) return "LR_DLE_A";
       if (i==1) return "LR_DLE_V";
@@ -1030,12 +888,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
     case SCHEME_LR_DLEOutput:
       if (i==0) return "LR_DLE_Y";
       break;
-    case SCHEME_LrDleStruct:
-      if (i==0) return "LR_DLE_STRUCT_A";
-      if (i==1) return "LR_DLE_STRUCT_V";
-      if (i==2) return "LR_DLE_STRUCT_C";
-      if (i==3) return "LR_DLE_STRUCT_H";
-      break;
     case SCHEME_LR_DPLEInput:
       if (i==0) return "LR_DPLE_A";
       if (i==1) return "LR_DPLE_V";
@@ -1044,12 +896,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_LR_DPLEOutput:
       if (i==0) return "LR_DPLE_Y";
-      break;
-    case SCHEME_LrDpleVecStruct:
-      if (i==0) return "LR_Dple_STRUCT_A";
-      if (i==1) return "LR_Dple_STRUCT_V";
-      if (i==2) return "LR_Dple_STRUCT_C";
-      if (i==3) return "LR_Dple_STRUCT_H";
       break;
     case SCHEME_NLPInput:
       if (i==0) return "NL_X";
@@ -1128,11 +974,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==2) return "QCQP_SOLVER_LAM_A";
       if (i==3) return "QCQP_SOLVER_LAM_X";
       break;
-    case SCHEME_QCQPStruct:
-      if (i==0) return "QCQP_STRUCT_H";
-      if (i==1) return "QCQP_STRUCT_P";
-      if (i==2) return "QCQP_STRUCT_A";
-      break;
     case SCHEME_QpSolverInput:
       if (i==0) return "QP_SOLVER_H";
       if (i==1) return "QP_SOLVER_G";
@@ -1149,10 +990,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==1) return "QP_SOLVER_COST";
       if (i==2) return "QP_SOLVER_LAM_A";
       if (i==3) return "QP_SOLVER_LAM_X";
-      break;
-    case SCHEME_QPStruct:
-      if (i==0) return "QP_STRUCT_H";
-      if (i==1) return "QP_STRUCT_A";
       break;
     case SCHEME_SDPInput:
       if (i==0) return "SDP_SOLVER_F";
@@ -1173,11 +1010,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==5) return "SDP_SOLVER_LAM_A";
       if (i==6) return "SDP_SOLVER_LAM_X";
       break;
-    case SCHEME_SDPStruct:
-      if (i==0) return "SDP_STRUCT_F";
-      if (i==1) return "SDP_STRUCT_G";
-      if (i==2) return "SDP_STRUCT_A";
-      break;
     case SCHEME_SDQPInput:
       if (i==0) return "SDQP_SOLVER_H";
       if (i==1) return "SDQP_SOLVER_C";
@@ -1197,12 +1029,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==4) return "SDQP_SOLVER_DUAL_COST";
       if (i==5) return "SDQP_SOLVER_LAM_A";
       if (i==6) return "SDQP_SOLVER_LAM_X";
-      break;
-    case SCHEME_SDQPStruct:
-      if (i==0) return "SDQP_STRUCT_H";
-      if (i==1) return "SDQP_STRUCT_F";
-      if (i==2) return "SDQP_STRUCT_G";
-      if (i==3) return "SDQP_STRUCT_A";
       break;
     case SCHEME_SOCPInput:
       if (i==0) return "SOCP_SOLVER_G";
@@ -1257,9 +1083,6 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_CLEOutput:
       return 1;
       break;
-    case SCHEME_CleStruct:
-      return 3;
-      break;
     case SCHEME_ControlledDAEInput:
       return 9;
       break;
@@ -1272,17 +1095,11 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_DLEOutput:
       return 1;
       break;
-    case SCHEME_DleStruct:
-      return 2;
-      break;
     case SCHEME_DPLEInput:
       return 2;
       break;
     case SCHEME_DPLEOutput:
       return 1;
-      break;
-    case SCHEME_DpleVecStruct:
-      return 2;
       break;
     case SCHEME_HNLPInput:
       return 3;
@@ -1317,26 +1134,17 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_LpSolverOutput:
       return 4;
       break;
-    case SCHEME_LPStruct:
-      return 1;
-      break;
     case SCHEME_LR_DLEInput:
       return 4;
       break;
     case SCHEME_LR_DLEOutput:
       return 1;
       break;
-    case SCHEME_LrDleStruct:
-      return 4;
-      break;
     case SCHEME_LR_DPLEInput:
       return 4;
       break;
     case SCHEME_LR_DPLEOutput:
       return 1;
-      break;
-    case SCHEME_LrDpleVecStruct:
-      return 4;
       break;
     case SCHEME_NLPInput:
       return 2;
@@ -1374,17 +1182,11 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_QcqpSolverOutput:
       return 4;
       break;
-    case SCHEME_QCQPStruct:
-      return 3;
-      break;
     case SCHEME_QpSolverInput:
       return 9;
       break;
     case SCHEME_QpSolverOutput:
       return 4;
-      break;
-    case SCHEME_QPStruct:
-      return 2;
       break;
     case SCHEME_SDPInput:
       return 8;
@@ -1392,17 +1194,11 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_SDPOutput:
       return 7;
       break;
-    case SCHEME_SDPStruct:
-      return 3;
-      break;
     case SCHEME_SDQPInput:
       return 9;
       break;
     case SCHEME_SDQPOutput:
       return 7;
-      break;
-    case SCHEME_SDQPStruct:
-      return 4;
       break;
     case SCHEME_SOCPInput:
       return 10;
@@ -1428,11 +1224,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
     case SCHEME_CLEOutput:
       if (name=="p") return 0;
       break;
-    case SCHEME_CleStruct:
-      if (name=="a") return 0;
-      if (name=="v") return 1;
-      if (name=="c") return 2;
-      break;
     case SCHEME_ControlledDAEInput:
       if (name=="t") return 0;
       if (name=="x") return 1;
@@ -1456,20 +1247,12 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
     case SCHEME_DLEOutput:
       if (name=="p") return 0;
       break;
-    case SCHEME_DleStruct:
-      if (name=="a") return 0;
-      if (name=="v") return 1;
-      break;
     case SCHEME_DPLEInput:
       if (name=="a") return 0;
       if (name=="v") return 1;
       break;
     case SCHEME_DPLEOutput:
       if (name=="p") return 0;
-      break;
-    case SCHEME_DpleVecStruct:
-      if (name=="a") return 0;
-      if (name=="v") return 1;
       break;
     case SCHEME_HNLPInput:
       if (name=="x") return 0;
@@ -1538,9 +1321,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="lam_a") return 2;
       if (name=="lam_x") return 3;
       break;
-    case SCHEME_LPStruct:
-      if (name=="a") return 0;
-      break;
     case SCHEME_LR_DLEInput:
       if (name=="a") return 0;
       if (name=="v") return 1;
@@ -1550,12 +1330,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
     case SCHEME_LR_DLEOutput:
       if (name=="y") return 0;
       break;
-    case SCHEME_LrDleStruct:
-      if (name=="a") return 0;
-      if (name=="v") return 1;
-      if (name=="c") return 2;
-      if (name=="h") return 3;
-      break;
     case SCHEME_LR_DPLEInput:
       if (name=="a") return 0;
       if (name=="v") return 1;
@@ -1564,12 +1338,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       break;
     case SCHEME_LR_DPLEOutput:
       if (name=="y") return 0;
-      break;
-    case SCHEME_LrDpleVecStruct:
-      if (name=="a") return 0;
-      if (name=="v") return 1;
-      if (name=="c") return 2;
-      if (name=="h") return 3;
       break;
     case SCHEME_NLPInput:
       if (name=="x") return 0;
@@ -1648,11 +1416,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="lam_a") return 2;
       if (name=="lam_x") return 3;
       break;
-    case SCHEME_QCQPStruct:
-      if (name=="h") return 0;
-      if (name=="p") return 1;
-      if (name=="a") return 2;
-      break;
     case SCHEME_QpSolverInput:
       if (name=="h") return 0;
       if (name=="g") return 1;
@@ -1669,10 +1432,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="cost") return 1;
       if (name=="lam_a") return 2;
       if (name=="lam_x") return 3;
-      break;
-    case SCHEME_QPStruct:
-      if (name=="h") return 0;
-      if (name=="a") return 1;
       break;
     case SCHEME_SDPInput:
       if (name=="f") return 0;
@@ -1693,11 +1452,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="lam_a") return 5;
       if (name=="lam_x") return 6;
       break;
-    case SCHEME_SDPStruct:
-      if (name=="f") return 0;
-      if (name=="g") return 1;
-      if (name=="a") return 2;
-      break;
     case SCHEME_SDQPInput:
       if (name=="h") return 0;
       if (name=="c") return 1;
@@ -1717,12 +1471,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="dual_cost") return 4;
       if (name=="lam_a") return 5;
       if (name=="lam_x") return 6;
-      break;
-    case SCHEME_SDQPStruct:
-      if (name=="h") return 0;
-      if (name=="f") return 1;
-      if (name=="g") return 2;
-      if (name=="a") return 3;
       break;
     case SCHEME_SOCPInput:
       if (name=="g") return 0;

@@ -48,42 +48,41 @@ namespace casadi {
     /** \brief  Clone function */
     virtual Multiplication* clone() const { return new Multiplication(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const std::vector<const T*>& input,
-                 const std::vector<T*>& output, int* itmp, T* rtmp);
+    void evalGen(const T** arg, T** res, int* iw, T* w);
 
     /// Evaluate the function numerically
-    virtual void evalD(const cpv_double& input, const pv_double& output,
-                       int* itmp, double* rtmp);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                            int* itmp, SXElement* rtmp);
+    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
 
-    /** \brief  Evaluate the function symbolically (MX) */
-    virtual void eval(const cpv_MX& arg, const pv_MX& res);
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens);
+    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens);
+    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const cpv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(const bvec_t** arg,
+                       bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const pv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(bvec_t** arg,
+                       bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_MATMUL;}
@@ -92,11 +91,12 @@ namespace casadi {
     virtual int numInplace() const { return 1;}
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const MXNode* node, int depth) const
-    { return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication*>(node)!=0;}
+    virtual bool zz_isEqual(const MXNode* node, int depth) const {
+      return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication*>(node)!=0;
+    }
 
-    /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr) { ni=0; nr=sparsity().size1();}
+    /** \brief Get required length of w field */
+    virtual size_t sz_w() const { return sparsity().size1();}
   };
 
 
@@ -119,8 +119,8 @@ namespace casadi {
     virtual DenseMultiplication* clone() const { return new DenseMultiplication(*this);}
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
   };
 
 

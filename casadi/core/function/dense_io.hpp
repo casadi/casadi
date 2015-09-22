@@ -65,16 +65,16 @@ void DenseIO<Derived>::init() {
 
   Derived* d = static_cast<Derived*>(this);
 
-  dense_inputs_.resize(d->getNumInputs());
-  dense_outputs_.resize(d->getNumOutputs());
+  dense_inputs_.resize(d->nIn());
+  dense_outputs_.resize(d->nOut());
 
-  for (int i=0;i< d->getNumInputs();++i) {
-    if (!d->input(i).isDense()) {
+  for (int i=0;i< d->nIn();++i) {
+    if (!d->input(i).isdense()) {
       dense_inputs_[i] = densify(d->input(i));
     }
   }
-  for (int i=0;i< d->getNumOutputs();++i) {
-    if (!d->output(i).isDense()) {
+  for (int i=0;i< d->nOut();++i) {
+    if (!d->output(i).isdense()) {
       dense_outputs_[i] = densify(d->output(i));
     }
   }
@@ -85,7 +85,7 @@ template< class Derived>
 DMatrix & DenseIO<Derived>::inputD(int i) {
   Derived* d = static_cast<Derived*>(this);
 
-  if (d->input(i).isDense()) {
+  if (d->input(i).isdense()) {
     return d->input(i);
   } else {
     return dense_inputs_[i];
@@ -96,7 +96,7 @@ template< class Derived>
 const DMatrix & DenseIO<Derived>::inputD(int i) const {
   Derived* d = static_cast<Derived*>(this);
 
-  if (d->input(i).isDense()) {
+  if (d->input(i).isdense()) {
     return d->input(i);
   } else {
     return dense_inputs_[i];
@@ -107,7 +107,7 @@ template< class Derived>
 DMatrix & DenseIO<Derived>::outputD(int i) {
   Derived* d = static_cast<Derived*>(this);
 
-  if (d->output(i).isDense()) {
+  if (d->output(i).isdense()) {
     return d->output(i);
   } else {
     return dense_outputs_[i];
@@ -118,7 +118,7 @@ template< class Derived>
 const DMatrix & DenseIO<Derived>::outputD(int i) const {
   Derived* d = static_cast<Derived*>(this);
 
-  if (d->output(i).isDense()) {
+  if (d->output(i).isdense()) {
     return d->output(i);
   } else {
     return dense_outputs_[i];
@@ -130,8 +130,8 @@ void DenseIO<Derived>::readInputs() {
 
   Derived* d = static_cast<Derived*>(this);
 
-  for (int i=0;i< d->getNumInputs();++i) {
-    if (!d->input(i).isDense()) {
+  for (int i=0;i< d->nIn();++i) {
+    if (!d->input(i).isdense()) {
       inputD(i).set(d->input(i));
     }
   }
@@ -143,8 +143,8 @@ void DenseIO<Derived>::writeOutputs() {
 
   Derived* d = static_cast<Derived*>(this);
 
-  for (int i=0;i< d->getNumOutputs();++i) {
-    if (!d->output(i).isDense()) {
+  for (int i=0;i< d->nOut();++i) {
+    if (!d->output(i).isdense()) {
       d->setOutput(outputD(i), i);
     }
   }

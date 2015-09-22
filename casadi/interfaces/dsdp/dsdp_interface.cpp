@@ -26,8 +26,6 @@
 #include "dsdp_interface.hpp"
 
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
 /**
    Some implementation details
@@ -54,13 +52,17 @@ namespace casadi {
 
   DsdpInterface* DsdpInterface::clone() const {
     // Return a deep copy
-    DsdpInterface* node = new DsdpInterface(st_);
+    DsdpInterface* node =
+      new DsdpInterface(make_map("h", st_[SDP_SOLVER_A],
+                                 "g", st_[SDP_SOLVER_G],
+                                 "f", st_[SDP_SOLVER_F]));
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  DsdpInterface::DsdpInterface(const std::vector<Sparsity> &st) : SdpSolverInternal(st) {
+  DsdpInterface::DsdpInterface(const std::map<std::string, Sparsity> &st)
+    : SdpSolverInternal(st) {
     casadi_assert_message(
       static_cast<double>(m_)*(static_cast<double>(m_)+1)/2 < std::numeric_limits<int>::max(),
       "Your problem size m is too large to be handled by DSDP.");
@@ -180,8 +182,7 @@ namespace casadi {
       MX lba = horzcat(fmax(fmin(LBA, dsdp_inf), -dsdp_inf), A).T();
       MX uba = horzcat(fmax(fmin(UBA, dsdp_inf), -dsdp_inf), A).T();
 
-      mappingA_ = MXFunction(syms, horzcat(-lba, uba).T());
-      mappingA_.init();
+      mappingA_ = MXFunction("mappingA", syms, make_vector(horzcat(-lba, uba).T()));
     }
 
     if (calc_dual_) {

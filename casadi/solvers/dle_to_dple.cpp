@@ -26,9 +26,6 @@
 #include "dle_to_dple.hpp"
 #include <cassert>
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
@@ -54,8 +51,7 @@ namespace casadi {
     DleInternal::registerPlugin(casadi_register_dlesolver_dple);
   }
 
-  DleToDple::DleToDple(
-         const DleStructure& st) : DleInternal(st) {
+  DleToDple::DleToDple(const std::map<std::string, Sparsity>& st) : DleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_dle_to_dple"); // name of the function
@@ -71,29 +67,36 @@ namespace casadi {
     // Initialize the base classes
     DleInternal::init();
 
+    // Solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
+
     // Create a DpleSolver instance
-    solver_ = DpleSolver(getOption(solvername()),
-                         dpleStruct("a", std::vector<Sparsity>(1, A_),
-                                    "v", std::vector<Sparsity>(1, V_)));
-    solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = std::vector<Sparsity>(1, A_);
+    tmp["v"] = std::vector<Sparsity>(1, V_);
+    solver_ = DpleSolver("solver", getOption(solvername()), tmp, options);
   }
 
   void DleToDple::evaluate() {
-    for (int i=0;i<getNumInputs();++i) {
+    for (int i=0;i<nIn();++i) {
       std::copy(input(i).begin(), input(i).end(), solver_.input(i).begin());
     }
     solver_.evaluate();
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       std::copy(solver_.output(i).begin(), solver_.output(i).end(), output(i).begin());
     }
   }
 
-  Function DleToDple::getDerForward(int nfwd) {
+  Function DleToDple
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     return solver_.derForward(nfwd);
   }
 
-  Function DleToDple::getDerReverse(int nadj) {
+  Function DleToDple
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     return solver_.derReverse(nadj);
   }
 
@@ -104,7 +107,8 @@ namespace casadi {
 
   DleToDple* DleToDple::clone() const {
     // Return a deep copy
-    DleToDple* node = new DleToDple(st_);
+    DleToDple* node =
+      new DleToDple(make_map("a", st_[Dle_STRUCT_A], "v", st_[Dle_STRUCT_V]));
     node->setOption(dictionary());
     return node;
   }

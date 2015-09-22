@@ -26,9 +26,6 @@
 #include "lr_dple_internal.hpp"
 #include "lr_dle_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "../mx/mx_tools.hpp"
-#include "../sx/sx_tools.hpp"
 #include "../function/mx_function.hpp"
 #include "../function/sx_function.hpp"
 
@@ -38,10 +35,9 @@ OUTPUTSCHEME(LR_DPLEOutput)
 using namespace std;
 namespace casadi {
 
-  LrDpleInternal::LrDpleInternal(const LrDpleStructure & st,
-                             int nrhs,
-                             bool transp) :
-      st_(st), nrhs_(nrhs), transp_(transp) {
+  LrDpleInternal::LrDpleInternal(const std::map<std::string, std::vector<Sparsity> > &st,
+                                 int nrhs, bool transp) :
+    nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -56,11 +52,26 @@ namespace casadi {
               "has eigenvalues greater than 1-eps_unstable");
     addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
 
-    if (nrhs_==1) {
-      input_.scheme = SCHEME_LR_DPLEInput;
-      output_.scheme = SCHEME_LR_DPLEOutput;
+    st_.resize(LR_Dple_STRUCT_NUM);
+    for (std::map<std::string, std::vector<Sparsity> >::const_iterator i=st.begin();
+         i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[LR_Dple_STRUCT_A]=i->second;
+      } else if (i->first=="v") {
+        st_[LR_Dple_STRUCT_V]=i->second;
+      } else if (i->first=="c") {
+        st_[LR_Dple_STRUCT_C]=i->second;
+      } else if (i->first=="h") {
+        st_[LR_Dple_STRUCT_H]=i->second;
+      } else {
+        casadi_error("Unrecognized field in LR Dple structure: " << i->first);
+      }
     }
 
+    if (nrhs_==1) {
+      ischeme_ = IOScheme(SCHEME_LR_DPLEInput);
+      oscheme_ = IOScheme(SCHEME_LR_DPLEOutput);
+    }
   }
 
   LrDpleInternal::~LrDpleInternal() {
@@ -138,7 +149,7 @@ namespace casadi {
     int m = with_C_? V_[0].size1(): n;
 
     for (int k=0;k<K_;++k) {
-      casadi_assert_message(V_[k].isSymmetric(), "V_i must be symmetric but got "
+      casadi_assert_message(V_[k].issymmetric(), "V_i must be symmetric but got "
                             << V_[k].dimString() << " for i = " << k << ".");
       if (with_C_) {
         casadi_assert_message(n==C_[k].size1(), "Number of rows in C ("
@@ -174,7 +185,7 @@ namespace casadi {
     }
 
     // Allocate inputs
-    setNumInputs(LR_DPLE_NUM_IN);
+    ibuf_.resize(LR_DPLE_NUM_IN);
 
     if (const_dim_) {
       input(LR_DPLE_A)  = DMatrix::zeros(horzcat(A_));
@@ -199,9 +210,13 @@ namespace casadi {
     }*/
 
     // Allocate outputs
-    std::vector<Sparsity> P = getSparsity(st_, Hs_);
-
-    setNumOutputs(nrhs_*LR_DPLE_NUM_OUT);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[LR_Dple_STRUCT_A];
+    tmp["v"] = st_[LR_Dple_STRUCT_V];
+    tmp["c"] = st_[LR_Dple_STRUCT_C];
+    tmp["h"] = st_[LR_Dple_STRUCT_H];
+    std::vector<Sparsity> P = getSparsity(tmp, Hs_);
+    obuf_.resize(nrhs_*LR_DPLE_NUM_OUT);
     for (int i=0;i<nrhs_;++i) {
       if (const_dim_) {
         output(i) = DMatrix::zeros(horzcat(P));
@@ -223,16 +238,17 @@ namespace casadi {
   const std::string LrDpleInternal::infix_ = "lrdplesolver";
 
 
-  std::vector<Sparsity> LrDpleInternal::getSparsity(
-    const LrDpleStructure& st, const std::vector< std::vector<int> > &Hs_) {
-
+  std::vector<Sparsity>
+  LrDpleInternal::getSparsity(const std::map<std::string, std::vector<Sparsity> >& st,
+                              const std::vector< std::vector<int> > &Hs_) {
     // Chop-up the arguments
-    std::vector<Sparsity> As = st[LR_Dple_STRUCT_A];
-    std::vector<Sparsity> Vs = st[LR_Dple_STRUCT_V];
-    std::vector<Sparsity> Cs = st[LR_Dple_STRUCT_C];
-    std::vector<Sparsity> Hs = st[LR_Dple_STRUCT_H];
+    std::vector<Sparsity> As, Vs, Cs, Hs;
+    if (st.count("a")) As = st.at("a");
+    if (st.count("v")) Vs = st.at("v");
+    if (st.count("c")) Cs = st.at("c");
+    if (st.count("h")) Hs = st.at("h");
 
-    bool with_H = !st[LR_Dple_STRUCT_H].empty();
+    bool with_H = !Hs.empty();
 
     int K = As.size();
 
@@ -250,7 +266,7 @@ namespace casadi {
     Sparsity V = diagcat(Vs.back(), diagcat(vector_slice(Vs, range(Vs.size()-1))));
     Sparsity C;
 
-    if (!st[LR_Dple_STRUCT_C].empty()) {
+    if (!Cs.empty()) {
       C = diagcat(Cs.back(), diagcat(vector_slice(Cs, range(Cs.size()-1))));
     }
     Sparsity H;
@@ -270,7 +286,7 @@ namespace casadi {
       }
     }
 
-    Sparsity res = LrDleInternal::getSparsity(lrdleStruct("a", A, "v", V, "c", C, "h", H), Hs_agg);
+    Sparsity res = LrDleInternal::getSparsity(make_map("a", A, "v", V, "c", C, "h", H), Hs_agg);
 
     if (with_H) {
       return diagsplit(res, Hi);

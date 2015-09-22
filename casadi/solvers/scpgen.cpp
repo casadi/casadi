@@ -57,7 +57,7 @@ namespace casadi {
     casadi_warning("SCPgen is under development");
     addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
-    addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
+    addOption("qp_solver_options", OT_DICT, GenericType(),
               "Options to be passed to the QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",
               "gauss-newton|exact");
@@ -162,9 +162,10 @@ namespace casadi {
     if (fg.isNull()) {
       vector<MX> nlp_in = nlp_.symbolicInput();
       vector<MX> nlp_out = nlp_(nlp_in);
-      fg = MXFunction(nlp_in, nlp_out);
+      fg = MXFunction("fg", nlp_in, nlp_out);
+    } else {
+      fg.init();
     }
-    fg.init();
 
     if (codegen_) {
 #ifdef WITH_DL
@@ -180,8 +181,6 @@ namespace casadi {
     // Generate lifting functions
     MXFunction vdef_fcn, vinit_fcn;
     fg.generateLiftingFunctions(vdef_fcn, vinit_fcn);
-    vdef_fcn.init();
-    vinit_fcn.init();
     vinit_fcn_ = vinit_fcn;
 
     // Extract the expressions
@@ -259,7 +258,7 @@ namespace casadi {
       g_lam = MX::sym("g_lam", ng_);
 
       if (verbose_) {
-        cout << "Allocated intermediate variables." << endl;
+        userOut() << "Allocated intermediate variables." << endl;
       }
 
       // Adjoint sweep to get the definitions of the lifted dual variables
@@ -274,20 +273,20 @@ namespace casadi {
       i=0;
 
       gL_defL = asens[0].at(i++);
-      if (gL_defL.isNull()) gL_defL = MX(x_.sparsity()); // Needed?
+      if (gL_defL.isNull()) gL_defL = MX::zeros(x_.sparsity()); // Needed?
 
       p_defL = asens[0].at(i++);
-      if (p_defL.isNull()) p_defL = MX(p_.sparsity()); // Needed?
+      if (p_defL.isNull()) p_defL = MX::zeros(p_.sparsity()); // Needed?
 
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         it->v_defL = asens[0].at(i++);
         if (it->v_defL.isNull()) {
-          it->v_defL = MX(it->v.sparsity());
+          it->v_defL = MX::zeros(it->v.sparsity());
         }
       }
 
       if (verbose_) {
-        cout << "Generated the gradient of the Lagrangian." << endl;
+        userOut() << "Generated the gradient of the Lagrangian." << endl;
       }
     }
     gL_.resize(nx_, numeric_limits<double>::quiet_NaN());
@@ -328,17 +327,9 @@ namespace casadi {
     }
 
     // Generate function
-    MXFunction res_fcn(res_fcn_in, res_fcn_out);
-    res_fcn.init();
+    MXFunction res_fcn("res", res_fcn_in, res_fcn_out);
     if (verbose_) {
-      cout << "Generated residual function ( " << res_fcn.getAlgorithmSize() << " nodes)." << endl;
-    }
-
-    // Generate c code and load as DLL
-    if (codegen_) {
-      res_fcn_ = dynamicCompilation(res_fcn, "res_fcn", "residual function", compiler);
-    } else {
-      res_fcn_ = res_fcn;
+      userOut() << "Generated residual function ( " << res_fcn.countNodes() << " nodes)." << endl;
     }
 
     // Declare difference vector d and substitute out p and v
@@ -426,8 +417,7 @@ namespace casadi {
     mfcn_out.push_back(gL_z);                            mod_gl_ = n++;
 
     // Lagrangian gradient function
-    MXFunction lgrad(mfcn_in, mfcn_out);
-    lgrad.init();
+    MXFunction lgrad("lgrad", mfcn_in, mfcn_out);
 
     // Jacobian of the constraints
     MX jac = lgrad.jac(mod_x_, mod_g_);
@@ -446,15 +436,7 @@ namespace casadi {
     vector<MX> mat_out;
     mat_out.push_back(jac);                             mat_jac_ = n++;
     mat_out.push_back(hes);                             mat_hes_ = n++;
-    MXFunction mat_fcn(mfcn_in, mat_out);
-    mat_fcn.init();
-
-    // Generate c code and load as DLL
-    if (codegen_) {
-      mat_fcn_ = dynamicCompilation(mat_fcn, "mat_fcn", "Matrices function", compiler);
-    } else {
-      mat_fcn_ = mat_fcn;
-    }
+    MXFunction mat_fcn("mfcn", mfcn_in, mat_out);
 
     // Definition of intermediate variables
     n = mfcn_out.size();
@@ -466,8 +448,7 @@ namespace casadi {
     }
 
     // Modifier function
-    MXFunction mfcn(mfcn_in, mfcn_out);
-    mfcn.init();
+    MXFunction mfcn("mfcn", mfcn_in, mfcn_out);
 
     // Directional derivative of Z
     vector<vector<MX> > mfcn_fwdSeed(1, mfcn_in), mfcn_fwdSens(1, mfcn_out);
@@ -499,19 +480,10 @@ namespace casadi {
     vec_fcn_out.push_back(b_g);                               vec_g_ = n++;
     casadi_assert(n==vec_fcn_out.size());
 
-    MXFunction vec_fcn(mfcn_in, vec_fcn_out);
-    vec_fcn.setOption("name", "vec_fcn");
-    vec_fcn.init();
+    MXFunction vec_fcn("vec_fcn", mfcn_in, vec_fcn_out);
     if (verbose_) {
-      cout << "Generated linearization function ( " << vec_fcn.getAlgorithmSize()
+      userOut() << "Generated linearization function ( " << vec_fcn.countNodes()
            << " nodes)." << endl;
-    }
-
-    // Generate c code and load as DLL
-    if (codegen_) {
-      vec_fcn_ = dynamicCompilation(vec_fcn, "vec_fcn", "linearization function", compiler);
-    } else {
-      vec_fcn_ = vec_fcn;
     }
 
     // Expression a + A*du in Lifted Newton (Section 2.1 in Alberspeyer2010)
@@ -558,42 +530,70 @@ namespace casadi {
     }
 
     // Step expansion function
-    MXFunction exp_fcn(mfcn_in, exp_fcn_out);
-    exp_fcn.setOption("name", "exp_fcn");
-    exp_fcn.init();
+    MXFunction exp_fcn("exp_fcn", mfcn_in, exp_fcn_out);
     if (verbose_) {
-      cout << "Generated step expansion function ( " << exp_fcn.getAlgorithmSize() << " nodes)."
+      userOut() << "Generated step expansion function ( " << exp_fcn.countNodes() << " nodes)."
            << endl;
     }
 
     // Generate c code and load as DLL
     if (codegen_) {
-      exp_fcn_ = dynamicCompilation(exp_fcn, "exp_fcn", "step expansion function", compiler);
+      // Codegen the functions
+      CodeGenerator gen;
+      gen.add(res_fcn, "res_fcn");
+      gen.add(mat_fcn, "mat_fcn");
+      gen.add(vec_fcn, "vec_fcn");
+      gen.add(exp_fcn, "exp_fcn");
+
+      // Filenames
+      string name = "scpgen_codegen";
+
+      // Complile and run
+      if (verbose_) {
+        userOut() << "Starting compilation"  << endl;
+      }
+      time_t time1 = time(0);
+      string dlname = gen.compile(name, compiler);
+      time_t time2 = time(0);
+      double comp_time = difftime(time2, time1);
+      if (verbose_) {
+        userOut() << "Compilation completed after " << comp_time << " s."  << endl;
+      }
+
+      // Load the generated code
+      res_fcn_ = ExternalFunction("res_fcn", dlname);
+      res_fcn_.init();
+      mat_fcn_ = ExternalFunction("mat_fcn", dlname);
+      mat_fcn_.init();
+      vec_fcn_ = ExternalFunction("vec_fcn", dlname);
+      vec_fcn_.init();
+      exp_fcn_ = ExternalFunction("exp_fcn", dlname);
+      exp_fcn_.init();
     } else {
+      mat_fcn_ = mat_fcn;
+      res_fcn_ = res_fcn;
+      vec_fcn_ = vec_fcn;
       exp_fcn_ = exp_fcn;
     }
 
     // Allocate QP data
     Sparsity sp_B_obj = mat_fcn_.output(mat_hes_).sparsity();
-    qpH_ = DMatrix(sp_B_obj.T().patternProduct(sp_B_obj));
+    qpH_ = DMatrix::zeros(sp_B_obj.T().patternProduct(sp_B_obj));
     qpA_ = mat_fcn_.output(mat_jac_);
     qpB_.resize(ng_);
 
-    // Allocate a QP solver
-    std::string qp_solver_name = getOption("qp_solver");
-    qp_solver_ = QpSolver(qp_solver_name,
-                          qpStruct("h", qpH_.sparsity(), "a", qpA_.sparsity()));
-
-    // Set options if provided
+    // QP solver options
+    Dict qp_solver_options;
     if (hasSetOption("qp_solver_options")) {
-      Dictionary qp_solver_options = getOption("qp_solver_options");
-      qp_solver_.setOption(qp_solver_options);
+      qp_solver_options = getOption("qp_solver_options");
     }
 
-    // Initialize the QP solver
-    qp_solver_.init();
+    // Allocate a QP solver
+    qp_solver_ = QpSolver("qp_solver", getOption("qp_solver"),
+                          make_map("h", qpH_.sparsity(), "a", qpA_.sparsity()),
+                          qp_solver_options);
     if (verbose_) {
-      cout << "Allocated QP solver." << endl;
+      userOut() << "Allocated QP solver." << endl;
     }
 
     // Residual
@@ -608,17 +608,17 @@ namespace casadi {
     }
 
     if (verbose_) {
-      cout << "NLP preparation completed" << endl;
+      userOut() << "NLP preparation completed" << endl;
     }
 
     // Header
     if (static_cast<bool>(getOption("print_header"))) {
-      cout << "-------------------------------------------" << endl;
-      cout << "This is casadi::SCPgen." << endl;
+      userOut() << "-------------------------------------------" << endl;
+      userOut() << "This is casadi::SCPgen." << endl;
       if (gauss_newton_) {
-        cout << "Using Gauss-Newton Hessian" << endl;
+        userOut() << "Using Gauss-Newton Hessian" << endl;
       } else {
-        cout << "Using exact Hessian" << endl;
+        userOut() << "Using exact Hessian" << endl;
       }
 
       // Count the total number of variables
@@ -627,29 +627,31 @@ namespace casadi {
         n_lifted += i->n;
       }
 
-      cout << endl;
-      cout << "Number of reduced variables:               " << setw(9) << nx_ << endl;
-      cout << "Number of reduced constraints:             " << setw(9) << ng_ << endl;
-      cout << "Number of lifted variables/constraints:    " << setw(9) << n_lifted << endl;
-      cout << "Number of parameters:                      " << setw(9) << np_ << endl;
-      cout << "Total number of variables:                 " << setw(9) << (nx_+n_lifted) << endl;
-      cout << "Total number of constraints:               " << setw(9) << (ng_+n_lifted) << endl;
-      cout << endl;
-      cout << "Iteration options:" << endl;
+      userOut()
+        << endl
+        << "Number of reduced variables:               " << setw(9) << nx_ << endl
+        << "Number of reduced constraints:             " << setw(9) << ng_ << endl
+        << "Number of lifted variables/constraints:    " << setw(9) << n_lifted << endl
+        << "Number of parameters:                      " << setw(9) << np_ << endl
+        << "Total number of variables:                 " << setw(9) << (nx_+n_lifted) << endl
+        << "Total number of constraints:               " << setw(9) << (ng_+n_lifted) << endl
+        << endl;
 
-      cout << "{ \"max_iter\":" << max_iter_ << ", ";
-      cout << "\"max_iter_ls\":" << max_iter_ls_ << ", ";
-      cout << "\"c1\":" << c1_ << ", ";
-      cout << "\"beta\":" << beta_ << ", ";
-      cout << "\"merit_memsize\":" << merit_memsize_ << ", ";
-      cout << "\"merit_start\":" << merit_start_ << ", ";
-      cout << "\"regularize\":" << regularize_ << ", ";
-      cout << endl << "  ";
-      cout << "\"tol_pr\":" << tol_pr_ << ", ";
-      cout << "\"tol_du\":" << tol_du_ << ", ";
-      cout << "\"tol_reg\":" << tol_reg_ << ", ";
-      cout << "\"reg_threshold\":" << reg_threshold_ << "}" << endl;
-      cout << endl;
+      userOut()
+        << "Iteration options:" << endl
+        << "{ \"max_iter\":" << max_iter_ << ", "
+        << "\"max_iter_ls\":" << max_iter_ls_ << ", "
+        << "\"c1\":" << c1_ << ", "
+        << "\"beta\":" << beta_ << ", "
+        << "\"merit_memsize\":" << merit_memsize_ << ", "
+        << "\"merit_start\":" << merit_start_ << ", "
+        << "\"regularize\":" << regularize_ << ", "
+        << endl << "  "
+        << "\"tol_pr\":" << tol_pr_ << ", "
+        << "\"tol_du\":" << tol_du_ << ", "
+        << "\"tol_reg\":" << tol_reg_ << ", "
+        << "\"reg_threshold\":" << reg_threshold_ << "}" << endl
+        << endl;
     }
   }
 
@@ -672,15 +674,15 @@ namespace casadi {
 
     if (v_.size()>0) {
       // Initialize lifted variables using the generated function
-      vinit_fcn_.setInput(x_init_, 0);
+      vinit_fcn_.setInputNZ(x_init_, 0);
       vinit_fcn_.setInput(input(NLP_SOLVER_P), 1);
       vinit_fcn_.evaluate();
       for (int i=0; i<v_.size(); ++i) {
-        vinit_fcn_.getOutput(v_[i].init, i);
+        vinit_fcn_.getOutputNZ(v_[i].init, i);
       }
     }
     if (verbose_) {
-      cout << "Passed initial guess" << endl;
+      userOut() << "Passed initial guess" << endl;
     }
 
     // Reset dual guess
@@ -748,29 +750,30 @@ namespace casadi {
       double du_inf = dualInfeasibility();
 
       // Print header occasionally
-      if (iter % 10 == 0) printIteration(cout);
+      if (iter % 10 == 0) printIteration(userOut());
 
       // Printing information about the actual iterate
-      printIteration(cout, iter, f_, pr_inf, du_inf, reg_, ls_iter, ls_success);
+      printIteration(userOut(), iter, f_, pr_inf, du_inf, reg_, ls_iter, ls_success);
 
       // Checking convergence criteria
       bool converged = pr_inf <= tol_pr_ && pr_step_ <= tol_pr_step_ && reg_ <= tol_reg_;
       converged = converged && du_inf <= tol_du_;
       if (converged) {
-        cout << endl;
-        cout << "casadi::SCPgen: Convergence achieved after " << iter << " iterations." << endl;
+        userOut()
+          << endl
+          << "casadi::SCPgen: Convergence achieved after " << iter << " iterations." << endl;
         break;
       }
 
       if (iter >= max_iter_) {
-        cout << endl;
-        cout << "casadi::SCPgen: Maximum number of iterations reached." << endl;
+        userOut() << endl;
+        userOut() << "casadi::SCPgen: Maximum number of iterations reached." << endl;
         break;
       }
 
       // Check if not-a-number
       if (f_!=f_ || pr_step_ != pr_step_ || pr_inf != pr_inf) {
-        cout << "casadi::SCPgen: Aborted, nan detected" << endl;
+        userOut() << "casadi::SCPgen: Aborted, nan detected" << endl;
         break;
       }
 
@@ -796,7 +799,7 @@ namespace casadi {
     t_mainloop_ = (time2-time1)/CLOCKS_PER_SEC;
 
     // Store optimal value
-    cout << "optimal cost = " << f_ << endl;
+    userOut() << "optimal cost = " << f_ << endl;
 
     // Save results to outputs
     output(NLP_SOLVER_F).set(f_);
@@ -807,19 +810,19 @@ namespace casadi {
 
     // Write timers
     if (print_time_) {
-      cout << endl;
-      cout << "time spent in eval_mat:    " << setw(9) << t_eval_mat_ << " s." << endl;
-      cout << "time spent in eval_res:    " << setw(9) << t_eval_res_ << " s." << endl;
-      cout << "time spent in eval_vec:    " << setw(9) << t_eval_vec_ << " s." << endl;
-      cout << "time spent in eval_exp:    " << setw(9) << t_eval_exp_ << " s." << endl;
-      cout << "time spent in solve_qp:    " << setw(9) << t_solve_qp_ << " s." << endl;
-      cout << "time spent in main loop:   " << setw(9) << t_mainloop_ << " s." << endl;
+      userOut() << endl;
+      userOut() << "time spent in eval_mat:    " << setw(9) << t_eval_mat_ << " s." << endl;
+      userOut() << "time spent in eval_res:    " << setw(9) << t_eval_res_ << " s." << endl;
+      userOut() << "time spent in eval_vec:    " << setw(9) << t_eval_vec_ << " s." << endl;
+      userOut() << "time spent in eval_exp:    " << setw(9) << t_eval_exp_ << " s." << endl;
+      userOut() << "time spent in solve_qp:    " << setw(9) << t_solve_qp_ << " s." << endl;
+      userOut() << "time spent in main loop:   " << setw(9) << t_mainloop_ << " s." << endl;
     }
 
     // Save statistics
     stats_["iter_count"] = iter;
 
-    cout << endl;
+    userOut() << endl;
   }
 
   double Scpgen::primalInfeasibility() {
@@ -917,16 +920,16 @@ namespace casadi {
     mat_fcn_.setInput(input(NLP_SOLVER_P), mod_p_);
 
     // Pass primal step/variables
-    mat_fcn_.setInput(x_opt_, mod_x_);
+    mat_fcn_.setInputNZ(x_opt_, mod_x_);
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      mat_fcn_.setInput(it->res, it->mod_var);
+      mat_fcn_.setInputNZ(it->res, it->mod_var);
     }
 
     // Pass dual steps/variables
     if (!gauss_newton_) {
-      mat_fcn_.setInput(g_lam_, mod_g_lam_);
+      mat_fcn_.setInputNZ(g_lam_, mod_g_lam_);
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        mat_fcn_.setInput(it->resL, it->mod_lam);
+        mat_fcn_.setInputNZ(it->resL, it->mod_lam);
       }
     }
 
@@ -976,16 +979,16 @@ namespace casadi {
     res_fcn_.setInput(input(NLP_SOLVER_P), res_p_);
 
     // Pass primal variables to the residual function for initial evaluation
-    res_fcn_.setInput(x_opt_, res_x_);
+    res_fcn_.setInputNZ(x_opt_, res_x_);
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      res_fcn_.setInput(it->opt, it->res_var);
+      res_fcn_.setInputNZ(it->opt, it->res_var);
     }
 
     // Pass dual variables to the residual function for initial evaluation
     if (!gauss_newton_) {
       res_fcn_.setInput(0.0, res_g_lam_);
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        res_fcn_.setInput(it->lam, it->res_lam);
+        res_fcn_.setInputNZ(it->lam, it->res_lam);
       }
     }
 
@@ -997,19 +1000,19 @@ namespace casadi {
 
     // Get objective gradient
     if (gauss_newton_) {
-      res_fcn_.getOutput(b_gn_, res_gl_);
+      res_fcn_.getOutputNZ(b_gn_, res_gl_);
     } else {
-      res_fcn_.getOutput(gf_, res_gl_);
+      res_fcn_.getOutputNZ(gf_, res_gl_);
     }
 
     // Get constraints
-    res_fcn_.getOutput(g_, res_g_);
+    res_fcn_.getOutputNZ(g_, res_g_);
 
     // Get residuals
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      res_fcn_.getOutput(it->res,  it->res_d);
+      res_fcn_.getOutputNZ(it->res,  it->res_d);
       if (!gauss_newton_) {
-        res_fcn_.getOutput(it->resL, it->res_lam_d);
+        res_fcn_.getOutputNZ(it->resL, it->res_lam_d);
       }
     }
 
@@ -1028,16 +1031,16 @@ namespace casadi {
     vec_fcn_.setInput(input(NLP_SOLVER_P), mod_p_);
 
     // Pass primal step/variables
-    vec_fcn_.setInput(x_opt_, mod_x_);
+    vec_fcn_.setInputNZ(x_opt_, mod_x_);
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      vec_fcn_.setInput(it->res, it->mod_var);
+      vec_fcn_.setInputNZ(it->res, it->mod_var);
     }
 
     // Pass dual steps/variables
     if (!gauss_newton_) {
       vec_fcn_.setInput(0.0, mod_g_lam_);
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        vec_fcn_.setInput(it->resL, it->mod_lam);
+        vec_fcn_.setInputNZ(it->resL, it->mod_lam);
       }
     }
 
@@ -1097,7 +1100,7 @@ namespace casadi {
 
     // Solve the QP
     qp_solver_.setInput(qpH_, QP_SOLVER_H);
-    qp_solver_.setInput(gf_, QP_SOLVER_G);
+    qp_solver_.setInputNZ(gf_, QP_SOLVER_G);
     qp_solver_.setInput(qpA_, QP_SOLVER_A);
     std::transform(x_lb_.begin(), x_lb_.end(), x_opt_.begin(),
                    qp_solver_.input(QP_SOLVER_LBX).begin(), std::minus<double>());
@@ -1252,18 +1255,18 @@ namespace casadi {
     exp_fcn_.setInput(input(NLP_SOLVER_P), mod_p_);
 
     // Pass primal step/variables
-    exp_fcn_.setInput(x_step_, mod_du_);
-    exp_fcn_.setInput(x_opt_, mod_x_);
+    exp_fcn_.setInputNZ(x_step_, mod_du_);
+    exp_fcn_.setInputNZ(x_opt_, mod_x_);
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      exp_fcn_.setInput(it->res, it->mod_var);
+      exp_fcn_.setInputNZ(it->res, it->mod_var);
     }
 
     // Pass dual step/variables
     if (!gauss_newton_) {
-      exp_fcn_.setInput(g_dlam_, mod_dlam_g_);
-      exp_fcn_.setInput(g_lam_, mod_g_lam_);
+      exp_fcn_.setInputNZ(g_dlam_, mod_dlam_g_);
+      exp_fcn_.setInputNZ(g_lam_, mod_g_lam_);
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        exp_fcn_.setInput(it->resL, it->mod_lam);
+        exp_fcn_.setInputNZ(it->resL, it->mod_lam);
       }
     }
 

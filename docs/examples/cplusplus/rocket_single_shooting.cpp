@@ -93,41 +93,42 @@ int main(){
   x0[2] = 1;
 
   // DAE residual function
-  SXFunction daefcn(daeIn("x",x, "p",u, "t",t),daeOut("ode",rhs));
-  daefcn.setOption("name","DAE residual");
+  SXFunction daefcn("dae_residual", daeIn("x", x, "p", u, "t", t), daeOut("ode", rhs));
 
-  // Integrator
-  Integrator integrator;
+  // Integrator options
+  string plugin;
+  Dict opts;
   if(sundials_integrator){
     if(explicit_integrator){
       // Explicit integrator (CVODES)
-      integrator = Integrator("cvodes", daefcn);
-      // integrator.setOption("exact_jacobian",true);
-      // integrator.setOption("linear_multistep_method","bdf"); // adams or bdf
-      // integrator.setOption("nonlinear_solver_iteration","newton"); // newton or functional
+      plugin = "cvodes";
+      // opts["exact_jacobian"] = true;
+      // opts["linear_multistep_method"] = "bdf"; // adams or bdf
+      // opts["nonlinear_solver_iteration"] = "newton"; // newton or functional
     } else {
       // Implicit integrator (IDAS)
-      integrator = Integrator("idas", daefcn);
-      integrator.setOption("calc_ic",false);
+      plugin = "idas";
+      opts["calc_ic"] = false;
     }
-    integrator.setOption("fsens_err_con",true);
-    integrator.setOption("quad_err_con",true);
-    integrator.setOption("abstol",1e-6);
-    integrator.setOption("reltol",1e-6);
-    integrator.setOption("stop_at_end",false);
-    //  integrator.setOption("fsens_all_at_once",false);
-    integrator.setOption("steps_per_checkpoint",100); // BUG: Too low number causes segfaults
+    opts["fsens_err_con"] = true;
+    opts["quad_err_con"] = true;
+    opts["abstol"] = 1e-6;
+    opts["reltol"] = 1e-6;
+    opts["stop_at_end"] = false;
+    //  opts["fsens_all_at_once"] = false;
+    opts["steps_per_checkpoint"] = 100; // BUG: Too low number causes segfaults
   } else {
     // An explicit Euler integrator
-    integrator = Integrator("rk", daefcn);
-    integrator.setOption("expand_f",true);
-    integrator.setOption("interpolation_order",1);
-    integrator.setOption("number_of_finite_elements",1000);
+    plugin = "rk";
+    opts["expand_f"] = true;
+    opts["interpolation_order"] = 1;
+    opts["number_of_finite_elements"] = 1000;
   }
+  opts["t0"] = t0;
+  opts["tf"] = tf;
 
-  integrator.setOption("t0",t0);
-  integrator.setOption("tf",tf);
-  integrator.init();
+  // Create integrator
+  Integrator integrator("integrator", plugin, daefcn, opts);
 
   // control for all segments
   MX U = MX::sym("U",nu); 
@@ -135,13 +136,8 @@ int main(){
   // Integrate over all intervals
   MX X=X0;
   for(int k=0; k<nu; ++k){
-    // Assemble the input
-    vector<MX> input(INTEGRATOR_NUM_IN);
-    input[INTEGRATOR_X0] = X;
-    input[INTEGRATOR_P] = U[k];
-
     // Integrate
-    X = integrator(input).at(0);
+    X = integrator(make_map("x0", X, "p", U[k])).at("xf");
 
     // Lift X
     if(lifted_newton){
@@ -156,62 +152,51 @@ int main(){
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  MXFunction nlp(nlpIn("x",U),nlpOut("f",F,"g",G));
+  MXFunction nlp("nlp", nlpIn("x", U), nlpOut("f", F, "g", G));
 
-  // Allocate an NLP solver
-  NlpSolver solver;
+  // NLP solver options
+  Dict solver_opts;
+  string solver_name;
   if(lifted_newton){
-    solver = NlpSolver("scpgen", nlp);
-
-    solver.setOption("verbose",true);
-    solver.setOption("regularize",false);
-    solver.setOption("max_iter_ls",1);
-    solver.setOption("max_iter",100);
-    
-    // Use IPOPT as QP solver
-    solver.setOption("qp_solver","nlp");
-    Dictionary qp_solver_options;
-    qp_solver_options["nlp_solver"] = "ipopt";
-    Dictionary ipopt_options;
+    solver_name = "scpgen";
+    solver_opts["verbose"] = true;
+    solver_opts["regularize"] = false;
+    solver_opts["max_iter_ls"] = 1;
+    solver_opts["max_iter"] = 100;
+    solver_opts["qp_solver"] = "nlp"; // Use IPOPT as QP solver
+    Dict ipopt_options;
     ipopt_options["tol"] = 1e-12;
     ipopt_options["print_level"] = 0;
     ipopt_options["print_time"] = false;
-    qp_solver_options["nlp_solver_options"] = ipopt_options;
-    solver.setOption("qp_solver_options",qp_solver_options);
+    solver_opts["qp_solver_options"] =
+      make_dict("nlp_solver_options", make_dict("nlp_solver", "ipopt"));
   } else {
-    solver = NlpSolver("ipopt", nlp);
-    
-    // Set options
-    solver.setOption("tol",1e-10);
-    solver.setOption("hessian_approximation","limited-memory");
+    solver_name = "ipopt";
+    solver_opts["tol"] = 1e-10;
+    solver_opts["hessian_approximation"] = "limited-memory";
   }
 
-  // initialize the solver
-  solver.init();
+  // NLP solver and buffers
+  NlpSolver solver("nlp_solver", solver_name, nlp, solver_opts);
+  std::map<std::string, DMatrix> arg, res;
 
   // Bounds on u and initial condition
-  vector<double> Umin(nu), Umax(nu), Usol(nu);
-  for(int i=0; i<nu; ++i){
-    Umin[i] = -10;
-    Umax[i] =  10;
-    Usol[i] = 0.4;
-  }
-  solver.setInput(Umin,"lbx");
-  solver.setInput(Umax,"ubx");
-  solver.setInput(Usol,"x0");
+  arg["lbx"] = -10;
+  arg["ubx"] = 10;
+  arg["x0"] = 0.4;
 
   // Bounds on g
-  vector<double> Gmin(2), Gmax(2);
-  Gmin[0] = Gmax[0] = 10;
-  Gmin[1] = Gmax[1] =  0;
-  solver.setInput(Gmin,"lbg");
-  solver.setInput(Gmax,"ubg");
+  vector<double> gmin(2), gmax(2);
+  gmin[0] = gmax[0] = 10;
+  gmin[1] = gmax[1] =  0;
+  arg["lbg"] = gmin;
+  arg["ubg"] = gmax;
 
   // Solve the problem
-  solver.evaluate();
+  res = solver(arg);
 
   // Get the solution
-  solver.getOutput(Usol,"x");
+  vector<double> Usol(res.at("x"));
   cout << "optimal solution: " << Usol << endl;
 
   return 0;

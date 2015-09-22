@@ -77,25 +77,17 @@ int main(){
   g.append(v);
   g.append(v_traj);
 
-  // Create the NLP
-  SXFunction nlp(nlpIn("x",u),nlpOut("f",f,"g",g));
+  // Create an NLP
+  SXFunction nlp("nlp", nlpIn("x", u), nlpOut("f", f, "g", g));
 
-  // Allocate an NLP solver
-  NlpSolver solver("snopt", nlp);
-
-  // initialize the solver
-  solver.init();
+  // Create an NLP solver and buffers
+  NlpSolver solver("solver", "snopt", nlp);
+  std::map<std::string, DMatrix> arg, res;
 
   // Bounds on u and initial condition
-  vector<double> umin(nu), umax(nu), uinit(nu);
-  for(int i=0; i<nu; ++i){
-    umin[i] = -10;
-    umax[i] =  10;
-    uinit[i] = 0.4;
-  }
-  solver.setInput(umin,"lbx");
-  solver.setInput(umax,"ubx");
-  solver.setInput(uinit,"x0");
+  arg["lbx"] = -10;
+  arg["ubx"] = 10;
+  arg["x0"] = 0.4;
 
   // Bounds on g
   vector<double> gmin(2), gmax(2);
@@ -103,36 +95,26 @@ int main(){
   gmin[1] = gmax[1] =  0;
   gmin.resize(2+nu, -numeric_limits<double>::infinity());
   gmax.resize(2+nu, 1.1);
-
-  solver.setInput(gmin,"lbg");
-  solver.setInput(gmax,"ubg");
+  arg["lbg"] = gmin;
+  arg["ubg"] = gmax;
 
   // Solve the problem
-  solver.evaluate();
+  res = solver(arg);
 
   // Print the optimal cost
-  double cost;
-  solver.getOutput(cost,"f");
+  double cost(res.at("f"));
   cout << "optimal cost: " << cost << endl;
 
   // Print the optimal solution
-  vector<double> uopt(nu);
-  solver.getOutput(uopt,"x");
+  vector<double> uopt(res.at("x"));
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory
-  vector<double> sopt(nu), vopt(nu), mopt(nu);
-  vector<SX> xfcn_out(3);
-  xfcn_out[0] = s_traj;
-  xfcn_out[1] = v_traj;
-  xfcn_out[2] = m_traj;
-  SXFunction xfcn(u,xfcn_out);
-  xfcn.init();
-  xfcn.setInput(uopt);
-  xfcn.evaluate();
-  xfcn.getOutput(sopt,0);
-  xfcn.getOutput(vopt,1);
-  xfcn.getOutput(mopt,2);
+  SXFunction xfcn("xfcn", make_vector(u), make_vector(s_traj, v_traj, m_traj));
+  vector<DMatrix> xopt = xfcn(make_vector(DMatrix(uopt)));
+  vector<double> sopt(xopt.at(0));
+  vector<double> vopt(xopt.at(1));
+  vector<double> mopt(xopt.at(2));
   cout << "position: " << sopt << endl;
   cout << "velocity: " << vopt << endl;
   cout << "mass:     " << mopt << endl;

@@ -29,6 +29,8 @@ from types import *
 from helpers import *
 import random
 
+warnings.filterwarnings("ignore",category=DeprecationWarning)
+
 lsolvers = []
 try:
   LinearSolver.loadPlugin("csparse")
@@ -56,10 +58,9 @@ except:
 
 nsolvers = []
   
-def nullspacewrapper(sp):
+def nullspacewrapper(name, sp, options):
   a = SX.sym("a",sp)
-  f = SXFunction([a],[nullspace(a)])
-  f.init()
+  f = SXFunction(name, [a],[nullspace(a)],options)
   return f
   
 nsolvers.append((nullspacewrapper,{}))
@@ -79,7 +80,7 @@ class LinearSolverTests(casadiTestCase):
               ]:
       n ,m = A.shape
       for Solver, options in nsolvers:
-        solver = Solver(A.T.sparsity())
+        solver = Solver("solver",A.T.sparsity(),options)
         solver.setOption(options)
         solver.init()
         solver.setInput(A.T)
@@ -174,8 +175,7 @@ class LinearSolverTests(casadiTestCase):
       print Solver
       C = solve(A,b,Solver,options)
       
-      f = MXFunction([A,b],[C])
-      f.init()
+      f = MXFunction("f", [A,b],[C])
       f.setInput(A_,0)
       f.setInput(b_,1)
       f.evaluate()
@@ -194,15 +194,13 @@ class LinearSolverTests(casadiTestCase):
       print Solver
       B = pinv(A,Solver,options)
       
-      f = MXFunction([A],[B])
-      f.init()
+      f = MXFunction("f", [A],[B])
       f.setInput(A_,0)
       f.evaluate()
       
       self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(4))
       
-      f = SXFunction([As],[pinv(As)])
-      f.init()
+      f = SXFunction("f", [As],[pinv(As)])
       f.setInput(A_,0)
       f.evaluate()
       
@@ -222,15 +220,13 @@ class LinearSolverTests(casadiTestCase):
       print Solver
       B = pinv(A,Solver,options)
       
-      f = MXFunction([A],[B])
-      f.init()
+      f = MXFunction("f", [A],[B])
       f.setInput(A_,0)
       f.evaluate()
       
       self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(3)) 
       
-      f = SXFunction([As],[pinv(As)])
-      f.init()
+      f = SXFunction("f", [As],[pinv(As)])
       f.setInput(A_,0)
       f.evaluate()
       
@@ -251,9 +247,7 @@ class LinearSolverTests(casadiTestCase):
   def test_simple_trans(self):
     A = DMatrix([[3,1],[7,2]])
     for Solver, options in lsolvers:
-      solver = LinearSolver(Solver, A.sparsity())
-      solver.setOption(options)
-      solver.init()
+      solver = LinearSolver("solver", Solver, A.sparsity(), options)
       solver.setInput(A,"A")
 
       solver.prepare()
@@ -271,9 +265,7 @@ class LinearSolverTests(casadiTestCase):
     A = DMatrix([[3,1],[7,2]])
     for Solver, options in lsolvers:
       print Solver
-      solver = LinearSolver(Solver, A.sparsity())
-      solver.setOption(options)
-      solver.init()
+      solver = LinearSolver("solver", Solver, A.sparsity(), options)
       solver.setInput(A,"A")
 
       solver.prepare()
@@ -295,9 +287,7 @@ class LinearSolverTests(casadiTestCase):
     
     for Solver, options in lsolvers:
       print Solver
-      solver = LinearSolver(Solver, A.sparsity())
-      solver.setOption(options)
-      solver.init()
+      solver = LinearSolver("solver", Solver, A.sparsity(), options)
       solver.setInput(A_,"A")
       solver.setInput(b_,"B")
       
@@ -309,8 +299,7 @@ class LinearSolverTests(casadiTestCase):
       b_0 = b[0]
       b_1 = b[1]
       
-      solution = MXFunction(linsolIn(A=A,B=b),[vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
-      solution.init()
+      solution = MXFunction("solution", linsolIn(A=A,B=b),[vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
       
       solution.setInput(A_,"A")
       solution.setInput(b_,"B")
@@ -326,14 +315,11 @@ class LinearSolverTests(casadiTestCase):
     
     for Solver, options in lsolvers:
       print Solver
-      solver = LinearSolver(Solver, A.sparsity())
-      solver.setOption(options)
-      solver.init()
+      solver = LinearSolver("solver", Solver, A.sparsity(), options)
       solver.setInput(A_,"A")
       solver.setInput(b_,"B")
       
-      relay = MXFunction(linsolIn(A=A,B=b),solver.call(linsolIn(A=A,B=b)))
-      relay.init()
+      relay = MXFunction("relay", linsolIn(A=A,B=b),linsolOut(**solver({'A':A,'B':b})))
 
       relay.setInput(A_,"A")
       relay.setInput(b_,"B")
@@ -346,8 +332,7 @@ class LinearSolverTests(casadiTestCase):
       b_0 = b[0]
       b_1 = b[1]
       
-      solution = MXFunction(linsolIn(A=A,B=b),[vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
-      solution.init()
+      solution = MXFunction("solution", linsolIn(A=A,B=b),[vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
       
       solution.setInput(A_,"A")
       solution.setInput(b_,"B")
@@ -366,13 +351,10 @@ class LinearSolverTests(casadiTestCase):
       b = MX.sym("b",b_.sparsity())
       for Solver, options in lsolvers:
         print Solver
-        solver = LinearSolver(Solver, A.sparsity())
-        solver.setOption(options)
-        solver.init()
+        solver = LinearSolver("solver", Solver, A.sparsity(), options)
         for tr in [True, False]:
           x = solver.solve(A,b,tr)
-          f = MXFunction([A,b],[x])
-          f.init()
+          f = MXFunction("f", [A,b],[x])
           f.setInput(A_,0)
           f.setInput(b_,1)
           f.evaluate()
@@ -394,8 +376,7 @@ class LinearSolverTests(casadiTestCase):
           c_0 = b[0,1]
           c_1 = b[1,1]
           
-          solution = MXFunction([A,b],[blockcat([[(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),(((A_3/((A_0*A_3)-(A_2*A_1)))*c_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*c_1))],[((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*c_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*c_1))]])])
-          solution.init()
+          solution = MXFunction("solution", [A,b],[blockcat([[(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),(((A_3/((A_0*A_3)-(A_2*A_1)))*c_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*c_1))],[((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*c_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*c_1))]])])
           
           solution.setInput(A_,0)
           solution.setInput(b_,1)
@@ -422,9 +403,7 @@ class LinearSolverTests(casadiTestCase):
     
     M.sparsity().spy()
 
-    S = LinearSolver("csparsecholesky",M.sparsity())
-    
-    S.init()
+    S = LinearSolver("S", "csparsecholesky",M.sparsity())
     S.setInput(M)
     S.prepare()
     
@@ -450,10 +429,8 @@ class LinearSolverTests(casadiTestCase):
     M = mul(L,L.T)
 
     print L
-    S = LinearSolver("csparsecholesky",M.sparsity())
+    S = LinearSolver("S", "csparsecholesky", M.sparsity())
     
-
-    S.init()
     S.getFactorizationSparsity().spy()
     S.setInput(M)
     S.prepare()
@@ -475,8 +452,7 @@ class LinearSolverTests(casadiTestCase):
       
       self.checkarray(mul(A,C),b)
       
-      f = MXFunction([As,bs],[solve(As,bs,Solver,options)])
-      f.init()
+      f = MXFunction("f", [As,bs],[solve(As,bs,Solver,options)])
       f.setInput(A,0)
       f.setInput(b,1)
       f.evaluate()
@@ -498,8 +474,7 @@ class LinearSolverTests(casadiTestCase):
       self.checkarray(mul(A,C),b)
       
       for As_,A_ in [(As,A),(densify(As),densify(A)),(densify(As).T,densify(A).T),(densify(As.T),densify(A.T)),(As.T,A.T)]:
-        f = MXFunction([As,bs],[solve(As_,bs,Solver,options)])
-        f.init()
+        f = MXFunction("f", [As,bs],[solve(As_,bs,Solver,options)])
         f.setInput(A,0)
         f.setInput(b,1)
         f.evaluate()

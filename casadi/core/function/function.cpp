@@ -24,12 +24,12 @@
 
 
 #include "function_internal.hpp"
-#include "../mx/call_function.hpp"
 #include "../function/mx_function.hpp"
 #include <typeinfo>
 #include "../std_vector_tools.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "parallelizer.hpp"
+#include "../function/map.hpp"
+#include "../function/mapaccum.hpp"
+
 
 using namespace std;
 
@@ -76,51 +76,113 @@ namespace casadi {
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
-  vector<vector<MX> > Function::callParallel(const vector<vector<MX> > &x,
-                                             const Dictionary& paropt) {
+  Function Function::mapaccum(const std::string& name, int N, const Dict& options) const {
+    std::vector<bool> accum_input(nIn(), false);
+    accum_input[0] = true;
+    std::vector<int> accum_output(1, 0);
+    return MapAccum(name, *this, N, accum_input, accum_output, false, options);
+  }
+
+  Function Function::map(const std::string& name, int N, const Dict& options) const {
+    std::vector<bool> repeated_input(nIn(), true);
+    std::vector<bool> repeated_output(nOut(), true);
+    return Map(name, *this, N, repeated_input, repeated_output, options);
+  }
+
+  vector<vector<MX> > Function::map(const vector<vector<MX> > &x,
+                                    const std::string& parallelization) {
     assertInit();
+    if (x.empty()) return x;
 
-    // Make sure not empty
-    casadi_assert_message(x.size()>1, "Function: callParallel(vector<vector<MX> >): "
-                          "argument must be of length > 1. You supplied length "
-                          << x.size() << ".");
-
-    // Return object
-    vector<vector<MX> > ret(x.size());
-
-    // Check if we are bypassing the parallelizer
-    Dictionary::const_iterator ii=paropt.find("parallelization");
-    if (ii!=paropt.end() && ii->second=="expand") {
-      for (int i=0; i<x.size(); ++i) {
-        call(x[i], ret[i]);
-      }
-      return ret;
+    // Check if arguments match
+    int n = x.size();
+    bool matching=true;
+    for (int i=0; i<n; ++i) {
+      matching = matchingArg(x[i]) && matching; // non-short circuiting
     }
 
-    // Create parallelizer object and initialize it
-    Parallelizer p(vector<Function>(x.size(), *this));
-    p.setOption(paropt);
-    p.init();
-
-    // Concatenate the arguments
-    vector<MX> p_in;
-    p_in.reserve(x.size() * getNumInputs());
-    for (int i=0; i<x.size(); ++i) {
-      p_in.insert(p_in.end(), x[i].begin(), x[i].end());
-      p_in.resize(p_in.size()+getNumInputs()-x[i].size());
+    // Replace arguments if needed
+    if (!matching) {
+      vector<vector<MX> > x_new(n);
+      for (int i=0; i<n; ++i) x_new[i] = replaceArg(x[i]);
+      return map(x_new, parallelization);
     }
 
-    // Call the parallelizer
-    vector<MX> p_out = p(p_in);
-    casadi_assert(p_out.size() == x.size() * getNumOutputs());
-
-    // Collect the outputs
-    vector<MX>::const_iterator it=p_out.begin();
-    for (int i=0; i<x.size(); ++i) {
-      ret[i].insert(ret[i].end(), it, it+getNumOutputs());
-      it += getNumOutputs();
+    vector< vector<MX> > trans = swapIndices(x);
+    vector< MX > x_cat(trans.size());
+    for (int i=0;i<trans.size();++i) {
+      x_cat[i] = horzcat(trans[i]);
     }
-    return ret;
+
+    // Call the internal function
+    vector< MX > ret_cat = map(x_cat, parallelization);
+    vector< vector<MX> > ret;
+
+    for (int i=0;i<ret_cat.size();++i) {
+      ret.push_back(horzsplit(ret_cat[i], output(i).size2()));
+    }
+    return swapIndices(ret);
+
+  }
+
+  vector<MX> Function::map(const vector< MX > &x,
+                                    const std::string& parallelization) {
+    assertInit();
+    if (x.empty()) return x;
+
+    // Replace arguments if needed
+    if (!matchingArg(x, true)) {
+      vector< MX > x_new = replaceArg(x, true);
+      return map(x_new, parallelization);
+    }
+
+    int n = 1;
+    for (int i=0;i<x.size();++i) {
+      n = max(x[i].size2()/input(i).size2(), n);
+    }
+
+    std::vector<bool> repeat_n;
+    for (int i=0;i<x.size();++i) {
+      repeat_n.push_back(x[i].size2()/input(i).size2()==n);
+    }
+
+    // Call the internal function
+
+    Dict options;
+    options["parallelization"] = parallelization;
+    Function ms = Map("map", *this, n, repeat_n, std::vector<bool>(nOut(), true), options);
+
+    // Call the internal function
+    return ms(x);
+  }
+
+  vector<MX> Function::mapsum(const vector< MX > &x,
+                                    const std::string& parallelization) {
+    assertInit();
+    if (x.empty()) return x;
+
+    // Replace arguments if needed
+    if (!matchingArg(x, true)) {
+      vector< MX > x_new = replaceArg(x, true);
+      return mapsum(x_new, parallelization);
+    }
+
+    int n = 1;
+    for (int i=0;i<x.size();++i) {
+      n = max(x[i].size2()/input(i).size2(), n);
+    }
+
+    std::vector<bool> repeat_n;
+    for (int i=0;i<x.size();++i) {
+      repeat_n.push_back(x[i].size2()/input(i).size2()==n);
+    }
+
+    Dict options;
+    options["parallelization"] = parallelization;
+    Function ms = Map("mapsum", *this, n, repeat_n, std::vector<bool>(nOut(), false), options);
+
+    // Call the internal function
+    return ms(x);
   }
 
   void Function::evaluate() {
@@ -128,20 +190,28 @@ namespace casadi {
     (*this)->evaluate();
   }
 
-  int Function::getNumInputNonzeros() const {
-    return (*this)->getNumInputNonzeros();
+  int Function::nIn() const {
+    return (*this)->nIn();
   }
 
-  int Function::getNumOutputNonzeros() const {
-    return (*this)->getNumOutputNonzeros();
+  int Function::nOut() const {
+    return (*this)->nOut();
   }
 
-  int Function::getNumInputElements() const {
-    return (*this)->getNumInputElements();
+  int Function::nnzIn() const {
+    return (*this)->nnzIn();
   }
 
-  int Function::getNumOutputElements() const {
-    return (*this)->getNumOutputElements();
+  int Function::nnzOut() const {
+    return (*this)->nnzOut();
+  }
+
+  int Function::numelIn() const {
+    return (*this)->numelIn();
+  }
+
+  int Function::numelOut() const {
+    return (*this)->numelOut();
   }
 
   Function Function::jacobian(int iind, int oind, bool compact, bool symmetric) {
@@ -189,7 +259,7 @@ namespace casadi {
     (*this)->monitors_.erase(mon);
   }
 
-  const Dictionary & Function::getStats() const {
+  const Dict & Function::getStats() const {
     return (*this)->getStats();
   }
 
@@ -197,7 +267,7 @@ namespace casadi {
     return (*this)->getStat(name);
   }
 
-  Sparsity& Function::jacSparsity(int iind, int oind, bool compact, bool symmetric) {
+  const Sparsity Function::jacSparsity(int iind, int oind, bool compact, bool symmetric) {
     return (*this)->jacSparsity(iind, oind, compact, symmetric);
   }
 
@@ -205,32 +275,124 @@ namespace casadi {
     (*this)->setJacSparsity(sp, iind, oind, compact);
   }
 
-  std::vector<MX> Function::symbolicInput() const {
-    return (*this)->symbolicInput();
+  std::vector<MX> Function::symbolicInput(bool unique) const {
+    if (unique) {
+      return (*this)->FunctionInternal::symbolicInput();
+    } else {
+      return (*this)->symbolicInput();
+    }
   }
 
   std::vector<SX> Function::symbolicInputSX() const {
     return (*this)->symbolicInputSX();
   }
 
-  void Function::setInputScheme(const IOScheme &scheme) {
-    return (*this)->setInputScheme(scheme);
+  std::vector<MX> Function::symbolicOutput() const {
+    return (*this)->symbolicOutput();
   }
 
-  void Function::setOutputScheme(const IOScheme &scheme) {
-    return (*this)->setOutputScheme(scheme);
+  std::vector<std::string> Function::inputScheme() const {
+    return (*this)->ischeme_;
   }
 
-  IOScheme Function::getInputScheme() const {
-    return (*this)->getInputScheme();
+  std::vector<std::string> Function::outputScheme() const {
+    return (*this)->oscheme_;
   }
 
-  IOScheme Function::getOutputScheme() const {
-    return (*this)->getOutputScheme();
+  int Function::inputIndex(const std::string &name) const {
+    return (*this)->inputIndex(name);
+  }
+
+  int Function::outputIndex(const std::string &name) const {
+    return (*this)->outputIndex(name);
+  }
+
+  std::string Function::inputName(int ind) const {
+    return (*this)->inputName(ind);
+  }
+
+  std::string Function::outputName(int ind) const {
+    return (*this)->outputName(ind);
+  }
+
+  std::string Function::inputDescription(int ind) const {
+    return (*this)->inputDescription(ind);
+  }
+
+  std::string Function::outputDescription(int ind) const {
+    return (*this)->outputDescription(ind);
+  }
+
+  const Matrix<double>& Function::input(int i) const {
+    return (*this)->input(i);
+  }
+
+  const Matrix<double>& Function::input(const std::string &iname) const {
+    return (*this)->input(iname);
+  }
+
+  Sparsity Function::inputSparsity(int ind) const {
+    return (*this)->inputSparsity(ind);
+  }
+
+  Sparsity Function::inputSparsity(const std::string &iname) const {
+    return (*this)->inputSparsity(iname);
+  }
+
+  Sparsity Function::outputSparsity(int ind) const {
+    return (*this)->outputSparsity(ind);
+  }
+
+  Sparsity Function::outputSparsity(const std::string &iname) const {
+    return (*this)->outputSparsity(iname);
+  }
+
+  Matrix<double>& Function::input(int i) {
+    return (*this)->input(i);
+  }
+
+  Matrix<double>& Function::input(const std::string &iname) {
+    return (*this)->input(iname);
+  }
+
+  const Matrix<double>& Function::output(int i) const {
+    return (*this)->output(i);
+  }
+
+  const Matrix<double>& Function::output(const std::string &oname) const {
+    return (*this)->output(oname);
+  }
+
+  Matrix<double>& Function::output(int i) {
+    return (*this)->output(i);
+  }
+
+  Matrix<double>& Function::output(const std::string &oname) {
+    return (*this)->output(oname);
   }
 
   void Function::spEvaluate(bool fwd) {
     (*this)->spEvaluate(fwd);
+  }
+
+  void Function::sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const {
+    (*this)->sz_work(sz_arg, sz_res, sz_iw, sz_w);
+  }
+
+  size_t Function::sz_arg() const { return (*this)->sz_arg();}
+
+  size_t Function::sz_res() const { return (*this)->sz_res();}
+
+  size_t Function::sz_iw() const { return (*this)->sz_w();}
+
+  size_t Function::sz_w() const { return (*this)->sz_w();}
+
+  void Function::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    (*this)->spFwdSwitch(arg, res, iw, w);
+  }
+
+  void Function::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    (*this)->spAdjSwitch(arg, res, iw, w);
   }
 
   bool Function::spCanEvaluate(bool fwd) {
@@ -251,8 +413,8 @@ namespace casadi {
     vector<MX> ret_in(arg), ret_out(res);
 
     // Number inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int num_in = nIn();
+    int num_out = nOut();
 
     // Forward sensitivities
     if (nfwd>0) {
@@ -265,7 +427,7 @@ namespace casadi {
       vector<MX>::iterator it=res.begin();
       for (int d=0; d<nfwd; ++d)
         for (int i=0; i<num_out; ++i, ++it)
-          *it = it->setSparse(output(i).sparsity());
+          *it = project(*it, output(i).sparsity());
       ret_out.insert(ret_out.end(), res.begin(), res.end());
     }
 
@@ -280,85 +442,78 @@ namespace casadi {
       vector<MX>::iterator it=res.begin();
       for (int d=0; d<nadj; ++d)
         for (int i=0; i<num_in; ++i, ++it)
-          *it = it->setSparse(input(i).sparsity());
+          *it = project(*it, input(i).sparsity());
       ret_out.insert(ret_out.end(), res.begin(), res.end());
     }
 
-    // Construct return function
-    MXFunction ret(ret_in, ret_out);
-
-    // Give it a suitable name
+    // Name of return function
     stringstream ss;
     ss << "derivative_" << getOption("name") << "_" << nfwd << "_" << nadj;
-    ret.setOption("name", ss.str());
 
     // Names of inputs
     std::vector<std::string> i_names;
-    i_names.reserve(getNumInputs()*(1+nfwd)+getNumOutputs()*nadj);
+    i_names.reserve(nIn()*(1+nfwd)+nOut()*nadj);
+    const std::vector<std::string>& ischeme=(*this)->ischeme_;
+    const std::vector<std::string>& oscheme=(*this)->oscheme_;
 
     // Nondifferentiated inputs
-    for (int i=0; i<getNumInputs(); ++i) {
-      i_names.push_back("der_" + inputScheme().entryLabel(i));
+    for (int i=0; i<nIn(); ++i) {
+      i_names.push_back("der_" + ischeme.at(i));
     }
 
     // Forward seeds
     for (int d=0; d<nfwd; ++d) {
-      for (int i=0; i<getNumInputs(); ++i) {
+      for (int i=0; i<nIn(); ++i) {
         ss.str(string());
-        ss << "fwd" << d << "_" << inputScheme().entryLabel(i);
+        ss << "fwd" << d << "_" << ischeme.at(i);
         i_names.push_back(ss.str());
       }
     }
 
     // Adjoint seeds
     for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<getNumOutputs(); ++i) {
+      for (int i=0; i<nOut(); ++i) {
         ss.str(string());
-        ss << "adj" << d << "_" << outputScheme().entryLabel(i);
+        ss << "adj" << d << "_" << oscheme.at(i);
         i_names.push_back(ss.str());
       }
     }
 
-    // Pass to return object
-    ret.setInputScheme(i_names);
-
     // Names of outputs
     std::vector<std::string> o_names;
-    o_names.reserve(getNumOutputs()*(1+nfwd)+getNumInputs()*nadj);
+    o_names.reserve(nOut()*(1+nfwd)+nIn()*nadj);
 
     // Nondifferentiated inputs
-    for (int i=0; i<getNumOutputs(); ++i) {
-      o_names.push_back("der_" + outputScheme().entryLabel(i));
+    for (int i=0; i<nOut(); ++i) {
+      o_names.push_back("der_" + oscheme.at(i));
     }
 
     // Forward sensitivities
     for (int d=0; d<nfwd; ++d) {
-      for (int i=0; i<getNumOutputs(); ++i) {
+      for (int i=0; i<nOut(); ++i) {
         ss.str(string());
-        ss << "fwd" << d << "_" << outputScheme().entryLabel(i);
+        ss << "fwd" << d << "_" << oscheme.at(i);
         o_names.push_back(ss.str());
       }
     }
 
     // Adjoint sensitivities
     for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<getNumInputs(); ++i) {
+      for (int i=0; i<nIn(); ++i) {
         ss.str(string());
-        ss << "adj" << d << "_" << inputScheme().entryLabel(i);
+        ss << "adj" << d << "_" << ischeme.at(i);
         o_names.push_back(ss.str());
       }
     }
 
-    // Pass to return object
-    ret.setOutputScheme(o_names);
-
-    // Initialize it
-    ret.init();
+    // Construct return function
+    MXFunction ret(ss.str(), ret_in, ret_out,
+                   make_dict("input_scheme", i_names, "output_scheme", o_names));
 
     // Consistency check for inputs
     int ind=0;
     for (int d=-1; d<nfwd; ++d) {
-      for (int i=0; i<getNumInputs(); ++i, ++ind) {
+      for (int i=0; i<nIn(); ++i, ++ind) {
         if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=input(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " input " << ind << " \""
                        << i_names.at(ind) << "\". Expected " << input(i).dimString()
@@ -367,7 +522,7 @@ namespace casadi {
       }
     }
     for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<getNumOutputs(); ++i, ++ind) {
+      for (int i=0; i<nOut(); ++i, ++ind) {
         if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=output(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " input " << ind <<
                        " \"" << i_names.at(ind) << "\". Expected " << output(i).dimString()
@@ -379,7 +534,7 @@ namespace casadi {
     // Consistency check for outputs
     ind=0;
     for (int d=-1; d<nfwd; ++d) {
-      for (int i=0; i<getNumOutputs(); ++i, ++ind) {
+      for (int i=0; i<nOut(); ++i, ++ind) {
         if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=output(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " output " << ind <<
                        " \"" <<  o_names.at(ind) << "\". Expected " << output(i).dimString()
@@ -388,7 +543,7 @@ namespace casadi {
       }
     }
     for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<getNumInputs(); ++i, ++ind) {
+      for (int i=0; i<nIn(); ++i, ++ind) {
         if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=input(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " output " << ind << " \""
                        << o_names.at(ind) << "\". Expected " << input(i).dimString()
@@ -415,74 +570,18 @@ namespace casadi {
     (*this)->setDerReverse(fcn, nadj);
   }
 
-  void Function::generateCode(const string& filename, bool generate_main) {
-    // Detect a C++ ending
-    vector<string> cpp_endings;
-    cpp_endings.push_back(".cpp");
-    cpp_endings.push_back(".cxx");
-    cpp_endings.push_back(".cc");
-    cpp_endings.push_back(".cp");
-    cpp_endings.push_back(".c++");
-    for (vector<string>::const_iterator it=cpp_endings.begin(); it!=cpp_endings.end(); ++it) {
-      if (filename.size()>it->size() &&
-         filename.compare(filename.size()-it->size(), it->size(), *it)==0) {
-        casadi_warning("Function::generateCode: Detected C++ file ending "
-                       "(generated code is C, not C++)");
-      }
-    }
-
-    // Create a file
-    std::ofstream cfile;
-    cfile.open(filename.c_str());
-    generateCode(cfile, generate_main);
-    cfile.close();
+  void Function::printDimensions(std::ostream &stream) const {
+    (*this)->printDimensions(stream);
   }
 
-  void Function::generateFunction(std::ostream &stream, const std::string& fname,
-                                  const std::string& type, CodeGenerator& gen) const {
-    (*this)->generateFunction(stream, fname, type, gen);
+  void Function::generate(const Dict& opts) {
+    generate(getSanitizedName(), opts);
   }
 
-  std::string Function::generateCodeStr(bool generate_main) {
-    std::ostringstream cfile;
-    generateCode(cfile, generate_main);
-    return cfile.str();
-  }
-
-  void Function::generateCode(std::ostream &stream, bool generate_main) {
-    (*this)->generateCode(stream, generate_main);
-  }
-
-  const IOScheme& Function::inputScheme() const {
-    return (*this)->inputScheme();
-  }
-
-  const IOScheme& Function::outputScheme() const {
-    return (*this)->outputScheme();
-  }
-
-  IOScheme& Function::inputScheme() {
-    return (*this)->inputScheme();
-  }
-
-  IOScheme& Function::outputScheme() {
-    return (*this)->outputScheme();
-  }
-
-  const IOSchemeVector<DMatrix>& Function::input_struct() const {
-    return (*this)->input_struct();
-  }
-
-  const IOSchemeVector<DMatrix>& Function::output_struct() const {
-    return (*this)->output_struct();
-  }
-
-  IOSchemeVector<DMatrix>& Function::input_struct() {
-    return (*this)->input_struct();
-  }
-
-  IOSchemeVector<DMatrix>& Function::output_struct() {
-    return (*this)->output_struct();
+  void Function::generate(const string& fname, const Dict& opts) {
+    CodeGenerator gen(opts);
+    gen.add(*this, fname);
+    gen.generate(fname);
   }
 
   void Function::checkInputs() const {
@@ -518,6 +617,10 @@ namespace casadi {
 
   std::string Function::getSanitizedName() const {
     return (*this)->getSanitizedName();
+  }
+
+  std::string Function::sanitizeName(const std::string& name) {
+    return FunctionInternal::sanitizeName(name);
   }
 
   void Function::callForward(const std::vector<MX>& arg, const std::vector<MX>& res,
@@ -619,34 +722,62 @@ namespace casadi {
     return res;
   }
 
-  IOSchemeVector<DMatrix> Function::
-  operator()(const IOSchemeVector<DMatrix>& arg, bool always_inline, bool never_inline) {
-    return outputScheme().fromVector(operator()(arg.data, always_inline, never_inline));
+  template<typename M>
+  const std::map<std::string, M>
+  Function::callMap(const std::map<std::string, M>& arg, bool always_inline, bool never_inline) {
+    casadi_assert(isInit());
+
+    // Get default inputs
+    std::vector<M> v(nIn());
+    for (int i=0; i<v.size(); ++i) {
+      v[i] = defaultInput(i);
+    }
+
+    // Assign provided inputs
+    for (typename std::map<std::string, M>::const_iterator i=arg.begin(); i!=arg.end(); ++i) {
+      v.at(inputIndex(i->first)) = i->second;
+    }
+
+    // Make call
+    v = (*this)(v, always_inline, never_inline);
+
+    // Save to map
+    std::map<std::string, M> ret;
+    for (int i=0; i<v.size(); ++i) {
+      ret[outputName(i)] = v[i];
+    }
+    return ret;
   }
 
-  IOSchemeVector<SX> Function::
-  operator()(const IOSchemeVector<SX>& arg, bool always_inline, bool never_inline) {
-    return outputScheme().fromVector(operator()(arg.data, always_inline, never_inline));
+  const DMatrixDict Function::operator()(const DMatrixDict& arg, bool always_inline,
+                                         bool never_inline) {
+    return callMap(arg, always_inline, never_inline);
   }
 
-  IOSchemeVector<MX> Function::
-  operator()(const IOSchemeVector<MX>& arg, bool always_inline, bool never_inline) {
-    return outputScheme().fromVector(operator()(arg.data, always_inline, never_inline));
+  const SXDict Function::operator()(const SXDict& arg, bool always_inline,
+                                    bool never_inline) {
+    return callMap(arg, always_inline, never_inline);
   }
 
-  inline bool checkMat(const Sparsity& arg, const Sparsity& inp) {
-    return arg.shape()==inp.shape() || arg.isEmpty() || arg.isScalar() ||
+  const MXDict Function::operator()(const MXDict& arg, bool always_inline,
+                                    bool never_inline) {
+    return callMap(arg, always_inline, never_inline);
+  }
+
+  inline bool checkMat(const Sparsity& arg, const Sparsity& inp, bool hcat=false) {
+    return arg.shape()==inp.shape() || arg.isempty() || arg.isscalar() ||
       (inp.size2()==arg.size1() && inp.size1()==arg.size2()
-       && (arg.isVector() || inp.isVector()));
+       && (arg.iscolumn() || inp.iscolumn())) ||
+      (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0);
   }
 
   template<typename M>
-  void Function::checkArg(const std::vector<M>& arg) const {
-    int n_in = getNumInputs();
+  void Function::checkArg(const std::vector<M>& arg, bool hcat) const {
+    int n_in = nIn();
     casadi_assert_message(arg.size()==n_in, "Incorrect number of inputs: Expected "
                           << n_in << ", got " << arg.size());
     for (int i=0; i<n_in; ++i) {
-      casadi_assert_message(checkMat(arg[i].sparsity(), input(i).sparsity()),
+      casadi_assert_message(checkMat(arg[i].sparsity(), input(i).sparsity(), hcat),
                             "Input " << i << " has mismatching shape. Expected "
                             << input(i).shape() << ", got " << arg[i].shape());
     }
@@ -654,7 +785,7 @@ namespace casadi {
 
   template<typename M>
   void Function::checkRes(const std::vector<M>& res) const {
-    int n_out = getNumOutputs();
+    int n_out = nOut();
     casadi_assert_message(res.size()==n_out, "Incorrect number of outputs: Expected "
                           << n_out << ", got " << res.size());
     for (int i=0; i<n_out; ++i) {
@@ -666,7 +797,7 @@ namespace casadi {
 
   template<typename M>
   void Function::checkFwdSeed(const std::vector<std::vector<M> >& fseed) const {
-    int n_in = getNumInputs();
+    int n_in = nIn();
     for (int d=0; d<fseed.size(); ++d) {
       casadi_assert_message(fseed[d].size()==n_in,
                             "Incorrect number of forward seeds for direction " << d
@@ -682,7 +813,7 @@ namespace casadi {
 
   template<typename M>
   void Function::checkAdjSeed(const std::vector<std::vector<M> >& aseed) const {
-    int n_out = getNumOutputs();
+    int n_out = nOut();
     for (int d=0; d<aseed.size(); ++d) {
       casadi_assert_message(aseed[d].size()==n_out,
                             "Incorrect number of adjoint seeds for direction " << d
@@ -697,11 +828,16 @@ namespace casadi {
   }
 
   template<typename M>
-  bool Function::matchingArg(const std::vector<M>& arg) const {
-    checkArg(arg);
-    int n_in = getNumInputs();
+  bool Function::matchingArg(const std::vector<M>& arg, bool hcat) const {
+    checkArg(arg, hcat);
+    int n_in = nIn();
     for (int i=0; i<n_in; ++i) {
-      if (arg.at(i).shape()!=input(i).shape()) return false;
+      if (hcat) {
+        if (arg.at(i).size1()!=input(i).size1()) return false;
+        if (arg.at(i).size2() % input(i).size2()!=0 || arg.at(i).size2()==0) return false;
+      } else {
+        if (arg.at(i).shape()!=input(i).shape()) return false;
+      }
     }
     return true;
   }
@@ -709,7 +845,7 @@ namespace casadi {
   template<typename M>
   bool Function::matchingRes(const std::vector<M>& res) const {
     checkRes(res);
-    int n_out = getNumOutputs();
+    int n_out = nOut();
     for (int i=0; i<n_out; ++i) {
       if (res.at(i).shape()!=output(i).shape()) return false;
     }
@@ -735,28 +871,32 @@ namespace casadi {
   }
 
   template<typename M>
-  M replaceMat(const M& arg, const Sparsity& inp) {
+  M replaceMat(const M& arg, const Sparsity& inp, bool hcat=false) {
     if (arg.shape()==inp.shape()) {
       // Matching dimensions already
       return arg;
-    } else if (arg.isEmpty()) {
+    } else if (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0
+                    && arg.size2() >=0) {
+      // Matching horzcat dimensions
+      return arg;
+    } else if (arg.isempty()) {
       // Empty matrix means set zero
       return M(inp.shape());
-    } else if (arg.isScalar()) {
+    } else if (arg.isscalar()) {
       // Scalar assign means set all
       return M(inp, arg);
     } else {
       // Assign vector with transposing
       casadi_assert(arg.size1()==inp.size2() && arg.size2()==inp.size1()
-                    && (arg.isVector() || inp.isVector()));
+                    && (arg.iscolumn() || inp.iscolumn()));
       return arg.T();
     }
   }
 
   template<typename M>
-  std::vector<M> Function::replaceArg(const std::vector<M>& arg) const {
+  std::vector<M> Function::replaceArg(const std::vector<M>& arg, bool hcat) const {
     std::vector<M> r(arg.size());
-    for (int i=0; i<r.size(); ++i) r[i] = replaceMat(arg[i], input(i).sparsity());
+    for (int i=0; i<r.size(); ++i) r[i] = replaceMat(arg[i], input(i).sparsity(), hcat);
     return r;
   }
 
@@ -781,6 +921,14 @@ namespace casadi {
     std::vector<std::vector<M> > r(aseed.size());
     for (int d=0; d<r.size(); ++d) r[d] = replaceRes(aseed[d]);
     return r;
+  }
+
+  double Function::defaultInput(int ind) const {
+    return (*this)->defaultInput(ind);
+  }
+
+  void Function::operator()(const double** arg, double** res, int* iw, double* w) {
+    (*this)->eval(arg, res, iw, w);
   }
 
 } // namespace casadi

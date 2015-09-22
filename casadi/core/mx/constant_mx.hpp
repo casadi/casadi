@@ -63,28 +63,27 @@ namespace casadi {
     virtual ConstantMX* clone() const = 0;
 
     /// Evaluate the function numerically
-    virtual void evalD(const cpv_double& input, const pv_double& output, int* itmp, double* rtmp);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w) = 0;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                            int* itmp, SXElement* rtmp);
+    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) = 0;
 
-    /** \brief  Evaluate the function symbolically (MX) */
-    virtual void eval(const cpv_MX& input, const pv_MX& output);
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens);
+    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens);
+    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const cpv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const pv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_CONST;}
@@ -118,28 +117,24 @@ namespace casadi {
     /** \brief  Clone function */
     virtual ConstantDMatrix* clone() const { return new ConstantDMatrix(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const {
-      x_.print(stream);
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const {
+      return x_.getDescription();
     }
 
     /** \brief  Evaluate the function numerically */
-    virtual void evalD(const cpv_double& input, const pv_double& output,
-                           int* itmp, double* rtmp) {
-      std::copy(x_.begin(), x_.end(), output[0]);
-      ConstantMX::evalD(input, output, itmp, rtmp);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w) {
+      std::copy(x_.begin(), x_.end(), res[0]);
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                            int* itmp, SXElement* rtmp) {
-      std::copy(x_.begin(), x_.end(), output[0]);
-      ConstantMX::evalSX(input, output, itmp, rtmp);
+    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+      std::copy(x_.begin(), x_.end(), res[0]);
     }
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
 
     /** \brief  Check if a particular integer value */
     virtual bool isZero() const;
@@ -183,20 +178,19 @@ namespace casadi {
     /** \brief  Clone function */
     virtual ZeroByZero* clone() const { return getInstance();}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    virtual void evalD(const cpv_double& input, const pv_double& output, int* itmp, double* rtmp) {}
+    virtual void evalD(const double** arg, double** res, int* iw, double* w) {}
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                            int* itmp, SXElement* rtmp) {}
+    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {}
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const {}
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const {}
 
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const { return 0;}
@@ -205,7 +199,7 @@ namespace casadi {
     virtual DMatrix getMatrixValue() const { return DMatrix(); }
 
     /// Get densification
-    virtual MX getSetSparse(const Sparsity& sp) const;
+    virtual MX getProject(const Sparsity& sp) const;
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
@@ -224,6 +218,33 @@ namespace casadi {
 
     /// Reshape
     virtual MX getReshape(const Sparsity& sp) const;
+
+    /** \brief  Check if valid function input */
+    virtual bool isValidInput() const { return true;}
+
+    /** \brief Get the number of symbolic primitives */
+    virtual int numPrimitives() const { return 0;}
+
+    /** \brief Get symbolic primitives */
+    virtual void getPrimitives(std::vector<MX>::iterator& it) const {}
+
+    /** \brief Split up an expression along symbolic primitives */
+    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {}
+
+    /** \brief Join an expression along symbolic primitives */
+    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const { return MX();}
+
+    /** \brief Detect duplicate symbolic expressions */
+    virtual bool hasDuplicates() { return false;}
+
+    /** \brief Reset the marker for an input expression */
+    virtual void resetInput() {}
+
+    /** \brief  Get the name */
+    virtual const std::string& getName() const {
+      static std::string dummyname;
+      return dummyname;
+    }
   };
 
   /** \brief Constant known at runtime */
@@ -254,25 +275,24 @@ namespace casadi {
     /** \brief  Clone function */
     virtual Constant* clone() const { return new Constant<Value>(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    virtual void evalD(const cpv_double& input, const pv_double& output, int* itmp, double* rtmp);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                            int* itmp, SXElement* rtmp);
+    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
 
     /** \brief  Check if a particular integer value */
     virtual bool isZero() const { return v_.value==0;}
     virtual bool isOne() const { return v_.value==1;}
-    virtual bool isIdentity() const { return v_.value==1 && sparsity().isDiagonal();}
+    virtual bool isIdentity() const { return v_.value==1 && sparsity().isdiag();}
     virtual bool isValue(double val) const { return v_.value==val;}
 
     /// Get the value (only for scalar constant nodes)
@@ -286,7 +306,7 @@ namespace casadi {
     }
 
     /// Get densification
-    virtual MX getSetSparse(const Sparsity& sp) const;
+    virtual MX getProject(const Sparsity& sp) const;
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
@@ -367,7 +387,7 @@ namespace casadi {
     // Constant folding
     double ret(0);
     casadi_math<double>::fun(op, v_.value, 0.0, ret);
-    if (operation_checker<F0XChecker>(op) || sparsity().isDense()) {
+    if (operation_checker<F0XChecker>(op) || sparsity().isdense()) {
       return MX(sparsity(), ret);
     } else {
       if (v_.value==0) {
@@ -394,7 +414,7 @@ namespace casadi {
 
       if (ret!=0) {
         Sparsity f = Sparsity::dense(y.size1(), y.size2());
-        MX yy = y.setSparse(f);
+        MX yy = project(y, f);
         return MX(f, shared_from_this<MX>())->getBinary(op, yy, false, false);
       }
     } else if (ScY && !operation_checker<F0XChecker>(op)) {
@@ -406,7 +426,7 @@ namespace casadi {
       }
       if (grow) {
         Sparsity f = Sparsity::dense(size1(), size2());
-        MX xx = shared_from_this<MX>().setSparse(f);
+        MX xx = project(shared_from_this<MX>(), f);
         return xx->getBinary(op, MX(f, y), false, false);
       }
     }
@@ -450,31 +470,27 @@ namespace casadi {
   }
 
   template<typename Value>
-  void Constant<Value>::evalD(const cpv_double& input, const pv_double& output,
-                                  int* itmp, double* rtmp) {
-    std::fill(output[0], output[0]+nnz(), static_cast<double>(v_.value));
-    ConstantMX::evalD(input, output, itmp, rtmp);
+  void Constant<Value>::evalD(const double** arg, double** res, int* iw, double* w) {
+    std::fill(res[0], res[0]+nnz(), static_cast<double>(v_.value));
   }
 
   template<typename Value>
-  void Constant<Value>::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                                   int* itmp, SXElement* rtmp) {
-    std::fill(output[0], output[0]+nnz(), SXElement(v_.value));
-    ConstantMX::evalSX(input, output, itmp, rtmp);
+  void Constant<Value>::evalSX(const SXElement** arg, SXElement** res,
+                               int* iw, SXElement* w) {
+    std::fill(res[0], res[0]+nnz(), SXElement(v_.value));
   }
 
   template<typename Value>
-  void Constant<Value>::generate(std::ostream &stream, const std::vector<int>& arg,
-                                          const std::vector<int>& res,
-                                          CodeGenerator& gen) const {
-    // Copy the constant to the work vector
-    stream << "  for (i=0, rr=" << gen.work(res.at(0)) << "; i<" << sparsity().nnz()
-           << "; ++i) *rr++=";
-    std::ios_base::fmtflags fmtfl = stream.flags(); // get current format flags
-    // full precision NOTE: hex better?
-    stream << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
-    stream << v_.value << ";" << std::endl;
-    stream.flags(fmtfl); // reset current format flags
+  void Constant<Value>::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                 CodeGenerator& g) const {
+    if (nnz()==0) {
+      // Quick return
+    } else if (nnz()==1) {
+      g.body << "  " << g.workel(res[0]) << " = " << g.constant(v_.value)
+             << ";" << std::endl;
+    } else {
+      g.body << "  " << g.fill_n(g.work(res[0], nnz()), nnz(), g.constant(v_.value)) << std::endl;
+    }
   }
 
   template<typename Value>
@@ -502,50 +518,53 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::getSetSparse(const Sparsity& sp) const {
+  MX Constant<Value>::getProject(const Sparsity& sp) const {
     if (isZero()) {
       return MX::create(new Constant<Value>(sp, v_));
-    } else if (sp.isDense()) {
+    } else if (sp.isdense()) {
       DMatrix v = getMatrixValue();
       v.makeDense();
       return v;
     } else {
-      return MXNode::getSetSparse(sp);
+      return MXNode::getProject(sp);
     }
   }
 
   template<typename Value>
-  void Constant<Value>::printPart(std::ostream &stream, int part) const {
-    if (sparsity().isScalar()) {
+  std::string
+  Constant<Value>::print(const std::vector<std::string>& arg) const {
+    std::stringstream ss;
+    if (sparsity().isscalar()) {
       // Print scalar
       if (sparsity().nnz()==0) {
-        stream << "00";
+        ss << "00";
       } else {
-        stream << v_.value;
+        ss << v_.value;
       }
-    } else if (sparsity().isEmpty()) {
+    } else if (sparsity().isempty()) {
       // Print empty
-      sparsity().printCompact(stream);
+      sparsity().printCompact(ss);
     } else {
       // Print value
       if (v_.value==0) {
-        stream << "zeros(";
+        ss << "zeros(";
       } else if (v_.value==1) {
-        stream << "ones(";
+        ss << "ones(";
       } else if (v_.value!=v_.value) {
-        stream << "nan(";
+        ss << "nan(";
       } else if (v_.value==std::numeric_limits<double>::infinity()) {
-        stream << "inf(";
+        ss << "inf(";
       } else if (v_.value==-std::numeric_limits<double>::infinity()) {
-        stream << "-inf(";
+        ss << "-inf(";
       } else {
-        stream << "all_" << v_.value << "(";
+        ss << "all_" << v_.value << "(";
       }
 
       // Print sparsity
-      sparsity().printCompact(stream);
-      stream << ")";
+      sparsity().printCompact(ss);
+      ss << ")";
     }
+    return ss.str();
   }
 
 } // namespace casadi

@@ -36,6 +36,14 @@
 
 namespace casadi {
 
+  /// Structure specification of a DLE
+  enum DleStruct {
+    /// The matrix A
+    Dle_STRUCT_A,
+    /// The matrix V
+    Dle_STRUCT_V,
+    Dle_STRUCT_NUM};
+
   /** \brief Internal storage for DleSolver related data
 
       @copydoc DLE_doc
@@ -49,8 +57,8 @@ namespace casadi {
     /** \brief  Constructor
      *  \param st \structargument{Dle}
      */
-    DleInternal(const DleStructure& st,
-                 int nrhs=1, bool transp=false);
+    explicit DleInternal(const std::map<std::string, Sparsity>& st,
+                         int nrhs=1, bool transp=false);
 
     /** \brief  Destructor */
     virtual ~DleInternal()=0;
@@ -62,7 +70,7 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual DleInternal* create(const DleStructure& st) const = 0;
+    virtual DleInternal* create(const std::map<std::string, Sparsity>& st) const = 0;
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -74,7 +82,7 @@ namespace casadi {
     virtual void init();
 
     /// Problem structure
-    DleStructure st_;
+    std::vector<Sparsity> st_;
 
     /// Sparsity of A
     Sparsity A_;
@@ -98,7 +106,7 @@ namespace casadi {
     bool transp_;
 
     // Creator function for internal class
-    typedef DleInternal* (*Creator)(const DleStructure& st);
+    typedef DleInternal* (*Creator)(const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
     struct Exposed{ };
@@ -113,7 +121,7 @@ namespace casadi {
     static std::string shortname() { return "dle";}
 
     /// Get the resulting sparsity
-    static Sparsity getSparsity(const DleStructure& st);
+    static Sparsity getSparsity(const std::map<std::string, Sparsity>& st);
 
   };
 

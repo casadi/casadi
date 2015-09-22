@@ -102,6 +102,15 @@ namespace casadi {
       void operator() (CustomFunction& fcn, void* user_data);
   };
 
+  class CASADI_EXPORT IterationCallback {
+    public:
+      IterationCallback() {}
+
+      virtual int operator() (Function& fcn);
+
+      virtual ~IterationCallback() { }
+  };
+
   /** \brief Callback
   *
   * In C++, supply a CallbackCPtr function pointer
@@ -127,6 +136,9 @@ namespace casadi {
 
       /// Construct from C pointer
       Callback(CallbackCPtr ptr);
+
+      /// Construct from an IterationCallback object
+      Callback(IterationCallback & cb);
 
       /// Call
       int operator() (Function& fcn, void* user_data);

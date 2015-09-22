@@ -24,14 +24,11 @@
 
 
 #include "lifting_lr_dple_internal.hpp"
-#include <cassert>
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
+#include <cassert>
 #include <numeric>
 
 INPUTSCHEME(LR_DPLEInput)
@@ -56,8 +53,9 @@ namespace casadi {
     LrDpleInternal::registerPlugin(casadi_register_lrdplesolver_lifting);
   }
 
-  LiftingLrDpleInternal::LiftingLrDpleInternal(
-      const LrDpleStructure & st) : LrDpleInternal(st) {
+  LiftingLrDpleInternal::LiftingLrDpleInternal(const std::map<std::string,
+                                               std::vector<Sparsity> > & st)
+    : LrDpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_lifting_lr_dple_solver"); // name of the function
@@ -142,15 +140,19 @@ namespace casadi {
       H = diagcat(form_==0? Hs_ : reverse(Hs_));
     }
 
+    // QP solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
+    options["Hs"] = Hss_;
+
     // Create an LrDleSolver instance
-    solver_ = LrDleSolver(getOption(solvername()),
-                          lrdleStruct("a", A.sparsity(),
-                                      "v", V.sparsity(),
-                                      "c", C.sparsity(),
-                                      "h", H.sparsity()));
-    solver_.setOption("Hs", Hss_);
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    solver_ = LrDleSolver("solver", getOption(solvername()),
+                          make_map("a", A.sparsity(),
+                                   "v", V.sparsity(),
+                                   "c", C.sparsity(),
+                                   "h", H.sparsity()), options);
 
     std::vector<MX> v_in(LR_DPLE_NUM_IN);
     v_in[LR_DLE_A] = As;
@@ -162,9 +164,7 @@ namespace casadi {
       v_in[LR_DLE_H] = Hs;
     }
 
-    std::vector<MX> Pr = solver_(lrdpleIn("a", A, "v", V, "c", C, "h", H));
-
-    MX Pf = Pr[0];
+    MX Pf = solver_(make_map("a", A, "v", V, "c", C, "h", H)).at(solver_.outputName(0));
 
     std::vector<MX> Ps = with_H_ ? diagsplit(Pf, Hsi_) : diagsplit(Pf, n_);
 
@@ -172,10 +172,9 @@ namespace casadi {
       Ps = reverse(Ps);
     }
 
-    f_ = MXFunction(v_in, dpleOut("p", horzcat(Ps)));
-    f_.setInputScheme(SCHEME_LR_DPLEInput);
-    f_.setOutputScheme(SCHEME_LR_DPLEOutput);
-    f_.init();
+    f_ = MXFunction(name_, v_in, dpleOut("p", horzcat(Ps)),
+                    make_dict("input_scheme", IOScheme(SCHEME_LR_DPLEInput),
+                              "output_scheme", IOScheme(SCHEME_LR_DPLEOutput)));
 
     Wrapper<LiftingLrDpleInternal>::checkDimensions();
 
@@ -187,11 +186,13 @@ namespace casadi {
     Wrapper<LiftingLrDpleInternal>::evaluate();
   }
 
-  Function LiftingLrDpleInternal::getDerForward(int nfwd) {
+  Function LiftingLrDpleInternal
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function LiftingLrDpleInternal::getDerReverse(int nadj) {
+  Function LiftingLrDpleInternal
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     return f_.derReverse(nadj);
   }
 
@@ -202,7 +203,12 @@ namespace casadi {
 
   LiftingLrDpleInternal* LiftingLrDpleInternal::clone() const {
     // Return a deep copy
-    LiftingLrDpleInternal* node = new LiftingLrDpleInternal(st_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[LR_Dple_STRUCT_A];
+    tmp["v"] = st_[LR_Dple_STRUCT_V];
+    tmp["c"] = st_[LR_Dple_STRUCT_C];
+    tmp["h"] = st_[LR_Dple_STRUCT_H];
+    LiftingLrDpleInternal* node = new LiftingLrDpleInternal(tmp);
     node->setOption(dictionary());
     return node;
   }

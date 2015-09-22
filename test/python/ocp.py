@@ -52,14 +52,13 @@ class OCPtests(casadiTestCase):
       cost = cost + s*X[i]**2+r*U[i]**2
     cost = cost + q*X[N]**2
     
-    nlp = SXFunction(nlpIn(x=V),nlpOut(f=cost,g=vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])))
-    
-    solver = NlpSolver("ipopt", nlp)
-    solver.setOption("tol",1e-5)
-    solver.setOption("hessian_approximation", "limited-memory")
-    solver.setOption("max_iter",100)
-    solver.setOption("print_level",0)
-    solver.init()
+    nlp = SXFunction('nlp', nlpIn(x=V),nlpOut(f=cost,g=vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])))
+    opts = {}
+    opts["tol"] = 1e-5
+    opts["hessian_approximation"] = "limited-memory"
+    opts["max_iter"] = 100
+    opts["print_level"] = 0
+    solver = NlpSolver("solver", "ipopt", nlp, opts)
     solver.setInput([-1000 for i in range(V.nnz())],"lbx")
     solver.setInput([1000 for i in range(V.nnz())],"ubx")
     solver.setInput([0 for i in range(N+1)],"lbg")
@@ -86,18 +85,15 @@ class OCPtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
-    f.init()
-    
-    integrator = Integrator("cvodes", f)
-    integrator.setOption("reltol",1e-15)
-    integrator.setOption("abstol",1e-15)
-    integrator.setOption("verbose",False)
-    integrator.setOption("steps_per_checkpoint",10000)
-    integrator.setOption("t0",0)
-    integrator.setOption("tf",te)
-
-    integrator.init()
+    f=SXFunction('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
+    opts = {}
+    opts["reltol"] = 1e-15
+    opts["abstol"] = 1e-15
+    opts["verbose"] = False
+    opts["steps_per_checkpoint"] = 10000
+    opts["t0"] = 0
+    opts["tf"] = te
+    integrator = Integrator("integrator", "cvodes", f, opts)
 
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
@@ -105,21 +101,19 @@ class OCPtests(casadiTestCase):
     
     q0   = vertcat([var[0],par])
     par  = var[1]
-    qend, = integratorOut(integrator.call(integratorIn(x0=q0,p=par)),"xf")
+    qend = integrator({'x0':q0,'p':par})["xf"]
     
     parc = MX(0)
     
-    f = MXFunction([var,parMX],[qend[0]])
-    f.init()
-    nlp = MXFunction(nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0]))
-    nlp.init()
-    solver = NlpSolver("ipopt", nlp)
-    solver.setOption("tol",1e-12)
-    solver.setOption("hessian_approximation", "limited-memory")
-    solver.setOption("max_iter",10)
-    solver.setOption("derivative_test","first-order")
-    solver.setOption("print_level",0)
-    solver.init()
+    f = MXFunction('f', [var,parMX],[qend[0]])
+    nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0]))
+    opts = {}
+    opts["tol"] = 1e-12
+    opts["hessian_approximation"] = "limited-memory"
+    opts["max_iter"] = 10
+    opts["derivative_test"] = "first-order"
+    opts["print_level"] = 0
+    solver = NlpSolver("solver", "ipopt", nlp, opts)
     solver.setInput([-1, -1],"lbx")
     solver.setInput([1, 0.2],"ubx")
     solver.evaluate()
@@ -145,40 +139,34 @@ class OCPtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
-    f.init()
-    
-    integrator = Integrator("cvodes", f)
-    integrator.setOption("reltol",1e-15)
-    integrator.setOption("abstol",1e-15)
-    integrator.setOption("verbose",False)
-    integrator.setOption("steps_per_checkpoint",10000)
-    integrator.setOption("t0",0)
-    integrator.setOption("tf",te)
-
-    integrator.init()
+    f=SXFunction('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
+    opts = {}
+    opts["reltol"] = 1e-15
+    opts["abstol"] = 1e-15
+    opts["verbose"] = False
+    opts["steps_per_checkpoint"] = 10000
+    opts["t0"] = 0
+    opts["tf"] = te
+    integrator = Integrator("integrator", "cvodes", f, opts)
 
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
     
     q0   = vertcat([var[0],par])
     parl  = var[1]
-    qend, = integratorOut(integrator.call(integratorIn(x0=q0,p=parl)),"xf")
+    qend = integrator({'x0':q0,'p':parl})["xf"]
     
     parc = MX(dy0)
     
-    f = MXFunction([var,par],[qend[0]])
-    f.init()
-    nlp = MXFunction(nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0],g=var[0]-var[1]))
-    nlp.init()
-    
-    solver = NlpSolver("ipopt", nlp)
-    solver.setOption("tol",1e-12)
-    solver.setOption("hessian_approximation", "limited-memory")
-    solver.setOption("max_iter",10)
-    solver.setOption("derivative_test","first-order")
-    #solver.setOption("print_level",0)
-    solver.init()
+    f = MXFunction('f', [var,par],[qend[0]])
+    nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0],g=var[0]-var[1]))
+    opts = {}
+    opts["tol"] = 1e-12
+    opts["hessian_approximation"] = "limited-memory"
+    opts["max_iter"] = 10
+    opts["derivative_test"] = "first-order"
+    #opts["print_level"] = 0
+    solver = NlpSolver("solver", "ipopt", nlp, opts)
     solver.setInput([-1, -1],"lbx")
     solver.setInput([1, 0.2],"ubx")
     solver.setInput([-1],"lbg")
@@ -199,54 +187,48 @@ class OCPtests(casadiTestCase):
   @requiresPlugin(XmlFile,"tinyxml")
   def test_XML(self):
     self.message("JModelica XML parsing")
-    ocp = SymbolicOCP()
-    ocp.parseFMI('data/cstr.xml')
+    ivp = DaeBuilder()
+    ivp.parseFMI('data/cstr.xml')
     
     # Separate differential and algebraic variables
-    ocp.split_dae()
+    ivp.split_dae()
     
-    self.assertEqual(ocp.t0,0)
-    self.assertEqual(ocp.tf,150)
-    #self.assertFalse(ocp.t0_free)
-    #self.assertFalse(ocp.tf_free)
-    self.assertTrue(ocp.lterm.nnz()==0)
-    self.assertTrue(ocp.mterm.nnz()==1)
-    m = ocp.mterm
-    self.assertTrue(isinstance(m,SX))
-    self.assertTrue(isinstance(ocp.t,SX))
+    self.assertTrue(len(ivp.q)==0)
+    self.assertTrue(len(ivp.y)==1)
+    m = vertcat(ivp.ydef)
+    self.assertTrue(isinstance(m,MX))
     self.assertEquals(str(m),'cost')
-    print dir(ocp)
-    self.assertEquals(ocp.dae.nnz(),3)
-    print type(ocp.s)
-    self.assertEquals(ocp.s.nnz(),3) # there are three states
-    c = ocp("cstr.c")
-    T = ocp("cstr.T")
-    cost = ocp("cost")
-    self.assertTrue(isinstance(c,SX))
+    print dir(ivp)
+    self.assertEquals(len(ivp.dae),3)
+    print type(ivp.s)
+    self.assertEquals(len(ivp.s),3) # there are three states
+    c = ivp("cstr.c")
+    T = ivp("cstr.T")
+    cost = ivp("cost")
+    self.assertTrue(isinstance(c,MX))
     
     self.assertEquals(c.getName(),"cstr.c")
     self.assertEquals(T.getName(),"cstr.T")
     self.assertEquals(cost.getName(),"cost")
-    self.assertEquals(ocp.nominal("cstr.c"),1000)
+    self.assertEquals(ivp.nominal("cstr.c"),1000)
    
-    u = ocp("u")
-    #self.assertEquals(ocp.path.nnz(),3)
-    #self.assertEquals(len(ocp.cfcn_lb),3)
-    #self.assertEquals(len(ocp.cfcn_ub),3)
-    #self.assertTrue(ocp.cfcn[0].isEqual(T)) 
-    #self.assertTrue(ocp.cfcn[1].isEqual(u)) 
-    #self.assertTrue(ocp.cfcn[2].isEqual(u)) 
-    #self.assertTrue(ocp.cfcn_lb[0].isMinusInf()) 
-    #self.assertEquals(ocp.cfcn_lb[1].getValue(),230) 
-    #self.assertTrue(ocp.cfcn_lb[2].isMinusInf()) 
-    #self.assertEquals(ocp.cfcn_ub[0].getValue(),350) 
-    #self.assertTrue(ocp.cfcn_ub[1].isInf())
-    #self.assertEquals(ocp.cfcn_ub[2].getValue(),370) 
-    print ocp.init
+    u = ivp("u")
+    #self.assertEquals(ivp.path.nnz(),3)
+    #self.assertEquals(len(ivp.cfcn_lb),3)
+    #self.assertEquals(len(ivp.cfcn_ub),3)
+    #self.assertTrue(ivp.cfcn[0].isEqual(T)) 
+    #self.assertTrue(ivp.cfcn[1].isEqual(u)) 
+    #self.assertTrue(ivp.cfcn[2].isEqual(u)) 
+    #self.assertTrue(ivp.cfcn_lb[0].isMinusInf()) 
+    #self.assertEquals(ivp.cfcn_lb[1].getValue(),230) 
+    #self.assertTrue(ivp.cfcn_lb[2].isMinusInf()) 
+    #self.assertEquals(ivp.cfcn_ub[0].getValue(),350) 
+    #self.assertTrue(ivp.cfcn_ub[1].isInf())
+    #self.assertEquals(ivp.cfcn_ub[2].getValue(),370) 
+    print ivp.init
     print c,T,cost
     #print c.atTime(0)
-    f=SXFunction([vertcat([c,T,cost])],[ocp.init])
-    f.init()
+    f=MXFunction('f', [vertcat([c,T,cost])],[vertcat(ivp.init)])
     return 
     f.evaluate()
     self.checkarray(f.getOutput(),matrix([-956.271065,-250.051971,0]).T,"initeq")
@@ -269,8 +251,8 @@ class OCPtests(casadiTestCase):
   #   x0 = SX.sym("x0",nx)
   #   p = SX.sym("p",nu)
   #   xf = x0 + p[0]
-  #   daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
-  #   mayer = SXFunction([x0],[7*x0[0]])
+  #   daeres = SXFunction('daeres', daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
+  #   mayer = SXFunction('mayer', [x0],[7*x0[0]])
   #   ms = DirectMultipleShooting(daeres,mayer)
   #   ms.setOption("integrator", "cvodes")
   #   ms.setOption("number_of_grid_points",ns)
@@ -278,16 +260,16 @@ class OCPtests(casadiTestCase):
   #   ms.setOption("nlp_solver", "ipopt")
   #   ms.init()
     
-  #   for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
+  #   for i in [IVP_LBX,IVP_UBX,IVP_X_INIT]:
   #     self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
       
-  #   for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
+  #   for i in [IVP_LBU,IVP_UBU,IVP_U_INIT]:
   #     self.checkarray(ms.input(i).shape,(nu,ns),"shape")
     
-  #   for i in [OCP_LBP,OCP_UBP,OCP_P_INIT]:
+  #   for i in [IVP_LBP,IVP_UBP,IVP_P_INIT]:
   #     self.checkarray(ms.input(i).shape,(np,1),"shape")
 
-  #   for i in [OCP_LBH,OCP_UBH]:
+  #   for i in [IVP_LBH,IVP_UBH]:
   #     self.checkarray(ms.input(i).shape,(nh,ns+1),"shape")
       
   #   ns = 20
@@ -301,12 +283,11 @@ class OCPtests(casadiTestCase):
   #   x0 = SX.sym("x0",nx)
   #   p = SX.sym("p",nu+np)
   #   xf = x0 + p[0]
-  #   daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
-  #   mayer = SXFunction([x0],[7*x0[0]])
+  #   daeres = SXFunction('daeres', daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
+  #   mayer = SXFunction('mayer', [x0],[7*x0[0]])
     
   #   t = SX.sym("t")
-  #   cfcn = SXFunction(daeIn(t=t,x=x0, p=p),[x0[:nh,0]])
-  #   cfcn.init()
+  #   cfcn = SXFunction('cfcn', daeIn(t=t,x=x0, p=p),[x0[:nh,0]])
     
   #   ms = DirectMultipleShooting(daeres,mayer,cfcn)
   #   ms.setOption("integrator", "cvodes")
@@ -316,16 +297,16 @@ class OCPtests(casadiTestCase):
   #   ms.setOption("nlp_solver", "ipopt")
   #   ms.init()
     
-  #   for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
+  #   for i in [IVP_LBX,IVP_UBX,IVP_X_INIT]:
   #     self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
       
-  #   for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
+  #   for i in [IVP_LBU,IVP_UBU,IVP_U_INIT]:
   #     self.checkarray(ms.input(i).shape,(nu,ns),"shape")
     
-  #   for i in [OCP_LBP,OCP_UBP,OCP_P_INIT]:
+  #   for i in [IVP_LBP,IVP_UBP,IVP_P_INIT]:
   #     self.checkarray(ms.input(i).shape,(np,1),"shape")
 
-  #   for i in [OCP_LBH,OCP_UBH]:
+  #   for i in [IVP_LBH,IVP_UBH]:
   #     self.checkarray(ms.input(i).shape,(nh,ns+1),"shape")
 
   # @requiresPlugin(NlpSolver,"ipopt")
@@ -351,8 +332,7 @@ class OCPtests(casadiTestCase):
   #   t=SX.sym("t")
   #   y=SX.sym("y",3,1)
   #   p=SX.sym("p")
-  #   f=SXFunction(daeIn(t=t, x=y, p=p),daeOut(ode=vertcat([y[1,0],-y[0,0],p*y[0,0]])))
-  #   f.init()
+  #   f=SXFunction('f', daeIn(t=t, x=y, p=p),daeOut(ode=vertcat([y[1,0],-y[0,0],p*y[0,0]])))
     
   #   # Options to be passed to the integrator
   #   integrator_options = {}
@@ -362,8 +342,7 @@ class OCPtests(casadiTestCase):
   #   integrator_options["t0"]=0
   #   integrator_options["tf"]=te/N
     
-  #   mayer = SXFunction([y],[-y[2]])
-  #   mayer.init()
+  #   mayer = SXFunction('mayer', [y],[-y[2]])
     
   #   ms = DirectMultipleShooting(f,mayer)
   #   ms.setOption("integrator", "cvodes")
@@ -426,8 +405,7 @@ class OCPtests(casadiTestCase):
   #   x=SX.sym("x")
   #   a=SX.sym("a")
   #   u=SX.sym("u")
-  #   f=SXFunction(daeIn(t=t, x=x, p=vertcat([a,u])),daeOut(a*x+u))
-  #   f.init()
+  #   f=SXFunction('f', daeIn(t=t, x=x, p=vertcat([a,u])),daeOut(a*x+u))
     
   #   integrator_options = {}
   #   integrator_options["reltol"]=1e-9
@@ -436,8 +414,7 @@ class OCPtests(casadiTestCase):
   #   integrator_options["t0"]=0
   #   integrator_options["tf"]=te/N
     
-  #   mayer = SXFunction([x],[-x])
-  #   mayer.init()
+  #   mayer = SXFunction('mayer', [x],[-x])
     
   #   ms = DirectMultipleShooting(f,mayer)
   #   ms.setOption("integrator", "cvodes")

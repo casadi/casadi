@@ -55,6 +55,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a QP problem [stabilizedQpIn]
   enum StabilizedQpSolverInput {
@@ -84,6 +85,7 @@ namespace casadi {
     /// dense (nc x 1) [mu]
     STABILIZED_QP_SOLVER_MU,
     STABILIZED_QP_SOLVER_NUM_IN};
+#endif // SWIG
 
   // Forward declaration of internal class
   class StabilizedQpSolverInternal;
@@ -105,12 +107,22 @@ namespace casadi {
     /// Default constructor
     StabilizedQpSolver();
 
-    /** \brief Constructor
-     *  \param name \pluginargument{StabilizedQpSolver}
+    /** \brief Constructor (new syntax, includes initialization)
+     *  \param solver \pluginargument{StabilizedQpSolver}
      *  \param st Problem structure
      *  \copydoc scheme_QPStruct
      */
-    StabilizedQpSolver(const std::string& name, const QPStructure& st);
+    StabilizedQpSolver(const std::string& name, const std::string& solver,
+                       const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor (no initialization)
+     *  \param solver \pluginargument{StabilizedQpSolver}
+     *  \param st Problem structure
+     *  \copydoc scheme_QPStruct
+     */
+    StabilizedQpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Access functions of the node
     StabilizedQpSolverInternal* operator->();
@@ -124,9 +136,6 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
-
-    /// Set options that make the QP solver more suitable for solving LPs
-    void setLPOptions();
 
     /** Generate native code in the interfaced language for debugging */
     void generateNativeCode(const std::string &filename) const;

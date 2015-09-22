@@ -43,8 +43,19 @@ namespace casadi {
     return dynamic_cast<const LpSolverInternal*>(ptr)!=0;
   }
 
-  LpSolver::LpSolver(const std::string& name, const LPStructure& st) {
-    assignNode(LpSolverInternal::instantiatePlugin(name, st));
+#ifdef WITH_DEPRECATED_FEATURES
+  LpSolver::LpSolver(const std::string& solver,
+                     const std::map<std::string, Sparsity>& st) {
+    assignNode(LpSolverInternal::instantiatePlugin(solver, st));
+  }
+#endif // WITH_DEPRECATED_FEATURES
+
+  LpSolver::LpSolver(const std::string& name, const std::string& solver,
+                     const std::map<std::string, Sparsity>& st, const Dict& opts) {
+    assignNode(LpSolverInternal::instantiatePlugin(solver, st));
+    setOption("name", name);
+    setOption(opts);
+    init();
   }
 
   bool LpSolver::hasPlugin(const std::string& name) {

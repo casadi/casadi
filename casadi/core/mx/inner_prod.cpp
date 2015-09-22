@@ -24,9 +24,6 @@
 
 
 #include "inner_prod.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "mx_tools.hpp"
-#include "../sx/sx_tools.hpp"
 #include "../runtime/runtime.hpp"
 
 using namespace std;
@@ -39,53 +36,44 @@ namespace casadi {
     setSparsity(Sparsity::scalar());
   }
 
-  void InnerProd::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "inner_prod(";
-    } else if (part==1) {
-      stream << ", ";
-    } else {
-      stream << ")";
+  std::string InnerProd::print(const std::vector<std::string>& arg) const {
+    return "inner_prod(" + arg.at(0) + ", " + arg.at(1) + ")";
+  }
+
+  void InnerProd::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = arg[0]->getInnerProd(arg[1]);
+  }
+
+  void InnerProd::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                          std::vector<std::vector<MX> >& fsens) {
+    for (int d=0; d<fsens.size(); ++d) {
+      fsens[d][0] = dep(0)->getInnerProd(fseed[d][1])
+        + fseed[d][0]->getInnerProd(dep(1));
     }
   }
 
-  void InnerProd::eval(const cpv_MX& input, const pv_MX& output) {
-    *output[0] = (*input[0])->getInnerProd(*input[1]);
-  }
-
-  void InnerProd::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
-    for (int d=0; d<fwdSens.size(); ++d) {
-      *fwdSens[d][0] = dep(0)->getInnerProd(*fwdSeed[d][1])
-        + (*fwdSeed[d][0])->getInnerProd(dep(1));
+  void InnerProd::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                          std::vector<std::vector<MX> >& asens) {
+    for (int d=0; d<aseed.size(); ++d) {
+      asens[d][0] += aseed[d][0] * dep(1);
+      asens[d][1] += aseed[d][0] * dep(0);
     }
   }
 
-  void InnerProd::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
-    for (int d=0; d<adjSeed.size(); ++d) {
-      adjSens[d][0]->addToSum(*adjSeed[d][0] * dep(1));
-      adjSens[d][1]->addToSum(*adjSeed[d][0] * dep(0));
-      *adjSeed[d][0] = MX();
-    }
+  void InnerProd::evalD(const double** arg, double** res, int* iw, double* w) {
+    evalGen<double>(arg, res, iw, w);
   }
 
-  void InnerProd::evalD(const cpv_double& input, const pv_double& output,
-                            int* itmp, double* rtmp) {
-    evalGen<double>(input, output, itmp, rtmp);
-  }
-
-  void InnerProd::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                         int* itmp, SXElement* rtmp) {
-    evalGen<SXElement>(input, output, itmp, rtmp);
+  void InnerProd::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<typename T>
-  void InnerProd::evalGen(const std::vector<const T*>& input,
-                          const std::vector<T*>& output, int* itmp, T* rtmp) {
-    *output[0] = casadi_dot(dep(0).nnz(), input[0], 1, input[1], 1);
+  void InnerProd::evalGen(const T** arg, T** res, int* iw, T* w) {
+    *res[0] = casadi_inner_prod(dep(0).nnz(), arg[0], arg[1]);
   }
 
-  void InnerProd::spFwd(const cpv_bvec_t& arg,
-                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void InnerProd::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t* r = res[0];
     const int n = dep(0).nnz();
@@ -95,8 +83,7 @@ namespace casadi {
     }
   }
 
-  void InnerProd::spAdj(const pv_bvec_t& arg,
-                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void InnerProd::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     bvec_t *a0=arg[0], *a1=arg[1], *r=res[0];
     const int n = dep(0).nnz();
     for (int i=0; i<n; ++i) {
@@ -106,10 +93,11 @@ namespace casadi {
     *r = 0;
   }
 
-  void InnerProd::generate(std::ostream &stream, const std::vector<int>& arg,
-                                    const std::vector<int>& res, CodeGenerator& gen) const {
-    gen.assign(stream, gen.workelement(res[0]),
-               gen.casadi_dot(dep().nnz(), gen.work(arg[0]), 1, gen.work(arg[1]), 1));
+  void InnerProd::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                           CodeGenerator& g) const {
+    g.assign(g.body, g.workel(res[0]),
+               g.inner_prod(dep().nnz(), g.work(arg[0], dep(0).nnz()),
+                              g.work(arg[1], dep(1).nnz())));
   }
 
 } // namespace casadi

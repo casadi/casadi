@@ -24,7 +24,6 @@
 
 
 #include "rk_integrator.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
 
 using namespace std;
 namespace casadi {
@@ -131,8 +130,7 @@ namespace casadi {
       f_res[DAE_ODE] = xf;
       f_res[DAE_QUAD] = qf;
       f_res[DAE_ALG] = horzcat(x_def);
-      F_ = MXFunction(f_arg, f_res);
-      F_.init();
+      F_ = MXFunction("dae", f_arg, f_res);
     }
 
     // Backward integration
@@ -198,8 +196,7 @@ namespace casadi {
       g_res[RDAE_ODE] = rxf;
       g_res[RDAE_QUAD] = rqf;
       g_res[RDAE_ALG] = horzcat(rx_def);
-      G_ = MXFunction(g_arg, g_res);
-      G_.init();
+      G_ = MXFunction("rdae", g_arg, g_res);
     }
   }
 

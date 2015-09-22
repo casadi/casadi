@@ -24,14 +24,11 @@
 
 
 #include "dple_to_dle.hpp"
-#include <cassert>
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
+#include <cassert>
 #include <numeric>
 
 INPUTSCHEME(DLEInput)
@@ -62,7 +59,7 @@ namespace casadi {
 
     addOption("dple_solver",            OT_STRING, GenericType(),
               "User-defined DPLE solver class.");
-    addOption("dple",    OT_DICTIONARY,   GenericType(),
+    addOption("dple",    OT_DICT,   GenericType(),
               "Options to be passed to the DPLE solver.");
 
   }
@@ -93,11 +90,11 @@ namespace casadi {
 
 
   void DpleToDle::evaluate() {
-    for (int i=0;i<getNumInputs();++i) {
+    for (int i=0;i<nIn();++i) {
       std::copy(input(i).begin(), input(i).end(), dplesolver_.input(i).begin());
     }
     dplesolver_.evaluate();
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       std::copy(dplesolver_.output(i).begin(), dplesolver_.output(i).end(), output(i).begin());
     }
   }

@@ -30,16 +30,19 @@ from helpers import *
 
 lpsolvers = []
 if QpSolver.hasPlugin("ooqp"):
-  lpsolvers.append(("qp",{"qp_solver": "ooqp" },False))
+  lpsolvers.append(("qp",{"qp_solver": "ooqp" }))
 
 if NlpSolver.hasPlugin("ipopt"):
-  lpsolvers.append(("qp",{"qp_solver": "nlp", "qp_solver_options":{"nlp_solver":"ipopt"}},False))
+  lpsolvers.append(("qp",{"qp_solver": "nlp", "qp_solver_options":{"nlp_solver":"ipopt"}}))
 
 if NlpSolver.hasPlugin("ipopt"):
-  lpsolvers.append(("qp.nlp.ipopt",{},False))
+  lpsolvers.append(("qp.nlp.ipopt",{}))
 
 if QpSolver.hasPlugin("ooqp"):
-  lpsolvers.append(("qp.ooqp",{},False))
+  lpsolvers.append(("qp.ooqp",{}))
+
+# if SocpSolver.hasPlugin("mosek"):
+#   lpsolvers.append(("qp.qcqp.socp.mosek",{"qp_solver_options.qcqp_solver_options.socp_solver_options": {"MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10}},False))
 
 # if SocpSolver.hasPlugin("mosek"):
 #   lpsolvers.append(("qp.qcqp.socp.mosek",{"qp_solver_options.qcqp_solver_options.socp_solver_options": {"MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10}},False))
@@ -64,12 +67,11 @@ class LpSolverTests(casadiTestCase):
     UBX = DMatrix([ inf, inf ])
     c = DMatrix([ 2.0, 1.0 ])
     
-    for lpsolver, lp_options, re_init in lpsolvers:
+    for lpsolver, lp_options in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
-      solver = LpSolver(lpsolver,lpStruct(a=A.sparsity()))
-      solver.setOption(lp_options)
-      solver.init()
+      solver = LpSolver("mysolver",lpsolver,{'a':A.sparsity()},lp_options)
+
 
       solver.setInput(c,"c")
       solver.setInput(A,"a")
@@ -89,12 +91,10 @@ class LpSolverTests(casadiTestCase):
     UBX = DMatrix([ inf, -inf ])
     c = DMatrix([ 2.0, 1.0 ])
     
-    for lpsolver, lp_options, re_init in lpsolvers:
+    for lpsolver, lp_options in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
-      solver = LpSolver(lpsolver,lpStruct(a=A.sparsity()))
-      solver.setOption(lp_options)
-      solver.init()
+      solver = LpSolver("mysolver",lpsolver,{'a':A.sparsity()},lp_options)
 
       solver.setInput(c,"c")
       solver.setInput(A,"a")
@@ -118,12 +118,10 @@ class LpSolverTests(casadiTestCase):
     UBX = DMatrix([ inf, inf ])
     c = DMatrix([ 2.0, 1.0 ])
     
-    for lpsolver, lp_options, re_init in lpsolvers:
+    for lpsolver, lp_options in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
-      solver = LpSolver(lpsolver,lpStruct(a=A.sparsity()))
-      solver.setOption(lp_options)
-      solver.init()
+      solver = LpSolver("mysolver",lpsolver,{'a':A.sparsity()},lp_options)
 
       solver.setInput(c,"c")
       solver.setInput([0,0],"lbx")
@@ -137,11 +135,7 @@ class LpSolverTests(casadiTestCase):
       self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(lpsolver),digits=5)
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],0,5,str(lpsolver))
-      
-      if re_init:
-        solver = lpsolver(lpStruct(a=A.sparsity()))
-        solver.setOption(lp_options)
-        solver.init()
+     
      
       solver.setInput(c,"c")
       solver.setInput([-1,3],"lbx")
@@ -156,11 +150,6 @@ class LpSolverTests(casadiTestCase):
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],1,5,str(lpsolver))
       
-      if re_init:
-        solver = lpsolver(lpStruct(a=A.sparsity()))
-        solver.setOption(lp_options)
-        solver.init()
-      
       solver.setInput(c,"c")
       solver.setInput([-1,3],"lbx")
       solver.setInput([inf,inf],"ubx")
@@ -174,11 +163,6 @@ class LpSolverTests(casadiTestCase):
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],1,5,str(lpsolver))
       
-      if re_init:
-        solver = lpsolver(lpStruct(a=A.sparsity()))
-        solver.setOption(lp_options)
-        solver.init()
-      
       solver.setInput(-c,"c")
       solver.setInput([-10,-10],"lbx")
       solver.setInput([0,0],"ubx")
@@ -191,11 +175,6 @@ class LpSolverTests(casadiTestCase):
       self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(lpsolver),digits=5)
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],0,5,str(lpsolver))
-
-      if re_init:
-        solver = lpsolver(lpStruct(a=A.sparsity()))
-        solver.setOption(lp_options)
-        solver.init()
       
       solver.setInput(-c,"c")
       solver.setInput([-10,-10],"lbx")
@@ -210,10 +189,6 @@ class LpSolverTests(casadiTestCase):
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],-1,5,str(lpsolver))
       
-      if re_init:
-        solver = lpsolver(lpStruct(a=A.sparsity()))
-        solver.setOption(lp_options)
-        solver.init()
       
       solver.setInput(-c,"c")
       solver.setInput([-inf,-inf],"lbx")
@@ -247,12 +222,10 @@ class LpSolverTests(casadiTestCase):
     UBX = DMatrix([ inf, inf ])
     c = DMatrix([ 2.0, 1.0 ])
     
-    for lpsolver, lp_options, re_init in lpsolvers:
+    for lpsolver, lp_options in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
-      solver = LpSolver(lpsolver,lpStruct(a=A.sparsity()))
-      solver.setOption(lp_options)
-      solver.init()
+      solver = LpSolver("mysolver", lpsolver,{'a':A.sparsity()},lp_options)
 
       solver.setInput(c,"c")
       solver.setInput(A,"a")
@@ -269,11 +242,6 @@ class LpSolverTests(casadiTestCase):
       self.checkarray(solver.getOutput("lam_a"),DMatrix([0.5,-1.5,0]),str(lpsolver),digits=5)
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],2.5,5,str(lpsolver))
-      
-      if re_init:
-        solver = lpsolver(lpStruct(a=A.sparsity()))
-        solver.setOption(lp_options)
-        solver.init()
       
       # Make a LBX active
       solver.setInput(c,"c")
@@ -292,11 +260,6 @@ class LpSolverTests(casadiTestCase):
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],4,5,str(lpsolver))
 
-      if re_init:
-        solver = lpsolver(lpStruct(a=A.sparsity()))
-        solver.setOption(lp_options)
-        solver.init()
-        
       # Make a UBX active
       solver.setInput(c,"c")
       solver.setInput(A,"a")
@@ -314,10 +277,6 @@ class LpSolverTests(casadiTestCase):
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],3,5,str(lpsolver))
 
-      if re_init:
-        solver = lpsolver(lpStruct(a=A.sparsity()))
-        solver.setOption(lp_options)
-        solver.init()
       # Make both LBX and UBX active
       solver.setInput(c,"c")
       solver.setInput(A,"a")
@@ -335,10 +294,6 @@ class LpSolverTests(casadiTestCase):
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],7,5,str(lpsolver))
 
-      if re_init:
-        solver = lpsolver(lpStruct(a=A.sparsity()))
-        solver.setOption(lp_options)
-        solver.init()
       # Linear equality constraint
       solver.setInput(c,"c")
       solver.setInput(A,"a")

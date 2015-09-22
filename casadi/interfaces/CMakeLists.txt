@@ -34,6 +34,14 @@ if(MOSEK_FOUND)
   add_subdirectory(mosek)
 endif()
 
+if(CLANG_FOUND)
+  add_subdirectory(clang)
+endif()
+
+if(ECOS_FOUND)
+  add_subdirectory(ecos)
+endif()
+
 if(OOQP_FOUND)
   add_subdirectory(ooqp)
 endif()

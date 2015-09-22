@@ -27,6 +27,9 @@
 #define CASADI_SX_FUNCTION_HPP
 
 #include "function.hpp"
+#ifdef USE_CXX11
+#include <initializer_list>
+#endif // USE_CXX11
 
 namespace casadi {
 
@@ -70,62 +73,60 @@ namespace casadi {
     /// Expand an Function
     explicit SXFunction(const Function &f);
 
-    /// Multiple (matrix valued) input, multiple (matrix valued) output
-    SXFunction(const std::vector< SX>& arg, const std::vector<SX>& res);
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    SXFunction(const std::string& name, const std::vector<SX>& arg,
+               const std::vector<SX>& res, const Dict& opts=Dict());
 
-    /// Multiple (matrix valued) input, multiple (matrix valued) output
-    SXFunction(const std::vector< SX>& arg, const IOSchemeVector< SX >& res);
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    SXFunction(const std::string& name, const std::pair< SXDict, std::vector<std::string> >& arg,
+               const std::vector<SX>& res, const Dict& opts=Dict());
 
-    /// Multiple (matrix valued) input, multiple (matrix valued) output
-    SXFunction(const IOSchemeVector< SX >& arg, const std::vector< SX>& res);
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    SXFunction(const std::string& name, const std::vector<SX>& arg,
+               const std::pair< SXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
 
-    /** \brief Multiple (matrix valued) input, multiple (matrix valued) output
-    
-    \doctest
-    X = SX.sym("X")
-    f = SXFunction(daeIn(x=X),daeOut(ode=X**2))
-    f.init()
-    print f
-    \doctestout
-     Inputs (DAEInput: 4):
-      0. (DAE_X aka 'x')   1-by-1 (dense)
-      1. (DAE_Z aka 'z')   0-by-0 (dense)
-      2. (DAE_P aka 'p')   0-by-0 (dense)
-      3. (DAE_T aka 't')   0-by-0 (dense)
-     Outputs (DAEOutput: 3):
-      0. (DAE_ODE aka 'ode')   1-by-1 (dense)
-      1. (DAE_ALG aka 'alg')   0-by-0 (dense)
-      2. (DAE_QUAD aka 'quad')   0-by-0 (dense)
-    @0 = input[0][0];
-    @0 = sq(@0);
-    output[0][0] = @0;
-    <BLANKLINE>
-    \enddoctest
-    
-    */
-    SXFunction(const IOSchemeVector< SX >& arg, const IOSchemeVector< SX >& res);
-
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    SXFunction(const std::string& name, const std::pair< SXDict, std::vector<std::string> >& arg,
+               const std::pair< SXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
 #ifndef SWIG
+#ifdef USE_CXX11
+    /** \brief Construct from initializer lists (new syntax, includes initialization) */
+    SXFunction(const std::string& name,
+               std::initializer_list<SX> arg,
+               std::initializer_list<SX> res,
+               const Dict& opts=Dict());
 
-    /// Multiple (vector valued) input, multiple (vector valued) output
-    SXFunction(const std::vector< std::vector<SXElement> >& arg,
-               const std::vector< std::vector<SXElement> >& res);
+    /** \brief Construct from vector & nitializer list (new syntax, includes initialization) */
+    SXFunction(const std::string& name,
+               std::vector<SX> arg,
+               std::initializer_list<SX> res,
+               const Dict& opts=Dict());
 
-    /// Single (scalar/matrix/vector valued) input, single (scalar/matrix/vector valued) output
-    SXFunction(const SX& arg, const SX& res);
-
-    /// Multiple (vector valued) input, single (scalar/vector/matrix valued) output
-    SXFunction(const std::vector< std::vector<SXElement> >& arg, const SX& res);
-
-    /// Multiple (matrix valued) input, single (scalar/vector/matrix valued) output
-    SXFunction(const std::vector< SX>& arg, const SX& res);
-
-    /// Single (scalar/vector/matrix valued) input, multiple (vector valued) output
-    SXFunction(const SX& arg, const std::vector< std::vector<SXElement> >& res);
-
-    /// Single (scalar/vector/matrix valued) input, multiple (matrix valued) output
-    SXFunction(const SX& arg, const std::vector< SX>& res);
+    /** \brief Construct from initializer list & vector (new syntax, includes initialization) */
+    SXFunction(const std::string& name,
+               std::initializer_list<SX> arg,
+               std::vector<SX> res,
+               const Dict& opts=Dict());
+#endif // USE_CXX11
 #endif // SWIG
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /// [DEPRECATED] Multiple input, multiple output, no initialization
+    SXFunction(const std::vector<SX>& arg,
+               const std::vector<SX>& res);
+
+    /// [DEPRECATED] Multiple input, multiple  output, no initialization
+    SXFunction(const std::vector<SX>& arg,
+               const std::pair< SXDict, std::vector<std::string> >& res);
+
+    /// [DEPRECATED] Multiple input, multiple output, no initialization
+    SXFunction(const std::pair< SXDict, std::vector<std::string> >& arg,
+               const std::vector<SX>& res);
+
+    /// [DEPRECATED] Multiple input, multiple output, no initialization
+    SXFunction(const std::pair< SXDict, std::vector<std::string> >& arg,
+               const std::pair< SXDict, std::vector<std::string> >& res);
+#endif // WITH_DEPRECATED_FEATURES
 
 /// \cond INTERNAL
     /// Access functions of the node
@@ -142,61 +143,70 @@ namespace casadi {
      */
     SX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
     SX jac(const std::string& iname, int oind=0, bool compact=false, bool symmetric=false)
-    { return jac(inputSchemeEntry(iname), oind, compact, symmetric); }
+    { return jac(inputIndex(iname), oind, compact, symmetric); }
     SX jac(int iind, const std::string& oname, bool compact=false, bool symmetric=false)
-    { return jac(iind, outputSchemeEntry(oname), compact, symmetric); }
+    { return jac(iind, outputIndex(oname), compact, symmetric); }
     SX jac(const std::string& iname, const std::string& oname,
            bool compact=false, bool symmetric=false)
-    { return jac(inputSchemeEntry(iname), outputSchemeEntry(oname), compact, symmetric); }
+    { return jac(inputIndex(iname), outputIndex(oname), compact, symmetric); }
     ///@}
 
     ///@{
     /// Gradient via source code transformation
     SX grad(int iind=0, int oind=0);
-    SX grad(const std::string& iname, int oind=0) { return grad(inputSchemeEntry(iname), oind); }
-    SX grad(int iind, const std::string& oname) { return grad(iind, outputSchemeEntry(oname)); }
+    SX grad(const std::string& iname, int oind=0) { return grad(inputIndex(iname), oind); }
+    SX grad(int iind, const std::string& oname) { return grad(iind, outputIndex(oname)); }
     SX grad(const std::string& iname, const std::string& oname)
-    { return grad(inputSchemeEntry(iname), outputSchemeEntry(oname)); }
+    { return grad(inputIndex(iname), outputIndex(oname)); }
     ///@}
 
     ///@{
     /// Tangent via source code transformation
     SX tang(int iind=0, int oind=0);
-    SX tang(const std::string& iname, int oind=0) { return tang(inputSchemeEntry(iname), oind); }
-    SX tang(int iind, const std::string& oname) { return tang(iind, outputSchemeEntry(oname)); }
+    SX tang(const std::string& iname, int oind=0) { return tang(inputIndex(iname), oind); }
+    SX tang(int iind, const std::string& oname) { return tang(iind, outputIndex(oname)); }
     SX tang(const std::string& iname, const std::string& oname)
-    { return tang(inputSchemeEntry(iname), outputSchemeEntry(oname)); }
+    { return tang(inputIndex(iname), outputIndex(oname)); }
     ///@}
 
     ///@{
     /// Hessian (forward over adjoint) via source code transformation
     SX hess(int iind=0, int oind=0);
-    SX hess(const std::string& iname, int oind=0) { return hess(inputSchemeEntry(iname), oind); }
-    SX hess(int iind, const std::string& oname) { return hess(iind, outputSchemeEntry(oname)); }
-    SX hess(const std::string& iname, const std::string& oname)
-    { return hess(inputSchemeEntry(iname), outputSchemeEntry(oname)); }
+    SX hess(const std::string& iname, int oind=0) { return hess(inputIndex(iname), oind); }
+    SX hess(int iind, const std::string& oname) { return hess(iind, outputIndex(oname)); }
+    SX hess(const std::string& iname, const std::string& oname) {
+      return hess(inputIndex(iname), outputIndex(oname));
+    }
     ///@}
 
     /** \brief Get function input */
-    const SX& inputExpr(int iind) const;
-    const SX& inputExpr(const std::string& iname) const
-    { return inputExpr(inputSchemeEntry(iname)); }
+    const SX inputExpr(int iind) const;
+    const SX inputExpr(const std::string& iname) const {
+      return inputExpr(inputIndex(iname));
+    }
 
     /** \brief Get function output */
-    const SX& outputExpr(int oind) const;
-    const SX& outputExpr(const std::string& oname) const
-    { return outputExpr(outputSchemeEntry(oname)); }
+    const SX outputExpr(int oind) const;
+    const SX outputExpr(const std::string& oname) const {
+      return outputExpr(outputIndex(oname));
+    }
 
     /** \brief Get all function inputs */
-    const std::vector<SX>& inputExpr() const;
+    const std::vector<SX> inputExpr() const;
 
     /** \brief Get all function outputs */
-    const std::vector<SX> & outputExpr() const;
+    const std::vector<SX> outputExpr() const;
 
 /// \cond INTERNAL
 #ifndef SWIG
     /** \brief Access the algorithm directly */
     const std::vector<ScalarAtomic>& algorithm() const;
+
+    /** \brief Called from constructor */
+    void construct(const std::string& name, const std::vector<SX>& arg,
+                   const std::vector<SX>& res, const Dict& opts,
+                   const std::vector<std::string>& ischeme=std::vector<std::string>(),
+                   const std::vector<std::string>& oscheme=std::vector<std::string>());
 #endif // SWIG
 /// \endcond
 

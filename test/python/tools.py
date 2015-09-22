@@ -149,7 +149,7 @@ class Toolstests(casadiTestCase):
     num = S(0)
     num["P"] = DMatrix([[1,2,3],[4,5,6],[7,8,9]])
     self.checkarray(num["P",index["x"],index["y"]],DMatrix([2]))
-    self.checkarray(num["P",index["x"],:],DMatrix([1,2,3]).T)
+    self.checkarray(num["P",index["x"],:],DMatrix([1,2,3]))
     self.checkarray(num["P",:,index["y"]],DMatrix([2,5,8]))
     self.checkarray(num["P",:,:],DMatrix([[1,2,3],[4,5,6],[7,8,9]]))
     
@@ -284,9 +284,8 @@ class Toolstests(casadiTestCase):
 
     self.assertTrue(isinstance(V.cat,MX)) 
     def isEqualV(a,b):
-      ft = MXFunction([x,m],[a-b])
-      ft.init()
-      for i in range(ft.getNumInputs()):
+      ft = MXFunction("ft", [x,m],[a-b])
+      for i in range(ft.nIn()):
         ft.setInput(numpy.random.rand(*ft.getInput(i).shape),i)
       ft.evaluate()
       self.checkarray(ft.getOutput(),DMatrix.zeros(*ft.getOutput().shape))
@@ -302,9 +301,8 @@ class Toolstests(casadiTestCase):
     V["y",0] = abc
     
     def isEqualV(a,b):
-      ft = MXFunction([x,m,abc],[a-b])
-      ft.init()
-      for i in range(ft.getNumInputs()):
+      ft = MXFunction("ft", [x,m,abc],[a-b])
+      for i in range(ft.nIn()):
         ft.setInput(numpy.random.rand(*ft.getInput(i).shape),i)
       ft.evaluate()
       self.checkarray(ft.getOutput(),DMatrix.zeros(*ft.getOutput().shape))
@@ -527,8 +525,7 @@ class Toolstests(casadiTestCase):
     self.assertEqual(a.size,6)
     self.checkarray(a["P"].shape,(3,3))
     
-    f = SXFunction([a],[a["P"]])
-    f.init()
+    f = SXFunction("f", [a],[a["P"]])
     f.setInput(range(6))
     f.evaluate()
     
@@ -743,8 +740,7 @@ class Toolstests(casadiTestCase):
 
     print d["b"]
 
-    f = MXFunction([V],[d["a"],d["b"],d["c"]])
-    f.init()
+    f = MXFunction("f", [V],[d["a"],d["b"],d["c"]])
 
     s_ = s()
     s_["a"] = 1
@@ -783,16 +779,15 @@ class Toolstests(casadiTestCase):
 
       J = states.product(controls,J)
 
-      f = F([J],[J["x","v"], J["x",:] , J["y",["v","w"]],  J[:,"u"] ])
-      f.init()
-      f.setInput(range(1,7))
+      f = F("f", [J],[J["x","v"], J["x",:] , J["y",["v","w"]],  J[:,"u"] ])
+      f.setInputNZ(range(1,7))
 
       f.evaluate()
 
-      self.checkarray(f.output(0),DMatrix([3]))
-      self.checkarray(f.output(1),DMatrix([1,3,5]).T)
-      self.checkarray(f.output(2),DMatrix([4,6]).T)
-      self.checkarray(f.output(3),DMatrix([1,2]))
+      self.checkarray(f.getOutput(0),DMatrix([3]))
+      self.checkarray(f.getOutput(1),DMatrix([1,3,5]).T)
+      self.checkarray(f.getOutput(2),DMatrix([4,6]).T)
+      self.checkarray(f.getOutput(3),DMatrix([1,2]))
    
   def test_empty_bug(self):
     

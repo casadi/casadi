@@ -58,50 +58,47 @@ int main(){
   double inf = numeric_limits<double>::infinity();
 
   // Initial guess and bounds for the optimization variables
-  double x0_[]  = {25,0,0};
-  double lbx_[] = {-inf, -inf, -inf};
-  double ubx_[] = { inf,  inf,  inf};
-  vector<double> x0(x0_,x0_+3);
-  vector<double> lbx(lbx_,lbx_+3);
-  vector<double> ubx(ubx_,ubx_+3);
+  vector<double> x0  = {25,0,0};
+  vector<double> lbx = {-inf, -inf, -inf};
+  vector<double> ubx = { inf,  inf,  inf};
 
   // Nonlinear bounds
-  double lbg_[] = {0.00};
-  double ubg_[] = {0.00};
-  vector<double> lbg(lbg_,lbg_+1);
-  vector<double> ubg(ubg_,ubg_+1);
+  vector<double> lbg = {0.00};
+  vector<double> ubg = {0.00};
 
-  // Create NLP solver
-  SXFunction nlp(nlpIn("x",x),nlpOut("f",f,"g",g));
-  NlpSolver solver("ipopt", nlp);
+  // Create NLP
+  SXFunction nlp("nlp", nlpIn("x", x), nlpOut("f", f, "g", g));
+
+  // NLP solver options
+  Dict opts;
 
   // Mark the parameters amongst the variables (see sIPOPT documentation)
-  Dictionary var_integer_md;
-  int red_hessian[] = {0,1,2};
-  var_integer_md["red_hessian"] = std::vector<int>(red_hessian,red_hessian+3);
-  solver.setOption("var_integer_md",var_integer_md);
+  Dict var_integer_md;
+  var_integer_md["red_hessian"] = std::vector<int>{0,1,2};
+  opts["var_integer_md"] = var_integer_md;
 
   // Enable reduced hessian calculation
-  solver.setOption("compute_red_hessian","yes");
+  opts["compute_red_hessian"] = "yes";
   
-  // Initialize solver
-  solver.init();
+  // Create NLP solver and buffers
+  NlpSolver solver("solver", "ipopt", nlp, opts);
+  std::map<std::string, DMatrix> arg, res;
 
   // Solve NLP
-  solver.setInput( x0, "x0");
-  solver.setInput(lbx, "lbx");
-  solver.setInput(ubx, "ubx");
-  solver.setInput(lbg, "lbg");
-  solver.setInput(ubg, "ubg");
-  solver.evaluate();
+  arg["x0"] = x0;
+  arg["lbx"] = lbx;
+  arg["ubx"] = ubx;
+  arg["lbg"] = lbg;
+  arg["ubg"] = ubg;
+  res = solver(arg);
 
   // Print the solution
   cout << "----" << endl;
-  cout << "Minimal cost " << solver.output("f") << endl;
+  cout << "Minimal cost " << res.at("f") << endl;
   cout << "----" << endl;
 
   cout << "Solution" << endl;
-  cout << "x = " << solver.output("x").data() << endl;
+  cout << "x = " << res.at("x") << endl;
   cout << "----" << endl;
   
   // Get the reduced Hessian

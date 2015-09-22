@@ -50,6 +50,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a linear solver [linsolIn]
   enum LinsolInput {
@@ -64,6 +65,7 @@ namespace casadi {
     /// Solution to the linear system of equations [X]
     LINSOL_X,
     LINSOL_NUM_OUT};
+#endif // SWIG
 
   // Forward declaration of internal class
   class LinearSolverInternal;
@@ -86,13 +88,24 @@ namespace casadi {
     LinearSolver();
     /// \endcond
 
-    /// Create a linear solver given a sparsity pattern (creates a dummy solver only)
-    explicit LinearSolver(const Sparsity& sp, int nrhs=1);
-
+    ///@{
     /** \brief Create a linear solver given a sparsity pattern
-    * \param name \pluginargument{LinearSolver}
+     * (new syntax, includes initialization)
+    * \param solver \pluginargument{LinearSolver}
     */
-    LinearSolver(const std::string& name, const Sparsity& sp, int nrhs=1);
+    LinearSolver(const std::string& name, const std::string& solver,
+                 const Sparsity& sp, const Dict& opts=Dict());
+    LinearSolver(const std::string& name, const std::string& solver,
+                 const Sparsity& sp, int nrhs, const Dict& opts=Dict());
+    ///@}
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Create a linear solver given a sparsity pattern
+     * No initialization
+    * \param solver \pluginargument{LinearSolver}
+    */
+    LinearSolver(const std::string& solver, const Sparsity& sp, int nrhs=1);
+#endif // WITH_DEPRECATED_FEATURES
 
     /// \cond INTERNAL
     /// Access functions of the node
@@ -128,10 +141,12 @@ namespace casadi {
     /// Check if prepared
     bool prepared() const;
 
+#ifndef SWIG
     /** \brief Solve the system of equations <tt>Lx = b</tt>
         Only when a Cholesky factorization is available
     */
     void solveL(double* x, int nrhs, bool transpose);
+#endif // SWIG
 
     /** \brief Obtain a symbolic Cholesky factorization
         Only for Cholesky solvers
@@ -143,8 +158,10 @@ namespace casadi {
      */
     DMatrix getFactorization(bool transpose=false) const;
 
+#ifndef SWIG
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
+#endif // SWIG
 
     /// Check if a plugin is available
     static bool hasPlugin(const std::string& name);

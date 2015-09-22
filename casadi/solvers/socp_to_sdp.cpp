@@ -25,10 +25,8 @@
 
 #include "socp_to_sdp.hpp"
 
-#include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
 #include "casadi/core/function/mx_function.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
 
 using namespace std;
 namespace casadi {
@@ -51,13 +49,15 @@ namespace casadi {
 
   SocpToSdp* SocpToSdp::clone() const {
     // Return a deep copy
-    SocpToSdp* node = new SocpToSdp(st_);
+    SocpToSdp* node =
+      new SocpToSdp(make_map("g", st_[SOCP_SOLVER_G], "a", st_[SOCP_SOLVER_A]));
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  SocpToSdp::SocpToSdp(const std::vector<Sparsity> &st) : SocpSolverInternal(st) {
+  SocpToSdp::SocpToSdp(const std::map<std::string, Sparsity> &st)
+    : SocpSolverInternal(st) {
     Adaptor<SocpToSdp, SdpSolverInternal>::addOptions();
   }
 
@@ -164,19 +164,20 @@ namespace casadi {
     syms.push_back(E);
     syms.push_back(F);
 
-    mapping_ = MXFunction(syms, out);
-    mapping_.init();
+    mapping_ = MXFunction("mapping", syms, out);
 
     log("SocpToSdp::init", "Created mapping function");
 
+    Dict options;
+    if (hasSetOption(optionsname())) options = getOption(optionsname());
+    options = OptionsFunctionality::addOptionRecipe(options, "socp");
+
     // Create an SdpSolver instance
-    solver_ = SdpSolver(getOption(solvername()),
-                        sdpStruct("a", input(SOCP_SOLVER_A).sparsity(),
-                                  "f", mapping_.output(0).sparsity(),
-                                  "g", mapping_.output(1).sparsity()));
-    solver_.setSOCPOptions();
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    solver_ = SdpSolver("sdpsolver", getOption(solvername()),
+                        make_map("a", input(SOCP_SOLVER_A).sparsity(),
+                                 "f", mapping_.output(0).sparsity(),
+                                 "g", mapping_.output(1).sparsity()),
+                        options);
 
     log("SocpToSdp::init", "Initialized SDP solver");
   }

@@ -43,9 +43,20 @@ namespace casadi {
     return dynamic_cast<const SocpSolverInternal*>(ptr)!=0;
   }
 
-  SocpSolver::SocpSolver(const std::string& name, const SOCPStructure& st) {
-    assignNode(SocpSolverInternal::instantiatePlugin(name, st));
+  SocpSolver::SocpSolver(const std::string& name, const std::string& solver,
+                         const std::map<std::string, Sparsity>& st, const Dict& opts) {
+    assignNode(SocpSolverInternal::instantiatePlugin(solver, st));
+    setOption("name", name);
+    setOption(opts);
+    init();
   }
+
+#ifdef WITH_DEPRECATED_FEATURES
+  SocpSolver::SocpSolver(const std::string& solver,
+                         const std::map<std::string, Sparsity>& st) {
+    assignNode(SocpSolverInternal::instantiatePlugin(solver, st));
+  }
+#endif // WITH_DEPRECATED_FEATURES
 
   bool SocpSolver::hasPlugin(const std::string& name) {
     return SocpSolverInternal::hasPlugin(name);

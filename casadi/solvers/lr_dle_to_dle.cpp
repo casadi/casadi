@@ -24,14 +24,11 @@
 
 
 #include "lr_dle_to_dle.hpp"
-#include <cassert>
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
+#include <cassert>
 #include <numeric>
 
 INPUTSCHEME(LR_DLEInput)
@@ -55,8 +52,7 @@ namespace casadi {
     LrDleInternal::registerPlugin(casadi_register_lrdlesolver_dle);
   }
 
-  LrDleToDle::LrDleToDle(
-         const LrDleStructure& st) : LrDleInternal(st) {
+  LrDleToDle::LrDleToDle(const std::map<std::string, Sparsity>& st) : LrDleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_lr_dle_to_dle"); // name of the function
@@ -81,14 +77,17 @@ namespace casadi {
 
     MX CVC = mul(C, mul(V, C.T()));
 
-    // Create an DleSolver instance
-    solver_ = DleSolver(getOption(solvername()),
-                        dleStruct("a", A_, "v", CVC.sparsity()));
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    // Solver options
+    Dict options;
+    if (hasSetOption(optionsname())) {
+      options = getOption(optionsname());
+    }
 
-    std::vector<MX> Pr = solver_(dleIn("a", A, "v", CVC));
-    MX P = Pr[DLE_P];
+    // Create an DleSolver instance
+    solver_ = DleSolver("solver", getOption(solvername()),
+                        make_map("a", A_, "v", CVC.sparsity()), options);
+
+    MX P = solver_(make_map("a", A, "v", CVC)).at("p");
 
     std::vector<MX> HPH(Hs_.size(), 0);
     std::vector<MX> Hs = horzsplit(H, Hi_);
@@ -98,9 +97,8 @@ namespace casadi {
       HPH[k] = mul(Hs[k].T(), mul(P, Hs[k]));
     }
 
-    f_ = MXFunction(lrdpleIn("a", A, "v", V, "c", C, "h", H),
+    f_ = MXFunction(name_, lrdpleIn("a", A, "v", V, "c", C, "h", H),
                     lrdleOut("y", diagcat(HPH)));
-    f_.init();
 
     Wrapper<LrDleToDle>::checkDimensions();
 
@@ -110,11 +108,13 @@ namespace casadi {
     Wrapper<LrDleToDle>::evaluate();
   }
 
-  Function LrDleToDle::getDerForward(int nfwd) {
+  Function LrDleToDle
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function LrDleToDle::getDerReverse(int nadj) {
+  Function LrDleToDle
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     return f_.derReverse(nadj);
   }
 
@@ -125,7 +125,11 @@ namespace casadi {
 
   LrDleToDle* LrDleToDle::clone() const {
     // Return a deep copy
-    LrDleToDle* node = new LrDleToDle(st_);
+    LrDleToDle* node =
+      new LrDleToDle(make_map("a", st_[LR_DLE_STRUCT_A],
+                              "v", st_[LR_DLE_STRUCT_V],
+                              "c", st_[LR_DLE_STRUCT_C],
+                              "h", st_[LR_DLE_STRUCT_H]));
     node->setOption(dictionary());
     return node;
   }

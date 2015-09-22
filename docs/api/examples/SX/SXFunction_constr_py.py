@@ -34,12 +34,11 @@ outs = [x,y,vertcat((x,y)),y*x,0]
 
 print outs
 
-f = SXFunction(ins,outs)
-f.init()
+f = SXFunction("f", ins, outs)
 
 #! f now has two inputs and a 4 outputs:
-print f.getNumInputs()
-print f.getNumOutputs()
+print f.nIn()
+print f.nOut()
 
 #! The outputs has the following string representation.
 #! Note how all elements of out have been converted to SX by

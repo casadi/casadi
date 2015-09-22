@@ -36,7 +36,7 @@ namespace casadi {
   /**
       \defgroup ImplicitFunction_doc
 
-      The equation:
+      Mathematically, the equation:
 
       F(z, x1, x2, ..., xn) == 0
 
@@ -44,17 +44,20 @@ namespace casadi {
 
       z := G(x1, x2, ..., xn)
 
+      In CasADi, F is a Function.
+      The first input presents the variables that need to be solved for.
+      The first output is the residual that needs to attain zero.
+      Optional remaining outputs can be supplied; they are output expressions.
+      
+      In pseudo-code, we can write:
+      
+      G* = ImplicitFunction('solver',F)
+      
+      Here, G* is a Function with one extra input over the pure mathematical G:
+      
+      z := G*(z0, x1, x2, ..., xn)
 
-
-      F should be an Function mapping from (n+1) inputs to m outputs.
-      The first output is the residual that should be zero.
-
-      ImplicitFunction (G) is an Function mapping from n inputs to m outputs.
-      n may be zero.
-      The first output is the solved for z.
-
-      You can provide an initial guess for z by setting output(0) of ImplicitFunction.
-
+      The first input to the ImplicitFunction is the intial guess for z.
 
   */
   /** \brief  Abstract base class for the implicit function classes
@@ -73,14 +76,24 @@ namespace casadi {
     /** \brief  Default constructor */
     ImplicitFunction();
 
-    /** \brief  Create an implicit function solver
-     * \param name \pluginargument{ImplicitFunction}
-     * \param f Function mapping from (n+1) inputs to 1 output
-     *
+    /** \brief  Create an implicit function solver (new syntax, includes initialization)
+     * \param solver \pluginargument{ImplicitFunction}
+     * \param f Function where one of the inputs (by default the first) is an unknown and
+     *        one of the outputs (by default the first) is a residual.
      */
-    ImplicitFunction(const std::string& name, const Function& f,
+    ImplicitFunction(const std::string& name, const std::string& solver,
+                     const Function& f, const Dict& opts=Dict());
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Create an implicit function solver, no initialization
+     * \param solver \pluginargument{ImplicitFunction}
+     * \param f Function where one of the inputs (by default the first) is an unknown and
+     *        one of the outputs (by default the first) is a residual.
+     */
+    ImplicitFunction(const std::string& solver, const Function& f,
                      const Function& jac=Function(),
                      const LinearSolver& linsol=LinearSolver());
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Access functions of the node
     ImplicitFunctionInternal* operator->();

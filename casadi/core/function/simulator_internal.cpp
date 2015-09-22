@@ -27,7 +27,6 @@
 #include "integrator_internal.hpp"
 #include "../std_vector_tools.hpp"
 #include "sx_function.hpp"
-#include "../sx/sx_tools.hpp"
 
 INPUTSCHEME(IntegratorInput)
 
@@ -37,12 +36,17 @@ namespace casadi {
 
   SimulatorInternal::SimulatorInternal(const Integrator& integrator,
                                        const Function& output_fcn,
-                                       const vector<double>& grid) :
-      integrator_(integrator), output_fcn_(output_fcn), grid_(grid) {
+                                       const DMatrix& grid) :
+    integrator_(integrator), output_fcn_(output_fcn), grid_(grid.data()) {
+    casadi_assert_message(grid.iscolumn(),
+                          "Simulator::Simulator: grid must be a column vector, but got "
+                          << grid.dimString());
+    casadi_assert_message(grid.isdense(),
+                          "Simulator::Simulator: grid must be dense, but got "
+                          << grid.dimString());
     setOption("name", "unnamed simulator");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
-
-    input_.scheme = SCHEME_IntegratorInput;
+    ischeme_ = IOScheme(SCHEME_IntegratorInput);
   }
 
   SimulatorInternal::~SimulatorInternal() {
@@ -84,26 +88,26 @@ namespace casadi {
       out[INTEGRATOR_ZF] = z;
 
       // Create the output function
-      output_fcn_ = SXFunction(arg, out);
+      output_fcn_ = SXFunction("ofcn", arg, out);
+      oscheme_ = IOScheme(SCHEME_IntegratorOutput);
+    } else {
 
-      output_.scheme = SCHEME_IntegratorOutput;
+      // Initialize the output function
+      output_fcn_.init();
     }
 
-    // Initialize the output function
-    output_fcn_.init();
-
     // Allocate inputs
-    setNumInputs(INTEGRATOR_NUM_IN);
+    ibuf_.resize(INTEGRATOR_NUM_IN);
     for (int i=0; i<INTEGRATOR_NUM_IN; ++i) {
       input(i) = integrator_.input(i);
     }
 
     // Allocate outputs
-    setNumOutputs(output_fcn_->getNumOutputs());
-    for (int i=0; i<getNumOutputs(); ++i) {
+    obuf_.resize(output_fcn_->nOut());
+    for (int i=0; i<nOut(); ++i) {
       output(i) = Matrix<double>::zeros(output_fcn_.output(i).numel(), grid_.size());
-      if (!output_fcn_.output(i).isEmpty()) {
-        casadi_assert_message(output_fcn_.output(i).isVector(),
+      if (!output_fcn_.output(i).isempty()) {
+        casadi_assert_message(output_fcn_.output(i).iscolumn(),
                               "SimulatorInternal::init: Output function output #" << i
                               << " has shape " << output_fcn_.output(i).dimString()
                               << ", while a column-matrix shape is expected.");
@@ -115,14 +119,14 @@ namespace casadi {
                           "scalar or empty, but got " << output_fcn_.input(DAE_T).dimString());
 
     casadi_assert_message(
-        output_fcn_.input(DAE_P).isEmpty() ||
+        output_fcn_.input(DAE_P).isempty() ||
         integrator_.input(INTEGRATOR_P).sparsity() == output_fcn_.input(DAE_P).sparsity(),
         "SimulatorInternal::init: output_fcn DAE_P argument must be empty or"
         << " have dimension " << integrator_.input(INTEGRATOR_P).dimString()
         << ", but got " << output_fcn_.input(DAE_P).dimString());
 
     casadi_assert_message(
-        output_fcn_.input(DAE_X).isEmpty() ||
+        output_fcn_.input(DAE_X).isempty() ||
         integrator_.input(INTEGRATOR_X0).sparsity() == output_fcn_.input(DAE_X).sparsity(),
         "SimulatorInternal::init: output_fcn DAE_X argument must be empty or have dimension "
         << integrator_.input(INTEGRATOR_X0).dimString()
@@ -132,7 +136,7 @@ namespace casadi {
     FunctionInternal::init();
 
     // Output iterators
-    output_its_.resize(getNumOutputs());
+    output_its_.resize(nOut());
   }
 
   void SimulatorInternal::evaluate() {
@@ -143,10 +147,10 @@ namespace casadi {
     integrator_.setInput(input(INTEGRATOR_P), INTEGRATOR_P);
 
     if (monitored("initial")) {
-      std::cout << "SimulatorInternal::evaluate: initial condition:" << std::endl;
-      std::cout << " x0     = "  << input(INTEGRATOR_X0) << std::endl;
-      std::cout << " z0     = "  << input(INTEGRATOR_Z0) << std::endl;
-      std::cout << " p      = "   << input(INTEGRATOR_P) << std::endl;
+      userOut() << "SimulatorInternal::evaluate: initial condition:" << std::endl;
+      userOut() << " x0     = "  << input(INTEGRATOR_X0) << std::endl;
+      userOut() << " z0     = "  << input(INTEGRATOR_Z0) << std::endl;
+      userOut() << " p      = "   << input(INTEGRATOR_P) << std::endl;
     }
 
     // Reset the integrator_
@@ -159,18 +163,18 @@ namespace casadi {
     for (int k=0; k<grid_.size(); ++k) {
 
       if (monitored("step")) {
-        std::cout << "SimulatorInternal::evaluate: integrating up to: " <<  grid_[k] << std::endl;
-        std::cout << " x0       = "  << integrator_.input(INTEGRATOR_X0) << std::endl;
-        std::cout << " z0       = "  << integrator_.input(INTEGRATOR_Z0) << std::endl;
-        std::cout << " p        = "   << integrator_.input(INTEGRATOR_P) << std::endl;
+        userOut() << "SimulatorInternal::evaluate: integrating up to: " <<  grid_[k] << std::endl;
+        userOut() << " x0       = "  << integrator_.input(INTEGRATOR_X0) << std::endl;
+        userOut() << " z0       = "  << integrator_.input(INTEGRATOR_Z0) << std::endl;
+        userOut() << " p        = "   << integrator_.input(INTEGRATOR_P) << std::endl;
       }
 
       // Integrate to the output time
       integrator_.integrate(grid_[k]);
 
       if (monitored("step")) {
-        std::cout << " xf  = "  << integrator_.output(INTEGRATOR_XF) << std::endl;
-        std::cout << " zf  = "  << integrator_.output(INTEGRATOR_ZF) << std::endl;
+        userOut() << " xf  = "  << integrator_.output(INTEGRATOR_XF) << std::endl;
+        userOut() << " zf  = "  << integrator_.output(INTEGRATOR_ZF) << std::endl;
       }
 
       // Pass integrator output to the output function
@@ -187,7 +191,7 @@ namespace casadi {
       output_fcn_.evaluate();
 
       // Save the outputs of the function
-      for (int i=0; i<getNumOutputs(); ++i) {
+      for (int i=0; i<nOut(); ++i) {
         const Matrix<double> &res = output_fcn_.output(i);
         copy(res.begin(), res.end(), output_its_.at(i));
         output_its_.at(i) += res.nnz();

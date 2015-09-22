@@ -31,14 +31,8 @@
 
 // To reuse variables we need to be able to sort by sparsity pattern (preferably using a hash map)
 #ifdef USE_CXX11
-// Using C++11 unordered_map (hash map)
-#ifdef USE_TR1_HASHMAP
-#include <tr1/unordered_map>
-#define SPARSITY_MAP std::tr1::unordered_map
-#else // USE_TR1_HASHMAP
 #include <unordered_map>
 #define SPARSITY_MAP std::unordered_map
-#endif // USE_TR1_HASHMAP
 #else // USE_CXX11
 // Falling back to std::map (binary search tree)
 #include <map>
@@ -87,33 +81,32 @@ namespace casadi {
                 bool always_inline=true, bool never_inline=false);
 
     /** \brief Return gradient function  */
-    virtual Function getGradient(int iind, int oind);
+    virtual Function getGradient(const std::string& name, int iind, int oind, const Dict& opts);
 
     /** \brief Return tangent function  */
-    virtual Function getTangent(int iind, int oind);
+    virtual Function getTangent(const std::string& name, int iind, int oind, const Dict& opts);
 
     /** \brief Return Jacobian function  */
-    virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
+    virtual Function getJacobian(const std::string& name, int iind, int oind,
+                                 bool compact, bool symmetric, const Dict& opts);
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function getDerForward(int nfwd);
-    virtual bool hasDerForward() const { return true;}
+    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
+    virtual int numDerForward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function getDerReverse(int nadj);
-    virtual bool hasDerReverse() const { return true;}
+    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
+    virtual int numDerReverse() const { return 64;}
     ///@}
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(std::ostream &stream, const std::string& type,
-                                      CodeGenerator& gen) const = 0;
+    virtual void generateDeclarations(CodeGenerator& g) const = 0;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(std::ostream &stream, const std::string& type,
-                              CodeGenerator& gen) const = 0;
+    virtual void generateBody(CodeGenerator& g) const = 0;
 
     /** \brief Helper function: Check if a vector equals inputv */
     virtual bool isInput(const std::vector<MatType>& arg) const;
@@ -152,23 +145,44 @@ namespace casadi {
 
     // Make sure that inputs are symbolic
     for (int i=0; i<inputv.size(); ++i) {
-      if (inputv[i].isEmpty()) {
+      if (inputv[i].isempty()) {
         // That's okay
-      } else if (!inputv[i].isSymbolicSparse()) {
+      } else if (!inputv[i].isValidInput()) {
         casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be"
                      " purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
       }
     }
 
     // Allocate space for inputs
-    setNumInputs(inputv_.size());
+    ibuf_.resize(inputv_.size());
     for (int i=0; i<inputv_.size(); ++i)
-      input(i) = DMatrix(inputv_[i].sparsity());
+      input(i) = DMatrix::zeros(inputv_[i].sparsity());
 
     // Allocate space for outputs
-    setNumOutputs(outputv_.size());
+    obuf_.resize(outputv_.size());
     for (int i=0; i<outputv_.size(); ++i)
-      output(i) = DMatrix(outputv_[i].sparsity());
+      output(i) = DMatrix::zeros(outputv_[i].sparsity());
+
+    // Check for duplicate entries among the input expressions
+    bool has_duplicates = false;
+    for (typename std::vector<MatType>::iterator it = inputv_.begin();
+         it != inputv_.end(); ++it) {
+      has_duplicates = it->hasDuplicates() || has_duplicates;
+    }
+
+    // Reset temporaries
+    for (typename std::vector<MatType>::iterator it = inputv_.begin();
+         it != inputv_.end(); ++it) {
+      it->resetInput();
+    }
+
+    if (has_duplicates) {
+      userOut<true, PL_WARN>() << "Input expressions:" << std::endl;
+      for (int iind=0; iind<inputv_.size(); ++iind) {
+        userOut<true, PL_WARN>() << iind << ": " << inputv_[iind] << std::endl;
+      }
+      casadi_error("The input expressions are not independent (or were not reset properly).");
+    }
   }
 
 
@@ -389,11 +403,11 @@ namespace casadi {
     int maxl=-1;
     for (int i=0; i<lind.size()-1; ++i) {
       int l = (lind[i+1] - lind[i]);
-      //if (l>10)    std::cout << "#level " << i << ": " << l << std::endl;
-      std::cout << l << ", ";
+      //if (l>10)    userOut() << "#level " << i << ": " << l << std::endl;
+      userOut() << l << ", ";
       if (l>maxl) maxl= l;
     }
-    std::cout << std::endl << "maxl = " << maxl << std::endl;
+    userOut() << std::endl << "maxl = " << maxl << std::endl;
 
     for (int i=0; i<algnodes.size(); ++i) {
       algnodes[i]->temp = i;
@@ -403,7 +417,7 @@ namespace casadi {
     maxl=-1;
     for (int i=0; i<lind.size()-1; ++i) {
       int l = (lind[i+1] - lind[i]);
-      std::cout << std::endl << "#level " << i << ": " << l << std::endl;
+      userOut() << std::endl << "#level " << i << ": " << l << std::endl;
 
       int ii = 0;
 
@@ -411,7 +425,7 @@ namespace casadi {
 
         std::vector<NodeType*>::const_iterator it = algnodes.begin() + j;
 
-        std::cout << "  "<< ii++ << ": ";
+        userOut() << "  "<< ii++ << ": ";
 
         int op = (*it)->op;
         stringstream s, s0, s1;
@@ -425,19 +439,19 @@ namespace casadi {
         if ((*it)->child[1]->hasDep())  s1 << "i_" << i1;
         else                             s1 << (*it)->child[1];
 
-        std::cout << s.str() << " = ";
-        print_c[op](std::cout, s0.str(), s1.str());
-        std::cout << ";" << std::endl;
+        userOut() << s.str() << " = ";
+        print_c[op](userOut(), s0.str(), s1.str());
+        userOut() << ";" << std::endl;
 
 
 
 
       }
 
-      std::cout << l << ", ";
+      userOut() << l << ", ";
       if (l>maxl) maxl= l;
     }
-    std::cout << std::endl << "maxl (before) = " << maxl << std::endl;
+    userOut() << std::endl << "maxl (before) = " << maxl << std::endl;
 
 
     for (int i=0; i<algnodes.size(); ++i) {
@@ -462,7 +476,7 @@ namespace casadi {
     maxl=-1;
     for (int i=0; i<lind.size()-1; ++i) {
       int l = (lind[i+1] - lind[i]);
-      std::cout << std::endl << "#level " << i << ": " << l << std::endl;
+      userOut() << std::endl << "#level " << i << ": " << l << std::endl;
 
       int ii = 0;
 
@@ -470,7 +484,7 @@ namespace casadi {
 
         std::vector<NodeType*>::const_iterator it = algnodes.begin() + j;
 
-        std::cout << "  "<< ii++ << ": ";
+        userOut() << "  "<< ii++ << ": ";
 
         int op = (*it)->op;
         stringstream s, s0, s1;
@@ -484,19 +498,19 @@ namespace casadi {
         if ((*it)->child[1]->hasDep())  s1 << "i_" << i1;
         else                             s1 << (*it)->child[1];
 
-        std::cout << s.str() << " = ";
-        print_c[op](std::cout, s0.str(), s1.str());
-        std::cout << ";" << std::endl;
+        userOut() << s.str() << " = ";
+        print_c[op](userOut(), s0.str(), s1.str());
+        userOut() << ";" << std::endl;
 
 
 
 
       }
 
-      std::cout << l << ", ";
+      userOut() << l << ", ";
       if (l>maxl) maxl= l;
     }
-    std::cout << std::endl << "maxl = " << maxl << std::endl;
+    userOut() << std::endl << "maxl = " << maxl << std::endl;
 
 
     //  return;
@@ -517,7 +531,7 @@ namespace casadi {
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   MatType XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::grad(int iind, int oind) {
-    casadi_assert_message(output(oind).isScalar(),
+    casadi_assert_message(output(oind).isscalar(),
                           "Only gradients of scalar functions allowed. Use jacobian instead.");
 
     // Quick return if trivially empty
@@ -539,16 +553,16 @@ namespace casadi {
     // Adjoint sensitivities
     std::vector<std::vector<MatType> > asens(1, std::vector<MatType>(inputv_.size()));
     for (int i=0; i<inputv_.size(); ++i) {
-      asens[0][i] = MatType(inputv_[i].sparsity());
+      asens[0][i] = MatType::zeros(inputv_[i].sparsity());
     }
 
     // Calculate with adjoint mode AD
     static_cast<DerivedType*>(this)->callReverse(inputv_, outputv_, aseed, asens, true, false);
 
     int dir = 0;
-    for (int i=0; i<getNumInputs(); ++i) { // Correct sparsities #1025
+    for (int i=0; i<nIn(); ++i) { // Correct sparsities #1025
       if (asens[dir][i].sparsity()!=inputv_[i].sparsity()) {
-        asens[dir][i] = asens[dir][i].setSparse(inputv_[i].sparsity());
+        asens[dir][i] = project(asens[dir][i], inputv_[i].sparsity());
       }
     }
 
@@ -558,7 +572,7 @@ namespace casadi {
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   MatType XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::tang(int iind, int oind) {
-    casadi_assert_message(input(iind).isScalar(),
+    casadi_assert_message(input(iind).isscalar(),
                           "Only tangent of scalar input functions allowed. Use jacobian instead.");
 
     // Forward seeds
@@ -585,13 +599,10 @@ namespace casadi {
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  MatType XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::jac(int iind, int oind,
-                                                                          bool compact,
-                                                                          bool symmetric,
-                                                                          bool always_inline,
-                                                                          bool never_inline) {
+  MatType XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::jac(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline) {
     using namespace std;
-    if (verbose()) std::cout << "XFunctionInternal::jac begin" << std::endl;
+    if (verbose()) userOut() << "XFunctionInternal::jac begin" << std::endl;
 
     // Quick return if trivially empty
     if (input(iind).nnz()==0 || output(oind).nnz()==0) {
@@ -602,12 +613,12 @@ namespace casadi {
     }
 
     if (symmetric) {
-      casadi_assert(output(oind).isDense());
+      casadi_assert(output(oind).isdense());
     }
 
     // Create return object
-    MatType ret = MatType(jacSparsity(iind, oind, compact, symmetric).T());
-    if (verbose()) std::cout << "XFunctionInternal::jac allocated return value" << std::endl;
+    MatType ret = MatType::zeros(jacSparsity(iind, oind, compact, symmetric).T());
+    if (verbose()) userOut() << "XFunctionInternal::jac allocated return value" << std::endl;
 
     // Quick return if empty
     if (ret.nnz()==0) {
@@ -617,7 +628,7 @@ namespace casadi {
     // Get a bidirectional partition
     Sparsity D1, D2;
     getPartition(iind, oind, D1, D2, true, symmetric);
-    if (verbose()) std::cout << "XFunctionInternal::jac graph coloring completed" << std::endl;
+    if (verbose()) userOut() << "XFunctionInternal::jac graph coloring completed" << std::endl;
 
     // Get the number of forward and adjoint sweeps
     int nfdir = D1.isNull() ? 0 : D1.size2();
@@ -650,7 +661,7 @@ namespace casadi {
     const int* output_row = output(oind).row();
 
     // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode
-    if (verbose())   std::cout << "XFunctionInternal::jac transposes and mapping" << std::endl;
+    if (verbose())   userOut() << "XFunctionInternal::jac transposes and mapping" << std::endl;
     std::vector<int> mapping;
     Sparsity jsp_trans;
     if (nfdir>0) {
@@ -675,7 +686,7 @@ namespace casadi {
     int nsweep_adj = nadir/max_nadir;   // Number of sweeps needed for the adjoint mode
     if (nadir%max_nadir>0) nsweep_adj++;
     int nsweep = std::max(nsweep_fwd, nsweep_adj);
-    if (verbose())   std::cout << "XFunctionInternal::jac " << nsweep << " sweeps needed for "
+    if (verbose())   userOut() << "XFunctionInternal::jac " << nsweep << " sweeps needed for "
                               << nfdir << " forward and " << nadir << " adjoint directions"
                               << std::endl;
 
@@ -690,7 +701,7 @@ namespace casadi {
         // Print when entering a new decade
         if (progress_new / 10 > progress / 10) {
           progress = progress_new;
-          std::cout << progress << " %"  << std::endl;
+          userOut() << progress << " %"  << std::endl;
         }
       }
 
@@ -717,7 +728,7 @@ namespace casadi {
         }
 
         // initialize to zero
-        fseed[d].resize(getNumInputs());
+        fseed[d].resize(nIn());
         for (int ind=0; ind<fseed[d].size(); ++ind) {
           int nrow = input(ind).size1(), ncol = input(ind).size2(); // Input dimensions
           if (ind==iind) {
@@ -747,7 +758,7 @@ namespace casadi {
         }
 
         //initialize to zero
-        aseed[d].resize(getNumOutputs());
+        aseed[d].resize(nOut());
         for (int ind=0; ind<aseed[d].size(); ++ind) {
           int nrow = output(ind).size1(), ncol = output(ind).size2(); // Output dimensions
           if (ind==oind) {
@@ -762,7 +773,7 @@ namespace casadi {
       fsens.resize(nfdir_batch);
       for (int d=0; d<nfdir_batch; ++d) {
         // initialize to zero
-        fsens[d].resize(getNumOutputs());
+        fsens[d].resize(nOut());
         for (int oind=0; oind<fsens[d].size(); ++oind) {
           fsens[d][oind] = MatType::zeros(output(oind).sparsity());
         }
@@ -772,14 +783,14 @@ namespace casadi {
       asens.resize(nadir_batch);
       for (int d=0; d<nadir_batch; ++d) {
         // initialize to zero
-        asens[d].resize(getNumInputs());
+        asens[d].resize(nIn());
         for (int ind=0; ind<asens[d].size(); ++ind) {
           asens[d][ind] = MatType::zeros(input(ind).sparsity());
         }
       }
 
       // Evaluate symbolically
-      if (verbose()) std::cout << "XFunctionInternal::jac making function call" << std::endl;
+      if (verbose()) userOut() << "XFunctionInternal::jac making function call" << std::endl;
       if (fseed.size()>0) {
         casadi_assert(aseed.size()==0);
         static_cast<DerivedType*>(this)->callForward(inputv_, outputv_,
@@ -932,13 +943,13 @@ namespace casadi {
     }
 
     // Return
-    if (verbose()) std::cout << "XFunctionInternal::jac end" << std::endl;
+    if (verbose()) userOut() << "XFunctionInternal::jac end" << std::endl;
     return ret.T();
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::getGradient(int iind,
-                                                                                   int oind) {
+  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::getGradient(const std::string& name, int iind, int oind, const Dict& opts) {
     // Create expressions for the gradient
     std::vector<MatType> ret_out;
     ret_out.reserve(1+outputv_.size());
@@ -946,12 +957,12 @@ namespace casadi {
     ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
 
     // Return function
-    return PublicType(inputv_, ret_out);
+    return PublicType(name, inputv_, ret_out, opts);
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::getTangent(int iind,
-                                                                                  int oind) {
+  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::getTangent(const std::string& name, int iind, int oind, const Dict& opts) {
     // Create expressions for the gradient
     std::vector<MatType> ret_out;
     ret_out.reserve(1+outputv_.size());
@@ -959,14 +970,13 @@ namespace casadi {
     ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
 
     // Return function
-    return PublicType(inputv_, ret_out);
+    return PublicType(name, inputv_, ret_out, opts);
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::getJacobian(int iind,
-                                                                                   int oind,
-                                                                                   bool compact,
-                                                                                   bool symmetric) {
+  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
+              const Dict& opts) {
     // Return function expression
     std::vector<MatType> ret_out;
     ret_out.reserve(1+outputv_.size());
@@ -974,12 +984,12 @@ namespace casadi {
     ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
 
     // Return function
-    return PublicType(inputv_, ret_out);
+    return PublicType(name, inputv_, ret_out, opts);
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType, DerivedType,
-                             MatType, NodeType>::getDerForward(int nfwd) {
+  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     // Seeds
     std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd, inputv_), fsens;
 
@@ -988,8 +998,8 @@ namespace casadi {
     casadi_assert(fsens.size()==fseed.size());
 
     // Number inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int num_in = nIn();
+    int num_out = nOut();
 
     // All inputs of the return function
     std::vector<MatType> ret_in;
@@ -1011,14 +1021,12 @@ namespace casadi {
     }
 
     // Assemble function and return
-    PublicType ret(ret_in, ret_out);
-    ret.init();
-    return ret;
+    return PublicType(name, ret_in, ret_out, opts);
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
-  ::getDerReverse(int nadj) {
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     // Seeds
     std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadj, outputv_), asens;
 
@@ -1026,8 +1034,8 @@ namespace casadi {
     static_cast<DerivedType*>(this)->evalAdj(aseed, asens);
 
     // Number inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int num_in = nIn();
+    int num_out = nOut();
 
     // All inputs of the return function
     std::vector<MatType> ret_in;
@@ -1049,9 +1057,7 @@ namespace casadi {
     }
 
     // Assemble function and return
-    PublicType ret(ret_in, ret_out);
-    ret.init();
-    return ret;
+    return PublicType(name, ret_in, ret_out, opts);
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
@@ -1093,8 +1099,7 @@ namespace casadi {
       static_cast<DerivedType*>(this)->evalFwd(fseed, fsens);
     } else {
       // Need to create a temporary function
-      PublicType f(arg, res);
-      f.init();
+      PublicType f("tmp", arg, res);
       f->evalFwd(fseed, fsens);
     }
   }
@@ -1124,8 +1129,7 @@ namespace casadi {
       static_cast<DerivedType*>(this)->evalAdj(aseed, asens);
     } else {
       // Need to create a temporary function
-      PublicType f(arg, res);
-      f.init();
+      PublicType f("tmp", arg, res);
       f->evalAdj(aseed, asens);
     }
   }

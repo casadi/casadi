@@ -27,11 +27,8 @@
 #define CASADI_BINARY_MX_IMPL_HPP
 
 #include "binary_mx.hpp"
-#include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
-#include "../matrix/matrix_tools.hpp"
-#include "../sx/sx_tools.hpp"
 #include "../std_vector_tools.hpp"
 #include "../casadi_options.hpp"
 
@@ -54,66 +51,65 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      casadi_math<double>::printPre(op_, stream);
-    } else if (part==1) {
-      casadi_math<double>::printSep(op_, stream);
-    } else {
-      casadi_math<double>::printPost(op_, stream);
-    }
+  std::string BinaryMX<ScX, ScY>::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    casadi_math<double>::printPre(op_, ss);
+    ss << arg.at(0);
+    casadi_math<double>::printSep(op_, ss);
+    ss << arg.at(1);
+    casadi_math<double>::printPost(op_, ss);
+    return ss.str();
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::eval(const cpv_MX& arg, const pv_MX& res) {
-    casadi_math<MX>::fun(op_, *arg[0], *arg[1], *res[0]);
+  void BinaryMX<ScX, ScY>::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    casadi_math<MX>::fun(op_, arg[0], arg[1], res[0]);
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalFwd(const std::vector<cpv_MX>& fseed,
-                                   const std::vector<pv_MX>& fsens) {
+  void BinaryMX<ScX, ScY>::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                                   std::vector<std::vector<MX> >& fsens) {
     // Get partial derivatives
     MX pd[2];
     casadi_math<MX>::der(op_, dep(0), dep(1), shared_from_this<MX>(), pd);
 
     // Propagate forward seeds
     for (int d=0; d<fsens.size(); ++d) {
-      *fsens[d][0] = pd[0]*(*fseed[d][0]) + pd[1]*(*fseed[d][1]);
+      fsens[d][0] = pd[0]*fseed[d][0] + pd[1]*fseed[d][1];
     }
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalAdj(const std::vector<pv_MX>& aseed,
-                                   const std::vector<pv_MX>& asens) {
+  void BinaryMX<ScX, ScY>::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                                   std::vector<std::vector<MX> >& asens) {
     // Get partial derivatives
     MX pd[2];
     casadi_math<MX>::der(op_, dep(0), dep(1), shared_from_this<MX>(), pd);
 
     // Propagate adjoint seeds
     for (int d=0; d<aseed.size(); ++d) {
-      MX s = *aseed[d][0];
-      *aseed[d][0] = MX();
+      MX s = aseed[d][0];
       for (int c=0; c<2; ++c) {
         // Get increment of sensitivity c
         MX t = pd[c]*s;
 
         // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
-        if (!t.isScalar() && t.shape() != dep(c).shape()) {
+        if (!t.isscalar() && t.shape() != dep(c).shape()) {
           if (pd[c].shape()!=s.shape()) pd[c] = MX(s.sparsity(), pd[c]);
           t = inner_prod(pd[c], s);
         }
 
         // Propagate the seeds
-        asens[d][c]->addToSum(t);
+        asens[d][c] += t;
       }
     }
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::generate(std::ostream &stream,
-                                    const std::vector<int>& arg,
-                                    const std::vector<int>& res,
-                                    CodeGenerator& gen) const {
+  void BinaryMX<ScX, ScY>::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                    CodeGenerator& g) const {
+    // Quick return if nothing to do
+    if (nnz()==0) return;
 
     // Check if inplace
     bool inplace;
@@ -123,53 +119,78 @@ namespace casadi {
     case OP_MUL:
     case OP_DIV:
       inplace = res[0]==arg[0];
+      break;
     default:
       inplace = false;
+      break;
     }
 
-    // Print loop and right hand side
-    stream << "  for (i=0, "
-           << "rr=" << gen.work(res.at(0)) << ", ";
-    if (!inplace) stream << "cr=" << gen.work(arg.at(0)) << ", ";
-    stream << "cs=" << gen.work(arg.at(1)) << "; i<" << sparsity().nnz() << "; ++i) "
-           << "*rr++";
+    // Print indent
+    g.body << "  ";
 
+    // Scalar names of arguments (start assuming all scalars)
+    string r = g.workel(res[0]);
+    string x = g.workel(arg[0]);
+    string y = g.workel(arg[1]);
+
+    // Codegen loop, if needed
+    if (nnz()>1) {
+      // Iterate over result
+      g.body << "for (i=0, " << "rr=" << g.work(res[0], nnz());
+      r = "(*rr++)";
+
+      // Iterate over first argument?
+      if (!ScX && !inplace) {
+        g.body << ", cr=" << g.work(arg[0], dep(0).nnz());
+        x = "(*cr++)";
+      }
+
+      // Iterate over second argument?
+      if (!ScY) {
+        g.body << ", cs=" << g.work(arg[1], dep(1).nnz());
+        y = "(*cs++)";
+      }
+
+      // Close loop
+      g.body << "; i<" << nnz() << "; ++i) ";
+    }
+
+    // Perform operation
+    g.body << r << " ";
     if (inplace) {
-      casadi_math<double>::printSep(op_, stream);
-      stream << "=";
-      stream << (ScY ? " *cs " : " *cs++ ");
+      casadi_math<double>::printSep(op_, g.body);
+      g.body << "= " << y;
     } else {
-      stream << "=";
-      casadi_math<double>::printPre(op_, stream);
-      stream << (ScX ? " *cr " : " *cr++ ");
-      casadi_math<double>::printSep(op_, stream);
-      stream << (ScY ? " *cs " : " *cs++ ");
-      casadi_math<double>::printPost(op_, stream);
+      g.body << " = ";
+      casadi_math<double>::printPre(op_, g.body);
+      g.body << x;
+      casadi_math<double>::printSep(op_, g.body);
+      g.body << y;
+      casadi_math<double>::printPost(op_, g.body);
     }
-
-    stream << ";" << endl;
+    g.body << ";" << endl;
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalD(const cpv_double& input, const pv_double& output,
-                                     int* itmp, double* rtmp) {
-    evalGen<double>(input, output, itmp, rtmp);
+  void BinaryMX<ScX, ScY>::evalD(const double** arg, double** res,
+                                 int* iw, double* w) {
+    evalGen<double>(arg, res, iw, w);
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                                      int* itmp, SXElement* rtmp) {
-    evalGen<SXElement>(input, output, itmp, rtmp);
+  void BinaryMX<ScX, ScY>::evalSX(const SXElement** arg, SXElement** res,
+                                  int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<bool ScX, bool ScY>
   template<typename T>
-  void BinaryMX<ScX, ScY>::evalGen(const std::vector<const T*>& input,
-                                   const std::vector<T*>& output, int* itmp, T* rtmp) {
+  void BinaryMX<ScX, ScY>::evalGen(const T* const* arg, T* const* res,
+                                   int* iw, T* w) {
     // Get data
-    T* output0 = output[0];
-    const T* input0 = input[0];
-    const T* input1 = input[1];
+    T* output0 = res[0];
+    const T* input0 = arg[0];
+    const T* input1 = arg[1];
 
     if (!ScX && !ScY) {
       casadi_math<T>::fun(op_, input0, input1, output0, nnz());
@@ -181,9 +202,9 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::spFwd(const cpv_bvec_t& arg,
-                                 const pv_bvec_t& res,
-                                 int* itmp, bvec_t* rtmp) {
+  void BinaryMX<ScX, ScY>::spFwd(const bvec_t** arg,
+                                 bvec_t** res,
+                                 int* iw, bvec_t* w) {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t *r=res[0];
     int n=nnz();
@@ -200,9 +221,9 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::spAdj(const pv_bvec_t& arg,
-                                 const pv_bvec_t& res,
-                                 int* itmp, bvec_t* rtmp) {
+  void BinaryMX<ScX, ScY>::spAdj(bvec_t** arg,
+                                 bvec_t** res,
+                                 int* iw, bvec_t* w) {
     bvec_t *a0=arg[0], *a1=arg[1], *r = res[0];
     int n=nnz();
     for (int i=0; i<n; ++i) {

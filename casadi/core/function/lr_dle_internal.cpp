@@ -25,9 +25,6 @@
 
 #include "lr_dle_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "../mx/mx_tools.hpp"
-#include "../sx/sx_tools.hpp"
 #include "../function/mx_function.hpp"
 #include "../function/sx_function.hpp"
 
@@ -37,10 +34,10 @@ OUTPUTSCHEME(LR_DLEOutput)
 using namespace std;
 namespace casadi {
 
-  LrDleInternal::LrDleInternal(const LrDleStructure& st,
+  LrDleInternal::LrDleInternal(const std::map<std::string, Sparsity>& st,
                              int nrhs,
                              bool transp) :
-      st_(st), nrhs_(nrhs), transp_(transp) {
+    nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -52,15 +49,26 @@ namespace casadi {
               "has eigenvalues greater than 1-eps_unstable");
     addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
 
-
-    if (nrhs_==1) {
-      input_.scheme = SCHEME_LR_DLEInput;
+    st_.resize(LR_DLE_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[LR_DLE_STRUCT_A]=i->second;
+      } else if (i->first=="v") {
+        st_[LR_DLE_STRUCT_V]=i->second;
+      } else if (i->first=="c") {
+        st_[LR_DLE_STRUCT_C]=i->second;
+      } else if (i->first=="h") {
+        st_[LR_DLE_STRUCT_H]=i->second;
+      } else {
+        casadi_error("Unrecognized field in LR DLE structure: " << i->first);
+      }
     }
 
-    if (nrhs_==1) {
-      output_.scheme = SCHEME_LR_DLEOutput;
-    }
 
+    if (nrhs_==1) {
+      ischeme_ = IOScheme(SCHEME_LR_DLEInput);
+      oscheme_ = IOScheme(SCHEME_LR_DLEOutput);
+    }
   }
 
   LrDleInternal::~LrDleInternal() {
@@ -84,7 +92,7 @@ namespace casadi {
     with_H_ = true;
 
     // Default H: unity
-    if (H_.isNull() || H_.isEmpty()) {
+    if (H_.isNull() || H_.isempty()) {
       //H_ = Sparsity::diag(n);
       H_ = Sparsity(0, 0);
       //casadi_assert(Hs_.size()==0);
@@ -112,7 +120,7 @@ namespace casadi {
     }
 
     with_C_ = true;
-    if (C_.isNull()  || C_.isEmpty()) {
+    if (C_.isNull()  || C_.isempty()) {
       C_ = Sparsity(0, 0);
       //C_ = Sparsity::diag(n);
       //st_[Dle_STRUCT_C] = C_;
@@ -121,7 +129,7 @@ namespace casadi {
 
 
 
-    casadi_assert_message(V_.isSymmetric(), "V must be symmetric but got "
+    casadi_assert_message(V_.issymmetric(), "V must be symmetric but got "
                           << V_.dimString() << ".");
 
     casadi_assert_message(A_.size1()==A_.size2(), "A must be square but got "
@@ -145,8 +153,7 @@ namespace casadi {
     casadi_assert(nrhs_==1);
 
     // Allocate inputs
-    setNumInputs(LR_DLE_NUM_IN);
-
+    ibuf_.resize(LR_DLE_NUM_IN);
     input(LR_DLE_A)  = DMatrix::zeros(A_);
 
 
@@ -158,9 +165,13 @@ namespace casadi {
       input(LR_DLE_H)  = DMatrix::zeros(H_);
     }
 
-    setNumOutputs(nrhs_*LR_DLE_NUM_OUT);
+    obuf_.resize(nrhs_*LR_DLE_NUM_OUT);
 
-    Sparsity Pnew = getSparsity(st_, Hs_);
+    Sparsity Pnew = getSparsity(make_map("a", st_[LR_DLE_STRUCT_A],
+                                         "v", st_[LR_DLE_STRUCT_V],
+                                         "c", st_[LR_DLE_STRUCT_C],
+                                         "h", st_[LR_DLE_STRUCT_H]),
+                                Hs_);
 
     for (int i=0;i<nrhs_;++i) {
       output(i) = DMatrix::zeros(Pnew);
@@ -186,20 +197,22 @@ namespace casadi {
 
   }
 
-  Sparsity LrDleInternal::getSparsity(const LrDleStructure& st, const std::vector<int> &Hs) {
+  Sparsity LrDleInternal::getSparsity(const std::map<std::string, Sparsity>& st,
+                                      const std::vector<int> &Hs) {
 
     // Compute output sparsity by Smith iteration with frequency doubling
-    Sparsity A = st[LR_DLE_STRUCT_A];
+    Sparsity A, V, C, H;
+    if (st.count("a")) A = st.at("a");
 
     int n = A.size1();
-    Sparsity V = st[LR_DLE_STRUCT_V];
-    Sparsity C = st[LR_DLE_STRUCT_C];
+    if (st.count("v")) V = st.at("v");
+    if (st.count("c")) C = st.at("c");
 
-    if (C.isNull() || C.isEmpty()) C = Sparsity::diag(n);
+    if (C.isNull() || C.isempty()) C = Sparsity::diag(n);
 
-    Sparsity H = st[LR_DLE_STRUCT_H];
-    bool with_H = !(H.isNull() || H.isEmpty());
-    if (H.isNull() || H.isEmpty()) {
+    if (st.count("h")) H = st.at("h");
+    bool with_H = !(H.isNull() || H.isempty());
+    if (H.isNull() || H.isempty()) {
       H = Sparsity::diag(n);
 
     }

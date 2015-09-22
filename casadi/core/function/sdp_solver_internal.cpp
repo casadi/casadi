@@ -24,9 +24,7 @@
 
 
 #include "sdp_solver_internal.hpp"
-#include "../matrix/matrix_tools.hpp"
 #include "sx_function.hpp"
-#include "../sx/sx_tools.hpp"
 
 INPUTSCHEME(SDPInput)
 OUTPUTSCHEME(SDPOutput)
@@ -35,7 +33,7 @@ using namespace std;
 namespace casadi {
 
 // Constructor
-SdpSolverInternal::SdpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
+SdpSolverInternal::SdpSolverInternal(const std::map<std::string, Sparsity> &st) {
   addOption("calc_p", OT_BOOLEAN, true,
             "Indicate if the P-part of primal solution should be allocated and calculated. "
             "You may want to avoid calculating this variable for problems with n large, "
@@ -45,7 +43,21 @@ SdpSolverInternal::SdpSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
             "as is always dense (m x m).");
   addOption("print_problem", OT_BOOLEAN, false, "Print out problem statement for debugging.");
 
-  casadi_assert_message(st_.size()==SDP_STRUCT_NUM, "Problem structure mismatch");
+  addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "",
+                                                       "socp", true);
+
+  st_.resize(SDP_STRUCT_NUM);
+  for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+    if (i->first=="a") {
+      st_[SDP_STRUCT_A]=i->second;
+    } else if (i->first=="g") {
+      st_[SDP_STRUCT_G]=i->second;
+    } else if (i->first=="f") {
+      st_[SDP_STRUCT_F]=i->second;
+    } else {
+      casadi_error("Unrecognized field in SDP structure: " << i->first);
+    }
+  }
 
   const Sparsity& A = st_[SDP_STRUCT_A];
   const Sparsity& G = st_[SDP_STRUCT_G];
@@ -68,7 +80,7 @@ SdpSolverInternal::SdpSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
                         << "), but got remainder " << F.size2()%n_);
 
   // Input arguments
-  setNumInputs(SDP_SOLVER_NUM_IN);
+  ibuf_.resize(SDP_SOLVER_NUM_IN);
   input(SDP_SOLVER_G) = DMatrix::zeros(G);
   input(SDP_SOLVER_F) = DMatrix::zeros(F);
   input(SDP_SOLVER_A) = DMatrix::zeros(A);
@@ -85,9 +97,8 @@ SdpSolverInternal::SdpSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
                           "But got " << s.dimString() <<  " for i = " << i << ".");
   }
 
-  input_.scheme = SCHEME_SDPInput;
-  output_.scheme = SCHEME_SDPOutput;
-
+  ischeme_ = IOScheme(SCHEME_SDPInput);
+  oscheme_ = IOScheme(SCHEME_SDPOutput);
 }
 
 void SdpSolverInternal::init() {
@@ -117,14 +128,14 @@ void SdpSolverInternal::init() {
   }
 
   // Make a mapping function from dense blocks to inversely-permuted block diagonal P
-  std::vector< SX > full_blocks;
+  std::vector<SX> full_blocks;
   for (int i=0;i<nb_;++i) {
     full_blocks.push_back(SX::sym("block", block_sizes_[i], block_sizes_[i]));
   }
 
-  Pmapper_ = SXFunction(full_blocks, diagcat(full_blocks)(lookupvector(p, p.size()),
-                                                         lookupvector(p, p.size())));
-  Pmapper_.init();
+  Pmapper_ = SXFunction("pmapper", full_blocks,
+                        make_vector(diagcat(full_blocks)(lookupvector(p, p.size()),
+                                                         lookupvector(p, p.size()))));
 
   if (nb_>0) {
     // Make a mapping function from (G, F) -> (G[p, p]_j, F_i[p, p]j)
@@ -144,12 +155,11 @@ void SdpSolverInternal::init() {
         out[(i+1)*nb_+j] = Fi(Slice(r[j], r[j+1]), Slice(r[j], r[j+1]));
       }
     }
-    mapping_ = SXFunction(in, out);
-    mapping_.init();
+    mapping_ = SXFunction("mapping", in, out);
   }
 
   // Output arguments
-  setNumOutputs(SDP_SOLVER_NUM_OUT);
+  obuf_.resize(SDP_SOLVER_NUM_OUT);
   output(SDP_SOLVER_X) = DMatrix::zeros(n_, 1);
   output(SDP_SOLVER_P) = calc_p_? DMatrix::zeros(Pmapper_.output().sparsity()) : DMatrix();
   output(SDP_SOLVER_DUAL) = calc_dual_? DMatrix::zeros(Pmapper_.output().sparsity()) : DMatrix();

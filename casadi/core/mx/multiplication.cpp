@@ -27,8 +27,6 @@
 #define CASADI_MULTIPLICATION_CPP
 
 #include "multiplication.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "mx_tools.hpp"
 #include "../std_vector_tools.hpp"
 #include "../function/function_internal.hpp"
 
@@ -47,112 +45,94 @@ namespace casadi {
     setSparsity(z.sparsity());
   }
 
-  void Multiplication::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "(";
-    } else if (part==1) {
-      stream << "+mul(";
-    } else if (part==2) {
-      stream << ", ";
-    } else {
-      stream << "))";
-    }
+  std::string Multiplication::print(const std::vector<std::string>& arg) const {
+    return "(" + arg.at(0) + "+mul(" + arg.at(1) + ", " + arg.at(2) + "))";
   }
 
-  void Multiplication::evalD(const cpv_double& input, const pv_double& output,
-                                 int* itmp, double* rtmp) {
-    evalGen<double>(input, output, itmp, rtmp);
+  void Multiplication::evalD(const double** arg, double** res, int* iw, double* w) {
+    evalGen<double>(arg, res, iw, w);
   }
 
-  void Multiplication::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                                  int* itmp, SXElement* rtmp) {
-    evalGen<SXElement>(input, output, itmp, rtmp);
+  void Multiplication::evalSX(const SXElement** arg, SXElement** res,
+                              int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Multiplication::evalGen(const std::vector<const T*>& input,
-                               const std::vector<T*>& output, int* itmp, T* rtmp) {
-    if (input[0]!=output[0]) {
-      copy(input[0], input[0]+dep(0).nnz(), output[0]);
-    }
-    casadi_mm_sparse(input[1], dep(1).sparsity(),
-                     input[2], dep(2).sparsity(),
-                     output[0], sparsity(), rtmp);
+  void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w) {
+    if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
+    casadi_mm_sparse(arg[1], dep(1).sparsity(),
+                     arg[2], dep(2).sparsity(),
+                     res[0], sparsity(), w);
   }
 
-  void Multiplication::evalFwd(const std::vector<cpv_MX>& fseed,
-                               const std::vector<pv_MX>& fsens) {
+  void Multiplication::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                               std::vector<std::vector<MX> >& fsens) {
     for (int d=0; d<fsens.size(); ++d) {
-      *fsens[d][0] = *fseed[d][0]
-        + mul(dep(1), *fseed[d][2], MX::zeros(dep(0).sparsity()))
-        + mul(*fseed[d][1], dep(2), MX::zeros(dep(0).sparsity()));
+      fsens[d][0] = fseed[d][0]
+        + mac(dep(1), fseed[d][2], MX::zeros(dep(0).sparsity()))
+        + mac(fseed[d][1], dep(2), MX::zeros(dep(0).sparsity()));
     }
   }
 
-  void Multiplication::evalAdj(const std::vector<pv_MX>& aseed,
-                               const std::vector<pv_MX>& asens) {
+  void Multiplication::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                               std::vector<std::vector<MX> >& asens) {
     for (int d=0; d<aseed.size(); ++d) {
-      asens[d][1]->addToSum(mul(*aseed[d][0], dep(2).T(), MX::zeros(dep(1).sparsity())));
-      asens[d][2]->addToSum(mul(dep(1).T(), *aseed[d][0], MX::zeros(dep(2).sparsity())));
-      if (aseed[d][0]!=asens[d][0]) {
-        asens[d][0]->addToSum(*aseed[d][0]);
-        *aseed[d][0] = MX();
-      }
+      asens[d][1] += mac(aseed[d][0], dep(2).T(), MX::zeros(dep(1).sparsity()));
+      asens[d][2] += mac(dep(1).T(), aseed[d][0], MX::zeros(dep(2).sparsity()));
+      asens[d][0] += aseed[d][0];
     }
   }
 
-  void Multiplication::eval(const cpv_MX& arg, const pv_MX& res) {
-    *res[0] = mul(*arg[1], *arg[2], *arg[0]);
+  void Multiplication::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = mac(arg[1], arg[2], arg[0]);
   }
 
-  void Multiplication::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp,
-                             bvec_t* rtmp) {
+  void Multiplication::spFwd(const bvec_t** arg, bvec_t** res, int* iw,
+                             bvec_t* w) {
     copyFwd(arg[0], res[0], nnz());
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
-                            res[0], sparsity(), rtmp);
+                            res[0], sparsity(), w);
   }
 
-  void Multiplication::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res,
-                             int* itmp, bvec_t* rtmp) {
+  void Multiplication::spAdj(bvec_t** arg, bvec_t** res,
+                             int* iw, bvec_t* w) {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
-                            res[0], sparsity(), rtmp);
+                            res[0], sparsity(), w);
     copyAdj(arg[0], res[0], nnz());
   }
 
-  void Multiplication::generate(std::ostream &stream,
-                                const std::vector<int>& arg,
-                                const std::vector<int>& res,
-                                CodeGenerator& gen) const {
+  void Multiplication::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                CodeGenerator& g) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      gen.copyVector(stream, gen.work(arg[0]), nnz(), gen.work(res[0]));
+      g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << endl;
     }
 
     // Perform sparse matrix multiplication
-    gen.addAuxiliary(CodeGenerator::AUX_MM_SPARSE);
-    stream << "  casadi_mm_sparse(";
-    stream << gen.work(arg[1]) << ", s" << gen.addSparsity(dep(1).sparsity()) << ", ";
-    stream << gen.work(arg[2]) << ", s" << gen.addSparsity(dep(2).sparsity()) << ", ";
-    stream << gen.work(res[0]) << ", s" << gen.addSparsity(sparsity()) << ", w);" << endl;
+    g.addAuxiliary(CodeGenerator::AUX_MM_SPARSE);
+    g.body << "  mm_sparse(   ";
+    g.body << g.work(arg[1], dep(1).nnz()) << ", " << g.sparsity(dep(1).sparsity()) << ", ";
+    g.body << g.work(arg[2], dep(2).nnz()) << ", " << g.sparsity(dep(2).sparsity()) << ", ";
+    g.body << g.work(res[0], nnz()) << ", " << g.sparsity(sparsity()) << ", w);" << endl;
   }
 
-  void DenseMultiplication::generate(std::ostream &stream,
-                                              const std::vector<int>& arg,
-                                              const std::vector<int>& res,
-                                              CodeGenerator& gen) const {
+  void DenseMultiplication::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                     CodeGenerator& g) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      gen.copyVector(stream, gen.work(arg[0]), nnz(), gen.work(res[0]));
+      g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(),
+                                 g.work(res[0], nnz())) << endl;
     }
 
     int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();
-    stream << "  for (i=0, rr=" << gen.work(res[0]) <<"; i<" << ncol_y << "; ++i)";
-    stream << " for (j=0; j<" << nrow_x << "; ++j, ++rr)";
-    stream << " for (k=0, ss=" << gen.work(arg[1]) << "+j, tt="
-           << gen.work(arg[2]) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)";
-    stream << " *rr += ss[k*" << nrow_x << "]**tt++;" << endl;
+    g.body << "  for (i=0, rr=" << g.work(res[0], nnz()) <<"; i<" << ncol_y << "; ++i)";
+    g.body << " for (j=0; j<" << nrow_x << "; ++j, ++rr)";
+    g.body << " for (k=0, ss=" << g.work(arg[1], dep(1).nnz()) << "+j, tt="
+           << g.work(arg[2], dep(2).nnz()) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)";
+    g.body << " *rr += ss[k*" << nrow_x << "]**tt++;" << endl;
   }
 
 } // namespace casadi

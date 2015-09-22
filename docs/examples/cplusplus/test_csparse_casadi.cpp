@@ -51,11 +51,8 @@ int main(int argc, char *argv[])
   Sparsity spA(nrow,ncol,colind,row);
   
   // Create a solver instance
-  LinearSolver linear_solver("csparse", spA);
+  LinearSolver linear_solver("linear_solver", "csparse", spA);
     
-  // Initialize
-  linear_solver.init();
-
   // Pass Non-zero elements
   double   s, u, p, e, r, l;
   s = 19.0; u = 21.0; p = 16.0; e = 5.0; r = 18.0; l = 12.0;
@@ -71,8 +68,8 @@ int main(int argc, char *argv[])
   bool tr = false;
 
   // Solve
-  linear_solver.setInput(val,"A");
-  linear_solver.setInput(rhs,"B");
+  linear_solver.setInputNZ(val,"A");
+  linear_solver.setInputNZ(rhs,"B");
   linear_solver.prepare();
   linear_solver.solve(tr);
   
@@ -83,12 +80,11 @@ int main(int argc, char *argv[])
   MX A = MX::sym("A",spA);
   MX B = MX::sym("B",ncol,1);
   MX X = linear_solver.solve(A,B,tr);
-  MXFunction F(linsolIn("A",A,"B",B),linsolOut("X",X));
-  F.init();
+  MXFunction F("F", linsolIn("A", A, "B", B), linsolOut("X", X));
 
   // Solve
-  F.setInput(val,"A");
-  F.setInput(rhs,"B");
+  F.setInputNZ(val,"A");
+  F.setInputNZ(rhs,"B");
   F.evaluate();
   
   // Print the solution
@@ -104,9 +100,8 @@ int main(int argc, char *argv[])
 
   // Jacobian
   Function J = F.jacobian("B","X");  
-  J.init();
-  J.setInput(val,"A");
-  J.setInput(rhs,"B");
+  J.setInputNZ(val,"A");
+  J.setInputNZ(rhs,"B");
   J.evaluate();
   cout << "solution (dx/db) = " << J.output() << endl;
   DMatrix J_analytic = inv(J.input("A"));

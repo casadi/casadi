@@ -32,8 +32,14 @@
 #include "sparsity.hpp"
 #include "../casadi_math.hpp"
 #include "sparsity_interface.hpp"
+#include "../generic_type.hpp"
 
 namespace casadi {
+  /** \brief Empty Base
+      This class is extended in SWIG.
+   */
+  struct CASADI_EXPORT GenericMatrixCommon {};
+
   /** \brief Matrix base class
 
       This is a common base class for MX and Matrix<>, introducing a uniform syntax and implementing
@@ -63,14 +69,17 @@ namespace casadi {
       \date 2012
   */
   template<typename MatType>
-  class CASADI_EXPORT GenericMatrix : public SparsityInterface<MatType> {
+  class CASADI_EXPORT GenericMatrix
+    : public GenericMatrixCommon,
+      public SparsityInterface<MatType> {
     using SparsityInterface<MatType>::self;
   public:
 
     /** \brief Get the number of (structural) non-zero elements */
     int nnz() const;
 
-    /** \brief DEPRECATED: Alias for nnz
+    /** \brief [DEPRECATED] Alias for nnz
+        The meaning of this function will change in future revision.
         \see nnz()
     */
     int size() const { return nnz();}
@@ -96,9 +105,6 @@ namespace casadi {
     /** \brief Get the second dimension (i.e. number of columns) */
     int size2() const;
 
-    /** \brief Get the number if non-zeros for a given sparsity pattern */
-    int size(SparsityType sp) const;
-
     /** \brief Get string representation of dimensions.
         The representation is (nrow x ncol = numel | size)
     */
@@ -107,32 +113,36 @@ namespace casadi {
     /** \brief  Get the shape */
     std::pair<int, int> shape() const;
 
+    /** \brief  Get the size along a particular dimensions */
+    int shape(int axis) const;
+
     /** \brief Check if the sparsity is empty, i.e. if one of the dimensions is zero
      * (or optionally both dimensions) */
-    bool isEmpty(bool both=false) const { return sparsity().isEmpty(both);}
+    bool isempty(bool both=false) const { return sparsity().isempty(both);}
 
     /** \brief  Check if the matrix expression is dense */
-    bool isDense() const { return sparsity().isDense();}
+    bool isdense() const { return sparsity().isdense();}
 
     /** \brief  Check if the matrix expression is scalar */
-    bool isScalar(bool scalar_and_dense=false) const;
+    bool isscalar(bool scalar_and_dense=false) const;
 
     /** \brief  Check if the matrix expression is square */
-    bool isSquare() const { return sparsity().isSquare();}
+    bool issquare() const { return sparsity().issquare();}
 
-    /** \brief  Check if the matrix is a column vector (i.e. size2()==1)
-        Optionally, checks if either row or column vector.
-     */
-    bool isVector(bool row_or_col=false) const { return sparsity().isVector(row_or_col);}
+    /** \brief  Check if the matrix is a row or column vector */
+    bool isvector() const { return sparsity().isvector();}
 
     /** \brief  Check if the matrix is a row vector (i.e. size1()==1) */
-    bool isRowVector() const { return sparsity().isVector();}
+    bool isrow() const { return sparsity().isrow();}
+
+    /** \brief  Check if the matrix is a column vector (i.e. size2()==1) */
+    bool iscolumn() const { return sparsity().iscolumn();}
 
     /** \brief Check if the matrix is upper triangular */
-    bool isTriu() const { return sparsity().isTriu();}
+    bool istriu() const { return sparsity().istriu();}
 
     /** \brief Check if the matrix is lower triangular */
-    bool isTril() const { return sparsity().isTril();}
+    bool istril() const { return sparsity().istril();}
 
     ///@{
     /** \brief Get the sparsity pattern. See the Sparsity class for details. */
@@ -156,12 +166,14 @@ namespace casadi {
     std::vector<int> find(bool ind1=SWIG_IND1) const { return sparsity().find(ind1);}
 
     /** \brief Get the sparsity pattern */
-    const Sparsity& sparsity() const;
+    SWIG_CONSTREF(Sparsity) sparsity() const;
 
+#ifndef SWIG
     /// \cond INTERNAL
     /** \brief Access the sparsity, make a copy if there are multiple references to it */
     Sparsity& sparsityRef();
     /// \endcond
+
 
     /// \cond CLUTTER
     /**  @{  */
@@ -169,20 +181,21 @@ namespace casadi {
     int zz_sprank() const { return sprank(sparsity());}
     int zz_norm_0_mul(const MatType &A) const { return norm_0_mul(sparsity(), A.sparsity());}
     MatType zz_tril(bool includeDiagonal=true) const {
-      return self().setSparse(tril(sparsity(), includeDiagonal));
+      return project(self(), tril(sparsity(), includeDiagonal));
     }
     MatType zz_triu(bool includeDiagonal=true) const {
-      return self().setSparse(triu(sparsity(), includeDiagonal));
+      return project(self(), triu(sparsity(), includeDiagonal));
     }
     MatType zz_quad_form(const MatType &A) const {
-      casadi_assert(isVector());
+      casadi_assert(isvector());
+      if (!iscolumn()) return quad_form(self().T(), A);
       return inner_prod(self(), mul(A, self()));
     }
     MatType zz_quad_form() const {
-      casadi_assert(isVector());
+      casadi_assert(isvector());
       return inner_prod(self(), self());
     }
-    MatType zz_sum_square() const { return sumAll(self()*self()); }
+    MatType zz_sum_square() const { return inner_prod(self(), self());}
     MatType zz_linspace(const MatType &b, int nsteps) const;
     MatType zz_cross(const MatType &b, int dim=-1) const;
     MatType zz_tril2symm() const;
@@ -192,10 +205,10 @@ namespace casadi {
       ret.makeDense();
       return ret;
     }
+    MatType zz_repsum(int n, int m=1) const;
     /** @}  */
     /// \endcond
 
-#ifndef SWIG
     /** \brief  Get vector nonzero or slice of nonzeros */
     template<typename K>
     const MatType operator[](const K& k) const {
@@ -240,24 +253,52 @@ namespace casadi {
 #endif // SWIG
 
 #if !defined(SWIG) || defined(DOXYGEN)
+/**
+\ingroup expression_tools
+@{
+*/
+    /** \brief Matrix power x^n
+     */
+    inline friend MatType mpower(const MatType& x, const MatType& n) {
+      return x.zz_mpower(n);
+    }
 
-    /**
-       \ingroup expression_tools
-     * @{ */
+    /** \brief Matrix divide (cf. slash '/' in MATLAB)
+     */
+    inline friend MatType mrdivide(const MatType& x, const MatType& n) {
+      return x.zz_mrdivide(n);
+    }
 
-    /** \brief Calculate quadratic form X^T A X*/
+    /** \brief Matrix divide (cf. backslash '\' in MATLAB)
+     */
+    inline friend MatType mldivide(const MatType& x, const MatType& n) {
+      return x.zz_mldivide(n);
+    }
+
+    /** \brief Get all symbols contained in the supplied expression
+     * Get all symbols on which the supplied expression depends
+     * \see SXFunction::getFree(), MXFunction::getFree()
+     */
+    inline friend std::vector<MatType> symvar(const MatType& x) {
+      return x.zz_symvar();
+    }
+
+    /** \brief Calculate quadratic form X^T A X
+     */
     inline friend MatType quad_form(const MatType &X, const MatType &A) {
       return X.zz_quad_form(A);
     }
 
-    /** \brief Calculate quadratic form X^T X*/
+    /** \brief Calculate quadratic form X^T X
+     */
     inline friend MatType quad_form(const MatType &X) {
-     return X.zz_quad_form();
+      return X.zz_quad_form();
     }
 
-    /** \brief Calculate some of squares: sum_ij X_ij^2  */
+    /** \brief Calculate some of squares: sum_ij X_ij^2 
+     */
     inline friend MatType sum_square(const MatType &X) {
-     return X.zz_sum_square();
+      return X.zz_sum_square();
     }
 
     /** \brief Matlab's \c linspace command
@@ -301,9 +342,6 @@ namespace casadi {
     /** \brief Infinity-norm */
     inline friend MatType norm_inf(const MatType &x) { return x.zz_norm_inf();}
 
-    /// Return summation of all elements
-    inline friend MatType sumAll(const MatType &x) { return x.zz_sumAll();}
-
     /** \brief Return a col-wise summation of elements */
     inline friend MatType sumCols(const MatType &x) { return x.zz_sumCols();}
 
@@ -311,10 +349,6 @@ namespace casadi {
     inline friend MatType sumRows(const MatType &x) { return x.zz_sumRows();}
 
     /** \brief Inner product of two matrices
-        Equals
-        \code
-        sumAll(x*y)
-        \endcode
         with x and y matrices of the same dimension
     */
     inline friend MatType inner_prod(const MatType &x, const MatType &y) {
@@ -341,9 +375,12 @@ namespace casadi {
      *
      * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
      */
-    inline friend MatType nullspace(const MatType& A) { return A.zz_nullspace();}
+    inline friend MatType nullspace(const MatType& A) {
+      return A.zz_nullspace();
+    }
 
-    /** \brief  Evaluate a polynomial with coefficients p in x */
+    /** \brief  Evaluate a polynomial with coefficients p in x
+    */
     inline friend MatType polyval(const MatType& p, const MatType& x) {
       return p.zz_polyval(x);
     }
@@ -351,34 +388,197 @@ namespace casadi {
     /** \brief   Get the diagonal of a matrix or construct a diagonal
         When the input is square, the diagonal elements are returned.
         If the input is vector-like, a diagonal matrix is constructed with it. */
-    inline friend MatType diag(const MatType &A) { return A.zz_diag();}
+    inline friend MatType diag(const MatType &A) {
+      return A.zz_diag();
+    }
 
-    /** \brief  Unite two matrices no overlapping sparsity */
+    /** \brief  Unite two matrices no overlapping sparsity
+     */
     inline friend MatType unite(const MatType& A, const MatType& B) {
       return A.zz_unite(B);
     }
 
-    /** \brief  Make the matrix dense if not already */
-    inline friend MatType densify(const MatType& x) { return x.zz_densify();}
+    /** \brief  Make the matrix dense if not already
+     */
+    inline friend MatType densify(const MatType& x) {
+      return x.zz_densify();
+    }
 
-    /** \brief Check if expression depends on the argument
-        The argument must be symbolic
-    */
-    //inline friend bool dependsOn(const MatType& f, const MatType &arg) {
-    //return f.zz_dependsOn(arg);
-    //}
+    /** \brief Create a new matrix with a given sparsity pattern but with the
+      * nonzeros taken from an existing matrix
+      */
+    inline friend MatType project(const MatType& A, const Sparsity& sp,
+                                  bool intersect=false) {
+      return A.zz_project(sp, intersect);
+    }
 
     /** \brief Branching on MX nodes
         Ternary operator, "cond ? if_true : if_false"
     */
-    inline friend MatType if_else(const MatType &cond,
-                                  const MatType &if_true,
-                                  const MatType &if_false) {
-      return cond.zz_if_else(if_true, if_false);
+    inline friend MatType if_else(const MatType &cond, const MatType &if_true,
+                                  const MatType &if_false, bool short_circuit=true) {
+      return cond.zz_if_else(if_true, if_false, short_circuit);
     }
-    /** @} */
 
-#endif // !SWIG || DOXYGEN
+    /** \brief Create a switch
+     *
+     * If the condition \param ind evaluates to the integer k, where 0<=k<f.size(),
+     * then x[k] will be returned, otherwise \param x_default will be returned.
+     */
+    inline friend MatType conditional(const MatType& ind, const std::vector<MatType> &x,
+                                      const MatType &x_default, bool short_circuit=true) {
+      return ind.zz_conditional(x, x_default, short_circuit);
+    }
+
+    /** \brief Check if expression depends on the argument
+        The argument must be symbolic
+    */
+    inline friend bool dependsOn(const MatType& f, const MatType &arg) {
+      return f.zz_dependsOn(arg);
+    }
+
+    /** \brief  Substitute variable v with expression vdef in an expression ex */
+    friend inline MatType substitute(const MatType& ex, const MatType& v,
+                                     const MatType& vdef) {
+      return ex.zz_substitute(v, vdef);
+    }
+
+    /** \brief  Substitute variable var with expression expr in multiple expressions */
+    friend inline std::vector<MatType>
+      substitute(const std::vector<MatType>& ex, const std::vector<MatType>& v,
+                 const std::vector<MatType>& vdef) {
+      return MatType::zz_substitute(ex, v, vdef);
+    }
+
+    /** \brief Inplace substitution with piggyback expressions
+     * Substitute variables v out of the expressions vdef sequentially,
+     * as well as out of a number of other expressions piggyback */
+    inline friend void
+      substituteInPlace(const std::vector<MatType>& v,
+                        std::vector<MatType>& inout_vdef,
+                        std::vector<MatType>& inout_ex, bool reverse=false) {
+      return MatType::zz_substituteInPlace(v, inout_vdef, inout_ex, reverse);
+    }
+
+    /** \brief  Solve a system of equations: A*x = b
+        The solve routine works similar to Matlab's backslash when A is square and nonsingular.
+        The algorithm used is the following:
+        1. A simple forward or backward substitution if A is upper or lower triangular
+        2. If the linear system is at most 3-by-3, form the inverse via minor expansion and multiply
+        3. Permute the variables and equations as to get a (structurally) nonzero diagonal,
+        then perform a QR factorization without pivoting and solve the factorized system.
+
+        Note 1: If there are entries of the linear system known to be zero, these will be removed.
+        Elements that are very small, or will evaluate to be zero, can still cause numerical errors,
+        due to the lack of pivoting (which is not possible since cannot compare the size of entries)
+
+        Note 2: When permuting the linear system, a BLT (block lower triangular) transformation is
+        formed. Only the permutation part of this is however used. An improvement would be to solve
+        block-by-block if there are multiple BLT blocks.
+    */
+    friend inline MatType solve(const MatType& A, const MatType& b) {
+      return A.zz_solve(b);
+    }
+
+    /** \brief Solve a system of equations: A*x = b
+     */
+    friend inline MatType solve(const MatType& A, const MatType& b,
+                                const std::string& lsolver,
+                                const Dict& dict = Dict()) {
+      return A.zz_solve(b, lsolver, dict);
+    }
+
+    /** \brief Computes the Moore-Penrose pseudo-inverse
+     *
+     * If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
+     * 
+     *  pinv(A)' = (AA')^(-1) A
+     *
+     *
+     * If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
+     *
+     *  pinv(A) = (A'A)^(-1) A'
+     *
+     */
+    friend inline MatType pinv(const MatType& A) {
+      return A.zz_pinv();
+    }
+
+    /** \brief Computes the Moore-Penrose pseudo-inverse
+     *
+     * If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity.
+     * If the matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
+     *
+     */
+    friend inline MatType pinv(const MatType& A, const std::string& lsolver,
+                               const Dict& dict = Dict()) {
+      return A.zz_pinv(lsolver, dict);
+    }
+
+    ///@{
+    /** \brief Calculate jacobian via source code transformation
+    */
+    inline friend MatType jacobian(const MatType &ex, const MatType &arg) {
+      return ex.zz_jacobian(arg);
+    }
+    inline friend MatType gradient(const MatType &ex, const MatType &arg) {
+      return ex.zz_gradient(arg);
+    }
+    inline friend MatType tangent(const MatType &ex, const MatType &arg) {
+      return ex.zz_tangent(arg);
+    }
+    ///@}
+
+    ///@{
+    // Hessian and (optionally) gradient
+    inline friend MatType hessian(const MatType &ex, const MatType &arg) {
+      return ex.zz_hessian(arg);
+    }
+    inline friend MatType hessian(const MatType &ex, const MatType &arg, MatType& output_g) {
+      return ex.zz_hessian(arg, output_g);
+    }
+    ///@}
+
+    /** Count number of nodes */
+    inline friend int countNodes(const MatType& A) {
+      return A.zz_countNodes();
+    }
+
+    /** \brief Get a string representation for a binary MatType, using custom arguments */
+    inline friend std::string
+      getOperatorRepresentation(const MatType& xb, const std::vector<std::string>& args) {
+      return xb.zz_getOperatorRepresentation(args);
+    }
+
+    /** \brief Extract shared subexpressions from an set of expressions */
+    inline friend void extractShared(std::vector<MatType>& ex,
+                                     std::vector<MatType>& v,
+                                     std::vector<MatType>& vdef,
+                                     const std::string& v_prefix="v_",
+                                     const std::string& v_suffix="") {
+      MatType::zz_extractShared(ex, v, vdef, v_prefix, v_suffix);
+    }
+
+    /** \brief Extract shared subexpressions from an set of expressions */
+    inline friend void extractShared(const std::vector<MatType>& ex,
+                                     std::vector<MatType>& ex_output,
+                                     std::vector<MatType>& v,
+                                     std::vector<MatType>& vdef,
+                                     const std::string& v_prefix="v_",
+                                     const std::string& v_suffix="") {
+      ex_output = ex;
+      extractShared(ex_output, v, vdef, v_prefix, v_suffix);
+    }
+
+    /** \brief Given a repeated matrix, computes the sum of repeated parts
+     */
+    inline friend MatType repsum(const MatType &A, int n, int m=1) {
+      return A.zz_repsum(n, m);
+    }
+
+
+/** @} */
+#endif // SWIG
 
     /** @name Construct symbolic primitives
         The "sym" function is intended to work in a similar way as "sym" used
@@ -424,14 +624,14 @@ namespace casadi {
 
 #if !defined(SWIG) || !defined(SWIGMATLAB)
     ///@{
-    /** \brief Create a sparse matrix with all zeros 
-        DEPRECATED: Use MatType(nrow, ncol) instead **/
+    /** \brief [DEPRECATED] Create a sparse matrix with all zeros 
+        Use MatType(nrow, ncol) instead **/
     static MatType sparse(int nrow=1, int ncol=1) { return MatType(nrow, ncol);}
     static MatType sparse(const std::pair<int, int>& rc) { return MatType(rc);}
     ///@}
 
-    /** \brief Create a sparse matrix with nonzeros given as a (dense) vector 
-        DEPRECATED: Use MatType(Sparsity, nz) instead **/
+    /** \brief [DEPRECATED] Create a sparse matrix with nonzeros given as a (dense) vector 
+        Use MatType(Sparsity, nz) instead **/
     static MatType sparse(const Sparsity& sp, const MatType& nz) { return MatType(sp, nz); }
 #endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
@@ -505,28 +705,22 @@ namespace casadi {
   }
 
   template<typename MatType>
+  int GenericMatrix<MatType>::shape(int axis) const {
+    if (axis==1)
+      return sparsity().size1();
+    if (axis==2)
+      return sparsity().size2();
+    casadi_error("Axis must be 1 or 2.");
+  }
+
+  template<typename MatType>
   std::string GenericMatrix<MatType>::dimString() const {
     return sparsity().dimString();
   }
 
   template<typename MatType>
-  bool GenericMatrix<MatType>::isScalar(bool scalar_and_dense) const {
-    return sparsity().isScalar(scalar_and_dense);
-  }
-
-  template<typename MatType>
-  int GenericMatrix<MatType>::size(SparsityType sp) const {
-    if (sp==SP_SPARSE) {
-      return nnz();
-    } else if (sp==SP_SPARSESYM) {
-      return sizeU();
-    } else if (sp==SP_DENSE) {
-      return numel();
-    } else if (sp==SP_DENSESYM) {
-      return (numel()+size2())/2;
-    } else {
-      throw CasadiException("Matrix<T>::size(Sparsity): unknown sparsity");
-    }
+  bool GenericMatrix<MatType>::isscalar(bool scalar_and_dense) const {
+    return sparsity().isscalar(scalar_and_dense);
   }
 
 #endif
@@ -614,7 +808,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::zz_tril2symm() const {
-    casadi_assert_message(self().isSquare(),
+    casadi_assert_message(self().issquare(),
                           "Shape error in tril2symm. Expecting square shape but got "
                           << self().dimString());
     casadi_assert_message(self().sizeU()-self().sizeD()==0,
@@ -624,8 +818,23 @@ namespace casadi {
   }
 
   template<typename MatType>
+  MatType GenericMatrix<MatType>::zz_repsum(int n, int m) const {
+    casadi_assert(self().size1() % n==0);
+    casadi_assert(self().size2() % m==0);
+    std::vector< std::vector< MatType> > s =
+      blocksplit(self(), self().size1()/n, self().size2()/m);
+    MatType sum = 0;
+    for (int i=0;i<s.size();++i) {
+      for (int j=0;j<s[i].size();++j) {
+        sum = sum + s[i][j];
+      }
+    }
+    return sum;
+  }
+
+  template<typename MatType>
   MatType GenericMatrix<MatType>::zz_triu2symm() const {
-    casadi_assert_message(self().isSquare(),
+    casadi_assert_message(self().issquare(),
                           "Shape error in triu2symm. Expecting square shape but got "
                           << self().dimString());
     casadi_assert_message(self().sizeL()-self().sizeD()==0,
@@ -633,6 +842,7 @@ namespace casadi {
                           << self().dimString());
     return self() + self().T() - diag(diag(self()));
   }
+
 #endif
 
 } // namespace casadi

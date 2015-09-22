@@ -55,11 +55,12 @@ namespace casadi {
     virtual SqicInterface* clone() const;
 
     /** \brief  Create a new QP Solver */
-    static QpSolverInternal* creator(const QPStructure& st)
-    { return new SqicInterface(st);}
+    static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
+      return new SqicInterface(st);
+    }
 
     /** \brief  Create a new Solver */
-    explicit SqicInterface(const std::vector<Sparsity>& st);
+    explicit SqicInterface(const std::map<std::string, Sparsity>& st);
 
     /** \brief  Destructor */
     virtual ~SqicInterface();

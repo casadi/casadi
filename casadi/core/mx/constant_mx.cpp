@@ -27,7 +27,6 @@
 #include <vector>
 #include <algorithm>
 #include "../std_vector_tools.hpp"
-#include "../matrix/matrix_tools.hpp"
 
 using namespace std;
 
@@ -40,53 +39,39 @@ namespace casadi {
   ConstantMX::~ConstantMX() {
   }
 
-  void ConstantMX::evalD(const cpv_double& input, const pv_double& output,
-                             int* itmp, double* rtmp) {
+  void ConstantMX::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = shared_from_this<MX>();
   }
 
-  void ConstantMX::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                              int* itmp, SXElement* rtmp) {
-  }
-
-  void ConstantMX::eval(const cpv_MX& input, const pv_MX& output) {
-    *output[0] = shared_from_this<MX>();
-  }
-
- void ConstantMX::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
+ void ConstantMX::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                          std::vector<std::vector<MX> >& fsens) {
    MX zero_sens(size1(), size2());
-   for (int d=0; d<fwdSens.size(); ++d) {
-     if (fwdSens[d][0]!=0) {
-       *fwdSens[d][0] = zero_sens;
-     }
+   for (int d=0; d<fsens.size(); ++d) {
+     fsens[d][0] = zero_sens;
    }
  }
 
-  void ConstantMX::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
-    for (int d=0; d<adjSeed.size(); ++d) {
-      if (adjSeed[d][0]!=0) {
-        *adjSeed[d][0] = MX();
-      }
-    }
+  void ConstantMX::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                           std::vector<std::vector<MX> >& asens) {
   }
 
-  void ConstantMX::spFwd(const cpv_bvec_t& arg,
-                         const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void ConstantMX::spFwd(const bvec_t** arg,
+                         bvec_t** res, int* iw, bvec_t* w) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantMX::spAdj(const pv_bvec_t& arg,
-                         const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void ConstantMX::spAdj(bvec_t** arg,
+                         bvec_t** res, int* iw, bvec_t* w) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantDMatrix::generate(std::ostream &stream, const std::vector<int>& arg,
-                                          const std::vector<int>& res,
-                                          CodeGenerator& gen) const {
+  void ConstantDMatrix::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                 CodeGenerator& g) const {
     // Print the constant
-    int ind = gen.getConstant(x_.data(), true);
+    int ind = g.getConstant(x_.data(), true);
 
     // Copy the constant to the work vector
-    gen.copyVector(stream, "c"+gen.numToString(ind), nnz(), gen.work(res.at(0)), "i", false);
+    g.body << "  " << g.copy_n("c"+g.to_string(ind), nnz(), g.work(res[0], nnz())) << endl;
   }
 
   bool ConstantMX::__nonzero__() const {
@@ -96,7 +81,7 @@ namespace casadi {
   }
 
   ConstantMX* ConstantMX::create(const Sparsity& sp, int val) {
-    if (sp.isEmpty(true)) {
+    if (sp.isempty(true)) {
       return ZeroByZero::getInstance();
     } else {
       switch (val) {
@@ -109,7 +94,7 @@ namespace casadi {
   }
 
   ConstantMX* ConstantMX::create(const Sparsity& sp, double val) {
-    if (sp.isEmpty(true)) {
+    if (sp.isempty(true)) {
       return ZeroByZero::getInstance();
     } else {
       int intval(val);
@@ -124,7 +109,7 @@ namespace casadi {
   ConstantMX* ConstantMX::create(const Matrix<double>& val) {
     if (val.nnz()==0) {
       return create(val.sparsity(), 0);
-    } else if (val.isScalar()) {
+    } else if (val.isscalar()) {
       return create(val.sparsity(), val.toScalar());
     } else {
       // Check if all values are the same
@@ -194,11 +179,11 @@ namespace casadi {
     return true;
   }
 
-  void ZeroByZero::printPart(std::ostream &stream, int part) const {
-    stream << "0x0";
+  std::string ZeroByZero::print(const std::vector<std::string>& arg) const {
+    return "0x0";
   }
 
-  MX ZeroByZero::getSetSparse(const Sparsity& sp) const {
+  MX ZeroByZero::getProject(const Sparsity& sp) const {
     return shared_from_this<MX>();
   }
 
@@ -224,7 +209,7 @@ namespace casadi {
   }
 
   MX ZeroByZero::getReshape(const Sparsity& sp) const {
-    casadi_assert(sp.isEmpty());
+    casadi_assert(sp.isempty());
     return MX::zeros(sp);
   }
 

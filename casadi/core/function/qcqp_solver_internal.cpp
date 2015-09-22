@@ -24,7 +24,6 @@
 
 
 #include "qcqp_solver_internal.hpp"
-#include "../matrix/matrix_tools.hpp"
 
 INPUTSCHEME(QcqpSolverInput)
 OUTPUTSCHEME(QcqpSolverOutput)
@@ -33,9 +32,22 @@ using namespace std;
 namespace casadi {
 
   // Constructor
-  QcqpSolverInternal::QcqpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
+  QcqpSolverInternal::QcqpSolverInternal(const std::map<std::string, Sparsity> &st) {
+    st_.resize(QCQP_STRUCT_NUM);
+    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+      if (i->first=="a") {
+        st_[QCQP_STRUCT_A]=i->second;
+      } else if (i->first=="h") {
+        st_[QCQP_STRUCT_H]=i->second;
+      } else if (i->first=="p") {
+        st_[QCQP_STRUCT_P]=i->second;
+      } else {
+        casadi_error("Unrecognized field in QCQP structure: " << i->first);
+      }
+    }
 
-    casadi_assert_message(st_.size()==QCQP_STRUCT_NUM, "Problem structure mismatch");
+    addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "",
+                                                       "qp", true);
 
     const Sparsity& A = st_[QCQP_STRUCT_A];
     const Sparsity& P = st_[QCQP_STRUCT_P];
@@ -73,7 +85,7 @@ namespace casadi {
     Sparsity bounds_sparsity = Sparsity::dense(nc_, 1);
 
     // Input arguments
-    setNumInputs(QCQP_SOLVER_NUM_IN);
+    ibuf_.resize(QCQP_SOLVER_NUM_IN);
     input(QCQP_SOLVER_X0) = DMatrix::zeros(x_sparsity);
     input(QCQP_SOLVER_H) = DMatrix::zeros(H);
     input(QCQP_SOLVER_G) = DMatrix::zeros(x_sparsity);
@@ -88,20 +100,20 @@ namespace casadi {
 
     for (int i=0;i<nq_;++i) {
       DMatrix Pi = input(QCQP_SOLVER_P)(ALL, Slice(i*n_, (i+1)*n_));
-      casadi_assert_message(Pi.sparsity().isSymmetric(),
+      casadi_assert_message(Pi.sparsity().issymmetric(),
                             "We need Pi square & symmetric but got " << Pi.dimString()
                             << " for i = " << i << ".");
     }
 
     // Output arguments
-    setNumOutputs(QCQP_SOLVER_NUM_OUT);
-    output(QCQP_SOLVER_X) = DMatrix(x_sparsity);
+    obuf_.resize(QCQP_SOLVER_NUM_OUT);
+    output(QCQP_SOLVER_X) = DMatrix::zeros(x_sparsity);
     output(QCQP_SOLVER_COST) = 0.0;
-    output(QCQP_SOLVER_LAM_X) = DMatrix(x_sparsity);
-    output(QCQP_SOLVER_LAM_A) = DMatrix(bounds_sparsity);
+    output(QCQP_SOLVER_LAM_X) = DMatrix::zeros(x_sparsity);
+    output(QCQP_SOLVER_LAM_A) = DMatrix::zeros(bounds_sparsity);
 
-    input_.scheme = SCHEME_QcqpSolverInput;
-    output_.scheme = SCHEME_QcqpSolverOutput;
+    ischeme_ = IOScheme(SCHEME_QcqpSolverInput);
+    oscheme_ = IOScheme(SCHEME_QcqpSolverOutput);
   }
 
   void QcqpSolverInternal::init() {

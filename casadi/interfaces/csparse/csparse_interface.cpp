@@ -24,7 +24,6 @@
 
 
 #include "csparse_interface.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/profiling.hpp"
 #include "casadi/core/casadi_options.hpp"
 
@@ -100,7 +99,7 @@ namespace casadi {
     }
     if (!called_once_) {
       if (verbose()) {
-        cout << "CsparseInterface::prepare: symbolic factorization" << endl;
+        userOut() << "CsparseInterface::prepare: symbolic factorization" << endl;
       }
 
       // ordering and symbolic analysis
@@ -122,8 +121,8 @@ namespace casadi {
     }
 
     if (verbose()) {
-      cout << "CsparseInterface::prepare: numeric factorization" << endl;
-      cout << "linear system to be factorized = " << endl;
+      userOut() << "CsparseInterface::prepare: numeric factorization" << endl;
+      userOut() << "linear system to be factorized = " << endl;
       input(0).printSparse();
     }
 
@@ -134,7 +133,7 @@ namespace casadi {
     if (N_==0) {
       DMatrix temp = input();
       temp.makeSparse();
-      if (temp.sparsity().isSingular()) {
+      if (temp.sparsity().issingular()) {
         stringstream ss;
         ss << "CsparseInterface::prepare: factorization failed due to matrix"
           " being singular. Matrix contains numerical zeros which are "

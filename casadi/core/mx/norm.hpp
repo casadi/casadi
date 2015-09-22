@@ -61,35 +61,34 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const std::vector<const T*>& input,
-                 const std::vector<T*>& output, int* itmp, T* rtmp);
+    void evalGen(const T** arg, T** res, int* iw, T* w);
 
     /// Evaluate the function numerically
-    virtual void evalD(const cpv_double& input, const pv_double& output,
-                       int* itmp, double* rtmp);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                            int* itmp, SXElement* rtmp);
+    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
 
-    /** \brief  Evaluate the function symbolically (MX) */
-    virtual void eval(const cpv_MX& input, const pv_MX& output);
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens);
+    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens);
+    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */
-    void generate(std::ostream &stream, const std::vector<int>& arg,
-                           const std::vector<int>& res, CodeGenerator& gen) const;
+    void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                  CodeGenerator& g) const;
 
     /** \brief  Clone function */
     virtual NormF* clone() const { return new NormF(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_NORMF;}
@@ -111,8 +110,8 @@ namespace casadi {
     /** \brief  Clone function */
     virtual Norm2* clone() const { return new Norm2(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_NORM2;}
@@ -134,8 +133,8 @@ namespace casadi {
     /** \brief  Clone function */
     virtual Norm1* clone() const { return new Norm1(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_NORM1;}
@@ -157,8 +156,8 @@ namespace casadi {
     /** \brief  Clone function */
     virtual NormInf* clone() const { return new NormInf(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_NORMINF;}

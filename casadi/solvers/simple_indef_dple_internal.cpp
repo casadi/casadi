@@ -24,14 +24,11 @@
 
 
 #include "simple_indef_dple_internal.hpp"
-#include <cassert>
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
 
+#include <cassert>
 #include <numeric>
 
 INPUTSCHEME(DPLEInput)
@@ -55,15 +52,16 @@ namespace casadi {
     DpleInternal::registerPlugin(casadi_register_dplesolver_simple);
   }
 
-  SimpleIndefDpleInternal::SimpleIndefDpleInternal(
-      const DpleStructure& st) : DpleInternal(st) {
+  SimpleIndefDpleInternal::
+  SimpleIndefDpleInternal(const std::map<std::string, std::vector<Sparsity> >& st)
+    : DpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_simple_indef_dple_solver"); // name of the function
 
     addOption("linear_solver",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linear_solver_options",    OT_DICT,   GenericType(),
               "Options to be passed to the linear solver.");
 
   }
@@ -109,13 +107,12 @@ namespace casadi {
     Vss_shift.push_back(Vss.back());
     Vss_shift.insert(Vss_shift.end(), Vss.begin(), Vss.begin()+K_-1);
 
-    MX Pf = solve(A_total, vec(horzcat(Vss_shift)), getOption("linear_solver"));
+    MX Pf = A_total.zz_solve(vec(horzcat(Vss_shift)), getOption("linear_solver"));
     MX P = reshape(Pf, n_, K_*n_);
 
     P = P(output(DPLE_P).sparsity());
 
-    f_ = MXFunction(dpleIn("a", As, "v", Vs), dpleOut("p", P));
-    f_.init();
+    f_ = MXFunction(name_, dpleIn("a", As, "v", Vs), dpleOut("p", P));
 
     Wrapper<SimpleIndefDpleInternal>::checkDimensions();
   }
@@ -126,11 +123,13 @@ namespace casadi {
     Wrapper<SimpleIndefDpleInternal>::evaluate();
   }
 
-  Function SimpleIndefDpleInternal::getDerForward(int nfwd) {
+  Function SimpleIndefDpleInternal
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function SimpleIndefDpleInternal::getDerReverse(int nadj) {
+  Function SimpleIndefDpleInternal
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     return f_.derReverse(nadj);
   }
 
@@ -141,7 +140,10 @@ namespace casadi {
 
   SimpleIndefDpleInternal* SimpleIndefDpleInternal::clone() const {
     // Return a deep copy
-    SimpleIndefDpleInternal* node = new SimpleIndefDpleInternal(st_);
+    std::map<std::string, std::vector<Sparsity> > tmp;
+    tmp["a"] = st_[Dple_STRUCT_A];
+    tmp["v"] = st_[Dple_STRUCT_V];
+    SimpleIndefDpleInternal* node = new SimpleIndefDpleInternal(tmp);
     node->setOption(dictionary());
     return node;
   }

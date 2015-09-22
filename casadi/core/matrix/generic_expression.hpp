@@ -30,6 +30,11 @@
 
 namespace casadi {
 
+  /** \brief Empty Base
+      This class is extended in SWIG.
+   */
+  struct CASADI_EXPORT GenericExpressionCommon {};
+
   /** \brief Expression interface
   *
   This is a common base class for SX, MX and Matrix<>, introducing a uniform syntax and implementing
@@ -39,7 +44,7 @@ namespace casadi {
   \date 2012
 */
 template<typename ExType>
-class CASADI_EXPORT GenericExpression {
+class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
 #ifndef SWIG
   protected:
     // Helper functions
@@ -48,18 +53,252 @@ class CASADI_EXPORT GenericExpression {
 #endif // SWIG
   public:
 
-#ifndef SWIG
+#if !defined(SWIG) || defined(DOXYGEN)
+/**
+\ingroup expression_tools
+@{
+*/
     /// Addition
-    inline friend ExType operator+(const ExType &x, const ExType &y) { return x.zz_plus(y); }
+    friend inline ExType operator+(const ExType &x, const ExType &y) {
+      return x.zz_plus(y);
+    }
 
     /// Subtraction
-    inline friend ExType operator-(const ExType &x, const ExType &y) { return x.zz_minus(y); }
+    friend inline ExType operator-(const ExType &x, const ExType &y) {
+      return x.zz_minus(y);
+    }
 
     /// Elementwise multiplication
-    inline friend ExType operator*(const ExType &x, const ExType &y) { return x.zz_times(y); }
+    friend inline ExType operator*(const ExType &x, const ExType &y) {
+      return x.zz_times(y);
+    }
 
     /// Elementwise division
-    inline friend ExType operator/(const ExType &x, const ExType &y) { return x.zz_rdivide(y); }
+    friend inline ExType operator/(const ExType &x, const ExType &y) {
+      return x.zz_rdivide(y);
+    }
+
+    /// Logic less than
+    friend inline ExType operator<(const ExType &x, const ExType &y) {
+      return x.zz_lt(y);
+    }
+
+    /// Logic less or equal to
+    friend inline ExType operator<=(const ExType &x, const ExType &y) {
+      return x.zz_le(y);
+    }
+
+    /// Logic greater than
+    friend inline ExType operator>(const ExType &x, const ExType &y) {
+      return y.zz_lt(x);
+    }
+
+    /// Logic greater or equal to
+    friend inline ExType operator>=(const ExType &x, const ExType &y) {
+      return y.zz_le(x);
+    }
+
+    /// Logic equal to
+    friend inline ExType operator==(const ExType &x, const ExType &y) {
+      return x.zz_eq(y);
+    }
+
+    /// Logic not equal to
+    friend inline ExType operator!=(const ExType &x, const ExType &y) {
+      return x.zz_ne(y);
+    }
+
+    /** \brief Logical `and`
+     * Returns (an expression evaluating to) 1 if both
+     * expressions are nonzero and 0 otherwise
+     */
+    friend inline ExType operator&&(const ExType &x, const ExType &y) {
+      return x.zz_and(y);
+    }
+
+    /** \brief  Logical `or`
+     * returns (an expression evaluating to) 1 if at
+     * least one expression is nonzero and 0 otherwise
+     */
+    friend inline ExType operator||(const ExType &x, const ExType &y) {
+      return x.zz_or(y);
+    }
+
+    /// Absolute value
+    friend inline ExType fabs(const ExType& x) {
+      return x.zz_abs();
+    }
+
+    /// Absolute value
+    friend inline ExType abs(const ExType& x) {
+      return x.zz_abs();
+    }
+
+    /// Square root
+    friend inline ExType sqrt(const ExType& x) {
+      return x.zz_sqrt();
+    }
+
+    /// Sine
+    friend inline ExType sin(const ExType& x) {
+      return x.zz_sin();
+    }
+
+    /// Cosine
+    friend inline ExType cos(const ExType& x) {
+      return x.zz_cos();
+    }
+
+    /// Tangent
+    friend inline ExType tan(const ExType& x) {
+      return x.zz_tan();
+    }
+
+    /// Arc tangent
+    friend inline ExType atan(const ExType& x) {
+      return x.zz_atan();
+    }
+
+    /// Arc sine
+    friend inline ExType asin(const ExType& x) {
+      return x.zz_asin();
+    }
+
+    /// Arc cosine
+    friend inline ExType acos(const ExType& x) {
+      return x.zz_acos();
+    }
+
+    /// Hyperbolic tangent
+    friend inline ExType tanh(const ExType& x) {
+      return x.zz_tanh();
+    }
+
+    /// Hyperbolic sine
+    friend inline ExType sinh(const ExType& x) {
+      return x.zz_sinh();
+    }
+
+    /// Hyperbolic cosine
+    friend inline ExType cosh(const ExType& x) {
+      return x.zz_cosh();
+    }
+
+    /// Inverse hyperbolic tangent
+    friend inline ExType atanh(const ExType& x) {
+      return x.zz_atanh();
+    }
+
+    /// Inverse hyperbolic sine
+    friend inline ExType asinh(const ExType& x) {
+      return x.zz_asinh();
+    }
+
+    /// Inverse hyperbolic cosine
+    friend inline ExType acosh(const ExType& x) {
+      return x.zz_acosh();
+    }
+
+    /// Exponential function
+    friend inline ExType exp(const ExType& x) {
+      return x.zz_exp();
+    }
+
+    /// Natural logarithm
+    friend inline ExType log(const ExType& x) {
+      return x.zz_log();
+    }
+
+    /// Base-10 logarithm
+    friend inline ExType log10(const ExType& x) {
+      return x.zz_log10();
+    }
+
+    /// Round down to nearest integer
+    friend inline ExType floor(const ExType& x) {
+      return x.zz_floor();
+    }
+
+    /// Round up to nearest integer
+    friend inline ExType ceil(const ExType& x) {
+      return x.zz_ceil();
+    }
+
+    /// Error function
+    friend inline ExType erf(const ExType& x) {
+      return x.zz_erf();
+    }
+
+    /// Invers error function
+    friend inline ExType erfinv(const ExType& x) {
+      return x.zz_erfinv();
+    }
+
+    /** Sine function
+        sign(x)   := -1 for x<0
+        sign(x)   :=  1 for x>0,
+        sign(0)   :=  0
+        sign(NaN) :=  NaN
+     */
+    friend inline ExType sign(const ExType& x) {
+      return x.zz_sign();
+    }
+
+    /// Elementwise power
+    friend inline ExType pow(const ExType& x, const ExType& n) {
+      return x.zz_power(n);
+    }
+
+    /// Remainder after division
+    friend inline ExType fmod(const ExType& x, const ExType& y) {
+      return x.zz_mod(y);
+    }
+
+    /// Two argument arc tangent
+    friend inline ExType atan2(const ExType& x, const ExType& y) {
+      return x.zz_atan2(y);
+    }
+
+    /// Smallest of two values
+    friend inline ExType fmin(const ExType& x, const ExType& y) {
+      return x.zz_min(y);
+    }
+
+    /// Largest of two values
+    friend inline ExType fmax(const ExType& x, const ExType& y) {
+      return x.zz_max(y);
+    }
+
+    /// Simplify an expression
+    friend inline ExType simplify(const ExType &x) {
+      return x.zz_simplify();
+    }
+
+    /** \brief Check if two nodes are equivalent up to a given depth.
+     * Depth=0 checks if the expressions are identical, i.e. points to the same node.
+     *
+     * a = x*x
+     * b = x*x
+     *
+     *  a.isEqual(b, 0)  will return false, but a.isEqual(b, 1) will return true
+     */
+    friend inline bool isEqual(const ExType& x, const ExType& y, int depth=0) {
+      return x.zz_isEqual(y, depth);
+    }
+
+    friend inline bool iszero(const ExType& x) {
+      return x.isZero();
+    }
+
+    /// Copy sign
+    friend inline ExType copysign(const ExType& x, const ExType& n) {
+      return x.zz_copysign(n);
+    }
+
+    /// Elementwise power with const power
+    friend inline ExType constpow(const ExType& x, const ExType& n) {
+      return x.zz_constpow(n);
+    }
 
     /// In-place addition
     inline ExType& operator+=(const ExType &y) { return self() = self().zz_plus(y); }
@@ -73,158 +312,30 @@ class CASADI_EXPORT GenericExpression {
     /// In-place elementwise division
     inline ExType& operator/=(const ExType &y) {return self() = self().zz_rdivide(y);}
 
-    /// Logic less than
-    inline friend ExType operator<(const ExType &x, const ExType &y) { return x.zz_lt(y); }
-
-    /// Logic less or equal to
-    inline friend ExType operator<=(const ExType &x, const ExType &y) { return x.zz_le(y); }
-
-    /// Logic greater than
-    inline friend ExType operator>(const ExType &x, const ExType &y) { return x.zz_gt(y); }
-
-    /// Logic greater or equal to
-    inline friend ExType operator>=(const ExType &x, const ExType &y) { return x.zz_ge(y); }
-
-    /// Logic equal to
-    inline friend ExType operator==(const ExType &x, const ExType &y) { return x.zz_eq(y); }
-
-    /// Logic not equal to
-    inline friend ExType operator!=(const ExType &x, const ExType &y) { return x.zz_ne(y); }
-
-    /// Logic not
+    /** \brief  Logical `not`
+     * Returns (an expression evaluating to) 1 if
+     * expression is zero and 0 otherwise
+     */
     inline ExType operator!() const { return self().zz_not(); }
 
-    /// Logic and
-    inline friend ExType operator&&(const ExType &x, const ExType &y) { return x.zz_and(y); }
-
-    /// Logic or
-    inline friend ExType operator||(const ExType &x, const ExType &y) { return x.zz_or(y); }
-
-    /** \brief  Simplify an expression */
-    inline friend ExType simplify(const ExType &x) { return x.zz_simplify();}
-    #endif // SWIG
-    /**
-    \ingroup expression_tools
-    @{
-    */
-    #if !defined(SWIG) || defined(DOXYGEN)
-    /** \brief Check if two nodes are equivalent up to a given depth.
-     *  Depth=0 checks if the expressions are identical, i.e. points to the same node.
-     *
-     *  a = x*x
-     *  b = x*x
-     *
-     *  a.isEqual(b, 0)  will return false, but a.isEqual(b, 1) will return true
-     */
-    inline friend bool isEqual(const ExType& x, const ExType& y, int depth=0) {
-      return x.zz_isEqual(y, depth);
+    /// Logical not, alternative syntax
+    friend inline ExType logic_not(const ExType& x) {
+      return !x;
     }
 
-    /** \brief  check if the matrix is 0 (note that false negative answers are possible) */
-    inline friend bool iszero(const ExType& x) { return x.isZero();}
+    /// Logical and, alternative syntax
+    friend inline ExType logic_and(const ExType& x, const ExType& y) {
+      return x && y;
+    }
 
-    /** \brief Absolute value, C++ syntax */
-    inline friend ExType abs(const ExType& x) { return x.zz_abs();}
+    /// Logical or, alterntive syntax
+    friend inline ExType logic_or(const ExType& x, const ExType& y) {
+      return x || y;
+    }
+/** @} */
+#endif // SWIG
 
-    /** \brief Absolute value, C syntax */
-    inline friend ExType fabs(const ExType& x) { return x.zz_abs();}
-
-    /** \brief Square root */
-    inline friend ExType sqrt(const ExType& x) { return x.zz_sqrt();}
-
-    /** \brief Sine */
-    inline friend ExType sin(const ExType& x) { return x.zz_sin();}
-
-    /** \brief Cosine */
-    inline friend ExType cos(const ExType& x) { return x.zz_cos();}
-
-    /** \brief Tangent */
-    inline friend ExType tan(const ExType& x) { return x.zz_tan();}
-
-    /** \brief Arc tangent */
-    inline friend ExType atan(const ExType& x) { return x.zz_atan();}
-
-    /** \brief Arc sine */
-    inline friend ExType asin(const ExType& x) { return x.zz_asin();}
-
-    /** \brief Arc cosine */
-    inline friend ExType acos(const ExType& x) { return x.zz_acos();}
-
-    /** \brief Hyperbolic tangent */
-    inline friend ExType tanh(const ExType& x) { return x.zz_tanh();}
-
-    /** \brief Hyperbolic sine */
-    inline friend ExType sinh(const ExType& x) { return x.zz_sinh();}
-
-    /** \brief Hyperbolic cosine */
-    inline friend ExType cosh(const ExType& x) { return x.zz_cosh();}
-
-    /** \brief Arc hyperbolic tangent */
-    inline friend ExType atanh(const ExType& x) { return x.zz_atanh();}
-
-    /** \brief Arc hyperbolic sine */
-    inline friend ExType asinh(const ExType& x) { return x.zz_asinh();}
-
-    /** \brief Arc hyperbolic cosine */
-    inline friend ExType acosh(const ExType& x) { return x.zz_acosh();}
-
-    /** \brief Natural exponential function (elementwise for matrix types) */
-    inline friend ExType exp(const ExType& x) { return x.zz_exp();}
-
-    /** \brief Natural logarithm */
-    inline friend ExType log(const ExType& x) { return x.zz_log();}
-
-    /** \brief 10-base logarithm */
-    inline friend ExType log10(const ExType& x) { return x.zz_log10();}
-
-    /** \brief Round down to nearest integer */
-    inline friend ExType floor(const ExType& x) { return x.zz_floor();}
-
-    /** \brief Round up to nearest integer */
-    inline friend ExType ceil(const ExType& x) { return x.zz_ceil();}
-
-    /** \brief Error function */
-    inline friend ExType erf(const ExType& x) { return x.zz_erf();}
-
-    /** \brief Sign function (note sign(nan) == nan, sign(0) == 0) */
-    inline friend ExType sign(const ExType& x) { return x.zz_sign();}
-
-    /** \brief Power (elementwise for matrix types) */
-    inline friend ExType pow(const ExType& x, const ExType& n) { return x.zz_power(n);}
-
-    /** \brief Modulo */
-    inline friend ExType fmod(const ExType& x, const ExType& y) { return x.zz_mod(y);}
-
-    /** \brief Arctan2 */
-    inline friend ExType atan2(const ExType& x, const ExType& y) { return x.zz_atan2(y);}
-
-    /** \brief Minimum of two values */
-    inline friend ExType fmin(const ExType& x, const ExType& y) { return x.zz_min(y);}
-
-    /** \brief Maximum of two values */
-    inline friend ExType fmax(const ExType& x, const ExType& y) { return x.zz_max(y);}
-    #endif // !SWIG || DOXYGEN
-    /** @} */
-
-    // \cond CLUTTER
-
-    /// Matrix division from left
-    inline ExType __mldivide__(const ExType& y) const
-    { return y.__mrdivide__(self());}
-
-    /// No need to have both < and >
-    inline ExType zz_gt(const ExType& y) const
-    { return y.zz_lt(self());}
-
-    /// No need to have both <= and >=
-    inline ExType zz_ge(const ExType& y) const
-    { return y.zz_le(self());}
-
-    /// Division (with <tt>__future__.division</tt> in effect)
-    inline ExType __truediv__(const ExType& y) const {return self()/y;}
-    /// \endcond
 };
-
 
 } // namespace casadi
 

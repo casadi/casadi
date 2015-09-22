@@ -47,6 +47,66 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::EcosInterface
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>dcost</td><td>casadi::EcosInterface</td></tr>
+<tr><td>dinf</td><td>casadi::EcosInterface</td></tr>
+<tr><td>dinfres</td><td>casadi::EcosInterface</td></tr>
+<tr><td>dres</td><td>casadi::EcosInterface</td></tr>
+<tr><td>exit_code</td><td>casadi::EcosInterface</td></tr>
+<tr><td>exit_code_explanation</td><td>casadi::EcosInterface</td></tr>
+<tr><td>gap</td><td>casadi::EcosInterface</td></tr>
+<tr><td>iter</td><td>casadi::EcosInterface</td></tr>
+<tr><td>kapovert</td><td>casadi::EcosInterface</td></tr>
+<tr><td>mu</td><td>casadi::EcosInterface</td></tr>
+<tr><td>nitref1</td><td>casadi::EcosInterface</td></tr>
+<tr><td>nitref2</td><td>casadi::EcosInterface</td></tr>
+<tr><td>nitref3</td><td>casadi::EcosInterface</td></tr>
+<tr><td>pcost</td><td>casadi::EcosInterface</td></tr>
+<tr><td>pinf</td><td>casadi::EcosInterface</td></tr>
+<tr><td>pinfres</td><td>casadi::EcosInterface</td></tr>
+<tr><td>pres</td><td>casadi::EcosInterface</td></tr>
+<tr><td>relgap</td><td>casadi::EcosInterface</td></tr>
+<tr><td>sigma</td><td>casadi::EcosInterface</td></tr>
+<tr><td>step</td><td>casadi::EcosInterface</td></tr>
+<tr><td>step_aff</td><td>casadi::EcosInterface</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_SocpSolver_ecos
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th></tr>
+<tr><td>dcost</td></tr>
+<tr><td>dinf</td></tr>
+<tr><td>dinfres</td></tr>
+<tr><td>dres</td></tr>
+<tr><td>exit_code</td></tr>
+<tr><td>exit_code_explanation</td></tr>
+<tr><td>gap</td></tr>
+<tr><td>iter</td></tr>
+<tr><td>kapovert</td></tr>
+<tr><td>mu</td></tr>
+<tr><td>nitref1</td></tr>
+<tr><td>nitref2</td></tr>
+<tr><td>nitref3</td></tr>
+<tr><td>pcost</td></tr>
+<tr><td>pinf</td></tr>
+<tr><td>pinfres</td></tr>
+<tr><td>pres</td></tr>
+<tr><td>relgap</td></tr>
+<tr><td>sigma</td></tr>
+<tr><td>step</td></tr>
+<tr><td>step_aff</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::IdasInterface
 \n
 \par
@@ -85,20 +145,29 @@
 <tr><td>iter_count</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>iteration</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>iterations</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>n_eval_callback</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>n_eval_f</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>n_eval_g</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>n_eval_grad_f</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>n_eval_h</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>n_eval_jac_g</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>return_status</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_callback_fun</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_callback_prepare</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_f</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_g</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_grad_f</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_h</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_jac_g</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_mainloop</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_callback_fun.proc</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_callback_fun.wall</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_callback_prepare.proc</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_callback_prepare.wall</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_f.proc</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_f.wall</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_g.proc</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_g.wall</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_grad_f.proc</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_grad_f.wall</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_h.proc</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_h.wall</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_jac_g.proc</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_jac_g.wall</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_mainloop.proc</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_mainloop.wall</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_integer_md</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_numeric_md</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_string_md</td><td>casadi::IpoptInterface</td></tr>
@@ -117,20 +186,29 @@
 <tr><td>iter_count</td></tr>
 <tr><td>iteration</td></tr>
 <tr><td>iterations</td></tr>
+<tr><td>n_eval_callback</td></tr>
 <tr><td>n_eval_f</td></tr>
 <tr><td>n_eval_g</td></tr>
 <tr><td>n_eval_grad_f</td></tr>
 <tr><td>n_eval_h</td></tr>
 <tr><td>n_eval_jac_g</td></tr>
 <tr><td>return_status</td></tr>
-<tr><td>t_callback_fun</td></tr>
-<tr><td>t_callback_prepare</td></tr>
-<tr><td>t_eval_f</td></tr>
-<tr><td>t_eval_g</td></tr>
-<tr><td>t_eval_grad_f</td></tr>
-<tr><td>t_eval_h</td></tr>
-<tr><td>t_eval_jac_g</td></tr>
-<tr><td>t_mainloop</td></tr>
+<tr><td>t_callback_fun.proc</td></tr>
+<tr><td>t_callback_fun.wall</td></tr>
+<tr><td>t_callback_prepare.proc</td></tr>
+<tr><td>t_callback_prepare.wall</td></tr>
+<tr><td>t_eval_f.proc</td></tr>
+<tr><td>t_eval_f.wall</td></tr>
+<tr><td>t_eval_g.proc</td></tr>
+<tr><td>t_eval_g.wall</td></tr>
+<tr><td>t_eval_grad_f.proc</td></tr>
+<tr><td>t_eval_grad_f.wall</td></tr>
+<tr><td>t_eval_h.proc</td></tr>
+<tr><td>t_eval_h.wall</td></tr>
+<tr><td>t_eval_jac_g.proc</td></tr>
+<tr><td>t_eval_jac_g.wall</td></tr>
+<tr><td>t_mainloop.proc</td></tr>
+<tr><td>t_mainloop.wall</td></tr>
 <tr><td>var_integer_md</td></tr>
 <tr><td>var_numeric_md</td></tr>
 <tr><td>var_string_md</td></tr>
@@ -220,38 +298,6 @@
 <tr><th>Id</th></tr>
 <tr><td>iter</td></tr>
 <tr><td>return_status</td></tr>
-</table>
-*/
-/// \cond INTERNAL
-/** \class casadi::ParallelizerInternal
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>max_threads</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>num_threads</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_allocation</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_cputime</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_endtime</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_order</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_starttime</td><td>casadi::ParallelizerInternal</td></tr>
-</table>
-*/
-/// \endcond
-/** \class casadi::Parallelizer
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>max_threads</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>num_threads</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_allocation</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_cputime</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_endtime</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_order</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_starttime</td><td>casadi::ParallelizerInternal</td></tr>
 </table>
 */
 /// \cond INTERNAL

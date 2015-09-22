@@ -57,6 +57,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a QP problem [qpIn]
   enum QpSolverInput {
@@ -92,16 +93,7 @@ namespace casadi {
     /// The dual solution corresponding to simple bounds [lam_x]
     QP_SOLVER_LAM_X,
     QP_SOLVER_NUM_OUT};
-
-
-  /// Structure specification of a QP [qpStruct]
-  enum QPStruct {
-    /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
-    /// The matrix is assumed to be symmetrical. [h]
-    QP_STRUCT_H,
-    /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
-    QP_STRUCT_A,
-    QP_STRUCT_NUM};
+#endif // SWIG
 
   // Forward declaration of internal class
   class QpSolverInternal;
@@ -123,11 +115,20 @@ namespace casadi {
     /// Default constructor
     QpSolver();
 
-    /** \brief Constructor
+    /** \brief Constructor (new syntax, includes initialization)
      *  \param name \pluginargument{QpSolver}
      *  \param st \structargument{QP}
      */
-    QpSolver(const std::string& name, const QPStructure& st);
+    QpSolver(const std::string& name, const std::string& solver,
+             const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
+
+    #ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Constructor (no initialization)
+     *  \param name \pluginargument{QpSolver}
+     *  \param st \structargument{QP}
+     */
+    QpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
+    #endif // WITH_DEPRECATED_FEATURES
 
     /// Access functions of the node
     QpSolverInternal* operator->();
@@ -144,9 +145,6 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
-
-    /// Set options that make the QP solver more suitable for solving LPs
-    void setLPOptions();
 
     /** Generate native code in the interfaced language for debugging */
     void generateNativeCode(const std::string &filename) const;

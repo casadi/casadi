@@ -47,8 +47,7 @@ rhs["v"]  = -10*(x["p"]-u) - x["v"]*sqrt(sum_square(x["v"])+1) + w
 
 T = SX.sym("T") # Time-period
 
-f = SXFunction(daeIn(x=x,p=vertcat([T,u,w])),daeOut(ode=T*rhs))
-f.init()
+f = SXFunction('f', daeIn(x=x,p=vertcat([T,u,w])),daeOut(ode=T*rhs))
 
 #  ==================================
 #    Construct the path constraints
@@ -61,11 +60,11 @@ hyper = [ ( vertcat([1,1]),   vertcat([0,0  ]) , 4),
 
 P = SX.sym("P",4,4)
 
-h_nom    = [ sumAll(((x["p"]-p)/s)**n) - 1 for s,p,n in hyper ]
+h_nom    = [ sumRows(vec(((x["p"]-p)/s)**n)) - 1 for s,p,n in hyper ]
+
 h_margin = [ sqrt(quad_form(jacobian(i,x).T,P)) for i in h_nom ]
 
-h_robust = SXFunction([x,P],[ n - gamma*m for n,m in zip(h_nom, h_margin) ])
-h_robust.init()
+h_robust = SXFunction('h_robust', [x,P],[ n - gamma*m for n,m in zip(h_nom, h_margin) ])
 
 
 #  ==================================
@@ -77,17 +76,12 @@ Tref = 4.0
 
 ts = [i*1.0/N for i in range(N)]
 
-Phi = Integrator("rk",f)
-Phi.setOption("number_of_finite_elements",2)
-Phi.setOption("tf",1.0/N)
-Phi.init()
+Phi = Integrator("Phi", "rk", f, {"number_of_finite_elements":2, "tf":1.0/N})
 
 # Obtain some sensitivity functions from the integrating block
 APhi = Phi.jacobian("x0","xf")
-APhi.init()
 
 CPhi = Phi.jacobian("p","xf")
-CPhi.init()
 
 #  ==================================
 #         Construct the NLP
@@ -116,9 +110,8 @@ for k in range(N):
  
 
 # DPLE solver
-dple = DpleSolver("slicot",dpleStruct(a=[i.sparsity() for i in As],v=[i.sparsity() for i in Qs]))
-dple.setOption("linear_solver","csparse")
-dple.init()
+opts = {"linear_solver":"csparse"}
+dple = DpleSolver("dple", "slicot",{'a':[i.sparsity() for i in As],'v':[i.sparsity() for i in Qs]}, opts)
 
 Ps = horzsplit(dple(a=horzcat(As),v=horzcat(Qs))["p"],x.shape[0])
 
@@ -132,15 +125,13 @@ g = struct_MX([
 # Objective function
 F = V["T"] + 1e-2*sum_square(vertcat(V["U"]))/2/N
 
-nlp = MXFunction(nlpIn(x=V),nlpOut(f=F,g=g))
+nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=F,g=g))
 
 #  ==================================
 #   Set NLP initial guess and bounds
 #  ==================================
 
-solver = NlpSolver("ipopt",nlp)
-solver.setOption("hessian_approximation","limited-memory")
-solver.init()
+solver = NlpSolver("solver","ipopt", nlp, {"hessian_approximation":"limited-memory"})
 
 V0 = V(0.0)
 
@@ -181,8 +172,7 @@ for s,p,n in hyper:
   fill(s[0]*fabs(cos(theta))**(2.0/n)*sign(cos(theta)) + p[0],s[1]*fabs(sin(theta))**(2.0/n)*sign(sin(theta)) + p[1],'r')
 
 # Plot the unertainty ellipsoids
-Pf = MXFunction(nlpIn(x=V),Ps)
-Pf.init()
+Pf = MXFunction('Pf', nlpIn(x=V),Ps)
 
 Pf.setInput(sol)
 Pf.evaluate()

@@ -28,171 +28,169 @@
 
 #include <set>
 #include <iostream>
-
 #include "../mx/mx.hpp"
 #include "sx_function.hpp"
 
-/// \cond INTERNAL
-
 namespace casadi {
 
-/** \brief  An element of the algorithm, namely an MX node */
-struct MXAlgEl {
-  /// Operator index
-  int op;
-
-  /// Data associated with the operation
-  MX data;
-
-  /// Work vector indices of the arguments
-  std::vector<int> arg;
-
-  /// Work vector indices of the results
-  std::vector<int> res;
-};
-
-} // namespace casadi
-
-#ifdef SWIG
-// Template instantiation
-%template(MXAlgElVector) std::vector<casadi::MXAlgEl>;
-#endif // SWIG
-
-/// \endcond
-
-namespace casadi {
-
-/** \brief  Forward declaration of internal class */
-class MXFunctionInternal;
+  /** \brief  Forward declaration of internal class */
+  class MXFunctionInternal;
 
   /** \brief  General function mapping from/to MX
-  \author Joel Andersson
-  \date 2010
-*/
-class CASADI_EXPORT MXFunction : public Function {
-public:
+      \author Joel Andersson
+      \date 2010-2015
+  */
+  class CASADI_EXPORT MXFunction : public Function {
+  public:
 
-  /** \brief  Default constructor */
-  MXFunction();
+    /** \brief  Default constructor */
+    MXFunction();
 
-  /** \brief  Attempt to form an MXFunction out of an Function */
-  explicit MXFunction(const Function& function);
+    /** \brief  Attempt to form an MXFunction out of an Function */
+    explicit MXFunction(const Function& function);
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    MXFunction(const std::string& name, const std::vector<MX>& arg,
+               const std::vector<MX>& res, const Dict& opts=Dict());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    MXFunction(const std::string& name, const std::pair< MXDict, std::vector<std::string> >& arg,
+               const std::vector<MX>& res, const Dict& opts=Dict());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    MXFunction(const std::string& name, const std::vector<MX>& arg,
+               const std::pair< MXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    MXFunction(const std::string& name, const std::pair< MXDict, std::vector<std::string> >& arg,
+               const std::pair< MXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
 
 #ifndef SWIG
-  /** \brief  Single input, single output */
-  MXFunction(const MX& input, const MX& output);
+#ifdef USE_CXX11
+    /** \brief Construct from initializer lists (new syntax, includes initialization) */
+    MXFunction(const std::string& name,
+               std::initializer_list<MX> arg,
+               std::initializer_list<MX> res,
+               const Dict& opts=Dict());
 
-  /** \brief  Single input, multiple output */
-  MXFunction(const MX& input, const std::vector<MX>& output);
+    /** \brief Construct from vector & initializer list (new syntax, includes initialization) */
+    MXFunction(const std::string& name,
+               std::vector<MX> arg,
+               std::initializer_list<MX> res,
+               const Dict& opts=Dict());
 
-  /** \brief  Multiple input, single output */
-  MXFunction(const std::vector<MX>& input, const MX& output);
+    /** \brief Construct from initializer list & vector (new syntax, includes initialization) */
+    MXFunction(const std::string& name,
+               std::initializer_list<MX> arg,
+               std::vector<MX> res,
+               const Dict& opts=Dict());
+#endif // USE_CXX11
 #endif // SWIG
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Multiple input, multiple output, no initialization */
+    MXFunction(const std::vector<MX>& arg,
+               const std::vector<MX>& res);
 
-  /** \brief  Multiple input, multiple output*/
-  MXFunction(const std::vector<MX>& input, const std::vector<MX>& output);
+    /** \brief [DEPRECATED] Multiple input, multiple output, no initialization */
+    MXFunction(const std::vector<MX>& arg,
+               const std::pair< MXDict, std::vector<std::string> >& res);
 
-  /** \brief  Multiple input, multiple output*/
-  MXFunction(const std::vector<MX>& input, const IOSchemeVector< MX >& output);
+    /** \brief [DEPRECATED] Multiple input, multiple output, no initialization */
+    MXFunction(const std::pair< MXDict, std::vector<std::string> >& arg,
+               const std::vector<MX>& res);
 
-  /** \brief  Multiple input, multiple output*/
-  MXFunction(const IOSchemeVector< MX >& input, const std::vector<MX>& output);
+    /** \brief [DEPRECATED] Multiple input, multiple output, no initialization */
+    MXFunction(const std::pair< MXDict, std::vector<std::string> >& arg,
+               const std::pair< MXDict, std::vector<std::string> >& res);
+#endif // WITH_DEPRECATED_FEATURESS
 
-  /** \brief  Multiple input, multiple output*/
-  MXFunction(const IOSchemeVector< MX >& input, const IOSchemeVector< MX >& output);
+    /// \cond INTERNAL
+    /** \brief  Access functions of the node */
+    MXFunctionInternal* operator->();
 
-  /// \cond INTERNAL
-  /** \brief  Access functions of the node */
-  MXFunctionInternal* operator->();
+    /** \brief  Const access functions of the node */
+    const MXFunctionInternal* operator->() const;
+    /// \endcond
 
-  /** \brief  Const access functions of the node */
-  const MXFunctionInternal* operator->() const;
-  /// \endcond
+    /** \brief Get function input */
+    const MX inputExpr(int ind) const;
+    const MX inputExpr(const std::string & iname) const {
+      return inputExpr(inputIndex(iname));
+    }
 
-  /** \brief Get function input */
-  const MX& inputExpr(int ind) const;
-  const MX& inputExpr(const std::string & iname) const
-  { return inputExpr(inputSchemeEntry(iname)); }
+    /** \brief Get function output */
+    const MX outputExpr(int ind) const;
+    const MX outputExpr(const std::string & oname) const {
+      return outputExpr(outputIndex(oname));
+    }
 
-  /** \brief Get function output */
-  const MX& outputExpr(int ind) const;
-  const MX& outputExpr(const std::string & oname) const
-  { return outputExpr(outputSchemeEntry(oname)); }
+    /** \brief Get all function inputs */
+    const std::vector<MX> inputExpr() const;
 
-  /** \brief Get all function inputs */
-  const std::vector<MX>& inputExpr() const;
+    /** \brief Get all function outputs */
+    const std::vector<MX> outputExpr() const;
 
-  /** \brief Get all function outputs */
-  const std::vector<MX> & outputExpr() const;
-
-/// \cond INTERNAL
+    /// \cond INTERNAL
 #ifndef SWIG
-  /** \brief Access the algorithm directly */
-  const std::vector<MXAlgEl>& algorithm() const;
+    /** \brief Called from constructor */
+    void construct(const std::string& name, const std::vector<MX>& arg,
+                   const std::vector<MX>& res, const Dict& opts,
+                   const std::vector<std::string>& ischeme=std::vector<std::string>(),
+                   const std::vector<std::string>& oscheme=std::vector<std::string>());
 #endif // SWIG
-/// \endcond
+    /// \endcond
 
-  /** \brief Get the number of atomic operations */
-  int getAlgorithmSize() const { return algorithm().size();}
+    /** \brief Number of nodes in the algorithm */
+    int countNodes() const;
 
-  /** \brief Get the length of the work vector */
-  int getWorkSize() const;
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
 
-  /** \brief Number of nodes in the algorithm */
-  int countNodes() const;
+    ///@{
+    /** \brief Jacobian via source code transformation */
+    MX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
+    MX jac(const std::string & iname, int oind=0, bool compact=false, bool symmetric=false)
+    { return jac(inputIndex(iname), oind, compact, symmetric); }
+    MX jac(int iind, const std::string & oname, bool compact=false, bool symmetric=false)
+    { return jac(iind, outputIndex(oname), compact, symmetric); }
+    MX jac(const std::string & iname, const std::string & oname,
+           bool compact=false, bool symmetric=false)
+    { return jac(inputIndex(iname), outputIndex(oname), compact, symmetric); }
+    ///@}
 
-  /// Check if a particular cast is allowed
-  static bool testCast(const SharedObjectNode* ptr);
+    ///@{
+    /** \brief Gradient via source code transformation */
+    MX grad(int iind=0, int oind=0);
+    MX grad(const std::string & iname, int oind=0) { return grad(inputIndex(iname), oind); }
+    MX grad(int iind, const std::string & oname) { return grad(iind, outputIndex(oname)); }
+    MX grad(const std::string & iname, const std::string & oname)
+    { return grad(inputIndex(iname), outputIndex(oname)); }
+    ///@}
 
-  ///@{
-  /** \brief Jacobian via source code transformation */
-  MX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-  MX jac(const std::string & iname, int oind=0, bool compact=false, bool symmetric=false)
-  { return jac(inputSchemeEntry(iname), oind, compact, symmetric); }
-  MX jac(int iind, const std::string & oname, bool compact=false, bool symmetric=false)
-  { return jac(iind, outputSchemeEntry(oname), compact, symmetric); }
-  MX jac(const std::string & iname, const std::string & oname,
-         bool compact=false, bool symmetric=false)
-  { return jac(inputSchemeEntry(iname), outputSchemeEntry(oname), compact, symmetric); }
-  ///@}
+    ///@{
+    /** \brief Tangent via source code transformation */
+    MX tang(int iind=0, int oind=0);
+    MX tang(const std::string & iname, int oind=0) { return tang(inputIndex(iname), oind); }
+    MX tang(int iind, const std::string & oname) { return tang(iind, outputIndex(oname)); }
+    MX tang(const std::string & iname, const std::string & oname)
+    { return tang(inputIndex(iname), outputIndex(oname)); }
+    ///@}
 
-  ///@{
-  /** \brief Gradient via source code transformation */
-  MX grad(int iind=0, int oind=0);
-  MX grad(const std::string & iname, int oind=0) { return grad(inputSchemeEntry(iname), oind); }
-  MX grad(int iind, const std::string & oname) { return grad(iind, outputSchemeEntry(oname)); }
-  MX grad(const std::string & iname, const std::string & oname)
-  { return grad(inputSchemeEntry(iname), outputSchemeEntry(oname)); }
-  ///@}
+    /** \brief Expand the matrix valued graph into a scalar valued graph */
+    SXFunction expand(const std::vector<SX>& inputv = std::vector<SX>());
 
-  ///@{
-  /** \brief Tangent via source code transformation */
-  MX tang(int iind=0, int oind=0);
-  MX tang(const std::string & iname, int oind=0) { return tang(inputSchemeEntry(iname), oind); }
-  MX tang(int iind, const std::string & oname) { return tang(iind, outputSchemeEntry(oname)); }
-  MX tang(const std::string & iname, const std::string & oname)
-  { return tang(inputSchemeEntry(iname), outputSchemeEntry(oname)); }
-  ///@}
+    /** \brief Get all the free variables of the function */
+    std::vector<MX> getFree() const;
 
-  /** \brief Expand the matrix valued graph into a scalar valued graph */
-  SXFunction expand(const std::vector<SX>& inputv = std::vector<SX>());
+    /// \cond INTERNAL
+    /** \brief Extract the functions needed for the Lifted Newton method */
+    void generateLiftingFunctions(MXFunction& SWIG_OUTPUT(vdef_fcn),
+                                  MXFunction& SWIG_OUTPUT(vinit_fcn));
+    /// \endcond
 
-  /** \brief Get all the free variables of the function */
-  std::vector<MX> getFree() const;
-
-/// \cond INTERNAL
-#ifndef SWIG
-  /** \brief Extract the functions needed for the Lifted Newton method */
-  void generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn);
-#else
-  /** \brief Extract the functions needed for the Lifted Newton method */
-  void generateLiftingFunctions(MXFunction& OUTPUT, MXFunction& OUTPUT);
-#endif
-/// \endcond
-
-  /** \brief Get the corresponding matrix type */
-  typedef MX MatType;
-};
+    /** \brief Get the corresponding matrix type */
+    typedef MX MatType;
+  };
 
 } // namespace casadi
 

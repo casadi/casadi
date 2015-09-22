@@ -23,7 +23,6 @@
  */
 
 #include <casadi/casadi.hpp>
-#include <casadi/core/misc/symbolic_nlp.hpp>
 
 /**
  * This example demonstrates how NL-files, which can be generated
@@ -42,43 +41,38 @@ int main(int argc, char **argv){
   std::string problem = (argc==2) ? argv[1] : "../docs/examples/nl_files/hs107.nl";
 
   // Parse an NL-file
-  SymbolicNLP nl;
+  NlpBuilder nl;
   nl.parseNL(problem);
 
   // NLP
-  SXFunction nlp(nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
- 
-  // Allocate NLP solver
-  NlpSolver nlp_solver("sqpmethod", nlp);
+  SXFunction nlp("nlp", nlpIn("x", nl.x), nlpOut("f", nl.f, "g", nl.g));
 
   // Set options
-  // nlp_solver.setOption("max_iter",10);
-  // nlp_solver.setOption("verbose",true);
-  // nlp_solver.setOption("linear_solver","ma57");
-  nlp_solver.setOption("hessian_approximation","exact");
-  // nlp_solver.setOption("derivative_test","second-order");
+  Dict opts;
+  // opts["max_iter"] = 10)
+  // opts["verbose"] = true;
+  // opts["linear_solver"] = "ma57";
+  opts["hessian_approximation"] = "exact";
+  // opts["derivative_test"] = "second-order";
 
   // Specify QP solver
-  nlp_solver.setOption("qp_solver","nlp");
-  Dictionary qp_solver_options;
-  qp_solver_options["nlp_solver"] = "ipopt"; 
-  Dictionary nlp_solver_options;
-  nlp_solver_options["print_level"] = 0;
-  nlp_solver_options["print_time"] = 0;
-  qp_solver_options["nlp_solver_options"] = nlp_solver_options;
-  nlp_solver.setOption("qp_solver_options",qp_solver_options);
- 
-  // Initialize NLP solver
-  nlp_solver.init();
+  opts["qp_solver"]  = "nlp";
+  opts["qp_solver_options"] =
+    make_dict("nlp_solver", "ipopt",
+              "nlp_solver_options", make_dict("print_level", 0,
+                                              "print_time", 0));
 
-  // Pass the bounds and initial guess
-  nlp_solver.setInput(nl.x_lb,"lbx");
-  nlp_solver.setInput(nl.x_ub,"ubx");
-  nlp_solver.setInput(nl.g_lb,"lbg");
-  nlp_solver.setInput(nl.g_ub,"ubg");
-  nlp_solver.setInput(nl.x_init,"x0");
+  // Allocate NLP solver and buffers
+  NlpSolver nlp_solver("nlp_solver", "sqpmethod", nlp, opts);
+  std::map<std::string, DMatrix> arg, res;
 
   // Solve NLP
-  nlp_solver.evaluate();
+  arg["lbx"] = nl.x_lb;
+  arg["ubx"] = nl.x_ub;
+  arg["lbg"] = nl.g_lb;
+  arg["ubg"] = nl.g_ub;
+  arg["x0"] = nl.x_init;
+  res = nlp_solver(arg);
+
   return 0;
 }

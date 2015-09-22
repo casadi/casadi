@@ -56,6 +56,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of a LP problem [lpIn]
   enum LpSolverInput {
@@ -84,12 +85,7 @@ namespace casadi {
     /// The dual solution corresponding to simple bounds [lam_x]
     LP_SOLVER_LAM_X,
     LP_SOLVER_NUM_OUT};
-
-  /// Structure specification of an LP [lpStruct]
-  enum LPStruct {
-    /// The matrix A: sparse [a]
-    LP_STRUCT_A,
-    LP_STRUCT_NUM};
+#endif // SWIG
 
   // Forward declaration of internal class
   class LpSolverInternal;
@@ -111,11 +107,20 @@ namespace casadi {
     /// Default constructor
     LpSolver();
 
-    /** \brief Constructor
-     *  \param name \pluginargument{LpSolver}
+    /** \brief Constructor (new syntax, includes initialization)
+     *  \param solver \pluginargument{LpSolver}
      *  \param st \structargument{LP}
      */
-    LpSolver(const std::string& name, const LPStructure& st);
+    LpSolver(const std::string& name, const std::string& solver,
+             const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief[DEPRECATED] Constructor, no initialization
+     *  \param solver \pluginargument{LpSolver}
+     *  \param st \structargument{LP}
+     */
+    LpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Access functions of the node
     LpSolverInternal* operator->();

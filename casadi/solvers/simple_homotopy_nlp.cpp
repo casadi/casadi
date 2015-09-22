@@ -25,8 +25,6 @@
 
 #include "simple_homotopy_nlp.hpp"
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/casadi_calculus.hpp"
 #include <ctime>
@@ -57,7 +55,7 @@ namespace casadi {
       : HomotopyNLPInternal(nlp) {
     addOption("nlp_solver",         OT_STRING,   GenericType(),
               "The NLP solver to be used by the Homotopy solver");
-    addOption("nlp_solver_options", OT_DICTIONARY, GenericType(),
+    addOption("nlp_solver_options", OT_DICT, GenericType(),
               "Options to be passed to the Homotopy solver");
 
     //addOption("max_step",            OT_REAL,      1.,
@@ -85,21 +83,17 @@ namespace casadi {
     std::vector<MX> p_tau = vertsplit(P, split);
     MX x = MX::sym("x", hnlp_.input(HNL_X).nnz());
 
-    std::vector<MX> nlp_in = nlpIn("x", x, "p", P);
-
-    MXFunction nlp(nlpIn("x", x, "p", P),
-                   hnlp_(hnlpIn("x", x, "p", p_tau[0], "tau", p_tau[1])));
+    map<string, MX> v = hnlp_(make_map("x", x, "p", p_tau[0], "tau", p_tau[1]));
+    MXFunction nlp("nlp", nlpIn("x", x, "p", P),
+                   nlpOut("f", v["f"], "g", v["g"]));
 
     // Create an nlpsolver instance
     std::string nlpsolver_name = getOption("nlp_solver");
-    nlpsolver_ = NlpSolver(nlpsolver_name, nlp);
+    nlpsolver_ = NlpSolver("nlpsolver", nlpsolver_name, nlp);
 
     if (hasSetOption("nlp_solver_options")) {
       nlpsolver_.setOption(getOption("nlp_solver_options"));
     }
-
-    // Initialize the NLP solver
-    nlpsolver_.init();
 
     num_steps_ = getOption("num_steps");
 

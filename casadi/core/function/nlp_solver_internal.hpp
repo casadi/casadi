@@ -55,7 +55,7 @@ namespace casadi {
     virtual void init();
 
     /// Prints out a human readable report about possible constraint violations - all constraints
-    void reportConstraints(std::ostream &stream=std::cout);
+    void reportConstraints(std::ostream &stream=casadi::userOut());
 
     /** \brief Check if the numerical values of the supplied bounds make sense */
     virtual void checkInputs() const;
@@ -64,7 +64,7 @@ namespace casadi {
     virtual void checkInitialBounds();
 
     /// Set options that make the NLP solver more suitable for solving QPs
-    virtual void setQPOptions() {}
+    virtual void setDefaultOptions(const std::string& recipe) {}
 
     /// Get or generate a function to calculate the gradient of the objective function
     virtual Function getGradF();
@@ -83,6 +83,9 @@ namespace casadi {
 
     /// Get or generate the sparsity pattern of the Hessian of the Lagrangian
     virtual Sparsity getSpHessLag();
+
+    /** \brief Get default input value */
+    virtual double defaultInput(int ind) const;
 
     // Access the objective gradient function
     Function& gradF();
@@ -164,6 +167,13 @@ namespace casadi {
 
     /// Read options from parameter xml
     virtual void setOptionsFromFile(const std::string & file);
+
+    /// WORKAROUND: Add an element to an std::vector stored in a GenericType:
+    template<typename Type> static void append_to_vec(GenericType& t, Type el) {
+      std::vector<Type> v = t;
+      v.push_back(el);
+      t = v;
+    }
 
   };
 

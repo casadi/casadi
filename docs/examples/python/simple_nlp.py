@@ -28,33 +28,30 @@ from casadi import *
 x = SX.sym("x",2)
 
 # Form the NLP
-nlp = SXFunction([x,[]],[
-        x[0]**2 + x[1]**2, # objective
-        x[0]+x[1]-10      # constraint
-      ])
-
+f = x[0]**2 + x[1]**2 # objective
+g = x[0]+x[1]-10      # constraint
+nlp = SXFunction('nlp', nlpIn(x=x), nlpOut(f=f, g=g))
 
 # Pick an NLP solver
 MySolver = "ipopt"
 #MySolver = "worhp"
 #MySolver = "sqpmethod"
 
-# Allocate a solver
-solver = NlpSolver(MySolver, nlp)
+# Solver options
+opts = {}
 if MySolver=="sqpmethod":
-  solver.setOption("qp_solver","qpoases")
-  solver.setOption("qp_solver_options",{"printLevel":"none"})
-solver.init()
+  opts["qp_solver"] = "qpoases"
+  opts["qp_solver_options"] = {"printLevel":"none"}
 
-# Set constraint bounds
-solver.setInput(0.,"lbg")
+# Allocate a solver
+solver = NlpSolver("solver", MySolver, nlp, opts)
 
 # Solve the NLP
-solver.evaluate()
+sol = solver({"lbg" : 0})
 
 # Print solution
 print "-----"
-print "objective at solution = ", solver.getOutput("f")
-print "primal solution = ", solver.getOutput("x")
-print "dual solution (x) = ", solver.getOutput("lam_x")
-print "dual solution (g) = ", solver.getOutput("lam_g")
+print "objective at solution = ", sol["f"]
+print "primal solution = ", sol["x"]
+print "dual solution (x) = ", sol["lam_x"]
+print "dual solution (g) = ", sol["lam_g"]

@@ -49,6 +49,7 @@
 */
 
 namespace casadi {
+#ifndef SWIG
 
   /// Input arguments of an NLP function [nlpIn]
   enum NLPInput {
@@ -182,6 +183,7 @@ namespace casadi {
     NLP_SOLVER_LAM_P,
     NLP_SOLVER_NUM_OUT
   };
+#endif // SWIG
 
   class NlpSolverInternal;
 
@@ -201,9 +203,41 @@ namespace casadi {
     /// Default constructor
     NlpSolver();
 
-    /// NLP solver factory
+    /// NLP solver factory (new syntax, includes initialization)
     NlpSolver(
       const std::string& name,
+      const std::string& solver,
+      /**< \pluginargument{NlpSolver}
+      */
+      const Function& nlp,
+      /**< \parblock
+       *  nlp function: \f$ [\mathbb {R}^{n_x} \times \mathbb{R}^{n_p}]
+       * \mapsto [\mathbb {R} \times \mathbb{R}^{n_g}]\f$
+       *
+       *  @copydoc scheme_NLPInput
+       *  @copydoc scheme_NLPOutput
+       *
+       *  \endparblock
+       */
+      const Dict& opts=Dict()
+      ); // NOLINT(whitespace/parens)
+
+    /// Create an NLP solver from a dictionary with SX expressions
+    NlpSolver(const std::string& name,
+              const std::string& solver,
+              const SXDict& nlp,
+              const Dict& opts=Dict());
+
+    /// Create an NLP solver from a dictionary with MX expressions
+    NlpSolver(const std::string& name,
+              const std::string& solver,
+              const MXDict& nlp,
+              const Dict& opts=Dict());
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /// [DEPRECATED] NLP solver factory, no initialization
+    NlpSolver(
+      const std::string& solver,
       /**< \pluginargument{NlpSolver}
       */
       const Function& nlp
@@ -217,6 +251,8 @@ namespace casadi {
        *  \endparblock
        */
       ); // NOLINT(whitespace/parens)
+#endif // WITH_DEPRECATED_FEATURES
+
     /// Access functions of the node
     NlpSolverInternal* operator->();
     const NlpSolverInternal* operator->() const;
@@ -234,13 +270,10 @@ namespace casadi {
     static std::string doc(const std::string& name);
 
     /// Prints out a human readable report about possible constraint violations, after solving
-    void reportConstraints(std::ostream &stream=CASADI_COUT);
+    void reportConstraints(std::ostream &stream=casadi::userOut());
 
     std::string getReportConstraints()
     { std::stringstream s; reportConstraints(s); return s.str(); }
-
-    /// Set options that make the NLP solver more suitable for solving QPs
-    void setQPOptions();
 
     /** \brief Access the NLP
     *  \copydoc scheme_NlpSolverInput
@@ -254,20 +287,17 @@ namespace casadi {
     */
     Function gradF();
 
-    /** \brief Access the Jacobian of the constraint function
-    *  \copydoc scheme_HessLagInput
-    *  \copydoc scheme_HessLagOutput
-    */
-    Function jacG();
-
     /** \brief Access the Hessian of the Lagrangian function
     *  \copydoc scheme_JacGInput
     *  \copydoc scheme_JacGOutput
     */
-    Function hessLag();
+    Function jacG();
 
-    /// Join F and G in old signature style to a common NLP function
-    static Function joinFG(Function F, Function G);
+    /** \brief Access the Jacobian of the constraint function
+    *  \copydoc scheme_HessLagInput
+    *  \copydoc scheme_HessLagOutput
+    */
+    Function hessLag();
 
     /** \brief Get the reduced Hessian.
      * Requires a patched sIPOPT installation, see CasADi documentation. */

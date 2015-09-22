@@ -29,6 +29,7 @@
 #include "stabilized_qp_solver.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
+#include "qp_solver_internal.hpp"
 
 /// \cond INTERNAL
 namespace casadi {
@@ -40,7 +41,7 @@ namespace casadi {
   public:
 
     // Constructor
-    StabilizedQpSolverInternal(const std::vector<Sparsity> &st);
+    StabilizedQpSolverInternal(const std::map<std::string, Sparsity> &st);
 
     // Destructor
     virtual ~StabilizedQpSolverInternal() = 0;
@@ -54,9 +55,6 @@ namespace casadi {
     // Solve the system of equations
     virtual void solve();
 
-    /// Set options that make the QP solver more suitable for solving LPs
-    virtual void setLPOptions() {}
-
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
 
@@ -64,7 +62,7 @@ namespace casadi {
     virtual void generateNativeCode(std::ostream& file) const {}
 
     // Creator function for internal class
-    typedef StabilizedQpSolverInternal* (*Creator)(const QPStructure& st);
+    typedef StabilizedQpSolverInternal* (*Creator)(const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
     struct Exposed{ };

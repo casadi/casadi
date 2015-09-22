@@ -24,7 +24,7 @@
 
 
 #include "symbolic_qr.hpp"
-#include "casadi/core/sx/sx_tools.hpp"
+
 #include "casadi/core/function/sx_function.hpp"
 
 #ifdef WITH_DL
@@ -104,7 +104,7 @@ namespace casadi {
     // Generate the QR factorization function
     vector<SX> QR(2);
     qr(Aperm, QR[0], QR[1]);
-    SXFunction fact_fcn(A, QR);
+    SXFunction fact_fcn("QR_fact", make_vector(A), QR);
 
     // Optionally generate c code and load as DLL
     if (codegen) {
@@ -115,10 +115,6 @@ namespace casadi {
     } else {
       fact_fcn_ = fact_fcn;
     }
-
-    // Initialize factorization function
-    fact_fcn_.setOption("name", "QR_fact");
-    fact_fcn_.init();
 
     // Symbolic expressions for solve function
     SX Q = SX::sym("Q", QR[0].sparsity());
@@ -132,17 +128,14 @@ namespace casadi {
     SX bperm = b(rowperm_, ALL);
 
     // Solve the factorized system
-    SX xperm = casadi::solve(R, mul(Q.T(), bperm));
+    SX xperm = R.zz_solve(mul(Q.T(), bperm));
 
     // Permute back the solution
     SX x = xperm(inv_colperm, ALL);
 
     // Generate the QR solve function
-    vector<SX> solv_in(3);
-    solv_in[0] = Q;
-    solv_in[1] = R;
-    solv_in[2] = b;
-    SXFunction solv_fcn(solv_in, x);
+    vector<SX> solv_in = make_vector(Q, R, b);
+    SXFunction solv_fcn("QR_solv", solv_in, make_vector(x));
 
     // Optionally generate c code and load as DLL
     if (codegen) {
@@ -153,10 +146,6 @@ namespace casadi {
       solv_fcn_N_ = solv_fcn;
     }
 
-    // Initialize solve function
-    solv_fcn_N_.setOption("name", "QR_solv");
-    solv_fcn_N_.init();
-
     // Solve transposed
     // We have (Pb' * Q * R * Px)' * x = b
     // <=> Px' * R' * Q' * Pb * x = b
@@ -166,13 +155,13 @@ namespace casadi {
     bperm = b(colperm_, ALL);
 
     // Solve the factorized system
-    xperm = mul(Q, casadi::solve(R.T(), bperm));
+    xperm = mul(Q, R.T().zz_solve(bperm));
 
     // Permute back the solution
     x = xperm(inv_rowperm, ALL);
 
     // Mofify the QR solve function
-    solv_fcn = SXFunction(solv_in, x);
+    solv_fcn = SXFunction("QR_solv_T", solv_in, make_vector(x));
 
     // Optionally generate c code and load as DLL
     if (codegen) {
@@ -182,10 +171,6 @@ namespace casadi {
     } else {
       solv_fcn_T_ = solv_fcn;
     }
-
-    // Initialize solve function
-    solv_fcn_T_.setOption("name", "QR_solv_T");
-    solv_fcn_T_.init();
 
     // Allocate storage for QR factorization
     Q_ = DMatrix::zeros(Q.sparsity());
@@ -211,82 +196,82 @@ namespace casadi {
 
     // Solve for all right hand sides
     for (int i=0; i<nrhs; ++i) {
-      solv.setInput(x, 2);
+      solv.setInputNZ(x, 2);
       solv.evaluate();
-      solv.getOutput(x);
+      solv.getOutputNZ(x);
       x += solv.output().nnz();
     }
   }
 
-  void SymbolicQr::evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr) {
-    // Get arguments
-    casadi_assert(input.at(0)!=0);
-    SX r = *input.at(0);
-    casadi_assert(input.at(1)!=0);
-    SX A = *input.at(1);
+  void SymbolicQr::evalSXLinsol(const SXElement** arg, SXElement** res,
+                                int* iw, SXElement* w, bool tr, int nrhs) {
+    casadi_assert(arg[0]!=0);
+    casadi_assert(arg[1]!=0);
+    casadi_assert(res[0]!=0);
 
-    // Number of right hand sides
-    int nrhs = r.size2();
-
-    // Factorize A
+    // Get A and factorize it
+    SX A = SX::zeros(input(LINSOL_A).sparsity());
+    copy(arg[1], arg[1]+A.nnz(), A.begin());
     vector<SX> v = fact_fcn_(A);
 
     // Select solve function
     Function& solv = tr ? solv_fcn_T_ : solv_fcn_N_;
 
     // Solve for every right hand side
-    vector<SX> resv;
-    v.resize(3);
+    v.push_back(SX::zeros(A.size1()));
+    const SXElement* a=arg[0];
+    SXElement* r=res[0];
     for (int i=0; i<nrhs; ++i) {
-      v[2] = r(Slice(), i);
-      resv.push_back(solv(v).at(0));
+      copy(a, a+v[2].nnz(), v[2].begin());
+      SX rr = solv(v).at(0);
+      copy(rr.begin(), rr.end(), r);
+      r += rr.nnz();
     }
-
-    // Collect the right hand sides
-    casadi_assert(output[0]!=0);
-    *output.at(0) = horzcat(resv);
   }
 
-  void SymbolicQr::generateDeclarations(std::ostream &stream, const std::string& type,
-                                                CodeGenerator& gen) const {
+  void SymbolicQr::generateDeclarations(CodeGenerator& g) const {
 
     // Generate code for the embedded functions
-    gen.addDependency(fact_fcn_);
-    gen.addDependency(solv_fcn_N_);
-    gen.addDependency(solv_fcn_T_);
+    fact_fcn_->addDependency(g);
+    solv_fcn_N_->addDependency(g);
+    solv_fcn_T_->addDependency(g);
   }
 
-  void SymbolicQr::generateBody(std::ostream &stream, const std::string& type,
-                                        CodeGenerator& gen) const {
-    casadi_warning("Code generation for SymbolicQR still experimental");
-
+  void SymbolicQr::generateBody(CodeGenerator& g) const {
+    casadi_error("Code generation for SymbolicQR still experimental");
+#if 0
     // Data structures to hold A, Q and R
-    stream << "  static int prepared = 0;" << endl;
-    stream << "  static d A[" << input(LINSOL_A).nnz() << "];" << endl;
-    stream << "  static d Q[" << Q_.nnz() << "];" << endl;
-    stream << "  static d R[" << R_.nnz() << "];" << endl;
+    g.body
+       << "  static int prepared = 0;" << endl
+       << "  static d A[" << input(LINSOL_A).nnz() << "];" << endl
+       << "  static d Q[" << Q_.nnz() << "];" << endl
+       << "  static d R[" << R_.nnz() << "];" << endl;
 
     // Check if the factorization is up-to-date
-    stream << "  int i;" << endl;
-    stream << "  for (i=0; prepared && i<" << input(LINSOL_A).nnz()
-           << "; ++i) prepared=A[i]!=x0[i];" << endl;
+    g.body
+      << "  int i;" << endl
+      << "  for (i=0; prepared && i<" << input(LINSOL_A).nnz()
+      << "; ++i) prepared=A[i]!=x0[i];" << endl;
 
     // Factorize if needed
-    int fact_ind = gen.getDependency(fact_fcn_);
-    stream << "  if (!prepared) {" << endl;
-    stream << "    for (i=0; i<" << input(LINSOL_A).nnz() << "; ++i) A[i]=x0[i];" << endl;
-    stream << "    f" << fact_ind << "(A, Q, R);" << endl;
-    stream << "    prepared = 1;" << endl;
-    stream << "  }" << endl;
+    int fact_ind = g.getDependency(fact_fcn_);
+    g.body
+      << "  if (!prepared) {" << endl
+      << "    for (i=0; i<" << input(LINSOL_A).nnz() << "; ++i) A[i]=x0[i];" << endl
+      << "    f" << fact_ind << "(A, Q, R);" << endl
+      << "    prepared = 1;" << endl
+      << "  }" << endl;
 
     // Solve
-    int solv_ind_N = gen.getDependency(solv_fcn_N_);
+    int solv_ind_N = g.getDependency(solv_fcn_N_);
     int neq = input(LINSOL_B).size1();
     int nrhs = input(LINSOL_B).size2();
-    stream << "  for (i=0; i<" << nrhs << "; ++i) {" << endl;
-    stream << "    f" << solv_ind_N << "(Q, R, x1, r0);" << endl;
-    stream << "    x1+=" << neq << "; r0+=" << neq << ";" << endl;
-    stream << "  }" << endl;
+    g.body
+      << "  for (i=0; i<" << nrhs << "; ++i) {" << endl
+      << "    f" << solv_ind_N << "(Q, R, x1, r0);" << endl
+      << "    x1+=" << neq << "; r0+=" << neq << ";" << endl
+      << "  }" << endl;
+#endif
   }
 
 } // namespace casadi

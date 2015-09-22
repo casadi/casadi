@@ -24,15 +24,12 @@
 
 
 #include "fixed_smith_lr_dle_internal.hpp"
-#include <cassert>
 #include "../core/std_vector_tools.hpp"
-#include "../core/matrix/matrix_tools.hpp"
-#include "../core/mx/mx_tools.hpp"
-#include "../core/sx/sx_tools.hpp"
 #include "../core/function/mx_function.hpp"
 #include "../core/function/sx_function.hpp"
-#include <iomanip>
 
+#include <cassert>
+#include <iomanip>
 #include <numeric>
 
 INPUTSCHEME(LR_DLEInput)
@@ -55,20 +52,17 @@ namespace casadi {
     LrDleInternal::registerPlugin(casadi_register_lrdlesolver_fixed_smith);
   }
 
-  FixedSmithLrDleInternal::FixedSmithLrDleInternal(
-      const LrDleStructure& st) :
-      LrDleInternal(st) {
+  FixedSmithLrDleInternal::
+  FixedSmithLrDleInternal(const std::map<std::string, Sparsity>& st) :
+    LrDleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_fixed_smith_indef_dle_solver"); // name of the function
 
     addOption("iter", OT_INTEGER, 100,   "Number of Smith iterations");
-
-
   }
 
   FixedSmithLrDleInternal::~FixedSmithLrDleInternal() {
-
   }
 
   void FixedSmithLrDleInternal::init() {
@@ -111,8 +105,7 @@ namespace casadi {
     if (with_C_) dle_in[LR_DLE_C] = C;
     if (with_H_) dle_in[LR_DLE_H] = H;
 
-    f_ = MXFunction(dle_in, lrdleOut("y", with_H_? diagcat(HPH): out));
-    f_.init();
+    f_ = MXFunction(name_, dle_in, lrdleOut("y", with_H_? diagcat(HPH) : out));
 
     Wrapper<FixedSmithLrDleInternal>::checkDimensions();
 
@@ -122,11 +115,13 @@ namespace casadi {
     Wrapper<FixedSmithLrDleInternal>::evaluate();
   }
 
-  Function FixedSmithLrDleInternal::getDerForward(int nfwd) {
+  Function FixedSmithLrDleInternal
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     return f_.derForward(nfwd);
   }
 
-  Function FixedSmithLrDleInternal::getDerReverse(int nadj) {
+  Function FixedSmithLrDleInternal
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     return f_.derReverse(nadj);
   }
 
@@ -137,7 +132,11 @@ namespace casadi {
 
   FixedSmithLrDleInternal* FixedSmithLrDleInternal::clone() const {
     // Return a deep copy
-    FixedSmithLrDleInternal* node = new FixedSmithLrDleInternal(st_);
+    FixedSmithLrDleInternal* node =
+      new FixedSmithLrDleInternal(make_map("a", st_[LR_DLE_STRUCT_A],
+                                           "v", st_[LR_DLE_STRUCT_V],
+                                           "c", st_[LR_DLE_STRUCT_C],
+                                           "h", st_[LR_DLE_STRUCT_H]));
     node->setOption(dictionary());
     return node;
   }

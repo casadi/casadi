@@ -81,9 +81,8 @@ class Symbolictests(casadiTestCase):
            for op3 in operations_toplevel(op1,op2):
              i+= 1
              e = eval(op3,{"a": a_s, "b": b_s})
-             f = xfunction([a_s,b_s],[e])
+             f = xfunction("f", [a_s,b_s],[e])
              #print i, xfunction, op1, op2, op3, " -> ", e
-             f.init()
              f.setInput(numbers[0],0)
              f.setInput(numbers[1],1)
              f.evaluate()

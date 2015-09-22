@@ -34,17 +34,16 @@ using namespace std;
  *  Joel Andersson, K.U. Leuven 2013
  */
 
-void generateCode(Function fcn, const std::string& name, bool expand, std::ostream& makefile){
+void generate(Function fcn, const std::string& name, bool expand, std::ostream& makefile){
   cout << "Generating code for " << name << endl;
 
   // Convert to an SXFunction (may or may not improve efficiency)
   if(expand && is_a<MXFunction>(fcn)){
     fcn = SXFunction(shared_cast<MXFunction>(fcn));
-    fcn.init();
   }
 
   // Generate C code
-  fcn.generateCode(name + ".c");
+  fcn.generate(name);
   
   // Generate compilation instructions
   makefile << "add_library(" << name << " SHARED " << name << ".c)" << endl;
@@ -77,21 +76,17 @@ int main(){
   bool expand = true;
 
   // NLP function
-  Function nlp = MXFunction(nlpIn("x",x),nlpOut("f",f,"g",g));
-  nlp.init();
+  Function nlp = MXFunction("nlp", nlpIn("x",x),nlpOut("f",f,"g",g));
 
   // Gradient of the Lagrangian
   Function grad_f = nlp.gradient("x","f");
-  grad_f.init();
 
   // Jacobian of the constraints
   Function jac_g = nlp.jacobian("x","g");
-  jac_g.init();
 
   // Hessian of the lagrangian
   Function grad_lag = nlp.derivative(0,1);
   Function hess_lag = grad_lag.jacobian(NL_X,NL_NUM_OUT+NL_X,false,true);
-  hess_lag.init();
 
   // Generate Makefile
   ofstream makefile;
@@ -100,10 +95,10 @@ int main(){
   makefile << "project(nlp-codegen-autogen C)" << endl;
 
   // Codegen and compile
-  generateCode(nlp,"nlp", expand, makefile);
-  generateCode(grad_f,"grad_f", expand, makefile);
-  generateCode(jac_g,"jac_g", expand, makefile);
-  generateCode(hess_lag,"hess_lag", expand, makefile);
+  generate(nlp,"nlp", expand, makefile);
+  generate(grad_f,"grad_f", expand, makefile);
+  generate(jac_g,"jac_g", expand, makefile);
+  generate(hess_lag,"hess_lag", expand, makefile);
 
   // Finalize makefile
   makefile.close();

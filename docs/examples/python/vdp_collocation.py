@@ -38,10 +38,10 @@ x  = SX.sym("x",3)  # state
 rhs = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
                x[0], \
                x[0]*x[0] + x[1]*x[1] + u*u])
-f = SXFunction([t,x,u],[rhs])
+f = SXFunction('f', [t,x,u],[rhs])
 
 # Objective function (meyer term)
-m = SXFunction([t,x,u],[x[2]])
+m = SXFunction('m', [t,x,u],[x[2]])
 
 # Control bounds
 u_min = -0.75
@@ -60,10 +60,6 @@ xi_max = [ 0.0,  1.0,  0.0]
 xf_min = [ 0.0,  0.0, -inf]
 xf_max = [ 0.0,  0.0,  inf]
 x_init = [ 0.0,  0.0,  0.0]
-
-# Initialize functions
-f.init()
-m.init()
 
 # Dimensions
 nx = 3
@@ -100,21 +96,15 @@ for j in range(d+1):
   for r in range(d+1):
     if r != j:
       L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
-  lfcn = SXFunction([tau],[L])
-  lfcn.init()
+  lfcn = SXFunction('lfcn', [tau],[L])
   
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-  lfcn.setInput(1.0)
-  lfcn.evaluate()
-  D[j] = lfcn.getOutput()
+  [D[j]] = lfcn([1.0])
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
   tfcn = lfcn.tangent()
-  tfcn.init()
   for r in range(d+1):
-    tfcn.setInput(tau_root[r])
-    tfcn.evaluate()
-    C[j,r] = tfcn.getOutput()
+    C[j,r], _ = tfcn([tau_root[r]])
 
 # Total number of variables
 NX = nk*(d+1)*nx      # Collocated states
@@ -205,41 +195,41 @@ g = vertcat(g)
 [f] = m.call([T[nk-1,d],X[nk,0],U[nk-1]])
   
 # NLP
-nlp = MXFunction(nlpIn(x=V),nlpOut(f=f,g=g))
-  
+nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=f,g=g))
+
 ## ----
 ## SOLVE THE NLP
 ## ----
-  
-# Allocate an NLP solver
-solver = NlpSolver("ipopt", nlp)
 
 # Set options
-solver.setOption("expand",True)
-#solver.setOption("max_iter",4)
+opts = {}
+opts["expand"] = True
+#opts["max_iter"] = 4
+opts["linear_solver"] = 'ma27'
 
-# initialize the solver
-solver.init()
+# Allocate an NLP solver
+solver = NlpSolver("solver", "ipopt", nlp, opts)
+arg = {}
   
 # Initial condition
-solver.setInput(vars_init,"x0")
+arg["x0"] = vars_init
 
 # Bounds on x
-solver.setInput(vars_lb,"lbx")
-solver.setInput(vars_ub,"ubx")
+arg["lbx"] = vars_lb
+arg["ubx"] = vars_ub
 
 # Bounds on g
-solver.setInput(NP.concatenate(lbg),"lbg")
-solver.setInput(NP.concatenate(ubg),"ubg")
+arg["lbg"] = NP.concatenate(lbg)
+arg["ubg"] = NP.concatenate(ubg)
 
 # Solve the problem
-solver.evaluate()
+res = solver(arg)
 
 # Print the optimal cost
-print "optimal cost: ", float(solver.getOutput("f"))
+print "optimal cost: ", float(res["f"])
 
 # Retrieve the solution
-v_opt = NP.array(solver.getOutput("x"))
+v_opt = NP.array(res["x"])
 
 # Get values at the beginning of each finite element
 x0_opt = v_opt[0::(d+1)*nx+nu]

@@ -24,7 +24,7 @@
 
 
 #include "slice.hpp"
-#include "matrix_tools.hpp"
+#include "../std_vector_tools.hpp"
 
 using namespace std;
 namespace casadi {
@@ -32,7 +32,11 @@ namespace casadi {
   Slice::Slice() : start_(0), stop_(std::numeric_limits<int>::max()), step_(1) {
   }
 
-  Slice::Slice(int i) : start_(i), stop_(i+1), step_(1) {
+  Slice::Slice(int i, bool ind1) : start_(i-ind1), stop_(i-ind1+1), step_(1) {
+    casadi_assert_message(!(ind1 && i<=0), "Matlab is 1-based, but requested index " <<
+                                              i <<  ". Note that negative slices are" <<
+                                              " disabled in the Matlab interface. " <<
+                                              "Possibly you may want to use 'end'.");
     if (i==-1) stop_ = std::numeric_limits<int>::max();
   }
 
@@ -105,6 +109,10 @@ namespace casadi {
     // Always false if negative numbers or non-increasing
     int last_v = -1;
     for (int i=0; i<v.size(); ++i) {
+      casadi_assert_message(!(ind1 && v[i]<=0), "Matlab is 1-based, but requested index " <<
+                                                v[i] <<  ". Note that negative slices are" <<
+                                                " disabled in the Matlab interface. " <<
+                                                "Possibly you may want to use 'end'.");
       if (v[i]-ind1<=last_v) return false;
       last_v = v[i]-ind1;
     }
@@ -226,7 +234,7 @@ namespace casadi {
     return ret;
   }
 
-  bool Slice::isScalar(int len) const {
+  bool Slice::isscalar(int len) const {
     int start = std::min(start_, len);
     int stop = std::min(stop_, len);
     int nret = (stop-start)/step_ + ((stop-start)%step_!=0);
@@ -234,7 +242,7 @@ namespace casadi {
   }
 
   int Slice::toScalar(int len) const {
-    casadi_assert(isScalar(len));
+    casadi_assert(isscalar(len));
     casadi_assert_message(start_ >= -len && start_ < len, "Slice::getScalar: out of bounds");
     return start_ >= 0 ? start_ : start_+len;
   }

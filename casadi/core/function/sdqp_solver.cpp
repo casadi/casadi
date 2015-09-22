@@ -43,13 +43,20 @@ namespace casadi {
     return dynamic_cast<const SdqpSolverInternal*>(ptr)!=0;
   }
 
-  void SdqpSolver::setSOCQPOptions() {
-    (*this)->setSOCQPOptions();
+  SdqpSolver::SdqpSolver(const std::string& name, const std::string& solver,
+                         const std::map<std::string, Sparsity>& st, const Dict& opts) {
+    assignNode(SdqpSolverInternal::instantiatePlugin(solver, st));
+    setOption("name", name);
+    setOption(opts);
+    init();
   }
 
-  SdqpSolver::SdqpSolver(const std::string& name, const SDQPStructure& st) {
-    assignNode(SdqpSolverInternal::instantiatePlugin(name, st));
+#ifdef WITH_DEPRECATED_FEATURES
+  SdqpSolver::SdqpSolver(const std::string& solver,
+                         const std::map<std::string, Sparsity>& st) {
+    assignNode(SdqpSolverInternal::instantiatePlugin(solver, st));
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   bool SdqpSolver::hasPlugin(const std::string& name) {
     return SdqpSolverInternal::hasPlugin(name);

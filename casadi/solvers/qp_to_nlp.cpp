@@ -25,7 +25,6 @@
 
 #include "qp_to_nlp.hpp"
 
-#include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
 
 using namespace std;
@@ -49,13 +48,14 @@ namespace casadi {
 
   QpToNlp* QpToNlp::clone() const {
     // Return a deep copy
-    QpToNlp* node = new QpToNlp(st_);
+    QpToNlp* node =
+      new QpToNlp(make_map("h", st_[QP_STRUCT_H], "a", st_[QP_STRUCT_A]));
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  QpToNlp::QpToNlp(const std::vector<Sparsity> &st) : QpSolverInternal(st) {
+  QpToNlp::QpToNlp(const std::map<std::string, Sparsity> &st) : QpSolverInternal(st) {
     Adaptor<QpToNlp, NlpSolverInternal>::addOptions();
   }
 
@@ -117,16 +117,19 @@ namespace casadi {
     par.push_back(G.data());
     par.push_back(A.data());
 
+
+
     // The nlp looks exactly like a mathematical description of the NLP
-    SXFunction QP_SOLVER_nlp(nlpIn("x", X, "p", vertcat(par)),
+    SXFunction QP_SOLVER_nlp("nlp", nlpIn("x", X, "p", vertcat(par)),
                              nlpOut("f", mul(G.T(), X) + 0.5*mul(mul(X.T(), H), X),
                                     "g", mul(A, X)));
 
+    Dict options;
+    if (hasSetOption(optionsname())) options = getOption(optionsname());
+    options = OptionsFunctionality::addOptionRecipe(options, "qp");
+
     // Create an NlpSolver instance
-    solver_ = NlpSolver(getOption(solvername()), QP_SOLVER_nlp);
-    solver_.setQPOptions();
-    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
-    solver_.init();
+    solver_ = NlpSolver("nlpsolver", getOption(solvername()), QP_SOLVER_nlp, options);
   }
 
 } // namespace casadi

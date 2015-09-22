@@ -40,9 +40,7 @@ mdot = -0.1*u*u
 xdot = vertcat([sdot,vdot,mdot])
 
 # ODE right hand side function
-f = MXFunction([x,u],[xdot])
-f.setOption("name","f")
-f.init()
+f = MXFunction('f', [x,u],[xdot])
 
 # Integrate with Explicit Euler over 0.2 seconds
 dt = 0.01  # Time step
@@ -52,8 +50,7 @@ for j in range(20):
   xj += dt*fj
 
 # Discrete time dynamics function
-F = MXFunction([x,u],[xj])
-F.init()
+F = MXFunction('F', [x,u],[xj])
 
 # Number of control segments
 nu = 50 
@@ -74,28 +71,27 @@ J = mul(U.T,U) # u'*u in Matlab
 G = X[0:2]     # x(1:2) in Matlab
 
 # NLP
-nlp = MXFunction(nlpIn(x=U),nlpOut(f=J,g=G))
+nlp = MXFunction('nlp', nlpIn(x=U),nlpOut(f=J,g=G))
   
 # Allocate an NLP solver
-solver = NlpSolver("ipopt", nlp)
-solver.setOption("tol",1e-10)
-solver.setOption("expand",True)
-solver.init()
+opts = {"tol":1e-10, "expand":True}
+solver = NlpSolver("solver", "ipopt", nlp, opts)
+arg = {}
 
 # Bounds on u and initial condition
-solver.setInput(-0.5, "lbx")
-solver.setInput( 0.5, "ubx")
-solver.setInput( 0.4, "x0")
+arg["lbx"] = -0.5
+arg["ubx"] =  0.5
+arg["x0"] =   0.4
 
 # Bounds on g
-solver.setInput([10,0],"lbg")
-solver.setInput([10,0],"ubg")
+arg["lbg"] = [10,0]
+arg["ubg"] = [10,0]
 
 # Solve the problem
-solver.evaluate()
+res = solver(arg)
 
 # Get the solution
-plot(solver.getOutput("x"))
-plot(solver.getOutput("lam_x"))
+plot(res["x"])
+plot(res["lam_x"])
 grid()
 show()

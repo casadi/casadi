@@ -54,7 +54,7 @@ namespace casadi {
   public:
 
     /** \brief  Create a new Solver */
-    explicit SocpToSdp(const std::vector<Sparsity> &st);
+    explicit SocpToSdp(const std::map<std::string, Sparsity> &st);
 
     /** \brief  Destructor */
     virtual ~SocpToSdp();
@@ -63,8 +63,9 @@ namespace casadi {
     virtual SocpToSdp* clone() const;
 
     /** \brief  Create a new SOCP Solver */
-    static SocpSolverInternal* creator(const SOCPStructure& st)
-    { return new SocpToSdp(st);}
+    static SocpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
+      return new SocpToSdp(st);
+    }
 
     /** \brief  Initialize */
     virtual void init();
