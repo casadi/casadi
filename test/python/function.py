@@ -450,8 +450,7 @@ class Functiontests(casadiTestCase):
           class Der:
              def evaluate(self,xy_andseeds,z_andseeds):  sself.evaluateDerFwd(xy_andseeds,z_andseeds,nfwd)
 
-          FunDer = PyFunction(Der(),inputs+outputs+inputs*nfwd,outputs*nfwd)
-          return FunDer
+          return PyFunction("Fun", Der(),inputs+outputs+inputs*nfwd,outputs*nfwd)
 
         def getDerReverse(self,f,nadj):
           inputs = [f.getInput(i).sparsity() for i in range(f.nIn())]
@@ -462,8 +461,7 @@ class Functiontests(casadiTestCase):
           class Der:
              def evaluate(self,xy_andseeds,z_andseeds):  sself.evaluateDerAdj(xy_andseeds,z_andseeds,nadj)
 
-          FunDer = PyFunction(Der(),inputs+outputs+outputs*nadj,inputs*nadj)
-          return FunDer
+          return PyFunction("Fcn", Der(),inputs+outputs+outputs*nadj,inputs*nadj)
           
         def evaluateDerFwd(self,inputs,outputs,nfwd):
           # sin(x+3*y)
@@ -515,16 +513,16 @@ class Functiontests(casadiTestCase):
             by+= 3*bz0
             outputs[num_in*i+0].set(bx)
             outputs[num_in*i+1].set(by)
-          
 
-      Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
+      opts = {}
       with warnings.catch_warnings():
         warnings.filterwarnings("ignore",category=DeprecationWarning)
         if max_adj and not max_fwd:
-          Fun.setOption("ad_weight", 1)
+          opts["ad_weight"] = 1
         elif max_fwd and not max_adj:
-          Fun.setOption("ad_weight", 0)
-        Fun.init()
+          opts["ad_weight"] = 0
+      Fun = PyFunction("Fun", Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)],
+                       [Sparsity.dense(1,1)], opts)
       
       if not indirect: 
         Fun.setInput(0.2,0)
@@ -647,14 +645,15 @@ class Functiontests(casadiTestCase):
             x_bar.set(bx)
             y_bar.set(by)
 
-      Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
+      opts = {}
       with warnings.catch_warnings():
         warnings.filterwarnings("ignore",category=DeprecationWarning)
         if max_adj and not max_fwd:
-          Fun.setOption("ad_weight", 1)
+          opts["ad_weight"] = 1
         elif max_fwd and not max_adj:
-          Fun.setOption("ad_weight", 0)
-        Fun.init()
+          opts["ad_weight"] = 0
+      Fun = PyFunction("Fun", Fun(), [Sparsity.dense(1,1),Sparsity.dense(1,1)],
+                       [Sparsity.dense(1,1)], opts)
       
       if not indirect: 
         Fun.setInput(0.2,0)
@@ -725,10 +724,7 @@ class Functiontests(casadiTestCase):
               x_bar.set(bx)
               y_bar.set(by)
 
-      Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
-      with warnings.catch_warnings():
-        warnings.filterwarnings("ignore",category=DeprecationWarning)
-        Fun.init()
+      Fun = PyFunction("Fun", Fun(), [Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
               
       if not indirect: 
         Fun.setInput(0.2,0)
@@ -838,12 +834,13 @@ class Functiontests(casadiTestCase):
 
       with warnings.catch_warnings():
         warnings.filterwarnings("ignore",category=DeprecationWarning)
-        Fun = PyFunction(Fun(),[Sparsity.dense(2,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
+        opts = {}
         if max_adj and not max_fwd:
-          Fun.setOption("ad_weight", 1)
+          opts["ad_weight"] = 1
         elif max_fwd and not max_adj:
-          Fun.setOption("ad_weight", 0)
-        Fun.init()
+          opts["ad_weight"] = 0
+        Fun = PyFunction("Fun", Fun(), [Sparsity.dense(2,1), Sparsity.dense(1,1)],
+                         [Sparsity.dense(1,1)], opts)
 
       if not indirect: 
         Fun.setInput([0.2,0.6],0)
@@ -909,14 +906,15 @@ class Functiontests(casadiTestCase):
               yb = Y_bar[1]
               X_bar.set([2*x*xb+y*yb,xb+x*yb])
           
-      c = PyFunction(Squares(),[Sparsity.dense(2,1)], [Sparsity.dense(2,1)])
+      opts = {}
       with warnings.catch_warnings():
         warnings.filterwarnings("ignore",category=DeprecationWarning)
         if max_adj and not max_fwd:
-          c.setOption("ad_weight", 1)
+          opts["ad_weight"] = 1
         elif max_fwd and not max_adj:
-          c.setOption("ad_weight", 0)
-        c.init()
+          opts["ad_weight"] = 0
+      c = PyFunction("c", Squares(), [Sparsity.dense(2,1)],
+                     [Sparsity.dense(2,1)], opts)
 
       if not indirect: 
         c.setInput([0.2,0.6],0)
@@ -1031,10 +1029,8 @@ class Functiontests(casadiTestCase):
     with warnings.catch_warnings():
       warnings.filterwarnings("ignore",category=DeprecationWarning)
         
-      foo = CustomFunction(dummy, [x.sparsity()], [Sparsity.dense(1,1)] )
-      foo.setOption("name","foo")
-      foo.setOption("verbose",True)
-      foo.init()
+      foo = CustomFunction("foo", dummy, [x.sparsity()], [Sparsity.dense(1,1)],
+                           {"verbose":True})
 
     # Jacobian for derivative information
     def dummy_jac(f):
@@ -1045,9 +1041,7 @@ class Functiontests(casadiTestCase):
     with warnings.catch_warnings():
       warnings.filterwarnings("ignore",category=DeprecationWarning)
         
-      foo_jac = CustomFunction(dummy_jac, [x.sparsity()], [Sparsity(1,1),Sparsity.dense(1,1)] )
-      foo_jac.setOption("name","foo_jac")
-      foo_jac.init()
+      foo_jac = CustomFunction("foo_jac", dummy_jac, [x.sparsity()], [Sparsity(1,1),Sparsity.dense(1,1)] )
     foo.setFullJacobian(foo_jac)
 
     y = x**2
