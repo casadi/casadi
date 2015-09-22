@@ -66,7 +66,8 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
 /// \name Option Functionality
 /// @{
 
-    /** \brief  set an option.
+    /** \brief [DEPRECATED: pass option dictionary to function constructor]
+    Set an option.
     For a list of options, check the class documentation of this class.
 
     The setOptions are only considered before the init function.
@@ -74,7 +75,8 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
     */
     void setOption(const std::string &str, const GenericType& val);
 
-    /** \brief  set a set of options.
+    /** \brief [DEPRECATED: pass option dictionary to function constructor]
+    Set a set of options.
     For a list of options, check the class documentation of this class.
 
     The setOptions are only considered before the init function.

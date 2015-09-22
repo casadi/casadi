@@ -54,7 +54,7 @@ namespace casadi {
 #endif // WITH_DL
   }
 
-  LibInfo<JitCompiler>::LibInfo(const JitCompiler& compiler,
+  LibInfo<Compiler>::LibInfo(const Compiler& compiler,
                                 const std::string& name)
     : compiler_(compiler), name_(name) {
     n_in = n_out = sz_arg = sz_res = 0;
@@ -89,7 +89,7 @@ namespace casadi {
   }
 
   template<typename FcnPtr>
-  void LibInfo<JitCompiler>::get(FcnPtr& fcnPtr, const std::string& sym) {
+  void LibInfo<Compiler>::get(FcnPtr& fcnPtr, const std::string& sym) {
     fcnPtr = (FcnPtr)compiler_.getFunction(sym);
   }
 
@@ -99,7 +99,7 @@ namespace casadi {
   }
 
   ExternalFunctionInternal*
-  ExternalFunctionInternal::create(const JitCompiler& compiler, const std::string& name) {
+  ExternalFunctionInternal::create(const Compiler& compiler, const std::string& name) {
     return createGeneric(compiler, name);
   }
 
@@ -340,7 +340,7 @@ namespace casadi {
 
   template<typename LibType>
   Function CommonExternal<LibType>
-  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     // Consistency check
     int n=1;
     while (n<nfwd) n*=2;
@@ -365,7 +365,7 @@ namespace casadi {
 
   template<typename LibType>
   Function CommonExternal<LibType>
-  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     // Consistency check
     int n=1;
     while (n<nadj) n*=2;

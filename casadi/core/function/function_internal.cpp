@@ -90,7 +90,7 @@ namespace casadi {
     addOption("input_scheme", OT_STRINGVECTOR, GenericType(), "Custom input scheme");
     addOption("output_scheme", OT_STRINGVECTOR, GenericType(), "Custom output scheme");
     addOption("jit", OT_BOOLEAN, false, "Use just-in-time compiler to speed up the evaluation");
-    addOption("jit_compiler", OT_STRING, "clang", "Just-in-time compiler plugin to be used.");
+    addOption("compiler", OT_STRING, "clang", "Just-in-time compiler plugin to be used.");
     addOption("jit_options", OT_DICT, GenericType(), "Options to be passed to the jit compiler.");
 
     verbose_ = false;
@@ -127,7 +127,7 @@ namespace casadi {
 
     verbose_ = getOption("verbose");
     jit_ = getOption("jit");
-    jit_compiler_ = getOption("jit_compiler").toString();
+    compilerplugin_ = getOption("compiler").toString();
     if (hasSetOption("jit_options")) jit_options_ = getOption("jit_options");
     regularity_check_ = getOption("regularity_check");
     name_ = getOption("name").toString();
@@ -199,7 +199,7 @@ namespace casadi {
       CodeGenerator gen;
       gen.add(shared_from_this<Function>(), "jit_tmp");
       gen.generate("jit_tmp");
-      compiler_ = JitCompiler("jit_tmp.c", jit_compiler_, jit_options_);
+      compiler_ = Compiler("jit_tmp.c", compilerplugin_, jit_options_);
       evalD_ = (evalPtr)compiler_.getFunction("jit_tmp");
       casadi_assert_message(evalD_!=0, "Cannot load JIT'ed function.");
     }
@@ -255,7 +255,7 @@ namespace casadi {
     // Generate gradient function
     Dict opts = make_dict("input_scheme", ischeme_,
                           "output_scheme", ionames,
-                          "jit", jit_, "jit_compiler", jit_compiler_, "jit_options", jit_options_);
+                          "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
     return getGradient(ss.str(), iind, oind, opts);
   }
 
@@ -279,7 +279,7 @@ namespace casadi {
     // Generate gradient function
     Dict opts = make_dict("input_scheme", ischeme_,
                           "output_scheme", ionames,
-                          "jit", jit_, "jit_compiler", jit_compiler_, "jit_options", jit_options_);
+                          "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
     return getTangent(ss.str(), iind, oind, opts);
   }
 
@@ -1564,7 +1564,7 @@ namespace casadi {
       // Generate a Jacobian
       Dict opts = make_dict("verbose", verbose_,
                             "input_scheme", ischeme_, "output_scheme", ionames,
-                            "jit", jit_, "jit_compiler", jit_compiler_,
+                            "jit", jit_, "compiler", compilerplugin_,
                             "jit_options", jit_options_);
       Function ret = getJacobian(ss.str(), iind, oind, compact, symmetric, opts);
 
@@ -1648,7 +1648,7 @@ namespace casadi {
 
     // Options
     Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names,
-                          "jit", jit_, "jit_compiler", jit_compiler_, "jit_options", jit_options_);
+                          "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
 
     // Return value
     Function ret;
@@ -1753,7 +1753,7 @@ namespace casadi {
 
     // Options
     Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names,
-                          "jit", jit_, "jit_compiler", jit_compiler_, "jit_options", jit_options_);
+                          "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
 
     // Return value
     Function ret;
@@ -1819,13 +1819,13 @@ namespace casadi {
     derivative_adj_[nadj] = fcn;
   }
 
-  Function FunctionInternal::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
+  Function FunctionInternal::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     // TODO(@jaeandersson): Fallback on finite differences
     casadi_error("FunctionInternal::getDerForward not defined for class "
                  << typeid(*this).name());
   }
 
-  Function FunctionInternal::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
+  Function FunctionInternal::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     casadi_error("FunctionInternal::getDerReverse not defined for class "
                  << typeid(*this).name());
   }

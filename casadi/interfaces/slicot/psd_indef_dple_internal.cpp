@@ -844,7 +844,7 @@ namespace casadi {
   }
 
   Function PsdIndefDpleInternal
-  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
 
     // Base:
     // P_0 P_1 P_2 .. P_{nrhs-1} = f( A Q_0 Q_1 Q_2 .. Q_{nrhs-1})
@@ -949,7 +949,7 @@ namespace casadi {
   }
 
   Function PsdIndefDpleInternal
-  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
 
     // Base:
     // P_0 P_1 P_2 .. P_{nrhs-1} = f( A Q_0 Q_1 Q_2 .. Q_{nrhs-1})

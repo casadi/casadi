@@ -85,9 +85,9 @@ namespace casadi {
 
   /** \brief Library that has been just-in-time compiled */
   template<>
-  class LibInfo<JitCompiler> {
+  class LibInfo<Compiler> {
   private:
-    JitCompiler compiler_;
+    Compiler compiler_;
     std::string name_;
 
   public:
@@ -97,13 +97,13 @@ namespace casadi {
     LibInfo() {}
 
     // Constructor
-    explicit LibInfo(const JitCompiler& compiler, const std::string& name);
+    explicit LibInfo(const Compiler& compiler, const std::string& name);
 
     // Clear memory
     void clear() {}
 
     // Automatic type conversion
-    operator const JitCompiler&() const { return compiler_;}
+    operator const Compiler&() const { return compiler_;}
 
     // Function name
     const std::string& name() const { return name_;}
@@ -121,7 +121,7 @@ namespace casadi {
 
     /** \brief Creator function, just-in-time compiled library */
     static ExternalFunctionInternal*
-      create(const JitCompiler& compiler, const std::string& name);
+      create(const Compiler& compiler, const std::string& name);
 
     /** \brief  clone function */
     virtual ExternalFunctionInternal* clone() const;
@@ -151,13 +151,13 @@ namespace casadi {
 
     ///@{
     /** \brief Forward mode derivatives */
-    virtual Function getDerForward(const std::string& name, int nfwd, const Dict& opts);
+    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
     virtual int numDerForward() const;
     ///@}
 
     ///@{
     /** \brief Reverse mode derivatives */
-    virtual Function getDerReverse(const std::string& name, int nadj, const Dict& opts);
+    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
     virtual int numDerReverse() const;
     ///@}
 

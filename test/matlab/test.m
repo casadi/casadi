@@ -209,7 +209,7 @@ assert(all(size(u(1:2,:))==[2 5]));
 assert(all(size(u(1:2,1:3))==[2 3]));
 
 
-if JitCompiler.hasPlugin('clang')
+if Compiler.hasPlugin('clang')
   x = MX.sym('x');
   F = MXFunction('f',{x},{x^2},struct('jit',true));
 
@@ -221,3 +221,9 @@ end
 a = DMatrix.ones(Sparsity.upper(5));
 i = full(full(sparse(a))-a);
 assert(any(any(i))==0);
+
+% Element assignment
+A = DMatrix.ones(1,4);
+A(2) = 20;
+A(3:4) = [30,40];
+assert(all(full(A)==[1 20 30 40]))

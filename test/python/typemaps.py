@@ -442,20 +442,22 @@ class typemaptests(casadiTestCase):
       
       
   def testGenericType(self):
-    self.message("Generic type")
-    x=SX.sym("x")
-    f=SXFunction("foo", [x],[2*x])
-    self.assertEquals(f.getOption("name"),"foo")
-    f.setOption("verbose",True)
-    #self.assertTrue(isinstance(f.getOption("verbose"),bool))
-    self.assertTrue(f.getOption("verbose"))
-    f.setOption("verbose",False)
-    self.assertTrue(not(f.getOption("verbose")))
-    d=f.dictionary()
-    self.assertTrue(isinstance(d,dict))
-    d["verbose"]=True
-    f.setOption(d)
-    self.assertTrue(f.getOption("verbose"))
+    with warnings.catch_warnings():
+      warnings.filterwarnings("ignore",category=DeprecationWarning)
+      self.message("Generic type")
+      x=SX.sym("x")
+      f=SXFunction("foo", [x],[2*x])
+      self.assertEquals(f.getOption("name"),"foo")
+      f.setOption("verbose",True)
+      #self.assertTrue(isinstance(f.getOption("verbose"),bool))
+      self.assertTrue(f.getOption("verbose"))
+      f.setOption("verbose",False)
+      self.assertTrue(not(f.getOption("verbose")))
+      d=f.dictionary()
+      self.assertTrue(isinstance(d,dict))
+      d["verbose"]=True
+      f.setOption(d)
+      self.assertTrue(f.getOption("verbose"))
 
   def testGenericType2(self):
     self.message("Generic type 2")
@@ -524,9 +526,11 @@ class typemaptests(casadiTestCase):
     nlp = SXFunction("nlp", nlpIn(x=x),nlpOut(f=x**2))
 
     nlp_solver = NlpSolver("mysolver","ipopt", nlp)
-    
-    self.assertRaises(RuntimeError,lambda : nlp_solver.setOption('acceptable_tol',SX.sym("x")))
-    nlp_solver.setOption('acceptable_tol',DMatrix(1))
+
+    with warnings.catch_warnings():
+      warnings.filterwarnings("ignore",category=DeprecationWarning)
+      self.assertRaises(RuntimeError,lambda : nlp_solver.setOption('acceptable_tol',SX.sym("x")))
+      nlp_solver.setOption('acceptable_tol',DMatrix(1))
 
   def test_DMatrixSXcast(self):
     self.message("Casting DMatrix to SX")

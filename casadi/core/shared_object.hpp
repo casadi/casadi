@@ -142,7 +142,7 @@ namespace casadi {
     void printPtr(std::ostream &stream=casadi::userOut()) const;
     /// \endcond
 
-    /** \brief Initialize or re-initialize the object:
+    /** \brief [DEPRECATED] Initialize or re-initialize the object:
     *
     * more documentation in the node class (SharedObjectNode and derived classes)
     */

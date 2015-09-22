@@ -23,52 +23,52 @@
  */
 
 
-#include "jit_compiler.hpp"
-#include "jit_compiler_internal.hpp"
+#include "compiler.hpp"
+#include "compiler_internal.hpp"
 
 using namespace std;
 namespace casadi {
 
-  JitCompiler::JitCompiler() {
+  Compiler::Compiler() {
   }
 
-  JitCompiler::JitCompiler(const std::string& name,
+  Compiler::Compiler(const std::string& name,
                            const std::string& compiler,
                            const Dict& opts) {
-    assignNode(JitCompilerInternal::getPlugin(compiler).creator(name));
+    assignNode(CompilerInternal::getPlugin(compiler).creator(name));
     setOption(opts);
     init();
   }
 
-  JitCompilerInternal* JitCompiler::operator->() {
-    return static_cast<JitCompilerInternal*>(OptionsFunctionality::operator->());
+  CompilerInternal* Compiler::operator->() {
+    return static_cast<CompilerInternal*>(OptionsFunctionality::operator->());
   }
 
-  const JitCompilerInternal* JitCompiler::operator->() const {
-    return static_cast<const JitCompilerInternal*>(OptionsFunctionality::operator->());
+  const CompilerInternal* Compiler::operator->() const {
+    return static_cast<const CompilerInternal*>(OptionsFunctionality::operator->());
   }
 
-  bool JitCompiler::testCast(const SharedObjectNode* ptr) {
-    return dynamic_cast<const JitCompilerInternal*>(ptr)!=0;
+  bool Compiler::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const CompilerInternal*>(ptr)!=0;
   }
 
-  bool JitCompiler::hasPlugin(const std::string& name) {
-    return JitCompilerInternal::hasPlugin(name);
+  bool Compiler::hasPlugin(const std::string& name) {
+    return CompilerInternal::hasPlugin(name);
   }
 
-  void JitCompiler::loadPlugin(const std::string& name) {
-    JitCompilerInternal::loadPlugin(name);
+  void Compiler::loadPlugin(const std::string& name) {
+    CompilerInternal::loadPlugin(name);
   }
 
-  std::string JitCompiler::doc(const std::string& name) {
-    return JitCompilerInternal::getPlugin(name).doc;
+  std::string Compiler::doc(const std::string& name) {
+    return CompilerInternal::getPlugin(name).doc;
   }
 
-  std::string JitCompiler::plugin_name() const {
+  std::string Compiler::plugin_name() const {
     return (*this)->plugin_name();
   }
 
-  void* JitCompiler::getFunction(const std::string& symname) {
+  void* Compiler::getFunction(const std::string& symname) {
     return (*this)->getFunction(symname);
   }
 

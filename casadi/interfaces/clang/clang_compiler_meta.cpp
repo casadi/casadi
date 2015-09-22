@@ -23,10 +23,10 @@
  */
 
 
-      #include "clang_interface.hpp"
+      #include "clang_compiler.hpp"
       #include <string>
 
-      const std::string casadi::ClangJitCompilerInterface::meta_doc=
+      const std::string casadi::ClangCompiler::meta_doc=
       "\n"
 "Interface to the SDP solver MOSEK Warning: The solver MOSEK is not good\n"
 "at handling linear equalities. There are several options if you notice\n"

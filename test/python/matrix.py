@@ -920,7 +920,6 @@ class Matrixtests(casadiTestCase):
     f = SXFunction("f", [vec(P.T),A,B],[vec(mul([A,P,B]).T)])
 
     J = f.jacobian()
-    J.init()
     J.setInput(numpy.random.rand(*vec(P.T).shape),0)
     J.setInput(numpy.random.rand(*A.shape),1)
     J.setInput(numpy.random.rand(*B.shape),2)

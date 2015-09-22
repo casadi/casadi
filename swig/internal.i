@@ -79,13 +79,13 @@
 %exception  casadi::IpoptUserClass::get_var_con_metadata(Index n, StringMetaDataMapType &var_string_md, IntegerMetaDataMapType &var_integer_md, NumericMetaDataMapType &var_numeric_md, Index m, StringMetaDataMapType &con_string_md, IntegerMetaDataMapType &con_integer_md, NumericMetaDataMapType &con_numeric_md) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LibInfo< JitCompiler >::clear() {
+%exception  casadi::LibInfo< Compiler >::clear() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LibInfo< JitCompiler >::get(FcnPtr &fcnPtr, const std::string &sym) {
+%exception  casadi::LibInfo< Compiler >::get(FcnPtr &fcnPtr, const std::string &sym) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LibInfo< JitCompiler >::name() const  {
+%exception  casadi::LibInfo< Compiler >::name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LibInfo< std::string >::clear() {
@@ -334,10 +334,10 @@
 %exception  snoptProblemC::solve(int starttype) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::LibInfo< JitCompiler >::LibInfo() {
+%exception casadi::LibInfo< Compiler >::LibInfo() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::LibInfo< JitCompiler >::LibInfo(const JitCompiler &compiler, const std::string &name) {
+%exception casadi::LibInfo< Compiler >::LibInfo(const Compiler &compiler, const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::LibInfo< std::string >::LibInfo() {

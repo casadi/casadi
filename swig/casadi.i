@@ -63,13 +63,13 @@
 %}
 %init %{
   // Set logger functions
-  casadi::Logger::writeWarn = pythonlogger;
-  casadi::Logger::writeProg = pythonlogger;
-  casadi::Logger::writeDebug = pythonlogger;
-  casadi::Logger::writeAll = pythonlogger;
+  casadi::Logger::writeWarn = casadi::pythonlogger;
+  casadi::Logger::writeProg = casadi::pythonlogger;
+  casadi::Logger::writeDebug = casadi::pythonlogger;
+  casadi::Logger::writeAll = casadi::pythonlogger;
 
   // @jgillis: please document
-  casadi::InterruptHandler::checkInterrupted = pythoncheckinterrupted;
+  casadi::InterruptHandler::checkInterrupted = casadi::pythoncheckinterrupted;
 %}
 #elif defined(SWIGMATLAB)
 %{
@@ -112,10 +112,6 @@
   // Set library path
   casadi::CasadiOptions::setCasadiPath(path);
 
-  // Set jit include path
-  casadi::CasadiOptions::setJitIncludePath(path + sep + "include"
-                                           + sep + "casadi" + sep + "jit");
-
   // @jgillis: please document
   mxArray *warning_rhs[] = {mxCreateString("error"),
 
@@ -126,14 +122,14 @@
 
   
   // Set logger functions
-  casadi::Logger::writeWarn = mexlogger;
-  casadi::Logger::writeProg = mexlogger;
-  casadi::Logger::writeDebug = mexlogger;
-  casadi::Logger::writeAll = mexlogger;
-  casadi::Logger::flush = mexflush;
+  casadi::Logger::writeWarn = casadi::mexlogger;
+  casadi::Logger::writeProg = casadi::mexlogger;
+  casadi::Logger::writeDebug = casadi::mexlogger;
+  casadi::Logger::writeAll = casadi::mexlogger;
+  casadi::Logger::flush = casadi::mexflush;
 
   // @jgillis: please document
-  casadi::InterruptHandler::checkInterrupted = mexcheckinterrupted;
+  casadi::InterruptHandler::checkInterrupted = casadi::mexcheckinterrupted;
 %}
 #endif
 
@@ -289,7 +285,7 @@ int deprecated(const std::string & c,const std::string & a) {
   return PyErr_WarnEx(PyExc_DeprecationWarning,msg.c_str(),3);
 }
 int internal(const std::string & c) {
-  if (CasadiOptions::allowed_internal_api) return 0;
+  if (casadi::CasadiOptions::allowed_internal_api) return 0;
   std::string msg = "This CasADi function (" + c + ") is not part of the public API. Use at your own risk.";
   return PyErr_WarnEx(PyExc_SyntaxWarning,msg.c_str(),3);
 }
@@ -304,7 +300,7 @@ int deprecated(const std::string & c,const std::string & a) {
   return 0;
 }
 int internal(const std::string & c) {
-  if (CasadiOptions::allowed_internal_api) return 0;
+  if (casadi::CasadiOptions::allowed_internal_api) return 0;
   std::string msg = "This CasADi function (" + c + ") is not part of the public API. Use at your own risk.";
   mexWarnMsgIdAndTxt("SWIG:SyntaxWarning",msg.c_str());
   return 0;
@@ -387,24 +383,13 @@ if (casadi::CasadiOptions::catch_errors_swig) { \
 import_array();
 %}
 
-%inline%{
-/** Check PyObjects by class name */
-bool PyObjectHasClassName(PyObject* p, const char * name) {
-  PyObject * classo = PyObject_GetAttrString( p, "__class__");
-  PyObject * classname = PyObject_GetAttrString( classo, "__name__");
-
-  bool ret = strcmp(PyString_AsString(classname),name)==0;
-  Py_DECREF(classo);Py_DECREF(classname);
-	return ret;
-}
-
-%}
 #endif // SWIGPYTHON
 
 %{
 #define SWIG_Error_return(code, msg)  { std::cerr << "Error occured in CasADi SWIG interface code:" << std::endl << "  "<< msg << std::endl;SWIG_Error(code, msg); return 0; }
 %}
 
+#ifndef CASADI_NOT_IN_DERIVED
 #ifdef SWIGPYTHON
 %{
   // Returns a new reference
@@ -507,6 +492,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   }
   %}
 #endif
+#endif // CASADI_NOT_IN_DERIVED
 
 #ifndef SWIGXML
 
@@ -528,17 +514,19 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     bool to_ptr(GUESTOBJECT *p, int** m);
     bool to_ptr(GUESTOBJECT *p, double** m);
     bool to_ptr(GUESTOBJECT *p, std::string** m);
-    bool to_ptr(GUESTOBJECT *p, Slice** m);
-    bool to_ptr(GUESTOBJECT *p, Sparsity** m);
-    bool to_ptr(GUESTOBJECT *p, DMatrix** m);
-    bool to_ptr(GUESTOBJECT *p, IMatrix** m);
-    bool to_ptr(GUESTOBJECT *p, SX** m);
-    bool to_ptr(GUESTOBJECT *p, MX** m);
-    bool to_ptr(GUESTOBJECT *p, Function** m);
-    bool to_ptr(GUESTOBJECT *p, Callback** m);
-    bool to_ptr(GUESTOBJECT *p, DerivativeGenerator** m);
-    bool to_ptr(GUESTOBJECT *p, CustomEvaluate** m);
-    bool to_ptr(GUESTOBJECT *p, GenericType** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::Slice** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::Sparsity** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::DMatrix** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::IMatrix** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::SX** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::MX** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::Function** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::Callback** m);
+#ifndef CASADI_NOT_IN_DERIVED
+    bool to_ptr(GUESTOBJECT *p, casadi::DerivativeGenerator** m);
+#endif
+    bool to_ptr(GUESTOBJECT *p, casadi::CustomEvaluate** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::GenericType** m);
 #ifdef SWIGMATLAB
     bool to_ptr(GUESTOBJECT *p, std::pair<int, int>** m);
 #endif // SWIGMATLAB
@@ -564,13 +552,13 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     GUESTOBJECT* from_ptr(const int *a);
     GUESTOBJECT* from_ptr(const double *a);
     GUESTOBJECT* from_ptr(const std::string *a);
-    GUESTOBJECT* from_ptr(const Slice *a);
-    GUESTOBJECT* from_ptr(const Sparsity *a);
-    GUESTOBJECT* from_ptr(const DMatrix *a);
-    GUESTOBJECT* from_ptr(const IMatrix *a);
-    GUESTOBJECT* from_ptr(const SX *a);
-    GUESTOBJECT* from_ptr(const MX *a);
-    GUESTOBJECT* from_ptr(const Function *a);
+    GUESTOBJECT* from_ptr(const casadi::Slice *a);
+    GUESTOBJECT* from_ptr(const casadi::Sparsity *a);
+    GUESTOBJECT* from_ptr(const casadi::DMatrix *a);
+    GUESTOBJECT* from_ptr(const casadi::IMatrix *a);
+    GUESTOBJECT* from_ptr(const casadi::SX *a);
+    GUESTOBJECT* from_ptr(const casadi::MX *a);
+    GUESTOBJECT* from_ptr(const casadi::Function *a);
 #ifdef SWIGMATLAB
     GUESTOBJECT* from_ptr(const std::pair<int, int>* a);
 #endif // SWIGMATLAB
@@ -745,10 +733,16 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     }
 
     GUESTOBJECT * from_ptr(const bool *a) {
-      return SWIG_From_bool(*a);
+#ifdef SWIGPYTHON
+      return PyBool_FromLong(*a);
+#elif defined(SWIGMATLAB)
+      return mxCreateLogicalScalar(*a);
+#else
+      return 0;
+#endif
     }
   } // namespace casadi
-  }
+ }
 
 %fragment("casadi_int", "header", fragment="casadi_aux", fragment=SWIG_AsVal_frag(int), fragment=SWIG_AsVal_frag(long)) {
   namespace casadi {
@@ -845,8 +839,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     GUESTOBJECT * from_ptr(const double *a) {
 #ifdef SWIGPYTHON
       return PyFloat_FromDouble(*a);
-#endif // SWIGPYTHON
+#elif defined(SWIGMATLAB)
+      return mxCreateDoubleScalar(*a);
+#else
       return 0;
+#endif
     }
   } // namespace casadi
  }
@@ -1101,6 +1098,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 }
 
 %fragment("casadi_derivativegenerator", "header", fragment="casadi_aux") {
+#ifndef CASADI_NOT_IN_DERIVED
   namespace casadi {
 #ifdef SWIGPYTHON
     Function DerivativeGeneratorPythonInternal::call(Function& fcn, int ndir, void* user_data) {
@@ -1161,9 +1159,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
   } // namespace casadi
+#endif // CASADI_NOT_IN_DERIVED
 }
 
 %fragment("casadi_callback", "header", fragment="casadi_aux") {
+#ifndef CASADI_NOT_IN_DERIVED
   namespace casadi {
 #ifdef SWIGPYTHON
     int CallbackPythonInternal::call(Function& fcn, void* user_data) {
@@ -1209,9 +1209,11 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
   } // namespace casadi
+#endif // CASADI_NOT_IN_DERIVED
 }
 
 %fragment("casadi_customevaluate", "header", fragment="casadi_aux") {
+#ifndef CASADI_NOT_IN_DERIVED
   namespace casadi {
 #ifdef SWIGPYTHON
     void CustomEvaluatePythonInternal::call(CustomFunction& fcn, void* user_data) {
@@ -1252,6 +1254,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       return false;
     }
   } // namespace casadi
+#endif // CASADI_NOT_IN_DERIVED
 }
 
 %fragment("casadi_generictype", "header", fragment="casadi_aux") {
@@ -1282,11 +1285,14 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
           || to_generic<std::vector<std::string> >(p, m)
           || to_generic<std::vector<std::vector<int> > >(p, m)
           || to_generic<casadi::Function>(p, m)
+#ifndef CASADI_NOT_IN_DERIVED
           || to_generic<casadi::DerivativeGenerator>(p, m)
+#endif
           || to_generic<casadi::GenericType::Dict>(p, m)) {
         return true;
       }
 
+#ifndef CASADI_NOT_IN_DERIVED
 #ifdef SWIGPYTHON
       if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
         PyObject *c = PyObject_GetAttrString(p,"creator");
@@ -1340,6 +1346,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
       }
       return true;
 #endif // SWIGPYTHON
+#endif // CASADI_NOT_IN_DERIVED
 
       // Check if it can be converted to boolean (last as e.g. can be converted to boolean)
       if (to_generic<bool>(p, m)) return true;
@@ -1819,6 +1826,18 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 %fragment("casadi_dmatrix", "header", fragment="casadi_aux") {
   namespace casadi {
+#ifdef SWIGPYTHON
+    /** Check PyObjects by class name */
+    bool PyObjectHasClassName(PyObject* p, const char * name) {
+      PyObject * classo = PyObject_GetAttrString( p, "__class__");
+      PyObject * classname = PyObject_GetAttrString( classo, "__name__");
+
+      bool ret = strcmp(PyString_AsString(classname),name)==0;
+      Py_DECREF(classo);Py_DECREF(classname);
+      return ret;
+    }
+#endif // SWIGPYTHON
+
     bool to_ptr(GUESTOBJECT *p, DMatrix** m) {
       // Treat Null
       if (is_null(p)) return false;
@@ -2398,10 +2417,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 #endif // SWIGXML
 
-%{
-using namespace casadi;
-%}
-
 #ifdef SWIGPYTHON
 %pythoncode %{
 if __name__ != "casadi.casadi":
@@ -2657,11 +2672,13 @@ class NZproxy:
 
 #ifdef SWIGMATLAB
 %{
-  /// Helper function: Convert ':' to Slice
-  inline Slice char2Slice(char ch) {
-    casadi_assert(ch==':');
-    return casadi::Slice();
-  }
+  namespace casadi {
+    /// Helper function: Convert ':' to Slice
+    inline Slice char2Slice(char ch) {
+      casadi_assert(ch==':');
+      return Slice();
+    }
+  } // namespace casadi
 %}
 
 %define %matrix_helpers(Type)
@@ -2682,17 +2699,17 @@ class NZproxy:
     }
     const Type paren(char rr, char cc) const {
       Type m;
-      $self->get(m, true, char2Slice(rr), char2Slice(cc));
+      $self->get(m, true, casadi::char2Slice(rr), casadi::char2Slice(cc));
       return m;
     }
     const Type paren(char rr, const Matrix<int>& cc) const {
       Type m;
-      $self->get(m, true, char2Slice(rr), cc);
+      $self->get(m, true, casadi::char2Slice(rr), cc);
       return m;
     }
     const Type paren(const Matrix<int>& rr, char cc) const {
       Type m;
-      $self->get(m, true, rr, char2Slice(cc));
+      $self->get(m, true, rr, casadi::char2Slice(cc));
       return m;
     }
     const Type paren(const Matrix<int>& rr, const Matrix<int>& cc) const {
@@ -2702,20 +2719,20 @@ class NZproxy:
     }
 
     // Set a submatrix (index-1)
-    void setparen(const Type& m, char rr) { $self->set(m, true, char2Slice(rr));}
-    void setparen(const Type& m, const Matrix<int>& rr) { $self->set(m, true, rr);}
-    void setparen(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
-    void setparen(const Type& m, char rr, char cc) { $self->set(m, true, char2Slice(rr), char2Slice(cc));}
-    void setparen(const Type& m, char rr, const Matrix<int>& cc) { $self->set(m, true, char2Slice(rr), cc);}
-    void setparen(const Type& m, const Matrix<int>& rr, char cc) { $self->set(m, true, rr, char2Slice(cc));}
-    void setparen(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
+    void paren_asgn(const Type& m, char rr) { $self->set(m, true, casadi::char2Slice(rr));}
+    void paren_asgn(const Type& m, const Matrix<int>& rr) { $self->set(m, true, rr);}
+    void paren_asgn(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
+    void paren_asgn(const Type& m, char rr, char cc) { $self->set(m, true, casadi::char2Slice(rr), casadi::char2Slice(cc));}
+    void paren_asgn(const Type& m, char rr, const Matrix<int>& cc) { $self->set(m, true, casadi::char2Slice(rr), cc);}
+    void paren_asgn(const Type& m, const Matrix<int>& rr, char cc) { $self->set(m, true, rr, casadi::char2Slice(cc));}
+    void paren_asgn(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
 
     // Get nonzeros (index-1)
-    const Type brace(char rr) const { Type m; $self->getNZ(m, true, char2Slice(rr)); return m;}
+    const Type brace(char rr) const { Type m; $self->getNZ(m, true, casadi::char2Slice(rr)); return m;}
     const Type brace(const Matrix<int>& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
 
     // Set nonzeros (index-1)
-    void setbrace(const Type& m, char rr) { $self->setNZ(m, true, char2Slice(rr));}
+    void setbrace(const Type& m, char rr) { $self->setNZ(m, true, casadi::char2Slice(rr));}
     void setbrace(const Type& m, const Matrix<int>& rr) { $self->setNZ(m, true, rr);}
 
     // 'end' function (needed for end syntax in MATLAB)
@@ -2821,7 +2838,7 @@ namespace casadi{
 %template(ExpMX)             casadi::GenericExpression<casadi::MX>;
 
 // Prefix symbols
-#ifdef SWIGMATLAB
+#if defined(SWIGMATLAB) || defined(SWIGXML)
 %define %HIDE(SYM) friendwrap_ ## SYM %enddef
 #else
 %define %HIDE(SYM) casadi_ ## SYM %enddef
@@ -3760,9 +3777,9 @@ def pyfunction(inputs,outputs):
 
     with warnings.catch_warnings():
       warnings.filterwarnings("ignore",category=DeprecationWarning)
-      Fun = CustomFunction(fcustom,inputs,outputs)
-      Fun.setOption("name","CustomFunction")
+      Fun = CustomFunction("CustomFunction",fcustom,inputs,outputs)
       return Fun
+
   return wrap
 
 def PyFunction(obj,inputs,outputs):
@@ -3847,6 +3864,10 @@ def PyFunction(obj,inputs,outputs):
             return DerFun
 
         Fun.setOption("custom_reverse",derivativewrapAdj)
+      with warnings.catch_warnings():
+        warnings.filterwarnings("ignore",category=DeprecationWarning)
+        Fun.init()
+
       return Fun
 
 %}
@@ -4018,7 +4039,7 @@ namespace casadi {
 
 %include <casadi/core/function/sx_function.hpp>
 %include <casadi/core/function/mx_function.hpp>
-%include <casadi/core/function/jit_compiler.hpp>
+%include <casadi/core/function/compiler.hpp>
 %include <casadi/core/function/linear_solver.hpp>
 %include <casadi/core/function/implicit_function.hpp>
 %include <casadi/core/function/integrator.hpp>
@@ -4232,3 +4253,8 @@ for name,v in locals().items():
 %}
 
 #endif
+
+// Cleanup for dependent modules
+%exception {
+  $action
+}

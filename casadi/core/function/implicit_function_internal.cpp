@@ -180,7 +180,7 @@ namespace casadi {
   }
 
   Function ImplicitFunctionInternal
-  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = symbolicInput();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
@@ -198,7 +198,7 @@ namespace casadi {
   }
 
   Function ImplicitFunctionInternal
-  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = symbolicInput();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",

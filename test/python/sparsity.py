@@ -490,8 +490,6 @@ class Sparsitytests(casadiTestCase):
     g = SXFunction('g', [optvar,p],[X*p], {'verbose':True})
 
     J = g.jacobian()
-    J.setOption("verbose",True)
-    J.init()
     
     self.assertTrue(J.getOutput()[:,:X.nnz()].sparsity()==Sparsity.diag(100))
 
@@ -503,8 +501,6 @@ class Sparsitytests(casadiTestCase):
     g = SXFunction('g', [X,p],[vertcat([X*p,P])], {'verbose':True})
 
     J = g.jacobian()
-    J.setOption("verbose",True)
-    J.init()
     
     self.assertTrue(J.getOutput()[:X.nnz(),:].sparsity()==Sparsity.diag(100))
     

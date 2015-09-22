@@ -199,7 +199,6 @@ class SocpSolverTests(casadiTestCase):
       allopts = dict(socp_options)
       allopts["ni"] = [2,2]
       solver = SocpSolver("mysolver",socpsolver,{'g':G.sparsity(),'e':E.sparsity(),'a':A.sparsity()},allopts)
-      solver.init()
 
       try:
         less_digits=aux_options["less_digits"]

@@ -29,6 +29,8 @@ from types import *
 from helpers import *
 import random
 
+warnings.filterwarnings("ignore",category=DeprecationWarning)
+
 lsolvers = []
 try:
   LinearSolver.loadPlugin("csparse")
@@ -56,9 +58,9 @@ except:
 
 nsolvers = []
   
-def nullspacewrapper(sp):
+def nullspacewrapper(name, sp, options):
   a = SX.sym("a",sp)
-  f = SXFunction("f", [a],[nullspace(a)])
+  f = SXFunction(name, [a],[nullspace(a)],options)
   return f
   
 nsolvers.append((nullspacewrapper,{}))
@@ -78,7 +80,7 @@ class LinearSolverTests(casadiTestCase):
               ]:
       n ,m = A.shape
       for Solver, options in nsolvers:
-        solver = Solver(A.T.sparsity())
+        solver = Solver("solver",A.T.sparsity(),options)
         solver.setOption(options)
         solver.init()
         solver.setInput(A.T)

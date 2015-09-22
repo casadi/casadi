@@ -23,40 +23,40 @@
  */
 
 
-#ifndef CASADI_JIT_COMPILER_HPP
-#define CASADI_JIT_COMPILER_HPP
+#ifndef CASADI_COMPILER_HPP
+#define CASADI_COMPILER_HPP
 
 #include "function.hpp"
 
 
 namespace casadi {
 
-  class JitCompilerInternal;
+  class CompilerInternal;
 
-  /** \brief JitCompiler
+  /** \brief Compiler
 
       Just-in-time compilation of code
 
-      \generalsection{JitCompiler}
-      \pluginssection{JitCompiler}
+      \generalsection{Compiler}
+      \pluginssection{Compiler}
 
       \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT JitCompiler : public OptionsFunctionality {
+  class CASADI_EXPORT Compiler : public OptionsFunctionality {
   public:
 
     /// Default constructor
-    JitCompiler();
+    Compiler();
 
-    /// JitCompiler factory (new syntax, includes initialization)
-    explicit JitCompiler(const std::string& name,
+    /// Compiler factory (new syntax, includes initialization)
+    explicit Compiler(const std::string& name,
                          const std::string& compiler,
                          const Dict& opts=Dict());
 
     /// Access functions of the node
-    JitCompilerInternal* operator->();
-    const JitCompilerInternal* operator->() const;
+    CompilerInternal* operator->();
+    const CompilerInternal* operator->() const;
 
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
@@ -81,5 +81,5 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // CASADI_JIT_COMPILER_HPP
+#endif // CASADI_COMPILER_HPP
 

@@ -92,7 +92,7 @@ Construct from an IterationCallback object.
 
 %feature("docstring") casadi::Callback::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -291,6 +291,9 @@ this class must never be instantiated. Access its static members directly
 Joris Gillis
 
 C++ includes: casadi_options.hpp ";
+
+
+// File: classcasadi_1_1ClangCompiler.xml
 
 
 // File: classcasadi_1_1CleSolver.xml
@@ -805,8 +808,8 @@ returned.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -814,8 +817,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -869,7 +872,7 @@ There is no guarantee that consecutive calls return identical objects
 
 %feature("docstring") casadi::CleSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -1174,6 +1177,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -1299,11 +1307,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -1659,6 +1662,332 @@ Generate a file, return code as string.
 
 
 // File: classcasadi_1_1CommonExternal.xml
+
+
+// File: classcasadi_1_1Compiler.xml
+
+
+/*  Option Functionality  */ %feature("docstring")
+casadi::Compiler::hasOption "
+
+check if there is an option str
+
+";
+
+%feature("docstring") casadi::Compiler::plugin_name "
+
+Query plugin name.
+
+";
+
+%feature("docstring") casadi::Compiler::getOptionNames "
+
+Get a list of all option names.
+
+";
+
+%feature("docstring") casadi::Compiler::getDescription "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring") casadi::Compiler::init "
+
+[DEPRECATED] Initialize or re-initialize the object:
+
+more documentation in the node class (SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring") casadi::Compiler::hasSetOption "
+
+check if the user has there is an option str
+
+";
+
+%feature("docstring") casadi::Compiler::isNull "
+
+Is a null pointer?
+
+";
+
+%feature("docstring") casadi::Compiler::getOptionType "
+
+Get the type of a certain option.
+
+";
+
+%feature("docstring") casadi::Compiler::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::Compiler::printOptions "
+
+Print options to a stream.
+
+";
+
+%feature("docstring") casadi::Compiler::getOption "
+
+get an option value
+
+";
+
+%feature("docstring") casadi::Compiler::getOptionTypeName "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring") casadi::Compiler::setOptionByEnumValue "[INTERNAL]
+Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring") casadi::Compiler::print "
+
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::Compiler::printPtr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
+%feature("docstring") casadi::Compiler "
+
+Compiler.
+
+Just-in-time compilation of code
+
+General information
+===================
+
+
+
+>List of available options
+
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+
+List of plugins
+===============
+
+
+
+- clang
+
+- shell
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Compiler.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+clang
+-----
+
+
+
+Interface to the JIT compiler CLANG
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| flags           | OT_STRINGVECTOR | GenericType()   | Compile flags   |
+|                 |                 |                 | for the JIT     |
+|                 |                 |                 | compiler.       |
+|                 |                 |                 | Default: None   |
++-----------------+-----------------+-----------------+-----------------+
+| include_path    | OT_STRING       | \"\"              | Include paths   |
+|                 |                 |                 | for the JIT     |
+|                 |                 |                 | compiler. The   |
+|                 |                 |                 | include         |
+|                 |                 |                 | directory       |
+|                 |                 |                 | shipped with    |
+|                 |                 |                 | CasADi will be  |
+|                 |                 |                 | automatically   |
+|                 |                 |                 | appended.       |
++-----------------+-----------------+-----------------+-----------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+shell
+-----
+
+
+
+Interface to the JIT compiler SHELL
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| compiler        | OT_STRING       | \"gcc\"           | Compiler        |
+|                 |                 |                 | command         |
++-----------------+-----------------+-----------------+-----------------+
+| compiler_setup  | OT_STRING       | \"-fPIC -shared\" | Compiler setup  |
+|                 |                 |                 | command         |
++-----------------+-----------------+-----------------+-----------------+
+| flags           | OT_STRINGVECTOR | GenericType()   | Compile flags   |
+|                 |                 |                 | for the JIT     |
+|                 |                 |                 | compiler.       |
+|                 |                 |                 | Default: None   |
++-----------------+-----------------+-----------------+-----------------+
+
+--------------------------------------------------------------------------------
+
+
+
+Joris Gillis
+Diagrams
+--------
+
+
+
+C++ includes: compiler.hpp ";
+
+%feature("docstring") casadi::Compiler::getOptionAllowedIndex "[INTERNAL]
+Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring") casadi::Compiler::setOptionByAllowedIndex "[INTERNAL]
+Set a certain option by giving its index into the allowed values.
+
+";
+
+%feature("docstring") casadi::Compiler::getOptionDescription "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring") casadi::Compiler::getOptionDefault "
+
+Get the default of a certain option.
+
+";
+
+%feature("docstring") casadi::Compiler::getOptionAllowed "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::Compiler::makeUnique "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring") casadi::Compiler::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::Compiler::getOptionEnumValue "[INTERNAL]  Get
+the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring") casadi::Compiler::repr "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::Compiler::setOption "
+
+>  void OptionsFunctionality.setOption(str str, GenericType val)
+------------------------------------------------------------------------
+
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+>  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
+------------------------------------------------------------------------
+
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring") casadi::Compiler::Compiler "
+
+>  Compiler()
+------------------------------------------------------------------------
+
+Default constructor.
+
+>  Compiler(str name, str compiler, Dict opts=Dict())
+------------------------------------------------------------------------
+
+Compiler factory (new syntax, includes initialization)
+
+";
+
+%feature("docstring") casadi::Compiler::assertInit "[INTERNAL]  Assert that
+it is initialized
+
+";
+
+%feature("docstring") casadi::Compiler::copyOptions "
+
+Copy all options from another object.
+
+";
+
+%feature("docstring") casadi::Compiler::isInit "
+
+Is initialized?
+
+";
+
+%feature("docstring") casadi::Compiler::dictionary "
+
+Get the dictionary.
+
+";
 
 
 // File: classcasadi_1_1Concat.xml
@@ -2108,6 +2437,11 @@ Joris Gillis
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | control_endp | OT_BOOLEAN   | false        | Include a    | casadi::Cont |
 | oint         |              |              | control      | rolSimulator |
 |              |              |              | value at the | Internal     |
@@ -2240,11 +2574,6 @@ Joris Gillis
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -3032,8 +3361,8 @@ Get the description of a certain option.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -3041,8 +3370,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -3143,7 +3472,7 @@ Get the type name of a certain option.
 
 %feature("docstring") casadi::ControlSimulator::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -3266,7 +3595,7 @@ point to any node, \"0\" is returned.
 
 %feature("docstring") casadi::CustomEvaluate::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -3504,7 +3833,7 @@ point to this new object
 
 %feature("docstring") casadi::CustomFunction::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -3771,6 +4100,11 @@ Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -3880,11 +4214,6 @@ Joel Andersson
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -4133,8 +4462,8 @@ oname:  output name. Only allowed when an output scheme is set.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -4142,8 +4471,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -5001,7 +5330,7 @@ Construct from C pointer.
 
 %feature("docstring") casadi::DerivativeGenerator::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -5126,7 +5455,7 @@ Is a null pointer?
 
 %feature("docstring") casadi::DleSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -5571,8 +5900,8 @@ adheres to SCHEME_NLPINput
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -5580,8 +5909,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -6102,6 +6431,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -6227,11 +6561,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -6620,7 +6949,7 @@ Copy all options from another object.
 
 %feature("docstring") casadi::DpleSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -7152,8 +7481,8 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -7161,8 +7490,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -7406,6 +7735,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | const_dim    | OT_BOOLEAN   | true         | Assume       | casadi::Dple |
 |              |              |              | constant     | Internal     |
 |              |              |              | dimension of |              |
@@ -7536,11 +7870,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -8269,8 +8598,8 @@ Add modules to be monitored.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -8278,8 +8607,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -8450,6 +8779,11 @@ Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -8560,11 +8894,6 @@ Joel Andersson
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
 |              |              |              | the jit      |              |
@@ -8632,7 +8961,7 @@ the output elements).
 
 %feature("docstring") casadi::ExternalFunction::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -9086,7 +9415,7 @@ Load an external function File name is assumed to be ./<f_name>.so.
 
 Load an external function File name given.
 
->  ExternalFunction(str name, JitCompiler compiler, Dict opts=Dict())
+>  ExternalFunction(str name, Compiler compiler, Dict opts=Dict())
 ------------------------------------------------------------------------
 
 Load a just-in-time compiled external function File name given.
@@ -9336,8 +9665,8 @@ Print options to a stream.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -9345,8 +9674,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -9980,6 +10309,11 @@ Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -10089,11 +10423,6 @@ Joel Andersson
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -10299,7 +10628,7 @@ Get output scheme name by index.
 
 %feature("docstring") casadi::Function::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -10347,7 +10676,7 @@ point to any node, \"0\" is returned.
 
 %feature("docstring") casadi::Functor::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -11360,7 +11689,7 @@ Is a null pointer?
 
 %feature("docstring") casadi::GenericType::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -11673,8 +12002,8 @@ Print dimensions of inputs and outputs.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -11682,8 +12011,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -12405,6 +12734,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -12521,11 +12855,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -12747,7 +13076,7 @@ There is no guarantee that consecutive calls return identical objects
 
 %feature("docstring") casadi::HomotopyNlpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -13059,7 +13388,7 @@ Print a description of the object.
 
 %feature("docstring") casadi::ImplicitFunction::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -13214,6 +13543,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | constraints  | OT_INTEGERVE | GenericType( | Constrain    | casadi::Impl |
 |              | CTOR         | )            | the          | icitFunction |
 |              |              |              | unknowns. 0  | Internal     |
@@ -13358,11 +13692,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -14102,8 +14431,8 @@ Access Jacobian.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -14111,8 +14440,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -14971,6 +15300,11 @@ General information
 |              |              |              | if one is    |              |
 |              |              |              | constructed. |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -15092,11 +15426,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -16259,8 +16588,8 @@ adjoint directions.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -16268,8 +16597,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -16504,7 +16833,7 @@ propagating_sparsity.cpp)
 
 %feature("docstring") casadi::Integrator::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -16620,300 +16949,6 @@ NULL)
 ";
 
 %feature("docstring") casadi::IterationCallback::IterationCallback "";
-
-
-// File: classcasadi_1_1JitCompiler.xml
-
-
-/*  Option Functionality  */ %feature("docstring")
-casadi::JitCompiler::getOptionAllowedIndex " [INTERNAL]  Get the index into
-allowed options of a certain option.
-
-";
-
-%feature("docstring") casadi::JitCompiler::getOptionType "
-
-Get the type of a certain option.
-
-";
-
-%feature("docstring") casadi::JitCompiler::isInit "
-
-Is initialized?
-
-";
-
-%feature("docstring") casadi::JitCompiler::printOptions "
-
-Print options to a stream.
-
-";
-
-%feature("docstring") casadi::JitCompiler::printPtr "[INTERNAL]  Print the
-pointer to the internal class
-
-";
-
-%feature("docstring") casadi::JitCompiler::getOptionDescription "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring") casadi::JitCompiler::setOption "
-
->  void OptionsFunctionality.setOption(str str, GenericType val)
-------------------------------------------------------------------------
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
->  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
-------------------------------------------------------------------------
-
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring") casadi::JitCompiler "
-
-JitCompiler.
-
-Just-in-time compilation of code
-
-General information
-===================
-
-
-
->List of available options
-
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
-| ipes         | TOR          | )            | default      | onsFunctiona |
-|              |              |              | options      | lityNode     |
-|              |              |              | according to |              |
-|              |              |              | a given      |              |
-|              |              |              | recipe (low- |              |
-|              |              |              | level)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-
-List of plugins
-===============
-
-
-
-- clang
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-JitCompiler.doc(\"myextraplugin\")
-
-
-
---------------------------------------------------------------------------------
-
-clang
------
-
-
-
-Interface to the JIT compiler CLANG
-
->List of available options
-
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| flags           | OT_STRINGVECTOR | GenericType()   | Compile flags   |
-|                 |                 |                 | for the JIT     |
-|                 |                 |                 | compiler.       |
-|                 |                 |                 | Default: None   |
-+-----------------+-----------------+-----------------+-----------------+
-| include_path    | OT_STRING       | \"\"              | Include paths   |
-|                 |                 |                 | for the JIT     |
-|                 |                 |                 | compiler. The   |
-|                 |                 |                 | include         |
-|                 |                 |                 | directory       |
-|                 |                 |                 | shipped with    |
-|                 |                 |                 | CasADi will be  |
-|                 |                 |                 | automatically   |
-|                 |                 |                 | appended.       |
-+-----------------+-----------------+-----------------+-----------------+
-
---------------------------------------------------------------------------------
-
-
-
-Joris Gillis
-Diagrams
---------
-
-
-
-C++ includes: jit_compiler.hpp ";
-
-%feature("docstring") casadi::JitCompiler::plugin_name "
-
-Query plugin name.
-
-";
-
-%feature("docstring") casadi::JitCompiler::isNull "
-
-Is a null pointer?
-
-";
-
-%feature("docstring") casadi::JitCompiler::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
-values.
-
-";
-
-%feature("docstring") casadi::JitCompiler::getDescription "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::JitCompiler::getOption "
-
-get an option value
-
-";
-
-%feature("docstring") casadi::JitCompiler::assertInit "[INTERNAL]  Assert
-that it is initialized
-
-";
-
-%feature("docstring") casadi::JitCompiler::makeUnique "
-
-Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
-";
-
-%feature("docstring") casadi::JitCompiler::print "
-
-Print a description of the object.
-
-";
-
-%feature("docstring") casadi::JitCompiler::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring") casadi::JitCompiler::getOptionEnumValue "[INTERNAL]
-Get the enum value corresponding to th certain option.
-
-";
-
-%feature("docstring") casadi::JitCompiler::hasOption "
-
-check if there is an option str
-
-";
-
-%feature("docstring") casadi::JitCompiler::getOptionAllowed "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring") casadi::JitCompiler::copyOptions "
-
-Copy all options from another object.
-
-";
-
-%feature("docstring") casadi::JitCompiler::repr "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring") casadi::JitCompiler::getOptionDefault "
-
-Get the default of a certain option.
-
-";
-
-%feature("docstring") casadi::JitCompiler::getOptionTypeName "
-
-Get the type name of a certain option.
-
-";
-
-%feature("docstring") casadi::JitCompiler::JitCompiler "
-
->  JitCompiler()
-------------------------------------------------------------------------
-
-Default constructor.
-
->  JitCompiler(str name, str compiler, Dict opts=Dict())
-------------------------------------------------------------------------
-
-JitCompiler factory (new syntax, includes initialization)
-
-";
-
-%feature("docstring") casadi::JitCompiler::getOptionNames "
-
-Get a list of all option names.
-
-";
-
-%feature("docstring") casadi::JitCompiler::setOptionByEnumValue "[INTERNAL]
-Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring") casadi::JitCompiler::init "
-
-Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
-%feature("docstring") casadi::JitCompiler::getRepresentation "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring") casadi::JitCompiler::hasSetOption "
-
-check if the user has there is an option str
-
-";
-
-%feature("docstring") casadi::JitCompiler::dictionary "
-
-Get the dictionary.
-
-";
 
 
 // File: classcasadi_1_1KernelSum2D.xml
@@ -17481,6 +17516,11 @@ Joris Gillis
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -17590,11 +17630,6 @@ Joris Gillis
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -17850,7 +17885,7 @@ returned.
 
 %feature("docstring") casadi::KernelSum2D::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -18015,8 +18050,8 @@ Get the enum value corresponding to th certain option.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -18024,8 +18059,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -18077,20 +18112,19 @@ information about the library.
 C++ includes: external_function_internal.hpp ";
 
 
-// File: classcasadi_1_1LibInfo_3_01JitCompiler_01_4.xml
-%feature("docstring") casadi::LibInfo< JitCompiler >::LibInfo " [INTERNAL]
-";
+// File: classcasadi_1_1LibInfo_3_01Compiler_01_4.xml
+%feature("docstring") casadi::LibInfo< Compiler >::LibInfo " [INTERNAL] ";
 
-%feature("docstring") casadi::LibInfo< JitCompiler > " [INTERNAL]  Library
-that has been just-in-time compiled.
+%feature("docstring") casadi::LibInfo< Compiler >::name " [INTERNAL] ";
+
+%feature("docstring") casadi::LibInfo< Compiler > " [INTERNAL]  Library that
+has been just-in-time compiled.
 
 C++ includes: external_function_internal.hpp ";
 
-%feature("docstring") casadi::LibInfo< JitCompiler >::clear " [INTERNAL] ";
+%feature("docstring") casadi::LibInfo< Compiler >::get " [INTERNAL] ";
 
-%feature("docstring") casadi::LibInfo< JitCompiler >::get " [INTERNAL] ";
-
-%feature("docstring") casadi::LibInfo< JitCompiler >::name " [INTERNAL] ";
+%feature("docstring") casadi::LibInfo< Compiler >::clear " [INTERNAL] ";
 
 
 // File: classcasadi_1_1LibInfo_3_01std_1_1string_01_4.xml
@@ -18196,7 +18230,7 @@ propagating_sparsity.cpp)
 
 %feature("docstring") casadi::LinearSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -18834,6 +18868,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -18943,11 +18982,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -19285,8 +19319,8 @@ Get input scheme.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -19294,8 +19328,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -20104,8 +20138,8 @@ Set a certain option by giving its index into the allowed values.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -20113,8 +20147,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -20161,7 +20195,7 @@ There is no guarantee that consecutive calls return identical objects
 
 %feature("docstring") casadi::LpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -20322,6 +20356,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -20431,11 +20470,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -21537,8 +21571,8 @@ adheres to SCHEME_NLPINput
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -21546,8 +21580,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -21792,6 +21826,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -21917,11 +21956,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -22088,7 +22122,7 @@ length of res field.
 
 %feature("docstring") casadi::LrDleSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -22737,7 +22771,7 @@ get an option value
 
 %feature("docstring") casadi::LrDpleSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -22938,8 +22972,8 @@ Return a string with a description (for SWIG)
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -22947,8 +22981,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -23250,6 +23284,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | const_dim    | OT_BOOLEAN   | true         | Assume       | casadi::LrDp |
 |              |              |              | constant     | leInternal   |
 |              |              |              | dimension of |              |
@@ -23380,11 +23419,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -23731,6 +23765,11 @@ Map Joris Gillis
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -23841,11 +23880,6 @@ Map Joris Gillis
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
 |              |              |              | the jit      |              |
@@ -23920,8 +23954,8 @@ of iw field.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -23929,8 +23963,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -24216,7 +24250,7 @@ Get default input value.
 
 %feature("docstring") casadi::Map::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -24746,8 +24780,8 @@ Print a representation of the object.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -24755,8 +24789,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -25370,7 +25404,7 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring") casadi::MapAccum::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -25519,6 +25553,11 @@ Joris Gillis
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -25628,11 +25667,6 @@ Joris Gillis
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -26153,7 +26187,7 @@ Is the Matrix a Slice (only for IMatrix)
 
 %feature("docstring") casadi::Matrix::appendColumns "
 
-Append a matrix horizontally.
+[DEPRECATED] Append a matrix horizontally
 
 ";
 
@@ -26266,8 +26300,8 @@ check if the matrix is 1 (note that false negative answers are possible)
 
 %feature("docstring") casadi::Matrix::makeSparse "
 
-Make a matrix sparse by removing numerical zeros smaller in absolute value
-than a specified tolerance.
+[DEPRECATED: use sparsify instead] Make a matrix sparse by removing
+numerical zeros smaller in absolute value than a specified tolerance
 
 ";
 
@@ -26879,7 +26913,7 @@ nodes by their ID.
 
 %feature("docstring") casadi::Matrix::setZero "
 
-Set all elements to zero.
+[DEPRECATED] Set all elements to zero
 
 ";
 
@@ -26904,7 +26938,7 @@ Get the number of non-zeros in the lower triangular half.
 
 %feature("docstring") casadi::Matrix::append "
 
-Append a matrix vertically (NOTE: only efficient if vector)
+[DEPRECATED] Append a matrix vertically (NOTE: only efficient if vector)
 
 ";
 
@@ -27041,13 +27075,13 @@ Get the number of non-zeros in the upper triangular half.
 
 %feature("docstring") casadi::MX::append "
 
-Append a matrix vertically (NOTE: only efficient if vector)
+[DEPRECATED] Append a matrix vertically (NOTE: only efficient if vector)
 
 ";
 
 %feature("docstring") casadi::MX::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -27127,7 +27161,7 @@ Check if the matrix expression is scalar.
 
 %feature("docstring") casadi::MX::lift "
 
-Lift an expression.
+[DEPRECATED] Lift an expression
 
 ";
 
@@ -27333,7 +27367,7 @@ Get the size along a particular dimensions.
 
 %feature("docstring") casadi::MX::appendColumns "
 
-Append a matrix horizontally.
+[DEPRECATED] Append a matrix horizontally
 
 ";
 
@@ -27359,7 +27393,7 @@ zero.
 
 %feature("docstring") casadi::MX::makeDense "
 
-Make the matrix dense.
+[DEPRECATED: Use densify instead] Make the matrix dense
 
 ";
 
@@ -27825,8 +27859,8 @@ Get default input value.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -27834,8 +27868,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -28465,6 +28499,11 @@ Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -28574,11 +28613,6 @@ Joel Andersson
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -28873,7 +28907,7 @@ ownership, only weak references to the derivatives are kept internally.
 
 %feature("docstring") casadi::MXFunction::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -29536,7 +29570,7 @@ adheres to SCHEME_NLPINput
 
 %feature("docstring") casadi::NlpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -29935,6 +29969,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -30172,11 +30211,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -32334,57 +32368,73 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 
 >List of available stats
 
-+--------------------+
-|         Id         |
-+====================+
-| con_integer_md     |
-+--------------------+
-| con_numeric_md     |
-+--------------------+
-| con_string_md      |
-+--------------------+
-| iter_count         |
-+--------------------+
-| iteration          |
-+--------------------+
-| iterations         |
-+--------------------+
-| n_eval_f           |
-+--------------------+
-| n_eval_g           |
-+--------------------+
-| n_eval_grad_f      |
-+--------------------+
-| n_eval_h           |
-+--------------------+
-| n_eval_jac_g       |
-+--------------------+
-| return_status      |
-+--------------------+
-| t_callback_fun     |
-+--------------------+
-| t_callback_prepare |
-+--------------------+
-| t_eval_f           |
-+--------------------+
-| t_eval_g           |
-+--------------------+
-| t_eval_grad_f      |
-+--------------------+
-| t_eval_h           |
-+--------------------+
-| t_eval_jac_g       |
-+--------------------+
-| t_mainloop         |
-+--------------------+
-| t_mainloop_wall    |
-+--------------------+
-| var_integer_md     |
-+--------------------+
-| var_numeric_md     |
-+--------------------+
-| var_string_md      |
-+--------------------+
++-------------------------+
+|           Id            |
++=========================+
+| con_integer_md          |
++-------------------------+
+| con_numeric_md          |
++-------------------------+
+| con_string_md           |
++-------------------------+
+| iter_count              |
++-------------------------+
+| iteration               |
++-------------------------+
+| iterations              |
++-------------------------+
+| n_eval_callback         |
++-------------------------+
+| n_eval_f                |
++-------------------------+
+| n_eval_g                |
++-------------------------+
+| n_eval_grad_f           |
++-------------------------+
+| n_eval_h                |
++-------------------------+
+| n_eval_jac_g            |
++-------------------------+
+| return_status           |
++-------------------------+
+| t_callback_fun.proc     |
++-------------------------+
+| t_callback_fun.wall     |
++-------------------------+
+| t_callback_prepare.proc |
++-------------------------+
+| t_callback_prepare.wall |
++-------------------------+
+| t_eval_f.proc           |
++-------------------------+
+| t_eval_f.wall           |
++-------------------------+
+| t_eval_g.proc           |
++-------------------------+
+| t_eval_g.wall           |
++-------------------------+
+| t_eval_grad_f.proc      |
++-------------------------+
+| t_eval_grad_f.wall      |
++-------------------------+
+| t_eval_h.proc           |
++-------------------------+
+| t_eval_h.wall           |
++-------------------------+
+| t_eval_jac_g.proc       |
++-------------------------+
+| t_eval_jac_g.wall       |
++-------------------------+
+| t_mainloop.proc         |
++-------------------------+
+| t_mainloop.wall         |
++-------------------------+
+| var_integer_md          |
++-------------------------+
+| var_numeric_md          |
++-------------------------+
+| var_string_md           |
++-------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -34407,8 +34457,8 @@ Get the description of a certain option.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -34416,8 +34466,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -34797,8 +34847,8 @@ point to any node, \"0\" is returned.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -34806,8 +34856,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -34876,7 +34926,7 @@ Evaluate.
 
 %feature("docstring") casadi::Nullspace::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -35328,6 +35378,11 @@ basis Joris Gillis
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -35442,11 +35497,6 @@ basis Joris Gillis
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -35821,8 +35871,8 @@ Assert that it is initialized
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -35830,8 +35880,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -35864,7 +35914,7 @@ get an option value
 
 %feature("docstring") casadi::OptionsFunctionality::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -36327,6 +36377,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -36436,11 +36491,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -37129,8 +37179,8 @@ the output elements).
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -37138,8 +37188,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -37221,7 +37271,7 @@ Get the type name of a certain option.
 
 %feature("docstring") casadi::QcqpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -37632,8 +37682,8 @@ propagating_sparsity.cpp)
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -37641,8 +37691,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -38176,6 +38226,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -38285,11 +38340,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -38874,7 +38924,7 @@ Evaluate the function symbolically or numerically.
 
 %feature("docstring") casadi::QpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -39324,7 +39374,7 @@ Export / Generate C code for the function.
 
 %feature("docstring") casadi::SdpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -39840,6 +39890,11 @@ General information
 |              |              |              | always dense |              |
 |              |              |              | (m x m).     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -39950,11 +40005,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -40385,8 +40435,8 @@ adjoint sensitivities, one direction at a time.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -40394,8 +40444,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -40979,6 +41029,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -41089,11 +41144,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -41263,7 +41313,7 @@ Evaluate.
 
 %feature("docstring") casadi::SdqpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -42063,8 +42113,8 @@ Get total number of elements in all of the matrix-valued outputs.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -42072,8 +42122,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -42191,7 +42241,7 @@ Return a string with a representation (for SWIG)
 
 %feature("docstring") casadi::SharedObject::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -42270,6 +42320,9 @@ Print a representation of the object.
 Return a string with a description (for SWIG)
 
 ";
+
+
+// File: classcasadi_1_1ShellCompiler.xml
 
 
 // File: classcasadi_1_1SimpleHomotopyNlp.xml
@@ -42630,6 +42683,11 @@ Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -42739,11 +42797,6 @@ Joel Andersson
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -42975,7 +43028,7 @@ Get output scheme name by index.
 
 %feature("docstring") casadi::Simulator::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -43147,8 +43200,8 @@ ownership, only weak references to the derivatives are kept internally.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -43156,8 +43209,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -44051,8 +44104,8 @@ Return a string with a description (for SWIG)
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -44060,8 +44113,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -44132,7 +44185,7 @@ Get sparsity of a given output.
 
 %feature("docstring") casadi::SocpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -44485,6 +44538,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -44600,11 +44658,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -46792,7 +46845,7 @@ Create a dense rectangular sparsity pattern.
 
 %feature("docstring") casadi::Sparsity::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -47889,8 +47942,8 @@ Evaluate the function symbolically or numerically.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -47898,8 +47951,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -48129,6 +48182,11 @@ General information
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -48238,11 +48296,6 @@ General information
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -48876,7 +48929,7 @@ Is the class able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::StabilizedQpSolver::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -49256,7 +49309,7 @@ point to any node, \"0\" is returned.
 
 %feature("docstring") casadi::Switch::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -49567,8 +49620,8 @@ Get the number of function inputs.
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -49576,8 +49629,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -49860,6 +49913,11 @@ Switch statement Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -49969,11 +50027,6 @@ Switch statement Joel Andersson
 |              |              |              | compiler to  |              |
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
@@ -50593,8 +50646,8 @@ Generate the sparsity of a Jacobian block
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -50602,8 +50655,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -51072,6 +51125,11 @@ Joel Andersson
 |              |              |              | . Cf. option |              |
 |              |              |              | \"ad_weight\". |              |
 +--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -51182,11 +51240,6 @@ Joel Andersson
 |              |              |              | speed up the |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jit_compiler | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
 |              |              | )            | be passed to | tionInternal |
 |              |              |              | the jit      |              |
@@ -51275,7 +51328,7 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 %feature("docstring") casadi::SXFunction::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -51508,8 +51561,9 @@ pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::WeakRef::init "[INTERNAL]  Initialize or re-
-initialize the object:
+%feature("docstring") casadi::WeakRef::init "
+
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 
@@ -51665,8 +51719,8 @@ Is a null pointer?
 >  void OptionsFunctionality.setOption(str str, GenericType val)
 ------------------------------------------------------------------------
 
-set an option. For a list of options, check the class documentation of this
-class.
+[DEPRECATED: pass option dictionary to function constructor] Set an option.
+For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -51674,8 +51728,8 @@ changes, the init function should be called again.
 >  void OptionsFunctionality.setOption(Dict dict, bool skipUnknown=false)
 ------------------------------------------------------------------------
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+[DEPRECATED: pass option dictionary to function constructor] Set a set of
+options. For a list of options, check the class documentation of this class.
 
 The setOptions are only considered before the init function. If properties
 changes, the init function should be called again.
@@ -51695,7 +51749,7 @@ Print options to a stream.
 
 %feature("docstring") casadi::XmlFile::init "
 
-Initialize or re-initialize the object:
+[DEPRECATED] Initialize or re-initialize the object:
 
 more documentation in the node class (SharedObjectNode and derived classes)
 

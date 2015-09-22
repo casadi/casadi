@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 2.8.6)
 
 find_package(SWIG REQUIRED)
 
-# NOTE: you are not allowd to generate header files with configure_file in this module.
+if (WITH_EXTENDING_CASADI)
+   add_subdirectory(extending_casadi)
+endif()
+
+# NOTE: you are not allowed to generate header files with configure_file in this module.
 # See https://github.com/casadi/casadi/issues/646
 
 # cmake_policy propagation rules
@@ -51,3 +55,4 @@ endif()
 if(WITH_JSON)
    add_subdirectory(json)
 endif()
+

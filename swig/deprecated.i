@@ -25,6 +25,39 @@
 %exception  casadi::GenericMatrix< Matrix< DataType >  >::sparse(int nrow=1, int ncol=1) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
+%exception  casadi::MX::append(const MX &y) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::MX::appendColumns(const MX &y) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::MX::lift(const MX &x_guess) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::MX::makeDense(const MX &val=0) {
+ CATCH_OR_NOT(DEPRECATED_MSG(" Use densify instead") $action)
+}
+%exception  casadi::Matrix< DataType >::append(const Matrix< DataType > &y) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::Matrix< DataType >::appendColumns(const Matrix< DataType > &y) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::Matrix< DataType >::makeSparse(double tol=0) {
+ CATCH_OR_NOT(DEPRECATED_MSG(" use sparsify instead") $action)
+}
+%exception  casadi::Matrix< DataType >::setZero() {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::OptionsFunctionality::setOption(const Dict &dict, bool skipUnknown=false) {
+ CATCH_OR_NOT(DEPRECATED_MSG(" pass option dictionary to function constructor") $action)
+}
+%exception  casadi::OptionsFunctionality::setOption(const std::string &str, const GenericType &val) {
+ CATCH_OR_NOT(DEPRECATED_MSG(" pass option dictionary to function constructor") $action)
+}
+%exception  casadi::SharedObject::init(bool allow_reinit=true) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
 %exception  casadi::Sparsity::reserve(int nnz, int ncol) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }

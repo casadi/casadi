@@ -31,7 +31,7 @@
 #include "../weak_ref.hpp"
 #include <set>
 #include "code_generator.hpp"
-#include "jit_compiler.hpp"
+#include "compiler.hpp"
 #include "../matrix/sparse_storage.hpp"
 
 // This macro is for documentation purposes
@@ -214,7 +214,7 @@ namespace casadi {
      *    if no cached version is available.
      */
     Function derForward(int nfwd);
-    virtual Function getDerForward(const std::string& name, int nfwd, const Dict& opts);
+    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
     virtual int numDerForward() const { return hasSetOption("custom_forward") ? 64 : 0;}
     void setDerForward(const Function& fcn, int nfwd);
     ///@}
@@ -226,7 +226,7 @@ namespace casadi {
      *    if no cached version is available.
      */
     Function derReverse(int nadj);
-    virtual Function getDerReverse(const std::string& name, int nadj, const Dict& opts);
+    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
     virtual int numDerReverse() const { return hasSetOption("custom_reverse") ? 64 : 0;}
     void setDerReverse(const Function& fcn, int nadj);
     ///@}
@@ -626,8 +626,8 @@ namespace casadi {
     std::string name_;
 
     /// Just-in-time compiler
-    std::string jit_compiler_;
-    JitCompiler compiler_;
+    std::string compilerplugin_;
+    Compiler compiler_;
     Dict jit_options_;
 
     bool monitor_inputs_, monitor_outputs_;

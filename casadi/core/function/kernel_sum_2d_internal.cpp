@@ -221,7 +221,7 @@ namespace casadi {
   }
 
   Function KernelSum2DInternal
-  ::getDerForward(const std::string& name, int nfwd, const Dict& opts) {
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
 
     /* Write KernelSum2D in linear form:
     *  
@@ -292,7 +292,7 @@ namespace casadi {
   }
 
   Function KernelSum2DInternal
-  ::getDerReverse(const std::string& name, int nadj, const Dict& opts) {
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     /* Write KernelSum2D in linear form:
     *  
     *    S = F(V, X)  = sum_i  f ( P_i, v_i, X)

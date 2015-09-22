@@ -87,6 +87,7 @@ option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warn
 option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" OFF)
 option(WITH_SELFCONTAINED "Make the install directory self-contained" OFF)
 option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" ON)
+option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
 
 # static on windows, shared on linux/osx by default
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -256,6 +257,26 @@ if(CXX11FLAG)
   endif()
 endif()
 
+# Check if mkstemps is available
+if(NOT WIN32)
+  file(WRITE ${CMAKE_BINARY_DIR}/mkstemps_test.cxx
+      "#include <cstdlib>\n"
+      "#include <unistd.h>\n"
+      "int main() {\n"
+      "  char tmp[] = \"mkstempstestXXXXXX.so\";\n"
+      "  int flag = mkstemps(tmp, 3);\n"
+      "  return flag;\n"
+      "}\n")
+  try_compile(HAVE_MKSTEMPS ${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/mkstemps_test.cxx
+              OUTPUT_VARIABLE HAVE_MKSTEMPS_OUTPUT)
+  if(HAVE_MKSTEMPS)
+    add_definitions(-DHAVE_MKSTEMPS)
+  else()
+    message(WARNING "mkstemp is not available, falling back on tmpnam. "
+                    "Test compilation returned the following:\n"
+                    "${HAVE_MKSTEMPS_OUTPUT}")
+  endif()
+endif()
 
 ################################################################################
 ############################### compiler warnings ##############################

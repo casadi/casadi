@@ -42,9 +42,6 @@ def fac(inputs):
     y*=(i+1)
   return [y]
 
-#! Just as other CasADi function, we have to initialize
-fac.init()
-
 #! Set the input
 fac.setInput(4)
 
@@ -91,7 +88,6 @@ class Fun:
     z.set(z2)
             
 c = PyFunction(Fun(12345), [Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)] )
-c.init()
 
 c.setInput(1.2,0)
 c.setInput(1.5,1)
@@ -155,7 +151,6 @@ class Fun:
       y_bar.set(by)
 
 c = PyFunction(Fun(), [Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)] )
-c.init()
 
 J = c.jacobian(1) # jacobian w.r.t second argument
 J.setInput(1.2,0)
@@ -176,8 +171,6 @@ def fun((x,y)):
 
   return [z2]
 
-fun.init()
-
 @pyfunction([Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,2),Sparsity.dense(1,1)])
 def funjac((x,y)):
 
@@ -191,7 +184,6 @@ def funjac((x,y)):
 
   return [J,z2]
 
-funjac.init()
 fun.setFullJacobian(funjac)
 """
 J = fun.jacobian(1)
@@ -290,7 +282,7 @@ class Fun:
       outputs[num_in*i+1].set(by)
       
 Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
-Fun.init()
+
 J = Fun.jacobian(1)
 J.setInput(1.2,0)
 J.setInput(1.5,1)

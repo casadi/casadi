@@ -44,7 +44,6 @@ set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-noproxydel")
 
 # Generate SWIG wrapper
 set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
-
 swig_add_module(casadi python ../casadi.i)
 swig_link_libraries(casadi ${PYTHON_LIBRARIES} casadi)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -148,3 +147,34 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
 )
+
+# Example of how to extend CasADi with additional features
+if (WITH_EXTENDING_CASADI)
+  set_source_files_properties(../extending_casadi/extending_casadi.i  PROPERTIES  CPLUSPLUS ON)
+  swig_add_module(extending_casadi python ../extending_casadi/extending_casadi.i)
+  swig_link_libraries(extending_casadi ${PYTHON_LIBRARIES} extending_casadi)
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    set_target_properties(_extending_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
+  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set_target_properties(_extending_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-maybe-uninitialized ${MAYBE_WERROR}")
+  endif()
+  set(CASADI_PYTHON_LIBRARY ${SWIG_MODULE_extending_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
+
+  add_custom_target(extending_casadi_python DEPENDS _extending_casadi extending_casadi)
+
+  install(TARGETS _extending_casadi
+    DESTINATION "${PYTHON_PREFIX}/extending_casadi"
+    COMPONENT install_python
+  )
+
+  install(FILES ${PROJECT_BINARY_DIR}/swig/python/extending_casadi.py
+    DESTINATION "${PYTHON_PREFIX}/extending_casadi"
+    COMPONENT install_python
+  )
+
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../extending_casadi/__init__.py
+    DESTINATION "${PYTHON_PREFIX}/extending_casadi"
+    COMPONENT install_python
+  )
+
+endif()
