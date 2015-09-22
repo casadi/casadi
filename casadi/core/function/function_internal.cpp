@@ -586,8 +586,8 @@ namespace casadi {
     }
 
     // Set inputs and outputs to zero
-    for (int ind=0; ind<nIn(); ++ind) input(ind).setZero();
-    for (int ind=0; ind<nOut(); ++ind) output(ind).setZero();
+    for (int ind=0; ind<nIn(); ++ind) input(ind).setAll(0);
+    for (int ind=0; ind<nOut(); ++ind) output(ind).setAll(0);
 
     // Construct sparsity pattern
     Sparsity ret = Sparsity::triplet(nz_out, nz_in, use_fwd ? jcol : jrow, use_fwd ? jrow : jcol);
@@ -752,9 +752,9 @@ namespace casadi {
             std::reverse(lookup_row.begin(), lookup_row.end());
             std::reverse(lookup_value.begin(), lookup_value.end());
             IMatrix duplicates =
-                IMatrix::triplet(lookup_row, lookup_col, lookup_value, bvec_size, coarse.size())
-                - lookup;
-            duplicates.makeSparse();
+              IMatrix::triplet(lookup_row, lookup_col, lookup_value, bvec_size, coarse.size())
+              - lookup;
+            duplicates = sparsify(duplicates);
             lookup(duplicates.sparsity()) = -bvec_size;
 
             // Propagate the dependencies

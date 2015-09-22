@@ -75,13 +75,6 @@ namespace casadi {
     init();
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  DleSolver::DleSolver(const std::string& solver,
-                       const std::map<std::string, Sparsity>& st) {
-    assignNode(DleInternal::instantiatePlugin(solver, st));
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   Sparsity DleSolver::getSparsity(const std::map<std::string, Sparsity>& st) {
     return DleInternal::getSparsity(st);
   }

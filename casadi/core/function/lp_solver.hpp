@@ -114,14 +114,6 @@ namespace casadi {
     LpSolver(const std::string& name, const std::string& solver,
              const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief[DEPRECATED] Constructor, no initialization
-     *  \param solver \pluginargument{LpSolver}
-     *  \param st \structargument{LP}
-     */
-    LpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
-#endif // WITH_DEPRECATED_FEATURES
-
     /// Access functions of the node
     LpSolverInternal* operator->();
     const LpSolverInternal* operator->() const;

@@ -76,16 +76,6 @@ namespace casadi {
     (*this)->spSolve(X, B, transpose);
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  LinearSolver::LinearSolver(const std::string& solver, const Sparsity& sp, int nrhs) {
-    if (solver=="none") {
-      assignNode(new LinearSolverInternal(sp, nrhs));
-    } else {
-      assignNode(LinearSolverInternal::getPlugin(solver).creator(sp, nrhs));
-    }
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   LinearSolver::LinearSolver(const std::string& name, const std::string& solver,
                              const Sparsity& sp, int nrhs, const Dict& opts) {
     if (solver=="none") {

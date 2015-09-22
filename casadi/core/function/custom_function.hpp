@@ -72,27 +72,6 @@ public:
                  const Dict& opts=Dict());
   ///@}
 
-#ifdef WITH_DEPRECATED_FEATURES
-  ///@{
-  /** \brief [DEPRECATED] Constructor */
-  CustomFunction(const CustomEvaluate &c_fcn,
-                 const std::vector<Sparsity>& inputscheme,
-                 const std::vector<Sparsity>& outputscheme);
-
-  CustomFunction(const CustomEvaluate &c_fcn,
-                 const std::pair< SparsityDict, std::vector<std::string> >& inputscheme,
-                 const std::vector<Sparsity>& outputscheme);
-
-  CustomFunction(const CustomEvaluate &c_fcn,
-                 const std::vector<Sparsity>& inputscheme,
-                 const std::pair< SparsityDict, std::vector<std::string> >& outputscheme);
-
-  CustomFunction(const CustomEvaluate &c_fcn,
-                 const std::pair< SparsityDict, std::vector<std::string> >& inputscheme,
-                 const std::pair< SparsityDict, std::vector<std::string> >& outputscheme);
-  ///@}
-#endif // WITH_DEPRECATED_FEATURES
-
   /** \brief  Access functions of the node */
   CustomFunctionInternal* operator->();
 

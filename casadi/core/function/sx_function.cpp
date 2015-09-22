@@ -42,31 +42,6 @@ namespace casadi {
   SXFunction::SXFunction() {
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  SXFunction::SXFunction(const vector<SX>& arg, const vector<SX>& res) {
-    assignNode(new SXFunctionInternal(arg, res));
-  }
-
-  SXFunction::SXFunction(const vector<SX>& arg,
-                         const pair<SXDict, vector<string> >& res) {
-    assignNode(new SXFunctionInternal(arg, make_vector(res)));
-    setOption("output_scheme", res.second);
-  }
-
-  SXFunction::SXFunction(const pair<SXDict, vector<string> >& arg,
-                         const vector<SX>& res) {
-    assignNode(new SXFunctionInternal(make_vector(arg), res));
-    setOption("input_scheme", arg.second);
-  }
-
-  SXFunction::SXFunction(const pair<SXDict, vector<string> >& arg,
-                         const pair<SXDict, vector<string> >& res) {
-    assignNode(new SXFunctionInternal(make_vector(arg), make_vector(res)));
-    setOption("input_scheme", arg.second);
-    setOption("output_scheme", res.second);
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   void SXFunction::construct(const std::string& name,
                              const std::vector<SX>& arg,
                              const std::vector<SX>& res,

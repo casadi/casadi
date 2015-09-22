@@ -202,24 +202,6 @@ namespace casadi {
                const MXDict& dae, const Dict& opts=Dict());
     ///@}
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Integrator factory, no initialization
-    *
-    * \param name \pluginargument{Integrator}
-    * \param f dynamical system
-    * \parblock
-    * \copydoc scheme_DAEInput
-    * \copydoc scheme_DAEOutput
-    * \endparblock
-    * \param g backwards system
-    * \parblock
-    * \copydoc scheme_RDAEInput
-    * \copydoc scheme_RDAEOutput
-    * \endparblock
-    */
-    Integrator(const std::string& solver, const Function& f, const Function& g=Function());
-#endif // WITH_DEPRECATED_FEATURES
-
     /// Clone
     Integrator clone() const;
 

@@ -84,17 +84,6 @@ namespace casadi {
     ImplicitFunction(const std::string& name, const std::string& solver,
                      const Function& f, const Dict& opts=Dict());
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Create an implicit function solver, no initialization
-     * \param solver \pluginargument{ImplicitFunction}
-     * \param f Function where one of the inputs (by default the first) is an unknown and
-     *        one of the outputs (by default the first) is a residual.
-     */
-    ImplicitFunction(const std::string& solver, const Function& f,
-                     const Function& jac=Function(),
-                     const LinearSolver& linsol=LinearSolver());
-#endif // WITH_DEPRECATED_FEATURES
-
     /// Access functions of the node
     ImplicitFunctionInternal* operator->();
 

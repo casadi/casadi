@@ -51,13 +51,6 @@ namespace casadi {
     init();
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  SocpSolver::SocpSolver(const std::string& solver,
-                         const std::map<std::string, Sparsity>& st) {
-    assignNode(SocpSolverInternal::instantiatePlugin(solver, st));
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   bool SocpSolver::hasPlugin(const std::string& name) {
     return SocpSolverInternal::hasPlugin(name);
   }

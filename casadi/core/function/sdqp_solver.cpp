@@ -51,13 +51,6 @@ namespace casadi {
     init();
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  SdqpSolver::SdqpSolver(const std::string& solver,
-                         const std::map<std::string, Sparsity>& st) {
-    assignNode(SdqpSolverInternal::instantiatePlugin(solver, st));
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   bool SdqpSolver::hasPlugin(const std::string& name) {
     return SdqpSolverInternal::hasPlugin(name);
   }

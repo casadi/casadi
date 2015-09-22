@@ -126,12 +126,6 @@ namespace casadi {
     init();
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  Integrator::Integrator(const std::string& solver, const Function& f, const Function& g) {
-    assignNode(IntegratorInternal::getPlugin(solver).creator(f, g));
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   Integrator  Integrator::clone() const {
     Integrator ret;
     if (!isNull()) ret.assignNode((*this)->clone());

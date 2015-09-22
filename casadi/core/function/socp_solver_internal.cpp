@@ -152,8 +152,8 @@ namespace casadi {
     dual_A_row_ = dual_A_DMatrix.sparsity().getRow();
     dual_A_colind_ = dual_A_DMatrix.sparsity().getColind();
     // Reserve memory for maximum size of dual_A_
-    int sizeof_A = input(SOCP_SOLVER_E).size() + input(SOCP_SOLVER_G).size() +
-                     2*input(SOCP_SOLVER_A).size()+2*n_;
+    int sizeof_A = input(SOCP_SOLVER_E).nnz() + input(SOCP_SOLVER_G).nnz() +
+                     2*input(SOCP_SOLVER_A).nnz()+2*n_;
     dual_A_data_.reserve(sizeof_A);
     dual_A_row_.reserve(sizeof_A);
     dual_A_colind_.reserve(m_+N_+2*nc_+2*n_+1);

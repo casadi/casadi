@@ -110,24 +110,6 @@ namespace casadi {
 #endif // USE_CXX11
 #endif // SWIG
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /// [DEPRECATED] Multiple input, multiple output, no initialization
-    SXFunction(const std::vector<SX>& arg,
-               const std::vector<SX>& res);
-
-    /// [DEPRECATED] Multiple input, multiple  output, no initialization
-    SXFunction(const std::vector<SX>& arg,
-               const std::pair< SXDict, std::vector<std::string> >& res);
-
-    /// [DEPRECATED] Multiple input, multiple output, no initialization
-    SXFunction(const std::pair< SXDict, std::vector<std::string> >& arg,
-               const std::vector<SX>& res);
-
-    /// [DEPRECATED] Multiple input, multiple output, no initialization
-    SXFunction(const std::pair< SXDict, std::vector<std::string> >& arg,
-               const std::pair< SXDict, std::vector<std::string> >& res);
-#endif // WITH_DEPRECATED_FEATURES
-
 /// \cond INTERNAL
     /// Access functions of the node
     SXFunctionInternal* operator->();

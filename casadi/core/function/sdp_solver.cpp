@@ -43,13 +43,6 @@ namespace casadi {
     return dynamic_cast<const SdpSolverInternal*>(ptr)!=0;
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  SdpSolver::SdpSolver(const std::string& solver,
-                       const std::map<std::string, Sparsity>& st) {
-    assignNode(SdpSolverInternal::instantiatePlugin(solver, st));
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   SdpSolver::SdpSolver(const std::string& name, const std::string& solver,
                        const std::map<std::string, Sparsity>& st, const Dict& opts) {
     assignNode(SdpSolverInternal::instantiatePlugin(solver, st));

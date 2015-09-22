@@ -68,19 +68,6 @@ public:
   Simulator(const std::string& name, const Integrator& integrator,
             const Matrix<double>& grid, const Dict& opts=Dict());
 
-#ifdef WITH_DEPRECATED_FEATURES
-  /** \brief [DEPRECATED] Constructor, no initialization
-  * \param output_fcn output function which maps to n outputs.
-  * \copydoc scheme_DAEInput
-  *
-  */
-  Simulator(const Integrator& integrator, const Function& output_fcn,
-            const Matrix<double>& grid);
-
-  /// [DEPRECATED] Output function equal to the state, no initialization
-  Simulator(const Integrator& integrator, const Matrix<double>& grid);
-#endif // WITH_DEPRECATED_FEATURES
-
   /// Access functions of the node.
   SimulatorInternal* operator->();
 

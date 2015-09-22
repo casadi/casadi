@@ -81,35 +81,6 @@ using namespace std;
     init();
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity>& inputscheme,
-                                 const vector<Sparsity>& outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
-  }
-
-  CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
-                                 const pair<SparsityDict, vector<string> >& inputscheme,
-                                 const vector<Sparsity>& outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme), outputscheme));
-    setOption("input_scheme", inputscheme.second);
-  }
-
-  CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity> &inputscheme,
-                                 const pair<SparsityDict, vector<string> > &outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, make_vector(outputscheme)));
-    setOption("output_scheme", outputscheme.second);
-  }
-
-  CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
-                                 const pair<SparsityDict, vector<string> > &inputscheme,
-                                 const pair<SparsityDict, vector<string> > &outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme),
-                                          make_vector(outputscheme)));
-    setOption("input_scheme", inputscheme.second);
-    setOption("output_scheme", outputscheme.second);
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   CustomFunctionInternal* CustomFunction::operator->() {
     return static_cast<CustomFunctionInternal*>(Function::operator->());
   }

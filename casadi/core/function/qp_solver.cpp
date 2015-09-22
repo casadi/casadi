@@ -54,12 +54,6 @@ namespace casadi {
     (*this)->generateNativeCode(file);
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  QpSolver::QpSolver(const std::string& solver, const std::map<std::string, Sparsity>& st) {
-    assignNode(QpSolverInternal::instantiatePlugin(solver, st));
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   QpSolver::QpSolver(const std::string& name, const std::string& solver,
                      const std::map<std::string, Sparsity>& st, const Dict& opts) {
     assignNode(QpSolverInternal::instantiatePlugin(solver, st));

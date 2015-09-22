@@ -86,23 +86,6 @@ namespace casadi {
                const Dict& opts=Dict());
 #endif // USE_CXX11
 #endif // SWIG
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Multiple input, multiple output, no initialization */
-    MXFunction(const std::vector<MX>& arg,
-               const std::vector<MX>& res);
-
-    /** \brief [DEPRECATED] Multiple input, multiple output, no initialization */
-    MXFunction(const std::vector<MX>& arg,
-               const std::pair< MXDict, std::vector<std::string> >& res);
-
-    /** \brief [DEPRECATED] Multiple input, multiple output, no initialization */
-    MXFunction(const std::pair< MXDict, std::vector<std::string> >& arg,
-               const std::vector<MX>& res);
-
-    /** \brief [DEPRECATED] Multiple input, multiple output, no initialization */
-    MXFunction(const std::pair< MXDict, std::vector<std::string> >& arg,
-               const std::pair< MXDict, std::vector<std::string> >& res);
-#endif // WITH_DEPRECATED_FEATURESS
 
     /// \cond INTERNAL
     /** \brief  Access functions of the node */

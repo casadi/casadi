@@ -137,8 +137,7 @@ namespace casadi {
 
   SX SXFunctionInternal::hess(int iind, int oind) {
     casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
-    SX g = grad(iind, oind);
-    g.makeDense();
+    SX g = densify(grad(iind, oind));
     if (verbose())  userOut() << "SXFunctionInternal::hess: calculating gradient done " << endl;
 
     // Create function

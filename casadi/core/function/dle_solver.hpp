@@ -95,14 +95,6 @@ namespace casadi {
     DleSolver(const std::string& name, const std::string& solver,
               const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Constructor (no initialization)
-     * \param solver \pluginargument{DleSolver}
-     * \param st \structargument{Dle}
-     */
-    DleSolver(const std::string& solver, const std::map<std::string, Sparsity>& st);
-#endif // WITH_DEPRECATED_FEATURES
-
     /// Print solver statistics
     void printStats(std::ostream &stream=casadi::userOut()) const;
 

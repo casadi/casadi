@@ -47,31 +47,6 @@ namespace casadi {
     assignNode(temp->clone());
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  MXFunction::MXFunction(const std::vector<MX>& arg, const std::vector<MX>& res) {
-    assignNode(new MXFunctionInternal(arg, res));
-  }
-
-  MXFunction::MXFunction(const std::vector<MX>& arg,
-                         const pair<MXDict, vector<string> >& res) {
-    assignNode(new MXFunctionInternal(arg, make_vector(res)));
-    setOption("output_scheme", res.second);
-  }
-
-  MXFunction::MXFunction(const pair<MXDict, vector<string> >& arg,
-                         const std::vector<MX>& res) {
-    assignNode(new MXFunctionInternal(make_vector(arg), res));
-    setOption("input_scheme", arg.second);
-  }
-
-  MXFunction::MXFunction(const pair<MXDict, vector<string> >& arg,
-                         const pair<MXDict, vector<string> >& res) {
-    assignNode(new MXFunctionInternal(make_vector(arg), make_vector(res)));
-    setOption("input_scheme", arg.second);
-    setOption("output_scheme", res.second);
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   void MXFunction::construct(const std::string& name,
                              const std::vector<MX>& arg,
                              const std::vector<MX>& res,
