@@ -97,8 +97,6 @@ namespace casadi {
       }
     }
 
-    userOut() << "C args" << args << std::endl;
-
     // Create the compiler instance
     clang::CompilerInstance compInst;
 
@@ -231,7 +229,6 @@ namespace casadi {
   }
 
   void* ClangCompiler::getFunction(const std::string& symname) {
-    userOut() << "ClangCompiler::getFunction(" + symname + ")"  << std::endl;
     return reinterpret_cast<void*>((intptr_t)executionEngine_
                                    ->getPointerToFunction(module_->getFunction(symname)));
   }
