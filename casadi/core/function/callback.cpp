@@ -99,12 +99,14 @@ Function DerivativeGenerator2::operator()(Function& fcn, int ndir) {
 }
 
 Function DerivativeGenerator2::original(Function& fcn, int ndir, bool fwd) {
+  // NOTE(@jaeandersson): If an internal function such as getDerForward is to be called
+  // here, the reason needs to be explained well in the comments.
   if (fwd) {
     Dict opts;
-    return fcn->getDerForward("der",ndir,opts);
+    return fcn->getDerForward("der", ndir, opts);
   } else {
     Dict opts;
-    return fcn->getDerReverse("der",ndir,opts);
+    return fcn->getDerReverse("der", ndir, opts);
   }
 }
 
