@@ -1321,7 +1321,7 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
 
     // Call memory-less
-    evalD(getPtr(arg), getPtr(res), getPtr(iw_tmp_), getPtr(w_tmp_));
+    eval(getPtr(arg), getPtr(res), getPtr(iw_tmp_), getPtr(w_tmp_));
   }
 
   void FunctionInternal::evalD(const double** arg,
