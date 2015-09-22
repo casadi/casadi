@@ -164,8 +164,7 @@ namespace casadi {
     if (L_) cs_nfree(L_);
     L_ = cs_chol(&AT_, S_) ;                 // numeric Cholesky factorization
     if (L_==0) {
-      DMatrix temp = input();
-      temp.makeSparse();
+      DMatrix temp = sparsify(input());
       if (temp.sparsity().issingular()) {
         stringstream ss;
         ss << "CSparseCholeskyInternal::prepare: factorization failed due "

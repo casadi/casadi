@@ -105,7 +105,7 @@ int main(){
   }
   
   // Get the collocation quations (that define V)
-  MX V_eq;
+  vector<MX> V_eq;
   for(int j=1; j<d+1; ++j){
     // Expression for the state derivative at the collocation point
     MX xp_j = 0;
@@ -115,11 +115,11 @@ int main(){
     
     // Append collocation equations
     MX f_j = f(make_map("x",X[j],"p",P)).at("ode");
-    V_eq.append(h*f_j - xp_j);
+    V_eq.push_back(h*f_j - xp_j);
   }
 
   // Root-finding function, implicitly defines V as a function of X0 and P
-  MXFunction vfcn("vfcn", {V, X0, P}, {V_eq});
+  MXFunction vfcn("vfcn", {V, X0, P}, {vertcat(V_eq)});
   
   // Convert to SXFunction to decrease overhead
   SXFunction vfcn_sx(vfcn);

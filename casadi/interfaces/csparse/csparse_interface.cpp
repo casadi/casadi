@@ -131,8 +131,7 @@ namespace casadi {
     if (N_) cs_nfree(N_);
     N_ = cs_lu(&A_, S_, tol) ;                 // numeric LU factorization
     if (N_==0) {
-      DMatrix temp = input();
-      temp.makeSparse();
+      DMatrix temp = sparsify(input());
       if (temp.sparsity().issingular()) {
         stringstream ss;
         ss << "CsparseInterface::prepare: factorization failed due to matrix"

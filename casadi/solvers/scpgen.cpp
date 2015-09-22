@@ -466,12 +466,8 @@ namespace casadi {
                         mfcn_adjSeed, mfcn_adjSens, true);
 
     // Vector(s) b in Lifted Newton
-    MX b_gf = mfcn_fwdSens[0][mod_gl_];
-    MX b_g = mfcn_fwdSens[0][mod_g_];
-
-    // Make sure that the vectors are dense
-    b_gf.makeDense();
-    b_g.makeDense();
+    MX b_gf = densify(mfcn_fwdSens[0][mod_gl_]);
+    MX b_g = densify(mfcn_fwdSens[0][mod_g_]);
 
     // Tangent function
     vector<MX> vec_fcn_out;

@@ -41,21 +41,15 @@ void simpleODE(Function& ffcn, double& tf, vector<double>& x0, double& u0){
   
   // Differential states
   SX s = SX::sym("s"), v = SX::sym("v"), m = SX::sym("m");
-  SX x;
-  x.append(s);
-  x.append(v);
-  x.append(m); 
+  SX x = vertcat(s, v, m);
   
   // Constants
   double alpha = 0.05; // friction
   double beta = 0.1;   // fuel consumption rate
   
   // Differential equation
-  SX ode;
-  ode.append(v);
-  ode.append((u-alpha*v*v)/m);
-  ode.append(-beta*u*u); 
-      
+  SX ode = vertcat(v, (u-alpha*v*v)/m, -beta*u*u);
+
   // Quadrature
   SX quad = pow(v,3) + pow((3-sin(t))-u,2);
 
