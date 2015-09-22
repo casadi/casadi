@@ -83,6 +83,9 @@ y_data = X_measured[0,:].T
 #y_data+= 0.001*numpy.random.random(N)
 # When noise is absent, the fit will be perfect.
 
+# Use just-in-time compilation to speed up the evaluation
+opts = {'jit':True, "jit_options":{"flags":['-O3']}}
+
 ############ Create a Gauss-Newton solver ##########
 def gauss_newton(e,nlp,V):
   gradF = nlp.gradient()
@@ -92,7 +95,7 @@ def gauss_newton(e,nlp,V):
 
   J = jacobian(e,V)
   sigma = MX.sym("sigma")
-  hessLag = MXFunction('H',hessLagIn(x=V,lam_f=sigma),hessLagOut(hess=sigma*mul(J.T,J)),{'jit':True})
+  hessLag = MXFunction('H',hessLagIn(x=V,lam_f=sigma),hessLagOut(hess=sigma*mul(J.T,J)),opts)
   return NlpSolver("solver","ipopt", nlp, {"hess_lag":hessLag})
 
 ############ Identifying the simulated system: single shooting strategy ##########
@@ -102,7 +105,6 @@ def gauss_newton(e,nlp,V):
 [X_symbolic] = all_samples([x0, u_data, repmat(params*scale,1,N) ])
 
 e = y_data-X_symbolic[0,:].T;
-opts = {'jit':True, "jit_options":{"flags":['-O3']}}
 nlp = MXFunction("nlp", nlpIn(x=params), nlpOut(f=0.5*inner_prod(e,e)),opts)
 
 solver = gauss_newton(e,nlp, params)
@@ -126,7 +128,7 @@ e = y_data-Xn[0,:].T;
 
 V = veccat([params, X])
 
-nlp = MXFunction("nlp", nlpIn(x=V), nlpOut(f=0.5*inner_prod(e,e),g=gaps))
+nlp = MXFunction("nlp", nlpIn(x=V), nlpOut(f=0.5*inner_prod(e,e),g=gaps),opts)
 
 # Multipleshooting allows for careful initialization
 yd = np.diff(y_data,axis=0)*fs
