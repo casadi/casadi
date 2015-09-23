@@ -571,6 +571,9 @@ import_array();
 
     // Same as the above, but with reference instead of pointer
     template<typename M> GUESTOBJECT* from_ref(const M& m) { return from_ptr(&m);}
+
+    // Same as the above, but with a temporary object
+    template<typename M> GUESTOBJECT* from_tmp(M m) { return from_ptr(&m);}
 #ifdef SWIGMATLAB
     // Get sparsity pattern
     Sparsity getSparsity(const mxArray* p);
@@ -1357,16 +1360,16 @@ import_array();
 
     GUESTOBJECT * from_ptr(const GenericType *a) {
       switch (a->getType()) {
-      case OT_BOOLEAN: return from_ptr(&a->asBool());
-      case OT_INTEGER: return from_ptr(&a->asInt());
-      case OT_REAL: return from_ptr(&a->asDouble());
-      case OT_STRING: return from_ptr(&a->asString());
-      case OT_INTEGERVECTOR: return from_ptr(&a->asIntVector());
-      case OT_INTEGERVECTORVECTOR: return from_ptr(&a->asIntVectorVector());
-      case OT_REALVECTOR: return from_ptr(&a->asDoubleVector());
-      case OT_STRINGVECTOR: return from_ptr(&a->asStringVector());
-      case OT_DICT: return from_ptr(&a->asDict());
-      case OT_FUNCTION: return from_ptr(&a->asFunction());
+      case OT_BOOLEAN: return from_tmp(a->asBool());
+      case OT_INTEGER: return from_tmp(a->asInt());
+      case OT_REAL: return from_tmp(a->asDouble());
+      case OT_STRING: return from_tmp(a->asString());
+      case OT_INTEGERVECTOR: return from_tmp(a->asIntVector());
+      case OT_INTEGERVECTORVECTOR: return from_tmp(a->asIntVectorVector());
+      case OT_REALVECTOR: return from_tmp(a->asDoubleVector());
+      case OT_STRINGVECTOR: return from_tmp(a->asStringVector());
+      case OT_DICT: return from_tmp(a->asDict());
+      case OT_FUNCTION: return from_tmp(a->asFunction());
 #ifdef SWIGPYTHON
       case OT_NULL: return Py_None;
 #endif // SWIGPYTHON
