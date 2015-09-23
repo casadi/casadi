@@ -52,11 +52,7 @@ class HomotopyNLPtests(casadiTestCase):
     hnlp = SXFunction('hnlp', hnlpIn(x=vertcat([x,y]),tau=tau),nlpOut(f=(1-x)**2+100*(y-x**2)**2+x-tau,g=x**2+y**2 - (tau -1.2)**2))
 
     for Solver, solver_options in solvers:
-      hnlpsolver = Solver(hnlp)
-
-      hnlpsolver.setOption(solver_options)
-
-      hnlpsolver.init()
+      hnlpsolver = Solver("hnlpsolver", hnlp, solver_options)
 
       hnlpsolver.setInput(-Inf,"lbg")
       hnlpsolver.setInput(0,"ubg")

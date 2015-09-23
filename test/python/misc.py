@@ -61,36 +61,7 @@ class Misctests(casadiTestCase):
     self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,3],[8,2,1]),[0.738,0.39,0.99]))
     self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,3],[-3,2,1]),[0.738,0.39,0.99]))
     self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1,2]),[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,0,3],[1,2,1]),[0.738,0.39,0.99]))
-  
-  def test_setoptionerrors(self):
-    self.message("option errors")
-    x = SX.sym("x")
-    f = SXFunction('foobar', [x],[x])
-    with warnings.catch_warnings():
-      warnings.filterwarnings("ignore",category=DeprecationWarning)
-    
-      self.assertRaises(RuntimeError,lambda : f.getOption("foobar"))
-      self.assertRaises(RuntimeError,lambda : f.setOption("foobar",123))
-      self.assertRaises(RuntimeError,lambda : f.setOption("name",123))
-      
-      self.assertRaises(RuntimeError,lambda : f.setOption("ad_weight","foo"))
-      
-    x = SX.sym("x")
-    nlp = SXFunction('nlp', nlpIn(x=x),nlpOut(f=x))
-
-    try:
-        print "ipopt"
-        g = NlpSolver('g', "ipopt", nlp)
-    except:
-        return
-
-    with warnings.catch_warnings():
-      warnings.filterwarnings("ignore",category=DeprecationWarning)
-      self.assertRaises(RuntimeError,lambda : g.setOption("monitor",["abc"]))
-      self.assertRaises(RuntimeError,lambda : g.setOption("monitor",["eval_f","abc"]))
-      g.setOption("monitor",["eval_f"])
-    
+    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,0,3],[1,2,1]),[0.738,0.39,0.99]))    
     
   def test_copyconstr_norefcount(self):
     self.message("Copy constructor for non-refcounted classes")
@@ -239,17 +210,7 @@ class Misctests(casadiTestCase):
     self.assertEqual(d,"OT_STRINGVECTOR")
 
     #d = i.getOptionAllowed(n)
-        
-  def test_regression418(self):
-    self.message("Segfault regression check")
-    f = ControlSimulator()
-    try:
-      with warnings.catch_warnings():
-        warnings.filterwarnings("ignore",category=DeprecationWarning)
-        f.setOption("integrator_options",None) # This should not give a segfault
-    except:
-      pass
-              
+
   def test_pickling(self):
 
     a = Sparsity.lower(4)

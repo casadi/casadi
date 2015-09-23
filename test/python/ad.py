@@ -306,7 +306,6 @@ class ADtests(casadiTestCase):
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1              
               f=SXFunction("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype], opts)
               Jf=f.jacobian(0,0)
-              Jf.init()
               J_in = DMatrix(f.inputSparsity(),n)
               [Jout,_] = Jf([J_in])
               J = self.jacobians[inputtype][outputtype](*n)
@@ -357,7 +356,6 @@ class ADtests(casadiTestCase):
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1
               f=MXFunction("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
               Jf=f.jacobian(0,0)
-              Jf.init()
               J_in = DMatrix(f.inputSparsity(),n)
               [J_out,_] = Jf([J_in])
               J = self.jacobians[inputtype][outputtype](*n)
@@ -376,7 +374,6 @@ class ADtests(casadiTestCase):
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1              
               f=MXFunction("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
               Jf=f.jacobian(0,0)
-              Jf.init()
               J_in = DMatrix(f.inputSparsity(),n)
               [J_out,_] = Jf([J_in])
               J = self.jacobians[inputtype][outputtype](*n)
@@ -393,14 +390,12 @@ class ADtests(casadiTestCase):
     n=array([1.2,2.3,7])
     f=SXFunction("f", [vertcat([x,y,z])],[vertcat([x+2*y**3+3*z**4])])
     J=f.jacobian(0,0)
-    J.init()
     m=MX.sym("m",3,1)
     JT,_ = J.call([m])
     JT = MXFunction("JT", [m],[JT.T])
     JT.setInput(n)
     JT.evaluate()
     H = JT.jacobian(0,0)
-    H.init()
     H.setInput(n)
     #H.evaluate()
     
@@ -418,7 +413,6 @@ class ADtests(casadiTestCase):
 
     f=SXFunction("f", [inp],[vertcat([x+y,x,y])])
     J=f.jacobian(0,0)
-    J.init()
     J.setInputNZ([2,7])
     J.evaluate()
 
@@ -437,7 +431,6 @@ class ADtests(casadiTestCase):
 
     f=SXFunction("f", [inp],[vertcat([x+y,x,y])])
     J=f.jacobian(0,0)
-    J.init()
     J_in = DMatrix(f.inputSparsity(),[2,7])
     [J_out,_] = J([J_in])
 
@@ -596,7 +589,8 @@ class ADtests(casadiTestCase):
       print out
       fun = MXFunction("fun", inputs,[out,jac])
       funsx = fun.expand()
-      funsx.init()
+      fun_ad = [MXFunction("fun", inputs,[out,jac], {'ad_weight':w, 'ad_weight_sp':w}) for w in [0,1]]
+      funsx_ad = [f.expand() for f in fun_ad]
       
       for i,v in enumerate(values):
         fun.setInput(v,i)
@@ -623,36 +617,11 @@ class ADtests(casadiTestCase):
       vf_mx = None
               
       for f in [fun,fun.expand()]:
-        f.init()
         d1 = f.derForward(ndir)
-        d1.init()
         d2 = f.derReverse(ndir)
-        d2.init()
         
         num_in = f.nIn()
         num_out = f.nOut()
-
-        """# Fwd and Adjoint AD
-        for i,v in enumerate(values):
-          f.setInput(v,i)
-          d.setInput(v,i)
-        
-        for d in range(ndir):
-          f.setInput(DMatrix(inputs[0].sparsity(),random.random(inputs[0].nnz())),num_in+d*num_in + d)
-          f.setAdjSeed(DMatrix(out.sparsity(),random.random(out.nnz())),num_in+d*num_in + 0)
-          f.setFwdSeed(0,1,d)
-          f.setAdjSeed(0,1,d)
-          
-        f.evaluate()
-        for d in range(ndir):
-          seed = array(f.getFwdSeed(0,d)).ravel()
-          sens = array(f.getFwdSens(0,d)).ravel()
-          self.checkarray(sens,mul(J_,seed),"Fwd %d %s" % (d,str(type(f))))
-
-          seed = array(f.getAdjSeed(0,d)).ravel()
-          sens = array(f.getAdjSens(0,d)).ravel()
-          self.checkarray(sens,mul(J_.T,seed),"Adj %d" %d)
-        """
         
         # evalThings
         for sym, Function in [(MX.sym,MXFunction),(SX.sym,SXFunction)]:
@@ -767,14 +736,13 @@ class ADtests(casadiTestCase):
               if a.numel()==0 and sparsify(b).nnz()==0: continue
               self.checkarray(sparsify(a),sparsify(b),("%s, output(%d)" % (order,k))+str(vf2.getInput(0)))
               
-      for f in [fun.expand(),fun]:
+      for expand in [False, True]:
         #  jacobian()
         for mode in ["forward","reverse"]:
-          f.setOption("ad_weight", 0 if mode=='forward' else 1)
-          f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
-          f.init()
+          ind = 0 if mode=='forward' else 1
+          f = fun_ad[ind] if expand  else funsx_ad[ind]
+
           Jf=f.jacobian(0,0)
-          Jf.init()
           for i,v in enumerate(values):
             Jf.setInput(v,i)
           Jf.evaluate()
@@ -789,23 +757,19 @@ class ADtests(casadiTestCase):
       s_i  = out.sparsity().row()[0]
       s_j  = out.sparsity().getCol()[0]
       s_k = s_i*out.size2()+s_j
-      fun = MXFunction("fun", inputs,[out[s_i,s_j],jac[s_k,:].T])
-        
-      for i,v in enumerate(values):
-        fun.setInput(v,i)
-        
-        
-      fun.evaluate()
-      J_ = fun.getOutput(1)
+      H_ = None
       
-      for f in [fun,fun.expand()]:
-        #  gradient()
+      for expand in [False, True]:
         for mode in ["forward","reverse"]:
-          f.setOption("ad_weight", 0 if mode=='forward' else 1)
-          f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
-          f.init()
+          w = 0 if mode=='forward' else 1
+          f = MXFunction("fun", inputs,[out[s_i,s_j],jac[s_k,:].T], {'ad_weight':w, 'ad_weight_sp':w})
+          if expand: f=f.expand()
+          for i,v in enumerate(values):
+            f.setInput(v,i)
+            f.evaluate()
+            J_ = f.getOutput(1)
+
           Gf=f.gradient(0,0)
-          Gf.init()
           for i,v in enumerate(values):
             Gf.setInput(v,i)
           Gf.evaluate()
@@ -813,16 +777,7 @@ class ADtests(casadiTestCase):
           self.checkarray(Gf.getOutput(),J_,failmessage=("mode: %s" % mode))
           #self.checkarray(DMatrix(Gf.getOutput().sparsity(),1),DMatrix(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
 
-      H_ = None
-      
-      for f in [fun,fun.expand()]:
-        #  hessian()
-        for mode in ["forward","reverse"]:
-          f.setOption("ad_weight", 0 if mode=='forward' else 1)
-          f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
-          f.init()
           Hf=f.hessian(0,0)
-          Hf.init()
           for i,v in enumerate(values):
             Hf.setInput(v,i)
           Hf.evaluate()

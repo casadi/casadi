@@ -441,24 +441,6 @@ class typemaptests(casadiTestCase):
       self.checkarray(w,goal,"name")
       
       
-  def testGenericType(self):
-    with warnings.catch_warnings():
-      warnings.filterwarnings("ignore",category=DeprecationWarning)
-      self.message("Generic type")
-      x=SX.sym("x")
-      f=SXFunction("foo", [x],[2*x])
-      self.assertEquals(f.getOption("name"),"foo")
-      f.setOption("verbose",True)
-      #self.assertTrue(isinstance(f.getOption("verbose"),bool))
-      self.assertTrue(f.getOption("verbose"))
-      f.setOption("verbose",False)
-      self.assertTrue(not(f.getOption("verbose")))
-      d=f.dictionary()
-      self.assertTrue(isinstance(d,dict))
-      d["verbose"]=True
-      f.setOption(d)
-      self.assertTrue(f.getOption("verbose"))
-
   def testGenericType2(self):
     self.message("Generic type 2")
     for i in [0,1,7,-7]:
@@ -505,32 +487,13 @@ class typemaptests(casadiTestCase):
     self.assertTrue(a.isStringVector())
     x = SX.sym("x")
     f = SXFunction("f", [x],[x])
-    #f.setOption("monitor",["foo","bar"])
-    #self.assertEqual(f.getOption("monitor")[0],"foo")
-    #self.assertEqual(f.getOption("monitor")[1],"bar")
-    #f.setOption("monitor",["foo"])
-    #self.assertEqual(f.getOption("monitor")[0],"foo")
-    #f.setOption("monitor",[])
-        
+
   def testGenericType3(self):
     self.message("Generic type 3")
     
     is_differential_gentype = GenericType([2,3])
     
     self.assertTrue(is_differential_gentype.isIntVector())
-
-  @requiresPlugin(NlpSolver,"ipopt")
-  def testGenericTypeBoolean(self):
-    x=SX.sym("x")
-
-    nlp = SXFunction("nlp", nlpIn(x=x),nlpOut(f=x**2))
-
-    nlp_solver = NlpSolver("mysolver","ipopt", nlp)
-
-    with warnings.catch_warnings():
-      warnings.filterwarnings("ignore",category=DeprecationWarning)
-      self.assertRaises(RuntimeError,lambda : nlp_solver.setOption('acceptable_tol',SX.sym("x")))
-      nlp_solver.setOption('acceptable_tol',DMatrix(1))
 
   def test_DMatrixSXcast(self):
     self.message("Casting DMatrix to SX")

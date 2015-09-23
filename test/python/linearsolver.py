@@ -80,9 +80,7 @@ class LinearSolverTests(casadiTestCase):
               ]:
       n ,m = A.shape
       for Solver, options in nsolvers:
-        solver = Solver("solver",A.T.sparsity(),options)
-        solver.setOption(options)
-        solver.init()
+        solver = Solver("solver", A.T.sparsity(), options)
         solver.setInput(A.T)
 
         solver.evaluate()
@@ -90,19 +88,17 @@ class LinearSolverTests(casadiTestCase):
         self.checkarray(mul(A.T,solver.getOutput()),DMatrix.zeros(m,n-m))
         self.checkarray(mul(solver.getOutput().T,solver.getOutput()),DMatrix.eye(n-m))
         
-        solver.setOption("ad_weight",0)
-        solver.setOption("ad_weight_sp",0)
-        solver.init()
+        options["ad_weight"] = 0
+        options["ad_weight_sp"] = 0
+        solver = Solver("solver", A.T.sparsity(), options)
         
         Jf = solver.jacobian()
-        Jf.init()
 
-        solver.setOption("ad_weight",1)
-        solver.setOption("ad_weight_sp",1)
-        solver.init()
+        options["ad_weight"] = 1
+        options["ad_weight_sp"] = 1
+        solver = Solver("solver", A.T.sparsity(), options)
         
         Jb = solver.jacobian()
-        Jb.init()
         
         Jf.setInput(A.T)
         Jb.setInput(A.T)
@@ -114,7 +110,6 @@ class LinearSolverTests(casadiTestCase):
         self.checkarray(Jf.getOutput(1),Jb.getOutput(1))
         
         d = solver.derivative(1,0)
-        d.init()
         
         r = numpy.random.rand(*A.shape)
         
@@ -385,7 +380,6 @@ class LinearSolverTests(casadiTestCase):
           
           if "SymbolicQR" not in str(Solver) : continue
           solversx = f.expand()
-          solversx.init()
           solversx.setInput(A_,0)
           solversx.setInput(b_,1)
    

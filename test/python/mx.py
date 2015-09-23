@@ -776,10 +776,8 @@ class MXtests(casadiTestCase):
     
     J_ = dot(dot((dot(D_,x_)+e_).T,C_.T),A_) + dot(dot((dot(A_,x_)+b_).T,C_),D_)
     
-    for mode in ["forward", "reverse"]:
-      f.setOption("ad_weight", 0 if mode=='forward' else 1)
-      f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
-      f.init()
+    for w in [0, 1]:
+      f = MXFunction("f", [x,A,b,C,D,e], [a], {"ad_weight":w, "ad_weight_sp":w})
       J = f.jacobian()
       J.setInput(x_,0)
       J.setInput(A_,1)
@@ -847,10 +845,9 @@ class MXtests(casadiTestCase):
 
     J_ = (D_*x_+e_).T*C_.T*A_ + (A_*x_+b_).T*C_*D_
     
-    for mode in ["forward", "reverse"]:
-      f.setOption("ad_weight", 0 if mode=='forward' else 1)
-      f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
-      f.init()
+    for w in [0, 1]:
+      f = MXFunction("f", [x,A,b,C,D,e], [a], {"ad_weight":w, "ad_weight_sp":w})
+
       J = f.jacobian()
       J.setInput(x_,0)
       J.setInput(A_,1)
@@ -922,10 +919,8 @@ class MXtests(casadiTestCase):
 
     J_ = (D_*x_+e_).T*C_.T*A_ + (A_*x_+b_).T*C_*D_
     
-    for mode in ["forward", "reverse"]:
-      f.setOption("ad_weight", 0 if mode=='forward' else 1)
-      f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
-      f.init()
+    for w in [0, 1]:
+      f = MXFunction("f", [x,A,b,C,D,e], [a], {"ad_weight":w, "ad_weight_sp":w})
       J = f.jacobian()
       J.setInput(x_,0)
       J.setInput(A_,1)
@@ -1103,66 +1098,7 @@ class MXtests(casadiTestCase):
       g.evaluate()
       self.checkarray(f.getOutput(),g.getOutput(),"#%d" % cnt )
       cnt+=1
-            
-  # 2-norms currently not supported
-  #def test_Norm2(self):
-    #self.message("Norm_2")
-    #X=MX.sym("x",5,1)
-    
-    #nums = matrix([1,2,3,0,-1]).T
 
-    #F =MXFunction("F", [X],[norm_2(X)])
-
-    #J = F.jacobian(0,0)
-    #J.init()
-
-    #J.setInput(nums)
-    #J.evaluate()
-    #self.checkarray(J.getOutput(),nums.T/linalg.norm(nums),"Norm_2")
-
-    #J = Jacobian(F,0,0)
-    #J.setOption("ad_weight",1)
-    #J.init()
-
-    #J.setInput(nums)
-    #J.evaluate()
-    
-    #self.checkarray(J.getOutput(),nums.T/linalg.norm(nums),"Norm_2")
-
-
-    #J = MXFunction("J", [X],[F.jac(0)[0]])
-
-    #J.setInput(nums)
-    #J.evaluate()
-    
-    #self.checkarray(J.getOutput(),nums.T/linalg.norm(nums),"Norm_2")
-    
-  # 1-norms currently not supported
-  #def test_Norm1(self):
-    #self.message("Norm_1")
-    #X=MX.sym("x",3,1)
-    
-    #nums = matrix([6,-3,0]).T
-
-    #F =MXFunction("F", [X],[norm_1(X)])
-
-    #J = Jacobian(F,0,0)
-    #J.setOption("ad_weight",0)
-    #J.init()
-
-    #J.setInput(nums)
-    #J.evaluate()
-    #self.checkarray(J.getOutput(),matrix([1,-1,nan]),"Norm_1")
-
-    #J = Jacobian(F,0,0)
-    #J.setOption("ad_weight",1)
-    #J.init()
-
-    #J.setInput(nums)
-    #J.evaluate()
-    
-    #self.checkarray(J.getOutput(),matrix([1,-1,nan]),"Norm_1")
-    
   def test_null(self):
     self.message("MXFunction null")
     x = MX.sym("x")

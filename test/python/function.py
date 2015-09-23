@@ -398,26 +398,6 @@ class Functiontests(casadiTestCase):
     with self.assertRaises(Exception):
       self.checkarray(ret["baz"],DMatrix([12]))
      
-      
-  def test_unknown_options(self):
-    x = SX.sym("x")
-    f = SXFunction("f", [x],[x])
-    
-    with warnings.catch_warnings():
-      warnings.filterwarnings("ignore",category=DeprecationWarning)
-
-    
-      with self.assertRaises(Exception):
-        f.setOption({"fooo": False},False)
-      
-      f.setOption({"fooo": False},True)
-      
-      f.setOption({"name": "abc"},False)
-      self.assertTrue(f.getOption("name")=="abc")
-      f.setOption({"name": "def"},True)
-      self.assertTrue(f.getOption("name")=="def")
-  
-  @skip("WITH_DEPRECATED_FEATURES" not in CasadiMeta.getCompilerFlags())
   def test_CustomFunctionHard(self):
 
     x = MX.sym("x")
@@ -549,7 +529,6 @@ class Functiontests(casadiTestCase):
                 
       self.checkfunction(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
     
-  @skip("WITH_DEPRECATED_FEATURES" not in CasadiMeta.getCompilerFlags())
   def test_CustomFunction(self):
   
     x = MX.sym("x")

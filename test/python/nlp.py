@@ -887,49 +887,7 @@ class NLPtests(casadiTestCase):
       self.checkarray(solver.getOutput("x"),x0,str(Solver),digits=2)
       self.assertAlmostEqual(solver.getOutput("f")[0],0,3,str(Solver))
       self.checkarray(solver.getOutput("lam_x"),DMatrix.zeros(N,1),str(Solver),digits=4)
-      
-      
-  def test_tol_pr(self):
-    return
-    self.message("Low tol_pr")
-    H = DMatrix([[1,-1],[-1,2]])
-    G = DMatrix([-2,-6])
-    A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
-
-    LBA = DMatrix([-inf]*3)
-    UBA = DMatrix([2, 2, 3])
-
-    LBX = DMatrix([0.5,0])
-    UBX = DMatrix([0.5,inf])
-
-    x=SX.sym("x",2)
-    nlp=SXFunction("nlp", nlpIn(x=x),nlpOut(f=0.5*mul([x.T,H,x])+mul(G.T,x),g=mul(A,x)))
-
-    for Solver, solver_options in solvers:
-      self.message(str(Solver))
-      solver = NlpSolver(Solver, nlp)
-      solver.setOption(solver_options)
-      for k,v in ({"tol":1e-8,"tol_pr":1e-10,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100,"MaxIter": 100,"print_level":0, "fixed_variable_treatment": "make_constraint"}).iteritems():
-        if solver.hasOption(k):
-          solver.setOption(k,v)
-          
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lbg")
-      solver.setInput(UBA,"ubg")
-
-      solver.evaluate()
-
-      self.assertAlmostEqual(solver.getOutput()[0],0.5,6,str(Solver))
-      self.assertAlmostEqual(solver.getOutput()[1],1.25,6,str(Solver))
-    
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,6,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
-
-      self.checkarray(solver.getOutput("lam_g"),DMatrix([0,2,0]),str(Solver),digits=6)
-      
-      self.assertAlmostEqual(solver.getOutput("f")[0],-7.4375,6,str(Solver))
-      
+           
   def test_QP2(self):
     H = DMatrix([[1,-1],[-1,2]])
     G = DMatrix([-2,-6])
