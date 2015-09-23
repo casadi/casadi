@@ -94,7 +94,7 @@ for N in range(1,11):
     
   # Construct the NLP
   x = vec(Z.T)
-  g = SX()
+  g = []
   for i in range(N):
     for k in range(1,K+1):
       # Add collocation equations to NLP
@@ -111,6 +111,8 @@ for N in range(1,11):
 
     if(i<N-1):
       g.append(Z[i+1,0] - rhs)
+
+  g = vertcat(g)
 
   print "g = ", g
 

@@ -146,7 +146,7 @@ p_val = 0.2
 # Make sure that both integrators give consistent results
 for integrator in (irk_integrator,ref_integrator):
   print "-------"
-  print "Testing ", integrator.getOption("name")
+  print "Testing ", integrator
   print "-------"
 
   # Generate a new function that calculates two forward directions and one adjoint direction
