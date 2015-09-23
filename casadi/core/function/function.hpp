@@ -765,6 +765,9 @@ namespace casadi {
     }
 #endif // SWIG
 
+    /** \brief Name of the function */
+    std::string name() const;
+
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     std::string getSanitizedName() const;
 

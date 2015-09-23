@@ -615,6 +615,10 @@ namespace casadi {
     callReverse(arg, res, aseed, asens, always_inline, never_inline);
   }
 
+  std::string Function::name() const {
+    return (*this)->name_;
+  }
+
   std::string Function::getSanitizedName() const {
     return (*this)->getSanitizedName();
   }

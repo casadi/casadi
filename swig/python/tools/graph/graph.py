@@ -235,7 +235,7 @@ class MXEvaluationArtist(DotArtist):
     for k,d in enumerate(deps):
       graph.add_edge(pydot.Edge(str(d.__hash__()),"funinput" + str(s.__hash__())+ ":f%d" % k,rankdir="LR"))
       
-    graph = pydot.Cluster(str(s.__hash__()), rank='max', label='Function:\n %s' % f.getOption("name"))
+    graph = pydot.Cluster(str(s.__hash__()), rank='max', label='Function:\n %s' % f.name())
     self.graph.add_subgraph(graph)
     
     s = (" %d inputs: |" % f.nIn()) + " | ".join("<f%d> %d" % (i,i) for i in range(f.nIn()))
