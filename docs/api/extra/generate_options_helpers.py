@@ -58,20 +58,20 @@ def addExtra(metadata):
   x=SX.sym("x")
   f = SXFunction("f",nlpIn(x=x),nlpOut(f=x**2))
   
-  i = NlpSolver("mysolver","ipopt", f)
+  i = NlpSolver("mysolver", "ipopt", f)
   extra(metadata,i,"IpoptInterface")
 
   x=SX.sym("x")
   f = SXFunction("f",nlpIn(x=x),nlpOut(f=x**2))
-  i = NlpSolver("worhp", f)
+  i = NlpSolver("mysolver", "worhp", f)
   extra(metadata,i,"WorhpInterface")
 
   x=SX.sym("x")
   f = SXFunction("f",nlpIn(x=x),nlpOut(f=x**2))
-  i = NlpSolver("mysolver","snopt", f)
+  i = NlpSolver("mysolver", "snopt", f)
   extra(metadata,i,"SnoptInterface")
 
-  i = QpSolver("mysolver","qpoases", {"h": Sparsity.dense(3,3),"a":Sparsity.dense(1,3)})
+  i = QpSolver("mysolver", "qpoases", {"h": Sparsity.dense(3,3),"a":Sparsity.dense(1,3)})
   extra(metadata,i,"QpoasesInterface")
  
   G = sparsify(DMatrix([[1,0],[0,1]])).T
