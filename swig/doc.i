@@ -28,12 +28,6 @@ C++ includes: adaptor.hpp ";
 
 
 // File: classcasadi_1_1Callback.xml
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
 %feature("docstring")  casadi::SharedObject::isNull() const  "
 
 Is a null pointer?
@@ -88,14 +82,6 @@ Construct from C pointer.
 %feature("docstring") casadi::Callback::Callback(IterationCallback &cb) "
 
 Construct from an IterationCallback object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -727,13 +713,6 @@ Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::numelOut() const  "
 
 Get total number of elements in all of the matrix-valued outputs.
@@ -943,41 +922,6 @@ Problem structure.>Struct scheme: casadi::CleStruct ( = 3) []
 
 ";
 
-%feature("docstring") casadi::CleSolver::CleSolver(const std::string
-&solver, const std::map< std::string, Sparsity > &st) "
-
-[DEPRECATED] Constructor (no initialization)
-
-Parameters:
------------
-
-solver:
-
-Name of a solver. It might be one of:
-
-- simple
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-CleSolver.doc(\"myextraplugin\")
-
-st:
-
-Problem structure.>Struct scheme: casadi::CleStruct ( = 3) []
-
-+--------------+-------+----------------------------------+
-|  Full name   | Short |           Description            |
-+==============+=======+==================================+
-| Cle_STRUCT_A |       | The matrix A.                    |
-+--------------+-------+----------------------------------+
-| Cle_STRUCT_V |       | The matrix V.                    |
-+--------------+-------+----------------------------------+
-| Cle_STRUCT_C |       | The matrix C (defaults to unity) |
-+--------------+-------+----------------------------------+
-
-";
-
 %feature("docstring")  casadi::Function::nIn() const  "
 
 Get the number of function inputs.
@@ -1001,28 +945,6 @@ returned.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
 &arg, const std::string &parallelization="serial") "
 
@@ -1032,17 +954,6 @@ Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
-
-";
-
-%feature("docstring")  casadi::Function::outputIndex(const std::string
-&name) const  "
-
-Find the index for a string describing a particular entry of an output
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
 
 ";
 
@@ -1069,14 +980,6 @@ const  "
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
 There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -1108,12 +1011,6 @@ one direction at a time and the last nadj*n_in outputs corresponds to
 adjoint sensitivities, one direction at a time.
 
 (n_in = nIn(), n_out = nOut())
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -1383,13 +1280,6 @@ required length of res field.
 OptionsFunctionality &obj, bool skipUnknown=false) "
 
 Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
 
 ";
 
@@ -1884,6 +1774,12 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
+
+";
+
 %feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
 std::string &str) const  "
 
@@ -1941,10 +1837,14 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
+%feature("docstring")  casadi::Function::outputIndex(const std::string
+&name) const  "
 
-get an option value
+Find the index for a string describing a particular entry of an output
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
 
 ";
 
@@ -2104,13 +2004,7 @@ Generate a file, return code as string.
 
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::OptionsFunctionality::hasOption(const std::string &str) const  "
-
-check if there is an option str
-
-";
-
-%feature("docstring")  casadi::Compiler::plugin_name() const  "
+casadi::Compiler::plugin_name() const  "
 
 Query plugin name.
 
@@ -2127,21 +2021,6 @@ Get a list of all option names.
 >::getDescription() const "
 
 Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
 
 ";
 
@@ -2170,13 +2049,6 @@ casadi::OptionsFunctionality::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
 
 Print options to a stream.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
 
 ";
 
@@ -2388,28 +2260,6 @@ Print a representation of the object.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring") casadi::Compiler::Compiler() "
 
 Default constructor.
@@ -2432,12 +2282,6 @@ Compiler factory (new syntax, includes initialization)
 OptionsFunctionality &obj, bool skipUnknown=false) "
 
 Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -2471,14 +2315,8 @@ Get the dictionary.
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::OptionsFunctionality::hasOption(const std::string &str) const  "
-
-check if there is an option str
-
-";
-
-%feature("docstring")  casadi::Function::generate(const std::string &fname,
-const Dict &opts=Dict()) "
+casadi::Function::generate(const std::string &fname, const Dict
+&opts=Dict()) "
 
 Export / Generate C code for the function.
 
@@ -2978,10 +2816,8 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -3406,12 +3242,6 @@ Diagrams
 
 C++ includes: control_simulator.hpp ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
 %feature("docstring")
 casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
 int v) " [INTERNAL]  Set a certain option by giving an enum value.
@@ -3444,13 +3274,6 @@ adheres to SCHEME_NLPINput
 %feature("docstring")  casadi::Function::inputScheme() const  "
 
 Get input scheme.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
 
 ";
 
@@ -3819,14 +3642,15 @@ returned.
 
 ";
 
-%feature("docstring")  casadi::Function::outputDescription(int ind) const  "
+%feature("docstring")  casadi::Function::name() const  "
 
-Get output scheme description by index.
+Name of the function.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
+%feature("docstring")  casadi::Function::outputDescription(int ind) const  "
+
+Get output scheme description by index.
 
 ";
 
@@ -3975,143 +3799,6 @@ Output function equal to the state (new syntax, includes initialization)
 
 ";
 
-%feature("docstring") casadi::ControlSimulator::ControlSimulator(const
-Function &dae, const Function &output_fcn, const Matrix< double > &grid) "
-
-[DEPRECATED] Creates a piecewise simulator, no initialization
-
-Parameters:
------------
-
-ffcn:  Continuous time dynamics, an casadi::Function with the following
-mapping:
-
->Input scheme: casadi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9) [controldaeIn]
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| CONTROL_DAE_T          | t                      | Global physical time.  |
-|                        |                        | (1-by-1) .             |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_X          | x                      | State vector           |
-|                        |                        | (dimension nx-by-1).   |
-|                        |                        | Should have the same   |
-|                        |                        | amount of non-zeros as |
-|                        |                        | DAEOutput:DAE_RES      |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_Z          | z                      | Algebraic state vector |
-|                        |                        | (dimension np-by-1). . |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_P          | p                      | Parameter vector       |
-|                        |                        | (dimension np-by-1). . |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_U          | u                      | Control vector         |
-|                        |                        | (dimension nu-by-1). . |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_U_INTERP   | u_interp               | Control vector,        |
-|                        |                        | linearly interpolated  |
-|                        |                        | (dimension nu-by-1). . |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_X_MAJOR    | x_major                | State vector           |
-|                        |                        | (dimension nx-by-1) at |
-|                        |                        | the last major time-   |
-|                        |                        | step .                 |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_T0         | t0                     | Time at start of       |
-|                        |                        | control interval       |
-|                        |                        | (1-by-1) .             |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_TF         | tf                     | Time at end of control |
-|                        |                        | interval (1-by-1) .    |
-+------------------------+------------------------+------------------------+
-
->Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
-
-+-----------+-------+--------------------------------------------+
-| Full name | Short |                Description                 |
-+===========+=======+============================================+
-| DAE_ODE   | ode   | Right hand side of the implicit ODE .      |
-+-----------+-------+--------------------------------------------+
-| DAE_ALG   | alg   | Right hand side of algebraic equations .   |
-+-----------+-------+--------------------------------------------+
-| DAE_QUAD  | quad  | Right hand side of quadratures equations . |
-+-----------+-------+--------------------------------------------+
-
-Parameters:
------------
-
-output_fcn:  output function which maps ControlledDAEInput or DAEInput to n
-outputs.
-
->Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
-
-+-----------+-------+----------------------------+
-| Full name | Short |        Description         |
-+===========+=======+============================+
-| DAE_X     | x     | Differential state .       |
-+-----------+-------+----------------------------+
-| DAE_Z     | z     | Algebraic state .          |
-+-----------+-------+----------------------------+
-| DAE_P     | p     | Parameter .                |
-+-----------+-------+----------------------------+
-| DAE_T     | t     | Explicit time dependence . |
-+-----------+-------+----------------------------+
-
->Input scheme: casadi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9) [controldaeIn]
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| CONTROL_DAE_T          | t                      | Global physical time.  |
-|                        |                        | (1-by-1) .             |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_X          | x                      | State vector           |
-|                        |                        | (dimension nx-by-1).   |
-|                        |                        | Should have the same   |
-|                        |                        | amount of non-zeros as |
-|                        |                        | DAEOutput:DAE_RES      |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_Z          | z                      | Algebraic state vector |
-|                        |                        | (dimension np-by-1). . |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_P          | p                      | Parameter vector       |
-|                        |                        | (dimension np-by-1). . |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_U          | u                      | Control vector         |
-|                        |                        | (dimension nu-by-1). . |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_U_INTERP   | u_interp               | Control vector,        |
-|                        |                        | linearly interpolated  |
-|                        |                        | (dimension nu-by-1). . |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_X_MAJOR    | x_major                | State vector           |
-|                        |                        | (dimension nx-by-1) at |
-|                        |                        | the last major time-   |
-|                        |                        | step .                 |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_T0         | t0                     | Time at start of       |
-|                        |                        | control interval       |
-|                        |                        | (1-by-1) .             |
-+------------------------+------------------------+------------------------+
-| CONTROL_DAE_TF         | tf                     | Time at end of control |
-|                        |                        | interval (1-by-1) .    |
-+------------------------+------------------------+------------------------+
-
-Parameters:
------------
-
-grid:  the major time grid
-
-";
-
-%feature("docstring") casadi::ControlSimulator::ControlSimulator(const
-Function &dae, const Matrix< double > &grid) "
-
-[DEPRECATED] Output function equal to the state, no initialization
-
-";
-
 %feature("docstring")  casadi::Function::setFullJacobian(const Function
 &jac) "
 
@@ -4229,28 +3916,6 @@ Get the description of a certain option.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
 Check if the numerical values of the supplied bounds make sense.
 
@@ -4362,14 +4027,6 @@ Get the type name of a certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -4403,12 +4060,6 @@ point to this new object
 %feature("docstring")  casadi::SharedObject::printPtr(std::ostream
 &stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
 internal class
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -4488,14 +4139,6 @@ Print a representation of the object.
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -4606,13 +4249,6 @@ Get output scheme.
 %feature("docstring")  casadi::Function::nnzIn() const  "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
@@ -4758,13 +4394,6 @@ Get default input value.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")  casadi::Function::derForward(int nfwd) "
 
 Get a function that calculates nfwd forward derivatives.
@@ -4789,14 +4418,6 @@ Make unique.
 
 If there are other references to the object, then make a deep copy of it and
 point to this new object
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -5059,12 +4680,6 @@ Get input scheme description by index.
 %feature("docstring")  casadi::Function::nOut() const  "
 
 Get the number of function outputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -5413,49 +5028,9 @@ Constructor (new syntax, includes initialization)
 
 ";
 
-%feature("docstring") casadi::CustomFunction::CustomFunction(const
-CustomEvaluate &c_fcn, const std::vector< Sparsity > &inputscheme, const
-std::vector< Sparsity > &outputscheme) "
-
-[DEPRECATED] Constructor
-
-";
-
-%feature("docstring") casadi::CustomFunction::CustomFunction(const
-CustomEvaluate &c_fcn, const std::pair< SparsityDict, std::vector<
-std::string > > &inputscheme, const std::vector< Sparsity > &outputscheme) "
-
-[DEPRECATED] Constructor
-
-";
-
-%feature("docstring") casadi::CustomFunction::CustomFunction(const
-CustomEvaluate &c_fcn, const std::vector< Sparsity > &inputscheme, const
-std::pair< SparsityDict, std::vector< std::string > > &outputscheme) "
-
-[DEPRECATED] Constructor
-
-";
-
-%feature("docstring") casadi::CustomFunction::CustomFunction(const
-CustomEvaluate &c_fcn, const std::pair< SparsityDict, std::vector<
-std::string > > &inputscheme, const std::pair< SparsityDict, std::vector<
-std::string > > &outputscheme) "
-
-[DEPRECATED] Constructor
-
-";
-
 %feature("docstring") casadi::CustomFunction::CustomFunction() "
 
 default constructor
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
 
 ";
 
@@ -5692,28 +5267,6 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring")  casadi::Function::getStat(const std::string &name)
 const  "
 
@@ -5872,6 +5425,12 @@ Evaluate the function symbolically or numerically.
 %feature("docstring")  casadi::SharedObject::printPtr(std::ostream
 &stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
 internal class
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -6741,14 +6300,6 @@ Construct from C pointer.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::SharedObject::printPtr(std::ostream
 &stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
 internal class
@@ -6757,12 +6308,6 @@ internal class
 
 %feature("docstring")  casadi::SharedObject::assertInit() const  "
 [INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -6873,14 +6418,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
 int iind, int oind, bool compact=false) "
 
@@ -6914,6 +6451,12 @@ casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
 const  "
 
 Get the description of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -7662,39 +7205,10 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
 Get a list of all option names.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
@@ -7787,13 +7301,6 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::outputDescription(int ind) const  "
 
 Get output scheme description by index.
@@ -7820,12 +7327,6 @@ one direction at a time and the last nadj*n_in outputs corresponds to
 adjoint sensitivities, one direction at a time.
 
 (n_in = nIn(), n_out = nOut())
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -7911,13 +7412,6 @@ Create call to (cached) derivative function, forward mode.
 %feature("docstring")  casadi::Function::numelOut() const  "
 
 Get total number of elements in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
 
 ";
 
@@ -8673,45 +8167,6 @@ Problem structure.>Struct scheme: casadi::DleStruct ( = 2) []
 
 ";
 
-%feature("docstring") casadi::DleSolver::DleSolver(const std::string
-&solver, const std::map< std::string, Sparsity > &st) "
-
-[DEPRECATED] Constructor (no initialization)
-
-Parameters:
------------
-
-solver:
-
-Name of a solver. It might be one of:
-
-- dple
-
-- lrdle
-
-- fixed_smith
-
-- simple
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-DleSolver.doc(\"myextraplugin\")
-
-st:
-
-Problem structure.>Struct scheme: casadi::DleStruct ( = 2) []
-
-+--------------+-------+---------------+
-|  Full name   | Short |  Description  |
-+==============+=======+===============+
-| Dle_STRUCT_A |       | The matrix A. |
-+--------------+-------+---------------+
-| Dle_STRUCT_V |       | The matrix V. |
-+--------------+-------+---------------+
-
-";
-
 %feature("docstring")  casadi::Function::nnzIn() const  "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
@@ -8754,13 +8209,6 @@ required length of iw field.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::getStat(const std::string &name)
 const  "
 
@@ -8800,14 +8248,6 @@ Return a string with a representation (for SWIG)
 OptionsFunctionality &obj, bool skipUnknown=false) "
 
 Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -8856,6 +8296,12 @@ Parameters:
 val:  can be double&, std::vector<double>&, Matrix<double>&, double *
 
 oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -9051,12 +8497,6 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
 %feature("docstring")  casadi::Function::derForward(int nfwd) "
 
 Get a function that calculates nfwd forward derivatives.
@@ -9090,13 +8530,6 @@ Propagate the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
 
 ";
 
@@ -9238,13 +8671,6 @@ Add modules to be monitored.
 %feature("docstring")  casadi::Function::inputScheme() const  "
 
 Get input scheme.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
 
 ";
 
@@ -9524,28 +8950,6 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
 
 ";
 
@@ -10348,39 +9752,6 @@ Problem structure.
 
 ";
 
-%feature("docstring") casadi::DpleSolver::DpleSolver(const std::string
-&solver, const std::map< std::string, std::vector< Sparsity > > &st) "
-
-[DEPRECATED] Constructor (no initialization)
-
-Parameters:
------------
-
-solver:
-
-Name of a solver. It might be one of:
-
-- slicot
-
-- condensing
-
-- lrdple
-
-- lifting
-
-- simple
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-DpleSolver.doc(\"myextraplugin\")
-
-st:
-
-Problem structure.
-
-";
-
 %feature("docstring")  casadi::Function::removeMonitor(const std::string
 &mon) "
 
@@ -10656,6 +10027,12 @@ point to this new object
 
 ";
 
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
+
+";
+
 %feature("docstring")  casadi::Function::inputDescription(int ind) const  "
 
 Get input scheme description by index.
@@ -10714,10 +10091,9 @@ internal class
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
-"
+%feature("docstring")  casadi::SharedObject::isNull() const  "
 
-Get a list of all option names.
+Is a null pointer?
 
 ";
 
@@ -10725,13 +10101,6 @@ Get a list of all option names.
 >::getDescription() const "
 
 Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
 
 ";
 
@@ -11047,28 +10416,6 @@ There is no guarantee that consecutive calls return identical objects
 "
 
 Add modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
 
 ";
 
@@ -11510,14 +10857,6 @@ the output elements).
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::Function::symbolicInputSX() const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
@@ -11551,12 +10890,6 @@ std::vector< DMatrix > > &aseed, std::vector< std::vector< DMatrix > >
 &output_asens, bool always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, reverse mode.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -11619,13 +10952,6 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
 %feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
 iind=0) "
 
@@ -11669,9 +10995,10 @@ Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isNull() const  "
+%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
+"
 
-Is a null pointer?
+Get a list of all option names.
 
 ";
 
@@ -11682,10 +11009,10 @@ Copy all options from another object.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
-std::string &str) const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
-Get the default of a certain option.
+Return a string with a representation (for SWIG)
 
 ";
 
@@ -11860,13 +11187,6 @@ Get the dictionary.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")  casadi::SharedObject::print(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -12032,10 +11352,10 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const "
+%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
+std::string &str) const  "
 
-Return a string with a representation (for SWIG)
+Get the default of a certain option.
 
 ";
 
@@ -12288,13 +11608,6 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
 std::string &str) const  "
 
@@ -12310,6 +11623,12 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 
 %feature("docstring")  casadi::Function::sz_res() const  " [INTERNAL]  Get
 required length of res field.
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -12436,13 +11755,6 @@ are kept internally
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
 std::string &str) const  "
 
@@ -12501,28 +11813,6 @@ casadi::OptionsFunctionality::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
 
 Print options to a stream.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
 
 ";
 
@@ -12751,12 +12041,6 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
 %feature("docstring")  casadi::Function::outputDescription(int ind) const  "
 
 Get output scheme description by index.
@@ -12780,13 +12064,6 @@ Get a list of all option names.
 %feature("docstring") casadi::Function::~Function "
 
 Destructor.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
 
 ";
 
@@ -13760,14 +13037,6 @@ Get output scheme name by index.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::Function::removeMonitor(const std::string
 &mon) "
 
@@ -13808,14 +13077,6 @@ Is a null pointer?
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -13873,12 +13134,6 @@ Return a string with a representation (for SWIG)
 >::getDescription() const "
 
 Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -14153,16 +13408,9 @@ Substitute variable var with expression expr in multiple expressions.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::numel() const  "
+%feature("docstring")  casadi::GenericMatrix< MatType >::size2() const  "
 
-Get the number of elements.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::numel(int i) const
-"
-
-Get the number of elements in slice (cf. MATLAB)
+Get the second dimension (i.e. number of columns)
 
 ";
 
@@ -14356,15 +13604,6 @@ Get the number of non-zeros in the upper triangular half.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::size() const  "
-
-[DEPRECATED] Alias for nnz The meaning of this function will change in
-future revision.
-
-See:   nnz()
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MatType >::iscolumn() const  "
 
 Check if the matrix is a column vector (i.e. size2()==1)
@@ -14508,12 +13747,6 @@ Matrix power x^n.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::size2() const  "
-
-Get the second dimension (i.e. number of columns)
-
-";
-
 %feature("docstring")  sumCols(const MatType &x) "
 
 Return a col-wise summation of elements.
@@ -14551,19 +13784,16 @@ Matrix divide (cf. slash '/' in MATLAB)
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::sparse(int nrow=1,
-int ncol=1) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::numel() const  "
 
-[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
-instead
+Get the number of elements.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::sparse(const
-std::pair< int, int > &rc) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::numel(int i) const
+"
 
-[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
-instead
+Get the number of elements in slice (cf. MATLAB)
 
 ";
 
@@ -14676,6 +13906,12 @@ Matlab's linspace command.
 %feature("docstring")  densify(const MatType &x) "
 
 Make the matrix dense if not already.
+
+";
+
+%feature("docstring")  densify(const MatType &x, const MatType &val) "
+
+Make the matrix dense and assign nonzeros to a value.
 
 ";
 
@@ -14917,14 +14153,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::SharedObject::makeUnique(bool
 clone_members=true) "
 
@@ -14952,12 +14180,6 @@ Check if a particular type.
 
 %feature("docstring")  casadi::GenericType::can_cast_to(const GenericType
 &other) const  " ";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
 
 %feature("docstring")  casadi::GenericType::toStringVector() const  "
 
@@ -15201,6 +14423,12 @@ Get input scheme.
 
 ";
 
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
+
+";
+
 %feature("docstring")  casadi::Function::map(const std::vector< std::vector<
 MX > > &arg, const std::string &parallelization="serial") "
 
@@ -15280,28 +14508,6 @@ Print dimensions of inputs and outputs.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring")  casadi::Function::generate(const std::string &fname,
 const Dict &opts=Dict()) "
 
@@ -15312,13 +14518,6 @@ Export / Generate C code for the function.
 %feature("docstring")  casadi::Function::generate(const Dict &opts=Dict()) "
 
 Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
 
 ";
 
@@ -15369,12 +14568,6 @@ Get the type name of a certain option.
 %feature("docstring")
 casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
 int v) " [INTERNAL]  Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -15772,13 +14965,6 @@ Create call to (cached) derivative function, reverse mode.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")
 casadi::OptionsFunctionality::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
@@ -15974,73 +15160,6 @@ and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
 the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind, const std::string
-&oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-const std::string &oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
 
 ";
 
@@ -16637,10 +15756,70 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
+%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
 
-check if there is an option str
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+int oind=0) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(int iind, const std::string
+&oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+const std::string &oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
 
 ";
 
@@ -16746,14 +15925,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph.
 
 There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -16889,13 +16060,6 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::nnzIn() const  "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
@@ -16982,13 +16146,6 @@ const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
 Reset the sparsity propagation.
 
@@ -17041,6 +16198,12 @@ are kept internally
 
 %feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
 Check if the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -17119,6 +16282,15 @@ std::vector< MX > &output_res, bool always_inline=false, bool
 never_inline=false) "
 
 Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
 
 ";
 
@@ -17210,14 +16382,6 @@ Get total number of elements in all of the matrix-valued inputs.
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
 Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -17891,13 +17055,6 @@ Get input scheme name by index.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
 std::string &str) const  "
 
@@ -17929,35 +17086,6 @@ std::string &name, const std::string &solver, const Function &f, const Dict
 &opts=Dict()) "
 
 Create an implicit function solver (new syntax, includes initialization)
-
-Parameters:
------------
-
-solver:
-
-Name of a solver. It might be one of:
-
-- kinsol
-
-- nlp
-
-- newton
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-ImplicitFunction.doc(\"myextraplugin\")
-
-f:   Function where one of the inputs (by default the first) is an unknown
-and one of the outputs (by default the first) is a residual.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::ImplicitFunction(const
-std::string &solver, const Function &f, const Function &jac=Function(),
-const LinearSolver &linsol=LinearSolver()) "
-
-[DEPRECATED] Create an implicit function solver, no initialization
 
 Parameters:
 -----------
@@ -18443,15 +17571,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
-const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
 %feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
 "
 
@@ -18462,28 +17581,6 @@ Add modules to be monitored.
 %feature("docstring")  casadi::ImplicitFunction::getJac() "
 
 Access Jacobian.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
 
 ";
 
@@ -18624,12 +17721,6 @@ The the mapaccumulated version has the signature:
   
 
 
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -18954,13 +18045,6 @@ Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
 %feature("docstring")  casadi::Integrator::clone() const  "
 
 Clone.
@@ -19215,13 +18299,6 @@ internal class
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")  casadi::SharedObject::print(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -19323,97 +18400,6 @@ const Dict &opts=Dict()) " ";
 %feature("docstring") casadi::Integrator::Integrator(const std::string
 &name, const std::string &solver, const MXDict &dae, const Dict
 &opts=Dict()) " ";
-
-%feature("docstring") casadi::Integrator::Integrator(const std::string
-&solver, const Function &f, const Function &g=Function()) "
-
-[DEPRECATED] Integrator factory, no initialization
-
-Parameters:
------------
-
-name:
-
-Name of a solver. It might be one of:
-
-- cvodes
-
-- idas
-
-- collocation
-
-- oldcollocation
-
-- rk
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-Integrator.doc(\"myextraplugin\")
-
-f:  dynamical system
-
->Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
-
-+-----------+-------+----------------------------+
-| Full name | Short |        Description         |
-+===========+=======+============================+
-| DAE_X     | x     | Differential state .       |
-+-----------+-------+----------------------------+
-| DAE_Z     | z     | Algebraic state .          |
-+-----------+-------+----------------------------+
-| DAE_P     | p     | Parameter .                |
-+-----------+-------+----------------------------+
-| DAE_T     | t     | Explicit time dependence . |
-+-----------+-------+----------------------------+
-
->Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
-
-+-----------+-------+--------------------------------------------+
-| Full name | Short |                Description                 |
-+===========+=======+============================================+
-| DAE_ODE   | ode   | Right hand side of the implicit ODE .      |
-+-----------+-------+--------------------------------------------+
-| DAE_ALG   | alg   | Right hand side of algebraic equations .   |
-+-----------+-------+--------------------------------------------+
-| DAE_QUAD  | quad  | Right hand side of quadratures equations . |
-+-----------+-------+--------------------------------------------+
-
-g:  backwards system
-
->Input scheme: casadi::RDAEInput (RDAE_NUM_IN = 7) [rdaeIn]
-
-+-----------+-------+-------------------------------+
-| Full name | Short |          Description          |
-+===========+=======+===============================+
-| RDAE_RX   | rx    | Backward differential state . |
-+-----------+-------+-------------------------------+
-| RDAE_RZ   | rz    | Backward algebraic state .    |
-+-----------+-------+-------------------------------+
-| RDAE_RP   | rp    | Backward parameter vector .   |
-+-----------+-------+-------------------------------+
-| RDAE_X    | x     | Forward differential state .  |
-+-----------+-------+-------------------------------+
-| RDAE_Z    | z     | Forward algebraic state .     |
-+-----------+-------+-------------------------------+
-| RDAE_P    | p     | Parameter vector .            |
-+-----------+-------+-------------------------------+
-| RDAE_T    | t     | Explicit time dependence .    |
-+-----------+-------+-------------------------------+
-
->Output scheme: casadi::RDAEOutput (RDAE_NUM_OUT = 3) [rdaeOut]
-
-+-----------+-------+-------------------------------------------+
-| Full name | Short |                Description                |
-+===========+=======+===========================================+
-| RDAE_ODE  | ode   | Right hand side of ODE. .                 |
-+-----------+-------+-------------------------------------------+
-| RDAE_ALG  | alg   | Right hand side of algebraic equations. . |
-+-----------+-------+-------------------------------------------+
-| RDAE_QUAD | quad  | Right hand side of quadratures. .         |
-+-----------+-------+-------------------------------------------+
-
-";
 
 %feature("docstring")  casadi::Function::nIn() const  "
 
@@ -20696,13 +19682,6 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::inputDescription(int ind) const  "
 
 Get input scheme description by index.
@@ -20942,12 +19921,6 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
 %feature("docstring")  casadi::Function::inputName(int ind) const  "
 
 Get input scheme name by index.
@@ -21130,34 +20103,18 @@ the length of the vector being the number of adjoint directions.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring")  casadi::Function::setFullJacobian(const Function
 &jac) "
 
 Set the Jacobian of all the input nonzeros with respect to all output
 nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
 are kept internally
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -21400,14 +20357,6 @@ Propagate the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -21711,12 +20660,6 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
 %feature("docstring")  casadi::SharedObject::print(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -22016,33 +20959,9 @@ point to this new object
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
-iind=0) "
+%feature("docstring")  casadi::SharedObject::isNull() const  "
 
-Set an input by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iind:  index within the range [0..nIn()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
-const std::string &iname) "
-
-Set an input by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iname:  input name. Only allowed when an input scheme is set.
+Is a null pointer?
 
 ";
 
@@ -22165,6 +21084,12 @@ Evaluate the function symbolically or numerically.
 %feature("docstring")  casadi::SharedObject::printPtr(std::ostream
 &stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
 internal class
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -22611,10 +21536,10 @@ Check if the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
-check if there is an option str
+Return a string with a representation (for SWIG)
 
 ";
 
@@ -22774,20 +21699,6 @@ Get default input value.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::outputName(int ind) const  "
 
 Get output scheme name by index.
@@ -22808,14 +21719,6 @@ time. * (n_in = nIn(), n_out = nOut())
 The functions returned are cached, meaning that if called multiple timed
 with the same value, then multiple references to the same function will be
 returned.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -22969,12 +21872,6 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
 %feature("docstring")  casadi::SharedObject::repr(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -23058,6 +21955,36 @@ Get output scheme.
 
 ";
 
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
+iind=0) "
+
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0..nIn()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
+const std::string &iname) "
+
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
 %feature("docstring")  casadi::Function::inputDescription(int ind) const  "
 
 Get input scheme description by index.
@@ -23067,35 +21994,6 @@ Get input scheme description by index.
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
 const  " [INTERNAL]  Get the enum value corresponding to th certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
 
 ";
 
@@ -23266,14 +22164,6 @@ Propagate the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -23451,36 +22341,6 @@ LinearSolver.doc(\"myextraplugin\")
 
 %feature("docstring") casadi::LinearSolver::LinearSolver() "[INTERNAL]
 Default (empty) constructor
-
-";
-
-%feature("docstring") casadi::LinearSolver::LinearSolver(const std::string
-&solver, const Sparsity &sp, int nrhs=1) "
-
-[DEPRECATED] Create a linear solver given a sparsity pattern No
-initialization
-
-Parameters:
------------
-
-solver:
-
-Name of a solver. It might be one of:
-
-- csparsecholesky
-
-- csparse
-
-- lapacklu
-
-- lapackqr
-
-- symbolicqr
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-LinearSolver.doc(\"myextraplugin\")
 
 ";
 
@@ -23900,13 +22760,6 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::outputSparsity(int ind=0) const  "
 
 Get sparsity of a given output.
@@ -24002,16 +22855,10 @@ Check if prepared.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
-get an option value
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
+Return a string with a description (for SWIG)
 
 ";
 
@@ -24082,13 +22929,6 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::sz_res() const  " [INTERNAL]  Get
 required length of res field.
 
@@ -24129,7 +22969,7 @@ singular
 If A is structurally singular, an error will be thrown during init. If A is
 numerically singular, the prepare step will fail.
 
-The usual procedure to use LinearSolver is:  init()
+The usual procedure to use LinearSolver is: init()
 
 set the first input (A)
 
@@ -24656,13 +23496,6 @@ internally
 
 ";
 
-%feature("docstring") casadi::LinearSolver::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
 %feature("docstring")  casadi::Function::derForward(int nfwd) "
 
 Get a function that calculates nfwd forward derivatives.
@@ -24722,43 +23555,27 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring")  casadi::Function::inputScheme() const  "
 
 Get input scheme.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
+%feature("docstring") casadi::LinearSolver::__hash__ "
 
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
 %feature("docstring")  casadi::SharedObject::assertInit() const  "
 [INTERNAL]  Assert that it is initialized
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -25305,37 +24122,6 @@ Problem structure.>Struct scheme: casadi::LPStruct ( = 1) []
 
 ";
 
-%feature("docstring") casadi::LpSolver::LpSolver(const std::string &solver,
-const std::map< std::string, Sparsity > &st) "
-
-[DEPRECATED] Constructor, no initialization
-
-Parameters:
------------
-
-solver:
-
-Name of a solver. It might be one of:
-
-- qp
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-LpSolver.doc(\"myextraplugin\")
-
-st:
-
-Problem structure.>Struct scheme: casadi::LPStruct ( = 1) []
-
-+-------------+-------+-----------------------+
-|  Full name  | Short |      Description      |
-+=============+=======+=======================+
-| LP_STRUCT_A |       | The matrix A: sparse. |
-+-------------+-------+-----------------------+
-
-";
-
 %feature("docstring")  casadi::Function::sz_w() const  " [INTERNAL]  Get
 required length of w field.
 
@@ -25522,12 +24308,6 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
 %feature("docstring")  casadi::Function::setDerForward(const Function &fcn,
 int nfwd) "
 
@@ -25546,14 +24326,6 @@ Get sparsity of a given input.
 &iname) const  "
 
 Get sparsity of a given input.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
-const  "
-
-Get the description of a certain option.
 
 ";
 
@@ -25802,17 +24574,16 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
 Reset the sparsity propagation.
 
 (for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -25865,28 +24636,6 @@ the allowed values.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
 &arg, const std::string &parallelization="serial") "
 
@@ -25923,14 +24672,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph.
 
 There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -26363,10 +25104,11 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
+const  "
 
-check if the user has there is an option str
+Get the description of a certain option.
 
 ";
 
@@ -26517,13 +25259,6 @@ Export / Generate C code for the function.
 %feature("docstring")  casadi::Function::generate(const Dict &opts=Dict()) "
 
 Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
@@ -27171,56 +25906,14 @@ Problem structure.>Struct scheme: casadi::LrDleStruct ( = 4) []
 
 ";
 
-%feature("docstring") casadi::LrDleSolver::LrDleSolver(const std::string
-&solver, const std::map< std::string, Sparsity > &st) "
-
-[DEPRECATED] Constructor (no initialization)
-
-Parameters:
------------
-
-solver:
-
-Name of a solver. It might be one of:
-
-- fixed_smith
-
-- dle
-
-- lrdple
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-LrDleSolver.doc(\"myextraplugin\")
-
-st:
-
-Problem structure.>Struct scheme: casadi::LrDleStruct ( = 4) []
-
-+-----------------+-------+---------------------------------------+
-|    Full name    | Short |              Description              |
-+=================+=======+=======================================+
-| LR_DLE_STRUCT_A |       | The matrix A.                         |
-+-----------------+-------+---------------------------------------+
-| LR_DLE_STRUCT_V |       | The matrix V.                         |
-+-----------------+-------+---------------------------------------+
-| LR_DLE_STRUCT_C |       | The matrix C (defaults to unity)      |
-+-----------------+-------+---------------------------------------+
-| LR_DLE_STRUCT_H |       | H matrix: horizontal stack of all Hi. |
-+-----------------+-------+---------------------------------------+
-
-";
-
 %feature("docstring")  casadi::Function::sz_iw() const  " [INTERNAL]  Get
 required length of iw field.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
+%feature("docstring")  casadi::Function::defaultInput(int ind) const  "
 
-check if there is an option str
+Get default input value.
 
 ";
 
@@ -27245,12 +25938,6 @@ the allowed values.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
 %feature("docstring")  casadi::Function::getStats() const  "
 
 Get all statistics obtained at the end of the last evaluate call.
@@ -27261,13 +25948,6 @@ Get all statistics obtained at the end of the last evaluate call.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
 
 ";
 
@@ -27522,12 +26202,6 @@ const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring")  casadi::Function::defaultInput(int ind) const  "
-
-Get default input value.
-
-";
-
 %feature("docstring")  casadi::SharedObject::printPtr(std::ostream
 &stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
 internal class
@@ -27636,13 +26310,6 @@ Add modules to be monitored.
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
 
 ";
 
@@ -27758,28 +26425,6 @@ scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
 
 ";
 
@@ -28449,14 +27094,6 @@ required length of res field.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::IOInterface< Function  >::getInput(int
 iind=0) const "
 
@@ -28532,6 +27169,12 @@ std::vector< MX > &output_res, bool always_inline=false, bool
 never_inline=false) "
 
 Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -28783,33 +27426,6 @@ Problem structure.
 
 ";
 
-%feature("docstring") casadi::LrDpleSolver::LrDpleSolver(const std::string
-&solver, const std::map< std::string, std::vector< Sparsity > > &st) "
-
-[DEPRECATED] Constructor (no initialization)
-
-Parameters:
------------
-
-solver:
-
-Name of a solver. It might be one of:
-
-- lifting
-
-- dple
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-LrDpleSolver.doc(\"myextraplugin\")
-
-st:
-
-Problem structure.
-
-";
-
 %feature("docstring")
 casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
 &name, int i) " [INTERNAL]  Set a certain option by giving its index into
@@ -28890,12 +27506,6 @@ Add modules to be monitored.
 %feature("docstring")  casadi::Function::evaluate() "
 
 Evaluate.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -29064,13 +27674,6 @@ oind:  The index of the output
 
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
 
 ";
 
@@ -29307,13 +27910,6 @@ int v) " [INTERNAL]  Set a certain option by giving an enum value.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
 std::string &str) const  "
 
@@ -29378,21 +27974,6 @@ Export / Generate C code for the function.
 %feature("docstring")  casadi::Function::generate(const Dict &opts=Dict()) "
 
 Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -29678,49 +28259,9 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
+%feature("docstring")  casadi::Function::nnzOut() const  "
 
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
-&arg, std::vector< DMatrix > &output_res, bool always_inline=false, bool
-never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
-std::vector< SX > &output_res, bool always_inline=false, bool
-never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
-std::vector< MX > &output_res, bool always_inline=false, bool
-never_inline=false) "
-
-Evaluate the function symbolically or numerically.
+Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
@@ -29840,9 +28381,27 @@ get function name with all non alphanumeric characters converted to '_'
 
 ";
 
-%feature("docstring")  casadi::Function::nnzOut() const  "
+%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
+&arg, std::vector< DMatrix > &output_res, bool always_inline=false, bool
+never_inline=false) "
 
-Get total number of nonzeros in all of the matrix-valued outputs.
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
+std::vector< SX > &output_res, bool always_inline=false, bool
+never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
+std::vector< MX > &output_res, bool always_inline=false, bool
+never_inline=false) "
+
+Evaluate the function symbolically or numerically.
 
 ";
 
@@ -29875,6 +28434,12 @@ casadi::OptionsFunctionality::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
 
 Print options to a stream.
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -30869,35 +29434,6 @@ required length of iw field.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")  casadi::Function::inputScheme() const  "
 
 Get input scheme.
@@ -31304,13 +29840,6 @@ required length of w field.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::outputName(int ind) const  "
 
 Get output scheme name by index.
@@ -31354,14 +29883,6 @@ Create call to (cached) derivative function, forward mode.
 %feature("docstring")  casadi::Function::defaultInput(int ind) const  "
 
 Get default input value.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -31646,21 +30167,14 @@ Return a string with a representation (for SWIG)
 
 ";
 
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
+
+";
+
 %feature("docstring")  casadi::Function::sz_res() const  " [INTERNAL]  Get
 required length of res field.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
@@ -31921,9 +30435,9 @@ const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
+%feature("docstring")  casadi::Function::inputName(int ind) const  "
 
-Is initialized?
+Get input scheme name by index.
 
 ";
 
@@ -32020,28 +30534,6 @@ propagating_sparsity.cpp)
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
 Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
 
 ";
 
@@ -32182,13 +30674,6 @@ std::vector< DMatrix > > &fseed, std::vector< std::vector< DMatrix > >
 &output_fsens, bool always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, forward mode.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
@@ -32438,13 +30923,6 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
 std::string &str) const  "
 
@@ -32533,13 +31011,6 @@ int nadj) "
 
 Set a function that calculates nadj adjoint derivatives NOTE: Does not take
 ownership, only weak references to the derivatives are kept internally.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
 
 ";
 
@@ -32876,14 +31347,6 @@ The the mapaccumulated version has the signature:
   
 
 
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -33378,6 +31841,12 @@ Get input scheme.
 
 ";
 
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
+
+";
+
 %feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
 
 Generate a Hessian function of output oind with respect to input iind.
@@ -33497,12 +31966,6 @@ Get output scheme name by index.
 
 %feature("docstring")  casadi::SharedObject::assertInit() const  "
 [INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")  casadi::Function::inputName(int ind) const  "
-
-Get input scheme name by index.
 
 ";
 
@@ -33765,19 +32228,9 @@ triangle function
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::sparse(int nrow=1, int ncol=1) "
+%feature("docstring")  adj(const Matrix< DataType > &A) "
 
-[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
-instead
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::sparse(const std::pair< int, int > &rc) "
-
-[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
-instead
+Matrix adjoint.
 
 ";
 
@@ -33944,13 +32397,6 @@ Is the Matrix a Slice (only for IMatrix)
 
 %feature("docstring")  casadi::Matrix< int >::isSlice(bool ind1) const " ";
 
-%feature("docstring")  casadi::Matrix< DataType >::appendColumns(const
-Matrix< DataType > &y) "
-
-[DEPRECATED] Append a matrix horizontally
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::hasDuplicates() "
 [INTERNAL]  Detect duplicate symbolic expressions If there are symbolic
 primitives appearing more than once, the function will return true and the
@@ -34024,25 +32470,11 @@ roots are real.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::printVector(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print vector-style.
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::setScientific(bool
 scientific) "
 
 Set the 'precision, width & scientific' used in printing and serializing to
 streams.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::isrow()
-const "
-
-Check if the matrix is a row vector (i.e. size1()==1)
 
 ";
 
@@ -34061,14 +32493,6 @@ Get double value (particular nonzero)
 %feature("docstring")  casadi::Matrix< DataType >::isOne() const  "
 
 check if the matrix is 1 (note that false negative answers are possible)
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::makeSparse(double tol=0)
-"
-
-[DEPRECATED: use sparsify instead] Make a matrix sparse by removing
-numerical zeros smaller in absolute value than a specified tolerance
 
 ";
 
@@ -34303,9 +32727,10 @@ check if the matrix is -1 (note that false negative answers are possible)
 
 ";
 
-%feature("docstring")  adj(const Matrix< DataType > &A) "
+%feature("docstring")  casadi::Matrix< DataType >::printVector(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
 
-Matrix adjoint.
+Print vector-style.
 
 ";
 
@@ -34423,12 +32848,6 @@ x:  Scalar symbol that the polynomial is build up with
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::binary(int op, const
-Matrix< DataType > &x, const Matrix< DataType > &y) " [INTERNAL]  Create
-nodes by their ID.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::shape()
 const "
 
@@ -34493,20 +32912,17 @@ Set upper triangular elements.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::size()
-const "
-
-[DEPRECATED] Alias for nnz The meaning of this function will change in
-future revision.
-
-See:   nnz()
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::isdense() const "
 
 Check if the matrix expression is dense.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::isrow()
+const "
+
+Check if the matrix is a row vector (i.e. size1()==1)
 
 ";
 
@@ -34831,9 +33247,9 @@ Create nodes by their ID.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::setZero() "
-
-[DEPRECATED] Set all elements to zero
+%feature("docstring")  casadi::Matrix< DataType >::binary(int op, const
+Matrix< DataType > &x, const Matrix< DataType > &y) " [INTERNAL]  Create
+nodes by their ID.
 
 ";
 
@@ -34855,13 +33271,6 @@ Get get the number of non-zeros on the diagonal.
 const "
 
 Get the number of non-zeros in the lower triangular half.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::append(const Matrix<
-DataType > &y) "
-
-[DEPRECATED] Append a matrix vertically (NOTE: only efficient if vector)
 
 ";
 
@@ -35000,20 +33409,6 @@ Get the number of non-zeros in the upper triangular half.
 
 ";
 
-%feature("docstring")  casadi::MX::append(const MX &y) "
-
-[DEPRECATED] Append a matrix vertically (NOTE: only efficient if vector)
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::MX::set(const MX &m, bool ind1, const Slice
 &rr) "
 
@@ -35073,6 +33468,12 @@ Get the sparsity pattern.
 
 ";
 
+%feature("docstring")  lift(const MX &x, const MX &x_guess) "
+
+Lift the expression Experimental feature.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MX  >::size2() const "
 
 Get the second dimension (i.e. number of columns)
@@ -35108,12 +33509,6 @@ Check if the matrix expression is scalar.
 
 ";
 
-%feature("docstring")  casadi::MX::lift(const MX &x_guess) "
-
-[DEPRECATED] Lift an expression
-
-";
-
 %feature("docstring")  casadi::PrintableObject< SharedObject
 >::getRepresentation() const "
 
@@ -35143,28 +33538,6 @@ Print a description of the object.
 %feature("docstring")  casadi::MX::splitPrimitives(const MX &x) const  "
 
 Split up an expression along symbolic primitives.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::sparse(int nrow=1, int
-ncol=1) "
-
-[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
-instead
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::sparse(const std::pair<
-int, int > &rc) "
-
-[DEPRECATED] Create a sparse matrix with all zeros Use MatType(nrow, ncol)
-instead
 
 ";
 
@@ -35367,12 +33740,6 @@ Get the size along a particular dimensions.
 
 ";
 
-%feature("docstring")  casadi::MX::appendColumns(const MX &y) "
-
-[DEPRECATED] Append a matrix horizontally
-
-";
-
 %feature("docstring") casadi::MX::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
@@ -35407,21 +33774,6 @@ int, int > &rc) "
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 zero.
-
-";
-
-%feature("docstring")  casadi::MX::makeDense(const MX &val=0) "
-
-[DEPRECATED: Use densify instead] Make the matrix dense
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::size() const "
-
-[DEPRECATED] Alias for nnz The meaning of this function will change in
-future revision.
-
-See:   nnz()
 
 ";
 
@@ -35997,28 +34349,6 @@ Get default input value.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
 std::string &str) const  "
 
@@ -36117,35 +34447,6 @@ std::pair< MXDict, std::vector< std::string > > &res, const Dict
 &opts=Dict()) "
 
 Construct from vectors (new syntax, includes initialization)
-
-";
-
-%feature("docstring") casadi::MXFunction::MXFunction(const std::vector< MX >
-&arg, const std::vector< MX > &res) "
-
-[DEPRECATED] Multiple input, multiple output, no initialization
-
-";
-
-%feature("docstring") casadi::MXFunction::MXFunction(const std::vector< MX >
-&arg, const std::pair< MXDict, std::vector< std::string > > &res) "
-
-[DEPRECATED] Multiple input, multiple output, no initialization
-
-";
-
-%feature("docstring") casadi::MXFunction::MXFunction(const std::pair<
-MXDict, std::vector< std::string > > &arg, const std::vector< MX > &res) "
-
-[DEPRECATED] Multiple input, multiple output, no initialization
-
-";
-
-%feature("docstring") casadi::MXFunction::MXFunction(const std::pair<
-MXDict, std::vector< std::string > > &arg, const std::pair< MXDict,
-std::vector< std::string > > &res) "
-
-[DEPRECATED] Multiple input, multiple output, no initialization
 
 ";
 
@@ -36311,6 +34612,12 @@ Get output scheme.
 
 ";
 
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
+
+";
+
 %feature("docstring")  casadi::Function::inputDescription(int ind) const  "
 
 Get input scheme description by index.
@@ -36432,13 +34739,6 @@ Get function output.
 %feature("docstring")  casadi::MXFunction::outputExpr() const  "
 
 Get all function outputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
@@ -36564,13 +34864,6 @@ Get the allowed values of a certain option.
 OptionsFunctionality &obj, bool skipUnknown=false) "
 
 Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
 
 ";
 
@@ -37350,13 +35643,6 @@ Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::outputName(int ind) const  "
 
 Get output scheme name by index.
@@ -37374,12 +35660,6 @@ There is no guarantee that consecutive calls return identical objects
 %feature("docstring")  casadi::Function::numelIn() const  "
 
 Get total number of elements in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -37485,14 +35765,6 @@ int nfwd) "
 
 Set a function that calculates nfwd forward derivatives NOTE: Does not take
 ownership, only weak references to the derivatives are kept internally.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -37939,13 +36211,6 @@ Create an NLP solver from a dictionary with MX expressions.
 
 ";
 
-%feature("docstring") casadi::NlpSolver::NlpSolver(const std::string
-&solver, const Function &nlp) "
-
-[DEPRECATED] NLP solver factory, no initialization
-
-";
-
 %feature("docstring")  casadi::Function::removeMonitor(const std::string
 &mon) "
 
@@ -38347,14 +36612,6 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::Function::generate(const std::string &fname,
 const Dict &opts=Dict()) "
 
@@ -38399,12 +36656,6 @@ one direction at a time and the last nadj*n_in outputs corresponds to
 adjoint sensitivities, one direction at a time.
 
 (n_in = nIn(), n_out = nOut())
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -38699,13 +36950,6 @@ returned.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::callReverse(const std::vector< MX >
 &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
 &aseed, std::vector< std::vector< MX > > &output_asens, bool
@@ -38746,13 +36990,6 @@ Get output scheme description by index.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")  casadi::Function::sz_res() const  " [INTERNAL]  Get
 required length of res field.
 
@@ -38762,13 +36999,6 @@ required length of res field.
 std::string &str) const  "
 
 Get the type of a certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
 
 ";
 
@@ -43302,11 +41532,7 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
-
-";
+%feature("docstring")  casadi::NlpSolver::getReportConstraints() "";
 
 %feature("docstring")  casadi::SharedObject::isNull() const  "
 
@@ -43317,6 +41543,12 @@ Is a null pointer?
 %feature("docstring")  casadi::Function::inputScheme() const  "
 
 Get input scheme.
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -43444,28 +41676,6 @@ casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
 const  "
 
 Get the description of a certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
 
 ";
 
@@ -43602,7 +41812,11 @@ Get output scheme name by index.
 
 ";
 
-%feature("docstring")  casadi::NlpSolver::getReportConstraints() "";
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
+int v) " [INTERNAL]  Set a certain option by giving an enum value.
+
+";
 
 %feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
 Reset the sparsity propagation.
@@ -43931,6 +42145,12 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
+%feature("docstring")  casadi::Function::numelIn() const  "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
 %feature("docstring")  casadi::Function::sz_res() const  " [INTERNAL]  Get
 required length of res field.
 
@@ -44043,28 +42263,6 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
 
 ";
 
@@ -44205,11 +42403,10 @@ Evaluate.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
+Return a string with a representation (for SWIG)
 
 ";
 
@@ -44225,9 +42422,10 @@ Get input scheme.
 
 ";
 
-%feature("docstring")  casadi::Function::numelIn() const  "
+%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
+OptionsFunctionality &obj, bool skipUnknown=false) "
 
-Get total number of elements in all of the matrix-valued inputs.
+Copy all options from another object.
 
 ";
 
@@ -44360,25 +42558,6 @@ and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
 the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Function::nnzOut() const  "
-
-Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
@@ -44675,10 +42854,9 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
+%feature("docstring")  casadi::Function::nnzOut() const  "
 
-get an option value
+Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
@@ -44689,16 +42867,15 @@ Reset the sparsity propagation.
 
 ";
 
-%feature("docstring")  casadi::Function::numelOut() const  "
+%feature("docstring")  casadi::Function::name() const  "
 
-Get total number of elements in all of the matrix-valued outputs.
+Name of the function.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
+%feature("docstring")  casadi::Function::numelOut() const  "
 
-Copy all options from another object.
+Get total number of elements in all of the matrix-valued outputs.
 
 ";
 
@@ -45115,13 +43292,6 @@ const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::setDerReverse(const Function &fcn,
 int nadj) "
 
@@ -45288,13 +43458,6 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
 std::string &str) const  "
 
@@ -45321,20 +43484,6 @@ ownership, only weak references to the derivatives are kept internally.
 
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
-%feature("docstring")
 casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
 &name, int i) " [INTERNAL]  Set a certain option by giving its index into
 the allowed values.
@@ -45359,25 +43508,9 @@ const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
+%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
 
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
+Get the dictionary.
 
 ";
 
@@ -45388,32 +43521,10 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
 std::string &str) const  "
 
 Get the type of a certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -45457,12 +43568,6 @@ casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
 const  "
 
 Get the description of a certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
-
-Get the dictionary.
 
 ";
 
@@ -46158,10 +44263,39 @@ Reset the sparsity propagation.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
+%feature("docstring")  casadi::Function::mapaccum(const std::string &name,
+int N, const Dict &options=Dict()) const  "
 
-check if the user has there is an option str
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -46468,13 +44602,6 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
 std::string &str) const  "
 
@@ -46485,27 +44612,6 @@ Get the allowed values of a certain option.
 %feature("docstring")  casadi::Function::outputScheme() const  "
 
 Get output scheme.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
-const  "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::nOut() const  "
-
-Get the number of function outputs.
 
 ";
 
@@ -46564,51 +44670,24 @@ Problem structure.>Struct scheme: casadi::QCQPStruct ( = 3) []
 
 ";
 
-%feature("docstring") casadi::QcqpSolver::QcqpSolver(const std::string
-&solver, const std::map< std::string, Sparsity > &st) "
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
+const  "
 
-[DEPRECATED] Constructor (no initialization)
+Get the description of a certain option.
 
-Parameters:
------------
+";
 
-solver:
+%feature("docstring")  casadi::Function::nOut() const  "
 
-Name of a solver. It might be one of:
+Get the number of function outputs.
 
-- socp
+";
 
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-QcqpSolver.doc(\"myextraplugin\")
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
-st:
-
-Problem structure.>Struct scheme: casadi::QCQPStruct ( = 3) []
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| QCQP_STRUCT_H          |                        | The square matrix H:   |
-|                        |                        | sparse, (n x n). Only  |
-|                        |                        | the lower triangular   |
-|                        |                        | part is actually used. |
-|                        |                        | The matrix is assumed  |
-|                        |                        | to be symmetrical.     |
-+------------------------+------------------------+------------------------+
-| QCQP_STRUCT_P          |                        | The horizontal stack   |
-|                        |                        | of all Pi. Each Pi is  |
-|                        |                        | sparse (n x n). Only   |
-|                        |                        | the lower triangular   |
-|                        |                        | part is actually used. |
-|                        |                        | The matrix is assumed  |
-|                        |                        | to be symmetrical.     |
-+------------------------+------------------------+------------------------+
-| QCQP_STRUCT_A          |                        | The matrix A: sparse,  |
-|                        |                        | (nc x n) - product     |
-|                        |                        | with x must be dense.  |
-+------------------------+------------------------+------------------------+
+Return a string with a description (for SWIG)
 
 ";
 
@@ -46616,11 +44695,6 @@ Problem structure.>Struct scheme: casadi::QCQPStruct ( = 3) []
 "
 
 Add modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -46634,13 +44708,6 @@ Get sparsity of a given output.
 &iname) const  "
 
 Get sparsity of a given output.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const "
-
-Return a string with a description (for SWIG)
 
 ";
 
@@ -46762,6 +44829,20 @@ Get the type of a certain option.
 
 ";
 
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
+
+";
+
+%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
+
+";
+
 %feature("docstring")  casadi::Function::derReverse(int nadj) "
 
 Get a function that calculates nadj adjoint derivatives.
@@ -46787,47 +44868,8 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int N, const Dict &options=Dict()) const  "
-
-Create a mapaccumulated version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (x, u) -> (x_next , y )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (x0, U) -> (X , Y )
-  
-      with
-          U: horzcat([u0, u1, ..., u_(N-1)])
-          X: horzcat([x1, x2, ..., x_N])
-          Y: horzcat([y0, y1, ..., y_(N-1)])
-  
-      and
-          x1, y0 <- f(x0, u0)
-          x2, y1 <- f(x1, u1)
-          ...
-          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
-  
-
-
-
-";
-
-%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
-Propagate the sparsity pattern through a set of directional.
-
-derivatives forward or backward (for usage, see the example
-propagating_sparsity.cpp)
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -46856,12 +44898,6 @@ Generate the sparsity of a Jacobian block
 const std::string &iind, const std::string &oind, bool compact=false) "
 
 Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -46905,28 +44941,6 @@ int v) " [INTERNAL]  Set a certain option by giving an enum value.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
 
 ";
 
@@ -47084,14 +45098,6 @@ Get the default of a certain option.
 std::string &str) const  "
 
 Get the type name of a certain option.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -47660,28 +45666,6 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring")  casadi::IOInterface< Function  >::getInput(int
 iind=0) const "
 
@@ -47923,6 +45907,12 @@ Get output scheme description by index.
 
 ";
 
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
+
+";
+
 %feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
 const  "
 
@@ -47976,56 +45966,6 @@ const std::string &solver, const std::map< std::string, Sparsity > &st,
 const Dict &opts=Dict()) "
 
 Constructor (new syntax, includes initialization)
-
-Parameters:
------------
-
-name:
-
-Name of a solver. It might be one of:
-
-- cplex
-
-- ooqp
-
-- qpoases
-
-- sqic
-
-- nlp
-
-- qcqp
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-QpSolver.doc(\"myextraplugin\")
-
-st:
-
-Problem structure.>Struct scheme: casadi::QPStruct ( = 2) []
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| QP_STRUCT_H            |                        | The square matrix H:   |
-|                        |                        | sparse, (n x n). Only  |
-|                        |                        | the lower triangular   |
-|                        |                        | part is actually used. |
-|                        |                        | The matrix is assumed  |
-|                        |                        | to be symmetrical.     |
-+------------------------+------------------------+------------------------+
-| QP_STRUCT_A            |                        | The matrix A: sparse,  |
-|                        |                        | (nc x n) - product     |
-|                        |                        | with x must be dense.  |
-+------------------------+------------------------+------------------------+
-
-";
-
-%feature("docstring") casadi::QpSolver::QpSolver(const std::string &solver,
-const std::map< std::string, Sparsity > &st) "
-
-[DEPRECATED] Constructor (no initialization)
 
 Parameters:
 -----------
@@ -48179,22 +46119,9 @@ Get the type name of a certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
 %feature("docstring")  casadi::Function::getSanitizedName() const  "
 
 get function name with all non alphanumeric characters converted to '_'
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
 
 ";
 
@@ -49094,13 +47021,6 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::symbolicInputSX() const  "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
@@ -49118,13 +47038,6 @@ scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
@@ -49149,14 +47062,6 @@ std::vector< MX > &output_res, bool always_inline=false, bool
 never_inline=false) "
 
 Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -49767,14 +47672,6 @@ Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::Function::outputIndex(const std::string
 &name) const  "
 
@@ -49808,44 +47705,6 @@ const std::string &solver, const std::map< std::string, Sparsity > &st,
 const Dict &opts=Dict()) "
 
 Constructor (new syntax, includes initialization)
-
-Parameters:
------------
-
-solver:
-
-Name of a solver. It might be one of:
-
-- dsdp
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-SdpSolver.doc(\"myextraplugin\")
-
-st:
-
-Problem structure.>Struct scheme: casadi::SDPStruct ( = 3) []
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| SDP_STRUCT_F           |                        | The horizontal stack   |
-|                        |                        | of all matrices F_i: ( |
-|                        |                        | m x nm)                |
-+------------------------+------------------------+------------------------+
-| SDP_STRUCT_G           |                        | The matrix G: ( m x m) |
-+------------------------+------------------------+------------------------+
-| SDP_STRUCT_A           |                        | The matrix A: ( nc x   |
-|                        |                        | n)                     |
-+------------------------+------------------------+------------------------+
-
-";
-
-%feature("docstring") casadi::SdpSolver::SdpSolver(const std::string
-&solver, const std::map< std::string, Sparsity > &st) "
-
-[DEPRECATED] Constructor
 
 Parameters:
 -----------
@@ -49948,6 +47807,12 @@ Print a description of the object.
 
 ";
 
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
+
+";
+
 %feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
 &arg, std::vector< DMatrix > &output_res, bool always_inline=false, bool
 never_inline=false) "
@@ -50002,20 +47867,6 @@ Get the type of a certain option.
 Reset the sparsity propagation.
 
 (for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
@@ -50784,13 +48635,6 @@ Print a representation of the object.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
 
 Generate a gradient function of output oind with respect to input iind.
@@ -51053,28 +48897,6 @@ one direction at a time and the last nadj*n_in outputs corresponds to
 adjoint sensitivities, one direction at a time.
 
 (n_in = nIn(), n_out = nOut())
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
 
 ";
 
@@ -51660,12 +49482,6 @@ Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
 %feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
 
@@ -52132,14 +49948,6 @@ Evaluate.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::Function::sz_w() const  " [INTERNAL]  Get
 required length of w field.
 
@@ -52172,13 +49980,6 @@ internally
 Set the Jacobian of all the input nonzeros with respect to all output
 nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
 are kept internally
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
 
 ";
 
@@ -52266,9 +50067,10 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::numelIn() const  "
+%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
+std::string &str) const  "
 
-Get total number of elements in all of the matrix-valued inputs.
+Get the type name of a certain option.
 
 ";
 
@@ -52454,12 +50256,6 @@ and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
 the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -53074,47 +50870,6 @@ Problem structure.>Struct scheme: casadi::SDQPStruct ( = 4) []
 
 ";
 
-%feature("docstring") casadi::SdqpSolver::SdqpSolver(const std::string
-&solver, const std::map< std::string, Sparsity > &st) "
-
-[DEPRECATED] Constructor (no initialization)
-
-Parameters:
------------
-
-solver:
-
-Name of a solver. It might be one of:
-
-- sdp
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-SdqpSolver.doc(\"myextraplugin\")
-
-st:
-
-Problem structure.>Struct scheme: casadi::SDQPStruct ( = 4) []
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| SDQP_STRUCT_H          |                        | The matrix H: sparse ( |
-|                        |                        | n x n)                 |
-+------------------------+------------------------+------------------------+
-| SDQP_STRUCT_F          |                        | The horizontal stack   |
-|                        |                        | of all matrices F_i: ( |
-|                        |                        | m x nm)                |
-+------------------------+------------------------+------------------------+
-| SDQP_STRUCT_G          |                        | The matrix G: ( m x m) |
-+------------------------+------------------------+------------------------+
-| SDQP_STRUCT_A          |                        | The matrix A: ( nc x   |
-|                        |                        | n)                     |
-+------------------------+------------------------+------------------------+
-
-";
-
 %feature("docstring")  casadi::Function::callForward(const std::vector< MX >
 &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
 &fseed, std::vector< std::vector< MX > > &output_fsens, bool
@@ -53209,6 +50964,12 @@ Get the dictionary.
 
 ";
 
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
+
+";
+
 %feature("docstring")  casadi::Function::inputIndex(const std::string &name)
 const  "
 
@@ -53224,13 +50985,6 @@ adheres to SCHEME_NLPINput
 casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
 &name, int i) " [INTERNAL]  Set a certain option by giving its index into
 the allowed values.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
@@ -53257,10 +51011,9 @@ Print options to a stream.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
-std::string &str) const  "
+%feature("docstring")  casadi::Function::numelIn() const  "
 
-Get the type name of a certain option.
+Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
@@ -53349,35 +51102,6 @@ Get total number of elements in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
 std::string &str) const  "
 
@@ -53385,8 +51109,9 @@ Get the type of a certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
+%feature("docstring")  casadi::Function::outputScheme() const  "
+
+Get output scheme.
 
 ";
 
@@ -53414,9 +51139,8 @@ Reset the sparsity propagation.
 
 ";
 
-%feature("docstring")  casadi::Function::outputScheme() const  "
-
-Get output scheme.
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -53482,20 +51206,6 @@ point to this new object
 >::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -53692,51 +51402,14 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
+%feature("docstring")  casadi::Function::outputIndex(const std::string
+&name) const  "
 
-Get an output by index.
+Find the index for a string describing a particular entry of an output
+scheme.
 
-Parameters:
------------
-
-oind:  index within the range [0..nOut()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-int oind=0) " [INTERNAL]  Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0..nOut()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-const std::string &oname) " [INTERNAL]  Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
 
 ";
 
@@ -53746,9 +51419,9 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring")  casadi::Function::evaluate() "
+%feature("docstring")  casadi::SharedObject::isNull() const  "
 
-Evaluate.
+Is a null pointer?
 
 ";
 
@@ -54446,14 +52119,6 @@ Get output scheme name by index.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::Function::sz_w() const  " [INTERNAL]  Get
 required length of w field.
 
@@ -54466,9 +52131,9 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isNull() const  "
+%feature("docstring")  casadi::Function::evaluate() "
 
-Is a null pointer?
+Evaluate.
 
 ";
 
@@ -54476,13 +52141,6 @@ Is a null pointer?
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
 Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
@@ -54562,6 +52220,12 @@ Get the type name of a certain option.
 
 %feature("docstring")  casadi::Function::sz_res() const  " [INTERNAL]  Get
 required length of res field.
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -54688,10 +52352,10 @@ are kept internally
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
+%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
 std::string &str) const  "
 
-get an option value
+Get the default of a certain option.
 
 ";
 
@@ -54707,13 +52371,6 @@ Propagate the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
-std::string &str) const  "
-
-Get the default of a certain option.
 
 ";
 
@@ -54745,28 +52402,6 @@ int nadj) "
 
 Set a function that calculates nadj adjoint derivatives NOTE: Does not take
 ownership, only weak references to the derivatives are kept internally.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
 
 ";
 
@@ -54828,14 +52463,51 @@ Get input scheme description by index.
 
 ";
 
-%feature("docstring")  casadi::Function::outputIndex(const std::string
-&name) const  "
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
+oind=0) const "
 
-Find the index for a string describing a particular entry of an output
-scheme.
+Get an output by index.
 
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
+Parameters:
+-----------
+
+oind:  index within the range [0..nOut()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
+std::string &oname) const "
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+int oind=0) " [INTERNAL]  Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0..nOut()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+const std::string &oname) " [INTERNAL]  Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -54967,39 +52639,6 @@ Output function equal to the state (new syntax, includes initialization)
 
 ";
 
-%feature("docstring") casadi::Simulator::Simulator(const Integrator
-&integrator, const Function &output_fcn, const Matrix< double > &grid) "
-
-[DEPRECATED] Constructor, no initialization
-
-Parameters:
------------
-
-output_fcn:  output function which maps to n outputs.
-
->Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
-
-+-----------+-------+----------------------------+
-| Full name | Short |        Description         |
-+===========+=======+============================+
-| DAE_X     | x     | Differential state .       |
-+-----------+-------+----------------------------+
-| DAE_Z     | z     | Algebraic state .          |
-+-----------+-------+----------------------------+
-| DAE_P     | p     | Parameter .                |
-+-----------+-------+----------------------------+
-| DAE_T     | t     | Explicit time dependence . |
-+-----------+-------+----------------------------+
-
-";
-
-%feature("docstring") casadi::Simulator::Simulator(const Integrator
-&integrator, const Matrix< double > &grid) "
-
-[DEPRECATED] Output function equal to the state, no initialization
-
-";
-
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
 int N, const Dict &options=Dict()) const  "
 
@@ -55047,26 +52686,6 @@ Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring")  casadi::Function::setDerForward(const Function &fcn,
-int nfwd) "
-
-Set a function that calculates nfwd forward derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
-%feature("docstring")  casadi::Function::outputDescription(int ind) const  "
-
-Get output scheme description by index.
-
-";
-
 %feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -55085,6 +52704,20 @@ adjoint sensitivities, one direction at a time.
 
 ";
 
+%feature("docstring")  casadi::Function::outputDescription(int ind) const  "
+
+Get output scheme description by index.
+
+";
+
+%feature("docstring")  casadi::Function::setDerForward(const Function &fcn,
+int nfwd) "
+
+Set a function that calculates nfwd forward derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
 %feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
 Reset the sparsity propagation.
 
@@ -55096,13 +52729,6 @@ Reset the sparsity propagation.
 "
 
 Get a list of all option names.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
 
 ";
 
@@ -55689,13 +53315,6 @@ Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")  casadi::SharedObject::print(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -55981,28 +53600,6 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring")  casadi::Function::printDimensions(std::ostream
 &stream=casadi::userOut()) const  "
 
@@ -56095,11 +53692,9 @@ Get sparsity of a given output.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
+%feature("docstring")  casadi::Function::getSanitizedName() const  "
 
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -56114,50 +53709,6 @@ Default constructor.
 &st, const Dict &opts=Dict()) "
 
 Constructor (new syntax, includes initialization)
-
-Parameters:
------------
-
-solver:
-
-Name of a solver. It might be one of:
-
-- ecos
-
-- mosek
-
-- sdp
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-SocpSolver.doc(\"myextraplugin\")
-
-st:
-
-Problem structure.>Struct scheme: casadi::SOCPStruct ( = 3) [socpStruct]
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| SOCP_STRUCT_G          | g                      | The horizontal stack   |
-|                        |                        | of all matrices Gi: (  |
-|                        |                        | n x N) .               |
-+------------------------+------------------------+------------------------+
-| SOCP_STRUCT_E          | e                      | The horizontal stack   |
-|                        |                        | of all vectors ei: ( n |
-|                        |                        | x m) .                 |
-+------------------------+------------------------+------------------------+
-| SOCP_STRUCT_A          | a                      | The matrix A: ( nc x   |
-|                        |                        | n) .                   |
-+------------------------+------------------------+------------------------+
-
-";
-
-%feature("docstring") casadi::SocpSolver::SocpSolver(const std::string
-&solver, const std::map< std::string, Sparsity > &st) "
-
-[DEPRECATED] Constructor (no initialization)
 
 Parameters:
 -----------
@@ -56257,6 +53808,12 @@ casadi::OptionsFunctionality::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
 
 Print options to a stream.
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -57868,12 +55425,6 @@ const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring")  casadi::Function::getSanitizedName() const  "
-
-get function name with all non alphanumeric characters converted to '_'
-
-";
-
 %feature("docstring")  casadi::Function::defaultInput(int ind) const  "
 
 Get default input value.
@@ -58113,12 +55664,6 @@ point to this new object
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
 %feature("docstring")  casadi::Function::derReverse(int nadj) "
 
 Get a function that calculates nadj adjoint derivatives.
@@ -58236,13 +55781,6 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
 
 ";
 
@@ -58535,13 +56073,6 @@ are kept internally
 %feature("docstring")
 casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
 int v) " [INTERNAL]  Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
@@ -58921,12 +56452,6 @@ Union of two sparsity patterns.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
 %feature("docstring")  casadi::Sparsity::getCCS(std::vector< int >
 &output_colind, std::vector< int > &output_row) const  "
 
@@ -58977,21 +56502,6 @@ Check if the sparsity is empty.
 
 A sparsity is considered empty if one of the dimensions is zero (or
 optionally both dimensions)
-
-";
-
-%feature("docstring")  casadi::Sparsity::sparse(int nrow, int ncol=1) "
-
-[DEPRECATED] Create a sparse (empty) rectangular sparsity pattern Use
-Sparse(nrow, ncol) instead
-
-";
-
-%feature("docstring")  casadi::Sparsity::sparse(const std::pair< int, int >
-&rc) "
-
-[DEPRECATED] Create a sparse (empty) rectangular sparsity pattern Use
-Sparse(nrow, ncol) instead
 
 ";
 
@@ -59089,14 +56599,6 @@ Create a dense rectangular sparsity pattern.
 &rc) "
 
 Create a dense rectangular sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -59456,12 +56958,6 @@ elements (i, j) with j>=i.
 %feature("docstring")  casadi::Sparsity::hasNZ(int rr, int cc) const  "
 
 Returns true if the pattern has a non-zero at location rr, cc.
-
-";
-
-%feature("docstring")  casadi::Sparsity::reserve(int nnz, int ncol) "
-
-[DEPRECATED]: Reserve space
 
 ";
 
@@ -59940,13 +57436,6 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")  casadi::Function::setJacobian(const Function &jac,
 int iind=0, int oind=0, bool compact=false) "
 
@@ -60242,16 +57731,10 @@ returned.
 
 ";
 
-%feature("docstring")  casadi::Function::outputSparsity(int ind=0) const  "
+%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
+OptionsFunctionality &obj, bool skipUnknown=false) "
 
-Get sparsity of a given output.
-
-";
-
-%feature("docstring")  casadi::Function::outputSparsity(const std::string
-&iname) const  "
-
-Get sparsity of a given output.
+Copy all options from another object.
 
 ";
 
@@ -60417,28 +57900,6 @@ std::vector< MX > &output_res, bool always_inline=false, bool
 never_inline=false) "
 
 Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
 
 ";
 
@@ -60905,6 +58366,12 @@ Diagrams
 
 C++ includes: stabilized_qp_solver.hpp ";
 
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
+
+";
+
 %feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
 "
 
@@ -60917,10 +58384,16 @@ required length of res field.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
+%feature("docstring")  casadi::Function::outputSparsity(int ind=0) const  "
 
-Copy all options from another object.
+Get sparsity of a given output.
+
+";
+
+%feature("docstring")  casadi::Function::outputSparsity(const std::string
+&iname) const  "
+
+Get sparsity of a given output.
 
 ";
 
@@ -61038,15 +58511,9 @@ required length of w field.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
+const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
@@ -61123,46 +58590,13 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
-&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
-DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
-DMatrixVectorVector &output_asens, bool always_inline=false, bool
-never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
-numerically with directional derivatives The first two arguments are the
-nondifferentiated inputs and results of the evaluation, the next two
-arguments are a set of forward directional seeds and the resulting forward
-directional derivatives, the length of the vector being the number of
-forward directions. The next two arguments are a set of adjoint directional
-seeds and the resulting adjoint directional derivatives, the length of the
-vector being the number of adjoint directions.
+%feature("docstring")  casadi::SharedObject::makeUnique(bool
+clone_members=true) "
 
-";
+Make unique.
 
-%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
-SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
-&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
-MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
-&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
+If there are other references to the object, then make a deep copy of it and
+point to this new object
 
 ";
 
@@ -61307,19 +58741,52 @@ Print a description of the object.
 
 ";
 
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
-const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+%feature("docstring")  casadi::SharedObject::isNull() const  "
+
+Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::SharedObject::makeUnique(bool
-clone_members=true) "
+%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
+&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
+DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
+DMatrixVectorVector &output_asens, bool always_inline=false, bool
+never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
+numerically with directional derivatives The first two arguments are the
+nondifferentiated inputs and results of the evaluation, the next two
+arguments are a set of forward directional seeds and the resulting forward
+directional derivatives, the length of the vector being the number of
+forward directions. The next two arguments are a set of adjoint directional
+seeds and the resulting adjoint directional derivatives, the length of the
+vector being the number of adjoint directions.
 
-Make unique.
+";
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
+SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
+&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
+
+";
+
+%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
+MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
+&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
 
 ";
 
@@ -61359,48 +58826,6 @@ std::string &name, const std::string &solver, const std::map< std::string,
 Sparsity > &st, const Dict &opts=Dict()) "
 
 Constructor (new syntax, includes initialization)
-
-Parameters:
------------
-
-solver:
-
-Name of a solver. It might be one of:
-
-- sqic
-
-- qp
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-StabilizedQpSolver.doc(\"myextraplugin\")
-
-st:  Problem structure
-
->Struct scheme: casadi::QPStruct ( = 2) []
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| QP_STRUCT_H            |                        | The square matrix H:   |
-|                        |                        | sparse, (n x n). Only  |
-|                        |                        | the lower triangular   |
-|                        |                        | part is actually used. |
-|                        |                        | The matrix is assumed  |
-|                        |                        | to be symmetrical.     |
-+------------------------+------------------------+------------------------+
-| QP_STRUCT_A            |                        | The matrix A: sparse,  |
-|                        |                        | (nc x n) - product     |
-|                        |                        | with x must be dense.  |
-+------------------------+------------------------+------------------------+
-
-";
-
-%feature("docstring") casadi::StabilizedQpSolver::StabilizedQpSolver(const
-std::string &solver, const std::map< std::string, Sparsity > &st) "
-
-[DEPRECATED] Constructor (no initialization)
 
 Parameters:
 -----------
@@ -61487,13 +58912,6 @@ val:  can be double, const std::vector<double>&, const Matrix<double>&,
 double *
 
 iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
@@ -61632,25 +59050,10 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
 
 (for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -62119,14 +59522,6 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::Function::inputIndex(const std::string &name)
 const  "
 
@@ -62135,13 +59530,6 @@ scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
 
 ";
 
@@ -62162,12 +59550,6 @@ Get a list of all option names.
 %feature("docstring")  casadi::Function::numelOut() const  "
 
 Get total number of elements in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -62264,6 +59646,12 @@ get function name with all non alphanumeric characters converted to '_'
 "
 
 Add modules to be monitored.
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -62522,28 +59910,6 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -62672,13 +60038,6 @@ Get, if necessary generate, the sparsity of a Jacobian block
 &iind, const std::string &oind, bool compact=false, bool symmetric=false) "
 
 Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
@@ -62823,12 +60182,10 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+%feature("docstring")  casadi::Function::getStat(const std::string &name)
 const  "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-There is no guarantee that consecutive calls return identical objects
+Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
@@ -63172,10 +60529,12 @@ Print options to a stream.
 
 ";
 
-%feature("docstring")  casadi::Function::getStat(const std::string &name)
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
 const  "
 
-Get a single statistic obtained at the end of the last evaluate call.
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
 
 ";
 
@@ -63331,13 +60690,6 @@ point to this new object
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::fullJacobian() "
 
 Generate a Jacobian function of all the inputs elements with respect to all
@@ -63360,13 +60712,7 @@ Get input scheme description by index.
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::OptionsFunctionality::hasSetOption(const std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
-%feature("docstring")  casadi::SXFunction::outputExpr(int oind) const  "
+casadi::SXFunction::outputExpr(int oind) const  "
 
 Get function output.
 
@@ -63920,13 +61266,6 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")  casadi::Function::removeMonitor(const std::string
 &mon) "
 
@@ -64099,13 +61438,6 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
 %feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
 int iind, int oind, bool compact=false) "
 
@@ -64134,38 +61466,10 @@ Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
 std::string &str) const  "
 
 Get the type name of a certain option.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
 
 ";
 
@@ -64445,35 +61749,6 @@ std::pair< SXDict, std::vector< std::string > > &res, const Dict
 &opts=Dict()) "
 
 Construct from vectors (new syntax, includes initialization)
-
-";
-
-%feature("docstring") casadi::SXFunction::SXFunction(const std::vector< SX >
-&arg, const std::vector< SX > &res) "
-
-[DEPRECATED] Multiple input, multiple output, no initialization
-
-";
-
-%feature("docstring") casadi::SXFunction::SXFunction(const std::vector< SX >
-&arg, const std::pair< SXDict, std::vector< std::string > > &res) "
-
-[DEPRECATED] Multiple input, multiple output, no initialization
-
-";
-
-%feature("docstring") casadi::SXFunction::SXFunction(const std::pair<
-SXDict, std::vector< std::string > > &arg, const std::vector< SX > &res) "
-
-[DEPRECATED] Multiple input, multiple output, no initialization
-
-";
-
-%feature("docstring") casadi::SXFunction::SXFunction(const std::pair<
-SXDict, std::vector< std::string > > &arg, const std::pair< SXDict,
-std::vector< std::string > > &res) "
-
-[DEPRECATED] Multiple input, multiple output, no initialization
 
 ";
 
@@ -65029,14 +62304,6 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")  casadi::IOInterface< Function  >::getInput(int
 iind=0) const "
 
@@ -65107,6 +62374,12 @@ Get sparsity of a given input.
 %feature("docstring")  casadi::SharedObject::isNull() const  "
 
 Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
 
 ";
 
@@ -65226,11 +62499,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring") casadi::WeakRef "[INTERNAL]  Weak reference type A
 weak reference to a SharedObject.
 
@@ -65285,22 +62553,14 @@ internal class
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
 
 ";
 
 %feature("docstring") casadi::WeakRef::__hash__ "[INTERNAL]  Returns a
 number that is unique for a given Node. If the Object does not point to any
 node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  " [INTERNAL]
-Is initialized?
 
 ";
 
@@ -65381,10 +62641,9 @@ Get the type of a certain option.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
+%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
+&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
+internal class
 
 ";
 
@@ -65419,12 +62678,6 @@ Get the type name of a certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
@@ -65448,34 +62701,6 @@ Get the default of a certain option.
 
 %feature("docstring") casadi::XmlFile::~XmlFile "";
 
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set an option.
-For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const Dict
-&dict, bool skipUnknown=false) "
-
-[DEPRECATED: pass option dictionary to function constructor] Set a set of
-options. For a list of options, check the class documentation of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
 const  " [INTERNAL]  Get the index into allowed options of a certain option.
@@ -65487,14 +62712,6 @@ casadi::OptionsFunctionality::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
 
 Print options to a stream.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-[DEPRECATED] Initialize or re-initialize the object:
-
-more documentation in the node class (SharedObjectNode and derived classes)
 
 ";
 
@@ -65520,9 +62737,9 @@ Print a description of the object.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
-internal class
+%feature("docstring")  casadi::SharedObject::isNull() const  "
+
+Is a null pointer?
 
 ";
 
@@ -65544,24 +62761,10 @@ const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
 %feature("docstring")
 casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
 &name, int i) " [INTERNAL]  Set a certain option by giving its index into
 the allowed values.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
 
 ";
 
