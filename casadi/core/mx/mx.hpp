@@ -357,12 +357,6 @@ namespace casadi {
     void setNZ(const MX& m, bool ind1, const Matrix<int>& kk);
     ///@}
 
-    /** \brief [DEPRECATED] Append a matrix vertically (NOTE: only efficient if vector) */
-    void append(const MX& y);
-
-    /** \brief [DEPRECATED] Append a matrix horizontally */
-    void appendColumns(const MX& y);
-
 #ifndef SWIG
     /// \cond CLUTTER
     ///@{
@@ -483,6 +477,7 @@ namespace casadi {
     std::vector<MX> zz_symvar() const;
     MX zz_nullspace() const;
     MX zz_repsum(int n, int m=1) const;
+    MX zz_densify(const MX& val) const;
     ///@}
 
     ///@{
@@ -498,6 +493,7 @@ namespace casadi {
     static std::vector<MX> zz_matrix_expand(const std::vector<MX>& e,
                                             const std::vector<MX>& boundary,
                                             const Dict& options);
+    MX zz_lift(const MX& x_guess) const;
     ///@}
     /// \endcond
 
@@ -560,6 +556,14 @@ namespace casadi {
                     const Dict& options = Dict()) {
       return MX::zz_matrix_expand(e, boundary, options);
     }
+
+    /** \brief Lift the expression
+     * Experimental feature
+     *
+     */
+    inline friend MX lift(const MX& x, const MX& x_guess) {
+      return x.zz_lift(x_guess);
+    }
 /** @} */
 #endif // SWIG
 
@@ -580,12 +584,6 @@ namespace casadi {
     MX zz_project(const Sparsity& sp, bool intersect=false) const;
 
 #endif // !defined(SWIG) || !defined(SWIGMATLAB)
-
-    /// [DEPRECATED: Use densify instead] Make the matrix dense
-    void makeDense(const MX& val = 0);
-
-    /// [DEPRECATED] Lift an expression
-    void lift(const MX& x_guess);
 
     /// Transpose the matrix
     MX T() const;

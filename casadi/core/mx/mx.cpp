@@ -769,9 +769,9 @@ namespace casadi {
     return (*this)->getUnary(OP_NOT);
   }
 
-  void MX::lift(const MX& x_guess) {
+  MX MX::zz_lift(const MX& x_guess) const {
     casadi_assert(sparsity()==x_guess.sparsity());
-    *this = (*this)->getBinary(OP_LIFT, x_guess, false, false);
+    return (*this)->getBinary(OP_LIFT, x_guess, false, false);
   }
 
   MX MX::zz_plus(const MX& y) const {
@@ -831,14 +831,6 @@ namespace casadi {
   MX MX::zz_mpower(const MX& b) const {
     casadi_assert_message(isscalar() || b.isscalar(), "Not implemented");
     return pow(*this, b);
-  }
-
-  void MX::append(const MX& y) {
-    *this = vertcat(*this, y);
-  }
-
-  void MX::appendColumns(const MX& y) {
-    *this = horzcat(*this, y);
   }
 
   MX MX::getDep(int ch) const { return (*this)->dep(ch); }
@@ -927,16 +919,16 @@ namespace casadi {
     }
   }
 
-  void MX::makeDense(const MX& val) {
+  MX MX::zz_densify(const MX& val) const {
     casadi_assert(val.isscalar());
     if (isdense()) {
-      return; // Already ok
+      return *this; // Already ok
     } else if (val->isZero()) {
-      *this = project(*this, Sparsity::dense(shape()));
+      return project(*this, Sparsity::dense(shape()));
     } else {
-      MX new_this = repmat(val, shape());
-      new_this(sparsity()) = *this;
-      *this = new_this;
+      MX ret = repmat(val, shape());
+      ret(sparsity()) = *this;
+      return ret;
     }
   }
 

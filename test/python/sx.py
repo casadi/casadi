@@ -1009,8 +1009,7 @@ class SXtests(casadiTestCase):
     s = SX([]).shape
     self.assertEqual(s[0],0)
     self.assertEqual(s[1],1)
-    x = SX.sym("x")
-    x.append(SX([]))
+    x = vertcat((SX.sym("x"),SX([])))
     
   def test_mul_sparsity(self):
 

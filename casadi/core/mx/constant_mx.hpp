@@ -522,9 +522,7 @@ namespace casadi {
     if (isZero()) {
       return MX::create(new Constant<Value>(sp, v_));
     } else if (sp.isdense()) {
-      DMatrix v = getMatrixValue();
-      v.makeDense();
-      return v;
+      return densify(getMatrixValue());
     } else {
       return MXNode::getProject(sp);
     }

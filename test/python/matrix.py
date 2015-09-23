@@ -742,15 +742,12 @@ class Matrixtests(casadiTestCase):
     f = MXFunction("f", [x],[y])
       
   def test_append_empty(self):
-    a = DMatrix(0,0)
-    a.append(DMatrix(0,2))
+    a = vertcat((DMatrix(0,0),DMatrix(0,2)))
     
     self.assertEqual(a.size1(),0)
     self.assertEqual(a.size2(),2)
 
-    a = DMatrix(0,0)
-    a.append(DMatrix(2,0))
-    a.append(DMatrix(3,0))
+    a = vertcat((DMatrix(0,0),DMatrix(2,0),DMatrix(3,0)))
     
     self.assertEqual(a.size1(),5)
     self.assertEqual(a.size2(),0)

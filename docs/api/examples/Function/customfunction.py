@@ -87,7 +87,7 @@ class Fun:
     z2 = sin(z1)
     z.set(z2)
             
-c = PyFunction(Fun(12345), [Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)] )
+c = PyFunction("c", Fun(12345), [Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)] )
 
 c.setInput(1.2,0)
 c.setInput(1.5,1)
@@ -150,7 +150,7 @@ class Fun:
       x_bar.set(bx)
       y_bar.set(by)
 
-c = PyFunction(Fun(), [Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)] )
+c = PyFunction("c", Fun(), [Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)] )
 
 J = c.jacobian(1) # jacobian w.r.t second argument
 J.setInput(1.2,0)
@@ -215,7 +215,7 @@ class Fun:
     class Der:
        def evaluate(self,xy_andseeds,z_andseeds):  sself.evaluateDerFwd(xy_andseeds,z_andseeds,nfwd)
 
-    FunDer = PyFunction(Der(),inputs+outputs+inputs*nfwd,outputs*nfwd)
+    FunDer = PyFunction("FunDer", Der(),inputs+outputs+inputs*nfwd,outputs*nfwd)
     return FunDer
 
   def getDerReverse(self,f,nadj):
@@ -227,7 +227,7 @@ class Fun:
     class Der:
        def evaluate(self,xy_andseeds,z_andseeds):  sself.evaluateDerAdj(xy_andseeds,z_andseeds,nadj)
 
-    FunDer = PyFunction(Der(),inputs+outputs+outputs*nadj,inputs*nadj)
+    FunDer = PyFunction("FunDer", Der(),inputs+outputs+outputs*nadj,inputs*nadj)
     return FunDer
     
   def evaluateDerFwd(self,inputs,outputs,nfwd):
@@ -281,7 +281,7 @@ class Fun:
       outputs[num_in*i+0].set(bx)
       outputs[num_in*i+1].set(by)
       
-Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
+Fun = PyFunction("FunDer", Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
 
 J = Fun.jacobian(1)
 J.setInput(1.2,0)

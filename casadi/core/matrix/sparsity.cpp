@@ -818,10 +818,6 @@ namespace casadi {
     return Sparsity(nrow, ncol, colind, row);
   }
 
-  Sparsity Sparsity::sparse(int nrow, int ncol) {
-    return Sparsity(nrow, ncol);
-  }
-
   Sparsity Sparsity::upper(int n) {
     casadi_assert_message(n>=0, "Sparsity::upper expects a positive integer as argument");
     int nrow=n, ncol=n;

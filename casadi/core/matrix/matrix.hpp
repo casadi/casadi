@@ -357,28 +357,10 @@ namespace casadi {
     void setNZ(const Matrix<DataType>& m, bool ind1, const Matrix<int>& k);
     ///@}
 
-    /// [DEPRECATED] Append a matrix vertically (NOTE: only efficient if vector)
-    void append(const Matrix<DataType>& y);
-
-    /// [DEPRECATED] Append a matrix horizontally
-    void appendColumns(const Matrix<DataType>& y);
-
-    /// [DEPRECATED] Set all elements to zero
-    void setZero();
-
 #ifndef SWIG
     /// Set all elements to a value
     void setAll(const DataType& val);
-
-    /// Make the matrix dense
-    void makeDense(const DataType& val = 0);
 #endif // SWIG
-
-
-    /** \brief [DEPRECATED: use sparsify instead]
-       Make a matrix sparse by removing numerical zeros smaller
-     * in absolute value than a specified tolerance */
-    void makeSparse(double tol=0);
 
     Matrix<DataType> operator+() const;
     Matrix<DataType> operator-() const;
@@ -503,6 +485,7 @@ namespace casadi {
     Matrix<DataType> zz_project(const Sparsity& sp, bool intersect) const;
     Matrix<DataType> zz_if_else_zero(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_polyval(const Matrix<DataType>& x) const;
+    Matrix<DataType> zz_densify(const Matrix<DataType>& val) const;
     ///@}
 
     ///@{

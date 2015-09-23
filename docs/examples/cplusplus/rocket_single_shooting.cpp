@@ -141,7 +141,7 @@ int main(){
 
     // Lift X
     if(lifted_newton){
-      X.lift(X);
+      X = lift(X, X);
     }
   }
 

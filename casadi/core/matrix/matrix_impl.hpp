@@ -506,74 +506,33 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::makeDense(const DataType& val) {
+  Matrix<DataType> Matrix<DataType>::
+  zz_densify(const Matrix<DataType>& val) const {
+    // Check argument
+    casadi_assert(val.isscalar());
+
     // Quick return if possible
-    if (isdense()) return;
+    if (isdense()) return *this;
 
     // Get sparsity pattern
     int nrow = size1();
     int ncol = size2();
     const int* colind = this->colind();
     const int* row = this->row();
+    auto it = data_.cbegin();
 
-    // Resize data and copy
-    data_.resize(nrow*ncol, val);
+    // New data vector
+    std::vector<DataType> d(nrow*ncol, val.toScalar());
 
-    // Loop over the columns in reverse order
-    for (int cc=ncol-1; cc>=0; --cc) {
-      // Loop over nonzero elements of the column in reverse order
-      for (int el=colind[cc+1]-1; el>=colind[cc]; --el) {
-        int rr = row[el];
-        int new_el = cc*nrow + rr;
-        if (el==new_el) break; // Already done, the rest of the elements must be in the same place
-        std::swap(data_[new_el], data_[el]);
-      }
-    }
-
-    // Update the sparsity pattern
-    sparsity_ = Sparsity::dense(shape());
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::makeSparse(double tol) {
-    // Quick return if there are no entries to be removed
-    bool remove_nothing = true;
-    for (typename std::vector<DataType>::iterator it=begin(); it!=end() && remove_nothing; ++it) {
-      remove_nothing = !casadi_limits<DataType>::isAlmostZero(*it, tol);
-    }
-    if (remove_nothing) return;
-
-    // Get the current sparsity pattern
-    int size1 = this->size1();
-    int size2 = this->size2();
-    const int* colind = this->colind();
-    const int* row = this->row();
-
-    // Construct the new sparsity pattern
-    std::vector<int> new_colind(1, 0), new_row;
-
-    // Loop over the columns
-    for (int cc=0; cc<size2; ++cc) {
-      // Loop over existing nonzeros
+    // Copy nonzeros
+    for (int cc=0; cc<ncol; ++cc) {
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        // If it is not known to be a zero
-        if (!casadi_limits<DataType>::isAlmostZero(data_[el], tol)) {
-          // Save the nonzero in its new location
-          data_[new_row.size()] = data_[el];
-
-          // Add to pattern
-          new_row.push_back(row[el]);
-        }
+        d[cc*nrow + row[el]] = *it++;
       }
-      // Save the new column offset
-      new_colind.push_back(new_row.size());
     }
 
-    // Trim the data vector
-    data_.resize(new_row.size());
-
-    // Update the sparsity pattern
-    sparsity_ = Sparsity(size1, size2, new_colind, new_row);
+    // Construct return matrix
+    return Matrix<DataType>(Sparsity::dense(shape()), d);
   }
 
   template<typename DataType>
@@ -898,11 +857,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setZero() {
-    setAll(0);
-  }
-
-  template<typename DataType>
   void Matrix<DataType>::setAll(const DataType& val) {
     std::fill(begin(), end(), val);
   }
@@ -927,7 +881,7 @@ namespace casadi {
       DataType fcn_0;
       casadi_math<DataType>::fun(op, 0, 0, fcn_0);
       if (!casadi_limits<DataType>::isZero(fcn_0)) { // Remove this if?
-        ret.makeDense(fcn_0);
+        ret = densify(ret, fcn_0);
       }
     }
 
@@ -1470,7 +1424,7 @@ namespace casadi {
       DataType fcn_0;
       casadi_math<DataType>::fun(op, x_val, casadi_limits<DataType>::zero, fcn_0);
       if (!casadi_limits<DataType>::isZero(fcn_0)) { // Remove this if?
-        ret.makeDense(fcn_0);
+        ret = densify(ret, fcn_0);
       }
     }
 
@@ -1501,7 +1455,7 @@ namespace casadi {
       DataType fcn_0;
       casadi_math<DataType>::fun(op, casadi_limits<DataType>::zero, y_val, fcn_0);
       if (!casadi_limits<DataType>::isZero(fcn_0)) { // Remove this if?
-        ret.makeDense(fcn_0);
+        ret = densify(ret, fcn_0);
       }
     }
 
@@ -1561,7 +1515,7 @@ namespace casadi {
       DataType fcn_0;
       casadi_math<DataType>::fun(op, casadi_limits<DataType>::zero,
                                  casadi_limits<DataType>::zero, fcn_0);
-      r.makeDense(fcn_0);
+      r = densify(r, fcn_0);
     }
 
     return r;
@@ -1635,49 +1589,6 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::nan(int nrow, int ncol) {
     return nan(Sparsity::dense(nrow, ncol));
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::append(const Matrix<DataType>& y) {
-    // Quick return if expr is empty
-    if (size2()==0 && size1()==0) {
-      *this=y;
-      return;
-    }
-
-    // Quick return if empty
-    if (y.size2()==0 && y.size1()==0) return;
-
-    // Appending can be done efficiently if column vectors
-    if (iscolumn()) {
-      // Append the sparsity pattern vertically
-      sparsityRef().append(y.sparsity());
-
-      // Add the non-zeros at the end
-      data().insert(end(), y.begin(), y.end());
-    } else {
-      // Fall back on vertical concatenation
-      *this = vertcat(*this, y);
-    }
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::appendColumns(const Matrix<DataType>& y) {
-
-    // Quick return if expr is empty
-    if (size2()==0 && size1()==0) {
-      *this=y;
-      return;
-    }
-
-    // Quick return if empty
-    if (y.size2()==0 && y.size1()==0) return;
-
-    // Append the sparsity pattern
-    sparsityRef().appendColumns(y.sparsity());
-
-    // Add the non-zeros at the end
-    data().insert(end(), y.begin(), y.end());
   }
 
   template<typename DataType>
@@ -2292,8 +2203,8 @@ namespace casadi {
       qi /= ri(i, 0);
 
       // Update R and Q
-      Q.appendColumns(qi);
-      R.appendColumns(ri);
+      Q = horzcat(Q, qi);
+      R = horzcat(R, ri);
     }
   }
 
@@ -2418,9 +2329,7 @@ namespace casadi {
 
       // If there are structurally nonzero entries that are known to be zero,
       // remove these and rerun the algorithm
-      Matrix<DataType> A_sparse = *this;
-      A_sparse.makeSparse();
-      return solve(A_sparse, b);
+      return solve(sparsify(*this), b);
 
     } else {
 
@@ -2807,9 +2716,45 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_sparsify(double tol) const {
-    Matrix<DataType> ret = *this;
-    ret.makeSparse(tol);
-    return ret;
+    // Quick return if there are no entries to be removed
+    bool remove_nothing = true;
+    for (auto it=begin(); it!=end() && remove_nothing; ++it) {
+      remove_nothing = !casadi_limits<DataType>::isAlmostZero(*it, tol);
+    }
+    if (remove_nothing) return *this;
+
+    // Get the current sparsity pattern
+    int size1 = this->size1();
+    int size2 = this->size2();
+    const int* colind = this->colind();
+    const int* row = this->row();
+
+    // Construct the new sparsity pattern
+    std::vector<int> new_colind(1, 0), new_row;
+    std::vector<DataType> new_data;
+
+    // Loop over the columns
+    for (int cc=0; cc<size2; ++cc) {
+      // Loop over existing nonzeros
+      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+        // If it is not known to be a zero
+        if (!casadi_limits<DataType>::isAlmostZero(data_[el], tol)) {
+          // Save the nonzero in its new location
+          new_data.push_back(data_[el]);
+
+          // Add to pattern
+          new_row.push_back(row[el]);
+        }
+      }
+      // Save the new column offset
+      new_colind.push_back(new_row.size());
+    }
+
+    // Construct the sparsity pattern
+    Sparsity sp(size1, size2, new_colind, new_row);
+
+    // Construct matrix and return
+    return Matrix<DataType>(sp, new_data);
   }
 
 

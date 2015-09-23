@@ -78,12 +78,6 @@ namespace casadi {
     /** \brief Get the number of (structural) non-zero elements */
     int nnz() const;
 
-    /** \brief [DEPRECATED] Alias for nnz
-        The meaning of this function will change in future revision.
-        \see nnz()
-    */
-    int size() const { return nnz();}
-
     /** \brief Get the number of non-zeros in the lower triangular half */
     int sizeL() const;
 
@@ -200,11 +194,6 @@ namespace casadi {
     MatType zz_cross(const MatType &b, int dim=-1) const;
     MatType zz_tril2symm() const;
     MatType zz_triu2symm() const;
-    MatType zz_densify() const {
-      MatType ret = self();
-      ret.makeDense();
-      return ret;
-    }
     MatType zz_repsum(int n, int m=1) const;
     /** @}  */
     /// \endcond
@@ -400,8 +389,8 @@ namespace casadi {
 
     /** \brief  Make the matrix dense if not already
      */
-    inline friend MatType densify(const MatType& x) {
-      return x.zz_densify();
+    inline friend MatType densify(const MatType& x, const MatType& val=0) {
+      return x.zz_densify(val);
     }
 
     /** \brief Create a new matrix with a given sparsity pattern but with the
@@ -621,19 +610,6 @@ namespace casadi {
       return sym(name, Sparsity::dense(nrow, ncol), p, r);
     }
     ///@}
-
-#if !defined(SWIG) || !defined(SWIGMATLAB)
-    ///@{
-    /** \brief [DEPRECATED] Create a sparse matrix with all zeros 
-        Use MatType(nrow, ncol) instead **/
-    static MatType sparse(int nrow=1, int ncol=1) { return MatType(nrow, ncol);}
-    static MatType sparse(const std::pair<int, int>& rc) { return MatType(rc);}
-    ///@}
-
-    /** \brief [DEPRECATED] Create a sparse matrix with nonzeros given as a (dense) vector 
-        Use MatType(Sparsity, nz) instead **/
-    static MatType sparse(const Sparsity& sp, const MatType& nz) { return MatType(sp, nz); }
-#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
     ///@{
     /** \brief Create a dense matrix or a matrix with specified sparsity with all entries zero */
