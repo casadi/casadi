@@ -115,8 +115,8 @@ namespace casadi {
     for (int i=0;i<m_+N_+2*nc_+2*n_+1;++i) ecos_Gjc_vec_[i] = i;
 
     // Initialize A
-    int sizeof_A = input(SOCP_SOLVER_E).size() + input(SOCP_SOLVER_G).size() +
-                2*input(SOCP_SOLVER_A).size()+2*n_;
+    int sizeof_A = input(SOCP_SOLVER_E).nnz() + input(SOCP_SOLVER_G).nnz() +
+                2*input(SOCP_SOLVER_A).nnz()+2*n_;
     ecos_Ajc_vec_.reserve(m_+N_+2*nc_+2*n_+1);
     ecos_Air_vec_.reserve(sizeof_A);
 
