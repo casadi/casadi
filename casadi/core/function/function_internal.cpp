@@ -1350,6 +1350,8 @@ namespace casadi {
 
   void FunctionInternal::evalSX(const SXElement** arg, SXElement** res,
                                 int* iw, SXElement* w) {
+    casadi_assert(canEvalSX());
+
     // Number of inputs and outputs
     int num_in = nIn();
     int num_out = nOut();
@@ -1376,6 +1378,8 @@ namespace casadi {
   }
 
   void FunctionInternal::evalSX(const std::vector<SX>& arg, std::vector<SX>& res) {
+    casadi_assert(canEvalSX());
+
     // Get the number of inputs and outputs
     int num_in = nIn();
     int num_out = nOut();

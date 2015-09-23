@@ -113,6 +113,9 @@ namespace casadi {
     virtual Function getNumericJacobian(const std::string& name, int iind, int oind,
                                         bool compact, bool symmetric, const Dict& opts);
 
+    /** \brief Quickfix to avoid segfault, #1552 */
+    virtual bool canEvalSX() const {return true;}
+
     /** \brief Evaluate symbolically, SX type*/
     virtual void evalSX(const SXElement** arg, SXElement** res,
                         int* iw, SXElement* w);
