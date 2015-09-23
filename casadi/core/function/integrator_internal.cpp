@@ -573,99 +573,116 @@ namespace casadi {
     log("IntegratorInternal::spFwd", "end");
   }
 
-  void IntegratorInternal::spAdj(bvec_t** arg, bvec_t** res,
-                                 int* iw, bvec_t* w) {
+  void IntegratorInternal::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     log("IntegratorInternal::spAdj", "begin");
 
     // Work vectors
-    bvec_t *tmp_x = w; w += nx_;
-    bvec_t *tmp_z = w; w += nz_;
-    bvec_t *tmp_rx = w; w += nrx_;
-    bvec_t *tmp_rz = w; w += nrz_;
     bvec_t** arg1 = arg+nIn();
     bvec_t** res1 = res+nOut();
+    bvec_t *tmp_x = w; w += nx_;
+    bvec_t *tmp_z = w; w += nz_;
 
-    // Get & clear seeds (forward integration)
-    if (res[INTEGRATOR_XF]) {
-      copy(res[INTEGRATOR_XF], res[INTEGRATOR_XF]+nx_, tmp_x);
-      fill_n(res[INTEGRATOR_XF], nx_, 0);
+    // Shorthands
+    bvec_t* x0 = arg[INTEGRATOR_X0];
+    bvec_t* p = arg[INTEGRATOR_P];
+    bvec_t* xf = res[INTEGRATOR_XF];
+    bvec_t* zf = res[INTEGRATOR_ZF];
+    bvec_t* qf = res[INTEGRATOR_QF];
+
+    // Propagate from outputs to state vectors
+    if (xf) {
+      copy_n(xf, nx_, tmp_x);
+      fill_n(xf, nx_, 0);
     } else {
       fill_n(tmp_x, nx_, 0);
     }
-    if (res[INTEGRATOR_ZF]) {
-      copy(res[INTEGRATOR_ZF], res[INTEGRATOR_ZF]+nz_, tmp_z);
-      fill_n(res[INTEGRATOR_ZF], nz_, 0);
+    if (zf) {
+      copy_n(zf, nz_, tmp_z);
+      fill_n(zf, nz_, 0);
     } else {
       fill_n(tmp_z, nz_, 0);
     }
 
     if (!g_.isNull()) {
-      // Get & clear seeds (backward integration)
-      if (res[INTEGRATOR_RXF]) {
-        copy(res[INTEGRATOR_RXF], res[INTEGRATOR_RXF]+nrx_, tmp_rx);
-        fill_n(res[INTEGRATOR_RXF], nrx_, 0);
+      // Work vectors
+      bvec_t *tmp_rx = w; w += nrx_;
+      bvec_t *tmp_rz = w; w += nrz_;
+
+      // Shorthands
+      bvec_t* rx0 = arg[INTEGRATOR_RX0];
+      bvec_t* rp = arg[INTEGRATOR_RP];
+      bvec_t* rxf = res[INTEGRATOR_RXF];
+      bvec_t* rzf = res[INTEGRATOR_RZF];
+      bvec_t* rqf = res[INTEGRATOR_RQF];
+
+      // Propagate from outputs to state vectors
+      if (rxf) {
+        copy_n(rxf, nrx_, tmp_rx);
+        fill_n(rxf, nrx_, 0);
       } else {
         fill_n(tmp_rx, nrx_, 0);
       }
-      if (res[INTEGRATOR_RZF]) {
-        copy(res[INTEGRATOR_RZF], res[INTEGRATOR_RZF]+nrz_, tmp_rz);
-        fill_n(res[INTEGRATOR_RZF], nrz_, 0);
+      if (rzf) {
+        copy_n(rzf, nrz_, tmp_rz);
+        fill_n(rzf, nrz_, 0);
       } else {
         fill_n(tmp_rz, nrz_, 0);
       }
 
-      // Propagate dependencies from quadratures
-      fill(res1, res1+RDAE_NUM_OUT, static_cast<bvec_t*>(0));
-      res1[RDAE_QUAD] = res[INTEGRATOR_RQF];
-      fill(arg1, arg1+RDAE_NUM_IN, static_cast<bvec_t*>(0));
+      // Get dependencies from backward quadratures
+      fill_n(res1, RDAE_NUM_OUT, static_cast<bvec_t*>(0));
+      fill_n(arg1, RDAE_NUM_IN, static_cast<bvec_t*>(0));
+      res1[RDAE_QUAD] = rqf;
       arg1[RDAE_X] = tmp_x;
       arg1[RDAE_Z] = tmp_z;
-      arg1[RDAE_P] = arg[INTEGRATOR_P];
+      arg1[RDAE_P] = p;
       arg1[RDAE_RX] = tmp_rx;
       arg1[RDAE_RZ] = tmp_rz;
-      arg1[RDAE_RP] = arg[INTEGRATOR_RP];
-      if (nrq_>0 && res[INTEGRATOR_RQF]) {
-        g_.spAdj(arg1, res1, iw, w);
-      }
+      arg1[RDAE_RP] = rp;
+      g_.spAdj(arg1, res1, iw, w);
 
-      // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
-      copy(tmp_rx, tmp_rx+nrx_+nrz_, w);
-      fill_n(tmp_rx, nrx_+nrz_, 0);
+      // Propagate interdependencies
       casadi_assert(!linsol_g_.isNull());
-      linsol_g_.spSolve(tmp_rx, w, true);
+      fill_n(w, nrx_+nrz_, 0);
+      linsol_g_.spSolve(w, tmp_rx, true);
+      copy(w, w+nrx_+nrz_, tmp_rx);
 
-      // Propagate through g
+      // Direct dependency rx0 -> rxf
+      if (rx0) for (int i=0; i<nrx_; ++i) rx0[i] |= tmp_rx[i];
+
+      // Indirect dependency via g
       res1[RDAE_ODE] = tmp_rx;
-      res1[RDAE_ALG] = tmp_rx + nrx_;
+      res1[RDAE_ALG] = tmp_rz;
       res1[RDAE_QUAD] = 0;
-      arg1[RDAE_X] = arg[INTEGRATOR_RX0];
-      arg1[RDAE_Z] = 0;
+      arg1[RDAE_RX] = rx0;
+      arg1[RDAE_RZ] = 0; // arg[INTEGRATOR_RZ0] is a guess, no dependency
       g_.spAdj(arg1, res1, iw, w);
     }
 
-    // Propagate dependencies from quadratures
-    fill(res1, res1+DAE_NUM_OUT, static_cast<bvec_t*>(0));
-    res1[DAE_QUAD] = res[INTEGRATOR_QF];
-    fill(arg1, arg1+DAE_NUM_IN, static_cast<bvec_t*>(0));
+    // Get dependencies from forward quadratures
+    fill_n(res1, DAE_NUM_OUT, static_cast<bvec_t*>(0));
+    fill_n(arg1, DAE_NUM_IN, static_cast<bvec_t*>(0));
+    res1[DAE_QUAD] = qf;
     arg1[DAE_X] = tmp_x;
     arg1[DAE_Z] = tmp_z;
-    arg1[DAE_P] = arg[INTEGRATOR_P];
-    if (nq_>0 && res[INTEGRATOR_QF]) {
-      f_.spAdj(arg1, res1, iw, w);
-    }
+    arg1[DAE_P] = p;
+    if (qf && nq_>0) f_.spAdj(arg1, res1, iw, w);
 
-    // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
-    copy(tmp_x, tmp_x+nx_+nz_, w);
-    fill_n(tmp_x, nx_+nz_, 0);
+    // Propagate interdependencies
     casadi_assert(!linsol_f_.isNull());
-    linsol_f_.spSolve(tmp_x, w, true);
+    fill_n(w, nx_+nz_, 0);
+    linsol_f_.spSolve(w, tmp_x, true);
+    copy(w, w+nx_+nz_, tmp_x);
 
-    // Propagate through f
+    // Direct dependency x0 -> xf
+    if (x0) for (int i=0; i<nx_; ++i) x0[i] |= tmp_x[i];
+
+    // Indirect dependency through f
     res1[DAE_ODE] = tmp_x;
-    res1[DAE_ALG] = tmp_x + nx_;
+    res1[DAE_ALG] = tmp_z;
     res1[DAE_QUAD] = 0;
-    arg1[DAE_X] = arg[INTEGRATOR_X0];
-    arg1[DAE_Z] = 0; // Note: Ignored, just a guess
+    arg1[DAE_X] = x0;
+    arg1[DAE_Z] = 0; // arg[INTEGRATOR_Z0] is a guess, no dependency
     f_.spAdj(arg1, res1, iw, w);
 
     log("IntegratorInternal::spAdj", "end");
