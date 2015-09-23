@@ -630,8 +630,8 @@ namespace casadi {
       }
 
       // Get dependencies from backward quadratures
-      fill_n(res1, RDAE_NUM_OUT, static_cast<bvec_t*>(0));
-      fill_n(arg1, RDAE_NUM_IN, static_cast<bvec_t*>(0));
+      fill(res1, res1+RDAE_NUM_OUT, static_cast<bvec_t*>(0));
+      fill(arg1, arg1+RDAE_NUM_IN, static_cast<bvec_t*>(0));
       res1[RDAE_QUAD] = rqf;
       arg1[RDAE_X] = tmp_x;
       arg1[RDAE_Z] = tmp_z;
@@ -660,8 +660,8 @@ namespace casadi {
     }
 
     // Get dependencies from forward quadratures
-    fill_n(res1, DAE_NUM_OUT, static_cast<bvec_t*>(0));
-    fill_n(arg1, DAE_NUM_IN, static_cast<bvec_t*>(0));
+    fill(res1, res1+DAE_NUM_OUT, static_cast<bvec_t*>(0));
+    fill(arg1, arg1+DAE_NUM_IN, static_cast<bvec_t*>(0));
     res1[DAE_QUAD] = qf;
     arg1[DAE_X] = tmp_x;
     arg1[DAE_Z] = tmp_z;
