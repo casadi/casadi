@@ -506,8 +506,12 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::
-  zz_densify(const Matrix<DataType>& val) const {
+  Matrix<DataType> Matrix<DataType>::zz_densify() const {
+    return densify(*this, 0);
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_densify(const Matrix<DataType>& val) const {
     // Check argument
     casadi_assert(val.isscalar());
 

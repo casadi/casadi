@@ -477,7 +477,7 @@ namespace casadi {
     std::vector<MX> zz_symvar() const;
     MX zz_nullspace() const;
     MX zz_repsum(int n, int m=1) const;
-    MX zz_densify(const MX& val) const;
+    MX zz_densify(const MX& val=0) const;
     ///@}
 
     ///@{

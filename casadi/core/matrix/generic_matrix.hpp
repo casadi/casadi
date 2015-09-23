@@ -389,7 +389,13 @@ namespace casadi {
 
     /** \brief  Make the matrix dense if not already
      */
-    inline friend MatType densify(const MatType& x, const MatType& val=0) {
+    inline friend MatType densify(const MatType& x) {
+      return x.zz_densify();
+    }
+
+    /** \brief  Make the matrix dense and assign nonzeros to a value
+     */
+    inline friend MatType densify(const MatType& x, const MatType& val) {
       return x.zz_densify(val);
     }
 
