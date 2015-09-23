@@ -72,6 +72,9 @@ namespace casadi {
     virtual void evalSXLinsol(const SXElement** arg, SXElement** res,
                               int* iw, SXElement* w, bool tr, int nrhs);
 
+    /** \brief Quickfix to avoid segfault, #1552 */
+    virtual bool canEvalSX() const {return true;}
+
     /// Evaluate SX
     virtual void evalSX(const SXElement** arg, SXElement** res,
                         int* iw, SXElement* w) {
