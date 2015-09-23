@@ -66,6 +66,7 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
 /// \name Option Functionality
 /// @{
 
+#ifndef SWIG
     /** \brief [DEPRECATED: pass option dictionary to function constructor]
     Set an option.
     For a list of options, check the class documentation of this class.
@@ -92,6 +93,7 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
 
     /** \brief  check if the user has there is an option str */
     bool hasSetOption(const std::string &str) const;
+#endif // SWIG
 
     /** \brief  Print options to a stream */
     void printOptions(std::ostream &stream=casadi::userOut()) const;

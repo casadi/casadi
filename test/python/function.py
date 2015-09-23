@@ -550,10 +550,6 @@ class Functiontests(casadiTestCase):
         z1 = x+z0
         z2 = sin(z1)
         return [z2]
-
-      with warnings.catch_warnings():
-        warnings.filterwarnings("ignore",category=DeprecationWarning)
-        Fun.init()
       
       if not indirect: 
         Fun.setInput(0.2,0)

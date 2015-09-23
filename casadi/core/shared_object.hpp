@@ -142,6 +142,7 @@ namespace casadi {
     void printPtr(std::ostream &stream=casadi::userOut()) const;
     /// \endcond
 
+#ifndef SWIG
     /** \brief [DEPRECATED] Initialize or re-initialize the object:
     *
     * more documentation in the node class (SharedObjectNode and derived classes)
@@ -150,6 +151,7 @@ namespace casadi {
 
     /// Is initialized?
     bool isInit() const;
+#endif // SWIG
 
     /// \cond INTERNAL
     /// Assert that it is initialized
