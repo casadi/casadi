@@ -72,10 +72,7 @@ int main(){
   SX f = inner_prod(u,u);
 
   // Terminal constraints
-  SX g;
-  g.append(s);
-  g.append(v);
-  g.append(v_traj);
+  SX g = vertcat(s, v, v_traj);
 
   // Create an NLP
   SXFunction nlp("nlp", nlpIn("x", u), nlpOut("f", f, "g", g));
