@@ -229,7 +229,13 @@
 %exception  casadi::check_exposed(T t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::diffTimers(const timer t1, const timer t0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::getRealTime() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::getTimerTime(void) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::hash_combine(std::size_t &seed, T v) {
@@ -275,6 +281,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::slicot_periodic_schur(int n, int K, const std::vector< double > &a, std::vector< double > &t, std::vector< double > &z, std::vector< double > &eig_real, std::vector< double > &eig_imag, double num_zero=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::timerPlusEq(diffTime &t, const diffTime diff) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  snoptProblem::setLog(isnLog snLog, isnLog2 snLog2, isqLog sqLog) {

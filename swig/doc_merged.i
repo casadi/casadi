@@ -49549,6 +49549,8 @@ Output arguments of a dle solver
 
 ";
 
+%feature("docstring") casadi::timerPlusEq "[INTERNAL] ";
+
 %feature("docstring") casadi::hash_combine "
 
 >  void hash_combine(std.size_t &seed, T v)
@@ -49658,6 +49660,8 @@ Input arguments of a SDQP problem
 +------------------------+------------------------+------------------------+
 
 ";
+
+%feature("docstring") casadi::getTimerTime "[INTERNAL] ";
 
 %feature("docstring") casadi::read_matlab "
 
@@ -50526,6 +50530,8 @@ Input arguments of a dle solver
 Get typename.
 
 ";
+
+%feature("docstring") casadi::diffTimers "[INTERNAL] ";
 
 %feature("docstring") casadi::socpOut "
 

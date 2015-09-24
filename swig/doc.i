@@ -63116,6 +63116,9 @@ Output arguments of a dle solver
 
 ";
 
+%feature("docstring")  casadi::timerPlusEq(diffTime &t, const diffTime diff)
+" [INTERNAL] ";
+
 %feature("docstring")  casadi::hash_combine(std::size_t &seed, T v) "
 [INTERNAL]  Generate a hash value incrementally (function taken from boost)
 
@@ -63239,6 +63242,8 @@ Input arguments of a SDQP problem
 +------------------------+------------------------+------------------------+
 
 ";
+
+%feature("docstring")  casadi::getTimerTime(void) "[INTERNAL] ";
 
 %feature("docstring")  casadi::read_matlab(std::istream &stream,
 std::vector< T > &v) "
@@ -64227,6 +64232,9 @@ Input arguments of a dle solver
 Get typename.
 
 ";
+
+%feature("docstring")  casadi::diffTimers(const timer t1, const timer t0) "
+[INTERNAL] ";
 
 %feature("docstring")  casadi::socpOut(const std::string &n0="", const M
 &x0=M(), const std::string &n1="", const M &x1=M(), const std::string
