@@ -276,7 +276,16 @@ for d in r.findall('*//namespace/cdecl'):
   name = d.find('attributelist/attribute[@name="name"]').attrib["value"]
   if dname == "dummy": continue
   code = ""
-  if "friendwrap" in name:
+  isIOSchemeHelper = False
+  friendwrap = "friendwrap" in name
+
+  maybeCode = d.find('attributelist/attribute[@name="code"]')
+  if maybeCode is not None:
+    msg = '// This comment lets the haskell bindings know this is a scheme helper'
+    if msg in maybeCode.attrib['value']:
+      isIOSchemeHelper = True
+
+  if friendwrap:
     dname= "casadi_" + dname
     code = d.find('attributelist/attribute[@name="code"]').attrib["value"]
     argnames = [i.attrib["value"] for i in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="name"]')]
@@ -314,7 +323,14 @@ for d in r.findall('*//namespace/cdecl'):
     continue
   docs = getDocstring(d)
 
-  functions.append((dname,params,rettype,docs,code))
+  functions.append({'funName':dname,
+                    'funParams':params,
+                    'funReturn':rettype,
+                    'funCode':code,
+                    'funDocs':"",#docs,
+                    'funDocslink':"",
+                    'funIsIOSchemeHelper':isIOSchemeHelper,
+                    'funFriendwrap':friendwrap})
 
 
 
@@ -354,8 +370,7 @@ for k,v in classes.items():
 print "elpased", time.time()-t0
 t0 = time.time()
 print "functions"
-for (name,pars,rettype,docs,code) in functions:
-  treedata["treeFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":docs,"funDocslink":"","funCode":code})
+treedata["treeFunctions"] = functions
 print "elpased", time.time()-t0
 t0 = time.time()
 print "enums"
