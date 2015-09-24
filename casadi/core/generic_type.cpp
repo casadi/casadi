@@ -58,10 +58,14 @@ namespace casadi {
       return isBool() || isInt() || isDouble();
     case OT_BOOLVECTOR:
       return isIntVector() || isDoubleVector();
-    case OT_INTEGER: case OT_REAL:
+    case OT_INTEGER:
+    case OT_REAL:
       return isInt() || isDouble();
-    case OT_INTEGERVECTOR: case OT_REALVECTOR:
+    case OT_INTEGERVECTOR:
+    case OT_REALVECTOR:
       return isDoubleVector() || isIntVector();
+    case OT_STRINGVECTOR:
+      return isStringVector() || isString();
     default:
       return getType() == other;
     }
@@ -272,14 +276,17 @@ namespace casadi {
   }
 
   const std::vector<std::vector<int> >& GenericType::asIntVectorVector() const {
+    casadi_assert(isIntVectorVector());
     return static_cast<const IntVectorVectorType*>(get())->d_;
   }
 
   const std::vector<double>& GenericType::asDoubleVector() const {
+    casadi_assert(isDoubleVector());
     return static_cast<const DoubleVectorType*>(get())->d_;
   }
 
   const std::vector<std::string>& GenericType::asStringVector() const {
+    casadi_assert(isStringVector());
     return static_cast<const StringVectorType*>(get())->d_;
   }
 
@@ -362,8 +369,13 @@ namespace casadi {
   }
 
   vector<string> GenericType::toStringVector() const {
-    casadi_assert_message(isStringVector(), "type mismatch");
-    return asStringVector();
+    if (isString()) {
+      std::string s = asString();
+      return vector<string>(1, s);
+    } else {
+      casadi_assert_message(isStringVector(), "type mismatch");
+      return asStringVector();
+    }
   }
 
   Dict GenericType::toDict() const {

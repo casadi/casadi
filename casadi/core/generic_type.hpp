@@ -98,13 +98,13 @@ namespace casadi {
     operator bool() const { return toBool();}
     operator int() const { return toInt();}
     operator double() const { return toDouble();}
-    operator const std::string& () const { return asString();}
-    operator const std::vector<int>& () const { return asIntVector();}
-    operator const std::vector<std::vector<int> >& () const { return asIntVectorVector();}
-    operator const std::vector<double>& () const { return asDoubleVector();}
-    operator const std::vector<std::string>& () const { return asStringVector();}
-    operator const Function& () const { return asFunction();}
-    operator const Dict& () const { return asDict();}
+    operator std::string() const { return toString();}
+    operator std::vector<int>() const { return toIntVector();}
+    operator std::vector<std::vector<int> >() const { return toIntVectorVector();}
+    operator std::vector<double>() const { return toDoubleVector();}
+    operator std::vector<std::string>() const { return toStringVector();}
+    operator const Function&() const { return asFunction();}
+    operator const Dict&() const { return asDict();}
     operator const DerivativeGenerator& () const { return asDerivativeGenerator();}
     operator const Callback& () const { return asCallback();}
     ///@}

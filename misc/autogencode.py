@@ -131,7 +131,7 @@ class Enum:
     for i, (name, doc, enum) in enumerate(self.entries):
       s+="""\n    const std::string &n%d ="", const M &x%d =M()""" % (i,i) + ","
     s=s[:-1] + ") {\n"
-
+    s+= "  // This comment lets the haskell bindings know this is a scheme helper\n"
     s+= "  std::map<std::string, M> m;\n"
     for i,_ in enumerate(self.entries):
       s+="""  if (!n%d.empty()) m[n%d]=x%d;\n""" % (i,i,i)

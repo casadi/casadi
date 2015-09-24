@@ -256,7 +256,7 @@ class MXConstantArtist(DotArtist):
     M = s.getMatrixValue()
     col = "#009900"
     if s.nnz() == s.numel() and s.nnz() == 1:
-      graph.add_node(pydot.Node(str(self.s.__hash__())+":f0",label=M[0,0],shape='rectangle',color=col))
+      graph.add_node(pydot.Node(str(self.s.__hash__())+":f0",label=str(M[0,0]),shape='rectangle',color=col))
     else:
       # The Matrix grid is represented by a html table with 'ports'
       label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="%s">' % col

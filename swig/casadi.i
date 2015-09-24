@@ -571,6 +571,9 @@ import_array();
 
     // Same as the above, but with reference instead of pointer
     template<typename M> GUESTOBJECT* from_ref(const M& m) { return from_ptr(&m);}
+
+    // Same as the above, but with a temporary object
+    template<typename M> GUESTOBJECT* from_tmp(M m) { return from_ptr(&m);}
 #ifdef SWIGMATLAB
     // Get sparsity pattern
     Sparsity getSparsity(const mxArray* p);
@@ -1357,16 +1360,16 @@ import_array();
 
     GUESTOBJECT * from_ptr(const GenericType *a) {
       switch (a->getType()) {
-      case OT_BOOLEAN: return from_ptr(&a->asBool());
-      case OT_INTEGER: return from_ptr(&a->asInt());
-      case OT_REAL: return from_ptr(&a->asDouble());
-      case OT_STRING: return from_ptr(&a->asString());
-      case OT_INTEGERVECTOR: return from_ptr(&a->asIntVector());
-      case OT_INTEGERVECTORVECTOR: return from_ptr(&a->asIntVectorVector());
-      case OT_REALVECTOR: return from_ptr(&a->asDoubleVector());
-      case OT_STRINGVECTOR: return from_ptr(&a->asStringVector());
-      case OT_DICT: return from_ptr(&a->asDict());
-      case OT_FUNCTION: return from_ptr(&a->asFunction());
+      case OT_BOOLEAN: return from_tmp(a->asBool());
+      case OT_INTEGER: return from_tmp(a->asInt());
+      case OT_REAL: return from_tmp(a->asDouble());
+      case OT_STRING: return from_tmp(a->asString());
+      case OT_INTEGERVECTOR: return from_tmp(a->asIntVector());
+      case OT_INTEGERVECTORVECTOR: return from_tmp(a->asIntVectorVector());
+      case OT_REALVECTOR: return from_tmp(a->asDoubleVector());
+      case OT_STRINGVECTOR: return from_tmp(a->asStringVector());
+      case OT_DICT: return from_tmp(a->asDict());
+      case OT_FUNCTION: return from_tmp(a->asFunction());
 #ifdef SWIGPYTHON
       case OT_NULL: return Py_None;
 #endif // SWIGPYTHON
@@ -3782,7 +3785,7 @@ def pyfunction(inputs,outputs):
 
   return wrap
 
-def PyFunction(obj,inputs,outputs):
+def PyFunction(name, obj, inputs, outputs, opts={}):
     @pyevaluate
     def fcustom(f):
       res = [f.getOutput(i) for i in range(f.nOut())]
@@ -3793,20 +3796,16 @@ def PyFunction(obj,inputs,outputs):
 
     with warnings.catch_warnings():
       warnings.filterwarnings("ignore",category=DeprecationWarning)
-      Fun = CustomFunction(fcustom,inputs,outputs)
-      Fun.setOption("name","CustomFunction")
       if hasattr(obj,'getDerForward'):
         @pyderivativegenerator
         def derivativewrap(f,nfwd):
           return obj.getDerForward(f,nfwd)
-        Fun.setOption("custom_forward",derivativewrap)
-
+        opts["custom_forward"] = derivativewrap
       if hasattr(obj,'getDerReverse'):
         @pyderivativegenerator
         def derivativewrap(f,adj):
           return obj.getDerReverse(f,adj)
-        Fun.setOption("custom_reverse",derivativewrap)
-
+        opts["custom_reverse"] = derivativewrap
       if hasattr(obj,'fwd'):
         @pyderivativegenerator
         def derivativewrapFwd(f,nfwd):
@@ -3828,13 +3827,10 @@ def PyFunction(obj,inputs,outputs):
 
           with warnings.catch_warnings():
             warnings.filterwarnings("ignore",category=DeprecationWarning)
-            
-            DerFun = CustomFunction(der,inputs+outputs+nfwd*inputs,nfwd*outputs)
-            DerFun.setOption("name","CustomFunction_derivative")
-            DerFun.init()
-            return DerFun
+            return CustomFunction("CustomFunction_derivative", der,
+                                  inputs+outputs+nfwd*inputs, nfwd*outputs)
 
-        Fun.setOption("custom_forward",derivativewrapFwd)
+        opts["custom_forward"] = derivativewrapFwd
 
       if hasattr(obj,'adj'):
         @pyderivativegenerator
@@ -3858,17 +3854,13 @@ def PyFunction(obj,inputs,outputs):
           with warnings.catch_warnings():
             warnings.filterwarnings("ignore",category=DeprecationWarning)
       
-            DerFun = CustomFunction(der,inputs+outputs+nadj*outputs,nadj*inputs)
-            DerFun.setOption("name","CustomFunction_derivative")
-            DerFun.init()
-            return DerFun
+            return CustomFunction("CustomFunction_derivative", der,
+                                  inputs+outputs+nadj*outputs,nadj*inputs)
 
-        Fun.setOption("custom_reverse",derivativewrapAdj)
-      with warnings.catch_warnings():
-        warnings.filterwarnings("ignore",category=DeprecationWarning)
-        Fun.init()
+        opts["custom_reverse"] = derivativewrapAdj
 
-      return Fun
+      return CustomFunction("CustomFunction", fcustom,
+                            inputs, outputs, opts)
 
 %}
 #endif

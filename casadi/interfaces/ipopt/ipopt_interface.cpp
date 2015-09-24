@@ -515,10 +515,26 @@ namespace casadi {
         std::make_tuple("eval_h", n_eval_h_, t_eval_h_));
 
       // These guys get -1 calls to supress that part of the printout.
+      diffTime t_all_functions = {0.0, 0.0};
+      timerPlusEq(t_all_functions, t_eval_f_);
+      timerPlusEq(t_all_functions, t_eval_grad_f_);
+      timerPlusEq(t_all_functions, t_eval_g_);
+      timerPlusEq(t_all_functions, t_eval_jac_g_);
+      timerPlusEq(t_all_functions, t_eval_h_);
+      times.push_back(
+        std::make_tuple("all previous", -1, t_all_functions));
+      diffTime t_ipopt;
+      t_ipopt.proc = t_mainloop_.proc - t_all_functions.proc
+        - t_callback_prepare_.proc - t_callback_fun_.proc;
+      t_ipopt.wall = t_mainloop_.wall - t_all_functions.wall
+        - t_callback_prepare_.wall - t_callback_fun_.wall;
+
       times.push_back(
         std::make_tuple("callback prep", n_eval_callback_, t_callback_prepare_));
       times.push_back(
         std::make_tuple("callback", n_eval_callback_, t_callback_fun_));
+      times.push_back(
+        std::make_tuple("ipopt", -1, t_ipopt));
       times.push_back(
         std::make_tuple("main loop", -1, t_mainloop_));
 

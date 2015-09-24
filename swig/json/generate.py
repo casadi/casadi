@@ -167,7 +167,7 @@ def getCanonicalType(x):
     return ''.join(q)+symnameToName[v]
   else:
     return x
-  
+
 def getCanonicalParams(d,debug=""):
   params = []
   if d.find('attributelist/parmlist') is not None:
@@ -276,26 +276,18 @@ for d in r.findall('*//namespace/cdecl'):
   name = d.find('attributelist/attribute[@name="name"]').attrib["value"]
   if dname == "dummy": continue
   code = ""
-  if "friendwrap" in name:
+  isIOSchemeHelper = False
+  friendwrap = "friendwrap" in name
+
+  maybeCode = d.find('attributelist/attribute[@name="code"]')
+  if maybeCode is not None:
+    msg = '// This comment lets the haskell bindings know this is a scheme helper'
+    if msg in maybeCode.attrib['value']:
+      isIOSchemeHelper = True
+
+  if friendwrap:
     dname= "casadi_" + dname
-    code = d.find('attributelist/attribute[@name="code"]').attrib["value"]
-    argnames = [i.attrib["value"] for i in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="name"]')]
-    
-    for i,arg in enumerate(argnames):
-      code = re.sub(r"\b%s\b" % arg,"x%d_" % i,code)
-    code = code[1:-1]
-    code = code.replace(";","")
-    code = code.replace("return","")
-    
-    if re.search(r"\w\(",code):
-      code_args = code.split(",")
-      if len(code_args)>len(argnames):
-        code_args = code_args[:len(argnames)]
-        code = ",".join(code_args)+")"
-        
-    code = code.strip()
-        
-    
+
   if my_module != getModule(d): continue
   if isInternal(d,msg="functions"):
     numInternalFunctions += 1
@@ -314,7 +306,13 @@ for d in r.findall('*//namespace/cdecl'):
     continue
   docs = getDocstring(d)
 
-  functions.append((dname,params,rettype,docs,code))
+  functions.append({'funName':dname,
+                    'funParams':params,
+                    'funReturn':rettype,
+                    'funDocs':"",#docs,
+                    'funDocslink':"",
+                    'funIsIOSchemeHelper':isIOSchemeHelper,
+                    'funFriendwrap':friendwrap})
 
 
 
@@ -354,8 +352,7 @@ for k,v in classes.items():
 print "elpased", time.time()-t0
 t0 = time.time()
 print "functions"
-for (name,pars,rettype,docs,code) in functions:
-  treedata["treeFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":docs,"funDocslink":"","funCode":code})
+treedata["treeFunctions"] = functions
 print "elpased", time.time()-t0
 t0 = time.time()
 print "enums"

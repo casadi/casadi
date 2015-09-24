@@ -65,6 +65,14 @@ namespace casadi {
       casadi_error("cannot happen.");
     }
 
+    #ifndef WITH_OPENMP
+    if (parallelization_ == PARALLELIZATION_OMP) {
+      casadi_warning("CasADi was not compiled with OpenMP." <<
+                     "Falling back to serial mode.");
+      parallelization_ = PARALLELIZATION_SERIAL;
+    }
+    #endif // WITH_OPENMP
+
     // OpenMP not yet supported for non-repeated outputs
     bool non_repeated_output = false;
     for (int i=0;i<repeat_out_.size();++i) {
@@ -76,14 +84,6 @@ namespace casadi {
                      "Falling back to serial mode.");
       parallelization_ = PARALLELIZATION_SERIAL;
     }
-    #ifndef WITH_OPENMP
-    if (parallelization_ == PARALLELIZATION_OMP) {
-      casadi_warning("CasADi was not compiled with OpenMP." <<
-                     "Falling back to serial mode.");
-      parallelization_ = PARALLELIZATION_SERIAL;
-    }
-    #endif // WITH_OPENMP
-
     int num_in = f_.nIn(), num_out = f_.nOut();
 
     // Initialize the functions, get input and output sparsities
