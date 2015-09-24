@@ -31,6 +31,13 @@ namespace casadi {
   Map::Map() {
   }
 
+  Map::Map(const std::string& name, const Function& f, int n, const Dict& opts) {
+    assignNode(MapBase::create(f, n, opts));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
   Map::Map(const std::string& name, const Function& f,
                  int n,
                  const std::vector<bool> &repeat_in,

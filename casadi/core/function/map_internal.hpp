@@ -33,15 +33,108 @@
 
 namespace casadi {
 
-  /** Map statement
+  /** A map Base class for different map operations
+      \author Joel Andersson
+      \date 2015
+  */
+  class CASADI_EXPORT MapBase : public FunctionInternal {
+  public:
+    // Create function (use instead of constructor)
+    static MapBase* create(const Function& f, int n, const Dict& opts);
+
+    /** \brief  Destructor */
+    virtual ~MapBase();
+
+    /** \brief  Initialize */
+    virtual void init();
+
+  protected:
+    // Constructor (protected, use create function above)
+    MapBase(const Function& f, int n);
+
+    // The function which is to be evaluated in parallel
+    Function f_;
+
+    /// Number of Function inputs
+    int n_in_;
+
+    /// Number of Function outputs
+    int n_out_;
+
+    // Number of times to evaluate this function
+    int n_;
+  };
+
+  /** A map Map for evaluating a function serially
+      \author Joel Andersson
+      \date 2015
+  */
+  class CASADI_EXPORT MapSerial : public MapBase {
+    friend class MapBase;
+  protected:
+    // Constructor (protected, use create function in MapBase)
+    MapSerial(const Function& f, int n) : MapBase(f, n) {}
+
+    /** \brief  Destructor */
+    virtual ~MapSerial();
+
+    /** \brief  clone function */
+    virtual MapSerial* clone() const { return new MapSerial(*this);}
+
+    /** \brief  Evaluate numerically, work vectors given */
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief  evaluate symbolically while also propagating directional derivatives */
+    virtual void evalSX(const SXElement** arg, SXElement** res,
+                        int* iw, SXElement* w);
+
+    /** \brief  Propagate sparsity forward */
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+
+    /** \brief  Initialize */
+    virtual void init();
+  };
+
+#ifndef WITH_OPENMP
+  /** A map Evaluate in parallel using OpenMP
+      Inherits from MapSerial to allow fallback to serial methods
+      \author Joel Andersson
+      \date 2015
+  */
+  class CASADI_EXPORT MapOmp : public MapSerial {
+    friend class MapBase;
+  protected:
+    // Constructor (protected, use create function in MapBase)
+    MapOmp(const Function& f, int n) : MapSerial(f, n) {}
+
+    /** \brief  clone function */
+    virtual MapOmp* clone() const { return new MapOmp(*this);}
+
+    /** \brief  Destructor */
+    virtual ~MapOmp();
+
+    /// Evaluate the function numerically
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief  Initialize */
+    virtual void init();
+  };
+#endif // WITH_OPENMP
+
+  /** A map operation that can also reduce certain arguments
       \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT MapReduce : public FunctionInternal {
-    friend class Map;
+  class CASADI_EXPORT MapReduce : public MapBase {
   public:
-
-    enum ParallelizationType {PARALLELIZATION_SERIAL, PARALLELIZATION_OMP};
+    /** Types of parallelization supported */
+    enum ParallelizationType {
+      PARALLELIZATION_SERIAL,
+      PARALLELIZATION_OMP
+    };
 
     /** \brief Constructor (generic map) */
     MapReduce(const Function& f, int n,
@@ -100,11 +193,6 @@ namespace casadi {
 
     /** \brief Generate code for the body of the C function */
     virtual void generateBody(CodeGenerator& g) const;
-
-    // Default case;
-    Function f_;
-
-    int n_;
 
     /// Indicate which inputs are repeated
     std::vector<bool> repeat_in_;

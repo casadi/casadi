@@ -30,13 +30,130 @@ using namespace std;
 
 namespace casadi {
 
-  MapReduce::MapReduce(const Function& f, int n,
-                           const std::vector<bool> &repeat_in,
-                           const std::vector<bool> &repeat_out)
-    : f_(f), n_(n), repeat_in_(repeat_in), repeat_out_(repeat_out) {
+  MapBase* MapBase::create(const Function& f, int n, const Dict& opts) {
+    // Check if there are reduced inputs or outputs
+    bool reduce_inputs = opts.find("reduced_inputs")!=opts.end();
+    bool reduce_outputs = opts.find("reduced_outputs")!=opts.end();
+
+    if (reduce_inputs || reduce_outputs) {
+      // Vector indicating which inputs/outputs are to be repeated
+      std::vector<bool> repeat_in(f.nIn(), true), repeat_out(f.nOut(), true);
+
+      // Mark reduced inputs
+      if (reduce_inputs) {
+        vector<int> ri = opts.find("reduced_inputs")->second;
+        for (vector<int>::const_iterator i=ri.begin(); i!=ri.end(); ++i) {
+          repeat_in[*i]=false;
+        }
+      }
+
+      // Mark reduced outputs
+      if (reduce_inputs) {
+        vector<int> ro = opts.find("reduced_outputs")->second;
+        for (vector<int>::const_iterator i=ro.begin(); i!=ro.end(); ++i) {
+          repeat_out[*i]=false;
+        }
+      }
+
+      // Call constructor
+      return new MapReduce(f, n, repeat_in, repeat_out);
+    }
+
+    // Read the type of parallelization
+    Dict::const_iterator par_op = opts.find("parallelization");
+    if (par_op==opts.end() || par_op->second == "serial") {
+      return new MapSerial(f, n);
+    } else {
+      casadi_assert(par_op->second == "openmp");
+#ifdef WITH_OPENMP
+      return new MapOmp(f, n);
+#else // WITH_OPENMP
+      casadi_warning("CasADi was not compiled with OpenMP. "
+                     "Falling back to serial mode.");
+      return new MapSerial(f, n);
+#endif // WITH_OPENMP
+    }
+  }
+
+  MapBase::MapBase(const Function& f, int n)
+    : f_(f), n_in_(f.nIn()), n_out_(f.nOut()), n_(n) {
 
     addOption("parallelization", OT_STRING, "serial",
               "Computational strategy for parallelization", "serial|openmp");
+    addOption("reduced_inputs", OT_INTEGERVECTOR, GenericType(),
+              "Reduction for certain inputs");
+    addOption("reduced_outputs", OT_INTEGERVECTOR, GenericType(),
+              "Reduction for certain outputs");
+
+    // Give a name
+    setOption("name", "unnamed_map");
+  }
+
+  MapBase::~MapBase() {
+  }
+
+  MapSerial::~MapSerial() {
+  }
+
+  void MapSerial::init() {
+    // Call the initialization method of the base class
+    MapBase::init();
+
+    // Allocate sufficient memory for serial evaluation
+    alloc_arg(f_.sz_arg());
+    alloc_res(f_.sz_res());
+    alloc_w(f_.sz_w());
+    alloc_iw(f_.sz_iw());
+  }
+
+  void MapSerial::evalD(const double** arg, double** res, int* iw, double* w) {
+    int n_in = n_in_, n_out = n_out_;
+    const double** arg1 = arg+nIn();
+    double** res1 = res+nOut();
+    for (int i=0; i<n_; ++i) {
+      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
+      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      f_->evalD(arg1, res1, iw, w);
+    }
+  }
+
+  void MapSerial::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+    int n_in = n_in_, n_out = n_out_;
+    const SXElement** arg1 = arg+nIn();
+    SXElement** res1 = res+nOut();
+    for (int i=0; i<n_; ++i) {
+      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
+      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      f_->evalSX(arg1, res1, iw, w);
+    }
+  }
+
+  void MapSerial::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    int n_in = n_in_, n_out = n_out_;
+    const bvec_t** arg1 = arg+nIn();
+    bvec_t** res1 = res+nOut();
+    for (int i=0; i<n_; ++i) {
+      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
+      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      f_->spFwd(arg1, res1, iw, w);
+    }
+  }
+
+  void MapSerial::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    int n_in = n_in_, n_out = n_out_;
+    bvec_t** arg1 = arg+nIn();
+    bvec_t** res1 = res+nOut();
+    for (int i=0; i<n_; ++i) {
+      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
+      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      f_->spAdj(arg1, res1, iw, w);
+    }
+  }
+
+  MapReduce::MapReduce(const Function& f, int n,
+                       const std::vector<bool> &repeat_in,
+                       const std::vector<bool> &repeat_out)
+    : MapBase(f, n), repeat_in_(repeat_in), repeat_out_(repeat_out) {
 
     casadi_assert_message(repeat_in_.size()==f.nIn(),
                           "MapReduce expected repeat_in of size " << f.nIn() <<
@@ -46,11 +163,16 @@ namespace casadi {
                           "MapReduce expected repeat_out of size " << f.nOut() <<
                           ", but got " << repeat_out_.size() << " instead.");
 
-    // Give a name
-    setOption("name", "unnamed_map");
   }
 
   MapReduce::~MapReduce() {
+
+  }
+
+  void MapBase::init() {
+    // Call the initialization method of the base class
+    FunctionInternal::init();
+
   }
 
   void MapReduce::init() {
@@ -127,7 +249,7 @@ namespace casadi {
     }
 
     // Call the initialization method of the base class
-    FunctionInternal::init();
+    MapBase::init();
 
     // Allocate some space to evaluate each function to.
     nnz_out_ = 0;
@@ -412,5 +534,39 @@ namespace casadi {
   void MapReduce::print(ostream &stream) const {
     stream << "Map(" << name(f_) << ", " << n_ << ")";
   }
+
+#ifdef WITH_OPENMP
+
+  MapOmp::~MapOmp() {
+  }
+
+  void MapOmp::evalD(const double** arg, double** res, int* iw, double* w) {
+    size_t sz_arg, sz_res, sz_iw, sz_w;
+    f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+#pragma omp parallel for
+    for (int i=0; i<n_; ++i) {
+      int n_in = n_in_, n_out = n_out_;
+      const double** arg_i = arg + n_in*n_ + sz_arg*i;
+      copy(arg+i*n_in, arg+(i+1)*n_in, arg_i);
+      double** res_i = res + n_out*n_ + sz_res*i;
+      copy(res+i*n_out, res+(i+1)*n_out, res_i);
+      int* iw_i = iw + i*sz_iw;
+      double* w_i = w + i*sz_w;
+      f_->evalD(arg_i, res_i, iw_i, w_i);
+    }
+  }
+
+  void MapOmp::init() {
+    // Call the initialization method of the base class
+    MapSerial::init();
+
+    // Allocate sufficient memory for parallel evaluation
+    alloc_arg(f_.sz_arg() * n_);
+    alloc_res(f_.sz_res() * n_);
+    alloc_w(f_.sz_w() * n_);
+    alloc_iw(f_.sz_iw() * n_);
+  }
+
+#endif // WITH_OPENMP
 
 } // namespace casadi
