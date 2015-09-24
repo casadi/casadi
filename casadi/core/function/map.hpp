@@ -42,13 +42,16 @@ namespace casadi {
     /** \brief Default constructor */
     Map();
 
+    /** \brief Constructor (any type of map) */
+    Map(const std::string& name, const Function& f, int n,
+        const Dict& opts=Dict());
+
     /** \brief Constructor (generic map) */
     Map(const std::string& name, const Function& f,
            int n,
            const std::vector<bool> &repeat_in,
            const std::vector<bool> &repeat_out,
            const Dict& opts=Dict());
-
 
     /** \brief  Access functions of the node */
     MapReduce* operator->();
