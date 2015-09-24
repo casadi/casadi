@@ -37,21 +37,21 @@ namespace casadi {
       \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT MapInternal : public FunctionInternal {
+  class CASADI_EXPORT MapReduce : public FunctionInternal {
     friend class Map;
   public:
 
     enum ParallelizationType {PARALLELIZATION_SERIAL, PARALLELIZATION_OMP};
 
     /** \brief Constructor (generic map) */
-    MapInternal(const Function& f, int n,
+    MapReduce(const Function& f, int n,
       const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out);
 
     /** \brief  clone function */
-    virtual MapInternal* clone() const { return new MapInternal(*this);}
+    virtual MapReduce* clone() const { return new MapReduce(*this);}
 
     /** \brief  Destructor */
-    virtual ~MapInternal();
+    virtual ~MapReduce();
 
     /** \brief  Initialize */
     virtual void init();

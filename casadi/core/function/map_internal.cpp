@@ -30,7 +30,7 @@ using namespace std;
 
 namespace casadi {
 
-  MapInternal::MapInternal(const Function& f, int n,
+  MapReduce::MapReduce(const Function& f, int n,
                            const std::vector<bool> &repeat_in,
                            const std::vector<bool> &repeat_out)
     : f_(f), n_(n), repeat_in_(repeat_in), repeat_out_(repeat_out) {
@@ -39,21 +39,21 @@ namespace casadi {
               "Computational strategy for parallelization", "serial|openmp");
 
     casadi_assert_message(repeat_in_.size()==f.nIn(),
-                          "MapInternal expected repeat_in of size " << f.nIn() <<
+                          "MapReduce expected repeat_in of size " << f.nIn() <<
                           ", but got " << repeat_in_.size() << " instead.");
 
     casadi_assert_message(repeat_out_.size()==f.nOut(),
-                          "MapInternal expected repeat_out of size " << f.nOut() <<
+                          "MapReduce expected repeat_out of size " << f.nOut() <<
                           ", but got " << repeat_out_.size() << " instead.");
 
     // Give a name
     setOption("name", "unnamed_map");
   }
 
-  MapInternal::~MapInternal() {
+  MapReduce::~MapReduce() {
   }
 
-  void MapInternal::init() {
+  void MapReduce::init() {
 
     std::string parallelization = getOption("parallelization").toString();
 
@@ -148,7 +148,7 @@ namespace casadi {
   }
 
   template<typename T, typename R>
-  void MapInternal::evalGen(const T** arg, T** res, int* iw, T* w,
+  void MapReduce::evalGen(const T** arg, T** res, int* iw, T* w,
                             void (FunctionInternal::*eval)(const T** arg, T** res, int* iw, T* w),
                             R reduction) {
     int num_in = f_.nIn(), num_out = f_.nOut();
@@ -198,7 +198,7 @@ namespace casadi {
     }
   }
 
-  void MapInternal::evalD(const double** arg, double** res,
+  void MapReduce::evalD(const double** arg, double** res,
                           int* iw, double* w) {
     if (parallelization_ == PARALLELIZATION_SERIAL) {
       evalGen<double>(arg, res, iw, w, &FunctionInternal::eval, std::plus<double>());
@@ -228,14 +228,14 @@ namespace casadi {
     }
   }
 
-  void MapInternal::evalSX(const SXElement** arg, SXElement** res,
+  void MapReduce::evalSX(const SXElement** arg, SXElement** res,
                            int* iw, SXElement* w) {
     evalGen<SXElement>(arg, res, iw, w, &FunctionInternal::evalSX, std::plus<SXElement>());
   }
 
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
-  void MapInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void MapReduce::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     evalGen<bvec_t>(arg, res, iw, w, &FunctionInternal::spFwd, &Orring);
   }
 
@@ -244,7 +244,7 @@ namespace casadi {
      }*/
 
   /**
-     void MapInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+     void MapReduce::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
      int num_in = f_.nIn(), num_out = f_.nOut();
 
      // split arguments
@@ -288,7 +288,7 @@ namespace casadi {
      }
   */
 
-  Function MapInternal
+  Function MapReduce
   ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
 
     // Differentiate mapped function
@@ -318,7 +318,7 @@ namespace casadi {
     return Map(name, df, n_, repeat_in, repeat_out, opts);
   }
 
-  Function MapInternal
+  Function MapReduce
   ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.derReverse(nadj);
@@ -347,11 +347,11 @@ namespace casadi {
     return Map(name, df, n_, repeat_in, repeat_out, opts);
   }
 
-  void MapInternal::generateDeclarations(CodeGenerator& g) const {
+  void MapReduce::generateDeclarations(CodeGenerator& g) const {
     f_->addDependency(g);
   }
 
-  void MapInternal::generateBody(CodeGenerator& g) const {
+  void MapReduce::generateBody(CodeGenerator& g) const {
 
     int num_in = f_.nIn(), num_out = f_.nOut();
 
@@ -408,7 +408,7 @@ namespace casadi {
     }
   }
 
-  void MapInternal::print(ostream &stream) const {
+  void MapReduce::print(ostream &stream) const {
     stream << "Map(" << name(f_) << ", " << n_ << ")";
   }
 
