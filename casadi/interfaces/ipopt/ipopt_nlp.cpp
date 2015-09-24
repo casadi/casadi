@@ -25,7 +25,6 @@
 
 #include "ipopt_nlp.hpp"
 #include "ipopt_interface.hpp"
-#include <ctime>
 #include "casadi/core/timing.hpp"
 
 namespace casadi {
