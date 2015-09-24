@@ -98,7 +98,7 @@ namespace casadi {
     virtual void init();
   };
 
-#ifndef WITH_OPENMP
+#ifdef WITH_OPENMP
   /** A map Evaluate in parallel using OpenMP
       Inherits from MapSerial to allow fallback to serial methods
       \author Joel Andersson
