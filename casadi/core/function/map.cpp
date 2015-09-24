@@ -36,22 +36,22 @@ namespace casadi {
                  const std::vector<bool> &repeat_in,
                  const std::vector<bool> &repeat_out,
                  const Dict& opts) {
-    assignNode(new MapInternal(f, n, repeat_in, repeat_out));
+    assignNode(new MapReduce(f, n, repeat_in, repeat_out));
     setOption("name", name);
     setOption(opts);
     init();
   }
 
-  MapInternal* Map::operator->() {
-    return static_cast<MapInternal*>(Function::operator->());
+  MapReduce* Map::operator->() {
+    return static_cast<MapReduce*>(Function::operator->());
   }
 
-  const MapInternal* Map::operator->() const {
-    return static_cast<const MapInternal*>(Function::operator->());
+  const MapReduce* Map::operator->() const {
+    return static_cast<const MapReduce*>(Function::operator->());
   }
 
   bool Map::testCast(const SharedObjectNode* ptr) {
-    return dynamic_cast<const MapInternal*>(ptr)!=0;
+    return dynamic_cast<const MapReduce*>(ptr)!=0;
   }
 
 } // namespace casadi
