@@ -26,6 +26,7 @@
 #include "nlp_solver_internal.hpp"
 #include "mx_function.hpp"
 #include "sx_function.hpp"
+#include "casadi/core/timing.hpp"
 
 INPUTSCHEME(NlpSolverInput)
 OUTPUTSCHEME(NlpSolverOutput)
@@ -136,7 +137,10 @@ namespace casadi {
     output(NLP_SOLVER_G)       = DMatrix::zeros(g_sparsity);
 
     // Call the initialization method of the base class
+    const timer time0 = getTimerTime();
     FunctionInternal::init();
+    const diffTime diff = diffTimers(getTimerTime(), time0);
+    stats_["base class init time"] = diff;
 
     // Find out if we are to expand the NLP in terms of scalar operations
     bool expand = getOption("expand");
@@ -222,7 +226,10 @@ namespace casadi {
       jacF = getOption("jac_f");
     } else {
       log("Generating objective jacobian");
+      const timer time0 = getTimerTime();
       jacF = nlp_.jacobian(NL_X, NL_F);
+      const diffTime diff = diffTimers(getTimerTime(), time0);
+      stats_["objective jacobian gen time"] = diff;
       log("Jacobian function generated");
     }
     jacF.setOption("name", "jac_f");
@@ -248,7 +255,10 @@ namespace casadi {
       gradF = getOption("grad_f");
     } else {
       log("Generating objective gradient");
+      const timer time0 = getTimerTime();
       gradF = nlp_.gradient(NL_X, NL_F);
+      const diffTime diff = diffTimers(getTimerTime(), time0);
+      stats_["objective gradient gen time"] = diff;
       log("Gradient function generated");
     }
     gradF.setOption("name", "grad_f");
@@ -285,7 +295,10 @@ namespace casadi {
       jacG = getOption("jac_g");
     } else {
       log("Generating constraint Jacobian");
+      const timer time0 = getTimerTime();
       jacG = nlp_.jacobian(NL_X, NL_G);
+      const diffTime diff = diffTimers(getTimerTime(), time0);
+      stats_["constraint jacobian gen time"] = diff;
       log("Jacobian function generated");
     }
     jacG.setOption("name", "jac_g");
@@ -318,7 +331,10 @@ namespace casadi {
       gradLag = getOption("grad_lag");
     } else {
       log("Generating/retrieving Lagrangian gradient function");
+      const timer time0 = getTimerTime();
       gradLag = nlp_.derivative(0, 1);
+      const diffTime diff = diffTimers(getTimerTime(), time0);
+      stats_["grad lag gen time"] = diff;
       log("Gradient function generated");
     }
     gradLag.setOption("name", "grad_lag");
@@ -344,7 +360,10 @@ namespace casadi {
     } else {
       Function& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian");
+      const timer time0 = getTimerTime();
       hessLag = gradLag.jacobian(NL_X, NL_NUM_OUT+NL_X, false, true);
+      const diffTime diff = diffTimers(getTimerTime(), time0);
+      stats_["hess lag gen time"] = diff;
       log("Hessian function generated");
     }
     hessLag.setOption("name", "hess_lag");
@@ -380,7 +399,10 @@ namespace casadi {
     } else {
       Function& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian sparsity pattern");
+      const timer time0 = getTimerTime();
       spHessLag = gradLag.jacSparsity(NL_X, NL_NUM_OUT+NL_X, false, true);
+      const diffTime diff = diffTimers(getTimerTime(), time0);
+      stats_["hess lag sparsity time"] = diff;
       log("Hessian sparsity pattern generated");
     }
     return spHessLag;
