@@ -167,7 +167,7 @@ def getCanonicalType(x):
     return ''.join(q)+symnameToName[v]
   else:
     return x
-  
+
 def getCanonicalParams(d,debug=""):
   params = []
   if d.find('attributelist/parmlist') is not None:
@@ -287,7 +287,7 @@ for d in r.findall('*//namespace/cdecl'):
 
   if friendwrap:
     dname= "casadi_" + dname
-    
+
   if my_module != getModule(d): continue
   if isInternal(d,msg="functions"):
     numInternalFunctions += 1
