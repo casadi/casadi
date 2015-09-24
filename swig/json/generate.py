@@ -287,23 +287,6 @@ for d in r.findall('*//namespace/cdecl'):
 
   if friendwrap:
     dname= "casadi_" + dname
-    code = d.find('attributelist/attribute[@name="code"]').attrib["value"]
-    argnames = [i.attrib["value"] for i in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="name"]')]
-    
-    for i,arg in enumerate(argnames):
-      code = re.sub(r"\b%s\b" % arg,"x%d_" % i,code)
-    code = code[1:-1]
-    code = code.replace(";","")
-    code = code.replace("return","")
-    
-    if re.search(r"\w\(",code):
-      code_args = code.split(",")
-      if len(code_args)>len(argnames):
-        code_args = code_args[:len(argnames)]
-        code = ",".join(code_args)+")"
-        
-    code = code.strip()
-        
     
   if my_module != getModule(d): continue
   if isInternal(d,msg="functions"):
@@ -326,7 +309,6 @@ for d in r.findall('*//namespace/cdecl'):
   functions.append({'funName':dname,
                     'funParams':params,
                     'funReturn':rettype,
-                    'funCode':code,
                     'funDocs':"",#docs,
                     'funDocslink':"",
                     'funIsIOSchemeHelper':isIOSchemeHelper,
