@@ -106,37 +106,28 @@ namespace casadi {
     alloc_iw(f_.sz_iw());
   }
 
-  void MapSerial::evalD(const double** arg, double** res, int* iw, double* w) {
+  template<typename T>
+  void MapSerial::evalGen(const T** arg, T** res, int* iw, T* w) {
     int n_in = n_in_, n_out = n_out_;
-    const double** arg1 = arg+nIn();
-    double** res1 = res+nOut();
+    const T** arg1 = arg+nIn();
+    T** res1 = res+nOut();
     for (int i=0; i<n_; ++i) {
       for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
       for (int j=0; j<n_out; ++j) res1[j]=*res++;
-      f_->evalD(arg1, res1, iw, w);
+      f_(arg1, res1, iw, w);
     }
+  }
+
+  void MapSerial::evalD(const double** arg, double** res, int* iw, double* w) {
+    evalGen(arg, res, iw, w);
   }
 
   void MapSerial::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    int n_in = n_in_, n_out = n_out_;
-    const SXElement** arg1 = arg+nIn();
-    SXElement** res1 = res+nOut();
-    for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
-      for (int j=0; j<n_out; ++j) res1[j]=*res++;
-      f_->evalSX(arg1, res1, iw, w);
-    }
+    evalGen(arg, res, iw, w);
   }
 
   void MapSerial::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    int n_in = n_in_, n_out = n_out_;
-    const bvec_t** arg1 = arg+nIn();
-    bvec_t** res1 = res+nOut();
-    for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
-      for (int j=0; j<n_out; ++j) res1[j]=*res++;
-      f_->spFwd(arg1, res1, iw, w);
-    }
+    evalGen(arg, res, iw, w);
   }
 
   void MapSerial::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {

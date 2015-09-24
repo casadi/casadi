@@ -129,8 +129,7 @@ namespace casadi {
 
   template<typename T, typename R>
   void MapAccumInternal::evalGen(const T** arg, T** res, int* iw, T* w,
-    void (FunctionInternal::*eval)(const T** arg, T** res, int* iw, T* w),
-    R reduction) {
+                                 R reduction) {
     int num_in = f_.nIn(), num_out = f_.nOut();
 
     // Catch: must accomodate scenario where res[j] of the accumulator = 0.
@@ -183,8 +182,7 @@ namespace casadi {
       }
 
       // Evaluate the function
-      FunctionInternal *f = f_.operator->();
-      (f->*eval)(arg1, res1, iw, w);
+      f_(arg1, res1, iw, w);
 
       // Copy the temporary storage to the accumulator
       copy(w+f_.sz_w()+nnz_accum_, w+f_.sz_w()+nnz_accum_*2, w+f_.sz_w());
@@ -204,18 +202,16 @@ namespace casadi {
 
   void MapAccumInternal::evalD(const double** arg, double** res,
                                 int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w, &FunctionInternal::eval, std::plus<double>());
+    evalGen(arg, res, iw, w, std::plus<double>());
   }
 
   void MapAccumInternal::evalSX(const SXElement** arg, SXElement** res,
                                 int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w, &FunctionInternal::evalSX, std::plus<double>());
+    evalGen(arg, res, iw, w, std::plus<SXElement>());
   }
 
-  static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
-
   void MapAccumInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    evalGen<bvec_t>(arg, res, iw, w, &FunctionInternal::spFwd, &Orring);
+    evalGen(arg, res, iw, w, orop);
   }
 
   std::vector<MX> bisect(const MX& a, int b) {

@@ -81,6 +81,10 @@ namespace casadi {
     /** \brief  clone function */
     virtual MapSerial* clone() const { return new MapSerial(*this);}
 
+    /** \brief  Evaluate or propagate sparsities */
+    template<typename T>
+    void evalGen(const T** arg, T** res, int* iw, T* w);
+
     /** \brief  Evaluate numerically, work vectors given */
     virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
