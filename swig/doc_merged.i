@@ -24454,9 +24454,6 @@ it is initialized
 // File: classcasadi_1_1MapBase.xml
 
 
-// File: classcasadi_1_1MapOmp.xml
-
-
 // File: classcasadi_1_1MapReduce.xml
 
 

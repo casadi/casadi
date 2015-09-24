@@ -31988,9 +31988,6 @@ Get output scheme name by index.
 // File: classcasadi_1_1MapBase.xml
 
 
-// File: classcasadi_1_1MapOmp.xml
-
-
 // File: classcasadi_1_1MapReduce.xml
 
 
