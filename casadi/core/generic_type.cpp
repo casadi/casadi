@@ -49,6 +49,7 @@ namespace casadi {
   typedef GenericTypeInternal<OT_DICT, Dict> DictType;
   typedef GenericTypeInternal<OT_VOIDPTR, void*> VoidPointerType;
   typedef GenericTypeInternal<OT_CALLBACK, Callback> CallbackType;
+  typedef GenericTypeInternal<OT_DIFFTIME, diffTime> diffTimeType;
   typedef GenericTypeInternal<OT_DERIVATIVEGENERATOR, DerivativeGenerator> DerivativeGeneratorType;
   /// \endcond
 
@@ -116,6 +117,8 @@ namespace casadi {
       return "OT_CALLBACK";
     case OT_FUNCTION:
       return "OT_FUNCTION";
+    case OT_DIFFTIME:
+      return "OT_DIFFTIME";
     case OT_VOIDPTR:
       return "OT_VOIDPTR";
     default:
@@ -135,6 +138,10 @@ namespace casadi {
 
   bool GenericType::isDouble() const {
     return getType()==OT_REAL;
+  }
+
+  bool GenericType::isDiffTime() const {
+    return getType()==OT_DIFFTIME;
   }
 
   bool GenericType::isString() const {
@@ -208,6 +215,10 @@ namespace casadi {
     assignNode(new DoubleType(d));
   }
 
+  GenericType::GenericType(const diffTime& dt) {
+    assignNode(new diffTimeType(dt));
+  }
+
   GenericType::GenericType(const vector<int>& iv) {
     assignNode(new IntVectorType(iv));
   }
@@ -263,6 +274,11 @@ namespace casadi {
   const double& GenericType::asDouble() const {
     casadi_assert(isDouble());
     return static_cast<const DoubleType*>(get())->d_;
+  }
+
+  const diffTime& GenericType::asDiffTime() const {
+    casadi_assert(isDiffTime());
+    return static_cast<const diffTimeType*>(get())->d_;
   }
 
   const std::string& GenericType::asString() const {
@@ -345,6 +361,15 @@ namespace casadi {
     } else {
       casadi_assert_message(isDouble(), "type mismatch");
       return asDouble();
+    }
+  }
+
+  diffTime GenericType::toDiffTime() const {
+    if (isDiffTime()) {
+      return static_cast<diffTime>(toDiffTime());
+    } else {
+      casadi_assert_message(isDiffTime(), "type mismatch");
+      return asDiffTime();
     }
   }
 

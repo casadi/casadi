@@ -28,6 +28,7 @@
 
 #include "shared_object.hpp"
 #include "casadi_types.hpp"
+#include "timing.hpp"
 #include <string>
 #include <vector>
 
@@ -50,6 +51,7 @@ namespace casadi {
     OT_FUNCTION,
     OT_CALLBACK,
     OT_VOIDPTR,
+    OT_DIFFTIME,
     OT_UNKNOWN};
 
   /** \brief Generic data type, can hold different types such as bool, int, string etc.
@@ -79,6 +81,7 @@ namespace casadi {
     GenericType(const DerivativeGenerator& c);
     GenericType(const Callback& c);
     GenericType(const Dict& dict);
+    GenericType(const diffTime& dt);
     #ifndef SWIG
     GenericType(void* ptr);
     #endif // SWIG
@@ -107,6 +110,7 @@ namespace casadi {
     operator const Dict&() const { return asDict();}
     operator const DerivativeGenerator& () const { return asDerivativeGenerator();}
     operator const Callback& () const { return asCallback();}
+    operator const diffTime& () const { return asDiffTime();}
     ///@}
     #endif // SWIG
 
@@ -132,6 +136,7 @@ namespace casadi {
     bool isVoidPointer() const;
     bool isCallback() const;
     bool isDerivativeGenerator() const;
+    bool isDiffTime() const;
     ///@}
 
 #ifndef SWIG
@@ -150,6 +155,7 @@ namespace casadi {
     void* const & asVoidPointer() const;
     const DerivativeGenerator& asDerivativeGenerator() const;
     const Callback& asCallback() const;
+    const diffTime& asDiffTime() const;
     ///@}
 #endif // SWIG
 
@@ -164,6 +170,7 @@ namespace casadi {
     std::vector<double> toDoubleVector() const;
     std::vector<std::string> toStringVector() const;
     Dict toDict() const;
+    diffTime toDiffTime() const;
     Function toFunction() const;
     void* toVoidPointer() const;
     ///@}
