@@ -31,20 +31,20 @@ using namespace std;
 namespace casadi {
 
   MapInternal::MapInternal(const Function& f, int n,
-    const std::vector<bool> &repeat_in,
-    const std::vector<bool> &repeat_out)
+                           const std::vector<bool> &repeat_in,
+                           const std::vector<bool> &repeat_out)
     : f_(f), n_(n), repeat_in_(repeat_in), repeat_out_(repeat_out) {
 
     addOption("parallelization", OT_STRING, "serial",
               "Computational strategy for parallelization", "serial|openmp");
 
     casadi_assert_message(repeat_in_.size()==f.nIn(),
-      "MapInternal expected repeat_in of size " << f.nIn() <<
-      ", but got " << repeat_in_.size() << " instead.");
+                          "MapInternal expected repeat_in of size " << f.nIn() <<
+                          ", but got " << repeat_in_.size() << " instead.");
 
     casadi_assert_message(repeat_out_.size()==f.nOut(),
-      "MapInternal expected repeat_out of size " << f.nOut() <<
-      ", but got " << repeat_out_.size() << " instead.");
+                          "MapInternal expected repeat_out of size " << f.nOut() <<
+                          ", but got " << repeat_out_.size() << " instead.");
 
     // Give a name
     setOption("name", "unnamed_map");
@@ -59,10 +59,9 @@ namespace casadi {
 
     if (parallelization.compare("serial")==0) {
       parallelization_ = PARALLELIZATION_SERIAL;
-    } else if (parallelization.compare("openmp")==0) {
-      parallelization_ = PARALLELIZATION_OMP;
     } else {
-      casadi_error("cannot happen.");
+      casadi_assert(parallelization.compare("openmp")==0);
+      parallelization_ = PARALLELIZATION_OMP;
     }
 
     #ifndef WITH_OPENMP
@@ -84,6 +83,7 @@ namespace casadi {
                      "Falling back to serial mode.");
       parallelization_ = PARALLELIZATION_SERIAL;
     }
+
     int num_in = f_.nIn(), num_out = f_.nOut();
 
     // Initialize the functions, get input and output sparsities
@@ -118,8 +118,8 @@ namespace casadi {
     step_out_.resize(num_out, 0);
 
     for (int i=0;i<num_in;++i) {
-        if (repeat_in_[i])
-          step_in_[i] = f_.input(i).nnz();
+      if (repeat_in_[i])
+        step_in_[i] = f_.input(i).nnz();
     }
 
     for (int i=0;i<num_out;++i) {
@@ -150,8 +150,8 @@ namespace casadi {
 
   template<typename T, typename R>
   void MapInternal::evalGen(const T** arg, T** res, int* iw, T* w,
-    void (FunctionInternal::*eval)(const T** arg, T** res, int* iw, T* w),
-    R reduction) {
+                            void (FunctionInternal::*eval)(const T** arg, T** res, int* iw, T* w),
+                            R reduction) {
     int num_in = f_.nIn(), num_out = f_.nOut();
 
     const T** arg1 = arg+f_.sz_arg();
@@ -200,18 +200,18 @@ namespace casadi {
   }
 
   void MapInternal::evalD(const double** arg, double** res,
-                                int* iw, double* w) {
+                          int* iw, double* w) {
     if (parallelization_ == PARALLELIZATION_SERIAL) {
       evalGen<double>(arg, res, iw, w, &FunctionInternal::eval, std::plus<double>());
     } else {
+#ifndef WITH_OPENMP
+      casadi_error("the \"impossible\" happened: " <<
+                   "should have fallen back to serial in init.");
+#else // WITH_OPEMMP
       int n_in_ = f_.nIn(), n_out_ = f_.nOut();
-      #ifndef WITH_OPENMP
-          casadi_error("the \"impossible\" happened: " <<
-                       "should have fallen back to serial in init.");
-      #endif // WITH_OPENMP
       size_t sz_arg, sz_res, sz_iw, sz_w;
       f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-      #pragma omp parallel for
+#pragma omp parallel for
       for (int i=0; i<n_; ++i) {
         const double** arg_i = arg + n_in_ + sz_arg*i;
         for (int j=0; j<n_in_; ++j) {
@@ -225,12 +225,12 @@ namespace casadi {
         double* w_i = w + i*sz_w;
         f_->eval(arg_i, res_i, iw_i, w_i);
       }
+#endif // WITH_OPENMP
     }
-
   }
 
   void MapInternal::evalSX(const SXElement** arg, SXElement** res,
-                                int* iw, SXElement* w) {
+                           int* iw, SXElement* w) {
     evalGen<SXElement>(arg, res, iw, w, &FunctionInternal::evalSX, std::plus<SXElement>());
   }
 
@@ -240,54 +240,54 @@ namespace casadi {
     evalGen<bvec_t>(arg, res, iw, w, &FunctionInternal::spFwd, &Orring);
   }
 
-/**void Map::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    evalGen<SXElement>(arg, res, iw, w);
-}*/
+  /**void Map::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+     evalGen<SXElement>(arg, res, iw, w);
+     }*/
 
   /**
-  void MapInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
-    int num_in = f_.nIn(), num_out = f_.nOut();
+     void MapInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+     int num_in = f_.nIn(), num_out = f_.nOut();
 
-      // split arguments
-      std::vector< std::vector< MX > > arg_split;
-      for (int i=0;i<arg.size();++i) {
-        arg_split.push_back(horzsplit(arg[i], f_.input(i).size2()));
-      }
+     // split arguments
+     std::vector< std::vector< MX > > arg_split;
+     for (int i=0;i<arg.size();++i) {
+     arg_split.push_back(horzsplit(arg[i], f_.input(i).size2()));
+     }
 
-      std::vector< std::vector<MX> > ret(n_);
+     std::vector< std::vector<MX> > ret(n_);
 
-      // call the original function
-      for (int i=0; i<n_; ++i) {
-        std::vector< MX > argi;
-        for (int j=0;j<arg.size();++j) {
-          if (repeat_in_[j]) {
-            argi.push_back(arg_split[j][i]);
-          } else {
-            argi.push_back(arg_split[j][0]);
-          }
-        }
-        const_cast<Function&>(f_)->call(argi, ret[i], false, false);
-      }
+     // call the original function
+     for (int i=0; i<n_; ++i) {
+     std::vector< MX > argi;
+     for (int j=0;j<arg.size();++j) {
+     if (repeat_in_[j]) {
+     argi.push_back(arg_split[j][i]);
+     } else {
+     argi.push_back(arg_split[j][0]);
+     }
+     }
+     const_cast<Function&>(f_)->call(argi, ret[i], false, false);
+     }
 
-      ret = transpose(ret);
+     ret = transpose(ret);
 
-      res.resize(num_out);
+     res.resize(num_out);
 
-      std::vector<MX> ret_cat;
-      for (int i=0;i<num_out;++i) {
-        if (repeat_out_[i]) {
-          res[i] = horzcat(ret[i]);
-        } else {
-          MX sum = 0;
-          for (int j=0;j<ret[i].size();++j) {
-            sum += ret[i][j];
-          }
-          res[i] = sum;
-        }
-      }
+     std::vector<MX> ret_cat;
+     for (int i=0;i<num_out;++i) {
+     if (repeat_out_[i]) {
+     res[i] = horzcat(ret[i]);
+     } else {
+     MX sum = 0;
+     for (int j=0;j<ret[i].size();++j) {
+     sum += ret[i][j];
+     }
+     res[i] = sum;
+     }
+     }
 
-  }
-*/
+     }
+  */
 
   Function MapInternal
   ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
@@ -375,12 +375,12 @@ namespace casadi {
 
     for (int j=0; j<num_in; ++j) {
       g.body << "    arg1[" << j << "] = (arg[" << j << "]==0)? " <<
-                "0: arg[" << j << "]+i*" << step_in_[j] << ";" << endl;
+        "0: arg[" << j << "]+i*" << step_in_[j] << ";" << endl;
     }
     for (int j=0; j<num_out; ++j) {
       if (repeat_out_[j]) {
         g.body << "    res1[" << j << "] = (res[" << j << "]==0)? " <<
-         "0: res[" << j << "]+i*" << step_out_[j] << ";" << endl;
+          "0: res[" << j << "]+i*" << step_out_[j] << ";" << endl;
       } else {
         g.body << "    res1[" << j << "] = (res[" << j << "]==0)? 0: temp_res;" << endl
                << "    temp_res+= " << step_out_[j] << ";" << endl;
@@ -395,7 +395,7 @@ namespace casadi {
       if (!repeat_out_[k]) {
         g.body << "    if (res1[" << k << "] && sum[" << k << "])" << endl
                << "       axpy(" << step_out_[k] << ",1," <<
-                            "res1["<< k << "],1,sum[" << k << "],1);" << endl;
+          "res1["<< k << "],1,sum[" << k << "],1);" << endl;
       }
     }
     g.body << "  }" << std::endl;

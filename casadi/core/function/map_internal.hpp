@@ -58,9 +58,9 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T, typename R>
-    void evalGen(const T** arg, T** res, int* iw, T* w,
-      void (FunctionInternal::*ptrEval)(const T** arg, T** res, int* iw, T* w),
-      R reduction);
+      void evalGen(const T** arg, T** res, int* iw, T* w,
+                   void (FunctionInternal::*ptrEval)(const T** arg, T** res, int* iw, T* w),
+                   R reduction);
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void evalD(const double** arg, double** res, int* iw, double* w);
