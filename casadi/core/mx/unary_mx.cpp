@@ -126,7 +126,7 @@ namespace casadi {
     // Output the operation
     g.body << r << " = ";
     casadi_math<double>::printPre(op_, g.body);
-    g.body << x;
+    g.body << " " << x << " ";
     casadi_math<double>::printPost(op_, g.body);
     g.body << ";" << endl;
   }
