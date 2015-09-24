@@ -26,6 +26,7 @@
 #include "ipopt_nlp.hpp"
 #include "ipopt_interface.hpp"
 #include <ctime>
+#include "casadi/core/timing.hpp"
 
 namespace casadi {
 
@@ -140,7 +141,7 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
   bool full_callback = false;
 
 #ifdef WITH_IPOPT_CALLBACK
-  const timer time0 = IpoptInterface::getTimerTime();
+  const timer time0 = getTimerTime();
   OrigIpoptNLP* orignlp = dynamic_cast<OrigIpoptNLP*>(GetRawPtr(ip_cq->GetIpoptNLP()));
   if (!orignlp) return true;
   TNLPAdapter* tnlp_adapter = dynamic_cast<TNLPAdapter*>(GetRawPtr(orignlp->nlp()));
@@ -192,9 +193,8 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
       }
     }
   }
-  const diffTime diff =
-    IpoptInterface::diffTimers(IpoptInterface::getTimerTime(), time0);
-  IpoptInterface::timerPlusEq(solver->t_callback_prepare_, diff);
+  const diffTime diff = diffTimers(getTimerTime(), time0);
+  timerPlusEq(solver->t_callback_prepare_, diff);
   full_callback = true;
 #endif // WITH_IPOPT_CALLBACK
 

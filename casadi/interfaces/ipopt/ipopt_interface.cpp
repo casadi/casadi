@@ -49,27 +49,6 @@ using namespace std;
 #endif // WITH_SIPOPT
 
 namespace casadi {
-  timer IpoptInterface::getTimerTime() {
-    timer ret;
-    ret.proc = clock();
-    ret.wall = getRealTime();
-    return ret;
-  }
-
-  // ret = t1 - t0
-  diffTime IpoptInterface::diffTimers(const timer t1, const timer t0) {
-    diffTime ret;
-    ret.proc = (t1.proc - t0.proc)/CLOCKS_PER_SEC;
-    ret.wall = t1.wall - t0.wall;
-    return ret;
-  }
-
-  // t += diff
-  void IpoptInterface::timerPlusEq(diffTime & t, const diffTime diff) {
-    t.proc += diff.proc;
-    t.wall += diff.wall;
-  }
-
   // Convert a float to a string of an exact length.
   // First it tries fixed precision, then falls back to exponential notation.
   //

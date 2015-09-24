@@ -31,6 +31,7 @@ set(CASADI_SRCS
   options_functionality.cpp   options_functionality.hpp # Functionality for getting and setting options of a derived class
   std_vector_tools.hpp        std_vector_tools.cpp      # Set of useful functions for the vector template class in STL
   profiling.hpp               profiling.cpp
+  timing.hpp                  timing.cpp
   functor.hpp                 functor.cpp              # Classes for callbacks
   functor_internal.hpp        functor_internal.cpp
   polynomial.hpp              polynomial.cpp            # Helper class for differentiating and integrating simple polynomials

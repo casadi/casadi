@@ -28,6 +28,7 @@
 
 #include <casadi/interfaces/ipopt/casadi_nlpsolver_ipopt_export.h>
 #include "casadi/core/function/nlp_solver_internal.hpp"
+#include "casadi/core/timing.hpp"
 
 /** \defgroup plugin_NlpSolver_ipopt
 *
@@ -54,16 +55,6 @@
 */
 
 /** \pluginsection{NlpSolver,ipopt} **/
-
-  typedef struct {
-    double proc;
-    double wall;
-  } timer;
-
-  typedef struct {
-    double proc;
-    double wall;
-  } diffTime;
 
 /// \cond INTERNAL
 namespace casadi {
@@ -158,9 +149,6 @@ public:
                           const std::map<std::string, std::vector<int> >& con_integer_md,
                           const std::map<std::string, std::vector<double> >& con_numeric_md);
 
-  static timer getTimerTime(void);
-  static diffTime diffTimers(const timer t1, const timer t0);
-  static void timerPlusEq(diffTime & t, const diffTime diff);
   static void timingSummary(
     std::vector<std::tuple<std::string, int, diffTime> >& xs);
 
