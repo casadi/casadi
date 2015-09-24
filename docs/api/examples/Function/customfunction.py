@@ -103,7 +103,6 @@ print c.getOutput(), sin(1.2+3*1.5)
 
 try:
   J = c.jacobian()
-  J.init()
 except Exception as e:
   print e
   
@@ -187,7 +186,6 @@ def funjac((x,y)):
 fun.setFullJacobian(funjac)
 """
 J = fun.jacobian(1)
-J.init()
 J.setInput(1.2,0)
 J.setInput(1.5,1)
 J.evaluate()
