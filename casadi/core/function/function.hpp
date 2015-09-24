@@ -334,10 +334,26 @@ namespace casadi {
     std::vector<MX> operator()(const MX& arg0) { return operator()(make_vector(arg0));}
     ///@}
 
-    ///@{
-    /// Evaluate memory-less
+    /** \brief Evaluate memory-less, numerically */
     void operator()(const double** arg, double** res, int* iw, double* w);
-    ///@}
+
+    /** \brief Evaluate memory-less SXElement
+        Same syntax as the double version, allowing use in templated code
+     */
+    void operator()(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+
+    /** \brief  Propagate sparsity forward */
+    void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+
+    /** \brief  Propagate sparsity backwards */
+    void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+
+    /** \brief Alias for spFwd
+        Same syntax as the double and SXElement versions, allowing use in templated code
+    */
+    void operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+      spFwd(arg, res, iw, w);
+    }
 #endif // SWIG
 
     /** \brief Create call to (cached) derivative function, forward mode  */
@@ -636,12 +652,6 @@ namespace casadi {
 #ifndef SWIG
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
-
-    /** \brief  Propagate sparsity forward */
-    void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
-
-    /** \brief  Propagate sparsity backwards */
-    void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 #endif // SWIG
 
     /// \endcond

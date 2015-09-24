@@ -931,5 +931,9 @@ namespace casadi {
     (*this)->eval(arg, res, iw, w);
   }
 
+  void Function::operator()(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+    (*this)->evalSX(arg, res, iw, w);
+  }
+
 } // namespace casadi
 
