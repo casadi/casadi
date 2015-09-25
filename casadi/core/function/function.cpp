@@ -84,9 +84,7 @@ namespace casadi {
   }
 
   Function Function::map(const std::string& name, int N, const Dict& options) const {
-    std::vector<bool> repeated_input(nIn(), true);
-    std::vector<bool> repeated_output(nOut(), true);
-    return Map(name, *this, N, repeated_input, repeated_output, options);
+    return Map(name, *this, N, options);
   }
 
   vector<vector<MX> > Function::map(const vector<vector<MX> > &x,
@@ -150,7 +148,7 @@ namespace casadi {
 
     Dict options;
     options["parallelization"] = parallelization;
-    Function ms = Map("map", *this, n, repeat_n, std::vector<bool>(nOut(), true), options);
+    Function ms = Map("map", *this, n, options);
 
     // Call the internal function
     return ms(x);

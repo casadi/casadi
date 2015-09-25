@@ -98,6 +98,12 @@ namespace casadi {
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(CodeGenerator& g) const;
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& g) const;
+
     /** \brief  Initialize */
     virtual void init();
   };
@@ -122,6 +128,12 @@ namespace casadi {
 
     /// Evaluate the function numerically
     virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(CodeGenerator& g) const;
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief  Initialize */
     virtual void init();
