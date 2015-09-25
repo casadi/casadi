@@ -48,4 +48,12 @@ namespace casadi {
     t.wall += diff.wall;
   }
 
+  Dict diffToDict(const diffTime& diff) {
+    Dict ret;
+    // compatable names with the linux "time" utility
+    ret["wall"] = diff.wall;
+    ret["proc"] = diff.proc;
+    return ret;
+  }
+
 } // namespace casadi

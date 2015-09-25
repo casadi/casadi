@@ -27,6 +27,7 @@
 #define CASADI_TIMING_HPP
 
 #include "profiling.hpp"
+#include "generic_type.hpp"
 
 namespace casadi {
 /// \cond INTERNAL
@@ -46,6 +47,8 @@ namespace casadi {
   CASADI_EXPORT diffTime diffTimers(const timer t1, const timer t0);
   // t += diff
   CASADI_EXPORT void timerPlusEq(diffTime & t, const diffTime diff);
+
+  CASADI_EXPORT Dict diffToDict(const diffTime& diff);
 
 /// \endcond
 } // namespace casadi

@@ -146,7 +146,7 @@ namespace casadi {
     const timer time0 = getTimerTime();
     FunctionInternal::init();
     const diffTime diff = diffTimers(getTimerTime(), time0);
-    stats_["base class init time"] = diff;
+    stats_["base class init time"] = diffToDict(diff);
     if (verbose_init)
       userOut() << "Initialized base class in " << diff.proc << " seconds.";
 
@@ -240,7 +240,7 @@ namespace casadi {
       const timer time0 = getTimerTime();
       jacF = nlp_.jacobian(NL_X, NL_F);
       const diffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["objective jacobian gen time"] = diff;
+      stats_["objective jacobian gen time"] = diffToDict(diff);
       if (verbose_init)
         userOut() << "Generated objective Jacobian in " << diff.proc << " seconds.";
       log("Jacobian function generated");
@@ -274,7 +274,7 @@ namespace casadi {
       const timer time0 = getTimerTime();
       gradF = nlp_.gradient(NL_X, NL_F);
       const diffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["objective gradient gen time"] = diff;
+      stats_["objective gradient gen time"] = diffToDict(diff);
       if (verbose_init)
         userOut() << "Generated objective gradient in " << diff.proc << " seconds.";
       log("Gradient function generated");
@@ -319,7 +319,7 @@ namespace casadi {
       const timer time0 = getTimerTime();
       jacG = nlp_.jacobian(NL_X, NL_G);
       const diffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["constraint jacobian gen time"] = diff;
+      stats_["constraint jacobian gen time"] = diffToDict(diff);
       if (verbose_init)
         userOut() << "Generated constraint Jacobian in " << diff.proc << " seconds.";
       log("Jacobian function generated");
@@ -360,7 +360,7 @@ namespace casadi {
       const timer time0 = getTimerTime();
       gradLag = nlp_.derivative(0, 1);
       const diffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["grad lag gen time"] = diff;
+      stats_["grad lag gen time"] = diffToDict(diff);
       if (verbose_init)
         userOut() << "Generated/retrieved Lagrangien gradient in "
                   << diff.proc << " seconds.";
@@ -395,7 +395,7 @@ namespace casadi {
       const timer time0 = getTimerTime();
       hessLag = gradLag.jacobian(NL_X, NL_NUM_OUT+NL_X, false, true);
       const diffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["hess lag gen time"] = diff;
+      stats_["hess lag gen time"] = diffToDict(diff);
       if (verbose_init)
         userOut() << "Generated Hessian of the Lagrangian in "
                   << diff.proc << " seconds.";
@@ -440,7 +440,7 @@ namespace casadi {
       const timer time0 = getTimerTime();
       spHessLag = gradLag.jacSparsity(NL_X, NL_NUM_OUT+NL_X, false, true);
       const diffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["hess lag sparsity time"] = diff;
+      stats_["hess lag sparsity time"] = diffToDict(diff);
       if (verbose_init)
         userOut() << "Generated Hessian of the Lagrangian sparsity pattern in "
                   << diff.proc << " seconds.";
