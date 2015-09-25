@@ -27,18 +27,19 @@
 #define CASADI_TIMING_HPP
 
 #include "profiling.hpp"
+#include "generic_type.hpp"
 
 namespace casadi {
 /// \cond INTERNAL
 
   typedef struct {
-    double proc;
-    double wall;
+    double user;
+    double real;
   } timer;
 
   typedef struct {
-    double proc;
-    double wall;
+    double user;
+    double real;
   } diffTime;
 
   CASADI_EXPORT timer getTimerTime(void);
@@ -46,6 +47,8 @@ namespace casadi {
   CASADI_EXPORT diffTime diffTimers(const timer t1, const timer t0);
   // t += diff
   CASADI_EXPORT void timerPlusEq(diffTime & t, const diffTime diff);
+
+  CASADI_EXPORT Dict diffToDict(const diffTime& diff);
 
 /// \endcond
 } // namespace casadi

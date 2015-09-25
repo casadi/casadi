@@ -91,9 +91,9 @@ namespace casadi {
     std::string blankName(maxNameLen, ' ');
     out
       << blankName
-      << "      proc           wall      num           mean             mean"
+      << "      user           real      num           mean             mean"
       << endl << blankName
-      << "      time           time     evals       proc time        wall time"
+      << "      time           time     evals       user time        real time"
       << endl;
     for (int k=0; k < xs.size(); ++k) {
       const std::tuple<std::string, int, diffTime> x = xs[k];
@@ -107,8 +107,8 @@ namespace casadi {
 
       out
         << setw(maxNameLen) << name << " "
-        << formatFloat(dt.proc, 9, 3, 3) << " [s]  "
-        << formatFloat(dt.wall, 9, 3, 3) << " [s]";
+        << formatFloat(dt.user, 9, 3, 3) << " [s]  "
+        << formatFloat(dt.real, 9, 3, 3) << " [s]";
       if (n == -1) {
         // things like main loop don't have # evals
         out << endl;
@@ -122,8 +122,8 @@ namespace casadi {
           // only print averages if there is more than 1 eval
           out
             << " "
-            << formatFloat(1000.0*dt.proc/n, 10, 2, 3) << " [ms]  "
-            << formatFloat(1000.0*dt.wall/n, 10, 2, 3) << " [ms]"
+            << formatFloat(1000.0*dt.user/n, 10, 2, 3) << " [ms]  "
+            << formatFloat(1000.0*dt.real/n, 10, 2, 3) << " [ms]"
             << endl;
         }
       }
@@ -476,7 +476,7 @@ namespace casadi {
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       profileWriteExit(CasadiOptions::profilingLog, this,
-        t_mainloop_.proc - (t_callback_fun_.proc-t_callback_prepare_.proc));
+        t_mainloop_.user - (t_callback_fun_.user-t_callback_prepare_.user));
     }
 
     if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
@@ -538,23 +538,14 @@ namespace casadi {
     if (status == Insufficient_Memory)
       stats_["return_status"] = "Insufficient_Memory";
 
-    stats_["t_eval_f.proc"] = t_eval_f_.proc;
-    stats_["t_eval_grad_f.proc"] = t_eval_grad_f_.proc;
-    stats_["t_eval_g.proc"] = t_eval_g_.proc;
-    stats_["t_eval_jac_g.proc"] = t_eval_jac_g_.proc;
-    stats_["t_eval_h.proc"] = t_eval_h_.proc;
-    stats_["t_mainloop.proc"] = t_mainloop_.proc;
-    stats_["t_callback_fun.proc"] = t_callback_fun_.proc;
-    stats_["t_callback_prepare.proc"] = t_callback_prepare_.proc;
-
-    stats_["t_eval_f.wall"] = t_eval_f_.wall;
-    stats_["t_eval_grad_f.wall"] = t_eval_grad_f_.wall;
-    stats_["t_eval_g.wall"] = t_eval_g_.wall;
-    stats_["t_eval_jac_g.wall"] = t_eval_jac_g_.wall;
-    stats_["t_eval_h.wall"] = t_eval_h_.wall;
-    stats_["t_mainloop.wall"] = t_mainloop_.wall;
-    stats_["t_callback_fun.wall"] = t_callback_fun_.wall;
-    stats_["t_callback_prepare.wall"] = t_callback_prepare_.wall;
+    stats_["t_eval_f"] = diffToDict(t_eval_f_);
+    stats_["t_eval_grad_f"] = diffToDict(t_eval_grad_f_);
+    stats_["t_eval_g"] = diffToDict(t_eval_g_);
+    stats_["t_eval_jac_g"] = diffToDict(t_eval_jac_g_);
+    stats_["t_eval_h"] = diffToDict(t_eval_h_);
+    stats_["t_mainloop"] = diffToDict(t_mainloop_);
+    stats_["t_callback_fun"] = diffToDict(t_callback_fun_);
+    stats_["t_callback_prepare"] = diffToDict(t_callback_prepare_);
 
     stats_["n_eval_f"] = n_eval_f_;
     stats_["n_eval_grad_f"] = n_eval_grad_f_;
@@ -718,7 +709,7 @@ namespace casadi {
       const diffTime delta = diffTimers(getTimerTime(), time0);
       timerPlusEq(t_eval_h_, delta);
       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 4, delta.proc);
+        profileWriteTime(CasadiOptions::profilingLog, this, 4, delta.user);
       }
       n_eval_h_ += 1;
       log("eval_h ok");
@@ -780,7 +771,7 @@ namespace casadi {
       const diffTime delta = diffTimers(getTimerTime(), time0);
       timerPlusEq(t_eval_jac_g_, delta);
       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 3, delta.proc);
+        profileWriteTime(CasadiOptions::profilingLog, this, 3, delta.user);
       }
       n_eval_jac_g_ += 1;
       log("eval_jac_g ok");
@@ -828,7 +819,7 @@ namespace casadi {
       timerPlusEq(t_eval_f_, delta);
       n_eval_f_ += 1;
       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 0, delta.proc);
+        profileWriteTime(CasadiOptions::profilingLog, this, 0, delta.user);
       }
       log("eval_f ok");
       return true;
@@ -869,7 +860,7 @@ namespace casadi {
       const diffTime delta = diffTimers(getTimerTime(), time0);
       timerPlusEq(t_eval_g_, delta);
       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 2, delta.proc);
+        profileWriteTime(CasadiOptions::profilingLog, this, 2, delta.user);
       }
       n_eval_g_ += 1;
       log("eval_g ok");
@@ -909,7 +900,7 @@ namespace casadi {
       const diffTime delta = diffTimers(getTimerTime(), time0);
       timerPlusEq(t_eval_grad_f_, delta);
       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 1, delta.proc);
+        profileWriteTime(CasadiOptions::profilingLog, this, 1, delta.user);
       }
       n_eval_grad_f_ += 1;
       log("eval_grad_f ok");

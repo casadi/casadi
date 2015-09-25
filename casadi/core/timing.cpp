@@ -30,23 +30,31 @@ namespace casadi {
 
   timer getTimerTime() {
     timer ret;
-    ret.proc = clock();
-    ret.wall = getRealTime();
+    ret.user = clock();
+    ret.real = getRealTime();
     return ret;
   }
 
   // ret = t1 - t0
   diffTime diffTimers(const timer t1, const timer t0) {
     diffTime ret;
-    ret.proc = (t1.proc - t0.proc)/CLOCKS_PER_SEC;
-    ret.wall = t1.wall - t0.wall;
+    ret.user = (t1.user - t0.user)/CLOCKS_PER_SEC;
+    ret.real = t1.real - t0.real;
     return ret;
   }
 
   // t += diff
   void timerPlusEq(diffTime & t, const diffTime diff) {
-    t.proc += diff.proc;
-    t.wall += diff.wall;
+    t.user += diff.user;
+    t.real += diff.real;
+  }
+
+  Dict diffToDict(const diffTime& diff) {
+    Dict ret;
+    // compatable names with the linux "time" utility
+    ret["real"] = diff.real;
+    ret["user"] = diff.user;
+    return ret;
   }
 
 } // namespace casadi
