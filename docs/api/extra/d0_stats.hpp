@@ -139,9 +139,14 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>base class init time</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>con_integer_md</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_numeric_md</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_string_md</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>constraint jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag sparsity time</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iter_count</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>iteration</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>iterations</td><td>casadi::IpoptInterface</td></tr>
@@ -151,23 +156,17 @@
 <tr><td>n_eval_grad_f</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>n_eval_h</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>n_eval_jac_g</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>objective gradient gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>objective jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>return_status</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_callback_fun.proc</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_callback_fun.wall</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_callback_prepare.proc</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_callback_prepare.wall</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_f.proc</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_f.wall</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_g.proc</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_g.wall</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_grad_f.proc</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_grad_f.wall</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_h.proc</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_h.wall</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_jac_g.proc</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_jac_g.wall</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_mainloop.proc</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_mainloop.wall</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_callback_fun</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_callback_prepare</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_f</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_g</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_grad_f</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_h</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_eval_jac_g</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_mainloop</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_integer_md</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_numeric_md</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_string_md</td><td>casadi::IpoptInterface</td></tr>
@@ -193,22 +192,14 @@
 <tr><td>n_eval_h</td></tr>
 <tr><td>n_eval_jac_g</td></tr>
 <tr><td>return_status</td></tr>
-<tr><td>t_callback_fun.proc</td></tr>
-<tr><td>t_callback_fun.wall</td></tr>
-<tr><td>t_callback_prepare.proc</td></tr>
-<tr><td>t_callback_prepare.wall</td></tr>
-<tr><td>t_eval_f.proc</td></tr>
-<tr><td>t_eval_f.wall</td></tr>
-<tr><td>t_eval_g.proc</td></tr>
-<tr><td>t_eval_g.wall</td></tr>
-<tr><td>t_eval_grad_f.proc</td></tr>
-<tr><td>t_eval_grad_f.wall</td></tr>
-<tr><td>t_eval_h.proc</td></tr>
-<tr><td>t_eval_h.wall</td></tr>
-<tr><td>t_eval_jac_g.proc</td></tr>
-<tr><td>t_eval_jac_g.wall</td></tr>
-<tr><td>t_mainloop.proc</td></tr>
-<tr><td>t_mainloop.wall</td></tr>
+<tr><td>t_callback_fun</td></tr>
+<tr><td>t_callback_prepare</td></tr>
+<tr><td>t_eval_f</td></tr>
+<tr><td>t_eval_g</td></tr>
+<tr><td>t_eval_grad_f</td></tr>
+<tr><td>t_eval_h</td></tr>
+<tr><td>t_eval_jac_g</td></tr>
+<tr><td>t_mainloop</td></tr>
 <tr><td>var_integer_md</td></tr>
 <tr><td>var_numeric_md</td></tr>
 <tr><td>var_string_md</td></tr>
@@ -221,6 +212,13 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>base class init time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>constraint jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag sparsity time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>objective gradient gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>objective jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>return_status</td><td>casadi::KnitroInterface</td></tr>
 </table>
 */
@@ -298,6 +296,38 @@
 <tr><th>Id</th></tr>
 <tr><td>iter</td></tr>
 <tr><td>return_status</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::NlpSolverInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>base class init time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>constraint jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag sparsity time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>objective gradient gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>objective jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup general_NlpSolver
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>base class init time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>constraint jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag sparsity time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>objective gradient gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>objective jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -411,7 +441,14 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>base class init time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>constraint jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag sparsity time</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iter_count</td><td>casadi::Scpgen</td></tr>
+<tr><td>objective gradient gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>objective jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
 </table>
 */
 /// \endcond
@@ -451,11 +488,18 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>base class init time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>constraint jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag sparsity time</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iter_count</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>iterations</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>n_callback_fun</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>n_eval_grad_f</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>n_eval_jac_g</td><td>casadi::SnoptInterface</td></tr>
+<tr><td>objective gradient gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>objective jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>return_status</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>t_callback_fun</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>t_eval_grad_f</td><td>casadi::SnoptInterface</td></tr>
@@ -509,6 +553,11 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>base class init time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>constraint jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag sparsity time</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iter_count</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>iteration</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>iterations</td><td>casadi::Sqpmethod</td></tr>
@@ -517,6 +566,8 @@
 <tr><td>n_eval_grad_f</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>n_eval_h</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>n_eval_jac_g</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>objective gradient gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>objective jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>return_status</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>t_callback_fun</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>t_callback_prepare</td><td>casadi::Sqpmethod</td></tr>
@@ -581,7 +632,14 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>base class init time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>constraint jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag sparsity time</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iter_count</td><td>casadi::StabilizedSqp</td></tr>
+<tr><td>objective gradient gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>objective jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>return_status</td><td>casadi::StabilizedSqp</td></tr>
 </table>
 */
@@ -603,6 +661,11 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>base class init time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>constraint jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>grad lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>hess lag sparsity time</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>iter_count</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>iteration</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>iterations</td><td>casadi::WorhpInterface</td></tr>
@@ -611,6 +674,8 @@
 <tr><td>n_eval_grad_f</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>n_eval_h</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>n_eval_jac_g</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>objective gradient gen time</td><td>casadi::NlpSolverInternal</td></tr>
+<tr><td>objective jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>return_code</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>return_status</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>t_callback_fun</td><td>casadi::WorhpInterface</td></tr>
