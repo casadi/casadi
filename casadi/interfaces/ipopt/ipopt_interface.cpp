@@ -538,23 +538,14 @@ namespace casadi {
     if (status == Insufficient_Memory)
       stats_["return_status"] = "Insufficient_Memory";
 
-    stats_["t_eval_f.user"] = t_eval_f_.user;
-    stats_["t_eval_grad_f.user"] = t_eval_grad_f_.user;
-    stats_["t_eval_g.user"] = t_eval_g_.user;
-    stats_["t_eval_jac_g.user"] = t_eval_jac_g_.user;
-    stats_["t_eval_h.user"] = t_eval_h_.user;
-    stats_["t_mainloop.user"] = t_mainloop_.user;
-    stats_["t_callback_fun.user"] = t_callback_fun_.user;
-    stats_["t_callback_prepare.user"] = t_callback_prepare_.user;
-
-    stats_["t_eval_f.real"] = t_eval_f_.real;
-    stats_["t_eval_grad_f.real"] = t_eval_grad_f_.real;
-    stats_["t_eval_g.real"] = t_eval_g_.real;
-    stats_["t_eval_jac_g.real"] = t_eval_jac_g_.real;
-    stats_["t_eval_h.real"] = t_eval_h_.real;
-    stats_["t_mainloop.real"] = t_mainloop_.real;
-    stats_["t_callback_fun.real"] = t_callback_fun_.real;
-    stats_["t_callback_prepare.real"] = t_callback_prepare_.real;
+    stats_["t_eval_f"] = diffToDict(t_eval_f_);
+    stats_["t_eval_grad_f"] = diffToDict(t_eval_grad_f_);
+    stats_["t_eval_g"] = diffToDict(t_eval_g_);
+    stats_["t_eval_jac_g"] = diffToDict(t_eval_jac_g_);
+    stats_["t_eval_h"] = diffToDict(t_eval_h_);
+    stats_["t_mainloop"] = diffToDict(t_mainloop_);
+    stats_["t_callback_fun"] = diffToDict(t_callback_fun_);
+    stats_["t_callback_prepare"] = diffToDict(t_callback_prepare_);
 
     stats_["n_eval_f"] = n_eval_f_;
     stats_["n_eval_grad_f"] = n_eval_grad_f_;
