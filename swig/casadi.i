@@ -1291,7 +1291,6 @@ import_array();
 #ifndef CASADI_NOT_IN_DERIVED
           || to_generic<casadi::DerivativeGenerator>(p, m)
 #endif
-          || to_generic<casadi::diffTime>(p, m)
           || to_generic<casadi::GenericType::Dict>(p, m)) {
         return true;
       }
@@ -1371,7 +1370,6 @@ import_array();
       case OT_STRINGVECTOR: return from_tmp(a->asStringVector());
       case OT_DICT: return from_tmp(a->asDict());
       case OT_FUNCTION: return from_tmp(a->asFunction());
-      case OT_DIFFTIME: return from_tmp(a->asDiffTime());
 #ifdef SWIGPYTHON
       case OT_NULL: return Py_None;
 #endif // SWIGPYTHON
