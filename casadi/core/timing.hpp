@@ -33,13 +33,13 @@ namespace casadi {
 /// \cond INTERNAL
 
   typedef struct {
-    double proc;
-    double wall;
+    double user;
+    double real;
   } timer;
 
   typedef struct {
-    double proc;
-    double wall;
+    double user;
+    double real;
   } diffTime;
 
   CASADI_EXPORT timer getTimerTime(void);
