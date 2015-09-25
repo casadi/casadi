@@ -24,6 +24,7 @@
 
 
 #include "timing.hpp"
+#include <ctime>
 
 namespace casadi {
 
