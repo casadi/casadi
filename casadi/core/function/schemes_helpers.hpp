@@ -38,6 +38,7 @@ template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > cleIn(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -56,6 +57,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > cleIn(
 template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > cleOut(
     const std::string &n0 ="", const M &x0 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   std::string s[] = {"p"};
@@ -81,6 +83,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > controldaeIn(
     const std::string &n6 ="", const M &x6 =M(),
     const std::string &n7 ="", const M &x7 =M(),
     const std::string &n8 ="", const M &x8 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -108,6 +111,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > controlsimulatorI
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -128,6 +132,7 @@ template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > dleIn(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -146,6 +151,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > dleIn(
 template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > dleOut(
     const std::string &n0 ="", const M &x0 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   std::string s[] = {"p"};
@@ -164,6 +170,7 @@ template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > dpleIn(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -182,6 +189,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > dpleIn(
 template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > dpleOut(
     const std::string &n0 ="", const M &x0 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   std::string s[] = {"p"};
@@ -201,6 +209,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > hnlpIn(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -223,6 +232,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > daeIn(
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M(),
     const std::string &n3 ="", const M &x3 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -245,6 +255,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > daeOut(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -270,6 +281,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > rdaeIn(
     const std::string &n4 ="", const M &x4 =M(),
     const std::string &n5 ="", const M &x5 =M(),
     const std::string &n6 ="", const M &x6 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -295,6 +307,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > rdaeOut(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -319,6 +332,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > integratorIn(
     const std::string &n3 ="", const M &x3 =M(),
     const std::string &n4 ="", const M &x4 =M(),
     const std::string &n5 ="", const M &x5 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -346,6 +360,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > integratorOut(
     const std::string &n3 ="", const M &x3 =M(),
     const std::string &n4 ="", const M &x4 =M(),
     const std::string &n5 ="", const M &x5 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -369,6 +384,7 @@ template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > linsolIn(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -387,6 +403,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > linsolIn(
 template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > linsolOut(
     const std::string &n0 ="", const M &x0 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   std::string s[] = {"X"};
@@ -409,6 +426,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > lpIn(
     const std::string &n3 ="", const M &x3 =M(),
     const std::string &n4 ="", const M &x4 =M(),
     const std::string &n5 ="", const M &x5 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -434,6 +452,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > lpOut(
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M(),
     const std::string &n3 ="", const M &x3 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -457,6 +476,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > lrdleIn(
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M(),
     const std::string &n3 ="", const M &x3 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -477,6 +497,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > lrdleIn(
 template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > lrdleOut(
     const std::string &n0 ="", const M &x0 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   std::string s[] = {"y"};
@@ -497,6 +518,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > lrdpleIn(
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M(),
     const std::string &n3 ="", const M &x3 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -517,6 +539,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > lrdpleIn(
 template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > lrdpleOut(
     const std::string &n0 ="", const M &x0 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   std::string s[] = {"y"};
@@ -535,6 +558,7 @@ template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > nlpIn(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -554,6 +578,7 @@ template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > nlpOut(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -573,6 +598,7 @@ template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > gradFIn(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -593,6 +619,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > gradFOut(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -613,6 +640,7 @@ template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > jacGIn(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -633,6 +661,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > jacGOut(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -655,6 +684,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > hessLagIn(
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M(),
     const std::string &n3 ="", const M &x3 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -679,6 +709,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > hessLagOut(
     const std::string &n2 ="", const M &x2 =M(),
     const std::string &n3 ="", const M &x3 =M(),
     const std::string &n4 ="", const M &x4 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -707,6 +738,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > nlpSolverIn(
     const std::string &n5 ="", const M &x5 =M(),
     const std::string &n6 ="", const M &x6 =M(),
     const std::string &n7 ="", const M &x7 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -736,6 +768,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > nlpSolverOut(
     const std::string &n3 ="", const M &x3 =M(),
     const std::string &n4 ="", const M &x4 =M(),
     const std::string &n5 ="", const M &x5 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -769,6 +802,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > qcqpIn(
     const std::string &n9 ="", const M &x9 =M(),
     const std::string &n10 ="", const M &x10 =M(),
     const std::string &n11 ="", const M &x11 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -800,6 +834,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > qcqpOut(
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M(),
     const std::string &n3 ="", const M &x3 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -828,6 +863,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > qpIn(
     const std::string &n6 ="", const M &x6 =M(),
     const std::string &n7 ="", const M &x7 =M(),
     const std::string &n8 ="", const M &x8 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -856,6 +892,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > qpOut(
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M(),
     const std::string &n3 ="", const M &x3 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -883,6 +920,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > sdpIn(
     const std::string &n5 ="", const M &x5 =M(),
     const std::string &n6 ="", const M &x6 =M(),
     const std::string &n7 ="", const M &x7 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -913,6 +951,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > sdpOut(
     const std::string &n4 ="", const M &x4 =M(),
     const std::string &n5 ="", const M &x5 =M(),
     const std::string &n6 ="", const M &x6 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -944,6 +983,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > sdqpIn(
     const std::string &n6 ="", const M &x6 =M(),
     const std::string &n7 ="", const M &x7 =M(),
     const std::string &n8 ="", const M &x8 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -975,6 +1015,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > sdqpOut(
     const std::string &n4 ="", const M &x4 =M(),
     const std::string &n5 ="", const M &x5 =M(),
     const std::string &n6 ="", const M &x6 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -1007,6 +1048,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > socpIn(
     const std::string &n7 ="", const M &x7 =M(),
     const std::string &n8 ="", const M &x8 =M(),
     const std::string &n9 ="", const M &x9 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -1038,6 +1080,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > socpOut(
     const std::string &n3 ="", const M &x3 =M(),
     const std::string &n4 ="", const M &x4 =M(),
     const std::string &n5 ="", const M &x5 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -1062,6 +1105,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > socpStruct(
     const std::string &n0 ="", const M &x0 =M(),
     const std::string &n1 ="", const M &x1 =M(),
     const std::string &n2 ="", const M &x2 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
@@ -1092,6 +1136,7 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > stabilizedQpIn(
     const std::string &n9 ="", const M &x9 =M(),
     const std::string &n10 ="", const M &x10 =M(),
     const std::string &n11 ="", const M &x11 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
   std::map<std::string, M> m;
   if (!n0.empty()) m[n0]=x0;
   if (!n1.empty()) m[n1]=x1;
