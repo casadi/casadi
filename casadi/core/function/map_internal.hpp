@@ -98,6 +98,9 @@ namespace casadi {
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
+    /** \brief  Is the class able to propagate seeds through the algorithm? */
+    virtual bool spCanEvaluate(bool fwd) { return true; }
+
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;
 
