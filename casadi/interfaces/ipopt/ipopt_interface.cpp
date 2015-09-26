@@ -503,10 +503,10 @@ namespace casadi {
       times.push_back(
         std::make_tuple("all previous", -1, t_all_functions));
       diffTime t_ipopt;
-      t_ipopt.proc = t_mainloop_.proc - t_all_functions.proc
-        - t_callback_prepare_.proc - t_callback_fun_.proc;
-      t_ipopt.wall = t_mainloop_.wall - t_all_functions.wall
-        - t_callback_prepare_.wall - t_callback_fun_.wall;
+      t_ipopt.user = t_mainloop_.user - t_all_functions.user
+        - t_callback_prepare_.user - t_callback_fun_.user;
+      t_ipopt.real = t_mainloop_.real - t_all_functions.real
+        - t_callback_prepare_.real - t_callback_fun_.real;
 
       times.push_back(
         std::make_tuple("callback prep", n_eval_callback_, t_callback_prepare_));
