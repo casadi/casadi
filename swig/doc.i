@@ -2175,7 +2175,13 @@ Interface to the JIT compiler SHELL
 |                 |                 |                 | command         |
 +-----------------+-----------------+-----------------+-----------------+
 | compiler_setup  | OT_STRING       | \"-fPIC -shared\" | Compiler setup  |
-|                 |                 |                 | command         |
+|                 |                 |                 | command.        |
+|                 |                 |                 | Intended to be  |
+|                 |                 |                 | fixed. The      |
+|                 |                 |                 | 'flag' option   |
+|                 |                 |                 | is the prefered |
+|                 |                 |                 | way to set      |
+|                 |                 |                 | custom flags.   |
 +-----------------+-----------------+-----------------+-----------------+
 | flags           | OT_STRINGVECTOR | GenericType()   | Compile flags   |
 |                 |                 |                 | for the JIT     |

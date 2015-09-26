@@ -5039,7 +5039,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>"gcc"</td><td>Compiler command</td><td>casadi::ShellCompiler</td></tr>
-<tr><td>compiler_setup</td><td>OT_STRING</td><td>"-fPIC -shared"</td><td>Compiler setup command</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>compiler_setup</td><td>OT_STRING</td><td>"-fPIC -shared"</td><td>Compiler setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>flags</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
@@ -5053,7 +5053,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>"gcc"</td><td>Compiler command</td></tr>
-<tr><td>compiler_setup</td><td>OT_STRING</td><td>"-fPIC -shared"</td><td>Compiler setup command</td></tr>
+<tr><td>compiler_setup</td><td>OT_STRING</td><td>"-fPIC -shared"</td><td>Compiler setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td></tr>
 <tr><td>flags</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Compile flags for the JIT compiler. Default: None</td></tr>
 </table>
 */
