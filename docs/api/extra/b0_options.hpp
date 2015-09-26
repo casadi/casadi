@@ -1942,6 +1942,7 @@
 <tr><td>var_string_md</td><td>OT_DICT</td><td>None</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>vartheta</td><td>OT_REAL</td><td>0.5</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOLEAN</td><td>false</td><td>Print out timing information about the different stages of initialization</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>warm_start_bound_frac</td><td>OT_REAL</td><td>0.001</td><td>same as bound_frac for the regular initializer. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>warm_start_bound_push</td><td>OT_REAL</td><td>0.001</td><td>same as bound_push for the regular initializer. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>warm_start_entire_iterate</td><td>OT_STRING</td><td>no</td><td>Tells algorithm whether to use the GetWarmStartIterate method in the NLP. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -2434,6 +2435,7 @@
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOLEAN</td><td>false</td><td>Print out timing information about the different stages of initialization</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NlpSolverInternal</td></tr>
 </table>
 */
@@ -4018,6 +4020,7 @@
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOLEAN</td><td>false</td><td>Print out timing information about the different stages of initialization</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NlpSolverInternal</td></tr>
 </table>
 */
@@ -4063,6 +4066,7 @@
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOLEAN</td><td>false</td><td>Print out timing information about the different stages of initialization</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NlpSolverInternal</td></tr>
 </table>
 */
@@ -4831,6 +4835,7 @@
 <tr><td>tol_reg</td><td>OT_REAL</td><td>1e-11</td><td>Stopping criterion for regularization</td><td>casadi::Scpgen</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOLEAN</td><td>false</td><td>Print out timing information about the different stages of initialization</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NlpSolverInternal</td></tr>
 </table>
 */
@@ -5422,6 +5427,7 @@
 <tr><td>summary</td><td>OT_BOOLEAN</td><td>True</td><td>n/a</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOLEAN</td><td>false</td><td>Print out timing information about the different stages of initialization</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NlpSolverInternal</td></tr>
 </table>
 */
@@ -5694,6 +5700,7 @@
 <tr><td>tol_pr</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOLEAN</td><td>false</td><td>Print out timing information about the different stages of initialization</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NlpSolverInternal</td></tr>
 </table>
 */
@@ -5924,6 +5931,7 @@
 <tr><td>tol_pr</td><td>OT_REAL</td><td>1e-5</td><td>Stopping criterion for primal infeasibility</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOLEAN</td><td>false</td><td>Print out timing information about the different stages of initialization</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>yEinitial</td><td>OT_STRING</td><td>"simple"</td><td>Initial multiplier. Simple (all zero) or least (LSQ).</td><td>casadi::StabilizedSqp</td></tr>
 </table>
@@ -6377,6 +6385,7 @@
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOLEAN</td><td>false</td><td>Print out timing information about the different stages of initialization</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NlpSolverInternal</td></tr>
 </table>
 */
