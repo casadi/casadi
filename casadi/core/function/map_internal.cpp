@@ -87,7 +87,7 @@ namespace casadi {
 
     // Give a name
     setOption("name", "unnamed_map");
-    
+
     setOption("input_scheme", f_.inputScheme());
     setOption("output_scheme", f_.outputScheme());
   }
@@ -113,7 +113,7 @@ namespace casadi {
     for (int i=0;i<n_out_;++i) {
       output(i) = DMatrix::zeros(repmat(f_.outputSparsity(i), 1, n_));
     }
-    
+
     // Call the initialization method of the base class
     MapBase::init();
 
@@ -166,7 +166,7 @@ namespace casadi {
       f_->spAdj(arg1, res1, iw, w);
     }
   }
-  
+
   void MapSerial::generateDeclarations(CodeGenerator& g) const {
     f_->addDependency(g);
   }
@@ -175,7 +175,7 @@ namespace casadi {
 
     g.body << "  const real_t** arg1 = arg+" << nIn() << ";"<< endl;
     g.body << "  real_t** res1 = res+" << nOut() << ";" << endl;
-    
+
     g.body << "  int i;" << endl;
     g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
     for (int j=0; j<n_in_; ++j) {
@@ -616,7 +616,7 @@ namespace casadi {
       f_->eval(arg_i, res_i, iw_i, w_i);
     }
   }
-  
+
   void MapOmp::generateDeclarations(CodeGenerator& g) const {
     f_->addDependency(g);
   }
@@ -624,7 +624,7 @@ namespace casadi {
   void MapOmp::generateBody(CodeGenerator& g) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-    
+
     g.body << "  int i;" << endl;
     g.body << "#pragma omp parallel for" << endl;
     g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
@@ -634,7 +634,8 @@ namespace casadi {
     }
     g.body << "    double** res_i = res + " <<  n_out_ << "+" <<  sz_res << "*i;" << endl;
     for (int j=0; j<n_out_; ++j) {
-      g.body << "    res_i[" << j << "] = res[" << j << "] ? res[" << j << "]+i*" << f_.output(j).nnz() << ": 0;" << endl;
+      g.body << "    res_i[" << j << "] = res[" << j << "] ?" <<
+                "res[" << j << "]+i*" << f_.output(j).nnz() << ": 0;" << endl;
     }
     g.body << "    int* iw_i = iw + i*" << sz_iw << ";" << endl;
     g.body << "    double* w_i = w + i*" << sz_w << ";" << endl;

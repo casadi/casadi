@@ -153,12 +153,12 @@ namespace casadi {
 
     Dict options;
     options["parallelization"] = parallelization;
-    
+
     Function ms;
     if (repeated) {
       ms = Map("map", *this, n, options);
     } else {
-      ms = Map("mapsum", *this, n, repeat_n, std::vector<bool>(nOut(), true), options);      
+      ms = Map("mapsum", *this, n, repeat_n, std::vector<bool>(nOut(), true), options);
     }
     // Call the internal function
     return ms(x);
