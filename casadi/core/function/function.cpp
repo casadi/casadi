@@ -144,12 +144,22 @@ namespace casadi {
       repeat_n.push_back(x[i].size2()/input(i).size2()==n);
     }
 
+    bool repeated = true;
+    for (int i=0;i<repeat_n.size();++i) {
+      repeated &= repeat_n[i];
+    }
+
     // Call the internal function
 
     Dict options;
     options["parallelization"] = parallelization;
-    Function ms = Map("map", *this, n, options);
-
+    
+    Function ms;
+    if (repeated) {
+      ms = Map("map", *this, n, options);
+    } else {
+      ms = Map("mapsum", *this, n, repeat_n, std::vector<bool>(nOut(), true), options);      
+    }
     // Call the internal function
     return ms(x);
   }

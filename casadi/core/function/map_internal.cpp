@@ -87,6 +87,9 @@ namespace casadi {
 
     // Give a name
     setOption("name", "unnamed_map");
+    
+    setOption("input_scheme", f_.inputScheme());
+    setOption("output_scheme", f_.outputScheme());
   }
 
   MapBase::~MapBase() {
@@ -96,8 +99,6 @@ namespace casadi {
   }
 
   void MapSerial::init() {
-    // Call the initialization method of the base class
-    MapBase::init();
 
     // Initialize the functions, get input and output sparsities
     // Input and output sparsities
@@ -112,6 +113,9 @@ namespace casadi {
     for (int i=0;i<n_out_;++i) {
       output(i) = DMatrix::zeros(repmat(f_.outputSparsity(i), 1, n_));
     }
+    
+    // Call the initialization method of the base class
+    MapBase::init();
 
     // Allocate sufficient memory for serial evaluation
     alloc_arg(f_.sz_arg());
@@ -153,8 +157,12 @@ namespace casadi {
     bvec_t** arg1 = arg+nIn();
     bvec_t** res1 = res+nOut();
     for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
-      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      for (int j=0; j<n_in; ++j) {
+        arg1[j] = arg[j] ? arg[j]+i*f_.input(j).nnz(): 0;
+      }
+      for (int j=0; j<n_out; ++j) {
+        res1[j]= res[j] ? res[j]+i*f_.output(j).nnz(): 0;
+      }
       f_->spAdj(arg1, res1, iw, w);
     }
   }
@@ -180,6 +188,24 @@ namespace casadi {
     }
     g.body << "    " << g.call(f_, "arg1", "res1", "iw", "w") << ";" << endl;
     g.body << "  }" << std::endl;
+  }
+
+  Function MapSerial
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
+    // Differentiate mapped function
+    Function df = f_.derForward(nfwd);
+
+    // Construct and return
+    return Map(name, df, n_, opts);
+  }
+
+  Function MapSerial
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
+    // Differentiate mapped function
+    Function df = f_.derReverse(nadj);
+
+    // Construct and return
+    return Map(name, df, n_, opts);
   }
 
   MapReduce::MapReduce(const Function& f, int n,
@@ -612,7 +638,7 @@ namespace casadi {
     }
     g.body << "    int* iw_i = iw + i*" << sz_iw << ";" << endl;
     g.body << "    double* w_i = w + i*" << sz_w << ";" << endl;
-    g.body << "    " << g.call(f_, "arg_i", "res_i", "iw", "w") << ";" << endl;
+    g.body << "    " << g.call(f_, "arg_i", "res_i", "iw_i", "w_i") << ";" << endl;
     g.body << "  }" << std::endl;
   }
 
