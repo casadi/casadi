@@ -180,7 +180,7 @@ namespace casadi {
     is_init_ = true;
   }
 
-  void FunctionInternal::postinit() {
+  void FunctionInternal::finalize() {
     if (jit_) {
       CodeGenerator gen;
       gen.add(shared_from_this<Function>(), "jit_tmp");

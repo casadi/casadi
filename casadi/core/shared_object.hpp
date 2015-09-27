@@ -202,8 +202,8 @@ namespace casadi {
     /// Initialize the object
     virtual void init();
 
-    /// Second pass of the initialization. To be run when init has been completed.
-    virtual void postinit();
+    /// Finalize the object creation. To be run when init has been completed.
+    virtual void finalize();
 
     /// Check if the object has been initialized
     bool isInit() const;
