@@ -514,25 +514,6 @@ namespace casadi {
     }
   }
 
-  MXFunctionInternal* MXFunctionInternal::clone() const {
-    return new MXFunctionInternal(*this);
-  }
-
-  void MXFunctionInternal::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    XFunctionInternal<MXFunction, MXFunctionInternal, MX, MXNode>::deepCopyMembers(already_copied);
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      if (it->data.isNull()) continue;
-      int nf = it->data->numFunctions();
-      if (nf==0) continue;
-      it->data.makeUnique(already_copied, false);
-      for (int i=0; i<nf; ++i) {
-        Function& f_i = const_cast<Function&>(it->data->getFunction(i)); // FIXME or remove function
-        f_i = deepcopy(f_i, already_copied);
-      }
-    }
-  }
-
   void MXFunctionInternal::spInit(bool fwd) {
     alloc();
     bvec_t *iwork = get_bvec_t(w_tmp_);

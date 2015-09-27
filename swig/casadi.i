@@ -200,10 +200,7 @@ class _copyableObject(_object):
     return self.__class__(self)
 
   def __deepcopy__(self,dummy=None):
-    shallow = self.__class__(self)
-    if hasattr(self,'makeUnique'):
-      shallow.makeUnique()
-    return shallow
+    return self.__class__(self)
 
 _object = _copyableObject
 
@@ -456,7 +453,6 @@ import_array();
 
     DerivativeGeneratorPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
       virtual Function call(Function& fcn, int ndir, void* user_data);
-      virtual DerivativeGeneratorPythonInternal* clone() const { return new DerivativeGeneratorPythonInternal(p_); }
     };
 
     class CustomEvaluatePythonInternal : public CustomEvaluateInternal, FunctorPythonInternal {
@@ -464,7 +460,6 @@ import_array();
 
     CustomEvaluatePythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
       virtual void call(CustomFunction& fcn, void* user_data);
-      virtual CustomEvaluatePythonInternal* clone() const { return new CustomEvaluatePythonInternal(p_); }
     };
 
     class DerivativeGeneratorPython : public DerivativeGenerator {
@@ -477,7 +472,6 @@ import_array();
 
     CallbackPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
       virtual int call(Function& fcn, void* user_data);
-      virtual CallbackPythonInternal* clone() const { return new CallbackPythonInternal(p_); }
     };
 
     class CustomEvaluatePython : public CustomEvaluate {

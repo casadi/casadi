@@ -73,9 +73,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~FunctionInternal() = 0;
 
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
     /** \brief  Evaluate using internal data structures */
     virtual void evaluate();
 

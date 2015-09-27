@@ -59,12 +59,6 @@ namespace casadi {
     // Destructor
     virtual ~SymbolicQr();
 
-    /** \brief  Clone */
-    virtual SymbolicQr* clone() const { return new SymbolicQr(*this);}
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
     /** \brief  Create a new LinearSolver */
     static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
     { return new SymbolicQr(sp, nrhs);}

@@ -55,9 +55,6 @@ public:
   /** \brief  Constructor */
   explicit QpToNlp();
 
-  /** \brief  Clone */
-  virtual QpToNlp* clone() const;
-
   /** \brief  Create a new QP Solver */
   static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
     return new QpToNlp(st);

@@ -50,14 +50,6 @@ namespace casadi {
     CompilerInternal::registerPlugin(casadi_register_compiler_shell);
   }
 
-  ShellCompiler* ShellCompiler::clone() const {
-    // Return a deep copy
-    ShellCompiler* node = new ShellCompiler(name_);
-    if (!node->is_init_)
-      node->init();
-    return node;
-  }
-
   ShellCompiler::ShellCompiler(const std::string& name) :
     CompilerInternal(name) {
     addOption("compiler", OT_STRING, "gcc", "Compiler command");

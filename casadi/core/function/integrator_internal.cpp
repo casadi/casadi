@@ -192,15 +192,6 @@ namespace casadi {
     alloc_w(sz_w + nx_ + nz_ + nrx_ + nrz_);
   }
 
-  void IntegratorInternal::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    FunctionInternal::deepCopyMembers(already_copied);
-    f_ = deepcopy(f_, already_copied);
-    g_ = deepcopy(g_, already_copied);
-    linsol_f_ = deepcopy(linsol_f_, already_copied);
-    linsol_g_ = deepcopy(linsol_g_, already_copied);
-  }
-
   std::pair<Function, Function> IntegratorInternal::getAugmented(int nfwd, int nadj,
                                                                 AugOffset& offset) {
     log("IntegratorInternal::getAugmented", "call");

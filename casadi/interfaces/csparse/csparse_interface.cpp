@@ -206,9 +206,4 @@ namespace casadi {
     }
   }
 
-
-  CsparseInterface* CsparseInterface::clone() const {
-    return new CsparseInterface(input(LINSOL_A).sparsity(), input(LINSOL_B).size2());
-  }
-
 } // namespace casadi

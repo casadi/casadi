@@ -55,14 +55,6 @@ namespace casadi {
   ImplicitFunctionInternal::~ImplicitFunctionInternal() {
   }
 
-  void ImplicitFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,
-                                                 SharedObject>& already_copied) {
-    FunctionInternal::deepCopyMembers(already_copied);
-    f_ = deepcopy(f_, already_copied);
-    jac_ = deepcopy(jac_, already_copied);
-    linsol_ = deepcopy(linsol_, already_copied);
-  }
-
   void ImplicitFunctionInternal::init() {
 
     // Initialize the residual function

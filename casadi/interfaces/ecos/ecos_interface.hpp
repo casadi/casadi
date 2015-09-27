@@ -54,9 +54,6 @@ namespace casadi {
     /** \brief Constructor */
     explicit EcosInterface(const std::map<std::string, Sparsity> &st);
 
-    /** \brief Clone */
-    virtual EcosInterface* clone() const;
-
     /** \brief  Create a new SOCP Solver */
     static SocpSolverInternal* creator(const std::map<std::string, Sparsity> &st)
     { return new EcosInterface(st);}

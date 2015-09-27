@@ -64,9 +64,6 @@ namespace casadi {
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     LapackQrDense(const Sparsity& sparsity, int nrhs);
 
-    // Clone
-    virtual LapackQrDense* clone() const;
-
     /** \brief  Create a new LinearSolver */
     static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
     { return new LapackQrDense(sp, nrhs);}

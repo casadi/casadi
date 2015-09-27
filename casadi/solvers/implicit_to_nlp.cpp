@@ -53,12 +53,6 @@ namespace casadi {
   QpToImplicit::~QpToImplicit() {
   }
 
-  void QpToImplicit::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    ImplicitFunctionInternal::deepCopyMembers(already_copied);
-    solver_ = deepcopy(solver_, already_copied);
-  }
-
   void QpToImplicit::solveNonLinear() {
 
     // Equality nonlinear constraints

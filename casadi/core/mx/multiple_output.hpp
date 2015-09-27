@@ -74,9 +74,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~OutputNode();
 
-    /** \brief  Clone function */
-    virtual OutputNode* clone() const { return new OutputNode(*this);}
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 

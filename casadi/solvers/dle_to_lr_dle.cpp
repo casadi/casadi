@@ -103,20 +103,6 @@ namespace casadi {
     return f_.derReverse(nadj);
   }
 
-  void DleToLrDle::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    DleInternal::deepCopyMembers(already_copied);
-  }
-
-  DleToLrDle* DleToLrDle::clone() const {
-    // Return a deep copy
-    DleToLrDle* node =
-      new DleToLrDle(make_map("a", st_[Dle_STRUCT_A], "v", st_[Dle_STRUCT_V]));
-    node->setOption(dictionary());
-    return node;
-  }
-
-
 } // namespace casadi
 
 

@@ -68,9 +68,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~Call() {}
 
-    /** \brief  Clone function */
-    virtual Call* clone() const;
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
@@ -115,9 +112,6 @@ namespace casadi {
 
     /** \brief  Get function output */
     virtual int getFunctionOutput() const { return -1;}
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Number of outputs */
     virtual int nout() const;

@@ -159,19 +159,6 @@ namespace casadi {
     return f_.derReverse(nadj);
   }
 
-  void SimpleIndefDleInternal::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    DleInternal::deepCopyMembers(already_copied);
-  }
-
-  SimpleIndefDleInternal* SimpleIndefDleInternal::clone() const {
-    // Return a deep copy
-    SimpleIndefDleInternal* node = new SimpleIndefDleInternal(st_, Hs_);
-    node->setOption(dictionary());
-    return node;
-  }
-
-
 } // namespace casadi
 
 

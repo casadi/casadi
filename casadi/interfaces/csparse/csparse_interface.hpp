@@ -68,9 +68,6 @@ namespace casadi {
     // Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose);
 
-    // Clone
-    virtual CsparseInterface* clone() const;
-
     // Has the solve function been called once
     bool called_once_;
 

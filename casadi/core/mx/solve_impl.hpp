@@ -110,12 +110,6 @@ namespace casadi {
     linear_solver_->spAdjLinsol(arg, res, iw, w, Tr, dep(0).size2());
   }
 
-  template<bool Tr>
-  void Solve<Tr>::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    MXNode::deepCopyMembers(already_copied);
-    linear_solver_ = deepcopy(linear_solver_, already_copied);
-  }
-
 } // namespace casadi
 
 /// \endcond

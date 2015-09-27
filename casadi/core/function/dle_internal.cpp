@@ -134,10 +134,6 @@ namespace casadi {
     return P;
   }
 
-  void DleInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    FunctionInternal::deepCopyMembers(already_copied);
-  }
-
   std::map<std::string, DleInternal::Plugin> DleInternal::solvers_;
 
   const std::string DleInternal::infix_ = "dlesolver";

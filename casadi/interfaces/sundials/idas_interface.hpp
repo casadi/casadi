@@ -74,9 +74,6 @@ namespace casadi {
     /** \brief  Copy constructor */
     //  IdasInterface(const IdasInterface& integrator);
 
-    /** \brief  Clone */
-    virtual IdasInterface* clone() const;
-
     /** \brief  Create a new integrator */
     virtual IdasInterface* create(const Function& f, const Function& g) const
     { return new IdasInterface(f, g);}
@@ -84,9 +81,6 @@ namespace casadi {
     /** \brief  Create a new integrator */
     static IntegratorInternal* creator(const Function& f, const Function& g)
     { return new IdasInterface(f, g);}
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Destructor */
     virtual ~IdasInterface();

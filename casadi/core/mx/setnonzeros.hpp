@@ -51,9 +51,6 @@ namespace casadi {
     /// Get all the nonzeros
     virtual std::vector<int> getAll() const = 0;
 
-    /// Clone function
-    virtual SetNonzeros* clone() const = 0;
-
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
@@ -86,9 +83,6 @@ namespace casadi {
 
     /// Constructor
     SetNonzerosVector(const MX& y, const MX& x, const std::vector<int>& nz);
-
-    /// Clone function
-    virtual SetNonzerosVector* clone() const { return new SetNonzerosVector(*this);}
 
     /// Destructor
     virtual ~SetNonzerosVector() {}
@@ -135,9 +129,6 @@ namespace casadi {
 
     /// Constructor
     SetNonzerosSlice(const MX& y, const MX& x, const Slice& s) : SetNonzeros<Add>(y, x), s_(s) {}
-
-    /// Clone function
-    virtual SetNonzerosSlice* clone() const { return new SetNonzerosSlice(*this);}
 
     /// Destructor
     virtual ~SetNonzerosSlice() {}
@@ -192,9 +183,6 @@ namespace casadi {
     /// Constructor
     SetNonzerosSlice2(const MX& y, const MX& x, const Slice& inner, const Slice& outer) :
         SetNonzeros<Add>(y, x), inner_(inner), outer_(outer) {}
-
-    /// Clone function
-    virtual SetNonzerosSlice2* clone() const { return new SetNonzerosSlice2(*this);}
 
     /// Destructor
     virtual ~SetNonzerosSlice2() {}

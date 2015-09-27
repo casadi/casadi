@@ -47,11 +47,6 @@ namespace casadi {
       FixedStepIntegrator(f, g) {
   }
 
-  void RkIntegrator::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    FixedStepIntegrator::deepCopyMembers(already_copied);
-  }
-
   RkIntegrator::~RkIntegrator() {
   }
 

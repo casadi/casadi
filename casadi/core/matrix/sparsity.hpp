@@ -219,17 +219,11 @@ namespace casadi {
     std::vector<int> compress() const;
 
 #ifndef SWIG
-    /// @{
     /// Access a member function or object
-    SparsityInternal* operator->();
     const SparsityInternal* operator->() const;
-    /// @}
 
     /// Reference to internal structure
-    /// @{
-    SparsityInternal& operator*();
     const SparsityInternal& operator*() const;
-    /// @}
 #endif // SWIG
     /// \name Check if two sparsity patterns are identical
     /// @{

@@ -176,46 +176,6 @@ namespace casadi {
     stream << typeid(this).name();
   }
 
-  void SharedObject::makeUnique(bool clone_members) {
-    std::map<SharedObjectNode*, SharedObject> already_copied;
-    makeUnique(already_copied, clone_members);
-  }
-
-  void SharedObject::makeUnique(std::map<SharedObjectNode*, SharedObject>& already_copied,
-                                bool clone_members) {
-    if (node && node->count>1) {
-      // First find out if the expression has already been copied
-      std::map<SharedObjectNode*, SharedObject>::iterator it = already_copied.find(node);
-
-      if (it==already_copied.end()) {
-        // If the expression has not yet been copied
-        SharedObjectNode *newnode = node->clone();
-
-        // Copy the data members
-        if (clone_members) newnode->deepCopyMembers(already_copied);
-
-        // Initialize object if parent was initialized
-        if (isInit() && !newnode->is_init_) {
-          newnode->init();
-        }
-
-        // Assign cloned node to object
-        assignNode(newnode);
-      } else {
-        // Use an existing copy
-        assignNode(it->second.get());
-      }
-    }
-  }
-
-  SharedObject SharedObject::clone() const {
-    SharedObject ret;
-    if (!isNull()) {
-      ret.assignNode((*this)->clone());
-    }
-    return ret;
-  }
-
   void SharedObject::swap(SharedObject& other) {
     SharedObject temp = *this;
     *this = other;
@@ -228,10 +188,6 @@ namespace casadi {
 
   int SharedObjectNode::getCount() const {
     return count;
-  }
-
-  void SharedObjectNode::deepCopyMembers(std::map<SharedObjectNode*,
-                                         SharedObject>& already_copied) {
   }
 
   bool SharedObject::isInit() const {

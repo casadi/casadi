@@ -68,16 +68,10 @@ namespace casadi {
     /** \brief Constructor */
     explicit SdqpToSdp(const std::map<std::string, Sparsity> &st);
 
-    /** \brief Clone */
-    virtual SdqpToSdp* clone() const { return new SdqpToSdp(*this);}
-
     /** \brief  Create a new SDQP Solver */
     static SdqpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
       return new SdqpToSdp(st);
     }
-
-    /// Deep copy data members
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief Destructor */
     virtual ~SdqpToSdp();

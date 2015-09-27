@@ -88,9 +88,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~QcqpToSocp();
 
-    /** \brief  Clone */
-    virtual QcqpToSocp* clone() const;
-
     /** \brief  Create a new QP Solver */
     static QcqpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
       return new QcqpToSocp(st);

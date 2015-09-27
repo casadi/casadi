@@ -50,17 +50,6 @@ namespace casadi {
     SdpSolverInternal::registerPlugin(casadi_register_sdpsolver_dsdp);
   }
 
-  DsdpInterface* DsdpInterface::clone() const {
-    // Return a deep copy
-    DsdpInterface* node =
-      new DsdpInterface(make_map("h", st_[SDP_SOLVER_A],
-                                 "g", st_[SDP_SOLVER_G],
-                                 "f", st_[SDP_SOLVER_F]));
-    if (!node->is_init_)
-      node->init();
-    return node;
-  }
-
   DsdpInterface::DsdpInterface(const std::map<std::string, Sparsity> &st)
     : SdpSolverInternal(st) {
     casadi_assert_message(

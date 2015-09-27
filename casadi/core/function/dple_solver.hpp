@@ -87,9 +87,6 @@ namespace casadi {
     /// Default constructor
     DpleSolver();
 
-    /// Clone
-    DpleSolver clone() const;
-
     /** \brief Constructor (new syntax, includes initialization)
      * \param solver \pluginargument{DpleSolver}
      * \param st \structargument{Dple}

@@ -48,7 +48,6 @@ namespace casadi {
   public:
     explicit KnitroInterface(const Function& nlp);
     virtual ~KnitroInterface();
-    virtual KnitroInterface* clone() const { return new KnitroInterface(*this);}
 
     /** \brief  Create a new NLP Solver */
     static NlpSolverInternal* creator(const Function& nlp)

@@ -54,9 +54,6 @@ namespace casadi {
     /** \brief Constructor */
     explicit MosekSocpInterface(const std::map<std::string, Sparsity> &st);
 
-    /** \brief Clone */
-    virtual MosekSocpInterface* clone() const;
-
     /** \brief  Create a new SOCP Solver */
     static SocpSolverInternal* creator(const std::map<std::string, Sparsity>& st)
     { return new MosekSocpInterface(st);}

@@ -105,9 +105,6 @@ namespace casadi {
     /// Constructor
     Horzcat(const std::vector<MX>& x);
 
-    /// Clone function
-    virtual Horzcat* clone() const { return new Horzcat(*this);}
-
     /// Destructor
     virtual ~Horzcat() {}
 
@@ -148,9 +145,6 @@ namespace casadi {
     /// Constructor
     Vertcat(const std::vector<MX>& x);
 
-    /// Clone function
-    virtual Vertcat* clone() const { return new Vertcat(*this);}
-
     /// Destructor
     virtual ~Vertcat() {}
 
@@ -190,9 +184,6 @@ namespace casadi {
 
     /// Constructor
     Diagcat(const std::vector<MX>& x);
-
-    /// Clone function
-    virtual Diagcat* clone() const { return new Diagcat(*this);}
 
     /// Destructor
     virtual ~Diagcat() {}

@@ -91,9 +91,6 @@ namespace casadi {
     /// Default constructor
     LrDpleSolver();
 
-    /// Clone
-    LrDpleSolver clone() const;
-
     /** \brief Constructor (new syntax, includes initialization)
      * \param solver \pluginargument{LrDpleSolver}
      * \param st \structargument{LrDple}

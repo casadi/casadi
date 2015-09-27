@@ -825,11 +825,6 @@ namespace casadi {
     if (verbose()) userOut() << "SXFunctionInternal::evalAdj end" << endl;
   }
 
-  SXFunctionInternal* SXFunctionInternal::clone() const {
-    return new SXFunctionInternal(*this);
-  }
-
-
   void SXFunctionInternal::clearSymbolic() {
     inputv_.clear();
     outputv_.clear();

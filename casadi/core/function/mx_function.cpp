@@ -44,7 +44,7 @@ namespace casadi {
   MXFunction::MXFunction(const Function& function) {
     const MXFunctionInternal* temp = dynamic_cast<const MXFunctionInternal*>(function.get());
     if (!temp) casadi_error("MXFunction(Function)::input Function cannot be cast into MXFunction");
-    assignNode(temp->clone());
+    assignNode(const_cast<MXFunctionInternal*>(temp));
   }
 
   void MXFunction::construct(const std::string& name,

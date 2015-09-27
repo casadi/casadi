@@ -46,17 +46,6 @@ namespace casadi {
     SocpSolverInternal::registerPlugin(casadi_register_socpsolver_ecos);
   }
 
-  EcosInterface* EcosInterface::clone() const {
-    // Return a deep copy
-    EcosInterface* node = new EcosInterface(
-                        make_map("g", st_[SOCP_SOLVER_G],
-                                 "e", st_[SOCP_SOLVER_E],
-                                 "a", st_[SOCP_SOLVER_A]));
-    if (!node->is_init_)
-      node->init();
-    return node;
-  }
-
   EcosInterface::EcosInterface(const std::map<std::string, Sparsity> &st) : SocpSolverInternal(st) {
     // Define options
     addOption("gamma"         , OT_REAL     , GAMMA,

@@ -57,9 +57,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~QpToQcqp();
 
-    /** \brief  Clone */
-    virtual QpToQcqp* clone() const;
-
     /** \brief  Create a new QP Solver */
     static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
       return new QpToQcqp(st);

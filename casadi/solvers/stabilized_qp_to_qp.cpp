@@ -56,12 +56,6 @@ namespace casadi {
   StabilizedQpToQp::~StabilizedQpToQp() {
   }
 
-  void StabilizedQpToQp::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    StabilizedQpSolverInternal::deepCopyMembers(already_copied);
-    qp_solver_ = deepcopy(qp_solver_, already_copied);
-  }
-
   void StabilizedQpToQp::init() {
     // Initialize the base classes
     StabilizedQpSolverInternal::init();

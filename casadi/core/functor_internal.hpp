@@ -60,7 +60,6 @@ namespace casadi {
 
     DerivativeGeneratorCInternal(DerivativeGeneratorCPtr ptr);
     virtual Function call(Function& fcn, int ndir, void* user_data);
-    virtual DerivativeGeneratorCInternal* clone() const;
   };
 
   class CASADI_EXPORT CustomEvaluateInternal : public FunctorInternal {
@@ -74,7 +73,6 @@ namespace casadi {
 
     CustomEvaluateCInternal(CustomEvaluateCPtr ptr);
     virtual void call(CustomFunction& fcn, void* user_data);
-    virtual CustomEvaluateCInternal* clone() const;
   };
 
   class CASADI_EXPORT CallbackInternal : public FunctorInternal {
@@ -88,7 +86,6 @@ namespace casadi {
 
     CallbackCInternal(CallbackCPtr ptr);
     virtual int call(Function& fcn, void* user_data);
-    virtual CallbackCInternal* clone() const;
   };
 
   class CASADI_EXPORT IterationCallbackInternal :
@@ -97,7 +94,6 @@ namespace casadi {
 
     IterationCallbackInternal(IterationCallback & cb);
     virtual int call(Function& fcn, void* user_data);
-    virtual IterationCallbackInternal* clone() const;
 
     IterationCallback& cb_;
   };

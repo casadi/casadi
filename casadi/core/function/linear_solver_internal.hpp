@@ -47,9 +47,6 @@ namespace casadi {
     /// Destructor
     virtual ~LinearSolverInternal();
 
-    /// Clone
-    virtual LinearSolverInternal* clone() const { return new LinearSolverInternal(*this);}
-
     /// Initialize
     virtual void init();
 

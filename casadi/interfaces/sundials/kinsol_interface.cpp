@@ -94,12 +94,6 @@ namespace casadi {
     disable_internal_warnings_ = false;
   }
 
-  KinsolInterface* KinsolInterface::clone() const {
-    KinsolInterface* node = new KinsolInterface(f_);
-    node->setOption(dictionary());
-    return node;
-  }
-
   KinsolInterface::~KinsolInterface() {
     if (u_) N_VDestroy_Serial(u_);
     if (u_scale_) N_VDestroy_Serial(u_scale_);

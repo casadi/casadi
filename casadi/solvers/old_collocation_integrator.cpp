@@ -75,13 +75,6 @@ namespace casadi {
     setOption("name", "unnamed_old_collocation_integrator");
   }
 
-  void OldCollocationIntegrator::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    IntegratorInternal::deepCopyMembers(already_copied);
-    startup_integrator_ = deepcopy(startup_integrator_, already_copied);
-    implicit_solver_ = deepcopy(implicit_solver_, already_copied);
-  }
-
   OldCollocationIntegrator::~OldCollocationIntegrator() {
   }
 

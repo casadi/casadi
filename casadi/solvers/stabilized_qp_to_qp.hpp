@@ -58,16 +58,10 @@ namespace casadi {
     /** \brief Destructor */
     virtual ~StabilizedQpToQp();
 
-    /** \brief  Clone */
-    virtual StabilizedQpToQp* clone() const { return new StabilizedQpToQp(*this);}
-
     /** \brief  Create a new Stabilized QP Solver */
     static StabilizedQpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
       return new StabilizedQpToQp(st);
     }
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief Initialize */
     virtual void init();

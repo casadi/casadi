@@ -226,17 +226,11 @@ namespace casadi {
     }
 
     FunctionInternal::init();
-
-  }
-
-  void LrDpleInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    FunctionInternal::deepCopyMembers(already_copied);
   }
 
   std::map<std::string, LrDpleInternal::Plugin> LrDpleInternal::solvers_;
 
   const std::string LrDpleInternal::infix_ = "lrdplesolver";
-
 
   std::vector<Sparsity>
   LrDpleInternal::getSparsity(const std::map<std::string, std::vector<Sparsity> >& st,

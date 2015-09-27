@@ -54,7 +54,6 @@ namespace casadi {
   public:
     explicit StabilizedSqp(const Function& nlp);
     virtual ~StabilizedSqp();
-    virtual StabilizedSqp* clone() const { return new StabilizedSqp(*this);}
 
     /** \brief  Create a new NLP Solver */
     static NlpSolverInternal* creator(const Function& nlp)

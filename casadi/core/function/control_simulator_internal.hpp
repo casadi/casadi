@@ -48,10 +48,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~ControlSimulatorInternal();
 
-    /** \brief  Clone */
-    virtual ControlSimulatorInternal* clone() const {
-        return new ControlSimulatorInternal(deepcopy(dae_), deepcopy(output_fcn_), gridc_);}
-
     /** \brief  initialize */
     virtual void init();
 

@@ -30,13 +30,6 @@ using namespace std;
 namespace casadi {
 
   DpleSolver::DpleSolver() {
-
-  }
-
-  DpleSolver  DpleSolver::clone() const {
-    DpleSolver ret;
-    if (!isNull()) ret.assignNode((*this)->clone());
-    return ret;
   }
 
   void DpleSolver::printStats(ostream &stream) const {

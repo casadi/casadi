@@ -400,9 +400,6 @@ namespace casadi {
     /// Hash the sparsity pattern
     std::size_t hash() const;
 
-    /// Clone
-    virtual SparsityInternal* clone() const { return new SparsityInternal(*this); }
-
     /// Print representation
     virtual void repr(std::ostream &stream) const;
 

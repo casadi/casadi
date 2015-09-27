@@ -54,9 +54,6 @@ public:
   /** \brief  Constructor */
   explicit QpoasesInterface();
 
-  /** \brief  Clone */
-  virtual QpoasesInterface* clone() const;
-
   /** \brief  Create a new QP Solver */
   static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
     return new QpoasesInterface(st);

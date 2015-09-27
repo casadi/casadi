@@ -196,24 +196,6 @@ namespace casadi {
     return f_.derReverse(nadj);
   }
 
-  void LiftingLrDpleInternal::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    LrDpleInternal::deepCopyMembers(already_copied);
-  }
-
-  LiftingLrDpleInternal* LiftingLrDpleInternal::clone() const {
-    // Return a deep copy
-    std::map<std::string, std::vector<Sparsity> > tmp;
-    tmp["a"] = st_[LR_Dple_STRUCT_A];
-    tmp["v"] = st_[LR_Dple_STRUCT_V];
-    tmp["c"] = st_[LR_Dple_STRUCT_C];
-    tmp["h"] = st_[LR_Dple_STRUCT_H];
-    LiftingLrDpleInternal* node = new LiftingLrDpleInternal(tmp);
-    node->setOption(dictionary());
-    return node;
-  }
-
-
 } // namespace casadi
 
 

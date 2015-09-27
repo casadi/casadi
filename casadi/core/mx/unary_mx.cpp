@@ -43,10 +43,6 @@ namespace casadi {
     setSparsity(x->sparsity());
   }
 
-  UnaryMX* UnaryMX::clone() const {
-    return new UnaryMX(*this);
-  }
-
   std::string UnaryMX::print(const std::vector<std::string>& arg) const {
     stringstream ss;
     casadi_math<double>::printPre(op_, ss);

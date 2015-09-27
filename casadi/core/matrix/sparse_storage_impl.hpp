@@ -92,7 +92,6 @@ namespace casadi {
 
   template<typename DataType>
   Sparsity& SparseStorage<DataType>::sparsityRef() {
-    sparsity_.makeUnique(); // NOTE: Remove?
     return sparsity_;
   }
 

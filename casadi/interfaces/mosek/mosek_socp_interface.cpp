@@ -51,17 +51,6 @@ namespace casadi {
     SocpSolverInternal::registerPlugin(casadi_register_socpsolver_mosek);
   }
 
-  MosekSocpInterface* MosekSocpInterface::clone() const {
-    // Return a deep copy
-    MosekSocpInterface* node = new MosekSocpInterface(
-                        make_map("g", st_[SOCP_SOLVER_G],
-                                 "e", st_[SOCP_SOLVER_E],
-                                 "a", st_[SOCP_SOLVER_A]));
-    if (!node->is_init_)
-      node->init();
-    return node;
-  }
-
   MosekSocpInterface::MosekSocpInterface(const std::map<std::string, Sparsity> &st) :
       SocpSolverInternal(st) {
     // Introduce temporary task

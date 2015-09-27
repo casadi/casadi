@@ -50,12 +50,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~IntegratorInternal()=0;
 
-    /** \brief  Clone */
-    virtual IntegratorInternal* clone() const=0;
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
     /** \brief  Create a new integrator */
     virtual IntegratorInternal* create(const Function& f, const Function& g) const = 0;
 

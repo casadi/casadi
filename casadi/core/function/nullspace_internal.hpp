@@ -46,9 +46,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~NullspaceInternal();
 
-    /** \brief  Clone */
-    virtual NullspaceInternal* clone() const { return new NullspaceInternal(A_sp_);}
-
     /** \brief  initialize */
     virtual void init();
 

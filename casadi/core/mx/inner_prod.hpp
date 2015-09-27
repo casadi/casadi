@@ -43,9 +43,6 @@ namespace casadi {
     /// Constructor
     InnerProd(const MX& x, const MX& y);
 
-    /// Clone function
-    virtual InnerProd* clone() const { return new InnerProd(*this);}
-
     /// Destructor
     virtual ~InnerProd() {}
 

@@ -63,9 +63,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~KinsolInterface();
 
-    /** \brief  Clone */
-    virtual KinsolInterface* clone() const;
-
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual ImplicitFunctionInternal* create(const Function& f) const
     { return new KinsolInterface(f);}

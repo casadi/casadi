@@ -202,9 +202,6 @@ namespace casadi {
                const MXDict& dae, const Dict& opts=Dict());
     ///@}
 
-    /// Clone
-    Integrator clone() const;
-
     /// Print solver statistics
     void printStats(std::ostream &stream=casadi::userOut()) const;
 

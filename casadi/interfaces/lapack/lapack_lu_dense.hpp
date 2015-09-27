@@ -72,9 +72,6 @@ namespace casadi {
     static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
     { return new LapackLuDense(sp, nrhs);}
 
-    /// Clone
-    virtual LapackLuDense* clone() const;
-
     /// Destructor
     virtual ~LapackLuDense();
 

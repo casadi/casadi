@@ -80,9 +80,6 @@ namespace casadi {
     /// Obtain a numeric Cholesky factorization
     virtual DMatrix getFactorization(bool transpose) const;
 
-    // Clone
-    virtual CSparseCholeskyInternal* clone() const;
-
     // The transpose of linear system in form (CCS)
     cs AT_;
 

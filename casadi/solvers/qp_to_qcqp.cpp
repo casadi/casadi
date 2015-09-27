@@ -46,15 +46,6 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_qcqp);
   }
 
-  QpToQcqp* QpToQcqp::clone() const {
-    // Return a deep copy
-    QpToQcqp* node =
-      new QpToQcqp(make_map("h", st_[QP_STRUCT_H], "a", st_[QP_STRUCT_A]));
-    if (!node->is_init_)
-      node->init();
-    return node;
-  }
-
   QpToQcqp::QpToQcqp(const std::map<std::string, Sparsity> &st) : QpSolverInternal(st) {
     Adaptor<QpToQcqp, QcqpSolverInternal>::addOptions();
   }

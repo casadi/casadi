@@ -44,9 +44,6 @@ namespace casadi {
     /** \brief Constructor (generic switch) */
     SwitchInternal(const std::vector<Function>& f, const Function& f_def);
 
-    /** \brief  clone function */
-    virtual SwitchInternal* clone() const { return new SwitchInternal(*this);}
-
     /** \brief  Destructor */
     virtual ~SwitchInternal();
 

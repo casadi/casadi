@@ -58,12 +58,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~SimpleIndefDpleInternal();
 
-    /** \brief  Clone */
-    virtual SimpleIndefDpleInternal* clone() const;
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
     /** \brief  Create a new solver */
     virtual SimpleIndefDpleInternal* create(const DpleStructure& st, const std::vector< std::vector<int> > &Hs) const {
         return new SimpleIndefDpleInternal(st, Hs);}

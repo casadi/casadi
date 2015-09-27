@@ -53,9 +53,6 @@ namespace casadi {
     /** \brief  Constructor */
     explicit OoqpInterface();
 
-    /** \brief  Clone */
-    virtual OoqpInterface* clone() const { return new OoqpInterface(*this);}
-
     /** \brief  Create a new Solver */
     explicit OoqpInterface(const std::map<std::string, Sparsity>& st);
 

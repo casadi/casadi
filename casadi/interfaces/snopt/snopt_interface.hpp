@@ -53,9 +53,6 @@ namespace casadi {
     // Destructor
     virtual ~SnoptInterface();
 
-    // Clone function
-    virtual SnoptInterface* clone() const;
-
     /** \brief  Create a new NLP Solver */
     static NlpSolverInternal* creator(const Function& nlp)
     { return new SnoptInterface(nlp);}

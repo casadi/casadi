@@ -85,9 +85,6 @@ class CASADI_EXPORT SXFunctionInternal :
 
   public:
 
-  /** \brief  Make a deep copy */
-  virtual SXFunctionInternal* clone() const;
-
   /** \brief  Destructor */
   virtual ~SXFunctionInternal();
 

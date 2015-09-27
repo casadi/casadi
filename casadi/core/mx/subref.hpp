@@ -43,9 +43,6 @@ namespace casadi {
     /// Constructor
     SubRef(const MX& x, const Slice& i, const Slice& j);
 
-    /// Clone function
-    virtual SubRef* clone() const;
-
     /// Destructor
     virtual ~SubRef() {}
 

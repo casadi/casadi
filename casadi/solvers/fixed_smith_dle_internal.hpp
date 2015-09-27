@@ -106,12 +106,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~FixedSmithDleInternal();
 
-    /** \brief  Clone */
-    virtual FixedSmithDleInternal* clone() const;
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
     /** \brief  Create a new solver */
     virtual FixedSmithDleInternal* create(const std::map<std::string, Sparsity>& st) const {
         return new FixedSmithDleInternal(st);}

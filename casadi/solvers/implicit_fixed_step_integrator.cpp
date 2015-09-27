@@ -39,13 +39,6 @@ namespace casadi {
               "Options to be passed to the NLP Solver");
   }
 
-  void ImplicitFixedStepIntegrator::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    FixedStepIntegrator::deepCopyMembers(already_copied);
-    implicit_solver_ = deepcopy(implicit_solver_, already_copied);
-    backward_implicit_solver_ = deepcopy(backward_implicit_solver_, already_copied);
-  }
-
   ImplicitFixedStepIntegrator::~ImplicitFixedStepIntegrator() {
   }
 

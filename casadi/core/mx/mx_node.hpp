@@ -86,9 +86,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~MXNode()=0;
 
-    /** \brief  Clone function */
-    virtual MXNode* clone() const = 0;
-
     /** \brief Check the truth value of this node
      */
     virtual bool __nonzero__() const;
@@ -110,9 +107,6 @@ namespace casadi {
 
     /** \brief Check if binary operation */
     virtual bool isBinaryOp() const { return false;}
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Print a representation */
     virtual void repr(std::ostream &stream) const;

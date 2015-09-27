@@ -542,16 +542,6 @@ namespace casadi {
     return (*this)->sparsity();
   }
 
-  Sparsity& MX::sparsityRef() {
-    // Since we can potentially change the behavior of the MX node,
-    // we must make a deep copy if there are other references
-    makeUnique();
-
-    // Return the reference, again, deep copy if multiple references
-    (*this)->sparsity_.makeUnique();
-    return (*this)->sparsity_;
-  }
-
   void MX::erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1) {
     // Get sparsity of the new matrix
     Sparsity sp = sparsity();

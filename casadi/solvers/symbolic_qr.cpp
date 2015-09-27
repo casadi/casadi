@@ -59,14 +59,6 @@ namespace casadi {
   SymbolicQr::~SymbolicQr() {
   }
 
-  void SymbolicQr::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    LinearSolverInternal::deepCopyMembers(already_copied);
-    fact_fcn_ = deepcopy(fact_fcn_, already_copied);
-    solv_fcn_N_ = deepcopy(solv_fcn_N_, already_copied);
-    solv_fcn_T_ = deepcopy(solv_fcn_T_, already_copied);
-  }
-
   void SymbolicQr::init() {
     // Call the base class initializer
     LinearSolverInternal::init();

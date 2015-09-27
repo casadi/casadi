@@ -56,11 +56,6 @@ namespace casadi {
     setOption("name", "unnamed_collocation_integrator");
   }
 
-  void CollocationIntegrator::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    ImplicitFixedStepIntegrator::deepCopyMembers(already_copied);
-  }
-
   CollocationIntegrator::~CollocationIntegrator() {
   }
 

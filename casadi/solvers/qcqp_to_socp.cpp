@@ -46,17 +46,6 @@ namespace casadi {
     QcqpSolverInternal::registerPlugin(casadi_register_qcqpsolver_socp);
   }
 
-  QcqpToSocp* QcqpToSocp::clone() const {
-    // Return a deep copy
-    QcqpToSocp* node =
-      new QcqpToSocp(make_map("h", st_[QCQP_STRUCT_H],
-                              "a", st_[QCQP_STRUCT_A],
-                              "p", st_[QCQP_STRUCT_P]));
-    if (!node->is_init_)
-      node->init();
-    return node;
-  }
-
   QcqpToSocp::QcqpToSocp(const std::map<std::string, Sparsity> &st) : QcqpSolverInternal(st) {
     Adaptor<QcqpToSocp, SocpSolverInternal>::addOptions();
   }

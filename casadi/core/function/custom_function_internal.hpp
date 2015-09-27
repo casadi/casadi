@@ -52,9 +52,6 @@ class CASADI_EXPORT CustomFunctionInternal : public FunctionInternal {
     /** \brief  Destructor */
     virtual ~CustomFunctionInternal();
 
-    /** \brief  Cloning */
-    virtual CustomFunctionInternal* clone() const { return new CustomFunctionInternal(*this);}
-
     /** \brief  Evaluate */
     virtual void evaluate();
 

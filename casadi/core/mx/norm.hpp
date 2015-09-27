@@ -84,9 +84,6 @@ namespace casadi {
     void generate(const std::vector<int>& arg, const std::vector<int>& res,
                   CodeGenerator& g) const;
 
-    /** \brief  Clone function */
-    virtual NormF* clone() const { return new NormF(*this);}
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
@@ -106,9 +103,6 @@ namespace casadi {
 
     /** \brief  Destructor */
     virtual ~Norm2() {}
-
-    /** \brief  Clone function */
-    virtual Norm2* clone() const { return new Norm2(*this);}
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
@@ -130,9 +124,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~Norm1() {}
 
-    /** \brief  Clone function */
-    virtual Norm1* clone() const { return new Norm1(*this);}
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
@@ -152,9 +143,6 @@ namespace casadi {
 
     /** \brief  Destructor */
     virtual ~NormInf() {}
-
-    /** \brief  Clone function */
-    virtual NormInf* clone() const { return new NormInf(*this);}
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;

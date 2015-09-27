@@ -78,9 +78,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~MapSerial();
 
-    /** \brief  clone function */
-    virtual MapSerial* clone() const { return new MapSerial(*this);}
-
     /** \brief  Evaluate or propagate sparsities */
     template<typename T>
     void evalGen(const T** arg, T** res, int* iw, T* w);
@@ -136,9 +133,6 @@ namespace casadi {
     // Constructor (protected, use create function in MapBase)
     MapOmp(const Function& f, int n) : MapSerial(f, n) {}
 
-    /** \brief  clone function */
-    virtual MapOmp* clone() const { return new MapOmp(*this);}
-
     /** \brief  Destructor */
     virtual ~MapOmp();
 
@@ -171,9 +165,6 @@ namespace casadi {
     /** \brief Constructor (generic map) */
     MapReduce(const Function& f, int n,
       const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out);
-
-    /** \brief  clone function */
-    virtual MapReduce* clone() const { return new MapReduce(*this);}
 
     /** \brief  Destructor */
     virtual ~MapReduce();

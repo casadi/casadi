@@ -42,9 +42,6 @@ namespace casadi {
     /// Constructor
     SubAssign(const MX& x, const MX& y, const Slice& i, const Slice& j);
 
-    /// Clone function
-    virtual SubAssign* clone() const;
-
     /// Destructor
     virtual ~SubAssign() {}
 

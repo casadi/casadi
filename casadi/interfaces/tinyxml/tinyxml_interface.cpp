@@ -49,10 +49,6 @@ namespace casadi {
   TinyXmlInterface::~TinyXmlInterface() {
   }
 
-  TinyXmlInterface* TinyXmlInterface::clone() const {
-    return new TinyXmlInterface();
-  }
-
   XmlNode TinyXmlInterface::parse(const std::string& filename) {
     bool flag = doc_.LoadFile(filename.c_str());
     casadi_assert_message(flag, "Cound not open " << filename);

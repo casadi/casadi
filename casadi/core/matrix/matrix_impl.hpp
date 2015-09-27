@@ -55,7 +55,7 @@ namespace casadi {
   template<typename DataType>
   DataType& Matrix<DataType>::elem(int rr, int cc) {
     int oldsize = sparsity().nnz();
-    int ind = sparsityRef().addNZ(rr, cc);
+    int ind = sparsity_.addNZ(rr, cc);
     if (oldsize != sparsity().nnz())
       data().insert(begin()+ind, DataType(0));
     return at(ind);
@@ -961,12 +961,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Sparsity& Matrix<DataType>::sparsityRef() {
-    sparsity_.makeUnique(); // NOTE: Remove?
-    return sparsity_;
-  }
-
-  template<typename DataType>
   void Matrix<DataType>::getBand(int kl, int ku, int ldres, DataType *res) const {
     // delete the content of the matrix
     for (int j=0; j<size1(); ++j) // loop over rows
@@ -1229,7 +1223,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1) {
     // Erase from sparsity pattern
-    std::vector<int> mapping = sparsityRef().erase(rr, cc, ind1);
+    std::vector<int> mapping = sparsity_.erase(rr, cc, ind1);
 
     // Update non-zero entries
     for (int k=0; k<mapping.size(); ++k)
@@ -1242,7 +1236,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::erase(const std::vector<int>& rr, bool ind1) {
     // Erase from sparsity pattern
-    std::vector<int> mapping = sparsityRef().erase(rr, ind1);
+    std::vector<int> mapping = sparsity_.erase(rr, ind1);
 
     // Update non-zero entries
     for (int k=0; k<mapping.size(); ++k)
@@ -1280,7 +1274,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::enlarge(int nrow, int ncol, const std::vector<int>& rr,
                                  const std::vector<int>& cc, bool ind1) {
-    sparsityRef().enlarge(nrow, ncol, rr, cc, ind1);
+    sparsity_.enlarge(nrow, ncol, rr, cc, ind1);
   }
 
   template<typename DataType>

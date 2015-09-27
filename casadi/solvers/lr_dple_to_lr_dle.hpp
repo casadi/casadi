@@ -63,12 +63,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~LrDpleToLrDle();
 
-    /** \brief  Clone */
-    virtual LrDpleToLrDle* clone() const;
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
     /** \brief  Create a new solver */
     virtual LrDpleToLrDle* create(const LrDleStructure& st, const std::vector<int> &Hs) const {
         return new LrDpleToLrDle(st, Hs);}

@@ -59,9 +59,6 @@ public:
   /** \brief  Destructor */
   virtual ~LpToQp();
 
-  /** \brief  Clone */
-  virtual LpToQp* clone() const;
-
   /** \brief  Create a new QP Solver */
   static LpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
     return new LpToQp(st);

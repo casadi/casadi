@@ -128,8 +128,4 @@ namespace casadi {
     }
   }
 
-  LapackQrDense* LapackQrDense::clone() const {
-    return new LapackQrDense(*this);
-  }
-
 } // namespace casadi

@@ -159,7 +159,7 @@ namespace casadi {
   SXFunction::SXFunction(const Function& f) {
     const SXFunctionInternal* temp = dynamic_cast<const SXFunctionInternal*>(f.get());
     if (temp) {
-      assignNode(temp->clone());
+      assignNode(const_cast<SXFunctionInternal*>(temp));
     } else {
       MXFunction f2(f);
       SXFunction t = f2.expand();

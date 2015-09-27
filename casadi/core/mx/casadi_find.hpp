@@ -42,9 +42,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~Find() {}
 
-    /** \brief  Clone function */
-    virtual Find* clone() const { return new Find(*this);}
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 

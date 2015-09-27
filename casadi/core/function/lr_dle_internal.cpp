@@ -252,10 +252,6 @@ namespace casadi {
     }
   }
 
-  void LrDleInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    FunctionInternal::deepCopyMembers(already_copied);
-  }
-
   std::map<std::string, LrDleInternal::Plugin> LrDleInternal::solvers_;
 
   const std::string LrDleInternal::infix_ = "lrdlesolver";
