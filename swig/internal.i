@@ -277,15 +277,6 @@
 %exception  casadi::ptrVec(std::vector< std::vector< T > > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::slicot_periodic_schur(const std::vector< Matrix< double > > &a, std::vector< Matrix< double > > &t, std::vector< Matrix< double > > &z, std::vector< double > &eig_real, std::vector< double > &eig_imag, double num_zero) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::slicot_periodic_schur(int n, int K, const std::vector< double > &a, std::vector< double > &t, std::vector< double > &z, std::vector< double > &dwork, std::vector< double > &eig_real, std::vector< double > &eig_imag, double num_zero=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::slicot_periodic_schur(int n, int K, const std::vector< double > &a, std::vector< double > &t, std::vector< double > &z, std::vector< double > &eig_real, std::vector< double > &eig_imag, double num_zero=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::timerPlusEq(diffTime &t, const diffTime diff) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
