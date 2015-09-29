@@ -4046,11 +4046,6 @@ namespace casadi {
 %include <casadi/core/function/callback.hpp>
 %include <casadi/core/functor.hpp>
 %include <casadi/core/function/nullspace.hpp>
-%include <casadi/core/function/dple_solver.hpp>
-%include <casadi/core/function/dle_solver.hpp>
-%include <casadi/core/function/lr_dple_solver.hpp>
-%include <casadi/core/function/lr_dle_solver.hpp>
-%include <casadi/core/function/cle_solver.hpp>
 %include <casadi/core/function/map.hpp>
 %include <casadi/core/function/mapaccum.hpp>
 %include <casadi/core/function/kernel_sum_2d.hpp>

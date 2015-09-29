@@ -58,10 +58,6 @@ if(SNOPT_FOUND OR WITH_SNOPT_FORCE_DUMMY)
   add_subdirectory(snopt)
 endif()
 
-if(SLICOT_FOUND)
-  add_subdirectory(slicot)
-endif()
-
 if(TINYXML_FOUND)
   add_subdirectory(tinyxml)
 endif()
