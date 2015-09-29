@@ -25,88 +25,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::DsdpInterface
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>solution_type</td><td>casadi::DsdpInterface</td></tr>
-<tr><td>termination_reason</td><td>casadi::DsdpInterface</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_SdpSolver_dsdp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>solution_type</td></tr>
-<tr><td>termination_reason</td></tr>
-</table>
-*/
-/// \cond INTERNAL
-/** \class casadi::EcosInterface
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>dcost</td><td>casadi::EcosInterface</td></tr>
-<tr><td>dinf</td><td>casadi::EcosInterface</td></tr>
-<tr><td>dinfres</td><td>casadi::EcosInterface</td></tr>
-<tr><td>dres</td><td>casadi::EcosInterface</td></tr>
-<tr><td>exit_code</td><td>casadi::EcosInterface</td></tr>
-<tr><td>exit_code_explanation</td><td>casadi::EcosInterface</td></tr>
-<tr><td>gap</td><td>casadi::EcosInterface</td></tr>
-<tr><td>iter</td><td>casadi::EcosInterface</td></tr>
-<tr><td>kapovert</td><td>casadi::EcosInterface</td></tr>
-<tr><td>mu</td><td>casadi::EcosInterface</td></tr>
-<tr><td>nitref1</td><td>casadi::EcosInterface</td></tr>
-<tr><td>nitref2</td><td>casadi::EcosInterface</td></tr>
-<tr><td>nitref3</td><td>casadi::EcosInterface</td></tr>
-<tr><td>pcost</td><td>casadi::EcosInterface</td></tr>
-<tr><td>pinf</td><td>casadi::EcosInterface</td></tr>
-<tr><td>pinfres</td><td>casadi::EcosInterface</td></tr>
-<tr><td>pres</td><td>casadi::EcosInterface</td></tr>
-<tr><td>relgap</td><td>casadi::EcosInterface</td></tr>
-<tr><td>sigma</td><td>casadi::EcosInterface</td></tr>
-<tr><td>step</td><td>casadi::EcosInterface</td></tr>
-<tr><td>step_aff</td><td>casadi::EcosInterface</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_SocpSolver_ecos
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>dcost</td></tr>
-<tr><td>dinf</td></tr>
-<tr><td>dinfres</td></tr>
-<tr><td>dres</td></tr>
-<tr><td>exit_code</td></tr>
-<tr><td>exit_code_explanation</td></tr>
-<tr><td>gap</td></tr>
-<tr><td>iter</td></tr>
-<tr><td>kapovert</td></tr>
-<tr><td>mu</td></tr>
-<tr><td>nitref1</td></tr>
-<tr><td>nitref2</td></tr>
-<tr><td>nitref3</td></tr>
-<tr><td>pcost</td></tr>
-<tr><td>pinf</td></tr>
-<tr><td>pinfres</td></tr>
-<tr><td>pres</td></tr>
-<tr><td>relgap</td></tr>
-<tr><td>sigma</td></tr>
-<tr><td>step</td></tr>
-<tr><td>step_aff</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::IdasInterface
 \n
 \par
@@ -233,50 +151,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::LpToQp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>qp_solver_stats</td><td>casadi::LpToQp</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_LpSolver_qp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>qp_solver_stats</td></tr>
-</table>
-*/
-/// \cond INTERNAL
-/** \class casadi::MosekSocpInterface
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>problem_status</td><td>casadi::MosekSocpInterface</td></tr>
-<tr><td>solution_status</td><td>casadi::MosekSocpInterface</td></tr>
-<tr><td>termination_reason</td><td>casadi::MosekSocpInterface</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_SocpSolver_mosek
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>problem_status</td></tr>
-<tr><td>solution_status</td></tr>
-<tr><td>termination_reason</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::Newton
 \n
 \par
@@ -331,26 +205,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::QcqpToSocp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>socp_solver_stats</td><td>casadi::QcqpToSocp</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_QcqpSolver_socp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>socp_solver_stats</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::QpToImplicit
 \n
 \par
@@ -391,26 +245,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::QpToQcqp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>qcqp_solver_stats</td><td>casadi::QpToQcqp</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_QpSolver_qcqp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>qcqp_solver_stats</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::Scpgen
 \n
 \par
@@ -435,26 +269,6 @@
 <caption>List of available stats</caption>
 <tr><th>Id</th></tr>
 <tr><td>iter_count</td></tr>
-</table>
-*/
-/// \cond INTERNAL
-/** \class casadi::SdqpToSdp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>sdp_solver_stats</td><td>casadi::SdqpToSdp</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_SdqpSolver_sdp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>sdp_solver_stats</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -500,26 +314,6 @@
 <tr><td>t_eval_grad_f</td></tr>
 <tr><td>t_eval_jac_g</td></tr>
 <tr><td>t_mainloop</td></tr>
-</table>
-*/
-/// \cond INTERNAL
-/** \class casadi::SocpToSdp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>sdp_solver_stats</td><td>casadi::SocpToSdp</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_SocpSolver_sdp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>sdp_solver_stats</td></tr>
 </table>
 */
 /// \cond INTERNAL
