@@ -33,14 +33,8 @@
 namespace casadi {
 class Sparsity;
 enum InputOutputScheme {
-  SCHEME_CLEInput,
-  SCHEME_CLEOutput,
   SCHEME_ControlledDAEInput,
   SCHEME_ControlSimulatorInput,
-  SCHEME_DLEInput,
-  SCHEME_DLEOutput,
-  SCHEME_DPLEInput,
-  SCHEME_DPLEOutput,
   SCHEME_HNLPInput,
   SCHEME_DAEInput,
   SCHEME_DAEOutput,
@@ -50,12 +44,6 @@ enum InputOutputScheme {
   SCHEME_IntegratorOutput,
   SCHEME_LinsolInput,
   SCHEME_LinsolOutput,
-  SCHEME_LpSolverInput,
-  SCHEME_LpSolverOutput,
-  SCHEME_LR_DLEInput,
-  SCHEME_LR_DLEOutput,
-  SCHEME_LR_DPLEInput,
-  SCHEME_LR_DPLEOutput,
   SCHEME_NLPInput,
   SCHEME_NLPOutput,
   SCHEME_GradFInput,
@@ -66,17 +54,8 @@ enum InputOutputScheme {
   SCHEME_HessLagOutput,
   SCHEME_NlpSolverInput,
   SCHEME_NlpSolverOutput,
-  SCHEME_QcqpSolverInput,
-  SCHEME_QcqpSolverOutput,
   SCHEME_QpSolverInput,
   SCHEME_QpSolverOutput,
-  SCHEME_SDPInput,
-  SCHEME_SDPOutput,
-  SCHEME_SDQPInput,
-  SCHEME_SDQPOutput,
-  SCHEME_SOCPInput,
-  SCHEME_SOCPOutput,
-  SCHEME_SOCPStruct,
   SCHEME_StabilizedQpSolverInput };
 
 CASADI_EXPORT std::string getSchemeEntryName(InputOutputScheme scheme, int i);
