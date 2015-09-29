@@ -79,6 +79,3 @@ def addExtra(metadata):
 
   A = DMatrix(0,2)
 
-  i = SocpSolver("mysolver", "mosek", {"g":G.sparsity(),"e":E.sparsity(),"a":A.sparsity()},{"ni":[2]})
-  extra(metadata,i,"MosekSocpInterface")
-
