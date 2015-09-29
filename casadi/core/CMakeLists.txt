@@ -103,11 +103,6 @@ set(CASADI_SRCS
   function/control_simulator.hpp   function/control_simulator.cpp   function/control_simulator_internal.hpp   function/control_simulator_internal.cpp
   function/qp_solver.hpp           function/qp_solver.cpp           function/qp_solver_internal.hpp           function/qp_solver_internal.cpp
   function/stabilized_qp_solver.hpp    function/stabilized_qp_solver.cpp    function/stabilized_qp_solver_internal.hpp function/stabilized_qp_solver_internal.cpp
-  function/sdp_solver.hpp          function/sdp_solver.cpp          function/sdp_solver_internal.hpp          function/sdp_solver_internal.cpp
-  function/sdqp_solver.hpp         function/sdqp_solver.cpp         function/sdqp_solver_internal.hpp         function/sdqp_solver_internal.cpp
-  function/socp_solver.hpp         function/socp_solver.cpp         function/socp_solver_internal.hpp         function/socp_solver_internal.cpp
-  function/qcqp_solver.hpp         function/qcqp_solver.cpp         function/qcqp_solver_internal.hpp         function/qcqp_solver_internal.cpp
-  function/lp_solver.hpp           function/lp_solver.cpp           function/lp_internal.hpp                  function/lp_internal.cpp
   function/code_generator.hpp      function/code_generator.cpp
   function/nullspace.hpp           function/nullspace.cpp           function/nullspace_internal.hpp           function/nullspace_internal.cpp
   function/wrapper.hpp             function/adaptor.hpp             function/dense_io.hpp

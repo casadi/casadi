@@ -63,11 +63,6 @@ namespace casadi {
   class Integrator;
   class QpSolver;
   class StabilizedQpSolver;
-  class QcqpSolver;
-  class LpSolver;
-  class SdpSolver;
-  class SocpSolver;
-  class SdqpSolver;
   class ImplicitFunction;
 
   class DerivativeGenerator;

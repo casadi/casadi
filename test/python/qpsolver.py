@@ -53,15 +53,6 @@ if NlpSolver.hasPlugin("ipopt"):
 # if QpSolver.hasPlugin("sqic"):
 #   qpsolvers.append(("sqic",{},{}))
 
-# if QpSolver.hasPlugin("qcqp.socp.sdp.dsdp"):
-#   qpsolvers.append(("qcqp.socp.sdp.dsdp",{"qcqp_solver_options.socp_solver_options.sdp_solver_options": {"gapTol":1e-10}},{}))
-
-# if QpSolver.hasPlugin("qcqp.socp.mosek"):
-#   qpsolvers.append(("qcqp.socp.mosek",{"qcqp_solver_options.socp_solver_options": {"MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10}},{"less_digits": 3}))
-
-# if QpSolver.hasPlugin("qcqp.socp.ecos"):
-#   qpsolvers.append(("qcqp.socp.ecos",{"qcqp_solver_options.socp_solver_options": {"reltol":1e-10,"abstol":1e-10}},{"less_digits": 2}))
-
 print qpsolvers
 
 class QpSolverTests(casadiTestCase):

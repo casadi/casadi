@@ -50,23 +50,11 @@ casadi_plugin(QpSolver nlp
   qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
 casadi_plugin(ImplicitFunction nlp
   implicit_to_nlp.hpp implicit_to_nlp.cpp implicit_to_nlp_meta.cpp)
-casadi_plugin(LpSolver qp
-  lp_to_qp.cpp lp_to_qp.hpp lp_to_qp_meta.cpp)
-casadi_plugin(QpSolver qcqp
-  qp_to_qcqp.cpp qp_to_qcqp.hpp qp_to_qcqp_meta.cpp)
-casadi_plugin(SocpSolver sdp
-  socp_to_sdp.cpp socp_to_sdp.hpp socp_to_sdp_meta.cpp)
 casadi_plugin(StabilizedQpSolver qp
   stabilized_qp_to_qp.cpp stabilized_qp_to_qp.hpp stabilized_qp_to_qp_meta.cpp)
 casadi_plugin(LinearSolver symbolicqr
   symbolic_qr.hpp symbolic_qr.cpp symbolic_qr_meta.cpp
 )
-if(WITH_CSPARSE)
-  casadi_plugin(QcqpSolver socp
-    qcqp_to_socp.cpp qcqp_to_socp.hpp qcqp_to_socp_meta.cpp)
-  casadi_plugin(SdqpSolver sdp
-    sdqp_to_sdp.cpp sdqp_to_sdp.hpp sdqp_to_sdp_meta.cpp)
-endif()
 
 if(WITH_DL AND NOT WIN32)
   # Simple just-in-time compiler, using shell commands
