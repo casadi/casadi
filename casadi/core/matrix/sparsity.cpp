@@ -113,7 +113,7 @@ namespace casadi {
     return (*this)->size2();
   }
 
-  int Sparsity::numel() const {
+  size_t Sparsity::numel() const {
     return (*this)->numel();
   }
 

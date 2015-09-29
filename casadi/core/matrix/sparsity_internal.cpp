@@ -34,8 +34,8 @@ using namespace std;
 
 namespace casadi {
 
-  int SparsityInternal::numel() const {
-    return size1()*size2();
+  size_t SparsityInternal::numel() const {
+    return static_cast<size_t>(size1())*static_cast<size_t>(size2());
   }
 
   void SparsityInternal::repr(ostream &stream) const {

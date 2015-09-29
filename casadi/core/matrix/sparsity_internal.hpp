@@ -236,7 +236,7 @@ namespace casadi {
     Sparsity zz_reshape(int nrow, int ncol) const;
 
     /// Number of elements
-    int numel() const;
+    size_t numel() const;
 
     /// Number of non-zeros in the lower triangular half
     int sizeL() const;
