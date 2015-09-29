@@ -987,33 +987,33 @@ import_array();
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
       // Cell arrays (only row vectors)
-      if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
-        // Get size
-        int sz = mxGetN(p);
-
-        // Allocate elements
-        if (m) {
-          (**m).clear();
-          (**m).reserve(sz);
-        }
-
-        // Temporary
-        M tmp;
-
-        // Loop over elements
-        for (int i=0; i<sz; ++i) {
-          // Get element
-          mxArray* pe = mxGetCell(p, i);
-          if (pe==0) return false;
-
-          // Convert element
-          M *m_i = m ? &tmp : 0;
-          if (!to_ptr(pe, m_i ? &m_i : 0)) {
-            return false;
+      if (mxGetClassID(p)==mxCELL_CLASS) {
+        int nrow = mxGetM(p), ncol = mxGetN(p);
+        if (nrow==1 || (nrow==0 && ncol==0)) {
+          // Allocate elements
+          if (m) {
+            (**m).clear();
+            (**m).reserve(ncol);
           }
-          if (m) (**m).push_back(*m_i);
+
+          // Temporary
+          M tmp;
+
+          // Loop over elements
+          for (int i=0; i<ncol; ++i) {
+            // Get element
+            mxArray* pe = mxGetCell(p, i);
+            if (pe==0) return false;
+
+            // Convert element
+            M *m_i = m ? &tmp : 0;
+            if (!to_ptr(pe, m_i ? &m_i : 0)) {
+              return false;
+            }
+            if (m) (**m).push_back(*m_i);
+          }
+          return true;
         }
-        return true;
       }
 #endif // SWIGMATLAB
       // No match
