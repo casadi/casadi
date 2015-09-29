@@ -110,10 +110,6 @@ namespace casadi {
 
   }
 
-  void CleInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    FunctionInternal::deepCopyMembers(already_copied);
-  }
-
   std::map<std::string, CleInternal::Plugin> CleInternal::solvers_;
 
   const std::string CleInternal::infix_ = "clesolver";

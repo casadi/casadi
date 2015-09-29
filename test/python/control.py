@@ -444,8 +444,6 @@ class ControlTests(casadiTestCase):
           
           
           solver = CleSolver("solver", Solver,{'a':Sparsity.dense(n,n),'v':Sparsity.dense(n,n)}, options)
-          solver.setInput(A_,"a")
-          solver.setInput(V_,"v")
           
           As = MX.sym("A",n,n)
           Vs = MX.sym("V",n,n)
@@ -460,15 +458,17 @@ class ControlTests(casadiTestCase):
           Pf = solve(A_total,vec(Vss),"csparse")
           
           refsol = MXFunction("refsol", dleIn(a=As,v=Vs),dleOut(p=Pf.reshape((n,n))))
-          
-          refsol.setInput(A_,"a")
-          refsol.setInput(V_,"v")
-          
+
+          solver.setInput(A_,"a")
+          solver.setInput(V_,"v")
           solver.evaluate()
           X = solver.getOutput()
+
+          refsol.setInput(A_,"a")
+          refsol.setInput(V_,"v")
           refsol.evaluate()
           Xref = refsol.getOutput()
-          
+
           a0 = mul([A_,X]) + mul([X,A_.T])+V_
           a0ref = mul([A_,Xref]) + mul([Xref,A_.T])+V_
           
@@ -493,8 +493,6 @@ class ControlTests(casadiTestCase):
           
           
           solver = DpleSolver("solver", Solver,{'a':[Sparsity.dense(n,n) for i in range(K)],'v':[Sparsity.dense(n,n) for i in range(K)]}, options)
-          solver.setInput(horzcat(A_),"a")
-          solver.setInput(horzcat(V_),"v")
           
           As = MX.sym("A",n,K*n)
           Vs = MX.sym("V",n,K*n)
@@ -517,12 +515,14 @@ class ControlTests(casadiTestCase):
           P = Pf.reshape((n,K*n))
           
           refsol = MXFunction("refsol", dpleIn(a=As,v=Vs),dpleOut(p=P))
-          
-          refsol.setInput(horzcat(A_),"a")
-          refsol.setInput(horzcat(V_),"v")
-          
+
+          solver.setInput(horzcat(A_),"a")
+          solver.setInput(horzcat(V_),"v")
           solver.evaluate()
           X = list(horzsplit(solver.getOutput(),n))
+
+          refsol.setInput(horzcat(A_),"a")
+          refsol.setInput(horzcat(V_),"v")
           refsol.evaluate()
           Xref = list(horzsplit(refsol.getOutput(),n))
           
@@ -563,12 +563,11 @@ class ControlTests(casadiTestCase):
           A_ = [As+1e-6*randstable(n,minimal=0.1) for i in range(K)]
           
           V_ = [mul(v,v.T) for v in [DMatrix(numpy.random.random((n,n))) for i in range(K)]]
-          
-          
+
           solver = DpleSolver("solver", Solver,{'a':[Sparsity.dense(n,n) for i in range(K)],'v':[Sparsity.dense(n,n) for i in range(K)]}, options)
+
           solver.setInput(horzcat(A_),"a")
           solver.setInput(horzcat(V_),"v")
-          
           t0 = time.time()
           solver.evaluate()
           print "eval [ms]: ", (time.time()-t0)*1000

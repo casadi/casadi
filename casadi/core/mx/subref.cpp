@@ -33,10 +33,6 @@ namespace casadi {
     setDependencies(x);
   }
 
-  SubRef* SubRef::clone() const {
-    return new SubRef(*this);
-  }
-
   void SubRef::evalD(const double** arg, double** res, int* iw, double* w) {
     evalGen<double>(arg, res, iw, w);
   }

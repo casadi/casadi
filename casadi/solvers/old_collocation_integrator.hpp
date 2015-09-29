@@ -62,13 +62,6 @@ namespace casadi {
     /// Constructor
     explicit OldCollocationIntegrator(const Function& f, const Function& g);
 
-    /// Deep copy data members
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
-    /// Clone
-    virtual OldCollocationIntegrator* clone() const
-    { return new OldCollocationIntegrator(*this);}
-
     /// Create a new integrator
     virtual OldCollocationIntegrator* create(const Function& f, const Function& g) const
     { return new OldCollocationIntegrator(f, g);}

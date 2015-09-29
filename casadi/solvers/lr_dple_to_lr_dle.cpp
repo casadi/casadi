@@ -107,19 +107,6 @@ namespace casadi {
     return dplesolver_.derReverse(nadj);
   }
 
-  void DpleToDle::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    DleInternal::deepCopyMembers(already_copied);
-  }
-
-  DpleToDle* DpleToDle::clone() const {
-    // Return a deep copy
-    DpleToDle* node = new DpleToDle(st_, Hs_);
-    node->setOption(dictionary());
-    return node;
-  }
-
-
 } // namespace casadi
 
 

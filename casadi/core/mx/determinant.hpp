@@ -43,9 +43,6 @@ namespace casadi {
     /// Constructor
     Determinant(const MX& x);
 
-    /// Clone function
-    virtual Determinant* clone() const { return new Determinant(*this);}
-
     /// Destructor
     virtual ~Determinant() {}
 

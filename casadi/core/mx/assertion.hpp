@@ -42,9 +42,6 @@ namespace casadi {
     /// Constructor
     Assertion(const MX& x, const MX& y, const std::string & s);
 
-    /// Clone function
-    virtual Assertion* clone() const { return new Assertion(*this);}
-
     /// Destructor
     virtual ~Assertion() {}
 

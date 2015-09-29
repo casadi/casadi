@@ -172,21 +172,6 @@ class Misctests(casadiTestCase):
     self.checkarray(x.shape,(2,8),"shape")
     self.checkarray(y.shape,(4,4),"shape")
     
-  def test_deepcopy_refcount_lazy(self):
-    self.message("Deep copy for refcounted classes - lazy")
-    import copy
-    x = SX.sym("x")
-
-    f = SXFunction('f', [x],[2*x])
-    f.setInput(2,0)
-    g = copy.deepcopy(f)
-
-    f.setInput(5,0)
-    f.evaluate()
-
-    self.assertEqual(g.getInput(0),2)
-    self.assertEqual(g.getOutput(),0)
-
   @requiresPlugin(NlpSolver,"ipopt")
   def test_options_introspection(self):
     self.message("options introspection")

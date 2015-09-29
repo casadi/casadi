@@ -126,12 +126,6 @@ namespace casadi {
     init();
   }
 
-  Integrator  Integrator::clone() const {
-    Integrator ret;
-    if (!isNull()) ret.assignNode((*this)->clone());
-    return ret;
-  }
-
   void Integrator::printStats(ostream &stream) const {
     (*this)->printStats(stream);
   }

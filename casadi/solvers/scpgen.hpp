@@ -56,7 +56,6 @@ namespace casadi {
   public:
     explicit Scpgen(const Function& nlp);
     virtual ~Scpgen();
-    virtual Scpgen* clone() const { return new Scpgen(*this);}
 
     /** \brief  Create a new NLP Solver */
     static NlpSolverInternal* creator(const Function& nlp)

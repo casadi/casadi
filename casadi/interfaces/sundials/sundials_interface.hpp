@@ -51,9 +51,6 @@ public:
   /** \brief  Reset the forward problem and bring the time back to t0 */
   virtual void reset() = 0;
 
-  /** \brief  Deep copy data members */
-  virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
   /** \brief  Set stop time for the integration */
   virtual void setStopTime(double tf) = 0;
 

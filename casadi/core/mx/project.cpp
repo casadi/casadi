@@ -37,10 +37,6 @@ namespace casadi {
     setSparsity(Sparsity(sp));
   }
 
-  Project* Project::clone() const {
-    return new Project(*this);
-  }
-
   std::string Project::print(const std::vector<std::string>& arg) const {
     if (sparsity().isdense()) {
       return "dense(" + arg.at(0) + ")";

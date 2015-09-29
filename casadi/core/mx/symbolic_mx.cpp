@@ -38,10 +38,6 @@ namespace casadi {
     setSparsity(sp);
   }
 
-  SymbolicMX* SymbolicMX::clone() const {
-    return new SymbolicMX(*this);
-  }
-
   std::string SymbolicMX::print(const std::vector<std::string>& arg) const {
     return name_;
   }

@@ -67,12 +67,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~PsdIndefDpleInternal();
 
-    /** \brief  Clone */
-    virtual PsdIndefDpleInternal* clone() const;
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
     /** \brief  Create a new solver */
     virtual PsdIndefDpleInternal* create(const std::map<std::string,
                                          std::vector<Sparsity> > & st) const {

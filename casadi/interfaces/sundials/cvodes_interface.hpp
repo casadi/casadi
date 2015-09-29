@@ -72,12 +72,6 @@ namespace casadi {
     /** \brief  Constructor */
     explicit CvodesInterface(const Function& f, const Function& g);
 
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
-    /** \brief  Clone */
-    virtual CvodesInterface* clone() const;
-
     /** \brief  Create a new integrator */
     virtual CvodesInterface* create(const Function& f, const Function& g) const
     { return new CvodesInterface(f, g);}

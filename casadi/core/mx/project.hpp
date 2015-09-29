@@ -43,9 +43,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~Project() {}
 
-    /** \brief  Clone function */
-    virtual Project * clone() const;
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 

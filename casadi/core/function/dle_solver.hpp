@@ -85,9 +85,6 @@ namespace casadi {
     /// Default constructor
     DleSolver();
 
-    /// Clone
-    DleSolver clone() const;
-
     /** \brief Constructor (new syntax, includes initialization)
      * \param solver \pluginargument{DleSolver}
      * \param st \structargument{Dle}

@@ -48,15 +48,6 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_cvodes);
   }
 
-  CvodesInterface* CvodesInterface::clone() const {
-    // Return a deep copy
-    CvodesInterface* node = new CvodesInterface(f_, g_);
-    node->setOption(dictionary());
-    node->jac_ = jac_;
-    node->linsol_ = linsol_;
-    return node;
-  }
-
   CvodesInterface::CvodesInterface(const Function& f, const Function& g) : SundialsInterface(f, g) {
     addOption("linear_multistep_method",          OT_STRING,              "bdf",
               "Integrator scheme", "bdf|adams");
@@ -1905,10 +1896,6 @@ namespace casadi {
     cvB_mem->cv_mem->cv_lsetup = lsetupB_wrapper;
     cvB_mem->cv_mem->cv_lsolve = lsolveB_wrapper;
     cvB_mem->cv_mem->cv_setupNonNull = TRUE;
-  }
-
-  void CvodesInterface::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    SundialsInterface::deepCopyMembers(already_copied);
   }
 
   template<typename FunctionType>

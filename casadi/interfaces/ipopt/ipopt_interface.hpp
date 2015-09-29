@@ -70,7 +70,6 @@ friend class IpoptUserClass;
 public:
   explicit IpoptInterface(const Function& nlp);
   virtual ~IpoptInterface();
-  virtual IpoptInterface* clone() const { return new IpoptInterface(*this);}
 
   /** \brief  Create a new NLP Solver */
   static NlpSolverInternal* creator(const Function& nlp)

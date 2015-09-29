@@ -53,9 +53,6 @@ namespace casadi {
     static XmlFileInternal* creator()
     { return new TinyXmlInterface();}
 
-    // Clone
-    virtual TinyXmlInterface* clone() const;
-
     // Parse an XML file
     virtual XmlNode parse(const std::string& filename);
 

@@ -72,10 +72,6 @@ namespace casadi {
     setSparsity(Sparsity::scalar());
   }
 
-  Call* Call::clone() const {
-    return new Call(*this);
-  }
-
   std::string Call::print(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << fcn_.getOption("name") << "(";
@@ -138,11 +134,6 @@ namespace casadi {
         }
       }
     }
-  }
-
-  void Call::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    MXNode::deepCopyMembers(already_copied);
-    fcn_ = deepcopy(fcn_, already_copied);
   }
 
   void Call::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {

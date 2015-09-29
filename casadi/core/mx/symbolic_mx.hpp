@@ -49,9 +49,6 @@ namespace casadi {
     /// Destructor
     virtual ~SymbolicMX() {}
 
-    /** \brief  Clone function */
-    virtual SymbolicMX* clone() const;
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 

@@ -62,9 +62,6 @@ namespace casadi {
     // Destructor
     virtual ~WorhpInterface();
 
-    // Clone function
-    virtual WorhpInterface* clone() const;
-
     /** \brief  Create a new NLP Solver */
     static NlpSolverInternal* creator(const Function& nlp)
     { return new WorhpInterface(nlp);}

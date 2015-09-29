@@ -44,9 +44,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~BinaryMX();
 
-    /** \brief  Clone function */
-    virtual BinaryMX* clone() const { return new BinaryMX(*this);}
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 

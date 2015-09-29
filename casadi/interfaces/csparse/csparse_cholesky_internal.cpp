@@ -229,10 +229,6 @@ namespace casadi {
     }
   }
 
-  CSparseCholeskyInternal* CSparseCholeskyInternal::clone() const {
-    return new CSparseCholeskyInternal(input(LINSOL_A).sparsity(), input(LINSOL_B).size2());
-  }
-
 } // namespace casadi
 
 /// \endcond

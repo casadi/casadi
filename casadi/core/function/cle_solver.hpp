@@ -86,9 +86,6 @@ namespace casadi {
     /// Default constructor
     CleSolver();
 
-    /// Clone
-    CleSolver clone() const;
-
     /** \brief Constructor (new syntax, includes initialization)
      * \param solver \pluginargument{CleSolver}
      * \param st \structargument{Cle}

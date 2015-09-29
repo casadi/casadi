@@ -55,14 +55,6 @@ namespace casadi {
     CompilerInternal::registerPlugin(casadi_register_compiler_clang);
   }
 
-  ClangCompiler* ClangCompiler::clone() const {
-    // Return a deep copy
-    ClangCompiler* node = new ClangCompiler(name_);
-    if (!node->is_init_)
-      node->init();
-    return node;
-  }
-
   ClangCompiler::ClangCompiler(const std::string& name) :
     CompilerInternal(name) {
     addOption("include_path", OT_STRING, "", "Include paths for the JIT compiler."

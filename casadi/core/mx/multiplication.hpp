@@ -45,9 +45,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~Multiplication() {}
 
-    /** \brief  Clone function */
-    virtual Multiplication* clone() const { return new Multiplication(*this);}
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
@@ -114,9 +111,6 @@ namespace casadi {
 
     /** \brief  Destructor */
     virtual ~DenseMultiplication() {}
-
-    /** \brief  Clone function */
-    virtual DenseMultiplication* clone() const { return new DenseMultiplication(*this);}
 
     /** \brief Generate code for the operation */
     virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,

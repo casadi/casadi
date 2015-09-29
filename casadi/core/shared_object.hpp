@@ -92,9 +92,6 @@ namespace casadi {
     /// Copy constructor (shallow copy)
     SharedObject(const SharedObject& ref);
 
-    /// Deep copy
-    SharedObject clone() const;
-
     /// Destructor
     ~SharedObject();
 
@@ -161,23 +158,6 @@ namespace casadi {
     /// Is a null pointer?
     bool isNull() const;
 
-    ///@{
-    /// \cond SWIGINTERNAL
-    /** \brief Make unique
-     *
-     * If there are other references to the object, then make a deep copy of it
-     *  and point to this new object
-     */
-    void makeUnique(bool clone_members=true);
-    /// \endcond
-    /// \cond INTERNAL
-#ifndef SWIG
-    void makeUnique(std::map<SharedObjectNode*, SharedObject>& already_copied,
-                    bool clone_members=true);
-#endif
-    /// \endcond
-    ///@}
-
 /// \cond INTERNAL
 #ifndef SWIG
     /** \brief Get a weak reference to the object */
@@ -216,20 +196,14 @@ namespace casadi {
     /// Destructor
     virtual ~SharedObjectNode() = 0;
 
-    /// Make a deep copy of the instance
-    virtual SharedObjectNode* clone() const=0;
-
-    /// Deep copy data members
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
     /// Get the reference count
     int getCount() const;
 
     /// Initialize the object
     virtual void init();
 
-    /// Second pass of the initialization. To be run when init has been completed.
-    virtual void postinit();
+    /// Finalize the object creation. To be run when init has been completed.
+    virtual void finalize();
 
     /// Check if the object has been initialized
     bool isInit() const;
@@ -317,22 +291,7 @@ namespace casadi {
   }
 
   ///@{
-  /// Make a deep copy of an object (Note: default is a shallow copy!)
-  template<class A>
-  A deepcopy(const A& a) {
-    A ret = a;
-    ret.makeUnique();
-    return ret;
-  }
-
   /// \cond INTERNAL
-  template<class A>
-  A deepcopy(const A& a, std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    A ret = a;
-    ret.makeUnique(already_copied);
-    return ret;
-  }
-
   template<class A>
   A getcopy(const A& a, std::map<SharedObjectNode*, SharedObject>& already_copied) {
     A ret;
@@ -342,16 +301,6 @@ namespace casadi {
       if (it!=already_copied.end()) {
         ret.assignNode(it->second.get());
       }
-    }
-    return ret;
-  }
-
-  template<class A>
-  std::vector<A> deepcopy(const std::vector<A>& a,
-                          std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    std::vector<A> ret = a;
-    for (typename std::vector<A>::iterator it=ret.begin(); it!=ret.end(); ++it) {
-      it->makeUnique(already_copied);
     }
     return ret;
   }

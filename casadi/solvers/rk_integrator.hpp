@@ -55,12 +55,6 @@ namespace casadi {
     /// Constructor
     explicit RkIntegrator(const Function& f, const Function& g);
 
-    /// Deep copy data members
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
-    /// Clone
-    virtual RkIntegrator* clone() const { return new RkIntegrator(*this);}
-
     /// Create a new integrator
     virtual RkIntegrator* create(const Function& f, const Function& g) const
     { return new RkIntegrator(f, g);}

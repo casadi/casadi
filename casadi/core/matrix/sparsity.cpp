@@ -93,18 +93,8 @@ namespace casadi {
     assignCached(size1(), size2(), colind(), row());
   }
 
-  SparsityInternal* Sparsity::operator->() {
-    makeUnique();
-    return static_cast<SparsityInternal*>(SharedObject::operator->());
-  }
-
   const SparsityInternal* Sparsity::operator->() const {
     return static_cast<const SparsityInternal*>(SharedObject::operator->());
-  }
-
-  SparsityInternal& Sparsity::operator*() {
-    makeUnique();
-    return *static_cast<SparsityInternal*>(get());
   }
 
   const SparsityInternal& Sparsity::operator*() const {

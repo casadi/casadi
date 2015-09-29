@@ -83,9 +83,6 @@ namespace casadi {
     /** \brief Constructor */
     explicit ClangCompiler(const std::string& name);
 
-    /** \brief Clone */
-    virtual ClangCompiler* clone() const;
-
     /** \brief  Create a new JIT function */
     static CompilerInternal* creator(const std::string& name) {
       return new ClangCompiler(name);

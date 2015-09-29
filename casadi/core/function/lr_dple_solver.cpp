@@ -33,12 +33,6 @@ namespace casadi {
 
   }
 
-  LrDpleSolver  LrDpleSolver::clone() const {
-    LrDpleSolver ret;
-    if (!isNull()) ret.assignNode((*this)->clone());
-    return ret;
-  }
-
   void LrDpleSolver::printStats(ostream &stream) const {
     (*this)->printStats(stream);
   }

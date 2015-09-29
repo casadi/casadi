@@ -43,9 +43,6 @@ namespace casadi {
     /// Constructor
     Transpose(const MX& x);
 
-    /// Clone function
-    virtual Transpose* clone() const { return new Transpose(*this);}
-
     /// Destructor
     virtual ~Transpose() {}
 
@@ -113,9 +110,6 @@ namespace casadi {
 
     /// Constructor
     DenseTranspose(const MX& x) : Transpose(x) {}
-
-    /// Clone function
-    virtual DenseTranspose* clone() const { return new DenseTranspose(*this);}
 
     /// Destructor
     virtual ~DenseTranspose() {}

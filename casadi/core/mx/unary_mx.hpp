@@ -43,9 +43,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~UnaryMX() {}
 
-    /** \brief  Clone function */
-    virtual UnaryMX * clone() const;
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 

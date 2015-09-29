@@ -37,10 +37,6 @@ namespace casadi {
     setSparsity(sp);
   }
 
-  Reshape* Reshape::clone() const {
-    return new Reshape(*this);
-  }
-
   void Reshape::evalD(const double** arg, double** res, int* iw, double* w) {
     evalGen<double>(arg, res, iw, w);
   }

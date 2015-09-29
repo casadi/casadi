@@ -50,18 +50,13 @@ namespace casadi {
     CompilerInternal::registerPlugin(casadi_register_compiler_shell);
   }
 
-  ShellCompiler* ShellCompiler::clone() const {
-    // Return a deep copy
-    ShellCompiler* node = new ShellCompiler(name_);
-    if (!node->is_init_)
-      node->init();
-    return node;
-  }
-
   ShellCompiler::ShellCompiler(const std::string& name) :
     CompilerInternal(name) {
     addOption("compiler", OT_STRING, "gcc", "Compiler command");
-    addOption("compiler_setup", OT_STRING, "-fPIC -shared", "Compiler setup command");
+    addOption("compiler_setup", OT_STRING, "-fPIC -shared",
+        "Compiler setup command. Intended to be fixed."
+        " The 'flag' option is the prefered way to set"
+        " custom flags.");
     addOption("flags", OT_STRINGVECTOR, GenericType(),
       "Compile flags for the JIT compiler. Default: None");
   }

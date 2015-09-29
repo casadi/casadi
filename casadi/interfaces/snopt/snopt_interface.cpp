@@ -208,13 +208,6 @@ namespace casadi {
   SnoptInterface::~SnoptInterface() {
   }
 
-  SnoptInterface* SnoptInterface::clone() const {
-    // Use default copy routine
-    SnoptInterface* node = new SnoptInterface(*this);
-
-    return node;
-  }
-
   void SnoptInterface::init() {
     // Read in casadi options
     detect_linear_ = getOption("detect_linear");

@@ -63,12 +63,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~DleInternal()=0;
 
-    /** \brief  Clone */
-    virtual DleInternal* clone() const=0;
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
     /** \brief  Create a new solver */
     virtual DleInternal* create(const std::map<std::string, Sparsity>& st) const = 0;
 

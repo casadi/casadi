@@ -108,20 +108,6 @@ namespace casadi {
   FunctionInternal::~FunctionInternal() {
   }
 
-  void FunctionInternal::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    OptionsFunctionalityNode::deepCopyMembers(already_copied);
-    for (vector<WeakRef>::iterator j=derivative_fwd_.begin(); j!=derivative_fwd_.end(); ++j) {
-      if (!j->isNull()) *j = getcopy(j->shared(), already_copied);
-    }
-    for (vector<WeakRef>::iterator j=derivative_adj_.begin(); j!=derivative_adj_.end(); ++j) {
-      if (!j->isNull()) *j = getcopy(j->shared(), already_copied);
-    }
-
-
-    full_jacobian_ = getcopy(full_jacobian_, already_copied);
-  }
-
   void FunctionInternal::init() {
     setDefaultOptions();
 
@@ -194,7 +180,7 @@ namespace casadi {
     is_init_ = true;
   }
 
-  void FunctionInternal::postinit() {
+  void FunctionInternal::finalize() {
     if (jit_) {
       CodeGenerator gen;
       gen.add(shared_from_this<Function>(), "jit_tmp");

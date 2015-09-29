@@ -123,9 +123,6 @@ namespace casadi {
     static ExternalFunctionInternal*
       create(const Compiler& compiler, const std::string& name);
 
-    /** \brief  clone function */
-    virtual ExternalFunctionInternal* clone() const;
-
     /** \brief  Destructor */
     virtual ~ExternalFunctionInternal() = 0;
 

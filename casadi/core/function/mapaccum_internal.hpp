@@ -47,9 +47,6 @@ namespace casadi {
       const std::vector<int>& output_accum,
       bool reverse);
 
-    /** \brief  clone function */
-    virtual MapAccumInternal* clone() const { return new MapAccumInternal(*this);}
-
     /** \brief  Destructor */
     virtual ~MapAccumInternal();
 

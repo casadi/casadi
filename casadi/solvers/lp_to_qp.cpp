@@ -46,16 +46,6 @@ namespace casadi {
     LpSolverInternal::registerPlugin(casadi_register_lpsolver_qp);
   }
 
-  LpToQp* LpToQp::clone() const {
-    // Return a deep copy
-    LpToQp* node =
-      new LpToQp(make_map("h", st_[QP_SOLVER_H], "a", st_[QP_SOLVER_A]));
-
-    if (!node->is_init_)
-      node->init();
-    return node;
-  }
-
   LpToQp::LpToQp(const std::map<std::string, Sparsity> &st) : LpSolverInternal(st) {
     Adaptor<LpToQp, QpSolverInternal>::addOptions();
   }

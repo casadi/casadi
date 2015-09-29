@@ -58,9 +58,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~Newton();
 
-    /** \brief  Clone */
-    virtual Newton* clone() const { return new Newton(*this);}
-
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual ImplicitFunctionInternal* create(const Function& f) const
     { return new Newton(f);}

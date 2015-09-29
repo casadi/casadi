@@ -51,19 +51,6 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_idas);
   }
 
-  IdasInterface* IdasInterface::clone() const {
-    // Return a deep copy
-    IdasInterface* node = new IdasInterface(f_, g_);
-    node->setOption(dictionary());
-    node->jac_ = jac_;
-    node->linsol_ = linsol_;
-    return node;
-  }
-
-  void IdasInterface::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    SundialsInterface::deepCopyMembers(already_copied);
-  }
-
   IdasInterface::IdasInterface(const Function& f, const Function& g) : SundialsInterface(f, g) {
     addOption("suppress_algebraic",          OT_BOOLEAN,          false,
               "Suppress algebraic variables in the error testing");

@@ -59,9 +59,6 @@ namespace casadi {
     // Creator (values may be different)
     static ConstantMX* create(const Matrix<double>& val);
 
-    /** \brief  Clone function */
-    virtual ConstantMX* clone() const = 0;
-
     /// Evaluate the function numerically
     virtual void evalD(const double** arg, double** res, int* iw, double* w) = 0;
 
@@ -113,9 +110,6 @@ namespace casadi {
 
     /// Destructor
     virtual ~ConstantDMatrix() {}
-
-    /** \brief  Clone function */
-    virtual ConstantDMatrix* clone() const { return new ConstantDMatrix(*this);}
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const {
@@ -174,9 +168,6 @@ namespace casadi {
     virtual ~ZeroByZero() {
       destroySingleton();
     }
-
-    /** \brief  Clone function */
-    virtual ZeroByZero* clone() const { return getInstance();}
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
@@ -271,9 +262,6 @@ namespace casadi {
 
     /// Destructor
     virtual ~Constant() {}
-
-    /** \brief  Clone function */
-    virtual Constant* clone() const { return new Constant<Value>(*this);}
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;

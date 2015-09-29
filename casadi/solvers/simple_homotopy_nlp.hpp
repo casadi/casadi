@@ -50,7 +50,6 @@ namespace casadi {
   public:
     explicit SimpleHomotopyNlp(const Function& hnlp);
     virtual ~SimpleHomotopyNlp();
-    virtual SimpleHomotopyNlp* clone() const { return new SimpleHomotopyNlp(*this);}
 
     /** \brief  Create a new Homotopy NLP Solver */
     static HomotopyNLPInternal* creator(const Function& hnlp)

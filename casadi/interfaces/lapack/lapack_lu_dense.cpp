@@ -205,8 +205,4 @@ namespace casadi {
           x[i+rhs*nrow_] *= c_[i];
   }
 
-  LapackLuDense* LapackLuDense::clone() const {
-    return new LapackLuDense(*this);
-  }
-
 } // namespace casadi

@@ -73,9 +73,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~FunctionInternal() = 0;
 
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
     /** \brief  Evaluate using internal data structures */
     virtual void evaluate();
 
@@ -89,11 +86,11 @@ namespace casadi {
         this function when initialized. */
     virtual void init();
 
-    /** \brief Post-initialization
+    /** \brief Finalize the object creation
         This function, which visits the class hierarchy in reverse order is run after
         init() has been completed.
     */
-    virtual void postinit();
+    virtual void finalize();
 
     /** \brief  Propagate the sparsity pattern through a set of directional
         derivatives forward or backward */

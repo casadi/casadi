@@ -49,7 +49,6 @@ namespace casadi {
   public:
     explicit Sqpmethod(const Function& nlp);
     virtual ~Sqpmethod();
-    virtual Sqpmethod* clone() const { return new Sqpmethod(*this);}
 
     /** \brief  Create a new NLP Solver */
     static NlpSolverInternal* creator(const Function& nlp)

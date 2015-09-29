@@ -54,9 +54,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~Solve() {}
 
-    /** \brief  Clone function */
-    virtual Solve* clone() const { return new Solve(*this);}
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
@@ -94,9 +91,6 @@ namespace casadi {
 
     /** \brief  Get function reference */
     virtual const Function& getFunction(int i) const { return linear_solver_;}
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief Get required length of w field */
     virtual size_t sz_w() const { return sparsity().size1();}

@@ -183,7 +183,6 @@ namespace casadi {
 
         dpse_solvers_[i].resize(n_*(n_+1)/2, solver);
         for (int k=0;k<n_*(n_+1)/2;++k) {
-          dpse_solvers_[i][k].makeUnique();
           dpse_solvers_[i][k].setInput(1, LINSOL_A);
         }
 
@@ -1057,21 +1056,6 @@ namespace casadi {
     }
 
     return MXFunction(name, ins_new, outs_new, opts);
-  }
-
-  void PsdIndefDpleInternal::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    DpleInternal::deepCopyMembers(already_copied);
-  }
-
-  PsdIndefDpleInternal* PsdIndefDpleInternal::clone() const {
-    // Return a deep copy
-    std::map<std::string, std::vector<Sparsity> > tmp;
-    tmp["a"] = st_[Dple_STRUCT_A];
-    tmp["v"] = st_[Dple_STRUCT_V];
-    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(tmp, nrhs_, transp_);
-    node->setOption(dictionary());
-    return node;
   }
 
   void slicot_mb03vd(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2, double * tau,

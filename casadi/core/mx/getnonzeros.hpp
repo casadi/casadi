@@ -76,9 +76,6 @@ namespace casadi {
     GetNonzerosVector(const Sparsity& sp, const MX& x,
                       const std::vector<int>& nz) : GetNonzeros(sp, x), nz_(nz) {}
 
-    /// Clone function
-    virtual GetNonzerosVector* clone() const { return new GetNonzerosVector(*this);}
-
     /// Destructor
     virtual ~GetNonzerosVector() {}
 
@@ -123,9 +120,6 @@ namespace casadi {
 
     /// Constructor
     GetNonzerosSlice(const Sparsity& sp, const MX& x, const Slice& s) : GetNonzeros(sp, x), s_(s) {}
-
-    /// Clone function
-    virtual GetNonzerosSlice* clone() const { return new GetNonzerosSlice(*this);}
 
     /// Destructor
     virtual ~GetNonzerosSlice() {}
@@ -178,9 +172,6 @@ namespace casadi {
     /// Constructor
     GetNonzerosSlice2(const Sparsity& sp, const MX& x, const Slice& inner,
                       const Slice& outer) : GetNonzeros(sp, x), inner_(inner), outer_(outer) {}
-
-    /// Clone function
-    virtual GetNonzerosSlice2* clone() const { return new GetNonzerosSlice2(*this);}
 
     /// Destructor
     virtual ~GetNonzerosSlice2() {}

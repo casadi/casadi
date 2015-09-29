@@ -232,6 +232,9 @@
 %exception  casadi::diffTimers(const timer t1, const timer t0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::diffToDict(const diffTime &diff) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::getRealTime() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

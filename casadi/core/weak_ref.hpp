@@ -82,9 +82,6 @@ namespace casadi {
     // Destructor
     ~WeakRefInternal();
 
-    // Clone (should never be used)
-    virtual WeakRefInternal* clone() const { return new WeakRefInternal(*this);}
-
     // Raw pointer to the cached object
     SharedObjectNode* raw_;
   };

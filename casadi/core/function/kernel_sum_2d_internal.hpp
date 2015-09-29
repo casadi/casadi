@@ -47,9 +47,6 @@ namespace casadi {
            double r,
            int n);
 
-    /** \brief  clone function */
-    virtual KernelSum2DInternal* clone() const { return new KernelSum2DInternal(*this);}
-
     /** \brief  Destructor */
     virtual ~KernelSum2DInternal();
 

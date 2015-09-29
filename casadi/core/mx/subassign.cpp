@@ -34,10 +34,6 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  SubAssign* SubAssign::clone() const {
-    return new SubAssign(*this);
-  }
-
   void SubAssign::evalD(const double** arg, double** res, int* iw, double* w) {
     evalGen<double>(arg, res, iw, w);
   }

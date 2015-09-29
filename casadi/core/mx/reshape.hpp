@@ -43,9 +43,6 @@ namespace casadi {
     /// Constructor
     Reshape(const MX& x, Sparsity sp);
 
-    /// Clone function
-    virtual Reshape* clone() const;
-
     /// Destructor
     virtual ~Reshape() {}
 

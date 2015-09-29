@@ -33,12 +33,6 @@ namespace casadi {
 
   }
 
-  DleSolver  DleSolver::clone() const {
-    DleSolver ret;
-    if (!isNull()) ret.assignNode((*this)->clone());
-    return ret;
-  }
-
   void DleSolver::printStats(ostream &stream) const {
     (*this)->printStats(stream);
   }

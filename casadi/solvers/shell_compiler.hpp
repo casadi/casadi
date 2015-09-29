@@ -52,9 +52,6 @@ namespace casadi {
     /** \brief Constructor */
     explicit ShellCompiler(const std::string& name);
 
-    /** \brief Clone */
-    virtual ShellCompiler* clone() const;
-
     /** \brief  Create a new JIT function */
     static CompilerInternal* creator(const std::string& name) {
       return new ShellCompiler(name);

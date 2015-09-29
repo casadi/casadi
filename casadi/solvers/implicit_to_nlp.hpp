@@ -57,12 +57,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~QpToImplicit();
 
-    /** \brief  Clone */
-    virtual QpToImplicit* clone() const { return new QpToImplicit(*this);}
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual QpToImplicit* create(const Function& f) const
     { return new QpToImplicit(f);}

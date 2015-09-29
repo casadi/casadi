@@ -52,13 +52,6 @@ namespace casadi {
   SimulatorInternal::~SimulatorInternal() {
   }
 
-  void SimulatorInternal::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    FunctionInternal::deepCopyMembers(already_copied);
-    integrator_ = deepcopy(integrator_, already_copied);
-    output_fcn_ = deepcopy(output_fcn_, already_copied);
-  }
-
   void SimulatorInternal::init() {
     // Let the integration time start from the first point of the time grid.
     if (!grid_.empty()) integrator_.setOption("t0", grid_[0]);

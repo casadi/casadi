@@ -78,9 +78,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~MapSerial();
 
-    /** \brief  clone function */
-    virtual MapSerial* clone() const { return new MapSerial(*this);}
-
     /** \brief  Evaluate or propagate sparsities */
     template<typename T>
     void evalGen(const T** arg, T** res, int* iw, T* w);
@@ -98,8 +95,30 @@ namespace casadi {
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
+    /** \brief  Is the class able to propagate seeds through the algorithm? */
+    virtual bool spCanEvaluate(bool fwd) { return true; }
+
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(CodeGenerator& g) const;
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& g) const;
+
     /** \brief  Initialize */
     virtual void init();
+
+    ///@{
+    /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
+    virtual int numDerForward() const { return 64;}
+    ///@}
+
+    ///@{
+    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
+    virtual int numDerReverse() const { return 64;}
+    ///@}
+
   };
 
 #ifdef WITH_OPENMP
@@ -114,14 +133,17 @@ namespace casadi {
     // Constructor (protected, use create function in MapBase)
     MapOmp(const Function& f, int n) : MapSerial(f, n) {}
 
-    /** \brief  clone function */
-    virtual MapOmp* clone() const { return new MapOmp(*this);}
-
     /** \brief  Destructor */
     virtual ~MapOmp();
 
     /// Evaluate the function numerically
     virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(CodeGenerator& g) const;
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief  Initialize */
     virtual void init();
@@ -143,9 +165,6 @@ namespace casadi {
     /** \brief Constructor (generic map) */
     MapReduce(const Function& f, int n,
       const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out);
-
-    /** \brief  clone function */
-    virtual MapReduce* clone() const { return new MapReduce(*this);}
 
     /** \brief  Destructor */
     virtual ~MapReduce();

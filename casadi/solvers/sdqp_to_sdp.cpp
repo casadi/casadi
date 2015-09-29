@@ -54,13 +54,6 @@ namespace casadi {
   SdqpToSdp::~SdqpToSdp() {
   }
 
-  void SdqpToSdp::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    SdqpSolverInternal::deepCopyMembers(already_copied);
-    solver_ = deepcopy(solver_, already_copied);
-    cholesky_ = deepcopy(cholesky_, already_copied);
-    mapping_ = deepcopy(mapping_, already_copied);
-  }
-
   void SdqpToSdp::init() {
     // Initialize the base classes
     SdqpSolverInternal::init();

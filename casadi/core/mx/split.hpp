@@ -90,9 +90,6 @@ namespace casadi {
     /// Destructor
     virtual ~Horzsplit() {}
 
-    /// Clone function
-    virtual Horzsplit* clone() const { return new Horzsplit(*this);}
-
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
@@ -127,9 +124,6 @@ namespace casadi {
     /// Destructor
     virtual ~Diagsplit() {}
 
-    /// Clone function
-    virtual Diagsplit* clone() const { return new Diagsplit(*this);}
-
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
@@ -163,9 +157,6 @@ namespace casadi {
 
     /// Destructor
     virtual ~Vertsplit() {}
-
-    /// Clone function
-    virtual Vertsplit* clone() const { return new Vertsplit(*this);}
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);

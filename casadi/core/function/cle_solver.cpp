@@ -33,12 +33,6 @@ namespace casadi {
 
   }
 
-  CleSolver  CleSolver::clone() const {
-    CleSolver ret;
-    if (!isNull()) ret.assignNode((*this)->clone());
-    return ret;
-  }
-
   void CleSolver::printStats(ostream &stream) const {
     (*this)->printStats(stream);
   }

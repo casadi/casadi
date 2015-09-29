@@ -49,14 +49,6 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_sqic);
   }
 
-  SqicInterface* SqicInterface::clone() const {
-    // Return a deep copy
-    SqicInterface* node = new SqicInterface(st_);
-    if (!node->is_init_)
-      node->init();
-    return node;
-  }
-
   SqicInterface::SqicInterface(const std::map<std::string, Sparsity>& st) : QpSolverInternal(st) {
     is_init_ = false;
   }

@@ -44,9 +44,6 @@ namespace casadi {
     /// Constructor
     HorzRepmat(const MX& x, int n);
 
-    /// Clone function
-    virtual HorzRepmat* clone() const { return new HorzRepmat(*this);}
-
     /// Evaluate the function (template)
     template<typename T>
     void evalGen(const T** arg, T** res, int* iw, T* w);
@@ -99,9 +96,6 @@ namespace casadi {
 
     /// Constructor
     HorzRepsum(const MX& x, int n);
-
-    /// Clone function
-    virtual HorzRepsum* clone() const { return new HorzRepsum(*this);}
 
     /// Evaluate the function (template)
     template<typename T, typename R>

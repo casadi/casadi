@@ -135,11 +135,6 @@ public:
   /** \brief  Destructor */
   virtual ~DerivativeGeneratorInternal2();
 
-  /** \brief  Cloning */
-  virtual DerivativeGeneratorInternal2* clone() const {
-    return new DerivativeGeneratorInternal2(*this);
-  }
-
   virtual Function call(Function& fcn, int ndir, void* user_data) { return callback_(fcn, ndir); }
 
   DerivativeGenerator2& callback_;
@@ -156,9 +151,6 @@ class CASADI_EXPORT CallbackFunctionInternal : public FunctionInternal {
 
     /** \brief  Destructor */
     virtual ~CallbackFunctionInternal();
-
-    /** \brief  Cloning */
-    virtual CallbackFunctionInternal* clone() const { return new CallbackFunctionInternal(*this);}
 
     virtual void evalD(const double** arg,
                                double** res, int* iw, double* w);

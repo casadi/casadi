@@ -42,9 +42,6 @@ namespace casadi {
     /// Constructor
     Monitor(const MX& x, const std::string& comment);
 
-    /// Clone function
-    virtual Monitor* clone() const { return new Monitor(*this);}
-
     /// Destructor
     virtual ~Monitor() {}
 

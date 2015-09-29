@@ -234,10 +234,6 @@ namespace casadi {
     }
   }
 
-  ExternalFunctionInternal* ExternalFunctionInternal::clone() const {
-    throw CasadiException("Error ExternalFunctionInternal cannot be cloned");
-  }
-
   ExternalFunctionInternal::~ExternalFunctionInternal() {
   }
 

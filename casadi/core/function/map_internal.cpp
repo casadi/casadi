@@ -87,6 +87,9 @@ namespace casadi {
 
     // Give a name
     setOption("name", "unnamed_map");
+
+    setOption("input_scheme", f_.inputScheme());
+    setOption("output_scheme", f_.outputScheme());
   }
 
   MapBase::~MapBase() {
@@ -96,6 +99,21 @@ namespace casadi {
   }
 
   void MapSerial::init() {
+
+    // Initialize the functions, get input and output sparsities
+    // Input and output sparsities
+    ibuf_.resize(n_in_);
+    obuf_.resize(n_out_);
+
+    for (int i=0;i<n_in_;++i) {
+      // Allocate space for input
+      input(i) = DMatrix::zeros(repmat(f_.inputSparsity(i), 1, n_));
+    }
+
+    for (int i=0;i<n_out_;++i) {
+      output(i) = DMatrix::zeros(repmat(f_.outputSparsity(i), 1, n_));
+    }
+
     // Call the initialization method of the base class
     MapBase::init();
 
@@ -112,8 +130,12 @@ namespace casadi {
     const T** arg1 = arg+nIn();
     T** res1 = res+nOut();
     for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
-      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      for (int j=0; j<n_in; ++j) {
+        arg1[j] = arg[j] ? arg[j]+i*f_.input(j).nnz(): 0;
+      }
+      for (int j=0; j<n_out; ++j) {
+        res1[j]= res[j] ? res[j]+i*f_.output(j).nnz(): 0;
+      }
       f_(arg1, res1, iw, w);
     }
   }
@@ -135,10 +157,55 @@ namespace casadi {
     bvec_t** arg1 = arg+nIn();
     bvec_t** res1 = res+nOut();
     for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
-      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      for (int j=0; j<n_in; ++j) {
+        arg1[j] = arg[j] ? arg[j]+i*f_.input(j).nnz(): 0;
+      }
+      for (int j=0; j<n_out; ++j) {
+        res1[j]= res[j] ? res[j]+i*f_.output(j).nnz(): 0;
+      }
       f_->spAdj(arg1, res1, iw, w);
     }
+  }
+
+  void MapSerial::generateDeclarations(CodeGenerator& g) const {
+    f_->addDependency(g);
+  }
+
+  void MapSerial::generateBody(CodeGenerator& g) const {
+
+    g.body << "  const real_t** arg1 = arg+" << nIn() << ";"<< endl;
+    g.body << "  real_t** res1 = res+" << nOut() << ";" << endl;
+
+    g.body << "  int i;" << endl;
+    g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
+    for (int j=0; j<n_in_; ++j) {
+      g.body << "    arg1[" << j << "] = arg[" << j << "]? " <<
+        "arg[" << j << "]+i*" << f_.input(j).nnz() << " : 0;" << endl;
+    }
+    for (int j=0; j<n_out_; ++j) {
+      g.body << "    res1[" << j << "] = res[" << j << "]? " <<
+        "res[" << j << "]+i*" << f_.output(j).nnz() << " : 0;" << endl;
+    }
+    g.body << "    " << g.call(f_, "arg1", "res1", "iw", "w") << ";" << endl;
+    g.body << "  }" << std::endl;
+  }
+
+  Function MapSerial
+  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
+    // Differentiate mapped function
+    Function df = f_.derForward(nfwd);
+
+    // Construct and return
+    return Map(name, df, n_, opts);
+  }
+
+  Function MapSerial
+  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
+    // Differentiate mapped function
+    Function df = f_.derReverse(nadj);
+
+    // Construct and return
+    return Map(name, df, n_, opts);
   }
 
   MapReduce::MapReduce(const Function& f, int n,
@@ -177,6 +244,14 @@ namespace casadi {
       parallelization_ = PARALLELIZATION_OMP;
     }
 
+    #ifndef WITH_OPENMP
+    if (parallelization_ == PARALLELIZATION_OMP) {
+      casadi_warning("CasADi was not compiled with OpenMP." <<
+                     "Falling back to serial mode.");
+      parallelization_ = PARALLELIZATION_SERIAL;
+    }
+    #endif // WITH_OPENMP
+
     // OpenMP not yet supported for non-repeated outputs
     bool non_repeated_output = false;
     for (int i=0;i<repeat_out_.size();++i) {
@@ -188,13 +263,6 @@ namespace casadi {
                      "Falling back to serial mode.");
       parallelization_ = PARALLELIZATION_SERIAL;
     }
-#ifndef WITH_OPENMP
-    if (parallelization_ == PARALLELIZATION_OMP) {
-      casadi_warning("CasADi was not compiled with OpenMP." <<
-                     "Falling back to serial mode.");
-      parallelization_ = PARALLELIZATION_SERIAL;
-    }
-#endif // WITH_OPENMP
 
     int num_in = f_.nIn(), num_out = f_.nOut();
 
@@ -284,17 +352,17 @@ namespace casadi {
 
       // Set the function inputs
       for (int j=0; j<num_in; ++j) {
-        arg1[j] = (arg[j]==0) ? 0: arg[j]+i*step_in_[j];
+        arg1[j] = arg[j] ? arg[j]+i*step_in_[j] : 0;
       }
 
       // Set the function outputs
       for (int j=0; j<num_out; ++j) {
         if (repeat_out_[j]) {
           // Make the function outputs end up in our outputs
-          res1[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
+          res1[j] = res[j] ? res[j]+i*step_out_[j]: 0;
         } else {
           // Make the function outputs end up in temp_res
-          res1[j] = (res[j]==0)? 0: temp_res;
+          res1[j] = res[j] ? temp_res : 0;
           temp_res+= step_out_[j];
         }
       }
@@ -535,15 +603,44 @@ namespace casadi {
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 #pragma omp parallel for
     for (int i=0; i<n_; ++i) {
-      int n_in = n_in_, n_out = n_out_;
-      const double** arg_i = arg + n_in*n_ + sz_arg*i;
-      copy(arg+i*n_in, arg+(i+1)*n_in, arg_i);
-      double** res_i = res + n_out*n_ + sz_res*i;
-      copy(res+i*n_out, res+(i+1)*n_out, res_i);
+      const double** arg_i = arg + n_in_ + sz_arg*i;
+      for (int j=0; j<n_in_; ++j) {
+        arg_i[j] = arg[j]+i*f_.input(j).nnz();
+      }
+      double** res_i = res + n_out_ + sz_res*i;
+      for (int j=0; j<n_out_; ++j) {
+        res_i[j] = res[j]? res[j]+i*f_.output(j).nnz() : 0;
+      }
       int* iw_i = iw + i*sz_iw;
       double* w_i = w + i*sz_w;
-      f_->evalD(arg_i, res_i, iw_i, w_i);
+      f_->eval(arg_i, res_i, iw_i, w_i);
     }
+  }
+
+  void MapOmp::generateDeclarations(CodeGenerator& g) const {
+    f_->addDependency(g);
+  }
+
+  void MapOmp::generateBody(CodeGenerator& g) const {
+    size_t sz_arg, sz_res, sz_iw, sz_w;
+    f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+
+    g.body << "  int i;" << endl;
+    g.body << "#pragma omp parallel for" << endl;
+    g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
+    g.body << "    const double** arg_i = arg + " << n_in_ << "+" << sz_arg << "*i;" << endl;
+    for (int j=0; j<n_in_; ++j) {
+      g.body << "    arg_i[" << j << "] = arg[" << j << "]+i*" << f_.input(j).nnz() << ";" << endl;
+    }
+    g.body << "    double** res_i = res + " <<  n_out_ << "+" <<  sz_res << "*i;" << endl;
+    for (int j=0; j<n_out_; ++j) {
+      g.body << "    res_i[" << j << "] = res[" << j << "] ?" <<
+                "res[" << j << "]+i*" << f_.output(j).nnz() << ": 0;" << endl;
+    }
+    g.body << "    int* iw_i = iw + i*" << sz_iw << ";" << endl;
+    g.body << "    double* w_i = w + i*" << sz_w << ";" << endl;
+    g.body << "    " << g.call(f_, "arg_i", "res_i", "iw_i", "w_i") << ";" << endl;
+    g.body << "  }" << std::endl;
   }
 
   void MapOmp::init() {

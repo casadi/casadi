@@ -115,9 +115,6 @@ namespace casadi {
     /** \brief Get the sparsity pattern */
     const Sparsity& sparsity() const;
 
-    /// Access the sparsity, make a copy if there are multiple references to it
-    Sparsity& sparsityRef();
-
     /// \cond INTERNAL
     /// Scalar type
     typedef MX ScalarType;

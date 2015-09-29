@@ -43,9 +43,6 @@ namespace casadi {
     /// Constructor
     Inverse(const MX& x);
 
-    /// Clone function
-    virtual Inverse* clone() const { return new Inverse(*this);}
-
     /// Destructor
     virtual ~Inverse() {}
 
