@@ -18,7 +18,7 @@ fs = 610.1 # Sampling frequency [hz]
 
 param_truth = DMatrix([5.625e-6,2.3e-4,1,4.69])
 param_guess = DMatrix([5,2,1,5])
-scale = vertcat([1e-6,1e-4,1,1])
+scale = vertcat([1e-6,1e-4,1,1])j
 
 ############ MODELING #####################
 y  = MX.sym('y')
@@ -84,7 +84,7 @@ y_data = X_measured[0,:].T
 # When noise is absent, the fit will be perfect.
 
 # Use just-in-time compilation to speed up the evaluation
-opts = {'jit':True, "jit_options":{"flags":['-O3']}}
+opts = {'jit': Compiler.hasPlugin('clang') , "jit_options":{"flags":['-O3']}}
 
 ############ Create a Gauss-Newton solver ##########
 def gauss_newton(e,nlp,V):
