@@ -242,23 +242,34 @@ namespace casadi {
     const char sep = '/';
 #endif // _WIN32
 
+    userOut() << "test001" << std::endl;
+
     // Return value
     vector<pair<string, bool> > ret;
 
     // Read line-by-line
     std::ifstream setup_file(path + sep + file);
     std::string line;
+    userOut() << "test002" << std::endl;
+
     while (std::getline(setup_file, line)) {
       // Skip empty lines
       if (line.empty()) continue;
 
+      userOut() << "test003" << std::endl;
+
       // Check if framework
       size_t loc = line.find(" (framework directory)");
       bool isframework = loc != string::npos;
+      
+      userOut() << "test004" << std::endl;
+
       if (isframework) {
         // Truncate path
         line = line.substr(0, loc);
       }
+
+      userOut() << "test005" << std::endl;
 
       // Check if the path is absolute or relative
 #ifdef _WIN32
@@ -267,6 +278,9 @@ namespace casadi {
       bool relative = line.at(0)!=sep;
 #endif // _WIN32
 
+      userOut() << "test006" << std::endl;
+
+
       if (relative) {
         // Relative path, make absolute
         ret.push_back(make_pair(path + sep + line, isframework));
@@ -274,6 +288,9 @@ namespace casadi {
         // Absolute path
         ret.push_back(make_pair(line, isframework));
       }
+      
+      userOut() << "test007" << std::endl;
+
     }
 
     return ret;
