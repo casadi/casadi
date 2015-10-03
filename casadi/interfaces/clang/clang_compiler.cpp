@@ -261,7 +261,7 @@ namespace casadi {
       // Check if framework
       size_t loc = line.find(" (framework directory)");
       bool isframework = loc != string::npos;
-      
+
       userOut() << "test004" << std::endl;
 
       if (isframework) {
@@ -288,7 +288,7 @@ namespace casadi {
         // Absolute path
         ret.push_back(make_pair(line, isframework));
       }
-      
+
       userOut() << "test007" << std::endl;
 
     }
