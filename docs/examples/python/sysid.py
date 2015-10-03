@@ -18,7 +18,7 @@ fs = 610.1 # Sampling frequency [hz]
 
 param_truth = DMatrix([5.625e-6,2.3e-4,1,4.69])
 param_guess = DMatrix([5,2,1,5])
-scale = vertcat([1e-6,1e-4,1,1])j
+scale = vertcat([1e-6,1e-4,1,1])
 
 ############ MODELING #####################
 y  = MX.sym('y')
