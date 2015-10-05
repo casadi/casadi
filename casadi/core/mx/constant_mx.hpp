@@ -293,6 +293,9 @@ namespace casadi {
       return Matrix<double>(sparsity(), v_.value, false);
     }
 
+    /** \brief Check if two nodes are equivalent up to a given depth */
+    virtual bool zz_isEqual(const MXNode* node, int depth) const;
+
     /// Get densification
     virtual MX getProject(const Sparsity& sp) const;
 
@@ -514,6 +517,11 @@ namespace casadi {
     } else {
       return MXNode::getProject(sp);
     }
+  }
+
+  template<typename Value>
+  bool Constant<Value>::zz_isEqual(const MXNode* node, int depth) const {
+    return node->isValue(v_.value) && node->sparsity()==sparsity();
   }
 
   template<typename Value>
