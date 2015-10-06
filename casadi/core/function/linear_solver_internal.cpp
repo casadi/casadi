@@ -34,7 +34,10 @@ OUTPUTSCHEME(LinsolOutput)
 using namespace std;
 namespace casadi {
 
-  LinearSolverInternal::LinearSolverInternal(const Sparsity& sparsity, int nrhs) {
+  LinearSolverInternal::LinearSolverInternal(const std::string& name,
+                                             const Sparsity& sparsity, int nrhs)
+  : FunctionInternal(name) {
+
     // Make sure arguments are consistent
     casadi_assert(!sparsity.isNull());
     casadi_assert_message(sparsity.size2()==sparsity.size1(),

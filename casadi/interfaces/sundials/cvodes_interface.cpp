@@ -48,7 +48,9 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_cvodes);
   }
 
-  CvodesInterface::CvodesInterface(const Function& f, const Function& g) : SundialsInterface(f, g) {
+  CvodesInterface::CvodesInterface(const std::string& name, const Function& f,
+                                   const Function& g) : SundialsInterface(name, f, g) {
+
     addOption("linear_multistep_method",          OT_STRING,              "bdf",
               "Integrator scheme", "bdf|adams");
     addOption("nonlinear_solver_iteration",       OT_STRING,              "newton",

@@ -36,11 +36,10 @@ using namespace std;
 
 namespace casadi {
 
-  MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv,
+  MXFunctionInternal::MXFunctionInternal(const std::string& name,
+                                         const std::vector<MX>& inputv,
                                          const std::vector<MX>& outputv) :
-    XFunctionInternal<MXFunction, MXFunctionInternal, MX, MXNode>(inputv, outputv) {
-
-    setOption("name", "unnamed_mx_function");
+    XFunctionInternal<MXFunction, MXFunctionInternal, MX, MXNode>(name, inputv, outputv) {
   }
 
 
@@ -336,7 +335,7 @@ namespace casadi {
     }
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog, this, getOption("name"),
+      profileWriteName(CasadiOptions::profilingLog, this, name_,
                        ProfilingData_FunctionType_MXFunction, algorithm_.size());
       int alg_counter = 0;
       for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end();
@@ -361,7 +360,7 @@ namespace casadi {
 
   void MXFunctionInternal::evalD(const double** arg,
                                  double** res, int* iw, double* w) {
-    casadi_msg("MXFunctionInternal::evalD():begin "  << getOption("name"));
+    casadi_msg("MXFunctionInternal::evalD():begin "  << name_);
     // Set up timers for profiling
     double time_zero=0;
     double time_start=0;
@@ -371,7 +370,7 @@ namespace casadi {
       if (CasadiOptions::profilingBinary) {
         profileWriteEntry(CasadiOptions::profilingLog, this);
       } else {
-        CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl;
+        CasadiOptions::profilingLog  << "start " << this << ":" <<name_ << std::endl;
       }
     }
 
@@ -432,13 +431,13 @@ namespace casadi {
         } else {
           CasadiOptions::profilingLog  << (time_stop-time_start)*1e6 << " ns | "
                                        << (time_stop-time_zero)*1e3 << " ms | "
-                                       << this << ":" <<getOption("name") << ":"
+                                       << this << ":" <<name_ << ":"
                                        << alg_counter <<"|";
           if (!it->data.isNull()) {
             int nf = it->data->numFunctions();
             for (int i=0; i<nf; ++i) {
               Function f = it->data->getFunction(i);
-              CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
+              CasadiOptions::profilingLog << f.get() << ":" << f.name();
             }
           }
           CasadiOptions::profilingLog << "|";
@@ -455,12 +454,12 @@ namespace casadi {
         profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_zero);
       } else {
         CasadiOptions::profilingLog  << "stop " << this << ":"
-                                     <<getOption("name") << (time_stop-time_zero)*1e3
+                                     <<name_ << (time_stop-time_zero)*1e3
                                      << " ms" << std::endl;
       }
     }
 
-    casadi_msg("MXFunctionInternal::evalD():end "  << getOption("name"));
+    casadi_msg("MXFunctionInternal::evalD():end "  << name_);
   }
 
   void MXFunctionInternal::print(ostream &stream, const AlgEl& el) const {

@@ -48,7 +48,8 @@ namespace casadi {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_worhp);
   }
 
-  WorhpInterface::WorhpInterface(const Function& nlp) : NlpSolverInternal(nlp) {
+  WorhpInterface::WorhpInterface(const std::string& name, const Function& nlp)
+    : NlpSolverInternal(name, nlp) {
 
     // Monitors
     addOption("monitor",            OT_STRINGVECTOR,  GenericType(),  "Monitor functions",

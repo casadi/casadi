@@ -40,9 +40,13 @@ namespace casadi {
   class CASADI_EXPORT MapBase : public FunctionInternal {
   public:
     // Create function (use instead of constructor)
-    static MapBase* create(const Function& f, int n, const Dict& opts);
+    static MapBase* create(const std::string& name,
+                           const Function& f, int n, const Dict& opts);
 
-    /** \brief  Destructor */
+    /** \brief Constructor */
+    MapBase(const std::string& name) : FunctionInternal(name) {}
+
+    /** \brief Destructor */
     virtual ~MapBase();
 
     /** \brief  Initialize */
@@ -50,7 +54,7 @@ namespace casadi {
 
   protected:
     // Constructor (protected, use create function above)
-    MapBase(const Function& f, int n);
+    MapBase(const std::string& name, const Function& f, int n);
 
     // The function which is to be evaluated in parallel
     Function f_;
@@ -73,7 +77,8 @@ namespace casadi {
     friend class MapBase;
   protected:
     // Constructor (protected, use create function in MapBase)
-    MapSerial(const Function& f, int n) : MapBase(f, n) {}
+    MapSerial(const std::string& name, const Function& f, int n)
+      : MapBase(name, f, n) {}
 
     /** \brief  Destructor */
     virtual ~MapSerial();
@@ -131,7 +136,7 @@ namespace casadi {
     friend class MapBase;
   protected:
     // Constructor (protected, use create function in MapBase)
-    MapOmp(const Function& f, int n) : MapSerial(f, n) {}
+    MapOmp(const std::string& name, const Function& f, int n) : MapSerial(name, f, n) {}
 
     /** \brief  Destructor */
     virtual ~MapOmp();
@@ -163,7 +168,7 @@ namespace casadi {
     };
 
     /** \brief Constructor (generic map) */
-    MapReduce(const Function& f, int n,
+    MapReduce(const std::string& name, const Function& f, int n,
       const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out);
 
     /** \brief  Destructor */

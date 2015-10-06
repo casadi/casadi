@@ -84,7 +84,7 @@ y_data = X_measured[0,:].T
 # When noise is absent, the fit will be perfect.
 
 # Use just-in-time compilation to speed up the evaluation
-opts = {'jit': Compiler.hasPlugin('clang') , "jit_options":{"flags":['-O3']}}
+opts = {'jit':True, "jit_options":{"flags":['-O3']}}
 
 ############ Create a Gauss-Newton solver ##########
 def gauss_newton(e,nlp,V):

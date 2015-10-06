@@ -65,8 +65,8 @@ namespace casadi {
     friend class Function;
 
   protected:
-    /** \brief  Default constructor (accessible from the Function class and derived classes) */
-    FunctionInternal();
+    /** \brief Constructor (accessible from the Function class and derived classes) */
+    FunctionInternal(const std::string& name);
 
   public:
     /** \brief  Destructor */
@@ -450,7 +450,7 @@ namespace casadi {
         return ibuf_.at(i);
       } catch(std::out_of_range&) {
         std::stringstream ss;
-        ss <<  "In function " << getOption("name")
+        ss <<  "In function " << name_
            << ": input " << i << " not in interval [0, " << nIn() << ")";
         if (!isInit()) ss << std::endl << "Did you forget to initialize?";
         throw CasadiException(ss.str());
@@ -478,7 +478,7 @@ namespace casadi {
         return obuf_.at(i);
       } catch(std::out_of_range&) {
         std::stringstream ss;
-        ss <<  "In function " << getOption("name")
+        ss <<  "In function " << name_
            << ": output " << i << " not in interval [0, " << nOut() << ")";
         if (!isInit()) ss << std::endl << "Did you forget to initialize?";
         throw CasadiException(ss.str());

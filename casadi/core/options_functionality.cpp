@@ -468,7 +468,6 @@ const OptionsFunctionalityNode* OptionsFunctionality::operator->() const {
 }
 
 OptionsFunctionalityNode::OptionsFunctionalityNode() {
-  addOption("name",            OT_STRING, "unnamed_shared_object"); // name of the object
   addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(),
             "Changes default options according to a given recipe (low-level)");
 }
@@ -565,10 +564,6 @@ void OptionsFunctionalityNode::setOption(const Dict& dict, bool skipUnknown) {
 
 void OptionsFunctionalityNode::copyOptions(const OptionsFunctionality& obj, bool skipUnknown) {
   setOption(obj.dictionary(), skipUnknown);
-}
-
-void OptionsFunctionalityNode::repr(ostream &stream) const {
-  stream << getOption("name").toString();
 }
 
 std::vector<std::string> OptionsFunctionalityNode::getOptionNames() const {

@@ -47,12 +47,13 @@ namespace casadi {
   */
   class CASADI_NLPSOLVER_SQPMETHOD_EXPORT Sqpmethod : public NlpSolverInternal {
   public:
-    explicit Sqpmethod(const Function& nlp);
+    explicit Sqpmethod(const std::string& name, const Function& nlp);
     virtual ~Sqpmethod();
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const Function& nlp)
-    { return new Sqpmethod(nlp);}
+    static NlpSolverInternal* creator(const std::string& name, const Function& nlp) {
+      return new Sqpmethod(name, nlp);
+    }
 
     virtual void init();
     virtual void evaluate();

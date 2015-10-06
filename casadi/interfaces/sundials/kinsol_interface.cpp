@@ -66,7 +66,9 @@ namespace casadi {
    * \see ImplicitFunction for more information
    *
    */
-  KinsolInterface::KinsolInterface(const Function& f) : ImplicitFunctionInternal(f) {
+  KinsolInterface::KinsolInterface(const std::string& name, const Function& f)
+    : ImplicitFunctionInternal(name, f) {
+
     addOption("max_iter",                 OT_INTEGER, 0,
               "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
     addOption("abstol",                   OT_REAL, 1e-6, "Stopping criterion tolerance");

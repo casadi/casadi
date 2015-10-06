@@ -36,8 +36,7 @@ namespace casadi {
                            double r,
                            int n,
                  const Dict& opts) {
-    assignNode(new KernelSum2DInternal(f, size, r, n));
-    setOption("name", name);
+    assignNode(new KernelSum2DInternal(name, f, size, r, n));
     setOption(opts);
     init();
   }

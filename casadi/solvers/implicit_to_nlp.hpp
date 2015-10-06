@@ -52,18 +52,20 @@ namespace casadi {
     public Adaptor<QpToImplicit, NlpSolverInternal> {
   public:
     /** \brief  Constructor */
-    explicit QpToImplicit(const Function& f);
+    explicit QpToImplicit(const std::string& name, const Function& f);
 
     /** \brief  Destructor */
     virtual ~QpToImplicit();
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual QpToImplicit* create(const Function& f) const
-    { return new QpToImplicit(f);}
+    virtual QpToImplicit* create(const std::string& name, const Function& f) const {
+      return new QpToImplicit(name, f);
+    }
 
     /** \brief  Create a new ImplicitFunction */
-    static ImplicitFunctionInternal* creator(const Function& f)
-    { return new QpToImplicit(f);}
+    static ImplicitFunctionInternal* creator(const std::string& name, const Function& f) {
+      return new QpToImplicit(name, f);
+    }
 
     /** \brief  Initialize */
     virtual void init();

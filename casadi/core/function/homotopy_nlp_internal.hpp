@@ -46,7 +46,7 @@ namespace casadi {
                         public PluginInterface<HomotopyNLPInternal> {
   public:
     /// Constructor
-    HomotopyNLPInternal(const Function& hnlp);
+    HomotopyNLPInternal(const std::string& name, const Function& hnlp);
 
     /// Destructor
     virtual ~HomotopyNLPInternal() = 0;
@@ -62,7 +62,8 @@ namespace casadi {
     int ng_;
 
     // Creator function for internal class
-    typedef HomotopyNLPInternal* (*Creator)(const Function& hnlp);
+    typedef HomotopyNLPInternal* (*Creator)(const std::string& name,
+                                            const Function& hnlp);
 
     // No static functions exposed
     struct Exposed{ };

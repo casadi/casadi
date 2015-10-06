@@ -48,14 +48,15 @@ namespace casadi {
 
   public:
     // Constructor
-    explicit SnoptInterface(const Function& nlp);
+    explicit SnoptInterface(const std::string& name, const Function& nlp);
 
     // Destructor
     virtual ~SnoptInterface();
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const Function& nlp)
-    { return new SnoptInterface(nlp);}
+    static NlpSolverInternal* creator(const std::string& name, const Function& nlp) {
+      return new SnoptInterface(name, nlp);
+    }
 
     // (Re)initialize
     virtual void init();

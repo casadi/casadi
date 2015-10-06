@@ -42,7 +42,7 @@ namespace casadi {
                          public PluginInterface<LinearSolverInternal> {
   public:
     /// Constructor
-    LinearSolverInternal(const Sparsity& sparsity, int nrhs);
+    LinearSolverInternal(const std::string& name, const Sparsity& sparsity, int nrhs);
 
     /// Destructor
     virtual ~LinearSolverInternal();
@@ -126,7 +126,8 @@ namespace casadi {
     const int* colind() const { return input(LINSOL_A).colind();}
 
     // Creator function for internal class
-    typedef LinearSolverInternal* (*Creator)(const Sparsity& sp, int nrhs);
+    typedef LinearSolverInternal* (*Creator)(const std::string& name,
+                                             const Sparsity& sp, int nrhs);
 
     // No static functions exposed
     struct Exposed{ };

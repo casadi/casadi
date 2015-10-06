@@ -52,12 +52,13 @@ namespace casadi {
   */
   class CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT StabilizedSqp : public NlpSolverInternal {
   public:
-    explicit StabilizedSqp(const Function& nlp);
+    explicit StabilizedSqp(const std::string& name, const Function& nlp);
     virtual ~StabilizedSqp();
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const Function& nlp)
-    { return new StabilizedSqp(nlp);}
+    static NlpSolverInternal* creator(const std::string& name, const Function& nlp) {
+      return new StabilizedSqp(name, nlp);
+    }
 
     virtual void init();
     virtual void evaluate();

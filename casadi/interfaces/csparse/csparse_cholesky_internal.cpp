@@ -45,20 +45,15 @@ namespace casadi {
     LinearSolverInternal::registerPlugin(casadi_register_linearsolver_csparsecholesky);
   }
 
-  CSparseCholeskyInternal::CSparseCholeskyInternal(const Sparsity& sparsity, int nrhs) :
-      LinearSolverInternal(sparsity, nrhs) {
+  CSparseCholeskyInternal::CSparseCholeskyInternal(const std::string& name,
+                                                   const Sparsity& sparsity, int nrhs) :
+    LinearSolverInternal(name, sparsity, nrhs) {
     L_ = 0;
     S_ = 0;
 
     casadi_assert_message(sparsity.issymmetric(),
                           "CSparseCholeskyInternal: supplied sparsity must be symmetric, got "
                           << sparsity.dimString() << ".");
-  }
-
-  CSparseCholeskyInternal::CSparseCholeskyInternal(const CSparseCholeskyInternal& linsol) :
-      LinearSolverInternal(linsol) {
-    L_ = 0;
-    S_ = 0;
   }
 
   CSparseCholeskyInternal::~CSparseCholeskyInternal() {

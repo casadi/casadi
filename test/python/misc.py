@@ -30,6 +30,8 @@ from types import *
 from helpers import *
 import pickle
 from operator import itemgetter
+import sys
+
 
 scipy_available = True
 try:

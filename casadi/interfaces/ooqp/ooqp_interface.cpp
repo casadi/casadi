@@ -54,8 +54,10 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_ooqp);
   }
 
-  OoqpInterface::OoqpInterface(const std::map<std::string, Sparsity>& st)
-    : QpSolverInternal(st) {
+  OoqpInterface::OoqpInterface(const std::string& name,
+                               const std::map<std::string, Sparsity>& st)
+    : QpSolverInternal(name, st) {
+
     addOption("print_level", OT_INTEGER, 0,
               "Print level. OOQP listens to print_level 0, 10 and 100");
     addOption("mutol", OT_REAL, 1e-8, "tolerance as provided with setMuTol to OOQP");

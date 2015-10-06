@@ -62,11 +62,13 @@ namespace casadi {
   class CASADI_LINEARSOLVER_LAPACKQR_EXPORT LapackQrDense : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQrDense(const Sparsity& sparsity, int nrhs);
+    LapackQrDense(const std::string& name, const Sparsity& sparsity, int nrhs);
 
     /** \brief  Create a new LinearSolver */
-    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new LapackQrDense(sp, nrhs);}
+    static LinearSolverInternal* creator(const std::string& name, const Sparsity& sp,
+                                         int nrhs) {
+      return new LapackQrDense(name, sp, nrhs);
+    }
 
     // Destructor
     virtual ~LapackQrDense();

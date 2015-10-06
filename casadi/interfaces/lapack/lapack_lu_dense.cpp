@@ -47,8 +47,10 @@ namespace casadi {
     LinearSolverInternal::registerPlugin(casadi_register_linearsolver_lapacklu);
   }
 
-  LapackLuDense::LapackLuDense(const Sparsity& sparsity, int nrhs)
-      : LinearSolverInternal(sparsity, nrhs) {
+  LapackLuDense::LapackLuDense(const std::string& name,
+                               const Sparsity& sparsity, int nrhs)
+    : LinearSolverInternal(name, sparsity, nrhs) {
+
     // Equilibrate the matrix
     addOption("equilibration", OT_BOOLEAN, true);
     addOption("allow_equilibration_failure", OT_BOOLEAN, false);

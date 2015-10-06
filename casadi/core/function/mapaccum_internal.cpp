@@ -30,39 +30,35 @@ using namespace std;
 
 namespace casadi {
 
-  MapAccumInternal::MapAccumInternal(const Function& f, int n,
-    const std::vector<bool>& input_accum,
-    const std::vector<int>& output_accum,
-    bool reverse)
-    : f_(f), n_(n), input_accum_(input_accum), output_accum_(output_accum), reverse_(reverse) {
+  MapAccumInternal::MapAccumInternal(const std::string& name, const Function& f, int n,
+                                     const std::vector<bool>& input_accum,
+                                     const std::vector<int>& output_accum,
+                                     bool reverse)
+    : FunctionInternal(name), f_(f), n_(n),
+      input_accum_(input_accum), output_accum_(output_accum), reverse_(reverse) {
 
-   casadi_assert(n>0);
-   casadi_assert(f.nIn()>=1);
-   casadi_assert(f.nOut()>=1);
+    casadi_assert(n>0);
+    casadi_assert(f.nIn()>=1);
+    casadi_assert(f.nOut()>=1);
 
-   casadi_assert(input_accum.size()==f_.nIn());
-   int n_accum=0;
-   for (int i=0;i<input_accum.size();++i) {
+    casadi_assert(input_accum.size()==f_.nIn());
+    int n_accum=0;
+    for (int i=0;i<input_accum.size();++i) {
       if (input_accum[i]) {
         casadi_assert(n_accum<output_accum.size());
         casadi_assert(output_accum[n_accum]>=0);
         casadi_assert(output_accum[n_accum]<f_.nOut());
 
         casadi_assert_message(f.inputSparsity(i)==f.outputSparsity(output_accum[n_accum]),
-                                "Input #" << i << " and output #" << output_accum[n_accum] <<
-                                " must have matching sparsity. " <<
-                                "Got " << f.inputSparsity(i).dimString() << " and " <<
-                                f.outputSparsity(output_accum[n_accum]).dimString() << ".");
+                              "Input #" << i << " and output #" << output_accum[n_accum] <<
+                              " must have matching sparsity. " <<
+                              "Got " << f.inputSparsity(i).dimString() << " and " <<
+                              f.outputSparsity(output_accum[n_accum]).dimString() << ".");
         n_accum++;
       }
-   }
-   casadi_assert(output_accum.size()==n_accum);
-   casadi_assert(isMonotone(output_accum));
-
-
-
-    // Give a name
-    setOption("name", "unnamed_mapaccum");
+    }
+    casadi_assert(output_accum.size()==n_accum);
+    casadi_assert(isMonotone(output_accum));
   }
 
   MapAccumInternal::~MapAccumInternal() {
@@ -708,7 +704,7 @@ namespace casadi {
     if (f.isNull()) {
       return "NULL";
     } else {
-      return f.getOption("name");
+      return f.name();
     }
   }
 

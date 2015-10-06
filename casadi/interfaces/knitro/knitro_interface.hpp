@@ -46,12 +46,13 @@ namespace casadi {
   class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroInterface : public NlpSolverInternal {
 
   public:
-    explicit KnitroInterface(const Function& nlp);
+    explicit KnitroInterface(const std::string& name, const Function& nlp);
     virtual ~KnitroInterface();
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const Function& nlp)
-    { return new KnitroInterface(nlp);}
+    static NlpSolverInternal* creator(const std::string& name, const Function& nlp) {
+      return new KnitroInterface(name, nlp);
+    }
 
     virtual void init();
     virtual void evaluate();

@@ -79,11 +79,10 @@ namespace casadi {
   LinearSolver::LinearSolver(const std::string& name, const std::string& solver,
                              const Sparsity& sp, int nrhs, const Dict& opts) {
     if (solver=="none") {
-      assignNode(new LinearSolverInternal(sp, nrhs));
+      assignNode(new LinearSolverInternal(name, sp, nrhs));
     } else {
-      assignNode(LinearSolverInternal::getPlugin(solver).creator(sp, nrhs));
+      assignNode(LinearSolverInternal::getPlugin(solver).creator(name, sp, nrhs));
     }
-    setOption("name", name);
     setOption(opts);
     init();
   }
@@ -91,11 +90,10 @@ namespace casadi {
   LinearSolver::LinearSolver(const std::string& name, const std::string& solver,
                              const Sparsity& sp, const Dict& opts) {
     if (solver=="none") {
-      assignNode(new LinearSolverInternal(sp, 1));
+      assignNode(new LinearSolverInternal(name, sp, 1));
     } else {
-      assignNode(LinearSolverInternal::getPlugin(solver).creator(sp, 1));
+      assignNode(LinearSolverInternal::getPlugin(solver).creator(name, sp, 1));
     }
-    setOption("name", name);
     setOption(opts);
     init();
   }

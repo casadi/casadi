@@ -45,13 +45,15 @@ namespace casadi {
                        public PluginInterface<IntegratorInternal> {
   public:
     /** \brief  Constructor */
-    IntegratorInternal(const Function& f, const Function& g);
+    IntegratorInternal(const std::string& name, const Function& f, const Function& g);
 
     /** \brief  Destructor */
     virtual ~IntegratorInternal()=0;
 
     /** \brief  Create a new integrator */
-    virtual IntegratorInternal* create(const Function& f, const Function& g) const = 0;
+    virtual IntegratorInternal* create(const std::string& name,
+                                       const Function& f,
+                                       const Function& g) const = 0;
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -163,7 +165,9 @@ namespace casadi {
     bool print_stats_;
 
     // Creator function for internal class
-    typedef IntegratorInternal* (*Creator)(const Function& f, const Function& g);
+    typedef IntegratorInternal* (*Creator)(const std::string& name,
+                                           const Function& f,
+                                           const Function& g);
 
     // No static functions exposed
     struct Exposed{ };

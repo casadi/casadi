@@ -42,10 +42,10 @@ namespace casadi {
   public:
 
     /** \brief Constructor (generic kernel_sum_2d) */
-    KernelSum2DInternal(const Function& f,
-           const std::pair<int, int> & size,
-           double r,
-           int n);
+    KernelSum2DInternal(const std::string& name, const Function& f,
+                        const std::pair<int, int> & size,
+                        double r,
+                        int n);
 
     /** \brief  Destructor */
     virtual ~KernelSum2DInternal();

@@ -79,7 +79,9 @@ namespace casadi {
 
     /** \brief  Multiple input, multiple output constructor, only to be accessed from MXFunction,
         therefore protected */
-    MXFunctionInternal(const std::vector<MX>& input, const std::vector<MX>& output);
+    MXFunctionInternal(const std::string& name,
+                       const std::vector<MX>& input,
+                       const std::vector<MX>& output);
 
     /** \brief  Destructor */
     virtual ~MXFunctionInternal();

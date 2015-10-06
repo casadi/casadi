@@ -33,7 +33,9 @@ OUTPUTSCHEME(NlpSolverOutput)
 using namespace std;
 namespace casadi {
 
-  HomotopyNLPInternal::HomotopyNLPInternal(const Function& hnlp) : hnlp_(hnlp) {
+  HomotopyNLPInternal::HomotopyNLPInternal(const std::string& name,
+                                           const Function& hnlp)
+  : FunctionInternal(name), hnlp_(hnlp) {
 
     addOption("expand",             OT_BOOLEAN,  false,
               "Expand the NLP function in terms of scalar operations, i.e. MX->SX");

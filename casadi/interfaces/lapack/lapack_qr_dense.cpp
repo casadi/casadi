@@ -44,8 +44,9 @@ namespace casadi {
     LinearSolverInternal::registerPlugin(casadi_register_linearsolver_lapackqr);
   }
 
-  LapackQrDense::LapackQrDense(const Sparsity& sparsity, int nrhs) :
-      LinearSolverInternal(sparsity, nrhs) {
+  LapackQrDense::LapackQrDense(const std::string& name,
+                               const Sparsity& sparsity, int nrhs) :
+    LinearSolverInternal(name, sparsity, nrhs) {
   }
 
   LapackQrDense::~LapackQrDense() {

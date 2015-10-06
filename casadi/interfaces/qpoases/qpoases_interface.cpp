@@ -49,8 +49,10 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_qpoases);
   }
 
-  QpoasesInterface::QpoasesInterface(const std::map<std::string, Sparsity>& st)
-    : QpSolverInternal(st) {
+  QpoasesInterface::QpoasesInterface(const std::string& name,
+                                     const std::map<std::string, Sparsity>& st)
+    : QpSolverInternal(name, st) {
+
     addOption("nWSR",                   OT_INTEGER,     GenericType(),
               "The maximum number of working set recalculations to be performed during "
               "the initial homotopy. Default is 5(nx + nc)");

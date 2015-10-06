@@ -53,15 +53,19 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit RkIntegrator(const Function& f, const Function& g);
+    explicit RkIntegrator(const std::string& name, const Function& f, const Function& g);
 
     /// Create a new integrator
-    virtual RkIntegrator* create(const Function& f, const Function& g) const
-    { return new RkIntegrator(f, g);}
+    virtual RkIntegrator* create(const std::string& name,
+                                 const Function& f, const Function& g) const {
+      return new RkIntegrator(name, f, g);
+    }
 
     /** \brief  Create a new integrator */
-    static IntegratorInternal* creator(const Function& f, const Function& g)
-    { return new RkIntegrator(f, g);}
+    static IntegratorInternal* creator(const std::string& name,
+                                       const Function& f, const Function& g) {
+      return new RkIntegrator(name, f, g);
+    }
 
     /// Destructor
     virtual ~RkIntegrator();

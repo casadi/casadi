@@ -44,13 +44,14 @@ namespace casadi {
      *
      * \param f   Function mapping from (n+1) inputs to 1 output.
      */
-    ImplicitFunctionInternal(const Function& f);
+    ImplicitFunctionInternal(const std::string& name, const Function& f);
 
     /// Destructor
     virtual ~ImplicitFunctionInternal() = 0;
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const Function& f) const = 0;
+    virtual ImplicitFunctionInternal* create(const std::string& name,
+                                             const Function& f) const = 0;
 
     /// Initialize
     virtual void init();
@@ -116,7 +117,7 @@ namespace casadi {
     int iin_, iout_;
 
     // Creator function for internal class
-    typedef ImplicitFunctionInternal* (*Creator)(const Function& f);
+    typedef ImplicitFunctionInternal* (*Creator)(const std::string& name, const Function& f);
 
     // No static functions exposed
     struct Exposed{ };

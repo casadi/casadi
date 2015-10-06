@@ -33,8 +33,7 @@ namespace casadi {
 
   ImplicitFunction::ImplicitFunction(const std::string& name, const std::string& solver,
                                      const Function& f, const Dict& opts) {
-    assignNode(ImplicitFunctionInternal::instantiatePlugin(solver, f));
-    setOption("name", name);
+    assignNode(ImplicitFunctionInternal::instantiatePlugin(name, solver, f));
     setOption(opts);
     init();
   }

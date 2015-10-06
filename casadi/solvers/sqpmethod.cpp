@@ -53,7 +53,9 @@ namespace casadi {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_sqpmethod);
   }
 
-  Sqpmethod::Sqpmethod(const Function& nlp) : NlpSolverInternal(nlp) {
+  Sqpmethod::Sqpmethod(const std::string& name, const Function& nlp)
+    : NlpSolverInternal(name, nlp) {
+
     casadi_warning("The SQP method is under development");
     addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");

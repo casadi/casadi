@@ -41,7 +41,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    NullspaceInternal(const Sparsity & A_sp);
+    NullspaceInternal(const std::string& name, const Sparsity & A_sp);
 
     /** \brief  Destructor */
     virtual ~NullspaceInternal();

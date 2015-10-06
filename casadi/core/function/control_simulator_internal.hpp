@@ -42,8 +42,8 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    ControlSimulatorInternal(const Function& dae, const Function& output_fcn,
-                             const DMatrix& gridc);
+    ControlSimulatorInternal(const std::string& name, const Function& dae,
+                             const Function& output_fcn, const DMatrix& gridc);
 
     /** \brief  Destructor */
     virtual ~ControlSimulatorInternal();

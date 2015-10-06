@@ -56,8 +56,7 @@ namespace casadi {
 
   QpSolver::QpSolver(const std::string& name, const std::string& solver,
                      const std::map<std::string, Sparsity>& st, const Dict& opts) {
-    assignNode(QpSolverInternal::instantiatePlugin(solver, st));
-    setOption("name", name);
+    assignNode(QpSolverInternal::instantiatePlugin(name, solver, st));
     setOption(opts);
     init();
   }

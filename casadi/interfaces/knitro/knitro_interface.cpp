@@ -47,7 +47,9 @@ namespace casadi {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_knitro);
   }
 
-  KnitroInterface::KnitroInterface(const Function& nlp) : NlpSolverInternal(nlp) {
+  KnitroInterface::KnitroInterface(const std::string& name, const Function& nlp)
+    : NlpSolverInternal(name, nlp) {
+
     // Monitors
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "",
               "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);

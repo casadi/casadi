@@ -52,16 +52,15 @@ namespace casadi {
 class CASADI_QPSOLVER_NLP_EXPORT QpToNlp : public QpSolverInternal,
   public Adaptor<QpToNlp, NlpSolverInternal> {
 public:
-  /** \brief  Constructor */
-  explicit QpToNlp();
+  /** \brief  Create a new Solver */
+  explicit QpToNlp(const std::string& name,
+                   const std::map<std::string, Sparsity> &st);
 
   /** \brief  Create a new QP Solver */
-  static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
-    return new QpToNlp(st);
+  static QpSolverInternal* creator(const std::string& name,
+                                   const std::map<std::string, Sparsity>& st) {
+    return new QpToNlp(name, st);
   }
-
-  /** \brief  Create a new Solver */
-  explicit QpToNlp(const std::map<std::string, Sparsity> &st);
 
   /** \brief  Destructor */
   virtual ~QpToNlp();

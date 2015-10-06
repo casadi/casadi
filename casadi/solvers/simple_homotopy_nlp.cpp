@@ -51,18 +51,15 @@ namespace casadi {
     HomotopyNLPInternal::registerPlugin(casadi_register_homotopynlpsolver_simple);
   }
 
-  SimpleHomotopyNlp::SimpleHomotopyNlp(const Function& nlp)
-      : HomotopyNLPInternal(nlp) {
+  SimpleHomotopyNlp::SimpleHomotopyNlp(const std::string& name, const Function& nlp)
+    : HomotopyNLPInternal(name, nlp) {
+
     addOption("nlp_solver",         OT_STRING,   GenericType(),
               "The NLP solver to be used by the Homotopy solver");
     addOption("nlp_solver_options", OT_DICT, GenericType(),
               "Options to be passed to the Homotopy solver");
-
-    //addOption("max_step",            OT_REAL,      1.,
-    //          "The maximal homotopy step that is allowed");
     addOption("num_steps",            OT_INTEGER,      10,
               "Take this many steps to go from tau=0 to tau=1.");
-
   }
 
 

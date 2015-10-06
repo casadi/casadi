@@ -42,8 +42,7 @@
 using namespace std;
 
 namespace casadi {
-  FunctionInternal::FunctionInternal() {
-    setOption("name", "unnamed_function"); // name of the function
+  FunctionInternal::FunctionInternal(const std::string& name) : name_(name) {
     addOption("verbose",                  OT_BOOLEAN,             false,
               "Verbose evaluation -- for debugging");
     addOption("ad_weight",                OT_REAL,                GenericType(),
@@ -79,8 +78,6 @@ namespace casadi {
               "Throw exceptions when the numerical values of the inputs don't make sense");
     addOption("gather_stats",             OT_BOOLEAN,             false,
               "Flag to indicate whether statistics must be gathered");
-    addOption("full_jacobian",                 OT_FUNCTION,              GenericType(),
-              "The Jacobian of all outputs with respect to all inputs.");
     addOption("input_scheme", OT_STRINGVECTOR, GenericType(), "Custom input scheme");
     addOption("output_scheme", OT_STRINGVECTOR, GenericType(), "Custom output scheme");
     addOption("jit", OT_BOOLEAN, false, "Use just-in-time compiler to speed up the evaluation");
@@ -110,13 +107,12 @@ namespace casadi {
     compilerplugin_ = getOption("compiler").toString();
     if (hasSetOption("jit_options")) jit_options_ = getOption("jit_options");
     regularity_check_ = getOption("regularity_check");
-    name_ = getOption("name").toString();
 
     // Warn for functions with too many inputs or outputs
-    casadi_assert_warning(nIn()<10000, "Function " << getOption("name")
+    casadi_assert_warning(nIn()<10000, "Function " << name_
                           << " has a large number of inputs (" << nIn() << "). "
                           "Changing the problem formulation is strongly encouraged.");
-    casadi_assert_warning(nOut()<10000, "Function " << getOption("name")
+    casadi_assert_warning(nOut()<10000, "Function " << name_
                           << " has a large number of outputs (" << nOut() << "). "
                           "Changing the problem formulation is strongly encouraged.");
 
@@ -212,7 +208,7 @@ namespace casadi {
   }
 
   void FunctionInternal::repr(ostream &stream) const {
-    stream << getOption("name");
+    stream << name_;
   }
 
   Function FunctionInternal::gradient(int iind, int oind) {
@@ -222,7 +218,7 @@ namespace casadi {
 
     // Give it a suitable name
     stringstream ss;
-    ss << "gradient_" << getOption("name") << "_" << iind << "_" << oind;
+    ss << "gradient_" << name_ << "_" << iind << "_" << oind;
 
     // Output names
     std::vector<std::string> ionames;
@@ -246,7 +242,7 @@ namespace casadi {
 
     // Give it a suitable name
     stringstream ss;
-    ss << "tangent_" << getOption("name") << "_" << iind << "_" << oind;
+    ss << "tangent_" << name_ << "_" << iind << "_" << oind;
 
     // Output names
     std::vector<std::string> ionames;
@@ -270,25 +266,7 @@ namespace casadi {
     casadi_assert_message(output(oind).isscalar(), "Only hessians of scalar functions allowed.");
 
     // Generate gradient function
-    Function ret = getHessian(iind, oind);
-
-    // Give it a suitable name
-    stringstream ss;
-    ss << "hessian_" << getOption("name") << "_" << iind << "_" << oind;
-    ret.setOption("name", ss.str());
-    ret.setOption("input_scheme", ischeme_);
-
-    // Output names
-    std::vector<std::string> ionames;
-    ionames.reserve(ret.nOut());
-    ionames.push_back("hess");
-    ionames.push_back("grad");
-    for (int i=0;i<nOut();++i) {
-      ionames.push_back(oscheme_.at(i));
-    }
-    ret.setOption("output_scheme", ionames);
-
-    return ret;
+    return getHessian(iind, oind);
   }
 
   Function FunctionInternal::getGradient(const std::string& name, int iind, int oind,
@@ -318,12 +296,6 @@ namespace casadi {
     opts["ad_weight"] = adWeight();
     opts["ad_weight_sp"] = adWeightSp();
 
-    // Propagate AD rules (options to be deprecated)
-    const char* oname[] = {"full_jacobian"};
-    for (int i=0; i<1; ++i) {
-      if (hasSetOption(oname[i])) opts[oname[i]] = getOption(oname[i]);
-    }
-
     // Propagate JIT
     opts["jit"] = jit_;
     opts["compiler"] = compilerplugin_;
@@ -341,9 +313,6 @@ namespace casadi {
     // Create gradient function
     log("FunctionInternal::getHessian generating gradient");
     Function g = gradient(iind, oind);
-    g.setOption("verbose", getOption("verbose"));
-    g.setOption("input_scheme", ischeme_);
-    g.init();
 
     // Return the Jacobian of the gradient, exploiting symmetry (the gradient has output index 0)
     log("FunctionInternal::getHessian generating Jacobian of gradient");
@@ -1545,7 +1514,7 @@ namespace casadi {
     } else {
       // Give it a suitable name
       stringstream ss;
-      ss << "jacobian_" << getOption("name") << "_" << iind << "_" << oind;
+      ss << "jacobian_" << name_ << "_" << iind << "_" << oind;
 
       // Output names
       std::vector<std::string> ionames;
@@ -1734,8 +1703,11 @@ namespace casadi {
     }
 
     // Options
-    Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names,
-                          "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
+    Dict opts = make_dict("input_scheme", i_names,
+                          "output_scheme", o_names,
+                          "jit", jit_,
+                          "compiler", compilerplugin_,
+                          "jit_options", jit_options_);
 
     // Return value
     casadi_assert(numDerReverse()>0);
@@ -1906,17 +1878,7 @@ namespace casadi {
       opts["input_scheme"] = ischeme_;
       opts["output_scheme"] = std::vector<std::string>(1, "jac");
 
-      Function ret;
-      if (hasSetOption("full_jacobian")) {
-        /// User-provided Jacobian function
-        ret = getOption("full_jacobian");
-        ret.setOption("name", name);
-        ret.setOption(opts);
-        ret.init();
-      } else {
-        // Generate full Jacobian
-        ret = getFullJacobian(name, opts);
-      }
+      Function ret = getFullJacobian(name, opts);
 
       // Consistency check
       casadi_assert(ret.nIn()==nIn());
@@ -2355,7 +2317,6 @@ namespace casadi {
 
     // Load it
     ExternalFunction f_gen(fname, dlname);
-    f_gen.setOption("name", fname + "_gen");
 
     // Initialize it if f was initialized
     if (f_is_init) {
@@ -2624,9 +2585,7 @@ namespace casadi {
   }
 
   std::string FunctionInternal::getSanitizedName() const {
-      casadi_assert(hasSetOption("name"));
-      string name = getOption("name");
-      return sanitizeName(name);
+      return sanitizeName(name_);
   }
 
   std::string FunctionInternal::sanitizeName(const std::string &name) {
@@ -2636,7 +2595,7 @@ namespace casadi {
   }
 
   bool FunctionInternal::hasFullJacobian() const {
-    return full_jacobian_.alive() || hasSetOption("full_jacobian");
+    return full_jacobian_.alive();
   }
 
   bool FunctionInternal::hasDerivative() const {

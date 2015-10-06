@@ -54,12 +54,12 @@ namespace casadi {
   */
   class CASADI_NLPSOLVER_SCPGEN_EXPORT Scpgen : public NlpSolverInternal {
   public:
-    explicit Scpgen(const Function& nlp);
+    explicit Scpgen(const std::string& name, const Function& nlp);
     virtual ~Scpgen();
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const Function& nlp)
-    { return new Scpgen(nlp);}
+    static NlpSolverInternal* creator(const std::string& name, const Function& nlp)
+    { return new Scpgen(name, nlp);}
 
     virtual void init();
     virtual void evaluate();

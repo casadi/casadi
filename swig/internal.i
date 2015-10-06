@@ -85,16 +85,10 @@
 %exception  casadi::LibInfo< Compiler >::get(FcnPtr &fcnPtr, const std::string &sym) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LibInfo< Compiler >::name() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::LibInfo< std::string >::clear() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LibInfo< std::string >::get(FcnPtr &fcnPtr, const std::string &sym) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::LibInfo< std::string >::name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::getTemp() const  {
@@ -340,13 +334,13 @@
 %exception casadi::LibInfo< Compiler >::LibInfo() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::LibInfo< Compiler >::LibInfo(const Compiler &compiler, const std::string &name) {
+%exception casadi::LibInfo< Compiler >::LibInfo(const Compiler &compiler) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::LibInfo< std::string >::LibInfo() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::LibInfo< std::string >::LibInfo(const std::string &bin_name, const std::string &name) {
+%exception casadi::LibInfo< std::string >::LibInfo(const std::string &bin_name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::LinearSolver::LinearSolver() {

@@ -54,7 +54,9 @@ namespace casadi {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_snopt);
   }
 
-  SnoptInterface::SnoptInterface(const Function& nlp) : NlpSolverInternal(nlp) {
+  SnoptInterface::SnoptInterface(const std::string& name, const Function& nlp)
+    : NlpSolverInternal(name, nlp) {
+
     addOption("detect_linear", OT_BOOLEAN, true,
               "Make an effort to treat linear constraints and linear variables specially.");
 

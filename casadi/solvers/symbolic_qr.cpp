@@ -49,8 +49,8 @@ namespace casadi {
     LinearSolverInternal::registerPlugin(casadi_register_linearsolver_symbolicqr);
   }
 
-  SymbolicQr::SymbolicQr(const Sparsity& sparsity, int nrhs) :
-      LinearSolverInternal(sparsity, nrhs) {
+  SymbolicQr::SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs) :
+    LinearSolverInternal(name, sparsity, nrhs) {
     addOption("codegen",           OT_BOOLEAN,  false,               "C-code generation");
     addOption("compiler",          OT_STRING,    "gcc -fPIC -O2",
               "Compiler command to be used for compiling generated code");

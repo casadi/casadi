@@ -46,14 +46,14 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_collocation);
   }
 
-  CollocationIntegrator::CollocationIntegrator(const Function& f,
-                                                               const Function& g)
-      : ImplicitFixedStepIntegrator(f, g) {
+  CollocationIntegrator::CollocationIntegrator(const std::string& name, const Function& f,
+                                               const Function& g)
+      : ImplicitFixedStepIntegrator(name, f, g) {
+
     addOption("interpolation_order",           OT_INTEGER,  3,
               "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",
               "Collocation scheme", "radau|legendre");
-    setOption("name", "unnamed_collocation_integrator");
   }
 
   CollocationIntegrator::~CollocationIntegrator() {

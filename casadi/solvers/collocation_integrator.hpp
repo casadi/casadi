@@ -60,15 +60,19 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit CollocationIntegrator(const Function& f, const Function& g);
+    explicit CollocationIntegrator(const std::string& name, const Function& f, const Function& g);
 
     /// Create a new integrator
-    virtual CollocationIntegrator* create(const Function& f, const Function& g) const
-    { return new CollocationIntegrator(f, g);}
+    virtual CollocationIntegrator* create(const std::string& name,
+                                          const Function& f, const Function& g) const {
+      return new CollocationIntegrator(name, f, g);
+    }
 
     /** \brief  Create a new integrator */
-    static IntegratorInternal* creator(const Function& f, const Function& g)
-    { return new CollocationIntegrator(f, g);}
+    static IntegratorInternal* creator(const std::string& name,
+                                       const Function& f, const Function& g) {
+      return new CollocationIntegrator(name, f, g);
+    }
 
     /// Destructor
     virtual ~CollocationIntegrator();

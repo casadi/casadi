@@ -35,7 +35,7 @@ namespace casadi {
   public:
 
     /** \brief Constructor */
-    explicit CallbackInternal(Callback* self);
+    explicit CallbackInternal(const std::string& name, Callback* self);
 
     /** \brief Destructor */
     virtual ~CallbackInternal();

@@ -57,7 +57,6 @@ namespace casadi {
 #endif
 
     std::string bin_name_;
-    std::string name_;
     handle_t handle_;
 
   public:
@@ -67,16 +66,13 @@ namespace casadi {
     LibInfo() : handle_(0) {}
 
     // Constructor
-    explicit LibInfo(const std::string& bin_name, const std::string& name);
+    explicit LibInfo(const std::string& bin_name);
 
     // Clear memory
     void clear();
 
     // Automatic type conversion
     operator const std::string&() const { return bin_name_;}
-
-    // Function name
-    const std::string& name() const { return name_;}
 
     // Get function pointer
     template<typename FcnPtr>
@@ -88,7 +84,6 @@ namespace casadi {
   class LibInfo<Compiler> {
   private:
     Compiler compiler_;
-    std::string name_;
 
   public:
     int n_in, n_out, sz_arg, sz_res;
@@ -97,16 +92,13 @@ namespace casadi {
     LibInfo() {}
 
     // Constructor
-    explicit LibInfo(const Compiler& compiler, const std::string& name);
+    explicit LibInfo(const Compiler& compiler);
 
     // Clear memory
     void clear() {}
 
     // Automatic type conversion
     operator const Compiler&() const { return compiler_;}
-
-    // Function name
-    const std::string& name() const { return name_;}
 
     // Get function pointer
     template<typename FcnPtr>
@@ -123,7 +115,10 @@ namespace casadi {
     static ExternalFunctionInternal*
       create(const Compiler& compiler, const std::string& name);
 
-    /** \brief  Destructor */
+    /** \brief Constructor */
+    ExternalFunctionInternal(const std::string& name);
+
+    /** \brief Destructor */
     virtual ~ExternalFunctionInternal() = 0;
 
   private:
@@ -141,7 +136,7 @@ namespace casadi {
     LibInfo<LibType> li_;
 
     /** \brief  constructor is protected */
-    CommonExternal(const LibInfo<LibType>& li);
+    CommonExternal(const std::string& name, const LibInfo<LibType>& li);
   public:
     /** \brief  Destructor */
     virtual ~CommonExternal() = 0;
@@ -170,7 +165,7 @@ namespace casadi {
     friend class ExternalFunctionInternal;
   private:
     /** \brief Constructor is called from factory */
-    SimplifiedExternal(const LibInfo<LibType>& li);
+    SimplifiedExternal(const std::string& name, const LibInfo<LibType>& li);
   public:
     using CommonExternal<LibType>::li_;
 
@@ -199,7 +194,7 @@ namespace casadi {
     friend class ExternalFunctionInternal;
   private:
     /** \brief Constructor is called from factory */
-    GenericExternal(const LibInfo<LibType>& li);
+    GenericExternal(const std::string& name, const LibInfo<LibType>& li);
   public:
     using CommonExternal<LibType>::li_;
 

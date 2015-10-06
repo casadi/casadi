@@ -34,17 +34,16 @@ using namespace std;
 namespace casadi {
 
 
-  SimulatorInternal::SimulatorInternal(const Integrator& integrator,
-                                       const Function& output_fcn,
-                                       const DMatrix& grid) :
-    integrator_(integrator), output_fcn_(output_fcn), grid_(grid.data()) {
+  SimulatorInternal::SimulatorInternal(const std::string& name, const Integrator& integrator,
+                                       const Function& output_fcn, const DMatrix& grid)
+    : FunctionInternal(name), integrator_(integrator), output_fcn_(output_fcn), grid_(grid.data()) {
+
     casadi_assert_message(grid.iscolumn(),
                           "Simulator::Simulator: grid must be a column vector, but got "
                           << grid.dimString());
     casadi_assert_message(grid.isdense(),
                           "Simulator::Simulator: grid must be dense, but got "
                           << grid.dimString());
-    setOption("name", "unnamed simulator");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
     ischeme_ = IOScheme(SCHEME_IntegratorInput);
   }

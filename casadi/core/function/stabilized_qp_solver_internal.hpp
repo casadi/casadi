@@ -41,7 +41,8 @@ namespace casadi {
   public:
 
     // Constructor
-    StabilizedQpSolverInternal(const std::map<std::string, Sparsity> &st);
+    StabilizedQpSolverInternal(const std::string& name,
+                               const std::map<std::string, Sparsity> &st);
 
     // Destructor
     virtual ~StabilizedQpSolverInternal() = 0;
@@ -62,7 +63,8 @@ namespace casadi {
     virtual void generateNativeCode(std::ostream& file) const {}
 
     // Creator function for internal class
-    typedef StabilizedQpSolverInternal* (*Creator)(const std::map<std::string, Sparsity>& st);
+    typedef StabilizedQpSolverInternal*
+      (*Creator)(const std::string& name, const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
     struct Exposed{ };

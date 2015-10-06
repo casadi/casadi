@@ -48,8 +48,7 @@ namespace casadi {
                              const Dict& opts,
                              const std::vector<std::string>& ischeme,
                              const std::vector<std::string>& oscheme) {
-    assignNode(new SXFunctionInternal(arg, res));
-    setOption("name", name);
+    assignNode(new SXFunctionInternal(name, arg, res));
     if (!ischeme.empty()) setOption("input_scheme", ischeme);
     if (!oscheme.empty()) setOption("output_scheme", oscheme);
     setOption(opts);

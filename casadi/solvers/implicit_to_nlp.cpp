@@ -46,7 +46,9 @@ namespace casadi {
     ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_nlp);
   }
 
-  QpToImplicit::QpToImplicit(const Function& f) : ImplicitFunctionInternal(f) {
+  QpToImplicit::QpToImplicit(const std::string& name, const Function& f)
+    : ImplicitFunctionInternal(name, f) {
+
     Adaptor<QpToImplicit, NlpSolverInternal>::addOptions();
   }
 

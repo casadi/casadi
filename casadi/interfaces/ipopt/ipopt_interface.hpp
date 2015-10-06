@@ -68,12 +68,13 @@ class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptInterface : public NlpSolverInternal {
 friend class IpoptUserClass;
 
 public:
-  explicit IpoptInterface(const Function& nlp);
+  explicit IpoptInterface(const std::string& name, const Function& nlp);
   virtual ~IpoptInterface();
 
   /** \brief  Create a new NLP Solver */
-  static NlpSolverInternal* creator(const Function& nlp)
-  { return new IpoptInterface(nlp);}
+  static NlpSolverInternal* creator(const std::string& name, const Function& nlp) {
+    return new IpoptInterface(name, nlp);
+  }
 
   // Free Ipopt related memory
   void freeIpopt();

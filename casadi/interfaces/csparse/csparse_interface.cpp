@@ -45,17 +45,11 @@ namespace casadi {
     LinearSolverInternal::registerPlugin(casadi_register_linearsolver_csparse);
   }
 
-  CsparseInterface::CsparseInterface(const Sparsity& sparsity, int nrhs)
-      : LinearSolverInternal(sparsity, nrhs) {
+  CsparseInterface::CsparseInterface(const std::string& name,
+                                     const Sparsity& sparsity, int nrhs)
+    : LinearSolverInternal(name, sparsity, nrhs) {
     N_ = 0;
     S_ = 0;
-  }
-
-  CsparseInterface::CsparseInterface(const CsparseInterface& linsol)
-      : LinearSolverInternal(linsol) {
-    N_ = 0;
-    S_ = 0;
-    is_init_ = false;
   }
 
   CsparseInterface::~CsparseInterface() {

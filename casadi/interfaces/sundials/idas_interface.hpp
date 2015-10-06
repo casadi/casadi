@@ -69,18 +69,19 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    explicit IdasInterface(const Function& f, const Function& g);
-
-    /** \brief  Copy constructor */
-    //  IdasInterface(const IdasInterface& integrator);
+    explicit IdasInterface(const std::string& name, const Function& f, const Function& g);
 
     /** \brief  Create a new integrator */
-    virtual IdasInterface* create(const Function& f, const Function& g) const
-    { return new IdasInterface(f, g);}
+    virtual IdasInterface* create(const std::string& name,
+                                  const Function& f, const Function& g) const {
+      return new IdasInterface(name, f, g);
+    }
 
     /** \brief  Create a new integrator */
-    static IntegratorInternal* creator(const Function& f, const Function& g)
-    { return new IdasInterface(f, g);}
+    static IntegratorInternal* creator(const std::string& name,
+                                       const Function& f, const Function& g) {
+      return new IdasInterface(name, f, g);
+    }
 
     /** \brief  Destructor */
     virtual ~IdasInterface();

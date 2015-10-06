@@ -225,7 +225,7 @@ virtual ~OptionsFunctionalityNode();
   virtual void print(std::ostream &stream) const = 0;
 
   /** \brief  Print representation */
-  virtual void repr(std::ostream &stream) const;
+  virtual void repr(std::ostream &stream) const = 0;
 
   /** \brief  Copy all options from another object*/
   void copyOptions(const OptionsFunctionality& obj, bool skipUnknown = false);

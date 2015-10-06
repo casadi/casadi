@@ -53,14 +53,16 @@ namespace casadi {
   public:
 
     /** \brief Constructor */
-    explicit StabilizedQpToQp(const std::map<std::string, Sparsity> &st);
+    explicit StabilizedQpToQp(const std::string& name,
+                              const std::map<std::string, Sparsity> &st);
 
     /** \brief Destructor */
     virtual ~StabilizedQpToQp();
 
     /** \brief  Create a new Stabilized QP Solver */
-    static StabilizedQpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
-      return new StabilizedQpToQp(st);
+    static StabilizedQpSolverInternal* creator(const std::string& name,
+                                               const std::map<std::string, Sparsity>& st) {
+      return new StabilizedQpToQp(name, st);
     }
 
     /** \brief Initialize */

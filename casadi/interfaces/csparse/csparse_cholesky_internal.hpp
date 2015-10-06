@@ -50,14 +50,12 @@ namespace casadi {
   CSparseCholeskyInternal : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseCholeskyInternal(const Sparsity& sp, int nrhs);
-
-    // Copy constructor
-    CSparseCholeskyInternal(const CSparseCholeskyInternal& linsol);
+    CSparseCholeskyInternal(const std::string& name, const Sparsity& sp, int nrhs);
 
     /** \brief  Create a new LinearSolver */
-    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new CSparseCholeskyInternal(sp, nrhs);}
+    static LinearSolverInternal* creator(const std::string& name, const Sparsity& sp, int nrhs) {
+      return new CSparseCholeskyInternal(name, sp, nrhs);
+    }
 
     // Destructor
     virtual ~CSparseCholeskyInternal();

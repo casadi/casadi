@@ -48,12 +48,13 @@ namespace casadi {
   SimpleHomotopyNlp : public HomotopyNLPInternal {
 
   public:
-    explicit SimpleHomotopyNlp(const Function& hnlp);
+    explicit SimpleHomotopyNlp(const std::string& name, const Function& hnlp);
     virtual ~SimpleHomotopyNlp();
 
     /** \brief  Create a new Homotopy NLP Solver */
-    static HomotopyNLPInternal* creator(const Function& hnlp)
-    { return new SimpleHomotopyNlp(hnlp);}
+    static HomotopyNLPInternal* creator(const std::string& name, const Function& hnlp) {
+      return new SimpleHomotopyNlp(name, hnlp);
+    }
 
     virtual void init();
     virtual void evaluate();

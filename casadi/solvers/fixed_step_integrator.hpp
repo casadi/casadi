@@ -38,10 +38,12 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit FixedStepIntegrator(const Function& f, const Function& g);
+    explicit FixedStepIntegrator(const std::string& name, const Function& f,
+                                 const Function& g);
 
     /// Create a new integrator
-    virtual FixedStepIntegrator* create(const Function& f, const Function& g) const = 0;
+    virtual FixedStepIntegrator* create(const std::string& name,
+                                        const Function& f, const Function& g) const = 0;
 
     /// Destructor
     virtual ~FixedStepIntegrator();

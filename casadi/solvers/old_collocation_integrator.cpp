@@ -49,9 +49,10 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_oldcollocation);
   }
 
-  OldCollocationIntegrator::OldCollocationIntegrator(const Function& f,
-                                                                     const Function& g)
-      : IntegratorInternal(f, g) {
+  OldCollocationIntegrator::
+  OldCollocationIntegrator(const std::string& name, const Function& f, const Function& g)
+    : IntegratorInternal(name, f, g) {
+
     addOption("number_of_finite_elements",     OT_INTEGER,  20,
               "Number of finite elements");
     addOption("interpolation_order",           OT_INTEGER,  3,
@@ -72,7 +73,6 @@ namespace casadi {
               "An ODE/DAE integrator that can be used to generate a startup trajectory");
     addOption("startup_integrator_options",    OT_DICT, GenericType(),
               "Options to be passed to the startup integrator");
-    setOption("name", "unnamed_old_collocation_integrator");
   }
 
   OldCollocationIntegrator::~OldCollocationIntegrator() {
@@ -355,7 +355,7 @@ namespace casadi {
     ifcn_out[1+INTEGRATOR_RXF] = RX[0][0];
     ifcn_out[1+INTEGRATOR_RQF] = RQF;
     std::stringstream ss_ifcn;
-    ss_ifcn << "collocation_implicit_residual_" << getOption("name");
+    ss_ifcn << "collocation_implicit_residual_" << name_;
     Function ifcn = MXFunction(ss_ifcn.str(), ifcn_in, ifcn_out);
     if (expand_f) {
       ifcn = SXFunction(shared_cast<MXFunction>(ifcn));
@@ -398,7 +398,7 @@ namespace casadi {
     double time_stop=0;
     if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
       time_zero = getRealTime();
-      CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl;
+      CasadiOptions::profilingLog  << "start " << this << ":" <<name_ << std::endl;
     }
 
     // Call the base class method
@@ -492,9 +492,9 @@ namespace casadi {
       CasadiOptions::profilingLog
         << (time_stop-time_start)*1e6 << " ns | "
         << (time_stop-time_zero)*1e3 << " ms | "
-        << this << ":" << getOption("name")
+        << this << ":" << name_
         << ":0|" << implicit_solver_.get()
-        << ":" << implicit_solver_.getOption("name")
+        << ":" << implicit_solver_.name()
         << "|solve system" << std::endl;
     }
 

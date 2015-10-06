@@ -46,16 +46,14 @@ namespace casadi {
     }
 
     // Create an initialize
-    assignNode(IntegratorInternal::getPlugin(solver).creator(f, g));
-    setOption("name", name);
+    assignNode(IntegratorInternal::getPlugin(solver).creator(name, f, g));
     setOption(opts2);
     init();
   }
 
   Integrator::Integrator(const std::string& name, const std::string& solver,
                          const std::pair<Function, Function>& fg, const Dict& opts) {
-    assignNode(IntegratorInternal::getPlugin(solver).creator(fg.first, fg.second));
-    setOption("name", name);
+    assignNode(IntegratorInternal::getPlugin(solver).creator(name, fg.first, fg.second));
     setOption(opts);
     init();
   }
@@ -87,8 +85,7 @@ namespace casadi {
     Function g; // dummy
 
     // Load the plugin
-    assignNode(IntegratorInternal::getPlugin(solver).creator(f, g));
-    setOption("name", name);
+    assignNode(IntegratorInternal::getPlugin(solver).creator(name, f, g));
     setOption(opts);
     init();
   }
@@ -120,8 +117,7 @@ namespace casadi {
     Function g; // dummy
 
     // Load the plugin
-    assignNode(IntegratorInternal::getPlugin(solver).creator(f, g));
-    setOption("name", name);
+    assignNode(IntegratorInternal::getPlugin(solver).creator(name, f, g));
     setOption(opts);
     init();
   }

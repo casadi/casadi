@@ -40,7 +40,7 @@ namespace casadi {
 class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public IntegratorInternal {
 public:
   /** \brief  Constructor */
-  SundialsInterface(const Function& f, const Function& g);
+  SundialsInterface(const std::string& name, const Function& f, const Function& g);
 
   /** \brief  Destructor */
   virtual ~SundialsInterface()=0;

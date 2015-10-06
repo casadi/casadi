@@ -259,7 +259,7 @@ namespace casadi {
 
     /** \brief The total number of elements, including structural zeros, i.e. size2()*size1()
         \see nnz()  */
-    size_t numel() const;
+    int numel() const;
 
     /** \brief Check if the sparsity is empty
     *

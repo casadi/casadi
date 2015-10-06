@@ -40,6 +40,10 @@ namespace casadi {
     stream << "Compiler" << endl;
   }
 
+  void CompilerInternal::repr(ostream &stream) const {
+    stream << "Compiler" << endl;
+  }
+
   std::map<std::string, CompilerInternal::Plugin> CompilerInternal::solvers_;
 
   const std::string CompilerInternal::infix_ = "compiler";

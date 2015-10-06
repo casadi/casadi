@@ -32,8 +32,7 @@ namespace casadi {
   }
 
   Map::Map(const std::string& name, const Function& f, int n, const Dict& opts) {
-    assignNode(MapBase::create(f, n, opts));
-    setOption("name", name);
+    assignNode(MapBase::create(name, f, n, opts));
     setOption(opts);
     init();
   }
@@ -43,8 +42,7 @@ namespace casadi {
                  const std::vector<bool> &repeat_in,
                  const std::vector<bool> &repeat_out,
                  const Dict& opts) {
-    assignNode(new MapReduce(f, n, repeat_in, repeat_out));
-    setOption("name", name);
+    assignNode(new MapReduce(name, f, n, repeat_in, repeat_out));
     setOption(opts);
     init();
   }

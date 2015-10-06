@@ -61,7 +61,7 @@ namespace casadi {
     int num_in = fcn.nIn();
     casadi_assert_message(arg.size()==num_in, "Argument list length (" << arg.size()
                           << ") does not match number of inputs (" << num_in << ")"
-                          << " for function " << fcn.getOption("name"));
+                          << " for function " << fcn.name());
 
     // Create arguments of the right dimensions and sparsity
     vector<MX> arg1(num_in);
@@ -74,7 +74,7 @@ namespace casadi {
 
   std::string Call::print(const std::vector<std::string>& arg) const {
     stringstream ss;
-    ss << fcn_.getOption("name") << "(";
+    ss << fcn_.name() << "(";
     for (int i=0; i<ndep(); ++i) {
       if (i!=0) ss << ", ";
       ss << arg.at(i);

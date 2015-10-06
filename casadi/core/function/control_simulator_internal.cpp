@@ -36,14 +36,16 @@ INPUTSCHEME(ControlSimulatorInput)
 using namespace std;
 namespace casadi {
   ControlSimulatorInternal::
-  ControlSimulatorInternal(const Function& control_dae, const Function& output_fcn,
-                           const DMatrix& grid) :
-    control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(grid.data()) {
+  ControlSimulatorInternal(const std::string& name, const Function& control_dae,
+                           const Function& output_fcn, const DMatrix& grid)
+    : FunctionInternal(name), control_dae_(control_dae),
+      orig_output_fcn_(output_fcn), gridc_(grid.data()) {
+
     casadi_assert_message(grid.iscolumn(), "ControlSimulator::ControlSimulator: grid must be a "
                           "column vector, but got " << grid.dimString());
     casadi_assert_message(grid.isdense(), "ControlSimulator::ControlSimulator: grid must be dense, "
                           "but got " << grid.dimString());
-    setOption("name", "unnamed controlsimulator");
+
     addOption("nf", OT_INTEGER, 1, "Number of minor grained integration steps per major interval. "
               "nf>0 must hold. This option is not used when 'minor_grid' is provided.");
     addOption("minor_grid", OT_INTEGERVECTOR, GenericType(),
@@ -249,14 +251,10 @@ namespace casadi {
       out[INTEGRATOR_XF] = x;
 
       // Create the output function
-      output_fcn_ = SXFunction("ofcn", arg, out);
-      output_fcn_.setOption("name", "output");
+      output_fcn_ = SXFunction("output", arg, out);
       oscheme_ = IOScheme(SCHEME_IntegratorOutput);
     } else {
       output_fcn_ = orig_output_fcn_;
-
-      // Initialize the output function
-      output_fcn_.init();
     }
 
     casadi_assert_message(output_fcn_.nIn()==CONTROL_DAE_NUM_IN,

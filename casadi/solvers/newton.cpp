@@ -50,7 +50,9 @@ namespace casadi {
     ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_newton);
   }
 
-  Newton::Newton(const Function& f) : ImplicitFunctionInternal(f) {
+  Newton::Newton(const std::string& name, const Function& f)
+    : ImplicitFunctionInternal(name, f) {
+
     addOption("abstol",                      OT_REAL, 1e-12,
               "Stopping criterion tolerance on max(|F|)");
     addOption("abstolStep",                  OT_REAL, 1e-12,
@@ -75,7 +77,7 @@ namespace casadi {
     double time_stop=0;
     if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
       time_zero = getRealTime();
-      CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl;
+      CasadiOptions::profilingLog  << "start " << this << ":" <<name_ << std::endl;
     }
 
     // Pass the inputs to J
@@ -131,8 +133,8 @@ namespace casadi {
         CasadiOptions::profilingLog
             << (time_stop-time_start)*1e6 << " ns | "
             << (time_stop-time_zero)*1e3 << " ms | "
-            << this << ":" << getOption("name") << ":0|" << jac_.get() << ":"
-            << jac_.getOption("name") << "|evaluate jacobian" << std::endl;
+            << this << ":" << name_ << ":0|" << jac_.get() << ":"
+            << jac_.name() << "|evaluate jacobian" << std::endl;
       }
 
       if (monitored("F")) userOut() << "  F = " << F << std::endl;
@@ -168,7 +170,7 @@ namespace casadi {
         CasadiOptions::profilingLog
             << (time_stop-time_start)*1e6 << " ns | "
             << (time_stop-time_zero)*1e3 << " ms | "
-            << this << ":" << getOption("name")
+            << this << ":" << name_
             << ":1||prepare linear system" << std::endl;
       }
 
@@ -182,7 +184,7 @@ namespace casadi {
         CasadiOptions::profilingLog
             << (time_stop-time_start)*1e6 << " ns | "
             << (time_stop-time_zero)*1e3 << " ms | "
-            << this << ":" << getOption("name") << ":2||solve linear system" << std::endl;
+            << this << ":" << name_ << ":2||solve linear system" << std::endl;
       }
 
       if (monitored("step")) {

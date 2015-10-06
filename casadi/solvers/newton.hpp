@@ -53,18 +53,20 @@ namespace casadi {
       : public ImplicitFunctionInternal {
   public:
     /** \brief  Constructor */
-    explicit Newton(const Function& f);
+    explicit Newton(const std::string& name, const Function& f);
 
     /** \brief  Destructor */
     virtual ~Newton();
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const Function& f) const
-    { return new Newton(f);}
+    virtual ImplicitFunctionInternal* create(const std::string& name, const Function& f) const {
+      return new Newton(name, f);
+    }
 
     /** \brief  Create a new ImplicitFunction */
-    static ImplicitFunctionInternal* creator(const Function& f)
-    { return new Newton(f);}
+    static ImplicitFunctionInternal* creator(const std::string& name, const Function& f) {
+      return new Newton(name, f);
+    }
 
     /** \brief  Initialize */
     virtual void init();

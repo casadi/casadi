@@ -43,9 +43,10 @@ namespace casadi {
   using namespace std;
 
 
-  SXFunctionInternal::SXFunctionInternal(const vector<SX >& inputv, const vector<SX >& outputv) :
-    XFunctionInternal<SXFunction, SXFunctionInternal, SX, SXNode>(inputv, outputv) {
-    setOption("name", "unnamed_sx_function");
+  SXFunctionInternal::SXFunctionInternal(const std::string& name,
+                                         const vector<SX >& inputv,
+                                         const vector<SX >& outputv)
+    : XFunctionInternal<SXFunction, SXFunctionInternal, SX, SXNode>(name, inputv, outputv) {
     addOption("just_in_time_sparsity", OT_BOOLEAN, false,
               "Propagate sparsity patterns using just-in-time "
               "compilation to a CPU or GPU using OpenCL");
@@ -81,11 +82,11 @@ namespace casadi {
       if (CasadiOptions::profilingBinary) {
         profileWriteEntry(CasadiOptions::profilingLog, this);
       } else {
-      CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl;
+      CasadiOptions::profilingLog  << "start " << this << ":" <<name_ << std::endl;
       }
     }
 
-    casadi_msg("SXFunctionInternal::evaluate():begin  " << getOption("name"));
+    casadi_msg("SXFunctionInternal::evaluate():begin  " << name_);
 
     // NOTE: The implementation of this function is very delicate. Small changes in the
     // class structure can cause large performance losses. For this reason,
@@ -117,7 +118,7 @@ namespace casadi {
       }
     }
 
-    casadi_msg("SXFunctionInternal::evalD():end " << getOption("name"));
+    casadi_msg("SXFunctionInternal::evalD():end " << name_);
 
     if (CasadiOptions::profiling) {
       time_stop = getRealTime();
@@ -127,7 +128,7 @@ namespace casadi {
         CasadiOptions::profilingLog
           << (time_stop-time_start)*1e6 << " ns | "
           << (time_stop-time_start)*1e3 << " ms | "
-          << this << ":" <<getOption("name")
+          << this << ":" <<name_
           << ":0||SX algorithm size: " << algorithm_.size()
           << std::endl;
       }
@@ -523,7 +524,7 @@ namespace casadi {
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
 
-      profileWriteName(CasadiOptions::profilingLog, this, getOption("name"),
+      profileWriteName(CasadiOptions::profilingLog, this, name_,
                        ProfilingData_FunctionType_SXFunction, algorithm_.size());
       int alg_counter = 0;
 
@@ -568,7 +569,7 @@ namespace casadi {
 
     // Print
     if (verbose()) {
-      userOut() << "SXFunctionInternal::init Initialized " << getOption("name") << " ("
+      userOut() << "SXFunctionInternal::init Initialized " << name_ << " ("
            << algorithm_.size() << " elementary operations)" << endl;
     }
   }

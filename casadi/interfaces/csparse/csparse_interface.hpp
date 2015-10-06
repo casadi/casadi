@@ -47,14 +47,12 @@ namespace casadi {
   public:
 
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CsparseInterface(const Sparsity& sp, int nrhs);
-
-    // Copy constructor
-    CsparseInterface(const CsparseInterface& linsol);
+    CsparseInterface(const std::string& name, const Sparsity& sp, int nrhs);
 
     /** \brief  Create a new LinearSolver */
-    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new CsparseInterface(sp, nrhs);}
+    static LinearSolverInternal* creator(const std::string& name,
+                                         const Sparsity& sp, int nrhs)
+    { return new CsparseInterface(name, sp, nrhs);}
 
     // Destructor
     virtual ~CsparseInterface();

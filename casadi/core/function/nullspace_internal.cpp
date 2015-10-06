@@ -34,10 +34,11 @@ using namespace std;
 namespace casadi {
 
 
-  NullspaceInternal::NullspaceInternal(const Sparsity& A_sp) : A_sp_(A_sp) {
+  NullspaceInternal::NullspaceInternal(const std::string& name, const Sparsity& A_sp)
+    : FunctionInternal(name), A_sp_(A_sp) {
+
     addOption("dense",        OT_BOOLEAN,       true,
               "Indicates that dense matrices can be assumed");
-
   }
 
   NullspaceInternal::~NullspaceInternal() {

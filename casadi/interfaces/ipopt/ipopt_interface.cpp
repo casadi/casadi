@@ -152,7 +152,9 @@ namespace casadi {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_ipopt);
   }
 
-  IpoptInterface::IpoptInterface(const Function& nlp) : NlpSolverInternal(nlp) {
+  IpoptInterface::IpoptInterface(const std::string& name, const Function& nlp)
+    : NlpSolverInternal(name, nlp) {
+
     addOption("pass_nonlinear_variables", OT_BOOLEAN, false);
     addOption("print_time",               OT_BOOLEAN, true,
               "print information about execution time");
@@ -386,7 +388,7 @@ namespace casadi {
 
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog, this, getOption("name"),
+      profileWriteName(CasadiOptions::profilingLog, this, name_,
                        ProfilingData_FunctionType_Other, 5);
 
       profileWriteSourceLineDep(CasadiOptions::profilingLog, this,

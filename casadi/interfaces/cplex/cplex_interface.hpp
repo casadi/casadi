@@ -52,16 +52,15 @@ namespace casadi {
   */
   class CASADI_QPSOLVER_CPLEX_EXPORT CplexInterface : public QpSolverInternal {
   public:
-    /** \brief Default constructor */
-    explicit CplexInterface();
-
     /** \brief  Create a new QP Solver */
-    static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
-      return new CplexInterface(st);
+    static QpSolverInternal* creator(const std::string& name,
+                                     const std::map<std::string, Sparsity>& st) {
+      return new CplexInterface(name, st);
     }
 
     /// Constructor using sparsity patterns
-    explicit CplexInterface(const std::map<std::string, Sparsity>& st);
+    explicit CplexInterface(const std::string& name,
+                            const std::map<std::string, Sparsity>& st);
 
     /// Destructor
     virtual ~CplexInterface();

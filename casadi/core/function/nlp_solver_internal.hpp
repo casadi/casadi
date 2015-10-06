@@ -46,7 +46,7 @@ namespace casadi {
 
   public:
     /// Constructor
-    NlpSolverInternal(const Function& nlp);
+    NlpSolverInternal(const std::string& name, const Function& nlp);
 
     /// Destructor
     virtual ~NlpSolverInternal() = 0;
@@ -148,7 +148,7 @@ namespace casadi {
     Function ref_;
 
     // Creator function for internal class
-    typedef NlpSolverInternal* (*Creator)(const Function& nlp);
+    typedef NlpSolverInternal* (*Creator)(const std::string& name, const Function& nlp);
 
     // No static functions exposed
     struct Exposed{ };

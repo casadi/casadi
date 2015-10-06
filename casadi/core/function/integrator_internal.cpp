@@ -34,9 +34,10 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace casadi {
 
-  IntegratorInternal::IntegratorInternal(const Function& f, const Function& g) : f_(f), g_(g) {
-    // set default options
-    setOption("name", "unnamed_integrator"); // name of the function
+  IntegratorInternal::IntegratorInternal(const std::string& name,
+                                         const Function& f,
+                                         const Function& g)
+    : FunctionInternal(name), f_(f), g_(g) {
 
     // Additional options
     addOption("print_stats",              OT_BOOLEAN,     false,
@@ -736,9 +737,13 @@ namespace casadi {
     AugOffset offset;
     std::pair<Function, Function> aug_dae = getAugmented(nfwd, 0, offset);
 
+    // Temp stringstream
+    stringstream ss;
+    ss << "aug_f" << nfwd << name_;
+
     // Create integrator for augmented DAE
     Integrator integrator;
-    integrator.assignNode(create(aug_dae.first, aug_dae.second));
+    integrator.assignNode(create(ss.str(), aug_dae.first, aug_dae.second));
 
     // Set solver specific options
     setDerivativeOptions(integrator, offset);
@@ -756,9 +761,6 @@ namespace casadi {
 
     // Augmented state
     vector<MX> x0_augv, p_augv, z0_augv, rx0_augv, rp_augv, rz0_augv;
-
-    // Temp stringstream
-    stringstream ss;
 
     // Inputs or forward/adjoint seeds in one direction
     vector<MX> dd;
@@ -879,9 +881,13 @@ namespace casadi {
     AugOffset offset;
     std::pair<Function, Function> aug_dae = getAugmented(0, nadj, offset);
 
+    // Temp stringstream
+    stringstream ss;
+    ss << "aug_r" << nadj << name_;
+
     // Create integrator for augmented DAE
     Integrator integrator;
-    integrator.assignNode(create(aug_dae.first, aug_dae.second));
+    integrator.assignNode(create(ss.str(), aug_dae.first, aug_dae.second));
 
     // Set solver specific options
     setDerivativeOptions(integrator, offset);
@@ -899,9 +905,6 @@ namespace casadi {
 
     // Augmented state
     vector<MX> x0_augv, p_augv, z0_augv, rx0_augv, rp_augv, rz0_augv;
-
-    // Temp stringstream
-    stringstream ss;
 
     // Inputs or forward/adjoint seeds in one direction
     vector<MX> dd;

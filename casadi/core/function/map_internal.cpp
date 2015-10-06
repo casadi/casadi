@@ -30,7 +30,9 @@ using namespace std;
 
 namespace casadi {
 
-  MapBase* MapBase::create(const Function& f, int n, const Dict& opts) {
+  MapBase* MapBase::create(const std::string& name,
+                           const Function& f, int n, const Dict& opts) {
+
     // Check if there are reduced inputs or outputs
     bool reduce_inputs = opts.find("reduced_inputs")!=opts.end();
     bool reduce_outputs = opts.find("reduced_outputs")!=opts.end();
@@ -56,27 +58,27 @@ namespace casadi {
       }
 
       // Call constructor
-      return new MapReduce(f, n, repeat_in, repeat_out);
+      return new MapReduce(name, f, n, repeat_in, repeat_out);
     }
 
     // Read the type of parallelization
     Dict::const_iterator par_op = opts.find("parallelization");
     if (par_op==opts.end() || par_op->second == "serial") {
-      return new MapSerial(f, n);
+      return new MapSerial(name, f, n);
     } else {
       casadi_assert(par_op->second == "openmp");
 #ifdef WITH_OPENMP
-      return new MapOmp(f, n);
+      return new MapOmp(name, f, n);
 #else // WITH_OPENMP
       casadi_warning("CasADi was not compiled with OpenMP. "
                      "Falling back to serial mode.");
-      return new MapSerial(f, n);
+      return new MapSerial(name, f, n);
 #endif // WITH_OPENMP
     }
   }
 
-  MapBase::MapBase(const Function& f, int n)
-    : f_(f), n_in_(f.nIn()), n_out_(f.nOut()), n_(n) {
+  MapBase::MapBase(const std::string& name, const Function& f, int n)
+    : FunctionInternal(name), f_(f), n_in_(f.nIn()), n_out_(f.nOut()), n_(n) {
 
     addOption("parallelization", OT_STRING, "serial",
               "Computational strategy for parallelization", "serial|openmp");
@@ -84,9 +86,6 @@ namespace casadi {
               "Reduction for certain inputs");
     addOption("reduced_outputs", OT_INTEGERVECTOR, GenericType(),
               "Reduction for certain outputs");
-
-    // Give a name
-    setOption("name", "unnamed_map");
 
     setOption("input_scheme", f_.inputScheme());
     setOption("output_scheme", f_.outputScheme());
@@ -208,10 +207,10 @@ namespace casadi {
     return Map(name, df, n_, opts);
   }
 
-  MapReduce::MapReduce(const Function& f, int n,
+  MapReduce::MapReduce(const std::string& name, const Function& f, int n,
                        const std::vector<bool> &repeat_in,
                        const std::vector<bool> &repeat_out)
-    : MapBase(f, n), repeat_in_(repeat_in), repeat_out_(repeat_out) {
+    : MapBase(name, f, n), repeat_in_(repeat_in), repeat_out_(repeat_out) {
 
     casadi_assert_message(repeat_in_.size()==f.nIn(),
                           "MapReduce expected repeat_in of size " << f.nIn() <<
@@ -585,7 +584,7 @@ namespace casadi {
     if (f.isNull()) {
       return "NULL";
     } else {
-      return f.getOption("name");
+      return f.name();
     }
   }
 

@@ -42,10 +42,10 @@ namespace casadi {
   public:
 
     /** \brief Constructor (generic mapaccum) */
-    MapAccumInternal(const Function& f, int n,
-      const std::vector<bool>& input_accum,
-      const std::vector<int>& output_accum,
-      bool reverse);
+    MapAccumInternal(const std::string& name, const Function& f, int n,
+                     const std::vector<bool>& input_accum,
+                     const std::vector<int>& output_accum,
+                     bool reverse);
 
     /** \brief  Destructor */
     virtual ~MapAccumInternal();

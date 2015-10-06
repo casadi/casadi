@@ -1364,12 +1364,6 @@ Joris Gillis, Joel Andersson
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -1449,10 +1443,6 @@ Joris Gillis, Joel Andersson
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -1887,10 +1877,6 @@ General information
 |              |              |              | a given      |              |
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
@@ -2830,12 +2816,6 @@ Joris Gillis
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -2939,10 +2919,6 @@ Joris Gillis
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | nf           | OT_INTEGER   | 1            | Number of    | casadi::Cont |
 |              |              |              | minor        | rolSimulator |
@@ -5665,12 +5641,6 @@ Joel Andersson
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -5751,10 +5721,6 @@ Joel Andersson
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
 |              |              |              | scheme       |              |
@@ -5781,16 +5747,6 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
->List of available monitors
-
-+---------+--------------------------+
-|   Id    |         Used in          |
-+=========+==========================+
-| inputs  | casadi::FunctionInternal |
-+---------+--------------------------+
-| outputs | casadi::FunctionInternal |
-+---------+--------------------------+
 
 Diagrams
 --------
@@ -6984,12 +6940,6 @@ Joel Andersson
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -7069,10 +7019,6 @@ Joel Andersson
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -9124,12 +9070,6 @@ General information
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -9209,10 +9149,6 @@ General information
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -10806,12 +10742,6 @@ General information
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -10934,10 +10864,6 @@ General information
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -12891,12 +12817,6 @@ General information
 |              |              |              | also be      |              |
 |              |              |              | SXFunction . |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -12976,10 +12896,6 @@ General information
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -15661,12 +15577,6 @@ Joris Gillis
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -15746,10 +15656,6 @@ Joris Gillis
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -16142,10 +16048,7 @@ C++ includes: external_function_internal.hpp ";
 %feature("docstring") casadi::LibInfo< Compiler >::LibInfo() " [INTERNAL] ";
 
 %feature("docstring") casadi::LibInfo< Compiler >::LibInfo(const Compiler
-&compiler, const std::string &name) " [INTERNAL] ";
-
-%feature("docstring")  casadi::LibInfo< Compiler >::name() const  "
-[INTERNAL] ";
+&compiler) " [INTERNAL] ";
 
 %feature("docstring") casadi::LibInfo< Compiler > " [INTERNAL]  Library that
 has been just-in-time compiled.
@@ -16164,9 +16067,6 @@ given as a dynamically linked library.
 
 C++ includes: external_function_internal.hpp ";
 
-%feature("docstring")  casadi::LibInfo< std::string >::get(FcnPtr &fcnPtr,
-const std::string &sym) " [INTERNAL] ";
-
 %feature("docstring")  casadi::LibInfo< std::string >::clear() " [INTERNAL]
 ";
 
@@ -16174,10 +16074,10 @@ const std::string &sym) " [INTERNAL] ";
 ";
 
 %feature("docstring") casadi::LibInfo< std::string >::LibInfo(const
-std::string &bin_name, const std::string &name) " [INTERNAL] ";
+std::string &bin_name) " [INTERNAL] ";
 
-%feature("docstring")  casadi::LibInfo< std::string >::name() const  "
-[INTERNAL] ";
+%feature("docstring")  casadi::LibInfo< std::string >::get(FcnPtr &fcnPtr,
+const std::string &sym) " [INTERNAL] ";
 
 
 // File: classcasadi_1_1LinearSolver.xml
@@ -17188,12 +17088,6 @@ General information
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -17273,10 +17167,6 @@ General information
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -18879,12 +18769,6 @@ Map Joris Gillis
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -18964,10 +18848,6 @@ Map Joris Gillis
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -19856,12 +19736,6 @@ Joris Gillis
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -19941,10 +19815,6 @@ Joris Gillis
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -24218,12 +24088,6 @@ Joel Andersson
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -24303,10 +24167,6 @@ Joel Andersson
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -26110,12 +25970,6 @@ General information
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -26308,10 +26162,6 @@ General information
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -32183,12 +32033,6 @@ basis Joris Gillis
 |              |              |              | matrices can | l            |
 |              |              |              | be assumed   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -32268,10 +32112,6 @@ basis Joris Gillis
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -32450,10 +32290,6 @@ Joel Andersson
 |              |              |              | a given      |              |
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -33442,12 +33278,6 @@ General information
 |              |              |              | recipe (low- |              |
 |              |              |              | level)  (lp) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -33527,10 +33357,6 @@ General information
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -35887,12 +35713,6 @@ Joel Andersson
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -35973,10 +35793,6 @@ Joel Andersson
 |              |              |              | (inputs|outp | casadi::Simu |
 |              |              |              | uts)  (initi | latorInterna |
 |              |              |              | al|step)     | l            |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -38767,12 +38583,6 @@ General information
 |              |              |              | recipe (low- | rInternal    |
 |              |              |              | level)  (qp) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -38852,10 +38662,6 @@ General information
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -40239,12 +40045,6 @@ Switch statement Joel Andersson
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -40324,10 +40124,6 @@ Switch statement Joel Andersson
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -42634,12 +42430,6 @@ Joel Andersson
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
@@ -42737,10 +42527,6 @@ Joel Andersson
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |

@@ -30,11 +30,11 @@ using namespace std;
 
 namespace casadi {
 
-  KernelSum2DInternal::KernelSum2DInternal(const Function& f,
-           const std::pair<int, int> & size,
-           double r,
-           int n)
-    : f_(f), size_(size), r_(r), n_(n) {
+  KernelSum2DInternal::KernelSum2DInternal(const std::string& name, const Function& f,
+                                           const std::pair<int, int> & size,
+                                           double r,
+                                           int n)
+    : FunctionInternal(name), f_(f), size_(size), r_(r), n_(n) {
 
     casadi_assert(n>=1);
 
@@ -44,9 +44,6 @@ namespace casadi {
     casadi_assert(f.inputSparsity(0)==Sparsity::dense(2, 1));
     casadi_assert(f.inputSparsity(1)==Sparsity::dense(1, 1));
     casadi_assert(f.inputSparsity(2)==Sparsity::dense(2, 1));
-
-    // Give a name
-    setOption("name", "unnamed_kernel_sum_2d");
   }
 
   KernelSum2DInternal::~KernelSum2DInternal() {
@@ -479,7 +476,7 @@ namespace casadi {
     if (f.isNull()) {
       return "NULL";
     } else {
-      return f.getOption("name");
+      return f.name();
     }
   }
 

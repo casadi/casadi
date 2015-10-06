@@ -37,8 +37,7 @@ namespace casadi {
                  const std::vector<int>& output_accum,
                  bool reverse,
                  const Dict& opts) {
-    assignNode(new MapAccumInternal(f, n, input_accum, output_accum, reverse));
-    setOption("name", name);
+    assignNode(new MapAccumInternal(name, f, n, input_accum, output_accum, reverse));
     setOption(opts);
     init();
   }

@@ -33,7 +33,9 @@ namespace casadi {
 
   // Constructor
   StabilizedQpSolverInternal::
-  StabilizedQpSolverInternal(const std::map<std::string, Sparsity> &st) {
+  StabilizedQpSolverInternal(const std::string& name, const std::map<std::string, Sparsity> &st)
+    : FunctionInternal(name) {
+
     st_.resize(QP_STRUCT_NUM);
     for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
       if (i->first=="a") {

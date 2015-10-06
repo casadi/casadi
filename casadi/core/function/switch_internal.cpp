@@ -30,14 +30,12 @@ using namespace std;
 
 namespace casadi {
 
-  SwitchInternal::SwitchInternal(const std::vector<Function>& f, const Function& f_def)
-    : f_(f), f_def_(f_def) {
+  SwitchInternal::SwitchInternal(const std::string& name,
+                                 const std::vector<Function>& f, const Function& f_def)
+    : FunctionInternal(name), f_(f), f_def_(f_def) {
 
     // Consitency check
     casadi_assert(!f_.empty());
-
-    // Give a name
-    setOption("name", "unnamed_switch");
   }
 
   SwitchInternal::~SwitchInternal() {
@@ -237,7 +235,7 @@ namespace casadi {
     if (f.isNull()) {
       return "NULL";
     } else {
-      return f.getOption("name");
+      return f.name();
     }
   }
 

@@ -66,11 +66,13 @@ namespace casadi {
   class CASADI_LINEARSOLVER_LAPACKLU_EXPORT LapackLuDense : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackLuDense(const Sparsity& sparsity, int nrhs);
+    LapackLuDense(const std::string& name, const Sparsity& sparsity, int nrhs);
 
     /** \brief  Create a new LinearSolver */
-    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new LapackLuDense(sp, nrhs);}
+    static LinearSolverInternal* creator(const std::string& name,
+                                         const Sparsity& sp, int nrhs) {
+      return new LapackLuDense(name, sp, nrhs);
+    }
 
     /// Destructor
     virtual ~LapackLuDense();

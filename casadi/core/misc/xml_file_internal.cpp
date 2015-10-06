@@ -43,6 +43,10 @@ namespace casadi {
     stream << "XmlFile" << endl;
   }
 
+  void XmlFileInternal::repr(ostream &stream) const {
+    stream << "XmlFile" << endl;
+  }
+
   XmlNode XmlFileInternal::parse(const std::string& filename) {
     casadi_error("FunctionInternal::parse not defined for class " << typeid(*this).name());
     return XmlNode();

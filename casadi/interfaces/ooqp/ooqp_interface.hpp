@@ -49,16 +49,14 @@ namespace casadi {
   */
   class CASADI_QPSOLVER_OOQP_EXPORT OoqpInterface : public QpSolverInternal {
   public:
-
-    /** \brief  Constructor */
-    explicit OoqpInterface();
-
     /** \brief  Create a new Solver */
-    explicit OoqpInterface(const std::map<std::string, Sparsity>& st);
+    explicit OoqpInterface(const std::string& name,
+                           const std::map<std::string, Sparsity>& st);
 
     /** \brief  Create a new QP Solver */
-    static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
-      return new OoqpInterface(st);
+    static QpSolverInternal* creator(const std::string& name,
+                                     const std::map<std::string, Sparsity>& st) {
+      return new OoqpInterface(name, st);
     }
 
     /** \brief  Destructor */

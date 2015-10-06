@@ -80,7 +80,8 @@ class CASADI_EXPORT SXFunctionInternal :
 
   protected:
     /** \brief  Constructor (only to be called from SXFunction, therefore protected) */
-    SXFunctionInternal(const std::vector<Matrix<SXElement> >& inputv,
+    SXFunctionInternal(const std::string& name,
+                       const std::vector<Matrix<SXElement> >& inputv,
                        const std::vector<Matrix<SXElement> >& outputv);
 
   public:

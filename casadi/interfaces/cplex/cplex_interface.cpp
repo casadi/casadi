@@ -51,8 +51,10 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_cplex);
   }
 
-  CplexInterface::CplexInterface(const std::map<std::string, Sparsity>& st) : QpSolverInternal(st) {
-    // Options available
+  CplexInterface::CplexInterface(const std::string& name,
+                                 const std::map<std::string, Sparsity>& st)
+    : QpSolverInternal(name, st) {
+
     addOption("qp_method",    OT_STRING, "automatic", "Determines which CPLEX algorithm to use.",
               "automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover");
     addOption("dump_to_file",   OT_BOOLEAN,        false, "Dumps QP to file in CPLEX format.");

@@ -43,28 +43,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::ExternalFunctionInternal
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-</table>
-*/
-/// \endcond
-/** \class casadi::ExternalFunction
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::FunctionInternal
 \n
 \par

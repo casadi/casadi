@@ -54,14 +54,16 @@ namespace casadi {
     : public LinearSolverInternal {
   public:
     // Constructor
-    SymbolicQr(const Sparsity& sparsity, int nrhs);
+    SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs);
 
     // Destructor
     virtual ~SymbolicQr();
 
     /** \brief  Create a new LinearSolver */
-    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new SymbolicQr(sp, nrhs);}
+    static LinearSolverInternal* creator(const std::string& name,
+                                         const Sparsity& sp, int nrhs) {
+      return new SymbolicQr(name, sp, nrhs);
+    }
 
     // Initialize
     virtual void init();

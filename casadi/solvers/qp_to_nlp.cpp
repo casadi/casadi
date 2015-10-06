@@ -46,7 +46,10 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_nlp);
   }
 
-  QpToNlp::QpToNlp(const std::map<std::string, Sparsity> &st) : QpSolverInternal(st) {
+  QpToNlp::QpToNlp(const std::string& name,
+                   const std::map<std::string, Sparsity> &st)
+    : QpSolverInternal(name, st) {
+
     Adaptor<QpToNlp, NlpSolverInternal>::addOptions();
   }
 

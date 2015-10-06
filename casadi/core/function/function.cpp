@@ -456,7 +456,7 @@ namespace casadi {
 
     // Name of return function
     stringstream ss;
-    ss << "derivative_" << getOption("name") << "_" << nfwd << "_" << nadj;
+    ss << "derivative_" << name() << "_" << nfwd << "_" << nadj;
 
     // Names of inputs
     std::vector<std::string> i_names;
