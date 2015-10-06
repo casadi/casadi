@@ -164,7 +164,7 @@ int main(){
   for(int integ=0; integ<2; ++integ){
     Function integrator = integ==0 ? Function(irk_integrator) : Function(ref_integrator);
     cout << "-------" << endl;
-    cout << "Testing " << integrator.getOption("name") << endl;
+    cout << "Testing " << integrator.name() << endl;
     cout << "-------" << endl;
 
     // Generate a new function that calculates two forward directions and one adjoint direction
