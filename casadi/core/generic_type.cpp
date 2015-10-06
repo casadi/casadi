@@ -29,7 +29,6 @@
 #include <cmath>
 
 #include "function/function.hpp"
-#include "functor.hpp"
 
 using namespace std;
 
@@ -48,8 +47,6 @@ namespace casadi {
   typedef GenericTypeInternal<OT_FUNCTION, Function> FunctionType;
   typedef GenericTypeInternal<OT_DICT, Dict> DictType;
   typedef GenericTypeInternal<OT_VOIDPTR, void*> VoidPointerType;
-  typedef GenericTypeInternal<OT_CALLBACK, Callback> CallbackType;
-  typedef GenericTypeInternal<OT_DERIVATIVEGENERATOR, DerivativeGenerator> DerivativeGeneratorType;
   /// \endcond
 
   bool GenericType::can_cast_to(TypeID other) const {
@@ -110,10 +107,6 @@ namespace casadi {
       return "OT_STRINGVECTOR";
     case OT_DICT:
       return "OT_DICT";
-    case OT_DERIVATIVEGENERATOR:
-      return "OT_DERIVATIVEGENERATOR";
-    case OT_CALLBACK:
-      return "OT_CALLBACK";
     case OT_FUNCTION:
       return "OT_FUNCTION";
     case OT_VOIDPTR:
@@ -176,14 +169,6 @@ namespace casadi {
     return getType()==OT_DICT;
   }
 
-  bool GenericType::isCallback() const {
-    return getType()==OT_CALLBACK;
-  }
-
-  bool GenericType::isDerivativeGenerator() const {
-    return getType()==OT_DERIVATIVEGENERATOR;
-  }
-
   GenericType::GenericType() {
   }
 
@@ -242,14 +227,6 @@ namespace casadi {
     assignNode(new FunctionType(f));
   }
 
-  GenericType::GenericType(const DerivativeGenerator& f) {
-    assignNode(new GenericTypeInternal<OT_DERIVATIVEGENERATOR, DerivativeGenerator>(f));
-  }
-
-  GenericType::GenericType(const Callback& f) {
-    assignNode(new CallbackType(f));
-  }
-
   const bool& GenericType::asBool() const {
     casadi_assert(isBool());
     return static_cast<const BoolType*>(get())->d_;
@@ -303,16 +280,6 @@ namespace casadi {
   void* const & GenericType::asVoidPointer() const {
     casadi_assert(isVoidPointer());
     return static_cast<const VoidPointerType*>(get())->d_;
-  }
-
-  const DerivativeGenerator& GenericType::asDerivativeGenerator() const {
-    casadi_assert(isDerivativeGenerator());
-    return static_cast<const DerivativeGeneratorType*>(get())->d_;
-  }
-
-  const Callback& GenericType::asCallback() const {
-    casadi_assert(isCallback());
-    return static_cast<const CallbackType*>(get())->d_;
   }
 
   bool GenericType::toBool() const {

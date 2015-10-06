@@ -886,7 +886,7 @@ namespace casadi {
         append_to_vec(iterations["qp_num_iter"], static_cast<int>(nMinor));
         stats_["iterations"] = iterations;
       }
-      if (!callback_.isNull()) {
+      if (!fcallback_.isNull()) {
         double time0 = clock();
         for (int k = 0; k < nx_; ++k) {
           int kk = x_order_[k];
@@ -901,7 +901,13 @@ namespace casadi {
           output(NLP_SOLVER_G).data()[kk] = x_[nx_+k];
         }
 
-        *iAbort = callback_(ref_, user_data_);
+        for (int i=0; i<NLP_SOLVER_NUM_OUT; ++i) {
+          fcallback_.setInput(output(i), i);
+        }
+        fcallback_.evaluate();
+        double ret_double;
+        fcallback_.getOutput(ret_double);
+        *iAbort = static_cast<int>(ret_double);
         t_callback_fun_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
         n_callback_fun_ += 1;
       }

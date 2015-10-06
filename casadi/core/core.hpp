@@ -32,7 +32,6 @@
 // Generic tools
 #include "polynomial.hpp"
 #include "std_vector_tools.hpp"
-#include "functor.hpp"
 #include "casadi_options.hpp"
 #include "casadi_meta.hpp"
 
@@ -53,7 +52,6 @@
 #include "function/nlp_solver.hpp"
 #include "function/integrator.hpp"
 #include "function/implicit_function.hpp"
-#include "function/custom_function.hpp"
 #include "function/callback.hpp"
 #include "function/simulator.hpp"
 #include "function/control_simulator.hpp"

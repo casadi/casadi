@@ -170,10 +170,11 @@ namespace casadi {
      */
     size_t __hash__() const;
 
-  private:
-    SharedObjectNode *node;
+  protected:
     void count_up(); // increase counter of the node
     void count_down(); // decrease counter of the node
+  private:
+    SharedObjectNode *node;
 
   };
 

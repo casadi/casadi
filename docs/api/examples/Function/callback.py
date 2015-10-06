@@ -23,56 +23,46 @@
 #
 from casadi import *
 
-#! CasADi provides a mechanism to add assertions in an MX expression graph
-#! This can be useful to debug yor code, e.g. debugging why the end-result of a computation yields NaN
+#! A simple case of Callback
+#!================================
 
-#! Consider this example:
-x = MX.sym("x")
-y = sin(x)
-z = sqrt(y)
+#! Callback allows the user to create functions that can be embedded into
+#! CasADi expressions. The user creates a class that inherits from this class
+#! and implements a subset of the virtual methods.
+#! Although Callback itself is implemented is C++, the virtual methods can be
+#! implemented in Python or MATLAB thanks to cross-language polymorphism as
+#! supported by the SWIG framework.
 
-f = MXFunction("f", [x], [z])
-
-[z0] = f([5])
-
-print z0
-
-#! For some mysterious reason we get NaN here
-
-#! Next, we add an assertion: 
-y = y.attachAssert(y>0, "bummer") # Add assertion here
-z = sqrt(y)
-
-f = MXFunction("f", [x],[z])
-
-try:
-  [z0] = f([5])
-except Exception as e:
-  print "An exception was raised here:"
-  print e
-
-
-#! You can combine this with Callback to do powerful assertions
-class Dummy(Callback):
+class Fac(Callback):
   def __init__(self, name, opts={}):
     Callback.__init__(self)
     self.construct(name, opts)
+
   def get_n_in(self): return 1
   def get_n_out(self): return 1
+
   def eval(self, arg):
-    import numpy
     x = arg[0]
-    m = max(numpy.real(numpy.linalg.eig(blockcat([[x,-1],[-1,2]]))[0]))
-    print "m=",m
-    return [int(m>2)]
+    y = 1
+    for i in range(x):
+      y*=(i+1)
+    return [y]
 
-foo = Dummy("foo")
+fac = Fac('fac')
 
-y = sin(x)
+#! Evaluate numerically
+[y] = fac([4])
 
-y = y.attachAssert(foo([y])[0], "you are in trouble") # Add assertion here
-z = sqrt(y)
+print "4! = ", y
 
-f = MXFunction("f", [x],[z])
+#! Using the function in a graph
+#!==============================
 
-[z0] = f([5])
+x = MX.sym("x")
+[y] = fac([x])
+
+f = MXFunction('f', [x],[y])
+
+[y] = f([5])
+
+print "5! = ", y

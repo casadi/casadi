@@ -79,12 +79,6 @@ namespace casadi {
               "Throw exceptions when the numerical values of the inputs don't make sense");
     addOption("gather_stats",             OT_BOOLEAN,             false,
               "Flag to indicate whether statistics must be gathered");
-    addOption("custom_forward",  OT_DERIVATIVEGENERATOR,   GenericType(),
-              "Function that returns a derivative function given a number of forward "
-              "mode directional derivatives. Overrides default routines.");
-    addOption("custom_reverse",  OT_DERIVATIVEGENERATOR,   GenericType(),
-              "Function that returns a derivative function given a number of reverse "
-              "mode directional derivatives. Overrides default routines.");
     addOption("full_jacobian",                 OT_FUNCTION,              GenericType(),
               "The Jacobian of all outputs with respect to all inputs.");
     addOption("input_scheme", OT_STRINGVECTOR, GenericType(), "Custom input scheme");
@@ -325,8 +319,8 @@ namespace casadi {
     opts["ad_weight_sp"] = adWeightSp();
 
     // Propagate AD rules (options to be deprecated)
-    const char* oname[] = {"custom_forward", "custom_reverse",  "full_jacobian"};
-    for (int i=0; i<3; ++i) {
+    const char* oname[] = {"full_jacobian"};
+    for (int i=0; i<1; ++i) {
       if (hasSetOption(oname[i])) opts[oname[i]] = getOption(oname[i]);
     }
 
@@ -1651,20 +1645,8 @@ namespace casadi {
                           "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
 
     // Return value
-    Function ret;
-    if (hasSetOption("custom_forward")) {
-      /// User-provided derivative generator function
-      DerivativeGenerator dergen = getOption("custom_forward");
-      Function this_ = shared_from_this<Function>();
-      ret = dergen(this_, nfwd, user_data_);
-      ret.setOption("name", name);
-      ret.setOption(opts);
-      ret.init();
-      // Fails for ImplicitFunction
-    } else {
-      casadi_assert(numDerForward()>0);
-      ret = getDerForward(name, nfwd, opts);
-    }
+    casadi_assert(numDerForward()>0);
+    Function ret = getDerForward(name, nfwd, opts);
 
     // Consistency check for inputs
     for (int i=0; i<ret.nIn(); ++i) {
@@ -1756,19 +1738,8 @@ namespace casadi {
                           "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
 
     // Return value
-    Function ret;
-    if (hasSetOption("custom_reverse")) {
-      /// User-provided derivative generator function
-      DerivativeGenerator dergen = getOption("custom_reverse");
-      Function this_ = shared_from_this<Function>();
-      ret = dergen(this_, nadj, user_data_);
-      ret.setOption("name", name);
-      ret.setOption(opts);
-      ret.init();
-    } else {
-      casadi_assert(numDerReverse()>0);
-      ret = getDerReverse(name, nadj, opts);
-    }
+    casadi_assert(numDerReverse()>0);
+    Function ret = getDerReverse(name, nadj, opts);
 
     // Consistency check for inputs
     for (int i=0; i<ret.nIn(); ++i) {

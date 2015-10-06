@@ -22,171 +22,108 @@
  *
  */
 
-#include "callback.hpp"
-#include "../functor.hpp"
-#include "mx_function.hpp"
+#include "callback_internal.hpp"
 
 using namespace std;
 
 namespace casadi {
 
-std::vector<DMatrix> Callback2::operator()(const std::vector<DMatrix>& arg) {
-  DMatrix out = arg[0];
-  std::vector<DMatrix> ret;
-  ret.push_back(out*2);
-  return ret;
-}
-
-Callback2::Callback2() {
-
-}
-
-
-Callback2::~Callback2() {
-
-}
-
-Function finiteDiffGenerator(Function& fcn, int ndir, void* user_data) {
-  // The step size to take
-  DMatrix eps = * reinterpret_cast<double *>(user_data);
-
-  // Obtain the symbols for nominal inputs/outputs
-  std::vector<MX> nominal_in  = fcn.symbolicInput();
-  std::vector<MX> nominal_out = fcn.symbolicOutput();
-
-  // A growing list of inputs to the returned derivative function
-  std::vector<MX> der_ins = nominal_in;
-  der_ins.insert(der_ins.end(),  nominal_out.begin(),  nominal_out.end());
-
-  // A growing list of outputs to the returned derivative function
-  std::vector<MX> der_outs;
-
-  for (int k=0;k<ndir;++k) {
-     std::vector<MX> seeds  = fcn.symbolicInput();
-     std::vector<MX> perturbed_in(seeds.size());
-     for (int i=0;i<perturbed_in.size();++i) {
-       perturbed_in[i] = nominal_in[i] + eps*seeds[i];
-     }
-     std::vector<MX> perturbed_out  = fcn(perturbed_in);
-     std::vector<MX> sens(perturbed_out.size());
-     for (int i=0;i<perturbed_out.size();++i) {
-       sens[i] = (perturbed_out[i]-nominal_out[i])/eps;
-     }
-     der_ins.insert(der_ins.end(),   seeds.begin(),  seeds.end());
-     der_outs.insert(der_outs.end(), sens.begin(),   sens.end());
-  }
-  MXFunction ret("finite_diff", der_ins, der_outs);
-  return ret;
-}
-
-Function Callback2::create() {
-  Function ret;
-  CallbackFunctionInternal* node = new CallbackFunctionInternal(*this);
-  ret.assignNode(node);
-  ret.setOption("name", name());
-  ret.setOption("custom_forward", DerivativeGenerator(finiteDiffGenerator) );
-
-  ret.setOption(options());
-  node->eps_ = ret.getOption("fin_diff_eps");
-
-  ret.setOption("user_data", reinterpret_cast<void *>(&node->eps_));
-  ret.init();
-  return ret;
-}
-
-Function DerivativeGenerator2::operator()(Function& fcn, int ndir) {
-  return fcn.derForward(ndir);
-}
-
-Function DerivativeGenerator2::original(Function& fcn, int ndir, bool fwd) {
-  // NOTE(@jaeandersson): If an internal function such as getDerForward is to be called
-  // here, the reason needs to be explained well in the comments.
-  if (fwd) {
-    Dict opts;
-    return fcn->getDerForward("der", ndir, opts);
-  } else {
-    Dict opts;
-    return fcn->getDerReverse("der", ndir, opts);
-  }
-}
-
-DerivativeGenerator DerivativeGenerator2::create() {
-  DerivativeGenerator ret;
-  ret.assignNode(new DerivativeGeneratorInternal2(*this));
-  return ret;
-}
-
-DerivativeGenerator2::DerivativeGenerator2() {
-}
-
-DerivativeGenerator2::~DerivativeGenerator2() {
-
-}
-
-DerivativeGeneratorInternal2::DerivativeGeneratorInternal2(
-    DerivativeGenerator2 &callback) : callback_(callback) {
-
-}
-
-DerivativeGeneratorInternal2::~DerivativeGeneratorInternal2() {
-
-}
-
-
-CallbackFunctionInternal::CallbackFunctionInternal(
-    Callback2 &callback) : callback_(callback) {
-
-  addOption("fin_diff_eps", OT_REAL, 1e-7, "eps used for finite differences");
-
-  ibuf_.resize(callback_.nIn());
-  obuf_.resize(callback_.nOut());
-
-  for (int k=0;k<ibuf_.size();k++) {
-    input(k) = DMatrix::zeros(callback_.inputSparsity(k));
+  Callback::Callback() {
   }
 
-  for (int k=0;k<obuf_.size();k++) {
-    output(k) = DMatrix::zeros(callback_.outputSparsity(k));
+  Callback::Callback(const Callback& obj) {
+    casadi_error("Callback objects cannot be copied");
   }
 
-}
+  void Callback::construct(const std::string& name, const Dict& opts) {
+    assignNode(new CallbackInternal(this));
+    setOption("name", name);
+    setOption(opts);
+    Function::init();
+  }
 
-CallbackFunctionInternal::~CallbackFunctionInternal() {
+  Callback::~Callback() {
+    // Make sure that this object isn't used after its deletion
+    if (!isNull()) {
+      (*this)->self_ = 0;
+    }
+  }
 
-}
+  Function Callback::fun(const std::string& name, Callback* n, const Dict& opts) {
+    n->construct(name, opts);
+    Function ret = *n;
+    n->transfer_ownership();
+    return ret;
+  }
 
+  std::vector<DMatrix> Callback::eval(const std::vector<DMatrix>& arg) {
+    casadi_error("Callback::eval has not been implemented");
+    return std::vector<DMatrix>();
+  }
 
-void CallbackFunctionInternal::evalD(const double** arg,
-                               double** res, int* iw, double* w) {
-    // Number of inputs and outputs
+  void Callback::eval(const double** arg, double** res, int* iw, double* w) {
+    // Allocate input matrices
     int num_in = nIn();
-    int num_out = nOut();
-
-    std::vector<DMatrix> inputs(num_in);
-
-    // Pass the inputs to the function
+    std::vector<DMatrix> argv(num_in);
     for (int i=0; i<num_in; ++i) {
-      inputs[i] = DMatrix::zeros(input(i).sparsity());
+      argv[i] = DMatrix::zeros(input(i).sparsity());
       if (arg[i] != 0) {
-        inputs[i].setNZ(arg[i]);
+        argv[i].setNZ(arg[i]);
       } else {
-        inputs[i].set(0.);
+        argv[i].set(0.);
       }
     }
 
-    std::vector<DMatrix> outputs = callback_(inputs);
+    // Evaluate
+    std::vector<DMatrix> resv = eval(argv);
 
     // Get the outputs
+    int num_out = nOut();
     for (int i=0; i<num_out; ++i) {
-      if (res[i] != 0) outputs[i].getNZ(res[i]);
+      if (res[i]!=0) resv[i].getNZ(res[i]);
     }
   }
 
-void CallbackFunctionInternal::init() {
-  FunctionInternal::init();
-}
+  const CallbackInternal* Callback::operator->() const {
+    return static_cast<const CallbackInternal*>(Function::operator->());
+  }
 
+  CallbackInternal* Callback::operator->() {
+    return static_cast<CallbackInternal*>(Function::operator->());
+  }
 
+  bool Callback::has_jacobian() const {
+    return (*this)->FunctionInternal::hasFullJacobian();
+  }
+
+  Function Callback::get_jacobian(const std::string& name, const Dict& opts) {
+    return (*this)->FunctionInternal::getFullJacobian(name, opts);
+  }
+
+  Function Callback::get_forward(const std::string& name, int nfwd, Dict& opts) {
+    return (*this)->FunctionInternal::getDerForward(name, nfwd, opts);
+  }
+
+  int Callback::get_n_forward() const {
+    return (*this)->FunctionInternal::numDerForward();
+  }
+
+  Function Callback::get_reverse(const std::string& name, int nadj, Dict& opts) {
+    return (*this)->FunctionInternal::getDerReverse(name, nadj, opts);
+  }
+
+  int Callback::get_n_reverse() const {
+    return (*this)->FunctionInternal::numDerReverse();
+  }
+
+  void Callback::transfer_ownership() {
+    casadi_assert_message(!isNull(), "Null pointer.");
+    casadi_assert_message(!(*this)->own_, "Ownership has already been transferred.");
+    casadi_assert_message(getCount()>1, "There are no owning references");
+    // Decrease the reference counter to offset the effect of the owning reference
+    count_down();
+    // Mark internal class as owning
+    (*this)->own_ = true;
+  }
 
 } // namespace casadi
-

@@ -23,14 +23,14 @@
  */
 
 /** 
-* This example looks at the CustomFunction class
+* This example looks at the Callback class
 *
 *
-* \pythonexample{Function/customfunction}
+* \pythonexample{Function/callback}
 *
 * \sa
 * \code
-* casadi::CustomFunction();
+* casadi::Callback();
 * \endcode
 *
 */

@@ -46,9 +46,7 @@ namespace casadi {
     OT_REALVECTOR,
     OT_STRINGVECTOR,
     OT_DICT,
-    OT_DERIVATIVEGENERATOR,
     OT_FUNCTION,
-    OT_CALLBACK,
     OT_VOIDPTR,
     OT_UNKNOWN};
 
@@ -76,8 +74,6 @@ namespace casadi {
     GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
     GenericType(const Function& f);
-    GenericType(const DerivativeGenerator& c);
-    GenericType(const Callback& c);
     GenericType(const Dict& dict);
     #ifndef SWIG
     GenericType(void* ptr);
@@ -105,8 +101,6 @@ namespace casadi {
     operator std::vector<std::string>() const { return toStringVector();}
     operator const Function&() const { return asFunction();}
     operator const Dict&() const { return asDict();}
-    operator const DerivativeGenerator& () const { return asDerivativeGenerator();}
-    operator const Callback& () const { return asCallback();}
     ///@}
     #endif // SWIG
 
@@ -130,8 +124,6 @@ namespace casadi {
     bool isDict() const;
     bool isFunction() const;
     bool isVoidPointer() const;
-    bool isCallback() const;
-    bool isDerivativeGenerator() const;
     ///@}
 
 #ifndef SWIG
@@ -148,8 +140,6 @@ namespace casadi {
     const Dict& asDict() const;
     const Function& asFunction() const;
     void* const & asVoidPointer() const;
-    const DerivativeGenerator& asDerivativeGenerator() const;
-    const Callback& asCallback() const;
     ///@}
 #endif // SWIG
 

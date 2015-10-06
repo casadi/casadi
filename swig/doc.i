@@ -28,162 +28,58 @@ C++ includes: adaptor.hpp ";
 
 
 // File: classcasadi_1_1Callback.xml
-%feature("docstring")  casadi::SharedObject::isNull() const  "
 
-Is a null pointer?
 
-";
+/*  Simple Getters & Setters  */
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const "
+/*  Advanced Getters  */
 
-Return a string with a representation (for SWIG)
+/*  Option Functionality  */ %feature("docstring")
+casadi::Function::numelOut() const  "
 
-";
-
-%feature("docstring") casadi::Callback::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
+Get total number of elements in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::Callback "
+%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
+std::string &str) const  "
 
-Callback.
-
-In C++, supply a CallbackCPtr function pointer When the callback function
-returns a non-zero integer, the host is signalled of a problem. E.g. an
-NlpSolver may halt iterations if the Callback is something else than 0
-
-In python, supply a callable, annotated with pycallback decorator
-
-C++ includes: functor.hpp ";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a representation of the object.
+Get the type of a certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
-internal class
+%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
+OptionsFunctionality &obj, bool skipUnknown=false) "
+
+Copy all options from another object.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
+%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
+&arg, std::vector< DMatrix > &output_res, bool always_inline=false, bool
+never_inline=false) "
 
-Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
+Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring") casadi::Callback::Callback() "
+%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
+std::vector< SX > &output_res, bool always_inline=false, bool
+never_inline=false) "
 
-Default constructor.
-
-";
-
-%feature("docstring") casadi::Callback::Callback(CallbackCPtr ptr) "
-
-Construct from C pointer.
+Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring") casadi::Callback::Callback(IterationCallback &cb) "
+%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
+std::vector< MX > &output_res, bool always_inline=false, bool
+never_inline=false) "
 
-Construct from an IterationCallback object.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const "
-
-Return a string with a description (for SWIG)
+Evaluate the function symbolically or numerically.
 
 ";
 
-
-// File: classcasadi_1_1Callback2.xml
-%feature("docstring")  casadi::Callback2::create() "";
-
-%feature("docstring")  casadi::Callback2::name() "
-
-Specify the name of the object.
-
-";
-
-%feature("docstring") casadi::Callback2 "C++ includes: callback.hpp ";
-
-%feature("docstring")  casadi::Callback2::inputShape(int i) "
-
-Specify input shape.
-
-Specify the shape corresponding to a given input. The shape must not be
-changed over the lifetime of the object
-
-Default implementation: scalar (1,1)
-
-";
-
-%feature("docstring")  casadi::Callback2::nOut() "
-
-Number of output arguments.
-
-Specify the number of output arguments that a specific instance can handle.
-The number must not be changed over the lifetime of the object
-
-Default implementation: 1
-
-";
-
-%feature("docstring") casadi::Callback2::~Callback2 "
-
-Destructor.
-
-";
-
-%feature("docstring")  casadi::Callback2::nIn() "
-
-Number of input arguments.
-
-Specify the number of input arguments that a specific instance can handle.
-The number must not be changed over the lifetime of the object
-
-Default implementation: 1
-
-";
-
-%feature("docstring")  casadi::Callback2::outputSparsity(int i) "
-
-Specify output sparsity.
-
-Specify the sparsity corresponding to a given output. The sparsity must not
-be changed over the lifetime of the object
-
-Default implementation: dense using outputShape
-
-";
-
-%feature("docstring")  casadi::Callback2::inputSparsity(int i) "
-
-Specify input sparsity.
-
-Specify the sparsity corresponding to a given input. The sparsity must not
-be changed over the lifetime of the object
-
-Default implementation: dense using inputShape
-
-";
-
-%feature("docstring")  casadi::Callback2::outputShape(int i) "
+%feature("docstring")  casadi::Callback::get_output_shape(int i) "
 
 Specify output shape.
 
@@ -194,11 +90,1565 @@ Default implementation: scalar (1,1)
 
 ";
 
-%feature("docstring") casadi::Callback2::Callback2() "";
+%feature("docstring")  casadi::Callback::get_n_in() "
 
-%feature("docstring")  casadi::Callback2::options() "
+Number of input arguments.
 
-Specify the options of the object.
+Specify the number of input arguments that a specific instance can handle.
+The number must not be changed over the lifetime of the object
+
+Default implementation: 1
+
+";
+
+%feature("docstring")  casadi::Function::setFullJacobian(const Function
+&jac) "
+
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
+const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring")  casadi::Function::sz_arg() const  " [INTERNAL]  Get
+required length of arg field.
+
+";
+
+%feature("docstring")  casadi::Function::outputScheme() const  "
+
+Get output scheme.
+
+";
+
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::Function::outputName(int ind) const  "
+
+Get output scheme name by index.
+
+";
+
+%feature("docstring")  casadi::Function::outputDescription(int ind) const  "
+
+Get output scheme description by index.
+
+";
+
+%feature("docstring")  casadi::Function::callForward(const std::vector< MX >
+&arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
+&fseed, std::vector< std::vector< MX > > &output_fsens, bool
+always_inline=false, bool never_inline=false) "
+
+Create call to (cached) derivative function, forward mode.
+
+";
+
+%feature("docstring")  casadi::Function::callForward(const std::vector< SX >
+&arg, const std::vector< SX > &res, const std::vector< std::vector< SX > >
+&fseed, std::vector< std::vector< SX > > &output_fsens, bool
+always_inline=false, bool never_inline=false) "
+
+Create call to (cached) derivative function, forward mode.
+
+";
+
+%feature("docstring")  casadi::Function::callForward(const std::vector<
+DMatrix > &arg, const std::vector< DMatrix > &res, const std::vector<
+std::vector< DMatrix > > &fseed, std::vector< std::vector< DMatrix > >
+&output_fsens, bool always_inline=false, bool never_inline=false) "
+
+Create call to (cached) derivative function, forward mode.
+
+";
+
+%feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
+&arg, const std::string &parallelization="serial") "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::Function::getStat(const std::string &name)
+const  "
+
+Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::Callback::init() "
+
+Initialize the object This function is called after the object construction
+(for the whole class hierarchy) is complete, but before the finalization
+step. It is called recursively for the whole class hierarchy, starting with
+the lowest level.
+
+";
+
+%feature("docstring")  casadi::Callback::get_n_out() "
+
+Number of output arguments.
+
+Specify the number of output arguments that a specific instance can handle.
+The number must not be changed over the lifetime of the object
+
+Default implementation: 1
+
+";
+
+%feature("docstring")  casadi::Function::generate(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict()) "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::sz_iw() const  " [INTERNAL]  Get
+required length of iw field.
+
+";
+
+%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
+Check if the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring")  casadi::Function::derForward(int nfwd) "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nfwd*n_in inputs correspond to forward seeds, one direction at a time The
+nfwd*n_out outputs correspond to forward sensitivities, one direction at a
+time. * (n_in = nIn(), n_out = nOut())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring")  casadi::Callback::get_n_reverse() const  "
+
+Return function that calculates adjoint derivatives derReverse(nadj) returns
+a cached instance if available, and calls  Function getDerReverse(int nadj)
+if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+int oind=0, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
+oind=0) const "
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0..nOut()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
+std::string &oname) const "
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+int oind=0) " [INTERNAL]  Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0..nOut()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+const std::string &oname) " [INTERNAL]  Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
+&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
+internal class
+
+";
+
+%feature("docstring")  casadi::Function::callReverse(const std::vector< MX >
+&arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
+&aseed, std::vector< std::vector< MX > > &output_asens, bool
+always_inline=false, bool never_inline=false) "
+
+Create call to (cached) derivative function, reverse mode.
+
+";
+
+%feature("docstring")  casadi::Function::callReverse(const std::vector< SX >
+&arg, const std::vector< SX > &res, const std::vector< std::vector< SX > >
+&aseed, std::vector< std::vector< SX > > &output_asens, bool
+always_inline=false, bool never_inline=false) "
+
+Create call to (cached) derivative function, reverse mode.
+
+";
+
+%feature("docstring")  casadi::Function::callReverse(const std::vector<
+DMatrix > &arg, const std::vector< DMatrix > &res, const std::vector<
+std::vector< DMatrix > > &aseed, std::vector< std::vector< DMatrix > >
+&output_asens, bool always_inline=false, bool never_inline=false) "
+
+Create call to (cached) derivative function, reverse mode.
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInputSX() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::Callback::Callback() "
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::Callback::Callback(const Callback &obj) "
+
+Copy constructor (throws an error)
+
+";
+
+%feature("docstring") casadi::Callback::~Callback "
+
+Destructor.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
+&name, int i) " [INTERNAL]  Set a certain option by giving its index into
+the allowed values.
+
+";
+
+%feature("docstring")  casadi::Function::inputName(int ind) const  "
+
+Get input scheme name by index.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+int oind=0) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(int iind, const std::string
+&oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+const std::string &oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
+
+";
+
+%feature("docstring")  casadi::Callback::get_input_sparsity(int i) "
+
+Specify input sparsity.
+
+Specify the sparsity corresponding to a given input. The sparsity must not
+be changed over the lifetime of the object
+
+Default implementation: dense using inputShape
+
+";
+
+%feature("docstring")  casadi::Function::nnzOut() const  "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring")  casadi::Function::inputDescription(int ind) const  "
+
+Get input scheme description by index.
+
+";
+
+%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::Function::nOut() const  "
+
+Get the number of function outputs.
+
+";
+
+%feature("docstring")  casadi::Callback::construct(const std::string &name,
+const Dict &opts=Dict()) "
+
+Construct internal object This is the step that actually construct the
+internal object, as the class constructor only creates a null pointer. It
+should be called from the user constructor.
+
+";
+
+%feature("docstring")  casadi::Callback::get_n_forward() const  "
+
+Return function that calculates forward derivatives derForward(nfwd) returns
+a cached instance if available, and calls  Function getDerForward(int nfwd)
+if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::Function::defaultInput(int ind) const  "
+
+Get default input value.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
+const  " [INTERNAL]  Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::getStats() const  "
+
+Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::Callback::get_input_shape(int i) "
+
+Specify input shape.
+
+Specify the shape corresponding to a given input. The shape must not be
+changed over the lifetime of the object
+
+Default implementation: scalar (1,1)
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
+
+Get the dictionary.
+
+";
+
+%feature("docstring")  casadi::Function::outputSparsity(int ind=0) const  "
+
+Get sparsity of a given output.
+
+";
+
+%feature("docstring")  casadi::Function::outputSparsity(const std::string
+&iname) const  "
+
+Get sparsity of a given output.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
+std::string &str) const  "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::inputIndex(const std::string &name)
+const  "
+
+Find the index for a string describing a particular entry of an input
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() const  "
+
+Get input scheme.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+int oind=0) "
+
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0..nOut()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+const std::string &oname) "
+
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
+std::string &str) const  "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring")  casadi::Callback::has_jacobian() const  "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring")  casadi::Callback::get_output_sparsity(int i) "
+
+Specify output sparsity.
+
+Specify the sparsity corresponding to a given output. The sparsity must not
+be changed over the lifetime of the object
+
+Default implementation: dense using outputShape
+
+";
+
+%feature("docstring")  casadi::Callback::finalize() "
+
+Finalize the object This function is called after the construction and init
+steps are completed, but before user functions are called. It is called
+recursively for the whole class hierarchy, starting with the highest level.
+
+";
+
+%feature("docstring")  casadi::Function::evaluate() "
+
+Evaluate.
+
+";
+
+%feature("docstring")  casadi::Function::outputIndex(const std::string
+&name) const  "
+
+Find the index for a string describing a particular entry of an output
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::nnzIn() const  "
+
+Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")  casadi::Function::mapaccum(const std::string &name,
+int N, const Dict &options=Dict()) const  "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, int oind=0, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
+std::string &str) const  "
+
+Get the default of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+int oind=0) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(int iind, const std::string
+&oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+const std::string &oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Legacy function: Use derForward and derReverse instead.
+
+Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
+
+(n_in = nIn(), n_out = nOut())
+
+";
+
+%feature("docstring")  casadi::Function::sz_w() const  " [INTERNAL]  Get
+required length of w field.
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
+const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::gradient(const std::string &iind,
+int oind=0) "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::gradient(int iind, const
+std::string &oind) "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::gradient(const std::string &iind,
+const std::string &oind) "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
+&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
+DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
+DMatrixVectorVector &output_asens, bool always_inline=false, bool
+never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
+numerically with directional derivatives The first two arguments are the
+nondifferentiated inputs and results of the evaluation, the next two
+arguments are a set of forward directional seeds and the resulting forward
+directional derivatives, the length of the vector being the number of
+forward directions. The next two arguments are a set of adjoint directional
+seeds and the resulting adjoint directional derivatives, the length of the
+vector being the number of adjoint directions.
+
+";
+
+%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
+SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
+&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
+
+";
+
+%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
+MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
+&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
+
+";
+
+%feature("docstring")  casadi::Callback::get_forward(const std::string
+&name, int nfwd, Dict &opts) "
+
+Return function that calculates forward derivatives derForward(nfwd) returns
+a cached instance if available, and calls  Function getDerForward(int nfwd)
+if no cached version is available.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
+const  "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::sz_res() const  " [INTERNAL]  Get
+required length of res field.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::printOptions(std::ostream
+&stream=casadi::userOut()) const  "
+
+Print options to a stream.
+
+";
+
+%feature("docstring")  casadi::Callback::get_jacobian(const std::string
+&name, const Dict &opts) "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring")  casadi::Function::numelIn() const  "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::Function::printDimensions(std::ostream
+&stream=casadi::userOut()) const  "
+
+Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
+iind=0) "
+
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0..nIn()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
+const std::string &iname) "
+
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::SharedObject::isNull() const  "
+
+Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
+int iind=0, int oind=0, bool compact=false) "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
+
+";
+
+%feature("docstring")  casadi::Callback::eval(const std::vector< DMatrix >
+&arg) "
+
+Evaluate numerically, temporary matrices and work vectors.
+
+";
+
+%feature("docstring")  casadi::Function::setDerReverse(const Function &fcn,
+int nadj) "
+
+Set a function that calculates nadj adjoint derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring")  casadi::Function::map(const std::vector< std::vector<
+MX > > &arg, const std::string &parallelization="serial") "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::map(const std::vector< MX > &arg,
+const std::string &parallelization="serial") "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::map(const std::string &name, int N,
+const Dict &options=Dict()) const  "
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
+int v) " [INTERNAL]  Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring")  casadi::Function::inputSparsity(int ind=0) const  "
+
+Get sparsity of a given input.
+
+";
+
+%feature("docstring")  casadi::Function::inputSparsity(const std::string
+&iname) const  "
+
+Get sparsity of a given input.
+
+";
+
+%feature("docstring")  casadi::Callback::get_reverse(const std::string
+&name, int nadj, Dict &opts) "
+
+Return function that calculates adjoint derivatives derReverse(nadj) returns
+a cached instance if available, and calls  Function getDerReverse(int nadj)
+if no cached version is available.
+
+";
+
+%feature("docstring") casadi::Callback "
+
+Callback function functionality This class provides a public API to the
+FunctionInternal class that can be subclassed by the user, who is then able
+to implement the different virtual method. Note that the Function class also
+provides a public API to FunctionInternal, but only allows calling, not
+being called.
+
+The user is responsible for not deleting this class for the lifetime of the
+internal function object.
+
+Joris Gillis, Joel Andersson
+
+>List of available options
+
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_weight    | OT_REAL      | GenericType( | Weighting    | casadi::Func |
+|              |              | )            | factor for   | tionInternal |
+|              |              |              | derivative c |              |
+|              |              |              | alculation.W |              |
+|              |              |              | hen there is |              |
+|              |              |              | an option of |              |
+|              |              |              | either using |              |
+|              |              |              | forward or   |              |
+|              |              |              | reverse mode |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives, |              |
+|              |              |              | the          |              |
+|              |              |              | condition ad |              |
+|              |              |              | _weight*nf<= |              |
+|              |              |              | (1-ad_weight |              |
+|              |              |              | )*na is used |              |
+|              |              |              | where nf and |              |
+|              |              |              | na are       |              |
+|              |              |              | estimates of |              |
+|              |              |              | the number   |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse mode  |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
+|              |              |              | needed. By   |              |
+|              |              |              | default,     |              |
+|              |              |              | ad_weight is |              |
+|              |              |              | calculated a |              |
+|              |              |              | utomatically |              |
+|              |              |              | , but this   |              |
+|              |              |              | can be       |              |
+|              |              |              | overridden   |              |
+|              |              |              | by setting   |              |
+|              |              |              | this option. |              |
+|              |              |              | In           |              |
+|              |              |              | particular,  |              |
+|              |              |              | 0 means      |              |
+|              |              |              | forcing      |              |
+|              |              |              | forward mode |              |
+|              |              |              | and 1        |              |
+|              |              |              | forcing      |              |
+|              |              |              | reverse      |              |
+|              |              |              | mode. Leave  |              |
+|              |              |              | unset for    |              |
+|              |              |              | (class       |              |
+|              |              |              | specific)    |              |
+|              |              |              | heuristics.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ad_weight_sp | OT_REAL      | GenericType( | Weighting    | casadi::Func |
+|              |              | )            | factor for   | tionInternal |
+|              |              |              | sparsity     |              |
+|              |              |              | pattern      |              |
+|              |              |              | calculation  |              |
+|              |              |              | calculation. |              |
+|              |              |              | Overrides    |              |
+|              |              |              | default      |              |
+|              |              |              | behavior.    |              |
+|              |              |              | Set to 0 and |              |
+|              |              |              | 1 to force   |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse mode |              |
+|              |              |              | respectively |              |
+|              |              |              | . Cf. option |              |
+|              |              |              | \"ad_weight\". |              |
++--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
+|              |              |              | compiler     | tionInternal |
+|              |              |              | plugin to be |              |
+|              |              |              | used.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
+| ipes         | TOR          | )            | default      | onsFunctiona |
+|              |              |              | options      | lityNode     |
+|              |              |              | according to |              |
+|              |              |              | a given      |              |
+|              |              |              | recipe (low- |              |
+|              |              |              | level)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
+| n            |              | )            | of all       | tionInternal |
+|              |              |              | outputs with |              |
+|              |              |              | respect to   |              |
+|              |              |              | all inputs.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| input_scheme | OT_STRINGVEC | GenericType( | Custom input | casadi::Func |
+|              | TOR          | )            | scheme       | tionInternal |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
+|              |              |              | requested    | tionInternal |
+|              |              |              | for a number |              |
+|              |              |              | of forward/r |              |
+|              |              |              | everse       |              |
+|              |              |              | directions,  |              |
+|              |              |              | it may be    |              |
+|              |              |              | cheaper to   |              |
+|              |              |              | compute      |              |
+|              |              |              | first the    |              |
+|              |              |              | full         |              |
+|              |              |              | jacobian and |              |
+|              |              |              | then         |              |
+|              |              |              | multiply     |              |
+|              |              |              | with seeds,  |              |
+|              |              |              | rather than  |              |
+|              |              |              | obtain the   |              |
+|              |              |              | requested    |              |
+|              |              |              | directions   |              |
+|              |              |              | in a straigh |              |
+|              |              |              | tforward     |              |
+|              |              |              | manner.      |              |
+|              |              |              | Casadi uses  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | to decide    |              |
+|              |              |              | which is     |              |
+|              |              |              | cheaper. A   |              |
+|              |              |              | high value   |              |
+|              |              |              | of 'jac_pena |              |
+|              |              |              | lty' makes   |              |
+|              |              |              | it less      |              |
+|              |              |              | likely for   |              |
+|              |              |              | the heurstic |              |
+|              |              |              | to chose the |              |
+|              |              |              | full         |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy.    |              |
+|              |              |              | The special  |              |
+|              |              |              | value -1     |              |
+|              |              |              | indicates    |              |
+|              |              |              | never to use |              |
+|              |              |              | the full     |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
+|              |              |              | time         | tionInternal |
+|              |              |              | compiler to  |              |
+|              |              |              | speed up the |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
+|              |              | )            | be passed to | tionInternal |
+|              |              |              | the jit      |              |
+|              |              |              | compiler.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
+| e            | TOR          | )            | output       | tionInternal |
+|              |              |              | scheme       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: callback.hpp ";
+
+%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
+"
+
+Add modules to be monitored.
+
+";
+
+%feature("docstring")  casadi::Function::removeMonitor(const std::string
+&mon) "
+
+Remove modules to be monitored.
+
+";
+
+%feature("docstring")  casadi::Function::getSanitizedName() const  "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring") casadi::Callback::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring")  casadi::Function::nIn() const  "
+
+Get the number of function inputs.
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+int iind, int oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+const std::string &iind, int oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+int iind, const std::string &oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+const std::string &iind, const std::string &oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
+"
+
+Get a list of all option names.
+
+";
+
+%feature("docstring")  casadi::Function::name() const  "
+
+Name of the function.
+
+";
+
+%feature("docstring")  casadi::Function::fullJacobian() "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
+%feature("docstring")  casadi::Function::derReverse(int nadj) "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = nIn(), n_out = nOut())
+
+(n_in = nIn(), n_out = nOut())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
+iind=0) const "
+
+Get an input by index.
+
+Parameters:
+-----------
+
+iind:  index within the range [0..nIn()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
+std::string &iname) const "
+
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
+iind=0) " [INTERNAL]  Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0..nIn()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
+const std::string &iname) " [INTERNAL]  Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::symbolicOutput() const  "
+
+Get a vector of symbolic variables with the same dimensions as the outputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring")  casadi::Function::setDerForward(const Function &fcn,
+int nfwd) "
+
+Set a function that calculates nfwd forward derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
 
 ";
 
@@ -1372,32 +2822,6 @@ Joris Gillis
 | rpolation    |              |              | |linear      | rolSimulator |
 |              |              |              |              | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
 |              |              |              | options      | lityNode     |
@@ -2378,1607 +3802,6 @@ adjoint sensitivities, one direction at a time.
 ";
 
 
-// File: classcasadi_1_1CustomEvaluate.xml
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
-internal class
-
-";
-
-%feature("docstring") casadi::CustomEvaluate::CustomEvaluate() "
-
-Default constructor.
-
-";
-
-%feature("docstring")
-casadi::CustomEvaluate::CustomEvaluate(CustomEvaluateCPtr ptr) "
-
-Construct from C pointer.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a description of the object.
-
-";
-
-%feature("docstring") casadi::CustomEvaluate "
-
-CustomEvaluate.
-
-In C++, supply a CustomEvaluateCPtr function pointer
-
-In python, supply a callable, annotated with pyevaluate decorator
-
-C++ includes: functor.hpp ";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring") casadi::CustomEvaluate::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-
-// File: classcasadi_1_1CustomFunction.xml
-
-
-/*  Simple Getters & Setters  */
-
-/*  Advanced Getters  */
-
-/*  Option Functionality  */ %feature("docstring")
-casadi::Function::getSanitizedName() const  "
-
-get function name with all non alphanumeric characters converted to '_'
-
-";
-
-%feature("docstring")  casadi::Function::callReverse(const std::vector< MX >
-&arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
-&aseed, std::vector< std::vector< MX > > &output_asens, bool
-always_inline=false, bool never_inline=false) "
-
-Create call to (cached) derivative function, reverse mode.
-
-";
-
-%feature("docstring")  casadi::Function::callReverse(const std::vector< SX >
-&arg, const std::vector< SX > &res, const std::vector< std::vector< SX > >
-&aseed, std::vector< std::vector< SX > > &output_asens, bool
-always_inline=false, bool never_inline=false) "
-
-Create call to (cached) derivative function, reverse mode.
-
-";
-
-%feature("docstring")  casadi::Function::callReverse(const std::vector<
-DMatrix > &arg, const std::vector< DMatrix > &res, const std::vector<
-std::vector< DMatrix > > &aseed, std::vector< std::vector< DMatrix > >
-&output_asens, bool always_inline=false, bool never_inline=false) "
-
-Create call to (cached) derivative function, reverse mode.
-
-";
-
-%feature("docstring")  casadi::Function::inputScheme() const  "
-
-Get input scheme.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
-"
-
-Get a list of all option names.
-
-";
-
-%feature("docstring")  casadi::Function::defaultInput(int ind) const  "
-
-Get default input value.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
-std::string &str) const  "
-
-Get the type name of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
-Check if the numerical values of the supplied bounds make sense.
-
-";
-
-%feature("docstring") casadi::CustomFunction "
-
-Interface to a custom function.
-
-Joel Andersson
-
->List of available options
-
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| ad_weight    | OT_REAL      | GenericType( | Weighting    | casadi::Func |
-|              |              | )            | factor for   | tionInternal |
-|              |              |              | derivative c |              |
-|              |              |              | alculation.W |              |
-|              |              |              | hen there is |              |
-|              |              |              | an option of |              |
-|              |              |              | either using |              |
-|              |              |              | forward or   |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives, |              |
-|              |              |              | the          |              |
-|              |              |              | condition ad |              |
-|              |              |              | _weight*nf<= |              |
-|              |              |              | (1-ad_weight |              |
-|              |              |              | )*na is used |              |
-|              |              |              | where nf and |              |
-|              |              |              | na are       |              |
-|              |              |              | estimates of |              |
-|              |              |              | the number   |              |
-|              |              |              | of forward/r |              |
-|              |              |              | everse mode  |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives  |              |
-|              |              |              | needed. By   |              |
-|              |              |              | default,     |              |
-|              |              |              | ad_weight is |              |
-|              |              |              | calculated a |              |
-|              |              |              | utomatically |              |
-|              |              |              | , but this   |              |
-|              |              |              | can be       |              |
-|              |              |              | overridden   |              |
-|              |              |              | by setting   |              |
-|              |              |              | this option. |              |
-|              |              |              | In           |              |
-|              |              |              | particular,  |              |
-|              |              |              | 0 means      |              |
-|              |              |              | forcing      |              |
-|              |              |              | forward mode |              |
-|              |              |              | and 1        |              |
-|              |              |              | forcing      |              |
-|              |              |              | reverse      |              |
-|              |              |              | mode. Leave  |              |
-|              |              |              | unset for    |              |
-|              |              |              | (class       |              |
-|              |              |              | specific)    |              |
-|              |              |              | heuristics.  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| ad_weight_sp | OT_REAL      | GenericType( | Weighting    | casadi::Func |
-|              |              | )            | factor for   | tionInternal |
-|              |              |              | sparsity     |              |
-|              |              |              | pattern      |              |
-|              |              |              | calculation  |              |
-|              |              |              | calculation. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | behavior.    |              |
-|              |              |              | Set to 0 and |              |
-|              |              |              | 1 to force   |              |
-|              |              |              | forward and  |              |
-|              |              |              | reverse mode |              |
-|              |              |              | respectively |              |
-|              |              |              | . Cf. option |              |
-|              |              |              | \"ad_weight\". |              |
-+--------------+--------------+--------------+--------------+--------------+
-| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
-| ipes         | TOR          | )            | default      | onsFunctiona |
-|              |              |              | options      | lityNode     |
-|              |              |              | according to |              |
-|              |              |              | a given      |              |
-|              |              |              | recipe (low- |              |
-|              |              |              | level)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
-| n            |              | )            | of all       | tionInternal |
-|              |              |              | outputs with |              |
-|              |              |              | respect to   |              |
-|              |              |              | all inputs.  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
-|              |              |              | indicate     | tionInternal |
-|              |              |              | whether      |              |
-|              |              |              | statistics   |              |
-|              |              |              | must be      |              |
-|              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| input_scheme | OT_STRINGVEC | GenericType( | Custom input | casadi::Func |
-|              | TOR          | )            | scheme       | tionInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
-|              |              |              | exceptions   | tionInternal |
-|              |              |              | when the     |              |
-|              |              |              | numerical    |              |
-|              |              |              | values of    |              |
-|              |              |              | the inputs   |              |
-|              |              |              | don't make   |              |
-|              |              |              | sense        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
-|              |              |              | requested    | tionInternal |
-|              |              |              | for a number |              |
-|              |              |              | of forward/r |              |
-|              |              |              | everse       |              |
-|              |              |              | directions,  |              |
-|              |              |              | it may be    |              |
-|              |              |              | cheaper to   |              |
-|              |              |              | compute      |              |
-|              |              |              | first the    |              |
-|              |              |              | full         |              |
-|              |              |              | jacobian and |              |
-|              |              |              | then         |              |
-|              |              |              | multiply     |              |
-|              |              |              | with seeds,  |              |
-|              |              |              | rather than  |              |
-|              |              |              | obtain the   |              |
-|              |              |              | requested    |              |
-|              |              |              | directions   |              |
-|              |              |              | in a straigh |              |
-|              |              |              | tforward     |              |
-|              |              |              | manner.      |              |
-|              |              |              | Casadi uses  |              |
-|              |              |              | a heuristic  |              |
-|              |              |              | to decide    |              |
-|              |              |              | which is     |              |
-|              |              |              | cheaper. A   |              |
-|              |              |              | high value   |              |
-|              |              |              | of 'jac_pena |              |
-|              |              |              | lty' makes   |              |
-|              |              |              | it less      |              |
-|              |              |              | likely for   |              |
-|              |              |              | the heurstic |              |
-|              |              |              | to chose the |              |
-|              |              |              | full         |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | strategy.    |              |
-|              |              |              | The special  |              |
-|              |              |              | value -1     |              |
-|              |              |              | indicates    |              |
-|              |              |              | never to use |              |
-|              |              |              | the full     |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | strategy     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
-|              |              |              | time         | tionInternal |
-|              |              |              | compiler to  |              |
-|              |              |              | speed up the |              |
-|              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
-|              |              | )            | be passed to | tionInternal |
-|              |              |              | the jit      |              |
-|              |              |              | compiler.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
-|              | TOR          | )            | be activated | tionInternal |
-|              |              |              | (inputs|outp |              |
-|              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
-| e            | TOR          | )            | output       | tionInternal |
-|              |              |              | scheme       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
-| heck         |              |              | exceptions   | tionInternal |
-|              |              |              | when NaN or  |              |
-|              |              |              | Inf appears  |              |
-|              |              |              | during       |              |
-|              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
-|              |              | )            | defined      | tionInternal |
-|              |              |              | field that   |              |
-|              |              |              | can be used  |              |
-|              |              |              | to identify  |              |
-|              |              |              | the function |              |
-|              |              |              | or pass      |              |
-|              |              |              | additional   |              |
-|              |              |              | information  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
-|              |              |              | evaluation   | tionInternal |
-|              |              |              | for          |              |
-|              |              |              | debugging    |              |
-+--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
-
-C++ includes: custom_function.hpp ";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
-iind=0) "
-
-Set an input by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iind:  index within the range [0..nIn()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
-const std::string &iname) "
-
-Set an input by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::getStats() const  "
-
-Get all statistics obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a description of the object.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring")  casadi::Function::outputName(int ind) const  "
-
-Get output scheme name by index.
-
-";
-
-%feature("docstring")  casadi::Function::inputIndex(const std::string &name)
-const  "
-
-Find the index for a string describing a particular entry of an input
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
-Propagate the sparsity pattern through a set of directional.
-
-derivatives forward or backward (for usage, see the example
-propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::Function::derReverse(int nadj) "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = nIn(), n_out = nOut())
-
-(n_in = nIn(), n_out = nOut())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
-%feature("docstring")  casadi::Function::outputSparsity(int ind=0) const  "
-
-Get sparsity of a given output.
-
-";
-
-%feature("docstring")  casadi::Function::outputSparsity(const std::string
-&iname) const  "
-
-Get sparsity of a given output.
-
-";
-
-%feature("docstring")  casadi::Function::outputScheme() const  "
-
-Get output scheme.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
-const  "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
-const  " [INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring") casadi::CustomFunction::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
-const  " [INTERNAL]  Get the enum value corresponding to th certain option.
-
-";
-
-%feature("docstring")  casadi::Function::nnzIn() const  "
-
-Get total number of nonzeros in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::Function::generate(const std::string &fname,
-const Dict &opts=Dict()) "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict()) "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::derForward(int nfwd) "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nfwd*n_in inputs correspond to forward seeds, one direction at a time The
-nfwd*n_out outputs correspond to forward sensitivities, one direction at a
-time. * (n_in = nIn(), n_out = nOut())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
-%feature("docstring")  casadi::Function::evaluate() "
-
-Evaluate.
-
-";
-
-%feature("docstring")  casadi::Function::callForward(const std::vector< MX >
-&arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
-&fseed, std::vector< std::vector< MX > > &output_fsens, bool
-always_inline=false, bool never_inline=false) "
-
-Create call to (cached) derivative function, forward mode.
-
-";
-
-%feature("docstring")  casadi::Function::callForward(const std::vector< SX >
-&arg, const std::vector< SX > &res, const std::vector< std::vector< SX > >
-&fseed, std::vector< std::vector< SX > > &output_fsens, bool
-always_inline=false, bool never_inline=false) "
-
-Create call to (cached) derivative function, forward mode.
-
-";
-
-%feature("docstring")  casadi::Function::callForward(const std::vector<
-DMatrix > &arg, const std::vector< DMatrix > &res, const std::vector<
-std::vector< DMatrix > > &fseed, std::vector< std::vector< DMatrix > >
-&output_fsens, bool always_inline=false, bool never_inline=false) "
-
-Create call to (cached) derivative function, forward mode.
-
-";
-
-%feature("docstring")  casadi::Function::removeMonitor(const std::string
-&mon) "
-
-Remove modules to be monitored.
-
-";
-
-%feature("docstring") casadi::CustomFunction::CustomFunction(const
-std::string &name, const CustomEvaluate &c_fcn, const std::vector< Sparsity
-> &inputscheme, const std::vector< Sparsity > &outputscheme, const Dict
-&opts=Dict()) "
-
-Constructor (new syntax, includes initialization)
-
-";
-
-%feature("docstring") casadi::CustomFunction::CustomFunction(const
-std::string &name, const CustomEvaluate &c_fcn, const std::pair<
-SparsityDict, std::vector< std::string > > &inputscheme, const std::vector<
-Sparsity > &outputscheme, const Dict &opts=Dict()) "
-
-Constructor (new syntax, includes initialization)
-
-";
-
-%feature("docstring") casadi::CustomFunction::CustomFunction(const
-std::string &name, const CustomEvaluate &c_fcn, const std::vector< Sparsity
-> &inputscheme, const std::pair< SparsityDict, std::vector< std::string > >
-&outputscheme, const Dict &opts=Dict()) "
-
-Constructor (new syntax, includes initialization)
-
-";
-
-%feature("docstring") casadi::CustomFunction::CustomFunction(const
-std::string &name, const CustomEvaluate &c_fcn, const std::pair<
-SparsityDict, std::vector< std::string > > &inputscheme, const std::pair<
-SparsityDict, std::vector< std::string > > &outputscheme, const Dict
-&opts=Dict()) "
-
-Constructor (new syntax, includes initialization)
-
-";
-
-%feature("docstring") casadi::CustomFunction::CustomFunction() "
-
-default constructor
-
-";
-
-%feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(const std::string &iind,
-int oind=0) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(int iind, const
-std::string &oind) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(const std::string &iind,
-const std::string &oind) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::numelIn() const  "
-
-Get total number of elements in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
-internal class
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
-&name, int i) " [INTERNAL]  Set a certain option by giving its index into
-the allowed values.
-
-";
-
-%feature("docstring")  casadi::Function::inputName(int ind) const  "
-
-Get input scheme name by index.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::printOptions(std::ostream
-&stream=casadi::userOut()) const  "
-
-Print options to a stream.
-
-";
-
-%feature("docstring")  casadi::Function::outputDescription(int ind) const  "
-
-Get output scheme description by index.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
-std::string &str) const  "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::inputSparsity(int ind=0) const  "
-
-Get sparsity of a given input.
-
-";
-
-%feature("docstring")  casadi::Function::inputSparsity(const std::string
-&iname) const  "
-
-Get sparsity of a given input.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Function::getStat(const std::string &name)
-const  "
-
-Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
-&arg, std::vector< DMatrix > &output_res, bool always_inline=false, bool
-never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
-std::vector< SX > &output_res, bool always_inline=false, bool
-never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
-std::vector< MX > &output_res, bool always_inline=false, bool
-never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-int iind, int oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-const std::string &iind, int oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-int iind, const std::string &oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-const std::string &iind, const std::string &oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::printDimensions(std::ostream
-&stream=casadi::userOut()) const  "
-
-Print dimensions of inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Legacy function: Use derForward and derReverse instead.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = nIn(), n_out = nOut())
-
-";
-
-%feature("docstring")  casadi::Function::sz_res() const  " [INTERNAL]  Get
-required length of res field.
-
-";
-
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::Function::symbolicInputSX() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::Function::sz_w() const  " [INTERNAL]  Get
-required length of w field.
-
-";
-
-%feature("docstring")  casadi::Function::nnzOut() const  "
-
-Get total number of nonzeros in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0..nOut()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-int oind=0) " [INTERNAL]  Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0..nOut()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-const std::string &oname) " [INTERNAL]  Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::name() const  "
-
-Name of the function.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-int oind=0, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::setDerReverse(const Function &fcn,
-int nadj) "
-
-Set a function that calculates nadj adjoint derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
-
-";
-
-%feature("docstring")  casadi::Function::outputIndex(const std::string
-&name) const  "
-
-Find the index for a string describing a particular entry of an output
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
-"
-
-Add modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
-&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
-DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
-DMatrixVectorVector &output_asens, bool always_inline=false, bool
-never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
-numerically with directional derivatives The first two arguments are the
-nondifferentiated inputs and results of the evaluation, the next two
-arguments are a set of forward directional seeds and the resulting forward
-directional derivatives, the length of the vector being the number of
-forward directions. The next two arguments are a set of adjoint directional
-seeds and the resulting adjoint directional derivatives, the length of the
-vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
-SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
-&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
-MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
-&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::nOut() const  "
-
-Get the number of function outputs.
-
-";
-
-%feature("docstring")  casadi::Function::sz_arg() const  " [INTERNAL]  Get
-required length of arg field.
-
-";
-
-%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
-Reset the sparsity propagation.
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::Function::setFullJacobian(const Function
-&jac) "
-
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
-
-Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::Function::symbolicOutput() const  "
-
-Get a vector of symbolic variables with the same dimensions as the outputs.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::Function::symbolicInput(bool unique=false)
-const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
-iind=0) const "
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0..nIn()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
-std::string &iname) const "
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
-iind=0) " [INTERNAL]  Get an input by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iind:  index within the range [0..nIn()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
-const std::string &iname) " [INTERNAL]  Get an input by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::numelOut() const  "
-
-Get total number of elements in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::Function::fullJacobian() "
-
-Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
-
-";
-
-%feature("docstring")  casadi::Function::sz_iw() const  " [INTERNAL]  Get
-required length of iw field.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(int iind, const std::string
-&oind) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-const std::string &oind) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
-int iind=0, int oind=0, bool compact=false) "
-
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
-
-";
-
-%feature("docstring")  casadi::Function::nIn() const  "
-
-Get the number of function inputs.
-
-";
-
-%feature("docstring")  casadi::Function::inputDescription(int ind) const  "
-
-Get input scheme description by index.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-int oind=0) "
-
-Set an output by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oind:  index within the range [0..nOut()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-const std::string &oname) "
-
-Set an output by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
-&arg, const std::string &parallelization="serial") "
-
-Evaluate symbolically in parallel and sum (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
-std::string &str) const  "
-
-Get the default of a certain option.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind, const std::string
-&oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-const std::string &oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::map(const std::vector< std::vector<
-MX > > &arg, const std::string &parallelization="serial") "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
-";
-
-%feature("docstring")  casadi::Function::map(const std::vector< MX > &arg,
-const std::string &parallelization="serial") "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
-";
-
-%feature("docstring")  casadi::Function::map(const std::string &name, int N,
-const Dict &options=Dict()) const  "
-
-Create a mapped version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (a, p) -> ( s )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (A, P) -> (S )
-  
-      with
-          a: horzcat([a0, a1, ..., a_(N-1)])
-          p: horzcat([p0, p1, ..., p_(N-1)])
-          s: horzcat([s0, s1, ..., s_(N-1)])
-      and
-          s0 <- f(a0, p0)
-          s1 <- f(a1, p1)
-          ...
-          s_(N-1) <- f(a_(N-1), p_(N-1))
-  
-
-
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
-std::string &str) const  "
-
-Get the type of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int N, const Dict &options=Dict()) const  "
-
-Create a mapaccumulated version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (x, u) -> (x_next , y )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (x0, U) -> (X , Y )
-  
-      with
-          U: horzcat([u0, u1, ..., u_(N-1)])
-          X: horzcat([x1, x2, ..., x_N])
-          Y: horzcat([y0, y1, ..., y_(N-1)])
-  
-      and
-          x1, y0 <- f(x0, u0)
-          x2, y1 <- f(x1, u1)
-          ...
-          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
-  
-
-
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
-
-Get the dictionary.
-
-";
-
-%feature("docstring")  casadi::Function::setDerForward(const Function &fcn,
-int nfwd) "
-
-Set a function that calculates nfwd forward derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
-
-";
-
-
 // File: classcasadi_1_1DaeBuilder.xml
 
 
@@ -4585,106 +4408,6 @@ Initialize.
 
 
 // File: classcasadi_1_1DenseTranspose.xml
-
-
-// File: classcasadi_1_1DerivativeGenerator.xml
-%feature("docstring") casadi::DerivativeGenerator::DerivativeGenerator() "
-
-Default constructor.
-
-";
-
-%feature("docstring")
-casadi::DerivativeGenerator::DerivativeGenerator(DerivativeGeneratorCPtr
-ptr) "
-
-Construct from C pointer.
-
-";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
-internal class
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring") casadi::DerivativeGenerator "
-
-Derivative Generator Functor.
-
-In C++, supply a DerivativeGeneratorCPtr function pointer
-
-In python, supply a callable, annotated with derivativegenerator decorator
-
-C++ includes: functor.hpp ";
-
-%feature("docstring") casadi::DerivativeGenerator::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const "
-
-Return a string with a representation (for SWIG)
-
-";
-
-
-// File: classcasadi_1_1DerivativeGenerator2.xml
-%feature("docstring")  casadi::DerivativeGenerator2::create() "";
-
-%feature("docstring") casadi::DerivativeGenerator2::~DerivativeGenerator2 "
-
-Destructor.
-
-";
-
-%feature("docstring") casadi::DerivativeGenerator2 "C++ includes:
-callback.hpp ";
-
-%feature("docstring")  casadi::DerivativeGenerator2::original(Function &fcn,
-int ndir, bool fwd) "
-
-Computes the derivative as if this derivative generator does not exist.
-
-";
-
-%feature("docstring") casadi::DerivativeGenerator2::DerivativeGenerator2() "";
 
 
 // File: classcasadi_1_1Determinant.xml
@@ -5933,32 +5656,6 @@ Joel Andersson
 |              |              |              | compiler     | tionInternal |
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
@@ -7279,32 +6976,6 @@ Joel Andersson
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
 |              |              |              | options      | lityNode     |
@@ -7741,68 +7412,6 @@ Get the type of a certain option.
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
 
 (for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const "
-
-Return a string with a description (for SWIG)
-
-";
-
-
-// File: classcasadi_1_1Functor.xml
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
-internal class
-
-";
-
-%feature("docstring") casadi::Functor::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring") casadi::Functor "
-
-Functor.
-
-Joris Gillis
-
-C++ includes: functor.hpp ";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -8853,19 +8462,7 @@ Convert to a type.
 
 ";
 
-%feature("docstring")  casadi::GenericType::isDerivativeGenerator() const  "
-
-Check if a particular type.
-
-";
-
 %feature("docstring")  casadi::GenericType::isDict() const  "
-
-Check if a particular type.
-
-";
-
-%feature("docstring")  casadi::GenericType::isCallback() const  "
 
 Check if a particular type.
 
@@ -8946,12 +8543,6 @@ std::string > &sv) " ";
 %feature("docstring") casadi::GenericType::GenericType(const Function &f) "
 ";
 
-%feature("docstring") casadi::GenericType::GenericType(const
-DerivativeGenerator &c) " ";
-
-%feature("docstring") casadi::GenericType::GenericType(const Callback &c) "
-";
-
 %feature("docstring") casadi::GenericType::GenericType(const Dict &dict) "
 ";
 
@@ -8961,9 +8552,9 @@ Convert to a type.
 
 ";
 
-%feature("docstring")  casadi::GenericType::toDouble() const  "
+%feature("docstring")  casadi::GenericType::isStringVector() const  "
 
-Convert to a type.
+Check if a particular type.
 
 ";
 
@@ -8979,9 +8570,9 @@ Get a description of the object's type.
 
 ";
 
-%feature("docstring")  casadi::GenericType::isStringVector() const  "
+%feature("docstring")  casadi::GenericType::toDouble() const  "
 
-Check if a particular type.
+Convert to a type.
 
 ";
 
@@ -9517,32 +9108,6 @@ General information
 |              |              |              | compiler     | tionInternal |
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
@@ -11232,32 +10797,6 @@ General information
 |              |              |              | 2: ui > 0.0, |              |
 |              |              |              | -2: ui <     |              |
 |              |              |              | 0.0.         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
@@ -13332,32 +12871,6 @@ General information
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
 |              |              |              | options      | lityNode     |
@@ -15124,15 +14637,6 @@ ls_trials, const IpoptData *ip_data, IpoptCalculatedQuantities *ip_cq) "
 *ipoptInterface) " [INTERNAL] ";
 
 
-// File: classcasadi_1_1IterationCallback.xml
-%feature("docstring") casadi::IterationCallback::~IterationCallback "";
-
-%feature("docstring") casadi::IterationCallback "C++ includes: functor.hpp
-";
-
-%feature("docstring") casadi::IterationCallback::IterationCallback() "";
-
-
 // File: classcasadi_1_1KernelSum2D.xml
 
 
@@ -16148,32 +15652,6 @@ Joris Gillis
 |              |              |              | compiler     | tionInternal |
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
@@ -17701,32 +17179,6 @@ General information
 |              |              |              | compiler     | tionInternal |
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
@@ -19419,32 +18871,6 @@ Map Joris Gillis
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
 |              |              |              | options      | lityNode     |
@@ -20421,32 +19847,6 @@ Joris Gillis
 |              |              |              | compiler     | tionInternal |
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
@@ -24810,32 +24210,6 @@ Joel Andersson
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
 |              |              |              | options      | lityNode     |
@@ -26713,32 +26087,6 @@ General information
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
 |              |              |              | options      | lityNode   c |
@@ -26842,7 +26190,7 @@ General information
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_CALLBACK  | GenericType( | A function   | casadi::NlpS |
+| iteration_ca | OT_FUNCTION  | GenericType( | A function   | casadi::NlpS |
 | llback       |              | )            | that will be | olverInterna |
 |              |              |              | called at    | l            |
 |              |              |              | each         |              |
@@ -32822,32 +32170,6 @@ basis Joris Gillis
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
 |              |              |              | options      | lityNode     |
@@ -34111,32 +33433,6 @@ General information
 |              |              |              | compiler     | tionInternal |
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
@@ -36582,32 +35878,6 @@ Joel Andersson
 |              |              |              | compiler     | tionInternal |
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
@@ -39489,32 +38759,6 @@ General information
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
 |              |              |              | options      | lityNode   c |
@@ -40986,32 +40230,6 @@ Switch statement Joel Andersson
 |              |              |              | compiler     | tionInternal |
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |
@@ -43407,32 +42625,6 @@ Joel Andersson
 |              |              |              | compiler     | tionInternal |
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| rd           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | forward mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| custom_rever | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
-| se           | EGENERATOR   | )            | that returns | tionInternal |
-|              |              |              | a derivative |              |
-|              |              |              | function     |              |
-|              |              |              | given a      |              |
-|              |              |              | number of    |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | routines.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
 | ipes         | TOR          | )            | default      | onsFunctiona |

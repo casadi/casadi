@@ -65,10 +65,6 @@ namespace casadi {
   class StabilizedQpSolver;
   class ImplicitFunction;
 
-  class DerivativeGenerator;
-  class Callback;
-  class CustomEvaluate;
-  class CustomFunction;
   class NlpBuilder;
   class Variable;
   class DaeBuilder;

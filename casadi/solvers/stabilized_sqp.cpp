@@ -403,13 +403,20 @@ namespace casadi {
       log("Checking Stopping criteria");
 
       // Call callback function if present
-      if (!callback_.isNull()) {
+      if (!fcallback_.isNull()) {
         if (!output(NLP_SOLVER_F).isempty()) output(NLP_SOLVER_F).set(fk_);
         if (!output(NLP_SOLVER_X).isempty()) output(NLP_SOLVER_X).setNZ(x_);
         if (!output(NLP_SOLVER_LAM_G).isempty()) output(NLP_SOLVER_LAM_G).setNZ(mu_);
         if (!output(NLP_SOLVER_LAM_X).isempty()) output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
         if (!output(NLP_SOLVER_G).isempty()) output(NLP_SOLVER_G).setNZ(gk_);
-        int ret = callback_(ref_, user_data_);
+
+        for (int i=0; i<NLP_SOLVER_NUM_OUT; ++i) {
+          fcallback_.setInput(output(i), i);
+        }
+        fcallback_.evaluate();
+        double ret_double;
+        fcallback_.getOutput(ret_double);
+        int ret = static_cast<int>(ret_double);
 
         if (!ret) {
           userOut() << endl;

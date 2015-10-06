@@ -597,7 +597,7 @@ namespace casadi {
         stats_["iterations"] = iterations;
       }
       const timer time0 = getTimerTime();
-      if (!callback_.isNull()) {
+      if (!fcallback_.isNull()) {
         if (full_callback) {
           if (!output(NLP_SOLVER_X).isempty()) copy(x, x+nx_, output(NLP_SOLVER_X).begin());
 
@@ -634,8 +634,13 @@ namespace casadi {
         output(NLP_SOLVER_F).at(0) = obj_value;
 
         n_eval_callback_ += 1;
-        int ret = callback_(ref_, user_data_);
-
+        for (int i=0; i<NLP_SOLVER_NUM_OUT; ++i) {
+          fcallback_.setInput(output(i), i);
+        }
+        fcallback_.evaluate();
+        double ret_double;
+        fcallback_.getOutput(ret_double);
+        int ret = static_cast<int>(ret_double);
         const diffTime delta = diffTimers(getTimerTime(), time0);
         timerPlusEq(t_callback_fun_, delta);
         return  !ret;

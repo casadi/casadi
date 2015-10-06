@@ -27,7 +27,6 @@
 #define CASADI_FUNCTION_INTERNAL_HPP
 
 #include "function.hpp"
-#include "../functor.hpp"
 #include "../weak_ref.hpp"
 #include <set>
 #include "code_generator.hpp"
@@ -215,7 +214,7 @@ namespace casadi {
      */
     Function derForward(int nfwd);
     virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
-    virtual int numDerForward() const { return hasSetOption("custom_forward") ? 64 : 0;}
+    virtual int numDerForward() const { return 0;}
     void setDerForward(const Function& fcn, int nfwd);
     ///@}
 
@@ -227,7 +226,7 @@ namespace casadi {
      */
     Function derReverse(int nadj);
     virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
-    virtual int numDerReverse() const { return hasSetOption("custom_reverse") ? 64 : 0;}
+    virtual int numDerReverse() const { return 0;}
     void setDerReverse(const Function& fcn, int nadj);
     ///@}
 

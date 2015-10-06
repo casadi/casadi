@@ -32,8 +32,6 @@ set(CASADI_SRCS
   std_vector_tools.hpp        std_vector_tools.cpp      # Set of useful functions for the vector template class in STL
   profiling.hpp               profiling.cpp
   timing.hpp                  timing.cpp
-  functor.hpp                 functor.cpp              # Classes for callbacks
-  functor_internal.hpp        functor_internal.cpp
   polynomial.hpp              polynomial.cpp            # Helper class for differentiating and integrating simple polynomials
 
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
@@ -92,7 +90,6 @@ set(CASADI_SRCS
   function/x_function_internal.hpp                                  # Base class for SXFunction and MXFunction
   function/sx_function.hpp         function/sx_function.cpp         function/sx_function_internal.hpp         function/sx_function_internal.cpp
   function/mx_function.hpp         function/mx_function.cpp         function/mx_function_internal.hpp         function/mx_function_internal.cpp
-  function/custom_function.hpp     function/custom_function.cpp     function/custom_function_internal.hpp     function/custom_function_internal.cpp
   function/external_function.hpp   function/external_function.cpp   function/external_function_internal.hpp   function/external_function_internal.cpp
   function/linear_solver.hpp       function/linear_solver.cpp       function/linear_solver_internal.hpp       function/linear_solver_internal.cpp
   function/implicit_function.hpp   function/implicit_function.cpp   function/implicit_function_internal.hpp   function/implicit_function_internal.cpp
@@ -111,7 +108,8 @@ set(CASADI_SRCS
   function/mapaccum.hpp            function/mapaccum.cpp            function/mapaccum_internal.hpp function/mapaccum_internal.cpp
   function/compiler.hpp            function/compiler.cpp            function/compiler_internal.hpp function/compiler_internal.cpp
   function/kernel_sum_2d.hpp       function/kernel_sum_2d.cpp       function/kernel_sum_2d_internal.hpp function/kernel_sum_2d_internal.cpp
-  
+  function/callback.cpp            function/callback.hpp            function/callback_internal.cpp function/callback_internal.hpp
+
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp
   misc/nlp_builder.hpp             misc/nlp_builder.cpp
@@ -124,9 +122,6 @@ set(CASADI_SRCS
   core.hpp
 
   function/schemes_metadata.hpp function/schemes_metadata.cpp function/schemes_helpers.hpp
-
-  function/callback.cpp            function/callback.hpp
-
 )
 
 set_source_files_properties( ${RUNTIME_EMBEDDED_SRC} PROPERTIES GENERATED TRUE )

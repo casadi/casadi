@@ -347,7 +347,7 @@ namespace casadi {
       }
 
       // Call callback function if present
-      if (!callback_.isNull()) {
+      if (!fcallback_.isNull()) {
         double time1 = clock();
 
         if (!output(NLP_SOLVER_F).isempty()) output(NLP_SOLVER_F).set(fk_);
@@ -368,7 +368,14 @@ namespace casadi {
         double time2 = clock();
         t_callback_prepare_ += (time2-time1)/CLOCKS_PER_SEC;
         time1 = clock();
-        int ret = callback_(ref_, user_data_);
+
+        for (int i=0; i<NLP_SOLVER_NUM_OUT; ++i) {
+          fcallback_.setInput(output(i), i);
+        }
+        fcallback_.evaluate();
+        double ret_double;
+        fcallback_.getOutput(ret_double);
+        int ret = static_cast<int>(ret_double);
         time2 = clock();
         t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
         if (ret) {

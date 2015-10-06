@@ -24,10 +24,10 @@
 
 /** 
 *
-* \example Function/customfunction_c.cc
+* \example Function/callback_c.cc
 *
 * Output:
-* \include Function/customfunction_c.log
+* \include Function/callback_c.log
 *
 *
 */

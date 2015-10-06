@@ -436,54 +436,6 @@ import_array();
     PyErr_Clear();
     return 0;
   }
-
-#include <casadi/core/functor_internal.hpp>
-
-  namespace casadi {
-    class FunctorPythonInternal {
-    public:
-    FunctorPythonInternal(PyObject *p) : p_(p) { Py_INCREF(p_); }
-      ~FunctorPythonInternal() { Py_DECREF(p_); }
-    protected:
-      PyObject *p_;
-    };
-
-    class DerivativeGeneratorPythonInternal : public DerivativeGeneratorInternal, FunctorPythonInternal {
-      friend class DerivativeGeneratorPython;
-
-    DerivativeGeneratorPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
-      virtual Function call(Function& fcn, int ndir, void* user_data);
-    };
-
-    class CustomEvaluatePythonInternal : public CustomEvaluateInternal, FunctorPythonInternal {
-      friend class CustomEvaluatePython;
-
-    CustomEvaluatePythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
-      virtual void call(CustomFunction& fcn, void* user_data);
-    };
-
-    class DerivativeGeneratorPython : public DerivativeGenerator {
-    public:
-      DerivativeGeneratorPython(PyObject *p) { assignNode(new DerivativeGeneratorPythonInternal(p)); }
-    };
-
-    class CallbackPythonInternal : public CallbackInternal, FunctorPythonInternal {
-      friend class CallbackPython;
-
-    CallbackPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
-      virtual int call(Function& fcn, void* user_data);
-    };
-
-    class CustomEvaluatePython : public CustomEvaluate {
-    public:
-      CustomEvaluatePython(PyObject *p) { assignNode(new CustomEvaluatePythonInternal(p)); }
-    };
-
-    class CallbackPython : public Callback {
-    public:
-      CallbackPython(PyObject *p) { assignNode(new CallbackPythonInternal(p)); }
-    };
-  }
   %}
 #endif
 #endif // CASADI_NOT_IN_DERIVED
@@ -515,11 +467,6 @@ import_array();
     bool to_ptr(GUESTOBJECT *p, casadi::SX** m);
     bool to_ptr(GUESTOBJECT *p, casadi::MX** m);
     bool to_ptr(GUESTOBJECT *p, casadi::Function** m);
-    bool to_ptr(GUESTOBJECT *p, casadi::Callback** m);
-#ifndef CASADI_NOT_IN_DERIVED
-    bool to_ptr(GUESTOBJECT *p, casadi::DerivativeGenerator** m);
-#endif
-    bool to_ptr(GUESTOBJECT *p, casadi::CustomEvaluate** m);
     bool to_ptr(GUESTOBJECT *p, casadi::GenericType** m);
 #ifdef SWIGMATLAB
     bool to_ptr(GUESTOBJECT *p, std::pair<int, int>** m);
@@ -1074,16 +1021,6 @@ import_array();
         return true;
       }
 
-      {
-            casadi::Callback2 *m2;
-            // Is callback?
-            if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                          $descriptor(casadi::Callback2*), 0))) {
-               if (m) **m = (*m2).create();
-               return true;
-            }
-      }
-
       // No match
       return false;
     }
@@ -1092,166 +1029,6 @@ import_array();
       return SWIG_NewPointerObj(new Function(*a), $descriptor(casadi::Function *), SWIG_POINTER_OWN);
     }
   } // namespace casadi
-}
-
-%fragment("casadi_derivativegenerator", "header", fragment="casadi_aux") {
-#ifndef CASADI_NOT_IN_DERIVED
-  namespace casadi {
-#ifdef SWIGPYTHON
-    Function DerivativeGeneratorPythonInternal::call(Function& fcn, int ndir, void* user_data) {
-      casadi_assert(p_!=0);
-      PyObject * ndir_py = PyInt_FromLong(ndir);
-      PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))),
-                                             $descriptor(casadi::Function *), SWIG_POINTER_OWN |  0 );
-      if(!fcn_py) {
-        Py_DECREF(ndir_py);
-        throw CasadiException("DerivativeGeneratorPythonInternal: failed to convert Function to python");
-      }
-      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, ndir_py, NULL);
-      Py_DECREF(ndir_py);
-      Py_DECREF(fcn_py);
-      if (r) {
-        Function ret;
-        if(!to_val(r, &ret)) {
-          Py_DECREF(r);
-          throw CasadiException("DerivativeGeneratorPythonInternal: return type was not Function.");
-        }
-        Py_DECREF(r);
-        return ret;
-      } else {
-        PyErr_Print();
-        throw CasadiException("DerivativeGeneratorPythonInternal: python method execution raised an Error.");
-      }
-    }
-#endif // SWIGPYTHON
-
-    bool to_ptr(GUESTOBJECT *p, DerivativeGenerator** m) {
-      // Treat Null
-      if (is_null(p)) return false;
-
-      // DerivativeGenerator already?
-      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                    $descriptor(casadi::DerivativeGenerator*), 0))) {
-        return true;
-      }
-
-#ifdef SWIGPYTHON
-      PyObject* return_type = getReturnType(p);
-      if (!return_type) return false;
-      PyObject* function = getCasadiObject("Function");
-      if (!function) {
-        Py_DECREF(return_type);
-        return false;
-      }
-      bool res = PyClass_IsSubclass(return_type,function);
-      Py_DECREF(return_type);
-      Py_DECREF(function);
-      if (res) {
-        if (m) **m = casadi::DerivativeGeneratorPython(p);
-        return true;
-      }
-#endif // SWIGPYTHON
-
-      // No match
-      return false;
-    }
-  } // namespace casadi
-#endif // CASADI_NOT_IN_DERIVED
-}
-
-%fragment("casadi_callback", "header", fragment="casadi_aux") {
-#ifndef CASADI_NOT_IN_DERIVED
-  namespace casadi {
-#ifdef SWIGPYTHON
-    int CallbackPythonInternal::call(Function& fcn, void* user_data) {
-      casadi_assert(p_!=0);
-      PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))),
-                                             $descriptor(casadi::CustomFunction *), SWIG_POINTER_OWN |  0 );
-      if(!fcn_py) throw CasadiException("CallbackPythonInternal: failed to convert CustomFunction to python");
-      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, NULL);
-      Py_DECREF(fcn_py);
-      if (!r) {
-        PyErr_Print();
-        throw CasadiException("CallbackPythonInternal: python method execution raised an Error.");
-      }
-      int ret = 0;
-      if (to_val(r, static_cast<int*>(0))) to_val(r, &ret);
-      Py_DECREF(r);
-      return ret;
-    }
-#endif // SWIGPYTHON
-
-    bool to_ptr(GUESTOBJECT *p, Callback** m) {
-      // Treat Null
-      if (is_null(p)) return false;
-
-      // Callback already?
-      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                    $descriptor(casadi::Callback*), 0))) {
-        return true;
-      }
-
-#ifdef SWIGPYTHON
-      PyObject* return_type = getReturnType(p);
-      if (!return_type) return false;
-      bool res = PyType_IsSubtype((PyTypeObject *)return_type, &PyInt_Type)
-        || PyType_IsSubtype((PyTypeObject *)return_type, &PyLong_Type);
-      Py_DECREF(return_type);
-      if (res) {
-        if (m) **m = casadi::CallbackPython(p);
-        return true;
-      }
-#endif // SWIGPYTHON
-      // No match
-      return false;
-    }
-  } // namespace casadi
-#endif // CASADI_NOT_IN_DERIVED
-}
-
-%fragment("casadi_customevaluate", "header", fragment="casadi_aux") {
-#ifndef CASADI_NOT_IN_DERIVED
-  namespace casadi {
-#ifdef SWIGPYTHON
-    void CustomEvaluatePythonInternal::call(CustomFunction& fcn, void* user_data) {
-      casadi_assert(p_!=0);
-      PyObject * fcn_py = SWIG_NewPointerObj((new CustomFunction(static_cast< const CustomFunction& >(fcn))),
-                                             $descriptor(casadi::CustomFunction *), SWIG_POINTER_OWN |  0 );
-      if(!fcn_py) throw CasadiException("CustomEvaluatePythonInternal: failed to convert CustomFunction to python");
-      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, NULL);
-      Py_DECREF(fcn_py);
-      if (!r) {
-        PyErr_Print();
-        throw CasadiException("CustomEvaluatePythonInternal: Python method execution raised an Error.");
-      }
-      Py_DECREF(r);
-    }
-#endif // SWIGPYTHON
-
-    bool to_ptr(GUESTOBJECT *p, CustomEvaluate** m) {
-      // Treat Null
-      if (is_null(p)) return false;
-
-      // Callback already?
-      if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                    $descriptor(casadi::CustomEvaluate*), 0))) {
-        return true;
-      }
-
-#ifdef SWIGPYTHON
-      PyObject* return_type = getReturnType(p);
-      bool res = (return_type==Py_None) || !return_type;
-      if (return_type) Py_DECREF(return_type);
-      if (res) {
-        if (m) **m = casadi::CustomEvaluatePython(p);
-      }
-      return res;
-#endif // SWIGPYTHON
-      // No match
-      return false;
-    }
-  } // namespace casadi
-#endif // CASADI_NOT_IN_DERIVED
 }
 
 %fragment("casadi_generictype", "header", fragment="casadi_aux") {
@@ -1282,9 +1059,6 @@ import_array();
           || to_generic<std::vector<std::string> >(p, m)
           || to_generic<std::vector<std::vector<int> > >(p, m)
           || to_generic<casadi::Function>(p, m)
-#ifndef CASADI_NOT_IN_DERIVED
-          || to_generic<casadi::DerivativeGenerator>(p, m)
-#endif
           || to_generic<casadi::GenericType::Dict>(p, m)) {
         return true;
       }
@@ -1314,9 +1088,7 @@ import_array();
           PyErr_Clear();
           return false;
         }
-      } else if (to_ptr(p, static_cast<GenericType::Dict**>(0))
-                 || to_ptr(p, static_cast<DerivativeGenerator**>(0))
-                 || to_ptr(p, static_cast<Callback**>(0))) {
+      } else if (to_ptr(p, static_cast<GenericType::Dict**>(0))) {
         PyObject* gt = getCasadiObject("GenericType");
         if (!gt) return false;
 
@@ -1426,7 +1198,7 @@ import_array();
       // Treat Null
       if (is_null(p)) return false;
 
-      // Callback already?
+      // Slice already?
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
                                     $descriptor(casadi::Slice*), 0))) {
         return true;
@@ -2226,7 +1998,7 @@ import_array();
  }
 
 // Collect all fragments
-%fragment("casadi_all", "header", fragment="casadi_aux,casadi_bool,casadi_int,casadi_double,casadi_vector,casadi_function,casadi_derivativegenerator,casadi_callback,casadi_customevaluate,casadi_generictype,casadi_string,casadi_slice,casadi_map,casadi_pair,casadi_dvector,casadi_sx,casadi_mx,casadi_dmatrix,casadi_sparsity,casadi_imatrix") { }
+%fragment("casadi_all", "header", fragment="casadi_aux,casadi_bool,casadi_int,casadi_double,casadi_vector,casadi_function,casadi_generictype,casadi_string,casadi_slice,casadi_map,casadi_pair,casadi_dvector,casadi_sx,casadi_mx,casadi_dmatrix,casadi_sparsity,casadi_imatrix") { }
 
 #endif // SWIGXML
 
@@ -2330,9 +2102,6 @@ import_array();
 %enddef
 
 // Order in typemap matching: Lower value means will be checked first
-%define PREC_DERIVATIVEGENERATOR 21 %enddef
-%define PREC_CUSTOMEVALUATE 21 %enddef
-%define PREC_CALLBACK 21 %enddef
 %define PREC_GENERICTYPE 22 %enddef
 %define PREC_DICT 21 %enddef
 %define PREC_SPARSITY 90 %enddef
@@ -2407,9 +2176,6 @@ import_array();
 %casadi_typemaps("Function", PREC_FUNCTION, casadi::Function)
 %casadi_template("[Function]", PREC_FUNCTION, std::vector<casadi::Function>)
 %casadi_template("(Function,Function)", PREC_FUNCTION, std::pair<casadi::Function, casadi::Function>)
-%casadi_input_typemaps("DerivativeGenerator", PREC_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
-%casadi_input_typemaps("CustomEvaluate", PREC_CUSTOMEVALUATE, casadi::CustomEvaluate)
-%casadi_input_typemaps("Callback", PREC_CALLBACK, casadi::Callback)
 %casadi_template("Dict", PREC_DICT, std::map<std::string, casadi::GenericType>)
 
 #endif // SWIGXML
@@ -3750,9 +3516,6 @@ def attach_return_type(f,t):
   f.func_annotations["return"] = t
   return f
 
-def pyderivativegenerator(f):
-  return attach_return_type(f,Function)
-
 def pyevaluate(f):
   return attach_return_type(f,None)
 
@@ -3790,69 +3553,6 @@ def PyFunction(name, obj, inputs, outputs, opts={}):
 
     with warnings.catch_warnings():
       warnings.filterwarnings("ignore",category=DeprecationWarning)
-      if hasattr(obj,'getDerForward'):
-        @pyderivativegenerator
-        def derivativewrap(f,nfwd):
-          return obj.getDerForward(f,nfwd)
-        opts["custom_forward"] = derivativewrap
-      if hasattr(obj,'getDerReverse'):
-        @pyderivativegenerator
-        def derivativewrap(f,adj):
-          return obj.getDerReverse(f,adj)
-        opts["custom_reverse"] = derivativewrap
-      if hasattr(obj,'fwd'):
-        @pyderivativegenerator
-        def derivativewrapFwd(f,nfwd):
-          num_in = f.nIn()
-          num_out = f.nOut()
-
-          @pyevaluate
-          def der(f2):
-            all_inputs = [f2.getInput(i) for i in range(f2.nIn())]
-            all_outputs = [f2.getOutput(i) for i in range(f2.nOut())]
-            inputs=all_inputs[:num_in]
-            outputs=all_inputs[num_in:num_in+num_out]
-            fwd_seeds=zip(*[iter(all_inputs[num_in+num_out:])]*num_in)
-            fwd_sens=zip(*[iter(all_outputs)]*num_out)
-            obj.fwd(inputs,outputs,fwd_seeds,fwd_sens)
-            for i in range(f2.nOut()): f2.setOutput(all_outputs[i], i)
-
-          import warnings
-
-          with warnings.catch_warnings():
-            warnings.filterwarnings("ignore",category=DeprecationWarning)
-            return CustomFunction("CustomFunction_derivative", der,
-                                  inputs+outputs+nfwd*inputs, nfwd*outputs)
-
-        opts["custom_forward"] = derivativewrapFwd
-
-      if hasattr(obj,'adj'):
-        @pyderivativegenerator
-        def derivativewrapAdj(f,nadj):
-          num_in = f.nIn()
-          num_out = f.nOut()
-
-          @pyevaluate
-          def der(f2):
-            all_inputs = [f2.getInput(i) for i in range(f2.nIn())]
-            all_outputs = [f2.getOutput(i) for i in range(f2.nOut())]
-            inputs=all_inputs[:num_in]
-            outputs=all_inputs[num_in:num_in+num_out]
-            adj_seeds=zip(*[iter(all_inputs[num_in+num_out:])]*num_out)
-            adj_sens=zip(*[iter(all_outputs)]*num_in)
-            obj.adj(inputs,outputs,adj_seeds,adj_sens)
-            for i in range(f2.nOut()): f2.setOutput(all_outputs[i],i)
-
-          import warnings
-
-          with warnings.catch_warnings():
-            warnings.filterwarnings("ignore",category=DeprecationWarning)
-      
-            return CustomFunction("CustomFunction_derivative", der,
-                                  inputs+outputs+nadj*outputs,nadj*inputs)
-
-        opts["custom_reverse"] = derivativewrapAdj
-
       return CustomFunction("CustomFunction", fcustom,
                             inputs, outputs, opts)
 
@@ -4019,9 +3719,7 @@ namespace casadi {
 } // namespace casadi
 #endif // SWIGPYTHON
 
-%feature("director") casadi::Callback2;
-%feature("director") casadi::DerivativeGenerator2;
-%feature("director") casadi::IterationCallback;
+%feature("director") casadi::Callback;
 
 %include <casadi/core/function/sx_function.hpp>
 %include <casadi/core/function/mx_function.hpp>
@@ -4037,9 +3735,7 @@ namespace casadi {
 %include <casadi/core/function/stabilized_qp_solver.hpp>
 %include <casadi/core/function/external_function.hpp>
 %include <casadi/core/function/switch.hpp>
-%include <casadi/core/function/custom_function.hpp>
 %include <casadi/core/function/callback.hpp>
-%include <casadi/core/functor.hpp>
 %include <casadi/core/function/nullspace.hpp>
 %include <casadi/core/function/map.hpp>
 %include <casadi/core/function/mapaccum.hpp>

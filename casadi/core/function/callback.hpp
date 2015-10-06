@@ -25,146 +25,171 @@
 #ifndef CASADI_CALLBACK_HPP
 #define CASADI_CALLBACK_HPP
 
-#include "function_internal.hpp"
-#include "../functor_internal.hpp"
+#include "function.hpp"
 
 namespace casadi {
+  /** Forward declaration of internal class */
+  class CallbackInternal;
 
+  /** \brief Callback function functionality
+   * This class provides a public API to the FunctionInternal class that
+   * can be subclassed by the user, who is then able to implement the different
+   * virtual method.
+   * Note that the Function class also provides a public API to FunctionInternal,
+   * but only allows calling, not being called.
 
-class CASADI_EXPORT Callback2 {
-
+   * The user is responsible for not deleting this class for the lifetime
+   * of the internal function object.
+   
+   \author Joris Gillis, Joel Andersson
+   \date 2015
+   */
+  class CASADI_EXPORT Callback : public Function {
   public:
-    Callback2();
+    /** \brief Default constructor */
+    Callback();
 
-    //virtual Sparsity jacSparsity(int iind, ind oind) { }
-    virtual std::vector<DMatrix> operator()(const std::vector<DMatrix>& arg);
-    //virtual Function derForward(const std::string& name, int nfwd, const Dict& options) {}
+    /** \brief Copy constructor (throws an error) */
+    Callback(const Callback& obj);
 
-    /** \brief Number of input arguments
-    *
-    * Specify the number of input arguments that a specific instance can handle.
-    * The number must not be changed over the lifetime of the object
-    *
-    * Default implementation: 1
-    *
-    */
-    virtual int nIn() { return 1;}
-    /** \brief Number of output arguments
-    *
-    * Specify the number of output arguments that a specific instance can handle.
-    * The number must not be changed over the lifetime of the object
-    *
-    * Default implementation: 1
-    */
-    virtual int nOut() { return 1;}
-    /** \brief Specify input sparsity
-    *
-    * Specify the sparsity corresponding to a given input.
-    * The sparsity must not be changed over the lifetime of the object
-    *
-    * Default implementation: dense using inputShape
-    *
-    */
-    virtual Sparsity inputSparsity(int i) { return Sparsity::dense(inputShape(i)); }
-    /** \brief Specify output sparsity
-    *
-    * Specify the sparsity corresponding to a given output.
-    * The sparsity must not be changed over the lifetime of the object
-    *
-    * Default implementation: dense using outputShape
-    *
-    */
-    virtual Sparsity outputSparsity(int i) { return Sparsity::dense(outputShape(i)); }
-    /** \brief Specify input shape
-    *
-    * Specify the shape corresponding to a given input.
-    * The shape must not be changed over the lifetime of the object
-    *
-    * Default implementation: scalar (1,1)
-    *
-    */
-    virtual std::pair<int, int> inputShape(int i) { return std::pair<int, int>(1, 1); }
-    /** \brief Specify output shape
-    *
-    * Specify the shape corresponding to a given output.
-    * The shape must not be changed over the lifetime of the object
-    *
-    * Default implementation: scalar (1,1)
-    *
-    */
-    virtual std::pair<int, int> outputShape(int i) { return std::pair<int, int>(1, 1); }
-    /** \brief Specify the name of the object
-    */
-    virtual std::string name() { return "Custom callback"; }
+    /** \brief Create an owning reference, given a pointer to a derived object */
+    static Function fun(const std::string& name, Callback* n,
+                        const Dict& opts=Dict());
 
-    /** \brief Specify the options of the object
-    */
-    virtual Dict options() { return Dict(); }
-
-    Function create();
-
-    /** \brief  Destructor */
-    virtual ~Callback2();
-
-
-};
-
-class CASADI_EXPORT DerivativeGenerator2 {
-
-  public:
-    DerivativeGenerator2();
-
-    virtual Function operator()(Function& fcn, int ndir);
-
-    /// Computes the derivative as if this derivative generator does not exist
-    Function original(Function& fcn, int ndir, bool fwd);
-
-    DerivativeGenerator create();
-
-    /** \brief  Destructor */
-    virtual ~DerivativeGenerator2();
-};
+    /** \brief Construct internal object
+     * This is the step that actually construct the internal object, as the
+     * class constructor only creates a null pointer.
+     * It should be called from the user constructor.
+     */
+    void construct(const std::string& name, const Dict& opts=Dict());
 
 #ifndef SWIG
-
-class DerivativeGeneratorInternal2 : public DerivativeGeneratorInternal {
-public:
-  /** \brief  Create a function */
-  explicit DerivativeGeneratorInternal2(DerivativeGenerator2 &callback);
-
-  /** \brief  Destructor */
-  virtual ~DerivativeGeneratorInternal2();
-
-  virtual Function call(Function& fcn, int ndir, void* user_data) { return callback_(fcn, ndir); }
-
-  DerivativeGenerator2& callback_;
-};
-
-
-class CASADI_EXPORT CallbackFunctionInternal : public FunctionInternal {
-  friend class CallbackFunction;
-  public:
-
-
-    /** \brief  Create a function */
-    explicit CallbackFunctionInternal(Callback2 &callback);
+    /** \brief Transfer ownership to the internal class
+     * With a call to this function, the public class will be owned by the
+     * internal class.
+     * For this to work, the object must have been created with "new" (and must
+     * not be deleted with "delete" as this is handled internally.
+     * There also has to be at least one owning reference to the class.
+     */
+    void transfer_ownership();
+#endif // SWIG
 
     /** \brief  Destructor */
-    virtual ~CallbackFunctionInternal();
+    virtual ~Callback();
 
-    virtual void evalD(const double** arg,
-                               double** res, int* iw, double* w);
+    /** \brief Initialize the object
+     * This function is called after the object construction (for the whole class
+     * hierarchy) is complete, but before the finalization step.
+     * It is called recursively for the whole class hierarchy, starting with the
+     * lowest level.
+     */
+    virtual void init() {}
 
-    /** \brief  Initialize */
-    virtual void init();
+    /** \brief Finalize the object
+     * This function is called after the construction and init steps are completed,
+     * but before user functions are called.
+     * It is called recursively for the whole class hierarchy, starting with the
+     * highest level.
+    */
+    virtual void finalize() {}
 
-    Callback2& callback_;
+    /** \brief Evaluate numerically, temporary matrices and work vectors */
+    virtual std::vector<DMatrix> eval(const std::vector<DMatrix>& arg);
 
-    double eps_;
+#ifndef SWIG
+    /** \brief Evaluate numerically, work vectors given */
+    virtual void eval(const double** arg, double** res, int* iw, double* w);
+#endif // SWIG
 
-};
-#endif
+    /** \brief Number of input arguments
+     *
+     * Specify the number of input arguments that a specific instance can handle.
+     * The number must not be changed over the lifetime of the object
+     *
+     * Default implementation: 1
+     *
+     */
+    virtual int get_n_in() { return 1;}
+    /** \brief Number of output arguments
+     *
+     * Specify the number of output arguments that a specific instance can handle.
+     * The number must not be changed over the lifetime of the object
+     *
+     * Default implementation: 1
+     */
+    virtual int get_n_out() { return 1;}
+    /** \brief Specify input sparsity
+     *
+     * Specify the sparsity corresponding to a given input.
+     * The sparsity must not be changed over the lifetime of the object
+     *
+     * Default implementation: dense using inputShape
+     *
+     */
+    virtual Sparsity get_input_sparsity(int i) { return Sparsity::dense(get_input_shape(i)); }
+    /** \brief Specify output sparsity
+     *
+     * Specify the sparsity corresponding to a given output.
+     * The sparsity must not be changed over the lifetime of the object
+     *
+     * Default implementation: dense using outputShape
+     *
+     */
+    virtual Sparsity get_output_sparsity(int i) { return Sparsity::dense(get_output_shape(i)); }
+    /** \brief Specify input shape
+     *
+     * Specify the shape corresponding to a given input.
+     * The shape must not be changed over the lifetime of the object
+     *
+     * Default implementation: scalar (1,1)
+     *
+     */
+    virtual std::pair<int, int> get_input_shape(int i) { return std::pair<int, int>(1, 1); }
+    /** \brief Specify output shape
+     *
+     * Specify the shape corresponding to a given output.
+     * The shape must not be changed over the lifetime of the object
+     *
+     * Default implementation: scalar (1,1)
+     *
+     */
+    virtual std::pair<int, int> get_output_shape(int i) { return std::pair<int, int>(1, 1); }
 
+    ///@{
+    /** \brief Return Jacobian of all input elements with respect to all output elements */
+    virtual bool has_jacobian() const;
+    virtual Function get_jacobian(const std::string& name, const Dict& opts);
+    ///@}
+
+    ///@{
+    /** \brief Return function that calculates forward derivatives
+     *    derForward(nfwd) returns a cached instance if available,
+     *    and calls <tt>Function getDerForward(int nfwd)</tt>
+     *    if no cached version is available.
+     */
+    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual int get_n_forward() const;
+    ///@}
+
+    ///@{
+    /** \brief Return function that calculates adjoint derivatives
+     *    derReverse(nadj) returns a cached instance if available,
+     *    and calls <tt>Function getDerReverse(int nadj)</tt>
+     *    if no cached version is available.
+     */
+    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual int get_n_reverse() const;
+    ///@}
+
+#ifndef SWIG
+    private:
+    /** \brief  Access functions of the node */
+    CallbackInternal* operator->();
+
+    /** \brief  Const access functions of the node */
+    const CallbackInternal* operator->() const;
+#endif // SWIG
+  };
 
 } // namespace casadi
 

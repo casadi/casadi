@@ -115,7 +115,7 @@ namespace casadi {
     int np_;
 
     /// callback function, executed at each iteration
-    Callback callback_;
+    Function fcallback_;
 
     /// Execute the callback function only after this amount of iterations
     int callback_step_;
