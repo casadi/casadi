@@ -2298,8 +2298,13 @@ except:
 %feature("varargin","1") friendwrap_veccat;
 %feature("optionalunpack","1") shape;
 
-// Explicit type conversion of the first argument of const member functions i.e. this/self
-%feature("convertself","1");
+// Raise an error if "this" not correct
+%typemap(check) SWIGTYPE *self %{
+if (!$1) {
+  SWIG_Error(SWIG_RuntimeError, "Invalid 'self' object");
+  SWIG_fail;
+ }
+%}
 
 // Workarounds, pending proper fix
 %rename(nonzero) __nonzero__;
