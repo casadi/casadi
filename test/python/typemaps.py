@@ -534,17 +534,6 @@ class typemaptests(casadiTestCase):
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
 
-  def test_sharedarray(self):
-    w = DMatrix([[1,2],[3,4]])
-    W = w.toArray(shared=True)
-    self.checkarray(w,W,"shared")
-    
-    w[0,1] = 8
-    self.checkarray(w,W,"shared")
-
-    W[:,0] = 47
-    self.checkarray(w,W,"shared")
-    
   def test_setgetslicetransp(self):
     self.message("set/get on DMatrix using tranpose")
     

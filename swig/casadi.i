@@ -346,13 +346,7 @@ if (casadi::CasadiOptions::catch_errors_swig) { \
 
 %{
 #define SWIG_FILE_WITH_INIT
-%}
-// Get the NumPy typemaps
-%{
-//#define NO_IMPORT_ARRAY
 #include "numpy.hpp"
-%}
-%{
 #define SWIG_PYTHON_CAST_MODE 1
 %}
 
@@ -3142,33 +3136,13 @@ namespace casadi{
 #ifdef SWIGPYTHON
 namespace casadi{
 %extend Matrix<double> {
-/// Create a 2D contiguous NP_DOUBLE numpy.ndarray
-
-PyObject* arrayView() {
-  if ($self->nnz()!=$self->numel())
-    throw  casadi::CasadiException("Matrix<double>::arrayview() can only construct arrayviews for dense DMatrices.");
-  npy_intp dims[2];
-  dims[0] = $self->size2();
-  dims[1] = $self->size1();
-  std::vector<double> &v = $self->data();
-  PyArrayObject* temp = (PyArrayObject*) PyArray_New(&PyArray_Type, 2, dims, NPY_DOUBLE, NULL, &v[0], 0, NPY_ARRAY_CARRAY, NULL);
-  PyObject* ret = PyArray_Transpose(temp,NULL);
-  Py_DECREF(temp);
-  return ret;
-}
-
 %pythoncode %{
-  def toArray(self,shared=False):
+  def toArray(self):
     import numpy as n
-    if shared:
-      if not self.isdense():
-        raise Expection("toArray(shared=True) only possible for dense arrays.")
-      return self.arrayView()
+    if isinstance(self,IMatrix):
+      return n.array(self.get(),n.int).reshape((self.shape[1],self.shape[0])).T
     else:
-      if isinstance(self,IMatrix):
-        return n.array(self.get(),n.int).reshape((self.shape[1],self.shape[0])).T
-      else:
-        return n.array(self.get()).reshape((self.shape[1],self.shape[0])).T
+      return n.array(self.get()).reshape((self.shape[1],self.shape[0])).T
 %}
 
 %python_array_wrappers(999.0)
