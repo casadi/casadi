@@ -2802,23 +2802,10 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::get(double* val, bool tr) const {
-    // Get sparsity pattern
-    int size1 = this->size1();
-    int size2 = this->size2();
-    const int* colind = this->colind();
-    const int* row = this->row();
-
-    // Initialize to zero
-    if (!this->isdense()) {
-      std::fill(val, val+size1*size2, 0);
-    }
-
-    // Set nonzeros
-    for (int cc=0; cc<size2; ++cc) {
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        int rr=row[el];
-        val[tr ? cc + size2*rr : rr + size1*cc] = getValue(el);
-      }
+    if (tr) {
+      casadi_to_dense_tr(this->ptr(), this->sparsity(), val);
+    } else {
+      casadi_to_dense(this->ptr(), this->sparsity(), val);
     }
   }
 

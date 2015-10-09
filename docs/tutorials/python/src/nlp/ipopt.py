@@ -71,7 +71,7 @@ nlp = MXFunction('nlp', nlpIn(x=X),nlpOut(f=F,g=G))
 nlp.setInput([1,1,1,1,1],"x")
 nlp.evaluate()
 #! Test the objective for some value of x:
-print nlp.getOutput("f").toArray()
+print nlp.getOutput("f").full()
 
 solver = NlpSolver("nlp","ipopt", nlp)
 solver.printOptions()

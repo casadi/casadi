@@ -164,6 +164,12 @@ namespace casadi {
     int getIntValue() const;
     SXElement getDep(int ch=0) const;
 
+    /// Type conversion to double
+    inline explicit operator double() const { return getValue();}
+
+    /// Type conversion to int
+    inline explicit operator int() const { return getIntValue();}
+
     /** \brief Check if the node is the sum of two equal expressions */
     bool isDoubled() const;
 

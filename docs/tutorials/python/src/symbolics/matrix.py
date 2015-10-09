@@ -47,7 +47,7 @@ print "nonzeros: ", w.nonzeros()
 #! --------------
 #! DMatrix can easily be converted into other data formats
 print w.nonzeros()
-print w.toArray()
+print w.full()
 print array(w)
 print w.toMatrix()
 print matrix(w)
