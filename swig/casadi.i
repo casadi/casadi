@@ -2067,6 +2067,14 @@ import_array();
   $1 = casadi::to_ptr($input, static_cast< xType **>(0));
  }
 
+// Alternative names
+%apply xType &OUTPUT {xType &OUTPUT1};
+%apply xType &OUTPUT {xType &OUTPUT2};
+%apply xType &OUTPUT {xType &OUTPUT3};
+%apply xType &OUTPUT {xType &OUTPUT4};
+%apply xType &OUTPUT {xType &OUTPUT5};
+%apply xType &OUTPUT {xType &OUTPUT6};
+
 // Inputs marked INOUT are also returned by the function, ...
 %typemap(argout,noblock=1,fragment="casadi_all") xType &INOUT {
   %append_output(casadi::from_ptr(static_cast<xType *>($1)));
@@ -2085,6 +2093,14 @@ import_array();
 
 // No arguments need to be freed
 %typemap(freearg, noblock=1) xType& INOUT {}
+
+// Alternative names
+%apply xType &INOUT {xType &INOUT1};
+%apply xType &INOUT {xType &INOUT2};
+%apply xType &INOUT {xType &INOUT3};
+%apply xType &INOUT {xType &INOUT4};
+%apply xType &INOUT {xType &INOUT5};
+%apply xType &INOUT {xType &INOUT6};
 
 %enddef
 
@@ -2915,8 +2931,8 @@ DECL M %SHOW(tangent)(const M &ex, const M &arg) {
   return tangent(ex, arg);
 }
 
-DECL M %SHOW(hessian)(const M& ex, const M& arg, M& output_g) {
-  return hessian(ex, arg, output_g);
+DECL M %SHOW(hessian)(const M& ex, const M& arg, M& OUTPUT1) {
+  return hessian(ex, arg, OUTPUT1);
 }
 
 DECL int %SHOW(countNodes)(const M& A) {
@@ -2945,19 +2961,19 @@ DECL std::vector< M > %SHOW(substitute)(const std::vector< M >& ex,
 }
 
 DECL void %SHOW(substituteInPlace)(const std::vector< M >& v,
-                                      std::vector< M >& inout_vdef,
-                                      std::vector< M >& inout_ex,
+                                      std::vector< M >& INOUT1,
+                                      std::vector< M >& INOUT2,
                                       bool reverse=false) {
-  return substituteInPlace(v, inout_vdef, inout_ex, reverse);
+  return substituteInPlace(v, INOUT1, INOUT2, reverse);
 }
 
 DECL void %SHOW(extractShared)(const std::vector< M >& ex,
-                                  std::vector< M >& output_ex,
-                                  std::vector< M >& output_v,
-                                  std::vector< M >& output_vdef,
-                                  const std::string& v_prefix="v_",
-                                  const std::string& v_suffix="") {
-  extractShared(ex, output_ex, output_v, output_vdef, v_prefix, v_suffix);
+                               std::vector< M >& OUTPUT1,
+                               std::vector< M >& OUTPUT2,
+                               std::vector< M >& OUTPUT3,
+                               const std::string& v_prefix="v_",
+                               const std::string& v_suffix="") {
+  extractShared(ex, OUTPUT1, OUTPUT2, OUTPUT3, v_prefix, v_suffix);
 }
 
 #endif // FLAG & IS_GLOBAL
@@ -3050,8 +3066,8 @@ DECL M %SHOW(cofactor)(const M& x, int i, int j) {
   return cofactor(x, i, j);
 }
 
-DECL void %SHOW(qr)(const M& A, M& output_Q, M& output_R) {
-  return qr(A, output_Q, output_R);
+DECL void %SHOW(qr)(const M& A, M& OUTPUT1, M& OUTPUT2) {
+  return qr(A, OUTPUT1, OUTPUT2);
 }
 
 DECL M %SHOW(chol)(const M& A) {
@@ -3066,8 +3082,8 @@ DECL M %SHOW(sparsify)(const M& A, double tol=0) {
   return sparsify(A, tol);
 }
 
-DECL void %SHOW(expand)(const M& ex, M& output_weights, M& output_terms) {
-  expand(ex, output_weights, output_terms);
+DECL void %SHOW(expand)(const M& ex, M& OUTPUT1, M& OUTPUT2) {
+  expand(ex, OUTPUT1, OUTPUT2);
 }
 
 DECL M %SHOW(pw_const)(const M &t, const M& tval, const M& val) {
@@ -3573,25 +3589,6 @@ def PyFunction(name, obj, inputs, outputs, opts={}):
 %include <casadi/core/function/function.hpp>
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/function/code_generator.hpp>
-
-%define RENAME_FUN(M)
-%apply M& OUTPUT { M& output_Q};
-%apply M& OUTPUT { M& output_R};
-%apply M& OUTPUT { M& output_weights};
-%apply M& OUTPUT { M& output_terms};
-%apply M& OUTPUT { M& output_g};
-%apply std::vector< M >& OUTPUT { std::vector< M >& output_ex};
-%apply std::vector< M >& OUTPUT { std::vector< M >& output_v};
-%apply std::vector< M >& OUTPUT { std::vector< M >& output_vdef};
-%apply std::vector< M >& INOUT { std::vector< M >& inout_vdef};
-%apply std::vector< M >& INOUT { std::vector< M >& inout_ex};
-%enddef
-
-RENAME_FUN(casadi::Sparsity)
-RENAME_FUN(casadi::MX)
-RENAME_FUN(casadi::Matrix<int>)
-RENAME_FUN(casadi::Matrix<double>)
-RENAME_FUN(casadi::Matrix<casadi::SXElement>)
 
 #ifdef SWIGMATLAB
 // Wrap (static) member functions
