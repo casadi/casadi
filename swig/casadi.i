@@ -366,60 +366,6 @@ import_array();
 #define SWIG_Error_return(code, msg)  { std::cerr << "Error occured in CasADi SWIG interface code:" << std::endl << "  "<< msg << std::endl;SWIG_Error(code, msg); return 0; }
 %}
 
-#ifndef CASADI_NOT_IN_DERIVED
-#ifdef SWIGPYTHON
-%{
-  // Returns a new reference
-  PyObject * getReturnType(PyObject* p) {
-    if (!p) return 0;
-    if (!PyCallable_Check(p)) return 0;
-    if (!PyObject_HasAttrString( p, "func_annotations")) return 0;
-    PyObject * func_annotations = PyObject_GetAttrString(p,"func_annotations");
-    if (!PyDict_Check(func_annotations)) {
-      Py_DECREF(func_annotations);
-      return 0;
-    }
-    PyObject * return_type = PyDict_GetItemString(func_annotations, "return"); // Borrowed
-    Py_INCREF(return_type); // Make a new reference
-    Py_DECREF(func_annotations);
-    if (return_type==0) {
-      return 0;
-    }
-    if (!PyType_Check(return_type) && return_type!=Py_None) {
-      Py_DECREF(return_type);
-      return 0;
-    }
-    return return_type;
-  }
-
-  // Returns a new reference
-  PyObject * getCasadiObject(const std::string &s) {
-    PyObject* pPyObjectModuleName = PyString_FromString("casadi");
-    if (pPyObjectModuleName) {
-      PyObject* pObjectModule = PyImport_Import(pPyObjectModuleName);
-      Py_DECREF(pPyObjectModuleName);
-      if (pObjectModule) {
-        PyObject* pObjectDict = PyModule_GetDict(pObjectModule); // Borrowed
-        Py_DECREF(pObjectModule);
-        if (pObjectDict) {
-          PyObject* ret = PyDict_GetItemString(pObjectDict,  s.c_str()); // Borrowed
-          if (ret) {
-            // New reference
-            Py_INCREF(ret);
-            return ret;
-          }
-        }
-      }
-    }
-
-    // Unsuccessful
-    PyErr_Clear();
-    return 0;
-  }
-  %}
-#endif
-#endif // CASADI_NOT_IN_DERIVED
-
 #ifndef SWIGXML
 
 %fragment("casadi_decl", "header") {
@@ -1042,60 +988,6 @@ import_array();
           || to_generic<casadi::GenericType::Dict>(p, m)) {
         return true;
       }
-
-#ifndef CASADI_NOT_IN_DERIVED
-#ifdef SWIGPYTHON
-      if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
-        PyObject *c = PyObject_GetAttrString(p,"creator");
-        if (!c) return false;
-        PyObject* gt = getCasadiObject("GenericType");
-        if (!gt) return false;
-
-        PyObject* args = PyTuple_New(1);
-        PyTuple_SetItem(args,0,c);
-
-        PyObject* g = PyObject_CallObject(gt,args);
-
-        Py_DECREF(args);
-        Py_DECREF(gt);
-
-        if (g) {
-          int result = to_ptr(g, m);
-          Py_DECREF(g);
-          return result;
-        }
-        if (!g) {
-          PyErr_Clear();
-          return false;
-        }
-      } else if (to_ptr(p, static_cast<GenericType::Dict**>(0))) {
-        PyObject* gt = getCasadiObject("GenericType");
-        if (!gt) return false;
-
-        PyObject* args = PyTuple_New(1);
-        Py_INCREF(p); // Needed because PyTuple_SetItem steals the reference
-        PyTuple_SetItem(args,0,p);
-
-        PyObject* g = PyObject_CallObject(gt,args);
-
-        Py_DECREF(args);
-        Py_DECREF(gt);
-
-        if (g) {
-          int result = to_val(g, m ? *m : 0);
-          Py_DECREF(g);
-          return result;
-        }
-        if (!g) {
-          PyErr_Clear();
-          return false;
-        }
-      } else {
-        return false;
-      }
-      return true;
-#endif // SWIGPYTHON
-#endif // CASADI_NOT_IN_DERIVED
 
       // Check if it can be converted to boolean (last as e.g. can be converted to boolean)
       if (to_generic<bool>(p, m)) return true;
