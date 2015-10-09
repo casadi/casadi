@@ -148,8 +148,9 @@ catch err
   msg = err.message;
 end
 
-assert(~isempty(strfind(msg,'  SXFunction(char,{SX} ,{SX} ,Dict)')))
-assert(~isempty(strfind(msg,'You have: char, SX')))
+% See issue #1483
+%assert(~isempty(strfind(msg,'  SXFunction(char,{SX} ,{SX} ,Dict)')))
+%assert(~isempty(strfind(msg,'You have: char, SX')))
 
 % Check mixing DMatrix and MX
 res = (DMatrix(1)+MX(1)) - (MX(1)+DMatrix(1))
