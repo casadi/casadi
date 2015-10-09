@@ -541,7 +541,7 @@ namespace casadi {
     // Quick return if trivially empty
     if (input(iind).nnz()==0 || output(oind).nnz()==0 ||
        jacSparsity(iind, oind, true, false).nnz()==0) {
-      return MatType(input(iind).shape());
+      return MatType(input(iind).size());
     }
 
     // Adjoint seeds
@@ -1012,7 +1012,7 @@ namespace casadi {
     for (int i=0; i<num_out; ++i) {
       std::stringstream ss;
       ss << "dummy_output_" << i;
-      ret_in.push_back(MatType::sym(ss.str(), Sparsity(outputv_.at(i).shape())));
+      ret_in.push_back(MatType::sym(ss.str(), Sparsity(outputv_.at(i).size())));
     }
     for (int d=0; d<nfwd; ++d)
       ret_in.insert(ret_in.end(), fseed[d].begin(), fseed[d].end());
@@ -1048,7 +1048,7 @@ namespace casadi {
     for (int i=0; i<num_out; ++i) {
       std::stringstream ss;
       ss << "dummy_output_" << i;
-      ret_in.push_back(MatType::sym(ss.str(), Sparsity(outputv_.at(i).shape())));
+      ret_in.push_back(MatType::sym(ss.str(), Sparsity(outputv_.at(i).size())));
     }
     for (int d=0; d<nadj; ++d)
       ret_in.insert(ret_in.end(), aseed[d].begin(), aseed[d].end());

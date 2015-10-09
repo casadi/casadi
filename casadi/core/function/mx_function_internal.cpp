@@ -680,7 +680,7 @@ namespace casadi {
         arg1.resize(it->arg.size());
         for (int i=0; i<arg1.size(); ++i) {
           int el = it->arg[i]; // index of the argument
-          arg1[i] = el<0 ? MX(it->data->dep(i).shape()) : swork[el];
+          arg1[i] = el<0 ? MX(it->data->dep(i).size()) : swork[el];
         }
 
         // Perform the operation
@@ -723,7 +723,7 @@ namespace casadi {
         for (int d=0; d<nfwd; ++d) {
           if (purgable(fseed[d])) {
             for (int i=0; i<fsens[d].size(); ++i) {
-              fsens[d][i] = MX(output(i).shape());
+              fsens[d][i] = MX(output(i).size());
             }
           } else {
             fseed_purged.push_back(fsens[d]);
@@ -795,7 +795,7 @@ namespace casadi {
           for (int i=0; i<it->arg.size(); ++i) {
             int el = it->arg[i];
             if (el<0 || dwork[el][d].isempty(true)) {
-              seed[i] = MX(it->data->dep(i).shape());
+              seed[i] = MX(it->data->dep(i).size());
             } else {
               seed[i] = dwork[el][d];
             }
@@ -817,7 +817,7 @@ namespace casadi {
           for (int i=0; i<it->res.size(); ++i) {
             int el = it->res[i];
             if (el>=0) {
-              dwork[el][d] = skip[d] ? MX(it->data->sparsity(i).shape()) : osens[d1][i];
+              dwork[el][d] = skip[d] ? MX(it->data->sparsity(i).size()) : osens[d1][i];
             }
           }
           if (!skip[d]) d1++;
@@ -853,7 +853,7 @@ namespace casadi {
         for (int d=0; d<nadj; ++d) {
           if (purgable(aseed[d])) {
             for (int i=0; i<asens[d].size(); ++i) {
-              asens[d][i] = MX(input(i).shape());
+              asens[d][i] = MX(input(i).size());
             }
           } else {
             aseed_purged.push_back(asens[d]);
@@ -935,7 +935,7 @@ namespace casadi {
             }
 
             // If first time encountered, reset to zero of right dimension
-            if (seed[i].isempty(true)) seed[i] = MX(it->data->sparsity(i).shape());
+            if (seed[i].isempty(true)) seed[i] = MX(it->data->sparsity(i).size());
 
             // If nonzero seeds, keep direction
             if (skip[d] && !seed[i].isZero()) skip[d] = false;
@@ -961,7 +961,7 @@ namespace casadi {
             }
 
             // If first time encountered, reset to zero of right dimension
-            if (osens[d1][i].isempty(true)) osens[d1][i] = MX(it->data->dep(i).shape());
+            if (osens[d1][i].isempty(true)) osens[d1][i] = MX(it->data->dep(i).size());
           }
           d1++;
         }
@@ -1292,7 +1292,7 @@ namespace casadi {
             arg1.resize(it->arg.size());
             for (int i=0; i<arg1.size(); ++i) {
               int el = it->arg[i]; // index of the argument
-              arg1[i] = el<0 ? MX(it->data->dep(i).shape()) : swork[el];
+              arg1[i] = el<0 ? MX(it->data->dep(i).size()) : swork[el];
             }
 
             // Perform the operation

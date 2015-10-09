@@ -80,7 +80,7 @@ namespace casadi {
         }
       } else {
         // Empty matrix
-        assignNode(ConstantMX::create(Sparsity(sp.shape()), 0));
+        assignNode(ConstantMX::create(Sparsity(sp.size()), 0));
       }
     } else {
       casadi_assert(val.iscolumn() && sp.nnz()==val.size1());
@@ -117,7 +117,7 @@ namespace casadi {
       if (ret[i].isempty(true)) {
         ret[i] = MX(0, 0);
       } else if (ret[i].nnz()==0) {
-        ret[i] = MX(ret[i].shape());
+        ret[i] = MX(ret[i].size());
       }
     }
     return ret;
@@ -181,10 +181,10 @@ namespace casadi {
   }
 
   void MX::get(MX& m, bool ind1, const Sparsity& sp) const {
-    casadi_assert_message(shape()==sp.shape(),
+    casadi_assert_message(size()==sp.size(),
                           "get(Sparsity sp): shape mismatch. This matrix has shape "
-                          << shape() << ", but supplied sparsity index has shape "
-                          << sp.shape() << ".");
+                          << size() << ", but supplied sparsity index has shape "
+                          << sp.size() << ".");
     m = project(*this, sp);
   }
 
@@ -232,7 +232,7 @@ namespace casadi {
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch." << "lhs is " << rr.size1() << "-by-"
-                     << cc.size1() << ", while rhs is " << m.shape());
+                     << cc.size1() << ", while rhs is " << m.size());
       }
     }
 
@@ -281,7 +281,7 @@ namespace casadi {
   void MX::set(const MX& m, bool ind1, const Matrix<int>& rr) {
     // Assert dimensions of assigning matrix
     if (rr.sparsity() != m.sparsity()) {
-      if (rr.shape() == m.shape()) {
+      if (rr.size() == m.size()) {
         // Remove submatrix to be replaced
         erase(rr.data(), ind1);
 
@@ -295,7 +295,7 @@ namespace casadi {
         if (m.isdense()) {
           return set(MX(rr.sparsity(), m), ind1, rr);
         } else {
-          return set(MX(rr.shape()), ind1, rr);
+          return set(MX(rr.size()), ind1, rr);
         }
       } else if (rr.size1() == m.size2() && rr.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
@@ -303,8 +303,8 @@ namespace casadi {
         return set(m.T(), ind1, rr);
       } else {
         // Error otherwise
-        casadi_error("Dimension mismatch." << "lhs is " << rr.shape()
-                     << ", while rhs is " << m.shape());
+        casadi_error("Dimension mismatch." << "lhs is " << rr.size()
+                     << ", while rhs is " << m.size());
       }
     }
 
@@ -351,10 +351,10 @@ namespace casadi {
   }
 
   void MX::set(const MX& m, bool ind1, const Sparsity& sp) {
-    casadi_assert_message(shape()==sp.shape(),
+    casadi_assert_message(size()==sp.size(),
                           "set(Sparsity sp): shape mismatch. This matrix has shape "
-                          << shape() << ", but supplied sparsity index has shape "
-                          << sp.shape() << ".");
+                          << size() << ", but supplied sparsity index has shape "
+                          << sp.size() << ".");
     std::vector<int> ii = sp.find();
     if (m.isscalar()) {
       (*this)(ii) = densify(m);
@@ -422,7 +422,7 @@ namespace casadi {
         // m scalar means "set all"
         if (!m.isdense()) return; // Nothing to set
         return setNZ(MX(kk.sparsity(), m), ind1, kk);
-      } else if (kk.shape() == m.shape()) {
+      } else if (kk.size() == m.size()) {
         // Project sparsity if needed
         return setNZ(project(m, kk.sparsity()), ind1, kk);
       } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
@@ -431,8 +431,8 @@ namespace casadi {
         return setNZ(m.T(), ind1, kk);
       } else {
         // Error otherwise
-        casadi_error("Dimension mismatch." << "lhs is " << kk.shape()
-                     << ", while rhs is " << m.shape());
+        casadi_error("Dimension mismatch." << "lhs is " << kk.size()
+                     << ", while rhs is " << m.size());
       }
     }
 
@@ -914,9 +914,9 @@ namespace casadi {
     if (isdense()) {
       return *this; // Already ok
     } else if (val->isZero()) {
-      return project(*this, Sparsity::dense(shape()));
+      return project(*this, Sparsity::dense(size()));
     } else {
-      MX ret = repmat(val, shape());
+      MX ret = repmat(val, size());
       ret(sparsity()) = *this;
       return ret;
     }
@@ -1392,7 +1392,7 @@ namespace casadi {
                           "Mismatch in the number of expression to substitute.");
     for (int k=0; k<v.size(); ++k) {
       casadi_assert_message(v[k].isSymbolic(), "Variable " << k << " is not symbolic");
-      casadi_assert_message(v[k].shape() == vdef[k].shape(),
+      casadi_assert_message(v[k].size() == vdef[k].size(),
                             "Inconsistent shape for variable " << k << ".");
     }
     casadi_assert_message(reverse==false, "Not implemented");
@@ -1437,7 +1437,7 @@ namespace casadi {
           oarg.resize(it->arg.size());
           for (int i=0; i<oarg.size(); ++i) {
             int el = it->arg[i];
-            oarg[i] = el<0 ? MX(it->data->dep(i).shape()) : work.at(el);
+            oarg[i] = el<0 ? MX(it->data->dep(i).size()) : work.at(el);
           }
 
           // Perform the operation
@@ -1466,7 +1466,7 @@ namespace casadi {
     // Quick return if all equal
     bool all_equal = true;
     for (int k=0; k<v.size(); ++k) {
-      if (v[k].shape()!=vdef[k].shape() || !isEqual(v[k], vdef[k])) {
+      if (v[k].size()!=vdef[k].size() || !isEqual(v[k], vdef[k])) {
         all_equal = false;
         break;
       }
@@ -1552,7 +1552,7 @@ namespace casadi {
           for (int i=0; i<oarg.size(); ++i) {
             int el = it->arg[i];
             if (el>=0) node_tainted =  node_tainted || tainted[el];
-            oarg[i] = el<0 ? MX(it->data->dep(i).shape()) : swork.at(el);
+            oarg[i] = el<0 ? MX(it->data->dep(i).size()) : swork.at(el);
           }
 
           // Perform the operation
@@ -1678,7 +1678,7 @@ namespace casadi {
           oarg.resize(it->arg.size());
           for (int i=0; i<oarg.size(); ++i) {
             int el = it->arg[i];
-            oarg[i] = el<0 ? MX(it->data->dep(i).shape()) : work.at(el);
+            oarg[i] = el<0 ? MX(it->data->dep(i).size()) : work.at(el);
           }
 
           // Perform the operation
@@ -1788,7 +1788,7 @@ namespace casadi {
 
   MX MX::zz_kron(const MX& b) const {
     const Sparsity &a_sp = sparsity();
-    MX filler(b.shape());
+    MX filler(b.size());
     std::vector< std::vector< MX > > blocks(size1(), std::vector< MX >(size2(), filler));
     for (int i=0; i<size1(); ++i) {
       for (int j=0; j<size2(); ++j) {

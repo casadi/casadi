@@ -290,7 +290,7 @@ namespace casadi {
     int bandwidthL() const;
 
     /** \brief  Get the shape */
-    std::pair<int, int> shape() const;
+    std::pair<int, int> size() const;
     /// @}
 
 #ifndef SWIG
@@ -481,9 +481,9 @@ namespace casadi {
                                        const std::vector<int>& offset2) const;
     Sparsity zz_mtimes(const Sparsity& y) const {
       if (isscalar()) {
-        return isdense() ? y : Sparsity(y.shape());
+        return isdense() ? y : Sparsity(y.size());
       } else if (y.isscalar()) {
-        return y.isdense() ? *this : Sparsity(shape());
+        return y.isdense() ? *this : Sparsity(size());
       } else {
         // Check dimensions
         casadi_assert_message(size2()==y.size1(),

@@ -84,11 +84,11 @@ namespace casadi {
 
   MX SymbolicMX::joinPrimitives(std::vector<MX>::const_iterator& it) const {
     MX ret = *it++;
-    if (ret.shape()==shape()) {
+    if (ret.size()==size()) {
       return ret;
     } else {
       casadi_assert(ret.isempty(true));
-      return MX(shape());
+      return MX(size());
     }
   }
 

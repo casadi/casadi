@@ -32,7 +32,7 @@ using namespace std;
 namespace casadi {
 
   MX GenericCall::projectArg(const MX& x, const Sparsity& sp, int i) {
-    if (x.shape()==sp.shape()) {
+    if (x.size()==sp.size()) {
       // Insert sparsity projection nodes if needed
       return project(x, sp);
     } else {
@@ -49,8 +49,8 @@ namespace casadi {
       } else {
         // Mismatching dimensions
         casadi_error("Cannot create function call node: Dimension mismatch for argument "
-                     << i << ". Argument has shape " << x.shape()
-                     << " but function input has shape " << sp.shape());
+                     << i << ". Argument has shape " << x.size()
+                     << " but function input has shape " << sp.size());
       }
     }
   }

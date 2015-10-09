@@ -237,7 +237,7 @@ namespace casadi {
     int nnz(int i=0) const { return sparsity(i).nnz(); }
     int size1() const { return sparsity().size1(); }
     int size2() const { return sparsity().size2(); }
-    std::pair<int, int> shape() const { return sparsity().shape();}
+    std::pair<int, int> size() const { return sparsity().size();}
 
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear() {return false;}
@@ -281,7 +281,7 @@ namespace casadi {
 
     /// Convert scalar to matrix
     inline static MX toMatrix(const MX& x, const Sparsity& sp) {
-      if (x.shape()==sp.shape()) {
+      if (x.size()==sp.size()) {
         return x;
       } else {
         return MX(sp, x);

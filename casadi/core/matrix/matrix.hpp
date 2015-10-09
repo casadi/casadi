@@ -159,7 +159,7 @@ namespace casadi {
     using B::numel;
     using B::size1;
     using B::size2;
-    using B::shape;
+    using B::size;
     using B::isempty;
     using B::isscalar;
     using B::isdense;

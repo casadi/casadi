@@ -340,7 +340,7 @@ namespace casadi {
     int u_offset[] = {0, 1, 1+p_sp.size1()};
     vector<MX> pp = vertsplit(u, vector<int>(u_offset, u_offset+3));
     MX h = pp[0];
-    MX p = reshape(pp[1], p_sp.shape());
+    MX p = reshape(pp[1], p_sp.size());
     MX f_in[] = {x, p};
     MX xdot = f(vector<MX>(f_in, f_in+2)).at(0);
     xdot *= h;

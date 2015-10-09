@@ -1122,7 +1122,7 @@ namespace casadi {
     casadi_assert_message(this->x.size()==this->ode.size(),
                           "x and ode have different lengths");
     for (int i=0; i<this->x.size(); ++i) {
-      casadi_assert_message(this->x[i].shape()==this->ode[i].shape(),
+      casadi_assert_message(this->x[i].size()==this->ode[i].size(),
                             "ode has wrong dimensions");
       casadi_assert_message(this->x[i].isSymbolic(), "Non-symbolic state x");
     }
@@ -1134,9 +1134,9 @@ namespace casadi {
                           "s and dae have different lengths");
     for (int i=0; i<this->s.size(); ++i) {
       casadi_assert_message(this->s[i].isSymbolic(), "Non-symbolic state s");
-      casadi_assert_message(this->s[i].shape()==this->sdot[i].shape(),
+      casadi_assert_message(this->s[i].size()==this->sdot[i].size(),
                             "sdot has wrong dimensions");
-      casadi_assert_message(this->s[i].shape()==this->dae[i].shape(),
+      casadi_assert_message(this->s[i].size()==this->dae[i].size(),
                             "dae has wrong dimensions");
     }
 
@@ -1145,7 +1145,7 @@ namespace casadi {
                           "z and alg have different lengths");
     for (int i=0; i<this->z.size(); ++i) {
       casadi_assert_message(this->z[i].isSymbolic(), "Non-symbolic algebraic variable z");
-      casadi_assert_message(this->z[i].shape()==this->alg[i].shape(),
+      casadi_assert_message(this->z[i].size()==this->alg[i].size(),
                             "alg has wrong dimensions");
     }
 
@@ -1154,7 +1154,7 @@ namespace casadi {
                           "q and quad have different lengths");
     for (int i=0; i<this->q.size(); ++i) {
       casadi_assert_message(this->q[i].isSymbolic(), "Non-symbolic quadrature state q");
-      casadi_assert_message(this->q[i].shape()==this->quad[i].shape(),
+      casadi_assert_message(this->q[i].size()==this->quad[i].size(),
                             "quad has wrong dimensions");
     }
 
@@ -1163,7 +1163,7 @@ namespace casadi {
                           "d and ddef have different lengths");
     for (int i=0; i<this->d.size(); ++i) {
       casadi_assert_message(this->d[i].isSymbolic(), "Non-symbolic dependent parameter d");
-      casadi_assert_message(this->d[i].shape()==this->ddef[i].shape(),
+      casadi_assert_message(this->d[i].size()==this->ddef[i].size(),
                             "ddef has wrong dimensions");
     }
 
@@ -1172,7 +1172,7 @@ namespace casadi {
                           "y and ydef have different lengths");
     for (int i=0; i<this->y.size(); ++i) {
       casadi_assert_message(this->y[i].isSymbolic(), "Non-symbolic output y");
-      casadi_assert_message(this->y[i].shape()==this->ydef[i].shape(),
+      casadi_assert_message(this->y[i].size()==this->ydef[i].size(),
                             "ydef has wrong dimensions");
     }
 

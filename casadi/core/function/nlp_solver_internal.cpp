@@ -171,12 +171,12 @@ namespace casadi {
       casadi_assert(!fcallback_.isNull());
       casadi_assert(fcallback_.nIn()==NLP_SOLVER_NUM_OUT);
       casadi_assert(fcallback_.nOut()==1);
-      casadi_assert(fcallback_.input(NLP_SOLVER_X).shape()==x_sparsity.shape());
+      casadi_assert(fcallback_.input(NLP_SOLVER_X).size()==x_sparsity.size());
       casadi_assert(fcallback_.input(NLP_SOLVER_F).isscalar());
-      casadi_assert(fcallback_.input(NLP_SOLVER_LAM_X).shape()==x_sparsity.shape());
-      casadi_assert(fcallback_.input(NLP_SOLVER_LAM_G).shape()==g_sparsity.shape());
-      casadi_assert(fcallback_.input(NLP_SOLVER_LAM_P).shape()==p_sparsity.shape());
-      casadi_assert(fcallback_.input(NLP_SOLVER_G).shape()==g_sparsity.shape());
+      casadi_assert(fcallback_.input(NLP_SOLVER_LAM_X).size()==x_sparsity.size());
+      casadi_assert(fcallback_.input(NLP_SOLVER_LAM_G).size()==g_sparsity.size());
+      casadi_assert(fcallback_.input(NLP_SOLVER_LAM_P).size()==p_sparsity.size());
+      casadi_assert(fcallback_.input(NLP_SOLVER_G).size()==g_sparsity.size());
     }
 
     callback_step_ = getOption("iteration_callback_step");

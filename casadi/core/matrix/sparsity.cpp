@@ -125,8 +125,8 @@ namespace casadi {
     return (*this)->nnz();
   }
 
-  std::pair<int, int> Sparsity::shape() const {
-    return (*this)->shape();
+  std::pair<int, int> Sparsity::size() const {
+    return (*this)->size();
   }
 
   const int* Sparsity::row() const {
@@ -1152,7 +1152,7 @@ namespace casadi {
 
   Sparsity Sparsity::zz_kron(const Sparsity& b) const {
     const Sparsity &a_sp = (*this);
-    Sparsity filler = Sparsity(b.shape());
+    Sparsity filler = Sparsity(b.size());
     std::vector< std::vector< Sparsity > >
       blocks(size1(), std::vector< Sparsity >(size2(), filler));
     for (int i=0;i<size1();++i) {

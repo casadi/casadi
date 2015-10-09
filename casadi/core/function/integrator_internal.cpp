@@ -142,15 +142,15 @@ namespace casadi {
                           "Sparse states in integrators are experimental");
 
     // Consistency checks
-    casadi_assert_message(f_.output(DAE_ODE).shape()==x0().shape(),
+    casadi_assert_message(f_.output(DAE_ODE).size()==x0().size(),
                           "Inconsistent dimensions. Expecting DAE_ODE output of shape "
-                          << x0().shape() << ", but got "
-                          << f_.output(DAE_ODE).shape() << " instead.");
+                          << x0().size() << ", but got "
+                          << f_.output(DAE_ODE).size() << " instead.");
     casadi_assert(f_.output(DAE_ODE).sparsity()==x0().sparsity());
-    casadi_assert_message(f_.output(DAE_ALG).shape()==z0().shape(),
+    casadi_assert_message(f_.output(DAE_ALG).size()==z0().size(),
                           "Inconsistent dimensions. Expecting DAE_ALG output of shape "
-                          << z0().shape() << ", but got "
-                          << f_.output(DAE_ALG).shape() << " instead.");
+                          << z0().size() << ", but got "
+                          << f_.output(DAE_ALG).size() << " instead.");
     casadi_assert(f_.output(DAE_ALG).sparsity()==z0().sparsity());
     if (!g_.isNull()) {
       casadi_assert(g_.input(RDAE_P).sparsity()==p().sparsity());
@@ -844,12 +844,12 @@ namespace casadi {
 
     // Add dummy inputs (outputs of the nondifferentiated funciton)
     dd.resize(INTEGRATOR_NUM_OUT);
-    dd[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(xf().shape()));
-    dd[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(qf().shape()));
-    dd[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(zf().shape()));
-    dd[INTEGRATOR_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().shape()));
-    dd[INTEGRATOR_RQF]  = MX::sym("rqf_dummy", Sparsity(rqf().shape()));
-    dd[INTEGRATOR_RZF]  = MX::sym("rzf_dummy", Sparsity(rzf().shape()));
+    dd[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(xf().size()));
+    dd[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(qf().size()));
+    dd[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(zf().size()));
+    dd[INTEGRATOR_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().size()));
+    dd[INTEGRATOR_RQF]  = MX::sym("rqf_dummy", Sparsity(rqf().size()));
+    dd[INTEGRATOR_RZF]  = MX::sym("rzf_dummy", Sparsity(rzf().size()));
     std::copy(dd.begin(), dd.end(), ret_in.begin()+INTEGRATOR_NUM_IN);
 
     // All outputs of the return function
@@ -942,12 +942,12 @@ namespace casadi {
 
     // Add dummy inputs (outputs of the nondifferentiated funciton)
     dd.resize(INTEGRATOR_NUM_OUT);
-    dd[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(xf().shape()));
-    dd[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(qf().shape()));
-    dd[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(zf().shape()));
-    dd[INTEGRATOR_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().shape()));
-    dd[INTEGRATOR_RQF]  = MX::sym("rqf_dummy", Sparsity(rqf().shape()));
-    dd[INTEGRATOR_RZF]  = MX::sym("rzf_dummy", Sparsity(rzf().shape()));
+    dd[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(xf().size()));
+    dd[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(qf().size()));
+    dd[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(zf().size()));
+    dd[INTEGRATOR_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().size()));
+    dd[INTEGRATOR_RQF]  = MX::sym("rqf_dummy", Sparsity(rqf().size()));
+    dd[INTEGRATOR_RZF]  = MX::sym("rzf_dummy", Sparsity(rzf().size()));
     ret_in.insert(ret_in.end(), dd.begin(), dd.end());
 
     // Add adjoint seeds

@@ -178,7 +178,7 @@ namespace casadi {
     // Symbolic expression for the input
     vector<MX> arg = symbolicInput();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
-                        Sparsity(arg[iin_].shape()));
+                        Sparsity(arg[iin_].size()));
     vector<MX> res = symbolicOutput();
     vector<vector<MX> > fseed = symbolicFwdSeed(nfwd, arg), fsens;
     callForward(arg, res, fseed, fsens, false, false);
@@ -196,7 +196,7 @@ namespace casadi {
     // Symbolic expression for the input
     vector<MX> arg = symbolicInput();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
-                        Sparsity(arg[iin_].shape()));
+                        Sparsity(arg[iin_].size()));
     vector<MX> res = symbolicOutput();
     vector<vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;
     callReverse(arg, res, aseed, asens, false, false);
@@ -296,10 +296,10 @@ namespace casadi {
     vector<MX> f_arg(arg);
     f_arg.at(iin_) = res.at(iout_);
     vector<MX> f_res(res);
-    f_res.at(iout_) = MX(input(iin_).shape()); // zero residual
+    f_res.at(iout_) = MX(input(iin_).size()); // zero residual
     std::vector<std::vector<MX> > f_fseed(fseed);
     for (int d=0; d<nfwd; ++d) {
-      f_fseed[d].at(iin_) = MX(input(iin_).shape()); // ignore seeds for guess
+      f_fseed[d].at(iin_) = MX(input(iin_).size()); // ignore seeds for guess
     }
     f_.callForward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
 
@@ -310,7 +310,7 @@ namespace casadi {
     vector<MX> rhs(nfwd);
     for (int d=0; d<nfwd; ++d) rhs[d] = vec(fsens[d][iout_]);
     rhs = horzsplit(J->getSolve(-horzcat(rhs), false, linsol_));
-    for (int d=0; d<nfwd; ++d) fsens[d][iout_] = reshape(rhs[d], input(iin_).shape());
+    for (int d=0; d<nfwd; ++d) fsens[d][iout_] = reshape(rhs[d], input(iin_).size());
 
     // Propagate to auxiliary outputs
     int num_out = nOut();
@@ -343,7 +343,7 @@ namespace casadi {
     int num_out = nOut();
     int num_in = nIn();
     vector<MX> f_res(res);
-    f_res[iout_] = MX(input(iin_).shape()); // zero residual
+    f_res[iout_] = MX(input(iin_).size()); // zero residual
     vector<vector<MX> > f_aseed(nadj);
     for (int d=0; d<nadj; ++d) {
       f_aseed[d].resize(num_out);
@@ -365,10 +365,10 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) {
       for (int i=0; i<num_out; ++i) {
         if (i==iout_) {
-          f_aseed[d][i] = reshape(rhs[d], output(i).shape());
+          f_aseed[d][i] = reshape(rhs[d], output(i).size());
         } else {
           // Avoid counting the auxiliary seeds twice
-          f_aseed[d][i] = MX(output(i).shape());
+          f_aseed[d][i] = MX(output(i).size());
         }
       }
     }
@@ -377,7 +377,7 @@ namespace casadi {
     vector<MX> tmp(nadj);
     for (int d=0; d<nadj; ++d) {
       asens[d].resize(num_in);
-      tmp[d] = asens[d][iin_].isempty(true) ? MX(input(iin_).shape()) : asens[d][iin_];
+      tmp[d] = asens[d][iin_].isempty(true) ? MX(input(iin_).size()) : asens[d][iin_];
     }
 
     // Propagate through f_

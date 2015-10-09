@@ -254,7 +254,7 @@ namespace casadi {
     int bandwidthL() const;
 
     /// Shape
-    std::pair<int, int> shape() const;
+    std::pair<int, int> size() const;
 
     /// Is scalar?
     bool isscalar(bool scalar_and_dense) const;

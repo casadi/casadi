@@ -248,7 +248,7 @@ namespace casadi {
 
     // Create a sparsity pattern from vectors
     if (r_nz.size()==0) {
-      res[0] = MX(osp.shape());
+      res[0] = MX(osp.size());
     } else {
       Sparsity f_sp(osp.size1(), osp.size2(), r_colind, r_row);
       res[0] = arg[0]->getGetNonzeros(f_sp, r_nz);
@@ -329,7 +329,7 @@ namespace casadi {
 
       // Create a sparsity pattern from vectors
       if (r_nz.size()==0) {
-        res = MX(osp.shape());
+        res = MX(osp.size());
       } else {
         Sparsity f_sp(osp.size1(), osp.size2(), r_colind, r_row);
         res = arg->getGetNonzeros(f_sp, r_nz);

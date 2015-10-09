@@ -105,10 +105,10 @@ namespace casadi {
     std::string dimString() const;
 
     /** \brief  Get the shape */
-    std::pair<int, int> shape() const;
+    std::pair<int, int> size() const;
 
     /** \brief  Get the size along a particular dimensions */
-    int shape(int axis) const;
+    int size(int axis) const;
 
     /** \brief Check if the sparsity is empty, i.e. if one of the dimensions is zero
      * (or optionally both dimensions) */
@@ -682,12 +682,12 @@ namespace casadi {
   }
 
   template<typename MatType>
-  std::pair<int, int> GenericMatrix<MatType>::shape() const {
-    return sparsity().shape();
+  std::pair<int, int> GenericMatrix<MatType>::size() const {
+    return sparsity().size();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::shape(int axis) const {
+  int GenericMatrix<MatType>::size(int axis) const {
     if (axis==1)
       return sparsity().size1();
     if (axis==2)

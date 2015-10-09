@@ -2257,7 +2257,6 @@ except:
 
 #ifdef SWIGPYTHON
 %ignore T;
-%ignore shape;
 %rename(__float__) getValue;
 %rename(__int__) getIntValue;
 
@@ -2290,8 +2289,6 @@ except:
 #ifdef SWIGMATLAB
 %rename(uminus) operator-;
 %rename(uplus) operator+;
-%ignore size;
-%rename(size) shape;
 %rename(mtimes) friendwrap_mul;
 %feature("varargin","1") friendwrap_vertcat;
 %feature("varargin","1") friendwrap_horzcat;

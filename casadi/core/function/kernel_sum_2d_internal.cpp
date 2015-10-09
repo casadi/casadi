@@ -356,7 +356,7 @@ namespace casadi {
     std::vector<MX> kn_inputs = ret_inputs;
     for (int i=0;i<num_out;++i) {
       // Dummy symbols for the nominal outputs (S)
-      MX output = MX::sym("x", Sparsity(f_.outputSparsity(i).shape()));
+      MX output = MX::sym("x", Sparsity(f_.outputSparsity(i).size()));
       ret_inputs.push_back(output);
     }
     for (int i=0;i<nadj;++i) {

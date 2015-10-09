@@ -128,8 +128,8 @@ namespace casadi {
     // Collocated states
     vector<MX> x(deg_+1), z(deg_+1);
     for (int d=1; d<=deg_; ++d) {
-      x[d] = reshape(*vv_it++, this->x0().shape());
-      z[d] = reshape(*vv_it++, this->z0().shape());
+      x[d] = reshape(*vv_it++, this->x0().size());
+      z[d] = reshape(*vv_it++, this->z0().size());
     }
     casadi_assert(vv_it==vv.end());
 
@@ -213,8 +213,8 @@ namespace casadi {
       // Collocated states
       vector<MX> rx(deg_+1), rz(deg_+1);
       for (int d=1; d<=deg_; ++d) {
-        rx[d] = reshape(*rvv_it++, this->rx0().shape());
-        rz[d] = reshape(*rvv_it++, this->rz0().shape());
+        rx[d] = reshape(*rvv_it++, this->rx0().size());
+        rz[d] = reshape(*rvv_it++, this->rz0().size());
       }
       casadi_assert(rvv_it==rvv.end());
 

@@ -541,7 +541,7 @@ namespace casadi {
     // Construct sparsity pattern
     Sparsity ret = Sparsity::triplet(nz_out, nz_in, use_fwd ? jcol : jrow, use_fwd ? jrow : jcol);
 
-    casadi_msg("Formed Jacobian sparsity pattern (dimension " << ret.shape() << ", "
+    casadi_msg("Formed Jacobian sparsity pattern (dimension " << ret.size() << ", "
                << ret.nnz() << " nonzeros, " << (100.0*ret.nnz())/ret.numel() << " % nonzeros).");
     casadi_msg("FunctionInternal::getJacSparsity end ");
 
@@ -780,7 +780,7 @@ namespace casadi {
     }
 
     casadi_msg("Number of sweeps: " << nsweeps);
-    casadi_msg("Formed Jacobian sparsity pattern (dimension " << r.shape() <<
+    casadi_msg("Formed Jacobian sparsity pattern (dimension " << r.size() <<
                ", " << r.nnz() << " nonzeros, " << (100.0*r.nnz())/r.numel() << " % nonzeros).");
 
     return r.T();
@@ -1077,7 +1077,7 @@ namespace casadi {
       hasrun = true;
     }
     casadi_msg("Number of sweeps: " << nsweeps);
-    casadi_msg("Formed Jacobian sparsity pattern (dimension " << r.shape() <<
+    casadi_msg("Formed Jacobian sparsity pattern (dimension " << r.size() <<
                ", " << r.nnz() << " nonzeros, " << (100.0*r.nnz())/r.numel() << " % nonzeros).");
 
     return r.T();
@@ -1622,19 +1622,19 @@ namespace casadi {
       const Sparsity& sp = i<n_in ? input(i).sparsity() :
         i<n_in+n_out ? output(i-n_in).sparsity() :
         input((i-n_in-n_out) % n_in).sparsity();
-      casadi_assert_message(ret.input(i).shape()==sp.shape(),
+      casadi_assert_message(ret.input(i).size()==sp.size(),
                             "Incorrect shape for " << ret << " input " << i << " \""
-                            << i_names.at(i) << "\". Expected " << sp.shape()
-                            << " but got " << ret.input(i).shape());
+                            << i_names.at(i) << "\". Expected " << sp.size()
+                            << " but got " << ret.input(i).size());
     }
 
     // Consistency check for outputs
     for (int i=0; i<ret.nOut(); ++i) {
       const Sparsity& sp = output(i % n_out).sparsity();
-      casadi_assert_message(ret.output(i).shape()==sp.shape(),
+      casadi_assert_message(ret.output(i).size()==sp.size(),
                             "Incorrect shape for " << ret << " output " << i << " \""
-                            << o_names.at(i) << "\". Expected " << sp.shape()
-                            << " but got " << ret.output(i).shape());
+                            << o_names.at(i) << "\". Expected " << sp.size()
+                            << " but got " << ret.output(i).size());
     }
 
     // Save to cache
@@ -1718,19 +1718,19 @@ namespace casadi {
       const Sparsity& sp = i<n_in ? input(i).sparsity() :
         i<n_in+n_out ? output(i-n_in).sparsity() :
         output((i-n_in-n_out) % n_out).sparsity();
-      casadi_assert_message(ret.input(i).shape()==sp.shape(),
+      casadi_assert_message(ret.input(i).size()==sp.size(),
                             "Incorrect shape for " << ret << " input " << i << " \""
-                            << i_names.at(i) << "\". Expected " << sp.shape()
-                            << " but got " << ret.input(i).shape());
+                            << i_names.at(i) << "\". Expected " << sp.size()
+                            << " but got " << ret.input(i).size());
     }
 
     // Consistency check for outputs
     for (int i=0; i<ret.nOut(); ++i) {
       const Sparsity& sp = input(i % n_in).sparsity();
-      casadi_assert_message(ret.output(i).shape()==sp.shape(),
+      casadi_assert_message(ret.output(i).size()==sp.size(),
                             "Incorrect shape for " << ret << " output " << i << " \""
-                            << o_names.at(i) << "\". Expected " << sp.shape()
-                            << " but got " << ret.output(i).shape());
+                            << o_names.at(i) << "\". Expected " << sp.size()
+                            << " but got " << ret.output(i).size());
     }
 
     // Save to cache
@@ -2684,7 +2684,7 @@ namespace casadi {
       for (int d=0; d<nfwd; ++d) {
         fsens[d] = vertsplit(v[d], offset);
         for (int i=0; i<n_out; ++i) {
-          fsens[d][i] = reshape(fsens[d][i], output(i).shape());
+          fsens[d][i] = reshape(fsens[d][i], output(i).size());
         }
       }
       return;
@@ -2762,9 +2762,9 @@ namespace casadi {
         vector<MX> a = vertsplit(v[d], offset);
         for (int i=0; i<n_in; ++i) {
           if (asens[d][i].isempty(true)) {
-            asens[d][i] = reshape(a[i], input(i).shape());
+            asens[d][i] = reshape(a[i], input(i).size());
           } else {
-            asens[d][i] += reshape(a[i], input(i).shape());
+            asens[d][i] += reshape(a[i], input(i).size());
           }
         }
       }

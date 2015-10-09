@@ -179,10 +179,10 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1, const Sparsity& sp) const {
-    casadi_assert_message(shape()==sp.shape(),
+    casadi_assert_message(size()==sp.size(),
                           "get(Sparsity sp): shape mismatch. This matrix has shape "
-                          << shape() << ", but supplied sparsity index has shape "
-                          << sp.shape() << ".");
+                          << size() << ", but supplied sparsity index has shape "
+                          << sp.size() << ".");
     m = project(*this, sp);
   }
 
@@ -249,7 +249,7 @@ namespace casadi {
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch." << "lhs is " << rr.size1() << "-by-"
-                     << cc.size1() << ", while rhs is " << m.shape());
+                     << cc.size1() << ", while rhs is " << m.size());
       }
     }
 
@@ -312,7 +312,7 @@ namespace casadi {
 
     // Assert dimensions of assigning matrix
     if (rr.sparsity() != m.sparsity()) {
-      if (rr.shape() == m.shape()) {
+      if (rr.size() == m.size()) {
         // Remove submatrix to be replaced
         erase(rr.data(), ind1);
 
@@ -326,7 +326,7 @@ namespace casadi {
         if (m.isdense()) {
           return set(Matrix<DataType>(rr.sparsity(), m), ind1, rr);
         } else {
-          return set(Matrix<DataType>(rr.shape()), ind1, rr);
+          return set(Matrix<DataType>(rr.size()), ind1, rr);
         }
       } else if (rr.size1() == m.size2() && rr.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
@@ -334,8 +334,8 @@ namespace casadi {
         return set(m.T(), ind1, rr);
       } else {
         // Error otherwise
-        casadi_error("Dimension mismatch." << "lhs is " << rr.shape()
-                     << ", while rhs is " << m.shape());
+        casadi_error("Dimension mismatch." << "lhs is " << rr.size()
+                     << ", while rhs is " << m.size());
       }
     }
 
@@ -385,10 +385,10 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1, const Sparsity& sp) {
-    casadi_assert_message(shape()==sp.shape(),
+    casadi_assert_message(size()==sp.size(),
                           "set(Sparsity sp): shape mismatch. This matrix has shape "
-                          << shape() << ", but supplied sparsity index has shape "
-                          << sp.shape() << ".");
+                          << size() << ", but supplied sparsity index has shape "
+                          << sp.size() << ".");
     std::vector<int> ii = sp.find();
     if (m.isscalar()) {
       (*this)(ii) = densify(m);
@@ -468,7 +468,7 @@ namespace casadi {
         // m scalar means "set all"
         if (!m.isdense()) return; // Nothing to set
         return setNZ(Matrix<DataType>(kk.sparsity(), m), ind1, kk);
-      } else if (kk.shape() == m.shape()) {
+      } else if (kk.size() == m.size()) {
         // Project sparsity if needed
         return setNZ(project(m, kk.sparsity()), ind1, kk);
       } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
@@ -477,8 +477,8 @@ namespace casadi {
         return setNZ(m.T(), ind1, kk);
       } else {
         // Error otherwise
-        casadi_error("Dimension mismatch." << "lhs is " << kk.shape()
-                     << ", while rhs is " << m.shape());
+        casadi_error("Dimension mismatch." << "lhs is " << kk.size()
+                     << ", while rhs is " << m.size());
       }
     }
 
@@ -536,7 +536,7 @@ namespace casadi {
     }
 
     // Construct return matrix
-    return Matrix<DataType>(Sparsity::dense(shape()), d);
+    return Matrix<DataType>(Sparsity::dense(size()), d);
   }
 
   template<typename DataType>
@@ -1349,7 +1349,7 @@ namespace casadi {
     // Assert dimensions
     casadi_assert_message(size1()==A.size2() && size1()==A.size1(),
                           "Dimension mismatch. Got x.size1 = " << size1()
-                          << " and A.shape = " << A.shape());
+                          << " and A.shape = " << A.size());
 
     // Calculate using runtime function
     return casadi_quad_form(A.ptr(), A.sparsity(), ptr());
@@ -1714,7 +1714,7 @@ namespace casadi {
   template<typename DataType>
   bool Matrix<DataType>::zz_isEqual(const Matrix<DataType> &ex2, int depth) const {
     // Assert matching dimensions
-    casadi_assert_message(shape() == ex2.shape(), "Dimension mismatch");
+    casadi_assert_message(size() == ex2.size(), "Dimension mismatch");
 
     // Project to union of patterns and call recursively if different sparsity
     if (sparsity() != ex2.sparsity()) {
@@ -2100,7 +2100,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_inner_prod(const Matrix<DataType> &y) const {
-    casadi_assert_message(shape()==y.shape(), "inner_prod: Dimension mismatch");
+    casadi_assert_message(size()==y.size(), "inner_prod: Dimension mismatch");
     if (sparsity()!=y.sparsity()) {
       Sparsity sp = sparsity() * y.sparsity();
       return inner_prod(project(*this, sp), project(y, sp));
@@ -2404,7 +2404,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_kron(const Matrix<DataType>& b) const {
     const Sparsity &a_sp = sparsity();
-    Matrix<DataType> filler = Matrix<DataType>(b.shape());
+    Matrix<DataType> filler = Matrix<DataType>(b.size());
     std::vector< std::vector< Matrix<DataType> > >
       blocks(size1(), std::vector< Matrix<DataType> >(size2(), filler));
     for (int i=0;i<size1();++i) {

@@ -74,20 +74,20 @@ namespace casadi {
   }
 
   void Reshape::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
-    res[0] = reshape(arg[0], shape());
+    res[0] = reshape(arg[0], size());
   }
 
   void Reshape::evalFwd(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) {
     for (int d = 0; d<fsens.size(); ++d) {
-      fsens[d][0] = reshape(fseed[d][0], shape());
+      fsens[d][0] = reshape(fseed[d][0], size());
     }
   }
 
   void Reshape::evalAdj(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) {
     for (int d=0; d<aseed.size(); ++d) {
-      asens[d][0] += reshape(aseed[d][0], dep().shape());
+      asens[d][0] += reshape(aseed[d][0], dep().size());
     }
   }
 
@@ -125,11 +125,11 @@ namespace casadi {
   }
 
   void Reshape::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
-    dep()->splitPrimitives(reshape(x, dep().shape()), it);
+    dep()->splitPrimitives(reshape(x, dep().size()), it);
   }
 
   MX Reshape::joinPrimitives(std::vector<MX>::const_iterator& it) const {
-    return reshape(dep()->joinPrimitives(it), shape());
+    return reshape(dep()->joinPrimitives(it), size());
   }
 
   bool Reshape::hasDuplicates() {

@@ -200,9 +200,9 @@ namespace casadi {
       // For all time points
       for (int j=0; j<nj; ++j) {
         // Get expressions for the differential state
-        X[k][j] = reshape(V(range(offset, offset+nx_)), x0().shape());
+        X[k][j] = reshape(V(range(offset, offset+nx_)), x0().size());
         offset += nx_;
-        RX[k][j] = reshape(V(range(offset, offset+nrx_)), rx0().shape());
+        RX[k][j] = reshape(V(range(offset, offset+nrx_)), rx0().size());
         offset += nrx_;
 
         // Get the local time
@@ -210,9 +210,9 @@ namespace casadi {
 
         // Get expressions for the algebraic variables
         if (j>0) {
-          Z[k][j-1] = reshape(V(range(offset, offset+nz_)), z0().shape());
+          Z[k][j-1] = reshape(V(range(offset, offset+nz_)), z0().size());
           offset += nz_;
-          RZ[k][j-1] = reshape(V(range(offset, offset+nrz_)), rz0().shape());
+          RZ[k][j-1] = reshape(V(range(offset, offset+nrz_)), rz0().size());
           offset += nrz_;
         }
       }

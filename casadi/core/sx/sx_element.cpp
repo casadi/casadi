@@ -1246,7 +1246,7 @@ namespace casadi {
     // Quick return if all equal
     bool all_equal = true;
     for (int k=0; k<v.size(); ++k) {
-      if (v[k].shape()!=vdef[k].shape() || !isEqual(v[k], vdef[k])) {
+      if (v[k].size()!=vdef[k].size() || !isEqual(v[k], vdef[k])) {
         all_equal = false;
         break;
       }

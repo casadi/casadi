@@ -530,7 +530,7 @@ namespace casadi {
 
   MX MXNode::getBinarySwitch(int op, const MX& y) const {
     // Make sure that dimensions match
-    casadi_assert_message(sparsity().isscalar() || y.isscalar() || sparsity().shape()==y.shape(),
+    casadi_assert_message(sparsity().isscalar() || y.isscalar() || sparsity().size()==y.size(),
                           "Dimension mismatch." << "lhs is " << sparsity().dimString()
                           << ", while rhs is " << y.dimString());
 
@@ -548,7 +548,7 @@ namespace casadi {
         return toMatrix(getBinary(op, y, false, true), sparsity());
       }
     } else {
-      casadi_assert_message(sparsity().shape() == y.sparsity().shape(), "Dimension mismatch.");
+      casadi_assert_message(sparsity().size() == y.sparsity().size(), "Dimension mismatch.");
       if (sparsity()==y.sparsity()) {
         // Matching sparsities
         return getBinary(op, y, false, false);
@@ -619,7 +619,7 @@ namespace casadi {
           case OP_ADD:
           case OP_SUB:
             if (y->isZero())
-                return scX ? repmat(shared_from_this<MX>(), y.shape()) : shared_from_this<MX>();
+                return scX ? repmat(shared_from_this<MX>(), y.size()) : shared_from_this<MX>();
             break;
           case OP_MUL:
             if (y->isValue(1)) return shared_from_this<MX>();

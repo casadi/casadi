@@ -2037,7 +2037,7 @@ namespace casadi {
     return nnz;
   }
 
-  std::pair<int, int> SparsityInternal::shape() const {
+  std::pair<int, int> SparsityInternal::size() const {
     return std::pair<int, int>(size1(), size2());
   }
 

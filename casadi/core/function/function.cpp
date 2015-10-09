@@ -777,7 +777,7 @@ namespace casadi {
   }
 
   inline bool checkMat(const Sparsity& arg, const Sparsity& inp, bool hcat=false) {
-    return arg.shape()==inp.shape() || arg.isempty() || arg.isscalar() ||
+    return arg.size()==inp.size() || arg.isempty() || arg.isscalar() ||
       (inp.size2()==arg.size1() && inp.size1()==arg.size2()
        && (arg.iscolumn() || inp.iscolumn())) ||
       (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0);
@@ -791,7 +791,7 @@ namespace casadi {
     for (int i=0; i<n_in; ++i) {
       casadi_assert_message(checkMat(arg[i].sparsity(), input(i).sparsity(), hcat),
                             "Input " << i << " has mismatching shape. Expected "
-                            << input(i).shape() << ", got " << arg[i].shape());
+                            << input(i).size() << ", got " << arg[i].size());
     }
   }
 
@@ -803,7 +803,7 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) {
       casadi_assert_message(checkMat(res[i].sparsity(), output(i).sparsity()),
                             "Output " << i << " has mismatching shape. Expected "
-                            << output(i).shape() << ", got " << res[i].shape());
+                            << output(i).size() << ", got " << res[i].size());
     }
   }
 
@@ -817,8 +817,8 @@ namespace casadi {
       for (int i=0; i<n_in; ++i) {
         casadi_assert_message(checkMat(fseed[d][i].sparsity(), input(i).sparsity()),
                               "Forward seed " << i << " for direction " << d
-                              << " has mismatching shape. Expected " << input(i).shape()
-                              << ", got " << fseed[d][i].shape());
+                              << " has mismatching shape. Expected " << input(i).size()
+                              << ", got " << fseed[d][i].size());
       }
     }
   }
@@ -833,8 +833,8 @@ namespace casadi {
       for (int i=0; i<n_out; ++i) {
         casadi_assert_message(checkMat(aseed[d][i].sparsity(), output(i).sparsity()),
                               "Adjoint seed " << i << " for direction " << d
-                              << " has mismatching shape. Expected " << output(i).shape()
-                              << ", got " << aseed[d][i].shape());
+                              << " has mismatching shape. Expected " << output(i).size()
+                              << ", got " << aseed[d][i].size());
       }
     }
   }
@@ -848,7 +848,7 @@ namespace casadi {
         if (arg.at(i).size1()!=input(i).size1()) return false;
         if (arg.at(i).size2() % input(i).size2()!=0 || arg.at(i).size2()==0) return false;
       } else {
-        if (arg.at(i).shape()!=input(i).shape()) return false;
+        if (arg.at(i).size()!=input(i).size()) return false;
       }
     }
     return true;
@@ -859,7 +859,7 @@ namespace casadi {
     checkRes(res);
     int n_out = nOut();
     for (int i=0; i<n_out; ++i) {
-      if (res.at(i).shape()!=output(i).shape()) return false;
+      if (res.at(i).size()!=output(i).size()) return false;
     }
     return true;
   }
@@ -884,7 +884,7 @@ namespace casadi {
 
   template<typename M>
   M replaceMat(const M& arg, const Sparsity& inp, bool hcat=false) {
-    if (arg.shape()==inp.shape()) {
+    if (arg.size()==inp.size()) {
       // Matching dimensions already
       return arg;
     } else if (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0
@@ -893,7 +893,7 @@ namespace casadi {
       return arg;
     } else if (arg.isempty()) {
       // Empty matrix means set zero
-      return M(inp.shape());
+      return M(inp.size());
     } else if (arg.isscalar()) {
       // Scalar assign means set all
       return M(inp, arg);
