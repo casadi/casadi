@@ -250,6 +250,7 @@ namespace casadi {
     
     // Read line-by-line
     std::string file_name = path + sep + file;
+    userOut() << "test001cc" << file_name << std::endl;
     std::ifstream setup_file(file_name.c_str());
     
     userOut() << "test001c" << std::endl;
