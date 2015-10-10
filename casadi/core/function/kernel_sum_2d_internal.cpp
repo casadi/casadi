@@ -41,9 +41,9 @@ namespace casadi {
     casadi_assert_message(n==1, "Vectorized form of KernelSum2D not yet implemented.");
 
     casadi_assert(f.n_in()>=2);
-    casadi_assert(f.inputSparsity(0)==Sparsity::dense(2, 1));
-    casadi_assert(f.inputSparsity(1)==Sparsity::dense(1, 1));
-    casadi_assert(f.inputSparsity(2)==Sparsity::dense(2, 1));
+    casadi_assert(f.sparsity_in(0)==Sparsity::dense(2, 1));
+    casadi_assert(f.sparsity_in(1)==Sparsity::dense(1, 1));
+    casadi_assert(f.sparsity_in(2)==Sparsity::dense(2, 1));
   }
 
   KernelSum2DInternal::~KernelSum2DInternal() {
@@ -61,12 +61,12 @@ namespace casadi {
 
     for (int i=0;i<num_in-3;++i) {
       // Allocate space for input
-      input(2+i) = DMatrix::zeros(f_.inputSparsity(i+3));
+      input(2+i) = DMatrix::zeros(f_.sparsity_in(i+3));
     }
 
     for (int i=0;i<num_out;++i) {
       // Allocate space for output
-      output(i) = DMatrix::zeros(f_.outputSparsity(i));
+      output(i) = DMatrix::zeros(f_.sparsity_out(i));
     }
 
     // Call the initialization method of the base class
@@ -356,7 +356,7 @@ namespace casadi {
     std::vector<MX> kn_inputs = ret_inputs;
     for (int i=0;i<num_out;++i) {
       // Dummy symbols for the nominal outputs (S)
-      MX output = MX::sym("x", Sparsity(f_.outputSparsity(i).size()));
+      MX output = MX::sym("x", Sparsity(f_.sparsity_out(i).size()));
       ret_inputs.push_back(output);
     }
     for (int i=0;i<nadj;++i) {

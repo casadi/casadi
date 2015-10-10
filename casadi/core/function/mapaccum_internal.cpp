@@ -49,11 +49,11 @@ namespace casadi {
         casadi_assert(output_accum[n_accum]>=0);
         casadi_assert(output_accum[n_accum]<f_.n_out());
 
-        casadi_assert_message(f.inputSparsity(i)==f.outputSparsity(output_accum[n_accum]),
+        casadi_assert_message(f.sparsity_in(i)==f.sparsity_out(output_accum[n_accum]),
                               "Input #" << i << " and output #" << output_accum[n_accum] <<
                               " must have matching sparsity. " <<
-                              "Got " << f.inputSparsity(i).dimString() << " and " <<
-                              f.outputSparsity(output_accum[n_accum]).dimString() << ".");
+                              "Got " << f.sparsity_in(i).dimString() << " and " <<
+                              f.sparsity_out(output_accum[n_accum]).dimString() << ".");
         n_accum++;
       }
     }
@@ -419,7 +419,7 @@ namespace casadi {
 
       // Add extra seeds
       for (int j=0;j<output_accum_.size();++j) {
-        MX s = MX::sym("x", f_.outputSparsity(output_accum_[j]));
+        MX s = MX::sym("x", f_.sparsity_out(output_accum_[j]));
         f_der_ins.push_back(s);
       }
     }
@@ -611,10 +611,10 @@ namespace casadi {
         if (input_accum_[j]) {
           MX& x = der_outs[i*n_in()+j];
           if (reverse_) {
-            std::vector<MX> r = bisect(x, f_.inputSparsity(j).size2()*(n_-1));
+            std::vector<MX> r = bisect(x, f_.sparsity_in(j).size2()*(n_-1));
             x = r[1];
           } else {
-            std::vector<MX> r = bisect(x, f_.inputSparsity(j).size2());
+            std::vector<MX> r = bisect(x, f_.sparsity_in(j).size2());
             x = r[0];
           }
         }

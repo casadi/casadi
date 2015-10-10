@@ -103,22 +103,6 @@ namespace casadi {
 #endif // SWIG
     /// \endcond
 
-
-    /** \brief Get default input value */
-    double default_in(int ind) const;
-
-    /** \brief Get sparsity of a given input */
-    /// @{
-    Sparsity inputSparsity(int ind=0) const;
-    Sparsity inputSparsity(const std::string& iname) const;
-    /// @}
-
-    /** \brief Get sparsity of a given output */
-    /// @{
-    Sparsity outputSparsity(int ind=0) const;
-    Sparsity outputSparsity(const std::string& iname) const;
-    /// @}
-
 #ifndef SWIG
     /// \cond UNSAFE
     /** \brief [UNSAFE] Obtain reference to inputs
@@ -194,6 +178,21 @@ namespace casadi {
 
     /** \brief Get output scheme description by index */
     std::string description_out(int ind) const;
+
+    /** \brief Get default input value */
+    double default_in(int ind) const;
+
+    /** \brief Get sparsity of a given input */
+    /// @{
+    Sparsity sparsity_in(int ind) const;
+    Sparsity sparsity_in(const std::string& iname) const;
+    /// @}
+
+    /** \brief Get sparsity of a given output */
+    /// @{
+    Sparsity sparsity_out(int ind) const;
+    Sparsity sparsity_out(const std::string& iname) const;
+    /// @}
 
     /** \brief  Evaluate */
     void evaluate();

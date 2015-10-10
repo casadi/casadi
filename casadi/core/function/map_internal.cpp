@@ -106,11 +106,11 @@ namespace casadi {
 
     for (int i=0;i<n_in_;++i) {
       // Allocate space for input
-      input(i) = DMatrix::zeros(repmat(f_.inputSparsity(i), 1, n_));
+      input(i) = DMatrix::zeros(repmat(f_.sparsity_in(i), 1, n_));
     }
 
     for (int i=0;i<n_out_;++i) {
-      output(i) = DMatrix::zeros(repmat(f_.outputSparsity(i), 1, n_));
+      output(i) = DMatrix::zeros(repmat(f_.sparsity_out(i), 1, n_));
     }
 
     // Call the initialization method of the base class

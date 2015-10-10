@@ -149,16 +149,16 @@ class ADtests(casadiTestCase):
           for outputtype in ["dense","sparse"]:
             self.message("evalSX on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=SXFunction("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
-            f_in = DMatrix(f.inputSparsity(),n)
+            f_in = DMatrix(f.sparsity_in(0),n)
             [r] = f([f_in])
             J = self.jacobians[inputtype][outputtype](*n)
             
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
             
-            y = SX.sym("y",f.inputSparsity())
+            y = SX.sym("y",f.sparsity_in(0))
             
-            fseeds = map(lambda x: DMatrix(f.inputSparsity(),x), seeds)
-            aseeds = map(lambda x: DMatrix(f.outputSparsity(),x), seeds)
+            fseeds = map(lambda x: DMatrix(f.sparsity_in(0),x), seeds)
+            aseeds = map(lambda x: DMatrix(f.sparsity_out(0),x), seeds)
             with internalAPI():
               res = f.call([y])
               fwdsens = f.callForward([y], res, map(lambda x: [x],fseeds))
@@ -190,16 +190,16 @@ class ADtests(casadiTestCase):
           for outputtype in ["dense","sparse"]:
             self.message("evalMX on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=MXFunction("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
-            f_in = DMatrix(f.inputSparsity(),n)
+            f_in = DMatrix(f.sparsity_in(0),n)
             [r] = f([f_in])
             J = self.jacobians[inputtype][outputtype](*n)
             
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
             
-            y = MX.sym("y",f.inputSparsity())
+            y = MX.sym("y",f.sparsity_in(0))
             
-            fseeds = map(lambda x: DMatrix(f.inputSparsity(),x), seeds)
-            aseeds = map(lambda x: DMatrix(f.outputSparsity(),x), seeds)
+            fseeds = map(lambda x: DMatrix(f.sparsity_in(0),x), seeds)
+            aseeds = map(lambda x: DMatrix(f.sparsity_out(0),x), seeds)
             with internalAPI():
               res = f.call([y])
               fwdsens = f.callForward([y],res,map(lambda x: [x],fseeds))
@@ -277,7 +277,7 @@ class ADtests(casadiTestCase):
           for outputtype in ["dense","sparse"]:
             self.message("evalSX on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=MXFunction("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
-            f_in = DMatrix(f.inputSparsity(),n)
+            f_in = DMatrix(f.sparsity_in(0),n)
             [r] = f([f_in])
   
             y = SX.sym("y",f.getInput().sparsity())
@@ -306,7 +306,7 @@ class ADtests(casadiTestCase):
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1              
               f=SXFunction("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype], opts)
               Jf=f.jacobian(0,0)
-              J_in = DMatrix(f.inputSparsity(),n)
+              J_in = DMatrix(f.sparsity_in(0),n)
               [Jout,_] = Jf([J_in])
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(Jout),J,"Jacobian\n Mode: %s\n Input: %s %s\n Output: %s %s"% (mode, inputshape, inputtype, outputshape, outputtype))
@@ -327,7 +327,7 @@ class ADtests(casadiTestCase):
                   )
               ]
             )
-            J_in = DMatrix(Jf.inputSparsity(),n)
+            J_in = DMatrix(Jf.sparsity_in(0),n)
             [J_out] = Jf([J_in])
             J = self.jacobians[inputtype][outputtype](*n)
             self.checkarray(array(J_out),J,"jacobian")
@@ -356,7 +356,7 @@ class ADtests(casadiTestCase):
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1
               f=MXFunction("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
               Jf=f.jacobian(0,0)
-              J_in = DMatrix(f.inputSparsity(),n)
+              J_in = DMatrix(f.sparsity_in(0),n)
               [J_out,_] = Jf([J_in])
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(J_out,J,"Jacobian\n Mode: %s\n Input: %s %s\n Output: %s %s"% (mode, inputshape, inputtype, outputshape, outputtype))
@@ -374,7 +374,7 @@ class ADtests(casadiTestCase):
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1              
               f=MXFunction("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
               Jf=f.jacobian(0,0)
-              J_in = DMatrix(f.inputSparsity(),n)
+              J_in = DMatrix(f.sparsity_in(0),n)
               [J_out,_] = Jf([J_in])
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(J_out),J,"jacobian")
@@ -431,7 +431,7 @@ class ADtests(casadiTestCase):
 
     f=SXFunction("f", [inp],[vertcat([x+y,x,y])])
     J=f.jacobian(0,0)
-    J_in = DMatrix(f.inputSparsity(),[2,7])
+    J_in = DMatrix(f.sparsity_in(0),[2,7])
     [J_out,_] = J([J_in])
 
     f=SXFunction("f", [inp],[vertcat([x+y,x,y])])

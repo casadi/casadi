@@ -339,20 +339,20 @@ namespace casadi {
     return (*this)->input(iname);
   }
 
-  Sparsity Function::inputSparsity(int ind) const {
-    return (*this)->inputSparsity(ind);
+  Sparsity Function::sparsity_in(int ind) const {
+    return (*this)->sparsity_in(ind);
   }
 
-  Sparsity Function::inputSparsity(const std::string &iname) const {
-    return (*this)->inputSparsity(iname);
+  Sparsity Function::sparsity_in(const std::string &iname) const {
+    return (*this)->sparsity_in(iname);
   }
 
-  Sparsity Function::outputSparsity(int ind) const {
-    return (*this)->outputSparsity(ind);
+  Sparsity Function::sparsity_out(int ind) const {
+    return (*this)->sparsity_out(ind);
   }
 
-  Sparsity Function::outputSparsity(const std::string &iname) const {
-    return (*this)->outputSparsity(iname);
+  Sparsity Function::sparsity_out(const std::string &iname) const {
+    return (*this)->sparsity_out(iname);
   }
 
   Matrix<double>& Function::input(int i) {
