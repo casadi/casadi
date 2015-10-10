@@ -95,8 +95,8 @@ namespace casadi {
     }
 
     // Allocate outputs
-    obuf_.resize(output_fcn_->nOut());
-    for (int i=0; i<nOut(); ++i) {
+    obuf_.resize(output_fcn_->n_out());
+    for (int i=0; i<n_out(); ++i) {
       output(i) = Matrix<double>::zeros(output_fcn_.output(i).numel(), grid_.size());
       if (!output_fcn_.output(i).isempty()) {
         casadi_assert_message(output_fcn_.output(i).iscolumn(),
@@ -128,7 +128,7 @@ namespace casadi {
     FunctionInternal::init();
 
     // Output iterators
-    output_its_.resize(nOut());
+    output_its_.resize(n_out());
   }
 
   void SimulatorInternal::evaluate() {
@@ -183,7 +183,7 @@ namespace casadi {
       output_fcn_.evaluate();
 
       // Save the outputs of the function
-      for (int i=0; i<nOut(); ++i) {
+      for (int i=0; i<n_out(); ++i) {
         const Matrix<double> &res = output_fcn_.output(i);
         copy(res.begin(), res.end(), output_its_.at(i));
         output_its_.at(i) += res.nnz();

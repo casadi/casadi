@@ -162,17 +162,17 @@ namespace casadi {
     casadi_assert_message(eval_!=0, "SimplifiedExternal: no \""+name+"\" found");
 
     // All inputs are scalars
-    for (int i=0; i<this->nIn(); ++i) {
+    for (int i=0; i<this->n_in(); ++i) {
       this->input(i) = 0;
     }
 
     // All outputs are scalars
-    for (int i=0; i<this->nOut(); ++i) {
+    for (int i=0; i<this->n_out(); ++i) {
       this->output(i) = 0;
     }
 
     // Arrays for holding inputs and outputs
-    this->alloc_w(this->nIn() + this->nOut());
+    this->alloc_w(this->n_in() + this->n_out());
   }
 
   template<typename LibType>
@@ -191,7 +191,7 @@ namespace casadi {
     }
 
     // Get the sparsity patterns
-    for (int i=0; i<this->nIn()+this->nOut(); ++i) {
+    for (int i=0; i<this->n_in()+this->n_out(); ++i) {
       // Get sparsity from file
       int nrow, ncol;
       const int *colind, *row;
@@ -211,10 +211,10 @@ namespace casadi {
       Sparsity sp(nrow, ncol, colindv, rowv);
 
       // Save to inputs/outputs
-      if (i<this->nIn()) {
+      if (i<this->n_in()) {
         this->input(i) = Matrix<double>::zeros(sp);
       } else {
-        this->output(i-this->nIn()) = Matrix<double>::zeros(sp);
+        this->output(i-this->n_in()) = Matrix<double>::zeros(sp);
       }
     }
 
@@ -247,7 +247,7 @@ namespace casadi {
                                           int* iw, double* w) {
     // Copy arguments to input buffers
     const double* arg1=w;
-    for (int i=0; i<this->nIn(); ++i) {
+    for (int i=0; i<this->n_in(); ++i) {
       *w++ = arg[i] ? *arg[i] : 0;
     }
 
@@ -255,7 +255,7 @@ namespace casadi {
     eval_(arg1, w);
 
     // Get outputs
-    for (int i=0; i<this->nOut(); ++i) {
+    for (int i=0; i<this->n_out(); ++i) {
       if (res[i]) *res[i] = *w;
       ++w;
     }

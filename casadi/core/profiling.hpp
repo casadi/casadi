@@ -156,8 +156,8 @@ void profileWriteName(std::ofstream &f, T *a, const std::string &name,
   s.length=name.size();
   s.type = type;
   s.algorithm_size = algorithm_size;
-  s.numin = a->nIn();
-  s.numout = a->nOut();
+  s.numin = a->n_in();
+  s.numout = a->n_out();
   profileWrite(f, s);
   f << name;
   for (int i=0;i<s.numin;++i) {

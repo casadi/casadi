@@ -84,7 +84,7 @@ namespace casadi {
     virtual bool isOutputNode() const {return true;}
 
     /** \brief  Get function input */
-    virtual int getFunctionInput() const { return -1;}
+    virtual int getFunction_input() const { return -1;}
 
     /** \brief  Get function output */
     virtual int getFunctionOutput() const { return oind_;}

@@ -38,16 +38,16 @@ namespace casadi {
       input_accum_(input_accum), output_accum_(output_accum), reverse_(reverse) {
 
     casadi_assert(n>0);
-    casadi_assert(f.nIn()>=1);
-    casadi_assert(f.nOut()>=1);
+    casadi_assert(f.n_in()>=1);
+    casadi_assert(f.n_out()>=1);
 
-    casadi_assert(input_accum.size()==f_.nIn());
+    casadi_assert(input_accum.size()==f_.n_in());
     int n_accum=0;
     for (int i=0;i<input_accum.size();++i) {
       if (input_accum[i]) {
         casadi_assert(n_accum<output_accum.size());
         casadi_assert(output_accum[n_accum]>=0);
-        casadi_assert(output_accum[n_accum]<f_.nOut());
+        casadi_assert(output_accum[n_accum]<f_.n_out());
 
         casadi_assert_message(f.inputSparsity(i)==f.outputSparsity(output_accum[n_accum]),
                               "Input #" << i << " and output #" << output_accum[n_accum] <<
@@ -66,7 +66,7 @@ namespace casadi {
 
   void MapAccumInternal::init() {
 
-    int num_in = f_.nIn(), num_out = f_.nOut();
+    int num_in = f_.n_in(), num_out = f_.n_out();
 
     // Initialize the functions, get input and output sparsities
     // Input and output sparsities
@@ -126,7 +126,7 @@ namespace casadi {
   template<typename T, typename R>
   void MapAccumInternal::evalGen(const T** arg, T** res, int* iw, T* w,
                                  R reduction) {
-    int num_in = f_.nIn(), num_out = f_.nOut();
+    int num_in = f_.n_in(), num_out = f_.n_out();
 
     // Catch: must accomodate scenario where res[j] of the accumulator = 0.
 
@@ -260,7 +260,7 @@ namespace casadi {
               0, 0, 0, 0,  1,      0
       
     */
-    std::vector<bool> input_accum(nIn()+nOut(), false);
+    std::vector<bool> input_accum(n_in()+n_out(), false);
     for (int i=0;i<nfwd;++i) {
       input_accum.insert(input_accum.end(), input_accum_.begin(), input_accum_.end());
     }
@@ -279,7 +279,7 @@ namespace casadi {
       for (int j=0;j<output_accum_.size();++j) {
         output_accum.push_back(offset+output_accum_[j]);
       }
-      offset+= nOut();
+      offset+= n_out();
     }
 
     // Construct the new MapAccum
@@ -314,7 +314,7 @@ namespace casadi {
     // which correspond to accumulators, supply these with the whole history
     /** Takes care of:  [x0 x1 x2]   */
     int i_output_accum=0;
-    for (int i=0;i<nIn();++i) {
+    for (int i=0;i<n_in();++i) {
       if (input_accum_[i]) {
         // [x0 x1 x2 x3] -> all
         // [x0 x1 x2] -> in
@@ -440,14 +440,14 @@ namespace casadi {
     for (int i=0;i<nadj;++i) {
 
       // Obtain the sensitivities of direction i.
-      f_der_outs.insert(f_der_outs.end(), der_outs.begin()+i*nIn(), der_outs.begin()+(i+1)*nIn());
+      f_der_outs.insert(f_der_outs.end(), der_outs.begin()+i*n_in(), der_outs.begin()+(i+1)*n_in());
 
       int i_output_accum = 0;
-      for (int j=0;j<nIn();++j) {
+      for (int j=0;j<n_in();++j) {
         if (input_accum_[j]) {
           // Add the extra argument to the output
-          int idx = nIn()+nOut()+i*(nOut()+output_accum_.size())+nOut()+i_output_accum;
-          f_der_outs[i*nIn()+j] += f_der_ins[idx];
+          int idx = n_in()+n_out()+i*(n_out()+output_accum_.size())+n_out()+i_output_accum;
+          f_der_outs[i*n_in()+j] += f_der_ins[idx];
           i_output_accum ++;
         }
       }
@@ -463,8 +463,8 @@ namespace casadi {
               0, 0, 0, 0,  1,      0,     0
       
     */
-    std::vector<bool> input_accum(nIn()+nOut(), false);
-    std::vector<bool> input_accum_rev(nOut(), false);
+    std::vector<bool> input_accum(n_in()+n_out(), false);
+    std::vector<bool> input_accum_rev(n_out(), false);
     for (int j=0;j<output_accum_.size();++j) {
       input_accum_rev[output_accum_[j]] = true;
     }
@@ -493,7 +493,7 @@ namespace casadi {
       for (int j=0;j<output_accum_.size();++j) {
         output_accum.push_back(offset+output_accum_rev[j]);
       }
-      offset+= nIn();
+      offset+= n_in();
     }
 
     // Create the new MapAccum
@@ -530,7 +530,7 @@ namespace casadi {
     der_ins.insert(der_ins.end(), ins.begin(), ins.end());
     der_ins.insert(der_ins.end(), outs.begin(), outs.end());
     int i_output_accum=0;
-    for (int i=0;i<nIn();++i) {
+    for (int i=0;i<n_in();++i) {
       if (input_accum_[i]) {
         // [x0 x1 x2 x3] -> all
         // [x0 x1 x2] -> in
@@ -564,7 +564,7 @@ namespace casadi {
       f_der_ins.insert(f_der_ins.end(), outs.begin(), outs.end());
 
       int i_output_accum=0;
-      for (int j=0;j<nIn();++j) {
+      for (int j=0;j<n_in();++j) {
         if (input_accum_[j]) {
           if (reverse_) {
             // 0, [X1_bar X2_bar X3_bar] -> all
@@ -574,7 +574,7 @@ namespace casadi {
             std::vector<MX> splits = bisect(all, ins[j].size2());
 
             // alter the seed corresponding to an accumulator
-            f_der_ins[nIn()+nOut()+i*(nOut()+output_accum_.size())+output_accum_[i_output_accum]]
+            f_der_ins[n_in()+n_out()+i*(n_out()+output_accum_.size())+output_accum_[i_output_accum]]
               = splits[0];
             // supply extra inputs
             f_der_ins.push_back(splits[1]);
@@ -586,7 +586,7 @@ namespace casadi {
             std::vector<MX> splits = bisect(all, ins[j].size2()*n_);
 
             // alter the seed corresponding to an accumulator
-            f_der_ins[nIn()+nOut()+i*(nOut()+output_accum_.size())+output_accum_[i_output_accum]]
+            f_der_ins[n_in()+n_out()+i*(n_out()+output_accum_.size())+output_accum_[i_output_accum]]
               = splits[1];
             // supply extra inputs
             f_der_ins.push_back(splits[0]);
@@ -607,9 +607,9 @@ namespace casadi {
       
     */
     for (int i=0;i<nadj;++i) {
-      for (int j=0;j<nIn();++j) {
+      for (int j=0;j<n_in();++j) {
         if (input_accum_[j]) {
-          MX& x = der_outs[i*nIn()+j];
+          MX& x = der_outs[i*n_in()+j];
           if (reverse_) {
             std::vector<MX> r = bisect(x, f_.inputSparsity(j).size2()*(n_-1));
             x = r[1];
@@ -634,7 +634,7 @@ namespace casadi {
 
   void MapAccumInternal::generateBody(CodeGenerator& g) const {
     g.addAuxiliary(CodeGenerator::AUX_COPY_N);
-    int num_in = f_.nIn(), num_out = f_.nOut();
+    int num_in = f_.n_in(), num_out = f_.n_out();
 
     g.body << "  const real_t** arg1 = arg+" << f_.sz_arg() << ";" << endl
            << "  real_t** res1 = res + " << f_.sz_res() << ";" << endl;

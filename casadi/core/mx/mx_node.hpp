@@ -115,7 +115,7 @@ namespace casadi {
     virtual void print(std::ostream &stream) const;
 
     /** \brief Find out which nodes can be inlined */
-    void canInline(std::map<const MXNode*, int>& nodeind) const;
+    void can_inline(std::map<const MXNode*, int>& nodeind) const;
 
     /** \brief Print compact */
     std::string printCompact(std::map<const MXNode*, int>& nodeind,
@@ -192,7 +192,7 @@ namespace casadi {
     virtual const Function& getFunction(int i) const;
 
     /** \brief  Get function input */
-    virtual int getFunctionInput() const;
+    virtual int getFunction_input() const;
 
     /** \brief  Get function output */
     virtual int getFunctionOutput() const;

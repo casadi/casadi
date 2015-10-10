@@ -108,7 +108,7 @@ namespace casadi {
     virtual const Function& getFunction(int i) const { return fcn_;}
 
     /** \brief  Get function input */
-    virtual int getFunctionInput() const { return -1;}
+    virtual int getFunction_input() const { return -1;}
 
     /** \brief  Get function output */
     virtual int getFunctionOutput() const { return -1;}

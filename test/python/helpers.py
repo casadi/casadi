@@ -307,22 +307,22 @@ class casadiTestCase(unittest.TestCase):
     if indirect:
       ins = trial.symbolicInput()
       extra_trial = MXFunction("extra_trial", ins,trial.call(ins))
-      for i in range(trial.nIn()):
+      for i in range(trial.n_in()):
         extra_trial.setInput(trial.getInput(i),i)
       self.checkfunction(extra_trial,solution,fwd,adj,jacobian,gradient,hessian,sens_der,evals,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
-      for i in range(trial.nIn()):
+      for i in range(trial.n_in()):
         trial.setInput(extra_trial.getInput(i),i)
 
     if digits_sens is None:
       digits_sens = digits
      
-    for i in range(trial.nIn()):
+    for i in range(trial.n_in()):
       if (allow_empty and (trial.getInput(i).isempty() or solution.getInput(i).isempty() )): continue
       message = "input(%d)" % i
       self.checkarray(trial.getInput(i),solution.getInput(i),"",digits=digits,failmessage=failmessage+": "+ message)
 
-    trial_inputs    = [ DMatrix(trial.getInput(k)) for k in range(trial.nIn())]
-    solution_inputs = [ DMatrix(solution.getInput(k)) for k in range(solution.nIn())] 
+    trial_inputs    = [ DMatrix(trial.getInput(k)) for k in range(trial.n_in())]
+    solution_inputs = [ DMatrix(solution.getInput(k)) for k in range(solution.n_in())] 
 
     try:
       trial.evaluate()
@@ -330,15 +330,15 @@ class casadiTestCase(unittest.TestCase):
     except Exception as e:
       raise Exception(str(e) + "\nThis occured for simple evaluate(%d,%d) for: %s" % (0,0,failmessage) )
 
-    for i in range(trial.nIn()):
+    for i in range(trial.n_in()):
       message = "input(%d) modified by evaluate" % i
       self.checkarray(trial.getInput(i),trial_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
       self.checkarray(solution.getInput(i),solution_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
 
-    self.assertEqual(trial.nOut(),solution.nOut(),failmessage+": trial has %d outputs while solution has %d." % (trial.nOut(),solution.nOut()) )
-    self.assertEqual(trial.nIn(),solution.nIn(),failmessage+": trial has %d inputs while solution has %d." % (trial.nIn(),solution.nIn()) )
+    self.assertEqual(trial.n_out(),solution.n_out(),failmessage+": trial has %d outputs while solution has %d." % (trial.n_out(),solution.n_out()) )
+    self.assertEqual(trial.n_in(),solution.n_in(),failmessage+": trial has %d inputs while solution has %d." % (trial.n_in(),solution.n_in()) )
 
-    for i in range(trial.nOut()):
+    for i in range(trial.n_out()):
       message = "output(%d)" % i
       if (allow_empty and (trial.getOutput(i).isempty() or solution.getOutput(i).isempty() )): continue
       if (allow_nondiff and (trial.getOutput(i).nnz()==0 or solution.getOutput(i).nnz()==0 )): continue
@@ -350,71 +350,71 @@ class casadiTestCase(unittest.TestCase):
     except Exception as e:
       raise Exception(str(e) + "\nThis occured for repeated evaluate(%d,%d) for: %s" % (0,0,failmessage) )
 
-    for i in range(trial.nIn()):
+    for i in range(trial.n_in()):
       message = "input(%d) modified by repeated evaluate" % i
       self.checkarray(trial.getInput(i),trial_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
       self.checkarray(solution.getInput(i),solution_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
 
-    self.assertEqual(trial.nOut(),solution.nOut(),failmessage+": trial has %d outputs while solution has %d." % (trial.nOut(),solution.nOut()) )
-    self.assertEqual(trial.nIn(),solution.nIn(),failmessage+": trial has %d inputs while solution has %d." % (trial.nIn(),solution.nIn()) )
+    self.assertEqual(trial.n_out(),solution.n_out(),failmessage+": trial has %d outputs while solution has %d." % (trial.n_out(),solution.n_out()) )
+    self.assertEqual(trial.n_in(),solution.n_in(),failmessage+": trial has %d inputs while solution has %d." % (trial.n_in(),solution.n_in()) )
 
-    for i in range(trial.nOut()):
+    for i in range(trial.n_out()):
       message = "output(%d)" % i
       if (allow_empty and (trial.getOutput(i).isempty() or solution.getOutput(i).isempty() )): continue
       if (allow_nondiff and (trial.getOutput(i).nnz()==0 or solution.getOutput(i).nnz()==0 )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
     
-    for i in range(trial.nIn()):
+    for i in range(trial.n_in()):
       message = "input(%d) modified by evaluate" % i
       self.checkarray(trial.getInput(i),trial_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
       self.checkarray(solution.getInput(i),solution_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
     
     if jacobian:
-      for i in range(trial.nIn()):
+      for i in range(trial.n_in()):
         if (allow_empty and (trial.getInput(i).isempty() or solution.getInput(i).isempty() )): continue
-        for j in range(trial.nOut()):
+        for j in range(trial.n_out()):
           trialjac = trial.jacobian(i,j)
-          self.assertEqual(trialjac.nIn(),trial.nIn())
-          self.assertEqual(trialjac.nOut(),trial.nOut()+1)
-          for k in range(trial.nIn()): trialjac.setInput(trial_inputs[k],k)
+          self.assertEqual(trialjac.n_in(),trial.n_in())
+          self.assertEqual(trialjac.n_out(),trial.n_out()+1)
+          for k in range(trial.n_in()): trialjac.setInput(trial_inputs[k],k)
           solutionjac = solution.jacobian(i,j)
-          self.assertEqual(solutionjac.nIn(),solution.nIn())
-          self.assertEqual(solutionjac.nOut(),solution.nOut()+1)
-          for k in range(solution.nIn()): solutionjac.setInput(solution_inputs[k],k)
+          self.assertEqual(solutionjac.n_in(),solution.n_in())
+          self.assertEqual(solutionjac.n_out(),solution.n_out()+1)
+          for k in range(solution.n_in()): solutionjac.setInput(solution_inputs[k],k)
           
           self.checkfunction(trialjac,solutionjac,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)
 
     if gradient:
-      for i in range(trial.nIn()):
+      for i in range(trial.n_in()):
         if (allow_empty and (trial.getInput(i).isempty() or solution.getInput(i).isempty() )): continue
-        for j in range(trial.nOut()):
+        for j in range(trial.n_out()):
           if trial.getOutput(j).isscalar() and solution.getOutput(j).isscalar():
             trialgrad = trial.gradient(i,j)
-            self.assertEqual(trialgrad.nIn(),trial.nIn())
-            self.assertEqual(trialgrad.nOut(),trial.nOut()+1)
-            for k in range(trial.nIn()): trialgrad.setInput(trial_inputs[k],k)
+            self.assertEqual(trialgrad.n_in(),trial.n_in())
+            self.assertEqual(trialgrad.n_out(),trial.n_out()+1)
+            for k in range(trial.n_in()): trialgrad.setInput(trial_inputs[k],k)
             solutiongrad = solution.gradient(i,j)
-            self.assertEqual(solutiongrad.nIn(),solution.nIn())
-            self.assertEqual(solutiongrad.nOut(),solution.nOut()+1)
-            for k in range(solution.nIn()): solutiongrad.setInput(solution_inputs[k],k)
+            self.assertEqual(solutiongrad.n_in(),solution.n_in())
+            self.assertEqual(solutiongrad.n_out(),solution.n_out()+1)
+            for k in range(solution.n_in()): solutiongrad.setInput(solution_inputs[k],k)
             self.checkfunction(trialgrad,solutiongrad,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)
 
     if hessian:
-      for i in range(trial.nIn()):
+      for i in range(trial.n_in()):
         if (allow_empty and (trial.getInput(i).isempty() or solution.getInput(i).isempty() )): continue
-        for j in range(trial.nOut()):
+        for j in range(trial.n_out()):
           if trial.getOutput(j).isscalar() and solution.getOutput(j).isscalar():
             trialhess = trial.hessian(i,j)
-            self.assertEqual(trialhess.nIn(),trial.nIn())
-            self.assertEqual(trialhess.nOut(),trial.nOut()+2)
-            for k in range(trial.nIn()): trialhess.setInput(trial_inputs[k],k)
+            self.assertEqual(trialhess.n_in(),trial.n_in())
+            self.assertEqual(trialhess.n_out(),trial.n_out()+2)
+            for k in range(trial.n_in()): trialhess.setInput(trial_inputs[k],k)
             solutionhess = solution.hessian(i,j)
-            self.assertEqual(solutionhess.nIn(),solution.nIn())
-            self.assertEqual(solutionhess.nOut(),solution.nOut()+2)
-            for k in range(solution.nIn()): solutionhess.setInput(solution_inputs[k],k)
+            self.assertEqual(solutionhess.n_in(),solution.n_in())
+            self.assertEqual(solutionhess.n_out(),solution.n_out()+2)
+            for k in range(solution.n_in()): solutionhess.setInput(solution_inputs[k],k)
             self.checkfunction(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)     
 
-    for k in range(trial.nIn()):
+    for k in range(trial.n_in()):
       trial.setInput(trial_inputs[k],k)
       solution.setInput(solution_inputs[k],k)
       
@@ -463,9 +463,9 @@ class casadiTestCase(unittest.TestCase):
       
         # dense
         for spmod,spmod2 in itertools.product(spmods,repeat=2):
-          fseeds = [[sym("f",spmod(f.getInput(i)).sparsity()) for i in range(f.nIn())]  for d in range(ndir)]
-          aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.nOut())] for d in range(ndir)]
-          inputss = [sym("i",f.getInput(i).sparsity()) for i in range(f.nIn())]
+          fseeds = [[sym("f",spmod(f.getInput(i)).sparsity()) for i in range(f.n_in())]  for d in range(ndir)]
+          aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.n_out())] for d in range(ndir)]
+          inputss = [sym("i",f.getInput(i).sparsity()) for i in range(f.n_in())]
           with internalAPI():
             res = f.call(inputss)
             fwdsens = f.callForward(inputss, res, fseeds)
@@ -477,7 +477,7 @@ class casadiTestCase(unittest.TestCase):
             vf.setInput(v,i)
         
           # Complete random seeding
-          for i in range(f.nIn(),vf.nIn()):
+          for i in range(f.n_in(),vf.n_in()):
             random.seed(i)
             vf.setInput(DMatrix(vf.getInput(i).sparsity(),random.random(vf.getInput(i).nnz())),i)
           
@@ -485,7 +485,7 @@ class casadiTestCase(unittest.TestCase):
           storagekey = (spmod,spmod2)
           if not(storagekey in storage):
             storage[storagekey] = []
-          storage[storagekey].append([vf.getOutput(i) for i in range(vf.nOut())])
+          storage[storagekey].append([vf.getOutput(i) for i in range(vf.n_out())])
           
           if vf_reference is None:
             vf_reference = vf
@@ -494,9 +494,9 @@ class casadiTestCase(unittest.TestCase):
 
             # Second order sensitivities
             for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
-              fseeds2 = [[sym("f",vf_reference.getInput(i).sparsity()) for i in range(vf.nIn())] for d in range(ndir)]
-              aseeds2 = [[sym("a",vf_reference.getOutput(i).sparsity())  for i in range(vf.nOut()) ] for d in range(ndir)]
-              inputss2 = [sym("i",vf_reference.getInput(i).sparsity()) for i in range(vf.nIn())]
+              fseeds2 = [[sym("f",vf_reference.getInput(i).sparsity()) for i in range(vf.n_in())] for d in range(ndir)]
+              aseeds2 = [[sym("a",vf_reference.getOutput(i).sparsity())  for i in range(vf.n_out()) ] for d in range(ndir)]
+              inputss2 = [sym("i",vf_reference.getInput(i).sparsity()) for i in range(vf.n_in())]
               
               with internalAPI():
                 res2 = vf.call(inputss2)
@@ -508,7 +508,7 @@ class casadiTestCase(unittest.TestCase):
               for i,v in enumerate(values):
                 vf2.setInput(v,i)
             
-              for i in range(f.nIn(),vf2.nIn()):
+              for i in range(f.n_in(),vf2.n_in()):
                 random.seed(i)
                 vf2.setInput(DMatrix(vf2.getInput(i).sparsity(),random.random(vf2.getInput(i).nnz())),i)
               
@@ -516,7 +516,7 @@ class casadiTestCase(unittest.TestCase):
               storagekey = (spmod,spmod2)
               if not(storagekey in storage2):
                 storage2[storagekey] = []
-              storage2[storagekey].append([vf2.getOutput(i) for i in range(vf2.nOut())])
+              storage2[storagekey].append([vf2.getOutput(i) for i in range(vf2.n_out())])
 
       # Remainder of eval testing
       for store,order in [(storage,"first-order"),(storage2,"second-order")][:evals]:
@@ -530,7 +530,7 @@ class casadiTestCase(unittest.TestCase):
               #self.checkarray(IMatrix(a.sparsity(),1),IMatrix(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
               self.checkarray(a,b,("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
               
-    for k in range(trial.nIn()):
+    for k in range(trial.n_in()):
       trial.setInput(trial_inputs[k],k)
       solution.setInput(solution_inputs[k],k)
 
@@ -543,13 +543,13 @@ class casadiTestCase(unittest.TestCase):
       p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
       F2 = ExternalFunction(name)
 
-      for i in range(F.nIn()):
+      for i in range(F.n_in()):
         F2.setInput(F.getInput(i),i)
 
       F.evaluate()
       F2.evaluate()
 
-      for i in range(F.nOut()):
+      for i in range(F.n_out()):
         self.checkarray(F2.getOutput(i),F.getOutput(i))
 
 

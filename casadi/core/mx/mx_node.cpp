@@ -226,7 +226,7 @@ namespace casadi {
   void MXNode::print(std::ostream &stream) const {
     // Find out which noded can be inlined
     std::map<const MXNode*, int> nodeind;
-    canInline(nodeind);
+    can_inline(nodeind);
 
     // Print expression
     vector<string> intermed;
@@ -240,7 +240,7 @@ namespace casadi {
     stream << s;
   }
 
-  void MXNode::canInline(std::map<const MXNode*, int>& nodeind) const {
+  void MXNode::can_inline(std::map<const MXNode*, int>& nodeind) const {
     // Add or mark node in map
     std::map<const MXNode*, int>::iterator it=nodeind.find(this);
     if (it==nodeind.end()) {
@@ -249,7 +249,7 @@ namespace casadi {
 
       // Handle dependencies with recursion
       for (int i=0; i<ndep(); ++i) {
-        dep(i)->canInline(nodeind);
+        dep(i)->can_inline(nodeind);
       }
     } else if (it->second==0 && getOp()!=OP_PARAMETER) {
       // Node encountered before, do not inline (except if symbolic primitive)
@@ -296,7 +296,7 @@ namespace casadi {
                           typeid(*this).name());
   }
 
-  int MXNode::getFunctionInput() const {
+  int MXNode::getFunction_input() const {
     throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") +
                           typeid(*this).name());
   }

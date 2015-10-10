@@ -78,8 +78,8 @@ namespace casadi {
     // Printing
     intOpts_["Major print level"] = "1 * 1-line major iteration log";
     intOpts_["Minor print level"] = "1 * 1-line minor iteration log";
-    // special om["Print file"] = OT_S; //  * specified by subroutine snInit
-    // special om["Summary file"] = OT_S; //  * specified by subroutine snInit
+    // special om["Print file"] = OT_S; //  * specified by subroutine sn_init
+    // special om["Summary file"] = OT_S; //  * specified by subroutine sn_init
     intOpts_["Print frequency"] = "100 * minor iterations log on Print file";
     intOpts_["Summary frequency"] = "100 * minor iterations log on Summary file";
     strOpts_["Solution"] = spair("Yes|No|If Optimal|If Infeasible|If Unbounded",

@@ -40,7 +40,7 @@ namespace casadi {
 
     casadi_assert_message(n==1, "Vectorized form of KernelSum2D not yet implemented.");
 
-    casadi_assert(f.nIn()>=2);
+    casadi_assert(f.n_in()>=2);
     casadi_assert(f.inputSparsity(0)==Sparsity::dense(2, 1));
     casadi_assert(f.inputSparsity(1)==Sparsity::dense(1, 1));
     casadi_assert(f.inputSparsity(2)==Sparsity::dense(2, 1));
@@ -51,7 +51,7 @@ namespace casadi {
 
   void KernelSum2DInternal::init() {
 
-    int num_in = f_.nIn(), num_out = f_.nOut();
+    int num_in = f_.n_in(), num_out = f_.n_out();
 
     ibuf_.resize(num_in-1);
     obuf_.resize(num_out);
@@ -96,7 +96,7 @@ namespace casadi {
   void KernelSum2DInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // First input is non-differentiable
 
-    int num_in = f_.nIn(), num_out = f_.nOut();
+    int num_in = f_.n_in(), num_out = f_.n_out();
 
     // Clear the accumulators
     bvec_t** sum = res;
@@ -148,7 +148,7 @@ namespace casadi {
 
   void KernelSum2DInternal::evalD(const double** arg, double** res,
                                 int* iw, double* w) {
-    int num_in = f_.nIn(), num_out = f_.nOut();
+    int num_in = f_.n_in(), num_out = f_.n_out();
 
     const double* V = arg[0];
     const double* X = arg[1];
@@ -303,7 +303,7 @@ namespace casadi {
     *
     */
 
-    int num_in = f_.nIn(), num_out = f_.nOut();
+    int num_in = f_.n_in(), num_out = f_.n_out();
 
     /* More exactly, the reverse mode of the primitive is
     * fd( P_i, v_i, X, S, S_bar) -> P_i_bar, v_i_bar, X_bar
@@ -339,8 +339,8 @@ namespace casadi {
     int offset = 2;
     for (int i=0;i<nadj;++i) {
       f_outputs.insert(f_outputs.end(), fd_outputs.begin()+offset,
-        fd_outputs.begin()+offset+f_.nIn()-2);
-      offset+= f_.nIn();
+        fd_outputs.begin()+offset+f_.n_in()-2);
+      offset+= f_.n_in();
     }
 
     Function f_reverse = MXFunction("f", f_inputs, f_outputs);
@@ -390,7 +390,7 @@ namespace casadi {
     g.addAuxiliary(CodeGenerator::AUX_COPY_N);
     g.addAuxiliary(CodeGenerator::AUX_FILL_N);
     g.addAuxiliary(CodeGenerator::AUX_AXPY);
-    int num_in = f_.nIn(), num_out = f_.nOut();
+    int num_in = f_.n_in(), num_out = f_.n_out();
 
     g.body << "  const real_t* V = arg[0];" << std::endl;
     g.body << "  const real_t* X = arg[1];" << std::endl;

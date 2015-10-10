@@ -300,12 +300,12 @@ namespace casadi {
     setOutputNZ(NV_DATA_S(u_), iout_);
 
     // Evaluate auxiliary outputs
-    if (nOut()>0) {
+    if (n_out()>0) {
       f_.setInput(output(iout_), iin_);
-      for (int i=0; i<nIn(); ++i)
+      for (int i=0; i<n_in(); ++i)
         if (i!=iin_) f_.setInput(input(i), i);
       f_.evaluate();
-      for (int i=0; i<nOut(); ++i) {
+      for (int i=0; i<n_out(); ++i) {
         if (i!=iout_) f_.getOutput(output(i), i);
       }
     }
@@ -322,7 +322,7 @@ namespace casadi {
 
     // Pass inputs
     f_.setInputNZ(NV_DATA_S(u), iin_);
-    for (int i=0; i<nIn(); ++i)
+    for (int i=0; i<n_in(); ++i)
       if (i!=iin_) f_.setInput(input(i), i);
 
     // Evaluate
@@ -398,7 +398,7 @@ namespace casadi {
 
     // Pass inputs to the Jacobian function
     jac_.setInputNZ(NV_DATA_S(u), iin_);
-    for (int i=0; i<nIn(); ++i)
+    for (int i=0; i<n_in(); ++i)
       if (i!=iin_) jac_.setInput(input(i), i);
 
     // Evaluate
@@ -457,7 +457,7 @@ namespace casadi {
 
     // Pass inputs to the Jacobian function
     jac_.setInputNZ(NV_DATA_S(u), iin_);
-    for (int i=0; i<nIn(); ++i)
+    for (int i=0; i<n_in(); ++i)
       if (i!=iin_) jac_.setInput(input(i), i);
 
     // Evaluate
@@ -506,19 +506,19 @@ namespace casadi {
 
     // Pass inputs
     f_fwd_.setInputNZ(NV_DATA_S(u), iin_);
-    for (int i=0; i<nIn(); ++i)
+    for (int i=0; i<n_in(); ++i)
       if (i!=iin_) f_fwd_.setInput(input(i), i);
 
     // Pass input seeds
-    f_fwd_.setInputNZ(NV_DATA_S(v), nIn()+iin_);
-    for (int i=0; i<nIn(); ++i)
-      if (i!=iin_) f_fwd_.setInput(0.0, nIn()+i);
+    f_fwd_.setInputNZ(NV_DATA_S(v), n_in()+iin_);
+    for (int i=0; i<n_in(); ++i)
+      if (i!=iin_) f_fwd_.setInput(0.0, n_in()+i);
 
     // Evaluate
     f_fwd_.evaluate();
 
     // Get the output seeds
-    f_fwd_.getOutputNZ(NV_DATA_S(Jv), nOut());
+    f_fwd_.getOutputNZ(NV_DATA_S(Jv), n_out());
 
     // Log time duration
     time2_ = clock();
@@ -545,7 +545,7 @@ namespace casadi {
 
     // Pass inputs
     jac_.setInputNZ(NV_DATA_S(u), iin_);
-    for (int i=0; i<nIn(); ++i)
+    for (int i=0; i<n_in(); ++i)
       if (i!=iin_) jac_.setInput(input(i), i);
 
     // Evaluate Jacobian

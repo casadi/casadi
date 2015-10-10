@@ -52,9 +52,9 @@ namespace casadi {
     // Initialize the Homotopy NLP
     hnlp_.init(false);
 
-    casadi_assert_message(hnlp_.nIn()==HNL_NUM_IN,
+    casadi_assert_message(hnlp_.n_in()==HNL_NUM_IN,
                           "The HNLP function must have exactly three input");
-    casadi_assert_message(hnlp_.nOut()==NL_NUM_OUT,
+    casadi_assert_message(hnlp_.n_out()==NL_NUM_OUT,
                           "The HNLP function must have exactly two outputs");
 
     // Sparsity patterns

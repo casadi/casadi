@@ -2597,7 +2597,7 @@ namespace casadi {
     return isEqual(y.size1(), y.size2(), y.colind(), y.row());
   }
 
-  Sparsity SparsityInternal::patternInverse() const {
+  Sparsity SparsityInternal::pattern_inverse() const {
     // Quick return clauses
     if (isempty()) return Sparsity::dense(size1(), size2());
     if (isdense()) return Sparsity(size1(), size2());

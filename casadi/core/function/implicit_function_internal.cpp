@@ -67,9 +67,9 @@ namespace casadi {
     iout_ = getOption("implicit_output");
 
     // Get the number of equations and check consistency
-    casadi_assert_message(iin_>=0 && iin_<f_.nIn() && f_.nIn()>0,
+    casadi_assert_message(iin_>=0 && iin_<f_.n_in() && f_.n_in()>0,
                           "Implicit input not in range");
-    casadi_assert_message(iout_>=0 && iout_<f_.nOut() && f_.nOut()>0,
+    casadi_assert_message(iout_>=0 && iout_<f_.n_out() && f_.n_out()>0,
                           "Implicit output not in range");
     casadi_assert_message(f_.output(iout_).isdense() && f_.output(iout_).iscolumn(),
                           "Residual must be a dense vector");
@@ -83,14 +83,14 @@ namespace casadi {
                           << f_.output(iout_).nnz());
 
     // Allocate inputs
-    ibuf_.resize(f_.nIn());
-    for (int i=0; i<nIn(); ++i) {
+    ibuf_.resize(f_.n_in());
+    for (int i=0; i<n_in(); ++i) {
       input(i) = f_.input(i);
     }
 
     // Allocate output
-    obuf_.resize(f_.nOut());
-    for (int i=0; i<nOut(); ++i) {
+    obuf_.resize(f_.n_out());
+    for (int i=0; i<n_out(); ++i) {
       output(i) = f_.output(i);
     }
 
@@ -211,16 +211,16 @@ namespace casadi {
 
   void ImplicitFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
                                        int* iw, bvec_t* w) {
-    int num_out = nOut();
-    int num_in = nIn();
+    int num_out = n_out();
+    int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
     bvec_t* tmp2 = w; w += n_;
 
     // Propagate dependencies through the function
-    const bvec_t** arg1 = arg+nIn();
+    const bvec_t** arg1 = arg+n_in();
     copy(arg, arg+num_in, arg1);
     arg1[iin_] = 0;
-    bvec_t** res1 = res+nOut();
+    bvec_t** res1 = res+n_out();
     fill_n(res1, num_out, static_cast<bvec_t*>(0));
     res1[iout_] = tmp1;
     f_.spFwd(arg1, res1, iw, w);
@@ -241,8 +241,8 @@ namespace casadi {
 
   void ImplicitFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
                                        int* iw, bvec_t* w) {
-    int num_out = nOut();
-    int num_in = nIn();
+    int num_out = n_out();
+    int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
     bvec_t* tmp2 = w; w += n_;
 
@@ -313,7 +313,7 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) fsens[d][iout_] = reshape(rhs[d], input(iin_).size());
 
     // Propagate to auxiliary outputs
-    int num_out = nOut();
+    int num_out = n_out();
     if (num_out>1) {
       for (int d=0; d<nfwd; ++d) f_fseed[d][iin_] = fsens[d][iout_];
       f_.callForward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
@@ -340,8 +340,8 @@ namespace casadi {
     MX J = jac_(f_arg).front();
 
     // Get adjoint seeds for calling f
-    int num_out = nOut();
-    int num_in = nIn();
+    int num_out = n_out();
+    int num_in = n_in();
     vector<MX> f_res(res);
     f_res[iout_] = MX(input(iin_).size()); // zero residual
     vector<vector<MX> > f_aseed(nadj);

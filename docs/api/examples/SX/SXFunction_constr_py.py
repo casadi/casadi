@@ -37,8 +37,8 @@ print outs
 f = SXFunction("f", ins, outs)
 
 #! f now has two inputs and a 4 outputs:
-print f.nIn()
-print f.nOut()
+print f.n_in()
+print f.n_out()
 
 #! The outputs has the following string representation.
 #! Note how all elements of out have been converted to SX by

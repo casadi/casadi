@@ -33,8 +33,8 @@ out = {x,y,[x x; x x],y*x,0}
 f = SXFunction('f', in,out);
 
 %! f now has two inputs and a 4 outputs:
-number_in = f.nIn()
-number_out = f.nOut()
+number_in = f.n_in()
+number_out = f.n_out()
 
 %! The outputs has the following string representation.
 %! Note how all elements of out have been converted to SX by

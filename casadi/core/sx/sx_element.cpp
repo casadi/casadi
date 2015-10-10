@@ -1823,7 +1823,7 @@ namespace casadi {
     // Find out which noded can be inlined
     std::map<const SXNode*, int> nodeind;
     for (vector<SXElement>::const_iterator i=begin(); i!=end(); ++i)
-      (*i)->canInline(nodeind);
+      (*i)->can_inline(nodeind);
 
     // Print expression
     nz.resize(0);

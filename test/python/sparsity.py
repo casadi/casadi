@@ -523,7 +523,7 @@ class Sparsitytests(casadiTestCase):
       dt = sparsify(1-d)
       dt = IMatrix.ones(dt.sparsity())
       
-      trial = IMatrix.ones(sp.patternInverse())
+      trial = IMatrix.ones(sp.pattern_inverse())
       
       d.printDense()
       dt.printDense()

@@ -305,10 +305,10 @@ namespace casadi {
     bool monitored(const std::string& mod) const;
 
     /** \brief Get the number of function inputs */
-    inline int nIn() const { return ibuf_.size();}
+    inline int n_in() const { return ibuf_.size();}
 
     /** \brief Get the number of function outputs */
-    inline int nOut() const { return obuf_.size();}
+    inline int n_out() const { return obuf_.size();}
 
     /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
     int nnzIn() const;
@@ -451,7 +451,7 @@ namespace casadi {
       } catch(std::out_of_range&) {
         std::stringstream ss;
         ss <<  "In function " << name_
-           << ": input " << i << " not in interval [0, " << nIn() << ")";
+           << ": input " << i << " not in interval [0, " << n_in() << ")";
         if (!isInit()) ss << std::endl << "Did you forget to initialize?";
         throw CasadiException(ss.str());
       }
@@ -479,7 +479,7 @@ namespace casadi {
       } catch(std::out_of_range&) {
         std::stringstream ss;
         ss <<  "In function " << name_
-           << ": output " << i << " not in interval [0, " << nOut() << ")";
+           << ": output " << i << " not in interval [0, " << n_out() << ")";
         if (!isInit()) ss << std::endl << "Did you forget to initialize?";
         throw CasadiException(ss.str());
       }

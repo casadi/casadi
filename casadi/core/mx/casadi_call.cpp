@@ -58,7 +58,7 @@ namespace casadi {
   Call::Call(const Function& fcn, const vector<MX>& arg) : fcn_(fcn) {
 
     // Number inputs and outputs
-    int num_in = fcn.nIn();
+    int num_in = fcn.n_in();
     casadi_assert_message(arg.size()==num_in, "Argument list length (" << arg.size()
                           << ") does not match number of inputs (" << num_in << ")"
                           << " for function " << fcn.name());
@@ -89,7 +89,7 @@ namespace casadi {
   }
 
   int Call::nout() const {
-    return fcn_.nOut();
+    return fcn_.n_out();
   }
 
   const Sparsity& Call::sparsity(int oind) const {

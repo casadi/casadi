@@ -388,7 +388,7 @@ namespace casadi {
       double ret2;
       casadi_math<double>::fun(op, 0, 0.0, ret2);
       return DMatrix(sparsity(), ret, false)
-        + DMatrix(sparsity().patternInverse(), ret2, false);
+        + DMatrix(sparsity().pattern_inverse(), ret2, false);
     }
   }
 

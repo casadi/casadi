@@ -63,7 +63,7 @@ print z
 #! The following code creates and evaluates a single input (scalar valued), single output (scalar valued) function.
 #$ f : $\mathbb{R} \mapsto \mathbb{R}$
 f = SXFunction('f', [x], [z]) # z = f(x)
-print "%d -> %d" % (f.nIn(),f.nOut())
+print "%d -> %d" % (f.n_in(),f.n_out())
 print f.inputExpr(), type(f.inputExpr())
 print f.outputExpr(), type(f.outputExpr())
 f.setInput(2)
@@ -85,7 +85,7 @@ print f.grad()
 x = SX.sym("x") # 1 by 1 matrix serves as scalar
 y = SX.sym("y") # 1 by 1 matrix serves as scalar
 f = SXFunction('f', [x , y ], [x*y, x+y])
-print "%d -> %d" % (f.nIn(),f.nOut())
+print "%d -> %d" % (f.n_in(),f.n_out())
 
 f.setInput(2,0)
 f.setInput(3,1)
@@ -120,7 +120,7 @@ print f([x,vertcat((SX.sym("c"),SX.sym("d")))])
 x = SX.sym("x")
 y = SX.sym("y")
 f = SXFunction('f', [vertcat((x , y ))], [vertcat((x*y, x+y))])
-print "%d -> %d" % (f.nIn(),f.nOut())
+print "%d -> %d" % (f.n_in(),f.n_out())
 f.setInput([2,3])
 f.evaluate()
 print f.getOutput()
@@ -142,7 +142,7 @@ x = SX.sym("x",2,2)
 y = SX.sym("y",2,2)
 print x*y # Not a dot product
 f = SXFunction('f', [x,y], [x*y])
-print "%d -> %d" % (f.nIn(),f.nOut())
+print "%d -> %d" % (f.n_in(),f.n_out())
 print f([x,y])
 f.setInput(DMatrix([[1,2],[3,4]]),0)
 f.setInput(DMatrix([[4,5],[6,7]]),1)

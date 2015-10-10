@@ -82,7 +82,7 @@ namespace casadi {
                           "The supplied time grid must be strictly increasing. "
                           "Notably, you cannot have a time instance repeating.");
 
-    if (control_dae_.nIn()==DAE_NUM_IN) {
+    if (control_dae_.n_in()==DAE_NUM_IN) {
       vector<MX> control_dae_in_(CONTROL_DAE_NUM_IN);
       vector<MX> dae_in_ = control_dae_.symbolicInput();
       control_dae_in_[CONTROL_DAE_T]    = dae_in_[DAE_T];
@@ -91,7 +91,7 @@ namespace casadi {
       control_dae_in_[CONTROL_DAE_P]    = dae_in_[DAE_P];
       control_dae_ = MXFunction("control_dae", control_dae_in_, control_dae_(dae_in_));
     }
-    casadi_assert_message(control_dae_.nIn()==CONTROL_DAE_NUM_IN,
+    casadi_assert_message(control_dae_.n_in()==CONTROL_DAE_NUM_IN,
                           "ControlSimulatorInternal::init: supplied control_dae does not "
                           "conform to the CONTROL_DAE or DAE input scheme.");
 
@@ -257,13 +257,13 @@ namespace casadi {
       output_fcn_ = orig_output_fcn_;
     }
 
-    casadi_assert_message(output_fcn_.nIn()==CONTROL_DAE_NUM_IN,
+    casadi_assert_message(output_fcn_.n_in()==CONTROL_DAE_NUM_IN,
                      "Output function, if supplied, must adhere to ControlledDAEInput scheme.");
 
     // Extend the output function two extra outputs at the start: DAE_X and DAE_XDOT
     vector<MX> output_fcn_in_ = output_fcn_.symbolicInput();
 
-    vector<MX> output_fcn_out_(2 + output_fcn_.nOut());
+    vector<MX> output_fcn_out_(2 + output_fcn_.n_out());
     output_fcn_out_[0] = output_fcn_in_[CONTROL_DAE_X];
 
     vector<MX> output_fcn_call_ = output_fcn_(output_fcn_in_);
@@ -328,8 +328,8 @@ namespace casadi {
     input(CONTROLSIMULATOR_U)   = DMatrix::zeros(nu_, ns_-1+(control_endpoint?1:0));
 
     // Allocate outputs
-    obuf_.resize(output_fcn_.nOut()-2);
-    for (int i=0; i<nOut(); ++i)
+    obuf_.resize(output_fcn_.n_out()-2);
+    for (int i=0; i<n_out(); ++i)
       output(i) = Matrix<double>::zeros(output_fcn_.output(i+2).numel(), (ns_-1)*nf_+1);
 
     // Call base class method
@@ -352,7 +352,7 @@ namespace casadi {
     P_eval[2] = P; // We can already set the fixed part in advance.
 
     // Placeholder to collect the outputs of all simulators (but not those 2 extra we introduced)
-    vector< vector<MX> > simulator_outputs(output_fcn_.nOut()-2);
+    vector< vector<MX> > simulator_outputs(output_fcn_.n_out()-2);
 
     // Input arguments to simulator.call
     vector<MX> simulator_in(INTEGRATOR_NUM_IN);
@@ -407,14 +407,14 @@ namespace casadi {
   void ControlSimulatorInternal::evaluate() {
 
     // Copy all inputs
-    for (int i=0;i<nIn();++i) {
+    for (int i=0;i<n_in();++i) {
       all_output_.input(i).set(input(i));
     }
 
     all_output_.evaluate();
 
     // Copy all outputs
-    for (int i=0;i<nOut();++i) {
+    for (int i=0;i<n_out();++i) {
       output(i).set(all_output_.output(i));
     }
 

@@ -77,7 +77,7 @@ namespace casadi {
   }
 
   Function Function::mapaccum(const std::string& name, int N, const Dict& options) const {
-    std::vector<bool> accum_input(nIn(), false);
+    std::vector<bool> accum_input(n_in(), false);
     accum_input[0] = true;
     std::vector<int> accum_output(1, 0);
     return MapAccum(name, *this, N, accum_input, accum_output, false, options);
@@ -158,7 +158,7 @@ namespace casadi {
     if (repeated) {
       ms = Map("map", *this, n, options);
     } else {
-      ms = Map("mapsum", *this, n, repeat_n, std::vector<bool>(nOut(), true), options);
+      ms = Map("mapsum", *this, n, repeat_n, std::vector<bool>(n_out(), true), options);
     }
     // Call the internal function
     return ms(x);
@@ -187,7 +187,7 @@ namespace casadi {
 
     Dict options;
     options["parallelization"] = parallelization;
-    Function ms = Map("mapsum", *this, n, repeat_n, std::vector<bool>(nOut(), false), options);
+    Function ms = Map("mapsum", *this, n, repeat_n, std::vector<bool>(n_out(), false), options);
 
     // Call the internal function
     return ms(x);
@@ -198,12 +198,12 @@ namespace casadi {
     (*this)->evaluate();
   }
 
-  int Function::nIn() const {
-    return (*this)->nIn();
+  int Function::n_in() const {
+    return (*this)->n_in();
   }
 
-  int Function::nOut() const {
-    return (*this)->nOut();
+  int Function::n_out() const {
+    return (*this)->n_out();
   }
 
   int Function::nnzIn() const {
@@ -421,8 +421,8 @@ namespace casadi {
     vector<MX> ret_in(arg), ret_out(res);
 
     // Number inputs and outputs
-    int num_in = nIn();
-    int num_out = nOut();
+    int num_in = n_in();
+    int num_out = n_out();
 
     // Forward sensitivities
     if (nfwd>0) {
@@ -460,18 +460,18 @@ namespace casadi {
 
     // Names of inputs
     std::vector<std::string> i_names;
-    i_names.reserve(nIn()*(1+nfwd)+nOut()*nadj);
+    i_names.reserve(n_in()*(1+nfwd)+n_out()*nadj);
     const std::vector<std::string>& ischeme=(*this)->ischeme_;
     const std::vector<std::string>& oscheme=(*this)->oscheme_;
 
     // Nondifferentiated inputs
-    for (int i=0; i<nIn(); ++i) {
+    for (int i=0; i<n_in(); ++i) {
       i_names.push_back("der_" + ischeme.at(i));
     }
 
     // Forward seeds
     for (int d=0; d<nfwd; ++d) {
-      for (int i=0; i<nIn(); ++i) {
+      for (int i=0; i<n_in(); ++i) {
         ss.str(string());
         ss << "fwd" << d << "_" << ischeme.at(i);
         i_names.push_back(ss.str());
@@ -480,7 +480,7 @@ namespace casadi {
 
     // Adjoint seeds
     for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<nOut(); ++i) {
+      for (int i=0; i<n_out(); ++i) {
         ss.str(string());
         ss << "adj" << d << "_" << oscheme.at(i);
         i_names.push_back(ss.str());
@@ -489,16 +489,16 @@ namespace casadi {
 
     // Names of outputs
     std::vector<std::string> o_names;
-    o_names.reserve(nOut()*(1+nfwd)+nIn()*nadj);
+    o_names.reserve(n_out()*(1+nfwd)+n_in()*nadj);
 
     // Nondifferentiated inputs
-    for (int i=0; i<nOut(); ++i) {
+    for (int i=0; i<n_out(); ++i) {
       o_names.push_back("der_" + oscheme.at(i));
     }
 
     // Forward sensitivities
     for (int d=0; d<nfwd; ++d) {
-      for (int i=0; i<nOut(); ++i) {
+      for (int i=0; i<n_out(); ++i) {
         ss.str(string());
         ss << "fwd" << d << "_" << oscheme.at(i);
         o_names.push_back(ss.str());
@@ -507,7 +507,7 @@ namespace casadi {
 
     // Adjoint sensitivities
     for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<nIn(); ++i) {
+      for (int i=0; i<n_in(); ++i) {
         ss.str(string());
         ss << "adj" << d << "_" << ischeme.at(i);
         o_names.push_back(ss.str());
@@ -521,7 +521,7 @@ namespace casadi {
     // Consistency check for inputs
     int ind=0;
     for (int d=-1; d<nfwd; ++d) {
-      for (int i=0; i<nIn(); ++i, ++ind) {
+      for (int i=0; i<n_in(); ++i, ++ind) {
         if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=input(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " input " << ind << " \""
                        << i_names.at(ind) << "\". Expected " << input(i).dimString()
@@ -530,7 +530,7 @@ namespace casadi {
       }
     }
     for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<nOut(); ++i, ++ind) {
+      for (int i=0; i<n_out(); ++i, ++ind) {
         if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=output(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " input " << ind <<
                        " \"" << i_names.at(ind) << "\". Expected " << output(i).dimString()
@@ -542,7 +542,7 @@ namespace casadi {
     // Consistency check for outputs
     ind=0;
     for (int d=-1; d<nfwd; ++d) {
-      for (int i=0; i<nOut(); ++i, ++ind) {
+      for (int i=0; i<n_out(); ++i, ++ind) {
         if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=output(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " output " << ind <<
                        " \"" <<  o_names.at(ind) << "\". Expected " << output(i).dimString()
@@ -551,7 +551,7 @@ namespace casadi {
       }
     }
     for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<nIn(); ++i, ++ind) {
+      for (int i=0; i<n_in(); ++i, ++ind) {
         if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=input(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " output " << ind << " \""
                        << o_names.at(ind) << "\". Expected " << input(i).dimString()
@@ -740,7 +740,7 @@ namespace casadi {
     casadi_assert(isInit());
 
     // Get default inputs
-    std::vector<M> v(nIn());
+    std::vector<M> v(n_in());
     for (int i=0; i<v.size(); ++i) {
       v[i] = defaultInput(i);
     }
@@ -785,7 +785,7 @@ namespace casadi {
 
   template<typename M>
   void Function::checkArg(const std::vector<M>& arg, bool hcat) const {
-    int n_in = nIn();
+    int n_in = this->n_in();
     casadi_assert_message(arg.size()==n_in, "Incorrect number of inputs: Expected "
                           << n_in << ", got " << arg.size());
     for (int i=0; i<n_in; ++i) {
@@ -797,7 +797,7 @@ namespace casadi {
 
   template<typename M>
   void Function::checkRes(const std::vector<M>& res) const {
-    int n_out = nOut();
+    int n_out = this->n_out();
     casadi_assert_message(res.size()==n_out, "Incorrect number of outputs: Expected "
                           << n_out << ", got " << res.size());
     for (int i=0; i<n_out; ++i) {
@@ -809,7 +809,7 @@ namespace casadi {
 
   template<typename M>
   void Function::checkFwdSeed(const std::vector<std::vector<M> >& fseed) const {
-    int n_in = nIn();
+    int n_in = this->n_in();
     for (int d=0; d<fseed.size(); ++d) {
       casadi_assert_message(fseed[d].size()==n_in,
                             "Incorrect number of forward seeds for direction " << d
@@ -825,7 +825,7 @@ namespace casadi {
 
   template<typename M>
   void Function::checkAdjSeed(const std::vector<std::vector<M> >& aseed) const {
-    int n_out = nOut();
+    int n_out = this->n_out();
     for (int d=0; d<aseed.size(); ++d) {
       casadi_assert_message(aseed[d].size()==n_out,
                             "Incorrect number of adjoint seeds for direction " << d
@@ -842,7 +842,7 @@ namespace casadi {
   template<typename M>
   bool Function::matchingArg(const std::vector<M>& arg, bool hcat) const {
     checkArg(arg, hcat);
-    int n_in = nIn();
+    int n_in = this->n_in();
     for (int i=0; i<n_in; ++i) {
       if (hcat) {
         if (arg.at(i).size1()!=input(i).size1()) return false;
@@ -857,7 +857,7 @@ namespace casadi {
   template<typename M>
   bool Function::matchingRes(const std::vector<M>& res) const {
     checkRes(res);
-    int n_out = nOut();
+    int n_out = this->n_out();
     for (int i=0; i<n_out; ++i) {
       if (res.at(i).size()!=output(i).size()) return false;
     }

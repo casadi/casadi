@@ -35,8 +35,8 @@ namespace casadi {
   /** \brief General function
 
       A general function \f$f\f$ in casadi can be multi-input, multi-output.\n
-      Number of inputs:  \a nin    nIn()\n
-      Number of outputs: \a nout   nOut()\n
+      Number of inputs:  \a nin    n_in()\n
+      Number of outputs: \a nout   n_out()\n
 
       We can view this function as a being composed of a (\a nin, \a nout) grid of single-input,
       single-output primitive functions.\n
@@ -171,10 +171,10 @@ namespace casadi {
 #endif
 
     /** \brief Get the number of function inputs */
-    int nIn() const;
+    int n_in() const;
 
     /** \brief Get the number of function outputs */
-    int nOut() const;
+    int n_out() const;
 
     /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
     int nnzIn() const;
@@ -505,7 +505,7 @@ namespace casadi {
      *         one direction at a time and the last <tt>nadj*n_in</tt> outputs corresponds to
      *         adjoint sensitivities, one direction at a time.
      *
-     *         <tt>(n_in = nIn(), n_out = nOut())</tt>
+     *         <tt>(n_in = n_in(), n_out = n_out())</tt>
      *
      */
     Function derivative(int nfwd, int nadj);
@@ -520,7 +520,7 @@ namespace casadi {
      *         one direction at a time
      *         The  <tt>nfwd*n_out</tt> outputs correspond to forward sensitivities,
      *         one direction at a time.     *
-     *         <tt>(n_in = nIn(), n_out = nOut())</tt>
+     *         <tt>(n_in = n_in(), n_out = n_out())</tt>
      *
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
@@ -537,9 +537,9 @@ namespace casadi {
      *         one direction at a time
      *         The  <tt>nadj*n_in</tt> outputs correspond to adjoint sensitivities,
      *         one direction at a time.     *
-     *         <tt>(n_in = nIn(), n_out = nOut())</tt>
+     *         <tt>(n_in = n_in(), n_out = n_out())</tt>
      *
-     *         <tt>(n_in = nIn(), n_out = nOut())</tt>
+     *         <tt>(n_in = n_in(), n_out = n_out())</tt>
      *
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.

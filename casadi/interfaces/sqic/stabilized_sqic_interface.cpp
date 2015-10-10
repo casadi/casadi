@@ -212,7 +212,7 @@ namespace casadi {
     file << "program exported" << std::endl;
     file << "  use SQICModule" << std::endl;
     file << "  implicit none" << std::endl;
-    file << "  integer(ip)               :: m, n, nInf, nnH, nnzH, nnzA, nS, lenpi" << std::endl;
+    file << "  integer(ip)               :: m, n, n_inf, nnH, nnzH, nnzA, nS, lenpi" << std::endl;
 
 
     file << "  real(rp)                  :: Obj, mu" << std::endl;

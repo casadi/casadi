@@ -17,7 +17,7 @@ subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, &
 
   integer                   :: INFO
   integer(ip)               :: Errors, iObj, iPrint, iSumm, ncObj, &
-                               m, n, nInf, nnH, nnzH, nNames, nnzA, nS, iSpecs
+                               m, n, n_inf, nnH, nnzH, nNames, nnzA, nS, iSpecs
 
   real(rp)                  :: ObjAdd, sInf
 
@@ -74,13 +74,13 @@ subroutine sqicSolve (Obj)  bind ( C, name="sqicSolve" )
   implicit none
 
   integer                   :: INFO
-  integer(ip)               :: nS, nInf
+  integer(ip)               :: nS, n_inf
 
   real(rp)                  :: Obj, sInf
 
 
   ! Solve the QP.
-  call QP%solve ( 'Cold', INFO, nS, nInf, sInf, Obj )
+  call QP%solve ( 'Cold', INFO, nS, n_inf, sInf, Obj )
 
 end subroutine sqicSolve
 
@@ -92,12 +92,12 @@ subroutine sqicSolveStabilized (Obj,mu,lenpi,piE)  bind ( C, name="sqicSolveStab
   implicit none
 
   integer                   :: INFO
-  integer(ip)               :: nS, nInf, lenpi
+  integer(ip)               :: nS, n_inf, lenpi
 
   real(rp)                  :: Obj, sInf, mu, piE(lenpi)
 
   ! Solve the QP.
-  call QP%solveR ( 'Cold', mu, lenpi, piE, INFO, nS, nInf, sInf, Obj )
+  call QP%solveR ( 'Cold', mu, lenpi, piE, INFO, nS, n_inf, sInf, Obj )
 
 end subroutine sqicSolveStabilized
 

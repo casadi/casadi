@@ -154,8 +154,8 @@ class Functiontests(casadiTestCase):
 
     g = f.jacobian(0,0)
 
-    self.assertEqual(g.nIn(),f.nIn())
-    self.assertEqual(g.nOut(),f.nOut()+1)
+    self.assertEqual(g.n_in(),f.n_in())
+    self.assertEqual(g.n_out(),f.n_out()+1)
 
   def test_xfunction(self):
     x = SX.sym("x",3,1)
@@ -626,7 +626,7 @@ class Functiontests(casadiTestCase):
 
         F = MXFunction("F",X+Y+Z+V,map(sin,res))
 
-        resref = [[] for i in range(fun.nOut())]
+        resref = [[] for i in range(fun.n_out())]
         for r in zip(X,Y,Z_alt2,V):
           for i,e in enumerate(map(sin,fun(r))):
             resref[i] = resref[i] + [e]
@@ -725,7 +725,7 @@ class Functiontests(casadiTestCase):
 
         F = MXFunction("F",X+Y+Z+V,map(sin,res),{"ad_weight": 0})
 
-        resref = [0 for i in range(fun.nOut())]
+        resref = [0 for i in range(fun.n_out())]
         for r in zip(X,Y,Z_alt,V):
           for i,e in enumerate(fun(r)):
             resref[i] = resref[i] + e
@@ -782,7 +782,7 @@ class Functiontests(casadiTestCase):
 
         F = Map("map",fun,n,[True,True,False,False],[False,True,True])
 
-        resref = [0 for i in range(fun.nOut())]
+        resref = [0 for i in range(fun.n_out())]
         acc = 0
         bl = []
         cl = []

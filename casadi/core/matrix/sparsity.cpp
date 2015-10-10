@@ -396,8 +396,8 @@ namespace casadi {
     return patternIntersection(b, mapping);
   }
 
-  Sparsity Sparsity::patternInverse() const {
-    return (*this)->patternInverse();
+  Sparsity Sparsity::pattern_inverse() const {
+    return (*this)->pattern_inverse();
   }
 
   void Sparsity::append(const Sparsity& sp) {

@@ -30,7 +30,7 @@ extern "C" {
   ( int *Prob, char *ProbTag, int *Elastc, int *gotR, int *jstFea, int *feasbl,
     int *m, int *mBS, int *nnH, int *nS, int *jSq, int *jBr, int *jSr,
     int *linesP, int *linesS, int *itn, int *itQP, int *kPrc, int *lvlInf,
-    double *pivot, double *step, int *nInf, double *sInf, double *wtInf,
+    double *pivot, double *step, int *n_inf, double *sInf, double *wtInf,
     double *ObjPrt, double *condHz, double *djqPrt, double *rgNorm,
     int kBS[], double xBS[],
     int iw[], int *leniw );
@@ -39,7 +39,7 @@ extern "C" {
   ( int *Prob, char *ProbTag, int *Elastc, int *gotR, int *jstFea, int *feasbl,
     int *m, int *mBS, int *nnH, int *nS, int *jSq, int *jBr, int *jSr,
     int *linesP, int *linesS, int *itn, int *itQP, int *kPrc, int *lvlInf,
-    double *pivot, double *step, int *nInf, double *sInf, double *wtInf,
+    double *pivot, double *step, int *n_inf, double *sInf, double *wtInf,
     double *ObjPrt, double *condHz, double *djqPrt, double *rgNorm,
     int kBS[], double xBS[],
     int iw[], int *leniw );

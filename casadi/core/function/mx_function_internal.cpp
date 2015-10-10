@@ -375,8 +375,8 @@ namespace casadi {
     }
 
     // Work vector and temporaries to hold pointers to operation input and outputs
-    const double** arg1 = arg+nIn();
-    double** res1 = res+nOut();
+    const double** arg1 = arg+n_in();
+    double** res1 = res+n_out();
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -521,8 +521,8 @@ namespace casadi {
 
   void MXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // Temporaries to hold pointers to operation input and outputs
-    const bvec_t** arg1=arg+nIn();
-    bvec_t** res1=res+nOut();
+    const bvec_t** arg1=arg+n_in();
+    bvec_t** res1=res+n_out();
 
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
@@ -560,8 +560,8 @@ namespace casadi {
 
   void MXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // Temporaries to hold pointers to operation input and outputs
-    bvec_t** arg1=arg+nIn();
-    bvec_t** res1=res+nOut();
+    bvec_t** arg1=arg+n_in();
+    bvec_t** res1=res+n_out();
 
     fill_n(w, sz_w(), 0);
 
@@ -631,7 +631,7 @@ namespace casadi {
   void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     log("MXFunctionInternal::evalMX begin");
     assertInit();
-    casadi_assert_message(arg.size()==nIn(), "Wrong number of input arguments");
+    casadi_assert_message(arg.size()==n_in(), "Wrong number of input arguments");
 
     // Resize the number of outputs
     res.resize(outputv_.size());
@@ -706,7 +706,7 @@ namespace casadi {
     int nfwd = fseed.size();
     fsens.resize(nfwd);
     for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(nOut());
+      fsens[d].resize(n_out());
     }
 
     // Quick return if no directions
@@ -836,7 +836,7 @@ namespace casadi {
     int nadj = aseed.size();
     asens.resize(nadj);
     for (int d=0; d<nadj; ++d) {
-      asens[d].resize(nIn());
+      asens[d].resize(n_in());
     }
 
     // Quick return if no directions
@@ -1122,8 +1122,8 @@ namespace casadi {
       << "  const int *cii;" << endl
       << "  real_t r, s, t, *rr, *ss, *tt;" << endl
       << "  const real_t *cr, *cs, *ct;" << endl
-      << "  const real_t** arg1=arg+" << nIn() << ";" << endl
-      << "  real_t** res1=res+" << nOut() << ";" << endl;
+      << "  const real_t** arg1=arg+" << n_in() << ";" << endl
+      << "  real_t** res1=res+" << n_out() << ";" << endl;
 
     // Declare scalar work vector elements as local variables
     bool first = true;
@@ -1246,7 +1246,7 @@ namespace casadi {
     // Definition of intermediate variables
     vector<MX> y;
     vector<MX> g;
-    vector<MX> f_G(nOut());
+    vector<MX> f_G(n_out());
 
     // Initial guess for intermediate variables
     vector<MX> x_init;

@@ -61,12 +61,12 @@ namespace casadi {
 
     /**
     * \defgroup  iind
-    *   \param[in] iind index within the range [0..nIn()-1]
+    *   \param[in] iind index within the range [0..n_in()-1]
     */
 
     /**
     * \defgroup  oind
-    *   \param[in] oind index within the range [0..nOut()-1]
+    *   \param[in] oind index within the range [0..n_out()-1]
     */
 
     /**

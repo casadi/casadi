@@ -326,7 +326,7 @@ namespace casadi {
     ///@}
 
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
-    Sparsity patternInverse() const;
+    Sparsity pattern_inverse() const;
 
     /// Check if two sparsity patterns are the same
     bool isEqual(const Sparsity& y) const;

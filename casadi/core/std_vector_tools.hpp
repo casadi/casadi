@@ -170,7 +170,7 @@ namespace casadi {
 
   /// Check if the vector is non-increasing
   template<typename T>
-  bool isNonIncreasing(const std::vector<T> &v);
+  bool isNon_increasing(const std::vector<T> &v);
 
   /// Check if the vector is non-decreasing
   template<typename T>
@@ -429,7 +429,7 @@ namespace casadi {
   }
 
   template<typename T>
-  bool isNonIncreasing(const std::vector<T> &v) {
+  bool isNon_increasing(const std::vector<T> &v) {
     if (v.size()==0) return true;
     T el = v[0];
     for (int i=1;i<v.size();++i) {
@@ -452,7 +452,7 @@ namespace casadi {
 
   template<typename T>
   bool isMonotone(const std::vector<T> &v) {
-    return isNonDecreasing(v) || isNonIncreasing(v);
+    return isNonDecreasing(v) || isNon_increasing(v);
   }
 
   template<typename T>

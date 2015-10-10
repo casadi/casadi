@@ -39,7 +39,7 @@ namespace casadi {
 
     if (reduce_inputs || reduce_outputs) {
       // Vector indicating which inputs/outputs are to be repeated
-      std::vector<bool> repeat_in(f.nIn(), true), repeat_out(f.nOut(), true);
+      std::vector<bool> repeat_in(f.n_in(), true), repeat_out(f.n_out(), true);
 
       // Mark reduced inputs
       if (reduce_inputs) {
@@ -78,7 +78,7 @@ namespace casadi {
   }
 
   MapBase::MapBase(const std::string& name, const Function& f, int n)
-    : FunctionInternal(name), f_(f), n_in_(f.nIn()), n_out_(f.nOut()), n_(n) {
+    : FunctionInternal(name), f_(f), n_in_(f.n_in()), n_out_(f.n_out()), n_(n) {
 
     addOption("parallelization", OT_STRING, "serial",
               "Computational strategy for parallelization", "serial|openmp");
@@ -126,8 +126,8 @@ namespace casadi {
   template<typename T>
   void MapSerial::evalGen(const T** arg, T** res, int* iw, T* w) {
     int n_in = n_in_, n_out = n_out_;
-    const T** arg1 = arg+nIn();
-    T** res1 = res+nOut();
+    const T** arg1 = arg+this->n_in();
+    T** res1 = res+this->n_out();
     for (int i=0; i<n_; ++i) {
       for (int j=0; j<n_in; ++j) {
         arg1[j] = arg[j] ? arg[j]+i*f_.input(j).nnz(): 0;
@@ -153,8 +153,8 @@ namespace casadi {
 
   void MapSerial::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     int n_in = n_in_, n_out = n_out_;
-    bvec_t** arg1 = arg+nIn();
-    bvec_t** res1 = res+nOut();
+    bvec_t** arg1 = arg+this->n_in();
+    bvec_t** res1 = res+this->n_out();
     for (int i=0; i<n_; ++i) {
       for (int j=0; j<n_in; ++j) {
         arg1[j] = arg[j] ? arg[j]+i*f_.input(j).nnz(): 0;
@@ -172,8 +172,8 @@ namespace casadi {
 
   void MapSerial::generateBody(CodeGenerator& g) const {
 
-    g.body << "  const real_t** arg1 = arg+" << nIn() << ";"<< endl;
-    g.body << "  real_t** res1 = res+" << nOut() << ";" << endl;
+    g.body << "  const real_t** arg1 = arg+" << n_in() << ";"<< endl;
+    g.body << "  real_t** res1 = res+" << n_out() << ";" << endl;
 
     g.body << "  int i;" << endl;
     g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
@@ -212,12 +212,12 @@ namespace casadi {
                        const std::vector<bool> &repeat_out)
     : MapBase(name, f, n), repeat_in_(repeat_in), repeat_out_(repeat_out) {
 
-    casadi_assert_message(repeat_in_.size()==f.nIn(),
-                          "MapReduce expected repeat_in of size " << f.nIn() <<
+    casadi_assert_message(repeat_in_.size()==f.n_in(),
+                          "MapReduce expected repeat_in of size " << f.n_in() <<
                           ", but got " << repeat_in_.size() << " instead.");
 
-    casadi_assert_message(repeat_out_.size()==f.nOut(),
-                          "MapReduce expected repeat_out of size " << f.nOut() <<
+    casadi_assert_message(repeat_out_.size()==f.n_out(),
+                          "MapReduce expected repeat_out of size " << f.n_out() <<
                           ", but got " << repeat_out_.size() << " instead.");
 
   }
@@ -263,7 +263,7 @@ namespace casadi {
       parallelization_ = PARALLELIZATION_SERIAL;
     }
 
-    int num_in = f_.nIn(), num_out = f_.nOut();
+    int num_in = f_.n_in(), num_out = f_.n_out();
 
     // Initialize the functions, get input and output sparsities
     // Input and output sparsities
@@ -331,7 +331,7 @@ namespace casadi {
   void MapReduce::evalGen(const T** arg, T** res, int* iw, T* w,
                             void (FunctionInternal::*eval)(const T** arg, T** res, int* iw, T* w),
                             R reduction) {
-    int num_in = f_.nIn(), num_out = f_.nOut();
+    int num_in = f_.n_in(), num_out = f_.n_out();
 
     const T** arg1 = arg+f_.sz_arg();
 
@@ -387,7 +387,7 @@ namespace casadi {
       casadi_error("the \"impossible\" happened: " <<
                    "should have fallen back to serial in init.");
 #else // WITH_OPEMMP
-      int n_in_ = f_.nIn(), n_out_ = f_.nOut();
+      int n_in_ = f_.n_in(), n_out_ = f_.n_out();
       size_t sz_arg, sz_res, sz_iw, sz_w;
       f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 #pragma omp parallel for
@@ -425,7 +425,7 @@ namespace casadi {
 
   /**
      void MapReduce::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
-     int num_in = f_.nIn(), num_out = f_.nOut();
+     int num_in = f_.n_in(), num_out = f_.n_out();
 
      // split arguments
      std::vector< std::vector< MX > > arg_split;
@@ -533,7 +533,7 @@ namespace casadi {
 
   void MapReduce::generateBody(CodeGenerator& g) const {
 
-    int num_in = f_.nIn(), num_out = f_.nOut();
+    int num_in = f_.n_in(), num_out = f_.n_out();
 
     g.body << "  const real_t** arg1 = arg+" << f_.sz_arg() << ";" << endl
            << "  real_t** sum = res;" << endl;

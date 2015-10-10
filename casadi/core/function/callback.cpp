@@ -62,7 +62,7 @@ namespace casadi {
 
   void Callback::eval(const double** arg, double** res, int* iw, double* w) {
     // Allocate input matrices
-    int num_in = nIn();
+    int num_in = n_in();
     std::vector<DMatrix> argv(num_in);
     for (int i=0; i<num_in; ++i) {
       argv[i] = DMatrix::zeros(input(i).sparsity());
@@ -77,7 +77,7 @@ namespace casadi {
     std::vector<DMatrix> resv = eval(argv);
 
     // Get the outputs
-    int num_out = nOut();
+    int num_out = n_out();
     for (int i=0; i<num_out; ++i) {
       if (res[i]!=0) resv[i].getNZ(res[i]);
     }

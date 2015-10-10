@@ -121,7 +121,7 @@ namespace casadi {
   void SXNode::print(std::ostream &stream) const {
     // Find out which noded can be inlined
     std::map<const SXNode*, int> nodeind;
-    canInline(nodeind);
+    can_inline(nodeind);
 
     // Print expression
     vector<string> intermed;
@@ -143,7 +143,7 @@ namespace casadi {
     temp = -temp-1;
   }
 
-  void SXNode::canInline(std::map<const SXNode*, int>& nodeind) const {
+  void SXNode::can_inline(std::map<const SXNode*, int>& nodeind) const {
     // Add or mark node in map
     std::map<const SXNode*, int>::iterator it=nodeind.find(this);
     if (it==nodeind.end()) {
@@ -152,7 +152,7 @@ namespace casadi {
 
       // Handle dependencies with recursion
       for (int i=0; i<ndep(); ++i) {
-        dep(i)->canInline(nodeind);
+        dep(i)->can_inline(nodeind);
       }
     } else if (it->second==0 && getOp()!=OP_PARAMETER) {
       // Node encountered before, do not inline (except if symbolic primitive)

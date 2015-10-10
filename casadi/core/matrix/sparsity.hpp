@@ -447,7 +447,7 @@ namespace casadi {
     /// @}
 
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
-    Sparsity patternInverse() const;
+    Sparsity pattern_inverse() const;
 
 #ifndef SWIG
     /** \brief Propagate sparsity using 0-1 logic through a matrix product,

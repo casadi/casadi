@@ -65,15 +65,15 @@ void DenseIO<Derived>::init() {
 
   Derived* d = static_cast<Derived*>(this);
 
-  dense_inputs_.resize(d->nIn());
-  dense_outputs_.resize(d->nOut());
+  dense_inputs_.resize(d->n_in());
+  dense_outputs_.resize(d->n_out());
 
-  for (int i=0;i< d->nIn();++i) {
+  for (int i=0;i< d->n_in();++i) {
     if (!d->input(i).isdense()) {
       dense_inputs_[i] = densify(d->input(i));
     }
   }
-  for (int i=0;i< d->nOut();++i) {
+  for (int i=0;i< d->n_out();++i) {
     if (!d->output(i).isdense()) {
       dense_outputs_[i] = densify(d->output(i));
     }
@@ -130,7 +130,7 @@ void DenseIO<Derived>::readInputs() {
 
   Derived* d = static_cast<Derived*>(this);
 
-  for (int i=0;i< d->nIn();++i) {
+  for (int i=0;i< d->n_in();++i) {
     if (!d->input(i).isdense()) {
       inputD(i).set(d->input(i));
     }
@@ -143,7 +143,7 @@ void DenseIO<Derived>::writeOutputs() {
 
   Derived* d = static_cast<Derived*>(this);
 
-  for (int i=0;i< d->nOut();++i) {
+  for (int i=0;i< d->n_out();++i) {
     if (!d->output(i).isdense()) {
       d->setOutput(outputD(i), i);
     }

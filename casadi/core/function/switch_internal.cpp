@@ -52,8 +52,8 @@ namespace casadi {
       fk.init(false);
       if (num_in<0) {
         // Number of inputs and outputs
-        num_in=fk.nIn();
-        num_out=fk.nOut();
+        num_in=fk.n_in();
+        num_out=fk.n_out();
         // Output sparsity
         sp_out.resize(num_out);
         for (int i=0; i<num_out; ++i) sp_out[i] = fk.output(i).sparsity();
@@ -62,8 +62,8 @@ namespace casadi {
         for (int i=0; i<num_in; ++i) sp_in[i] = fk.input(i).sparsity();
       } else {
         // Assert matching number of inputs and outputs
-        casadi_assert(num_in==fk.nIn());
-        casadi_assert(num_out==fk.nOut());
+        casadi_assert(num_in==fk.n_in());
+        casadi_assert(num_out==fk.n_out());
         // Intersect with output sparsity
         for (int i=0; i<num_out; ++i) {
           sp_out[i] = sp_out[i].patternIntersection(fk.output(i).sparsity());
@@ -98,13 +98,13 @@ namespace casadi {
       size_t sz_w = fk.sz_w();
 
       // Add size for input buffers
-      for (int i=1; i<nIn(); ++i) {
+      for (int i=1; i<n_in(); ++i) {
         const Sparsity& s = fk.input(i-1).sparsity();
         if (s!=input(i).sparsity()) sz_w += s.nnz();
       }
 
       // Add size for output buffers
-      for (int i=0; i<nOut(); ++i) {
+      for (int i=0; i<n_out(); ++i) {
         const Sparsity& s = fk.output(i).sparsity();
         if (s!=output(i).sparsity()) sz_w += s.nnz();
       }
@@ -122,13 +122,13 @@ namespace casadi {
     Function& fk = k<f_.size() ? f_[k] : f_def_;
 
     // Input buffers
-    for (int i=1; i<nIn(); ++i) {
+    for (int i=1; i<n_in(); ++i) {
       const Sparsity& s = fk.input(i-1).sparsity();
       casadi_assert_message(s==input(i).sparsity(), "Not implemented");
     }
 
     // Output buffers
-    for (int i=0; i<nOut(); ++i) {
+    for (int i=0; i<n_out(); ++i) {
       const Sparsity& s = fk.output(i).sparsity();
       casadi_assert_message(s==output(i).sparsity(), "Not implemented");
     }
@@ -175,7 +175,7 @@ namespace casadi {
     }
 
     // Create wrapper
-    casadi_assert(v.size()==sw.nIn());
+    casadi_assert(v.size()==sw.n_in());
     return MXFunction(name, w_in, sw(v), opts);
   }
 
@@ -215,14 +215,14 @@ namespace casadi {
     }
 
     // Construct wrapper outputs
-    casadi_assert(v.size()==sw.nIn());
+    casadi_assert(v.size()==sw.n_in());
     v = sw(v);
     vector<MX> w_out;
     MX ind_sens = MX(1, 1); // no dependency on index
     vector<MX>::const_iterator v_it = v.begin(), v_it_next;
     for (int d=0; d<nadj; ++d) {
       w_out.push_back(ind_sens);
-      v_it_next = v_it + (nIn()-1);
+      v_it_next = v_it + (n_in()-1);
       w_out.insert(w_out.end(), v_it, v_it_next);
       v_it = v_it_next;
     }

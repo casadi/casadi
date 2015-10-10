@@ -88,7 +88,7 @@ integrator = Integrator("integrator", "cvodes", fmod, opts)
 #$ \end{verbatim}
 #$ 
 print isinstance(integrator,Function)
-print "%d -> %d" % (integrator.nIn(),integrator.nOut())
+print "%d -> %d" % (integrator.n_in(),integrator.n_out())
 #! Setup the Integrator to integrate from 0 to t=tend, starting at [x0,y0]
 #! The output of Integrator is the state at the end of integration.
 #! There are two basic mechanisms two retrieve the whole trajectory of states:

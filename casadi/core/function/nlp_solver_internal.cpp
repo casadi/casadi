@@ -102,9 +102,9 @@ namespace casadi {
   void NlpSolverInternal::init() {
     // Initialize the NLP
     nlp_.init(false);
-    casadi_assert_message(nlp_.nIn()==NL_NUM_IN,
+    casadi_assert_message(nlp_.n_in()==NL_NUM_IN,
                           "The NLP function must have exactly two input");
-    casadi_assert_message(nlp_.nOut()==NL_NUM_OUT,
+    casadi_assert_message(nlp_.n_out()==NL_NUM_OUT,
                           "The NLP function must have exactly two outputs");
 
     // Sparsity patterns
@@ -169,8 +169,8 @@ namespace casadi {
 
       // Consistency checks
       casadi_assert(!fcallback_.isNull());
-      casadi_assert(fcallback_.nIn()==NLP_SOLVER_NUM_OUT);
-      casadi_assert(fcallback_.nOut()==1);
+      casadi_assert(fcallback_.n_in()==NLP_SOLVER_NUM_OUT);
+      casadi_assert(fcallback_.n_out()==1);
       casadi_assert(fcallback_.input(NLP_SOLVER_X).size()==x_sparsity.size());
       casadi_assert(fcallback_.input(NLP_SOLVER_F).isscalar());
       casadi_assert(fcallback_.input(NLP_SOLVER_LAM_X).size()==x_sparsity.size());
@@ -258,10 +258,10 @@ namespace casadi {
       jacF.setOption(getOption("jac_f_options"));
     }
     jacF.init(false);
-    casadi_assert_message(jacF.nIn()==GRADF_NUM_IN,
+    casadi_assert_message(jacF.n_in()==GRADF_NUM_IN,
                           "Wrong number of inputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
-    casadi_assert_message(jacF.nOut()==GRADF_NUM_OUT,
+    casadi_assert_message(jacF.n_out()==GRADF_NUM_OUT,
                           "Wrong number of outputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
     jacF.setOption("input_scheme", IOScheme(SCHEME_GradFInput));
@@ -291,10 +291,10 @@ namespace casadi {
       gradF.setOption(getOption("grad_f_options"));
     }
     gradF.init(false);
-    casadi_assert_message(gradF.nIn()==GRADF_NUM_IN,
+    casadi_assert_message(gradF.n_in()==GRADF_NUM_IN,
                           "Wrong number of inputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
-    casadi_assert_message(gradF.nOut()==GRADF_NUM_OUT,
+    casadi_assert_message(gradF.n_out()==GRADF_NUM_OUT,
                           "Wrong number of outputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
     gradF.setOption("input_scheme", IOScheme(SCHEME_GradFInput));
@@ -335,10 +335,10 @@ namespace casadi {
       jacG.setOption(getOption("jac_g_options"));
     }
     jacG.init(false);
-    casadi_assert_message(jacG.nIn()==JACG_NUM_IN,
+    casadi_assert_message(jacG.n_in()==JACG_NUM_IN,
                           "Wrong number of inputs to the Jacobian function. "
                           "Note: The Jacobian signature was changed in #544");
-    casadi_assert_message(jacG.nOut()==JACG_NUM_OUT,
+    casadi_assert_message(jacG.n_out()==JACG_NUM_OUT,
                           "Wrong number of outputs to the Jacobian function. "
                           "Note: The Jacobian signature was changed in #544");
     jacG.setOption("input_scheme", IOScheme(SCHEME_JacGInput));
@@ -410,10 +410,10 @@ namespace casadi {
       hessLag.setOption(getOption("hess_lag_options"));
     }
     hessLag.init(false);
-    casadi_assert_message(hessLag.nIn()==HESSLAG_NUM_IN,
+    casadi_assert_message(hessLag.n_in()==HESSLAG_NUM_IN,
                           "Wrong number of inputs to the Hessian function. "
                           "Note: The Lagrangian Hessian signature was changed in #544");
-    casadi_assert_message(hessLag.nOut()==HESSLAG_NUM_OUT,
+    casadi_assert_message(hessLag.n_out()==HESSLAG_NUM_OUT,
                           "Wrong number of outputs to the Hessian function. "
                           "Note: The Lagrangian Hessian signature was changed in #544");
     hessLag.setOption("input_scheme", IOScheme(SCHEME_HessLagInput));
