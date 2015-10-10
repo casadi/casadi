@@ -399,7 +399,7 @@ namespace casadi {
     }
 
     /** \brief Get input scheme description by index */
-    virtual std::string inputDescription(int ind) const {
+    virtual std::string description_in(int ind) const {
       const std::string& s=ischeme_.at(ind);
       size_t col = s.find(':'); // Colon seprates name from description
       if (col==std::string::npos) {
@@ -410,7 +410,7 @@ namespace casadi {
     }
 
     /** \brief Get output scheme description by index */
-    virtual std::string outputDescription(int ind) const {
+    virtual std::string description_out(int ind) const {
       const std::string& s=oscheme_.at(ind);
       size_t col = s.find(':'); // Colon seprates name from description
       if (col==std::string::npos) {
@@ -421,7 +421,7 @@ namespace casadi {
     }
 
     /** \brief Get default input value */
-    virtual double defaultInput(int ind) const { return 0;}
+    virtual double default_in(int ind) const { return 0;}
 
     /** \brief Get sparsity of a given input */
     /// @{

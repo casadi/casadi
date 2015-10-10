@@ -103,34 +103,9 @@ namespace casadi {
 #endif // SWIG
     /// \endcond
 
-    /** \brief Find the index for a string describing a particular entry of an input scheme
-     *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
-     * SCHEME_NLPINput
-     */
-    int index_in(const std::string &name) const;
-
-    /** \brief Find the index for a string describing a particular entry of an output scheme
-     *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
-     * SCHEME_NLPINput
-     */
-    int index_out(const std::string &name) const;
-
-    /** \brief Get input scheme name by index */
-    std::string name_in(int ind) const;
-
-    /** \brief Get output scheme name by index */
-    std::string name_out(int ind) const;
-
-    /** \brief Get input scheme description by index */
-    std::string inputDescription(int ind) const;
-
-    /** \brief Get output scheme description by index */
-    std::string outputDescription(int ind) const;
 
     /** \brief Get default input value */
-    double defaultInput(int ind) const;
+    double default_in(int ind) const;
 
     /** \brief Get sparsity of a given input */
     /// @{
@@ -193,6 +168,32 @@ namespace casadi {
 
     /** \brief Get output scheme */
     std::vector<std::string> name_out() const;
+
+    /** \brief Get input scheme name by index */
+    std::string name_in(int ind) const;
+
+    /** \brief Get output scheme name by index */
+    std::string name_out(int ind) const;
+
+    /** \brief Find the index for a string describing a particular entry of an input scheme
+     *
+     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
+     * SCHEME_NLPINput
+     */
+    int index_in(const std::string &name) const;
+
+    /** \brief Find the index for a string describing a particular entry of an output scheme
+     *
+     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
+     * SCHEME_NLPINput
+     */
+    int index_out(const std::string &name) const;
+
+    /** \brief Get input scheme description by index */
+    std::string description_in(int ind) const;
+
+    /** \brief Get output scheme description by index */
+    std::string description_out(int ind) const;
 
     /** \brief  Evaluate */
     void evaluate();

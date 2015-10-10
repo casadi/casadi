@@ -323,12 +323,12 @@ namespace casadi {
     return (*this)->name_out(ind);
   }
 
-  std::string Function::inputDescription(int ind) const {
-    return (*this)->inputDescription(ind);
+  std::string Function::description_in(int ind) const {
+    return (*this)->description_in(ind);
   }
 
-  std::string Function::outputDescription(int ind) const {
-    return (*this)->outputDescription(ind);
+  std::string Function::description_out(int ind) const {
+    return (*this)->description_out(ind);
   }
 
   const Matrix<double>& Function::input(int i) const {
@@ -742,7 +742,7 @@ namespace casadi {
     // Get default inputs
     std::vector<M> v(n_in());
     for (int i=0; i<v.size(); ++i) {
-      v[i] = defaultInput(i);
+      v[i] = default_in(i);
     }
 
     // Assign provided inputs
@@ -935,8 +935,8 @@ namespace casadi {
     return r;
   }
 
-  double Function::defaultInput(int ind) const {
-    return (*this)->defaultInput(ind);
+  double Function::default_in(int ind) const {
+    return (*this)->default_in(ind);
   }
 
   void Function::operator()(const double** arg, double** res, int* iw, double* w) {

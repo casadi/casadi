@@ -483,7 +483,7 @@ namespace casadi {
                  << typeid(*this).name());
   }
 
-  double NlpSolverInternal::defaultInput(int ind) const {
+  double NlpSolverInternal::default_in(int ind) const {
     switch (ind) {
     case NLP_SOLVER_LBX:
     case NLP_SOLVER_LBG:
