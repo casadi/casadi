@@ -3392,10 +3392,10 @@ def pyfunction(inputs,outputs):
 
     @pyevaluate
     def fcustom(f2):
-      res = f([f2.getInput(i) for i in range(f2.nIn())])
+      res = f([f2.getInput(i) for i in range(f2.n_in())])
       if not isinstance(res,list):
         res = [res]
-      for i in range(f2.nOut()):
+      for i in range(f2.n_out()):
         f2.setOutput(res[i],i)
     import warnings
 
@@ -3409,9 +3409,9 @@ def pyfunction(inputs,outputs):
 def PyFunction(name, obj, inputs, outputs, opts={}):
     @pyevaluate
     def fcustom(f):
-      res = [f.getOutput(i) for i in range(f.nOut())]
-      obj.evaluate([f.getInput(i) for i in range(f.nIn())],res)
-      for i in range(f.nOut()): f.setOutput(res[i], i)
+      res = [f.getOutput(i) for i in range(f.n_out())]
+      obj.evaluate([f.getInput(i) for i in range(f.n_in())],res)
+      for i in range(f.n_out()): f.setOutput(res[i], i)
 
     import warnings
 
