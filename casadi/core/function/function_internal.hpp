@@ -385,14 +385,14 @@ namespace casadi {
     }
 
     /** \brief Get input scheme name by index */
-    virtual std::string inputName(int ind) const {
+    virtual std::string name_in(int ind) const {
       const std::string& s=ischeme_.at(ind);
       size_t col = s.find(':'); // Colon seprates name from description
       return s.substr(0, col);
     }
 
     /** \brief Get output scheme name by index */
-    virtual std::string outputName(int ind) const {
+    virtual std::string name_out(int ind) const {
       const std::string& s=oscheme_.at(ind);
       size_t col = s.find(':'); // Colon seprates name from description
       return s.substr(0, col);

@@ -193,12 +193,12 @@ namespace casadi {
     casadi_assert(isInit());
     stream << " Number of inputs: " << n_in() << endl;
     for (int i=0; i<n_in(); ++i) {
-      stream << "  Input " << i  << ", a.k.a. \"" << inputName(i) << "\", "
+      stream << "  Input " << i  << ", a.k.a. \"" << name_in(i) << "\", "
              << input(i).dimString() << ", " << inputDescription(i) << endl;
     }
     stream << " Number of outputs: " << n_out() << endl;
     for (int i=0; i<n_out(); ++i) {
-      stream << "  Output " << i  << ", a.k.a. \"" << outputName(i) << "\", "
+      stream << "  Output " << i  << ", a.k.a. \"" << name_out(i) << "\", "
              << output(i).dimString() << ", " << outputDescription(i) << endl;
     }
   }

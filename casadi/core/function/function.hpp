@@ -118,10 +118,10 @@ namespace casadi {
     int index_out(const std::string &name) const;
 
     /** \brief Get input scheme name by index */
-    std::string inputName(int ind) const;
+    std::string name_in(int ind) const;
 
     /** \brief Get output scheme name by index */
-    std::string outputName(int ind) const;
+    std::string name_out(int ind) const;
 
     /** \brief Get input scheme description by index */
     std::string inputDescription(int ind) const;

@@ -315,12 +315,12 @@ namespace casadi {
     return (*this)->index_out(name);
   }
 
-  std::string Function::inputName(int ind) const {
-    return (*this)->inputName(ind);
+  std::string Function::name_in(int ind) const {
+    return (*this)->name_in(ind);
   }
 
-  std::string Function::outputName(int ind) const {
-    return (*this)->outputName(ind);
+  std::string Function::name_out(int ind) const {
+    return (*this)->name_out(ind);
   }
 
   std::string Function::inputDescription(int ind) const {
@@ -756,7 +756,7 @@ namespace casadi {
     // Save to map
     std::map<std::string, M> ret;
     for (int i=0; i<v.size(); ++i) {
-      ret[outputName(i)] = v[i];
+      ret[name_out(i)] = v[i];
     }
     return ret;
   }
