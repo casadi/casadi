@@ -361,25 +361,25 @@ namespace casadi {
     virtual std::vector<SX> symbolicInputSX() const;
 
     /** \brief Get input scheme index by name */
-    virtual int inputIndex(const std::string &name) const {
+    virtual int index_in(const std::string &name) const {
       const std::vector<std::string>& v=ischeme_;
       for (std::vector<std::string>::const_iterator i=v.begin(); i!=v.end(); ++i) {
         size_t col = i->find(':');
         if (i->compare(0, col, name)==0) return i-v.begin();
       }
-      casadi_error("FunctionInternal::inputIndex: could not find entry \""
+      casadi_error("FunctionInternal::index_in: could not find entry \""
                    << name << "\". Available names are: " << v << ".");
       return -1;
     }
 
     /** \brief Get output scheme index by name */
-    virtual int outputIndex(const std::string &name) const {
+    virtual int index_out(const std::string &name) const {
       const std::vector<std::string>& v=oscheme_;
       for (std::vector<std::string>::const_iterator i=v.begin(); i!=v.end(); ++i) {
         size_t col = i->find(':');
         if (i->compare(0, col, name)==0) return i-v.begin();
       }
-      casadi_error("FunctionInternal::outputIndex: could not find entry \""
+      casadi_error("FunctionInternal::index_out: could not find entry \""
                    << name << "\". Available names are: " << v << ".");
       return -1;
     }
@@ -429,7 +429,7 @@ namespace casadi {
       return input(ind).sparsity();
     }
     inline Sparsity inputSparsity(const std::string& iname) const {
-      return input(inputIndex(iname)).sparsity();
+      return input(index_in(iname)).sparsity();
     }
     /// @}
 
@@ -439,7 +439,7 @@ namespace casadi {
       return output(ind).sparsity();
     }
     inline Sparsity outputSparsity(const std::string& iname) const {
-      return output(outputIndex(iname)).sparsity();
+      return output(index_out(iname)).sparsity();
     }
     /// @}
 
@@ -459,7 +459,7 @@ namespace casadi {
 
     /// Access input argument by name
     inline Matrix<double>& input(const std::string &iname) {
-      return input(inputIndex(iname));
+      return input(index_in(iname));
     }
 
     /// Const access input argument by index
@@ -487,7 +487,7 @@ namespace casadi {
 
     /// Access output argument by name
     inline Matrix<double>& output(const std::string &oname) {
-      return output(outputIndex(oname));
+      return output(index_out(oname));
     }
 
     /// Const access output argument by index

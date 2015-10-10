@@ -201,10 +201,10 @@ namespace casadi {
       self().assertInit(); self().output(oind).setNZ(val);              \
     }                                                                   \
     void setInputNZ(T val, const std::string &iname) {                  \
-      setInputNZ(val, self().inputIndex(iname));                        \
+      setInputNZ(val, self().index_in(iname));                        \
     }                                                                   \
     void setOutputNZ(T val, const std::string &oname) {                 \
-      setOutputNZ(val, self().outputIndex(oname));                      \
+      setOutputNZ(val, self().index_out(oname));                      \
     }
 
 #define SETTERS_SUB(T)                                                  \
@@ -220,10 +220,10 @@ namespace casadi {
       self().assertInit(); self().output(oind).set(val);                \
     }                                                                   \
     void setInput(T val, const std::string &iname) {                    \
-      setInput(val, self().inputIndex(iname));                          \
+      setInput(val, self().index_in(iname));                          \
     }                                                                   \
     void setOutput(T val, const std::string &oname) {                   \
-      setOutput(val, self().outputIndex(oname));                        \
+      setOutput(val, self().index_out(oname));                        \
     }
 
 #ifndef DOXYGENPROC
@@ -248,10 +248,10 @@ namespace casadi {
         self().assertInit(); self().output(oind).getNZ(val);    \
       }                                                         \
       void getInputNZ(T val, const std::string &iname) const {  \
-        getInputNZ(val, self().inputIndex(iname));              \
+        getInputNZ(val, self().index_in(iname));              \
       }                                                         \
       void getOutputNZ(T val, const std::string &oname) const { \
-        getOutputNZ(val, self().outputIndex(oname));            \
+        getOutputNZ(val, self().index_out(oname));            \
       }
 
 #define GETTERS_SUB(T)                                                  \
@@ -262,10 +262,10 @@ namespace casadi {
         self().assertInit(); self().output(oind).get(val);              \
       }                                                                 \
       void getInput(T val, const std::string &iname) const {            \
-        getInput(val, self().inputIndex(iname));                        \
+        getInput(val, self().index_in(iname));                        \
       }                                                                 \
       void getOutput(T val, const std::string &oname) const {           \
-        getOutput(val, self().outputIndex(oname));                      \
+        getOutput(val, self().index_out(oname));                      \
       }
 
 #ifndef DOXYGENPROC

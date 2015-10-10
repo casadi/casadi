@@ -125,52 +125,52 @@ namespace casadi {
      */
     SX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
     SX jac(const std::string& iname, int oind=0, bool compact=false, bool symmetric=false)
-    { return jac(inputIndex(iname), oind, compact, symmetric); }
+    { return jac(index_in(iname), oind, compact, symmetric); }
     SX jac(int iind, const std::string& oname, bool compact=false, bool symmetric=false)
-    { return jac(iind, outputIndex(oname), compact, symmetric); }
+    { return jac(iind, index_out(oname), compact, symmetric); }
     SX jac(const std::string& iname, const std::string& oname,
            bool compact=false, bool symmetric=false)
-    { return jac(inputIndex(iname), outputIndex(oname), compact, symmetric); }
+    { return jac(index_in(iname), index_out(oname), compact, symmetric); }
     ///@}
 
     ///@{
     /// Gradient via source code transformation
     SX grad(int iind=0, int oind=0);
-    SX grad(const std::string& iname, int oind=0) { return grad(inputIndex(iname), oind); }
-    SX grad(int iind, const std::string& oname) { return grad(iind, outputIndex(oname)); }
+    SX grad(const std::string& iname, int oind=0) { return grad(index_in(iname), oind); }
+    SX grad(int iind, const std::string& oname) { return grad(iind, index_out(oname)); }
     SX grad(const std::string& iname, const std::string& oname)
-    { return grad(inputIndex(iname), outputIndex(oname)); }
+    { return grad(index_in(iname), index_out(oname)); }
     ///@}
 
     ///@{
     /// Tangent via source code transformation
     SX tang(int iind=0, int oind=0);
-    SX tang(const std::string& iname, int oind=0) { return tang(inputIndex(iname), oind); }
-    SX tang(int iind, const std::string& oname) { return tang(iind, outputIndex(oname)); }
+    SX tang(const std::string& iname, int oind=0) { return tang(index_in(iname), oind); }
+    SX tang(int iind, const std::string& oname) { return tang(iind, index_out(oname)); }
     SX tang(const std::string& iname, const std::string& oname)
-    { return tang(inputIndex(iname), outputIndex(oname)); }
+    { return tang(index_in(iname), index_out(oname)); }
     ///@}
 
     ///@{
     /// Hessian (forward over adjoint) via source code transformation
     SX hess(int iind=0, int oind=0);
-    SX hess(const std::string& iname, int oind=0) { return hess(inputIndex(iname), oind); }
-    SX hess(int iind, const std::string& oname) { return hess(iind, outputIndex(oname)); }
+    SX hess(const std::string& iname, int oind=0) { return hess(index_in(iname), oind); }
+    SX hess(int iind, const std::string& oname) { return hess(iind, index_out(oname)); }
     SX hess(const std::string& iname, const std::string& oname) {
-      return hess(inputIndex(iname), outputIndex(oname));
+      return hess(index_in(iname), index_out(oname));
     }
     ///@}
 
     /** \brief Get function input */
     const SX inputExpr(int iind) const;
     const SX inputExpr(const std::string& iname) const {
-      return inputExpr(inputIndex(iname));
+      return inputExpr(index_in(iname));
     }
 
     /** \brief Get function output */
     const SX outputExpr(int oind) const;
     const SX outputExpr(const std::string& oname) const {
-      return outputExpr(outputIndex(oname));
+      return outputExpr(index_out(oname));
     }
 
     /** \brief Get all function inputs */

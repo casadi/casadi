@@ -108,14 +108,14 @@ namespace casadi {
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
      * SCHEME_NLPINput
      */
-    int inputIndex(const std::string &name) const;
+    int index_in(const std::string &name) const;
 
     /** \brief Find the index for a string describing a particular entry of an output scheme
      *
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
      * SCHEME_NLPINput
      */
-    int outputIndex(const std::string &name) const;
+    int index_out(const std::string &name) const;
 
     /** \brief Get input scheme name by index */
     std::string inputName(int ind) const;
@@ -219,14 +219,14 @@ namespace casadi {
     Function jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
     Function jacobian(const std::string& iind,  int oind=0, bool compact=false,
                       bool symmetric=false) {
-        return jacobian(inputIndex(iind), oind, compact, symmetric);
+        return jacobian(index_in(iind), oind, compact, symmetric);
     }
     Function jacobian(int iind, const std::string& oind, bool compact=false, bool symmetric=false) {
-        return jacobian(iind, outputIndex(oind), compact, symmetric);
+        return jacobian(iind, index_out(oind), compact, symmetric);
     }
     Function jacobian(const std::string& iind, const std::string& oind, bool compact=false,
                       bool symmetric=false) {
-        return jacobian(inputIndex(iind), outputIndex(oind), compact, symmetric);
+        return jacobian(index_in(iind), index_out(oind), compact, symmetric);
     }
     ///@}
 
@@ -245,13 +245,13 @@ namespace casadi {
      */
     Function gradient(int iind=0, int oind=0);
     Function gradient(const std::string& iind, int oind=0) {
-        return gradient(inputIndex(iind), oind);
+        return gradient(index_in(iind), oind);
     }
     Function gradient(int iind, const std::string& oind) {
-        return gradient(iind, outputIndex(oind));
+        return gradient(iind, index_out(oind));
     }
     Function gradient(const std::string& iind, const std::string& oind) {
-        return gradient(inputIndex(iind), outputIndex(oind));
+        return gradient(index_in(iind), index_out(oind));
     }
     ///@}
 
@@ -266,11 +266,11 @@ namespace casadi {
      */
     Function tangent(int iind=0, int oind=0);
     Function tangent(const std::string& iind, int oind=0)
-    { return tangent(inputIndex(iind), oind); }
+    { return tangent(index_in(iind), oind); }
     Function tangent(int iind, const std::string& oind)
-    { return tangent(iind, outputIndex(oind)); }
+    { return tangent(iind, index_out(oind)); }
     Function tangent(const std::string& iind, const std::string& oind)
-    { return tangent(inputIndex(iind), outputIndex(oind)); }
+    { return tangent(index_in(iind), index_out(oind)); }
     ///@}
 
     ///@{
@@ -284,11 +284,11 @@ namespace casadi {
      */
     Function hessian(int iind=0, int oind=0);
     Function hessian(const std::string& iind, int oind=0)
-    { return hessian(inputIndex(iind), oind); }
+    { return hessian(index_in(iind), oind); }
     Function hessian(int iind, const std::string& oind)
-    { return hessian(iind, outputIndex(oind)); }
+    { return hessian(iind, index_out(oind)); }
     Function hessian(const std::string& iind, const std::string& oind)
-    { return hessian(inputIndex(iind), outputIndex(oind)); }
+    { return hessian(index_in(iind), index_out(oind)); }
     ///@}
 
     /** \brief Generate a Jacobian function of all the inputs elements with respect to all
@@ -559,25 +559,25 @@ namespace casadi {
     const Sparsity jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
     const Sparsity jacSparsity(const std::string &iind, int oind=0, bool compact=false,
                           bool symmetric=false) {
-        return jacSparsity(inputIndex(iind), oind, compact, symmetric); }
+        return jacSparsity(index_in(iind), oind, compact, symmetric); }
     const Sparsity jacSparsity(int iind, const std::string &oind, bool compact=false,
                           bool symmetric=false) {
-        return jacSparsity(iind, outputIndex(oind), compact, symmetric); }
+        return jacSparsity(iind, index_out(oind), compact, symmetric); }
     const Sparsity jacSparsity(const std::string &iind, const std::string &oind,
                           bool compact=false, bool symmetric=false) {
-        return jacSparsity(inputIndex(iind), outputIndex(oind), compact, symmetric); }
+        return jacSparsity(index_in(iind), index_out(oind), compact, symmetric); }
     ///@}
 
     ///@{
     /// Generate the sparsity of a Jacobian block
     void setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
     void setJacSparsity(const Sparsity& sp, const std::string &iind, int oind, bool compact=false) {
-        setJacSparsity(sp, inputIndex(iind), oind, compact); }
+        setJacSparsity(sp, index_in(iind), oind, compact); }
     void setJacSparsity(const Sparsity& sp, int iind, const std::string &oind, bool compact=false) {
-        setJacSparsity(sp, iind, outputIndex(oind), compact); }
+        setJacSparsity(sp, iind, index_out(oind), compact); }
     void setJacSparsity(const Sparsity& sp, const std::string &iind, const std::string &oind,
                         bool compact=false) {
-        setJacSparsity(sp, inputIndex(iind), outputIndex(oind), compact); }
+        setJacSparsity(sp, index_in(iind), index_out(oind), compact); }
     ///@}
 
     /** \brief Export / Generate C code for the function */

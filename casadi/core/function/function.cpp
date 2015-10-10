@@ -307,12 +307,12 @@ namespace casadi {
     return (*this)->oscheme_;
   }
 
-  int Function::inputIndex(const std::string &name) const {
-    return (*this)->inputIndex(name);
+  int Function::index_in(const std::string &name) const {
+    return (*this)->index_in(name);
   }
 
-  int Function::outputIndex(const std::string &name) const {
-    return (*this)->outputIndex(name);
+  int Function::index_out(const std::string &name) const {
+    return (*this)->index_out(name);
   }
 
   std::string Function::inputName(int ind) const {
@@ -747,7 +747,7 @@ namespace casadi {
 
     // Assign provided inputs
     for (typename std::map<std::string, M>::const_iterator i=arg.begin(); i!=arg.end(); ++i) {
-      v.at(inputIndex(i->first)) = i->second;
+      v.at(index_in(i->first)) = i->second;
     }
 
     // Make call
