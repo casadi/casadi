@@ -522,11 +522,11 @@ class MXtests(casadiTestCase):
     self.numpyEvaluationCheck(lambda x: x[0].nz[1], lambda x: matrix(sx0[1]).T,[x],x0,name="x[1]",setx0=[sx0])
     self.numpyEvaluationCheck(lambda x: x[0].nz[-1], lambda x: matrix(sx0[-1]).T,[x],x0,name="x[-1]",setx0=[sx0])
     
-  def test_getinputExpr(self):
-    self.message("outputExpr/inputExpr")
+  def test_getmx_in(self):
+    self.message("mx_out/mx_in")
     x=MX.sym("x",2,3)
     f = MXFunction("f", [x],[3*x]) 
-    g = MXFunction("g", [f.inputExpr(0)],[6*f.outputExpr(0)]) 
+    g = MXFunction("g", [f.mx_in(0)],[6*f.mx_out(0)]) 
     n=[1,2,3,4,5,6]
     f.setInputNZ(n)
     f.evaluate()

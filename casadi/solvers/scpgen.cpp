@@ -185,8 +185,8 @@ namespace casadi {
     vinit_fcn_ = vinit_fcn;
 
     // Extract the expressions
-    vector<MX> vdef_in = vdef_fcn.inputExpr();
-    vector<MX> vdef_out = vdef_fcn.outputExpr();
+    vector<MX> vdef_in = vdef_fcn.mx_in();
+    vector<MX> vdef_out = vdef_fcn.mx_out();
 
     // Get the dimensions
     x_ = vdef_in.at(0);

@@ -529,7 +529,7 @@ class typemaptests(casadiTestCase):
     
     f = MXFunction("f", [x],[w])
     
-    W = f.outputExpr(0)
+    W = f.mx_out(0)
 
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)

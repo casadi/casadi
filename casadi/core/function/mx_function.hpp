@@ -95,23 +95,27 @@ namespace casadi {
     const MXFunctionInternal* operator->() const;
     /// \endcond
 
+    ///@{
     /** \brief Get function input */
-    const MX inputExpr(int ind) const;
-    const MX inputExpr(const std::string & iname) const {
-      return inputExpr(index_in(iname));
+    const MX mx_in(int ind) const;
+    const MX mx_in(const std::string & iname) const {
+      return mx_in(index_in(iname));
     }
-
-    /** \brief Get function output */
-    const MX outputExpr(int ind) const;
-    const MX outputExpr(const std::string & oname) const {
-      return outputExpr(index_out(oname));
-    }
+    ///@}
 
     /** \brief Get all function inputs */
-    const std::vector<MX> inputExpr() const;
+    const std::vector<MX> mx_in() const;
+
+    ///@{
+    /** \brief Get function output */
+    const MX mx_out(int ind) const;
+    const MX mx_out(const std::string & oname) const {
+      return mx_out(index_out(oname));
+    }
+    ///@}
 
     /** \brief Get all function outputs */
-    const std::vector<MX> outputExpr() const;
+    const std::vector<MX> mx_out() const;
 
     /// \cond INTERNAL
 #ifndef SWIG

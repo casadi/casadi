@@ -105,19 +105,19 @@ namespace casadi {
     return static_cast<MXFunctionInternal*>(Function::operator->());
   }
 
-  const MX MXFunction::inputExpr(int ind) const {
+  const MX MXFunction::mx_in(int ind) const {
     return (*this)->inputv_.at(ind);
   }
 
-  const MX MXFunction::outputExpr(int ind) const {
+  const MX MXFunction::mx_out(int ind) const {
     return (*this)->outputv_.at(ind);
   }
 
-  const std::vector<MX> MXFunction::inputExpr() const {
+  const std::vector<MX> MXFunction::mx_in() const {
     return (*this)->inputv_;
   }
 
-  const std::vector<MX> MXFunction::outputExpr() const {
+  const std::vector<MX> MXFunction::mx_out() const {
     return (*this)->outputv_;
   }
 

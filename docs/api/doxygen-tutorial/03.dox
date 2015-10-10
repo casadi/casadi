@@ -393,8 +393,8 @@ function symbolically representing the first derivative of the original function
      8  SXFunction f(variables, f_expr);
      9  f.init();
     10  SXFunction f_der = f.jacobian();
-    11  cout << "f: " << f.outputExpr() << "\n"; 
-    12  cout << "f_der: " << f_der.outputExpr() << "\n";
+    11  cout << "f: " << f.mx_out() << "\n"; 
+    12  cout << "f_der: " << f_der.mx_out() << "\n";
     13  vector<double> d0(3);
     14  fill(d0.begin(), d0.end(), 6.0);
     15  f_der.init();
