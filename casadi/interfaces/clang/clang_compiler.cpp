@@ -246,9 +246,12 @@ namespace casadi {
 
     // Return value
     vector<pair<string, bool> > ret;
-
+    userOut() << "test001b" << std::endl;
+    
     // Read line-by-line
     std::ifstream setup_file(path + sep + file);
+    
+    userOut() << "test001c" << std::endl;
     std::string line;
     userOut() << "test002" << std::endl;
 
