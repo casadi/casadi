@@ -142,7 +142,7 @@ namespace casadi {
 
   int SXFunction::countNodes() const {
     assertInit();
-    return algorithm().size() - nnzOut();
+    return algorithm().size() - nnz_out();
   }
 
   void SXFunction::clearSymbolic() {

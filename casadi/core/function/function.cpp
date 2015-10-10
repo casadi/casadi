@@ -206,20 +206,20 @@ namespace casadi {
     return (*this)->n_out();
   }
 
-  int Function::nnzIn() const {
-    return (*this)->nnzIn();
+  int Function::nnz_in() const {
+    return (*this)->nnz_in();
   }
 
-  int Function::nnzOut() const {
-    return (*this)->nnzOut();
+  int Function::nnz_out() const {
+    return (*this)->nnz_out();
   }
 
-  int Function::numelIn() const {
-    return (*this)->numelIn();
+  int Function::numel_in() const {
+    return (*this)->numel_in();
   }
 
-  int Function::numelOut() const {
-    return (*this)->numelOut();
+  int Function::numel_out() const {
+    return (*this)->numel_out();
   }
 
   Function Function::jacobian(int iind, int oind, bool compact, bool symmetric) {

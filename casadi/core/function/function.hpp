@@ -177,16 +177,16 @@ namespace casadi {
     int n_out() const;
 
     /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
-    int nnzIn() const;
+    int nnz_in() const;
 
     /** \brief  Get total number of nonzeros in all of the matrix-valued outputs */
-    int nnzOut() const;
+    int nnz_out() const;
 
     /** \brief  Get total number of elements in all of the matrix-valued inputs */
-    int numelIn() const;
+    int numel_in() const;
 
     /** \brief  Get total number of elements in all of the matrix-valued outputs */
-    int numelOut() const;
+    int numel_out() const;
 
     /** \brief Get input scheme */
     std::vector<std::string> inputScheme() const;

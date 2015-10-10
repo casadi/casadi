@@ -1433,8 +1433,8 @@ namespace casadi {
 
         // Save the seeds/sens (#1532)
         // This code should stay in place until refactored away
-        std::vector<double> store_in(nnzIn());
-        std::vector<double> store_out(nnzOut());
+        std::vector<double> store_in(nnz_in());
+        std::vector<double> store_out(nnz_out());
 
         int offset = 0;
         for (int i=0;i<n_in();++i) {
@@ -1773,7 +1773,7 @@ namespace casadi {
                  << typeid(*this).name());
   }
 
-  int FunctionInternal::nnzIn() const {
+  int FunctionInternal::nnz_in() const {
     int ret=0;
     for (int iind=0; iind<n_in(); ++iind) {
       ret += input(iind).nnz();
@@ -1781,7 +1781,7 @@ namespace casadi {
     return ret;
   }
 
-  int FunctionInternal::nnzOut() const {
+  int FunctionInternal::nnz_out() const {
     int ret=0;
     for (int oind=0; oind<n_out(); ++oind) {
       ret += output(oind).nnz();
@@ -1789,7 +1789,7 @@ namespace casadi {
     return ret;
   }
 
-  int FunctionInternal::numelIn() const {
+  int FunctionInternal::numel_in() const {
     int ret=0;
     for (int iind=0; iind<n_in(); ++iind) {
       ret += input(iind).numel();
@@ -1797,7 +1797,7 @@ namespace casadi {
     return ret;
   }
 
-  int FunctionInternal::numelOut() const {
+  int FunctionInternal::numel_out() const {
     int ret=0;
     for (int oind=0; oind<n_out(); ++oind) {
       ret += output(oind).numel();
@@ -2142,7 +2142,7 @@ namespace casadi {
              << "Too many output arguments (%d, max " << n_out << ")\", resc);" << endl;
 
       // Work vectors, including input and output buffers
-      int i_nnz = nnzIn(), o_nnz = nnzOut();
+      int i_nnz = nnz_in(), o_nnz = nnz_out();
       size_t sz_w = this->sz_w();
       for (int i=0; i<n_in; ++i) {
         const Sparsity& s = input(i).sparsity();
@@ -2202,7 +2202,7 @@ namespace casadi {
       s << "int main_" << fname << "(int argc, char* argv[]) {" << endl;
 
       // Work vectors and input and output buffers
-      size_t nr = sz_w() + nnzIn() + nnzOut();
+      size_t nr = sz_w() + nnz_in() + nnz_out();
       s << "  int iw[" << sz_iw() << "];" << endl
              << "  real_t w[" << nr << "];" << endl;
 
@@ -2228,7 +2228,7 @@ namespace casadi {
       // TODO(@jaeandersson): Read inputs from file. For now; read from stdin
       s << "  int j;" << endl
              << "  real_t* a = w;" << endl
-             << "  for (j=0; j<" << nnzIn() << "; ++j) "
+             << "  for (j=0; j<" << nnz_in() << "; ++j) "
              << "scanf(\"%lf\", a++);" << endl;
 
       // Call the function
@@ -2236,8 +2236,8 @@ namespace casadi {
              << "  if (flag) return flag;" << endl;
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
-      s << "  const real_t* r = w+" << nnzIn() << ";" << endl
-             << "  for (j=0; j<" << nnzOut() << "; ++j) "
+      s << "  const real_t* r = w+" << nnz_in() << ";" << endl
+             << "  for (j=0; j<" << nnz_out() << "; ++j) "
              << g.printf("%g ", "*r++") << endl;
       // End with newline
       s << "  " << g.printf("\\n") << endl;
@@ -2611,11 +2611,11 @@ namespace casadi {
     if (jac_penalty==-1) return false;
 
     // Heuristic 1: Jac calculated via forward mode likely cheaper
-    if (jac_penalty*nnzIn()<nfwd) return true;
+    if (jac_penalty*nnz_in()<nfwd) return true;
 
     // Heuristic 2: Jac calculated via reverse mode likely cheaper
     double w = adWeight();
-    if (numDerReverse()>0 && jac_penalty*(1-w)*nnzOut()<w*nfwd)
+    if (numDerReverse()>0 && jac_penalty*(1-w)*nnz_out()<w*nfwd)
       return true;
 
     return false;
@@ -2630,11 +2630,11 @@ namespace casadi {
     if (jac_penalty==-1) return false;
 
     // Heuristic 1: Jac calculated via reverse mode likely cheaper
-    if (jac_penalty*nnzOut()<nadj) return true;
+    if (jac_penalty*nnz_out()<nadj) return true;
 
     // Heuristic 2: Jac calculated via forward mode likely cheaper
     double w = adWeight();
-    if (numDerForward()>0 && jac_penalty*w*nnzIn()<(1-w)*nadj)
+    if (numDerForward()>0 && jac_penalty*w*nnz_in()<(1-w)*nadj)
       return true;
 
     return false;
