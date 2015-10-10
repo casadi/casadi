@@ -1854,4 +1854,12 @@ namespace casadi {
     return (*this)->getFind();
   }
 
+  std::vector<MX> MX::get_input(const Function& f) {
+    return shared_cast<MXFunction>(f).inputExpr();
+  }
+
+  std::vector<MX> MX::get_output(const Function& f) {
+    return shared_cast<MXFunction>(f).outputExpr();
+  }
+
 } // namespace casadi

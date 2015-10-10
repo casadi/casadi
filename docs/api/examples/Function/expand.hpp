@@ -32,7 +32,7 @@
 * \code
 * casadi::MXFunction::expand();
 * casadi::MXFunction::outputExpr();
-* casadi::SXFunction::outputExpr();
+* casadi::SXFunction::sx_out();
 * \endcode
 *
 */

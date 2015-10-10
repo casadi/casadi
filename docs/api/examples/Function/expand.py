@@ -41,7 +41,7 @@ print "Expression = ", f.outputExpr(0)
 #! We expand the MXFunction into an SXFunction
 fSX = f.expand()
 
-print "Expanded expression = ", fSX.outputExpr(0)
+print "Expanded expression = ", fSX.sx_out(0)
 
 
 #! Limitations

@@ -120,19 +120,19 @@ namespace casadi {
     return (*this)->hess(iind, oind);
   }
 
-  const SX SXFunction::inputExpr(int ind) const {
+  const SX SXFunction::sx_in(int ind) const {
     return (*this)->inputv_.at(ind);
   }
 
-  const SX SXFunction::outputExpr(int ind) const {
+  const SX SXFunction::sx_out(int ind) const {
     return (*this)->outputv_.at(ind);
   }
 
-  const std::vector<SX> SXFunction::inputExpr() const {
+  const std::vector<SX> SXFunction::sx_in() const {
     return (*this)->inputv_;
   }
 
-  const std::vector<SX> SXFunction::outputExpr() const {
+  const std::vector<SX> SXFunction::sx_out() const {
     return (*this)->outputv_;
   }
 

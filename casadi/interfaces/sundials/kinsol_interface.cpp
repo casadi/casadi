@@ -353,7 +353,7 @@ namespace casadi {
           SXFunction f_sx = shared_cast<SXFunction>(f_);
           if (!f_sx.isNull()) {
             f_sx.print(ss);
-            ss << "Equation " << k << " = " << f_sx.outputExpr(0).at(k) << endl;
+            ss << "Equation " << k << " = " << f_sx.sx_out(0).at(k) << endl;
           }
         }
 
@@ -581,14 +581,14 @@ namespace casadi {
           // Print the expression for f[Jrow] if f is an SXFunction instance
           SXFunction f_sx = shared_cast<SXFunction>(f_);
           if (!f_sx.isNull()) {
-            ss << "Variable " << Jcol << " = " << f_sx.inputExpr(0).at(Jcol) << endl;
-            ss << "Equation " << Jrow << " = " << f_sx.outputExpr(0).at(Jrow) << endl;
+            ss << "Variable " << Jcol << " = " << f_sx.sx_in(0).at(Jcol) << endl;
+            ss << "Equation " << Jrow << " = " << f_sx.sx_out(0).at(Jrow) << endl;
           }
 
           // Print the expression for J[k] if J is an SXFunction instance
           SXFunction jac_sx = shared_cast<SXFunction>(jac_);
           if (!jac_sx.isNull()) {
-            ss << "J[" << Jrow << ", " << Jcol << "] = " << jac_sx.outputExpr(0).at(k) << endl;
+            ss << "J[" << Jrow << ", " << Jcol << "] = " << jac_sx.sx_out(0).at(k) << endl;
           }
         }
 

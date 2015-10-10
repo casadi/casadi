@@ -597,6 +597,12 @@ namespace casadi {
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
 
+    /** \brief Get function inputs */
+    static std::vector<MX> get_input(const Function& f);
+
+    /** \brief Get function output */
+    static std::vector<MX> get_output(const Function& f);
+
 #ifndef SWIG
     /// Construct constant matrix with a given sparsity and all
     MX(const Sparsity& sp, int val, bool dummy);

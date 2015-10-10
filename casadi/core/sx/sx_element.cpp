@@ -1425,8 +1425,8 @@ namespace casadi {
     int nasens = transpose_jacobian ? vv.size() : 0;
 
     // Assemble arguments and directional derivatives
-    vector<SX> argv = f.inputExpr();
-    vector<SX> resv = f.outputExpr();
+    vector<SX> argv = f.sx_in();
+    vector<SX> resv = f.sx_out();
     vector<vector<SX> > fseed(nfsens, argv), fsens(nfsens, resv),
         aseed(nasens, resv), asens(nasens, argv);
 
@@ -1831,6 +1831,14 @@ namespace casadi {
     inter.resize(0);
     for (vector<SXElement>::const_iterator i=begin(); i!=end(); ++i)
       nz.push_back((*i)->printCompact(nodeind, inter));
+  }
+
+  template<> std::vector<SX> SX::get_input(const Function& f) {
+    return shared_cast<SXFunction>(f).sx_in();
+  }
+
+  template<> std::vector<SX> SX::get_output(const Function& f) {
+    return shared_cast<SXFunction>(f).sx_out();
   }
 
 } // namespace casadi

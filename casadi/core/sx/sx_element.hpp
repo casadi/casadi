@@ -395,6 +395,8 @@ namespace casadi {
   template<> SX SX::zz_eig_symbolic() const;
   template<> void SX::printSplit(std::vector<std::string>& nz,
                                  std::vector<std::string>& inter) const;
+  template<> std::vector<SX> SX::get_input(const Function& f);
+  template<> std::vector<SX> SX::get_output(const Function& f);
 } // namespace casadi
 
 #ifndef SWIG

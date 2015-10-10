@@ -1912,7 +1912,7 @@ namespace casadi {
         c_x*f.jac(DAE_X, DAE_ODE) + c_xdot*FunctionType::MatType::eye(nx_);
 
     // Jacobian function
-    std::vector<typename FunctionType::MatType> jac_in = f.inputExpr();
+    std::vector<typename FunctionType::MatType> jac_in = FunctionType::MatType::get_input(f);
     jac_in.push_back(c_x);
     jac_in.push_back(c_xdot);
 
@@ -1932,7 +1932,7 @@ namespace casadi {
         c_x*g.jac(RDAE_RX, RDAE_ODE) + c_xdot*FunctionType::MatType::eye(nrx_);
 
     // Jacobian function
-    std::vector<typename FunctionType::MatType> jac_in = g.inputExpr();
+    std::vector<typename FunctionType::MatType> jac_in = FunctionType::MatType::get_input(g);
     jac_in.push_back(c_x);
     jac_in.push_back(c_xdot);
 

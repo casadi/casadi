@@ -45,4 +45,4 @@ print f.n_out()
 #! automatic typecasting functionality
 
 for i in range(3):
-  print f.outputExpr(i)
+  print f.sx_out(i)

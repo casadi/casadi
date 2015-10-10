@@ -851,6 +851,12 @@ namespace casadi {
     /** \brief Get the depth to which equalities are being checked for simplifications */
     static int getEqualityCheckingDepth();
 
+    /** \brief Get function input */
+    static std::vector<Matrix<DataType> > get_input(const Function& f);
+
+    /** \brief Get function output */
+    static std::vector<Matrix<DataType>> get_output(const Function& f);
+
     /// Get name of the class
     static std::string className();
 

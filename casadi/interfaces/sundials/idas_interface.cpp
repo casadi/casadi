@@ -2343,7 +2343,7 @@ namespace casadi {
     }
 
     // Jacobian function
-    std::vector<typename FunctionType::MatType> jac_in = f.inputExpr();
+    std::vector<typename FunctionType::MatType> jac_in = FunctionType::MatType::get_input(f);
     jac_in.push_back(cj);
 
     // Return generated function
@@ -2365,7 +2365,7 @@ namespace casadi {
     }
 
     // Jacobian function
-    std::vector<typename FunctionType::MatType> jac_in = g.inputExpr();
+    std::vector<typename FunctionType::MatType> jac_in = FunctionType::MatType::get_input(g);
     jac_in.push_back(cj);
 
     // return generated function

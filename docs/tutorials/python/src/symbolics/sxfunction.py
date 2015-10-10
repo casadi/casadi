@@ -64,8 +64,8 @@ print z
 #$ f : $\mathbb{R} \mapsto \mathbb{R}$
 f = SXFunction('f', [x], [z]) # z = f(x)
 print "%d -> %d" % (f.n_in(),f.n_out())
-print f.inputExpr(), type(f.inputExpr())
-print f.outputExpr(), type(f.outputExpr())
+print f.sx_in(), type(f.sx_in())
+print f.sx_out(), type(f.sx_out())
 f.setInput(2)
 f.evaluate()
 print f.getOutput()
