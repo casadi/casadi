@@ -87,8 +87,8 @@ namespace casadi {
     addOption("reduced_outputs", OT_INTEGERVECTOR, GenericType(),
               "Reduction for certain outputs");
 
-    setOption("input_scheme", f_.scheme_in());
-    setOption("output_scheme", f_.scheme_out());
+    setOption("input_scheme", f_.name_in());
+    setOption("output_scheme", f_.name_out());
   }
 
   MapBase::~MapBase() {

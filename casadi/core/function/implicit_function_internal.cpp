@@ -95,8 +95,8 @@ namespace casadi {
     }
 
     // Same input and output schemes
-    setOption("input_scheme", f_.scheme_in());
-    setOption("output_scheme", f_.scheme_out());
+    setOption("input_scheme", f_.name_in());
+    setOption("output_scheme", f_.name_out());
 
     // Call the base class initializer
     FunctionInternal::init();

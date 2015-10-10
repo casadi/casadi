@@ -755,7 +755,7 @@ class Integrationtests(casadiTestCase):
     
     q0=MX.sym("q0")
     p=MX.sym("p")
-    Ji = MXFunction("Ji", [q0,p],(J({'x0':q0,'p':p}), J.scheme_out()))
+    Ji = MXFunction("Ji", [q0,p],(J({'x0':q0,'p':p}), J.name_out()))
     H=Ji.jacobian(1)
     H.setInput([num['q0']],0)
     H.setInput([num['p']],1)
