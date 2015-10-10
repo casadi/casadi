@@ -299,11 +299,11 @@ namespace casadi {
     return (*this)->symbolicOutput();
   }
 
-  std::vector<std::string> Function::inputScheme() const {
+  std::vector<std::string> Function::scheme_in() const {
     return (*this)->ischeme_;
   }
 
-  std::vector<std::string> Function::outputScheme() const {
+  std::vector<std::string> Function::scheme_out() const {
     return (*this)->oscheme_;
   }
 

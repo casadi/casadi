@@ -189,10 +189,10 @@ namespace casadi {
     int numel_out() const;
 
     /** \brief Get input scheme */
-    std::vector<std::string> inputScheme() const;
+    std::vector<std::string> scheme_in() const;
 
     /** \brief Get output scheme */
-    std::vector<std::string> outputScheme() const;
+    std::vector<std::string> scheme_out() const;
 
     /** \brief  Evaluate */
     void evaluate();
