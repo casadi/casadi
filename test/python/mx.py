@@ -1298,7 +1298,7 @@ class MXtests(casadiTestCase):
       gfcn = 0
       if kk==0:
         tmp = MXFunction("tmp", [U],[G], {"ad_weight":1})
-        gfcn = tmp.expand()
+        gfcn = SXFunction('expand_'+tmp.name(), tmp)
       else:
         gfcn = MXFunction("gfcn", [U],[G], {"ad_weight":1})
       J = gfcn.jacobian()
@@ -2376,7 +2376,7 @@ class MXtests(casadiTestCase):
     
     mf = MXFunction("mf", [x],[x*x[0,0]])
     
-    mfunction = mf.expand()
+    mfunction = SXFunction('expand_'+mf.name(), mf)
     
     mfg = mf.derivative(0,1)
     
@@ -2400,7 +2400,7 @@ class MXtests(casadiTestCase):
     d.setInput([1,2],0)
     d.setInput([3,4],1)
 
-    dx = d.expand()
+    dx = SXFunction('expand_'+d.name(), d)
     dx.setInput([1,2],0)
     dx.setInput([3,4],1)
     
@@ -2413,7 +2413,7 @@ class MXtests(casadiTestCase):
     d.setInput([1,2],0)
     d.setInput([3,4],1)
 
-    dx = d.expand()
+    dx = SXFunction('expand_'+d.name(), d)
     dx.setInput([1,2],0)
     dx.setInput([3,4],1)
     

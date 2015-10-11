@@ -1779,9 +1779,7 @@ namespace casadi {
     MXFunction f("tmp", v, ret);
 
     // Expand to SXFunction
-    SXFunction s = f.expand();
-    s.setOption(options);
-    s.init();
+    SXFunction s("expand_" + f.name(), f, options);
 
     return s(graph_substitute(v, syms, boundary), true);
   }

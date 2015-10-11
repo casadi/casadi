@@ -144,7 +144,7 @@ class Functiontests(casadiTestCase):
 
     g = MXFunction("g", X,[z[0]])
 
-    g.expand([x])
+    g = SXFunction('expand_g', g)
   
   def test_jacobian(self):
     x = SX.sym("x",3,1)
@@ -639,7 +639,7 @@ class Functiontests(casadiTestCase):
         Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
         V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
-        for f in [F, F.expand()]:
+        for f in [F, SXFunction('expand_'+F.name(), F)]:
           for i,e in enumerate(X_+Y_+Z_+V_):
             f.setInput(e,i)
             Fref.setInput(e,i)
@@ -690,7 +690,7 @@ class Functiontests(casadiTestCase):
         Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
         V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
-        for f in [F, F.expand()]:
+        for f in [F, SXFunction('expand_'+F.name(), F)]:
           for i,e in enumerate(X_+Y_+Z_+V_):
             f.setInput(e,i)
             Fref.setInput(e,i)

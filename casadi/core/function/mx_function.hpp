@@ -139,10 +139,10 @@ namespace casadi {
     MX tang(const std::string & iname, const std::string & oname)
     { return tang(index_in(iname), index_out(oname)); }
     ///@}
-#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     SXFunction expand(const std::vector<SX>& inputv = std::vector<SX>());
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Get all the free variables of the function */
     std::vector<MX> getFree() const;

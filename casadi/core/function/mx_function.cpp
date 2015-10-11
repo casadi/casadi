@@ -122,11 +122,11 @@ namespace casadi {
   MX MXFunction::tang(int iind, int oind) {
     return (*this)->tang(iind, oind);
   }
-#endif // WITH_DEPRECATED_FEATURES
 
   SXFunction MXFunction::expand(const std::vector<SX>& inputv) {
     return (*this)->expand(inputv);
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   std::vector<MX> MXFunction::getFree() const {
     return (*this)->free_vars_;

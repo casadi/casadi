@@ -379,7 +379,7 @@ class LinearSolverTests(casadiTestCase):
           self.checkfunction(f,solution)
           
           if "SymbolicQR" not in str(Solver) : continue
-          solversx = f.expand()
+          solversx = SXFunction('expand_'+f.name(), f)
           solversx.setInput(A_,0)
           solversx.setInput(b_,1)
    

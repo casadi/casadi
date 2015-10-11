@@ -70,8 +70,11 @@ namespace casadi {
     /// Expand an MXFunction
     explicit SXFunction(const MXFunction &f);
 
-    /// Expand an Function
+    /// Expand a Function
     explicit SXFunction(const Function &f);
+
+    /// Expand a function
+    SXFunction(const std::string& name, const Function &f, const Dict& opts=Dict());
 
     /** \brief Construct from vectors (new syntax, includes initialization) */
     SXFunction(const std::string& name, const std::vector<SX>& arg,

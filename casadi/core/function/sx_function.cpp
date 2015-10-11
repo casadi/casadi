@@ -55,6 +55,17 @@ namespace casadi {
     init();
   }
 
+  SXFunction::SXFunction(const std::string& name, const Function &f, const Dict& opts) {
+    vector<SX> arg = f.sx_in();
+    vector<SX> res = Function(f)(arg);
+    vector<string> name_in = f.name_in();
+    vector<string> name_out = f.name_out();
+    Dict opts2(opts);
+    if (!name_in.empty() && !opts.count("input_scheme")) opts2["input_scheme"]=name_in;
+    if (!name_out.empty() && !opts.count("output_scheme")) opts2["output_scheme"]=name_out;
+    construct(name, arg, res, opts2);
+  }
+
   SXFunction::SXFunction(const std::string& name, const std::vector<SX>& arg,
                          const std::vector<SX>& res, const Dict& opts) {
     construct(name, arg, res, opts);
@@ -136,8 +147,7 @@ namespace casadi {
   }
 
   SXFunction::SXFunction(const MXFunction& f) {
-    MXFunction f2 = f;
-    SXFunction t = f2.expand();
+    SXFunction t("expand_" + f.name(), f);
     assignNode(t.get());
   }
 
@@ -146,8 +156,7 @@ namespace casadi {
     if (temp) {
       assignNode(const_cast<SXFunctionInternal*>(temp));
     } else {
-      MXFunction f2(f);
-      SXFunction t = f2.expand();
+      SXFunction t("expand_" + f.name(), f);
       assignNode(t.get());
     }
   }
