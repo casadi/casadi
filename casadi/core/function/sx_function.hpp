@@ -177,33 +177,6 @@ namespace casadi {
 #endif // SWIG
 /// \endcond
 
-    /** \brief Get the number of atomic operations */
-    int getAlgorithmSize() const { return algorithm().size();}
-
-    /** \brief Get the length of the work vector */
-    int getWorkSize() const;
-
-    /** \brief Get an atomic operation operator index */
-    int getAtomicOperation(int k) const { return algorithm().at(k).op;}
-
-    /** \brief Get the (integer) input arguments of an atomic operation */
-    std::pair<int, int> getAtomicInput(int k) const {
-      const ScalarAtomic& atomic = algorithm().at(k);
-      return std::pair<int, int>(atomic.i1, atomic.i2);}
-
-    /** \brief Get the floating point output argument of an atomic operation */
-    double getAtomicInputReal(int k) const { return algorithm().at(k).d;}
-
-    /** \brief Get the (integer) output argument of an atomic operation */
-    int getAtomicOutput(int k) const { return algorithm().at(k).i0;}
-
-    /** \brief Number of nodes in the algorithm */
-    int countNodes() const;
-
-    /** \brief Clear the function from its symbolic representation, to free up memory,
-     * no symbolic evaluations are possible after this */
-    void clearSymbolic();
-
     /** \brief Get the corresponding matrix type */
     typedef SX MatType;
 

@@ -103,9 +103,6 @@ namespace casadi {
 #endif // SWIG
     /// \endcond
 
-    /** \brief Number of nodes in the algorithm */
-    int countNodes() const;
-
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
 

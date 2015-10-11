@@ -137,15 +137,6 @@ namespace casadi {
     return (*this)->algorithm_;
   }
 
-  int SXFunction::countNodes() const {
-    assertInit();
-    return algorithm().size() - nnz_out();
-  }
-
-  void SXFunction::clearSymbolic() {
-    (*this)->clearSymbolic();
-  }
-
   SXFunction::SXFunction(const MXFunction& f) {
     SXFunction t("expand_" + f.name(), f);
     assignNode(t.get());
@@ -159,10 +150,6 @@ namespace casadi {
       SXFunction t("expand_" + f.name(), f);
       assignNode(t.get());
     }
-  }
-
-  int SXFunction::getWorkSize() const {
-    return (*this)->sz_w();
   }
 
 } // namespace casadi

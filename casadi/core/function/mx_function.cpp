@@ -105,11 +105,6 @@ namespace casadi {
     return static_cast<MXFunctionInternal*>(Function::operator->());
   }
 
-  int MXFunction::countNodes() const {
-    assertInit();
-    return (*this)->algorithm_.size();
-  }
-
 #ifdef WITH_DEPRECATED_FEATURES
   MX MXFunction::jac(int iind, int oind, bool compact, bool symmetric) {
     return (*this)->jac(iind, oind, compact, symmetric);

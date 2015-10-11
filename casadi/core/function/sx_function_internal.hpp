@@ -157,6 +157,32 @@ class CASADI_EXPORT SXFunctionInternal :
   /** \brief Hessian (forward over adjoint) via source code transformation */
   SX hess(int iind=0, int oind=0);
 
+  /** \brief Get the number of atomic operations */
+  virtual int getAlgorithmSize() const { return algorithm_.size();}
+
+  /** \brief Get the length of the work vector */
+  virtual int getWorkSize() const { return sz_w();}
+
+  /** \brief Get an atomic operation operator index */
+  virtual int getAtomicOperation(int k) const { return algorithm_.at(k).op;}
+
+  /** \brief Get the (integer) input arguments of an atomic operation */
+  virtual std::pair<int, int> getAtomicInput(int k) const {
+    const ScalarAtomic& atomic = algorithm_.at(k);
+    return std::pair<int, int>(atomic.i1, atomic.i2);
+  }
+
+  /** \brief Get the floating point output argument of an atomic operation */
+  virtual double getAtomicInputReal(int k) const {
+    return algorithm_.at(k).d;
+  }
+
+  /** \brief Get the (integer) output argument of an atomic operation */
+  virtual int getAtomicOutput(int k) const { return algorithm_.at(k).i0;}
+
+  /** \brief Number of nodes in the algorithm */
+  virtual int countNodes() const { return algorithm_.size() - nnz_out();}
+
   /** \brief  DATA MEMBERS */
 
   /** \brief  An element of the algorithm, namely a binary operation */
@@ -189,10 +215,6 @@ class CASADI_EXPORT SXFunctionInternal :
 
   /** \brief Generate code for the body of the C function */
   virtual void generateBody(CodeGenerator& g) const;
-
-  /** \brief Clear the function from its symbolic representation, to free up memory,
-   * no symbolic evaluations are possible after this */
-  void clearSymbolic();
 
   /** \brief  Propagate sparsity forward */
   virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);

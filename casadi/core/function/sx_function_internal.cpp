@@ -826,12 +826,6 @@ namespace casadi {
     if (verbose()) userOut() << "SXFunctionInternal::evalAdj end" << endl;
   }
 
-  void SXFunctionInternal::clearSymbolic() {
-    inputv_.clear();
-    outputv_.clear();
-    s_work_.clear();
-  }
-
   void SXFunctionInternal::spInit(bool fwd) {
     // Quick return if just-in-time compilation for
     //  sparsity pattern propagation, no work vector needed

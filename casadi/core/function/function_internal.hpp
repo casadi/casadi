@@ -287,6 +287,27 @@ namespace casadi {
     /** \brief Extract the functions needed for the Lifted Newton method */
     virtual void generateLiftingFunctions(Function& vdef_fcn, Function& vinit_fcn);
 
+    /** \brief Get the number of atomic operations */
+    virtual int getAlgorithmSize() const;
+
+    /** \brief Get the length of the work vector */
+    virtual int getWorkSize() const;
+
+    /** \brief Get an atomic operation operator index */
+    virtual int getAtomicOperation(int k) const;
+
+    /** \brief Get the (integer) input arguments of an atomic operation */
+    virtual std::pair<int, int> getAtomicInput(int k) const;
+
+    /** \brief Get the floating point output argument of an atomic operation */
+    virtual double getAtomicInputReal(int k) const;
+
+    /** \brief Get the (integer) output argument of an atomic operation */
+    virtual int getAtomicOutput(int k) const;
+
+    /** \brief Number of nodes in the algorithm */
+    virtual int countNodes() const;
+
     /** \brief Create a helper MXFunction with some properties copied
     *
     * Copied properties:

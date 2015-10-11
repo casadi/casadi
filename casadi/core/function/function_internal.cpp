@@ -3030,4 +3030,32 @@ namespace casadi {
     casadi_error("'generateLiftingFunctions' only defined for 'mxfunction'");
   }
 
+  int FunctionInternal::getAlgorithmSize() const {
+    casadi_error("'getAlgorithmSize' not defined for " + type_name());
+  }
+
+  int FunctionInternal::getWorkSize() const {
+    casadi_error("'getWorkSize' not defined for " + type_name());
+  }
+
+  int FunctionInternal::getAtomicOperation(int k) const {
+    casadi_error("'getAtomicOperation' not defined for " + type_name());
+  }
+
+  std::pair<int, int> FunctionInternal::getAtomicInput(int k) const {
+    casadi_error("'getAtomicInput' not defined for " + type_name());
+  }
+
+  double FunctionInternal::getAtomicInputReal(int k) const {
+    casadi_error("'getAtomicInputReal' not defined for " + type_name());
+  }
+
+  int FunctionInternal::getAtomicOutput(int k) const {
+    casadi_error("'getAtomicOutput' not defined for " + type_name());
+  }
+
+  int FunctionInternal::countNodes() const {
+    casadi_error("'countNodes' not defined for " + type_name());
+  }
+
 } // namespace casadi

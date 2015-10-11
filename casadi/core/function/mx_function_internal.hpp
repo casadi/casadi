@@ -178,6 +178,9 @@ namespace casadi {
 
     /// Get free variables (MX)
     virtual std::vector<MX> free_mx() const {return free_vars_;}
+
+    /** \brief Number of nodes in the algorithm */
+    virtual int countNodes() const { return algorithm_.size();}
   };
 
 } // namespace casadi

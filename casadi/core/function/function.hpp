@@ -641,6 +641,27 @@ namespace casadi {
     void generateLiftingFunctions(Function& SWIG_OUTPUT(vdef_fcn),
                                   Function& SWIG_OUTPUT(vinit_fcn));
 
+    /** \brief Get the number of atomic operations */
+    int getAlgorithmSize() const;
+
+    /** \brief Get the length of the work vector */
+    int getWorkSize() const;
+
+    /** \brief Get an atomic operation operator index */
+    int getAtomicOperation(int k) const;
+
+    /** \brief Get the (integer) input arguments of an atomic operation */
+    std::pair<int, int> getAtomicInput(int k) const;
+
+    /** \brief Get the floating point output argument of an atomic operation */
+    double getAtomicInputReal(int k) const;
+
+    /** \brief Get the (integer) output argument of an atomic operation */
+    int getAtomicOutput(int k) const;
+
+    /** \brief Number of nodes in the algorithm */
+    int countNodes() const;
+
     /// \cond INTERNAL
     /** \brief Is the class able to propagate seeds through the algorithm?
      *
