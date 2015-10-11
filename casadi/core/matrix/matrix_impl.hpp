@@ -2907,11 +2907,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  std::vector<Matrix<DataType> > Matrix<DataType>::get_output(const Function& f) {
-    throw CasadiException("\"get_output\" not defined for " + className());
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::jac(const Function& f, int iind, int oind,
                                          bool compact, bool symmetric) {
     throw CasadiException("\"jac\" not defined for " + className());

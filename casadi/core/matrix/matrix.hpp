@@ -854,9 +854,6 @@ namespace casadi {
     /** \brief Get function input */
     static std::vector<Matrix<DataType> > get_input(const Function& f);
 
-    /** \brief Get function output */
-    static std::vector<Matrix<DataType> > get_output(const Function& f);
-
     ///@{
     /** \brief Jacobian expression */
     static Matrix<DataType> jac(const Function& f, int iind=0, int oind=0,

@@ -600,9 +600,6 @@ namespace casadi {
     /** \brief Get function inputs */
     static std::vector<MX> get_input(const Function& f);
 
-    /** \brief Get function output */
-    static std::vector<MX> get_output(const Function& f);
-
     ///@{
     /** \brief Jacobian expression */
     static MX jac(const Function& f, int iind=0, int oind=0,

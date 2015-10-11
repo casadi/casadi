@@ -1837,10 +1837,6 @@ namespace casadi {
     return f.sx_in();
   }
 
-  template<> std::vector<SX> SX::get_output(const Function& f) {
-    return f.sx_out();
-  }
-
   template<> SX SX::jac(const Function& f, int iind, int oind, bool compact, bool symmetric) {
     return Function(f)->jac_sx(iind, oind, compact, symmetric);
   }

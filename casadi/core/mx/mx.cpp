@@ -1858,10 +1858,6 @@ namespace casadi {
     return f.mx_in();
   }
 
-  std::vector<MX> MX::get_output(const Function& f) {
-    return f.mx_out();
-  }
-
   MX MX::jac(const Function& f, int iind, int oind, bool compact, bool symmetric) {
     return Function(f)->jac_mx(iind, oind, compact, symmetric);
   }
