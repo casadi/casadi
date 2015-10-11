@@ -1943,9 +1943,9 @@ namespace casadi {
   }
 
   Function CvodesInterface::getJacB() {
-    if (is_a<SXFunction>(g_)) {
+    if (g_.is_a("sxfunction")) {
       return getJacGenB<SXFunction>();
-    } else if (is_a<MXFunction>(g_)) {
+    } else if (g_.is_a("mxfunction")) {
       return getJacGenB<MXFunction>();
     } else {
       throw CasadiException("CvodesInterface::getJacB(): Not an SXFunction or MXFunction");
@@ -1954,9 +1954,9 @@ namespace casadi {
 
 
   Function CvodesInterface::getJac() {
-    if (is_a<SXFunction>(f_)) {
+    if (f_.is_a("sxfunction")) {
       return getJacGen<SXFunction>();
-    } else if (is_a<MXFunction>(f_)) {
+    } else if (f_.is_a("mxfunction")) {
       return getJacGen<MXFunction>();
     } else {
       throw CasadiException("CvodesInterface::getJac(): Not an SXFunction or MXFunction");

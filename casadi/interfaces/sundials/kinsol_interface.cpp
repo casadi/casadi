@@ -350,7 +350,7 @@ namespace casadi {
           ss << "u = " << f_.input(iin_) << endl;
 
           // Print the expression for f[Jcol] if f is an SXFunction instance
-          if (is_a<SXFunction>(f_)) {
+          if (f_.is_a("sxfunction")) {
             vector<SX> res = f_(f_.sx_in());
             f_.print(ss);
             ss << "Equation " << k << " = " << res.at(0).at(k) << endl;
@@ -579,14 +579,14 @@ namespace casadi {
              << " with respect to the variable " << Jcol << "." << endl;
 
           // Print the expression for f[Jrow] if f is an SXFunction instance
-          if (is_a<SXFunction>(f_)) {
+          if (f_.is_a("sxfunction")) {
             vector<SX> arg = f_.sx_in(), res = f_(arg);
             ss << "Variable " << Jcol << " = " << arg.at(0).at(Jcol) << endl;
             ss << "Equation " << Jrow << " = " << res.at(0).at(Jrow) << endl;
           }
 
           // Print the expression for J[k] if J is an SXFunction instance
-          if (is_a<SXFunction>(jac_)) {
+          if (jac_.is_a("sxfunction")) {
             vector<SX> res = jac_(jac_.sx_in());
             ss << "J[" << Jrow << ", " << Jcol << "] = " << res.at(0).at(k) << endl;
           }

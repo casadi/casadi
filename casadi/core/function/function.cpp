@@ -963,5 +963,13 @@ namespace casadi {
     return (*this)->mx_out();
   }
 
+  std::string Function::type_name() const {
+    return (*this)->type_name();
+  }
+
+  bool Function::is_a(const std::string& type, bool recursive) const {
+    return (*this)->is_a(type, recursive);
+  }
+
 } // namespace casadi
 

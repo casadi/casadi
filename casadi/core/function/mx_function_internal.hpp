@@ -92,6 +92,12 @@ namespace casadi {
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const;
 
+    /** \brief Get type name */
+    virtual std::string type_name() const;
+
+    /** \brief Check if the function is of a particular type */
+    virtual bool is_a(const std::string& type, bool recursive) const;
+
     /** \brief  Initialize */
     virtual void init();
 

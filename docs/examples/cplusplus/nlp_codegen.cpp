@@ -40,7 +40,7 @@ Function generateCodeAndCompile(Function fcn, const std::string& name, bool expa
   cout << "Generating code for " << name << endl;
 
   // Convert to an SXFunction (may or may not improve efficiency)
-  if(expand && is_a<MXFunction>(fcn)){
+  if(expand && fcn.is_a("mxfunction")) {
     fcn = SXFunction(shared_cast<MXFunction>(fcn));
   }
 

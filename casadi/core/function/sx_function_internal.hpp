@@ -126,6 +126,12 @@ class CASADI_EXPORT SXFunctionInternal :
   /** \brief  Print the algorithm */
   virtual void print(std::ostream &stream) const;
 
+  /** \brief Get type name */
+  virtual std::string type_name() const;
+
+  /** \brief Check if the function is of a particular type */
+  virtual bool is_a(const std::string& type, bool recursive) const;
+
   /** \brief Gradient expression */
   virtual SX grad_sx(int iind=0, int oind=0);
 

@@ -2378,9 +2378,9 @@ namespace casadi {
   }
 
   Function IdasInterface::getJacB() {
-    if (is_a<SXFunction>(g_)) {
+    if (g_.is_a("sxfunction")) {
       return getJacGenB<SXFunction>();
-    } else if (is_a<MXFunction>(g_)) {
+    } else if (g_.is_a("sxfunction")) {
       return getJacGenB<MXFunction>();
     } else {
       throw CasadiException("IdasInterface::getJacB(): Not an SXFunction or MXFunction");
@@ -2388,9 +2388,9 @@ namespace casadi {
   }
 
   Function IdasInterface::getJac() {
-    if (is_a<SXFunction>(f_)) {
+    if (f_.is_a("sxfunction")) {
       return getJacGen<SXFunction>();
-    } else if (is_a<MXFunction>(f_)) {
+    } else if (f_.is_a("mxfunction")) {
       return getJacGen<MXFunction>();
     } else {
       throw CasadiException("IdasInterface::getJac(): Not an SXFunction or MXFunction");

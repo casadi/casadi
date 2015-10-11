@@ -284,13 +284,6 @@ namespace casadi {
   }
   /// \endcond
 
-  /// Check if a shared object is of a certain type
-  template<class B>
-  bool is_a(const SharedObject& A) {
-    casadi_assert(!A.isNull());
-    return !shared_cast<B>(A).isNull();
-  }
-
   ///@{
   /// \cond INTERNAL
   template<class A>

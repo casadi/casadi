@@ -419,7 +419,7 @@ namespace casadi {
     bool expand = getOption("expand_augmented");
 
     // Can we expand?
-    expand = expand && is_a<SXFunction>(f_) && (g_.isNull() || is_a<SXFunction>(g_));
+    expand = expand && f_.is_a("sxfunction") && (g_.isNull() || g_.is_a("sxfunction"));
 
     // Form the augmented forward integration function
     if (g_.isNull() && nfwd==0) {

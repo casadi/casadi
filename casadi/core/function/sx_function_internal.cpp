@@ -1473,4 +1473,14 @@ namespace casadi {
     return inputv_;
   }
 
+  std::string SXFunctionInternal::type_name() const {
+    return "sxfunction";
+  }
+
+  bool SXFunctionInternal::is_a(const std::string& type, bool recursive) const {
+    return type=="sxfunction" || (recursive && XFunctionInternal<SXFunction,
+                                  SXFunctionInternal,
+                                  SX, SXNode>::is_a(type, recursive));
+  }
+
 } // namespace casadi

@@ -82,6 +82,11 @@ namespace casadi {
     MatType jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
                 bool always_inline=true, bool never_inline=false);
 
+    /** \brief Check if the function is of a particular type */
+    virtual bool is_a(const std::string& type, bool recursive) const {
+      return type=="xfunction" || (recursive && FunctionInternal::is_a(type, recursive));
+    }
+
     /** \brief Return gradient function  */
     virtual Function getGradient(const std::string& name, int iind, int oind, const Dict& opts);
 

@@ -667,7 +667,10 @@ namespace casadi {
     std::string getSanitizedName() const;
 
     /** \brief Get type name */
-    std::string type_name() const;
+    virtual std::string type_name() const;
+
+    /** \brief Check if the function is of a particular type */
+    virtual bool is_a(const std::string& type, bool recursive) const;
 
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     static std::string sanitizeName(const std::string& name);
