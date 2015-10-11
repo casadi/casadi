@@ -356,17 +356,6 @@ namespace casadi {
     return GenericType(it->second);
   }
 
-  std::vector<MX> FunctionInternal::symbolicOutput() const {
-    assertInit();
-    vector<MX> ret(n_out());
-    for (int i=0; i<ret.size(); ++i) {
-      stringstream name;
-      name << "r_" << i;
-      ret[i] = MX::sym(name.str(), output(i).sparsity());
-    }
-    return ret;
-  }
-
   std::vector<MX> FunctionInternal::symbolicOutput(const std::vector<MX>& arg) {
     return shared_from_this<Function>()(arg);
   }
@@ -2966,11 +2955,12 @@ namespace casadi {
 
   const SX FunctionInternal::sx_in(int ind) const {
     assertInit();
-    return SX::sym("x_" + to_string(ind), input(ind).sparsity());
+    return SX::sym("x_" + to_string(ind), sparsity_in(ind));
   }
 
   const SX FunctionInternal::sx_out(int ind) const {
-    casadi_error("'sx_out' not defined for " + type_name());
+    assertInit();
+    return SX::sym("r_" + to_string(ind), sparsity_out(ind));
   }
 
   const std::vector<SX> FunctionInternal::sx_in() const {
@@ -2991,11 +2981,12 @@ namespace casadi {
 
   const MX FunctionInternal::mx_in(int ind) const {
     assertInit();
-    return MX::sym("x_" + to_string(ind), input(ind).sparsity());
+    return MX::sym("x_" + to_string(ind), sparsity_in(ind));
   }
 
   const MX FunctionInternal::mx_out(int ind) const {
-    casadi_error("'mx_out' not defined for " + type_name());
+    assertInit();
+    return MX::sym("r_" + to_string(ind), sparsity_out(ind));
   }
 
   const std::vector<MX> FunctionInternal::mx_in() const {

@@ -247,7 +247,7 @@ namespace casadi {
     for (int i=0; i<f_inputs.size(); ++i) {
       f_inputs[i] = f_->FunctionInternal::mx_in(i); // NOTE(@jaeandersson): Flawed design
     }
-    std::vector<MX> f_outputs  = f_.symbolicOutput();
+    std::vector<MX> f_outputs  = f_.mx_out();
 
     std::vector<MX> fd_inputs   = f_inputs;
 
@@ -280,7 +280,7 @@ namespace casadi {
     std::vector<MX> der_inputs = mx_in();
     std::vector<MX> ret_inputs = der_inputs;
 
-    std::vector<MX> outputs = symbolicOutput();
+    std::vector<MX> outputs = mx_out();
     der_inputs.insert(der_inputs.end(), outputs.begin(), outputs.end());
 
     for (int i=0;i<nfwd;++i) {
@@ -327,7 +327,7 @@ namespace casadi {
 
     // NOTE(@jaeandersson): Flawed design
     std::vector<MX> f_inputs   = f_->FunctionInternal::mx_in();
-    std::vector<MX> f_outputs  = f_.symbolicOutput();
+    std::vector<MX> f_outputs  = f_.mx_out();
 
     std::vector<MX> fd_inputs   = f_inputs;
     // Create nodes for the nominal output (S)
@@ -336,7 +336,7 @@ namespace casadi {
     fd_inputs.insert(fd_inputs.end(), f_call_out.begin(), f_call_out.end());
 
     for (int i=0;i<nadj;++i) {
-      std::vector<MX> outputs   = f_.symbolicOutput();
+      std::vector<MX> outputs   = f_.mx_out();
       fd_inputs.insert(fd_inputs.end(), outputs.begin(), outputs.end());
       f_inputs.insert(f_inputs.end(), outputs.begin(), outputs.end());
     }
@@ -369,7 +369,7 @@ namespace casadi {
       ret_inputs.push_back(output);
     }
     for (int i=0;i<nadj;++i) {
-      std::vector<MX> outputs = symbolicOutput();
+      std::vector<MX> outputs = mx_out();
       ret_inputs.insert(ret_inputs.end(), outputs.begin(), outputs.end());
       kn_inputs.insert(kn_inputs.end(), outputs.begin(), outputs.end());
     }

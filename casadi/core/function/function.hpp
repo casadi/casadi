@@ -603,32 +603,13 @@ namespace casadi {
     /// Get a single statistic obtained at the end of the last evaluate call
     GenericType getStat(const std::string& name) const;
 
-    /** \brief  Get a vector of symbolic variables with the same dimensions as the outputs
-     *
-     * There is no guarantee that consecutive calls return identical objects
-     */
-    std::vector<MX> symbolicOutput() const;
-
     ///@{
-    /** \brief Get function input(s), SX */
+    /** \brief Get symbolic primitives equivalent to the input expressions */
     const SX sx_in(int iind) const;
     const SX sx_in(const std::string& iname) const {
       return sx_in(index_in(iname));
     }
     const std::vector<SX> sx_in() const;
-    ///@}
-
-    ///@{
-    /** \brief Get function output(s), SX */
-    const SX sx_out(int oind) const;
-    const SX sx_out(const std::string& oname) const {
-      return sx_out(index_out(oname));
-    }
-    const std::vector<SX> sx_out() const;
-    ///@}
-
-    ///@{
-    /** \brief Get function input(s), MX */
     const MX mx_in(int ind) const;
     const MX mx_in(const std::string & iname) const {
       return mx_in(index_in(iname));
@@ -637,9 +618,14 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Get function output(s), MX */
+    /** \brief Get symbolic primitives equivalent to the output expressions */
+    const SX sx_out(int oind) const;
+    const SX sx_out(const std::string& oname) const {
+      return sx_out(index_out(oname));
+    }
+    const std::vector<SX> sx_out() const;
     const MX mx_out(int ind) const;
-    const MX mx_out(const std::string & oname) const {
+    const MX mx_out(const std::string& oname) const {
       return mx_out(index_out(oname));
     }
     const std::vector<MX> mx_out() const;

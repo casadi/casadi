@@ -383,9 +383,6 @@ namespace casadi {
     /// Get, if necessary generate, the sparsity of a Jacobian block
     Sparsity& jacSparsity(int iind, int oind, bool compact, bool symmetric);
 
-    /// Get a vector of symbolic variables with the same dimensions as the outputs
-    virtual std::vector<MX> symbolicOutput() const;
-
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
 

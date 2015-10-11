@@ -283,10 +283,6 @@ namespace casadi {
     (*this)->setJacSparsity(sp, iind, oind, compact);
   }
 
-  std::vector<MX> Function::symbolicOutput() const {
-    return (*this)->symbolicOutput();
-  }
-
   std::vector<std::string> Function::name_in() const {
     return (*this)->ischeme_;
   }

@@ -304,7 +304,7 @@ namespace casadi {
     */
 
     std::vector<MX> ins = mx_in();
-    std::vector<MX> outs = symbolicOutput();
+    std::vector<MX> outs = mx_out();
 
     std::vector<MX> f_der_ins;
     std::vector<MX> der_ins = ins;
@@ -407,12 +407,12 @@ namespace casadi {
     std::vector<MX> der_ins   = ins;
 
     // Copy nominal outputs
-    std::vector<MX> outs = f_.symbolicOutput();
+    std::vector<MX> outs = f_.mx_out();
     der_ins.insert(der_ins.end(), outs.begin(), outs.end());
     f_der_ins.insert(f_der_ins.end(), outs.begin(), outs.end());
 
     for (int i=0;i<nadj;++i) {
-      std::vector<MX> outs = f_.symbolicOutput();
+      std::vector<MX> outs = f_.mx_out();
       // Copy seeds
       der_ins.insert(der_ins.end(), outs.begin(), outs.end());
       f_der_ins.insert(f_der_ins.end(), outs.begin(), outs.end());
@@ -522,7 +522,7 @@ namespace casadi {
     der_outs.clear();
 
     ins  = mx_in();
-    outs = symbolicOutput();
+    outs = mx_out();
 
     // For the inputs to the new mapaccum
     // which correspond to accumulators, supply these with the whole history
@@ -557,7 +557,7 @@ namespace casadi {
     for (int i=0;i<nadj;++i) {
 
       // Seed has the signature of the output
-      std::vector<MX> outs = symbolicOutput();
+      std::vector<MX> outs = mx_out();
 
       // Pass seeds unchanged
       der_ins.insert(der_ins.end(), outs.begin(), outs.end());

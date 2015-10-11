@@ -179,7 +179,7 @@ namespace casadi {
     vector<MX> arg = mx_in();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
                         Sparsity(arg[iin_].size()));
-    vector<MX> res = symbolicOutput();
+    vector<MX> res = mx_out();
     vector<vector<MX> > fseed = symbolicFwdSeed(nfwd, arg), fsens;
     callForward(arg, res, fseed, fsens, false, false);
 
@@ -197,7 +197,7 @@ namespace casadi {
     vector<MX> arg = mx_in();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
                         Sparsity(arg[iin_].size()));
-    vector<MX> res = symbolicOutput();
+    vector<MX> res = mx_out();
     vector<vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;
     callReverse(arg, res, aseed, asens, false, false);
 
