@@ -1841,14 +1841,6 @@ namespace casadi {
     return Function(f)->jac_sx(iind, oind, compact, symmetric);
   }
 
-  template<> SX SX::grad(const Function& f, int iind, int oind) {
-    return Function(f)->grad_sx(iind, oind);
-  }
-
-  template<> SX SX::tang(const Function& f, int iind, int oind) {
-    return Function(f)->tang_sx(iind, oind);
-  }
-
   template<> SX SX::jac(const Function& f, const std::string & iname, int oind,
          bool compact, bool symmetric) {
     return jac(f, f.index_in(iname), oind, compact, symmetric);
@@ -1864,12 +1856,20 @@ namespace casadi {
     return jac(f, f.index_in(iname), f.index_out(oname), compact, symmetric);
   }
 
+  template<> SX SX::grad(const Function& f, int iind, int oind) {
+    return Function(f)->grad_sx(iind, oind);
+  }
+
   template<> SX SX::grad(const Function& f, const std::string& iname, int oind) {
     return grad(f, f.index_in(iname), oind);
   }
 
   template<> SX SX::grad(const Function& f, int iind, const std::string& oname) {
     return grad(f, iind, f.index_out(oname));
+  }
+
+  template<> SX SX::tang(const Function& f, int iind, int oind) {
+    return Function(f)->tang_sx(iind, oind);
   }
 
   template<> SX SX::grad(const Function& f, const std::string& iname, const std::string& oname) {
@@ -1887,6 +1887,23 @@ namespace casadi {
   template<> SX SX::tang(const Function& f, const std::string& iname, const std::string& oname) {
     return tang(f, f.index_in(iname), f.index_out(oname));
   }
+
+  template<> SX SX::hess(const Function& f, int iind, int oind) {
+    return Function(f)->hess_sx(iind, oind);
+  }
+
+  template<> SX SX::hess(const Function& f, const std::string& iname, int oind) {
+    return hess(f, f.index_in(iname), oind);
+  }
+
+  template<> SX SX::hess(const Function& f, int iind, const std::string& oname) {
+    return hess(f, iind, f.index_out(oname));
+  }
+
+  template<> SX SX::hess(const Function& f, const std::string& iname, const std::string& oname) {
+    return hess(f, f.index_in(iname), f.index_out(oname));
+  }
+
 
 } // namespace casadi
 

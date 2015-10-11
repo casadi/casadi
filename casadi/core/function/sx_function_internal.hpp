@@ -142,6 +142,9 @@ class CASADI_EXPORT SXFunctionInternal :
   virtual SX jac_sx(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
                     bool always_inline=true, bool never_inline=false);
 
+  /** \brief Hessian expression */
+  virtual SX hess_sx(int iind, int oind);
+
   ///@{
   /** \brief Get function input(s) and output(s)  */
   virtual const SX sx_in(int ind) const;

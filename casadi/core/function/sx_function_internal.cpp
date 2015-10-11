@@ -1465,6 +1465,10 @@ namespace casadi {
     return jac(iind, oind, compact, symmetric, always_inline, never_inline);
   }
 
+  SX SXFunctionInternal::hess_sx(int iind, int oind) {
+    return hess(iind, oind);
+  }
+
   const SX SXFunctionInternal::sx_in(int ind) const {
     return inputv_.at(ind);
   }

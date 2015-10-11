@@ -417,6 +417,11 @@ namespace casadi {
   template<> SX SX::tang(const Function& f, int iind, const std::string& oname);
   template<> SX SX::tang(const Function& f, const std::string& iname, const std::string& oname);
 
+  template<> SX SX::hess(const Function& f, int iind, int oind);
+  template<> SX SX::hess(const Function& f, const std::string& iname, int oind);
+  template<> SX SX::hess(const Function& f, int iind, const std::string& oname);
+  template<> SX SX::hess(const Function& f, const std::string& iname, const std::string& oname);
+
 } // namespace casadi
 
 #ifndef SWIG

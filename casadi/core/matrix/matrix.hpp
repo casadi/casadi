@@ -885,6 +885,15 @@ namespace casadi {
                                  const std::string& oname);
     ///@}
 
+    ///@{
+    /** \bried Hessian expression */
+    static Matrix<DataType> hess(const Function& f, int iind=0, int oind=0);
+    static Matrix<DataType> hess(const Function& f, const std::string& iname, int oind=0);
+    static Matrix<DataType> hess(const Function& f, int iind, const std::string& oname);
+    static Matrix<DataType> hess(const Function& f, const std::string& iname,
+                                 const std::string& oname);
+    ///@}
+
     /// Get name of the class
     static std::string className();
 

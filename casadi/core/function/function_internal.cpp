@@ -2953,6 +2953,10 @@ namespace casadi {
     casadi_error("'jac_sx' not defined for " + type_name());
   }
 
+  SX FunctionInternal::hess_sx(int iind, int oind) {
+    casadi_error("'hess_sx' not defined for " + type_name());
+  }
+
   const SX FunctionInternal::sx_in(int ind) const {
     assertInit();
     return SX::sym("x_" + to_string(ind), sparsity_in(ind));

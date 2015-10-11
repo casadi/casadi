@@ -149,10 +149,9 @@ namespace casadi {
     SX tang(const std::string& iname, const std::string& oname)
     { return tang(index_in(iname), index_out(oname)); }
     ///@}
-#endif // WITH_DEPRECATED_FEATURES
 
     ///@{
-    /// Hessian (forward over adjoint)
+    /** \bried Hessian expression */
     SX hess(int iind=0, int oind=0);
     SX hess(const std::string& iname, int oind=0) { return hess(index_in(iname), oind); }
     SX hess(int iind, const std::string& oname) { return hess(iind, index_out(oname)); }
@@ -160,6 +159,7 @@ namespace casadi {
       return hess(index_in(iname), index_out(oname));
     }
     ///@}
+#endif // WITH_DEPRECATED_FEATURES
 
 /// \cond INTERNAL
 #ifndef SWIG

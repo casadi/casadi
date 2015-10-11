@@ -116,11 +116,11 @@ namespace casadi {
   SX SXFunction::tang(int iind, int oind) {
     return (*this)->tang(iind, oind);
   }
-#endif // WITH_DEPRECATED_FEATURES
 
   SX SXFunction::hess(int iind, int oind) {
     return (*this)->hess(iind, oind);
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   const vector<ScalarAtomic>& SXFunction::algorithm() const {
     return (*this)->algorithm_;

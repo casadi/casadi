@@ -2965,13 +2965,37 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::tang(const Function& f, int iind, const std::string& oname) {
-    throw CasadiException("\"tang\" not defined for " + className());
+    throw CasadiException("'tang' not defined for " + className());
   }
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::tang(const Function& f, const std::string& iname,
                                           const std::string& oname) {
-    throw CasadiException("\"tang\" not defined for " + className());
+    throw CasadiException("'tang' not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::hess(const Function& f,
+                                          int iind, int oind) {
+    throw CasadiException("'hess' not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::hess(const Function& f,
+                                          const std::string& iname, int oind) {
+    throw CasadiException("'hess' not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::hess(const Function& f, int iind,
+                                          const std::string& oname) {
+    throw CasadiException("'hess' not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::hess(const Function& f, const std::string& iname,
+                                          const std::string& oname) {
+    throw CasadiException("'hess' not defined for " + className());
   }
 
 #ifdef USE_CXX11
