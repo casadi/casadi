@@ -240,7 +240,8 @@ class NLPtests(casadiTestCase):
     y=SX.sym("y")
     
     obj = (1-x)**2+100*(y-x**2)**2
-    nlp=SXFunction("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=x**2+y**2))
+    g = x**2+y**2
+    nlp=SXFunction("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=g))
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -248,7 +249,7 @@ class NLPtests(casadiTestCase):
     sigma=SX.sym("sigma")
     lambd=SX.sym("lambd")
     h=SXFunction("h", hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd),
-                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))[0]+lambd*hessian(nlp.sx_out2("g"),vertcat([x,y]))[0]))
+                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))[0]+lambd*hessian(g,vertcat([x,y]))[0]))
     h.setInput([0.5,0.5])
     h.setInput(-40,1)
     h.setInput(1,2)
@@ -398,7 +399,8 @@ class NLPtests(casadiTestCase):
     p=SX.sym("p")
     
     obj = (p-x)**2+100*(y-x**2)**2
-    nlp=SXFunction("nlp", nlpIn(x=vertcat([x,y]),p=p),nlpOut(f=obj,g=x**2+y**2))
+    g = x**2+y**2
+    nlp=SXFunction("nlp", nlpIn(x=vertcat([x,y]),p=p),nlpOut(f=obj,g=g))
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -406,7 +408,7 @@ class NLPtests(casadiTestCase):
     sigma=SX.sym("sigma")
     lambd=SX.sym("lambd")
     h=SXFunction("h", hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd,p=p),
-                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))[0]+lambd*hessian(nlp.sx_out2("g"),vertcat([x,y]))[0]))
+                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))[0]+lambd*hessian(g,vertcat([x,y]))[0]))
 
     for Solver, solver_options in solvers:
       self.message(str(Solver))

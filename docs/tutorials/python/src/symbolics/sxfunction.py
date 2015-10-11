@@ -64,8 +64,10 @@ print z
 #$ f : $\mathbb{R} \mapsto \mathbb{R}$
 f = SXFunction('f', [x], [z]) # z = f(x)
 print "%d -> %d" % (f.n_in(),f.n_out())
-print f.sx_in(), type(f.sx_in())
-print f.sx_out2(), type(f.sx_out2())
+f_in = f.sx_in()
+print f_in, type(f_in)
+f_out = f(f_in)
+print f_out, type(f_out)
 f.setInput(2)
 f.evaluate()
 print f.getOutput()
@@ -79,7 +81,7 @@ print f([y])
 print f([2])
 #! We can do symbolic derivatives: f' = dz/dx . 
 #$ The result is $2 x \cos(x^2)+2 x$:
-print f.grad()
+print SX.grad(f)
 #! The following code creates and evaluates a multi input (scalar valued), multi output (scalar valued) function.
 #$ The mathematical notation could be $ f_{i,j} : $\mathbb{R} \mapsto \mathbb{R} \quad  i,j \in [0,1]$
 x = SX.sym("x") # 1 by 1 matrix serves as scalar
@@ -91,7 +93,7 @@ f.setInput(2,0)
 f.setInput(3,1)
 
 print [f.getOutput(i) for i in range(2)]
-print [[f.grad(i,j) for i in range(2)] for j in range(2)]
+print [[SX.grad(f,i,j) for i in range(2)] for j in range(2)]
 
 #! Symbolic function manipulation
 #! ------------------------------
@@ -124,7 +126,7 @@ print "%d -> %d" % (f.n_in(),f.n_out())
 f.setInput([2,3])
 f.evaluate()
 print f.getOutput()
-G=f.jac().T
+G=SX.jac(f).T
 print G
 
 #$ Notice how G is a 2-nd order tensor $ {\buildrel\leftrightarrow\over{G}} = \vec{\nabla}{\vec{f}} = \frac{\partial [x*y, x+y]}{\partial [x , y]}$
@@ -148,8 +150,8 @@ f.setInput(DMatrix([[1,2],[3,4]]),0)
 f.setInput(DMatrix([[4,5],[6,7]]),1)
 f.evaluate()
 print f.getOutput()
-print f.jac(0).T
-print f.jac(1).T
+print SX.jac(f,0).T
+print SX.jac(f,1).T
 
 print 12
 

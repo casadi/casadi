@@ -44,5 +44,6 @@ print f.n_out()
 #! Note how all elements of out have been converted to SX by
 #! automatic typecasting functionality
 
+f_out = f(f.sx_in())
 for i in range(3):
-  print f.sx_out2(i)
+  print f_out[i]

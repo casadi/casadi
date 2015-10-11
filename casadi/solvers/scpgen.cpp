@@ -186,7 +186,7 @@ namespace casadi {
 
     // Extract the expressions
     vector<MX> vdef_in = vdef_fcn.mx_in();
-    vector<MX> vdef_out = vdef_fcn.mx_out2();
+    vector<MX> vdef_out = vdef_fcn(vdef_in);
 
     // Get the dimensions
     x_ = vdef_in.at(0);

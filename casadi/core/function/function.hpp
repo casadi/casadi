@@ -620,11 +620,11 @@ namespace casadi {
 
     ///@{
     /** \brief Get function output(s), SX */
-    const SX sx_out2(int oind) const;
-    const SX sx_out2(const std::string& oname) const {
-      return sx_out2(index_out(oname));
+    const SX sx_out(int oind) const;
+    const SX sx_out(const std::string& oname) const {
+      return sx_out(index_out(oname));
     }
-    const std::vector<SX> sx_out2() const;
+    const std::vector<SX> sx_out() const;
     ///@}
 
     ///@{
@@ -638,11 +638,11 @@ namespace casadi {
 
     ///@{
     /** \brief Get function output(s), MX */
-    const MX mx_out2(int ind) const;
-    const MX mx_out2(const std::string & oname) const {
-      return mx_out2(index_out(oname));
+    const MX mx_out(int ind) const;
+    const MX mx_out(const std::string & oname) const {
+      return mx_out(index_out(oname));
     }
-    const std::vector<MX> mx_out2() const;
+    const std::vector<MX> mx_out() const;
     ///@}
 
     /// \cond INTERNAL

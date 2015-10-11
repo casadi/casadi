@@ -139,9 +139,7 @@ class CASADI_EXPORT SXFunctionInternal :
   ///@{
   /** \brief Get function input(s) and output(s)  */
   virtual const SX sx_in(int ind) const;
-  virtual const SX sx_out2(int ind) const;
   virtual const std::vector<SX> sx_in() const;
-  virtual const std::vector<SX> sx_out2() const;
   ///@}
 
   /** \brief Hessian (forward over adjoint) via source code transformation */
