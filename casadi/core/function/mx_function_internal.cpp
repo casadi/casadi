@@ -628,6 +628,14 @@ namespace casadi {
     }
   }
 
+  std::vector<MX> MXFunctionInternal::create_call(const std::vector<MX>& arg) {
+    if (isInput(arg)) {
+      return outputv_;
+    } else {
+      return FunctionInternal::create_call(arg);
+    }
+  }
+
   void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     log("MXFunctionInternal::evalMX begin");
     assertInit();
@@ -636,18 +644,8 @@ namespace casadi {
     // Resize the number of outputs
     res.resize(outputv_.size());
 
-    // Check if arguments matches the input expressions, in which case
-    // the output is known to be the output expressions
-    const int checking_depth = 2;
-    bool output_given = true;
-    for (int i=0; i<arg.size() && output_given; ++i) {
-      if (!isEqual(arg[i], inputv_[i], checking_depth)) {
-        output_given = false;
-      }
-    }
-
     // Copy output if known
-    if (output_given) {
+    if (isInput(arg)) {
       copy(outputv_.begin(), outputv_.end(), res.begin());
       return;
     }

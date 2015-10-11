@@ -1813,8 +1813,12 @@ namespace casadi {
           << ", " << input(i).size1() << ") while a shape (" << arg[i].size2() << ", "
           << arg[i].size1() << ") was supplied.");
       }
-      res = Call::create(shared_from_this<Function>(), arg);
+      res = create_call(arg);
     }
+  }
+
+  std::vector<MX> FunctionInternal::create_call(const std::vector<MX>& arg) {
+    return Call::create(shared_from_this<Function>(), arg);
   }
 
   void FunctionInternal::call(const SXVector& arg, SXVector& res,

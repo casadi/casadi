@@ -136,6 +136,9 @@ namespace casadi {
     void call(const SXVector& arg, SXVector& res,
               bool always_inline, bool never_inline);
 
+    /** \brief Create call */
+    virtual std::vector<MX> create_call(const std::vector<MX>& arg);
+
     /** \brief Create call to (cached) derivative function, forward mode  */
     virtual void callForward(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& fseed,
