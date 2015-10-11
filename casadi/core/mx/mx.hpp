@@ -601,6 +601,45 @@ namespace casadi {
     static std::vector<MX> get_input(const Function& f);
 
     ///@{
+    /// Readability typedefs
+    typedef std::map<std::string, MX> MXDict;
+    ///@}
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    static Function fun(const std::string& name, const std::vector<MX>& arg,
+                        const std::vector<MX>& res, const Dict& opts=Dict());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    static Function fun(const std::string& name,
+                        const std::pair< MXDict, std::vector<std::string> >& arg,
+                        const std::vector<MX>& res, const Dict& opts=Dict());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    static Function fun(const std::string& name, const std::vector<MX>& arg,
+                        const std::pair< MXDict, std::vector<std::string> >& res,
+                        const Dict& opts=Dict());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    static Function fun(const std::string& name,
+                        const std::pair< MXDict, std::vector<std::string> >& arg,
+                        const std::pair< MXDict, std::vector<std::string> >& res,
+                        const Dict& opts=Dict());
+
+#ifndef SWIG
+    /** \brief Construct from initializer lists (new syntax, includes initialization) */
+    static Function fun(const std::string& name, std::initializer_list<MX> arg,
+                        std::initializer_list<MX> res, const Dict& opts=Dict());
+
+    /** \brief Construct from vector & initializer list (new syntax, includes initialization) */
+    static Function fun(const std::string& name, std::vector<MX> arg,
+                        std::initializer_list<MX> res, const Dict& opts=Dict());
+
+    /** \brief Construct from initializer list & vector (new syntax, includes initialization) */
+    static Function fun(const std::string& name, std::initializer_list<MX> arg,
+                        std::vector<MX> res, const Dict& opts=Dict());
+#endif // SWIG
+
+    ///@{
     /** \brief Jacobian expression */
     static MX jac(const Function& f, int iind=0, int oind=0,
                   bool compact=false, bool symmetric=false);

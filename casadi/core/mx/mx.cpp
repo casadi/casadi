@@ -1907,4 +1907,43 @@ namespace casadi {
     return tang(f, f.index_in(iname), f.index_out(oname));
   }
 
+  Function MX::fun(const std::string& name, const std::vector<MX>& arg,
+                   const std::vector<MX>& res, const Dict& opts) {
+    return MXFunction(name, arg, res, opts);
+  }
+
+  Function MX::fun(const std::string& name,
+                   const std::pair< MXDict, std::vector<std::string> >& arg,
+                   const std::vector<MX>& res, const Dict& opts) {
+    return MXFunction(name, arg, res, opts);
+  }
+
+  Function MX::fun(const std::string& name, const std::vector<MX>& arg,
+                   const std::pair< MXDict, std::vector<std::string> >& res,
+                   const Dict& opts) {
+    return MXFunction(name, arg, res, opts);
+  }
+
+  Function MX::fun(const std::string& name,
+                   const std::pair< MXDict, std::vector<std::string> >& arg,
+                   const std::pair< MXDict, std::vector<std::string> >& res,
+                   const Dict& opts) {
+    return MXFunction(name, arg, res, opts);
+  }
+
+  Function MX::fun(const std::string& name, std::initializer_list<MX> arg,
+               std::initializer_list<MX> res, const Dict& opts) {
+    return fun(name, std::vector<MX>(arg), std::vector<MX>(res), opts);
+  }
+
+  Function MX::fun(const std::string& name, std::vector<MX> arg,
+               std::initializer_list<MX> res, const Dict& opts) {
+    return fun(name, arg, std::vector<MX>(res), opts);
+  }
+
+  Function MX::fun(const std::string& name, std::initializer_list<MX> arg,
+               std::vector<MX> res, const Dict& opts) {
+    return fun(name, std::vector<MX>(arg), res, opts);
+  }
+
 } // namespace casadi
