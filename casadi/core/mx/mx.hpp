@@ -603,6 +603,34 @@ namespace casadi {
     /** \brief Get function output */
     static std::vector<MX> get_output(const Function& f);
 
+    ///@{
+    /** \brief Jacobian expression */
+    static MX jac(const Function& f, int iind=0, int oind=0,
+                  bool compact=false, bool symmetric=false);
+    static MX jac(const Function& f, const std::string & iname, int oind=0,
+                  bool compact=false, bool symmetric=false);
+    static MX jac(const Function& f, int iind, const std::string& oname,
+                  bool compact=false, bool symmetric=false);
+    static MX jac(const Function& f, const std::string& iname, const std::string& oname,
+                  bool compact=false, bool symmetric=false);
+    ///@}
+
+    ///@{
+    /** \brief Gradient expression */
+    static MX grad(const Function& f, int iind=0, int oind=0);
+    static MX grad(const Function& f, const std::string& iname, int oind=0);
+    static MX grad(const Function& f, int iind, const std::string& oname);
+    static MX grad(const Function& f, const std::string& iname, const std::string& oname);
+    ///@}
+
+    ///@{
+    /** \brief Tangent expression */
+    static MX tang(const Function& f, int iind=0, int oind=0);
+    static MX tang(const Function& f, const std::string& iname, int oind=0);
+    static MX tang(const Function& f, int iind, const std::string& oname);
+    static MX tang(const Function& f, const std::string& iname, const std::string& oname);
+    ///@}
+
 #ifndef SWIG
     /// Construct constant matrix with a given sparsity and all
     MX(const Sparsity& sp, int val, bool dummy);

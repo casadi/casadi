@@ -240,6 +240,26 @@ namespace casadi {
         sparsity propagation */
     virtual double adWeightSp();
 
+    /** \brief Gradient expression */
+    virtual MX grad_mx(int iind=0, int oind=0);
+
+    /** \brief Tangent expression */
+    virtual MX tang_mx(int iind=0, int oind=0);
+
+    /** \brief Jacobian expression */
+    virtual MX jac_mx(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
+                      bool always_inline=true, bool never_inline=false);
+
+    /** \brief Gradient expression */
+    virtual SX grad_sx(int iind=0, int oind=0);
+
+    /** \brief Tangent expression */
+    virtual SX tang_sx(int iind=0, int oind=0);
+
+    /** \brief Jacobian expression */
+    virtual SX jac_sx(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
+                      bool always_inline=true, bool never_inline=false);
+
     /** \brief Create a helper MXFunction with some properties copied
     *
     * Copied properties:

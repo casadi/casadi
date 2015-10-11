@@ -1322,5 +1322,18 @@ namespace casadi {
     vinit_fcn = MXFunction("lifting_variable_guess", f_in, f_out);
   }
 
+  MX MXFunctionInternal::grad_mx(int iind, int oind) {
+    return grad(iind, oind);
+  }
+
+  MX MXFunctionInternal::tang_mx(int iind, int oind) {
+    return tang(iind, oind);
+  }
+
+  MX MXFunctionInternal::jac_mx(int iind, int oind, bool compact, bool symmetric,
+                              bool always_inline, bool never_inline) {
+    return jac(iind, oind, compact, symmetric, always_inline, never_inline);
+  }
+
 } // namespace casadi
 

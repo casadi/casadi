@@ -2961,4 +2961,36 @@ namespace casadi {
     return 0.49; // Forward when tie
   }
 
+  MX FunctionInternal::grad_mx(int iind, int oind) {
+    casadi_error("FunctionInternal::grad_mx: not defined for class "
+                 << typeid(*this).name());
+  }
+
+  MX FunctionInternal::tang_mx(int iind, int oind) {
+    casadi_error("FunctionInternal::tang_mx: not defined for class "
+                 << typeid(*this).name());
+  }
+
+  MX FunctionInternal::jac_mx(int iind, int oind, bool compact, bool symmetric,
+                              bool always_inline, bool never_inline) {
+    casadi_error("FunctionInternal::jac_mx: not defined for class "
+                 << typeid(*this).name());
+  }
+
+  SX FunctionInternal::grad_sx(int iind, int oind) {
+    casadi_error("FunctionInternal::grad_sx: not defined for class "
+                 << typeid(*this).name());
+  }
+
+  SX FunctionInternal::tang_sx(int iind, int oind) {
+    casadi_error("FunctionInternal::tang_sx: not defined for class "
+                 << typeid(*this).name());
+  }
+
+  SX FunctionInternal::jac_sx(int iind, int oind, bool compact, bool symmetric,
+                              bool always_inline, bool never_inline) {
+    casadi_error("FunctionInternal::jac_sx: not defined for class "
+                 << typeid(*this).name());
+  }
+
 } // namespace casadi

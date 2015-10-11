@@ -1452,4 +1452,17 @@ namespace casadi {
       ::callReverse(arg, res, aseed, asens, true, false);
   }
 
+  SX SXFunctionInternal::grad_sx(int iind, int oind) {
+    return grad(iind, oind);
+  }
+
+  SX SXFunctionInternal::tang_sx(int iind, int oind) {
+    return tang(iind, oind);
+  }
+
+  SX SXFunctionInternal::jac_sx(int iind, int oind, bool compact, bool symmetric,
+                              bool always_inline, bool never_inline) {
+    return jac(iind, oind, compact, symmetric, always_inline, never_inline);
+  }
+
 } // namespace casadi

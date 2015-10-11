@@ -153,6 +153,16 @@ namespace casadi {
 
     // print an element of an algorithm
     void print(std::ostream &stream, const AlgEl& el) const;
+
+    /** \brief Gradient expression */
+    virtual MX grad_mx(int iind=0, int oind=0);
+
+    /** \brief Tangent expression */
+    virtual MX tang_mx(int iind=0, int oind=0);
+
+    /** \brief Jacobian expression */
+    virtual MX jac_mx(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
+                      bool always_inline=true, bool never_inline=false);
   };
 
 } // namespace casadi

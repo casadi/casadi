@@ -1862,4 +1862,55 @@ namespace casadi {
     return shared_cast<MXFunction>(f).mx_out();
   }
 
+  MX MX::jac(const Function& f, int iind, int oind, bool compact, bool symmetric) {
+    return Function(f)->jac_mx(iind, oind, compact, symmetric);
+  }
+
+  MX MX::grad(const Function& f, int iind, int oind) {
+    return Function(f)->grad_mx(iind, oind);
+  }
+
+  MX MX::tang(const Function& f, int iind, int oind) {
+    return Function(f)->tang_mx(iind, oind);
+  }
+
+  MX MX::jac(const Function& f, const std::string & iname, int oind,
+         bool compact, bool symmetric) {
+    return jac(f, f.index_in(iname), oind, compact, symmetric);
+  }
+
+  MX MX::jac(const Function& f, int iind, const std::string& oname,
+         bool compact, bool symmetric) {
+    return jac(f, iind, f.index_out(oname), compact, symmetric);
+  }
+
+  MX MX::jac(const Function& f, const std::string& iname, const std::string& oname,
+         bool compact, bool symmetric) {
+    return jac(f, f.index_in(iname), f.index_out(oname), compact, symmetric);
+  }
+
+  MX MX::grad(const Function& f, const std::string& iname, int oind) {
+    return grad(f, f.index_in(iname), oind);
+  }
+
+  MX MX::grad(const Function& f, int iind, const std::string& oname) {
+    return grad(f, iind, f.index_out(oname));
+  }
+
+  MX MX::grad(const Function& f, const std::string& iname, const std::string& oname) {
+    return grad(f, f.index_in(iname), f.index_out(oname));
+  }
+
+  MX MX::tang(const Function& f, const std::string& iname, int oind) {
+    return tang(f, f.index_in(iname), oind);
+  }
+
+  MX MX::tang(const Function& f, int iind, const std::string& oname) {
+    return tang(f, iind, f.index_out(oname));
+  }
+
+  MX MX::tang(const Function& f, const std::string& iname, const std::string& oname) {
+    return tang(f, f.index_in(iname), f.index_out(oname));
+  }
+
 } // namespace casadi

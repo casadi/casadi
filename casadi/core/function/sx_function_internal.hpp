@@ -126,6 +126,16 @@ class CASADI_EXPORT SXFunctionInternal :
   /** \brief  Print the algorithm */
   virtual void print(std::ostream &stream) const;
 
+  /** \brief Gradient expression */
+  virtual SX grad_sx(int iind=0, int oind=0);
+
+  /** \brief Tangent expression */
+  virtual SX tang_sx(int iind=0, int oind=0);
+
+  /** \brief Jacobian expression */
+  virtual SX jac_sx(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
+                    bool always_inline=true, bool never_inline=false);
+
   /** \brief Hessian (forward over adjoint) via source code transformation */
   SX hess(int iind=0, int oind=0);
 

@@ -119,9 +119,7 @@ namespace casadi {
 /// \endcond
 
     ///@{
-    /** \brief Jacobian via source code transformation
-     *
-     * \see casadi::Jacobian for an AD approach
+    /** \brief Jacobian expression
      */
     SX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
     SX jac(const std::string& iname, int oind=0, bool compact=false, bool symmetric=false)
@@ -134,7 +132,7 @@ namespace casadi {
     ///@}
 
     ///@{
-    /// Gradient via source code transformation
+    /// Gradient expression
     SX grad(int iind=0, int oind=0);
     SX grad(const std::string& iname, int oind=0) { return grad(index_in(iname), oind); }
     SX grad(int iind, const std::string& oname) { return grad(iind, index_out(oname)); }
@@ -143,7 +141,7 @@ namespace casadi {
     ///@}
 
     ///@{
-    /// Tangent via source code transformation
+    /// Tangent expression
     SX tang(int iind=0, int oind=0);
     SX tang(const std::string& iname, int oind=0) { return tang(index_in(iname), oind); }
     SX tang(int iind, const std::string& oname) { return tang(iind, index_out(oname)); }
@@ -152,7 +150,7 @@ namespace casadi {
     ///@}
 
     ///@{
-    /// Hessian (forward over adjoint) via source code transformation
+    /// Hessian (forward over adjoint)
     SX hess(int iind=0, int oind=0);
     SX hess(const std::string& iname, int oind=0) { return hess(index_in(iname), oind); }
     SX hess(int iind, const std::string& oname) { return hess(iind, index_out(oname)); }

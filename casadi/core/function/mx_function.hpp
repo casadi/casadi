@@ -134,7 +134,7 @@ namespace casadi {
     static bool testCast(const SharedObjectNode* ptr);
 
     ///@{
-    /** \brief Jacobian via source code transformation */
+    /** \brief Jacobian expression */
     MX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
     MX jac(const std::string & iname, int oind=0, bool compact=false, bool symmetric=false)
     { return jac(index_in(iname), oind, compact, symmetric); }
@@ -146,7 +146,7 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Gradient via source code transformation */
+    /** \brief Gradient expression */
     MX grad(int iind=0, int oind=0);
     MX grad(const std::string & iname, int oind=0) { return grad(index_in(iname), oind); }
     MX grad(int iind, const std::string & oname) { return grad(iind, index_out(oname)); }
@@ -155,7 +155,7 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Tangent via source code transformation */
+    /** \brief Tangent expression */
     MX tang(int iind=0, int oind=0);
     MX tang(const std::string & iname, int oind=0) { return tang(index_in(iname), oind); }
     MX tang(int iind, const std::string & oname) { return tang(iind, index_out(oname)); }
