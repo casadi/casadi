@@ -1855,11 +1855,11 @@ namespace casadi {
   }
 
   std::vector<MX> MX::get_input(const Function& f) {
-    return shared_cast<MXFunction>(f).mx_in();
+    return f.mx_in();
   }
 
   std::vector<MX> MX::get_output(const Function& f) {
-    return shared_cast<MXFunction>(f).mx_out();
+    return f.mx_out();
   }
 
   MX MX::jac(const Function& f, int iind, int oind, bool compact, bool symmetric) {

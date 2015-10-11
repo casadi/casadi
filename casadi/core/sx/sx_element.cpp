@@ -1834,11 +1834,11 @@ namespace casadi {
   }
 
   template<> std::vector<SX> SX::get_input(const Function& f) {
-    return shared_cast<SXFunction>(f).sx_in();
+    return f.sx_in();
   }
 
   template<> std::vector<SX> SX::get_output(const Function& f) {
-    return shared_cast<SXFunction>(f).sx_out();
+    return f.sx_out();
   }
 
   template<> SX SX::jac(const Function& f, int iind, int oind, bool compact, bool symmetric) {

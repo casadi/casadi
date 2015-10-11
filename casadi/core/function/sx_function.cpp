@@ -122,22 +122,6 @@ namespace casadi {
     return (*this)->hess(iind, oind);
   }
 
-  const SX SXFunction::sx_in(int ind) const {
-    return (*this)->inputv_.at(ind);
-  }
-
-  const SX SXFunction::sx_out(int ind) const {
-    return (*this)->outputv_.at(ind);
-  }
-
-  const std::vector<SX> SXFunction::sx_in() const {
-    return (*this)->inputv_;
-  }
-
-  const std::vector<SX> SXFunction::sx_out() const {
-    return (*this)->outputv_;
-  }
-
   const vector<ScalarAtomic>& SXFunction::algorithm() const {
     return (*this)->algorithm_;
   }

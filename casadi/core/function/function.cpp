@@ -947,5 +947,37 @@ namespace casadi {
     (*this)->evalSX(arg, res, iw, w);
   }
 
+  const SX Function::sx_in(int ind) const {
+    return (*this)->sx_in(ind);
+  }
+
+  const SX Function::sx_out(int ind) const {
+    return (*this)->sx_out(ind);
+  }
+
+  const std::vector<SX> Function::sx_in() const {
+    return (*this)->sx_in();
+  }
+
+  const std::vector<SX> Function::sx_out() const {
+    return (*this)->sx_out();
+  }
+
+  const MX Function::mx_in(int ind) const {
+    return (*this)->mx_in(ind);
+  }
+
+  const MX Function::mx_out(int ind) const {
+    return (*this)->mx_out(ind);
+  }
+
+  const std::vector<MX> Function::mx_in() const {
+    return (*this)->mx_in();
+  }
+
+  const std::vector<MX> Function::mx_out() const {
+    return (*this)->mx_out();
+  }
+
 } // namespace casadi
 

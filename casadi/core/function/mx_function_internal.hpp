@@ -163,6 +163,14 @@ namespace casadi {
     /** \brief Jacobian expression */
     virtual MX jac_mx(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
                       bool always_inline=true, bool never_inline=false);
+
+    ///@{
+    /** \brief Get function input(s) and output(s)  */
+    virtual const MX mx_in(int ind) const;
+    virtual const MX mx_out(int ind) const;
+    virtual const std::vector<MX> mx_in() const;
+    virtual const std::vector<MX> mx_out() const;
+    ///@}
   };
 
 } // namespace casadi

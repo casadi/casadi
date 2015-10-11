@@ -260,6 +260,18 @@ namespace casadi {
     virtual SX jac_sx(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
                       bool always_inline=true, bool never_inline=false);
 
+    ///@{
+    /** \brief Get function input(s) and output(s)  */
+    virtual const SX sx_in(int ind) const;
+    virtual const SX sx_out(int ind) const;
+    virtual const std::vector<SX> sx_in() const;
+    virtual const std::vector<SX> sx_out() const;
+    virtual const MX mx_in(int ind) const;
+    virtual const MX mx_out(int ind) const;
+    virtual const std::vector<MX> mx_in() const;
+    virtual const std::vector<MX> mx_out() const;
+    ///@}
+
     /** \brief Create a helper MXFunction with some properties copied
     *
     * Copied properties:
@@ -659,6 +671,9 @@ namespace casadi {
 
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     std::string getSanitizedName() const;
+
+    /** \brief Get type name */
+    std::string type_name() const;
 
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     static std::string sanitizeName(const std::string& name);

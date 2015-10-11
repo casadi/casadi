@@ -93,31 +93,7 @@ namespace casadi {
 
     /** \brief  Const access functions of the node */
     const MXFunctionInternal* operator->() const;
-    /// \endcond
 
-    ///@{
-    /** \brief Get function input */
-    const MX mx_in(int ind) const;
-    const MX mx_in(const std::string & iname) const {
-      return mx_in(index_in(iname));
-    }
-    ///@}
-
-    /** \brief Get all function inputs */
-    const std::vector<MX> mx_in() const;
-
-    ///@{
-    /** \brief Get function output */
-    const MX mx_out(int ind) const;
-    const MX mx_out(const std::string & oname) const {
-      return mx_out(index_out(oname));
-    }
-    ///@}
-
-    /** \brief Get all function outputs */
-    const std::vector<MX> mx_out() const;
-
-    /// \cond INTERNAL
 #ifndef SWIG
     /** \brief Called from constructor */
     void construct(const std::string& name, const std::vector<MX>& arg,

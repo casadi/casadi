@@ -1764,13 +1764,11 @@ namespace casadi {
 
   Function FunctionInternal::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     // TODO(@jaeandersson): Fallback on finite differences
-    casadi_error("FunctionInternal::getDerForward not defined for class "
-                 << typeid(*this).name());
+    casadi_error("'getDerForward' not defined for " + type_name());
   }
 
   Function FunctionInternal::getDerReverse(const std::string& name, int nadj, Dict& opts) {
-    casadi_error("FunctionInternal::getDerReverse not defined for class "
-                 << typeid(*this).name());
+    casadi_error("'getDerReverse' not defined for " + type_name());
   }
 
   int FunctionInternal::nnz_in() const {
@@ -2265,8 +2263,7 @@ namespace casadi {
   std::string FunctionInternal::generateCall(const CodeGenerator& g,
                                              const std::string& arg,
                                              const std::string& res) const {
-    casadi_error("FunctionInternal::generateCall (simplified): not defined for class "
-                 << typeid(*this).name());
+    casadi_error("'generateCall' (simplified) not defined for " + type_name());
   }
 
 
@@ -2300,8 +2297,7 @@ namespace casadi {
   }
 
   void FunctionInternal::generateBody(CodeGenerator& g) const {
-    casadi_error("FunctionInternal::generateBody: generateBody not defined for class "
-                 << typeid(*this).name());
+    casadi_error("'generateBody' not defined for " + type_name());
   }
 
   Function FunctionInternal::dynamicCompilation(Function f, std::string fname, std::string fdescr,
@@ -2645,7 +2641,7 @@ namespace casadi {
                                  std::vector<std::vector<MX> >& fsens,
                                  bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    casadi_assert_message(!always_inline, "Class " << typeid(*this).name() <<
+    casadi_assert_message(!always_inline, "Class " + type_name() +
                           " cannot be inlined in an MX expression");
 
     // Derivative information must be available
@@ -2721,7 +2717,7 @@ namespace casadi {
                                  std::vector<std::vector<MX> >& asens,
                                  bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    casadi_assert_message(!always_inline, "Class " << typeid(*this).name() <<
+    casadi_assert_message(!always_inline, "Class " + type_name() +
                           " cannot be inlined in an MX expression");
 
     // Derivative information must be available
@@ -2810,8 +2806,7 @@ namespace casadi {
       fsens.clear();
       return;
     }
-    casadi_error("FunctionInternal::callForward(SX) not defined for class "
-                 << typeid(*this).name());
+    casadi_error("'callForward' (SX) not defined for " + type_name());
   }
 
   void FunctionInternal::callReverse(const std::vector<SX>& arg, const std::vector<SX>& res,
@@ -2823,8 +2818,7 @@ namespace casadi {
       asens.clear();
       return;
     }
-    casadi_error("FunctionInternal::callReverse(SX) not defined for class "
-                 << typeid(*this).name());
+    casadi_error("'callReverse' (SX) not defined for " + type_name());
   }
 
   void FunctionInternal::
@@ -2962,35 +2956,65 @@ namespace casadi {
   }
 
   MX FunctionInternal::grad_mx(int iind, int oind) {
-    casadi_error("FunctionInternal::grad_mx: not defined for class "
-                 << typeid(*this).name());
+    casadi_error("'grad_mx' not defined for " + type_name());
   }
 
   MX FunctionInternal::tang_mx(int iind, int oind) {
-    casadi_error("FunctionInternal::tang_mx: not defined for class "
-                 << typeid(*this).name());
+    casadi_error("'tang_mx' not defined for " + type_name());
   }
 
   MX FunctionInternal::jac_mx(int iind, int oind, bool compact, bool symmetric,
                               bool always_inline, bool never_inline) {
-    casadi_error("FunctionInternal::jac_mx: not defined for class "
-                 << typeid(*this).name());
+    casadi_error("'jac_mx' not defined for " + type_name());
   }
 
   SX FunctionInternal::grad_sx(int iind, int oind) {
-    casadi_error("FunctionInternal::grad_sx: not defined for class "
-                 << typeid(*this).name());
+    casadi_error("'grad_sx' not defined for " + type_name());
   }
 
   SX FunctionInternal::tang_sx(int iind, int oind) {
-    casadi_error("FunctionInternal::tang_sx: not defined for class "
-                 << typeid(*this).name());
+    casadi_error("'tang_sx' not defined for " + type_name());
   }
 
   SX FunctionInternal::jac_sx(int iind, int oind, bool compact, bool symmetric,
                               bool always_inline, bool never_inline) {
-    casadi_error("FunctionInternal::jac_sx: not defined for class "
-                 << typeid(*this).name());
+    casadi_error("'jac_sx' not defined for " + type_name());
+  }
+
+  const SX FunctionInternal::sx_in(int ind) const {
+    casadi_error("'sx_in' not defined for " + type_name());
+  }
+
+  const SX FunctionInternal::sx_out(int ind) const {
+    casadi_error("'sx_out' not defined for " + type_name());
+  }
+
+  const std::vector<SX> FunctionInternal::sx_in() const {
+    casadi_error("'sx_in' not defined for " + type_name());
+  }
+
+  const std::vector<SX> FunctionInternal::sx_out() const {
+    casadi_error("'sx_out' not defined for " + type_name());
+  }
+
+  const MX FunctionInternal::mx_in(int ind) const {
+    casadi_error("'mx_in' not defined for " + type_name());
+  }
+
+  const MX FunctionInternal::mx_out(int ind) const {
+    casadi_error("'mx_out' not defined for " + type_name());
+  }
+
+  const std::vector<MX> FunctionInternal::mx_in() const {
+    casadi_error("'mx_in' not defined for " + type_name());
+  }
+
+  const std::vector<MX> FunctionInternal::mx_out() const {
+    casadi_error("'mx_out' not defined for " + type_name());
+  }
+
+  std::string FunctionInternal::type_name() const {
+    return typeid(*this).name();
   }
 
 } // namespace casadi

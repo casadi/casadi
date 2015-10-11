@@ -1335,5 +1335,21 @@ namespace casadi {
     return jac(iind, oind, compact, symmetric, always_inline, never_inline);
   }
 
+  const MX MXFunctionInternal::mx_in(int ind) const {
+    return inputv_.at(ind);
+  }
+
+  const MX MXFunctionInternal::mx_out(int ind) const {
+    return outputv_.at(ind);
+  }
+
+  const std::vector<MX> MXFunctionInternal::mx_in() const {
+    return inputv_;
+  }
+
+  const std::vector<MX> MXFunctionInternal::mx_out() const {
+    return outputv_;
+  }
+
 } // namespace casadi
 

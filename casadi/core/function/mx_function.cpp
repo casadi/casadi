@@ -105,22 +105,6 @@ namespace casadi {
     return static_cast<MXFunctionInternal*>(Function::operator->());
   }
 
-  const MX MXFunction::mx_in(int ind) const {
-    return (*this)->inputv_.at(ind);
-  }
-
-  const MX MXFunction::mx_out(int ind) const {
-    return (*this)->outputv_.at(ind);
-  }
-
-  const std::vector<MX> MXFunction::mx_in() const {
-    return (*this)->inputv_;
-  }
-
-  const std::vector<MX> MXFunction::mx_out() const {
-    return (*this)->outputv_;
-  }
-
   int MXFunction::countNodes() const {
     assertInit();
     return (*this)->algorithm_.size();

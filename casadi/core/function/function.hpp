@@ -621,6 +621,42 @@ namespace casadi {
      */
     std::vector<MX> symbolicOutput() const;
 
+    ///@{
+    /** \brief Get function input(s), SX */
+    const SX sx_in(int iind) const;
+    const SX sx_in(const std::string& iname) const {
+      return sx_in(index_in(iname));
+    }
+    const std::vector<SX> sx_in() const;
+    ///@}
+
+    ///@{
+    /** \brief Get function output(s), SX */
+    const SX sx_out(int oind) const;
+    const SX sx_out(const std::string& oname) const {
+      return sx_out(index_out(oname));
+    }
+    const std::vector<SX> sx_out() const;
+    ///@}
+
+    ///@{
+    /** \brief Get function input(s), MX */
+    const MX mx_in(int ind) const;
+    const MX mx_in(const std::string & iname) const {
+      return mx_in(index_in(iname));
+    }
+    const std::vector<MX> mx_in() const;
+    ///@}
+
+    ///@{
+    /** \brief Get function output(s), MX */
+    const MX mx_out(int ind) const;
+    const MX mx_out(const std::string & oname) const {
+      return mx_out(index_out(oname));
+    }
+    const std::vector<MX> mx_out() const;
+    ///@}
+
     /// \cond INTERNAL
     /** \brief Is the class able to propagate seeds through the algorithm?
      *

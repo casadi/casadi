@@ -161,28 +161,6 @@ namespace casadi {
     }
     ///@}
 
-    ///@{
-    /** \brief Get function input */
-    const SX sx_in(int iind) const;
-    const SX sx_in(const std::string& iname) const {
-      return sx_in(index_in(iname));
-    }
-    ///@}
-
-    /** \brief Get all function inputs */
-    const std::vector<SX> sx_in() const;
-
-    ///@{
-    /** \brief Get function output */
-    const SX sx_out(int oind) const;
-    const SX sx_out(const std::string& oname) const {
-      return sx_out(index_out(oname));
-    }
-    ///@}
-
-    /** \brief Get all function outputs */
-    const std::vector<SX> sx_out() const;
-
 /// \cond INTERNAL
 #ifndef SWIG
     /** \brief Access the algorithm directly */

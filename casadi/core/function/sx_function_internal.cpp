@@ -1465,4 +1465,20 @@ namespace casadi {
     return jac(iind, oind, compact, symmetric, always_inline, never_inline);
   }
 
+  const SX SXFunctionInternal::sx_in(int ind) const {
+    return inputv_.at(ind);
+  }
+
+  const SX SXFunctionInternal::sx_out(int ind) const {
+    return outputv_.at(ind);
+  }
+
+  const std::vector<SX> SXFunctionInternal::sx_in() const {
+    return inputv_;
+  }
+
+  const std::vector<SX> SXFunctionInternal::sx_out() const {
+    return outputv_;
+  }
+
 } // namespace casadi
