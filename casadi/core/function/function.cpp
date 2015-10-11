@@ -283,18 +283,6 @@ namespace casadi {
     (*this)->setJacSparsity(sp, iind, oind, compact);
   }
 
-  std::vector<MX> Function::symbolicInput(bool unique) const {
-    if (unique) {
-      return (*this)->FunctionInternal::symbolicInput();
-    } else {
-      return (*this)->symbolicInput();
-    }
-  }
-
-  std::vector<SX> Function::symbolicInputSX() const {
-    return (*this)->symbolicInputSX();
-  }
-
   std::vector<MX> Function::symbolicOutput() const {
     return (*this)->symbolicOutput();
   }
@@ -416,7 +404,7 @@ namespace casadi {
     if (nfwd==0 && nadj==0) return *this;
 
     // Call self
-    vector<MX> arg = symbolicInput();
+    vector<MX> arg = mx_in();
     vector<MX> res = (*this)(arg);
     vector<MX> ret_in(arg), ret_out(res);
 
@@ -427,7 +415,7 @@ namespace casadi {
     // Forward sensitivities
     if (nfwd>0) {
       Function dfcn = derForward(nfwd);
-      arg = dfcn.symbolicInput();
+      arg = dfcn.mx_in();
       copy(ret_in.begin(), ret_in.begin()+num_in, arg.begin());
       copy(ret_out.begin(), ret_out.begin()+num_out, arg.begin()+num_in);
       ret_in.insert(ret_in.end(), arg.begin()+num_in+num_out, arg.end());
@@ -442,7 +430,7 @@ namespace casadi {
     // Adjoint sensitivities
     if (nadj>0) {
       Function dfcn = derReverse(nadj);
-      arg = dfcn.symbolicInput();
+      arg = dfcn.mx_in();
       copy(ret_in.begin(), ret_in.begin()+num_in, arg.begin());
       copy(ret_out.begin(), ret_out.begin()+num_out, arg.begin()+num_in);
       ret_in.insert(ret_in.end(), arg.begin()+num_in+num_out, arg.end());

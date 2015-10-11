@@ -84,7 +84,7 @@ namespace casadi {
 
     if (control_dae_.n_in()==DAE_NUM_IN) {
       vector<MX> control_dae_in_(CONTROL_DAE_NUM_IN);
-      vector<MX> dae_in_ = control_dae_.symbolicInput();
+      vector<MX> dae_in_ = control_dae_.mx_in();
       control_dae_in_[CONTROL_DAE_T]    = dae_in_[DAE_T];
       control_dae_in_[CONTROL_DAE_X]    = dae_in_[DAE_X];
       control_dae_in_[CONTROL_DAE_Z]    = dae_in_[DAE_Z];
@@ -261,7 +261,7 @@ namespace casadi {
                      "Output function, if supplied, must adhere to ControlledDAEInput scheme.");
 
     // Extend the output function two extra outputs at the start: DAE_X and DAE_XDOT
-    vector<MX> output_fcn_in_ = output_fcn_.symbolicInput();
+    vector<MX> output_fcn_in_ = output_fcn_.mx_in();
 
     vector<MX> output_fcn_out_(2 + output_fcn_.n_out());
     output_fcn_out_[0] = output_fcn_in_[CONTROL_DAE_X];

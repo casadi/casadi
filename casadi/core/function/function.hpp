@@ -603,18 +603,6 @@ namespace casadi {
     /// Get a single statistic obtained at the end of the last evaluate call
     GenericType getStat(const std::string& name) const;
 
-    /** \brief  Get a vector of symbolic variables with the same dimensions as the inputs
-     *
-     * There is no guarantee that consecutive calls return identical objects
-     */
-    std::vector<MX> symbolicInput(bool unique=false) const;
-
-    /** \brief Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
-     *
-     * There is no guarantee that consecutive calls return identical objects
-     */
-    std::vector<SX> symbolicInputSX() const;
-
     /** \brief  Get a vector of symbolic variables with the same dimensions as the outputs
      *
      * There is no guarantee that consecutive calls return identical objects

@@ -130,9 +130,6 @@ namespace casadi {
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     SXFunction expand(const std::vector<SX>& inputv);
 
-    /// Get a vector of symbolic variables with the same dimensions as the inputs
-    virtual std::vector<MX> symbolicInput() const { return inputv_;}
-
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
 

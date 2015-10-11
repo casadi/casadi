@@ -161,7 +161,7 @@ namespace casadi {
 
     MXFunction fg = shared_cast<MXFunction>(nlp_);
     if (fg.isNull()) {
-      vector<MX> nlp_in = nlp_.symbolicInput();
+      vector<MX> nlp_in = nlp_.mx_in();
       vector<MX> nlp_out = nlp_(nlp_in);
       fg = MXFunction("fg", nlp_in, nlp_out);
     } else {

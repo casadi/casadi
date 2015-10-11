@@ -155,7 +155,7 @@ namespace casadi {
     Switch sw(ss.str(), der, der_def);
 
     // Construct wrapper inputs and arguments for calling sw
-    vector<MX> arg = symbolicInput();
+    vector<MX> arg = mx_in();
     vector<MX> res = symbolicOutput();
     vector<vector<MX> > seed = symbolicFwdSeed(nfwd, arg);
     // Wrapper input being constructed
@@ -197,7 +197,7 @@ namespace casadi {
     Switch sw(ss.str(), der, der_def);
 
     // Construct wrapper inputs and arguments for calling sw
-    vector<MX> arg = symbolicInput();
+    vector<MX> arg = mx_in();
     vector<MX> res = symbolicOutput();
     vector<vector<MX> > seed = symbolicAdjSeed(nadj, res);
     vector<MX> w_in = arg;

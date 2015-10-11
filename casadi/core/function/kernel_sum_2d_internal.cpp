@@ -243,7 +243,10 @@ namespace casadi {
     */
     Function fd = f_.derForward(nfwd);
 
-    std::vector<MX> f_inputs   = f_.symbolicInput(true);
+    vector<MX> f_inputs(f_.n_in());
+    for (int i=0; i<f_inputs.size(); ++i) {
+      f_inputs[i] = f_->FunctionInternal::mx_in(i); // NOTE(@jaeandersson): Flawed design
+    }
     std::vector<MX> f_outputs  = f_.symbolicOutput();
 
     std::vector<MX> fd_inputs   = f_inputs;
@@ -256,7 +259,12 @@ namespace casadi {
       // Pad with blanks: we don't consider P_i_dot and v_i_dot
       fd_inputs.push_back(MX());
       fd_inputs.push_back(MX());
-      std::vector<MX> inputs   = f_.symbolicInput(true);
+
+      vector<MX> inputs(f_.n_in());
+      for (int i=0; i<inputs.size(); ++i) {
+        inputs[i] = f_->FunctionInternal::mx_in(i); // NOTE(@jaeandersson): Flawed design
+      }
+
       fd_inputs.insert(fd_inputs.end(), inputs.begin()+2, inputs.end());
       f_inputs.insert(f_inputs.end(), inputs.begin()+2, inputs.end());
     }
@@ -269,7 +277,7 @@ namespace casadi {
     *  der(V,X,S,V_dot,X_dot)
     *
     */
-    std::vector<MX> der_inputs = symbolicInput();
+    std::vector<MX> der_inputs = mx_in();
     std::vector<MX> ret_inputs = der_inputs;
 
     std::vector<MX> outputs = symbolicOutput();
@@ -278,7 +286,7 @@ namespace casadi {
     for (int i=0;i<nfwd;++i) {
       // Construct dummy matrix for capturing the V_dot argument.
       der_inputs.push_back(MX::sym("x", Sparsity(size_) ));
-      std::vector<MX> inputs = symbolicInput();
+      std::vector<MX> inputs = mx_in();
       der_inputs.insert(der_inputs.end(), inputs.begin()+1, inputs.end());
       ret_inputs.insert(ret_inputs.end(), inputs.begin()+1, inputs.end());
     }
@@ -317,7 +325,8 @@ namespace casadi {
     */
     Function fd = f_.derReverse(nadj);
 
-    std::vector<MX> f_inputs   = f_.symbolicInput(true);
+    // NOTE(@jaeandersson): Flawed design
+    std::vector<MX> f_inputs   = f_->FunctionInternal::mx_in();
     std::vector<MX> f_outputs  = f_.symbolicOutput();
 
     std::vector<MX> fd_inputs   = f_inputs;
@@ -352,7 +361,7 @@ namespace casadi {
     *
     */
 
-    std::vector<MX> ret_inputs = symbolicInput();
+    std::vector<MX> ret_inputs = mx_in();
     std::vector<MX> kn_inputs = ret_inputs;
     for (int i=0;i<num_out;++i) {
       // Dummy symbols for the nominal outputs (S)

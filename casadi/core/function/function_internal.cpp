@@ -302,7 +302,7 @@ namespace casadi {
     opts["jit_options"] = jit_options_;
 
     // Wrap the function
-    vector<MX> arg = symbolicInput();
+    vector<MX> arg = mx_in();
     vector<MX> res = shared_from_this<Function>()(arg);
     return MXFunction("wrap_" + name_, arg, res, opts);
   }
@@ -356,17 +356,6 @@ namespace casadi {
     return GenericType(it->second);
   }
 
-  std::vector<MX> FunctionInternal::symbolicInput() const {
-    assertInit();
-    vector<MX> ret(n_in());
-    for (int i=0; i<ret.size(); ++i) {
-      stringstream name;
-      name << "x_" << i;
-      ret[i] = MX::sym(name.str(), input(i).sparsity());
-    }
-    return ret;
-  }
-
   std::vector<MX> FunctionInternal::symbolicOutput() const {
     assertInit();
     vector<MX> ret(n_out());
@@ -382,16 +371,6 @@ namespace casadi {
     return shared_from_this<Function>()(arg);
   }
 
-  std::vector<SX> FunctionInternal::symbolicInputSX() const {
-    vector<SX> ret(n_in());
-    assertInit();
-    for (int i=0; i<ret.size(); ++i) {
-      stringstream name;
-      name << "x_" << i;
-      ret[i] = SX::sym(name.str(), input(i).sparsity());
-    }
-    return ret;
-  }
   /// \cond INTERNAL
 
   void bvec_toggle(bvec_t* s, int begin, int end, int j) {
@@ -1896,7 +1875,7 @@ namespace casadi {
     int n_out = this->n_out();
 
     // Symbolic inputs of the full Jacobian function under construction
-    vector<MX> ret_argv = symbolicInput(), argv, resv;
+    vector<MX> ret_argv = mx_in(), argv, resv;
 
     // Symbolic input of the SISO function formed for generating the Jacobian
     MX arg;
@@ -2982,7 +2961,8 @@ namespace casadi {
   }
 
   const SX FunctionInternal::sx_in(int ind) const {
-    casadi_error("'sx_in' not defined for " + type_name());
+    assertInit();
+    return SX::sym("x_" + to_string(ind), input(ind).sparsity());
   }
 
   const SX FunctionInternal::sx_out(int ind) const {
@@ -2990,15 +2970,24 @@ namespace casadi {
   }
 
   const std::vector<SX> FunctionInternal::sx_in() const {
-    casadi_error("'sx_in' not defined for " + type_name());
+    vector<SX> ret(n_in());
+    for (int i=0; i<ret.size(); ++i) {
+      ret[i] = sx_in(i);
+    }
+    return ret;
   }
 
   const std::vector<SX> FunctionInternal::sx_out() const {
-    casadi_error("'sx_out' not defined for " + type_name());
+    vector<SX> ret(n_out());
+    for (int i=0; i<ret.size(); ++i) {
+      ret[i] = sx_out(i);
+    }
+    return ret;
   }
 
   const MX FunctionInternal::mx_in(int ind) const {
-    casadi_error("'mx_in' not defined for " + type_name());
+    assertInit();
+    return MX::sym("x_" + to_string(ind), input(ind).sparsity());
   }
 
   const MX FunctionInternal::mx_out(int ind) const {
@@ -3006,11 +2995,19 @@ namespace casadi {
   }
 
   const std::vector<MX> FunctionInternal::mx_in() const {
-    casadi_error("'mx_in' not defined for " + type_name());
+    vector<MX> ret(n_in());
+    for (int i=0; i<ret.size(); ++i) {
+      ret[i] = mx_in(i);
+    }
+    return ret;
   }
 
   const std::vector<MX> FunctionInternal::mx_out() const {
-    casadi_error("'mx_out' not defined for " + type_name());
+    vector<MX> ret(n_out());
+    for (int i=0; i<ret.size(); ++i) {
+      ret[i] = mx_out(i);
+    }
+    return ret;
   }
 
   std::string FunctionInternal::type_name() const {

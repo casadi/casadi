@@ -113,11 +113,11 @@ class FunctionPool:
 
 
 def toSXFunction(fun):
-  ins = fun.symbolicInputSX()
+  ins = fun.sx_in()
   return SXFunction("f",ins,fun(ins))
   
 def toMXFunction(fun):
-  ins = fun.symbolicInput()
+  ins = fun.mx_in()
   return MXFunction("f",ins,fun(ins))
 
 class casadiTestCase(unittest.TestCase):
@@ -305,7 +305,7 @@ class casadiTestCase(unittest.TestCase):
   def checkfunction(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True,allow_nondiff=False):
 
     if indirect:
-      ins = trial.symbolicInput()
+      ins = trial.mx_in()
       extra_trial = MXFunction("extra_trial", ins,trial.call(ins))
       for i in range(trial.n_in()):
         extra_trial.setInput(trial.getInput(i),i)

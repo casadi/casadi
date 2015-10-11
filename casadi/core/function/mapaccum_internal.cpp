@@ -303,7 +303,7 @@ namespace casadi {
 
     */
 
-    std::vector<MX> ins = symbolicInput();
+    std::vector<MX> ins = mx_in();
     std::vector<MX> outs = symbolicOutput();
 
     std::vector<MX> f_der_ins;
@@ -334,7 +334,7 @@ namespace casadi {
     f_der_ins.insert(f_der_ins.end(), outs.begin(), outs.end());
 
     for (int i=0;i<nfwd;++i) {
-      std::vector<MX> ins = symbolicInput();
+      std::vector<MX> ins = mx_in();
       der_ins.insert(der_ins.end(), ins.begin(), ins.end());
       f_der_ins.insert(f_der_ins.end(), ins.begin(), ins.end());
     }
@@ -400,7 +400,7 @@ namespace casadi {
         fbX:  x, u, xp, y, xp_bar, y_bar, X -> ...
       
     */
-    std::vector<MX> ins  = f_.symbolicInput();
+    std::vector<MX> ins  = f_.mx_in();
 
     // Copy nominal inputs
     std::vector<MX> f_der_ins = ins;
@@ -521,7 +521,7 @@ namespace casadi {
     der_ins.clear();f_der_ins.clear();
     der_outs.clear();
 
-    ins  = symbolicInput();
+    ins  = mx_in();
     outs = symbolicOutput();
 
     // For the inputs to the new mapaccum
