@@ -278,6 +278,12 @@ namespace casadi {
     virtual const std::vector<MX> mx_out() const;
     ///@}
 
+    /// Get free variables (MX)
+    virtual std::vector<MX> free_mx() const;
+
+    /// Get free variables (SX)
+    virtual SX free_sx() const;
+
     /** \brief Create a helper MXFunction with some properties copied
     *
     * Copied properties:

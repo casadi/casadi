@@ -175,6 +175,9 @@ namespace casadi {
     virtual const MX mx_in(int ind) const;
     virtual const std::vector<MX> mx_in() const;
     ///@}
+
+    /// Get free variables (MX)
+    virtual std::vector<MX> free_mx() const {return free_vars_;}
   };
 
 } // namespace casadi

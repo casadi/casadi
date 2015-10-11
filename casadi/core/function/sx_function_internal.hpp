@@ -151,6 +151,9 @@ class CASADI_EXPORT SXFunctionInternal :
   virtual const std::vector<SX> sx_in() const;
   ///@}
 
+  /// Get free variables (SX)
+  virtual SX free_sx() const {return free_vars_;}
+
   /** \brief Hessian (forward over adjoint) via source code transformation */
   SX hess(int iind=0, int oind=0);
 

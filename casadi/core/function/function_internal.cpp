@@ -3017,4 +3017,12 @@ namespace casadi {
     return type == "function";
   }
 
+  std::vector<MX> FunctionInternal::free_mx() const {
+    casadi_error("'free_mx' only defined for 'mxfunction'");
+  }
+
+  SX FunctionInternal::free_sx() const {
+    casadi_error("'free_sx' only defined for 'sxfunction'");
+  }
+
 } // namespace casadi

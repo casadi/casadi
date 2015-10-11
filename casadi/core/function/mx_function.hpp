@@ -144,9 +144,6 @@ namespace casadi {
     SXFunction expand(const std::vector<SX>& inputv = std::vector<SX>());
 #endif // WITH_DEPRECATED_FEATURES
 
-    /** \brief Get all the free variables of the function */
-    std::vector<MX> getFree() const;
-
     /// \cond INTERNAL
     /** \brief Extract the functions needed for the Lifted Newton method */
     void generateLiftingFunctions(MXFunction& SWIG_OUTPUT(vdef_fcn),

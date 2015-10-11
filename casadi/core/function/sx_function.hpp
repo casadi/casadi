@@ -204,9 +204,6 @@ namespace casadi {
      * no symbolic evaluations are possible after this */
     void clearSymbolic();
 
-    /** \brief Get all the free variables of the function */
-    SX getFree() const;
-
     /** \brief Get the corresponding matrix type */
     typedef SX MatType;
 

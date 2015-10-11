@@ -631,6 +631,12 @@ namespace casadi {
     const std::vector<MX> mx_out() const;
     ///@}
 
+    /** \brief Get all the free variables of the function */
+    SX free_sx() const;
+
+    /** \brief Get all the free variables of the function */
+    std::vector<MX> free_mx() const;
+
     /// \cond INTERNAL
     /** \brief Is the class able to propagate seeds through the algorithm?
      *

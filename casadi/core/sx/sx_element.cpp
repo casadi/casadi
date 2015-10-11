@@ -1535,7 +1535,7 @@ namespace casadi {
   template<>
   std::vector<SX> SX::zz_symvar() const {
     SXFunction f("tmp", std::vector<SX>(), make_vector(*this));
-    std::vector<SXElement> ret1 = f.getFree().data();
+    std::vector<SXElement> ret1 = f.free_sx().data();
     std::vector<SX> ret(ret1.size());
     std::copy(ret1.begin(), ret1.end(), ret.begin());
     return ret;

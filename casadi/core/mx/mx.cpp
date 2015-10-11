@@ -1751,7 +1751,7 @@ namespace casadi {
 
   std::vector<MX> MX::zz_symvar() const {
     MXFunction f("f", std::vector<MX>(), make_vector(*this));
-    return f.getFree();
+    return f.free_mx();
   }
 
   MX MX::zz_matrix_expand(const MX& e, const std::vector<MX> &boundary, const Dict &options) {

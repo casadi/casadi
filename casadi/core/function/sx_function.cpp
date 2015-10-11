@@ -161,10 +161,6 @@ namespace casadi {
     }
   }
 
-  SX SXFunction::getFree() const {
-    return (*this)->free_vars_;
-  }
-
   int SXFunction::getWorkSize() const {
     return (*this)->sz_w();
   }
