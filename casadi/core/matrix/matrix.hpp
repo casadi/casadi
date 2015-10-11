@@ -855,7 +855,38 @@ namespace casadi {
     static std::vector<Matrix<DataType> > get_input(const Function& f);
 
     /** \brief Get function output */
-    static std::vector<Matrix<DataType>> get_output(const Function& f);
+    static std::vector<Matrix<DataType> > get_output(const Function& f);
+
+    ///@{
+    /** \brief Jacobian expression */
+    static Matrix<DataType> jac(const Function& f, int iind=0, int oind=0,
+                  bool compact=false, bool symmetric=false);
+    static Matrix<DataType> jac(const Function& f, const std::string & iname, int oind=0,
+                  bool compact=false, bool symmetric=false);
+    static Matrix<DataType> jac(const Function& f, int iind, const std::string& oname,
+                  bool compact=false, bool symmetric=false);
+    static Matrix<DataType> jac(const Function& f, const std::string& iname,
+                                const std::string& oname,
+                                bool compact=false, bool symmetric=false);
+    ///@}
+
+    ///@{
+    /** \brief Gradient expression */
+    static Matrix<DataType> grad(const Function& f, int iind=0, int oind=0);
+    static Matrix<DataType> grad(const Function& f, const std::string& iname, int oind=0);
+    static Matrix<DataType> grad(const Function& f, int iind, const std::string& oname);
+    static Matrix<DataType> grad(const Function& f, const std::string& iname,
+                                 const std::string& oname);
+    ///@}
+
+    ///@{
+    /** \brief Tangent expression */
+    static Matrix<DataType> tang(const Function& f, int iind=0, int oind=0);
+    static Matrix<DataType> tang(const Function& f, const std::string& iname, int oind=0);
+    static Matrix<DataType> tang(const Function& f, int iind, const std::string& oname);
+    static Matrix<DataType> tang(const Function& f, const std::string& iname,
+                                 const std::string& oname);
+    ///@}
 
     /// Get name of the class
     static std::string className();

@@ -397,6 +397,26 @@ namespace casadi {
                                  std::vector<std::string>& inter) const;
   template<> std::vector<SX> SX::get_input(const Function& f);
   template<> std::vector<SX> SX::get_output(const Function& f);
+
+  template<> SX SX::jac(const Function& f, int iind, int oind,
+                        bool compact, bool symmetric);
+  template<> SX SX::jac(const Function& f, const std::string& iname, int oind,
+                        bool compact, bool symmetric);
+  template<> SX SX::jac(const Function& f, int iind, const std::string& oname,
+                        bool compact, bool symmetric);
+  template<> SX SX::jac(const Function& f, const std::string& iname, const std::string& oname,
+                        bool compact, bool symmetric);
+
+  template<> SX SX::grad(const Function& f, int iind, int oind);
+  template<> SX SX::grad(const Function& f, const std::string& iname, int oind);
+  template<> SX SX::grad(const Function& f, int iind, const std::string& oname);
+  template<> SX SX::grad(const Function& f, const std::string& iname, const std::string& oname);
+
+  template<> SX SX::tang(const Function& f, int iind, int oind);
+  template<> SX SX::tang(const Function& f, const std::string& iname, int oind);
+  template<> SX SX::tang(const Function& f, int iind, const std::string& oname);
+  template<> SX SX::tang(const Function& f, const std::string& iname, const std::string& oname);
+
 } // namespace casadi
 
 #ifndef SWIG

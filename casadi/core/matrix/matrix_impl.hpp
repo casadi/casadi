@@ -2902,13 +2902,81 @@ namespace casadi {
   }
 
   template<typename DataType>
-  std::vector<Matrix<DataType>> Matrix<DataType>::get_input(const Function& f) {
-    throw CasadiException("\"get_input\" not defined for instantiation");
+  std::vector<Matrix<DataType> > Matrix<DataType>::get_input(const Function& f) {
+    throw CasadiException("\"get_input\" not defined for " + className());
   }
 
   template<typename DataType>
-  std::vector<Matrix<DataType>> Matrix<DataType>::get_output(const Function& f) {
-    throw CasadiException("\"get_output\" not defined for instantiation");
+  std::vector<Matrix<DataType> > Matrix<DataType>::get_output(const Function& f) {
+    throw CasadiException("\"get_output\" not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::jac(const Function& f, int iind, int oind,
+                                         bool compact, bool symmetric) {
+    throw CasadiException("\"jac\" not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::grad(const Function& f, int iind, int oind) {
+    throw CasadiException("\"grad\" not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::tang(const Function& f, int iind, int oind) {
+    throw CasadiException("\"tang\" not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::jac(const Function& f, const std::string& iname, int oind,
+                                         bool compact, bool symmetric) {
+    throw CasadiException("\"jac\" not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::jac(const Function& f, int iind,
+                                         const std::string& oname,
+                                         bool compact, bool symmetric) {
+    throw CasadiException("\"jac\" not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::jac(const Function& f, const std::string& iname,
+                                         const std::string& oname,
+         bool compact, bool symmetric) {
+    throw CasadiException("\"jac\" not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::grad(const Function& f, const std::string& iname, int oind) {
+    throw CasadiException("\"grad\" not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::grad(const Function& f, int iind, const std::string& oname) {
+    throw CasadiException("\"grad\" not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::grad(const Function& f, const std::string& iname,
+                                          const std::string& oname) {
+    throw CasadiException("\"grad\" not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::tang(const Function& f, const std::string& iname, int oind) {
+    throw CasadiException("\"tang\" not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::tang(const Function& f, int iind, const std::string& oname) {
+    throw CasadiException("\"tang\" not defined for " + className());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::tang(const Function& f, const std::string& iname,
+                                          const std::string& oname) {
+    throw CasadiException("\"tang\" not defined for " + className());
   }
 
 #ifdef USE_CXX11
