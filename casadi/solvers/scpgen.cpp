@@ -421,11 +421,11 @@ namespace casadi {
     MXFunction lgrad("lgrad", mfcn_in, mfcn_out);
 
     // Jacobian of the constraints
-    MX jac = lgrad.jac(mod_x_, mod_g_);
+    MX jac = MX::jac(lgrad, mod_x_, mod_g_);
     log("Formed Jacobian of the constraints.");
 
     // Hessian of the Lagrangian
-    MX hes = lgrad.jac(mod_x_, mod_gl_, false, !gauss_newton_);
+    MX hes = MX::jac(lgrad, mod_x_, mod_gl_, false, !gauss_newton_);
     if (gauss_newton_) {
       log("Formed square root of Gauss-Newton Hessian.");
     } else {

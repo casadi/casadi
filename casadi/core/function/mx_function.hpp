@@ -133,6 +133,7 @@ namespace casadi {
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
 
+#ifdef WITH_DEPRECATED_FEATURES
     ///@{
     /** \brief Jacobian expression */
     MX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
@@ -162,6 +163,7 @@ namespace casadi {
     MX tang(const std::string & iname, const std::string & oname)
     { return tang(index_in(iname), index_out(oname)); }
     ///@}
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     SXFunction expand(const std::vector<SX>& inputv = std::vector<SX>());

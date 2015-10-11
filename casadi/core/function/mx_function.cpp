@@ -126,6 +126,7 @@ namespace casadi {
     return (*this)->algorithm_.size();
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   MX MXFunction::jac(int iind, int oind, bool compact, bool symmetric) {
     return (*this)->jac(iind, oind, compact, symmetric);
   }
@@ -137,6 +138,7 @@ namespace casadi {
   MX MXFunction::tang(int iind, int oind) {
     return (*this)->tang(iind, oind);
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   SXFunction MXFunction::expand(const std::vector<SX>& inputv) {
     return (*this)->expand(inputv);

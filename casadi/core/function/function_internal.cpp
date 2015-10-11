@@ -1939,7 +1939,7 @@ namespace casadi {
     {
       MXFunction tmp("tmp", make_vector(arg), make_vector(res),
                      make_dict("ad_weight", adWeight()));
-      J = tmp.jac();
+      J = MX::jac(tmp);
     }
 
     // Make sure argv is the input of J

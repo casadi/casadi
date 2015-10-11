@@ -104,6 +104,7 @@ namespace casadi {
     return dynamic_cast<const SXFunctionInternal*>(ptr)!=0;
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   SX SXFunction::jac(int iind, int oind, bool compact, bool symmetric) {
     return (*this)->jac(iind, oind, compact, symmetric);
   }
@@ -115,6 +116,7 @@ namespace casadi {
   SX SXFunction::tang(int iind, int oind) {
     return (*this)->tang(iind, oind);
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   SX SXFunction::hess(int iind, int oind) {
     return (*this)->hess(iind, oind);

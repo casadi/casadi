@@ -118,6 +118,7 @@ namespace casadi {
     const SXFunctionInternal* operator->() const;
 /// \endcond
 
+#ifdef WITH_DEPRECATED_FEATURES
     ///@{
     /** \brief Jacobian expression
      */
@@ -148,6 +149,7 @@ namespace casadi {
     SX tang(const std::string& iname, const std::string& oname)
     { return tang(index_in(iname), index_out(oname)); }
     ///@}
+#endif // WITH_DEPRECATED_FEATURES
 
     ///@{
     /// Hessian (forward over adjoint)

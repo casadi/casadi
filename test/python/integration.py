@@ -773,7 +773,7 @@ class Integrationtests(casadiTestCase):
     p=MX.sym("p")
     qe = MXFunction("qe", [q0,p],integratorOut(**self.integrator({'x0':q0,'p':p})))
 
-    JT = MXFunction("JT", [q0,p],[qe.jac(1,0)[0].T])
+    JT = MXFunction("JT", [q0,p],[MX.jac(qe, 1,0)[0].T])
     JT.setInput([num['q0']],0)
     JT.setInput([num['p']],1)
     JT.evaluate()
@@ -1056,7 +1056,7 @@ class Integrationtests(casadiTestCase):
     p=MX.sym("p",N*N)
     qe = MXFunction("qe", [q0,p],integratorOut(**I({'x0':q0,'p':p})))
 
-    JT = MXFunction("JT", [q0,p],[qe.jac(1,0).T])
+    JT = MXFunction("JT", [q0,p],[MX.jac(qe, 1,0).T])
 
     H  = JT.jacobian(1)
     H.setInput(x0_,0)

@@ -685,7 +685,7 @@ namespace casadi {
     xz.append(v[P]);
     xz.append(v[U]);
     MXFunction fcn = MXFunction(xz, this->ode);
-    MXFunction J(v, fcn.jac());
+    MXFunction J(v, MX::jac(fcn));
 
     // Evaluate the Jacobian in the starting point
     J.init();
@@ -825,7 +825,7 @@ namespace casadi {
     f = MXFunction("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
 
     // Get the Jacobian
-    MX J = f.jac();
+    MX J = MX::jac(f);
 
     // Explicit ODE
     vector<MX> new_ode;

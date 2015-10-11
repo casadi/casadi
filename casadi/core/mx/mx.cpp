@@ -1717,17 +1717,17 @@ namespace casadi {
 
   MX MX::zz_jacobian(const MX &arg) const {
     MXFunction temp("helper_jacobian_MX", make_vector(arg), make_vector(*this));
-    return temp.jac();
+    return MX::jac(temp);
   }
 
   MX MX::zz_gradient(const MX &arg) const {
     MXFunction temp("helper_gradient_MX", make_vector(arg), make_vector(*this));
-    return temp.grad();
+    return MX::grad(temp);
   }
 
   MX MX::zz_tangent(const MX &arg) const {
     MXFunction temp("helper_tangent_MX", make_vector(arg), make_vector(*this));
-    return temp.tang();
+    return MX::tang(temp);
   }
 
   MX MX::zz_hessian(const MX &arg) const {
@@ -1738,7 +1738,7 @@ namespace casadi {
   MX MX::zz_hessian(const MX &arg, MX &g) const {
     g = gradient(*this, arg);
     MXFunction gfcn("gfcn", make_vector(arg), make_vector(g));
-    return gfcn.jac(0, 0, false, true);
+    return MX::jac(gfcn, 0, 0, false, true);
   }
 
   MX MX::zz_det() const {

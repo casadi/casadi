@@ -965,24 +965,24 @@ class MXtests(casadiTestCase):
     X =  MX.sym("X",10)
     V =  MX.sym("V")
     f =  MXFunction("f", [X,V],[X,MX.eye(3)])
-    self.assertTrue(isinstance(f.jac(0,0),MX))
-    self.assertEqual(f.jac(0,0).nnz(),10)
-    self.assertEqual(f.jac(0,0).size1(),10)
-    self.assertEqual(f.jac(0,0).size2(),10)
+    self.assertTrue(isinstance(MX.jac(f, 0,0),MX))
+    self.assertEqual(MX.jac(f, 0,0).nnz(),10)
+    self.assertEqual(MX.jac(f, 0,0).size1(),10)
+    self.assertEqual(MX.jac(f, 0,0).size2(),10)
     
-    g = MXFunction("g", [],[f.jac(0,0)])
+    g = MXFunction("g", [],[MX.jac(f, 0,0)])
     g.evaluate()
     self.checkarray(g.getOutput(),eye(10),"unit matrix")
     
-    g = MXFunction("g", [],[f.jac(0,1)])
+    g = MXFunction("g", [],[MX.jac(f, 0,1)])
     g.evaluate()
     self.checkarray(g.getOutput(),zeros((9,10)),"zero matrix")
     
-    g = MXFunction("g", [],[f.jac(1,0)])
+    g = MXFunction("g", [],[MX.jac(f, 1,0)])
     g.evaluate()
     self.checkarray(g.getOutput(),zeros((10,1)),"zero matrix")
     
-    g = MXFunction("g", [],[f.jac(1,1)])
+    g = MXFunction("g", [],[MX.jac(f, 1,1)])
     g.evaluate()
     self.checkarray(g.getOutput(),zeros((9,1)),"zero matrix")
     
@@ -992,21 +992,21 @@ class MXtests(casadiTestCase):
     X =  MX.sym("X")
     f =  MXFunction("f", [X,V],[X-V])
     
-    g = MXFunction("g", [],[f.jac(0,0)])
+    g = MXFunction("g", [],[MX.jac(f, 0,0)])
     g.evaluate()
     self.checkarray(g.getOutput(),ones((1,1)), "one")
 
-    g = MXFunction("g", [],[f.jac(1,0)])
+    g = MXFunction("g", [],[MX.jac(f, 1,0)])
     g.evaluate()
     self.checkarray(g.getOutput(),-ones((1,1)), "one")
     
     f =  MXFunction("f", [X,V],[V-X])
     
-    g = MXFunction("g", [],[f.jac(0,0)])
+    g = MXFunction("g", [],[MX.jac(f, 0,0)])
     g.evaluate()
     self.checkarray(g.getOutput(),-ones((1,1)), "one")
 
-    g = MXFunction("g", [],[f.jac(1,0)])
+    g = MXFunction("g", [],[MX.jac(f, 1,0)])
     g.evaluate()
     self.checkarray(g.getOutput(),ones((1,1)),"one")
     
@@ -1015,10 +1015,10 @@ class MXtests(casadiTestCase):
     X = MX.sym("X",3)
     Y = MX.sym("Y",2)
     f = MXFunction("f", [X,Y],[vertcat([X,Y])])
-    J = f.jac(0,0)
+    J = MX.jac(f, 0,0)
     JJ = DMatrix.ones(J.sparsity())
     self.checkarray(JJ,vstack((eye(3),zeros((2,3)))),"diag")
-    J = f.jac(1,0)
+    J = MX.jac(f, 1,0)
     JJ = DMatrix.ones(J.sparsity())
     self.checkarray(JJ,vstack((zeros((3,2)),eye(2))),"diag")
     
@@ -1347,7 +1347,7 @@ class MXtests(casadiTestCase):
 
     self.checkarray(IMatrix([0,1,9,4,16,25]),ff.getOutput())
     
-    J = MXFunction("J", [X],[f.jac()])
+    J = MXFunction("J", [X],[MX.jac(f)])
     J.setInput(range(10))
     J.evaluate()
     
@@ -1358,7 +1358,7 @@ class MXtests(casadiTestCase):
     
     f = MXFunction("f", [X],[vecNZ(T.T)**2], {"ad_weight":1, "ad_weight_sp":1})
     
-    J = MXFunction("J", [X],[f.jac()])
+    J = MXFunction("J", [X],[MX.jac(f)])
     J.setInput(range(10))
     J.evaluate()
     
@@ -1387,7 +1387,7 @@ class MXtests(casadiTestCase):
 
     self.checkarray(IMatrix([16,4]),ff.getOutput())
     
-    J = MXFunction("J", [X],[f.jac()])
+    J = MXFunction("J", [X],[MX.jac(f)])
     J.setInput(range(10))
     J.evaluate()
     
@@ -1399,7 +1399,7 @@ class MXtests(casadiTestCase):
     
     f = MXFunction("f", [X],[T**2], {"ad_weight":1, "ad_weight_sp":1})
     
-    J = MXFunction("J", [X],[f.jac()])
+    J = MXFunction("J", [X],[MX.jac(f)])
     J.setInput(range(10))
     J.evaluate()
     

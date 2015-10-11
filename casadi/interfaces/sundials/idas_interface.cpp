@@ -2336,10 +2336,13 @@ namespace casadi {
 
     // Get the Jacobian in the Newton iteration
     typename FunctionType::MatType cj = FunctionType::MatType::sym("cj");
-    typename FunctionType::MatType jac = f.jac(DAE_X, DAE_ODE) - cj*FunctionType::MatType::eye(nx_);
+    typename FunctionType::MatType jac = FunctionType::MatType::jac(f, DAE_X, DAE_ODE)
+      - cj*FunctionType::MatType::eye(nx_);
     if (nz_>0) {
-      jac = horzcat(vertcat(jac, f.jac(DAE_X, DAE_ALG)),
-                    vertcat(f.jac(DAE_Z, DAE_ODE), f.jac(DAE_Z, DAE_ALG)));
+      jac = horzcat(vertcat(jac,
+                            FunctionType::MatType::jac(f, DAE_X, DAE_ALG)),
+                    vertcat(FunctionType::MatType::jac(f, DAE_Z, DAE_ODE),
+                            FunctionType::MatType::jac(f, DAE_Z, DAE_ALG)));
     }
 
     // Jacobian function
@@ -2358,10 +2361,12 @@ namespace casadi {
     // Get the Jacobian in the Newton iteration
     typename FunctionType::MatType cj = FunctionType::MatType::sym("cj");
     typename FunctionType::MatType jac =
-        g.jac(RDAE_RX, RDAE_ODE) + cj*FunctionType::MatType::eye(nrx_);
+        FunctionType::MatType::jac(g, RDAE_RX, RDAE_ODE) + cj*FunctionType::MatType::eye(nrx_);
     if (nrz_>0) {
-      jac = horzcat(vertcat(jac, g.jac(RDAE_RX, RDAE_ALG)),
-                    vertcat(g.jac(RDAE_RZ, RDAE_ODE), g.jac(RDAE_RZ, RDAE_ALG)));
+      jac = horzcat(vertcat(jac,
+                            FunctionType::MatType::jac(g, RDAE_RX, RDAE_ALG)),
+                    vertcat(FunctionType::MatType::jac(g, RDAE_RZ, RDAE_ODE),
+                            FunctionType::MatType::jac(g, RDAE_RZ, RDAE_ALG)));
     }
 
     // Jacobian function

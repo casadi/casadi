@@ -1375,19 +1375,19 @@ namespace casadi {
   template<>
   SX SX::zz_jacobian(const SX &arg) const {
     SXFunction temp("temp", make_vector(arg), make_vector(*this)); // make a runtime
-    return temp.jac();
+    return SX::jac(temp);
   }
 
   template<>
   SX SX::zz_gradient(const SX &arg) const {
     SXFunction temp("temp", make_vector(arg), make_vector(*this)); // make a runtime
-    return temp.grad();
+    return SX::grad(temp);
   }
 
   template<>
   SX SX::zz_tangent(const SX &arg) const {
     SXFunction temp("temp", make_vector(arg), make_vector(*this)); // make a runtime
-    return temp.tang();
+    return SX::tang(temp);
   }
 
   template<>
@@ -1400,7 +1400,7 @@ namespace casadi {
   SX SX::zz_hessian(const SX &arg, SX &g) const {
     g = gradient(*this, arg);
     SXFunction gfcn("gfcn", make_vector(arg), make_vector(g)); // make a runtime
-    return gfcn.jac(0, 0, false, true);
+    return SX::jac(gfcn, 0, 0, false, true);
   }
 
   template<>
@@ -1678,7 +1678,7 @@ namespace casadi {
     bool success = false;
     for (int i=0; i<1000; ++i) {
       r.push_back((f(SX(0)).at(0)/mult).toScalar());;
-      SX j = f.jac();
+      SX j = SX::jac(f);
       if (j.nnz()==0) {
         success = true;
         break;
