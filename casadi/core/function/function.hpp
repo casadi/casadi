@@ -637,6 +637,10 @@ namespace casadi {
     /** \brief Get all the free variables of the function */
     std::vector<MX> free_mx() const;
 
+    /** \brief Extract the functions needed for the Lifted Newton method */
+    void generateLiftingFunctions(Function& SWIG_OUTPUT(vdef_fcn),
+                                  Function& SWIG_OUTPUT(vinit_fcn));
+
     /// \cond INTERNAL
     /** \brief Is the class able to propagate seeds through the algorithm?
      *

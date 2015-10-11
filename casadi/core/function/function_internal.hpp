@@ -284,6 +284,9 @@ namespace casadi {
     /// Get free variables (SX)
     virtual SX free_sx() const;
 
+    /** \brief Extract the functions needed for the Lifted Newton method */
+    virtual void generateLiftingFunctions(Function& vdef_fcn, Function& vinit_fcn);
+
     /** \brief Create a helper MXFunction with some properties copied
     *
     * Copied properties:

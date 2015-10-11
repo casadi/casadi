@@ -144,12 +144,6 @@ namespace casadi {
     SXFunction expand(const std::vector<SX>& inputv = std::vector<SX>());
 #endif // WITH_DEPRECATED_FEATURES
 
-    /// \cond INTERNAL
-    /** \brief Extract the functions needed for the Lifted Newton method */
-    void generateLiftingFunctions(MXFunction& SWIG_OUTPUT(vdef_fcn),
-                                  MXFunction& SWIG_OUTPUT(vinit_fcn));
-    /// \endcond
-
     /** \brief Get the corresponding matrix type */
     typedef MX MatType;
   };

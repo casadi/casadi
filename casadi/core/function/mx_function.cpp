@@ -128,10 +128,6 @@ namespace casadi {
   }
 #endif // WITH_DEPRECATED_FEATURES
 
-  void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn) {
-    (*this)->generateLiftingFunctions(vdef_fcn, vinit_fcn);
-  }
-
 
 } // namespace casadi
 

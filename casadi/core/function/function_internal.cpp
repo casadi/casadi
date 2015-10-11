@@ -3025,4 +3025,9 @@ namespace casadi {
     casadi_error("'free_sx' only defined for 'sxfunction'");
   }
 
+  void FunctionInternal::generateLiftingFunctions(Function& vdef_fcn,
+                                                  Function& vinit_fcn) {
+    casadi_error("'generateLiftingFunctions' only defined for 'mxfunction'");
+  }
+
 } // namespace casadi

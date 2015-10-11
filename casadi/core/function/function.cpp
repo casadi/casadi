@@ -979,5 +979,10 @@ namespace casadi {
     return (*this)->free_mx();
   }
 
+  void Function::generateLiftingFunctions(Function& vdef_fcn, Function& vinit_fcn) {
+    (*this)->generateLiftingFunctions(vdef_fcn, vinit_fcn);
+  }
+
+
 } // namespace casadi
 
