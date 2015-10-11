@@ -167,9 +167,9 @@ namespace casadi {
     ///@{
     /** \brief Get function input(s) and output(s)  */
     virtual const MX mx_in(int ind) const;
-    virtual const MX mx_out(int ind) const;
+    virtual const MX mx_out2(int ind) const;
     virtual const std::vector<MX> mx_in() const;
-    virtual const std::vector<MX> mx_out() const;
+    virtual const std::vector<MX> mx_out2() const;
     ///@}
   };
 

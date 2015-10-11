@@ -2969,8 +2969,8 @@ namespace casadi {
     return SX::sym("x_" + to_string(ind), input(ind).sparsity());
   }
 
-  const SX FunctionInternal::sx_out(int ind) const {
-    casadi_error("'sx_out' not defined for " + type_name());
+  const SX FunctionInternal::sx_out2(int ind) const {
+    casadi_error("'sx_out2' not defined for " + type_name());
   }
 
   const std::vector<SX> FunctionInternal::sx_in() const {
@@ -2981,10 +2981,10 @@ namespace casadi {
     return ret;
   }
 
-  const std::vector<SX> FunctionInternal::sx_out() const {
+  const std::vector<SX> FunctionInternal::sx_out2() const {
     vector<SX> ret(n_out());
     for (int i=0; i<ret.size(); ++i) {
-      ret[i] = sx_out(i);
+      ret[i] = sx_out2(i);
     }
     return ret;
   }
@@ -2994,8 +2994,8 @@ namespace casadi {
     return MX::sym("x_" + to_string(ind), input(ind).sparsity());
   }
 
-  const MX FunctionInternal::mx_out(int ind) const {
-    casadi_error("'mx_out' not defined for " + type_name());
+  const MX FunctionInternal::mx_out2(int ind) const {
+    casadi_error("'mx_out2' not defined for " + type_name());
   }
 
   const std::vector<MX> FunctionInternal::mx_in() const {
@@ -3006,10 +3006,10 @@ namespace casadi {
     return ret;
   }
 
-  const std::vector<MX> FunctionInternal::mx_out() const {
+  const std::vector<MX> FunctionInternal::mx_out2() const {
     vector<MX> ret(n_out());
     for (int i=0; i<ret.size(); ++i) {
-      ret[i] = mx_out(i);
+      ret[i] = mx_out2(i);
     }
     return ret;
   }

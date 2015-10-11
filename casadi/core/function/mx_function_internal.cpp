@@ -1337,7 +1337,7 @@ namespace casadi {
     return inputv_.at(ind);
   }
 
-  const MX MXFunctionInternal::mx_out(int ind) const {
+  const MX MXFunctionInternal::mx_out2(int ind) const {
     return outputv_.at(ind);
   }
 
@@ -1345,7 +1345,7 @@ namespace casadi {
     return inputv_;
   }
 
-  const std::vector<MX> MXFunctionInternal::mx_out() const {
+  const std::vector<MX> MXFunctionInternal::mx_out2() const {
     return outputv_;
   }
 

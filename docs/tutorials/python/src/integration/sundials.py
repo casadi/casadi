@@ -37,7 +37,7 @@ f  = SXFunction('f', [vertcat([x,y]),u], [vertcat([(1-y*y)*x-y+u,x])])
 #! Manipulate the function to adhere to the integrator's
 #! input/output signature
 #! f(time;states;parameters)
-fmod=SXFunction('ODE_right_hand_side', daeIn(x=f.sx_in(0),p=f.sx_in(1)),daeOut(ode=f.sx_out(0)))
+fmod=SXFunction('ODE_right_hand_side', daeIn(x=f.sx_in(0),p=f.sx_in(1)),daeOut(ode=f.sx_out2(0)))
 #! The whole series of sundials options are available for the user
 opts = {}
 opts["fsens_err_con"] = True

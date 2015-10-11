@@ -1426,7 +1426,7 @@ namespace casadi {
 
     // Assemble arguments and directional derivatives
     vector<SX> argv = f.sx_in();
-    vector<SX> resv = f.sx_out();
+    vector<SX> resv = f.sx_out2();
     vector<vector<SX> > fseed(nfsens, argv), fsens(nfsens, resv),
         aseed(nasens, resv), asens(nasens, argv);
 

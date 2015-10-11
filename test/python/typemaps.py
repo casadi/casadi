@@ -518,7 +518,7 @@ class typemaptests(casadiTestCase):
     
     f = SXFunction("f", [x],[w])
     
-    W = f.sx_out(0)
+    W = f.sx_out2(0)
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
 
@@ -529,7 +529,7 @@ class typemaptests(casadiTestCase):
     
     f = MXFunction("f", [x],[w])
     
-    W = f.mx_out(0)
+    W = f.mx_out2(0)
 
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)

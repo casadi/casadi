@@ -31,8 +31,8 @@
 * \sa
 * \code
 * casadi::MXFunction::expand();
-* casadi::MXFunction::mx_out();
-* casadi::SXFunction::sx_out();
+* casadi::MXFunction::mx_out2();
+* casadi::SXFunction::sx_out2();
 * \endcode
 *
 */

@@ -65,7 +65,7 @@ print z
 f = SXFunction('f', [x], [z]) # z = f(x)
 print "%d -> %d" % (f.n_in(),f.n_out())
 print f.sx_in(), type(f.sx_in())
-print f.sx_out(), type(f.sx_out())
+print f.sx_out2(), type(f.sx_out2())
 f.setInput(2)
 f.evaluate()
 print f.getOutput()

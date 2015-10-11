@@ -1469,7 +1469,7 @@ namespace casadi {
     return inputv_.at(ind);
   }
 
-  const SX SXFunctionInternal::sx_out(int ind) const {
+  const SX SXFunctionInternal::sx_out2(int ind) const {
     return outputv_.at(ind);
   }
 
@@ -1477,7 +1477,7 @@ namespace casadi {
     return inputv_;
   }
 
-  const std::vector<SX> SXFunctionInternal::sx_out() const {
+  const std::vector<SX> SXFunctionInternal::sx_out2() const {
     return outputv_;
   }
 
