@@ -278,12 +278,12 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   // Variables in the lifted NLP
   stringstream ss;
   
-  // Objective function
-  MX nlp_f;
-  if(!gauss_newton) nlp_f = 0;
-  
-  // Constraint function
-  MX nlp_g = MX::sparse(0,1);
+  // Objective function terms
+  vector<MX> nlp_fv;
+  if(!gauss_newton) nlp_fv.push_back(0);
+
+  // Constraint function terms
+  vector<MX> nlp_gv;
   
   // Generate full-space NLP
   MX U = u0_;  MX V = v0_;  MX H = h0_;
@@ -296,7 +296,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
     // Lift the height
     if(!single_shooting){
       // Initialize with measurements
-      H.lift(H_meas_[k]);
+      H = lift(H, H_meas_[k]);
 
       // Initialize with initial conditions
       //U.lift(u0_);
@@ -312,60 +312,50 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
     // Objective function term
     MX H_dev = H-H_meas_[k];
     if(gauss_newton){
-      nlp_f.append(vec(H_dev));
+      nlp_fv.push_back(vec(H_dev));
     } else {
-      nlp_f += inner_prod(H_dev,H_dev)/2;
+      nlp_fv.front() += inner_prod(H_dev, H_dev)/2;
     }
 
     // Add to the constraints
-    nlp_g.append(vec(H));
+    nlp_gv.push_back(vec(H));
   }
 
-  MXFunction nlp("nlp", nlpIn("x",P), nlpOut("f",nlp_f,"g",nlp_g));
+  MXFunction nlp("nlp", nlpIn("x",P),
+                 nlpOut("f",vertcat(nlp_fv), "g",vertcat(nlp_gv)));
   cout << "Generated single-shooting NLP" << endl;
   
   // NLP Solver
-  nlp_solver_ = NlpSolver("scpgen",nlp);
-  nlp_solver_.setOption("verbose",true);
-  nlp_solver_.setOption("regularize",regularize);
-  nlp_solver_.setOption("codegen",codegen);
-  nlp_solver_.setOption("reg_threshold",reg_threshold);
-  nlp_solver_.setOption("max_iter_ls",3);
-  nlp_solver_.setOption("beta",0.5);
-  nlp_solver_.setOption("merit_start",1e-3);
-  //nlp_solver_.setOption("merit_memory",1);
-  nlp_solver_.setOption("max_iter",100);
-  nlp_solver_.setOption("compiler","clang -fPIC -O2"); // Optimization
+  Dict opts;
+  opts["verbose"] = true;
+  opts["regularize"] = regularize;
+  opts["codegen"] = codegen;
+  opts["reg_threshold"] = reg_threshold;
+  opts["max_iter_ls"] = 3;
+  opts["beta"] = 0.5;
+  opts["merit_start"] = 1e-3;
+  //opts["merit_memory"] = 1;
+  opts["max_iter"] = 100;
+  opts["compiler"] = "clang -fPIC -O2"; // Optimization
   if(gauss_newton){
-    nlp_solver_.setOption("hessian_approximation","gauss-newton");
+    opts["hessian_approximation"] = "gauss-newton";
   }
-
-  // Name the variables
-  vector<string> variable_name;
-  variable_name.push_back("drag");
-  variable_name.push_back("depth");
-  nlp_solver_.setOption("name_x",variable_name);
 
   // Print both of the variables
-  nlp_solver_.setOption("print_x",range(2));
+  opts["name_x"] = vector<string>{"drag", "depth"};
+  opts["print_x"] = range(2);
 
-  Dict qp_solver_options;
   if(ipopt_as_qp_solver){
-    nlp_solver_.setOption("qp_solver","nlp");
-    qp_solver_options["nlp_solver"] = "ipopt";
-    Dict nlp_solver_options;
-    nlp_solver_options["tol"] = 1e-12;
-    nlp_solver_options["print_level"] = 0;
-    nlp_solver_options["print_time"] = false;
-    qp_solver_options["nlp_solver_options"] = nlp_solver_options;
-    
+    opts["qp_solver"] = "nlp";
+    Dict nlp_opts = make_dict("tol", 1e-12, "print_level", 0, "print_time", false);
+    opts["qp_solver_options"] = make_dict("nlp_solver", "ipopt", "nlp_solver_options", nlp_opts);
   } else {
-    nlp_solver_.setOption("qp_solver","qpoases");
-    qp_solver_options["printLevel"] = "none";
+    opts["qp_solver"] = "qpoases";
+    opts["qp_solver_options"] = make_dict("printLevel", "none");
   }
-  nlp_solver_.setOption("qp_solver_options",qp_solver_options);
-  nlp_solver_.init();
 
+  // Create NLP solver instance
+  nlp_solver_ = NlpSolver("nlp_solver", "scpgen", nlp, opts);
 }
 
 void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est){

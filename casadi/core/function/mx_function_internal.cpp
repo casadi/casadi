@@ -1234,7 +1234,7 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn) {
+  void MXFunctionInternal::generateLiftingFunctions(Function& vdef_fcn, Function& vinit_fcn) {
     assertInit();
 
     vector<MX> swork(workloc_.size()-1);
