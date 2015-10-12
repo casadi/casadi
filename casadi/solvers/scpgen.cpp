@@ -31,6 +31,9 @@
 #include <cmath>
 #include <cfloat>
 #include <cstdlib>
+#ifdef HAVE_MKSTEMPS
+#include <unistd.h>
+#endif
 
 using namespace std;
 namespace casadi {
