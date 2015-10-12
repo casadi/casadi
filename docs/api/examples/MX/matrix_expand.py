@@ -35,11 +35,11 @@ e = d*c
 #! The element-wise addition and multiplication operators appear just as a single node in the MX expression graph
 dotdraw(e)
 
-#! We can use MXFunction.expand to expand into subexpressions
+#! We can use SXFunction to expand into subexpressions
 
 f = MXFunction("f", [a,b,c],[e])
 
-g = SXFunction(f.expand())
+g = SXFunction('g', f)
 
 dotdraw(g(g.sx_in())[0])
 

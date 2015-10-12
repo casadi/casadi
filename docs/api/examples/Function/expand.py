@@ -36,7 +36,7 @@ z = mul(x,y)
 f = MXFunction("f", [x,y],[z])
 
 #! We expand the MXFunction into an SXFunction
-fSX = f.expand()
+fSX = SXFunction('fSX', f)
 
 print "Expanded expression = ", fSX
 
@@ -52,7 +52,6 @@ G = MXFunction("G", [x,y], [g])
 
 #! This function cannot be expanded.
 try:
-  G.expand()
+  SXFunction('G_sx', G)
 except Exception as e:
   print e
-

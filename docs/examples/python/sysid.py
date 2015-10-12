@@ -64,7 +64,7 @@ for i in range(N_steps_per_sample):
 one_sample = MXFunction('one_sample',[states, controls, params], [X])
 
 # speedup trick: expand into scalar operations
-one_sample = one_sample.expand()
+one_sample = SXFunction('one_sample_sx', one_sample)
 
 ############ Simulating the system ##########
 
