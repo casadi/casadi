@@ -152,7 +152,9 @@ namespace casadi {
     int size2_out(int ind) const;
     int size2_out(const std::string& oname) const {return size2_out(index_out(oname));}
     std::pair<int, int> size_out(int ind) const;
-    std::pair<int, int> size_out(const std::string& oname) const {return size_out(index_out(oname));}
+    std::pair<int, int> size_out(const std::string& oname) const {
+      return size_out(index_out(oname));
+    }
     ///@}
 
     ///@{
