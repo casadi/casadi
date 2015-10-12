@@ -2705,7 +2705,7 @@
 <tr><td>beta</td><td>OT_REAL</td><td>0.8</td><td>Line-search parameter, restoration factor of stepsize</td><td>casadi::Scpgen</td></tr>
 <tr><td>c1</td><td>OT_REAL</td><td>1e-4</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::Scpgen</td></tr>
 <tr><td>codegen</td><td>OT_BOOLEAN</td><td>false</td><td>C-code generation</td><td>casadi::Scpgen</td></tr>
-<tr><td>compiler</td><td>OT_STRING</td><td>"gcc -fPIC -O2"</td><td>Compiler command to be used for compiling generated code</td><td>casadi::Scpgen</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)<br />(qp)</td><td>casadi::OptionsFunctionalityNode<br />casadi::NlpSolverInternal</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOLEAN</td><td>false</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::NlpSolverInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NlpSolverInternal</td></tr>
@@ -2766,7 +2766,6 @@
 <tr><td>beta</td><td>OT_REAL</td><td>0.8</td><td>Line-search parameter, restoration factor of stepsize</td></tr>
 <tr><td>c1</td><td>OT_REAL</td><td>1e-4</td><td>Armijo condition, coefficient of decrease in merit</td></tr>
 <tr><td>codegen</td><td>OT_BOOLEAN</td><td>false</td><td>C-code generation</td></tr>
-<tr><td>compiler</td><td>OT_STRING</td><td>"gcc -fPIC -O2"</td><td>Compiler command to be used for compiling generated code</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>"exact"</td><td>gauss-newton|exact</td></tr>
 <tr><td>lbfgs_memory</td><td>OT_INTEGER</td><td>10</td><td>Size of L-BFGS memory.</td></tr>
 <tr><td>max_iter</td><td>OT_INTEGER</td><td>50</td><td>Maximum number of SQP iterations</td></tr>
@@ -3595,25 +3594,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::TinyXmlInterface
-\n
-\par
-<a name='options'></a><table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_XmlFile_tinyxml
-\n
-\par
-<a name='options'></a><table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::WorhpInterface
 \n
 \par
@@ -4055,23 +4035,3 @@
 </table>
 */
 /// \endcond
-/// \cond INTERNAL
-/** \class casadi::XmlFileInternal
-\n
-\par
-<a name='options'></a><table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup general_XmlFile
-\n
-\par
-<a name='options'></a><table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
-</table>
-*/

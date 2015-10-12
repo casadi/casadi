@@ -103,7 +103,43 @@
 %exception  casadi::MX::setTemp(int t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MXFunction::generateLiftingFunctions(MXFunction &output_vdef_fcn, MXFunction &output_vinit_fcn) {
+%exception  casadi::MXFunction::expand(const std::vector< SX > &inputv=std::vector< SX >()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXFunction::grad(const std::string &iname, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXFunction::grad(const std::string &iname, int oind=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXFunction::grad(int iind, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXFunction::grad(int iind=0, int oind=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXFunction::jac(const std::string &iname, const std::string &oname, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXFunction::jac(const std::string &iname, int oind=0, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXFunction::jac(int iind, const std::string &oname, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXFunction::jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXFunction::tang(const std::string &iname, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXFunction::tang(const std::string &iname, int oind=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXFunction::tang(int iind, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXFunction::tang(int iind=0, int oind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::binary(int op, const Matrix< DataType > &x, const Matrix< DataType > &y) {
@@ -158,6 +194,54 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ProfilingType< ProfilingData_TIMELINE >() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::grad(const std::string &iname, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::grad(const std::string &iname, int oind=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::grad(int iind, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::grad(int iind=0, int oind=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::hess(const std::string &iname, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::hess(const std::string &iname, int oind=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::hess(int iind, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::hess(int iind=0, int oind=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::jac(const std::string &iname, const std::string &oname, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::jac(const std::string &iname, int oind=0, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::jac(int iind, const std::string &oname, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::tang(const std::string &iname, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::tang(const std::string &iname, int oind=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::tang(int iind, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXFunction::tang(int iind=0, int oind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SharedObject::assertInit() const  {
