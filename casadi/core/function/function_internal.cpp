@@ -1741,33 +1741,25 @@ namespace casadi {
 
   int FunctionInternal::nnz_in() const {
     int ret=0;
-    for (int iind=0; iind<n_in(); ++iind) {
-      ret += input(iind).nnz();
-    }
+    for (int iind=0; iind<n_in(); ++iind) ret += nnz_in(iind);
     return ret;
   }
 
   int FunctionInternal::nnz_out() const {
     int ret=0;
-    for (int oind=0; oind<n_out(); ++oind) {
-      ret += output(oind).nnz();
-    }
+    for (int oind=0; oind<n_out(); ++oind) ret += nnz_out(oind);
     return ret;
   }
 
   int FunctionInternal::numel_in() const {
     int ret=0;
-    for (int iind=0; iind<n_in(); ++iind) {
-      ret += input(iind).numel();
-    }
+    for (int iind=0; iind<n_in(); ++iind) ret += numel_in(iind);
     return ret;
   }
 
   int FunctionInternal::numel_out() const {
     int ret=0;
-    for (int oind=0; oind<n_out(); ++oind) {
-      ret += output(oind).numel();
-    }
+    for (int oind=0; oind<n_out(); ++oind) ret += numel_out(oind);
     return ret;
   }
 

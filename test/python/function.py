@@ -280,7 +280,7 @@ class Functiontests(casadiTestCase):
       self.assertTrue(sp==sp.T)
       f = SXFunction("f", [x],[mul([x.T,DMatrix.ones(sp),x])])
       J = f.hessian()
-      sp2 = J.getOutput().sparsity()
+      sp2 = J.sparsity_out(0)
       self.checkarray(sp.row(),sp2.row())
       self.checkarray(sp.colind(),sp2.colind())
       
@@ -406,7 +406,7 @@ class Functiontests(casadiTestCase):
     J = f.jacobian()
     J.evaluate()
     
-    self.assertEqual(J.getOutput().nnz(),4)
+    self.assertEqual(J.nnz_out(0),4)
     
     f = MXFunction("f", [x],[x])
     f.setJacSparsity(Sparsity.dense(4,4),0,0,True)
@@ -414,7 +414,7 @@ class Functiontests(casadiTestCase):
     J = f.jacobian()
     J.evaluate()
     
-    self.assertEqual(J.getOutput().nnz(),16)
+    self.assertEqual(J.nnz_out(0),16)
 
   def test_derivative_simplifications(self):
   

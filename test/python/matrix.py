@@ -111,7 +111,7 @@ class Matrixtests(casadiTestCase):
 
     for f in [fMX,fSX]:
       for i in range(3):
-        f.setInput(range(f.input(i).nnz()),i)
+        f.setInput(range(f.nnz_in(i)),i)
       
     self.checkfunction(fMX,fSX)
     

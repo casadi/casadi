@@ -135,17 +135,61 @@ namespace casadi {
     /** \brief Get the number of function outputs */
     int n_out() const;
 
-    /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
+    ///@{
+    /** \brief Get input dimension */
+    int size1_in(int ind) const;
+    int size1_in(const std::string& iname) const {return size1_in(index_in(iname));}
+    int size2_in(int ind) const;
+    int size2_in(const std::string& iname) const {return size2_in(index_in(iname));}
+    std::pair<int, int> size_in(int ind) const;
+    std::pair<int, int> size_in(const std::string& iname) const {return size_in(index_in(iname));}
+    ///@}
+
+    ///@{
+    /** \brief Get output dimension */
+    int size1_out(int ind) const;
+    int size1_out(const std::string& oname) const {return size1_out(index_out(oname));}
+    int size2_out(int ind) const;
+    int size2_out(const std::string& oname) const {return size2_out(index_out(oname));}
+    std::pair<int, int> size_out(int ind) const;
+    std::pair<int, int> size_out(const std::string& oname) const {return size_out(index_out(oname));}
+    ///@}
+
+    ///@{
+    /** \brief  Get of number of input nonzeros
+     * For a particular input or for all for all of the inputs
+     */
     int nnz_in() const;
+    int nnz_in(int ind) const;
+    int nnz_in(const std::string& iname) const {return numel_in(index_in(iname));}
+    ///@}
 
-    /** \brief  Get total number of nonzeros in all of the matrix-valued outputs */
+    ///@{
+    /** \brief  Get of number of output nonzeros
+     * For a particular output or for all for all of the outputs
+     */
     int nnz_out() const;
+    int nnz_out(int ind) const;
+    int nnz_out(const std::string& oname) const {return numel_out(index_out(oname));}
+    ///@}
 
-    /** \brief  Get total number of elements in all of the matrix-valued inputs */
+    ///@{
+    /** \brief  Get of number of input elements
+     * For a particular input or for all for all of the inputs
+     */
     int numel_in() const;
+    int numel_in(int ind) const;
+    int numel_in(const std::string& iname) const {return numel_in(index_in(iname));}
+    ///@}
 
-    /** \brief  Get total number of elements in all of the matrix-valued outputs */
+    ///@{
+    /** \brief  Get of number of output elements
+     * For a particular output or for all for all of the outputs
+     */
     int numel_out() const;
+    int numel_out(int ind) const;
+    int numel_out(const std::string& oname) const {return numel_out(index_out(oname));}
+    ///@}
 
     /** \brief Get input scheme */
     std::vector<std::string> name_in() const;

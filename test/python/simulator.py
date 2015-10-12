@@ -224,7 +224,7 @@ class Simulatortests(casadiTestCase):
 
     self.checkarray(sim.getOutput().T,num['q0']*exp(-tc),"Evaluation output mismatch",digits=9)
     self.checkarray(sim.getOutput(1).T,tc,"Evaluation output mismatch",digits=9)
-    self.assertTrue(sim.getOutput().sparsity()==sim.getOutput(1).sparsity())
+    self.assertTrue(sim.sparsity_out(0)==sim.sparsity_out(1))
     
   def test_sim_outputs(self):
     self.message("Simulator: outputs")
@@ -259,7 +259,7 @@ class Simulatortests(casadiTestCase):
     sim.evaluate()
 
     
-    self.checkarray(sim.getOutput(),DMatrix.ones(sim.getOutput().shape)*p,"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(),DMatrix.ones(sim.size_out(0))*p,"Evaluation output mismatch")
 
     #yv = SX.sym("y")
     #out = SXFunction('out', daeIn(),[yv])
@@ -269,7 +269,7 @@ class Simulatortests(casadiTestCase):
     #sim.setInput([num['p']],1)
     #sim.evaluate()
 
-    #self.checkarray(sim.getOutput(),DMatrix.zeros(sim.output().shape),"'xpf' unsupported",digits=9)
+    #self.checkarray(sim.getOutput(),DMatrix.zeros(sim.size_out(0)),"'xpf' unsupported",digits=9)
     #self.checkarray(sim.getOutput(),DMatrix((q0*t**2*exp(t**3/(3*p)))/p),"Evaluation output mismatch",digits=9)
 
   def test_controlsim_inputs(self):
@@ -295,7 +295,7 @@ class Simulatortests(casadiTestCase):
     sim = ControlSimulator("sim", f, out, tc, opts)
     sim.setInput([num['q0']],"x0")
     sim.setInput([num['p']],"p")
-    self.assertTrue(sim.getInput("u").isempty())
+    self.assertTrue(sim.sparsity_in("u").isempty())
     sim.evaluate()
     
     tf = DMatrix(sim.getMinorT())

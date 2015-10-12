@@ -261,7 +261,7 @@ class Integrationtests(casadiTestCase):
                 integrator = c.Integrator("integrator", Integrator, (f, g), opts)
                 for ff in [fs,integrator]:
                   for k,v in point.items():
-                    if not ff.getInput(k).isempty():
+                    if not ff.sparsity_in(k).isempty():
                       ff.setInput(v,k)
 
                 integrator.evaluate()
@@ -372,7 +372,7 @@ class Integrationtests(casadiTestCase):
               
               for ff in [fs,integrator]:
                 for k,v in point.items():
-                  if not ff.getInput(k).isempty():
+                  if not ff.sparsity_in(k).isempty():
                     ff.setInput(v,k)
 
               integrator.evaluate()
@@ -519,7 +519,7 @@ class Integrationtests(casadiTestCase):
 
             for ff in [fs,integrator]:
               for k,v in point.items():
-                if not ff.getInput(k).isempty():
+                if not ff.sparsity_in(k).isempty():
                   ff.setInput(v,k)
             integrator.evaluate()
             

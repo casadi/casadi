@@ -378,17 +378,31 @@ namespace casadi {
     /** \brief Get the number of function outputs */
     inline int n_out() const { return obuf_.size();}
 
-    /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
+    ///@{
+    /** \brief Number of input/output nonzeros */
     int nnz_in() const;
-
-    /** \brief  Get total number of nonzeros in all of the matrix-valued outputs */
+    int nnz_in(int ind) const { return input(ind).nnz(); }
     int nnz_out() const;
+    int nnz_out(int ind) const { return output(ind).nnz(); }
+    ///@}
 
-    /** \brief  Get total number of elements in all of the matrix-valued inputs */
+    ///@{
+    /** \brief Number of input/output elements */
     int numel_in() const;
-
-    /** \brief  Get total number of elements in all of the matrix-valued outputs */
+    int numel_in(int ind) const { return input(ind).numel(); }
+    int numel_out(int ind) const { return output(ind).numel(); }
     int numel_out() const;
+    ///@}
+
+    ///@{
+    /** \brief Input/output dimensions */
+    int size1_in(int ind) const { return input(ind).size1(); }
+    int size2_in(int ind) const { return input(ind).size2(); }
+    int size1_out(int ind) const { return output(ind).size1(); }
+    int size2_out(int ind) const { return output(ind).size2(); }
+    std::pair<int, int> size_in(int ind) const { return input(ind).size(); }
+    std::pair<int, int> size_out(int ind) const { return output(ind).size(); }
+    ///@}
 
     /// Get all statistics obtained at the end of the last evaluate call
     const Dict & getStats() const;

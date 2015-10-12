@@ -265,7 +265,7 @@ class casadiTestCase(unittest.TestCase):
       try:
         f.setInput(setx0[i],i)
       except Exception as e:
-         print f.getInput(i).shape
+         print f.size_in(i)
          raise e
          raise Exception("ERROR! Tried to set input with %s which is of type  %s \n%s" %(str(x0[i]), str(type(x0[i])),name))
     f.evaluate()
@@ -317,7 +317,7 @@ class casadiTestCase(unittest.TestCase):
       digits_sens = digits
      
     for i in range(trial.n_in()):
-      if (allow_empty and (trial.getInput(i).isempty() or solution.getInput(i).isempty() )): continue
+      if (allow_empty and (trial.sparsity_in(i).isempty() or solution.sparsity_in(i).isempty() )): continue
       message = "input(%d)" % i
       self.checkarray(trial.getInput(i),solution.getInput(i),"",digits=digits,failmessage=failmessage+": "+ message)
 
@@ -340,7 +340,7 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.n_out()):
       message = "output(%d)" % i
-      if (allow_empty and (trial.getOutput(i).isempty() or solution.getOutput(i).isempty() )): continue
+      if (allow_empty and (trial.sparsity_out(i).isempty() or solution.sparsity_out(i).isempty() )): continue
       if (allow_nondiff and (trial.getOutput(i).nnz()==0 or solution.getOutput(i).nnz()==0 )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
       
@@ -360,7 +360,7 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.n_out()):
       message = "output(%d)" % i
-      if (allow_empty and (trial.getOutput(i).isempty() or solution.getOutput(i).isempty() )): continue
+      if (allow_empty and (trial.sparsity_out(i).isempty() or solution.sparsity_out(i).isempty() )): continue
       if (allow_nondiff and (trial.getOutput(i).nnz()==0 or solution.getOutput(i).nnz()==0 )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
     
@@ -371,7 +371,7 @@ class casadiTestCase(unittest.TestCase):
     
     if jacobian:
       for i in range(trial.n_in()):
-        if (allow_empty and (trial.getInput(i).isempty() or solution.getInput(i).isempty() )): continue
+        if (allow_empty and (trial.sparsity_in(i).isempty() or solution.sparsity_in(i).isempty() )): continue
         for j in range(trial.n_out()):
           trialjac = trial.jacobian(i,j)
           self.assertEqual(trialjac.n_in(),trial.n_in())
@@ -386,7 +386,7 @@ class casadiTestCase(unittest.TestCase):
 
     if gradient:
       for i in range(trial.n_in()):
-        if (allow_empty and (trial.getInput(i).isempty() or solution.getInput(i).isempty() )): continue
+        if (allow_empty and (trial.sparsity_in(i).isempty() or solution.sparsity_in(i).isempty() )): continue
         for j in range(trial.n_out()):
           if trial.getOutput(j).isscalar() and solution.getOutput(j).isscalar():
             trialgrad = trial.gradient(i,j)
@@ -401,7 +401,7 @@ class casadiTestCase(unittest.TestCase):
 
     if hessian:
       for i in range(trial.n_in()):
-        if (allow_empty and (trial.getInput(i).isempty() or solution.getInput(i).isempty() )): continue
+        if (allow_empty and (trial.sparsity_in(i).isempty() or solution.sparsity_in(i).isempty() )): continue
         for j in range(trial.n_out()):
           if trial.getOutput(j).isscalar() and solution.getOutput(j).isscalar():
             trialhess = trial.hessian(i,j)
@@ -465,7 +465,7 @@ class casadiTestCase(unittest.TestCase):
         for spmod,spmod2 in itertools.product(spmods,repeat=2):
           fseeds = [[sym("f",spmod(f.getInput(i)).sparsity()) for i in range(f.n_in())]  for d in range(ndir)]
           aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.n_out())] for d in range(ndir)]
-          inputss = [sym("i",f.getInput(i).sparsity()) for i in range(f.n_in())]
+          inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
           with internalAPI():
             res = f.call(inputss)
             fwdsens = f.callForward(inputss, res, fseeds)
@@ -479,7 +479,7 @@ class casadiTestCase(unittest.TestCase):
           # Complete random seeding
           for i in range(f.n_in(),vf.n_in()):
             random.seed(i)
-            vf.setInput(DMatrix(vf.getInput(i).sparsity(),random.random(vf.getInput(i).nnz())),i)
+            vf.setInput(DMatrix(vf.sparsity_in(i),random.random(vf.nnz_in(i))),i)
           
           vf.evaluate()
           storagekey = (spmod,spmod2)
@@ -494,9 +494,9 @@ class casadiTestCase(unittest.TestCase):
 
             # Second order sensitivities
             for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
-              fseeds2 = [[sym("f",vf_reference.getInput(i).sparsity()) for i in range(vf.n_in())] for d in range(ndir)]
+              fseeds2 = [[sym("f",vf_reference.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]
               aseeds2 = [[sym("a",vf_reference.getOutput(i).sparsity())  for i in range(vf.n_out()) ] for d in range(ndir)]
-              inputss2 = [sym("i",vf_reference.getInput(i).sparsity()) for i in range(vf.n_in())]
+              inputss2 = [sym("i",vf_reference.sparsity_in(i)) for i in range(vf.n_in())]
               
               with internalAPI():
                 res2 = vf.call(inputss2)
@@ -510,7 +510,7 @@ class casadiTestCase(unittest.TestCase):
             
               for i in range(f.n_in(),vf2.n_in()):
                 random.seed(i)
-                vf2.setInput(DMatrix(vf2.getInput(i).sparsity(),random.random(vf2.getInput(i).nnz())),i)
+                vf2.setInput(DMatrix(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))),i)
               
               vf2.evaluate()
               storagekey = (spmod,spmod2)

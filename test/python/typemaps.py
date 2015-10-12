@@ -259,11 +259,11 @@ class typemaptests(casadiTestCase):
         dummy = [1.3,2.7,9.4,1.0]
 
         f=function("f", [z],[r])
-        f.setInputNZ(dummy[0:f.getInput().nnz()])
+        f.setInputNZ(dummy[0:f.nnz_in(0)])
         f.evaluate()
         
         f_=function("f", [z],[z])
-        f_.setInputNZ(dummy[0:f.getInput().nnz()])
+        f_.setInputNZ(dummy[0:f.nnz_in(0)])
         f_.evaluate()
         
 
@@ -273,13 +273,13 @@ class typemaptests(casadiTestCase):
         dummy2 = [0.3,2.4,1.4,1.7]
         
         f=function("f", [z,s],[r])
-        f.setInputNZ(dummy[0:f.getInput(0).nnz()],0)
-        f.setInputNZ(dummy2[0:f.getInput(1).nnz()],1)
+        f.setInputNZ(dummy[0:f.nnz_in(0)],0)
+        f.setInputNZ(dummy2[0:f.nnz_in(1)],1)
         f.evaluate()
         
         f_=function("f", [z,s],[z,s])
-        f_.setInputNZ(dummy[0:f.getInput(0).nnz()],0)
-        f_.setInputNZ(dummy2[0:f.getInput(1).nnz()],1)
+        f_.setInputNZ(dummy[0:f.nnz_in(0)],0)
+        f_.setInputNZ(dummy2[0:f.nnz_in(1)],1)
         f_.evaluate()
 
         self.checkarray(fun(f_.getOutput(0),f_.getOutput(1)),f.getOutput(),"operation"+str(f_.getOutput(0))+","+str(f_.getOutput(1))+":"+str(f.getOutput()))

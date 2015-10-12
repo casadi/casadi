@@ -359,8 +359,8 @@ class SXtests(casadiTestCase):
     y=SX.sym("y",2,3)
     
     f=SXFunction("f", [y],[y])
-    self.checkarray(f.getInput(0).shape,(2,3),"SXFunction constructors")
-    self.checkarray(f.getOutput(0).shape,(2,3),"SXFunction constructors")
+    self.checkarray(f.size_in(0),(2,3),"SXFunction constructors")
+    self.checkarray(f.size_out(0),(2,3),"SXFunction constructors")
     
     self.assertRaises(NotImplementedError,lambda: SXFunction("f", y,[y,y]))
     self.assertRaises(NotImplementedError,lambda: SXFunction("f", x0,[x0,x1]))
@@ -1032,7 +1032,7 @@ class SXtests(casadiTestCase):
     f.evaluate()
     g.evaluate()
     
-    self.checkarray(IMatrix.ones(filt),IMatrix.ones(g.getOutput().sparsity()))
+    self.checkarray(IMatrix.ones(filt),IMatrix.ones(g.sparsity_out(0)))
     
     self.checkarray(f.getOutput()[filt],g.getOutput())
     
@@ -1056,7 +1056,7 @@ class SXtests(casadiTestCase):
     h = f.hessian()
     h.evaluate()
     
-    self.assertTrue(h.getOutput().sparsity()==H.sparsity())
+    self.assertTrue(h.sparsity_out(0)==H.sparsity())
     
     self.checkarray(h.getOutput().nonzeros(),H.nonzeros())
 

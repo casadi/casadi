@@ -286,9 +286,9 @@ class Toolstests(casadiTestCase):
     def isEqualV(a,b):
       ft = MXFunction("ft", [x,m],[a-b])
       for i in range(ft.n_in()):
-        ft.setInput(numpy.random.rand(*ft.getInput(i).shape),i)
+        ft.setInput(numpy.random.rand(*ft.size_in(i)),i)
       ft.evaluate()
-      self.checkarray(ft.getOutput(),DMatrix.zeros(*ft.getOutput().shape))
+      self.checkarray(ft.getOutput(),DMatrix.zeros(*ft.size_out(0)))
     
     isEqualV(V["x"],x)
     isEqualV(V["y",0],y0)
@@ -303,9 +303,9 @@ class Toolstests(casadiTestCase):
     def isEqualV(a,b):
       ft = MXFunction("ft", [x,m,abc],[a-b])
       for i in range(ft.n_in()):
-        ft.setInput(numpy.random.rand(*ft.getInput(i).shape),i)
+        ft.setInput(numpy.random.rand(*ft.size_in(i)),i)
       ft.evaluate()
-      self.checkarray(ft.getOutput(),DMatrix.zeros(*ft.getOutput().shape))
+      self.checkarray(ft.getOutput(),DMatrix.zeros(*ft.size_out(0)))
       
     isEqualV(V["y",0],abc)
 

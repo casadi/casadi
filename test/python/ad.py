@@ -239,10 +239,10 @@ class ADtests(casadiTestCase):
             
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
             
-            y = SX.sym("y",f.getInput().sparsity())
+            y = SX.sym("y",f.sparsity_in(0))
             
-            fseeds = map(lambda x: DMatrix(f.getInput().sparsity(),x), seeds)
-            aseeds = map(lambda x: DMatrix(f.getOutput().sparsity(),x), seeds)
+            fseeds = map(lambda x: DMatrix(f.sparsity_in(0),x), seeds)
+            aseeds = map(lambda x: DMatrix(f.sparsity_out(0),x), seeds)
             with internalAPI():
               res = f.call([y])
               fwdsens = f.callForward([y],res,map(lambda x: [x],fseeds))
@@ -280,7 +280,7 @@ class ADtests(casadiTestCase):
             f_in = DMatrix(f.sparsity_in(0),n)
             [r] = f([f_in])
   
-            y = SX.sym("y",f.getInput().sparsity())
+            y = SX.sym("y",f.sparsity_in(0))
             
             with internalAPI():
               res = f.call([y])
@@ -416,8 +416,8 @@ class ADtests(casadiTestCase):
     J.setInputNZ([2,7])
     J.evaluate()
 
-    self.assertEqual(f.getOutput().size1(),3,"Jacobian shape bug")
-    self.assertEqual(f.getOutput().size2(),1,"Jacobian shape bug")
+    self.assertEqual(f.size1_out(0),3,"Jacobian shape bug")
+    self.assertEqual(f.size2_out(0),1,"Jacobian shape bug")
 
     
   def test_bugglibc(self):
@@ -634,7 +634,7 @@ class ADtests(casadiTestCase):
           for spmod,spmod2 in itertools.product(spmods,repeat=2):
             fseeds = [[sym("f",spmod(f.getInput(i)).sparsity()) for i in range(f.n_in())]  for d in range(ndir)]
             aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.n_out())] for d in range(ndir)]
-            inputss = [sym("i",f.getInput(i).sparsity()) for i in range(f.n_in())]
+            inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
         
             with internalAPI():
               res = f.call(inputss,True)
@@ -684,7 +684,7 @@ class ADtests(casadiTestCase):
             # Complete random seeding
             random.seed(1)
             for i in range(vf.n_in()):
-              vf.setInput(DMatrix(vf.getInput(i).sparsity(),random.random(vf.getInput(i).nnz())),i)
+              vf.setInput(DMatrix(vf.sparsity_in(i),random.random(vf.nnz_in(i))),i)
             
             vf.evaluate()
             self.check_codegen(vf)
@@ -705,9 +705,9 @@ class ADtests(casadiTestCase):
             
 
             for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
-              fseeds2 = [[sym2("f",vf_mx.getInput(i).sparsity()) for i in range(vf.n_in())] for d in range(ndir)]
+              fseeds2 = [[sym2("f",vf_mx.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]
               aseeds2 = [[sym2("a",vf_mx.getOutput(i).sparsity())  for i in range(vf.n_out()) ] for d in range(ndir)]
-              inputss2 = [sym2("i",vf_mx.getInput(i).sparsity()) for i in range(vf.n_in())]
+              inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]
            
               with internalAPI():
                 res2 = vf.call(inputss2,True)
@@ -718,7 +718,7 @@ class ADtests(casadiTestCase):
                 
               random.seed(1)
               for i in range(vf2.n_in()):
-                vf2.setInput(DMatrix(vf2.getInput(i).sparsity(),random.random(vf2.getInput(i).nnz())),i)
+                vf2.setInput(DMatrix(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))),i)
               
               vf2.evaluate()
               self.check_codegen(vf2)
@@ -749,7 +749,7 @@ class ADtests(casadiTestCase):
           
           self.check_codegen(Jf)
           self.checkarray(Jf.getOutput(),J_)
-          self.checkarray(DMatrix.ones(Jf.getOutput().sparsity()),DMatrix.ones(J_.sparsity()),str(out)+str(mode))
+          self.checkarray(DMatrix.ones(Jf.sparsity_out(0)),DMatrix.ones(J_.sparsity()),str(out)+str(mode))
           self.checkarray(DMatrix.ones(f.jacSparsity()),DMatrix.ones(J_.sparsity()))
                 
       # Scalarized
@@ -775,7 +775,7 @@ class ADtests(casadiTestCase):
           Gf.evaluate()
           self.check_codegen(Gf)
           self.checkarray(Gf.getOutput(),J_,failmessage=("mode: %s" % mode))
-          #self.checkarray(DMatrix(Gf.getOutput().sparsity(),1),DMatrix(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
+          #self.checkarray(DMatrix(Gf.sparsity_out(0),1),DMatrix(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
 
           Hf=f.hessian(0,0)
           for i,v in enumerate(values):
@@ -785,7 +785,7 @@ class ADtests(casadiTestCase):
           if H_ is None:
             H_ = Hf.getOutput()
           self.checkarray(Hf.getOutput(),H_,failmessage=("mode: %s" % mode))
-          #self.checkarray(DMatrix(Gf.getOutput().sparsity(),1),DMatrix(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
+          #self.checkarray(DMatrix(Gf.sparsity_out(0),1),DMatrix(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
     
 if __name__ == '__main__':
     unittest.main()

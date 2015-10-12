@@ -1540,7 +1540,7 @@ class MXtests(casadiTestCase):
     f.evaluate()
     g.evaluate()
     
-    self.checkarray(IMatrix.ones(filt),IMatrix.ones(g.getOutput().sparsity()))
+    self.checkarray(IMatrix.ones(filt),IMatrix.ones(g.sparsity_out(0)))
     
     self.checkarray(f.getOutput()[filt],g.getOutput())
     
@@ -1752,7 +1752,7 @@ class MXtests(casadiTestCase):
             
             self.checkarray(f.getOutput(),numpyop(x_))
             
-            a = IMatrix(f.getOutput().sparsity(),1)
+            a = IMatrix(f.sparsity_out(0),1)
             b = IMatrix.ones(DMatrix(numpyop(x_)).sparsity())
             
             c = b-a
@@ -1790,8 +1790,8 @@ class MXtests(casadiTestCase):
                 
                 
                 if "mul" not in name:
-                  a = IMatrix.ones(f.getOutput().sparsity())
-                  b = IMatrix.ones(g.getOutput().sparsity())
+                  a = IMatrix.ones(f.sparsity_out(0))
+                  b = IMatrix.ones(g.sparsity_out(0))
                   
                   c = b-a
                   if c.nnz()>0:
@@ -1846,7 +1846,7 @@ class MXtests(casadiTestCase):
                 
                 self.checkarray(f.getOutput(),numpyop([x1_,x2_]),str([sp,sp2,v1,v2,name]))
                 if "mul" not in name:
-                  a = IMatrix.ones(f.getOutput().sparsity())
+                  a = IMatrix.ones(f.sparsity_out(0))
                   b = IMatrix.ones(DMatrix(numpyop([x1_,x2_])).sparsity())
                   
                   c = b-a
@@ -1958,7 +1958,7 @@ class MXtests(casadiTestCase):
     f.evaluate()
     
     self.checkarray(f.getOutput(),DMatrix([[1,0,0],[0,4,0],[0,0,6]]))
-    self.checkarray(IMatrix.ones(f.getOutput().sparsity()),IMatrix.ones(Sparsity.lower(3).T))
+    self.checkarray(IMatrix.ones(f.sparsity_out(0)),IMatrix.ones(Sparsity.lower(3).T))
     
   def test_repmat(self):
     a = DMatrix([[1,2],[3,4],[5,6]])
@@ -2038,8 +2038,8 @@ class MXtests(casadiTestCase):
     r.evaluate()
     R.evaluate()
 
-    r.getOutput().sparsity().spy()
-    R.getOutput().sparsity().spy()
+    r.sparsity_out(0).spy()
+    R.sparsity_out(0).spy()
 
     self.checkarray(R.getOutput(),numpy.linalg.solve(A.T,b))
     self.checkarray(r.getOutput(),R.getOutput())

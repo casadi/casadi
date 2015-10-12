@@ -206,6 +206,30 @@ namespace casadi {
     return (*this)->n_out();
   }
 
+  int Function::size1_in(int ind) const {
+    return (*this)->size1_in(ind);
+  }
+
+  int Function::size2_in(int ind) const {
+    return (*this)->size2_in(ind);
+  }
+
+  int Function::size1_out(int ind) const {
+    return (*this)->size1_out(ind);
+  }
+
+  int Function::size2_out(int ind) const {
+    return (*this)->size2_out(ind);
+  }
+
+  std::pair<int, int> Function::size_in(int ind) const {
+    return (*this)->size_in(ind);
+  }
+
+  std::pair<int, int> Function::size_out(int ind) const {
+    return (*this)->size_out(ind);
+  }
+
   int Function::nnz_in() const {
     return (*this)->nnz_in();
   }
@@ -220,6 +244,22 @@ namespace casadi {
 
   int Function::numel_out() const {
     return (*this)->numel_out();
+  }
+
+  int Function::nnz_in(int ind) const {
+    return (*this)->nnz_in(ind);
+  }
+
+  int Function::nnz_out(int ind) const {
+    return (*this)->nnz_out(ind);
+  }
+
+  int Function::numel_in(int ind) const {
+    return (*this)->numel_in(ind);
+  }
+
+  int Function::numel_out(int ind) const {
+    return (*this)->numel_out(ind);
   }
 
   Function Function::jacobian(int iind, int oind, bool compact, bool symmetric) {
