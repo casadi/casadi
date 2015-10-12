@@ -564,7 +564,7 @@ class Integrationtests(casadiTestCase):
     q0=self.q0
     qe=MXFunction("qe", [q0,par],[qend[0]])
     
-    f = MXFunction("f", [q0],qe.call([q0,MX(num['p'])]))
+    f = MXFunction("f", [q0],qe([q0,MX(num['p'])]))
     f.setInput([num['q0']],0)
     f.evaluate()
 
@@ -1023,7 +1023,7 @@ class Integrationtests(casadiTestCase):
     
     
     
-    qeJf=MXFunction("qeJf", [q0,par],[vec(qeJ.call([q0,par])[0])])
+    qeJf=MXFunction("qeJf", [q0,par],[vec(qeJ([q0,par])[0])])
     
     H=qeJf.jacobian(0,0)
     H.setInput(A,0)

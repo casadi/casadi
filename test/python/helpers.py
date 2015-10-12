@@ -306,7 +306,7 @@ class casadiTestCase(unittest.TestCase):
 
     if indirect:
       ins = trial.mx_in()
-      extra_trial = MXFunction("extra_trial", ins,trial.call(ins))
+      extra_trial = MXFunction("extra_trial", ins,trial(ins))
       for i in range(trial.n_in()):
         extra_trial.setInput(trial.getInput(i),i)
       self.checkfunction(extra_trial,solution,fwd,adj,jacobian,gradient,hessian,sens_der,evals,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
@@ -467,7 +467,7 @@ class casadiTestCase(unittest.TestCase):
           aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.n_out())] for d in range(ndir)]
           inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
           with internalAPI():
-            res = f.call(inputss)
+            res = f(inputss)
             fwdsens = f.callForward(inputss, res, fseeds)
             adjsens = f.callReverse(inputss, res, aseeds)
           
@@ -499,7 +499,7 @@ class casadiTestCase(unittest.TestCase):
               inputss2 = [sym("i",vf_reference.sparsity_in(i)) for i in range(vf.n_in())]
               
               with internalAPI():
-                res2 = vf.call(inputss2)
+                res2 = vf(inputss2)
                 fwdsens2 = vf.callForward(inputss2, res2, fseeds2)
                 adjsens2 = vf.callReverse(inputss2, res2, aseeds2)
 

@@ -1018,7 +1018,7 @@ class NLPtests(casadiTestCase):
     aa = MX.sym("aa", 5)
     a = aa[:3]
     b = aa[3:]
-    [f_call] = f.call([a, b])
+    [f_call] = f([a, b])
     nlp = MXFunction("nlp", nlpIn(x=aa), nlpOut(f=f_call))
     for Solver, solver_options in solvers:
       solver = NlpSolver("mysolver", Solver, nlp,solver_options)

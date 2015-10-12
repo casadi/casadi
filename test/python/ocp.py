@@ -106,7 +106,7 @@ class OCPtests(casadiTestCase):
     parc = MX(0)
     
     f = MXFunction('f', [var,parMX],[qend[0]])
-    nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0]))
+    nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f([var,parc])[0]))
     opts = {}
     opts["tol"] = 1e-12
     opts["hessian_approximation"] = "limited-memory"
@@ -159,7 +159,7 @@ class OCPtests(casadiTestCase):
     parc = MX(dy0)
     
     f = MXFunction('f', [var,par],[qend[0]])
-    nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0],g=var[0]-var[1]))
+    nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f([var,parc])[0],g=var[0]-var[1]))
     opts = {}
     opts["tol"] = 1e-12
     opts["hessian_approximation"] = "limited-memory"

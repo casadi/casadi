@@ -41,7 +41,7 @@ class Functiontests(casadiTestCase):
       f.evaluate()
 
       X = MX.sym("X",2)
-      F = f.call([X,MX()])[0]
+      F = f([X,MX()])[0]
       g = MXFunction("g", [X],[F])
 
       g.evaluate()
@@ -56,7 +56,7 @@ class Functiontests(casadiTestCase):
       f.evaluate()
 
       X = MX.sym("X",2)
-      F = f.call([X])[0]
+      F = f([X])[0]
       g = MXFunction("g", [X],[F])
 
       g.evaluate()
@@ -140,7 +140,7 @@ class Functiontests(casadiTestCase):
 
     X = [MX.sym("X")]
 
-    z=f.call(X)
+    z=f(X)
 
     g = MXFunction("g", X,[z[0]])
 
@@ -428,7 +428,7 @@ class Functiontests(casadiTestCase):
     P = MX.sym("P",n,n)
     X = MX.sym("X",n)
 
-    M_X= M.call([X])[0]
+    M_X= M([X])[0]
 
     Pf = MXFunction("P", [X,P],[mul(M_X,P)])
 

@@ -253,7 +253,7 @@ class ImplicitFunctiontests(casadiTestCase):
     ifcn = ImplicitFunction("ifcn", "newton",vfcn_sx, {"linear_solver":"csparse"})
 
     #ifcn = MXFunction('I', [X0],[vertcat([X0])])
-    [V] = ifcn.call([0,X0],True)
+    [V] = ifcn([0,X0],True)
 
     f = 1  # fails
 

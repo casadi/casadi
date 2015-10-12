@@ -369,7 +369,7 @@ class SXtests(casadiTestCase):
     self.message("eval fail test")
     x = SX.sym("x",2,2)
     f = SXFunction("f", [x], [x])
-    self.assertRaises(NotImplementedError,lambda: f.call(x))
+    self.assertRaises(NotImplementedError,lambda: f(x))
 
   def test_SXconversion(self):
     self.message("Conversions from and to SX")
@@ -444,7 +444,7 @@ class SXtests(casadiTestCase):
     x=SX.sym("x",2,2)
     y=SX.sym("y",2,2)
     f  = SXFunction("f", [x,y], [x*y])
-    f.call([x,y])
+    f([x,y])
     
   def test_symbolcheck(self):
     self.message("Check if non-symbolic inputs are caught")
@@ -574,20 +574,20 @@ class SXtests(casadiTestCase):
     self.assertTrue(f.getOutput(1).isempty())
     f.evaluate()
     
-    r = f.call([x,[]])
+    r = f([x,[]])
     self.assertTrue(r[1].isempty())
 
-    r = f.call([x,[]])
+    r = f([x,[]])
     self.assertTrue(r[1].isempty())
     
-    r = f.call([x,SX(0,1)])
+    r = f([x,SX(0,1)])
     self.assertTrue(r[1].isempty())
 
-    r = f.call([x,SX(1,0)])
+    r = f([x,SX(1,0)])
     self.assertTrue(r[1].isempty())
     
-    #self.assertRaises(Exception,lambda : f.call([x,x]))
-    #self.assertRaises(Exception,lambda : f.call([[],[]]))
+    #self.assertRaises(Exception,lambda : f([x,x]))
+    #self.assertRaises(Exception,lambda : f([[],[]]))
     
   def test_mtaylor(self):
     self.message("multivariate taylor expansions")
@@ -658,9 +658,9 @@ class SXtests(casadiTestCase):
     
     f = SXFunction("f", [x],[x**2])
     
-    self.assertRaises(RuntimeError, lambda : f.call([y]))
-    self.assertRaises(RuntimeError, lambda : f.call([q]))
-    f.call([z])
+    self.assertRaises(RuntimeError, lambda : f([y]))
+    self.assertRaises(RuntimeError, lambda : f([q]))
+    f([z])
     
   def test_indexinglimits(self):
     self.message("Limits of indexing")
@@ -1066,12 +1066,12 @@ class SXtests(casadiTestCase):
      bm = MX.sym("x",2)
      
      f = SXFunction("f", [b],[a])
-     c = f.call([bm])[0]
+     c = f([bm])[0]
 
      self.assertEqual(c.size1(),5)
      self.assertEqual(c.size2(),0)
      
-     c = f.call([b])[0]
+     c = f([b])[0]
 
      self.assertEqual(c.size1(),5)
      self.assertEqual(c.size2(),0)
@@ -1080,12 +1080,12 @@ class SXtests(casadiTestCase):
      
      f = SXFunction("f", [b],[a])
      
-     c = f.call([bm])[0]
+     c = f([bm])[0]
 
      self.assertEqual(c.size1(),0)
      self.assertEqual(c.size2(),0)
      
-     c = f.call([b])[0]
+     c = f([b])[0]
 
      self.assertEqual(c.size1(),0)
      self.assertEqual(c.size2(),0)

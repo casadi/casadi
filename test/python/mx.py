@@ -299,7 +299,7 @@ class MXtests(casadiTestCase):
 
     f = MXFunction("f", [x,y],[z])
 
-    [fc] = f.call([MX(3),y])
+    [fc] = f([MX(3),y])
 
     g = MXFunction("g", [y],[fc])
     g.setInput([7])
@@ -307,7 +307,7 @@ class MXtests(casadiTestCase):
 
     self.assertAlmostEqual(g.getOutput()[0],10,10,"issue #83")
     
-    [fc] = f.call([x,MX(7)])
+    [fc] = f([x,MX(7)])
 
     g = MXFunction("g", [x],[fc])
     g.setInput([3])
@@ -943,7 +943,7 @@ class MXtests(casadiTestCase):
     J=f.jacobian()
     
     X=MX.sym("X")
-    F=MXFunction("F", [X],J.call([X]))
+    F=MXFunction("F", [X],J([X]))
     
     
     x_=1.7
@@ -1055,8 +1055,8 @@ class MXtests(casadiTestCase):
       f = MXFunction("f", ins,[x])
       J = f.jacobian([i for i in range(len(ins)) if ins[i] is y][0])
       if x.shape[0]==1 and x.shape[1]==1:
-        return (J.call(ins)[0].T).reshape(y.shape)
-      return J.call(ins)[0].T
+        return (J(ins)[0].T).reshape(y.shape)
+      return J(ins)[0].T
 
     def eye(n):
       return DMatrix(numpy.eye(n))
@@ -1117,14 +1117,14 @@ class MXtests(casadiTestCase):
     self.assertEqual(f.getOutput(1).shape[1],0)
     f.evaluate()
     
-    r = f.call([x,MX()])
+    r = f([x,MX()])
     self.assertTrue(r[1].isempty(True))
 
-    r = f.call([MX(),MX()])
+    r = f([MX(),MX()])
     self.assertTrue(r[1].isempty(True))
     
-    #self.assertRaises(Exception,lambda : f.call([x,x],True))
-    #self.assertRaises(Exception,lambda : f.call([[],[]],True))
+    #self.assertRaises(Exception,lambda : f([x,x],True))
+    #self.assertRaises(Exception,lambda : f([[],[]],True))
     
   def test_issue184(self):
     self.message("Regression test issue #184")
@@ -1291,8 +1291,8 @@ class MXtests(casadiTestCase):
 
     U = MX.sym("U")
 
-    X = F.call([U,U])[0]
-    G = F.call([U,X])[0]
+    X = F([U,U])[0]
+    G = F([U,X])[0]
 
     for kk in range(2):
       gfcn = 0
@@ -1343,7 +1343,7 @@ class MXtests(casadiTestCase):
 
     Y = MX.sym("Y",10)
 
-    ff = MXFunction("ff", [Y],f.call([Y],True))
+    ff = MXFunction("ff", [Y],f([Y],True))
     ff.setInput(range(10))
     ff.evaluate()
 
@@ -1383,7 +1383,7 @@ class MXtests(casadiTestCase):
 
     Y = MX.sym("Y",10)
 
-    ff = MXFunction("ff", [Y],f.call([Y],True))
+    ff = MXFunction("ff", [Y],f([Y],True))
     ff.setInput(range(10))
     ff.evaluate()
 
@@ -1680,12 +1680,12 @@ class MXtests(casadiTestCase):
      b = MX.sym("x",2)
      
      f = MXFunction("f", [b],[a])
-     c = f.call([b])[0]
+     c = f([b])[0]
 
      self.assertEqual(c.size1(),5)
      self.assertEqual(c.size2(),0)
 
-     c = f.call([b],True)[0]
+     c = f([b],True)[0]
 
      self.assertEqual(c.size1(),5)
      self.assertEqual(c.size2(),0)
@@ -1694,12 +1694,12 @@ class MXtests(casadiTestCase):
      b = MX.sym("x",2)
      
      f = MXFunction("f", [b],[a])
-     c = f.call([b])[0]
+     c = f([b])[0]
 
      self.assertEqual(c.size1(),0)
      self.assertEqual(c.size2(),0)
 
-     c = f.call([b],True)[0]
+     c = f([b],True)[0]
 
      self.assertEqual(c.size1(),0)
      self.assertEqual(c.size2(),0)
