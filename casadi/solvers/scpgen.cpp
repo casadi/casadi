@@ -96,8 +96,6 @@ namespace casadi {
               "Names of the variables.");
     addOption("print_x",           OT_INTEGERVECTOR,  GenericType(),
               "Which variables to print.");
-    addOption("compiler",          OT_STRING,    "gcc -fPIC -O2",
-              "Compiler command to be used for compiling generated code");
     addOption("print_time",        OT_BOOLEAN, true,
               "Print information about execution time");
 
@@ -164,8 +162,6 @@ namespace casadi {
       vector<MX> nlp_in = nlp_.mx_in();
       vector<MX> nlp_out = nlp_(nlp_in);
       fg = MXFunction("fg", nlp_in, nlp_out);
-    } else {
-      fg.init();
     }
 
     if (codegen_) {
@@ -542,15 +538,35 @@ namespace casadi {
       gen.add(vec_fcn, "vec_fcn");
       gen.add(exp_fcn, "exp_fcn");
 
-      // Filenames
-      string name = "scpgen_codegen";
+      // Name of temporary file
+      string cname;
+#ifdef HAVE_MKSTEMPS
+      // Preferred solution
+      char cname_array[] = "tmp_casadi_scpgen_XXXXXX.c";
+      if (mkstemps(cname_array, 3) == -1) {
+        casadi_error("Failed to create a temporary file name");
+      }
+      cname = cname_array;
+#else
+      // Fallback, may result in deprecation warnings
+      char* cname_array = tempnam(0, "scp.c");
+      cname = cname_array;
+      free(cname_array);
+#endif
+
+      // Generate code
+      if (verbose_) {
+        userOut() << "Generating \"" << cname << "\""  << endl;
+      }
+      string name = cname.substr(0, cname.find_first_of('.'));
+      gen.generate(name);
 
       // Complile and run
       if (verbose_) {
         userOut() << "Starting compilation"  << endl;
       }
       time_t time1 = time(0);
-      string dlname = gen.compile(name, compiler);
+      compiler_ = Compiler(cname, compilerplugin_, jit_options_);
       time_t time2 = time(0);
       double comp_time = difftime(time2, time1);
       if (verbose_) {
@@ -558,14 +574,10 @@ namespace casadi {
       }
 
       // Load the generated code
-      res_fcn_ = ExternalFunction("res_fcn", dlname);
-      res_fcn_.init();
-      mat_fcn_ = ExternalFunction("mat_fcn", dlname);
-      mat_fcn_.init();
-      vec_fcn_ = ExternalFunction("vec_fcn", dlname);
-      vec_fcn_.init();
-      exp_fcn_ = ExternalFunction("exp_fcn", dlname);
-      exp_fcn_.init();
+      res_fcn_ = ExternalFunction("res_fcn", compiler_);
+      mat_fcn_ = ExternalFunction("mat_fcn", compiler_);
+      vec_fcn_ = ExternalFunction("vec_fcn", compiler_);
+      exp_fcn_ = ExternalFunction("exp_fcn", compiler_);
     } else {
       mat_fcn_ = mat_fcn;
       res_fcn_ = res_fcn;

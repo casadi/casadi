@@ -286,27 +286,29 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   vector<MX> nlp_gv;
   
   // Generate full-space NLP
-  MX U = u0_;  MX V = v0_;  MX H = h0_;
+  MX U = u0_;
+  MX V = v0_;
+  MX H = h0_;
   for(int k=0; k<n_meas_; ++k){
     // Take a step
-    MX f_arg[4] = {P,U,V,H};
-    vector<MX> f_res = f_(vector<MX>(f_arg,f_arg+4));
-    U = f_res[0];    V = f_res[1];    H = f_res[2];
+    vector<MX> f_res = f_(vector<MX>{P,U,V,H});
+    U = f_res[0];
+    V = f_res[1];
+    H = f_res[2];
     
-    // Lift the height
     if(!single_shooting){
-      // Initialize with measurements
+      // Lift the heights, initialized with measurements
       H = lift(H, H_meas_[k]);
 
       // Initialize with initial conditions
-      //U.lift(u0_);
-      //V.lift(v0_);
-      //H.lift(DMatrix::zeros(n_  ,n_));
+      // U = lift(U, u0_);
+      // V = lift(V, v0_);
+      // H = lift(H, DMatrix::zeros(n_  ,n_));
       
       // Initialize through simulation
-      //      U.lift(U);
-      //      V.lift(V);
-      //      H.lift(H);
+      // U = lift(U, U);
+      // V = lift(V, V);
+      // H = lift(H, H);
     }
     
     // Objective function term
@@ -322,7 +324,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   }
 
   MXFunction nlp("nlp", nlpIn("x",P),
-                 nlpOut("f",vertcat(nlp_fv), "g",vertcat(nlp_gv)));
+                 nlpOut("f", vertcat(nlp_fv), "g", vertcat(nlp_gv)));
   cout << "Generated single-shooting NLP" << endl;
   
   // NLP Solver
@@ -336,7 +338,8 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   opts["merit_start"] = 1e-3;
   //opts["merit_memory"] = 1;
   opts["max_iter"] = 100;
-  opts["compiler"] = "clang -fPIC -O2"; // Optimization
+  opts["compiler"] = "shell";
+  opts["jit_options"] = make_dict("compiler", "clang", "flags", vector<string>{"-O2"});
   if(gauss_newton){
     opts["hessian_approximation"] = "gauss-newton";
   }
