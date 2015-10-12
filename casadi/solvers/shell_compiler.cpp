@@ -27,7 +27,6 @@
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/casadi_meta.hpp"
 #include <fstream>
-#include <stdlib.h>
 #include <dlfcn.h>
 #include <cstdlib>
 #include <unistd.h>

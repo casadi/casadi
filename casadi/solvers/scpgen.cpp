@@ -30,10 +30,7 @@
 #include <fstream>
 #include <cmath>
 #include <cfloat>
-
-#ifdef WITH_DL
 #include <cstdlib>
-#endif // WITH_DL
 
 using namespace std;
 namespace casadi {
@@ -162,17 +159,6 @@ namespace casadi {
       vector<MX> nlp_in = nlp_.mx_in();
       vector<MX> nlp_out = nlp_(nlp_in);
       fg = MXFunction("fg", nlp_in, nlp_out);
-    }
-
-    if (codegen_) {
-#ifdef WITH_DL
-      // Make sure that command processor is available
-      int flag = system(static_cast<const char*>(0));
-      casadi_assert_message(flag!=0, "No command procesor available");
-#else // WITH_DL
-      casadi_error("Codegen in SCPgen requires CasADi to be "
-                   "compiled with option \"WITH_DL\" enabled");
-#endif // WITH_DL
     }
 
     // Generate lifting functions
@@ -1299,6 +1285,5 @@ namespace casadi {
     double time2 = clock();
     t_eval_exp_ += (time2-time1)/CLOCKS_PER_SEC;
   }
-
 
 } // namespace casadi
