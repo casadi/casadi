@@ -34,7 +34,7 @@ f = SXFunction('f',{x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2
 f.setInput([1,2,3,4])
 f.evaluate()
 
-for i=1:f.nOut()
+for i=1:f.n_out()
   res = f.getOutput(i-1)-2;
 
   assert(res.isZero())
@@ -67,7 +67,7 @@ f = MXFunction('f',{x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2
 f.setInput([1,2,3,4])
 f.evaluate()
 
-for i=1:f.nOut()
+for i=1:f.n_out()
   res = f.getOutput(i-1)-2;
 
   assert(res.isZero())

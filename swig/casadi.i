@@ -2179,7 +2179,7 @@ except:
 %feature("varargin","1") friendwrap_vertcat;
 %feature("varargin","1") friendwrap_horzcat;
 %feature("varargin","1") friendwrap_veccat;
-%feature("optionalunpack","1") shape;
+%feature("optionalunpack","1") size;
 
 // Raise an error if "this" not correct
 %typemap(check) SWIGTYPE *self %{
