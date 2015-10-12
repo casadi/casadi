@@ -27,7 +27,7 @@
 #define CASADI_XML_FILE_HPP
 
 #include "xml_file.hpp"
-#include "../options_functionality.hpp"
+#include "../shared_object.hpp"
 #include "xml_node.hpp"
 
 namespace casadi {
@@ -41,7 +41,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2014
    */
-  class CASADI_EXPORT XmlFile : public OptionsFunctionality {
+  class CASADI_EXPORT XmlFile : public SharedObject {
   public:
     // Default constructor
     XmlFile();
