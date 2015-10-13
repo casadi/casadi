@@ -854,48 +854,48 @@ namespace casadi {
     /** \brief Get function input */
     static std::vector<Matrix<DataType> > get_input(const Function& f);
 
-    ///@{
-    /// Readability typedefs
-    typedef Matrix<DataType> M;
-    typedef std::map<std::string, M> MDict;
-    ///@}
-
     /** \brief Expand a function */
     static Function fun(const std::string& name, const Function &f,
                         const Dict& opts=Dict());
 
     /** \brief Construct from vectors */
-    static Function fun(const std::string& name, const std::vector<M>& arg,
-                        const std::vector<M>& res, const Dict& opts=Dict());
+    static Function fun(const std::string& name, const std::vector<Matrix<DataType> >& arg,
+                        const std::vector<Matrix<DataType> >& res, const Dict& opts=Dict());
 
     /** \brief Construct from vectors */
     static Function fun(const std::string& name,
-                        const std::pair< MDict, std::vector<std::string> >& arg,
-                        const std::vector<M>& res, const Dict& opts=Dict());
-
-    /** \brief Construct from vectors */
-    static Function fun(const std::string& name, const std::vector<M>& arg,
-                        const std::pair< MDict, std::vector<std::string> >& res,
+                        const std::pair< std::map<std::string, Matrix<DataType> >,
+                        std::vector<std::string> >& arg,
+                        const std::vector<Matrix<DataType> >& res,
                         const Dict& opts=Dict());
 
     /** \brief Construct from vectors */
     static Function fun(const std::string& name,
-                        const std::pair< MDict, std::vector<std::string> >& arg,
-                        const std::pair< MDict, std::vector<std::string> >& res,
+                        const std::vector<Matrix<DataType> >& arg,
+                        const std::pair< std::map<std::string, Matrix<DataType> >,
+                        std::vector<std::string> >& res,
+                        const Dict& opts=Dict());
+
+    /** \brief Construct from vectors */
+    static Function fun(const std::string& name,
+                        const std::pair< std::map<std::string, Matrix<DataType> >,
+                        std::vector<std::string> >& arg,
+                        const std::pair< std::map<std::string, Matrix<DataType> >,
+                        std::vector<std::string> >& res,
                         const Dict& opts=Dict());
 
 #ifndef SWIG
     /** \brief Construct from initializer lists */
-    static Function fun(const std::string& name, std::initializer_list<M> arg,
-                        std::initializer_list<M> res, const Dict& opts=Dict());
+    static Function fun(const std::string& name, std::initializer_list<Matrix<DataType> > arg,
+                        std::initializer_list<Matrix<DataType> > res, const Dict& opts=Dict());
 
     /** \brief Construct from vector & initializer list */
-    static Function fun(const std::string& name, std::vector<M> arg,
-                        std::initializer_list<M> res, const Dict& opts=Dict());
+    static Function fun(const std::string& name, std::vector<Matrix<DataType> > arg,
+                        std::initializer_list<Matrix<DataType> > res, const Dict& opts=Dict());
 
     /** \brief Construct from initializer list & vector */
-    static Function fun(const std::string& name, std::initializer_list<M> arg,
-                        std::vector<M> res, const Dict& opts=Dict());
+    static Function fun(const std::string& name, std::initializer_list<Matrix<DataType> > arg,
+                        std::vector<Matrix<DataType> > res, const Dict& opts=Dict());
 #endif // SWIG
 
     ///@{

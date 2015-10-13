@@ -3048,24 +3048,28 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Function Matrix<DataType>::fun(const std::string& name,
-                   const std::pair< Matrix<DataType>::MDict, std::vector<std::string> >& arg,
-                   const std::vector<Matrix<DataType>>& res, const Dict& opts) {
+  Function Matrix<DataType>::
+  fun(const std::string& name,
+      const std::pair< std::map<std::string, Matrix<DataType> >, std::vector<std::string> >& arg,
+      const std::vector<Matrix<DataType>>& res, const Dict& opts) {
     throw CasadiException("\"fun\" not defined for " + className());
   }
 
   template<typename DataType>
-  Function Matrix<DataType>::fun(const std::string& name, const std::vector<Matrix<DataType>>& arg,
-                   const std::pair< Matrix<DataType>::MDict, std::vector<std::string> >& res,
-                   const Dict& opts) {
+  Function Matrix<DataType>::
+  fun(const std::string& name,
+      const std::vector<Matrix<DataType>>& arg,
+      const std::pair< std::map<std::string, Matrix<DataType> >, std::vector<std::string> >& res,
+      const Dict& opts) {
     throw CasadiException("\"fun\" not defined for " + className());
   }
 
   template<typename DataType>
-  Function Matrix<DataType>::fun(const std::string& name,
-                   const std::pair< Matrix<DataType>::MDict, std::vector<std::string> >& arg,
-                   const std::pair< Matrix<DataType>::MDict, std::vector<std::string> >& res,
-                   const Dict& opts) {
+  Function Matrix<DataType>::
+  fun(const std::string& name,
+      const std::pair< std::map<std::string, Matrix<DataType> >, std::vector<std::string> >& arg,
+      const std::pair< std::map<std::string, Matrix<DataType> >, std::vector<std::string> >& res,
+      const Dict& opts) {
     throw CasadiException("\"fun\" not defined for " + className());
   }
 
