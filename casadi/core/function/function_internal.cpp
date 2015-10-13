@@ -272,14 +272,12 @@ namespace casadi {
   Function FunctionInternal::getGradient(const std::string& name, int iind, int oind,
                                          const Dict& opts) {
     Function f = wrapMXFunction();
-    f.init();
     return f.gradient(iind, oind);
   }
 
   Function FunctionInternal::getTangent(const std::string& name, int iind, int oind,
                                         const Dict& opts) {
     Function f = wrapMXFunction();
-    f.init();
     return f.tangent(iind, oind);
   }
 
@@ -1340,7 +1338,6 @@ namespace casadi {
 
   void FunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     MXFunction f = wrapMXFunction();
-    f.init();
     f.call(arg, res, true);
   }
 
@@ -1825,7 +1822,6 @@ namespace casadi {
   getNumericJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
                      const Dict& opts) {
     Function f = wrapMXFunction();
-    f.init();
     return f->getNumericJacobian(name, iind, oind, compact, symmetric, opts);
   }
 
@@ -2266,26 +2262,13 @@ namespace casadi {
 
   Function FunctionInternal::dynamicCompilation(Function f, std::string fname, std::string fdescr,
                                                 std::string compiler) {
-    // Check if f is initialized
-    bool f_is_init = f.isInit();
-    if (!f_is_init) f.init();
-
     // Codegen and compile
     CodeGenerator g;
     g.add(f, fname);
     string dlname = g.compile(fname, compiler);
 
     // Load it
-    ExternalFunction f_gen(fname, dlname);
-
-    // Initialize it if f was initialized
-    if (f_is_init) {
-      f_gen.init();
-      if (verbose_) {
-        userOut() << "Dynamically loaded " << fdescr << " (" << fname << ")" << endl;
-      }
-    }
-    return f_gen;
+    return ExternalFunction(fname, dlname);
   }
 
   void FunctionInternal::spFwdSwitch(const bvec_t** arg, bvec_t** res,

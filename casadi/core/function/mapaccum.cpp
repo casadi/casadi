@@ -39,7 +39,7 @@ namespace casadi {
                  const Dict& opts) {
     assignNode(new MapAccumInternal(name, f, n, input_accum, output_accum, reverse));
     setOption(opts);
-    init();
+    init(false);
   }
 
   MapAccumInternal* MapAccum::operator->() {

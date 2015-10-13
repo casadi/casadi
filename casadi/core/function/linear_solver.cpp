@@ -84,7 +84,7 @@ namespace casadi {
       assignNode(LinearSolverInternal::getPlugin(solver).creator(name, sp, nrhs));
     }
     setOption(opts);
-    init();
+    init(false);
   }
 
   LinearSolver::LinearSolver(const std::string& name, const std::string& solver,
@@ -95,7 +95,7 @@ namespace casadi {
       assignNode(LinearSolverInternal::getPlugin(solver).creator(name, sp, 1));
     }
     setOption(opts);
-    init();
+    init(false);
   }
 
   bool LinearSolver::hasPlugin(const std::string& name) {

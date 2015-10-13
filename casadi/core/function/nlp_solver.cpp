@@ -38,7 +38,7 @@ namespace casadi {
                        const Function& nlp, const Dict& opts) {
     assignNode(NlpSolverInternal::instantiatePlugin(name, solver, nlp));
     setOption(opts);
-    init();
+    init(false);
   }
 
   NlpSolver::NlpSolver(const std::string& name,
@@ -65,7 +65,7 @@ namespace casadi {
     // Create the solver instance
     assignNode(NlpSolverInternal::instantiatePlugin(name, solver, nlpf));
     setOption(opts);
-    init();
+    init(false);
   }
 
   NlpSolver::NlpSolver(const std::string& name,
@@ -92,7 +92,7 @@ namespace casadi {
     // Create the solver instance
     assignNode(NlpSolverInternal::instantiatePlugin(name, solver, nlpf));
     setOption(opts);
-    init();
+    init(false);
   }
 
   NlpSolverInternal* NlpSolver::operator->() {

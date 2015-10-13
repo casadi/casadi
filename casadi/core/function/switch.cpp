@@ -35,14 +35,14 @@ namespace casadi {
                  const Function& f_def, const Dict& opts) {
     assignNode(new SwitchInternal(name, f, f_def));
     setOption(opts);
-    init();
+    init(false);
   }
 
   Switch::Switch(const std::string& name, const Function& f_true,
                  const Function& f_false, const Dict& opts) {
     assignNode(new SwitchInternal(name, vector<Function>(1, f_false), f_true));
     setOption(opts);
-    init();
+    init(false);
   }
 
   SwitchInternal* Switch::operator->() {

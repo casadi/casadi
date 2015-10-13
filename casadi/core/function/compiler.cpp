@@ -37,7 +37,7 @@ namespace casadi {
                            const Dict& opts) {
     assignNode(CompilerInternal::getPlugin(compiler).creator(name));
     setOption(opts);
-    init();
+    init(false);
   }
 
   CompilerInternal* Compiler::operator->() {

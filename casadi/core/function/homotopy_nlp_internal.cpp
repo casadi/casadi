@@ -102,7 +102,7 @@ namespace casadi {
       } else {
         hnlp_ = SXFunction(hnlp_mx);
         hnlp_.copyOptions(hnlp_mx, true);
-        hnlp_.init();
+        hnlp_.init(false);
       }
     }
   }

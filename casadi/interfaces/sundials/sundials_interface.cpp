@@ -231,8 +231,6 @@ namespace casadi {
 
     // Create a Jacobian if requested
     if (exact_jacobian_) jac_ = getJac();
-    // Initialize Jacobian if availabe
-    if (!jac_.isNull() && !jac_.isInit()) jac_.init();
 
     if (!jac_.isNull()) {
       casadi_assert_message(
@@ -250,8 +248,6 @@ namespace casadi {
 
     // Create a backwards Jacobian if requested
     if (exact_jacobianB_ && !g_.isNull()) jacB_ = getJacB();
-    // Initialize backwards  Jacobian if availabe
-    if (!jacB_.isNull() && !jacB_.isInit()) jacB_.init();
 
     if (!jacB_.isNull()) {
       casadi_assert_message(

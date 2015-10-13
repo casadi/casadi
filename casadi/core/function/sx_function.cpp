@@ -52,7 +52,7 @@ namespace casadi {
     if (!ischeme.empty()) setOption("input_scheme", ischeme);
     if (!oscheme.empty()) setOption("output_scheme", oscheme);
     setOption(opts);
-    init();
+    init(false);
   }
 
   SXFunction::SXFunction(const std::string& name, const Function &f, const Dict& opts) {

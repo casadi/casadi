@@ -160,7 +160,7 @@ namespace casadi {
       } else {
         nlp_ = SXFunction(nlp_mx);
         nlp_.copyOptions(nlp_mx, true);
-        nlp_.init();
+        nlp_.init(false);
       }
     }
 

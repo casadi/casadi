@@ -144,7 +144,7 @@ namespace casadi {
     *
     * more documentation in the node class (SharedObjectNode and derived classes)
     */
-    void init(bool allow_reinit=true);
+    void init(bool allow_reinit);
 
     /// Is initialized?
     bool isInit() const;

@@ -52,15 +52,24 @@ namespace casadi {
   }
 
   void SimulatorInternal::init() {
-    // Let the integration time start from the first point of the time grid.
-    if (!grid_.empty()) integrator_.setOption("t0", grid_[0]);
-    // Let the integration time stop at the last point of the time grid.
-    if (!grid_.empty()) integrator_.setOption("tf", grid_[grid_.size()-1]);
+    if (!grid_.empty()) {
+      casadi_assert_message(isNonDecreasing(grid_),
+                            "The supplied time grid must be non-decreasing.");
 
-    casadi_assert_message(isNonDecreasing(grid_), "The supplied time grid must be non-decreasing.");
+      // Create new integrator object
+      Function I = Function::create(integrator_->create(integrator_.name(),
+                                                        integrator_->f_, integrator_->g_));
+      I.setOption(integrator_.dictionary());
 
-    // Initialize the integrator
-    integrator_.init();
+      // Let the integration time start from the first point of the time grid.
+      I.setOption("t0", grid_[0]);
+      // Let the integration time stop at the last point of the time grid.
+      I.setOption("tf", grid_[grid_.size()-1]);
+      I.init(false);
+
+      // Overwrite
+      integrator_ = shared_cast<Integrator>(I);
+    }
 
     // Generate an output function if there is none (returns the whole state)
     if (output_fcn_.isNull()) {
@@ -82,10 +91,6 @@ namespace casadi {
       // Create the output function
       output_fcn_ = SXFunction("ofcn", arg, out);
       oscheme_ = IOScheme(SCHEME_IntegratorOutput);
-    } else {
-
-      // Initialize the output function
-      output_fcn_.init();
     }
 
     // Allocate inputs

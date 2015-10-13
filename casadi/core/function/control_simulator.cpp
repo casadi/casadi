@@ -37,14 +37,14 @@ namespace casadi {
                                      const Matrix<double>& grid, const Dict& opts) {
     assignNode(new ControlSimulatorInternal(name, dae, output_fcn, grid));
     setOption(opts);
-    init();
+    init(false);
   }
 
   ControlSimulator::ControlSimulator(const std::string& name, const Function& dae,
                                      const Matrix<double>& grid, const Dict& opts) {
     assignNode(new ControlSimulatorInternal(name, dae, Function(), grid));
     setOption(opts);
-    init();
+    init(false);
   }
 
   ControlSimulatorInternal* ControlSimulator::operator->() {

@@ -88,8 +88,6 @@ namespace casadi {
     // Initialize the functions
     casadi_assert(!f_.isNull());
 
-    // Initialize and get dimensions for the forward integration
-    if (!f_.isInit()) f_.init();
     casadi_assert_message(f_.n_in()==DAE_NUM_IN,
                           "Wrong number of inputs for the DAE callback function");
     casadi_assert_message(f_.n_out()==DAE_NUM_OUT,
@@ -104,7 +102,6 @@ namespace casadi {
       // No backwards integration
       nrx_ = nrz_ = nrq_ = nrp_ = 0;
     } else {
-      if (!g_.isInit()) g_.init();
       casadi_assert_message(g_.n_in()==RDAE_NUM_IN,
                             "Wrong number of inputs for the backwards DAE callback function");
       casadi_assert_message(g_.n_out()==RDAE_NUM_OUT,
@@ -753,7 +750,7 @@ namespace casadi {
       integrator.setOption(getOption("augmented_options"));
 
     // Initialize the integrator since we will call it below
-    integrator.init();
+    integrator.init(false);
 
     // All inputs of the return function
     vector<MX> ret_in;
@@ -897,7 +894,7 @@ namespace casadi {
       integrator.setOption(getOption("augmented_options"));
 
     // Initialize the integrator since we will call it below
-    integrator.init();
+    integrator.init(false);
 
     // All inputs of the return function
     vector<MX> ret_in;

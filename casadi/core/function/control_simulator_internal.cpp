@@ -74,8 +74,6 @@ namespace casadi {
 
     bool control_endpoint = getOption("control_endpoint");
 
-    if (!control_dae_.isInit()) control_dae_.init();
-
     casadi_assert_message(!gridc_.empty(), "The supplied time grid must not be empty.");
 
     casadi_assert_message(isIncreasing(gridc_),
