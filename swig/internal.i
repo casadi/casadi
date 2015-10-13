@@ -244,9 +244,6 @@
 %exception  casadi::SXFunction::tang(int iind=0, int oind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SharedObject::assertInit() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SharedObject::printPtr(std::ostream &stream=casadi::userOut()) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

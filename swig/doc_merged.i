@@ -411,11 +411,6 @@ Get output scheme description by index.
 
 ";
 
-%feature("docstring") casadi::Callback::assertInit "[INTERNAL]  Assert that
-it is initialized
-
-";
-
 %feature("docstring") casadi::Callback::get_input_sparsity "
 
 Specify input sparsity.
@@ -1713,11 +1708,6 @@ Compiler factory (new syntax, includes initialization)
 
 ";
 
-%feature("docstring") casadi::Compiler::assertInit "[INTERNAL]  Assert that
-it is initialized
-
-";
-
 %feature("docstring") casadi::Compiler::copyOptions "
 
 Copy all options from another object.
@@ -2014,11 +2004,6 @@ Get the description of a certain option.
 %feature("docstring") casadi::ControlSimulator::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring") casadi::ControlSimulator::assertInit "[INTERNAL]
-Assert that it is initialized
 
 ";
 
@@ -4807,11 +4792,6 @@ internally
 
 ";
 
-%feature("docstring") casadi::ExternalFunction::assertInit "[INTERNAL]
-Assert that it is initialized
-
-";
-
 %feature("docstring") casadi::ExternalFunction::removeMonitor "
 
 Remove modules to be monitored.
@@ -5216,11 +5196,6 @@ The the mapaccumulated version has the signature:
   
 
 
-
-";
-
-%feature("docstring") casadi::Function::assertInit "[INTERNAL]  Assert that
-it is initialized
 
 ";
 
@@ -7051,11 +7026,6 @@ Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::GenericType::assertInit "[INTERNAL]  Assert
-that it is initialized
-
-";
-
 %feature("docstring") casadi::GenericType::toBool "
 
 Convert to a type.
@@ -7844,11 +7814,6 @@ required length of arg field.
 %feature("docstring") casadi::HomotopyNlpSolver::isNull "
 
 Is a null pointer?
-
-";
-
-%feature("docstring") casadi::HomotopyNlpSolver::assertInit "[INTERNAL]
-Assert that it is initialized
 
 ";
 
@@ -9265,11 +9230,6 @@ Get the default of a certain option.
 
 ";
 
-%feature("docstring") casadi::ImplicitFunction::assertInit "[INTERNAL]
-Assert that it is initialized
-
-";
-
 %feature("docstring") casadi::ImplicitFunction::size_in "
 
 Get input dimension.
@@ -10165,11 +10125,6 @@ Print a description of the object.
 %feature("docstring") casadi::Integrator::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring") casadi::Integrator::assertInit "[INTERNAL]  Assert
-that it is initialized
 
 ";
 
@@ -12371,11 +12326,6 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::KernelSum2D::assertInit "[INTERNAL]  Assert
-that it is initialized
-
-";
-
 %feature("docstring") casadi::KernelSum2D::setJacobian "
 
 Set the Jacobian function of output oind with respect to input iind NOTE:
@@ -14421,11 +14371,6 @@ returned.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::assertInit "[INTERNAL]  Assert
-that it is initialized
-
-";
-
 %feature("docstring") casadi::LinearSolver::getFactorizationSparsity "
 
 Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
@@ -15845,11 +15790,6 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::Map::assertInit "[INTERNAL]  Assert that it
-is initialized
-
-";
-
 %feature("docstring") casadi::Map::setInput "
 
 >  void IOInterface< Function  >.setInput(T val, int iind=0)
@@ -17139,11 +17079,6 @@ Get the default of a certain option.
 %feature("docstring") casadi::MapAccum::evaluate "
 
 Evaluate.
-
-";
-
-%feature("docstring") casadi::MapAccum::assertInit "[INTERNAL]  Assert that
-it is initialized
 
 ";
 
@@ -19009,11 +18944,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::MX::assertInit "[INTERNAL]  Assert that it is
-initialized
-
-";
-
 %feature("docstring") casadi::MX::unary "
 
 Create nodes by their ID.
@@ -19165,11 +19095,6 @@ Attempt to form an MXFunction out of an Function.
 ------------------------------------------------------------------------
 
 Construct from vectors (new syntax, includes initialization)
-
-";
-
-%feature("docstring") casadi::MXFunction::assertInit "[INTERNAL]  Assert
-that it is initialized
 
 ";
 
@@ -25580,11 +25505,6 @@ the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::NlpSolver::assertInit "[INTERNAL]  Assert
-that it is initialized
-
-";
-
 %feature("docstring") casadi::NlpSolver::nnz_out "
 
 Get of number of output nonzeros For a particular output or for all for all
@@ -27001,11 +26921,6 @@ matches one of the base classes (default true)
 
 ";
 
-%feature("docstring") casadi::Nullspace::assertInit "[INTERNAL]  Assert
-that it is initialized
-
-";
-
 %feature("docstring") casadi::Nullspace::map "
 
 >  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
@@ -27097,11 +27012,6 @@ Print a description of the object.
 ";
 
 %feature("docstring") casadi::OptionsFunctionality::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
-%feature("docstring") casadi::OptionsFunctionality::assertInit "[INTERNAL]
-Assert that it is initialized
 
 ";
 
@@ -27719,11 +27629,6 @@ Get output scheme.
 ------------------------------------------------------------------------
 
 Get output scheme name by index.
-
-";
-
-%feature("docstring") casadi::QpSolver::assertInit "[INTERNAL]  Assert that
-it is initialized
 
 ";
 
@@ -29138,11 +29043,6 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring") casadi::SharedObject::assertInit "[INTERNAL]  Assert
-that it is initialized
-
-";
-
 %feature("docstring") casadi::SharedObject::repr "
 
 Print a representation of the object.
@@ -30209,11 +30109,6 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring") casadi::Simulator::assertInit "[INTERNAL]  Assert
-that it is initialized
-
-";
-
 %feature("docstring") casadi::Simulator::derivative "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -30767,11 +30662,7 @@ Copy constructor.
 /*  Check if two sparsity patterns are identical  */
 
 /*  Size and element counting  */ %feature("docstring")
-casadi::Sparsity::assertInit " [INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring") casadi::Sparsity::enlargeRows "
+casadi::Sparsity::enlargeRows "
 
 Enlarge the matrix along the first dimension (i.e. insert rows)
 
@@ -32198,11 +32089,6 @@ oname:  output name. Only allowed when an output scheme is set.
 %feature("docstring") casadi::StabilizedQpSolver::removeMonitor "
 
 Remove modules to be monitored.
-
-";
-
-%feature("docstring") casadi::StabilizedQpSolver::assertInit "[INTERNAL]
-Assert that it is initialized
 
 ";
 
@@ -33826,11 +33712,6 @@ length of res field.
 
 ";
 
-%feature("docstring") casadi::Switch::assertInit "[INTERNAL]  Assert that
-it is initialized
-
-";
-
 %feature("docstring") casadi::Switch::getOptionDescription "
 
 Get the description of a certain option.
@@ -34830,11 +34711,6 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::SXFunction::assertInit "[INTERNAL]  Assert
-that it is initialized
-
-";
-
 %feature("docstring") casadi::SXFunction::mx_in "
 
 Get symbolic primitives equivalent to the input expressions.
@@ -35776,11 +35652,6 @@ pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::WeakRef::assertInit "[INTERNAL]  Assert that
-it is initialized
-
-";
-
 %feature("docstring") casadi::WeakRef::getRepresentation "[INTERNAL]
 Return a string with a representation (for SWIG)
 
@@ -35844,11 +35715,6 @@ pointer to the internal class
 %feature("docstring") casadi::XmlFile::getRepresentation "
 
 Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring") casadi::XmlFile::assertInit "[INTERNAL]  Assert that
-it is initialized
 
 ";
 

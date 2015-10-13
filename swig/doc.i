@@ -635,11 +635,6 @@ Get output scheme description by index.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::Callback::get_input_sparsity(int i) "
 
 Specify input sparsity.
@@ -2307,11 +2302,6 @@ Compiler factory (new syntax, includes initialization)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
 OptionsFunctionality &obj, bool skipUnknown=false) "
 
@@ -2891,11 +2881,6 @@ Get the description of a certain option.
 const  "
 
 Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -6560,11 +6545,6 @@ internally
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::Function::removeMonitor(const std::string
 &mon) "
 
@@ -7220,11 +7200,6 @@ The the mapaccumulated version has the signature:
   
 
 
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -9500,11 +9475,6 @@ Print a representation of the object.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::GenericType::toBool() const  "
 
 Convert to a type.
@@ -10725,11 +10695,6 @@ required length of arg field.
 %feature("docstring")  casadi::SharedObject::isNull() const  "
 
 Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -12520,11 +12485,6 @@ Get the default of a certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::Function::size_in(int ind) const  "
 
 Get input dimension.
@@ -14051,11 +14011,6 @@ Print a description of the object.
 const  "
 
 Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -16723,11 +16678,6 @@ Get the default of a certain option.
 %feature("docstring")  casadi::Function::getStats() const  "
 
 Get all statistics obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -19675,11 +19625,6 @@ returned.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::LinearSolver::getFactorizationSparsity(bool
 transpose=false) const  "
 
@@ -21833,11 +21778,6 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
 iind=0) "
 
@@ -23720,11 +23660,6 @@ Get the default of a certain option.
 %feature("docstring")  casadi::Function::evaluate() "
 
 Evaluate.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -26176,11 +26111,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::MX::unary(int op, const MX &x) "
 
 Create nodes by their ID.
@@ -26407,11 +26337,6 @@ std::pair< MXDict, std::vector< std::string > > &res, const Dict
 &opts=Dict()) "
 
 Construct from vectors (new syntax, includes initialization)
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -33819,11 +33744,6 @@ Check if the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::Function::nnz_out() const  "
 
 Get of number of output nonzeros For a particular output or for all for all
@@ -35949,11 +35869,6 @@ matches one of the base classes (default true)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::Function::map(const std::vector< std::vector<
 MX > > &arg, const std::string &parallelization="serial") "
 
@@ -36068,11 +35983,6 @@ Print a description of the object.
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
 const  " [INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -36919,11 +36829,6 @@ Get output scheme.
 %feature("docstring")  casadi::Function::name_out(int ind) const  "
 
 Get output scheme name by index.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -38720,11 +38625,6 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::SharedObject::repr(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -40221,11 +40121,6 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -41024,13 +40919,8 @@ SparseStorage< DataType > &m) " [INTERNAL]  Copy constructor.
 /*  Check if two sparsity patterns are identical  */
 
 /*  Size and element counting  */ %feature("docstring")
-casadi::SharedObject::assertInit() const  " [INTERNAL]  Assert that it is
-initialized
-
-";
-
-%feature("docstring")  casadi::Sparsity::enlargeRows(int nrow, const
-std::vector< int > &rr, bool ind1=false) "
+casadi::Sparsity::enlargeRows(int nrow, const std::vector< int > &rr, bool
+ind1=false) "
 
 Enlarge the matrix along the first dimension (i.e. insert rows)
 
@@ -42729,11 +42619,6 @@ oname:  output name. Only allowed when an output scheme is set.
 &mon) "
 
 Remove modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -44958,11 +44843,6 @@ required length of res field.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
 const  "
@@ -46550,11 +46430,6 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::Function::mx_in(int ind) const  "
 
 Get symbolic primitives equivalent to the input expressions.
@@ -47931,11 +47806,6 @@ internal class
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
 %feature("docstring")  casadi::PrintableObject< SharedObject
 >::getRepresentation() const " [INTERNAL]  Return a string with a
 representation (for SWIG)
@@ -48007,11 +47877,6 @@ internal class
 >::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
 
 ";
 
