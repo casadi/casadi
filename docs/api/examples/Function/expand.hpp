@@ -30,7 +30,7 @@
 *
 * \sa
 * \code
-* casadi::MXFunction::expand();
+* casadi::MX.fun::expand();
 * \endcode
 *
 */

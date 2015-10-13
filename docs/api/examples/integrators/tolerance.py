@@ -31,7 +31,7 @@ x=SX.sym("x")
 dx=SX.sym("dx")
 states = vertcat([x,dx])
 
-f=SXFunction("f", daeIn(x=states),daeOut(ode=vertcat([dx,-x])))
+f=SX.fun("f", daeIn(x=states),daeOut(ode=vertcat([dx,-x])))
 
 tend = 2*pi*3
 ts = linspace(0,tend,1000)

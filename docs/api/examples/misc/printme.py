@@ -33,7 +33,7 @@ d = c**2
 
 print d
 
-f = SXFunction("f", [a,b],[d])
+f = SX.fun("f", [a,b],[d])
 f.setInput(4,0)
 f.setInput(3,1)
 

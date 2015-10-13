@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-#! SXFunction constructors
+#! SX.fun constructors
 #! =======================
 from casadi import *
 
@@ -34,7 +34,7 @@ outs = [x,y,vertcat((x,y)),y*x,0]
 
 print outs
 
-f = SXFunction("f", ins, outs)
+f = SX.fun("f", ins, outs)
 
 #! f now has two inputs and a 4 outputs:
 print f.n_in()

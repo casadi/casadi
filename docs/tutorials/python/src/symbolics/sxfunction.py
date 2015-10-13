@@ -23,7 +23,7 @@
 #
 #! CasADi tutorial 2
 #! ==================
-#! This tutorial file explains the use of CasADi's SXFunction in a python context.
+#! This tutorial file explains the use of CasADi's SX.fun in a python context.
 #! We assume you have read trough the SX tutorial.
 #! 
 #! Introduction
@@ -47,7 +47,7 @@ print z
 #!
 #! Functions
 #! --------------------------------
-#! CasADi's SXFunction has powerful input/output behaviour.
+#! CasADi's SX.fun has powerful input/output behaviour.
 #! The following input/output primitives are supported:
 #$ \begin{description}
 #$ \item[scalar] e.g. 'SX.sym("x")'
@@ -62,7 +62,7 @@ print z
 #! ----------------------------------
 #! The following code creates and evaluates a single input (scalar valued), single output (scalar valued) function.
 #$ f : $\mathbb{R} \mapsto \mathbb{R}$
-f = SXFunction('f', [x], [z]) # z = f(x)
+f = SX.fun('f', [x], [z]) # z = f(x)
 print "%d -> %d" % (f.n_in(),f.n_out())
 f_in = f.sx_in()
 print f_in, type(f_in)
@@ -86,7 +86,7 @@ print SX.grad(f)
 #$ The mathematical notation could be $ f_{i,j} : $\mathbb{R} \mapsto \mathbb{R} \quad  i,j \in [0,1]$
 x = SX.sym("x") # 1 by 1 matrix serves as scalar
 y = SX.sym("y") # 1 by 1 matrix serves as scalar
-f = SXFunction('f', [x , y ], [x*y, x+y])
+f = SX.fun('f', [x , y ], [x*y, x+y])
 print "%d -> %d" % (f.n_in(),f.n_out())
 
 f.setInput(2,0)
@@ -101,7 +101,7 @@ print [[SX.grad(f,i,j) for i in range(2)] for j in range(2)]
 x=SX.sym("x")
 a=SX.sym("a")
 b=SX.sym("b")
-f = SXFunction('f', [x,vertcat((a,b))],[a*x + b]) 
+f = SX.fun('f', [x,vertcat((a,b))],[a*x + b]) 
 
 print f([x,vertcat([a,b])])
 print f([SX(1.0),vertcat((a,b))])
@@ -121,7 +121,7 @@ print f([x,vertcat((SX.sym("c"),SX.sym("d")))])
 
 x = SX.sym("x")
 y = SX.sym("y")
-f = SXFunction('f', [vertcat((x , y ))], [vertcat((x*y, x+y))])
+f = SX.fun('f', [vertcat((x , y ))], [vertcat((x*y, x+y))])
 print "%d -> %d" % (f.n_in(),f.n_out())
 f.setInput([2,3])
 f.evaluate()
@@ -143,7 +143,7 @@ print df.getOutput(1) # v
 x = SX.sym("x",2,2)
 y = SX.sym("y",2,2)
 print x*y # Not a dot product
-f = SXFunction('f', [x,y], [x*y])
+f = SX.fun('f', [x,y], [x*y])
 print "%d -> %d" % (f.n_in(),f.n_out())
 print f([x,y])
 f.setInput(DMatrix([[1,2],[3,4]]),0)
@@ -155,7 +155,7 @@ print SX.jac(f,1).T
 
 print 12
 
-f = SXFunction('f', [x,y], [x*y,x+y])
+f = SX.fun('f', [x,y], [x*y,x+y])
 print type(x)
 print f([x,y])
 print type(f([x,y]))
@@ -163,7 +163,7 @@ print type(f([x,y])[0])
 print type(f([x,y])[0][0,0])
 
 
-f = SXFunction('f', [x], [x+y])
+f = SX.fun('f', [x], [x+y])
 print type(x)
 print f([x])
 print type(f([x]))
@@ -175,4 +175,4 @@ print type(f([x])[0][0,0])
 #! 
 #! Conclusion
 #! ----------
-#! This tutorial showed how SXFunction allows for symbolic or numeric evaluation and differentiation.
+#! This tutorial showed how SX.fun allows for symbolic or numeric evaluation and differentiation.

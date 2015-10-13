@@ -387,7 +387,7 @@ print f.shape
 
 As you can see, the output of this operation is a 2-by-2 matrix. Note how the multiplication and the addition were performed elementwise and new expressions (of type \texttt{SX}) were created for each entry of the result matrix.
 
-We shall now introduce a second, more general \emph{matrix expression} type \texttt{MX}. The \texttt{MX} type allows, like \texttt{SX}, to build up expressions consisting of a sequence of elementary operations. But unlike \texttt{SX}, these elementary operations are not restricted to be scalar unary or binary operations ($\mathbb{R} \rightarrow \mathbb{R}$ or $\mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R}$. Instead the elementary operations that are used to form \texttt{MX} expressions are allowed to be general \emph{multiple sparse-matrix valued} input, \emph{multiple sparse-matrix valued} output functions: $\mathbb{R}^{n_1 \times m_1} \times \ldots \times \mathbb{R}^{n_N \times m_N} \rightarrow \mathbb{R}^{p_1 \times q_1} \times \ldots \times \mathbb{R}^{p_M \times q_M}$. %In particular, we allow \emph{calls} to functions of type \texttt{Function} (including calls to ODE integrators and \texttt{SXFunction} instances).
+We shall now introduce a second, more general \emph{matrix expression} type \texttt{MX}. The \texttt{MX} type allows, like \texttt{SX}, to build up expressions consisting of a sequence of elementary operations. But unlike \texttt{SX}, these elementary operations are not restricted to be scalar unary or binary operations ($\mathbb{R} \rightarrow \mathbb{R}$ or $\mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R}$. Instead the elementary operations that are used to form \texttt{MX} expressions are allowed to be general \emph{multiple sparse-matrix valued} input, \emph{multiple sparse-matrix valued} output functions: $\mathbb{R}^{n_1 \times m_1} \times \ldots \times \mathbb{R}^{n_N \times m_N} \rightarrow \mathbb{R}^{p_1 \times q_1} \times \ldots \times \mathbb{R}^{p_M \times q_M}$.
 
 The syntax of \texttt{MX} is intended to mirror that of \texttt{SX}:
 
@@ -966,51 +966,51 @@ print jacobian(mul(A,x),x)
 
 \chapter{Function objects} \label{ch:function}
 
-\section{\texttt{Function} and derived classes} \label{sec:function}
-\CasADi allows the user to create function objects, in C++ terminology often referred to as \emph{functors}, that all derive the \texttt{Function} base class. This includes functions that are defined by a symbolic expression, ODE/DAE integrators, QP solvers, NLP solvers etc.
+\section{\texttt{Function}} \label{sec:function}
+\CasADi allows the user to create function objects, in C++ terminology often referred to as \emph{functors}. This includes functions that are defined by a symbolic expression, ODE/DAE integrators, QP solvers, NLP solvers etc.
 
-Function objects are created with the syntax:
+Function objects are typically created with the syntax:
 \begin{lstlisting}[language=Python]
-f = ClassName(name, arguments, ..., [options])
+f = functionname(name, arguments, ..., [options])
 \end{lstlisting}
 
 The name is mainly a display name that will show up in e.g. error messages or as comments in generated C code. This is followed by a set of arguments, which is class dependent. Finally, the user can pass an options structure for customizing the behavior of the class. The options structure is a dictionary type in Python, a struct in MATLAB or \CasADi's \texttt{Dict} type in C++.
 
-One important member of the \texttt{Function} derived classes is \texttt{SXFunction}, which is constructed by passing a list of input expressions and a list of output expressions:
+A \texttt{Function} can be constructed by passing a list of input expressions and a list of output expressions:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 x = SX.sym('x',2,2)
 y = SX.sym('y')
-f = SXFunction('f',[x,y],\
-               [x,sin(y)*x])
+f = SX.fun('f',[x,y],\
+           [x,sin(y)*x])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
 x = SX.sym('x',2,2);
 y = SX.sym('y');
-f = SXFunction('f',{x,y},...
-               {x,sin(y)*x});
+f = SX.fun('f',{x,y},...
+           {x,sin(y)*x});
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
 x = SX.sym('x',2,2)
 y = SX.sym('y')
-f = SXFunction('f',[x,y],\
-               [x,sin(y)*x])
+f = SX.fun('f',[x,y],\
+           [x,sin(y)*x])
 \end{pytexoutput}
 
 which defines a function $f : \mathbb{R}^{2 \times 2} \times \mathbb{R}, \quad (x,y) \mapsto (x,\sin(y) x)$.
 Note that all function objects in \CasADi, including the above, are multiple matrix-valued input, multiple, matrix-valued output.
 
-\texttt{MXFunction} works the same way, but for the \texttt{MX} expression graphs:
+\texttt{MX.fun} works the same way, but for the \texttt{MX} expression graphs:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 x = MX.sym('x',2,2)
 y = MX.sym('y')
-f = MXFunction('f',[x,y],\
+f = MX.fun('f',[x,y],\
                [x,sin(y)*x])
 \end{lstlisting}
 \end{minipage}
@@ -1018,14 +1018,14 @@ f = MXFunction('f',[x,y],\
 \begin{lstlisting}[language=Matlab]
 x = MX.sym('x',2,2);
 y = MX.sym('y');
-f = MXFunction('f',{x,y},...
+f = MX.fun('f',{x,y},...
                {x,sin(y)*x});
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
 x = MX.sym('x',2,2)
 y = MX.sym('y')
-f = MXFunction('f',[x,y],\
+f = MX.fun('f',[x,y],\
                [x,sin(y)*x])
 \end{pytexoutput}
 
@@ -1040,7 +1040,7 @@ x = SX.sym('x')
 p = SX.sym('p')
 f = x**2
 g = log(x)-p
-nlp = SXFunction('nlp',\
+nlp = SX.fun('nlp',\
         nlpIn(x=x,p=p),\
         nlpOut(f=f,g=g))
 \end{lstlisting}
@@ -1051,7 +1051,7 @@ x = SX.sym('x');
 p = SX.sym('p');
 f = x^2;
 g = log(x)-p;
-nlp = SXFunction('nlp',...
+nlp = SX.fun('nlp',...
         nlpIn('x',x,'p',p),...
         nlpOut('f',f,'g',g));
 \end{lstlisting}
@@ -1061,12 +1061,12 @@ x = SX.sym('x')
 p = SX.sym('p')
 f = x**2
 g = log(x)-p
-nlp = SXFunction('nlp',\
+nlp = SX.fun('nlp',\
         nlpIn(x=x,p=p),\
         nlpOut(f=f,g=g))
 \end{pytexoutput}
 
-The last line is essentially equivalent to \lstinline[language=Python]{SXFunction('nlp',[x,p],[f,g])}, but is preferred for a number of reasons:
+The last line is essentially equivalent to \lstinline[language=Python]{SX.fun('nlp',[x,p],[f,g])}, but is preferred for a number of reasons:
 \begin{itemize}
 \item No need to remember the number or order of arguments
 \item Inputs or outputs that are absent can be left unset
@@ -1117,7 +1117,7 @@ res = nlp({'x':1.1,\
 print res['f'], res['g']
 \end{pytexoutput}
 
-The recommendation is to always work with named inputs and outputs, since it is less error prone and more maintainable. When creating a function from expressions, not from the scheme helpers as above, you can specify the input and output schemes by passing the "input\_scheme" and "output\_scheme" option to the \texttt{SXFunction} or \texttt{MXFunction} constructor:
+The recommendation is to always work with named inputs and outputs, since it is less error prone and more maintainable. When creating a function from expressions, not from the scheme helpers as above, you can specify the input and output schemes by passing the "input\_scheme" and "output\_scheme" option to the \texttt{SX.fun} or \texttt{MX.fun} constructor:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -1128,7 +1128,7 @@ g = log(x)-p
 op = \
  {'input_scheme':['x','p'],\
   'output_scheme':['f','g']}
-nlp = SXFunction('nlp',\
+nlp = SX.fun('nlp',\
           [x,p],[f,g],op)
 \end{lstlisting}
 \end{minipage}
@@ -1141,7 +1141,7 @@ g = log(x)-p;
 op = struct;
 op.input_scheme=char('x','p');
 op.output_scheme=char('f','g');
-nlp = SXFunction('nlp',...
+nlp = SX.fun('nlp',...
           {x,p},{f,g},op);
 \end{lstlisting}
 \end{minipage}
@@ -1153,7 +1153,7 @@ g = log(x)-p
 op = \
  {'input_scheme':['x','p'],\
   'output_scheme':['f','g']}
-nlp = SXFunction('nlp',\
+nlp = SX.fun('nlp',\
           [x,p],[f,g],op)
 \end{pytexoutput}
 
@@ -1243,11 +1243,11 @@ G = f.hessian(id_in,id_out);
 
 which will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) Hessian, the gradient and all the original function outputs as outputs.
 
-\section{Converting \texttt{MXFunction} to \texttt{SXFunction}}
-An \texttt{MXFunction} which only contains built-in operations (e.g. elementwise operations such as addition, square root, matrix multiplications and calls to \texttt{SXFunction} instances, can be converted into an \texttt{SXFunction} using the syntax:
+\section{Converting \texttt{MX.fun} to \texttt{SX.fun}}
+An \texttt{MX.fun} which only contains built-in operations (e.g. elementwise operations such as addition, square root, matrix multiplications and calls to \texttt{SX.fun} instances, can be converted into an \texttt{SX.fun} using the syntax:
 
 \begin{lstlisting}[language=Python]
-sx_function = SXFunction(mx_function)
+sx_function = SX.fun(mx_function)
 \end{lstlisting}
 
 This might speed up the calculations significantly, but might also cause extra memory overhead.
@@ -1273,7 +1273,7 @@ x = SX.sym('x')
 z = SX.sym('z')
 f = -z*x
 g = z**2-2
-dae = SXFunction('dae',\
+dae = SX.fun('dae',\
   daeIn(x=x,z=z),\
   daeOut(ode=f,alg=g))
 print dae
@@ -1285,7 +1285,7 @@ x = SX.sym('x');
 z = SX.sym('z');
 f = -z*x;
 g = z^2-2;
-dae = SXFunction('dae',...
+dae = SX.fun('dae',...
   daeIn('x',x,'z',z),...
   daeOut('ode',f,'alg',g));
 disp(dae)
@@ -1296,7 +1296,7 @@ x = SX.sym('x')
 z = SX.sym('z')
 f = -z*x
 g = z**2-2
-dae = SXFunction('dae',\
+dae = SX.fun('dae',\
   daeIn(x=x,z=z),\
   daeOut(ode=f,alg=g))
 print dae
@@ -1338,7 +1338,7 @@ disp(Integrator.doc('cvodes'))
 or by consulting the online C++ API docs on the website.
 
 \section{Sensitivity analysis}
-From evaluation point of view, an integrator behaves just like the \texttt{SXFunction} introduced in the previous session. Use the member functions of in the Function class to generate new function objects corresponding to directional derivatives (forward or reverse mode) or complete Jacobians. Then evaluate these function objects numerically to obtain sensitivity information. The documented example "sensitivity\_analysis" (available in \CasADi's example collection for Python, MATLAB and C++) demonstrate how \CasADi can be used to calculate first and second order derivative information (forward-over-forward, forward-over-adjoint, adjoint-over-adjoint) for a simple DAE.
+From evaluation point of view, an integrator behaves just like the \texttt{SX.fun} introduced in the previous section. Use the member functions of in the Function class to generate new function objects corresponding to directional derivatives (forward or reverse mode) or complete Jacobians. Then evaluate these function objects numerically to obtain sensitivity information. The documented example "sensitivity\_analysis" (available in \CasADi's example collection for Python, MATLAB and C++) demonstrate how \CasADi can be used to calculate first and second order derivative information (forward-over-forward, forward-over-adjoint, adjoint-over-adjoint) for a simple DAE.
 
 \section{The \texttt{Simulator} class}
 As already mentioned, integrators in \CasADi are functions that calculates the state at the final time. Often, however, a user is interested in obtaining the solution at multiple time points. This can often be done more efficiently than by repeatedly calling \texttt{integrator.evaluate()}. The easiest way to use this functionality is to use the \texttt{Simulator} class.

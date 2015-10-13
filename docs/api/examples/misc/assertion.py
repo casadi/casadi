@@ -31,7 +31,7 @@ x = MX.sym("x")
 y = sin(x)
 z = sqrt(y)
 
-f = MXFunction("f", [x], [z])
+f = MX.fun("f", [x], [z])
 
 [z0] = f([5])
 
@@ -43,7 +43,7 @@ print z0
 y = y.attachAssert(y>0, "bummer") # Add assertion here
 z = sqrt(y)
 
-f = MXFunction("f", [x],[z])
+f = MX.fun("f", [x],[z])
 
 try:
   [z0] = f([5])
@@ -73,6 +73,6 @@ y = sin(x)
 y = y.attachAssert(foo([y])[0], "you are in trouble") # Add assertion here
 z = sqrt(y)
 
-f = MXFunction("f", [x],[z])
+f = MX.fun("f", [x],[z])
 
 [z0] = f([5])

@@ -35,7 +35,7 @@ obj = (1-x)**2+100*(y-x**2)**2
 #! We choose to add a single constraint
 constr = x**2+y**2
 
-nlp=SXFunction("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=constr))
+nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=constr))
 solver = NlpSolver("solver", "ipopt", nlp)
     
 #! We need the hessian of the lagrangian.
@@ -46,7 +46,7 @@ lambd=SX.sym("lambd")  # Multipier of the problem, shape m x 1.
 
 xy = vertcat([x,y])
 
-h=SXFunction("h", hessLagIn(x=xy,lam_g=lambd,lam_f=sigma),
+h=SX.fun("h", hessLagIn(x=xy,lam_g=lambd,lam_f=sigma),
              hessLagOut(hess=sigma*hessian(obj,xy)[0]+lambd*hessian(constr,xy)[0]))
    
 #! We solve the problem with an exact hessian

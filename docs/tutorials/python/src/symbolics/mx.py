@@ -44,9 +44,9 @@ z= mul(x,y)
 print z
 #! Note how the operations on MXes are lazy on the matrix level.
 #! Any elementwise logic is postponed until evaluation demands it.
-#! Just like, SXFunction, MXFunction can be single or multi input/output.
+#! Just like, SX.fun, MX.fun can be single or multi input/output.
 #! The only allowed input/output primitive is MX.
-f = MXFunction('f', [x,y],[z])
+f = MX.fun('f', [x,y],[z])
 
 
 #! Evaluation
@@ -70,7 +70,7 @@ print MX(DMatrix([1,2,3]).T)
 print MX([1,2,3])
 #! As before, evaluation is lazy on the matrix level
 Y = MX.sym("Y")
-f = MXFunction('f', [Y],[X])
+f = MX.fun('f', [Y],[X])
 f.setInput([2])
 f.evaluate()
 print f.getOutput()

@@ -40,9 +40,9 @@ x = SX.sym("x")
 
 y = SX.sym("y")
 
-#f  = SXFunction('f', [x,y], tan(x)-1) 
+#f  = SX.fun('f', [x,y], tan(x)-1) 
 
-#g=SXFunction('g', [x,y],[y])
+#g=SX.fun('g', [x,y],[y])
 
 #print f.eval(x)
 #! Quadractic program
@@ -67,7 +67,7 @@ F = 0.5*mul([X.T,P,X]) + mul(q.T,X)
 G = X+X
 
 #! NLP
-nlp = MXFunction('nlp', nlpIn(x=X),nlpOut(f=F,g=G))
+nlp = MX.fun('nlp', nlpIn(x=X),nlpOut(f=F,g=G))
 nlp.setInput([1,1,1,1,1],"x")
 nlp.evaluate()
 #! Test the objective for some value of x:

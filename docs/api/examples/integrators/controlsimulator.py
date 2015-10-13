@@ -58,7 +58,7 @@ fin = controldaeIn(
     u = u,
     x_major = vertcat((x0,v0))
   )
-f=SXFunction("f", fin,daeOut(ode=rhs))
+f=SX.fun("f", fin,daeOut(ode=rhs))
 
 #! Choose a time grid, we will have 10-1 = 9 control intervals
 ts = linspace(0,50,10)
@@ -100,7 +100,7 @@ fin = controldaeIn(
     u = u,
     x_major = vertcat([x0,v0])
   )
-h=SXFunction("h", fin, [x0, u])
+h=SX.fun("h", fin, [x0, u])
 
 #! Set options, each control interval will be subdived in 8
 opts = {"integrator":"cvodes", "nf":8}
@@ -129,7 +129,7 @@ fin = controldaeIn(
     x_major = vertcat([x0,v0])
   )
   
-f=SXFunction("f", fin,[rhs])
+f=SX.fun("f", fin,[rhs])
 
 ui = SX.sym("ui")
 
@@ -141,7 +141,7 @@ fin = controldaeIn(
     x_major = vertcat([x0,v0])
   )
   
-h=SXFunction("h", fin,[x,ui])
+h=SX.fun("h", fin,[x,ui])
 
 #! Set options, each control interval will be subdived in 8
 opts = {}

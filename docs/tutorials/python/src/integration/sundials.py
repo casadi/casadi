@@ -34,11 +34,11 @@ u = SX.sym("u")
 x = SX.sym("x")
 y = SX.sym("y")
 ode = vertcat([(1-y*y)*x-y+u,x])
-f  = SXFunction('f', [vertcat([x,y]),u], [ode])
+f  = SX.fun('f', [vertcat([x,y]),u], [ode])
 #! Manipulate the function to adhere to the integrator's
 #! input/output signature
 #! f(time;states;parameters)
-fmod=SXFunction('ODE_right_hand_side', daeIn(x=vertcat([x,y]),p=u),daeOut(ode=ode))
+fmod=SX.fun('ODE_right_hand_side', daeIn(x=vertcat([x,y]),p=u),daeOut(ode=ode))
 #! The whole series of sundials options are available for the user
 opts = {}
 opts["fsens_err_con"] = True
@@ -215,7 +215,7 @@ u=MX.sym("u")
 w = integrator({'x0':MX([1,0]),'p':u})["xf"]
 
 #! We construct an MXfunction and a python help function 'out'
-f=MXFunction('f', [u],[w])
+f=MX.fun('f', [u],[w])
 
 def out(u):
 	f.setInput(u)

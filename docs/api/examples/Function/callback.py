@@ -61,7 +61,7 @@ print "4! = ", y
 x = MX.sym("x")
 [y] = fac([x])
 
-f = MXFunction('f', [x],[y])
+f = MX.fun('f', [x],[y])
 
 [y] = f([5])
 
