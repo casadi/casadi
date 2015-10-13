@@ -55,6 +55,9 @@
 %exception  casadi::Function::sz_w() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericMatrix< SX >::sym(const std::string &name, const Sparsity &sp) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::IOInterface< Function  >::getInput(T val, const std::string &iname) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -329,6 +332,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::iszero(double x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::matrixName< SXElement >() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::operation_checker(unsigned int op) {

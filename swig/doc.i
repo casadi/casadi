@@ -9240,10 +9240,10 @@ symbolic primitives.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX >::sym(const std::string
-&name, const Sparsity &sp) " ";
-
 %feature("docstring")  casadi::GenericMatrix< SX >::sym(const std::string
+&name, const Sparsity &sp) " [INTERNAL] ";
+
+%feature("docstring")  casadi::GenericMatrix< MX >::sym(const std::string
 &name, const Sparsity &sp) " ";
 
 %feature("docstring")  casadi::GenericMatrix< MatType >::istril() const  "
@@ -13920,14 +13920,6 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Integrator::resetB() "
-
-Reset the backward problem.
-
-Time will be set to tf and backward state to input(INTEGRATOR_RX0)
-
-";
-
 %feature("docstring")  casadi::Function::derForward(int nfwd) "
 
 Get a function that calculates nfwd forward derivatives.
@@ -16026,12 +16018,6 @@ Get symbolic primitives equivalent to the input expressions.
 
 ";
 
-%feature("docstring")  casadi::Integrator::integrateB(double t_out) "
-
-Integrate backward until a specified time point.
-
-";
-
 %feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
 iind=0) "
 
@@ -16084,12 +16070,6 @@ scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::Integrator::integrate(double t_out) "
-
-Integrate forward until a specified time point.
 
 ";
 
@@ -16183,13 +16163,6 @@ adjoint sensitivities, one direction at a time.
 
 ";
 
-%feature("docstring")  casadi::Integrator::reset() "
-
-Reset the forward problem Time will be set to t0 and state to
-input(INTEGRATOR_X0)
-
-";
-
 %feature("docstring")  casadi::Integrator::printStats(std::ostream
 &stream=casadi::userOut()) const  "
 
@@ -16236,14 +16209,14 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
-Check if the numerical values of the supplied bounds make sense.
-
-";
-
 %feature("docstring")  casadi::Function::description_out(int ind) const  "
 
 Get output scheme description by index.
+
+";
+
+%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
+Check if the numerical values of the supplied bounds make sense.
 
 ";
 
@@ -24757,6 +24730,8 @@ Check if the matrix expression is dense.
 Returns the truth value of a Matrix.
 
 ";
+
+%feature("docstring") casadi::Matrix::__nonzero__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::getColind() const "
@@ -49183,6 +49158,8 @@ iwork:  A integer work vector that you must allocate Minimum size:
 y.size1()+x.size2()+1
 
 ";
+
+%feature("docstring")  casadi::matrixName< SXElement >() " [INTERNAL] ";
 
 %feature("docstring")  casadi::getSchemeEntryName(InputOutputScheme scheme,
 int i) " ";
