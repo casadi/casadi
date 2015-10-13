@@ -167,38 +167,38 @@ class ComplexityTests(casadiTestCase):
     self.complexity(setupfun,fun, 1)
 
 
-  def test_SXFunctionadd(self):
+  def test_SX_funadd(self):
     return
-    self.message("SXFunction add column vectors")
+    self.message("SX.fun add column vectors")
     def setupfun(self,N):
       A = SX.sym("A",N,1)
       B = SX.sym("B",N,1)
-      f = SXFunction('f', [A,B],[A+B])
+      f = SX.fun('f', [A,B],[A+B])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
     
     self.complexity(setupfun,fun, 1)
 
-  def test_SXFunctionprodvec(self):
+  def test_SX_funprodvec(self):
     return
-    self.message("SXFunction prod column vectors")
+    self.message("SX.fun prod column vectors")
     def setupfun(self,N):
       A = SX.sym("A",N,1)
       B = SX.sym("B",N,1)
-      f = SXFunction('f', [A,B],[c.dot(A.T,B)])
+      f = SX.fun('f', [A,B],[c.dot(A.T,B)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
     self.complexity(setupfun,fun, 1)
 
-  def test_SXFunctionprodsparse(self):
-    self.message("SXFunction prod sparse")
+  def test_SX_funprodsparse(self):
+    self.message("SX.fun prod sparse")
     def setupfun(self,N):
       A = SX.sym("A",Sparsity.diag(N))
       A[-1,0]=SX("off") # Have one of-diagonal element
       B = SX.sym("B",N,1)
-      f = SXFunction('f', [A,B],[c.dot(A,B)])
+      f = SX.fun('f', [A,B],[c.dot(A,B)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
@@ -206,30 +206,30 @@ class ComplexityTests(casadiTestCase):
     self.complexity(setupfun,fun, 1)
 
 
-  def test_MXFunctionprodvec(self):
-    self.message("MXFunction prod")
+  def test_MX_funprodvec(self):
+    self.message("MX.fun prod")
     def setupfun(self,N):
       G = MX.sym("G",N,1)
       X = MX.sym("X",N,1)
-      f = MXFunction('f', [G,X],[c.prod(G.T,X)])
+      f = MX.fun('f', [G,X],[c.prod(G.T,X)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
     self.complexity(setupfun,fun, 1)
 
-  def test_MXFunctionprodsparse(self):
-    self.message("MXFunction sparse product")
+  def test_MX_funprodsparse(self):
+    self.message("MX.fun sparse product")
     def setupfun(self,N):
       s = Sparsity.diag(N)
       s[-1,0]=1
       H = MX.sym("H",s)
       X = MX.sym("X",N,1)
-      f = MXFunction('f', [H,X],[c.prod(H,X)])
+      f = MX.fun('f', [H,X],[c.prod(H,X)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
     self.complexity(setupfun,fun, 2)  # 1
-    self.message("MXFunction sparse sparse product")
+    self.message("MX.fun sparse sparse product")
     def setupfun(self,N):
       s = Sparsity.diag(N)
       s[-1,0]=1
@@ -237,7 +237,7 @@ class ComplexityTests(casadiTestCase):
       s = Sparsity.diag(N)
       s[-1,0]=1
       X = MX.sym("X",s)
-      f = MXFunction('f', [H,X],[c.prod(H,X)])
+      f = MX.fun('f', [H,X],[c.prod(H,X)])
       return {'f':f}
     self.complexity(setupfun,fun, 2)  # 1
 

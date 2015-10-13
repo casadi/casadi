@@ -52,7 +52,7 @@ class OCPtests(casadiTestCase):
       cost = cost + s*X[i]**2+r*U[i]**2
     cost = cost + q*X[N]**2
     
-    nlp = SXFunction('nlp', nlpIn(x=V),nlpOut(f=cost,g=vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])))
+    nlp = SX.fun('nlp', nlpIn(x=V),nlpOut(f=cost,g=vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])))
     opts = {}
     opts["tol"] = 1e-5
     opts["hessian_approximation"] = "limited-memory"
@@ -85,7 +85,7 @@ class OCPtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    f=SXFunction('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
+    f=SX.fun('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
     opts = {}
     opts["reltol"] = 1e-15
     opts["abstol"] = 1e-15
@@ -105,8 +105,8 @@ class OCPtests(casadiTestCase):
     
     parc = MX(0)
     
-    f = MXFunction('f', [var,parMX],[qend[0]])
-    nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f([var,parc])[0]))
+    f = MX.fun('f', [var,parMX],[qend[0]])
+    nlp = MX.fun('nlp', nlpIn(x=var),nlpOut(f=-f([var,parc])[0]))
     opts = {}
     opts["tol"] = 1e-12
     opts["hessian_approximation"] = "limited-memory"
@@ -139,7 +139,7 @@ class OCPtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    f=SXFunction('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
+    f=SX.fun('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
     opts = {}
     opts["reltol"] = 1e-15
     opts["abstol"] = 1e-15
@@ -158,8 +158,8 @@ class OCPtests(casadiTestCase):
     
     parc = MX(dy0)
     
-    f = MXFunction('f', [var,par],[qend[0]])
-    nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f([var,parc])[0],g=var[0]-var[1]))
+    f = MX.fun('f', [var,par],[qend[0]])
+    nlp = MX.fun('nlp', nlpIn(x=var),nlpOut(f=-f([var,parc])[0],g=var[0]-var[1]))
     opts = {}
     opts["tol"] = 1e-12
     opts["hessian_approximation"] = "limited-memory"
@@ -228,7 +228,7 @@ class OCPtests(casadiTestCase):
     print ivp.init
     print c,T,cost
     #print c.atTime(0)
-    f=MXFunction('f', [vertcat([c,T,cost])],[vertcat(ivp.init)])
+    f=MX.fun('f', [vertcat([c,T,cost])],[vertcat(ivp.init)])
     return 
     f.evaluate()
     self.checkarray(f.getOutput(),matrix([-956.271065,-250.051971,0]).T,"initeq")

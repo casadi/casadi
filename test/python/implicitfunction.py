@@ -57,22 +57,22 @@ class ImplicitFunctiontests(casadiTestCase):
       A_ = DMatrix([[1,2],[3,2.1]])
       C_ = DMatrix([[1.6,2.1],[1,1.3]])
       b_ = DMatrix([0.7,0.6])
-      f=SXFunction("f", [x],[mul(A_,x)-b_, mul(C_,x)])
+      f=SX.fun("f", [x],[mul(A_,x)-b_, mul(C_,x)])
       solver=ImplicitFunction("solver", Solver, f, options)
       solver.evaluate()
       
-      refsol = SXFunction("refsol", [x],[solve(A_,b_), mul(C_,solve(A_,b_))])
+      refsol = SX.fun("refsol", [x],[solve(A_,b_), mul(C_,solve(A_,b_))])
       self.checkfunction(solver,refsol,digits=10)         
       
       A = SX.sym("A",2,2)
       b = SX.sym("b",2)
-      f=SXFunction("f", [x,A,b],[mul(A,x)-b])
+      f=SX.fun("f", [x,A,b],[mul(A,x)-b])
       solver=ImplicitFunction("solver", Solver, f, options)
       solver.setInput(A_,1)
       solver.setInput(b_,2)
       solver.evaluate()
       
-      refsol = SXFunction("refsol", [x,A,b],[solve(A,b)])      
+      refsol = SX.fun("refsol", [x,A,b],[solve(A,b)])      
       refsol.setInput(A_,1)
       refsol.setInput(b_,2)      
       self.checkfunction(solver,refsol,digits=10)
@@ -80,7 +80,7 @@ class ImplicitFunctiontests(casadiTestCase):
       
       A = SX.sym("A",2,2)
       b = SX.sym("b",2)
-      f=SXFunction("f", [x,A,b],[mul(A,x)-b,mul(C_,x)])
+      f=SX.fun("f", [x,A,b],[mul(A,x)-b,mul(C_,x)])
       for ad_weight_sp in [0,1]:
         for ad_weight in [0,1]:
           print ad_weight, ad_weight_sp
@@ -92,7 +92,7 @@ class ImplicitFunctiontests(casadiTestCase):
           solver.setInput(A_,1)
           solver.setInput(b_,2)
       
-          refsol = SXFunction("refsol", [x,A,b],[solve(A,b),mul(C_,solve(A,b))])      
+          refsol = SX.fun("refsol", [x,A,b],[solve(A,b),mul(C_,solve(A,b))])      
           refsol.setInput(0,0)
           refsol.setInput(A_,1)
           refsol.setInput(b_,2)      
@@ -103,12 +103,12 @@ class ImplicitFunctiontests(casadiTestCase):
     for Solver, options in solvers:
       self.message(Solver)
       x=SX.sym("x")
-      f=SXFunction("f", [x],[sin(x)])
+      f=SX.fun("f", [x],[sin(x)])
       solver=ImplicitFunction("solver", Solver, f, options)
       solver.setInput(6)
       solver.evaluate()
       
-      refsol = SXFunction("refsol", [x],[ceil(x/pi-0.5)*pi])
+      refsol = SX.fun("refsol", [x],[ceil(x/pi-0.5)*pi])
       refsol.setInput(6)
       self.checkfunction(solver,refsol,digits=10)         
       
@@ -120,11 +120,11 @@ class ImplicitFunctiontests(casadiTestCase):
       x=SX.sym("x")
       y=SX.sym("y")
       n=0.2
-      f=SXFunction("f", [y,x],[x-arcsin(y)])
+      f=SX.fun("f", [y,x],[x-arcsin(y)])
       solver=ImplicitFunction("solver", Solver, f, options)
       solver.setInput(n,1)
 
-      refsol = SXFunction("refsol", [y,x],[sin(x)])
+      refsol = SX.fun("refsol", [y,x],[sin(x)])
       refsol.setInput(n,1)
       self.checkfunction(solver,refsol,digits=6,sens_der=False,failmessage=message)
 
@@ -135,16 +135,16 @@ class ImplicitFunctiontests(casadiTestCase):
       x=SX.sym("x")
       y=SX.sym("y")
       n=0.2
-      f=SXFunction("f", [y,x],[x-arcsin(y)])
+      f=SX.fun("f", [y,x],[x-arcsin(y)])
       solver=ImplicitFunction("solver", Solver, f, options)
       
       X = MX.sym("X")
       [R] = solver([MX(),X])
       
-      trial = MXFunction("trial", [X],[R])
+      trial = MX.fun("trial", [X],[R])
       trial.setInput(n)
       
-      refsol = SXFunction("refsol", [x],[sin(x)])
+      refsol = SX.fun("refsol", [x],[sin(x)])
       refsol.setInput(n)
       self.checkfunction(trial,refsol,digits=6,sens_der=False,failmessage=message)
       
@@ -161,7 +161,7 @@ class ImplicitFunctiontests(casadiTestCase):
       y=SX.sym("y",s)
       y0 = DMatrix(Sparsity.diag(N),0.1)
 
-      f=SXFunction("f", [vecNZ(y),vecNZ(x)],[vecNZ((mul((x+y0),(x+y0).T)-mul((y+y0),(y+y0).T))[s])])
+      f=SX.fun("f", [vecNZ(y),vecNZ(x)],[vecNZ((mul((x+y0),(x+y0).T)-mul((y+y0),(y+y0).T))[s])])
       options2 = dict(options)
       options2["constraints"] = [1]*s.nnz()
       solver=ImplicitFunction("options2", Solver, f, options2)
@@ -169,7 +169,7 @@ class ImplicitFunctiontests(casadiTestCase):
       X = MX.sym("X",x.sparsity())
       [R] = solver([MX(),vecNZ(X)])
       
-      trial = MXFunction("trial", [X],[R])
+      trial = MX.fun("trial", [X],[R])
       trial.setInputNZ([abs(cos(i)) for i in range(x.nnz())])
       trial.evaluate()
 
@@ -181,7 +181,7 @@ class ImplicitFunctiontests(casadiTestCase):
       f.setInput(vecNZ(trial.getInput()),1)
       f.evaluate()
       
-      refsol = MXFunction("refsol", [X],[vecNZ(X)])
+      refsol = MX.fun("refsol", [X],[vecNZ(X)])
       refsol.setInput(trial.getInput())
 
       self.checkfunction(trial,refsol,digits=6,sens_der=False,evals=1,failmessage=message)
@@ -197,19 +197,19 @@ class ImplicitFunctiontests(casadiTestCase):
       y0 = DMatrix([0.1,0.4])
       yy = y + y0
       n=0.2
-      f=SXFunction("f", [y,x],[vertcat([x-arcsin(yy[0]),yy[1]**2-yy[0]])])
+      f=SX.fun("f", [y,x],[vertcat([x-arcsin(yy[0]),yy[1]**2-yy[0]])])
       solver=ImplicitFunction("solver", Solver, f, options)
       solver.setInput(n)
       solver.evaluate()
       
-      refsol = SXFunction("refsol", [y,x],[vertcat([sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
+      refsol = SX.fun("refsol", [y,x],[vertcat([sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
       refsol.setInput(n)
       self.checkfunction(solver,refsol,digits=5,sens_der=False,failmessage=message)
       
   def testKINSol1c(self):
     self.message("Scalar KINSol problem, n=0, constraint")
     x=SX.sym("x")
-    f=SXFunction("f", [x],[sin(x)])
+    f=SX.fun("f", [x],[sin(x)])
     solver=ImplicitFunction("solver", "kinsol", f, {"constraints":[-1]})
     solver.setInput(-6)
     solver.evaluate()
@@ -220,7 +220,7 @@ class ImplicitFunctiontests(casadiTestCase):
       if 'kinsol' in str(Solver): continue
       if 'newton' in str(Solver): continue
       x=SX.sym("x",2)
-      f=SXFunction("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
+      f=SX.fun("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
       options2 = dict(options)
       options2["constraints"] = [-1,0]
       solver=ImplicitFunction("solver", Solver, f, options2)
@@ -228,7 +228,7 @@ class ImplicitFunctiontests(casadiTestCase):
       
       self.checkarray(solver.getOutput(),DMatrix([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
 
-      f=SXFunction("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
+      f=SX.fun("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
       options2 = dict(options)
       options2["constraints"] = [1,0]
       solver=ImplicitFunction("solver", Solver, f, options2)
@@ -244,20 +244,20 @@ class ImplicitFunctiontests(casadiTestCase):
     V_eq = vertcat([V[0]-X0])
 
     # Root-finding function, implicitly defines V as a function of X0 and P
-    vfcn = MXFunction("vfcn", [V,X0], [V_eq], {"ad_weight":0, "ad_weight_sp":1})
+    vfcn = MX.fun("vfcn", [V,X0], [V_eq], {"ad_weight":0, "ad_weight_sp":1})
 
-    # Convert to SXFunction to decrease overhead
-    vfcn_sx = SXFunction(vfcn)
+    # Convert to SX.fun to decrease overhead
+    vfcn_sx = SX.fun('vfcn_sx', vfcn, {"ad_weight":0, "ad_weight_sp":1})
 
     # Create a implicit function instance to solve the system of equations
     ifcn = ImplicitFunction("ifcn", "newton",vfcn_sx, {"linear_solver":"csparse"})
 
-    #ifcn = MXFunction('I', [X0],[vertcat([X0])])
+    #ifcn = MX.fun('I', [X0],[vertcat([X0])])
     [V] = ifcn([0,X0],True)
 
     f = 1  # fails
 
-    F = MXFunction("F", [X0], [f*X0+V], {"ad_weight":0, "ad_weight_sp":1})
+    F = MX.fun("F", [X0], [f*X0+V], {"ad_weight":0, "ad_weight_sp":1})
 
     # Test values
     x0_val  = 1
@@ -280,7 +280,7 @@ class ImplicitFunctiontests(casadiTestCase):
   def test_extra_outputs(self):
     x = SX.sym("x")
     a = SX.sym("a")
-    f = SXFunction("f", [x,a],[tan(x)-a,sqrt(a)*x**2 ])
+    f = SX.fun("f", [x,a],[tan(x)-a,sqrt(a)*x**2 ])
     for Solver, options in solvers:
       options2 = dict(options)
       options2["ad_weight_sp"] = 1
@@ -289,14 +289,14 @@ class ImplicitFunctiontests(casadiTestCase):
       solver.setInput(0.1,0)
       solver.evaluate()
       
-      refsol = SXFunction("refsol", [x,a],[arctan(a),sqrt(a)*arctan(a)**2]) 
+      refsol = SX.fun("refsol", [x,a],[arctan(a),sqrt(a)*arctan(a)**2]) 
       refsol.setInput(0.3,1)
       refsol.setInput(0.1,0)
       self.checkfunction(solver,refsol,digits=5)
 
     x = SX.sym("x",2)
     a = SX.sym("a",2)
-    f = SXFunction("f", [x,a],[tan(x)-a,sqrt(a)*x**2 ])
+    f = SX.fun("f", [x,a],[tan(x)-a,sqrt(a)*x**2 ])
 
 if __name__ == '__main__':
     unittest.main()

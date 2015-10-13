@@ -237,11 +237,11 @@ class typemaptests(casadiTestCase):
       
       if type(z) in [type(SX()),type(SX())]:
         ztype = [type(SX()),type(SX())]
-        function = SXFunction
+        function = SX.fun
       
       if type(z) in [type(MX())]:
         ztype = [type(MX())]
-        function = MXFunction
+        function = MX.fun
         
       r = fun(z,s)
             
@@ -357,11 +357,11 @@ class typemaptests(casadiTestCase):
       
       if type(z) in [type(SX()),type(SX())]:
         ztype = [type(SX()),type(SX())]
-        function = SXFunction
+        function = SX.fun
       
       if type(z) in [type(MX())]:
         ztype = [type(MX())]
-        function = MXFunction
+        function = MX.fun
         
       r = fun(z,s)
             
@@ -486,7 +486,7 @@ class typemaptests(casadiTestCase):
     a = GenericType(["foo","bar"])
     self.assertTrue(a.isStringVector())
     x = SX.sym("x")
-    f = SXFunction("f", [x],[x])
+    f = SX.fun("f", [x],[x])
 
   def testGenericType3(self):
     self.message("Generic type 3")
@@ -516,7 +516,7 @@ class typemaptests(casadiTestCase):
     w = DMatrix([[1,2,3],[4,5,6]])
     x = SX.sym("x")
     
-    f = SXFunction("f", [x],[w])
+    f = SX.fun("f", [x],[w])
     
     W = f(f.sx_in())[0]
     self.assertEqual(W.size1(),2)
@@ -527,7 +527,7 @@ class typemaptests(casadiTestCase):
     w = DMatrix([[1,2,3],[4,5,6]])
     x = MX.sym("x")
     
-    f = MXFunction("f", [x],[w])
+    f = MX.fun("f", [x],[w])
     
     W = f(f.mx_in())[0]
 
@@ -645,7 +645,7 @@ class typemaptests(casadiTestCase):
     self.message("casting DMatrix")
     
     x = SX.sym("x")
-    f = SXFunction("f", [x],[x])
+    f = SX.fun("f", [x],[x])
     class Foo:
       def __DMatrix__(self):
         return DMatrix([4])
@@ -706,24 +706,24 @@ class typemaptests(casadiTestCase):
       def __SX__(self):
         return x
         
-    SXFunction("tmp", [x],[Foo()])
+    SX.fun("tmp", [x],[Foo()])
     
     class Foo:
       def __SX__(self):
         return MX.sym("x")
         
-    self.assertRaises(NotImplementedError,lambda : SXFunction("tmp", [x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : SX.fun("tmp", [x],[Foo()]))
     
     class Foo:
       def __SX__(self):
         raise Exception("15")
         
-    self.assertRaises(NotImplementedError,lambda : SXFunction("tmp", [x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : SX.fun("tmp", [x],[Foo()]))
 
     class Foo:
       pass
         
-    self.assertRaises(NotImplementedError,lambda :SXFunction("tmp", [x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda :SX.fun("tmp", [x],[Foo()]))
 
 
   def test_casting_MX(self):
@@ -736,24 +736,24 @@ class typemaptests(casadiTestCase):
       def __MX__(self):
         return x
         
-    MXFunction("tmp", [x],[Foo()])
+    MX.fun("tmp", [x],[Foo()])
     
     class Foo:
       def __MX__(self):
         return SX.sym("x")
         
-    self.assertRaises(NotImplementedError,lambda : MXFunction("tmp", [x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : MX.fun("tmp", [x],[Foo()]))
     
     class Foo:
       def __MX__(self):
         raise Exception("15")
         
-    self.assertRaises(NotImplementedError,lambda : MXFunction("tmp", [x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : MX.fun("tmp", [x],[Foo()]))
 
     class Foo:
       pass
         
-    self.assertRaises(NotImplementedError,lambda :MXFunction("tmp", [x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda :MX.fun("tmp", [x],[Foo()]))
     
   def test_OUTPUT(self):
     self.message("OUTPUT typemap")
@@ -774,7 +774,7 @@ class typemaptests(casadiTestCase):
   def test_sxmatrix(self):
 
     def val(a):
-      f = SXFunction("f", [],[a])
+      f = SX.fun("f", [],[a])
       f.evaluate()
       return f.getOutput()
       
@@ -823,7 +823,7 @@ class typemaptests(casadiTestCase):
       d = DMatrix.ones(2,2)
       
       x = SX.sym("x",d.sparsity())
-      f = SXFunction("f", [x],[x])
+      f = SX.fun("f", [x],[x])
       f.setInput(D)
 
       self.checkarray(f.getInput(),DMatrix([[1,2],[3,4]]))

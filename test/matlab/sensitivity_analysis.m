@@ -58,7 +58,7 @@ for ode=0:1
     quad = v^3 + ((3-sin(t)) - u)^2;
 
     % DAE callback function
-    ffcn = SXFunction('ffcn', daeIn('t',t,'x',x,'p',u),daeOut('ode',ode,'quad',quad));
+    ffcn = SX.fun('ffcn', daeIn('t',t,'x',x,'p',u),daeOut('ode',ode,'quad',quad));
 
     % Time length
     tf = 0.5;
@@ -93,7 +93,7 @@ for ode=0:1
     quad = x*x + 3.0*u*u;
 
     % DAE callback function
-    ffcn = SXFunction('ffcn', daeIn('x',x,'z',z,'p',u),daeOut('ode',ode,'alg',alg,'quad',quad));
+    ffcn = SX.fun('ffcn', daeIn('x',x,'z',z,'p',u),daeOut('ode',ode,'alg',alg,'quad',quad));
     
     % End time
     tf = 5;

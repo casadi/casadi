@@ -46,7 +46,7 @@ class Misctests(casadiTestCase):
     self.message('Regression test #179 (B)')
     def calc_sparsity():
       x = casadi.SX.sym("x")
-      f = casadi.SXFunction('f', [x], [x ** 2])
+      f = casadi.SX.fun('f', [x], [x ** 2])
       return f.jacSparsity()
     
     def print_sparsity():
@@ -94,9 +94,9 @@ class Misctests(casadiTestCase):
     self.message("Copy constructor for refcounted classes - lazy")
     x = SX.sym("x")
 
-    f = SXFunction('f', [x],[2*x])
+    f = SX.fun('f', [x],[2*x])
     f.setInput(2,0)
-    g = SXFunction(f)
+    g = Function(f)
 
     f.setInput(5,0)
     f.evaluate()
@@ -137,7 +137,7 @@ class Misctests(casadiTestCase):
     import copy
     x = SX.sym("x")
 
-    f = SXFunction('f', [x],[2*x])
+    f = SX.fun('f', [x],[2*x])
     f.setInput(2,0)
     g = copy.copy(f)
 
@@ -178,7 +178,7 @@ class Misctests(casadiTestCase):
   def test_options_introspection(self):
     self.message("options introspection")
     x=SX.sym("x")
-    nlp = SXFunction('nlp', nlpIn(x=x),nlpOut(f=x**2))
+    nlp = SX.fun('nlp', nlpIn(x=x),nlpOut(f=x**2))
     i = NlpSolver('i', "ipopt", nlp)
     
     opts = i.getOptionNames()
@@ -223,7 +223,7 @@ class Misctests(casadiTestCase):
     
   def test_exceptions(self):
     try:
-      MXFunction('tmp', nlpIn(x=SX.sym("x")))
+      MX.fun('tmp', nlpIn(x=SX.sym("x")))
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
@@ -333,7 +333,7 @@ class Misctests(casadiTestCase):
   def test_callkw(self):
       x = SX.sym("x")
 
-      f = SXFunction('f', nlpIn(x=x),nlpOut(g=x**2))
+      f = SX.fun('f', nlpIn(x=x),nlpOut(g=x**2))
 
       [f_,g_] = itemgetter('f','g')(f({'x':4}))
       self.checkarray(g_,DMatrix(16))
@@ -345,7 +345,7 @@ class Misctests(casadiTestCase):
         [f_,g_] = itemgetter('f','g')(f({'x':[x]}))
 
 
-      f = SXFunction('f', [x],nlpOut(g=x**2))
+      f = SX.fun('f', [x],nlpOut(g=x**2))
 
       with self.assertRaises(Exception):
         [f_,g_] = itemgetter('f','g')(f({'x':4}))
@@ -354,7 +354,7 @@ class Misctests(casadiTestCase):
     x = SX.sym("x")
     p = SX.sym("p")
 
-    F = SXFunction('F', nlpIn(x=x,p=p),nlpOut(g=x**2,f=x+p))
+    F = SX.fun('F', nlpIn(x=x,p=p),nlpOut(g=x**2,f=x+p))
     
     fc = F({'x':3,'p':4})
     [f] = fc['f']
@@ -378,7 +378,7 @@ class Misctests(casadiTestCase):
     
     v = sin(z)
     
-    f = MXFunction('f', [x],[v])
+    f = MX.fun('f', [x],[v])
     
     print f
     
@@ -401,7 +401,7 @@ class Misctests(casadiTestCase):
     assert "2" in result[0]
 
     x=SX.sym("x")
-    f = SXFunction('f', nlpIn(x=x),nlpOut(f=x**2))
+    f = SX.fun('f', nlpIn(x=x),nlpOut(f=x**2))
     solver = NlpSolver("solver", "ipopt",f)
     with capture_stdout() as result:
       solver.evaluate()

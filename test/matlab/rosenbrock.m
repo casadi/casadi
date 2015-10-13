@@ -33,7 +33,7 @@ z = SX.sym('z');
 v = [x;y;z]
 f = x^2 + 100*z^2;
 g = z + (1-x)^2 - y;
-nlp = SXFunction('nlp', nlpIn('x',v),nlpOut('f',f','g',g));
+nlp = SX.fun('nlp', nlpIn('x',v),nlpOut('f',f','g',g));
 
 % Create IPOPT solver object
 solver = NlpSolver('solver', 'ipopt', nlp);

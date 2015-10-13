@@ -149,11 +149,11 @@ class typemaptests(casadiTestCase):
       
       if type(z) in [type(SX()),type(SX())]:
         ztype = [type(SX()),type(SX())]
-        function = SXFunction
+        function = SX.fun
       
       if type(z) in [type(MX())]:
         ztype = [type(MX())]
-        function = MXFunction
+        function = MX.fun
         
       r = fun(z,s)
             

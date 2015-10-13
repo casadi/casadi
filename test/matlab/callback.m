@@ -7,7 +7,7 @@ foo = MyCallback('foo');
 
 y = foo({x});
 
-f = MXFunction('f',{x},y);
+f = MX.fun('f',{x},y);
 
 out = f({5});
 

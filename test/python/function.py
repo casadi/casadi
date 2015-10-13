@@ -32,32 +32,32 @@ class Functiontests(casadiTestCase):
 
   def test_call_empty(self):
     x = SX.sym("x",2)
-    fsx = SXFunction("fsx", [x,[]],[x])
+    fsx = SX.fun("fsx", [x,[]],[x])
     x = MX.sym("x",2)
-    fmx1 = MXFunction("fmx1", [x,MX()],[x])
-    fmx2 = MXFunction("fmx2", [x,[]],[x])
+    fmx1 = MX.fun("fmx1", [x,MX()],[x])
+    fmx2 = MX.fun("fmx2", [x,[]],[x])
     
     for f in [fsx,fmx1,fmx2]:
       f.evaluate()
 
       X = MX.sym("X",2)
       F = f([X,MX()])[0]
-      g = MXFunction("g", [X],[F])
+      g = MX.fun("g", [X],[F])
 
       g.evaluate()
     
     x = SX.sym("x",2)
-    fsx = SXFunction("fsx", [x],[x,[]])
+    fsx = SX.fun("fsx", [x],[x,[]])
     x = MX.sym("x",2)
-    fmx1 = MXFunction("fmx1", [x],[x,MX()])
-    fmx2 = MXFunction("fmx2", [x],[x,[]])
+    fmx1 = MX.fun("fmx1", [x],[x,MX()])
+    fmx2 = MX.fun("fmx2", [x],[x,[]])
     
     for f in [fsx,fmx1,]:
       f.evaluate()
 
       X = MX.sym("X",2)
       F = f([X])[0]
-      g = MXFunction("g", [X],[F])
+      g = MX.fun("g", [X],[F])
 
       g.evaluate()
   
@@ -66,7 +66,7 @@ class Functiontests(casadiTestCase):
     x = MX.sym("x",2)
     y = MX.sym("y")
 
-    f = MXFunction("f", [x,y],[sin(x) + y])
+    f = MX.fun("f", [x,y],[sin(x) + y])
         
     for mode in ["serial","openmp"]:
       x0 = MX.sym("x0",2)
@@ -76,7 +76,7 @@ class Functiontests(casadiTestCase):
 
       [[z0],[z1]] = f.map([[x0,y0],[x1,y1]],mode)
       
-      p = MXFunction("p", [x0,y0,x1,y1],[z0,z1])
+      p = MX.fun("p", [x0,y0,x1,y1],[z0,z1])
       
       n1 = DMatrix([4,5])
       N1 = 3
@@ -89,13 +89,13 @@ class Functiontests(casadiTestCase):
       self.checkarray(sin(n1)+N1,out[0],"output")
       self.checkarray(sin(n2)+N2,out[1],"output")
       
-  def test_MXFunctionSeed(self):
-    self.message("MXFunctionSeed")
+  def test_MX_funSeed(self):
+    self.message("MX.funSeed")
     x1 = MX.sym("x",2)
     y1 = MX.sym("y")
     x2 = MX.sym("x",2)
     y2 = MX.sym("y")
-    p= MXFunction("p", [x1,y1,x2,y2],[sin(x1) + y1,sin(x2) + y2])
+    p= MX.fun("p", [x1,y1,x2,y2],[sin(x1) + y1,sin(x2) + y2])
     
     n1 = DMatrix([4,5])
     N1 = 3
@@ -112,7 +112,7 @@ class Functiontests(casadiTestCase):
     x = MX.sym("x",2)
     y = MX.sym("y")
 
-    f = MXFunction("f", [x,y],[sin(x) + y])
+    f = MX.fun("f", [x,y],[sin(x) + y])
 
     #! Evaluate this function ten times in parallel
     x1 = MX.sym("x",2)
@@ -120,7 +120,7 @@ class Functiontests(casadiTestCase):
     x2 = MX.sym("x",2)
     y2 = MX.sym("y")
     [[F1],[F2]] = f.map([[x1,y1],[x2,y2]])
-    p = MXFunction("p", [x1,y1,x2,y2],[F1,F2])
+    p = MX.fun("p", [x1,y1,x2,y2],[F1,F2])
     
     n1 = DMatrix([4,5])
     N1 = 3
@@ -136,21 +136,21 @@ class Functiontests(casadiTestCase):
     self.message("regression test for #304") # this code used to segfault
     x = SX.sym("x")
 
-    f = SXFunction("f", [x],[x**2,x**3])
+    f = SX.fun("f", [x],[x**2,x**3])
 
     X = [MX.sym("X")]
 
     z=f(X)
 
-    g = MXFunction("g", X,[z[0]])
+    g = MX.fun("g", X,[z[0]])
 
-    g = SXFunction('expand_g', g)
+    g = SX.fun('expand_g', g)
   
   def test_jacobian(self):
     x = SX.sym("x",3,1)
     y = SX.sym("y",2,1)
 
-    f = SXFunction("f", [x,y],[x**2,y,x*y[0]])
+    f = SX.fun("f", [x,y],[x**2,y,x*y[0]])
 
     g = f.jacobian(0,0)
 
@@ -161,7 +161,7 @@ class Functiontests(casadiTestCase):
     x = SX.sym("x",3,1)
     y = SX.sym("y",2,1)
     
-    f = SXFunction("f", [x,y],[x**2,y,x*y[0]])
+    f = SX.fun("f", [x,y],[x**2,y,x*y[0]])
     
     f.setInput([0.1,0.7,1.3],0)
     f.setInput([7.1,2.9],1)
@@ -169,7 +169,7 @@ class Functiontests(casadiTestCase):
     X = MX.sym("x",3,1)
     Y = MX.sym("y",2,1)
     
-    F = MXFunction("F", [X,Y],[X**2,Y,X*Y[0]])
+    F = MX.fun("F", [X,Y],[X**2,Y,X*Y[0]])
     
     F.setInput([0.1,0.7,1.3],0)
     F.setInput([7.1,2.9],1)
@@ -278,7 +278,7 @@ class Functiontests(casadiTestCase):
     def test(sp):
       x = SX.sym("x",sp.size2())
       self.assertTrue(sp==sp.T)
-      f = SXFunction("f", [x],[mul([x.T,DMatrix.ones(sp),x])])
+      f = SX.fun("f", [x],[mul([x.T,DMatrix.ones(sp),x])])
       J = f.hessian()
       sp2 = J.sparsity_out(0)
       self.checkarray(sp.row(),sp2.row())
@@ -363,7 +363,7 @@ class Functiontests(casadiTestCase):
   def test_getOutput(self):
     x = SX.sym("x",2)
     
-    f = SXFunction("f", daeIn(x=x),daeOut(ode=x))
+    f = SX.fun("f", daeIn(x=x),daeOut(ode=x))
     f.setInput([1,2])
     f.evaluate()
     a = f.getOutput()
@@ -381,7 +381,7 @@ class Functiontests(casadiTestCase):
   def test_customIO(self):
     
     x = SX.sym("x")
-    f = SXFunction('f',[x],[x*x, x],{'output_scheme':["foo","bar"]})
+    f = SX.fun('f',[x],[x*x, x],{'output_scheme':["foo","bar"]})
     
     ret = f({"i0": 12})
 
@@ -401,14 +401,14 @@ class Functiontests(casadiTestCase):
   def test_setjacsparsity(self):
     x = MX.sym("x",4)
           
-    f = MXFunction("f", [x],[x])
+    f = MX.fun("f", [x],[x])
     
     J = f.jacobian()
     J.evaluate()
     
     self.assertEqual(J.nnz_out(0),4)
     
-    f = MXFunction("f", [x],[x])
+    f = MX.fun("f", [x],[x])
     f.setJacSparsity(Sparsity.dense(4,4),0,0,True)
     
     J = f.jacobian()
@@ -421,7 +421,7 @@ class Functiontests(casadiTestCase):
     n = 1
     x = SX.sym("x",n)
 
-    M = SXFunction("M", [x],[mul((x-DMatrix(range(n))),x.T)])
+    M = SX.fun("M", [x],[mul((x-DMatrix(range(n))),x.T)])
     M.evaluate()
 
 
@@ -430,7 +430,7 @@ class Functiontests(casadiTestCase):
 
     M_X= M([X])[0]
 
-    Pf = MXFunction("P", [X,P],[mul(M_X,P)])
+    Pf = MX.fun("P", [X,P],[mul(M_X,P)])
 
     P_P = Pf.jacobian(1)
 
@@ -442,7 +442,7 @@ class Functiontests(casadiTestCase):
     b = SX.sym("b")
     c = sin(a)+b
     d = cos(sumCols(a)-c)
-    f = SXFunction("f",[a,b],[c,d])
+    f = SX.fun("f",[a,b],[c,d])
 
     random.seed(0)
 
@@ -456,14 +456,14 @@ class Functiontests(casadiTestCase):
     Fref = blockcat([f(e) for e in r])
 
 
-    F = MXFunction("F",[],[blockcat(f.map(r))])
+    F = MX.fun("F",[],[blockcat(f.map(r))])
 
     self.checkarray(F([])[0],Fref)
     
     a = SX.sym("a",1,2)
     c = sin(a)
     d = cos(sumCols(a)-c)
-    f = SXFunction("f",[a],[c,d])
+    f = SX.fun("f",[a],[c,d])
 
     random.seed(0)
 
@@ -477,7 +477,7 @@ class Functiontests(casadiTestCase):
     Fref = blockcat([f(e) for e in r])
 
 
-    F = MXFunction("F",[],[blockcat(f.map(r))])
+    F = MX.fun("F",[],[blockcat(f.map(r))])
 
     self.checkarray(F([])[0],Fref)
 
@@ -485,7 +485,7 @@ class Functiontests(casadiTestCase):
     b = SX.sym("b")
     c = sin(a)+b
     d = cos(sumCols(a)-c)
-    f = SXFunction("f",[a,b],[c])
+    f = SX.fun("f",[a,b],[c])
 
     random.seed(0)
 
@@ -499,7 +499,7 @@ class Functiontests(casadiTestCase):
     Fref = blockcat([f(e) for e in r])
 
 
-    F = MXFunction("F",[],[blockcat(f.map(r))])
+    F = MX.fun("F",[],[blockcat(f.map(r))])
 
     self.checkarray(F([])[0],Fref)
     
@@ -508,7 +508,7 @@ class Functiontests(casadiTestCase):
 
     x = SX.sym("x")
 
-    f = SXFunction("f", daeIn(x=x),[x**2])
+    f = SX.fun("f", daeIn(x=x),[x**2])
 
     self.checkarray(f(x=0.3)['o0'],DMatrix(0.09))
 
@@ -520,9 +520,9 @@ class Functiontests(casadiTestCase):
 
     N = 9
 
-    rk4 = SXFunction("f",[x,u],[x+u])
+    rk4 = SX.fun("f",[x,u],[x+u])
 
-    for XX,XFunction in [(SX,SXFunction),(MX,MXFunction)]:
+    for XX,XFunction in [(SX,SX.fun),(MX,MX.fun)]:
 
       g = []
       g2 = []
@@ -569,7 +569,7 @@ class Functiontests(casadiTestCase):
     x = MX.sym('x')
     y = foo([x])
 
-    f = MXFunction("f",[x],y)
+    f = MX.fun("f",[x],y)
 
     out = f([5])
     
@@ -589,7 +589,7 @@ class Functiontests(casadiTestCase):
     x = MX.sym('x')
     y = foo([x])
 
-    f = MXFunction("f",[x],y)
+    f = MX.fun("f",[x],y)
 
     try:
       f([3])
@@ -603,7 +603,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = SXFunction("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
+    fun = SX.fun("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -624,14 +624,14 @@ class Functiontests(casadiTestCase):
         res = fun.map(map(horzcat,[X,Y,Z_alt,V]),parallelization)
 
 
-        F = MXFunction("F",X+Y+Z+V,map(sin,res))
+        F = MX.fun("F",X+Y+Z+V,map(sin,res))
 
         resref = [[] for i in range(fun.n_out())]
         for r in zip(X,Y,Z_alt2,V):
           for i,e in enumerate(map(sin,fun(r))):
             resref[i] = resref[i] + [e]
 
-        Fref = MXFunction("F",X+Y+Z+V,map(horzcat,resref))
+        Fref = MX.fun("F",X+Y+Z+V,map(horzcat,resref))
         
         np.random.seed(0)
         X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
@@ -639,7 +639,7 @@ class Functiontests(casadiTestCase):
         Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
         V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
-        for f in [F, SXFunction('expand_'+F.name(), F)]:
+        for f in [F, SX.fun('expand_'+F.name(), F)]:
           for i,e in enumerate(X_+Y_+Z_+V_):
             f.setInput(e,i)
             Fref.setInput(e,i)
@@ -658,7 +658,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = SXFunction("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
+    fun = SX.fun("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -676,13 +676,13 @@ class Functiontests(casadiTestCase):
         flatres = []
         for r in res:
           flatres+= map(sin,r)
-        F = MXFunction("F",X+Y+Z+V,flatres)
+        F = MX.fun("F",X+Y+Z+V,flatres)
 
         flatresref = []
         for r in zip(X,Y,Z_alt,V):
           flatresref+=map(sin,fun(r))
 
-        Fref = MXFunction("F",X+Y+Z+V,flatresref)
+        Fref = MX.fun("F",X+Y+Z+V,flatresref)
         
         np.random.seed(0)
         X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
@@ -690,7 +690,7 @@ class Functiontests(casadiTestCase):
         Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
         V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
-        for f in [F, SXFunction('expand_'+F.name(), F)]:
+        for f in [F, SX.fun('expand_'+F.name(), F)]:
           for i,e in enumerate(X_+Y_+Z_+V_):
             f.setInput(e,i)
             Fref.setInput(e,i)
@@ -707,7 +707,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = SXFunction("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
+    fun = SX.fun("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -723,14 +723,14 @@ class Functiontests(casadiTestCase):
         res = fun.mapsum(map(horzcat,[X,Y,Z_alt,V]),parallelization)
 
 
-        F = MXFunction("F",X+Y+Z+V,map(sin,res),{"ad_weight": 0})
+        F = MX.fun("F",X+Y+Z+V,map(sin,res),{"ad_weight": 0})
 
         resref = [0 for i in range(fun.n_out())]
         for r in zip(X,Y,Z_alt,V):
           for i,e in enumerate(fun(r)):
             resref[i] = resref[i] + e
 
-        Fref = MXFunction("F",X+Y+Z+V,map(sin,resref))
+        Fref = MX.fun("F",X+Y+Z+V,map(sin,resref))
         
         np.random.seed(0)
         X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
@@ -751,7 +751,7 @@ class Functiontests(casadiTestCase):
         self.checkfunction(Fcgen,Fref,jacobian=False,hessian=False,evals=False)
         del Fcgen
 
-        for f in [F,toSXFunction(F)]:
+        for f in [F,toSX_fun(F)]:
           for i,e in enumerate(X_+Y_+Z_+V_):
             f.setInput(e,i)
             Fref.setInput(e,i)
@@ -767,7 +767,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = SXFunction("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
+    fun = SX.fun("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -792,7 +792,7 @@ class Functiontests(casadiTestCase):
           bl.append(b)
           cl.append(c)
 
-        Fref = MXFunction("F",[horzcat(X),horzcat(Y),Z,V],[acc,horzcat(bl),horzcat(cl)])
+        Fref = MX.fun("F",[horzcat(X),horzcat(Y),Z,V],[acc,horzcat(bl),horzcat(cl)])
 
         np.random.seed(0)
         X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
@@ -814,7 +814,7 @@ class Functiontests(casadiTestCase):
         self.checkfunction(Fcgen,Fref,jacobian=False,hessian=False,evals=False)
         del Fcgen
 
-        for f in [F,toSXFunction(F)]:
+        for f in [F,toSX_fun(F)]:
           for i,e in enumerate([horzcat(X_),horzcat(Y_),Z_,V_]):
             f.setInput(e,i)
             Fref.setInput(e,i)
@@ -830,7 +830,7 @@ class Functiontests(casadiTestCase):
 
     obj = (x-(x+y))**2
 
-    nlp = MXFunction("nlp",nlpIn(x=V),nlpOut(f=obj))
+    nlp = MX.fun("nlp",nlpIn(x=V),nlpOut(f=obj))
 
     self.assertTrue(nlp.hessian(0,0).sparsity_out(0).issymmetric())
 
@@ -844,10 +844,10 @@ class Functiontests(casadiTestCase):
     for j in range(2):
       dist+=sumRows((xs[0]-(xs[j]+travels[j]))**2)
 
-    nlp = MXFunction("nlp",nlpIn(x=V),nlpOut(f=-dist))
+    nlp = MX.fun("nlp",nlpIn(x=V),nlpOut(f=-dist))
 
     hs = []
-    for n in [nlp,SXFunction(nlp)]:
+    for n in [nlp,SX.fun('nlp_expanded', nlp)]:
         H = n.derivative(0,1).jacobian(0,2,False,True)
 
         h = H(der_x=1,adj0_f=1)["jac"]
@@ -861,14 +861,14 @@ class Functiontests(casadiTestCase):
 
     z = MX.sym("y",2,2)
 
-    F = MXFunction("f",[x,z],[sumCols(sumRows(y))])
+    F = MX.fun("f",[x,z],[sumCols(sumRows(y))])
 
     x = SX.sym("x",2)
 
     y = sin(repmat(x**2,1,3))
     z = SX.sym("y",2,2)
 
-    Fref = SXFunction("f",[x,z],[sumCols(sumRows(y))])
+    Fref = SX.fun("f",[x,z],[sumCols(sumRows(y))])
     
     x0 = DMatrix([1,7])
     x1 = DMatrix([[3,0],[2,4]])
@@ -885,13 +885,13 @@ class Functiontests(casadiTestCase):
     x = MX.sym("x",2)
     z = MX.sym("y",2,2)
 
-    F = MXFunction("f",[x,z],[sin(repsum((x**2).T,1,2)),(cos(x**2)*2*x).T])
+    F = MX.fun("f",[x,z],[sin(repsum((x**2).T,1,2)),(cos(x**2)*2*x).T])
 
     x = SX.sym("x",2)
     z = SX.sym("y",2,2)
 
 
-    Fref = SXFunction("f",[x,z],[sin(repsum((x**2).T,1,2)),(cos(x**2)*2*x).T])
+    Fref = SX.fun("f",[x,z],[sin(repsum((x**2).T,1,2)),(cos(x**2)*2*x).T])
 
     x0 = DMatrix([1,7])
     x1 = DMatrix([[3,0],[2,4]])
@@ -912,7 +912,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("v",Sparsity.upper(3))
 
-    fun = SXFunction("f",[x,y,z,v],[mul(z,x)+y,sin(y*x).T,v/y])
+    fun = SX.fun("f",[x,y,z,v],[mul(z,x)+y,sin(y*x).T,v/y])
 
     n = 2
 
@@ -939,10 +939,10 @@ class Functiontests(casadiTestCase):
       Y0s.append(Y0)
       Y1s.append(Y1)
       Xps.append(XP)
-    Fref = MXFunction("f",[X,horzcat(Y),horzcat(Z),horzcat(V)],[horzcat(Xps),horzcat(Y0s),horzcat(Y1s)])
+    Fref = MX.fun("f",[X,horzcat(Y),horzcat(Z),horzcat(V)],[horzcat(Xps),horzcat(Y0s),horzcat(Y1s)])
     print Fref([X_,horzcat(Y_),horzcat(Z_),horzcat(V_)])
 
-    for f in [F,toSXFunction(F)]:
+    for f in [F,toSX_fun(F)]:
       for i,e in enumerate([X_,horzcat(Y_),horzcat(Z_),horzcat(V_)]):
         f.setInput(e,i)
         Fref.setInput(e,i)
@@ -950,7 +950,7 @@ class Functiontests(casadiTestCase):
       self.checkfunction(f,Fref)
       self.check_codegen(f)
 
-    fun = SXFunction("f",[y,x,z,v],[mul(z,x)+y+trace(v)**2,sin(y*x).T,v/y])
+    fun = SX.fun("f",[y,x,z,v],[mul(z,x)+y+trace(v)**2,sin(y*x).T,v/y])
 
     F = MapAccum("map",fun,n,[False,True,False,True],[0,2])
 
@@ -967,9 +967,9 @@ class Functiontests(casadiTestCase):
       Xps.append(XP)
       Vps.append(VP)
 
-    Fref = MXFunction("f",[horzcat(Y),X,horzcat(Z),V[0]],[horzcat(Xps),horzcat(Y0s),horzcat(Vps)])
+    Fref = MX.fun("f",[horzcat(Y),X,horzcat(Z),V[0]],[horzcat(Xps),horzcat(Y0s),horzcat(Vps)])
 
-    for f in [F,toSXFunction(F)]:
+    for f in [F,toSX_fun(F)]:
       for i,e in enumerate([horzcat(Y_),X_,horzcat(Z_),V_[0]]):
         f.setInput(e,i)
         Fref.setInput(e,i)
@@ -980,7 +980,7 @@ class Functiontests(casadiTestCase):
   # @requiresPlugin(Compiler,"clang")
   # def test_jitfunction_clang(self):
   #   x = MX.sym("x")
-  #   F = MXFunction("f",[x],[x**2],{'jit':True})
+  #   F = MX.fun("f",[x],[x**2],{'jit':True})
 
   #   out = F([5])
   #   self.checkarray(out[0],25)
@@ -1033,7 +1033,7 @@ class Functiontests(casadiTestCase):
 
     r = sqrt(sumRows((p-x)**2))
 
-    f = SXFunction("f",[p,v,x],[v**2*exp(-r**2)/pi])
+    f = SX.fun("f",[p,v,x],[v**2*exp(-r**2)/pi])
 
     F = KernelSum2D("test",f,(n,m),4,1,{"ad_weight": 1})
 
@@ -1046,7 +1046,7 @@ class Functiontests(casadiTestCase):
     
     zs = MX.sym("z", z.shape)
     xs = MX.sym("x",2)
-    Fref = MXFunction("Fref",[zs,xs],Fref([horzcat([vec(xx),vec(yy)]).T,vec(zs),xs]))
+    Fref = MX.fun("Fref",[zs,xs],Fref([horzcat([vec(xx),vec(yy)]).T,vec(zs),xs]))
     
     F.setInput(z,0)
     Fref.setInput(z,0)
