@@ -101,7 +101,7 @@ namespace casadi {
     log("CvodesInterface::init", "begin");
 
     // Free memory if already initialized
-    if (isInit()) freeCVodes();
+    freeCVodes();
 
     // Initialize the base classes
     SundialsInterface::init();

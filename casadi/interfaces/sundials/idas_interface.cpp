@@ -124,7 +124,7 @@ namespace casadi {
     log("IdasInterface::init", "begin");
 
     // Free memory if already initialized
-    if (isInit()) freeIDAS();
+    freeIDAS();
 
     // Call the base class init
     SundialsInterface::init();

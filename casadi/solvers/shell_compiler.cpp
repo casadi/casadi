@@ -72,9 +72,6 @@ namespace casadi {
   }
 
   void ShellCompiler::init() {
-    // Initialize the base classes
-    CompilerInternal::init();
-
     // Read options
     string compiler = getOption("compiler").toString();
     string compiler_setup = getOption("compiler_setup").toString();

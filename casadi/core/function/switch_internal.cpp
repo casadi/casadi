@@ -49,7 +49,7 @@ namespace casadi {
     for (int k=0; k<=f_.size(); ++k) {
       Function& fk = k<f_.size() ? f_[k] : f_def_;
       if (fk.isNull()) continue;
-      fk.init(false);
+      fk.init();
       if (num_in<0) {
         // Number of inputs and outputs
         num_in=fk.n_in();

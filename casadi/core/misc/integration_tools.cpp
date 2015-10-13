@@ -132,7 +132,7 @@ namespace casadi {
 
   MXFunction simpleRK(Function f, int N, int order) {
     // Initialize f, if needed
-    f.init(false);
+    f.init();
 
     // Consistency check
     casadi_assert_message(N>=1, "Parameter N (number of steps) must be at least 1, but got "
@@ -250,7 +250,7 @@ namespace casadi {
                        const std::string& solver,
                        const Dict& solver_options) {
     // Initialize f, if needed
-    f.init(false);
+    f.init();
 
     // Consistency check
     casadi_assert_message(N>=1, "Parameter N (number of steps) must be at least 1, but got "
@@ -321,7 +321,7 @@ namespace casadi {
   MXFunction simpleIntegrator(Function f, const std::string& integrator,
                               const Dict& integrator_options) {
     // Initialize f, if needed
-    f.init(false);
+    f.init();
 
     // Consistency check
     casadi_assert_message(f.n_in()==2, "Function must have two inputs: x and p");

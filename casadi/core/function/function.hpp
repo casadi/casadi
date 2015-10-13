@@ -878,6 +878,13 @@ namespace casadi {
 
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     static std::string sanitizeName(const std::string& name);
+
+#ifndef SWIG
+    /** \brief Initialize the object, called from constructor */
+    void init();
+#endif // SWIG
+
+
   };
 
 } // namespace casadi

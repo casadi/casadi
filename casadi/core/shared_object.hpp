@@ -139,22 +139,6 @@ namespace casadi {
     void printPtr(std::ostream &stream=casadi::userOut()) const;
     /// \endcond
 
-#ifndef SWIG
-    /** \brief [DEPRECATED] Initialize or re-initialize the object:
-    *
-    * more documentation in the node class (SharedObjectNode and derived classes)
-    */
-    void init(bool allow_reinit);
-
-    /// Is initialized?
-    bool isInit() const;
-#endif // SWIG
-
-    /// \cond INTERNAL
-    /// Assert that it is initialized
-    void assertInit() const;
-    /// \endcond
-
     /// Is a null pointer?
     bool isNull() const;
 
@@ -200,18 +184,6 @@ namespace casadi {
     /// Get the reference count
     int getCount() const;
 
-    /// Initialize the object
-    virtual void init();
-
-    /// Finalize the object creation. To be run when init has been completed.
-    virtual void finalize();
-
-    /// Check if the object has been initialized
-    bool isInit() const;
-
-    /// Assert that the object has been initialized
-    void assertInit() const;
-
     /// Print a representation of the object
     virtual void repr(std::ostream &stream) const;
 
@@ -240,9 +212,6 @@ namespace casadi {
     /// Get a shared object from the current internal object
     template<class B>
     const B shared_from_this() const;
-
-    /// Has the function been initialized?
-    bool is_init_;
 
   private:
     /// Number of references pointing to the object

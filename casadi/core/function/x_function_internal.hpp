@@ -206,9 +206,6 @@ namespace casadi {
       // If the last element on the stack has not yet been added
       if (t && !t->temp) {
 
-        // Initialize the node
-        t->init();
-
         // Find out which not yet added dependency has most number of dependencies
         int max_deps = -1, dep_with_max_deps = -1;
         for (int i=0; i<t->ndep(); ++i) {

@@ -38,7 +38,7 @@ namespace casadi {
                  const Dict& opts) {
     assignNode(new KernelSum2DInternal(name, f, size, r, n));
     setOption(opts);
-    init(false);
+    init();
   }
 
   KernelSum2DInternal* KernelSum2D::operator->() {

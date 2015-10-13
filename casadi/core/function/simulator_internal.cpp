@@ -65,7 +65,7 @@ namespace casadi {
       I.setOption("t0", grid_[0]);
       // Let the integration time stop at the last point of the time grid.
       I.setOption("tf", grid_[grid_.size()-1]);
-      I.init(false);
+      I.init();
 
       // Overwrite
       integrator_ = shared_cast<Integrator>(I);

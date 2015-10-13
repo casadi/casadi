@@ -190,7 +190,6 @@ namespace casadi {
 
 #define SETTERS_NZ(T) \
     void setInputNZ(T val, int iind=0) {                                \
-      self().assertInit();                                              \
       try {                                                             \
         self().input(iind).setNZ(val);                                  \
       } catch(std::exception& e) {                                      \
@@ -198,7 +197,7 @@ namespace casadi {
       }                                                                 \
     }                                                                   \
     void setOutputNZ(T val, int oind=0) {                               \
-      self().assertInit(); self().output(oind).setNZ(val);              \
+      self().output(oind).setNZ(val);              \
     }                                                                   \
     void setInputNZ(T val, const std::string &iname) {                  \
       setInputNZ(val, self().index_in(iname));                        \
@@ -209,7 +208,6 @@ namespace casadi {
 
 #define SETTERS_SUB(T)                                                  \
     void setInput(T val, int iind=0) {                                  \
-      self().assertInit();                                              \
       try {                                                             \
         self().input(iind).set(val);                                    \
       } catch(std::exception& e) {                                      \
@@ -217,7 +215,7 @@ namespace casadi {
       }                                                                 \
     }                                                                   \
     void setOutput(T val, int oind=0) {                                 \
-      self().assertInit(); self().output(oind).set(val);                \
+      self().output(oind).set(val);                \
     }                                                                   \
     void setInput(T val, const std::string &iname) {                    \
       setInput(val, self().index_in(iname));                          \
@@ -242,10 +240,10 @@ namespace casadi {
 
 #define GETTERS_NZ(T)                                           \
       void getInputNZ(T val, int iind=0) const {                \
-        self().assertInit(); self().input(iind).getNZ(val);     \
+        self().input(iind).getNZ(val);     \
       }                                                         \
       void getOutputNZ(T val, int oind=0) const {               \
-        self().assertInit(); self().output(oind).getNZ(val);    \
+        self().output(oind).getNZ(val);    \
       }                                                         \
       void getInputNZ(T val, const std::string &iname) const {  \
         getInputNZ(val, self().index_in(iname));              \
@@ -256,10 +254,10 @@ namespace casadi {
 
 #define GETTERS_SUB(T)                                                  \
       void getInput(T val, int iind=0) const {                          \
-        self().assertInit(); self().input(iind).get(val);               \
+        self().input(iind).get(val);               \
       }                                                                 \
       void getOutput(T val, int oind=0) const {                         \
-        self().assertInit(); self().output(oind).get(val);              \
+        self().output(oind).get(val);              \
       }                                                                 \
       void getInput(T val, const std::string &iname) const {            \
         getInput(val, self().index_in(iname));                        \

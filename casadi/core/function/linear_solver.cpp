@@ -40,27 +40,22 @@ namespace casadi {
   }
 
   void LinearSolver::prepare() {
-    assertInit();
     (*this)->prepare();
   }
 
   void LinearSolver::solve(double* x, int nrhs, bool transpose) {
-    assertInit();
     (*this)->solve(x, nrhs, transpose);
   }
 
   void LinearSolver::solve(bool transpose) {
-    assertInit();
     (*this)->solve(transpose);
   }
 
   MX LinearSolver::solve(const MX& A, const MX& B, bool transpose) {
-    assertInit();
     return (*this)->solve(A, B, transpose);
   }
 
   bool LinearSolver::prepared() const {
-    assertInit();
     return (*this)->prepared_;
   }
 
@@ -84,7 +79,7 @@ namespace casadi {
       assignNode(LinearSolverInternal::getPlugin(solver).creator(name, sp, nrhs));
     }
     setOption(opts);
-    init(false);
+    init();
   }
 
   LinearSolver::LinearSolver(const std::string& name, const std::string& solver,
@@ -95,7 +90,7 @@ namespace casadi {
       assignNode(LinearSolverInternal::getPlugin(solver).creator(name, sp, 1));
     }
     setOption(opts);
-    init(false);
+    init();
   }
 
   bool LinearSolver::hasPlugin(const std::string& name) {

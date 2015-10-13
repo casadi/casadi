@@ -50,7 +50,7 @@ namespace casadi {
 
   void HomotopyNLPInternal::init() {
     // Initialize the Homotopy NLP
-    hnlp_.init(false);
+    hnlp_.init();
 
     casadi_assert_message(hnlp_.n_in()==HNL_NUM_IN,
                           "The HNLP function must have exactly three input");
@@ -102,7 +102,7 @@ namespace casadi {
       } else {
         hnlp_ = SXFunction(hnlp_mx);
         hnlp_.copyOptions(hnlp_mx, true);
-        hnlp_.init(false);
+        hnlp_.init();
       }
     }
   }

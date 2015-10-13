@@ -57,7 +57,7 @@ namespace casadi {
     if (!ischeme.empty()) setOption("input_scheme", ischeme);
     if (!oscheme.empty()) setOption("output_scheme", oscheme);
     setOption(opts);
-    init(false);
+    init();
   }
 
   MXFunction::MXFunction(const std::string& name, const std::vector<MX>& arg,

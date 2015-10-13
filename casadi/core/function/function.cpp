@@ -89,7 +89,6 @@ namespace casadi {
 
   vector<vector<MX> > Function::map(const vector<vector<MX> > &x,
                                     const std::string& parallelization) {
-    assertInit();
     if (x.empty()) return x;
 
     // Check if arguments match
@@ -125,7 +124,6 @@ namespace casadi {
 
   vector<MX> Function::map(const vector< MX > &x,
                                     const std::string& parallelization) {
-    assertInit();
     if (x.empty()) return x;
 
     // Replace arguments if needed
@@ -166,7 +164,6 @@ namespace casadi {
 
   vector<MX> Function::mapsum(const vector< MX > &x,
                                     const std::string& parallelization) {
-    assertInit();
     if (x.empty()) return x;
 
     // Replace arguments if needed
@@ -194,7 +191,6 @@ namespace casadi {
   }
 
   void Function::evaluate() {
-    assertInit();
     (*this)->evaluate();
   }
 
@@ -263,7 +259,6 @@ namespace casadi {
   }
 
   Function Function::jacobian(int iind, int oind, bool compact, bool symmetric) {
-    assertInit();
     return (*this)->jacobian(iind, oind, compact, symmetric);
   }
 
@@ -272,22 +267,18 @@ namespace casadi {
   }
 
   Function Function::gradient(int iind, int oind) {
-    assertInit();
     return (*this)->gradient(iind, oind);
   }
 
   Function Function::tangent(int iind, int oind) {
-    assertInit();
     return (*this)->tangent(iind, oind);
   }
 
   Function Function::hessian(int iind, int oind) {
-    assertInit();
     return (*this)->hessian(iind, oind);
   }
 
   Function Function::fullJacobian() {
-    assertInit();
     return (*this)->fullJacobian();
   }
 
@@ -761,8 +752,6 @@ namespace casadi {
   template<typename M>
   const std::map<std::string, M>
   Function::callMap(const std::map<std::string, M>& arg, bool always_inline, bool never_inline) {
-    casadi_assert(isInit());
-
     // Get default inputs
     std::vector<M> v(n_in());
     for (int i=0; i<v.size(); ++i) {
@@ -1049,6 +1038,11 @@ namespace casadi {
 
   int Function::countNodes() const {
     return (*this)->countNodes();
+  }
+
+  void Function::init() {
+    (*this)->init();
+    (*this)->finalize();
   }
 
 } // namespace casadi

@@ -525,7 +525,6 @@ namespace casadi {
         std::stringstream ss;
         ss <<  "In function " << name_
            << ": input " << i << " not in interval [0, " << n_in() << ")";
-        if (!isInit()) ss << std::endl << "Did you forget to initialize?";
         throw CasadiException(ss.str());
       }
     }
@@ -553,7 +552,6 @@ namespace casadi {
         std::stringstream ss;
         ss <<  "In function " << name_
            << ": output " << i << " not in interval [0, " << n_out() << ")";
-        if (!isInit()) ss << std::endl << "Did you forget to initialize?";
         throw CasadiException(ss.str());
       }
     }

@@ -34,7 +34,7 @@ namespace casadi {
   Map::Map(const std::string& name, const Function& f, int n, const Dict& opts) {
     assignNode(MapBase::create(name, f, n, opts));
     setOption(opts);
-    init(false);
+    init();
   }
 
   Map::Map(const std::string& name, const Function& f,
@@ -44,7 +44,7 @@ namespace casadi {
                  const Dict& opts) {
     assignNode(new MapReduce(name, f, n, repeat_in, repeat_out));
     setOption(opts);
-    init(false);
+    init();
   }
 
   MapReduce* Map::operator->() {

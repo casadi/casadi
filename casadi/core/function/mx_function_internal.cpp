@@ -638,7 +638,6 @@ namespace casadi {
 
   void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     log("MXFunctionInternal::evalMX begin");
-    assertInit();
     casadi_assert_message(arg.size()==n_in(), "Wrong number of input arguments");
 
     // Resize the number of outputs
@@ -698,7 +697,6 @@ namespace casadi {
   void MXFunctionInternal::evalFwd(const std::vector<std::vector<MX> >& fseed,
                                    std::vector<std::vector<MX> >& fsens) {
     log("MXFunctionInternal::evalFwd begin");
-    assertInit();
 
     // Allocate results
     int nfwd = fseed.size();
@@ -828,7 +826,6 @@ namespace casadi {
   void MXFunctionInternal::evalAdj(const std::vector<std::vector<MX> >& aseed,
                                    std::vector<std::vector<MX> >& asens) {
     log("MXFunctionInternal::evalAdj begin");
-    assertInit();
 
     // Allocate results
     int nadj = aseed.size();
@@ -1041,7 +1038,6 @@ namespace casadi {
   }
 
   SXFunction MXFunctionInternal::expand(const std::vector<SX>& inputvsx) {
-    assertInit();
 
     // Create inputs with the same name and sparsity as the matrix valued symbolic inputs
     vector<SX> arg(inputv_.size());
@@ -1235,8 +1231,6 @@ namespace casadi {
   }
 
   void MXFunctionInternal::generateLiftingFunctions(Function& vdef_fcn, Function& vinit_fcn) {
-    assertInit();
-
     vector<MX> swork(workloc_.size()-1);
 
     vector<MX> arg1, res1;

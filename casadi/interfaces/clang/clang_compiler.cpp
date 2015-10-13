@@ -76,9 +76,6 @@ namespace casadi {
   }
 
   void ClangCompiler::init() {
-    // Initialize the base classes
-    CompilerInternal::init();
-
     // Arguments to pass to the clang frontend
     vector<const char *> args(1, name_.c_str());
     std::vector<std::string> flags;

@@ -60,6 +60,9 @@ namespace casadi {
     // Creator function for internal class
     typedef CompilerInternal* (*Creator)(const std::string& name);
 
+    /** \brief Initialize */
+    virtual void init() = 0;
+
     // No static functions exposed
     struct Exposed{ };
 

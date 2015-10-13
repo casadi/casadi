@@ -35,7 +35,7 @@ namespace casadi {
                                      const Function& f, const Dict& opts) {
     assignNode(ImplicitFunctionInternal::instantiatePlugin(name, solver, f));
     setOption(opts);
-    init(false);
+    init();
   }
 
   ImplicitFunctionInternal* ImplicitFunction::operator->() {

@@ -161,8 +161,6 @@ namespace casadi {
   }
 
   bool SXFunctionInternal::isSmooth() const {
-    assertInit();
-
     // Go through all nodes and check if any node is non-smooth
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       if (!operation_checker<SmoothChecker>(it->op)) {

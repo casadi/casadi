@@ -3428,9 +3428,9 @@ def PyFunction(name, obj, inputs, outputs, opts={}):
 %template(IOInterfaceFunction) casadi::IOInterface<casadi::Function>;
 
 %extend casadi::IOInterface<casadi::Function> {
-  casadi::Matrix<double> getInput(int iind=0) const             { static_cast<const casadi::Function*>($self)->assertInit(); return $self->input(iind);}
+  casadi::Matrix<double> getInput(int iind=0) const             { static_cast<const casadi::Function*>(return $self->input(iind);}
   casadi::Matrix<double> getInput(const std::string &iname) const             { return $self->input($self->inputIndex(iname)); }
-  casadi::Matrix<double> getOutput(int oind=0) const            { static_cast<const casadi::Function*>($self)->assertInit(); return $self->output(oind);}
+  casadi::Matrix<double> getOutput(int oind=0) const            { static_cast<const casadi::Function*>(return $self->output(oind);}
 }
 
 %include <casadi/core/function/io_scheme.hpp>

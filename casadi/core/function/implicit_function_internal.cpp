@@ -60,7 +60,7 @@ namespace casadi {
   void ImplicitFunctionInternal::init() {
 
     // Initialize the residual function
-    f_.init(false);
+    f_.init();
 
     // Which input/output correspond to the root-finding problem?
     iin_ = getOption("implicit_input");
@@ -108,7 +108,7 @@ namespace casadi {
 
     // Generate Jacobian if not provided
     if (jac_.isNull()) jac_ = f_.jacobian(iin_, iout_);
-    jac_.init(false);
+    jac_.init();
 
     // Check for structural singularity in the Jacobian
     casadi_assert_message(
@@ -137,7 +137,7 @@ namespace casadi {
       }
     } else {
       // Initialize the linear solver, if provided
-      linsol_.init(false);
+      linsol_.init();
       casadi_assert(linsol_.input().sparsity()==jac_.output().sparsity());
     }
 

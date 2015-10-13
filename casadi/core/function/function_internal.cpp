@@ -165,9 +165,6 @@ namespace casadi {
     inputs_check_ = getOption("inputs_check");
     alloc_arg(0);
     alloc_res(0);
-
-    // Mark the function as initialized
-    is_init_ = true;
   }
 
   void FunctionInternal::finalize() {
@@ -190,7 +187,6 @@ namespace casadi {
   }
 
   void FunctionInternal::printDimensions(ostream &stream) const {
-    casadi_assert(isInit());
     stream << " Number of inputs: " << n_in() << endl;
     for (int i=0; i<n_in(); ++i) {
       stream << "  Input " << i  << ", a.k.a. \"" << name_in(i) << "\", "
@@ -1083,8 +1079,6 @@ namespace casadi {
   }
 
   Sparsity& FunctionInternal::jacSparsity(int iind, int oind, bool compact, bool symmetric) {
-    casadi_assert_message(isInit(), "Function not initialized.");
-
     // Get an owning reference to the block
     Sparsity jsp = compact ? jac_sparsity_compact_.elem(oind, iind)
         : jac_sparsity_.elem(oind, iind);
@@ -1773,7 +1767,6 @@ namespace casadi {
 
     } else {
       // Create a call-node
-      assertInit();
 
       // Argument checking
       casadi_assert_message(
@@ -1911,8 +1904,6 @@ namespace casadi {
 
   void FunctionInternal::generateFunction(CodeGenerator& g,
                                           const std::string& fname, bool decl_static) const {
-    assertInit();
-
     // Add standard math
     g.addInclude("math.h");
 
@@ -2933,12 +2924,10 @@ namespace casadi {
   }
 
   const SX FunctionInternal::sx_in(int ind) const {
-    assertInit();
     return SX::sym("x_" + to_string(ind), sparsity_in(ind));
   }
 
   const SX FunctionInternal::sx_out(int ind) const {
-    assertInit();
     return SX::sym("r_" + to_string(ind), sparsity_out(ind));
   }
 
@@ -2959,12 +2948,10 @@ namespace casadi {
   }
 
   const MX FunctionInternal::mx_in(int ind) const {
-    assertInit();
     return MX::sym("x_" + to_string(ind), sparsity_in(ind));
   }
 
   const MX FunctionInternal::mx_out(int ind) const {
-    assertInit();
     return MX::sym("r_" + to_string(ind), sparsity_out(ind));
   }
 

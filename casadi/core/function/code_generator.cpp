@@ -84,7 +84,6 @@ namespace casadi {
   }
 
   void CodeGenerator::add(const Function& f) {
-    casadi_assert(f.isInit());
     add(f, f.getSanitizedName());
   }
 

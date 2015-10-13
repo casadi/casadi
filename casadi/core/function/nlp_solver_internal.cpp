@@ -101,7 +101,7 @@ namespace casadi {
 
   void NlpSolverInternal::init() {
     // Initialize the NLP
-    nlp_.init(false);
+    nlp_.init();
     casadi_assert_message(nlp_.n_in()==NL_NUM_IN,
                           "The NLP function must have exactly two input");
     casadi_assert_message(nlp_.n_out()==NL_NUM_OUT,
@@ -160,7 +160,7 @@ namespace casadi {
       } else {
         nlp_ = SXFunction(nlp_mx);
         nlp_.copyOptions(nlp_mx, true);
-        nlp_.init(false);
+        nlp_.init();
       }
     }
 
@@ -257,7 +257,7 @@ namespace casadi {
     if (hasSetOption("jac_f_options")) {
       jacF.setOption(getOption("jac_f_options"));
     }
-    jacF.init(false);
+    jacF.init();
     casadi_assert_message(jacF.n_in()==GRADF_NUM_IN,
                           "Wrong number of inputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
@@ -290,7 +290,7 @@ namespace casadi {
     if (hasSetOption("grad_f_options")) {
       gradF.setOption(getOption("grad_f_options"));
     }
-    gradF.init(false);
+    gradF.init();
     casadi_assert_message(gradF.n_in()==GRADF_NUM_IN,
                           "Wrong number of inputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
@@ -334,7 +334,7 @@ namespace casadi {
     if (hasSetOption("jac_g_options")) {
       jacG.setOption(getOption("jac_g_options"));
     }
-    jacG.init(false);
+    jacG.init();
     casadi_assert_message(jacG.n_in()==JACG_NUM_IN,
                           "Wrong number of inputs to the Jacobian function. "
                           "Note: The Jacobian signature was changed in #544");
@@ -375,7 +375,7 @@ namespace casadi {
     if (hasSetOption("grad_lag_options")) {
       gradLag.setOption(getOption("grad_lag_options"));
     }
-    gradLag.init(false);
+    gradLag.init();
     log("Gradient function initialized");
     return gradLag;
   }
@@ -409,7 +409,7 @@ namespace casadi {
     if (hasSetOption("hess_lag_options")) {
       hessLag.setOption(getOption("hess_lag_options"));
     }
-    hessLag.init(false);
+    hessLag.init();
     casadi_assert_message(hessLag.n_in()==HESSLAG_NUM_IN,
                           "Wrong number of inputs to the Hessian function. "
                           "Note: The Lagrangian Hessian signature was changed in #544");
