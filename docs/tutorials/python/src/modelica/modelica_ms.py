@@ -93,8 +93,8 @@ ode_fcn = MX.fun('ode_fcn', [x,u],[f,L])
 init_fcn = MX.fun('init_fcn', [x],[I])
 #$ Increased speed is often possible by converting the MX.fun instances to SX.fun instances.
 #$ This is possible when the symbolic expressions do not contain any exotic operators:
-ode_fcn = SX.fun(ode_fcn)
-init_fcn = SX.fun(init_fcn)
+ode_fcn = SX.fun('ode_fcn', ode_fcn)
+init_fcn = SX.fun('init_fcn', init_fcn)
 #$ We shall use the "direct multiple shooting" method with 20 shooting intervals of equal length
 #$ to solve the IVP. 
 nk = 20
