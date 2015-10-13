@@ -52,7 +52,7 @@ int main(){
   SX ode = vertcat((1 - x[1]*x[1])*x[0] - x[1] + p,
                    x[0],
                    x[0]*x[0] + x[1]*x[1] + p*p);
-  SXFunction f("f", daeIn("x",x,"p",p),daeOut("ode",ode));
+  Function f = SX::fun("f", daeIn("x",x,"p",p),daeOut("ode",ode));
 
   // Number of finite elements
   int n = 100;
@@ -119,10 +119,10 @@ int main(){
   }
 
   // Root-finding function, implicitly defines V as a function of X0 and P
-  MXFunction vfcn("vfcn", {V, X0, P}, {vertcat(V_eq)});
+  Function vfcn = MX::fun("vfcn", {V, X0, P}, {vertcat(V_eq)});
   
-  // Convert to SXFunction to decrease overhead
-  SXFunction vfcn_sx(vfcn);
+  // Convert to sxfunction to decrease overhead
+  Function vfcn_sx = SX::fun("vfcn", vfcn);
 
   // Create a implicit function instance to solve the system of equations
   ImplicitFunction ifcn("ifcn", "newton", vfcn_sx, make_dict("linear_solver", "csparse"));
@@ -140,7 +140,7 @@ int main(){
   }
   
   // Get the discrete time dynamics
-  MXFunction F("F", {X0, P}, {XF});
+  Function F = MX::fun("F", {X0, P}, {XF});
 
   // Do this iteratively for all finite elements
   MX Xk = X0;
@@ -149,9 +149,9 @@ int main(){
   }
 
   // Fixed-step integrator
-  MXFunction irk_integrator("irk_integrator",
-                            integratorIn("x0", X0, "p", P),
-                            integratorOut("xf", Xk));
+  Function irk_integrator = MX::fun("irk_integrator",
+                                    integratorIn("x0", X0, "p", P),
+                                    integratorOut("xf", Xk));
 
   // Create a convensional integrator for reference
   Integrator ref_integrator("ref_integrator", "cvodes", f, make_dict("tf", tf));

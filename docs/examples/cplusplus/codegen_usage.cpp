@@ -200,7 +200,7 @@ int main(){
   SX y = SX::sym("y");
 
   // Simple function
-  SXFunction f("f", {x, y}, {sqrt(y)-1, sin(x)-y});
+  Function f = SX::fun("f", {x, y}, {sqrt(y)-1, sin(x)-y});
 
   // Generate C-code
   f.generate("f");

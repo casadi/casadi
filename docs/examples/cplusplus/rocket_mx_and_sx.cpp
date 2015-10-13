@@ -57,7 +57,7 @@ Function create_integrator(int nj, int nu){
   SX x0 = vertcat(s0, v0, m0);
 
   // Integrator
-  return SXFunction("integrator", {u, x0}, {x});
+  return SX::fun("integrator", {u, x0}, {x});
 }
 
 
@@ -97,7 +97,7 @@ int main(){
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  MXFunction nlp("nlp", nlpIn("x",U),nlpOut("f",F,"g",G));
+  Function nlp = MX::fun("nlp", nlpIn("x",U),nlpOut("f",F,"g",G));
 
   // Allocate an NLP solver and buffers
   Dict opts = make_dict("tol", 1e-10,

@@ -67,7 +67,7 @@ int main(){
   vector<double> ubg = {0.00};
 
   // Create NLP
-  SXFunction nlp("nlp", nlpIn("x", x), nlpOut("f", f, "g", g));
+  Function nlp = SX::fun("nlp", nlpIn("x", x), nlpOut("f", f, "g", g));
 
   // NLP solver options
   Dict opts;

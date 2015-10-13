@@ -74,7 +74,7 @@ int main(){
   SX g = vertcat(s, v, v_traj);
   
   // Create the NLP
-  SXFunction nlp("nlp", nlpIn("x", u), nlpOut("f", f, "g", g));
+  Function nlp = SX::fun("nlp", nlpIn("x", u), nlpOut("f", f, "g", g));
   
   // Allocate an NLP solver and buffers
   NlpSolver solver("solver", "ipopt", nlp);
@@ -107,7 +107,7 @@ int main(){
 
   // Get the state trajectory
   vector<double> sopt(nu), vopt(nu), mopt(nu);
-  SXFunction xfcn("xfcn", make_vector(u), make_vector(s_traj, v_traj, m_traj));
+  Function xfcn = SX::fun("xfcn", make_vector(u), make_vector(s_traj, v_traj, m_traj));
   assign_vector(sopt, vopt, mopt, xfcn(make_vector(res.at("x"))));
   cout << "position: " << sopt << endl;
   cout << "velocity: " << vopt << endl;

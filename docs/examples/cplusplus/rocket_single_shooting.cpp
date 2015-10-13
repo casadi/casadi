@@ -93,7 +93,7 @@ int main(){
   x0[2] = 1;
 
   // DAE residual function
-  SXFunction daefcn("dae_residual", daeIn("x", x, "p", u, "t", t), daeOut("ode", rhs));
+  Function daefcn = SX::fun("dae_residual", daeIn("x", x, "p", u, "t", t), daeOut("ode", rhs));
 
   // Integrator options
   string plugin;
@@ -152,7 +152,7 @@ int main(){
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  MXFunction nlp("nlp", nlpIn("x", U), nlpOut("f", F, "g", G));
+  Function nlp = MX::fun("nlp", nlpIn("x", U), nlpOut("f", F, "g", G));
 
   // NLP solver options
   Dict solver_opts;

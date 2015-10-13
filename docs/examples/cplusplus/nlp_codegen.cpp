@@ -39,9 +39,9 @@ using namespace std;
 Function generateCodeAndCompile(Function fcn, const std::string& name, bool expand){
   cout << "Generating code for " << name << endl;
 
-  // Convert to an SXFunction (may or may not improve efficiency)
+  // Convert to sx (may or may not improve efficiency)
   if(expand && fcn.is_a("mxfunction")) {
-    fcn = SXFunction(shared_cast<MXFunction>(fcn));
+    fcn = SX::fun(fcn.name(), fcn);
   }
 
   // Generate C code
@@ -55,8 +55,7 @@ Function generateCodeAndCompile(Function fcn, const std::string& name, bool expa
   casadi_assert_message(flag==0, "Compilation failed");
 
   // Load the generated function for evaluation
-  ExternalFunction fcn_e(name);
-  return fcn_e;
+  return ExternalFunction(name);
 }
 
 int main(){
@@ -75,11 +74,11 @@ int main(){
   // Constraints
   MX g = x[0]+x[1]-10;
     
-  // Convert MXFunction to SXFunction before code generation (may or may not improve efficiency)
+  // Convert mxfunction to sxfunction before code generation (may or may not improve efficiency)
   bool expand = true;
 
   // NLP function
-  Function nlp = MXFunction("nlp", nlpIn("x", x),nlpOut("f", f, "g", g));
+  Function nlp = MX::fun("nlp", nlpIn("x", x),nlpOut("f", f, "g", g));
 
   // Gradient of the objective
   Function grad_f = nlp.gradient("x", "f");

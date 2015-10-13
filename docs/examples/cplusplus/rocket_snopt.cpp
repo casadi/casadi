@@ -75,7 +75,7 @@ int main(){
   SX g = vertcat(s, v, v_traj);
 
   // Create an NLP
-  SXFunction nlp("nlp", nlpIn("x", u), nlpOut("f", f, "g", g));
+  Function nlp = SX::fun("nlp", nlpIn("x", u), nlpOut("f", f, "g", g));
 
   // Create an NLP solver and buffers
   NlpSolver solver("solver", "snopt", nlp);
@@ -107,7 +107,7 @@ int main(){
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory
-  SXFunction xfcn("xfcn", make_vector(u), make_vector(s_traj, v_traj, m_traj));
+  Function xfcn = SX::fun("xfcn", make_vector(u), make_vector(s_traj, v_traj, m_traj));
   vector<DMatrix> xopt = xfcn(make_vector(DMatrix(uopt)));
   vector<double> sopt(xopt.at(0));
   vector<double> vopt(xopt.at(1));

@@ -54,7 +54,7 @@ void simpleODE(Function& ffcn, double& tf, vector<double>& x0, double& u0){
   SX quad = pow(v,3) + pow((3-sin(t))-u,2);
 
   // Callback function
-  ffcn = SXFunction("simple_ode", daeIn("t", t, "x", x, "p", u), daeOut("ode", ode, "quad", quad));
+  ffcn = SX::fun("simple_ode", daeIn("t", t, "x", x, "p", u), daeOut("ode", ode, "quad", quad));
 
   // End time
   tf = 0.5;
@@ -90,7 +90,7 @@ void simpleDAE(Function& ffcn, double& tf, vector<double>& x0, double& u0){
   SX quad = x*x + 3.0*u*u;
   
   // Callback function
-  ffcn = SXFunction("simple_dae", daeIn("x", x, "z", z, "p", u),
+  ffcn = SX::fun("simple_dae", daeIn("x", x, "z", z, "p", u),
                     daeOut("ode", ode, "alg", alg, "quad", quad));
 
   // End time

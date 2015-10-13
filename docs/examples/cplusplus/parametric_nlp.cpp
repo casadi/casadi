@@ -81,7 +81,7 @@ int main(){
   vector<double> p0  = {5.00, 1.00};
 
   // NLP
-  SXFunction nlp("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
+  Function nlp = SX::fun("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
 
   // Create NLP solver and buffers
   NlpSolver solver("solver", "ipopt", nlp);
