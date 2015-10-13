@@ -211,6 +211,7 @@ namespace casadi {
     /// Access functions of the node
     const IntegratorInternal* operator->() const;
 
+#ifndef SWIG
     /** \brief Reset the forward problem
      * Time will be set to t0 and state to input(INTEGRATOR_X0)
      */
@@ -227,6 +228,7 @@ namespace casadi {
 
     /// Integrate backward until a specified time point
     void integrateB(double t_out);
+#endif // SWIG
 
     /// Check if a plugin is available
     static bool hasPlugin(const std::string& name);
