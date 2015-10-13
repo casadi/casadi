@@ -86,7 +86,7 @@ rhs = struct_SX(states)
 rhs["x"] = dx
 rhs["dx"] = (-k*x-c*dx+F)/m+w
 
-f = SXFunction('f', [states,controls,disturbances],[rhs])
+f = SX.fun('f', [states,controls,disturbances],[rhs])
 
 # Build an integrator for this system: Runge Kutta 4 integrator
 k1 = f([states,controls,disturbances])[0]
@@ -95,10 +95,10 @@ k3 = f([states+dt/2.0*k2,controls,disturbances])[0]
 k4 = f([states+dt*k3,controls,disturbances])[0]
 
 states_1 = states+dt/6.0*(k1+2*k2+2*k3+k4)
-phi = SXFunction('phi', [states,controls,disturbances],[states_1])
+phi = SX.fun('phi', [states,controls,disturbances],[states_1])
 PHI = phi.jacobian()
 # Define the measurement system
-h = SXFunction('h', [states],[x]) # We have measurements of the position
+h = SX.fun('h', [states],[x]) # We have measurements of the position
 H = h.jacobian()
 # Build the objective
 obj = 0
@@ -118,7 +118,7 @@ for i in range(N-1):
   g.append( shooting["X",i+1] - phi([shooting["X",i],parameters["U",i],shooting["W",i]])[0] )
 
 # Formulate the NLP
-nlp = SXFunction('nlp', nlpIn(x=shooting,p=parameters),nlpOut(f=obj,g=vertcat(g)))
+nlp = SX.fun('nlp', nlpIn(x=shooting,p=parameters),nlpOut(f=obj,g=vertcat(g)))
 
 # Make a simulation to create the data for the problem
 simulated_X = DMatrix.zeros(Nstates,Nsimulation)

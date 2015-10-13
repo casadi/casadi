@@ -75,7 +75,7 @@ lbg = [0.00, 0.00, p_a[0], p_a[1]]
 ubg = [0.00, 0.00, p_a[0], p_a[1]]
     
 # Create NLP
-nlp = SXFunction("nlp", nlpIn(x=x),nlpOut(f=f,g=g))
+nlp = SX.fun("nlp", nlpIn(x=x),nlpOut(f=f,g=g))
 
 # NLP solver options
 opts = {}

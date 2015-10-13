@@ -38,7 +38,7 @@ x  = SX.sym("x",3)  # state
 ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
        x[0], \
        x[0]*x[0] + x[1]*x[1] + u*u])
-dae = SXFunction("dae", daeIn(x=x, p=u, t=t), daeOut(ode=ode))
+dae = SX.fun("dae", daeIn(x=x, p=u, t=t), daeOut(ode=ode))
 
 # Create an integrator
 opts = {"tf":tf/nk} # final time
@@ -112,7 +112,7 @@ f = X2[nk]
 g = vertcat(g)
 
 # Create NLP solver instance
-nlp = MXFunction("nlp", nlpIn(x=V), nlpOut(f=f,g=g))
+nlp = MX.fun("nlp", nlpIn(x=V), nlpOut(f=f,g=g))
 solver = NlpSolver("solver", "ipopt", nlp)
 
 # Solve the problem

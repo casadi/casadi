@@ -68,7 +68,7 @@ f = substitute(f,u,u_opt)
 
 # Create the right hand side function
 rhs_in = daeIn(x=vertcat((x,lam)))
-rhs = SXFunction('rhs', rhs_in,daeOut(ode=f))
+rhs = SX.fun('rhs', rhs_in,daeOut(ode=f))
 
 # Augmented DAE state dimension
 nX = 4
@@ -107,7 +107,7 @@ for k in range(num_nodes):
 G.append(X[num_nodes][2:] - NP.array([0,0])) # costates fixed, states free at final time
 
 # Terminal constraints: lam = 0
-rfp = MXFunction('rfp', [V], [vertcat(G)])
+rfp = MX.fun('rfp', [V], [vertcat(G)])
 
 # Select a solver for the root-finding problem
 Solver = "nlp"
@@ -136,7 +136,7 @@ V_sol, = solver([0])
 tgrid = NP.linspace(0,tf,100)
 
 # Output functions
-output_fcn = SXFunction("output", rhs_in, [x0,x1,u_opt])
+output_fcn = SX.fun("output", rhs_in, [x0,x1,u_opt])
 
 # Simulator to get optimal state and control trajectories
 simulator = Simulator("simulator", I, output_fcn, tgrid)

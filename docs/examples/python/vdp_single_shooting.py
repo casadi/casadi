@@ -38,7 +38,7 @@ xdot = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, x[0]] )
 qdot = x[0]*x[0] + x[1]*x[1] + u*u
 
 # DAE residual function
-dae = SXFunction("dae", daeIn(x=x, p=u),daeOut(ode=xdot, quad=qdot))
+dae = SX.fun("dae", daeIn(x=x, p=u),daeOut(ode=xdot, quad=qdot))
 
 # Create an integrator
 integrator = Integrator("integrator", "cvodes", dae, {"tf":tf/nk})
@@ -62,7 +62,7 @@ for k in range(nk):
 g = X
 
 # Allocate an NLP solver
-nlp = MXFunction("nlp", nlpIn(x=x),nlpOut(f=f,g=g))
+nlp = MX.fun("nlp", nlpIn(x=x),nlpOut(f=f,g=g))
 solver = NlpSolver("solver", "ipopt", nlp)
 
 # Solve the problem

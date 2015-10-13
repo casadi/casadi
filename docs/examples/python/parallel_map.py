@@ -18,13 +18,13 @@ x = SX.sym('x')
 y = x
 for k in range(100000):
     y = sin(y)
-f0 = SXFunction('f', [x], [y])
+f0 = SX.fun('f', [x], [y])
 
 
 # evaluate it serially, the old-fasioned way
 X = MX.sym('x',N)
 Y = vertcat([f0([X[k]])[0] for k in range(N)])
-fNaiveParallel = MXFunction('fParallel', [X], [Y])
+fNaiveParallel = MX.fun('fParallel', [X], [Y])
 
 print "evaluating naive parallel function..."
 t0 = time.time()

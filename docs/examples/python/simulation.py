@@ -59,7 +59,7 @@ rhs["y"]  = dy
 rhs["dx"] = F[0]
 rhs["dy"] = F[1]
 
-f = SXFunction("f", controldaeIn(x=states,p=parameters,u=controls),daeOut(ode=rhs))
+f = SX.fun("f", controldaeIn(x=states,p=parameters,u=controls),daeOut(ode=rhs))
 
 
 # Simulation output grid
@@ -131,7 +131,7 @@ rhs_aug = struct_SX(states_aug)
 rhs_aug["orig"]  = rhs
 rhs_aug["P"]  = mul(A,states_aug["P"]) + mul(states_aug["P"],A.T)
 
-f_aug = SXFunction("f_aug", controldaeIn(x=states_aug,p=parameters,u=controls),daeOut(ode=rhs_aug))
+f_aug = SX.fun("f_aug", controldaeIn(x=states_aug,p=parameters,u=controls),daeOut(ode=rhs_aug))
 
 csim_aug = ControlSimulator("csim_aug", f_aug, tgrid, {"integrator":"cvodes"})
 

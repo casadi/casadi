@@ -23,7 +23,7 @@
 #
 # -*- coding: utf-8 -*-
 """
-Demonstration on how the algorithm of an SXFunction can be accessed and its operations can be transversed.
+Demonstration on how the algorithm of an SX.fun can be accessed and its operations can be transversed.
 """
 
 from casadi import *
@@ -45,7 +45,7 @@ output_ex = [2*a + b]
 output_val = [numpy.zeros(2)]
 
 # Create a function
-f = SXFunction("f", input_ex,output_ex)
+f = SX.fun("f", input_ex,output_ex)
 
 # Work vector
 work = numpy.zeros(f.getWorkSize())

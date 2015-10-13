@@ -38,7 +38,7 @@ params = vertcat([M,c,k,k_NL])
 rhs = vertcat([dy , (u-k_NL*y**3-k*y-c*dy)/M])
 
 # Form an ode function
-ode = MXFunction('ode',[states,controls,params],[rhs])
+ode = MX.fun('ode',[states,controls,params],[rhs])
 
 ############ Creating a simulator ##########
 N_steps_per_sample = 10
@@ -53,7 +53,7 @@ dt = 1/fs/N_steps_per_sample
 states_final = states+dt/6.0*(k1+2*k2+2*k3+k4)
 
 # Create a function that simulates one step propagation in a sample
-one_step = MXFunction('one_step',[states, controls, params],[states_final]);
+one_step = MX.fun('one_step',[states, controls, params],[states_final]);
 
 X = states;
 
@@ -61,10 +61,10 @@ for i in range(N_steps_per_sample):
   [X] = one_step([X, controls, params])
 
 # Create a function that simulates all step propagation on a sample
-one_sample = MXFunction('one_sample',[states, controls, params], [X])
+one_sample = MX.fun('one_sample',[states, controls, params], [X])
 
 # speedup trick: expand into scalar operations
-one_sample = SXFunction('one_sample_sx', one_sample)
+one_sample = SX.fun('one_sample_sx', one_sample)
 
 ############ Simulating the system ##########
 
@@ -95,7 +95,7 @@ def gauss_newton(e,nlp,V):
 
   J = jacobian(e,V)
   sigma = MX.sym("sigma")
-  hessLag = MXFunction('H',hessLagIn(x=V,lam_f=sigma),hessLagOut(hess=sigma*mul(J.T,J)),opts)
+  hessLag = MX.fun('H',hessLagIn(x=V,lam_f=sigma),hessLagOut(hess=sigma*mul(J.T,J)),opts)
   return NlpSolver("solver","ipopt", nlp, {"hess_lag":hessLag})
 
 ############ Identifying the simulated system: single shooting strategy ##########
@@ -105,7 +105,7 @@ def gauss_newton(e,nlp,V):
 [X_symbolic] = all_samples([x0, u_data, repmat(params*scale,1,N) ])
 
 e = y_data-X_symbolic[0,:].T;
-nlp = MXFunction("nlp", nlpIn(x=params), nlpOut(f=0.5*inner_prod(e,e)),opts)
+nlp = MX.fun("nlp", nlpIn(x=params), nlpOut(f=0.5*inner_prod(e,e)),opts)
 
 solver = gauss_newton(e,nlp, params)
 
@@ -128,7 +128,7 @@ e = y_data-Xn[0,:].T;
 
 V = veccat([params, X])
 
-nlp = MXFunction("nlp", nlpIn(x=V), nlpOut(f=0.5*inner_prod(e,e),g=gaps),opts)
+nlp = MX.fun("nlp", nlpIn(x=V), nlpOut(f=0.5*inner_prod(e,e),g=gaps),opts)
 
 # Multipleshooting allows for careful initialization
 yd = np.diff(y_data,axis=0)*fs

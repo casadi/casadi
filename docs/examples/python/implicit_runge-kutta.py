@@ -46,7 +46,7 @@ p  = SX.sym("u",np)  # control
 ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + p, \
                x[0], \
                x[0]*x[0] + x[1]*x[1] + p*p])
-f = SXFunction('f', daeIn(x=x,p=p),daeOut(ode=ode))
+f = SX.fun('f', daeIn(x=x,p=p),daeOut(ode=ode))
 
 # Number of finite elements
 n = 100     
@@ -76,7 +76,7 @@ for j in range(d+1):
   for r in range(d+1):
     if r != j:
       L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
-  lfcn = SXFunction('lfcn', [tau], [L])
+  lfcn = SX.fun('lfcn', [tau], [L])
   
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
   [D[j]] = lfcn([1.0])
@@ -110,10 +110,10 @@ for j in range(1,d+1):
 V_eq = vertcat(V_eq)
 
 # Root-finding function, implicitly defines V as a function of X0 and P
-vfcn = MXFunction('vfcn', [V, X0, P], [V_eq])
+vfcn = MX.fun('vfcn', [V, X0, P], [V_eq])
 
-# Convert to SXFunction to decrease overhead
-vfcn_sx = SXFunction(vfcn)
+# Convert to SX.fun to decrease overhead
+vfcn_sx = SX.fun('vfcn', vfcn)
 
 # Create a implicit function instance to solve the system of equations
 ifcn = ImplicitFunction("ifcn", "newton", vfcn_sx, {"linear_solver":"csparse"})
@@ -126,7 +126,7 @@ for r in range(d+1):
   XF += D[r]*X[r]
   
 # Get the discrete time dynamics
-F = MXFunction('F', [X0,P],[XF])
+F = MX.fun('F', [X0,P],[XF])
 
 # Do this iteratively for all finite elements
 X = X0
@@ -134,7 +134,7 @@ for i in range(n):
   [X] = F.call([X,P])
 
 # Fixed-step integrator
-irk_integrator = MXFunction("irk_integrator", integratorIn(x0=X0,p=P),integratorOut(xf=X))
+irk_integrator = MX.fun("irk_integrator", integratorIn(x0=X0,p=P),integratorOut(xf=X))
 
 # Create a convensional integrator for reference
 ref_integrator = Integrator("ref_integrator", "cvodes", f, {"tf":tf})

@@ -40,7 +40,7 @@ nl = NlpBuilder()
 nl.parseNL("../nl_files/hs107.nl",{"verbose":False})
 
 # NLP function
-nlp = SXFunction("nlp", nlpIn(x=nl.x),nlpOut(f=nl.f,g=nl.g))
+nlp = SX.fun("nlp", nlpIn(x=nl.x),nlpOut(f=nl.f,g=nl.g))
 
 # NLP solver options
 opts = {}

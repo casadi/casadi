@@ -83,7 +83,7 @@ u_ = (DMatrix([[ -1, 1 ],[1,-1]]*((N-1)/2))).T
 p = SX.sym("p")
 
 tn = np.linspace(0,te,N)
-cdae = SXFunction('cdae', controldaeIn(x=y,u=u),[mul(A,y)+mul(B,u)])
+cdae = SX.fun('cdae', controldaeIn(x=y,u=u),[mul(A,y)+mul(B,u)])
 
 opts = {}
 opts["integrator"] = "cvodes"
@@ -210,7 +210,7 @@ rhs = struct_SX(states)
 rhs["eAt"] = mul(A,eAt)
 rhs["Wt"]  = mul([eAt,B,B.T,eAt.T])
 
-dae = SXFunction('dae', daeIn(x=states),daeOut(ode=rhs))
+dae = SX.fun('dae', daeIn(x=states),daeOut(ode=rhs))
 
 integrator = Integrator("integrator", "cvodes", dae, {"tf":t1, "reltol":1e-12})
 integrator.setInput(states_,"x0")
@@ -247,10 +247,10 @@ rhs = struct_SX(states)
 rhs["y"]   = mul(A,y)+mul(B,u)
 rhs["eAt"] = -mul(A,eAt)
 
-cdae = SXFunction('cdae', controldaeIn(x=states),[rhs])
+cdae = SX.fun('cdae', controldaeIn(x=states),[rhs])
 
 # Output function
-out = SXFunction('out', controldaeIn(x=states),[states,u])
+out = SX.fun('out', controldaeIn(x=states),[states,u])
 
 opts = {}
 opts["integrator"] = "cvodes"
@@ -289,7 +289,7 @@ P = SX.sym("P",ns,ns)
 
 ric = (Q + mul(A.T,P) + mul(P,A) - mul([P,B,inv(R),B.T,P]))
 
-dae = SXFunction('dae', daeIn(x=vec(P)),daeOut(ode=vec(ric)))
+dae = SX.fun('dae', daeIn(x=vec(P)),daeOut(ode=vec(ric)))
 
 # We solve the ricatti equation by simulating backwards in time until steady state is reached.
 opts = {"reltol":1e-16, "stop_at_end":False}
@@ -336,7 +336,7 @@ print "feedback matrix= ", K
 print "Open-loop eigenvalues: ", D
 
 # Check what happens if we integrate the Riccati equation forward in time
-dae = SXFunction('dae', daeIn(x = vec(P)),daeOut(ode=vec(-ric)))
+dae = SX.fun('dae', daeIn(x = vec(P)),daeOut(ode=vec(-ric)))
 
 integrator = Integrator("integrator", "cvodes", dae, {"reltol":1e-16, "stop_at_end":False})
 x0_pert = vec(P_)
@@ -353,7 +353,7 @@ for i in range(1,10):
   print "Forward riccati simulation %d; error: %.2e" % (i, e)
 
 # We notice divergence. Why?
-stabric = SXFunction('stabric', [P],[jacobian(-ric,P)])
+stabric = SX.fun('stabric', [P],[jacobian(-ric,P)])
 stabric.setInput(P_)
 stabric.evaluate()
 
@@ -388,10 +388,10 @@ figure(6)
 for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-1,sin(t)])]):
   u = -mul(K,y) + mul(mul(K,F)+Nm,yref)
   rhs = mul(A,y)+mul(B,u)
-  cdae = SXFunction('cdae', controldaeIn(t=t, x=y),[rhs])
+  cdae = SX.fun('cdae', controldaeIn(t=t, x=y),[rhs])
 
   # Output function
-  out = SXFunction('out', controldaeIn(t=t, x=y),[y,mul(C,y),u,yref])
+  out = SX.fun('out', controldaeIn(t=t, x=y),[y,mul(C,y),u,yref])
 
   opts = {}
   opts["integrator"] = "cvodes"
@@ -452,10 +452,10 @@ rhs["y"]      =  mul(A,y)+mul(B,u)
 rhs["yref"]   =  mul(A,states["yref"])+mul(B,uref)
 rhs["eAt"]    = -mul(A,eAt)
 
-cdae = SXFunction('cdae', controldaeIn(x=states, p=param),[rhs])
+cdae = SX.fun('cdae', controldaeIn(x=states, p=param),[rhs])
 
 # Output function
-out = SXFunction('out', controldaeIn(x=states, p=param),[states,u,uref,states["yref"]])
+out = SX.fun('out', controldaeIn(x=states, p=param),[states,u,uref,states["yref"]])
 
 opts = {}
 opts["integrator"] = "cvodes"
@@ -531,10 +531,10 @@ dy    = SX.sym("dy",ns)
 u     = controls["uref"]-mul(param["K"],y-controls["yref"])
 rhs   = mul(A,y)+mul(B,u)
 
-cdae = SXFunction('cdae', controldaeIn(x=y, u=controls, p=param),[rhs])
+cdae = SX.fun('cdae', controldaeIn(x=y, u=controls, p=param),[rhs])
 
 # Output function
-out = SXFunction('out', controldaeIn(x=y, u=controls, p=param),[y,u,controls["uref"],controls["yref"]])
+out = SX.fun('out', controldaeIn(x=y, u=controls, p=param),[y,u,controls["uref"],controls["yref"]])
 
 opts = {}
 opts["integrator"] = "cvodes"
@@ -585,10 +585,10 @@ y0     = SX.sym("y0",ns)
 u     = controls["uref"]-mul(param["K"],y0-controls["yref"])
 rhs   = mul(A,y)+mul(B,u)
 
-cdae = SXFunction('cdae', controldaeIn(x=y, x_major=y0, u=controls, p=param),[rhs])
+cdae = SX.fun('cdae', controldaeIn(x=y, x_major=y0, u=controls, p=param),[rhs])
 
 # Output function
-out = SXFunction('out', controldaeIn(x=y, x_major=y0, u=controls, p=param),[y,u,controls["uref"],controls["yref"]])
+out = SX.fun('out', controldaeIn(x=y, x_major=y0, u=controls, p=param),[y,u,controls["uref"],controls["yref"]])
 
 opts = {}
 opts["integrator"] = "cvodes"
