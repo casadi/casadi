@@ -192,8 +192,8 @@ namespace casadi {
     * \copydoc scheme_DAEOutput
     * \endparblock
     */
-    Integrator(const std::string& name, const std::string& solver, const Function& f,
-               const Dict& opts=Dict());
+    Integrator(const std::string& name, const std::string& solver,
+               const Function& f, const Dict& opts=Dict());
     Integrator(const std::string& name, const std::string& solver,
                const std::pair<Function, Function>& fg, const Dict& opts=Dict());
     Integrator(const std::string& name, const std::string& solver,

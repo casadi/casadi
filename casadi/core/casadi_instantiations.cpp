@@ -23,6 +23,8 @@
  */
 
 
+#include "function/function.hpp"
+
 #include "sx/sx_element.hpp"
 #include "matrix/matrix.hpp"
 #include "matrix/sparse_storage.hpp"

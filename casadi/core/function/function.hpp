@@ -27,6 +27,14 @@
 
 #include "io_interface.hpp"
 
+/*
+  NOTE: The order of includes is as follows:
+  1. Forward declaration of Function (in casadi_types.hpp)
+  2. Declaration of Matrix class (in matrix.hpp), Function only as references or return values
+  3. Definition of Function (this file), requires Matrix to be complete type
+  4. Definition of Matrix class (in matrix_impl.hpp, included at the end of this file)
+*/
+
 namespace casadi {
 
   /** Forward declaration of internal class */
@@ -888,5 +896,9 @@ namespace casadi {
   };
 
 } // namespace casadi
+
+#ifdef casadi_implementation
+#include "../matrix/matrix_impl.hpp"
+#endif
 
 #endif // CASADI_FUNCTION_HPP

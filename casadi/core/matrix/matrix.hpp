@@ -855,6 +855,50 @@ namespace casadi {
     static std::vector<Matrix<DataType> > get_input(const Function& f);
 
     ///@{
+    /// Readability typedefs
+    typedef Matrix<DataType> M;
+    typedef std::map<std::string, M> MDict;
+    ///@}
+
+    /** \brief Expand a function */
+    static Function fun(const std::string& name, const Function &f,
+                        const Dict& opts=Dict());
+
+    /** \brief Construct from vectors */
+    static Function fun(const std::string& name, const std::vector<M>& arg,
+                        const std::vector<M>& res, const Dict& opts=Dict());
+
+    /** \brief Construct from vectors */
+    static Function fun(const std::string& name,
+                        const std::pair< MDict, std::vector<std::string> >& arg,
+                        const std::vector<M>& res, const Dict& opts=Dict());
+
+    /** \brief Construct from vectors */
+    static Function fun(const std::string& name, const std::vector<M>& arg,
+                        const std::pair< MDict, std::vector<std::string> >& res,
+                        const Dict& opts=Dict());
+
+    /** \brief Construct from vectors */
+    static Function fun(const std::string& name,
+                        const std::pair< MDict, std::vector<std::string> >& arg,
+                        const std::pair< MDict, std::vector<std::string> >& res,
+                        const Dict& opts=Dict());
+
+#ifndef SWIG
+    /** \brief Construct from initializer lists */
+    static Function fun(const std::string& name, std::initializer_list<M> arg,
+                        std::initializer_list<M> res, const Dict& opts=Dict());
+
+    /** \brief Construct from vector & initializer list */
+    static Function fun(const std::string& name, std::vector<M> arg,
+                        std::initializer_list<M> res, const Dict& opts=Dict());
+
+    /** \brief Construct from initializer list & vector */
+    static Function fun(const std::string& name, std::initializer_list<M> arg,
+                        std::vector<M> res, const Dict& opts=Dict());
+#endif // SWIG
+
+    ///@{
     /** \brief Jacobian expression */
     static Matrix<DataType> jac(const Function& f, int iind=0, int oind=0,
                   bool compact=false, bool symmetric=false);
@@ -1187,9 +1231,5 @@ namespace casadi {
   typedef std::map<std::string, DMatrix> DMatrixDict;
   ///@}
 } // namespace casadi
-
-#ifdef casadi_implementation
-#include "matrix_impl.hpp"
-#endif
 
 #endif // CASADI_MATRIX_HPP

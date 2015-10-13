@@ -285,20 +285,6 @@ namespace casadi {
     /** @} */
   };
 
-  /// \cond INTERNAL
-  // Template specializations
-  template<>
-  CASADI_EXPORT Matrix<double> Matrix<double>::
-  zz_solve(const Matrix<double>& b,
-           const std::string& lsolver, const Dict& dict) const;
-
-  template<>
-  CASADI_EXPORT Matrix<double> Matrix<double>::
-  zz_pinv(const std::string& lsolver, const Dict& dict) const;
-
-  template<>
-  CASADI_EXPORT bool Matrix<SXElement>::__nonzero__() const;
-
   template<>
   class CASADI_EXPORT casadi_limits<SXElement>{
   public:
@@ -332,106 +318,10 @@ namespace casadi {
   typedef std::map<std::string, SX> SXDict;
   ///@}
 
-  // Specialize functions in GenericMatrix<SX> and SX
-  template<> SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
-  template<> bool SX::isRegular() const;
-  template<> bool SX::isSmooth() const;
-  template<> bool SX::isLeaf() const;
-  template<> bool SX::isCommutative() const;
-  template<> bool SX::isSymbolic() const;
-  template<> bool SX::isValidInput() const;
-  template<> bool SX::hasDuplicates();
-  template<> void SX::resetInput();
-  template<> double SX::getValue(int k) const;
-  template<> int SX::getIntValue() const;
-  template<> std::vector<double> SX::nonzeros() const;
-  template<> std::vector<int> SX::nonzeros_int() const;
-  template<> SX SX::getDep(int ch) const;
-  template<> int SX::getNdeps() const;
-  template<> std::string SX::getName() const;
-  template<> void SX::setEqualityCheckingDepth(int eq_depth);
-  template<> int SX::getEqualityCheckingDepth();
-  template<> size_t SX::getElementHash() const;
-  template<> void SX::zz_expand(SX &weights, SX& terms) const;
-  template<> SX SX::zz_pw_const(const SX &tval, const SX &val) const;
-  template<> SX SX::zz_pw_lin(const SX &tval, const SX &val) const;
-  template<> SX SX::zz_if_else(const SX &if_true, const SX &if_false,
-                               bool short_circuit) const;
-  template<> SX SX::zz_gauss_quadrature(const SX &x, const SX &a,
-                                        const SX &b, int order,
-                                        const SX& w) const;
-  template<> SX SX::zz_simplify() const;
-  template<> SX SX::zz_substitute(const SX& v, const SX& vdef) const;
-  template<> std::vector<SX > SX::zz_substitute(const std::vector<SX >& ex,
-                                                const std::vector<SX >& v,
-                                                const std::vector<SX >& vdef);
-  template<> void SX::zz_substituteInPlace(const std::vector<SX >& v,
-                                           std::vector<SX >& vdef,
-                                           std::vector<SX >& ex,
-                                           bool reverse);
-  template<> bool SX::zz_dependsOn(const SX &arg) const;
-  template<> std::vector<SX > SX::zz_symvar() const;
-  template<> SX SX::zz_jacobian(const SX &arg) const;
-  template<> SX SX::zz_gradient(const SX &arg) const;
-  template<> SX SX::zz_tangent(const SX &arg) const;
-  template<> SX SX::zz_hessian(const SX &arg) const;
-  template<> SX SX::zz_hessian(const SX &arg, SX &g) const;
-  template<> SX SX::zz_jacobianTimesVector(const SX &arg, const SX &v,
-                                           bool transpose_jacobian) const;
-  template<> SX SX::zz_taylor(const SX& x, const SX& a, int order) const;
-  template<> SX SX::zz_mtaylor(const SX& x, const SX& a, int order) const;
-  template<> SX SX::zz_mtaylor(const SX& x, const SX& a, int order,
-                               const std::vector<int>& order_contributions) const;
-  template<> int SX::zz_countNodes() const;
-  template<> std::string
-  SX::zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
-  template<> void SX::zz_extractShared(std::vector<SX >& ex,
-                                       std::vector<SX >& v,
-                                       std::vector<SX >& vdef,
-                                       const std::string& v_prefix,
-                                       const std::string& v_suffix);
-  template<> SX SX::zz_poly_coeff(const SX&x) const;
-  template<> SX SX::zz_poly_roots() const;
-  template<> SX SX::zz_eig_symbolic() const;
-  template<> void SX::printSplit(std::vector<std::string>& nz,
-                                 std::vector<std::string>& inter) const;
-
-  template<> std::vector<SX> SX::get_input(const Function& f);
-
-  template<> SX SX::jac(const Function& f, int iind, int oind,
-                        bool compact, bool symmetric);
-  template<> SX SX::jac(const Function& f, const std::string& iname, int oind,
-                        bool compact, bool symmetric);
-  template<> SX SX::jac(const Function& f, int iind, const std::string& oname,
-                        bool compact, bool symmetric);
-  template<> SX SX::jac(const Function& f, const std::string& iname, const std::string& oname,
-                        bool compact, bool symmetric);
-
-  template<> SX SX::grad(const Function& f, int iind, int oind);
-  template<> SX SX::grad(const Function& f, const std::string& iname, int oind);
-  template<> SX SX::grad(const Function& f, int iind, const std::string& oname);
-  template<> SX SX::grad(const Function& f, const std::string& iname, const std::string& oname);
-
-  template<> SX SX::tang(const Function& f, int iind, int oind);
-  template<> SX SX::tang(const Function& f, const std::string& iname, int oind);
-  template<> SX SX::tang(const Function& f, int iind, const std::string& oname);
-  template<> SX SX::tang(const Function& f, const std::string& iname, const std::string& oname);
-
-  template<> SX SX::hess(const Function& f, int iind, int oind);
-  template<> SX SX::hess(const Function& f, const std::string& iname, int oind);
-  template<> SX SX::hess(const Function& f, int iind, const std::string& oname);
-  template<> SX SX::hess(const Function& f, const std::string& iname, const std::string& oname);
 
 } // namespace casadi
 
 #ifndef SWIG
-
-/// \cond INTERNAL
-// Template specialization
-namespace casadi {
-  template<> inline std::string matrixName<SXElement>() { return "SX"; }
-} // namespace casadi
-/// \endcond
 
 namespace std {
   template<>
@@ -471,10 +361,6 @@ namespace std {
     static const float_round_style round_style = round_toward_zero;
   };
 } //namespace std
-
-/** \brief  The following functions needs the class so they cannot be included
- * in the beginning of the header */
-#include "sx_node.hpp"
 
 #endif // SWIG
 
