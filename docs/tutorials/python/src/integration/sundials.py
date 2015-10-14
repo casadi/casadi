@@ -92,25 +92,16 @@ print isinstance(integrator,Function)
 print "%d -> %d" % (integrator.n_in(),integrator.n_out())
 #! Setup the Integrator to integrate from 0 to t=tend, starting at [x0,y0]
 #! The output of Integrator is the state at the end of integration.
-#! There are two basic mechanisms two retrieve the whole trajectory of states:
-#!  - method A, using reset + integrate
-#!  - method B, using Simulator
-#!
-#! We demonstrate first method A:
+#! To obtain the whole trajectory of states, use Simulator:
 ts=numpy.linspace(0,tend,100)
-x0 = 0;y0 = 1
-integrator.setInput([x0,y0],"x0")
-integrator.setInput(0,"p")
-integrator.evaluate()
-integrator.reset()
-	
-#! Define a convenience function to acces x(t)
-def out(t):
-	integrator.integrate(t)
-	return integrator.getOutput().full()
+x0 = 0; y0 = 1
+sim=Simulator("sim", integrator, ts)
+sim.setInput([x0,y0],"x0")
+sim.setInput(0,"p")
+sim.evaluate()
 
-sol = array([out(t) for t in ts]).squeeze()
-	
+sol = sim.getOutput().full().T
+
 #! Plot the trajectory
 figure()
 plot(sol[:,0],sol[:,1])
@@ -118,16 +109,6 @@ title('Van der Pol phase space')
 xlabel('x')
 ylabel('y')
 show()
-
-#! We demonstrate method B:
-sim=Simulator("sim", integrator, ts)
-sim.setInput([x0,y0],"x0")
-sim.setInput(0,"p")
-sim.evaluate()
-
-sol2 = sim.getOutput().full().T
-#! sol and sol2 are exactly the same
-print linalg.norm(sol-sol2)
 
 #! Sensitivity for initial conditions
 #! ------------------------------------
