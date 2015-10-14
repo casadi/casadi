@@ -49,7 +49,7 @@ B = DMatrix([[1,1],[0,1],[1,0]])
 
 # Inspect the open-loop system
 [D,V] = linalg.eig(A)
-print "Open-loop eigenvalues: ", D
+print 'Open-loop eigenvalues: ', D
 
 tn = linspace(0,te,N)
 
@@ -73,26 +73,26 @@ assert(rank==ns)
 # Simulation of the open-loop system
 # -----------------------------------
 
-y  = SX.sym("y",ns)
-u  = SX.sym("u",nu)
+y  = SX.sym('y',ns)
+u  = SX.sym('u',nu)
 
 x0 = DMatrix([1,0,0])
 # no control
 u_ = (DMatrix([[ -1, 1 ],[1,-1]]*((N-1)/2))).T
 
-p = SX.sym("p")
+p = SX.sym('p')
 
 tn = np.linspace(0,te,N)
 cdae = SX.fun('cdae', controldaeIn(x=y,u=u),[mul(A,y)+mul(B,u)])
 
 opts = {}
-opts["integrator"] = "cvodes"
-opts["integrator_options"] = {"fsens_err_con": True,"reltol":1e-12}
-opts["nf"] = 20
+opts['integrator'] = 'cvodes'
+opts['integrator_options'] = {'fsens_err_con': True,'reltol':1e-12}
+opts['nf'] = 20
 
-sim = ControlSimulator("sim", cdae, tn, opts)
-sim.setInput(x0,"x0")
-sim.setInput(u_,"u")
+sim = ControlSimulator('sim', cdae, tn, opts)
+sim.setInput(x0,'x0')
+sim.setInput(u_,'u')
 sim.evaluate()
 
 tf = sim.getMinorT()
@@ -108,8 +108,8 @@ out = sim.getOutput()
 # -----------------------------------
 
 x0_pert = DMatrix([0,0,1])*1e-4
-sim.setInput(x0+x0_pert,"x0")
-sim.setInput(u_,"u")
+sim.setInput(x0+x0_pert,'x0')
+sim.setInput(u_,'u')
 sim.evaluate()
 
 tf = list(sim.getMinorT())
@@ -120,8 +120,8 @@ plot(tf,sim.getOutput().T-out.T,linewidth=3)
 
 # Not supported in current revision, cf. #929
 # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
-# jacsim.setInput(x0,"x0")
-# jacsim.setInput(u_,"u")
+# jacsim.setInput(x0,'x0')
+# jacsim.setInput(u_,'u')
 
 # jacsim.evaluate()
 
@@ -151,8 +151,8 @@ plot(tf,sim.getOutput().T-out.T,linewidth=3)
 
 u_perturb = DMatrix(u_)
 u_perturb[0,N/5] = 1e-4
-sim.setInput(x0,"x0")
-sim.setInput(u_+u_perturb,"u")
+sim.setInput(x0,'x0')
+sim.setInput(u_+u_perturb,'u')
 sim.evaluate()
 
 figure(3)
@@ -162,8 +162,8 @@ plot(tf,sim.getOutput().T-out.T,linewidth=3)
 
 # Not supported in current revision, cf. #929
 # jacsim = sim.jacobian(CONTROLSIMULATOR_U,0)
-# jacsim.setInput(x0,"x0")
-# jacsim.setInput(u_,"u")
+# jacsim.setInput(x0,'x0')
+# jacsim.setInput(u_,'u')
 
 # jacsim.evaluate()
 
@@ -190,12 +190,12 @@ x0 = vertcat([1,0,0])
 xref_e = vertcat([1,0,0])
 
 states = struct_symSX([
-           entry("eAt",shape=(ns,ns)),
-           entry("Wt",shape=(ns,ns))
+           entry('eAt',shape=(ns,ns)),
+           entry('Wt',shape=(ns,ns))
          ])
          
-eAt = states["eAt"]
-Wt  = states["Wt"]
+eAt = states['eAt']
+Wt  = states['Wt']
 
 # We will find the control that allow to reach xref_e at t1
 t1 = te
@@ -203,23 +203,23 @@ t1 = te
 # Initial conditions
 e = densify(DMatrix.eye(ns))
 states_ = states(0)
-states_["eAt"] = e
-states_["Wt"] = 0
+states_['eAt'] = e
+states_['Wt'] = 0
 
 rhs = struct_SX(states)
-rhs["eAt"] = mul(A,eAt)
-rhs["Wt"]  = mul([eAt,B,B.T,eAt.T])
+rhs['eAt'] = mul(A,eAt)
+rhs['Wt']  = mul([eAt,B,B.T,eAt.T])
 
 dae = SX.fun('dae', daeIn(x=states),daeOut(ode=rhs))
 
-integrator = Integrator("integrator", "cvodes", dae, {"tf":t1, "reltol":1e-12})
-integrator.setInput(states_,"x0")
+integrator = Integrator('integrator', 'cvodes', dae, {'tf':t1, 'reltol':1e-12})
+integrator.setInput(states_,'x0')
 integrator.evaluate()
 
 out = states(integrator.getOutput())
 
-Wt_  = out["Wt"]
-eAt_ = out["eAt"]
+Wt_  = out['Wt']
+eAt_ = out['eAt']
 
 # Check that eAt is indeed the matrix exponential
 e = max(fabs(eAt_-scipy.linalg.expm(numpy.array(A*te))))/max(fabs(eAt_))
@@ -229,23 +229,23 @@ assert(e<1e-7)
 # -----------------------------------
 
 states = struct_symSX([
-          entry("y",shape=ns),      # The regular states of the LTI system
-          entry("eAt",shape=(ns,ns))  # The matrix exponential exp(A*(t1-t))
+          entry('y',shape=ns),      # The regular states of the LTI system
+          entry('eAt',shape=(ns,ns))  # The matrix exponential exp(A*(t1-t))
          ])
 
-eAt = states["eAt"]
-y   = states["y"]
+eAt = states['eAt']
+y   = states['y']
 
 # Initial conditions
 states_ = states(0)
-states_["y"] = x0
-states_["eAt"] = eAt_
+states_['y'] = x0
+states_['eAt'] = eAt_
 
 u = mul([B.T,eAt.T,inv(Wt_),xref_e-mul(eAt_,x0)])
 
 rhs = struct_SX(states)
-rhs["y"]   = mul(A,y)+mul(B,u)
-rhs["eAt"] = -mul(A,eAt)
+rhs['y']   = mul(A,y)+mul(B,u)
+rhs['eAt'] = -mul(A,eAt)
 
 cdae = SX.fun('cdae', controldaeIn(x=states),[rhs])
 
@@ -253,15 +253,15 @@ cdae = SX.fun('cdae', controldaeIn(x=states),[rhs])
 out = SX.fun('out', controldaeIn(x=states),[states,u])
 
 opts = {}
-opts["integrator"] = "cvodes"
-opts["integrator_options"] = {"fsens_err_con": True,"reltol":1e-12}
-opts["nf"] = 20
+opts['integrator'] = 'cvodes'
+opts['integrator_options'] = {'fsens_err_con': True,'reltol':1e-12}
+opts['nf'] = 20
 
-sim = ControlSimulator("sim", cdae, out, tn, opts)
-sim.setInput(states_,"x0")
+sim = ControlSimulator('sim', cdae, out, tn, opts)
+sim.setInput(states_,'x0')
 sim.evaluate()
 
-e = sim.getOutput()[states.i["y"],-1] - xref_e
+e = sim.getOutput()[states.i['y'],-1] - xref_e
 assert(max(fabs(e))/max(fabs(xref_e))<1e-6)
 
 tf = sim.getMinorT()
@@ -269,12 +269,12 @@ tf = sim.getMinorT()
 
 figure(4)
 subplot(211)
-title("Feedforward control, states")
-plot(tf,sim.getOutput(0)[list(states.i["y"]),:].T)
+title('Feedforward control, states')
+plot(tf,sim.getOutput(0)[list(states.i['y']),:].T)
 for i,c in enumerate(['b','g','r']):
   plot(t1,xref_e[i],c+'o')
 subplot(212)
-title("Control action")
+title('Control action')
 plot(tf,sim.getOutput(1).T)
 
 # Design an infinite horizon LQR
@@ -285,43 +285,40 @@ Q = DMatrix.eye(ns)
 R = DMatrix.eye(nu)
 
 # Continuous Riccati equation
-P = SX.sym("P",ns,ns)
+P = SX.sym('P',ns,ns)
 
 ric = (Q + mul(A.T,P) + mul(P,A) - mul([P,B,inv(R),B.T,P]))
 
 dae = SX.fun('dae', daeIn(x=vec(P)),daeOut(ode=vec(ric)))
 
 # We solve the ricatti equation by simulating backwards in time until steady state is reached.
-opts = {"reltol":1e-16, "stop_at_end":False}
-integrator = Integrator("integrator", "cvodes", dae, opts)
+opts = {'reltol':1e-16, 'stop_at_end':False, 'tf':1}
+integrator = Integrator('integrator', 'cvodes', dae, opts)
 
 # Start from P = identity matrix
 u = densify(DMatrix.eye(ns))
-integrator.reset()
-integrator.setInput(vec(u),"x0")
-integrator.integrate(0)
+xe = vec(u)
 
 # Keep integrating until steady state is reached
 for i in range(1,40):
-  x0 = integrator.getOutput()
-  integrator.integrate(1*i)
-  xe = integrator.getOutput()
+  x0 = xe
+  xe = integrator({'x0':x0})['xf']
   e = max(fabs(xe-x0))
-  print "it. %02d - deviation from steady state: %.2e" % (i, e)
+  print 'it. %02d - deviation from steady state: %.2e' % (i, e)
   if e < 1e-11:
     break
   
 # Obtain the solution of the ricatti equation
-P_ = integrator.getOutput().reshape((ns,ns))
-print "P=", P_
+P_ = xe.reshape((ns,ns))
+print 'P=', P_
 
 [D,V] = linalg.eig(P_)
 assert (min(real(D))>0)
-print "(positive definite)"
+print '(positive definite)'
 
 
 # Check that it does indeed satisfy the ricatti equation
-dae.setInput(integrator.getOutput(),"x")
+dae.setInput(integrator.getOutput(),'x')
 dae.evaluate()
 print max(fabs(dae.getOutput()))
 assert(max(fabs(dae.getOutput()))<1e-8)
@@ -329,28 +326,25 @@ assert(max(fabs(dae.getOutput()))<1e-8)
 # From P, obtain a feedback matrix K
 K = mul([inv(R),B.T,P_])
 
-print "feedback matrix= ", K
+print 'feedback matrix= ', K
 
 # Inspect closed-loop eigenvalues
 [D,V] = linalg.eig(A-mul(B,K))
-print "Open-loop eigenvalues: ", D
+print 'Open-loop eigenvalues: ', D
 
 # Check what happens if we integrate the Riccati equation forward in time
 dae = SX.fun('dae', daeIn(x = vec(P)),daeOut(ode=vec(-ric)))
 
-integrator = Integrator("integrator", "cvodes", dae, {"reltol":1e-16, "stop_at_end":False})
+integrator = Integrator('integrator', 'cvodes', dae, {'reltol':1e-16, 'stop_at_end':False, 'tf':0.4})
 x0_pert = vec(P_)
 x0_pert[0] += 1e-9 # Put a tiny perturbation
-integrator.setInput(x0_pert,"x0")
-integrator.reset()
-integrator.integrate(0)
+xe = x0_pert
 
 for i in range(1,10):
-  x0 = integrator.getOutput()
-  integrator.integrate(0.4*i)
-  xe = integrator.getOutput()
+  x0 = xe
+  xe = integrator({'x0':x0})['xf']
   e = max(fabs(xe-x0))
-  print "Forward riccati simulation %d; error: %.2e" % (i, e)
+  print 'Forward riccati simulation %d; error: %.2e' % (i, e)
 
 # We notice divergence. Why?
 stabric = SX.fun('stabric', [P],[jacobian(-ric,P)])
@@ -361,7 +355,7 @@ S = stabric.getOutput()
 
 [D,V] = linalg.eig(S)
 
-print "Forward riccati eigenvalues = ", D
+print 'Forward riccati eigenvalues = ', D
 
 
 # Simulation of the closed-loop system:
@@ -371,7 +365,7 @@ print "Forward riccati eigenvalues = ", D
 
 x0 = DMatrix([1,0,0])
 
-y  = SX.sym("y",ns)
+y  = SX.sym('y',ns)
 
 C = DMatrix([[1,0,0],[0,1,0]])
 D = DMatrix([[0,0],[0,0]])
@@ -381,7 +375,7 @@ temp = inv(blockcat([[A,B],[C,D]]))
 F = temp[:ns,-ny:]
 Nm = temp[ns:,-ny:]
 
-t = SX.sym("t")
+t = SX.sym('t')
 
 figure(6)
 
@@ -394,12 +388,12 @@ for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-
   out = SX.fun('out', controldaeIn(t=t, x=y),[y,mul(C,y),u,yref])
 
   opts = {}
-  opts["integrator"] = "cvodes"
-  opts["integrator_options"] = {"fsens_err_con": True,"reltol":1e-12}
-  opts["nf"] = 200
-  sim = ControlSimulator("sim", cdae, out, tn, opts)
-  sim.setInput(x0,"x0")
-  #sim.setInput(yref_,"u")
+  opts['integrator'] = 'cvodes'
+  opts['integrator_options'] = {'fsens_err_con': True,'reltol':1e-12}
+  opts['nf'] = 200
+  sim = ControlSimulator('sim', cdae, out, tn, opts)
+  sim.setInput(x0,'x0')
+  #sim.setInput(yref_,'u')
   sim.evaluate()
 
   tf = sim.getMinorT()
@@ -425,54 +419,54 @@ x0 = vertcat([1,0,0])
 
 # Now simulate with open-loop controls
 states = struct_symSX([
-           entry("y",shape=ns), # The regular states of the LTI system
-           entry("yref",shape=ns), # States that constitute a tracking reference for the LTI system
-           entry("eAt",shape=(ns,ns)) # The matrix exponential exp(A*(t1-t))
+           entry('y',shape=ns), # The regular states of the LTI system
+           entry('yref',shape=ns), # States that constitute a tracking reference for the LTI system
+           entry('eAt',shape=(ns,ns)) # The matrix exponential exp(A*(t1-t))
          ])
 
-y     = states["y"]
-eAt   = states["eAt"]
+y     = states['y']
+eAt   = states['eAt']
 
 # Initial conditions
 states_ = states(0)
-states_["y"]    = 2*x0
-states_["yref"] = x0
-states_["eAt"]  = eAt_
+states_['y']    = 2*x0
+states_['yref'] = x0
+states_['eAt']  = eAt_
 
 
-param = struct_symSX([entry("K",shape=(nu,ns))])
+param = struct_symSX([entry('K',shape=(nu,ns))])
 
 param_ = param(0)
 
 uref = mul([B.T,eAt.T,inv(Wt_),xref_e-mul(eAt_,x0)])
-u    = uref - mul(param["K"],y-states["yref"])
+u    = uref - mul(param['K'],y-states['yref'])
 
 rhs = struct_SX(states)
-rhs["y"]      =  mul(A,y)+mul(B,u)
-rhs["yref"]   =  mul(A,states["yref"])+mul(B,uref)
-rhs["eAt"]    = -mul(A,eAt)
+rhs['y']      =  mul(A,y)+mul(B,u)
+rhs['yref']   =  mul(A,states['yref'])+mul(B,uref)
+rhs['eAt']    = -mul(A,eAt)
 
 cdae = SX.fun('cdae', controldaeIn(x=states, p=param),[rhs])
 
 # Output function
-out = SX.fun('out', controldaeIn(x=states, p=param),[states,u,uref,states["yref"]])
+out = SX.fun('out', controldaeIn(x=states, p=param),[states,u,uref,states['yref']])
 
 opts = {}
-opts["integrator"] = "cvodes"
-opts["integrator_options"] = {"fsens_err_con": True,"reltol":1e-8}
-opts["nf"] = 20
-sim = ControlSimulator("sim", cdae, out, tn, opts)
+opts['integrator'] = 'cvodes'
+opts['integrator_options'] = {'fsens_err_con': True,'reltol':1e-8}
+opts['nf'] = 20
+sim = ControlSimulator('sim', cdae, out, tn, opts)
 
 # Not supported in current revision, cf. #929
 # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
 
 figure(7)
   
-for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)]):
-  param_["K"] = K_
+for k,(caption,K_) in enumerate([('K: zero',DMatrix.zeros((nu,ns))),('K: LQR',K)]):
+  param_['K'] = K_
 
-  sim.setInput(states_,"x0")
-  sim.setInput(param_,"p")
+  sim.setInput(states_,'x0')
+  sim.setInput(param_,'p')
   sim.evaluate()
   sim.getOutput()
 
@@ -481,8 +475,8 @@ for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)
   subplot(2,2,2*k+1)
   title('states (%s)' % caption)
   for i,c in enumerate(['b','g','r']):
-    plot(tf,sim.getOutput()[states.i["yref",i],:].T,c+'--')
-    plot(tf,sim.getOutput()[states.i["y",i],:].T,c,linewidth=2)
+    plot(tf,sim.getOutput()[states.i['yref',i],:].T,c+'--')
+    plot(tf,sim.getOutput()[states.i['y',i],:].T,c,linewidth=2)
   subplot(2,2,2*k+2)
   for i,c in enumerate(['b','g']):
     plot(tf,sim.getOutput(1)[i,:].T,c,linewidth=2)
@@ -491,18 +485,18 @@ for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)
 
   # Not supported in current revision, cf. #929
   # # Calculate monodromy matrix
-  # jacsim.setInput(states_,"x0")
-  # jacsim.setInput(param_,"p")
+  # jacsim.setInput(states_,'x0')
+  # jacsim.setInput(param_,'p')
   # jacsim.evaluate()
-  # M = jacsim.getOutput()[-states.size:,:][list(states.i["y"]),list(states.i["y"])]
+  # M = jacsim.getOutput()[-states.size:,:][list(states.i['y']),list(states.i['y'])]
   
   # # Inspect the eigenvalues of M
   # [D,V] = linalg.eig(M)
-  # print "Spectral radius of monodromy (%s): " % caption
+  # print 'Spectral radius of monodromy (%s): ' % caption
   
   # print max(abs(D))
 
-print "Spectral radius of exp((A-BK)*te): "
+print 'Spectral radius of exp((A-BK)*te): '
 
 [D,V] = linalg.eig(scipy.linalg.expm(numpy.array((A-mul(B,K))*te)))
 print max(abs(D))
@@ -521,29 +515,29 @@ u_ = vertcat([controls_,yref_])
 x0 = DMatrix([1,0,0])
 
 controls = struct_symSX([
-             entry("uref",shape=nu),
-             entry("yref",shape=ns)
+             entry('uref',shape=nu),
+             entry('yref',shape=ns)
            ])
 
-yref  = SX.sym("yref",ns)
-y     = SX.sym("y",ns)
-dy    = SX.sym("dy",ns)
-u     = controls["uref"]-mul(param["K"],y-controls["yref"])
+yref  = SX.sym('yref',ns)
+y     = SX.sym('y',ns)
+dy    = SX.sym('dy',ns)
+u     = controls['uref']-mul(param['K'],y-controls['yref'])
 rhs   = mul(A,y)+mul(B,u)
 
 cdae = SX.fun('cdae', controldaeIn(x=y, u=controls, p=param),[rhs])
 
 # Output function
-out = SX.fun('out', controldaeIn(x=y, u=controls, p=param),[y,u,controls["uref"],controls["yref"]])
+out = SX.fun('out', controldaeIn(x=y, u=controls, p=param),[y,u,controls['uref'],controls['yref']])
 
 opts = {}
-opts["integrator"] = "cvodes"
-opts["integrator_options"] = {"fsens_err_con": True,"reltol":1e-8}
-opts["nf"] = 20
-sim = ControlSimulator("sim", cdae, out, tn, opts)
-sim.setInput(2*x0,"x0")
-sim.setInput(param_,"p")
-sim.setInput(u_,"u")
+opts['integrator'] = 'cvodes'
+opts['integrator_options'] = {'fsens_err_con': True,'reltol':1e-8}
+opts['nf'] = 20
+sim = ControlSimulator('sim', cdae, out, tn, opts)
+sim.setInput(2*x0,'x0')
+sim.setInput(param_,'p')
+sim.setInput(u_,'u')
 sim.evaluate()
 
 tf = sim.getMinorT()
@@ -564,15 +558,15 @@ title('controls (%s)' % caption)
 # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
 
 # # Calculate monodromy matrix
-# jacsim.setInput(x0,"x0")
-# jacsim.setInput(param_,"p")
-# jacsim.setInput(u_,"u")
+# jacsim.setInput(x0,'x0')
+# jacsim.setInput(param_,'p')
+# jacsim.setInput(u_,'u')
 # jacsim.evaluate()
 # M = jacsim.getOutput()[-ns:,:]
 
 # # Inspect the eigenvalues of M
 # [D,V] = linalg.eig(M)
-# print "Spectral radius of monodromy, discrete reference, continous control"
+# print 'Spectral radius of monodromy, discrete reference, continous control'
 
 # print max(abs(D))
   
@@ -580,25 +574,25 @@ title('controls (%s)' % caption)
 # discrete reference, discrete control action
 # -----------------------------------------------------------
 
-y0     = SX.sym("y0",ns)
+y0     = SX.sym('y0',ns)
 
-u     = controls["uref"]-mul(param["K"],y0-controls["yref"])
+u     = controls['uref']-mul(param['K'],y0-controls['yref'])
 rhs   = mul(A,y)+mul(B,u)
 
 cdae = SX.fun('cdae', controldaeIn(x=y, x_major=y0, u=controls, p=param),[rhs])
 
 # Output function
-out = SX.fun('out', controldaeIn(x=y, x_major=y0, u=controls, p=param),[y,u,controls["uref"],controls["yref"]])
+out = SX.fun('out', controldaeIn(x=y, x_major=y0, u=controls, p=param),[y,u,controls['uref'],controls['yref']])
 
 opts = {}
-opts["integrator"] = "cvodes"
-opts["integrator_options"] = {"fsens_err_con": True,"reltol":1e-8}
-opts["nf"] = 20
+opts['integrator'] = 'cvodes'
+opts['integrator_options'] = {'fsens_err_con': True,'reltol':1e-8}
+opts['nf'] = 20
 
-sim = ControlSimulator("sim", cdae, out, tn, opts)
-sim.setInput(2*x0,"x0")
-sim.setInput(param_,"p")
-sim.setInput(u_,"u")
+sim = ControlSimulator('sim', cdae, out, tn, opts)
+sim.setInput(2*x0,'x0')
+sim.setInput(param_,'p')
+sim.setInput(u_,'u')
 sim.evaluate()
 
 tf = sim.getMinorT()
@@ -619,15 +613,15 @@ title('controls (%s)' % caption)
 # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
 
 # # Calculate monodromy matrix
-# jacsim.setInput(x0,"x0")
-# jacsim.setInput(param_,"p")
-# jacsim.setInput(u_,"u")
+# jacsim.setInput(x0,'x0')
+# jacsim.setInput(param_,'p')
+# jacsim.setInput(u_,'u')
 # jacsim.evaluate()
 # M = jacsim.getOutput()[-ns:,:]
 
 # # Inspect the eigenvalues of M
 # [D,V] = linalg.eig(M)
-# print "Spectral radius of monodromy, discrete reference, discrete control"
+# print 'Spectral radius of monodromy, discrete reference, discrete control'
 
 # print max(abs(D))
 
