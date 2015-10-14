@@ -130,7 +130,7 @@ namespace casadi {
     return collocationPointsGen<long double>(order, scheme);
   }
 
-  MXFunction simpleRK(Function f, int N, int order) {
+  Function simpleRK(Function f, int N, int order) {
     // Initialize f, if needed
     f.init();
 
@@ -195,7 +195,7 @@ namespace casadi {
     ret_in[0] = x0;
     ret_in[1] = p;
     ret_in[2] = h;
-    return MXFunction("F", ret_in, make_vector(xf),
+    return MX::fun("F", ret_in, make_vector(xf),
                       make_dict("input_scheme", IOScheme("x0", "p", "h"),
                                 "output_scheme", IOScheme("xf")));
   }
@@ -246,7 +246,7 @@ namespace casadi {
     }
   }
 
-  MXFunction simpleIRK(Function f, int N, int order, const std::string& scheme,
+  Function simpleIRK(Function f, int N, int order, const std::string& scheme,
                        const std::string& solver,
                        const Dict& solver_options) {
     // Initialize f, if needed
@@ -294,7 +294,7 @@ namespace casadi {
     }
 
     // Root-finding function
-    MXFunction rfp("rfp", make_vector(v, x0, p, h), make_vector(vertcat(V_eq)));
+    Function rfp = MX::fun("rfp", make_vector(v, x0, p, h), make_vector(vertcat(V_eq)));
 
     // Create a implicit function instance to solve the system of equations
     ImplicitFunction ifcn("ifcn", solver, rfp, solver_options);
@@ -313,12 +313,12 @@ namespace casadi {
     }
 
     // Form discrete-time dynamics
-    return MXFunction("F", make_vector(x0, p, h), make_vector(xf),
+    return MX::fun("F", make_vector(x0, p, h), make_vector(xf),
                       make_dict("input_scheme", IOScheme("x0", "p", "h"),
                                 "output_scheme", IOScheme("xf")));
   }
 
-  MXFunction simpleIntegrator(Function f, const std::string& integrator,
+  Function simpleIntegrator(Function f, const std::string& integrator,
                               const Dict& integrator_options) {
     // Initialize f, if needed
     f.init();
@@ -345,7 +345,7 @@ namespace casadi {
     xdot *= h;
 
     // Form DAE function
-    MXFunction dae("dae", daeIn("x", x, "p", u), daeOut("ode", xdot));
+    Function dae = MX::fun("dae", daeIn("x", x, "p", u), daeOut("ode", xdot));
 
     // Create integrator function
     Dict integrator_options2 = integrator_options;
@@ -362,7 +362,7 @@ namespace casadi {
     MX xf = ifcn(make_map("x0", x0, "p", vertcat(h, vec(p)))).at("xf");
 
     // Form discrete-time dynamics
-    return MXFunction("F", make_vector(x0, p, h), make_vector(xf),
+    return MX::fun("F", make_vector(x0, p, h), make_vector(xf),
                       make_dict("input_scheme", IOScheme("x0", "p", "h"),
                                 "output_scheme", IOScheme("xf")));
   }

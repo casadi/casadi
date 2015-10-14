@@ -1264,8 +1264,8 @@ namespace casadi {
       arg = symvar(veccat(arg));
 
       // Form functions for cases
-      MXFunction f_true("f_true", arg, make_vector(x_true));
-      MXFunction f_false("f_false", arg, make_vector(x_false));
+      Function f_true=MX::fun("f_true", arg, make_vector(x_true));
+      Function f_false=MX::fun("f_false", arg, make_vector(x_false));
 
       // Form Switch
       Switch sw("if_else", f_true, f_false);
@@ -1292,9 +1292,9 @@ namespace casadi {
       for (int k=0; k<x.size(); ++k) {
         stringstream ss;
         ss << "f_case" << k;
-        f[k] = MXFunction(ss.str(), arg, make_vector(x[k]));
+        f[k] = MX::fun(ss.str(), arg, make_vector(x[k]));
       }
-      MXFunction f_default("f_default", arg, make_vector(x_default));
+      Function f_default=MX::fun("f_default", arg, make_vector(x_default));
 
       // Form Switch
       Switch sw("conditional", f, f_default);
@@ -1360,7 +1360,7 @@ namespace casadi {
   }
 
   int MX::zz_countNodes() const {
-    MXFunction f("tmp", vector<MX>(), make_vector(*this));
+    Function f=MX::fun("tmp", vector<MX>(), make_vector(*this));
     return f.countNodes();
   }
 
@@ -1408,11 +1408,12 @@ namespace casadi {
     f_out.insert(f_out.end(), ex.begin(), ex.end());
 
     // Write the mapping function
-    MXFunction f("mapping", f_in, f_out);
+    Function f=MX::fun("mapping", f_in, f_out);
+    auto *ff = dynamic_cast<MXFunctionInternal *>(f.get());
 
     // Get references to the internal data structures
-    std::vector<MXAlgEl>& algorithm = f->algorithm_;
-    vector<MX> work(f->workloc_.size()-1);
+    std::vector<MXAlgEl>& algorithm = ff->algorithm_;
+    vector<MX> work(ff->workloc_.size()-1);
     vector<MX> oarg, ores;
 
     for (vector<MXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it) {
@@ -1474,7 +1475,7 @@ namespace casadi {
     if (all_equal) return ex;
 
     // Otherwise, evaluate symbolically
-    MXFunction F("tmp", v, ex);
+    Function F=MX::fun("tmp", v, ex);
     return F(vdef, true);
   }
 
@@ -1490,11 +1491,12 @@ namespace casadi {
                           << expr.size() << " <-> " << exprs.size() << ".");
 
     // Sort the expression
-    MXFunction f("tmp", vector<MX>(), ex);
+    Function f=MX::fun("tmp", vector<MX>(), ex);
+    auto *ff = dynamic_cast<MXFunctionInternal *>(f.get());
 
     // Get references to the internal data structures
-    const vector<MXAlgEl>& algorithm = f->algorithm_;
-    vector<MX> swork(f->workloc_.size()-1);
+    const vector<MXAlgEl>& algorithm = ff->algorithm_;
+    vector<MX> swork(ff->workloc_.size()-1);
 
     // A boolean vector indicated whoch nodes are tainted by substitutions
     vector<bool> tainted(swork.size());
@@ -1592,11 +1594,12 @@ namespace casadi {
                             const std::string& v_prefix, const std::string& v_suffix) {
 
     // Sort the expression
-    MXFunction f("tmp", vector<MX>(), ex);
+    Function f=MX::fun("tmp", vector<MX>(), ex);
+    auto *ff = dynamic_cast<MXFunctionInternal *>(f.get());
 
     // Get references to the internal data structures
-    const vector<MXAlgEl>& algorithm = f->algorithm_;
-    vector<MX> work(f->workloc_.size()-1);
+    const vector<MXAlgEl>& algorithm = ff->algorithm_;
+    vector<MX> work(ff->workloc_.size()-1);
 
     // Count how many times an expression has been used
     vector<int> usecount(work.size(), 0);
@@ -1716,17 +1719,17 @@ namespace casadi {
   }
 
   MX MX::zz_jacobian(const MX &arg) const {
-    MXFunction temp("helper_jacobian_MX", make_vector(arg), make_vector(*this));
+    Function temp=MX::fun("helper_jacobian_MX", make_vector(arg), make_vector(*this));
     return MX::jac(temp);
   }
 
   MX MX::zz_gradient(const MX &arg) const {
-    MXFunction temp("helper_gradient_MX", make_vector(arg), make_vector(*this));
+    Function temp=MX::fun("helper_gradient_MX", make_vector(arg), make_vector(*this));
     return MX::grad(temp);
   }
 
   MX MX::zz_tangent(const MX &arg) const {
-    MXFunction temp("helper_tangent_MX", make_vector(arg), make_vector(*this));
+    Function temp=MX::fun("helper_tangent_MX", make_vector(arg), make_vector(*this));
     return MX::tang(temp);
   }
 
@@ -1737,7 +1740,7 @@ namespace casadi {
 
   MX MX::zz_hessian(const MX &arg, MX &g) const {
     g = gradient(*this, arg);
-    MXFunction gfcn("gfcn", make_vector(arg), make_vector(g));
+    Function gfcn=MX::fun("gfcn", make_vector(arg), make_vector(g));
     return MX::jac(gfcn, 0, 0, false, true);
   }
 
@@ -1750,7 +1753,7 @@ namespace casadi {
   }
 
   std::vector<MX> MX::zz_symvar() const {
-    MXFunction f("f", std::vector<MX>(), make_vector(*this));
+    Function f=MX::fun("f", std::vector<MX>(), make_vector(*this));
     return f.free_mx();
   }
 
@@ -1776,10 +1779,10 @@ namespace casadi {
     std::vector<MX> v = symvar(veccat(ret));
 
     // Construct an MXFunction with it
-    MXFunction f("tmp", v, ret);
+    Function f=MX::fun("tmp", v, ret);
 
     // Expand to SXFunction
-    SXFunction s("expand_" + f.name(), f, options);
+    Function s=SX::fun("expand_" + f.name(), f, options);
 
     return s(graph_substitute(v, syms, boundary), true);
   }
@@ -1822,7 +1825,7 @@ namespace casadi {
 
   MX MX::zz_nullspace() const {
     SX n = SX::sym("A", sparsity());
-    SXFunction f("nullspace", make_vector(n), make_vector(nullspace(n)));
+    Function f=SX::fun("nullspace", make_vector(n), make_vector(nullspace(n)));
     return f(*this).at(0);
   }
 
@@ -1830,7 +1833,7 @@ namespace casadi {
     if (nnz()==0) return false;
 
     // Construct a temporary algorithm
-    MXFunction temp("tmp", make_vector(arg), make_vector(*this));
+    Function temp=MX::fun("tmp", make_vector(arg), make_vector(*this));
     temp.spInit(true);
 
     bvec_t* input_ =  get_bvec_t(temp.input().data());
@@ -1909,26 +1912,37 @@ namespace casadi {
 
   Function MX::fun(const std::string& name, const std::vector<MX>& arg,
                    const std::vector<MX>& res, const Dict& opts) {
-    return MXFunction(name, arg, res, opts);
+    Function ret;
+    ret.assignNode(new MXFunctionInternal(name, arg, res));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
   }
 
   Function MX::fun(const std::string& name,
                    const std::pair< MXDict, std::vector<std::string> >& arg,
                    const std::vector<MX>& res, const Dict& opts) {
-    return MXFunction(name, arg, res, opts);
+    Dict opts2 = opts;
+    opts2["input_scheme"] = arg.second;
+    return fun(name, make_vector(arg), res, opts2);
   }
 
   Function MX::fun(const std::string& name, const std::vector<MX>& arg,
                    const std::pair< MXDict, std::vector<std::string> >& res,
                    const Dict& opts) {
-    return MXFunction(name, arg, res, opts);
+    Dict opts2 = opts;
+    opts2["output_scheme"] = res.second;
+    return fun(name, arg, make_vector(res), opts2);
   }
 
   Function MX::fun(const std::string& name,
                    const std::pair< MXDict, std::vector<std::string> >& arg,
                    const std::pair< MXDict, std::vector<std::string> >& res,
                    const Dict& opts) {
-    return MXFunction(name, arg, res, opts);
+    Dict opts2 = opts;
+    opts2["input_scheme"] = arg.second;
+    opts2["output_scheme"] = res.second;
+    return fun(name, make_vector(arg), make_vector(res), opts2);
   }
 
   Function MX::fun(const std::string& name, std::initializer_list<MX> arg,

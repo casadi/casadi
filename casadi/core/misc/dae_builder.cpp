@@ -595,8 +595,8 @@ namespace casadi {
     if (this->d.empty()) return;
 
     // Find out which intermediates depends on which other
-    MXFunction f("tmp", make_vector(vertcat(this->d)),
-                 make_vector(vertcat(this->d) - vertcat(this->ddef)));
+    Function f = MX::fun("tmp", make_vector(vertcat(this->d)),
+                         make_vector(vertcat(this->d) - vertcat(this->ddef)));
     Sparsity sp = f.jacSparsity();
     casadi_assert(sp.issquare());
 
@@ -684,8 +684,8 @@ namespace casadi {
     xz.append(v[Z]);
     xz.append(v[P]);
     xz.append(v[U]);
-    MXFunction fcn = MXFunction(xz, this->ode);
-    MXFunction J(v, MX::jac(fcn));
+    Function fcn = MX::fun(xz, this->ode);
+    Function J = MX::fun(v, MX::jac(fcn));
 
     // Evaluate the Jacobian in the starting point
     J.init();
@@ -735,7 +735,7 @@ namespace casadi {
     if (this->x.empty()) return;
 
     // Find out which differential equation depends on which differential state
-    MXFunction f("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
+    Function f = MX::fun("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
     Sparsity sp = f.jacSparsity();
     casadi_assert(sp.issquare());
 
@@ -763,7 +763,7 @@ namespace casadi {
     if (this->z.empty()) return;
 
     // Find out which algebraic equation depends on which algebraic state
-    MXFunction f("tmp", make_vector(vertcat(this->z)), make_vector(vertcat(this->alg)));
+    Function f = MX::fun("tmp", make_vector(vertcat(this->z)), make_vector(vertcat(this->alg)));
     Sparsity sp = f.jacSparsity();
     casadi_assert(sp.issquare());
 
@@ -795,7 +795,7 @@ namespace casadi {
     if (this->s.empty()) return;
 
     // Write the ODE as a function of the state derivatives
-    MXFunction f("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
+    Function f = MX::fun("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
 
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
@@ -822,7 +822,7 @@ namespace casadi {
     this->sdot = sdotnew;
 
     // Now write the sorted ODE as a function of the state derivatives
-    f = MXFunction("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
+    f = MX::fun("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
 
     // Get the Jacobian
     MX J = MX::jac(f);
@@ -879,7 +879,7 @@ namespace casadi {
     if (this->z.empty()) return;
 
     // Write the algebraic equations as a function of the algebraic states
-    MXFunction f("f", make_vector(vertcat(this->z)), make_vector(vertcat(this->alg)));
+    Function f = MX::fun("f", make_vector(vertcat(this->z)), make_vector(vertcat(this->alg)));
 
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
@@ -904,7 +904,7 @@ namespace casadi {
     this->z = znew;
 
     // Rewrite the sorted algebraic equations as a function of the algebraic states
-    f = MXFunction("f", make_vector(vertcat(this->z)), make_vector(vertcat(this->alg)));
+    f = MX::fun("f", make_vector(vertcat(this->z)), make_vector(vertcat(this->alg)));
 
     // Variables where we have found an explicit expression and where we haven't
     vector<MX> z_exp, z_imp;
@@ -1235,7 +1235,7 @@ namespace casadi {
     if (this->s.empty()) return;
 
     // We investigate the interdependencies in sdot -> dae
-    MXFunction f("f", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
+    Function f = MX::fun("f", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
 
     // Number of s
     int ns = f.input().nnz();
@@ -1715,7 +1715,7 @@ namespace casadi {
     return ret;
   }
 
-  MXFunction DaeBuilder::create(const std::string& fname,
+  Function DaeBuilder::create(const std::string& fname,
                                 const std::vector<std::string>& s_in,
                                 const std::vector<std::string>& s_out) const {
     // Collect function inputs
@@ -1977,7 +1977,7 @@ namespace casadi {
     }
 
     // Generate the constructed function
-    return MXFunction(fname, ret_in, ret_out,
+    return MX::fun(fname, ret_in, ret_out,
                       make_dict("input_scheme", s_in, "output_scheme", s_out));
   }
 

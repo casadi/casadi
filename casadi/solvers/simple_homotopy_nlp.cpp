@@ -81,7 +81,7 @@ namespace casadi {
     MX x = MX::sym("x", hnlp_.input(HNL_X).nnz());
 
     map<string, MX> v = hnlp_(make_map("x", x, "p", p_tau[0], "tau", p_tau[1]));
-    MXFunction nlp("nlp", nlpIn("x", x, "p", P),
+    Function nlp=MX::fun("nlp", nlpIn("x", x, "p", P),
                    nlpOut("f", v["f"], "g", v["g"]));
 
     // Create an nlpsolver instance

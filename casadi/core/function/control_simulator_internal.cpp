@@ -87,7 +87,7 @@ namespace casadi {
       control_dae_in_[CONTROL_DAE_X]    = dae_in_[DAE_X];
       control_dae_in_[CONTROL_DAE_Z]    = dae_in_[DAE_Z];
       control_dae_in_[CONTROL_DAE_P]    = dae_in_[DAE_P];
-      control_dae_ = MXFunction("control_dae", control_dae_in_, control_dae_(dae_in_));
+      control_dae_ = MX::fun("control_dae", control_dae_in_, control_dae_(dae_in_));
     }
     casadi_assert_message(control_dae_.n_in()==CONTROL_DAE_NUM_IN,
                           "ControlSimulatorInternal::init: supplied control_dae does not "
@@ -172,7 +172,7 @@ namespace casadi {
     int i=1;
     while ( control_dae_call.size()>i && dae_out.size()>i) {dae_out[i] = control_dae_call[i];i++;}
 
-    dae_ = MXFunction("dae", dae_in_, dae_out);
+    dae_ = MX::fun("dae", dae_in_, dae_out);
 
     // Size of the coarse grid
     ns_ = gridc_.size();
@@ -249,7 +249,7 @@ namespace casadi {
       out[INTEGRATOR_XF] = x;
 
       // Create the output function
-      output_fcn_ = SXFunction("output", arg, out);
+      output_fcn_ = SX::fun("output", arg, out);
       oscheme_ = IOScheme(SCHEME_IntegratorOutput);
     } else {
       output_fcn_ = orig_output_fcn_;
@@ -268,7 +268,7 @@ namespace casadi {
 
     copy(output_fcn_call_.begin(), output_fcn_call_.end(), output_fcn_out_.begin()+2);
 
-    output_fcn_ = MXFunction("output_fcn", output_fcn_in_, output_fcn_out_);
+    output_fcn_ = MX::fun("output_fcn", output_fcn_in_, output_fcn_out_);
 
     if (!output_fcn_.input(CONTROL_DAE_U).isempty() &&
         control_dae_.input(CONTROL_DAE_U).isempty()) {
@@ -309,7 +309,7 @@ namespace casadi {
       output_fcn_in_[CONTROL_DAE_X_MAJOR] = dae_in_[DAE_P](iYM);
 
     // Transform the output_fcn_ with CONTROL_DAE input scheme to a DAE input scheme
-    output_fcn_ = MXFunction("output_function", dae_in_, output_fcn_(output_fcn_in_));
+    output_fcn_ = MX::fun("output_function", dae_in_, output_fcn_(output_fcn_in_));
 
     // Simulator options
     Dict simulator_options;
@@ -399,7 +399,7 @@ namespace casadi {
     }
 
     // Finally, construct all_output_
-    all_output_ = MXFunction("all_output", all_output_in, all_output_out);
+    all_output_ = MX::fun("all_output", all_output_in, all_output_out);
   }
 
   void ControlSimulatorInternal::evaluate() {

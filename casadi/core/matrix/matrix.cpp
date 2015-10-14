@@ -152,10 +152,11 @@ namespace casadi {
   template<>
   bool SX::isSmooth() const {
     // Make a function
-    SXFunction temp("temp", make_vector(SX()), make_vector(*this));
+    Function temp=SX::fun("temp", make_vector(SX()), make_vector(*this));
 
     // Run the function on the temporary variable
-    return temp->isSmooth();
+    auto *t = dynamic_cast<SXFunctionInternal *>(temp.get());
+    return t->isSmooth();
   }
 
   template<>
@@ -446,7 +447,7 @@ namespace casadi {
       SX q1 = (b-a)/2;
       SX q2 = (b+a)/2;
 
-      SXFunction fcn("gauss_quadrature", make_vector(x), make_vector(f));
+      Function fcn=SX::fun("gauss_quadrature", make_vector(x), make_vector(f));
 
       return q1*gauss_quadrature(fcn(q1*x+q2).at(0), x, -1, 1);
     }
@@ -468,7 +469,7 @@ namespace casadi {
     wi.push_back((322-13*sqrt(70.0))/900.0);
 
     // Evaluate at the Gauss points
-    SXFunction fcn("gauss_quadrature", make_vector(x), make_vector(f));
+    Function fcn=SX::fun("gauss_quadrature", make_vector(x), make_vector(f));
     vector<SXElement> f_val(5);
     for (int i=0; i<5; ++i)
       f_val[i] = fcn(SX(xi[i])).at(0).toScalar();
@@ -532,7 +533,7 @@ namespace casadi {
 
 
     // Otherwise, evaluate symbolically
-    SXFunction F("tmp", v, ex);
+    Function F=SX::fun("tmp", v, ex);
     return F(vdef);
   }
 
@@ -561,20 +562,21 @@ namespace casadi {
     f_out.insert(f_out.end(), ex.begin(), ex.end());
 
     // Write the mapping function
-    SXFunction f("tmp", f_in, f_out);
+    Function f=SX::fun("tmp", f_in, f_out);
 
     // Get references to the internal data structures
-    const vector<ScalarAtomic>& algorithm = f.algorithm();
+    auto *ff = dynamic_cast<SXFunctionInternal *>(f.get());
+    const vector<ScalarAtomic>& algorithm = ff->algorithm_;
     vector<SXElement> work(f.getWorkSize());
 
     // Iterator to the binary operations
-    vector<SXElement>::const_iterator b_it=f->operations_.begin();
+    vector<SXElement>::const_iterator b_it=ff->operations_.begin();
 
     // Iterator to stack of constants
-    vector<SXElement>::const_iterator c_it = f->constants_.begin();
+    vector<SXElement>::const_iterator c_it = ff->constants_.begin();
 
     // Iterator to free variables
-    vector<SXElement>::const_iterator p_it = f->free_vars_.begin();
+    vector<SXElement>::const_iterator p_it = ff->free_vars_.begin();
 
     // Evaluate the algorithm
     for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
@@ -616,7 +618,7 @@ namespace casadi {
     if (nnz()==0) return false;
 
     // Construct a temporary algorithm
-    SXFunction temp("temp", make_vector(arg), make_vector(*this));
+    Function temp=SX::fun("temp", make_vector(arg), make_vector(*this));
     temp.spInit(true);
 
     bvec_t* input_ =  get_bvec_t(temp.input().data());
@@ -636,19 +638,19 @@ namespace casadi {
 
   template<>
   SX SX::zz_jacobian(const SX &arg) const {
-    SXFunction temp("temp", make_vector(arg), make_vector(*this)); // make a runtime
+    Function temp=SX::fun("temp", make_vector(arg), make_vector(*this)); // make a runtime
     return SX::jac(temp);
   }
 
   template<>
   SX SX::zz_gradient(const SX &arg) const {
-    SXFunction temp("temp", make_vector(arg), make_vector(*this)); // make a runtime
+    Function temp=SX::fun("temp", make_vector(arg), make_vector(*this)); // make a runtime
     return SX::grad(temp);
   }
 
   template<>
   SX SX::zz_tangent(const SX &arg) const {
-    SXFunction temp("temp", make_vector(arg), make_vector(*this)); // make a runtime
+    Function temp=SX::fun("temp", make_vector(arg), make_vector(*this)); // make a runtime
     return SX::tang(temp);
   }
 
@@ -661,13 +663,13 @@ namespace casadi {
   template<>
   SX SX::zz_hessian(const SX &arg, SX &g) const {
     g = gradient(*this, arg);
-    SXFunction gfcn("gfcn", make_vector(arg), make_vector(g)); // make a runtime
+    Function gfcn=SX::fun("gfcn", make_vector(arg), make_vector(g)); // make a runtime
     return SX::jac(gfcn, 0, 0, false, true);
   }
 
   template<>
   SX SX::zz_jacobianTimesVector(const SX &arg, const SX &v, bool transpose_jacobian) const {
-    SXFunction f("tmp", make_vector(arg), make_vector(*this));
+    Function f=SX::fun("tmp", make_vector(arg), make_vector(*this));
 
     // Split up v
     vector<SX> vv = horzsplit(v);
@@ -777,7 +779,7 @@ namespace casadi {
 
   template<>
   int SX::zz_countNodes() const {
-    SXFunction f("tmp", make_vector(SX()), make_vector(*this));
+    Function f=SX::fun("tmp", make_vector(SX()), make_vector(*this));
     return f.countNodes();
   }
 
@@ -796,7 +798,7 @@ namespace casadi {
 
   template<>
   std::vector<SX> SX::zz_symvar() const {
-    SXFunction f("tmp", std::vector<SX>(), make_vector(*this));
+    Function f=SX::fun("tmp", std::vector<SX>(), make_vector(*this));
     std::vector<SXElement> ret1 = f.free_sx().data();
     std::vector<SX> ret(ret1.size());
     std::copy(ret1.begin(), ret1.end(), ret.begin());
@@ -811,21 +813,22 @@ namespace casadi {
                             const std::string& v_suffix) {
 
     // Sort the expression
-    SXFunction f("tmp", vector<SX>(), ex);
+    Function f=SX::fun("tmp", vector<SX>(), ex);
+    auto *ff = dynamic_cast<SXFunctionInternal *>(f.get());
 
     // Get references to the internal data structures
-    const vector<ScalarAtomic>& algorithm = f.algorithm();
+    const vector<ScalarAtomic>& algorithm = ff->algorithm_;
     vector<SXElement> work(f.getWorkSize());
     vector<SXElement> work2 = work;
 
     // Iterator to the binary operations
-    vector<SXElement>::const_iterator b_it=f->operations_.begin();
+    vector<SXElement>::const_iterator b_it=ff->operations_.begin();
 
     // Iterator to stack of constants
-    vector<SXElement>::const_iterator c_it = f->constants_.begin();
+    vector<SXElement>::const_iterator c_it = ff->constants_.begin();
 
     // Iterator to free variables
-    vector<SXElement>::const_iterator p_it = f->free_vars_.begin();
+    vector<SXElement>::const_iterator p_it = ff->free_vars_.begin();
 
     // Count how many times an expression has been used
     vector<int> usecount(work.size(), 0);
@@ -889,7 +892,7 @@ namespace casadi {
     vector<SXElement> marked = vdef;
 
     // Reset iterator
-    b_it=f->operations_.begin();
+    b_it=ff->operations_.begin();
 
     // Evaluate the algorithm
     for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
@@ -934,7 +937,7 @@ namespace casadi {
 
     std::vector<SXElement> r;
 
-    SXFunction f("tmp", make_vector(x), make_vector(*this));
+    Function f = SX::fun("tmp", make_vector(x), make_vector(*this));
     int mult = 1;
     bool success = false;
     for (int i=0; i<1000; ++i) {
@@ -944,7 +947,7 @@ namespace casadi {
         success = true;
         break;
       }
-      f = SXFunction("tmp", make_vector(x), make_vector(j));
+      f = SX::fun("tmp", make_vector(x), make_vector(j));
       mult*=i+1;
     }
 
@@ -1167,35 +1170,24 @@ namespace casadi {
 
   template<>
   Function SX::fun(const std::string& name, const Function &f, const Dict& opts) {
-    return SXFunction(name, f, opts);
+    vector<SX> arg = f.sx_in();
+    vector<SX> res = Function(f)(arg);
+    vector<string> name_in = f.name_in();
+    vector<string> name_out = f.name_out();
+    Dict opts2(opts);
+    if (!name_in.empty() && !opts.count("input_scheme")) opts2["input_scheme"]=name_in;
+    if (!name_out.empty() && !opts.count("output_scheme")) opts2["output_scheme"]=name_out;
+    return fun(name, arg, res, opts2);
   }
 
   template<>
   Function SX::fun(const std::string& name, const std::vector<SX>& arg,
                    const std::vector<SX>& res, const Dict& opts) {
-    return SXFunction(name, arg, res, opts);
-  }
-
-  template<>
-  Function SX::fun(const std::string& name,
-                   const std::pair< SXDict, std::vector<std::string> >& arg,
-                   const std::vector<SX>& res, const Dict& opts) {
-    return SXFunction(name, arg, res, opts);
-  }
-
-  template<>
-  Function SX::fun(const std::string& name, const std::vector<SX>& arg,
-                   const std::pair< SXDict, std::vector<std::string> >& res,
-                   const Dict& opts) {
-    return SXFunction(name, arg, res, opts);
-  }
-
-  template<>
-  Function SX::fun(const std::string& name,
-                   const std::pair< SXDict, std::vector<std::string> >& arg,
-                   const std::pair< SXDict, std::vector<std::string> >& res,
-                   const Dict& opts) {
-    return SXFunction(name, arg, res, opts);
+    Function ret;
+    ret.assignNode(new SXFunctionInternal(name, arg, res));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
   }
 
 } // namespace casadi

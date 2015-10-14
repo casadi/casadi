@@ -80,7 +80,7 @@ namespace casadi {
         casadi_error("No such field: \"" + i->first + "\"");
       }
     }
-    SXFunction f("dae", daeIn("x", x, "z", z, "p", p),
+    Function f=SX::fun("dae", daeIn("x", x, "z", z, "p", p),
                     daeOut("ode", ode, "alg", alg, "quad", quad));
     Function g; // dummy
 
@@ -112,7 +112,7 @@ namespace casadi {
         casadi_error("No such field: \"" + i->first + "\"");
       }
     }
-    MXFunction f("dae", daeIn("x", x, "z", z, "p", p),
+    Function f=MX::fun("dae", daeIn("x", x, "z", z, "p", p),
                     daeOut("ode", ode, "alg", alg, "quad", quad));
     Function g; // dummy
 

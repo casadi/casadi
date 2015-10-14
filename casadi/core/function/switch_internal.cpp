@@ -176,7 +176,7 @@ namespace casadi {
 
     // Create wrapper
     casadi_assert(v.size()==sw.n_in());
-    return MXFunction(name, w_in, sw(v), opts);
+    return MX::fun(name, w_in, sw(v), opts);
   }
 
   Function SwitchInternal
@@ -228,7 +228,7 @@ namespace casadi {
     }
 
     // Create wrapper
-    return MXFunction(name, w_in, w_out, opts);
+    return MX::fun(name, w_in, w_out, opts);
   }
 
   inline string name(const Function& f) {

@@ -100,7 +100,7 @@ namespace casadi {
       if (hnlp_mx.isNull()) {
         casadi_warning("Cannot expand NLP as it is not an MXFunction");
       } else {
-        hnlp_ = SXFunction(hnlp_mx);
+        hnlp_ = SX::fun(hnlp_mx.name(), hnlp_mx);
         hnlp_.copyOptions(hnlp_mx, true);
         hnlp_.init();
       }

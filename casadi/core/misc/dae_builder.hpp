@@ -310,9 +310,9 @@ namespace casadi {
                             const std::vector<std::string>& f_out);
 
     /// Construct a function object
-    MXFunction create(const std::string& fname,
-                      const std::vector<std::string>& s_in,
-                      const std::vector<std::string>& s_out) const;
+    Function create(const std::string& fname,
+                    const std::vector<std::string>& s_in,
+                    const std::vector<std::string>& s_out) const;
     ///@}
 
     /// Get variable expression by name

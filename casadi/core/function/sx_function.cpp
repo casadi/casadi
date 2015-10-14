@@ -138,7 +138,7 @@ namespace casadi {
   }
 
   SXFunction::SXFunction(const MXFunction& f) {
-    SXFunction t("expand_" + f.name(), f);
+    Function t=SX::fun("expand_" + f.name(), f);
     assignNode(t.get());
   }
 
@@ -147,7 +147,7 @@ namespace casadi {
     if (temp) {
       assignNode(const_cast<SXFunctionInternal*>(temp));
     } else {
-      SXFunction t("expand_" + f.name(), f);
+      Function t=SX::fun("expand_" + f.name(), f);
       assignNode(t.get());
     }
   }

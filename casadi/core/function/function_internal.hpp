@@ -53,8 +53,6 @@ namespace casadi {
   typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
   ///@}
 
-  class MXFunction;
-
   /** \brief Internal class for Function
       \author Joel Andersson
       \date 2010
@@ -317,7 +315,7 @@ namespace casadi {
     *
     *  The function is not initialized
     */
-    MXFunction wrapMXFunction();
+    Function wrapMXFunction();
 
     /** \brief Generate function call */
     virtual void generate(CodeGenerator& g, const std::vector<int>& arg,

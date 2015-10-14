@@ -70,21 +70,17 @@ namespace casadi {
 #endif // WITH_OPENCL
 
 /** \brief  Internal node class for SXFunction
-  A regular user should never work with any Node class. Use SXFunction directly.
-  \author Joel Andersson
-  \date 2010
+    Do not use any internal class directly - always use the public Function
+    \author Joel Andersson
+    \date 2010-2015
 */
 class CASADI_EXPORT SXFunctionInternal :
         public XFunctionInternal<SXFunction, SXFunctionInternal, Matrix<SXElement>, SXNode>{
-  friend class SXFunction;
-
-  protected:
-    /** \brief  Constructor (only to be called from SXFunction, therefore protected) */
+  public:
+    /** \brief Constructor */
     SXFunctionInternal(const std::string& name,
                        const std::vector<Matrix<SXElement> >& inputv,
                        const std::vector<Matrix<SXElement> >& outputv);
-
-  public:
 
   /** \brief  Destructor */
   virtual ~SXFunctionInternal();

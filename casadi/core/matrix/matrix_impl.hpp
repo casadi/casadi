@@ -3052,7 +3052,9 @@ namespace casadi {
   fun(const std::string& name,
       const std::pair< std::map<std::string, Matrix<DataType> >, std::vector<std::string> >& arg,
       const std::vector<Matrix<DataType>>& res, const Dict& opts) {
-    throw CasadiException("\"fun\" not defined for " + className());
+    Dict opts2 = opts;
+    opts2["input_scheme"] = arg.second;
+    return fun(name, make_vector(arg), res, opts2);
   }
 
   template<typename DataType>
@@ -3061,7 +3063,9 @@ namespace casadi {
       const std::vector<Matrix<DataType>>& arg,
       const std::pair< std::map<std::string, Matrix<DataType> >, std::vector<std::string> >& res,
       const Dict& opts) {
-    throw CasadiException("\"fun\" not defined for " + className());
+    Dict opts2 = opts;
+    opts2["output_scheme"] = res.second;
+    return fun(name, arg, make_vector(res), opts2);
   }
 
   template<typename DataType>
@@ -3070,7 +3074,10 @@ namespace casadi {
       const std::pair< std::map<std::string, Matrix<DataType> >, std::vector<std::string> >& arg,
       const std::pair< std::map<std::string, Matrix<DataType> >, std::vector<std::string> >& res,
       const Dict& opts) {
-    throw CasadiException("\"fun\" not defined for " + className());
+    Dict opts2 = opts;
+    opts2["input_scheme"] = arg.second;
+    opts2["output_scheme"] = res.second;
+    return fun(name, make_vector(arg), make_vector(res), opts2);
   }
 
   template<typename DataType>
@@ -3205,17 +3212,6 @@ namespace casadi {
   template<> Function SX::fun(const std::string& name, const Function &f, const Dict& opts);
   template<> Function SX::fun(const std::string& name, const std::vector<SX>& arg,
                               const std::vector<SX>& res, const Dict& opts);
-
-  template<> Function SX::fun(const std::string& name,
-                              const std::pair< SXDict, std::vector<std::string> >& arg,
-                              const std::vector<SX>& res, const Dict& opts);
-  template<> Function SX::fun(const std::string& name, const std::vector<SX>& arg,
-                              const std::pair< SXDict, std::vector<std::string> >& res,
-                              const Dict& opts);
-  template<> Function SX::fun(const std::string& name,
-                              const std::pair< SXDict, std::vector<std::string> >& arg,
-                              const std::pair< SXDict, std::vector<std::string> >& res,
-                              const Dict& opts);
 
 } // namespace casadi
 

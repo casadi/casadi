@@ -62,8 +62,6 @@ namespace casadi {
   */
   class CASADI_EXPORT MXFunctionInternal :
         public XFunctionInternal<MXFunction, MXFunctionInternal, MX, MXNode>{
-    friend class MXFunction;
-
   public:
     /** \brief  An element of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;
@@ -77,10 +75,8 @@ namespace casadi {
     /// Free variables
     std::vector<MX> free_vars_;
 
-    /** \brief  Multiple input, multiple output constructor, only to be accessed from MXFunction,
-        therefore protected */
-    MXFunctionInternal(const std::string& name,
-                       const std::vector<MX>& input,
+    /** \brief Constructor */
+    MXFunctionInternal(const std::string& name, const std::vector<MX>& input,
                        const std::vector<MX>& output);
 
     /** \brief  Destructor */
@@ -134,7 +130,7 @@ namespace casadi {
                         std::vector<std::vector<MX> >& adjSens);
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
-    SXFunction expand(const std::vector<SX>& inputv);
+    Function expand(const std::vector<SX>& inputv);
 
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);

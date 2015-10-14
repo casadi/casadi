@@ -60,7 +60,7 @@ namespace casadi {
         casadi_error("No such field: \"" + i->first + "\"");
       }
     }
-    SXFunction nlpf("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
+    Function nlpf=SX::fun("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
 
     // Create the solver instance
     assignNode(NlpSolverInternal::instantiatePlugin(name, solver, nlpf));
@@ -87,7 +87,7 @@ namespace casadi {
         casadi_error("No such field: \"" + i->first + "\"");
       }
     }
-    MXFunction nlpf("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
+    Function nlpf=MX::fun("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
 
     // Create the solver instance
     assignNode(NlpSolverInternal::instantiatePlugin(name, solver, nlpf));

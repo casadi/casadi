@@ -146,7 +146,7 @@ namespace casadi {
     std::vector<MX> ins;
     ins.push_back(a);
     ins.push_back(g);
-    formatA_ = MXFunction(ins, vertcat(a, g.T()));
+    formatA_ = MX::fun(ins, vertcat(a, g.T()));
     formatA_.init();
 
     // Set objective row of augmented linear constraints

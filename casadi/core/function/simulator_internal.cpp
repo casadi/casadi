@@ -89,7 +89,7 @@ namespace casadi {
       out[INTEGRATOR_ZF] = z;
 
       // Create the output function
-      output_fcn_ = SXFunction("ofcn", arg, out);
+      output_fcn_ = SX::fun("ofcn", arg, out);
       oscheme_ = IOScheme(SCHEME_IntegratorOutput);
     }
 
