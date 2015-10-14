@@ -4636,17 +4636,17 @@ default constructor
 
 >  ExternalFunction(str name, Dict opts=Dict())
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Load an external function File name is assumed to be ./<f_name>.so.
 
 >  ExternalFunction(str name, str bin_name, Dict opts=Dict())
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Load an external function File name given.
 
 >  ExternalFunction(str name, Compiler compiler, Dict opts=Dict())
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Load a just-in-time compiled external function File name given.
 
 ";

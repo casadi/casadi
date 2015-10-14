@@ -418,6 +418,15 @@
 %exception  snoptProblemC::solve(int starttype) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::ExternalFunction::ExternalFunction(const std::string &name, const Compiler &compiler, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::ExternalFunction::ExternalFunction(const std::string &name, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::ExternalFunction::ExternalFunction(const std::string &name, const std::string &bin_name, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::LibInfo< Compiler >::LibInfo() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

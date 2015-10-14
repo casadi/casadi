@@ -462,7 +462,7 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::Function.externalInternal
+/** \class casadi::ExternalFunctionInternal
 \n
 \par
 <a name='options'></a><table>
@@ -486,7 +486,7 @@
 </table>
 */
 /// \endcond
-/** \class casadi::Function.external
+/** \class casadi::ExternalFunction
 \n
 \par
 <a name='options'></a><table>

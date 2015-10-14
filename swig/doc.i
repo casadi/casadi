@@ -6357,23 +6357,20 @@ default constructor
 ";
 
 %feature("docstring") casadi::ExternalFunction::ExternalFunction(const
-std::string &name, const Dict &opts=Dict()) "
-
-Load an external function File name is assumed to be ./<f_name>.so.
+std::string &name, const Dict &opts=Dict()) " [INTERNAL]  Load an external
+function File name is assumed to be ./<f_name>.so.
 
 ";
 
 %feature("docstring") casadi::ExternalFunction::ExternalFunction(const
 std::string &name, const std::string &bin_name, const Dict &opts=Dict()) "
-
-Load an external function File name given.
+[INTERNAL]  Load an external function File name given.
 
 ";
 
 %feature("docstring") casadi::ExternalFunction::ExternalFunction(const
 std::string &name, const Compiler &compiler, const Dict &opts=Dict()) "
-
-Load a just-in-time compiled external function File name given.
+[INTERNAL]  Load a just-in-time compiled external function File name given.
 
 ";
 
