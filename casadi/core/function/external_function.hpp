@@ -44,6 +44,7 @@ class ExternalFunctionInternal;
     /** \brief  default constructor */
     ExternalFunction();
 
+#ifdef WITH_DEPRECATED_FEATURES
     /** \brief  Load an external function 
      * File name is assumed to be ./<f_name>.so
      */
@@ -60,6 +61,7 @@ class ExternalFunctionInternal;
      */
     ExternalFunction(const std::string& name, const Compiler& compiler,
                      const Dict& opts=Dict());
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief  Access functions of the node */
     ExternalFunctionInternal* operator->();

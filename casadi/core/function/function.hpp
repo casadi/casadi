@@ -892,7 +892,22 @@ namespace casadi {
     void init();
 #endif // SWIG
 
+    /** \brief  Load an external function
+     * File name is assumed to be ./<f_name>.so
+     */
+    static Function external(const std::string& name, const Dict& opts=Dict());
 
+    /** \brief  Load an external function
+     * File name given
+     */
+    static Function external(const std::string& name, const std::string& bin_name,
+                             const Dict& opts=Dict());
+
+    /** \brief  Load a just-in-time compiled external function
+     * File name given
+     */
+    static Function external(const std::string& name, const Compiler& compiler,
+                             const Dict& opts=Dict());
   };
 
 } // namespace casadi

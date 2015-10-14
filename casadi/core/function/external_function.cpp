@@ -37,6 +37,7 @@ using namespace std;
   ExternalFunction::ExternalFunction() {
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   ExternalFunction::ExternalFunction(const string& name, const Dict& opts) {
     assignNode(ExternalFunctionInternal::create("./" + name + ".so", name));
     setOption(opts);
@@ -56,6 +57,7 @@ using namespace std;
     setOption(opts);
     init();
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   ExternalFunctionInternal* ExternalFunction::operator->() {
     return static_cast<ExternalFunctionInternal*>(Function::operator->());

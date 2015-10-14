@@ -328,7 +328,7 @@ namespace casadi {
   Function CommonExternal<LibType>
   ::getFullJacobian(const std::string& name, const Dict& opts) {
     if (hasFullJacobian()) {
-      return ExternalFunction(name, li_, opts);
+      return Function::external(name, li_, opts);
     } else {
       return FunctionInternal::getFullJacobian(name, opts);
     }
@@ -343,7 +343,7 @@ namespace casadi {
     if (n!=nfwd || nfwd>numDerForward()) {
       casadi_error("Internal error: Refactoring needed, cf. #1055");
     }
-    return ExternalFunction(name, li_, opts);
+    return Function::external(name, li_, opts);
   }
 
   template<typename LibType>
@@ -368,7 +368,7 @@ namespace casadi {
     if (n!=nadj || nadj>numDerReverse()) {
       casadi_error("Internal error: Refactoring needed, cf. #1055");
     }
-    return ExternalFunction(name, li_, opts);
+    return Function::external(name, li_, opts);
   }
 
   template<typename LibType>

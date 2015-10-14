@@ -2259,7 +2259,7 @@ namespace casadi {
     string dlname = g.compile(fname, compiler);
 
     // Load it
-    return ExternalFunction(fname, dlname);
+    return Function::external(fname, dlname);
   }
 
   void FunctionInternal::spFwdSwitch(const bvec_t** arg, bvec_t** res,

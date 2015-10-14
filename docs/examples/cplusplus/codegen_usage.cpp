@@ -31,7 +31,7 @@
  *  generated files is not recommended and subject to change.
  *
  *  We show how the generated code can be used from C (or C++), without requiring
- *  any CasADi classes as well as how to use it from C++ using CasADi's ExternalFunction.
+ *  any CasADi classes as well as how to use it from C++ using CasADi's Function::external.
  *
  *  Joel Andersson, 2013-2015
  */
@@ -181,8 +181,8 @@ void usage_cplusplus(){
   cout << "Usage from C++" << endl;
   cout << endl;
 
-  // Use CasADi's "ExternalFunction" to load the compiled function
-  ExternalFunction f("f");
+  // Use CasADi's "Function::external" to load the compiled function
+  Function f = Function::external("f");
 
   // Use like any other CasADi function
   vector<double> x = {1, 2, 3, 4};

@@ -29,7 +29,7 @@
 #include "../std_vector_tools.hpp"
 #include "../function/map.hpp"
 #include "../function/mapaccum.hpp"
-
+#include "external_function_internal.hpp"
 
 using namespace std;
 
@@ -1043,6 +1043,32 @@ namespace casadi {
   void Function::init() {
     (*this)->init();
     (*this)->finalize();
+  }
+
+  Function Function::external(const string& name, const Dict& opts) {
+    Function ret;
+    ret.assignNode(ExternalFunctionInternal::create("./" + name + ".so", name));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
+  }
+
+  Function Function::external(const string& name, const string& bin_name,
+                              const Dict& opts) {
+    Function ret;
+    ret.assignNode(ExternalFunctionInternal::create(bin_name, name));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
+  }
+
+  Function Function::external(const string& name, const Compiler& compiler,
+                              const Dict& opts) {
+    Function ret;
+    ret.assignNode(ExternalFunctionInternal::create(compiler, name));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
   }
 
 } // namespace casadi

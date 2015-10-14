@@ -541,7 +541,7 @@ class casadiTestCase(unittest.TestCase):
       F.generate(name)
       import subprocess
       p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
-      F2 = ExternalFunction(name)
+      F2 = Function.external(name)
 
       for i in range(F.n_in()):
         F2.setInput(F.getInput(i),i)

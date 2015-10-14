@@ -75,9 +75,9 @@ t2 = time.time()
 print "time = ", (t2-t1)*1e3, " ms"
 
 # Read function
-efcn_no_opt = ExternalFunction(name, "./"+objname_no_opt)
-efcn_O3_opt = ExternalFunction(name, "./"+objname_O3_opt)
-efcn_Os_opt = ExternalFunction(name, "./"+objname_O3_opt)
+efcn_no_opt = Function.external(name, "./"+objname_no_opt)
+efcn_O3_opt = Function.external(name, "./"+objname_O3_opt)
+efcn_Os_opt = Function.external(name, "./"+objname_O3_opt)
 f_test = [gfcn,efcn_no_opt,efcn_O3_opt,efcn_Os_opt]
 
 # Just-in-time compilation with OpenCL

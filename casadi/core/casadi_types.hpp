@@ -69,6 +69,7 @@ namespace casadi {
   class Variable;
   class DaeBuilder;
   class XmlFile;
+  class Compiler;
 
 #ifndef SWIG
   // The number of derivative directions for which the tool has been optimized
