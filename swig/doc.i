@@ -26276,42 +26276,36 @@ Default constructor.
 ";
 
 %feature("docstring") casadi::MXFunction::MXFunction(const Function
-&function) "
-
-Attempt to form an MXFunction out of an Function.
+&function) " [INTERNAL]  Attempt to form an MXFunction out of an Function.
 
 ";
 
 %feature("docstring") casadi::MXFunction::MXFunction(const std::string
 &name, const std::vector< MX > &arg, const std::vector< MX > &res, const
-Dict &opts=Dict()) "
-
-Construct from vectors (new syntax, includes initialization)
+Dict &opts=Dict()) " [INTERNAL]  Construct from vectors (new syntax,
+includes initialization)
 
 ";
 
 %feature("docstring") casadi::MXFunction::MXFunction(const std::string
 &name, const std::pair< MXDict, std::vector< std::string > > &arg, const
-std::vector< MX > &res, const Dict &opts=Dict()) "
-
-Construct from vectors (new syntax, includes initialization)
+std::vector< MX > &res, const Dict &opts=Dict()) " [INTERNAL]  Construct
+from vectors (new syntax, includes initialization)
 
 ";
 
 %feature("docstring") casadi::MXFunction::MXFunction(const std::string
 &name, const std::vector< MX > &arg, const std::pair< MXDict, std::vector<
-std::string > > &res, const Dict &opts=Dict()) "
-
-Construct from vectors (new syntax, includes initialization)
+std::string > > &res, const Dict &opts=Dict()) " [INTERNAL]  Construct from
+vectors (new syntax, includes initialization)
 
 ";
 
 %feature("docstring") casadi::MXFunction::MXFunction(const std::string
 &name, const std::pair< MXDict, std::vector< std::string > > &arg, const
 std::pair< MXDict, std::vector< std::string > > &res, const Dict
-&opts=Dict()) "
-
-Construct from vectors (new syntax, includes initialization)
+&opts=Dict()) " [INTERNAL]  Construct from vectors (new syntax, includes
+initialization)
 
 ";
 
@@ -46882,54 +46876,47 @@ Default constructor.
 ";
 
 %feature("docstring") casadi::SXFunction::SXFunction(const MXFunction &f) "
-
-Expand an MXFunction.
+[INTERNAL]  Expand an MXFunction.
 
 ";
 
 %feature("docstring") casadi::SXFunction::SXFunction(const Function &f) "
-
-Expand a Function.
+[INTERNAL]  Expand a Function.
 
 ";
 
 %feature("docstring") casadi::SXFunction::SXFunction(const std::string
-&name, const Function &f, const Dict &opts=Dict()) "
-
-Expand a function.
+&name, const Function &f, const Dict &opts=Dict()) " [INTERNAL]  Expand a
+function.
 
 ";
 
 %feature("docstring") casadi::SXFunction::SXFunction(const std::string
 &name, const std::vector< SX > &arg, const std::vector< SX > &res, const
-Dict &opts=Dict()) "
-
-Construct from vectors (new syntax, includes initialization)
+Dict &opts=Dict()) " [INTERNAL]  Construct from vectors (new syntax,
+includes initialization)
 
 ";
 
 %feature("docstring") casadi::SXFunction::SXFunction(const std::string
 &name, const std::pair< SXDict, std::vector< std::string > > &arg, const
-std::vector< SX > &res, const Dict &opts=Dict()) "
-
-Construct from vectors (new syntax, includes initialization)
+std::vector< SX > &res, const Dict &opts=Dict()) " [INTERNAL]  Construct
+from vectors (new syntax, includes initialization)
 
 ";
 
 %feature("docstring") casadi::SXFunction::SXFunction(const std::string
 &name, const std::vector< SX > &arg, const std::pair< SXDict, std::vector<
-std::string > > &res, const Dict &opts=Dict()) "
-
-Construct from vectors (new syntax, includes initialization)
+std::string > > &res, const Dict &opts=Dict()) " [INTERNAL]  Construct from
+vectors (new syntax, includes initialization)
 
 ";
 
 %feature("docstring") casadi::SXFunction::SXFunction(const std::string
 &name, const std::pair< SXDict, std::vector< std::string > > &arg, const
 std::pair< SXDict, std::vector< std::string > > &res, const Dict
-&opts=Dict()) "
-
-Construct from vectors (new syntax, includes initialization)
+&opts=Dict()) " [INTERNAL]  Construct from vectors (new syntax, includes
+initialization)
 
 ";
 
@@ -48515,9 +48502,9 @@ const std::string &scheme="radau", const std::string &solver="newton", const
 Dict &solver_options=Dict()) "
 
 Construct an implicit Runge-Kutta integrator using a collocation scheme The
-constructed function (which is of type MXFunction), has three inputs,
-corresponding to initial state (x0), parameter (p) and integration time (h)
-and one output, corresponding to final state (xf).
+constructed function has three inputs, corresponding to initial state (x0),
+parameter (p) and integration time (h) and one output, corresponding to
+final state (xf).
 
 Parameters:
 -----------
@@ -48769,10 +48756,9 @@ scheme, int i) " ";
 std::string &integrator="cvodes", const Dict &integrator_options=Dict()) "
 
 Simplified wrapper for the Integrator class Constructs an integrator using
-the same syntax as simpleRK and simpleIRK. The constructed function (which
-is of type MXFunction), has three inputs, corresponding to initial state
-(x0), parameter (p) and integration time (h) and one output, corresponding
-to final state (xf).
+the same syntax as simpleRK and simpleIRK. The constructed function has
+three inputs, corresponding to initial state (x0), parameter (p) and
+integration time (h) and one output, corresponding to final state (xf).
 
 Parameters:
 -----------
@@ -49111,10 +49097,9 @@ Output arguments of an NLP function
 
 %feature("docstring")  casadi::simpleRK(Function f, int N=10, int order=4) "
 
-Construct an explicit Runge-Kutta integrator The constructed function (which
-is of type MXFunction), has three inputs, corresponding to initial state
-(x0), parameter (p) and integration time (h) and one output, corresponding
-to final state (xf).
+Construct an explicit Runge-Kutta integrator The constructed function has
+three inputs, corresponding to initial state (x0), parameter (p) and
+integration time (h) and one output, corresponding to final state (xf).
 
 Parameters:
 -----------

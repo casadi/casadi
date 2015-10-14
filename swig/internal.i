@@ -433,6 +433,21 @@
 %exception casadi::LinearSolver::LinearSolver() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::MXFunction::MXFunction(const Function &function) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::MXFunction::MXFunction(const std::string &name, const std::pair< MXDict, std::vector< std::string > > &arg, const std::pair< MXDict, std::vector< std::string > > &res, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::MXFunction::MXFunction(const std::string &name, const std::pair< MXDict, std::vector< std::string > > &arg, const std::vector< MX > &res, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::MXFunction::MXFunction(const std::string &name, const std::vector< MX > &arg, const std::pair< MXDict, std::vector< std::string > > &res, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::MXFunction::MXFunction(const std::string &name, const std::vector< MX > &arg, const std::vector< MX > &res, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::Matrix< DataType >::Matrix(const Sparsity &sp, const DataType &val, bool dummy) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -443,6 +458,27 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Matrix< DataType >::Matrix(const std::vector< DataType > &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::SXFunction::SXFunction(const Function &f) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::SXFunction::SXFunction(const MXFunction &f) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::SXFunction::SXFunction(const std::string &name, const Function &f, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::SXFunction::SXFunction(const std::string &name, const std::pair< SXDict, std::vector< std::string > > &arg, const std::pair< SXDict, std::vector< std::string > > &res, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::SXFunction::SXFunction(const std::string &name, const std::pair< SXDict, std::vector< std::string > > &arg, const std::vector< SX > &res, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::SXFunction::SXFunction(const std::string &name, const std::vector< SX > &arg, const std::pair< SXDict, std::vector< std::string > > &res, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::SXFunction::SXFunction(const std::string &name, const std::vector< SX > &arg, const std::vector< SX > &res, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::SparseStorage< DataType >::SparseStorage() {

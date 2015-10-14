@@ -19064,7 +19064,7 @@ Default constructor.
 
 >  MXFunction(Function function)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Attempt to form an MXFunction out of an Function.
 
 >  MXFunction(str name, [MX ] arg, [MX ] res, Dict opts=Dict())
@@ -19075,7 +19075,7 @@ Attempt to form an MXFunction out of an Function.
 
 >  MXFunction(str name, (str:MX,[str ]) arg, (str:MX,[str ]) res, Dict opts=Dict())
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Construct from vectors (new syntax, includes initialization)
 
 ";
@@ -34954,17 +34954,17 @@ Default constructor.
 
 >  SXFunction(MXFunction f)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Expand an MXFunction.
 
 >  SXFunction(Function f)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Expand a Function.
 
 >  SXFunction(str name, Function f, Dict opts=Dict())
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Expand a function.
 
 >  SXFunction(str name, [SX ] arg, [SX ] res, Dict opts=Dict())
@@ -34975,7 +34975,7 @@ Expand a function.
 
 >  SXFunction(str name, (str:SX,[str ]) arg, (str:SX,[str ]) res, Dict opts=Dict())
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Construct from vectors (new syntax, includes initialization)
 
 ";
@@ -36281,9 +36281,9 @@ Input arguments of an NLP objective gradient function
 %feature("docstring") casadi::simpleIRK "
 
 Construct an implicit Runge-Kutta integrator using a collocation scheme The
-constructed function (which is of type MXFunction), has three inputs,
-corresponding to initial state (x0), parameter (p) and integration time (h)
-and one output, corresponding to final state (xf).
+constructed function has three inputs, corresponding to initial state (x0),
+parameter (p) and integration time (h) and one output, corresponding to
+final state (xf).
 
 Parameters:
 -----------
@@ -36497,10 +36497,9 @@ scheme:  'radau' or 'legendre'
 %feature("docstring") casadi::simpleIntegrator "
 
 Simplified wrapper for the Integrator class Constructs an integrator using
-the same syntax as simpleRK and simpleIRK. The constructed function (which
-is of type MXFunction), has three inputs, corresponding to initial state
-(x0), parameter (p) and integration time (h) and one output, corresponding
-to final state (xf).
+the same syntax as simpleRK and simpleIRK. The constructed function has
+three inputs, corresponding to initial state (x0), parameter (p) and
+integration time (h) and one output, corresponding to final state (xf).
 
 Parameters:
 -----------
@@ -36805,10 +36804,9 @@ Output arguments of an NLP function
 
 %feature("docstring") casadi::simpleRK "
 
-Construct an explicit Runge-Kutta integrator The constructed function (which
-is of type MXFunction), has three inputs, corresponding to initial state
-(x0), parameter (p) and integration time (h) and one output, corresponding
-to final state (xf).
+Construct an explicit Runge-Kutta integrator The constructed function has
+three inputs, corresponding to initial state (x0), parameter (p) and
+integration time (h) and one output, corresponding to final state (xf).
 
 Parameters:
 -----------
