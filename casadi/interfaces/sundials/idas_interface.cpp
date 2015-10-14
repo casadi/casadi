@@ -2329,59 +2329,51 @@ namespace casadi {
     IDAB_mem->IDA_mem->ida_setupNonNull = TRUE;
   }
 
-  template<typename FunctionType>
-  FunctionType IdasInterface::getJacGen() {
-    FunctionType f = shared_cast<FunctionType>(f_);
-    casadi_assert(!f.isNull());
-
+  template<typename MatType>
+  Function IdasInterface::getJacGen() {
     // Get the Jacobian in the Newton iteration
-    typename FunctionType::MatType cj = FunctionType::MatType::sym("cj");
-    typename FunctionType::MatType jac = FunctionType::MatType::jac(f, DAE_X, DAE_ODE)
-      - cj*FunctionType::MatType::eye(nx_);
+    MatType cj = MatType::sym("cj");
+    MatType jac = MatType::jac(f_, DAE_X, DAE_ODE) - cj*MatType::eye(nx_);
     if (nz_>0) {
       jac = horzcat(vertcat(jac,
-                            FunctionType::MatType::jac(f, DAE_X, DAE_ALG)),
-                    vertcat(FunctionType::MatType::jac(f, DAE_Z, DAE_ODE),
-                            FunctionType::MatType::jac(f, DAE_Z, DAE_ALG)));
+                            MatType::jac(f_, DAE_X, DAE_ALG)),
+                    vertcat(MatType::jac(f_, DAE_Z, DAE_ODE),
+                            MatType::jac(f_, DAE_Z, DAE_ALG)));
     }
 
     // Jacobian function
-    std::vector<typename FunctionType::MatType> jac_in = FunctionType::MatType::get_input(f);
+    std::vector<MatType> jac_in = MatType::get_input(f_);
     jac_in.push_back(cj);
 
     // Return generated function
-    return FunctionType("jac", jac_in, make_vector(jac));
+    return MatType::fun("jac", jac_in, make_vector(jac));
   }
 
-  template<typename FunctionType>
-  FunctionType IdasInterface::getJacGenB() {
-    FunctionType g = shared_cast<FunctionType>(g_);
-    casadi_assert(!g.isNull());
-
+  template<typename MatType>
+  Function IdasInterface::getJacGenB() {
     // Get the Jacobian in the Newton iteration
-    typename FunctionType::MatType cj = FunctionType::MatType::sym("cj");
-    typename FunctionType::MatType jac =
-        FunctionType::MatType::jac(g, RDAE_RX, RDAE_ODE) + cj*FunctionType::MatType::eye(nrx_);
+    MatType cj = MatType::sym("cj");
+    MatType jac = MatType::jac(g_, RDAE_RX, RDAE_ODE) + cj*MatType::eye(nrx_);
     if (nrz_>0) {
       jac = horzcat(vertcat(jac,
-                            FunctionType::MatType::jac(g, RDAE_RX, RDAE_ALG)),
-                    vertcat(FunctionType::MatType::jac(g, RDAE_RZ, RDAE_ODE),
-                            FunctionType::MatType::jac(g, RDAE_RZ, RDAE_ALG)));
+                            MatType::jac(g_, RDAE_RX, RDAE_ALG)),
+                    vertcat(MatType::jac(g_, RDAE_RZ, RDAE_ODE),
+                            MatType::jac(g_, RDAE_RZ, RDAE_ALG)));
     }
 
     // Jacobian function
-    std::vector<typename FunctionType::MatType> jac_in = FunctionType::MatType::get_input(g);
+    std::vector<MatType> jac_in = MatType::get_input(g_);
     jac_in.push_back(cj);
 
     // return generated function
-    return FunctionType("jacB", jac_in, make_vector(jac));
+    return MatType::fun("jacB", jac_in, make_vector(jac));
   }
 
   Function IdasInterface::getJacB() {
     if (g_.is_a("sxfunction")) {
-      return getJacGenB<SXFunction>();
+      return getJacGenB<SX>();
     } else if (g_.is_a("sxfunction")) {
-      return getJacGenB<MXFunction>();
+      return getJacGenB<MX>();
     } else {
       throw CasadiException("IdasInterface::getJacB(): Not an SXFunction or MXFunction");
     }
@@ -2389,9 +2381,9 @@ namespace casadi {
 
   Function IdasInterface::getJac() {
     if (f_.is_a("sxfunction")) {
-      return getJacGen<SXFunction>();
+      return getJacGen<SX>();
     } else if (f_.is_a("mxfunction")) {
-      return getJacGen<MXFunction>();
+      return getJacGen<MX>();
     } else {
       throw CasadiException("IdasInterface::getJac(): Not an SXFunction or MXFunction");
     }

@@ -42,6 +42,7 @@ namespace casadi {
   SXFunction::SXFunction() {
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   void SXFunction::construct(const std::string& name,
                              const std::vector<SX>& arg,
                              const std::vector<SX>& res,
@@ -86,7 +87,6 @@ namespace casadi {
     construct(name, make_vector(arg), make_vector(res), opts, arg.second, res.second);
   }
 
-#ifdef USE_CXX11
   SXFunction::SXFunction(const std::string& name, std::initializer_list<SX> arg,
                          std::initializer_list<SX> res, const Dict& opts) {
     construct(name, vector<SX>(arg), vector<SX>(res), opts);
@@ -101,7 +101,7 @@ namespace casadi {
                          std::vector<SX> res, const Dict& opts) {
     construct(name, vector<SX>(arg), res, opts);
   }
-#endif // USE_CXX11
+#endif // WITH_DEPRECATED_FEATURES
 
   const SXFunctionInternal* SXFunction::operator->() const {
     return static_cast<const SXFunctionInternal*>(Function::operator->());
@@ -131,7 +131,6 @@ namespace casadi {
   SX SXFunction::hess(int iind, int oind) {
     return (*this)->hess(iind, oind);
   }
-#endif // WITH_DEPRECATED_FEATURES
 
   const vector<ScalarAtomic>& SXFunction::algorithm() const {
     return (*this)->algorithm_;
@@ -151,5 +150,6 @@ namespace casadi {
       assignNode(t.get());
     }
   }
+#endif // WITH_DEPRECATED_FEATURES
 
 } // namespace casadi

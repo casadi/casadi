@@ -67,6 +67,8 @@ namespace casadi {
     /// Default constructor
     SXFunction();
 
+#ifdef WITH_DEPRECATED_FEATURES
+
     /// Expand an MXFunction
     explicit SXFunction(const MXFunction &f);
 
@@ -92,7 +94,6 @@ namespace casadi {
     SXFunction(const std::string& name, const std::pair< SXDict, std::vector<std::string> >& arg,
                const std::pair< SXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
 #ifndef SWIG
-#ifdef USE_CXX11
     /** \brief Construct from initializer lists (new syntax, includes initialization) */
     SXFunction(const std::string& name,
                std::initializer_list<SX> arg,
@@ -110,8 +111,8 @@ namespace casadi {
                std::initializer_list<SX> arg,
                std::vector<SX> res,
                const Dict& opts=Dict());
-#endif // USE_CXX11
 #endif // SWIG
+#endif // WITH_DEPRECATED_FEATURES
 
 /// \cond INTERNAL
     /// Access functions of the node
@@ -162,7 +163,6 @@ namespace casadi {
       return hess(index_in(iname), index_out(oname));
     }
     ///@}
-#endif // WITH_DEPRECATED_FEATURES
 
 /// \cond INTERNAL
 #ifndef SWIG
@@ -176,6 +176,7 @@ namespace casadi {
                    const std::vector<std::string>& oscheme=std::vector<std::string>());
 #endif // SWIG
 /// \endcond
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Get the corresponding matrix type */
     typedef SX MatType;

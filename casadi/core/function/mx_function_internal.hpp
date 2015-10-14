@@ -61,7 +61,7 @@ namespace casadi {
       \date 2010-2015
   */
   class CASADI_EXPORT MXFunctionInternal :
-        public XFunctionInternal<MXFunction, MXFunctionInternal, MX, MXNode>{
+        public XFunctionInternal<MXFunctionInternal, MX, MXNode>{
   public:
     /** \brief  An element of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;

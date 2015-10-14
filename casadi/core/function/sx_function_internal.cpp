@@ -46,7 +46,7 @@ namespace casadi {
   SXFunctionInternal::SXFunctionInternal(const std::string& name,
                                          const vector<SX >& inputv,
                                          const vector<SX >& outputv)
-    : XFunctionInternal<SXFunction, SXFunctionInternal, SX, SXNode>(name, inputv, outputv) {
+    : XFunctionInternal<SXFunctionInternal, SX, SXNode>(name, inputv, outputv) {
     addOption("just_in_time_sparsity", OT_BOOLEAN, false,
               "Propagate sparsity patterns using just-in-time "
               "compilation to a CPU or GPU using OpenCL");
@@ -268,7 +268,7 @@ namespace casadi {
   void SXFunctionInternal::init() {
 
     // Call the init function of the base class
-    XFunctionInternal<SXFunction, SXFunctionInternal, SX, SXNode>::init();
+    XFunctionInternal<SXFunctionInternal, SX, SXNode>::init();
 
     // Stack used to sort the computational graph
     stack<SXNode*> s;
@@ -1431,7 +1431,7 @@ namespace casadi {
                                    std::vector<std::vector<SX> >& fsens,
                                    bool always_inline, bool never_inline) {
     casadi_assert_message(!never_inline, "SX expressions do not have call nodes");
-    XFunctionInternal<SXFunction, SXFunctionInternal, SX, SXNode>
+    XFunctionInternal<SXFunctionInternal, SX, SXNode>
       ::callForward(arg, res, fseed, fsens, true, false);
   }
 
@@ -1440,7 +1440,7 @@ namespace casadi {
                                  std::vector<std::vector<SX> >& asens,
                                  bool always_inline, bool never_inline) {
     casadi_assert_message(!never_inline, "SX expressions do not have call nodes");
-    XFunctionInternal<SXFunction, SXFunctionInternal, SX, SXNode>
+    XFunctionInternal<SXFunctionInternal, SX, SXNode>
       ::callReverse(arg, res, aseed, asens, true, false);
   }
 
@@ -1474,8 +1474,7 @@ namespace casadi {
   }
 
   bool SXFunctionInternal::is_a(const std::string& type, bool recursive) const {
-    return type=="sxfunction" || (recursive && XFunctionInternal<SXFunction,
-                                  SXFunctionInternal,
+    return type=="sxfunction" || (recursive && XFunctionInternal<SXFunctionInternal,
                                   SX, SXNode>::is_a(type, recursive));
   }
 

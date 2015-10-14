@@ -41,6 +41,7 @@ namespace casadi {
   MXFunction::MXFunction() {
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   MXFunction::MXFunction(const Function& function) {
     const MXFunctionInternal* temp = dynamic_cast<const MXFunctionInternal*>(function.get());
     if (!temp) casadi_error("MXFunction(Function)::input Function cannot be cast into MXFunction");
@@ -80,7 +81,6 @@ namespace casadi {
     construct(name, make_vector(arg), make_vector(res), opts, arg.second, res.second);
   }
 
-#ifdef USE_CXX11
   MXFunction::MXFunction(const std::string& name, std::initializer_list<MX> arg,
                          std::initializer_list<MX> res, const Dict& opts) {
     construct(name, vector<MX>(arg), vector<MX>(res), opts);
@@ -95,7 +95,7 @@ namespace casadi {
                          std::vector<MX> res, const Dict& opts) {
     construct(name, vector<MX>(arg), res, opts);
   }
-#endif // USE_CXX11
+#endif // WITH_DEPRECATED_FEATURES
 
   const MXFunctionInternal* MXFunction::operator->() const {
     return static_cast<const MXFunctionInternal*>(Function::operator->());

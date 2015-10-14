@@ -75,7 +75,7 @@ namespace casadi {
     \date 2010-2015
 */
 class CASADI_EXPORT SXFunctionInternal :
-        public XFunctionInternal<SXFunction, SXFunctionInternal, Matrix<SXElement>, SXNode>{
+        public XFunctionInternal<SXFunctionInternal, Matrix<SXElement>, SXNode>{
   public:
     /** \brief Constructor */
     SXFunctionInternal(const std::string& name,

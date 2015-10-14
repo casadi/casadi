@@ -46,6 +46,8 @@ namespace casadi {
     /** \brief  Default constructor */
     MXFunction();
 
+#ifdef WITH_DEPRECATED_FEATURES
+
     /** \brief  Attempt to form an MXFunction out of an Function */
     explicit MXFunction(const Function& function);
 
@@ -66,7 +68,6 @@ namespace casadi {
                const std::pair< MXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
 
 #ifndef SWIG
-#ifdef USE_CXX11
     /** \brief Construct from initializer lists (new syntax, includes initialization) */
     MXFunction(const std::string& name,
                std::initializer_list<MX> arg,
@@ -84,8 +85,8 @@ namespace casadi {
                std::initializer_list<MX> arg,
                std::vector<MX> res,
                const Dict& opts=Dict());
-#endif // USE_CXX11
 #endif // SWIG
+#endif // WITH_DEPRECATED_FEATURES
 
     /// \cond INTERNAL
     /** \brief  Access functions of the node */
@@ -94,6 +95,7 @@ namespace casadi {
     /** \brief  Const access functions of the node */
     const MXFunctionInternal* operator->() const;
 
+#ifdef WITH_DEPRECATED_FEATURES
 #ifndef SWIG
     /** \brief Called from constructor */
     void construct(const std::string& name, const std::vector<MX>& arg,
@@ -101,6 +103,8 @@ namespace casadi {
                    const std::vector<std::string>& ischeme=std::vector<std::string>(),
                    const std::vector<std::string>& oscheme=std::vector<std::string>());
 #endif // SWIG
+#endif // WITH_DEPRECATED_FEATURES
+
     /// \endcond
 
     /// Check if a particular cast is allowed

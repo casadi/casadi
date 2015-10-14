@@ -39,7 +39,7 @@ namespace casadi {
   MXFunctionInternal::MXFunctionInternal(const std::string& name,
                                          const std::vector<MX>& inputv,
                                          const std::vector<MX>& outputv) :
-    XFunctionInternal<MXFunction, MXFunctionInternal, MX, MXNode>(name, inputv, outputv) {
+    XFunctionInternal<MXFunctionInternal, MX, MXNode>(name, inputv, outputv) {
   }
 
 
@@ -51,7 +51,7 @@ namespace casadi {
     log("MXFunctionInternal::init begin");
 
     // Call the init function of the base class
-    XFunctionInternal<MXFunction, MXFunctionInternal, MX, MXNode>::init();
+    XFunctionInternal<MXFunctionInternal, MX, MXNode>::init();
 
     // Stack used to sort the computational graph
     stack<MXNode*> s;
@@ -1340,9 +1340,9 @@ namespace casadi {
   }
 
   bool MXFunctionInternal::is_a(const std::string& type, bool recursive) const {
-    return type=="mxfunction" || (recursive && XFunctionInternal<MXFunction,
-                                  MXFunctionInternal,
-                                  MX, MXNode>::is_a(type, recursive));
+    return type=="mxfunction"
+      || (recursive && XFunctionInternal<MXFunctionInternal,
+          MX, MXNode>::is_a(type, recursive));
   }
 
 } // namespace casadi

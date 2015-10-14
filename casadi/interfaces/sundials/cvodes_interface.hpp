@@ -115,12 +115,10 @@ namespace casadi {
     virtual void printStats(std::ostream &stream) const;
 
     /** \brief  Get the integrator Jacobian for the forward problem (generic) */
-    template<typename FunctionType>
-      FunctionType getJacGen();
+    template<typename MatType> Function getJacGen();
 
     /** \brief  Get the integrator Jacobian for the backward problem (generic) */
-    template<typename FunctionType>
-      FunctionType getJacGenB();
+    template<typename MatType> Function getJacGenB();
 
     /** \brief  Get the integrator Jacobian for the forward problem */
     virtual Function getJac();
