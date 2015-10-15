@@ -169,7 +169,7 @@ int main(){
     ipopt_options["print_level"] = 0;
     ipopt_options["print_time"] = false;
     solver_opts["qp_solver_options"] =
-      make_dict("nlp_solver_options", make_dict("nlp_solver", "ipopt"));
+      Dict{{"nlp_solver_options", Dict{{"nlp_solver", "ipopt"}}}};
   } else {
     solver_name = "ipopt";
     solver_opts["tol"] = 1e-10;

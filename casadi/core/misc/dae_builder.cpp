@@ -1978,7 +1978,7 @@ namespace casadi {
 
     // Generate the constructed function
     return MX::fun(fname, ret_in, ret_out,
-                      make_dict("input_scheme", s_in, "output_scheme", s_out));
+                   Dict{{"input_scheme", s_in}, {"output_scheme", s_out}});
   }
 
 } // namespace casadi

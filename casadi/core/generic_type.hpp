@@ -172,6 +172,7 @@ namespace casadi {
   /// C++ equivalent of Python's dict or MATLAB's struct
   typedef GenericType::Dict Dict;
 
+#ifdef WITH_DEPRECATED_FEATURES
 #ifndef SWIG
   // Create dictionary with 1 element
   inline Dict
@@ -232,6 +233,7 @@ namespace casadi {
   }
 
 #endif // SWIG
+#endif // WITH_DEPRECATED_FEATURES
 
 
 } // namespace casadi

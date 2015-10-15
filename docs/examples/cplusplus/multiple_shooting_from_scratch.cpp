@@ -87,7 +87,7 @@ int main(){
   Function rhs = SX::fun("rhs", daeIn("x", x, "p", u), daeOut("ode", ode, "quad", quad));
 
   // Create an integrator (CVodes)
-  Integrator integrator("integrator", "cvodes", rhs, make_dict("t0", 0, "tf", tf/ns));
+  Integrator integrator("integrator", "cvodes", rhs, Dict{{"t0", 0}, {"tf", tf/ns}});
   
   // Total number of NLP variables
   int NV = nx*(ns+1) + nu*ns;

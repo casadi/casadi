@@ -132,7 +132,7 @@ int main(){
     for(int integrator=0; integrator<NUM_INTEGRATORS; ++integrator){
 
       // Integrator options
-      Dict opts = make_dict("tf", tf);
+      Dict opts = {{"tf", tf}};
 
       // Get integrator
       Integrator I;
@@ -155,7 +155,7 @@ int main(){
         cout << endl << "== CollocationIntegrator == " << endl;
         opts["implicit_solver"] = "kinsol";
         opts["collocation_scheme"] = "legendre";
-        opts["implicit_solver_options"] = make_dict("linear_solver", "csparse");
+        opts["implicit_solver_options"] = Dict{{"linear_solver", "csparse"}};
         I = Integrator("I", "collocation", ffcn, opts);
         break;
       case OLD_COLLOCATION:        
@@ -163,7 +163,7 @@ int main(){
         opts["expand_f"] = true;
         opts["collocation_scheme"] = "legendre";
         opts["implicit_solver"] = "kinsol";
-        opts["implicit_solver_options"] = make_dict("linear_solver", "csparse");
+        opts["implicit_solver_options"] = Dict{{"linear_solver", "csparse"}};
         I = Integrator("I", "oldcollocation", ffcn, opts);
         break;
       }

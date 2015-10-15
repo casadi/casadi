@@ -125,7 +125,7 @@ int main(){
   Function vfcn_sx = SX::fun("vfcn", vfcn);
 
   // Create a implicit function instance to solve the system of equations
-  ImplicitFunction ifcn("ifcn", "newton", vfcn_sx, make_dict("linear_solver", "csparse"));
+  ImplicitFunction ifcn("ifcn", "newton", vfcn_sx, Dict{{"linear_solver", "csparse"}});
   vector<MX> ifcn_arg = {MX(), X0, P};
   V = ifcn(ifcn_arg).front();
   X.resize(1);
@@ -154,7 +154,7 @@ int main(){
                                     integratorOut("xf", Xk));
 
   // Create a convensional integrator for reference
-  Integrator ref_integrator("ref_integrator", "cvodes", f, make_dict("tf", tf));
+  Integrator ref_integrator("ref_integrator", "cvodes", f, Dict{{"tf", tf}});
 
   // Test values
   vector<double> x0_val = {0, 1, 0};

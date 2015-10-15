@@ -98,7 +98,7 @@ int main(){
 
   // Create an NLP solver passing derivative information
   NlpSolver solver("solver", "ipopt", nlp,
-                   make_dict("grad_f", grad_f, "jac_g", jac_g, "hess_lag",hess_lag));
+                   Dict{{"grad_f", grad_f}, {"jac_g", jac_g}, {"hess_lag",hess_lag}});
 
   // Bounds and initial guess
   std::map<std::string, DMatrix> arg, res;

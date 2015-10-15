@@ -58,9 +58,9 @@ int main(int argc, char **argv){
   // Specify QP solver
   opts["qp_solver"]  = "nlp";
   opts["qp_solver_options"] =
-    make_dict("nlp_solver", "ipopt",
-              "nlp_solver_options", make_dict("print_level", 0,
-                                              "print_time", 0));
+    Dict{{"nlp_solver", "ipopt"},
+         {"nlp_solver_options", Dict{{"print_level", 0},
+                                     {"print_time", 0}}}};
 
   // Allocate NLP solver and buffers
   NlpSolver nlp_solver("nlp_solver", "sqpmethod", nlp, opts);

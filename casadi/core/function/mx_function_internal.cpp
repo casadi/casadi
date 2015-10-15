@@ -1079,9 +1079,9 @@ namespace casadi {
     FunctionInternal::evalSX(arg, res);
 
     // Create function
-    Function f=SX::fun("expand_" + name_, arg, res,
-                 make_dict("input_scheme", ischeme_, "output_scheme", oscheme_));
-    return f;
+    return SX::fun("expand_" + name_, arg, res,
+                   Dict{{"input_scheme", ischeme_},
+                       {"output_scheme", oscheme_}});
   }
 
   void MXFunctionInternal::printWork(ostream &stream) {

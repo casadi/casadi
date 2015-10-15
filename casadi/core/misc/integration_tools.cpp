@@ -191,13 +191,9 @@ namespace casadi {
     }
 
     // Form discrete-time dynamics
-    vector<MX> ret_in(3);
-    ret_in[0] = x0;
-    ret_in[1] = p;
-    ret_in[2] = h;
-    return MX::fun("F", ret_in, make_vector(xf),
-                      make_dict("input_scheme", IOScheme("x0", "p", "h"),
-                                "output_scheme", IOScheme("xf")));
+    return MX::fun("F", {x0, p, h}, {xf},
+                   Dict{{"input_scheme", IOScheme("x0", "p", "h")},
+                       {"output_scheme", IOScheme("xf")}});
   }
 
   void collocationInterpolators(const std::vector<double> & tau_root,
@@ -313,9 +309,9 @@ namespace casadi {
     }
 
     // Form discrete-time dynamics
-    return MX::fun("F", make_vector(x0, p, h), make_vector(xf),
-                      make_dict("input_scheme", IOScheme("x0", "p", "h"),
-                                "output_scheme", IOScheme("xf")));
+    return MX::fun("F", {x0, p, h}, {xf},
+                   Dict{{"input_scheme", IOScheme("x0", "p", "h")},
+                       {"output_scheme", IOScheme("xf")}});
   }
 
   Function simpleIntegrator(Function f, const std::string& integrator,
@@ -362,9 +358,9 @@ namespace casadi {
     MX xf = ifcn(make_map("x0", x0, "p", vertcat(h, vec(p)))).at("xf");
 
     // Form discrete-time dynamics
-    return MX::fun("F", make_vector(x0, p, h), make_vector(xf),
-                      make_dict("input_scheme", IOScheme("x0", "p", "h"),
-                                "output_scheme", IOScheme("xf")));
+    return MX::fun("F", {x0, p, h}, {xf},
+                   Dict{{"input_scheme", IOScheme("x0", "p", "h")},
+                       {"output_scheme", IOScheme("xf")}});
   }
 
 } // namespace casadi

@@ -251,9 +251,11 @@ namespace casadi {
     }
 
     // Generate gradient function
-    Dict opts = make_dict("input_scheme", ischeme_,
-                          "output_scheme", ionames,
-                          "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
+    Dict opts = {{"input_scheme", ischeme_},
+                 {"output_scheme", ionames},
+                 {"jit", jit_},
+                 {"compiler", compilerplugin_},
+                 {"jit_options", jit_options_}};
     return getTangent(ss.str(), iind, oind, opts);
   }
 
@@ -1486,10 +1488,12 @@ namespace casadi {
       }
 
       // Generate a Jacobian
-      Dict opts = make_dict("verbose", verbose_,
-                            "input_scheme", ischeme_, "output_scheme", ionames,
-                            "jit", jit_, "compiler", compilerplugin_,
-                            "jit_options", jit_options_);
+      Dict opts = {{"verbose", verbose_},
+                   {"input_scheme", ischeme_},
+                   {"output_scheme", ionames},
+                   {"jit", jit_},
+                   {"compiler", compilerplugin_},
+                   {"jit_options", jit_options_}};
       Function ret = getJacobian(ss.str(), iind, oind, compact, symmetric, opts);
 
       // Save in cache
@@ -1571,8 +1575,11 @@ namespace casadi {
     }
 
     // Options
-    Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names,
-                          "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
+    Dict opts = {{"input_scheme", i_names},
+                 {"output_scheme", o_names},
+                 {"jit", jit_},
+                 {"compiler", compilerplugin_},
+                 {"jit_options", jit_options_}};
 
     // Return value
     casadi_assert(numDerForward()>0);
@@ -1664,11 +1671,11 @@ namespace casadi {
     }
 
     // Options
-    Dict opts = make_dict("input_scheme", i_names,
-                          "output_scheme", o_names,
-                          "jit", jit_,
-                          "compiler", compilerplugin_,
-                          "jit_options", jit_options_);
+    Dict opts = {{"input_scheme", i_names},
+                 {"output_scheme", o_names},
+                 {"jit", jit_},
+                 {"compiler", compilerplugin_},
+                 {"jit_options", jit_options_}};
 
     // Return value
     casadi_assert(numDerReverse()>0);
@@ -1891,7 +1898,7 @@ namespace casadi {
     MX J;
     {
       Function tmp = MX::fun("tmp", make_vector(arg), make_vector(res),
-                              make_dict("ad_weight", adWeight()));
+                              Dict{{"ad_weight", adWeight()}});
       J = MX::jac(tmp);
     }
 
