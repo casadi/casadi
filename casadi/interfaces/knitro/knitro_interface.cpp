@@ -195,7 +195,7 @@ namespace casadi {
     }
 
     // Hessian sparsity
-    int nnzH = hessLag_.isNull() ? 0 : hessLag_.output().sizeL();
+    int nnzH = hessLag_.isNull() ? 0 : hessLag_.output().nnz_lower();
     vector<int> Hcol(nnzH), Hrow(nnzH);
     if (nnzH>0) {
       const int* colind = hessLag_.output().colind();

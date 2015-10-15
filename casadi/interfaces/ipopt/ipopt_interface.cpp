@@ -1001,7 +1001,7 @@ namespace casadi {
 
       // Get Hessian sparsity pattern
       if (exact_hessian_)
-        nnz_h_lag = hessLag().output().sparsity().sizeU();
+        nnz_h_lag = hessLag().output().sparsity().nnz_upper();
       else
         nnz_h_lag = 0;
     } catch(exception& ex) {

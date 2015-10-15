@@ -265,20 +265,20 @@ namespace casadi {
 
     /** \brief Number of non-zeros in the upper triangular half,
      * i.e. the number of elements (i, j) with j>=i */
-    int sizeU() const;
+    int nnz_upper() const;
 
     /** \brief Number of non-zeros in the lower triangular half,
      * i.e. the number of elements (i, j) with j<=i */
-    int sizeL() const;
+    int nnz_lower() const;
 
     /** \brief Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with j==i */
-    int sizeD() const;
+    int nnz_diag() const;
 
     /** \brief Upper half-bandwidth */
-    int bandwidthU() const;
+    int bw_upper() const;
 
     /** \brief Lower half-bandwidth */
-    int bandwidthL() const;
+    int bw_lower() const;
 
     /** \brief  Get the shape */
     std::pair<int, int> size() const;

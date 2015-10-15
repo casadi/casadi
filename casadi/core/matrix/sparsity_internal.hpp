@@ -239,19 +239,19 @@ namespace casadi {
     int numel() const;
 
     /// Number of non-zeros in the lower triangular half
-    int sizeL() const;
+    int nnz_lower() const;
 
     /// Number of non-zeros in the upper triangular half
-    int sizeU() const;
+    int nnz_upper() const;
 
     /// Number of non-zeros on the diagonal
-    int sizeD() const;
+    int nnz_diag() const;
 
     /** \brief Upper half-bandwidth */
-    int bandwidthU() const;
+    int bw_upper() const;
 
     /** \brief Lower half-bandwidth */
-    int bandwidthL() const;
+    int bw_lower() const;
 
     /// Shape
     std::pair<int, int> size() const;

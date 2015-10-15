@@ -87,7 +87,7 @@ namespace casadi {
     iclow_.resize(nc_);
     cupp_.resize(nc_);
     icupp_.resize(nc_);
-    dQ_.resize(input(QP_SOLVER_H).sizeU());
+    dQ_.resize(input(QP_SOLVER_H).nnz_upper());
     irowQ_.resize(dQ_.size());
     jcolQ_.resize(dQ_.size());
     dA_.resize(input(QP_SOLVER_A).size());

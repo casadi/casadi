@@ -291,16 +291,16 @@ namespace casadi {
     return mapping;
   }
 
-  int Sparsity::sizeL() const {
-    return (*this)->sizeL();
+  int Sparsity::nnz_lower() const {
+    return (*this)->nnz_lower();
   }
 
-  int Sparsity::sizeU() const {
-    return (*this)->sizeU();
+  int Sparsity::nnz_upper() const {
+    return (*this)->nnz_upper();
   }
 
-  int Sparsity::sizeD() const {
-    return (*this)->sizeD();
+  int Sparsity::nnz_diag() const {
+    return (*this)->nnz_diag();
   }
 
   std::vector<int> Sparsity::getColind() const {
@@ -1091,12 +1091,12 @@ namespace casadi {
     (*this)->printCompact(stream);
   }
 
-  int Sparsity::bandwidthU() const {
-    return (*this)->bandwidthU();
+  int Sparsity::bw_upper() const {
+    return (*this)->bw_upper();
   }
 
-  int Sparsity::bandwidthL() const {
-    return (*this)->bandwidthL();
+  int Sparsity::bw_lower() const {
+    return (*this)->bw_lower();
   }
 
   Sparsity Sparsity::zz_horzcat(const std::vector<Sparsity> & sp) {

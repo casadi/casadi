@@ -2005,7 +2005,7 @@ namespace casadi {
     return isTranspose(*this);
   }
 
-  int SparsityInternal::sizeL() const {
+  int SparsityInternal::nnz_lower() const {
     const int* colind = this->colind();
     const int* row = this->row();
     int nnz = 0;
@@ -2015,7 +2015,7 @@ namespace casadi {
     return nnz;
   }
 
-  int SparsityInternal::sizeD() const {
+  int SparsityInternal::nnz_diag() const {
     const int* colind = this->colind();
     const int* row = this->row();
     int nnz = 0;
@@ -2027,7 +2027,7 @@ namespace casadi {
     return nnz;
   }
 
-  int SparsityInternal::sizeU() const {
+  int SparsityInternal::nnz_upper() const {
     const int* colind = this->colind();
     const int* row = this->row();
     int nnz = 0;
@@ -3181,7 +3181,7 @@ namespace casadi {
     vector<int> firstNeighborQ_el(size2(), -1);
 
     vector<int> treated(size2(), -1);
-    vector<int> hub(sizeU(), -1);
+    vector<int> hub(nnz_upper(), -1);
 
     vector<int> Tmapping;
     transpose(Tmapping);
@@ -3858,7 +3858,7 @@ namespace casadi {
     return ret;
   }
 
-  int SparsityInternal::bandwidthU() const {
+  int SparsityInternal::bw_upper() const {
     int bw = 0;
     const int* colind = this->colind();
     const int* row = this->row();
@@ -3871,7 +3871,7 @@ namespace casadi {
     return bw;
   }
 
-  int SparsityInternal::bandwidthL() const {
+  int SparsityInternal::bw_lower() const {
     int bw = 0;
     const int* colind = this->colind();
     const int* row = this->row();

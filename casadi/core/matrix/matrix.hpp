@@ -154,8 +154,8 @@ namespace casadi {
 
     /// Expose base class functions
     using B::nnz;
-    using B::sizeL;
-    using B::sizeU;
+    using B::nnz_lower;
+    using B::nnz_upper;
     using B::numel;
     using B::size1;
     using B::size2;

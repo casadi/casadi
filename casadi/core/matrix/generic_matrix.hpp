@@ -79,13 +79,13 @@ namespace casadi {
     int nnz() const;
 
     /** \brief Get the number of non-zeros in the lower triangular half */
-    int sizeL() const;
+    int nnz_lower() const;
 
     /** \brief Get the number of non-zeros in the upper triangular half */
-    int sizeU() const;
+    int nnz_upper() const;
 
     /** \brief Get get the number of non-zeros on the diagonal */
-    int sizeD() const;
+    int nnz_diag() const;
 
     /** \brief Get the number of elements */
     int numel() const;
@@ -652,18 +652,18 @@ namespace casadi {
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::sizeL() const {
-    return sparsity().sizeL();
+  int GenericMatrix<MatType>::nnz_lower() const {
+    return sparsity().nnz_lower();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::sizeU() const {
-    return sparsity().sizeU();
+  int GenericMatrix<MatType>::nnz_upper() const {
+    return sparsity().nnz_upper();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::sizeD() const {
-    return sparsity().sizeD();
+  int GenericMatrix<MatType>::nnz_diag() const {
+    return sparsity().nnz_diag();
   }
 
   template<typename MatType>
@@ -793,7 +793,7 @@ namespace casadi {
     casadi_assert_message(self().issquare(),
                           "Shape error in tril2symm. Expecting square shape but got "
                           << self().dimString());
-    casadi_assert_message(self().sizeU()-self().sizeD()==0,
+    casadi_assert_message(self().nnz_upper()-self().nnz_diag()==0,
                           "Sparsity error in tril2symm. Found above-diagonal entries in argument: "
                           << self().dimString());
     return self() +  self().T() - diag(diag(self()));
@@ -819,7 +819,7 @@ namespace casadi {
     casadi_assert_message(self().issquare(),
                           "Shape error in triu2symm. Expecting square shape but got "
                           << self().dimString());
-    casadi_assert_message(self().sizeL()-self().sizeD()==0,
+    casadi_assert_message(self().nnz_lower()-self().nnz_diag()==0,
                           "Sparsity error in triu2symm. Found below-diagonal entries in argument: "
                           << self().dimString());
     return self() + self().T() - diag(diag(self()));

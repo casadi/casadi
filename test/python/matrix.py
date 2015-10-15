@@ -706,16 +706,16 @@ class Matrixtests(casadiTestCase):
     self.assertFalse(DMatrix.nan(2).isRegular())
     
   def test_sizes(self):
-    self.assertEqual(Sparsity.diag(10).sizeD(),10)
-    self.assertEqual(Sparsity.diag(10).sizeU(),10)
-    self.assertEqual(Sparsity.diag(10).sizeL(),10)
-    self.assertEqual(Sparsity.dense(10,10).sizeL(),10*11/2)
-    self.assertEqual(Sparsity.dense(10,10).sizeU(),10*11/2)
-    self.assertEqual(Sparsity.dense(10,10).sizeD(),10)
+    self.assertEqual(Sparsity.diag(10).nnz_diag(),10)
+    self.assertEqual(Sparsity.diag(10).nnz_upper(),10)
+    self.assertEqual(Sparsity.diag(10).nnz_lower(),10)
+    self.assertEqual(Sparsity.dense(10,10).nnz_lower(),10*11/2)
+    self.assertEqual(Sparsity.dense(10,10).nnz_upper(),10*11/2)
+    self.assertEqual(Sparsity.dense(10,10).nnz_diag(),10)
     
-    self.assertEqual(sparsify(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeD(),1)
-    self.assertEqual(sparsify(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeL(),2)
-    self.assertEqual(sparsify(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeU(),3)
+    self.assertEqual(sparsify(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).nnz_diag(),1)
+    self.assertEqual(sparsify(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).nnz_lower(),2)
+    self.assertEqual(sparsify(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).nnz_upper(),3)
     
   def test_tril2symm(self):
     a = DMatrix(Sparsity.upper(3),range(Sparsity.upper(3).nnz())).T
@@ -725,7 +725,7 @@ class Matrixtests(casadiTestCase):
     with self.assertRaises(Exception):
       tril2symm(DMatrix.ones(5,3))
     
-    print DMatrix.ones(5,5).sizeU()-DMatrix.ones(5,5).sizeD()
+    print DMatrix.ones(5,5).nnz_upper()-DMatrix.ones(5,5).nnz_diag()
     
     with self.assertRaises(Exception):
       tril2symm(DMatrix.ones(5,5))

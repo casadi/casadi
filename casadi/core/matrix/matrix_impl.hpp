@@ -2835,7 +2835,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::setSym(const std::vector<double>& val) {
-    casadi_assert(val.size()==this->sizeU());
+    casadi_assert(val.size()==this->nnz_upper());
     setSym(getPtr(val));
   }
 
@@ -2861,7 +2861,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::getSym(std::vector<double>& val) const {
-    val.resize(this->sizeU());
+    val.resize(this->nnz_upper());
     getSym(getPtr(val));
   }
 
