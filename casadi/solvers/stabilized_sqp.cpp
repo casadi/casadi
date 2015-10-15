@@ -183,7 +183,7 @@ namespace casadi {
         : jacG().output().sparsity();
     stabilized_qp_solver_ = StabilizedQpSolver("stabilized_qp_solver",
                                                getOption("stabilized_qp_solver"),
-                                               make_map("h", H_sparsity, "a", A_sparsity),
+                                               SparsityDict{{"h", H_sparsity}, {"a", A_sparsity}},
                                                stabilized_qp_solver_options);
 
     // Lagrange multipliers of the NLP

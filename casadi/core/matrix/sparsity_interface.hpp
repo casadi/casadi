@@ -179,6 +179,7 @@ namespace casadi {
       x.at(5).get(x5);
     }
 
+#ifdef WITH_DEPRECATED_FEATURES
     // Create map with 1 element
     inline friend std::map<std::string, MatType>
       make_map(const std::string& n0, const MatType& x0) {
@@ -241,6 +242,7 @@ namespace casadi {
       ret[n5]=x5;
       return ret;
     }
+#endif // WITH_DEPRECATED_FEATURES
 
     // Assign 1 element from a map
     template<typename T0>

@@ -72,7 +72,7 @@ namespace casadi {
     Sparsity H_sparsity_qp = diagcat(st_[QP_STRUCT_H], Sparsity::diag(nc_));
     Sparsity A_sparsity_qp = horzcat(st_[QP_STRUCT_A], Sparsity::diag(nc_));
     qp_solver_ = QpSolver("qp_solver", getOption("qp_solver"),
-                          make_map("h", H_sparsity_qp, "a", A_sparsity_qp),
+                          SparsityDict{{"h", H_sparsity_qp}, {"a", A_sparsity_qp}},
                           qp_solver_options);
   }
 

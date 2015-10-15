@@ -80,7 +80,7 @@ namespace casadi {
     std::vector<MX> p_tau = vertsplit(P, split);
     MX x = MX::sym("x", hnlp_.input(HNL_X).nnz());
 
-    map<string, MX> v = hnlp_(make_map("x", x, "p", p_tau[0], "tau", p_tau[1]));
+    MXDict v = hnlp_(MXDict{{"x", x}, {"p", p_tau[0]}, {"tau", p_tau[1]}});
     Function nlp=MX::fun("nlp", nlpIn("x", x, "p", P),
                    nlpOut("f", v["f"], "g", v["g"]));
 

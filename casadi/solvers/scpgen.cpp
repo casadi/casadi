@@ -588,7 +588,7 @@ namespace casadi {
 
     // Allocate a QP solver
     qp_solver_ = QpSolver("qp_solver", getOption("qp_solver"),
-                          make_map("h", qpH_.sparsity(), "a", qpA_.sparsity()),
+                          SparsityDict{{"h", qpH_.sparsity()}, {"a", qpA_.sparsity()}},
                           qp_solver_options);
     if (verbose_) {
       userOut() << "Allocated QP solver." << endl;

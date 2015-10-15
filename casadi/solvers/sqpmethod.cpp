@@ -136,7 +136,7 @@ namespace casadi {
 
     // Allocate a QP solver
     qp_solver_ = QpSolver("qp_solver", getOption("qp_solver"),
-                          make_map("h", H_sparsity, "a", A_sparsity),
+                          SparsityDict{{"h", H_sparsity}, {"a", A_sparsity}},
                           qp_solver_options);
 
     // Lagrange multipliers of the NLP

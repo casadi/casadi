@@ -137,7 +137,7 @@ int main(){
   MX X=X0;
   for(int k=0; k<nu; ++k){
     // Integrate
-    X = integrator(make_map("x0", X, "p", U[k])).at("xf");
+    X = integrator(MXDict{{"x0", X}, {"p", U[k]}}).at("xf");
 
     // Lift X
     if(lifted_newton){

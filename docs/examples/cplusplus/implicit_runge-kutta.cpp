@@ -114,7 +114,7 @@ int main(){
     }
     
     // Append collocation equations
-    MX f_j = f(make_map("x",X[j],"p",P)).at("ode");
+    MX f_j = f(MXDict{{"x", X[j]}, {"p",P}}).at("ode");
     V_eq.push_back(h*f_j - xp_j);
   }
 

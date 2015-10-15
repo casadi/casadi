@@ -166,15 +166,13 @@ void Tester::model(){
   f_step_out[0] = u;
   f_step_out[1] = v;
   f_step_out[2] = h;
-  MXFunction f_step_mx("f_step_mx", f_step_in,f_step_out);
-  cout << "generated single step dynamics (" << f_step_mx.countNodes() << " nodes)" << endl;
+  Function f_step = MX::fun("f_step_mx", f_step_in, f_step_out);
+  cout << "generated single step dynamics (" << f_step.countNodes() << " nodes)" << endl;
   
   // Expand the discrete dynamics?
-  Function f_step = f_step_mx;
   if(false){
-    SXFunction f_step_sx(f_step_mx);
-    cout << "generated single step dynamics, SX (" << f_step_sx.countNodes() << " nodes)" << endl;
-    f_step = f_step_sx;
+    f_step = SX::fun(f_step.name(), f_step);
+    cout << "generated single step dynamics, SX (" << f_step.countNodes() << " nodes)" << endl;
   }
 
   // Integrate over one subinterval
@@ -200,8 +198,8 @@ void Tester::model(){
   }
   
   // Create an integrator function
-  MXFunction f_mx("f_mx", f_in, f_out);
-  cout << "generated discrete dynamics for one finite element (" << f_mx.countNodes() << " MX nodes)" << endl;
+  f_ = MX::fun("f_mx", f_in, f_out);
+  cout << "generated discrete dynamics for one finite element (" << f_.countNodes() << " MX nodes)" << endl;
   
   // Integrate over the complete interval
   if(n_finite_elements_>1){
@@ -212,7 +210,7 @@ void Tester::model(){
     f_inter = f_in;
     for(int j=0; j<n_finite_elements_; ++j){
       // Create a call node
-      f_out = f_mx(f_inter);
+      f_out = f_(f_inter);
       
       // Save intermediate state
       f_inter[1] = f_out[0];
@@ -221,17 +219,14 @@ void Tester::model(){
     }
     
     // Create an integrator function
-    f_mx = MXFunction("f_mx", f_in, f_out);
-    cout << "generated discrete dynamics for complete interval (" << f_mx.countNodes() << " MX nodes)" << endl;    
+    f_ = MX::fun("f_mx", f_in, f_out);
+    cout << "generated discrete dynamics for complete interval (" << f_.countNodes() << " MX nodes)" << endl;    
   }
     
   // Expand the discrete dynamics
   if(false){
-    SXFunction f_sx(f_mx);
-    cout << "generated discrete dynamics, SX (" << f_sx.countNodes() << " nodes)" << endl;
-    f_ = f_sx;
-  } else {
-    f_ = f_mx;
+    f_ = SX::fun("f_sx", f_);
+    cout << "generated discrete dynamics, SX (" << f_.countNodes() << " nodes)" << endl;
   }
 }
 
@@ -323,8 +318,8 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
     nlp_gv.push_back(vec(H));
   }
 
-  MXFunction nlp("nlp", nlpIn("x",P),
-                 nlpOut("f", vertcat(nlp_fv), "g", vertcat(nlp_gv)));
+  Function nlp = MX::fun("nlp", nlpIn("x",P),
+                         nlpOut("f", vertcat(nlp_fv), "g", vertcat(nlp_gv)));
   cout << "Generated single-shooting NLP" << endl;
   
   // NLP Solver
@@ -339,7 +334,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   //opts["merit_memory"] = 1;
   opts["max_iter"] = 100;
   opts["compiler"] = "shell";
-  opts["jit_options"] = make_dict("compiler", "clang", "flags", vector<string>{"-O2"});
+  opts["jit_options"] = Dict{{"compiler", "clang"}, {"flags", vector<string>{"-O2"}}};
   if(gauss_newton){
     opts["hessian_approximation"] = "gauss-newton";
   }
@@ -350,11 +345,11 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
 
   if(ipopt_as_qp_solver){
     opts["qp_solver"] = "nlp";
-    Dict nlp_opts = make_dict("tol", 1e-12, "print_level", 0, "print_time", false);
-    opts["qp_solver_options"] = make_dict("nlp_solver", "ipopt", "nlp_solver_options", nlp_opts);
+    Dict nlp_opts = {{"tol", 1e-12}, {"print_level", 0}, {"print_time", false}};
+    opts["qp_solver_options"] = Dict{{"nlp_solver", "ipopt"}, {"nlp_solver_options", nlp_opts}};
   } else {
     opts["qp_solver"] = "qpoases";
-    opts["qp_solver_options"] = make_dict("printLevel", "none");
+    opts["qp_solver_options"] = Dict{{"printLevel", "none"}};
   }
 
   // Create NLP solver instance

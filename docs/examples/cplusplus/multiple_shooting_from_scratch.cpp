@@ -143,7 +143,7 @@ int main(){
   // Loop over shooting nodes
   for(int k=0; k<ns; ++k){
     // Create an evaluation node
-    map<string, MX> I_out = integrator(make_map("x0", X[k], "p", U[k]));
+    MXDict I_out = integrator(MXDict{{"x0", X[k]}, {"p", U[k]}});
 
     // Save continuity constraints
     g.push_back( I_out.at("xf") - X[k+1] );
