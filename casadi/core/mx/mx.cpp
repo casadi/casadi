@@ -1089,7 +1089,7 @@ namespace casadi {
         return diagcat(ret);
       }
     } else {
-      return x.front()->getDiagcat(x);
+      return x.front()->get_diagcat(x);
     }
   }
 
@@ -1163,7 +1163,7 @@ namespace casadi {
     casadi_assert(offset2.back()==size2());
     casadi_assert(isMonotone(offset2));
 
-    return (*this)->getDiagsplit(offset1, offset2);
+    return (*this)->get_diagsplit(offset1, offset2);
   }
 
   std::vector<MX> MX::zz_vertsplit(const std::vector<int>& offset) const {
@@ -1350,7 +1350,7 @@ namespace casadi {
     std::vector<int> mapping;
 
     // Get the sparsity
-    Sparsity sp = sparsity().getDiag(mapping);
+    Sparsity sp = sparsity().get_diag(mapping);
 
     // Create a reference to the nonzeros
     return (*this)->getGetNonzeros(sp, mapping);

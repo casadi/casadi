@@ -122,7 +122,7 @@ namespace casadi {
     auto targetoptions = std::make_shared<clang::TargetOptions>();
     targetoptions->Triple = llvm::sys::getDefaultTargetTriple();
     clang::TargetInfo *targetInfo =
-      clang::TargetInfo::CreateTargetInfo(compInst.getDiagnostics(), targetoptions);
+      clang::TargetInfo::CreateTargetInfo(compInst.get_diagnostics(), targetoptions);
     compInst.setTarget(targetInfo);
 #endif
 

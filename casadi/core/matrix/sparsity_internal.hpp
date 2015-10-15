@@ -77,7 +77,7 @@ namespace casadi {
      *
      * \param[out] mapping will contain the nonzero mapping
      */
-    Sparsity getDiag(std::vector<int>& mapping) const;
+    Sparsity get_diag(std::vector<int>& mapping) const;
 
     /// Calculate the elimination tree: See cs_etree in CSparse
     std::vector<int> eliminationTree(bool ata) const;

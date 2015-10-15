@@ -377,16 +377,16 @@ namespace casadi {
     return dep();
   }
 
-  MX Diagsplit::getDiagcat(const std::vector<MX>& x) const {
+  MX Diagsplit::get_diagcat(const std::vector<MX>& x) const {
     // Check x length
     if (x.size()!=nout()) {
-      return MXNode::getDiagcat(x);
+      return MXNode::get_diagcat(x);
     }
 
     // Check x content
     for (int i=0; i<x.size(); ++i) {
       if (!(x[i]->isOutputNode() && x[i]->getFunctionOutput()==i && x[i]->dep().get()==this)) {
-        return MXNode::getDiagcat(x);
+        return MXNode::get_diagcat(x);
       }
     }
 

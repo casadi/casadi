@@ -1832,7 +1832,7 @@ namespace casadi {
     }
   }
 
-  Sparsity SparsityInternal::getDiag(std::vector<int>& mapping) const {
+  Sparsity SparsityInternal::get_diag(std::vector<int>& mapping) const {
     int nrow = this->size1();
     int ncol = this->size2();
     const int* colind = this->colind();

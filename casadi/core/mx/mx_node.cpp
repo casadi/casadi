@@ -788,7 +788,7 @@ namespace casadi {
     return MX::create(new Horzcat(x));
   }
 
-  MX MXNode::getDiagcat(const std::vector<MX>& x) const {
+  MX MXNode::get_diagcat(const std::vector<MX>& x) const {
     // Create a Horzcat node
     return MX::create(new Diagcat(x));
   }
@@ -863,7 +863,7 @@ namespace casadi {
     }
   }
 
-  std::vector<MX> MXNode::getDiagsplit(const std::vector<int>& offset1,
+  std::vector<MX> MXNode::get_diagsplit(const std::vector<int>& offset1,
                                        const std::vector<int>& offset2) const {
     if (isZero()) {
       std::vector<MX> ret =

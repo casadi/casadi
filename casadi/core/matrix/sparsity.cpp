@@ -516,8 +516,8 @@ namespace casadi {
     return (*this)->dimString();
   }
 
-  Sparsity Sparsity::getDiag(std::vector<int>& mapping) const {
-    return (*this)->getDiag(mapping);
+  Sparsity Sparsity::get_diag(std::vector<int>& mapping) const {
+    return (*this)->get_diag(mapping);
   }
 
   std::vector<int> Sparsity::eliminationTree(bool ata) const {

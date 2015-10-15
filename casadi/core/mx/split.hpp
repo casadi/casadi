@@ -142,7 +142,7 @@ namespace casadi {
     virtual int getOp() const { return OP_DIAGSPLIT;}
 
     /// Create a diagonal concatenation node
-    virtual MX getDiagcat(const std::vector<MX>& x) const;
+    virtual MX get_diagcat(const std::vector<MX>& x) const;
   };
 
   /** \brief Vertical split of vectors, x -> x0, x1, ...

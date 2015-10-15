@@ -204,7 +204,7 @@ namespace casadi {
         When the input is square, the diagonal elements are returned.
         If the input is vector-like, a diagonal matrix is constructed with it.
     */
-    Sparsity getDiag(std::vector<int>& SWIG_OUTPUT(mapping)) const;
+    Sparsity get_diag(std::vector<int>& SWIG_OUTPUT(mapping)) const;
 
     /// Compress a sparsity pattern
     std::vector<int> compress() const;

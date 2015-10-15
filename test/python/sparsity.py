@@ -224,11 +224,11 @@ class Sparsitytests(casadiTestCase):
     A.addNZ(2,4)
     A.addNZ(3,3)
     
-    sp, mapping = A.getDiag()
+    sp, mapping = A.get_diag()
     B = DMatrix.ones(sp)
     
-    self.checkarray(array([[0],[1],[0],[1],[0]]),B,"getDiag(matrix)")
-    self.checkarray(array([0,1]),array(list(mapping)),"getDiag(vector)")
+    self.checkarray(array([[0],[1],[0],[1],[0]]),B,"get_diag(matrix)")
+    self.checkarray(array([0,1]),array(list(mapping)),"get_diag(vector)")
     
     #print B
     
@@ -237,24 +237,24 @@ class Sparsitytests(casadiTestCase):
     A.addNZ(2,0)
     A.addNZ(4,0)
     
-    sp, mapping = A.getDiag()
+    sp, mapping = A.get_diag()
     B = DMatrix.ones(sp)
     
-    self.checkarray(array([[0,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,1]]),B,"getDiag(vector)")
+    self.checkarray(array([[0,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,1]]),B,"get_diag(vector)")
     
-    self.checkarray(array([0,1,2]),array(list(mapping)),"getDiag(vector)")
+    self.checkarray(array([0,1,2]),array(list(mapping)),"get_diag(vector)")
     
     A = Sparsity(1,5)
     A.addNZ(0,1)
     A.addNZ(0,2)
     A.addNZ(0,4)
     
-    sp, mapping = A.getDiag()
+    sp, mapping = A.get_diag()
     B = DMatrix.ones(sp)
     
-    self.checkarray(array([[0,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,1]]),B,"getDiag(vector)")
+    self.checkarray(array([[0,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,1]]),B,"get_diag(vector)")
     
-    self.checkarray(array([0,1,2]),array(list(mapping)),"getDiag(vector)")
+    self.checkarray(array([0,1,2]),array(list(mapping)),"get_diag(vector)")
             
   def test_sparsityindex(self):
     self.message("sparsity indexing")

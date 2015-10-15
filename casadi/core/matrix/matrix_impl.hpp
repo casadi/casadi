@@ -2422,7 +2422,7 @@ namespace casadi {
     // Nonzero mapping
     std::vector<int> mapping;
     // Get the sparsity
-    Sparsity sp = sparsity().getDiag(mapping);
+    Sparsity sp = sparsity().get_diag(mapping);
 
     Matrix<DataType> ret = zeros(sp);
 

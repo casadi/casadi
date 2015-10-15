@@ -40947,7 +40947,7 @@ make a shallow copy of that one.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::getDiag(std::vector< int >
+%feature("docstring")  casadi::Sparsity::get_diag(std::vector< int >
 &output_mapping) const  "
 
 Get the diagonal of the matrix/create a diagonal matrix (mapping will

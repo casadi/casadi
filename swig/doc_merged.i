@@ -30705,7 +30705,7 @@ shallow copy of that one.
 
 ";
 
-%feature("docstring") casadi::Sparsity::getDiag "
+%feature("docstring") casadi::Sparsity::get_diag "
 
 Get the diagonal of the matrix/create a diagonal matrix (mapping will
 contain the nonzero mapping) When the input is square, the diagonal elements
