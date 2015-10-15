@@ -1258,14 +1258,11 @@ namespace casadi {
   MX MX::zz_if_else(const MX &x_true, const MX &x_false, bool short_circuit) const {
     if (short_circuit) {
       // Get symbolic primitives
-      std::vector<MX> arg;
-      arg.push_back(x_true);
-      arg.push_back(x_false);
-      arg = symvar(veccat(arg));
+      vector<MX> arg = symvar(veccat(vector<MX>{x_true, x_false}));
 
       // Form functions for cases
-      Function f_true=MX::fun("f_true", arg, make_vector(x_true));
-      Function f_false=MX::fun("f_false", arg, make_vector(x_false));
+      Function f_true=MX::fun("f_true", arg, {x_true});
+      Function f_false=MX::fun("f_false", arg, {x_false});
 
       // Form Switch
       Switch sw("if_else", f_true, f_false);
@@ -1292,9 +1289,9 @@ namespace casadi {
       for (int k=0; k<x.size(); ++k) {
         stringstream ss;
         ss << "f_case" << k;
-        f[k] = MX::fun(ss.str(), arg, make_vector(x[k]));
+        f[k] = MX::fun(ss.str(), arg, {x[k]});
       }
-      Function f_default=MX::fun("f_default", arg, make_vector(x_default));
+      Function f_default=MX::fun("f_default", arg, {x_default});
 
       // Form Switch
       Switch sw("conditional", f, f_default);
@@ -1360,7 +1357,7 @@ namespace casadi {
   }
 
   int MX::zz_countNodes() const {
-    Function f=MX::fun("tmp", vector<MX>(), make_vector(*this));
+    Function f=MX::fun("tmp", {}, {*this});
     return f.countNodes();
   }
 
@@ -1719,17 +1716,17 @@ namespace casadi {
   }
 
   MX MX::zz_jacobian(const MX &arg) const {
-    Function temp=MX::fun("helper_jacobian_MX", make_vector(arg), make_vector(*this));
+    Function temp=MX::fun("helper_jacobian_MX", {arg}, {*this});
     return MX::jac(temp);
   }
 
   MX MX::zz_gradient(const MX &arg) const {
-    Function temp=MX::fun("helper_gradient_MX", make_vector(arg), make_vector(*this));
+    Function temp=MX::fun("helper_gradient_MX", {arg}, {*this});
     return MX::grad(temp);
   }
 
   MX MX::zz_tangent(const MX &arg) const {
-    Function temp=MX::fun("helper_tangent_MX", make_vector(arg), make_vector(*this));
+    Function temp=MX::fun("helper_tangent_MX", {arg}, {*this});
     return MX::tang(temp);
   }
 
@@ -1740,7 +1737,7 @@ namespace casadi {
 
   MX MX::zz_hessian(const MX &arg, MX &g) const {
     g = gradient(*this, arg);
-    Function gfcn=MX::fun("gfcn", make_vector(arg), make_vector(g));
+    Function gfcn=MX::fun("gfcn", {arg}, {g});
     return MX::jac(gfcn, 0, 0, false, true);
   }
 
@@ -1753,7 +1750,7 @@ namespace casadi {
   }
 
   std::vector<MX> MX::zz_symvar() const {
-    Function f=MX::fun("f", std::vector<MX>(), make_vector(*this));
+    Function f=MX::fun("f", {}, {*this});
     return f.free_mx();
   }
 
@@ -1825,7 +1822,7 @@ namespace casadi {
 
   MX MX::zz_nullspace() const {
     SX n = SX::sym("A", sparsity());
-    Function f=SX::fun("nullspace", make_vector(n), make_vector(nullspace(n)));
+    Function f=SX::fun("nullspace", {n}, {nullspace(n)});
     return f(*this).at(0);
   }
 
@@ -1833,7 +1830,7 @@ namespace casadi {
     if (nnz()==0) return false;
 
     // Construct a temporary algorithm
-    Function temp=MX::fun("tmp", make_vector(arg), make_vector(*this));
+    Function temp=MX::fun("tmp", {arg}, {*this});
     temp.spInit(true);
 
     bvec_t* input_ =  get_bvec_t(temp.input().data());

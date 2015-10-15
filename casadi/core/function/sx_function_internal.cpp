@@ -144,8 +144,7 @@ namespace casadi {
     // Create function
     Dict opts;
     opts["verbose"] = getOption("verbose");
-    Function gfcn=SX::fun("gfcn", make_vector(inputv_.at(iind)),
-                    make_vector(g), opts);
+    Function gfcn=SX::fun("gfcn", {inputv_.at(iind)}, {g}, opts);
 
     // Calculate jacobian of gradient
     if (verbose()) {
@@ -895,7 +894,7 @@ namespace casadi {
 
   Function SXFunctionInternal::getFullJacobian() {
     SX J = veccat(outputv_).zz_jacobian(veccat(inputv_));
-    return SX::fun(name_ + "_jac", inputv_, make_vector(J));
+    return SX::fun(name_ + "_jac", inputv_, {J});
   }
 
 

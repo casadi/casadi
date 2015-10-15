@@ -383,9 +383,15 @@ namespace casadi {
 #ifndef SWIG
     ///@{
     /// Functor shorthand for evaluation, single argument (only C++)
-    std::vector<DMatrix> operator()(const DMatrix& arg0) { return operator()(make_vector(arg0));}
-    std::vector<SX> operator()(const SX& arg0) { return operator()(make_vector(arg0));}
-    std::vector<MX> operator()(const MX& arg0) { return operator()(make_vector(arg0));}
+    std::vector<DMatrix> operator()(const DMatrix& arg0) {
+      return operator()(std::vector<DMatrix>{arg0});
+    }
+    std::vector<SX> operator()(const SX& arg0) {
+      return operator()(std::vector<SX>{arg0});
+    }
+    std::vector<MX> operator()(const MX& arg0) {
+      return operator()(std::vector<MX>{arg0});
+    }
     ///@}
 
     /** \brief Evaluate memory-less, numerically */
@@ -827,6 +833,7 @@ namespace casadi {
 #endif // SWIG
     /// \endcond
 
+#ifdef WITH_DEPRECATED_FEATURES
 #ifndef SWIG
     // Create vector with 1 element
     inline friend std::vector<Function> make_vector(const Function& x0) {
@@ -869,6 +876,7 @@ namespace casadi {
       return std::vector<Function>(x, x+6);
     }
 #endif // SWIG
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Name of the function */
     std::string name() const;

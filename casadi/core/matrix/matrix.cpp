@@ -152,7 +152,7 @@ namespace casadi {
   template<>
   bool SX::isSmooth() const {
     // Make a function
-    Function temp=SX::fun("temp", make_vector(SX()), make_vector(*this));
+    Function temp=SX::fun("temp", {SX()}, {*this});
 
     // Run the function on the temporary variable
     auto *t = dynamic_cast<SXFunctionInternal *>(temp.get());
@@ -447,7 +447,7 @@ namespace casadi {
       SX q1 = (b-a)/2;
       SX q2 = (b+a)/2;
 
-      Function fcn=SX::fun("gauss_quadrature", make_vector(x), make_vector(f));
+      Function fcn=SX::fun("gauss_quadrature", {x}, {f});
 
       return q1*gauss_quadrature(fcn(q1*x+q2).at(0), x, -1, 1);
     }
@@ -469,7 +469,7 @@ namespace casadi {
     wi.push_back((322-13*sqrt(70.0))/900.0);
 
     // Evaluate at the Gauss points
-    Function fcn=SX::fun("gauss_quadrature", make_vector(x), make_vector(f));
+    Function fcn=SX::fun("gauss_quadrature", {x}, {f});
     vector<SXElement> f_val(5);
     for (int i=0; i<5; ++i)
       f_val[i] = fcn(SX(xi[i])).at(0).toScalar();
@@ -618,7 +618,7 @@ namespace casadi {
     if (nnz()==0) return false;
 
     // Construct a temporary algorithm
-    Function temp=SX::fun("temp", make_vector(arg), make_vector(*this));
+    Function temp=SX::fun("temp", {arg}, {*this});
     temp.spInit(true);
 
     bvec_t* input_ =  get_bvec_t(temp.input().data());
@@ -638,19 +638,19 @@ namespace casadi {
 
   template<>
   SX SX::zz_jacobian(const SX &arg) const {
-    Function temp=SX::fun("temp", make_vector(arg), make_vector(*this)); // make a runtime
+    Function temp=SX::fun("temp", {arg}, {*this});
     return SX::jac(temp);
   }
 
   template<>
   SX SX::zz_gradient(const SX &arg) const {
-    Function temp=SX::fun("temp", make_vector(arg), make_vector(*this)); // make a runtime
+    Function temp=SX::fun("temp", {arg}, {*this});
     return SX::grad(temp);
   }
 
   template<>
   SX SX::zz_tangent(const SX &arg) const {
-    Function temp=SX::fun("temp", make_vector(arg), make_vector(*this)); // make a runtime
+    Function temp=SX::fun("temp", {arg}, {*this});
     return SX::tang(temp);
   }
 
@@ -663,13 +663,13 @@ namespace casadi {
   template<>
   SX SX::zz_hessian(const SX &arg, SX &g) const {
     g = gradient(*this, arg);
-    Function gfcn=SX::fun("gfcn", make_vector(arg), make_vector(g)); // make a runtime
+    Function gfcn=SX::fun("gfcn", {arg}, {g});
     return SX::jac(gfcn, 0, 0, false, true);
   }
 
   template<>
   SX SX::zz_jacobianTimesVector(const SX &arg, const SX &v, bool transpose_jacobian) const {
-    Function f=SX::fun("tmp", make_vector(arg), make_vector(*this));
+    Function f=SX::fun("tmp", {arg}, {*this});
 
     // Split up v
     vector<SX> vv = horzsplit(v);
@@ -779,7 +779,7 @@ namespace casadi {
 
   template<>
   int SX::zz_countNodes() const {
-    Function f=SX::fun("tmp", make_vector(SX()), make_vector(*this));
+    Function f=SX::fun("tmp", {SX()}, {*this});
     return f.countNodes();
   }
 
@@ -798,7 +798,7 @@ namespace casadi {
 
   template<>
   std::vector<SX> SX::zz_symvar() const {
-    Function f=SX::fun("tmp", std::vector<SX>(), make_vector(*this));
+    Function f=SX::fun("tmp", {}, {*this});
     std::vector<SXElement> ret1 = f.free_sx().data();
     std::vector<SX> ret(ret1.size());
     std::copy(ret1.begin(), ret1.end(), ret.begin());
@@ -937,7 +937,7 @@ namespace casadi {
 
     std::vector<SXElement> r;
 
-    Function f = SX::fun("tmp", make_vector(x), make_vector(*this));
+    Function f = SX::fun("tmp", {x}, {*this});
     int mult = 1;
     bool success = false;
     for (int i=0; i<1000; ++i) {
@@ -947,7 +947,7 @@ namespace casadi {
         success = true;
         break;
       }
-      f = SX::fun("tmp", make_vector(x), make_vector(j));
+      f = SX::fun("tmp", {x}, {j});
       mult*=i+1;
     }
 

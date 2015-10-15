@@ -223,7 +223,7 @@ namespace casadi {
         }
       }
 
-      Function lfcn = SX::fun("lfcn", make_vector(tau), make_vector(L));
+      Function lfcn = SX::fun("lfcn", {tau}, {L});
 
       // Evaluate the polynomial at the final time to get the
       // coefficients of the continuity equation
@@ -290,7 +290,7 @@ namespace casadi {
     }
 
     // Root-finding function
-    Function rfp = MX::fun("rfp", make_vector(v, x0, p, h), make_vector(vertcat(V_eq)));
+    Function rfp = MX::fun("rfp", {v, x0, p, h}, {vertcat(V_eq)});
 
     // Create a implicit function instance to solve the system of equations
     ImplicitFunction ifcn("ifcn", solver, rfp, solver_options);
@@ -298,7 +298,7 @@ namespace casadi {
     // Get state at end time
     MX xf = x0;
     for (int k=0; k<N; ++k) {
-      std::vector<MX> ifcn_out = ifcn(make_vector(repmat(xf, order), xf, p, h));
+      std::vector<MX> ifcn_out = ifcn({repmat(xf, order), xf, p, h});
       x = vertsplit(ifcn_out[0], x0.size1());
 
       // State at end of step

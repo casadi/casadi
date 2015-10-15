@@ -51,6 +51,7 @@ namespace casadi {
     inline const MatType& self() const { return static_cast<const MatType&>(*this); }
     inline MatType& self() { return static_cast<MatType&>(*this); }
   public:
+#ifdef WITH_DEPRECATED_FEATURES
     // Create vector with 1 element
     inline friend std::vector<MatType> make_vector(const MatType& x0) {
       return std::vector<MatType>(1, x0);
@@ -91,6 +92,7 @@ namespace casadi {
       MatType x[] = {x0, x1, x2, x3, x4, x5};
       return std::vector<MatType>(x, x+6);
     }
+#endif // WITH_DEPRECATED_FEATURES
 
     // Create vector from map and vector with key order
     inline friend std::vector<MatType> make_vector(const std::map<std::string, MatType>& m,
@@ -639,50 +641,50 @@ namespace casadi {
 
     /** \brief Concatenate horizontally, two matrices */
     inline friend MatType horzcat(const MatType &x, const MatType &y) {
-      return horzcat(make_vector(x, y));
+      return horzcat(std::vector<MatType>{x, y});
     }
 
     /** \brief Concatenate horizontally, three matrices */
     inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z) {
-      return horzcat(make_vector(x, y, z));
+      return horzcat(std::vector<MatType>{x, y, z});
     }
 
     /** \brief Concatenate horizontally, four matrices */
     inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z,
                                   const MatType &w) {
-      return horzcat(make_vector(x, y, z, w));
+      return horzcat(std::vector<MatType>{x, y, z, w});
     }
 
     /** \brief Concatenate vertically, two matrices */
     inline friend MatType vertcat(const MatType &x, const MatType &y) {
-      return vertcat(make_vector(x, y));
+      return vertcat(std::vector<MatType>{x, y});
     }
 
     /** \brief Concatenate vertically, three matrices */
     inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z) {
-      return vertcat(make_vector(x, y, z));
+      return vertcat(std::vector<MatType>{x, y, z});
     }
 
     /** \brief Concatenate vertically, four matrices */
     inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z,
                                   const MatType &w) {
-      return vertcat(make_vector(x, y, z, w));
+      return vertcat(std::vector<MatType>{x, y, z, w});
     }
 
     /** \brief Concatenate along diagonal, two matrices */
     inline friend MatType diagcat(const MatType &x, const MatType &y) {
-      return diagcat(make_vector(x, y));
+      return diagcat(std::vector<MatType>{x, y});
     }
 
     /** \brief Concatenate along diagonal, three matrices */
     inline friend MatType diagcat(const MatType &x, const MatType &y, const MatType &z) {
-      return diagcat(make_vector(x, y, z));
+      return diagcat(std::vector<MatType>{x, y, z});
     }
 
     /** \brief Concatenate along diagonal, four matrices */
     inline friend MatType diagcat(const MatType &x, const MatType &y, const MatType &z,
                                   const MatType &w) {
-      return diagcat(make_vector(x, y, z, w));
+      return diagcat(std::vector<MatType>{x, y, z, w});
     }
 /** \@} */
 #endif // SWIG

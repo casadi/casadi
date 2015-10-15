@@ -1897,8 +1897,8 @@ namespace casadi {
     // Form Jacobian
     MX J;
     {
-      Function tmp = MX::fun("tmp", make_vector(arg), make_vector(res),
-                              Dict{{"ad_weight", adWeight()}});
+      Function tmp = MX::fun("tmp", {arg}, {res},
+                             Dict{{"ad_weight", adWeight()}});
       J = MX::jac(tmp);
     }
 
@@ -1908,7 +1908,7 @@ namespace casadi {
     }
 
     // Form an expression for the full Jacobian
-    return MX::fun(name, ret_argv, make_vector(J), opts);
+    return MX::fun(name, ret_argv, {J}, opts);
   }
 
   void FunctionInternal::generateFunction(CodeGenerator& g,
