@@ -177,37 +177,36 @@ namespace casadi {
     // Quick return if matrix is dense
     if (isdense()) return rr+cc*size1();
 
+    // Get sparsity pattern
+    int size1=this->size1(), size2=this->size2(), nnz=this->nnz();
+    const int *colind = this->colind(), *row = this->row();
+
     // Quick return if we are adding an element to the end
-    if (colind(cc)==nnz() || (colind(cc+1)==nnz() && row(nnz()-1)<rr)) {
-      std::vector<int> rowv = getRow();
-      std::vector<int> colindv = getColind();
+    if (colind[cc]==nnz || (colind[cc+1]==nnz && row[nnz-1]<rr)) {
+      std::vector<int> rowv=getRow(), colindv=getColind();
       rowv.push_back(rr);
-      for (int c=cc; c<size2(); ++c) {
-        colindv[c+1]++;
-      }
-      assignCached(size1(), size2(), colindv, rowv);
+      for (int c=cc; c<size2; ++c) colindv[c+1]++;
+      assignCached(size1, size2, colindv, rowv);
       return rowv.size()-1;
     }
 
     // go to the place where the element should be
     int ind;
-    for (ind=colind(cc); ind<colind(cc+1); ++ind) { // better: loop from the back to the front
-      if (row(ind) == rr) {
+    for (ind=colind[cc]; ind<colind[cc+1]; ++ind) { // better: loop from the back to the front
+      if (row[ind] == rr) {
         return ind; // element exists
-      } else if (row(ind) > rr) {
+      } else if (row[ind] > rr) {
         break;                // break at the place where the element should be added
       }
     }
 
     // insert the element
-    std::vector<int> rowv = getRow();
-    std::vector<int> colindv = getColind();
+    std::vector<int> rowv = getRow(), colindv = getColind();
     rowv.insert(rowv.begin()+ind, rr);
-    for (int c=cc+1; c<size2()+1; ++c)
-      colindv[c]++;
+    for (int c=cc+1; c<size2+1; ++c) colindv[c]++;
 
     // Return the location of the new element
-    assignCached(size1(), size2(), colindv, rowv);
+    assignCached(size1, size2, colindv, rowv);
     return ind;
   }
 
