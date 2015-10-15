@@ -364,6 +364,28 @@ namespace casadi {
               bool always_inline=false, bool never_inline=false);
     ///@}
 
+#ifndef SWIG
+    ///@{
+    /** \brief Create input/output buffer */
+    std::vector<const double*> buf_in(const std::vector<std::vector<double>>& arg) const;
+    std::vector<const double*> buf_in(std::initializer_list<std::vector<double>> arg) const;
+    std::vector<double*> buf_out(std::vector<std::vector<double>>& res) const;
+    std::vector<double*> buf_out(std::initializer_list<std::vector<double>*> res) const;
+    ///@}
+
+    ///@{
+    /** \brief Numerical evaluation */
+    void operator()(const std::vector<std::vector<double>>& arg,
+                    std::vector<std::vector<double>>& res);
+    void operator()(const std::vector<std::vector<double>>& arg,
+                    std::initializer_list<std::vector<double>*> res);
+    void operator()(std::initializer_list<std::vector<double>> arg,
+                    std::vector<std::vector<double>>& res);
+    void operator()(std::initializer_list<std::vector<double>> arg,
+                    std::initializer_list<std::vector<double>*> res);
+    ///@}
+#endif // SWIG
+
     ///@{
     /// Functor shorthand for evaluation
     std::vector<DMatrix> operator()(const std::vector<DMatrix>& arg,

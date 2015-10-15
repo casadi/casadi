@@ -134,6 +134,7 @@ namespace casadi {
       return make_vector(ms.first, ms.second);
     }
 
+#ifdef WITH_DEPRECATED_FEATURES
     // Assign 1 element from a vector
     template<typename T0>
       inline friend void assign_vector(T0& x0,
@@ -181,7 +182,6 @@ namespace casadi {
       x.at(5).get(x5);
     }
 
-#ifdef WITH_DEPRECATED_FEATURES
     // Create map with 1 element
     inline friend std::map<std::string, MatType>
       make_map(const std::string& n0, const MatType& x0) {

@@ -76,6 +76,95 @@ namespace casadi {
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
+  vector<const double*> Function::buf_in(const vector<vector<double>>& arg) const {
+    casadi_assert(arg.size()==n_in());
+    auto arg_it=arg.begin();
+    vector<const double*> buf_arg(sz_arg());
+    for (uint i=0; i<arg.size(); ++i) {
+      casadi_assert(arg_it->size()==nnz_in(i));
+      buf_arg[i] = getPtr(*arg_it++);
+    }
+    return buf_arg;
+  }
+
+  vector<const double*> Function::buf_in(initializer_list<vector<double>> arg) const {
+    casadi_assert(arg.size()==n_in());
+    auto arg_it=arg.begin();
+    vector<const double*> buf_arg(sz_arg());
+    for (uint i=0; i<arg.size(); ++i) {
+      casadi_assert(arg_it->size()==nnz_in(i));
+      buf_arg[i] = getPtr(*arg_it++);
+    }
+    return buf_arg;
+  }
+
+  vector<double*> Function::buf_out(vector<vector<double>>& res) const {
+    res.resize(n_out());
+    auto res_it=res.begin();
+    vector<double*> buf_res(sz_res());
+    for (uint i=0; i<res.size(); ++i) {
+      res_it->resize(nnz_out(i));
+      buf_res[i] = getPtr(*res_it++);
+    }
+    return buf_res;
+  }
+
+  vector<double*> Function::buf_out(initializer_list<vector<double>*> res) const {
+    casadi_assert(res.size()==n_out());
+    auto res_it=res.begin();
+    vector<double*> buf_res(sz_res());
+    for (uint i=0; i<res.size(); ++i) {
+      casadi_assert(*res_it!=0);
+      (*res_it)->resize(nnz_out(i));
+      buf_res[i] = getPtr(**res_it++);
+    }
+    return buf_res;
+  }
+
+  void Function::operator()(const vector<vector<double>> &arg,
+                            vector<vector<double>>& res) {
+    // Allocate buffers
+    auto buf_arg = buf_in(arg);
+    auto buf_res = buf_out(res);
+    vector<int> buf_iw(sz_iw());
+    vector<double> buf_w(sz_w());
+    // Evaluate memoryless
+    (*this)(getPtr(buf_arg), getPtr(buf_res), getPtr(buf_iw), getPtr(buf_w));
+  }
+
+  void Function::operator()(const std::vector<std::vector<double>>& arg,
+                            std::initializer_list<std::vector<double>*> res) {
+    // Allocate buffers
+    auto buf_arg = buf_in(arg);
+    auto buf_res = buf_out(res);
+    vector<int> buf_iw(sz_iw());
+    vector<double> buf_w(sz_w());
+    // Evaluate memoryless
+    (*this)(getPtr(buf_arg), getPtr(buf_res), getPtr(buf_iw), getPtr(buf_w));
+  }
+
+  void Function::operator()(std::initializer_list<std::vector<double>> arg,
+                            std::vector<std::vector<double>>& res) {
+    // Allocate buffers
+    auto buf_arg = buf_in(arg);
+    auto buf_res = buf_out(res);
+    vector<int> buf_iw(sz_iw());
+    vector<double> buf_w(sz_w());
+    // Evaluate memoryless
+    (*this)(getPtr(buf_arg), getPtr(buf_res), getPtr(buf_iw), getPtr(buf_w));
+  }
+
+  void Function::operator()(std::initializer_list<std::vector<double>> arg,
+                            std::initializer_list<std::vector<double>*> res) {
+    // Allocate buffers
+    auto buf_arg = buf_in(arg);
+    auto buf_res = buf_out(res);
+    vector<int> buf_iw(sz_iw());
+    vector<double> buf_w(sz_w());
+    // Evaluate memoryless
+    (*this)(getPtr(buf_arg), getPtr(buf_res), getPtr(buf_iw), getPtr(buf_w));
+  }
+
   Function Function::mapaccum(const std::string& name, int N, const Dict& options) const {
     std::vector<bool> accum_input(n_in(), false);
     accum_input[0] = true;

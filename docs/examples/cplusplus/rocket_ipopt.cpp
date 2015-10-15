@@ -106,9 +106,9 @@ int main(){
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory
-  vector<double> sopt(nu), vopt(nu), mopt(nu);
   Function xfcn = SX::fun("xfcn", {u}, {s_traj, v_traj, m_traj});
-  assign_vector(sopt, vopt, mopt, xfcn(vector<DMatrix>{res.at("x")}));
+  vector<double> sopt, vopt, mopt;
+  xfcn({uopt}, {&sopt, &vopt, &mopt});
   cout << "position: " << sopt << endl;
   cout << "velocity: " << vopt << endl;
   cout << "mass:     " << mopt << endl;
