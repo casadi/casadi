@@ -50,9 +50,7 @@ int main(){
   SX beta = 0.1; // fuel consumption rate
 
   // Trajectory
-  SX s_traj = SX::zeros(nu);
-  SX v_traj = SX::zeros(nu);
-  SX m_traj = SX::zeros(nu);
+  vector<SX> s_k, v_k, m_k;
 
   // Integrate over the interval with Euler forward
   SX s = s_0, v = v_0, m = m_0;
@@ -62,41 +60,38 @@ int main(){
       v += dt / m * (u[k]- alpha * v*v);
       m += -dt * beta*u[k]*u[k];
     }
-    s_traj[k] = s;
-    v_traj[k] = v;
-    m_traj[k] = m;
+    s_k.push_back(s);
+    v_k.push_back(v);
+    m_k.push_back(m);
   }
+  SX s_all=vertcat(s_k), v_all=vertcat(v_k), m_all=vertcat(m_k);
 
   // Objective function
   SX f = inner_prod(u, u);
     
   // Terminal constraints
-  SX g = vertcat(s, v, v_traj);
+  SX g = vertcat(s, v, v_all);
   
   // Create the NLP
-  Function nlp = SX::fun("nlp", nlpIn("x", u), nlpOut("f", f, "g", g));
+  SXDict nlp = {{"x", u}, {"f", f}, {"g", g}};
   
   // Allocate an NLP solver and buffers
   NlpSolver solver("solver", "ipopt", nlp);
-  std::map<std::string, DMatrix> arg, res;
 
-  // Bounds on u and initial condition
-  arg["lbx"] = -10;
-  arg["ubx"] = 10;
-  arg["x0"] = 0.4;
-  
   // Bounds on g
-  vector<double> gmin(2), gmax(2);
-  gmin[0] = gmax[0] = 10;
-  gmin[1] = gmax[1] =  0;
+  vector<double> gmin = {10, 0};
+  vector<double> gmax = {10, 0};
   gmin.resize(2+nu, -numeric_limits<double>::infinity());
   gmax.resize(2+nu, 1.1);
-  arg["lbg"] = gmin;
-  arg["ubg"] = gmax;
 
   // Solve the problem
-  res = solver(arg);
-  
+  DMatrixDict arg = {{"lbx", -10},
+                     {"ubx", 10},
+                     {"x0", 0.4},
+                     {"lbg", gmin},
+                     {"ubg", gmax}};  
+  DMatrixDict res = solver(arg);
+
   // Print the optimal cost
   double cost(res.at("f"));
   cout << "optimal cost: " << cost << endl;
@@ -106,7 +101,7 @@ int main(){
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory
-  Function xfcn = SX::fun("xfcn", {u}, {s_traj, v_traj, m_traj});
+  Function xfcn = SX::fun("xfcn", {u}, {s_all, v_all, m_all});
   vector<double> sopt, vopt, mopt;
   xfcn({uopt}, {&sopt, &vopt, &mopt});
   cout << "position: " << sopt << endl;
