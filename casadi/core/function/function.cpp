@@ -80,7 +80,7 @@ namespace casadi {
     casadi_assert(arg.size()==n_in());
     auto arg_it=arg.begin();
     vector<const double*> buf_arg(sz_arg());
-    for (uint i=0; i<arg.size(); ++i) {
+    for (unsigned int i=0; i<arg.size(); ++i) {
       casadi_assert(arg_it->size()==nnz_in(i));
       buf_arg[i] = getPtr(*arg_it++);
     }
@@ -91,7 +91,7 @@ namespace casadi {
     casadi_assert(arg.size()==n_in());
     auto arg_it=arg.begin();
     vector<const double*> buf_arg(sz_arg());
-    for (uint i=0; i<arg.size(); ++i) {
+    for (unsigned int i=0; i<arg.size(); ++i) {
       casadi_assert(arg_it->size()==nnz_in(i));
       buf_arg[i] = getPtr(*arg_it++);
     }
@@ -102,7 +102,7 @@ namespace casadi {
     res.resize(n_out());
     auto res_it=res.begin();
     vector<double*> buf_res(sz_res());
-    for (uint i=0; i<res.size(); ++i) {
+    for (unsigned int i=0; i<res.size(); ++i) {
       res_it->resize(nnz_out(i));
       buf_res[i] = getPtr(*res_it++);
     }
@@ -113,7 +113,7 @@ namespace casadi {
     casadi_assert(res.size()==n_out());
     auto res_it=res.begin();
     vector<double*> buf_res(sz_res());
-    for (uint i=0; i<res.size(); ++i) {
+    for (unsigned int i=0; i<res.size(); ++i) {
       casadi_assert(*res_it!=0);
       (*res_it)->resize(nnz_out(i));
       buf_res[i] = getPtr(**res_it++);

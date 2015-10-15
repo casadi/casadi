@@ -45,7 +45,7 @@ namespace casadi {
   template<>
   Matrix<double> Matrix<double>::
   zz_solve(const Matrix<double>& b,
-           const std::string& lsolver, const Dict& dict) const {
+           const string& lsolver, const Dict& dict) const {
     const Matrix<double>& A = *this;
     LinearSolver mysolver("tmp", lsolver, A.sparsity(), b.size2(), dict);
     mysolver.setInput(A, LINSOL_A);
@@ -58,7 +58,7 @@ namespace casadi {
 
   template<>
   Matrix<double> Matrix<double>::
-  zz_pinv(const std::string& lsolver,
+  zz_pinv(const string& lsolver,
           const Dict& dict) const {
     const Matrix<double>& A = *this;
     if (A.size1()>=A.size2()) {
@@ -86,9 +86,9 @@ namespace casadi {
   }
 
   template<>
-  SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp) {
+  SX GenericMatrix<SX>::sym(const string& name, const Sparsity& sp) {
     // Create a dense n-by-m matrix
-    std::vector<SXElement> retv;
+    vector<SXElement> retv;
 
     // Check if individial names have been provided
     if (name[0]=='[') {
@@ -117,7 +117,7 @@ namespace casadi {
       retv.push_back(SXElement::sym(name));
     } else {
       // Scalar
-      std::stringstream ss;
+      stringstream ss;
       for (int k=0; k<sp.nnz(); ++k) {
         ss.str("");
         ss << name << "_" << k;
@@ -222,8 +222,8 @@ namespace casadi {
   }
 
   template<>
-  std::vector<double> SX::nonzeros() const {
-    std::vector<double> ret(nnz());
+  vector<double> SX::nonzeros() const {
+    vector<double> ret(nnz());
     for (size_t i=0; i<ret.size(); ++i) {
       ret[i] = at(i).getValue();
     }
@@ -231,8 +231,8 @@ namespace casadi {
   }
 
   template<>
-  std::vector<int> SX::nonzeros_int() const {
-    std::vector<int> ret(nnz());
+  vector<int> SX::nonzeros_int() const {
+    vector<int> ret(nnz());
     for (size_t i=0; i<ret.size(); ++i) {
       ret[i] = at(i).getIntValue();
     }
@@ -240,7 +240,7 @@ namespace casadi {
   }
 
   template<>
-  std::string SX::getName() const {
+  string SX::getName() const {
     return toScalar().getName();
   }
 
@@ -261,12 +261,12 @@ namespace casadi {
     SXElement ex = ex2.toScalar();
 
     // Terms, weights and indices of the nodes that are already expanded
-    std::vector<std::vector<SXNode*> > terms;
-    std::vector<std::vector<double> > weights;
-    std::map<SXNode*, int> indices;
+    vector<vector<SXNode*> > terms;
+    vector<vector<double> > weights;
+    map<SXNode*, int> indices;
 
     // Stack of nodes that are not yet expanded
-    std::stack<SXNode*> to_be_expanded;
+    stack<SXNode*> to_be_expanded;
     to_be_expanded.push(ex.get());
 
     while (!to_be_expanded.empty()) { // as long as there are nodes to be expanded
@@ -279,8 +279,8 @@ namespace casadi {
       }
 
       // Weights and terms
-      std::vector<double> w; // weights
-      std::vector<SXNode*> f; // terms
+      vector<double> w; // weights
+      vector<SXNode*> f; // terms
 
       if (to_be_expanded.top()->isConstant()) { // constant nodes are seen as multiples of one
         w.push_back(to_be_expanded.top()->getValue());
@@ -338,13 +338,13 @@ namespace casadi {
               for (int i=0; i<weights[ind2].size(); ++i) w.push_back(-weights[ind2][i]);
             }
             // Eliminate multiple elements
-            std::vector<double> w_new; w_new.reserve(w.size());   // weights
-            std::vector<SXNode*> f_new;  f_new.reserve(f.size());   // terms
-            std::map<SXNode*, int> f_ind; // index in f_new
+            vector<double> w_new; w_new.reserve(w.size());   // weights
+            vector<SXNode*> f_new;  f_new.reserve(f.size());   // terms
+            map<SXNode*, int> f_ind; // index in f_new
 
             for (int i=0; i<w.size(); i++) {
               // Try to locate the node
-              std::map<SXNode*, int>::iterator it = f_ind.find(f[i]);
+              map<SXNode*, int>::iterator it = f_ind.find(f[i]);
               if (it == f_ind.end()) { // if the term wasn't found
                 w_new.push_back(w[i]);
                 f_new.push_back(f[i]);
@@ -496,10 +496,10 @@ namespace casadi {
   }
 
   template<>
-  std::vector<SX >
-  SX::zz_substitute(const std::vector<SX >& ex,
-                    const std::vector<SX >& v,
-                    const std::vector<SX >& vdef) {
+  vector<SX >
+  SX::zz_substitute(const vector<SX >& ex,
+                    const vector<SX >& v,
+                    const vector<SX >& vdef) {
 
     // Assert consistent dimensions
     casadi_assert_warning(v.size()==vdef.size(), "subtitute: number of symbols to replace ( "
@@ -521,7 +521,7 @@ namespace casadi {
       if (v[k].sparsity()!=vdef[k].sparsity()) {
         // Expand vdef to sparsity of v if vdef is scalar
         if (vdef[k].isscalar() && vdef[k].nnz()==1) {
-          std::vector<SX> vdef_mod = vdef;
+          vector<SX> vdef_mod = vdef;
           vdef_mod[k] = SX(v[k].sparsity(), vdef[k].at(0), false);
           return substitute(ex, v, vdef_mod);
         } else {
@@ -538,9 +538,9 @@ namespace casadi {
   }
 
   template<>
-  void SX::zz_substituteInPlace(const std::vector<SX >& v,
-                                std::vector<SX >& vdef,
-                                std::vector<SX >& ex,
+  void SX::zz_substituteInPlace(const vector<SX >& v,
+                                vector<SX >& vdef,
+                                vector<SX >& ex,
                                 bool reverse) {
     // Assert correctness
     casadi_assert(v.size()==vdef.size());
@@ -554,11 +554,11 @@ namespace casadi {
     if (v.empty()) return;
 
     // Function inputs
-    std::vector<SX> f_in;
+    vector<SX> f_in;
     if (!reverse) f_in.insert(f_in.end(), v.begin(), v.end());
 
     // Function outputs
-    std::vector<SX> f_out = vdef;
+    vector<SX> f_out = vdef;
     f_out.insert(f_out.end(), ex.begin(), ex.end());
 
     // Write the mapping function
@@ -623,7 +623,7 @@ namespace casadi {
 
     bvec_t* input_ =  get_bvec_t(temp.input().data());
     // Make a column with all variables active
-    std::fill(input_, input_+temp.input().nnz(), bvec_t(1));
+    fill(input_, input_+temp.input().nnz(), bvec_t(1));
     bvec_t* output_ = get_bvec_t(temp.output().data());
     // Perform a single dependency sweep
     temp.spEvaluate(true);
@@ -739,11 +739,11 @@ namespace casadi {
 
   template<>
   SX SX::zz_mtaylor(const SX& x, const SX& a, int order) const {
-    return mtaylor(*this, x, a, order, std::vector<int>(x.nnz(), 1));
+    return mtaylor(*this, x, a, order, vector<int>(x.nnz(), 1));
   }
 
   SX mtaylor_recursive(const SX& ex, const SX& x, const SX& a, int order,
-                       const std::vector<int>&order_contributions,
+                       const vector<int>&order_contributions,
                        const SXElement & current_dx=casadi_limits<SXElement>::one,
                        double current_denom=1, int current_order=1) {
     SX result = substitute(ex, x, a)*current_dx/current_denom;
@@ -763,7 +763,7 @@ namespace casadi {
 
   template<>
   SX SX::zz_mtaylor(const SX& x, const SX& a, int order,
-                    const std::vector<int>& order_contributions) const {
+                    const vector<int>& order_contributions) const {
     casadi_assert_message(nnz()==numel() && x.nnz()==x.numel(),
                           "mtaylor: not implemented for sparse matrices");
 
@@ -784,33 +784,33 @@ namespace casadi {
   }
 
   template<>
-  std::string
-  SX::zz_getOperatorRepresentation(const std::vector<std::string>& args) const {
+  string
+  SX::zz_getOperatorRepresentation(const vector<string>& args) const {
     SXElement x = toScalar();
     if (!x.hasDep())
         throw CasadiException("getOperatorRepresentation: SXElement must be binary operator");
     if (args.size() == 0 || (casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2))
         throw CasadiException("getOperatorRepresentation: not enough arguments supplied");
-    std::stringstream s;
+    stringstream s;
     casadi_math<double>::print(x.getOp(), s, args[0], args[1]);
     return s.str();
   }
 
   template<>
-  std::vector<SX> SX::zz_symvar() const {
-    Function f=SX::fun("tmp", {}, {*this});
-    std::vector<SXElement> ret1 = f.free_sx().data();
-    std::vector<SX> ret(ret1.size());
-    std::copy(ret1.begin(), ret1.end(), ret.begin());
+  vector<SX> SX::zz_symvar() const {
+    Function f=SX::fun("tmp", vector<SX>{}, {*this});
+    vector<SXElement> ret1 = f.free_sx().data();
+    vector<SX> ret(ret1.size());
+    copy(ret1.begin(), ret1.end(), ret.begin());
     return ret;
   }
 
   template<>
-  void SX::zz_extractShared(std::vector<SX >& ex,
-                            std::vector<SX >& v_sx,
-                            std::vector<SX >& vdef_sx,
-                            const std::string& v_prefix,
-                            const std::string& v_suffix) {
+  void SX::zz_extractShared(vector<SX >& ex,
+                            vector<SX >& v_sx,
+                            vector<SX >& vdef_sx,
+                            const string& v_prefix,
+                            const string& v_suffix) {
 
     // Sort the expression
     Function f=SX::fun("tmp", vector<SX>(), ex);
@@ -924,9 +924,9 @@ namespace casadi {
 
     // Save v, vdef
     v_sx.resize(v.size());
-    std::copy(v.begin(), v.end(), v_sx.begin());
+    copy(v.begin(), v.end(), v_sx.begin());
     vdef_sx.resize(vdef.size());
-    std::copy(vdef.begin(), vdef.end(), vdef_sx.begin());
+    copy(vdef.begin(), vdef.end(), vdef_sx.begin());
   }
 
   template<>
@@ -935,7 +935,7 @@ namespace casadi {
     casadi_assert(x.isscalar());
     casadi_assert(x.isSymbolic());
 
-    std::vector<SXElement> r;
+    vector<SXElement> r;
 
     Function f = SX::fun("tmp", {x}, {*this});
     int mult = 1;
@@ -953,7 +953,7 @@ namespace casadi {
 
     if (!success) casadi_error("poly: supplied expression does not appear to be polynomial.");
 
-    std::reverse(r.begin(), r.end());
+    reverse(r.begin(), r.end());
 
     return r;
   }
@@ -1054,8 +1054,8 @@ namespace casadi {
     vector<SX> ret;
 
     /// Bring m in block diagonal form, calculating eigenvalues of each block separately
-    std::vector<int> offset;
-    std::vector<int> index;
+    vector<int> offset;
+    vector<int> index;
     int nb = m.sparsity().stronglyConnectedComponents(offset, index);
 
     SX m_perm = m(offset, offset);
@@ -1063,7 +1063,7 @@ namespace casadi {
     SX l = SX::sym("l");
 
     for (int k=0; k<nb; ++k) {
-      std::vector<int> r = range(index.at(k), index.at(k+1));
+      vector<int> r = range(index.at(k), index.at(k+1));
       // det(lambda*I-m) = 0
       ret.push_back(poly_roots(poly_coeff(det(SX::eye(r.size())*l-m_perm(r, r)), l)));
     }
@@ -1082,10 +1082,10 @@ namespace casadi {
   }
 
   template<>
-  void SX::printSplit(std::vector<std::string>& nz,
-                      std::vector<std::string>& inter) const {
+  void SX::printSplit(vector<string>& nz,
+                      vector<string>& inter) const {
     // Find out which noded can be inlined
-    std::map<const SXNode*, int> nodeind;
+    map<const SXNode*, int> nodeind;
     for (vector<SXElement>::const_iterator i=begin(); i!=end(); ++i)
       (*i)->can_inline(nodeind);
 
@@ -1097,7 +1097,7 @@ namespace casadi {
       nz.push_back((*i)->printCompact(nodeind, inter));
   }
 
-  template<> std::vector<SX> SX::get_input(const Function& f) {
+  template<> vector<SX> SX::get_input(const Function& f) {
     return f.sx_in();
   }
 
@@ -1105,17 +1105,17 @@ namespace casadi {
     return Function(f)->jac_sx(iind, oind, compact, symmetric);
   }
 
-  template<> SX SX::jac(const Function& f, const std::string & iname, int oind,
+  template<> SX SX::jac(const Function& f, const string & iname, int oind,
          bool compact, bool symmetric) {
     return jac(f, f.index_in(iname), oind, compact, symmetric);
   }
 
-  template<> SX SX::jac(const Function& f, int iind, const std::string& oname,
+  template<> SX SX::jac(const Function& f, int iind, const string& oname,
          bool compact, bool symmetric) {
     return jac(f, iind, f.index_out(oname), compact, symmetric);
   }
 
-  template<> SX SX::jac(const Function& f, const std::string& iname, const std::string& oname,
+  template<> SX SX::jac(const Function& f, const string& iname, const string& oname,
          bool compact, bool symmetric) {
     return jac(f, f.index_in(iname), f.index_out(oname), compact, symmetric);
   }
@@ -1124,11 +1124,11 @@ namespace casadi {
     return Function(f)->grad_sx(iind, oind);
   }
 
-  template<> SX SX::grad(const Function& f, const std::string& iname, int oind) {
+  template<> SX SX::grad(const Function& f, const string& iname, int oind) {
     return grad(f, f.index_in(iname), oind);
   }
 
-  template<> SX SX::grad(const Function& f, int iind, const std::string& oname) {
+  template<> SX SX::grad(const Function& f, int iind, const string& oname) {
     return grad(f, iind, f.index_out(oname));
   }
 
@@ -1136,19 +1136,19 @@ namespace casadi {
     return Function(f)->tang_sx(iind, oind);
   }
 
-  template<> SX SX::grad(const Function& f, const std::string& iname, const std::string& oname) {
+  template<> SX SX::grad(const Function& f, const string& iname, const string& oname) {
     return grad(f, f.index_in(iname), f.index_out(oname));
   }
 
-  template<> SX SX::tang(const Function& f, const std::string& iname, int oind) {
+  template<> SX SX::tang(const Function& f, const string& iname, int oind) {
     return tang(f, f.index_in(iname), oind);
   }
 
-  template<> SX SX::tang(const Function& f, int iind, const std::string& oname) {
+  template<> SX SX::tang(const Function& f, int iind, const string& oname) {
     return tang(f, iind, f.index_out(oname));
   }
 
-  template<> SX SX::tang(const Function& f, const std::string& iname, const std::string& oname) {
+  template<> SX SX::tang(const Function& f, const string& iname, const string& oname) {
     return tang(f, f.index_in(iname), f.index_out(oname));
   }
 
@@ -1156,20 +1156,20 @@ namespace casadi {
     return Function(f)->hess_sx(iind, oind);
   }
 
-  template<> SX SX::hess(const Function& f, const std::string& iname, int oind) {
+  template<> SX SX::hess(const Function& f, const string& iname, int oind) {
     return hess(f, f.index_in(iname), oind);
   }
 
-  template<> SX SX::hess(const Function& f, int iind, const std::string& oname) {
+  template<> SX SX::hess(const Function& f, int iind, const string& oname) {
     return hess(f, iind, f.index_out(oname));
   }
 
-  template<> SX SX::hess(const Function& f, const std::string& iname, const std::string& oname) {
+  template<> SX SX::hess(const Function& f, const string& iname, const string& oname) {
     return hess(f, f.index_in(iname), f.index_out(oname));
   }
 
   template<>
-  Function SX::fun(const std::string& name, const Function &f, const Dict& opts) {
+  Function SX::fun(const string& name, const Function &f, const Dict& opts) {
     vector<SX> arg = f.sx_in();
     vector<SX> res = Function(f)(arg);
     vector<string> name_in = f.name_in();
@@ -1181,8 +1181,8 @@ namespace casadi {
   }
 
   template<>
-  Function SX::fun(const std::string& name, const std::vector<SX>& arg,
-                   const std::vector<SX>& res, const Dict& opts) {
+  Function SX::fun(const string& name, const vector<SX>& arg,
+                   const vector<SX>& res, const Dict& opts) {
     Function ret;
     ret.assignNode(new SXFunctionInternal(name, arg, res));
     ret.setOption(opts);

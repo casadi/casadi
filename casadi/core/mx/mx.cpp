@@ -1357,7 +1357,7 @@ namespace casadi {
   }
 
   int MX::zz_countNodes() const {
-    Function f=MX::fun("tmp", {}, {*this});
+    Function f=MX::fun("tmp", vector<MX>{}, {*this});
     return f.countNodes();
   }
 
@@ -1750,7 +1750,7 @@ namespace casadi {
   }
 
   std::vector<MX> MX::zz_symvar() const {
-    Function f=MX::fun("f", {}, {*this});
+    Function f=MX::fun("f", vector<MX>{}, {*this});
     return f.free_mx();
   }
 
