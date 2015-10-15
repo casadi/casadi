@@ -225,9 +225,11 @@ namespace casadi {
     }
 
     // Generate gradient function
-    Dict opts = make_dict("input_scheme", ischeme_,
-                          "output_scheme", ionames,
-                          "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
+    Dict opts = {{"input_scheme", ischeme_},
+                 {"output_scheme", ionames},
+                 {"jit", jit_},
+                 {"compiler", compilerplugin_},
+                 {"jit_options", jit_options_}};
     return getGradient(ss.str(), iind, oind, opts);
   }
 
