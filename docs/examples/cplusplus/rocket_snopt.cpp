@@ -107,18 +107,16 @@ int main(){
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory
-  Function xfcn = SX::fun("xfcn", make_vector(u), make_vector(s_traj, v_traj, m_traj));
-  vector<DMatrix> xopt = xfcn(make_vector(DMatrix(uopt)));
-  vector<double> sopt(xopt.at(0));
-  vector<double> vopt(xopt.at(1));
-  vector<double> mopt(xopt.at(2));
+  Function xfcn = SX::fun("xfcn", {u}, {s_traj, v_traj, m_traj});
+  vector<double> sopt, vopt, mopt;
+  xfcn({uopt}, {&sopt, &vopt, &mopt});
   cout << "position: " << sopt << endl;
   cout << "velocity: " << vopt << endl;
   cout << "mass:     " << mopt << endl;
 
   // Create Matlab script to plot the solution
   ofstream file;
-  string filename = "rocket_ipopt_results.m";
+  string filename = "rocket_snopt_results.m";
   file.open(filename.c_str());
   file << "% Results file from " __FILE__ << endl;
   file << "% Generated " __DATE__ " at " __TIME__ << endl;
