@@ -9023,7 +9023,7 @@ Return a col-wise summation of elements.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::getColind() const
+%feature("docstring")  casadi::GenericMatrix< MatType >::get_colind() const
 "
 
 Get the sparsity pattern. See the Sparsity class for details.
@@ -9139,7 +9139,7 @@ Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::getRow() const  "
+%feature("docstring")  casadi::GenericMatrix< MatType >::get_row() const  "
 
 Get the sparsity pattern. See the Sparsity class for details.
 
@@ -24474,7 +24474,7 @@ sparsity can be accessed with Sparsity& sparsity() Joel Andersson
 C++ includes: casadi_types.hpp ";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::getRow() const "
+>::get_row() const "
 
 Get the sparsity pattern. See the Sparsity class for details.
 
@@ -24731,7 +24731,7 @@ Returns the truth value of a Matrix.
 %feature("docstring") casadi::Matrix::__nonzero__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::getColind() const "
+>::get_colind() const "
 
 Get the sparsity pattern. See the Sparsity class for details.
 
@@ -25457,7 +25457,7 @@ it at which expansion should stop.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::getColind() const "
+%feature("docstring")  casadi::GenericMatrix< MX  >::get_colind() const "
 
 Get the sparsity pattern. See the Sparsity class for details.
 
@@ -26053,7 +26053,7 @@ Is it a certain operation.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::getRow() const "
+%feature("docstring")  casadi::GenericMatrix< MX  >::get_row() const "
 
 Get the sparsity pattern. See the Sparsity class for details.
 
@@ -40934,7 +40934,7 @@ Joel Andersson
 
 C++ includes: sparsity.hpp ";
 
-%feature("docstring")  casadi::Sparsity::getColind() const  "
+%feature("docstring")  casadi::Sparsity::get_colind() const  "
 
 Get the column index for each column Together with the row-vector, one
 obtains the sparsity pattern in the column compressed format.
@@ -41403,7 +41403,7 @@ See:   numel()
 
 ";
 
-%feature("docstring")  casadi::Sparsity::getRow() const  "
+%feature("docstring")  casadi::Sparsity::get_row() const  "
 
 Get the row for each non-zero entry Together with the column-vector, this
 vector gives the sparsity of the matrix in sparse triplet format, and
@@ -41654,7 +41654,7 @@ Returns true if the pattern has a non-zero at location rr, cc.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::getCol() const  "
+%feature("docstring")  casadi::Sparsity::get_col() const  "
 
 Get the column for each non-zero entry Together with the row-vector, this
 vector gives the sparsity of the matrix in sparse triplet format, i.e. the

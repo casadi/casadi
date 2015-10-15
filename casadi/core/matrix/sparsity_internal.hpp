@@ -221,13 +221,13 @@ namespace casadi {
     int scatter(int j, std::vector<int>& w, int mark, int* Ci, int nz) const;
 
     /// Get row() as a vector
-    std::vector<int> getRow() const;
+    std::vector<int> get_row() const;
 
     /// Get colind() as a vector
-    std::vector<int> getColind() const;
+    std::vector<int> get_colind() const;
 
     /// Get the column for each nonzero
-    std::vector<int> getCol() const;
+    std::vector<int> get_col() const;
 
     /// Resize
     Sparsity zz_resize(int nrow, int ncol) const;

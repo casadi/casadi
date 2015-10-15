@@ -140,8 +140,8 @@ namespace casadi {
 
     ///@{
     /** \brief Get the sparsity pattern. See the Sparsity class for details. */
-    std::vector<int> getRow() const { return sparsity().getRow(); }
-    std::vector<int> getColind() const { return sparsity().getColind(); }
+    std::vector<int> get_row() const { return sparsity().get_row(); }
+    std::vector<int> get_colind() const { return sparsity().get_colind(); }
 #ifndef SWIG
     const int* row() const { return sparsity().row(); }
     const int* colind() const { return sparsity().colind(); }

@@ -784,7 +784,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
       k += sp.nnz()
       it = tuple(i)
       self.map[it] = m
-      self.lookuptable+=[(it,kk,p) for kk,p in enumerate(zip(sp.getCol(),sp.row()))]
+      self.lookuptable+=[(it,kk,p) for kk,p in enumerate(zip(sp.get_col(),sp.row()))]
       for a in canonicalIndexAncestors(it)[1:]:
         if a in hmap:
           hmap[a].append(m)

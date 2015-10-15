@@ -133,7 +133,7 @@ inline returnValue QProblem::setA( Matrix *A_new )
 		Ax_l[j] = Ax[j] - lbA[j];
 		
 		// (ckirches) disable constraints with empty rows	
-		if (A->getRowNorm (j) == 0.0)
+		if (A->get_rowNorm (j) == 0.0)
 			constraints.setType ( j, ST_DISABLED );
 	}
 

@@ -569,7 +569,7 @@ namespace casadi {
           ss << "Input vector is " << jac_.input().data() << endl;
 
           // Get the column
-          int Jcol = jac_.output().sparsity().getCol().at(k);
+          int Jcol = jac_.output().sparsity().get_col().at(k);
 
           // Get the row
           int Jrow = jac_.output().sparsity().row(k);

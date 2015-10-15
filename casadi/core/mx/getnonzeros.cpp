@@ -192,12 +192,12 @@ namespace casadi {
     // Output sparsity
     const Sparsity& osp = sparsity();
     const int* orow = osp.row();
-    vector<int> ocol = osp.getCol();
+    vector<int> ocol = osp.get_col();
 
     // Input sparsity
     const Sparsity& isp = dep().sparsity();
     //const vector<int>& irow = isp.row();
-    vector<int> icol = isp.getCol();
+    vector<int> icol = isp.get_col();
 
     // Get all input elements
     vector<int> el_input;
@@ -266,12 +266,12 @@ namespace casadi {
     // Output sparsity
     const Sparsity& osp = sparsity();
     const int* orow = osp.row();
-    vector<int> ocol = osp.getCol();
+    vector<int> ocol = osp.get_col();
 
     // Input sparsity
     const Sparsity& isp = dep().sparsity();
     //const vector<int>& irow = isp.row();
-    vector<int> icol = isp.getCol();
+    vector<int> icol = isp.get_col();
 
     // Get all input elements
     vector<int> el_input;
@@ -347,12 +347,12 @@ namespace casadi {
 
     // Output sparsity
     const Sparsity& osp = sparsity();
-    vector<int> ocol = osp.getCol();
+    vector<int> ocol = osp.get_col();
 
     // Input sparsity
     const Sparsity& isp = dep().sparsity();
     //const vector<int>& irow = isp.row();
-    vector<int> icol = isp.getCol();
+    vector<int> icol = isp.get_col();
 
     // Get all input elements
     vector<int> el_input;

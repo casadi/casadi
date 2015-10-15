@@ -179,7 +179,7 @@ namespace casadi {
 
     // Quick return if we are adding an element to the end
     if (colind[cc]==nnz || (colind[cc+1]==nnz && row[nnz-1]<rr)) {
-      std::vector<int> rowv=getRow(), colindv=getColind();
+      std::vector<int> rowv=get_row(), colindv=get_colind();
       rowv.push_back(rr);
       for (int c=cc; c<size2; ++c) colindv[c+1]++;
       assignCached(size1, size2, colindv, rowv);
@@ -197,7 +197,7 @@ namespace casadi {
     }
 
     // insert the element
-    std::vector<int> rowv = getRow(), colindv = getColind();
+    std::vector<int> rowv = get_row(), colindv = get_colind();
     rowv.insert(rowv.begin()+ind, rr);
     for (int c=cc+1; c<size2+1; ++c) colindv[c]++;
 
@@ -303,21 +303,21 @@ namespace casadi {
     return (*this)->nnz_diag();
   }
 
-  std::vector<int> Sparsity::getColind() const {
-    return (*this)->getColind();
+  std::vector<int> Sparsity::get_colind() const {
+    return (*this)->get_colind();
   }
 
-  std::vector<int> Sparsity::getCol() const {
-    return (*this)->getCol();
+  std::vector<int> Sparsity::get_col() const {
+    return (*this)->get_col();
   }
 
-  std::vector<int> Sparsity::getRow() const {
-    return (*this)->getRow();
+  std::vector<int> Sparsity::get_row() const {
+    return (*this)->get_row();
   }
 
   void Sparsity::getCCS(std::vector<int>& colind, std::vector<int>& row) const {
-    colind = getColind();
-    row = getRow();
+    colind = get_colind();
+    row = get_row();
   }
 
   void Sparsity::getCRS(std::vector<int>& rowind, std::vector<int>& col) const {
@@ -325,8 +325,8 @@ namespace casadi {
   }
 
   void Sparsity::getTriplet(std::vector<int>& row, std::vector<int>& col) const {
-    row = getRow();
-    col = getCol();
+    row = get_row();
+    col = get_col();
   }
 
   Sparsity Sparsity::transpose(std::vector<int>& mapping, bool invert_mapping) const {

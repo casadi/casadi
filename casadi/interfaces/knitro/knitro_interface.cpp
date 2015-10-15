@@ -188,7 +188,7 @@ namespace casadi {
     // Jacobian sparsity
     vector<int> Jcol, Jrow;
     if (!jacG_.isNull()) {
-      Jcol = jacG_.output().sparsity().getCol();
+      Jcol = jacG_.output().sparsity().get_col();
       int sz = jacG_.output().nnz();
       const int* row = jacG_.output().row();
       Jrow = vector<int>(row, row+sz);

@@ -297,12 +297,12 @@ namespace casadi {
         Together with the column-vector, this vector gives the sparsity of the matrix in
         sparse triplet format, and together with the colind vector, one obtains the sparsity
         in column compressed format. */
-    std::vector<int> getRow() const;
+    std::vector<int> get_row() const;
 
     /** \brief Get the column index for each column
         Together with the row-vector, one obtains the sparsity pattern in the
         column compressed format. */
-    std::vector<int> getColind() const;
+    std::vector<int> get_colind() const;
 
     /** \brief  Get a reference to the colindex of column cc (see class description) */
     int colind(int cc) const;
@@ -313,7 +313,7 @@ namespace casadi {
     /** \brief Get the column for each non-zero entry
         Together with the row-vector, this vector gives the sparsity of the matrix in
         sparse triplet format, i.e. the column and row for each non-zero elements  */
-    std::vector<int> getCol() const;
+    std::vector<int> get_col() const;
 
     /// Resize
     void resize(int nrow, int ncol);

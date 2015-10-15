@@ -151,11 +151,11 @@ class Matrix
         /** Get the two-norm of a row
          *  \return Two-norm of row \a rNum
          */
-        virtual real_t getRowNorm (int rNum) const = 0;
+        virtual real_t get_rowNorm (int rNum) const = 0;
 
 		/** Retrieve indexed entries of matrix row multiplied by alpha.
 		 *	\return SUCCESSFUL_RETURN */
-		virtual returnValue getRow(
+		virtual returnValue get_row(
 				int rNum,						/**< Row number. */
 				const Indexlist* const icols,	/**< Index list specifying columns. */
 				real_t alpha,					/**< Scalar factor. */
@@ -164,7 +164,7 @@ class Matrix
 
 		/** Retrieve indexed entries of matrix column multiplied by alpha.
 		 *	\return SUCCESSFUL_RETURN */
-		virtual returnValue getCol(
+		virtual returnValue get_col(
 				int cNum,						/**< Column number. */
 				const Indexlist* const irows,	/**< Index list specifying rows. */
 				real_t alpha,					/**< Scalar factor. */
@@ -332,11 +332,11 @@ class DenseMatrix : public virtual Matrix
         /** Get the two-norm of a row
          *  \return Two-norm of row \a rNum
          */
-        virtual real_t getRowNorm (int rNum) const;
+        virtual real_t get_rowNorm (int rNum) const;
 
         /** Retrieve indexed entries of matrix row multiplied by alpha.
 		 *  \return SUCCESSFUL_RETURN */
-		virtual returnValue getRow(
+		virtual returnValue get_row(
 				int rNum,						/**< Row number. */
 				const Indexlist* const icols,	/**< Index list specifying columns. */
 				real_t alpha,					/**< Scalar factor. */
@@ -345,7 +345,7 @@ class DenseMatrix : public virtual Matrix
 
 		/** Retrieve indexed entries of matrix column multiplied by alpha.
 		 *  \return SUCCESSFUL_RETURN */
-		virtual returnValue getCol(
+		virtual returnValue get_col(
 				int cNum,						/**< Column number. */
 				const Indexlist* const irows,	/**< Index list specifying rows. */
 				real_t alpha,					/**< Scalar factor. */
@@ -521,10 +521,10 @@ class SparseMatrix : public virtual Matrix
         /** Get the two-norm of a row
          *  \return Two-norm of row \a rNum
          */
-        virtual real_t getRowNorm (int rNum) const;
+        virtual real_t get_rowNorm (int rNum) const;
 
 		/** Retrieve indexed entries of matrix row multiplied by alpha. */
-		virtual returnValue getRow (
+		virtual returnValue get_row (
 				int rNum,						/**< Row number. */
 				const Indexlist* const icols,	/**< Index list specifying columns. */
 				real_t alpha,					/**< Scalar factor. */
@@ -532,7 +532,7 @@ class SparseMatrix : public virtual Matrix
 				) const;
 
 		/** Retrieve indexed entries of matrix column multiplied by alpha. */
-		virtual returnValue getCol (
+		virtual returnValue get_col (
 				int cNum,						/**< Column number. */
 				const Indexlist* const irows,	/**< Index list specifying rows. */
 				real_t alpha,					/**< Scalar factor. */
@@ -675,10 +675,10 @@ class SparseMatrixRow : public virtual Matrix
         /** Get the two-norm of a row
          *  \return Two-norm of row \a rNum
          */
-        virtual real_t getRowNorm (int rNum) const;
+        virtual real_t get_rowNorm (int rNum) const;
 
 		/** Retrieve indexed entries of matrix row multiplied by alpha. */
-		virtual returnValue getRow (
+		virtual returnValue get_row (
 				int rNum,						/**< Row number. */
 				const Indexlist* const icols,	/**< Index list specifying columns. */
 				real_t alpha,					/**< Scalar factor. */
@@ -686,7 +686,7 @@ class SparseMatrixRow : public virtual Matrix
 				) const;
 
 		/** Retrieve indexed entries of matrix column multiplied by alpha. */
-		virtual returnValue getCol (
+		virtual returnValue get_col (
 				int cNum,						/**< Column number. */
 				const Indexlist* const irows,	/**< Index list specifying rows. */
 				real_t alpha,					/**< Scalar factor. */

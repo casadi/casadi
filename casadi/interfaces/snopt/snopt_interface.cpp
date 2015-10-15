@@ -395,7 +395,7 @@ namespace casadi {
     // Construct the linear objective row
     IMatrix d = mapping_gradF(Slice(0), x_order_);
 
-    std::vector<int> ii = mapping_gradF.sparsity().getCol();
+    std::vector<int> ii = mapping_gradF.sparsity().get_col();
     for (int j = 0; j < nnObj_; ++j) {
       if (d.colind(j) != d.colind(j+1)) {
         int k = d.colind(j);

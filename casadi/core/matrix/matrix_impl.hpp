@@ -358,7 +358,7 @@ namespace casadi {
     }
 
     // Construct new sparsity pattern
-    std::vector<int> new_row=sparsity().getRow(), new_col=sparsity().getCol(), nz(rr.data());
+    std::vector<int> new_row=sparsity().get_row(), new_col=sparsity().get_col(), nz(rr.data());
     new_row.reserve(sz+rrsz);
     new_col.reserve(sz+rrsz);
     nz.reserve(rrsz);
@@ -1869,7 +1869,7 @@ namespace casadi {
 
       Matrix<DataType> row = (*this)(j, Slice(0, n));
 
-      std::vector< int > col_i = row.sparsity().getCol();
+      std::vector< int > col_i = row.sparsity().get_col();
 
       for (int k=0; k<row.nnz(); ++k) {
         // Sum up the cofactors
@@ -1914,7 +1914,7 @@ namespace casadi {
     // Remove col i and row j
     Matrix<DataType> M = Matrix<DataType>(n-1, n-1);
 
-    std::vector<int> col = sparsity().getCol();
+    std::vector<int> col = sparsity().get_col();
     const int* row = sparsity().row();
 
     for (int k=0;k<nnz();++k) {
@@ -2877,7 +2877,7 @@ namespace casadi {
     }
 
     // Assign strictly lower triangular part
-    std::vector<int> ind = this->getColind();
+    std::vector<int> ind = this->get_colind();
     for (int cc=0; cc<size2; ++cc) {
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         int rr=row[el];

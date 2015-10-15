@@ -2137,8 +2137,8 @@ except:
 %rename("%(regex:/zz_(?!ML)(.*)/\\1/)s") ""; // Strip leading zz_ unless followed by ML
 #endif
 
-%rename(row) getRow;
-%rename(colind) getColind;
+%rename(row) get_row;
+%rename(colind) get_colind;
 %rename(sparsity) getSparsity;
 
 #ifdef SWIGPYTHON

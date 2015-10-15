@@ -72,11 +72,11 @@ namespace casadi {
     // Output sparsity
     const Sparsity &osp = sparsity();
     const int* orow = osp.row();
-    vector<int> ocol = osp.getCol();
+    vector<int> ocol = osp.get_col();
 
     // Input sparsity (first input same as output)
     const Sparsity &isp = dep(1).sparsity();
-    vector<int> icol = isp.getCol();
+    vector<int> icol = isp.get_col();
 
     // We next need to resort the assignment vector by outputs instead of inputs
     // Start by counting the number of output nonzeros corresponding to each input nonzero
@@ -198,11 +198,11 @@ namespace casadi {
     // Output sparsity
     const Sparsity &osp = sparsity();
     const int* orow = osp.row();
-    vector<int> ocol = osp.getCol();
+    vector<int> ocol = osp.get_col();
 
     // Input sparsity (first input same as output)
     const Sparsity &isp = dep(1).sparsity();
-    vector<int> icol = isp.getCol();
+    vector<int> icol = isp.get_col();
 
     // We next need to resort the assignment vector by outputs instead of inputs
     // Start by counting the number of output nonzeros corresponding to each input nonzero
@@ -331,12 +331,12 @@ namespace casadi {
     // Output sparsity
     const Sparsity &osp = sparsity();
     const int* orow = osp.row();
-    vector<int> ocol = osp.getCol();
+    vector<int> ocol = osp.get_col();
 
     // Input sparsity (first input same as output)
     const Sparsity &isp = dep(1).sparsity();
     const int* irow = isp.row();
-    vector<int> icol = isp.getCol();
+    vector<int> icol = isp.get_col();
 
     // We next need to resort the assignment vector by outputs instead of inputs
     // Start by counting the number of output nonzeros corresponding to each input nonzero

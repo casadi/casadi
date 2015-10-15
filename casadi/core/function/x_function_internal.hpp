@@ -659,11 +659,11 @@ namespace casadi {
     const int* jsp_row = jsp.row();
 
     // Input sparsity
-    std::vector<int> input_col = input(iind).sparsity().getCol();
+    std::vector<int> input_col = input(iind).sparsity().get_col();
     const int* input_row = input(iind).row();
 
     // Output sparsity
-    std::vector<int> output_col = output(oind).sparsity().getCol();
+    std::vector<int> output_col = output(oind).sparsity().get_col();
     const int* output_row = output(oind).row();
 
     // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode

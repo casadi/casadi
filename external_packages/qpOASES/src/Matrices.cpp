@@ -115,7 +115,7 @@ real_t DenseMatrix::getNorm() const
 }
 
 
-real_t DenseMatrix::getRowNorm (int rNum) const
+real_t DenseMatrix::get_rowNorm (int rNum) const
 {
     int j;
     real_t norm = 0.0;
@@ -124,7 +124,7 @@ real_t DenseMatrix::getRowNorm (int rNum) const
     return sqrt (norm);
 }
 
-returnValue DenseMatrix::getRow(int rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
+returnValue DenseMatrix::get_row(int rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
 {
 	int i;
     if (icols != 0)
@@ -154,7 +154,7 @@ returnValue DenseMatrix::getRow(int rNum, const Indexlist* const icols, real_t a
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue DenseMatrix::getCol(int cNum, const Indexlist* const irows, real_t alpha, real_t *col) const
+returnValue DenseMatrix::get_col(int cNum, const Indexlist* const irows, real_t alpha, real_t *col) const
 {
 	int i;
 
@@ -591,7 +591,7 @@ real_t SparseMatrix::getNorm() const
     return 1.0;
 }
 
-real_t SparseMatrix::getRowNorm (int rNum) const
+real_t SparseMatrix::get_rowNorm (int rNum) const
 {
     int i,j;
     real_t norm = 0.0;
@@ -602,7 +602,7 @@ real_t SparseMatrix::getRowNorm (int rNum) const
     return sqrt (norm);
 }
 
-returnValue SparseMatrix::getRow(int rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
+returnValue SparseMatrix::get_row(int rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
 {
 	long i, j, k;
 
@@ -654,7 +654,7 @@ returnValue SparseMatrix::getRow(int rNum, const Indexlist* const icols, real_t 
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue SparseMatrix::getCol(int cNum, const Indexlist* const irows, real_t alpha, real_t *col) const
+returnValue SparseMatrix::get_col(int cNum, const Indexlist* const irows, real_t alpha, real_t *col) const
 {
 	long i, j;
 
@@ -1214,7 +1214,7 @@ real_t SparseMatrixRow::getNorm() const
 }
 
 
-real_t SparseMatrixRow::getRowNorm (int rNum) const
+real_t SparseMatrixRow::get_rowNorm (int rNum) const
 {
     int j;
     real_t norm = 0.0;
@@ -1224,7 +1224,7 @@ real_t SparseMatrixRow::getRowNorm (int rNum) const
 }
 
 
-returnValue SparseMatrixRow::getRow(int rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
+returnValue SparseMatrixRow::get_row(int rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
 {
 	long i, j;
 
@@ -1280,7 +1280,7 @@ returnValue SparseMatrixRow::getRow(int rNum, const Indexlist* const icols, real
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue SparseMatrixRow::getCol(int cNum, const Indexlist* const irows, real_t alpha, real_t *col) const
+returnValue SparseMatrixRow::get_col(int cNum, const Indexlist* const irows, real_t alpha, real_t *col) const
 {
 	long i, j, k, srt;
 

@@ -100,11 +100,11 @@ namespace casadi {
   void SparsityInternal::print(ostream &stream) const {
     repr(stream);
     stream << endl;
-    stream << "colind: " << getColind() << endl;
-    stream << "row:    " << getRow() << endl;
+    stream << "colind: " << get_colind() << endl;
+    stream << "row:    " << get_row() << endl;
   }
 
-  vector<int> SparsityInternal::getCol() const {
+  vector<int> SparsityInternal::get_col() const {
     const int* colind = this->colind();
     vector<int> col(nnz());
     for (int r=0; r<size2(); ++r) {
@@ -124,8 +124,8 @@ namespace casadi {
 
   Sparsity SparsityInternal::transpose(vector<int>& mapping, bool invert_mapping) const {
     // Get the sparsity of the transpose in sparse triplet form
-    vector<int> trans_col = getRow();
-    vector<int> trans_row = getCol();
+    vector<int> trans_col = get_row();
+    vector<int> trans_row = get_col();
 
     // Create the sparsity pattern
     return Sparsity::triplet(size2(), size1(), trans_row, trans_col, mapping, invert_mapping);
@@ -1168,8 +1168,8 @@ namespace casadi {
 
     //-- Construct matrix C -----------------------------------------------
     Sparsity AT = T() ;              // compute A'
-    vector<int> AT_colind = AT.getColind();
-    vector<int> AT_row = AT.getRow();
+    vector<int> AT_colind = AT.get_colind();
+    vector<int> AT_row = AT.get_row();
 
     int m = size1();
     int n = size2();
@@ -1215,8 +1215,8 @@ namespace casadi {
       // C=A'*A
       C = AT->multiply(shared_from_this<Sparsity>());
     }
-    vector<int> C_colind = C.getColind();
-    vector<int> C_row = C.getRow();
+    vector<int> C_colind = C.get_colind();
+    vector<int> C_row = C.get_row();
 
     // Free memory
     AT = Sparsity();
@@ -2090,7 +2090,7 @@ namespace casadi {
     vector<int>::const_iterator next_rr = rr.begin();
 
     // Return value
-    vector<int> ret_colind = getColind(), ret_row = getRow();
+    vector<int> ret_colind = get_colind(), ret_row = get_row();
 
     // First and last index for the column (note colind_ is being overwritten)
     int k_first, k_last=0;
@@ -2185,7 +2185,7 @@ namespace casadi {
     mapping.reserve(nnz());
 
     // Return value
-    vector<int> ret_colind = getColind(), ret_row = getRow();
+    vector<int> ret_colind = get_colind(), ret_row = get_row();
 
     // Number of non-zeros
     int nz=0;
@@ -2604,7 +2604,7 @@ namespace casadi {
 
     // Sparsity of the result
     std::vector<int> row_ret;
-    std::vector<int> colind_ret=getColind();
+    std::vector<int> colind_ret=get_colind();
     const int* colind = this->colind();
     const int* row = this->row();
 
@@ -2679,7 +2679,7 @@ namespace casadi {
     int sz = nnz();
 
     // Add row indices
-    vector<int> new_row = getRow();
+    vector<int> new_row = get_row();
     const int* sp_row = sp.row();
     new_row.resize(sz + sp.nnz());
     for (int i=sz; i<new_row.size(); ++i)
@@ -2697,12 +2697,12 @@ namespace casadi {
                           << " for lhs, and " << sp.size1() << " for rhs.");
 
     // Append rows
-    vector<int> new_row = getRow();
+    vector<int> new_row = get_row();
     const int* sp_row = sp.row();
     new_row.insert(new_row.end(), sp_row, sp_row+sp.nnz());
 
     // Get column indices
-    vector<int> new_colind = getColind();
+    vector<int> new_colind = get_colind();
     const int* sp_colind = sp.colind();
     new_colind.resize(size2() + sp.size2() + 1);
     for (int i = size2()+1; i<new_colind.size(); ++i)
@@ -2731,7 +2731,7 @@ namespace casadi {
     }
 
     // Sparsify the columns
-    vector<int> new_colind = getColind();
+    vector<int> new_colind = get_colind();
     new_colind.resize(ncol+1, nnz());
 
     int ik=cc.back(); // need only to update from the last new index
@@ -2753,7 +2753,7 @@ namespace casadi {
     for (; ik>=0; --ik) {
       new_colind[ik] = 0;
     }
-    return Sparsity(size1(), ncol, new_colind, getRow());
+    return Sparsity(size1(), ncol, new_colind, get_row());
   }
 
   Sparsity SparsityInternal::zz_enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) const {
@@ -2778,11 +2778,11 @@ namespace casadi {
     casadi_assert(rr.size() == size1());
 
     // Begin by sparsify the rows
-    vector<int> new_row = getRow();
+    vector<int> new_row = get_row();
     for (int k=0; k<nnz(); ++k) {
       new_row[k] = rr[new_row[k]];
     }
-    return Sparsity(nrow, size2(), getColind(), new_row);
+    return Sparsity(nrow, size2(), get_colind(), new_row);
   }
 
   Sparsity SparsityInternal::makeDense(std::vector<int>& mapping) const {
@@ -2909,7 +2909,7 @@ namespace casadi {
     casadi_assert(mapping.size()==nnz());
 
     // Return value (to be hashed)
-    vector<int> ret_colind = getColind(), ret_row = getRow();
+    vector<int> ret_colind = get_colind(), ret_row = get_row();
 
     // Nonzero counter without duplicates
     int k_strict=0;
@@ -3509,7 +3509,7 @@ namespace casadi {
   }
 
   std::vector<int> SparsityInternal::largestFirstOrdering() const {
-    vector<int> degree = getColind();
+    vector<int> degree = get_colind();
     int max_degree = 0;
     for (int k=0; k<size2(); ++k) {
       degree[k] = degree[k+1]-degree[k];
@@ -3556,7 +3556,7 @@ namespace casadi {
     const vector<int>& pp = invert_permutation ? p_inv : p;
 
     // Get columns
-    vector<int> col = getCol();
+    vector<int> col = get_col();
 
     // Get rows
     const int* row = this->row();
@@ -3686,7 +3686,7 @@ namespace casadi {
   void SparsityInternal::spy(std::ostream &stream) const {
 
     // Index counter for each column
-    std::vector<int> cind = getColind();
+    std::vector<int> cind = get_colind();
     const int* colind = this->colind();
     const int* row = this->row();
 
@@ -3884,12 +3884,12 @@ namespace casadi {
     return bw;
   }
 
-  vector<int> SparsityInternal::getColind() const {
+  vector<int> SparsityInternal::get_colind() const {
     const int* colind = this->colind();
     return vector<int>(colind, colind+size2()+1);
   }
 
-  vector<int> SparsityInternal::getRow() const {
+  vector<int> SparsityInternal::get_row() const {
     const int* row = this->row();
     return vector<int>(row, row+nnz());
   }

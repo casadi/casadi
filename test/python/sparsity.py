@@ -54,7 +54,7 @@ class Sparsitytests(casadiTestCase):
     c = a + b
     self.assertEquals(c.nnz(),len(nza.union(nzb)))
     for k in range(c.nnz()):
-      ind = (c.row(k),c.getCol()[k])
+      ind = (c.row(k),c.get_col()[k])
       self.assertTrue(ind in nza or ind in nzb)
 
   def test_intersection(self):
@@ -79,13 +79,13 @@ class Sparsitytests(casadiTestCase):
     
     c=a.patternIntersection(b)
     for k in range(c.nnz()):
-      ind = (c.row(k),c.getCol()[k])
+      ind = (c.row(k),c.get_col()[k])
       self.assertTrue(ind in nza and ind in nzb)
         
     c = a * b
     self.assertEquals(c.nnz(),len(nza.intersection(nzb)))
     for k in range(c.nnz()):
-      ind = (c.row(k),c.getCol()[k])
+      ind = (c.row(k),c.get_col()[k])
       self.assertTrue(ind in nza and ind in nzb)
        
   def test_getNZDense(self):
