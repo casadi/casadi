@@ -283,15 +283,6 @@
 %exception  casadi::SparseStorage< DataType >::toScalar() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Sparsity::reCache() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_tril(bool includeDiagonal=true) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_triu(bool includeDiagonal=true) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::WeakRef::alive() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

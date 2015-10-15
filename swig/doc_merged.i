@@ -3177,6 +3177,12 @@ Get the (optionally normalized) derivative value(s) at time 0 by expression.
 
 ";
 
+%feature("docstring") casadi::DaeBuilder::sanity_check "
+
+Check if dimensions match.
+
+";
+
 %feature("docstring") casadi::DaeBuilder::DaeBuilder "
 
 Default constructor.
@@ -3485,12 +3491,6 @@ Add a new differential state.
 %feature("docstring") casadi::DaeBuilder::eliminate_quad "
 
 Eliminate quadrature states and turn them into ODE states.
-
-";
-
-%feature("docstring") casadi::DaeBuilder::sanity_check "
-
-Check if dimensions match.
 
 ";
 
@@ -6083,17 +6083,6 @@ Cosine.
 
 ";
 
-%feature("docstring") friendwrap_isEqual "
-
-Check if two nodes are equivalent up to a given depth. Depth=0 checks if the
-expressions are identical, i.e. points to the same node.
-
-a = x*x b = x*x
-
-a.isEqual(b, 0) will return false, but a.isEqual(b, 1) will return true
-
-";
-
 %feature("docstring") friendwrap_asinh "
 
 Inverse hyperbolic sine.
@@ -6267,6 +6256,17 @@ template pattern (CRTP) idiom. Joel Andersson
 
 C++ includes: generic_expression.hpp ";
 
+%feature("docstring") friendwrap_is_equal "
+
+Check if two nodes are equivalent up to a given depth. Depth=0 checks if the
+expressions are identical, i.e. points to the same node.
+
+a = x*x b = x*x
+
+a.is_equal(b, 0) will return false, but a.is_equal(b, 1) will return true
+
+";
+
 %feature("docstring") friendwrap_sin "
 
 Sine.
@@ -6312,9 +6312,17 @@ Substitute variable var with expression expr in multiple expressions.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::size2 "
+%feature("docstring") casadi::GenericMatrix::numel "
 
-Get the second dimension (i.e. number of columns)
+>  int MatType .numel() const 
+------------------------------------------------------------------------
+
+Get the number of elements.
+
+>  int MatType .numel(int i) const 
+------------------------------------------------------------------------
+
+Get the number of elements in slice (cf. MATLAB)
 
 ";
 
@@ -6355,18 +6363,17 @@ Count number of nodes
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::isempty "
-
-Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
-optionally both dimensions)
-
-";
-
 %feature("docstring") friendwrap_hessian "";
 
 %feature("docstring") friendwrap_trace "
 
 Matrix trace.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::nnz_lower "
+
+Get the number of non-zeros in the lower triangular half.
 
 ";
 
@@ -6376,9 +6383,15 @@ Matrix divide (cf. backslash '\\\\' in MATLAB)
 
 ";
 
-%feature("docstring") friendwrap_jacobian "
+%feature("docstring") friendwrap_inner_prod "
 
-Calculate jacobian via source code transformation.
+Inner product of two matrices with x and y matrices of the same dimension.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::get_colind "
+
+Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
@@ -6399,13 +6412,6 @@ Convert a lower triangular matrix to a symmetric one.
 Inplace substitution with piggyback expressions Substitute variables v out
 of the expressions vdef sequentially, as well as out of a number of other
 expressions piggyback.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::dimString "
-
-Get string representation of dimensions. The representation is (nrow x ncol
-= numel | size)
 
 ";
 
@@ -6441,9 +6447,9 @@ Get the sparsity pattern.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::sizeD "
+%feature("docstring") casadi::GenericMatrix::size2 "
 
-Get get the number of non-zeros on the diagonal.
+Get the second dimension (i.e. number of columns)
 
 ";
 
@@ -6453,21 +6459,15 @@ Check if expression depends on the argument The argument must be symbolic.
 
 ";
 
-%feature("docstring") friendwrap_inner_prod "
+%feature("docstring") friendwrap_mpower "
 
-Inner product of two matrices with x and y matrices of the same dimension.
+Matrix power x^n.
 
 ";
 
 %feature("docstring") casadi::GenericMatrix::nnz "
 
 Get the number of (structural) non-zero elements.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::sizeL "
-
-Get the number of non-zeros in the lower triangular half.
 
 ";
 
@@ -6495,9 +6495,16 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::sizeU "
+%feature("docstring") casadi::GenericMatrix::nnz_diag "
 
-Get the number of non-zeros in the upper triangular half.
+Get get the number of non-zeros on the diagonal.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::isempty "
+
+Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
+optionally both dimensions)
 
 ";
 
@@ -6633,9 +6640,9 @@ Unite two matrices no overlapping sparsity.
 
 ";
 
-%feature("docstring") friendwrap_mpower "
+%feature("docstring") casadi::GenericMatrix::get_row "
 
-Matrix power x^n.
+Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
@@ -6651,9 +6658,9 @@ Return a col-wise summation of elements.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::get_colind "
+%feature("docstring") casadi::GenericMatrix::nnz_upper "
 
-Get the sparsity pattern. See the Sparsity class for details.
+Get the number of non-zeros in the upper triangular half.
 
 ";
 
@@ -6681,17 +6688,9 @@ Matrix divide (cf. slash '/' in MATLAB)
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::numel "
+%feature("docstring") friendwrap_jacobian "
 
->  int MatType .numel() const 
-------------------------------------------------------------------------
-
-Get the number of elements.
-
->  int MatType .numel(int i) const 
-------------------------------------------------------------------------
-
-Get the number of elements in slice (cf. MATLAB)
+Calculate jacobian via source code transformation.
 
 ";
 
@@ -6748,12 +6747,6 @@ Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::get_row "
-
-Get the sparsity pattern. See the Sparsity class for details.
-
-";
-
 %feature("docstring") friendwrap_diag "
 
 Get the diagonal of a matrix or construct a diagonal When the input is
@@ -6777,6 +6770,13 @@ Check if the matrix expression is scalar.
 %feature("docstring") friendwrap_linspace "
 
 Matlab's linspace command.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::dim "
+
+Get string representation of dimensions. The representation is (nrow x ncol
+= numel | size)
 
 ";
 
@@ -17090,6 +17090,12 @@ Get double value (only if integer constant)
 
 ";
 
+%feature("docstring") casadi::Matrix::nnz_upper "
+
+Get the number of non-zeros in the upper triangular half.
+
+";
+
 %feature("docstring") casadi::Matrix::repr "
 
 Print a representation of the object.
@@ -17313,6 +17319,18 @@ Set a set of nonzeros
 
 ";
 
+%feature("docstring") casadi::Matrix::sanity_check "
+
+Check if the dimensions and colind, row vectors are compatible.
+
+Parameters:
+-----------
+
+complete:  set to true to also check elementwise throws an error as possible
+result
+
+";
+
 %feature("docstring") casadi::Matrix::getSym "
 
 Get upper triangular elements.
@@ -17369,6 +17387,12 @@ Convert to Slice (only for IMatrix)
 
 ";
 
+%feature("docstring") casadi::Matrix::nnz_diag "
+
+Get get the number of non-zeros on the diagonal.
+
+";
+
 %feature("docstring") casadi::Matrix::sparsity "
 
 Get the sparsity pattern.
@@ -17413,21 +17437,16 @@ optionally both dimensions)
 
 ";
 
-%feature("docstring") casadi::Matrix::printSparse "
+%feature("docstring") casadi::Matrix::dim "
 
-Print sparse matrix style.
+Get string representation of dimensions. The representation is (nrow x ncol
+= numel | size)
 
 ";
 
-%feature("docstring") casadi::Matrix::sanity_check "
+%feature("docstring") casadi::Matrix::printSparse "
 
-Check if the dimensions and colind, row vectors are compatible.
-
-Parameters:
------------
-
-complete:  set to true to also check elementwise throws an error as possible
-result
+Print sparse matrix style.
 
 ";
 
@@ -17505,6 +17524,12 @@ check if the matrix is 1 (note that false negative answers are possible)
 
 ";
 
+%feature("docstring") casadi::Matrix::nnz_lower "
+
+Get the number of non-zeros in the lower triangular half.
+
+";
+
 %feature("docstring") casadi::Matrix::reserve "";
 
 %feature("docstring") casadi::Matrix::printScalar "
@@ -17538,13 +17563,6 @@ columns of a matrix.
 
 Erase a submatrix (leaving structural zeros in its place) Erase elements of
 a matrix.
-
-";
-
-%feature("docstring") casadi::Matrix::dimString "
-
-Get string representation of dimensions. The representation is (nrow x ncol
-= numel | size)
 
 ";
 
@@ -17654,12 +17672,6 @@ std::vector<DataType> that contain all non-identical-zero elements. The
 sparsity can be accessed with Sparsity& sparsity() Joel Andersson
 
 C++ includes: casadi_types.hpp ";
-
-%feature("docstring") casadi::Matrix::get_row "
-
-Get the sparsity pattern. See the Sparsity class for details.
-
-";
 
 %feature("docstring") casadi::Matrix::setValue "
 
@@ -17859,12 +17871,6 @@ Returns the truth value of a Matrix.
 [INTERNAL] 
 ";
 
-%feature("docstring") casadi::Matrix::get_colind "
-
-Get the sparsity pattern. See the Sparsity class for details.
-
-";
-
 %feature("docstring") friendwrap_taylor "
 
 univariate Taylor series expansion
@@ -17926,6 +17932,12 @@ Integrate f from a to b using Gaussian quadrature with n points.
 ------------------------------------------------------------------------
 
 Matrix adjoint.
+
+";
+
+%feature("docstring") casadi::Matrix::get_row "
+
+Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
@@ -18127,21 +18139,9 @@ possible)
 
 ";
 
-%feature("docstring") casadi::Matrix::sizeD "
+%feature("docstring") casadi::Matrix::get_colind "
 
-Get get the number of non-zeros on the diagonal.
-
-";
-
-%feature("docstring") casadi::Matrix::sizeL "
-
-Get the number of non-zeros in the lower triangular half.
-
-";
-
-%feature("docstring") casadi::Matrix::sizeU "
-
-Get the number of non-zeros in the upper triangular half.
+Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
@@ -18181,15 +18181,11 @@ marker for an input expression.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring") casadi::MX::sizeU "
+*/ %feature("docstring") casadi::MX::attachAssert "
 
-Get the number of non-zeros in the upper triangular half.
+returns itself, but with an assertion attached
 
-";
-
-%feature("docstring") casadi::MX::sizeL "
-
-Get the number of non-zeros in the lower triangular half.
+If y does not evaluate to 1, a runtime error is raised
 
 ";
 
@@ -18217,16 +18213,15 @@ Joel Andersson
 
 C++ includes: mx.hpp ";
 
-%feature("docstring") casadi::MX::sizeD "
+%feature("docstring") casadi::MX::grad "
 
-Get get the number of non-zeros on the diagonal.
+Gradient expression.
 
 ";
 
-%feature("docstring") casadi::MX::dimString "
+%feature("docstring") casadi::MX::getDescription "
 
-Get string representation of dimensions. The representation is (nrow x ncol
-= numel | size)
+Return a string with a description (for SWIG)
 
 ";
 
@@ -18246,18 +18241,17 @@ a matrix.
 
 ";
 
+%feature("docstring") casadi::MX::monitor "
+
+Monitor an expression Returns itself, but with the side effect of printing
+the nonzeros along with a comment.
+
+";
+
 %feature("docstring") casadi::MX::isValidInput "
 
 Check if matrix can be used to define function inputs. Valid inputs for
 MXFunctions are combinations of Reshape, concatenations and SymbolicMX.
-
-";
-
-%feature("docstring") casadi::MX::attachAssert "
-
-returns itself, but with an assertion attached
-
-If y does not evaluate to 1, a runtime error is raised
 
 ";
 
@@ -18375,12 +18369,6 @@ Split up an expression along symbolic primitives.
 
 ";
 
-%feature("docstring") casadi::MX::grad "
-
-Gradient expression.
-
-";
-
 %feature("docstring") casadi::MX::ones "
 
 Create a dense matrix or a matrix with specified sparsity with all entries
@@ -18412,12 +18400,6 @@ check if zero (note that false negative answers are possible)
 
 ";
 
-%feature("docstring") casadi::MX::getDescription "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring") casadi::MX::inf "
 
 create a matrix with all inf
@@ -18430,12 +18412,6 @@ Expand MX graph to SXFunction call.
 
 Expand the given expression e, optionally supplying expressions contained in
 it at which expansion should stop.
-
-";
-
-%feature("docstring") casadi::MX::get_colind "
-
-Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
@@ -18454,6 +18430,12 @@ Checks if expression does not contain NaN or Inf.
 %feature("docstring") casadi::MX::getName "
 
 Get the name.
+
+";
+
+%feature("docstring") casadi::MX::get_colind "
+
+Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
@@ -18487,6 +18469,13 @@ matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
 zeros.
 
 k = A.find() A[k] will contain the elements of A that are non-zero in B
+
+";
+
+%feature("docstring") casadi::MX::dim "
+
+Get string representation of dimensions. The representation is (nrow x ncol
+= numel | size)
 
 ";
 
@@ -18528,6 +18517,18 @@ Get the value (only for scalar constant nodes)
 
 Get the index of evaluation output - only valid when isEvaluationoutput() is
 true.
+
+";
+
+%feature("docstring") casadi::MX::get_row "
+
+Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring") casadi::MX::nnz_upper "
+
+Get the number of non-zeros in the upper triangular half.
 
 ";
 
@@ -18836,10 +18837,9 @@ Get operation type.
 
 ";
 
-%feature("docstring") casadi::MX::monitor "
+%feature("docstring") casadi::MX::nnz_lower "
 
-Monitor an expression Returns itself, but with the side effect of printing
-the nonzeros along with a comment.
+Get the number of non-zeros in the lower triangular half.
 
 ";
 
@@ -18896,12 +18896,6 @@ Is it a certain operation.
 
 ";
 
-%feature("docstring") casadi::MX::get_row "
-
-Get the sparsity pattern. See the Sparsity class for details.
-
-";
-
 %feature("docstring") casadi::MX::getNdeps "
 
 Get the number of dependencies of a binary SXElement.
@@ -18923,6 +18917,12 @@ Check if the matrix expression is square.
 %feature("docstring") casadi::MX::isNull "
 
 Is a null pointer?
+
+";
+
+%feature("docstring") casadi::MX::nnz_diag "
+
+Get get the number of non-zeros on the diagonal.
 
 ";
 
@@ -30692,25 +30692,15 @@ Joel Andersson
 
 C++ includes: sparsity.hpp ";
 
-%feature("docstring") casadi::Sparsity::get_colind "
+%feature("docstring") casadi::Sparsity::largest_first "
 
-Get the column index for each column Together with the row-vector, one
-obtains the sparsity pattern in the column compressed format.
-
-";
-
-%feature("docstring") casadi::Sparsity::reCache "[INTERNAL]  Check if there
-is an identical copy of the sparsity pattern in the cache, and if so, make a
-shallow copy of that one.
+Order the columns by decreasing degree.
 
 ";
 
-%feature("docstring") casadi::Sparsity::get_diag "
+%feature("docstring") casadi::Sparsity::dim "
 
-Get the diagonal of the matrix/create a diagonal matrix (mapping will
-contain the nonzero mapping) When the input is square, the diagonal elements
-are returned. If the input is vector-like, a diagonal matrix is constructed
-with it.
+Get the dimension as a string.
 
 ";
 
@@ -30738,17 +30728,18 @@ strictly:  if true, then do not allow multiple entries
 
 ";
 
-%feature("docstring") casadi::Sparsity::isdiag "
+%feature("docstring") casadi::Sparsity::get_diag "
 
-Is diagonal?
+Get the diagonal of the matrix/create a diagonal matrix (mapping will
+contain the nonzero mapping) When the input is square, the diagonal elements
+are returned. If the input is vector-like, a diagonal matrix is constructed
+with it.
 
 ";
 
-%feature("docstring") casadi::Sparsity::patternProduct "
+%feature("docstring") casadi::Sparsity::isdiag "
 
-Sparsity pattern for a matrix-matrix product Returns the sparsity pattern
-resulting from multiplying the pattern with another pattern y from the
-right.
+Is diagonal?
 
 ";
 
@@ -30760,9 +30751,10 @@ Enlarge the matrix along the second dimension (i.e. insert columns)
 
 %feature("docstring") casadi::Sparsity::hash "";
 
-%feature("docstring") casadi::Sparsity::resize "
+%feature("docstring") casadi::Sparsity::nnz_upper "
 
-Resize.
+Number of non-zeros in the upper triangular half, i.e. the number of
+elements (i, j) with j>=i.
 
 ";
 
@@ -30788,6 +30780,13 @@ Get nonzeros in upper triangular part.
 
 ";
 
+%feature("docstring") casadi::Sparsity::spy_matlab "
+
+Generate a script for Matlab or Octave which visualizes the sparsity using
+the spy command.
+
+";
+
 %feature("docstring") casadi::Sparsity::isdense "
 
 Is dense?
@@ -30806,26 +30805,22 @@ Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::Sparsity::printPtr "[INTERNAL]  Print the
-pointer to the internal class
+%feature("docstring") casadi::Sparsity::bw_lower "
 
-";
-
-%feature("docstring") casadi::Sparsity::sanity_check "
-
-Check if the dimensions and colind, row vectors are compatible.
-
-Parameters:
------------
-
-complete:  set to true to also check elementwise throws an error as possible
-result
+Lower half-bandwidth.
 
 ";
 
 %feature("docstring") casadi::Sparsity::T "
 
 Transpose the matrix.
+
+";
+
+%feature("docstring") casadi::Sparsity::nnz_diag "
+
+Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with
+j==i.
 
 ";
 
@@ -30855,43 +30850,18 @@ Check if the sparsity is the transpose of another.
 
 ";
 
-%feature("docstring") casadi::Sparsity::largestFirstOrdering "
-
-Order the cols by decreasing degree.
-
-";
-
 %feature("docstring") casadi::Sparsity::colind "
 
 Get a reference to the colindex of column cc (see class description)
 
 ";
 
-%feature("docstring") casadi::Sparsity::stronglyConnectedComponents "
+%feature("docstring") casadi::Sparsity::elimination_tree "
 
-Find the strongly connected components of the bigraph defined by the
-sparsity pattern of a square matrix.
-
-See Direct Methods for Sparse Linear Systems by Davis (2006). Returns:
-Number of components
-
-Offset for each components (length: 1 + number of components)
-
-Indices for each components, component i has indices index[offset[i]], ...,
-index[offset[i+1]]
-
-In the case that the matrix is symmetric, the result has a particular
-interpretation: Given a symmetric matrix A and n =
-A.stronglyConnectedComponents(p, r)
-
-=> A[p, p] will appear block-diagonal with n blocks and with the indices of
-the block boundaries to be found in r.
-
-";
-
-%feature("docstring") casadi::Sparsity::patternUnion "
-
-Union of two sparsity patterns.
+Calculate the elimination tree See Direct Methods for Sparse Linear Systems
+by Davis (2006). If the parameter ata is false, the algorithm is equivalent
+to Matlab's etree(A), except that the indices are zero- based. If ata is
+true, the algorithm is equivalent to Matlab's etree(A, 'row').
 
 ";
 
@@ -30916,23 +30886,6 @@ Get the sparsity in compressed row storage (CRS) format.
 
 ";
 
-%feature("docstring") casadi::Sparsity::dulmageMendelsohn "
-
-Compute the Dulmage-Mendelsohn decomposition See Direct Methods for Sparse
-Linear Systems by Davis (2006).
-
-Dulmage-Mendelsohn will try to bring your matrix into lower block-
-triangular (LBT) form. It will not care about the distance of off- diagonal
-elements to the diagonal: there is no guarantee you will get a block-
-diagonal matrix if you supply a randomly permuted block- diagonal matrix.
-
-If your matrix is symmetrical, this method is of limited use; permutation
-can make it non-symmetric.
-
-See:   stronglyConnectedComponents
-
-";
-
 %feature("docstring") casadi::Sparsity::isempty "
 
 Check if the sparsity is empty.
@@ -30942,9 +30895,16 @@ optionally both dimensions)
 
 ";
 
-%feature("docstring") casadi::Sparsity::isReshape "
+%feature("docstring") casadi::Sparsity::unite "
 
-Check if the sparsity is a reshape of another.
+Union of two sparsity patterns.
+
+";
+
+%feature("docstring") casadi::Sparsity::nnz_lower "
+
+Number of non-zeros in the lower triangular half, i.e. the number of
+elements (i, j) with j<=i.
 
 ";
 
@@ -30960,25 +30920,15 @@ Append another sparsity patten horizontally.
 
 ";
 
-%feature("docstring") casadi::Sparsity::patternIntersection "
-
-Intersection of two sparsity patterns Returns the new sparsity pattern as
-well as a mapping with the same length as the number of non-zero elements
-The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if
-it is from the second and 3 (i.e. 1 | 2) if from both.
-
-";
-
 %feature("docstring") casadi::Sparsity::issingular "
 
 Check whether the sparsity-pattern indicates structural singularity.
 
 ";
 
-%feature("docstring") casadi::Sparsity::unidirectionalColoring "
+%feature("docstring") casadi::Sparsity::isReshape "
 
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+Check if the sparsity is a reshape of another.
 
 ";
 
@@ -30991,16 +30941,15 @@ the same length as the number of nonzeros
 
 ";
 
-%feature("docstring") casadi::Sparsity::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
 %feature("docstring") casadi::Sparsity::makeDense "
 
 Make a patten dense.
+
+";
+
+%feature("docstring") casadi::Sparsity::pattern_inverse "
+
+Take the inverse of a sparsity pattern; flip zeros and non-zeros.
 
 ";
 
@@ -31019,12 +30968,6 @@ Check if the pattern is a column vector (i.e. size2()==1)
 %feature("docstring") casadi::Sparsity::dense "
 
 Create a dense rectangular sparsity pattern.
-
-";
-
-%feature("docstring") casadi::Sparsity::printCompact "
-
-Print a compact description of the sparsity pattern.
 
 ";
 
@@ -31061,26 +31004,9 @@ position el.
 
 ";
 
-%feature("docstring") casadi::Sparsity::zz_triu "[INTERNAL]  Get upper
-triangular part
-
-";
-
 %feature("docstring") casadi::Sparsity::append "
 
 Append another sparsity patten vertically (NOTE: only efficient if vector)
-
-";
-
-%feature("docstring") casadi::Sparsity::spyMatlab "
-
-Generate a script for Matlab or Octave which visualizes the sparsity using
-the spy command.
-
-";
-
-%feature("docstring") casadi::Sparsity::zz_tril "[INTERNAL]  Get lower
-triangular part.
 
 ";
 
@@ -31090,15 +31016,21 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::Sparsity::bandwidthU "
+%feature("docstring") casadi::Sparsity::depth_first_search "
 
-Upper half-bandwidth.
+Depth-first search on the adjacency graph of the sparsity See Direct Methods
+for Sparse Linear Systems by Davis (2006).
 
 ";
 
-%feature("docstring") casadi::Sparsity::pattern_inverse "
+%feature("docstring") casadi::Sparsity::combine "
 
-Take the inverse of a sparsity pattern; flip zeros and non-zeros.
+Combine two sparsity patterns Returns the new sparsity pattern as well as a
+mapping with the same length as the number of non-zero elements The mapping
+matrix contains the arguments for each nonzero, the first bit indicates if
+the first argument is nonzero, the second bit indicates if the second
+argument is nonzero (note that none of, one of or both of the arguments can
+be nonzero)
 
 ";
 
@@ -31110,12 +31042,12 @@ See:   numel()
 
 ";
 
-%feature("docstring") casadi::Sparsity::get_row "
+%feature("docstring") casadi::Sparsity::intersect "
 
-Get the row for each non-zero entry Together with the column-vector, this
-vector gives the sparsity of the matrix in sparse triplet format, and
-together with the colind vector, one obtains the sparsity in column
-compressed format.
+Intersection of two sparsity patterns Returns the new sparsity pattern as
+well as a mapping with the same length as the number of non-zero elements
+The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if
+it is from the second and 3 (i.e. 1 | 2) if from both.
 
 ";
 
@@ -31131,20 +31063,19 @@ Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::Sparsity::starColoring "
+%feature("docstring") casadi::Sparsity::get_colind "
 
-Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring
-algorithm Algorithm 4.1 in What Color Is Your Jacobian? Graph Coloring for
-Computing Derivatives A. H. GEBREMEDHIN, F. MANNE, A. POTHEN SIAM Rev.,
-47(4), 629705 (2006)
-
-Ordering options: None (0), largest first (1)
+Get the column index for each column Together with the row-vector, one
+obtains the sparsity pattern in the column compressed format.
 
 ";
 
-%feature("docstring") casadi::Sparsity::bandwidthL "
+%feature("docstring") casadi::Sparsity::get_row "
 
-Lower half-bandwidth.
+Get the row for each non-zero entry Together with the column-vector, this
+vector gives the sparsity of the matrix in sparse triplet format, and
+together with the colind vector, one obtains the sparsity in column
+compressed format.
 
 ";
 
@@ -31172,31 +31103,38 @@ Get the shape.
 
 ";
 
-%feature("docstring") casadi::Sparsity::starColoring2 "
+%feature("docstring") casadi::Sparsity::star_coloring "
 
-Perform a star coloring of a symmetric matrix: A new greedy distance-2
-coloring algorithm Algorithm 4.1 in NEW ACYCLIC AND STAR COLORING ALGORITHMS
-WITH APPLICATION TO COMPUTING HESSIANS A. H. GEBREMEDHIN, A. TARAFDAR, F.
-MANNE, A. POTHEN SIAM J. SCI. COMPUT. Vol. 29, No. 3, pp. 10421072 (2007)
+Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring
+algorithm Algorithm 4.1 in What Color Is Your Jacobian? Graph Coloring for
+Computing Derivatives A. H. GEBREMEDHIN, F. MANNE, A. POTHEN SIAM Rev.,
+47(4), 629705 (2006)
 
 Ordering options: None (0), largest first (1)
 
 ";
 
-%feature("docstring") casadi::Sparsity::patternCombine "
+%feature("docstring") casadi::Sparsity::hasNZ "
 
-Combine two sparsity patterns Returns the new sparsity pattern as well as a
-mapping with the same length as the number of non-zero elements The mapping
-matrix contains the arguments for each nonzero, the first bit indicates if
-the first argument is nonzero, the second bit indicates if the second
-argument is nonzero (note that none of, one of or both of the arguments can
-be nonzero)
+Returns true if the pattern has a non-zero at location rr, cc.
 
 ";
 
-%feature("docstring") casadi::Sparsity::dimString "
+%feature("docstring") casadi::Sparsity::print_compact "
 
-Get the dimension as a string.
+Print a compact description of the sparsity pattern.
+
+";
+
+%feature("docstring") casadi::Sparsity::sanity_check "
+
+Check if the dimensions and colind, row vectors are compatible.
+
+Parameters:
+-----------
+
+complete:  set to true to also check elementwise throws an error as possible
+result
 
 ";
 
@@ -31210,7 +31148,12 @@ nonzeros The last colind[ncol] entries are the row indices
 
 ";
 
-%feature("docstring") casadi::Sparsity::isEqual "";
+%feature("docstring") casadi::Sparsity::uni_coloring "
+
+Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
+(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+
+";
 
 %feature("docstring") casadi::Sparsity::isNull "
 
@@ -31243,9 +31186,8 @@ Is upper triangular?
 
 ";
 
-%feature("docstring") casadi::Sparsity::isrow "
-
-Check if the pattern is a row vector (i.e. size1()==1)
+%feature("docstring") casadi::Sparsity::printPtr "[INTERNAL]  Print the
+pointer to the internal class
 
 ";
 
@@ -31283,9 +31225,45 @@ Get the number of columns.
 
 ";
 
+%feature("docstring") casadi::Sparsity::get_col "
+
+Get the column for each non-zero entry Together with the row-vector, this
+vector gives the sparsity of the matrix in sparse triplet format, i.e. the
+column and row for each non-zero elements.
+
+";
+
 %feature("docstring") casadi::Sparsity::size1 "
 
 Get the number of rows.
+
+";
+
+%feature("docstring") casadi::Sparsity::star_coloring2 "
+
+Perform a star coloring of a symmetric matrix: A new greedy distance-2
+coloring algorithm Algorithm 4.1 in NEW ACYCLIC AND STAR COLORING ALGORITHMS
+WITH APPLICATION TO COMPUTING HESSIANS A. H. GEBREMEDHIN, A. TARAFDAR, F.
+MANNE, A. POTHEN SIAM J. SCI. COMPUT. Vol. 29, No. 3, pp. 10421072 (2007)
+
+Ordering options: None (0), largest first (1)
+
+";
+
+%feature("docstring") casadi::Sparsity::dulmage_mendelsohn "
+
+Compute the Dulmage-Mendelsohn decomposition See Direct Methods for Sparse
+Linear Systems by Davis (2006).
+
+Dulmage-Mendelsohn will try to bring your matrix into lower block-
+triangular (LBT) form. It will not care about the distance of off- diagonal
+elements to the diagonal: there is no guarantee you will get a block-
+diagonal matrix if you supply a randomly permuted block- diagonal matrix.
+
+If your matrix is symmetrical, this method is of limited use; permutation
+can make it non-symmetric.
+
+See:   strongly_connected_components
 
 ";
 
@@ -31301,31 +31279,32 @@ Print a textual representation of sparsity.
 
 ";
 
-%feature("docstring") casadi::Sparsity::depthFirstSearch "
+%feature("docstring") casadi::Sparsity::__hash__ "
 
-Depth-first search on the adjacency graph of the sparsity See Direct Methods
-for Sparse Linear Systems by Davis (2006).
-
-";
-
-%feature("docstring") casadi::Sparsity::sizeD "
-
-Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with
-j==i.
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring") casadi::Sparsity::sizeL "
+%feature("docstring") casadi::Sparsity::strongly_connected_components "
 
-Number of non-zeros in the lower triangular half, i.e. the number of
-elements (i, j) with j<=i.
+Find the strongly connected components of the bigraph defined by the
+sparsity pattern of a square matrix.
 
-";
+See Direct Methods for Sparse Linear Systems by Davis (2006). Returns:
+Number of components
 
-%feature("docstring") casadi::Sparsity::sizeU "
+Offset for each components (length: 1 + number of components)
 
-Number of non-zeros in the upper triangular half, i.e. the number of
-elements (i, j) with j>=i.
+Indices for each components, component i has indices index[offset[i]], ...,
+index[offset[i+1]]
+
+In the case that the matrix is symmetric, the result has a particular
+interpretation: Given a symmetric matrix A and n =
+A.strongly_connected_components(p, r)
+
+=> A[p, p] will appear block-diagonal with n blocks and with the indices of
+the block boundaries to be found in r.
 
 ";
 
@@ -31338,19 +31317,13 @@ As an alternative, P can be transposed (inverted).
 
 ";
 
-%feature("docstring") casadi::Sparsity::hasNZ "
+%feature("docstring") casadi::Sparsity::isrow "
 
-Returns true if the pattern has a non-zero at location rr, cc.
-
-";
-
-%feature("docstring") casadi::Sparsity::get_col "
-
-Get the column for each non-zero entry Together with the row-vector, this
-vector gives the sparsity of the matrix in sparse triplet format, i.e. the
-column and row for each non-zero elements.
+Check if the pattern is a row vector (i.e. size1()==1)
 
 ";
+
+%feature("docstring") casadi::Sparsity::is_equal "";
 
 %feature("docstring") casadi::Sparsity::erase "
 
@@ -31366,18 +31339,21 @@ Erase elements of a matrix.
 
 ";
 
-%feature("docstring") casadi::Sparsity::eliminationTree "
+%feature("docstring") casadi::Sparsity::bw_upper "
 
-Calculate the elimination tree See Direct Methods for Sparse Linear Systems
-by Davis (2006). If the parameter ata is false, the algorithm is equivalent
-to Matlab's etree(A), except that the indices are zero- based. If ata is
-true, the algorithm is equivalent to Matlab's etree(A, 'row').
+Upper half-bandwidth.
 
 ";
 
 %feature("docstring") casadi::Sparsity::scalar "
 
 Create a scalar sparsity pattern.
+
+";
+
+%feature("docstring") casadi::Sparsity::resize "
+
+Resize.
 
 ";
 
