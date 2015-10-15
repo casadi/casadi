@@ -893,7 +893,7 @@ class Matrixtests(casadiTestCase):
           print "ref:"
           c_ref.sparsity().spy()
           c_ref.printDense()
-          a.sparsity().sanityCheck()
+          a.sparsity().sanity_check()
           a.printDense()
           raise e
           

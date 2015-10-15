@@ -184,7 +184,7 @@ namespace casadi {
     void add_quad(const MX& new_quad, const std::string& name=std::string());
 
     /// Check if dimensions match
-    void sanityCheck() const;
+    void sanity_check() const;
     ///@}
 
     /** @name Manipulation

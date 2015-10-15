@@ -4687,7 +4687,7 @@ Eliminate quadrature states and turn them into ODE states.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::sanityCheck() const  "
+%feature("docstring")  casadi::DaeBuilder::sanity_check() const  "
 
 Check if dimensions match.
 
@@ -24130,7 +24130,7 @@ Print sparse matrix style.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::sanityCheck(bool
+%feature("docstring")  casadi::Matrix< DataType >::sanity_check(bool
 complete=false) const  "
 
 Check if the dimensions and colind, row vectors are compatible.
@@ -41060,7 +41060,7 @@ internal class
 
 ";
 
-%feature("docstring")  casadi::Sparsity::sanityCheck(bool complete=false)
+%feature("docstring")  casadi::Sparsity::sanity_check(bool complete=false)
 const  "
 
 Check if the dimensions and colind, row vectors are compatible.

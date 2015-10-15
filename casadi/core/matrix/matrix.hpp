@@ -116,7 +116,7 @@ namespace casadi {
      * \param complete  set to true to also check elementwise
      * throws an error as possible result
      */
-    void sanityCheck(bool complete=false) const;
+    void sanity_check(bool complete=false) const;
 
     /// This constructor enables implicit type conversion from a numeric type
     Matrix(double val);

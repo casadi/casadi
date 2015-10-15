@@ -194,20 +194,11 @@ namespace casadi {
 #endif // SWIG
     ///@}
 
-    /// \cond INTERNAL
-    /** \brief Check if there is an identical copy of the sparsity pattern in the cache,
-     * and if so, make a shallow copy of that one */
-    void reCache();
-
-    /** \brief Clear the cache */
-    static void clearCache();
-    /// \endcond
-
     /** \brief Check if the dimensions and colind, row vectors are compatible.
      * \param complete  set to true to also check elementwise
      * throws an error as possible result
      */
-    void sanityCheck(bool complete=false) const;
+    void sanity_check(bool complete=false) const;
     /** Get the diagonal of the matrix/create a diagonal matrix
         (mapping will contain the nonzero mapping)
         When the input is square, the diagonal elements are returned.

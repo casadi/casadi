@@ -49,7 +49,7 @@ namespace casadi {
       sp_[1] = ncol;
       std::copy(colind, colind+ncol+1, sp_.begin()+2);
       std::copy(row, row+colind[ncol], sp_.begin()+2+ncol+1);
-      sanityCheck(false);
+      sanity_check(false);
     }
 
     /** \brief Get number of rows (see public class) */
@@ -71,7 +71,7 @@ namespace casadi {
     inline int nnz() const { return colind()[size2()];}
 
     /// Check if the dimensions and colind, row vectors are compatible
-    void sanityCheck(bool complete=false) const;
+    void sanity_check(bool complete=false) const;
 
     /** \brief Get the diagonal of the matrix/create a diagonal matrix
      *

@@ -74,23 +74,19 @@ namespace casadi {
   Sparsity::Sparsity(int nrow, int ncol) {
     std::vector<int> row, colind(ncol+1, 0);
     assignCached(nrow, ncol, colind, row);
-    sanityCheck(true);
+    sanity_check(true);
   }
 
   Sparsity::Sparsity(const std::pair<int, int>& rc) {
     std::vector<int> row, colind(rc.second+1, 0);
     assignCached(rc.first, rc.second, colind, row);
-    sanityCheck(true);
+    sanity_check(true);
   }
 
   Sparsity::Sparsity(int nrow, int ncol, const std::vector<int>& colind,
                      const std::vector<int>& row) {
     assignCached(nrow, ncol, colind, row);
-    sanityCheck(true);
-  }
-
-  void Sparsity::reCache() {
-    assignCached(size1(), size2(), colind(), row());
+    sanity_check(true);
   }
 
   const SparsityInternal* Sparsity::operator->() const {
@@ -155,8 +151,8 @@ namespace casadi {
     return colind()[cc];
   }
 
-  void Sparsity::sanityCheck(bool complete) const {
-    (*this)->sanityCheck(complete);
+  void Sparsity::sanity_check(bool complete) const {
+    (*this)->sanity_check(complete);
   }
 
   void Sparsity::resize(int nrow, int ncol) {
@@ -755,10 +751,6 @@ namespace casadi {
       }
     }
 #endif // USE_CXX11
-  }
-
-  void Sparsity::clearCache() {
-    getCache().clear();
   }
 
   Sparsity Sparsity::zz_tril(bool includeDiagonal) const {

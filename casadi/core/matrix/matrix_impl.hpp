@@ -1277,8 +1277,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::sanityCheck(bool complete) const {
-    sparsity_.sanityCheck(complete);
+  void Matrix<DataType>::sanity_check(bool complete) const {
+    sparsity_.sanity_check(complete);
     if (data_.size()!=sparsity_.nnz()) {
       std::stringstream s;
       s << "Matrix is not sane. The following must hold:" << std::endl;

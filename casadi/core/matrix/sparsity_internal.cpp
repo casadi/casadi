@@ -59,7 +59,7 @@ namespace casadi {
     }
   }
 
-  void SparsityInternal::sanityCheck(bool complete) const {
+  void SparsityInternal::sanity_check(bool complete) const {
     int nrow = size1();
     int ncol = size2();
     const int* colind = this->colind();

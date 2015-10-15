@@ -790,8 +790,8 @@ namespace casadi {
         }
       }
 
-      jacF_.output().sparsity().sanityCheck(true);
-      jacF_.output().sparsity().sanityCheck(false);
+      jacF_.output().sparsity().sanity_check(true);
+      jacF_.output().sparsity().sanity_check(false);
 
       // timing and counters
       t_eval_grad_f_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;

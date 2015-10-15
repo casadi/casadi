@@ -454,7 +454,7 @@ namespace casadi {
 
   void DaeBuilder::print(ostream &stream, bool trailing_newline) const {
     // Assert correctness
-    sanityCheck();
+    sanity_check();
 
     // Print dimensions
     repr(stream);
@@ -537,7 +537,7 @@ namespace casadi {
 
   void DaeBuilder::scaleVariables() {
     // Assert correctness
-    sanityCheck();
+    sanity_check();
 
     // Gather variables and expressions to replace
     vector<MX> v_id, v_rep;
@@ -1112,7 +1112,7 @@ namespace casadi {
     this->lam_quad.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
   }
 
-  void DaeBuilder::sanityCheck() const {
+  void DaeBuilder::sanity_check() const {
     // Time
     casadi_assert_message(this->t.isSymbolic(), "Non-symbolic time t");
     casadi_assert_message(this->t.isscalar(), "Non-scalar time t");
@@ -1677,7 +1677,7 @@ namespace casadi {
   MX DaeBuilder::addLinearCombination(const std::string& name,
                                       const std::vector<std::string>& f_out) {
     // Make sure object valid
-    sanityCheck();
+    sanity_check();
 
     // Make sure name is valid
     casadi_assert_message(!name.empty(), "DaeBuilder::addLinearCombination: \"name\" is empty");
