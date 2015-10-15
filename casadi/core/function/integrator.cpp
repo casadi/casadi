@@ -142,7 +142,7 @@ namespace casadi {
     (*this)->integrate(t_out);
   }
 
-  bool Integrator::testCast(const SharedObjectNode* ptr) {
+  bool Integrator::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const IntegratorInternal*>(ptr)!=0;
   }
 

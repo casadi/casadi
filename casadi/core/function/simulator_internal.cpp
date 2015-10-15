@@ -40,10 +40,10 @@ namespace casadi {
 
     casadi_assert_message(grid.iscolumn(),
                           "Simulator::Simulator: grid must be a column vector, but got "
-                          << grid.dimString());
+                          << grid.dim());
     casadi_assert_message(grid.isdense(),
                           "Simulator::Simulator: grid must be dense, but got "
-                          << grid.dimString());
+                          << grid.dim());
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
     ischeme_ = IOScheme(SCHEME_IntegratorInput);
   }
@@ -106,28 +106,28 @@ namespace casadi {
       if (!output_fcn_.output(i).isempty()) {
         casadi_assert_message(output_fcn_.output(i).iscolumn(),
                               "SimulatorInternal::init: Output function output #" << i
-                              << " has shape " << output_fcn_.output(i).dimString()
+                              << " has shape " << output_fcn_.output(i).dim()
                               << ", while a column-matrix shape is expected.");
       }
     }
 
     casadi_assert_message(output_fcn_.input(DAE_T).numel() <=1,
                           "SimulatorInternal::init: output_fcn DAE_T argument must be "
-                          "scalar or empty, but got " << output_fcn_.input(DAE_T).dimString());
+                          "scalar or empty, but got " << output_fcn_.input(DAE_T).dim());
 
     casadi_assert_message(
         output_fcn_.input(DAE_P).isempty() ||
         integrator_.input(INTEGRATOR_P).sparsity() == output_fcn_.input(DAE_P).sparsity(),
         "SimulatorInternal::init: output_fcn DAE_P argument must be empty or"
-        << " have dimension " << integrator_.input(INTEGRATOR_P).dimString()
-        << ", but got " << output_fcn_.input(DAE_P).dimString());
+        << " have dimension " << integrator_.input(INTEGRATOR_P).dim()
+        << ", but got " << output_fcn_.input(DAE_P).dim());
 
     casadi_assert_message(
         output_fcn_.input(DAE_X).isempty() ||
         integrator_.input(INTEGRATOR_X0).sparsity() == output_fcn_.input(DAE_X).sparsity(),
         "SimulatorInternal::init: output_fcn DAE_X argument must be empty or have dimension "
-        << integrator_.input(INTEGRATOR_X0).dimString()
-        << ", but got " << output_fcn_.input(DAE_X).dimString());
+        << integrator_.input(INTEGRATOR_X0).dim()
+        << ", but got " << output_fcn_.input(DAE_X).dim());
 
     // Call base class method
     FunctionInternal::init();

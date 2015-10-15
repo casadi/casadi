@@ -676,7 +676,7 @@ namespace casadi {
     const FunctionInternal* operator->() const;
 
     /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
     /// \endcond
 
     /// Get all statistics obtained at the end of the last evaluate call

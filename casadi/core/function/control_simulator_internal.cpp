@@ -42,9 +42,9 @@ namespace casadi {
       orig_output_fcn_(output_fcn), gridc_(grid.data()) {
 
     casadi_assert_message(grid.iscolumn(), "ControlSimulator::ControlSimulator: grid must be a "
-                          "column vector, but got " << grid.dimString());
+                          "column vector, but got " << grid.dim());
     casadi_assert_message(grid.isdense(), "ControlSimulator::ControlSimulator: grid must be dense, "
-                          "but got " << grid.dimString());
+                          "but got " << grid.dim());
 
     addOption("nf", OT_INTEGER, 1, "Number of minor grained integration steps per major interval. "
               "nf>0 must hold. This option is not used when 'minor_grid' is provided.");
@@ -114,7 +114,7 @@ namespace casadi {
         control_dae_.input(CONTROL_DAE_U).sparsity() ==
         control_dae_.input(CONTROL_DAE_U_INTERP).sparsity(),
         "You specfified both U and U_INTERP, but the sparsities do not match: "
-        << control_dae_.input(CONTROL_DAE_U).dimString()
+        << control_dae_.input(CONTROL_DAE_U).dim()
         << "  <-> "
         << control_dae_.input(CONTROL_DAE_U_INTERP).sparsity());
     }

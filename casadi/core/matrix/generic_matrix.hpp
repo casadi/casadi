@@ -102,7 +102,7 @@ namespace casadi {
     /** \brief Get string representation of dimensions.
         The representation is (nrow x ncol = numel | size)
     */
-    std::string dimString() const;
+    std::string dim() const;
 
     /** \brief  Get the shape */
     std::pair<int, int> size() const;
@@ -696,8 +696,8 @@ namespace casadi {
   }
 
   template<typename MatType>
-  std::string GenericMatrix<MatType>::dimString() const {
-    return sparsity().dimString();
+  std::string GenericMatrix<MatType>::dim() const {
+    return sparsity().dim();
   }
 
   template<typename MatType>
@@ -757,12 +757,12 @@ namespace casadi {
     const MatType &a = self();
     casadi_assert_message(a.size1()==b.size1() && a.size2()==b.size2(),
                           "cross(a, b): Inconsistent dimensions. Dimension of a ("
-                          << a.dimString() << " ) must equal that of b ("
-                          << b.dimString() << ").");
+                          << a.dim() << " ) must equal that of b ("
+                          << b.dim() << ").");
 
     casadi_assert_message(a.size1()==3 || a.size2()==3,
                           "cross(a, b): One of the dimensions of a should have length 3, but got "
-                          << a.dimString() << ".");
+                          << a.dim() << ".");
     casadi_assert_message(dim==-1 || dim==1 || dim==2,
                           "cross(a, b, dim): Dim must be 1, 2 or -1 (automatic).");
 
@@ -792,10 +792,10 @@ namespace casadi {
   MatType GenericMatrix<MatType>::zz_tril2symm() const {
     casadi_assert_message(self().issquare(),
                           "Shape error in tril2symm. Expecting square shape but got "
-                          << self().dimString());
+                          << self().dim());
     casadi_assert_message(self().nnz_upper()-self().nnz_diag()==0,
                           "Sparsity error in tril2symm. Found above-diagonal entries in argument: "
-                          << self().dimString());
+                          << self().dim());
     return self() +  self().T() - diag(diag(self()));
   }
 
@@ -818,10 +818,10 @@ namespace casadi {
   MatType GenericMatrix<MatType>::zz_triu2symm() const {
     casadi_assert_message(self().issquare(),
                           "Shape error in triu2symm. Expecting square shape but got "
-                          << self().dimString());
+                          << self().dim());
     casadi_assert_message(self().nnz_lower()-self().nnz_diag()==0,
                           "Sparsity error in triu2symm. Found below-diagonal entries in argument: "
-                          << self().dimString());
+                          << self().dim());
     return self() + self().T() - diag(diag(self()));
   }
 

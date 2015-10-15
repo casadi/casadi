@@ -125,7 +125,7 @@ namespace casadi {
 
     // Print expression
     vector<string> intermed;
-    string s = printCompact(nodeind, intermed);
+    string s = print_compact(nodeind, intermed);
 
     // Print intermediate expressions
     for (int i=0; i<intermed.size(); ++i)
@@ -160,7 +160,7 @@ namespace casadi {
     }
   }
 
-  std::string SXNode::printCompact(std::map<const SXNode*, int>& nodeind,
+  std::string SXNode::print_compact(std::map<const SXNode*, int>& nodeind,
                                    std::vector<std::string>& intermed) const {
     // Get reference to node index
     int& ind = nodeind[this];
@@ -175,7 +175,7 @@ namespace casadi {
     // Get expressions for dependencies
     std::string arg[2];
     for (int i=0; i<ndep(); ++i) {
-      arg[i] = dep(i)->printCompact(nodeind, intermed);
+      arg[i] = dep(i)->print_compact(nodeind, intermed);
     }
 
     // Get expression for this

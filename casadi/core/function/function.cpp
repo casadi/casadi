@@ -375,7 +375,7 @@ namespace casadi {
     (*this)->full_jacobian_ = jac;
   }
 
-  bool Function::testCast(const SharedObjectNode* ptr) {
+  bool Function::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const FunctionInternal*>(ptr)!=0;
   }
 
@@ -628,8 +628,8 @@ namespace casadi {
       for (int i=0; i<n_in(); ++i, ++ind) {
         if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=input(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " input " << ind << " \""
-                       << i_names.at(ind) << "\". Expected " << input(i).dimString()
-                       << " but got " << ret.input(ind).dimString());
+                       << i_names.at(ind) << "\". Expected " << input(i).dim()
+                       << " but got " << ret.input(ind).dim());
         }
       }
     }
@@ -637,8 +637,8 @@ namespace casadi {
       for (int i=0; i<n_out(); ++i, ++ind) {
         if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=output(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " input " << ind <<
-                       " \"" << i_names.at(ind) << "\". Expected " << output(i).dimString()
-                       << " but got " << ret.input(ind).dimString());
+                       " \"" << i_names.at(ind) << "\". Expected " << output(i).dim()
+                       << " but got " << ret.input(ind).dim());
         }
       }
     }
@@ -649,8 +649,8 @@ namespace casadi {
       for (int i=0; i<n_out(); ++i, ++ind) {
         if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=output(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " output " << ind <<
-                       " \"" <<  o_names.at(ind) << "\". Expected " << output(i).dimString()
-                       << " but got " << ret.output(ind).dimString());
+                       " \"" <<  o_names.at(ind) << "\". Expected " << output(i).dim()
+                       << " but got " << ret.output(ind).dim());
         }
       }
     }
@@ -658,8 +658,8 @@ namespace casadi {
       for (int i=0; i<n_in(); ++i, ++ind) {
         if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=input(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " output " << ind << " \""
-                       << o_names.at(ind) << "\". Expected " << input(i).dimString()
-                       << " but got " << ret.output(ind).dimString());
+                       << o_names.at(ind) << "\". Expected " << input(i).dim()
+                       << " but got " << ret.output(ind).dim());
         }
       }
     }

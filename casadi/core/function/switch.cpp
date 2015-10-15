@@ -53,7 +53,7 @@ namespace casadi {
     return static_cast<const SwitchInternal*>(Function::operator->());
   }
 
-  bool Switch::testCast(const SharedObjectNode* ptr) {
+  bool Switch::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const SwitchInternal*>(ptr)!=0;
   }
 

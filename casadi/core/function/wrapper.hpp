@@ -64,12 +64,12 @@ void Wrapper<Derived>::checkDimensions() {
   for (int i=0;i< d->n_in();++i) {
     casadi_assert_message(d->input(i).sparsity()==f_.input(i).sparsity(),
       "Sparsity mismatch for input " << i << ":" <<
-      d->input(i).dimString() << " <-> " << f_.input(i).dimString() << ".");
+      d->input(i).dim() << " <-> " << f_.input(i).dim() << ".");
   }
   for (int i=0;i< d->n_out();++i) {
     casadi_assert_message(d->output(i).sparsity()==f_.output(i).sparsity(),
       "Sparsity mismatch for output " << i << ":" <<
-      d->output(i).dimString() << " <-> " << f_.output(i).dimString() << ".");
+      d->output(i).dim() << " <-> " << f_.output(i).dim() << ".");
   }
 
 }

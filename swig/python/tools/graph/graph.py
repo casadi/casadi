@@ -109,7 +109,7 @@ class DotArtist:
       graph.add_node(pydot.Node(id,label="%d x %d" % (s.size1(),s.size2()),shape='rectangle',color=self.sparsitycol,style="filled"))
     else:
       label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
-      label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
+      label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dim())
       for i in range(s.size1()):
         label+="<TR>"
         for j in range(s.size2()):
@@ -140,7 +140,7 @@ class MXSymbolicArtist(DotArtist):
     else:
        # The Matrix grid is represented by a html table with 'ports'
       label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="%s">' % col
-      label+="<TR><TD COLSPAN='%d'>%s: <font color='#666666'>%s</font></TD></TR>" % (s.size2(),s.getName(), s.dimString())
+      label+="<TR><TD COLSPAN='%d'>%s: <font color='#666666'>%s</font></TD></TR>" % (s.size2(),s.getName(), s.dim())
       for i in range(s.size1()):
         label+="<TR>"
         for j in range(s.size2()):
@@ -189,7 +189,7 @@ class MXSymbolicArtist(DotArtist):
 #       if candidates[0] == hash(s):
 #         label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="#0000aa">'
 #         if not(d.numel()==1 and d.numel()==d.nnz()): 
-#           label+="<TR><TD COLSPAN='%d' BGCOLOR='#dddddd'><font>%s</font></TD></TR>" % (d.size2(), d.dimString())
+#           label+="<TR><TD COLSPAN='%d' BGCOLOR='#dddddd'><font>%s</font></TD></TR>" % (d.size2(), d.dim())
 #         for i in range(d.size1()):
 #           label+="<TR>"
 #           for j in range(d.size2()):
@@ -206,7 +206,7 @@ class MXSymbolicArtist(DotArtist):
 #     # The Matrix grid is represented by a html table with 'ports'
 #     label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
 #     if not(s.numel()==1 and s.numel()==s.nnz()): 
-#       label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
+#       label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dim())
 #     for i in range(s.size1()):
 #       label+="<TR>"
 #       for j in range(s.size2()):
@@ -260,7 +260,7 @@ class MXConstantArtist(DotArtist):
     else:
       # The Matrix grid is represented by a html table with 'ports'
       label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="%s">' % col
-      label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
+      label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dim())
       if not "max_numel" in self.kwargs or s.numel() < self.kwargs["max_numel"]:
         for i in range(s.size1()):
           label+="<TR>"

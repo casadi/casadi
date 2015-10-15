@@ -236,7 +236,7 @@ namespace casadi {
     B ret;
 
     /// Quick return if not allowed
-    if (!B::testCast(ptr)) return ret;
+    if (!B::test_cast(ptr)) return ret;
 
     /// Assign node of B and return
     ret.assignNode(ptr);
@@ -274,7 +274,7 @@ namespace casadi {
   /// Template function implementations
   template<class B>
   B SharedObjectNode::shared_from_this() {
-    casadi_assert(B::testCast(this));
+    casadi_assert(B::test_cast(this));
     B ret;
     ret.assignNode(this);
     return ret;
@@ -282,7 +282,7 @@ namespace casadi {
 
   template<class B>
   const B SharedObjectNode::shared_from_this() const {
-    casadi_assert(B::testCast(this));
+    casadi_assert(B::test_cast(this));
     B ret;
     ret.assignNode(const_cast<SharedObjectNode*>(this));
     return ret;

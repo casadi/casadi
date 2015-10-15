@@ -495,7 +495,7 @@ class CasadiStructureDerivable:
     (a,mtype) = self.argtype(arg)
 
     if not(a.shape[0] == self.size):
-       raise Exception("Expecting %d x n DMatrix. Got %s" % (self.size,a.dimString()))  
+       raise Exception("Expecting %d x n DMatrix. Got %s" % (self.size,a.dim()))  
     s = struct([entry("t",struct=self,repeat=a.shape[1])])
 
     for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
@@ -512,7 +512,7 @@ class CasadiStructureDerivable:
     if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
        a = DMatrix.ones(self.size,self.size)*a
     if not(a.shape[1] == a.shape[0] and a.shape[0]==self.size):
-       raise Exception("Expecting square DMatrix of size %s. Got %s" % (self.size,a.dimString()))
+       raise Exception("Expecting square DMatrix of size %s. Got %s" % (self.size,a.dim()))
     s = struct([entry("t",shapestruct=(self,self))])
     for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
       if isinstance(a,t):
@@ -527,7 +527,7 @@ class CasadiStructureDerivable:
     if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
        a = DMatrix.ones(self.size,otherstruct.size)*a
     if not(a.shape[1]==otherstruct.size and a.shape[0]==self.size):
-       raise Exception("Expecting DMatrix of shape (%s,%s). Got %s" % (self.size,otherstruct.size,a.dimString()))
+       raise Exception("Expecting DMatrix of shape (%s,%s). Got %s" % (self.size,otherstruct.size,a.dim()))
     s = struct([entry("t",shapestruct=(self,otherstruct))])
     for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
       if isinstance(a,t):
@@ -540,7 +540,7 @@ class CasadiStructureDerivable:
     (a,mtype) = self.argtype(arg)
 
     if not(a.shape[0]==self.size and a.shape[1] % self.size == 0):
-       raise Exception("Expecting square (%d) DMatrix by N. Got %s" % (self.size,a.dimString()))
+       raise Exception("Expecting square (%d) DMatrix by N. Got %s" % (self.size,a.dim()))
     s = struct([entry("t",shapestruct=(self,self),repeat=a.shape[1] / self.size)])
 
     for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
@@ -598,7 +598,7 @@ class SetterDispatcher(Dispatcher):
           else:
             oi = performExtraIndex(DMatrix.ones(entry.originalsparsity),extraIndex=extraIndex,entry=entry)
             if oi.sparsity()!=payload_.sparsity():
-              raise Exception("Payload sparsity " + payload_.dimString() +  " does not match lhs sparisty " + oi.dimString() + "." )
+              raise Exception("Payload sparsity " + payload_.dim() +  " does not match lhs sparisty " + oi.dim() + "." )
             self.master[iflip] = payload_.T[iflip.sparsity()]
             self.master[i] = payload_[i.sparsity()]
         else:
@@ -1010,9 +1010,9 @@ class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
       self.master = mtype(data)
       
     if self.master.shape[0]!=self.size:
-      raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dimString()))
+      raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dim()))
     if self.master.shape[1]!=1 and self.master.shape[0]>0:
-      raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dimString()))
+      raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dim()))
         
     for e in self.entries:
       self[e.name] = e.expr
@@ -1085,7 +1085,7 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
       
       if canonicalIndex in self.mapping:
         if self.struct.map[canonicalIndex].sparsity()!=payload.sparsity():
-          raise Exception("Error in powerIndex slicing %s for canonicalIndex %s: Shape mismatch. lhs is %s, rhs is %s." % (str(powerIndex),str(canonicalIndex),self.struct.map[canonicalIndex].sparsity().dimString(),payload.sparsity().dimString()))
+          raise Exception("Error in powerIndex slicing %s for canonicalIndex %s: Shape mismatch. lhs is %s, rhs is %s." % (str(powerIndex),str(canonicalIndex),self.struct.map[canonicalIndex].sparsity().dim(),payload.sparsity().dim()))
         self.storage[self.mapping[canonicalIndex]] = payload
       else:
         raise Exception("Not found: %s " % str(canonicalIndex))
@@ -1256,7 +1256,7 @@ class CasadiStructEntry(StructEntry):
         raise Exception("You supplied a type argument '%s' but it is not recognised. Use one of %s" % (str(self.type,str(allowedclass))))
       if self.type=="symm":
         if self.sparsity.size1() != self.sparsity.size2():
-          raise Exception("You supplied a type 'symm', but matrix is not square. Got " % self.sparsity.dimString() + ".")
+          raise Exception("You supplied a type 'symm', but matrix is not square. Got " % self.sparsity.dim() + ".")
         self.originalsparsity = self.sparsity
         self.sparsity = self.sparsity*Sparsity.upper(self.sparsity.size1())
         
@@ -1266,9 +1266,9 @@ class CasadiStructEntry(StructEntry):
  
   def primitiveString(self):
     if self.type is None:
-      return self.sparsity.dimString()
+      return self.sparsity.dim()
     elif self.type=="symm":
-      return "symm(" +  self.sparsity.dimString() + ")"
+      return "symm(" +  self.sparsity.dim() + ")"
       
   def __getstate__(self):
     return dict((k,getattr(self,k)) for k in ["name", "struct", "sparsity","type","repeat","shapestruct","dims"])
@@ -1357,8 +1357,8 @@ class DataReference:
   def shape(self):
     return self.v.shape
     
-  def dimString(self):
-    return self.v.dimString()
+  def dim(self):
+    return self.v.dim()
 
   
 class DataReferenceRepeated(DataReference):

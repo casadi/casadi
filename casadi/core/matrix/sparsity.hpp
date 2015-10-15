@@ -423,7 +423,7 @@ namespace casadi {
         the second and 3 (i.e. 1 | 2) if from both */
 #ifndef SWIG
     Sparsity intersect(const Sparsity& y,
-                                 std::vector<unsigned char>& mapping) const;
+                       std::vector<unsigned char>& mapping) const;
 #endif // SWIG
     Sparsity intersect(const Sparsity& y) const;
     Sparsity operator*(const Sparsity& b) const;
@@ -470,9 +470,8 @@ namespace casadi {
     int zz_sprank() const;
     int zz_norm_0_mul(const Sparsity& B) const;
     Sparsity zz_kron(const Sparsity& b) const;
-    /// @}
-    /// \endcond
-
+    Sparsity zz_triu(bool includeDiagonal=true) const;
+    Sparsity zz_tril(bool includeDiagonal=true) const;
 #endif //SWIG
 
     /** \brief Enlarge matrix
@@ -544,17 +543,6 @@ namespace casadi {
     /// Check whether the sparsity-pattern indicates structural singularity
     bool issingular() const;
 
-#if !defined(SWIG) || !defined(SWIGMATLAB)
-
-    /// \cond INTERNAL
-    /// Get upper triangular part
-    Sparsity zz_triu(bool includeDiagonal=true) const;
-
-    /// Get lower triangular part
-    Sparsity zz_tril(bool includeDiagonal=true) const;
-    /// \endcond
-#endif // !defined(SWIG) || !defined(SWIGMATLAB)
-
     /** \brief Do the rows appear sequentially on each column
     *
     * \param[in] strictly if true, then do not allow multiple entries
@@ -593,12 +581,12 @@ namespace casadi {
         the indices are zero-based. If ata is true, the algorithm is equivalent to Matlab's
         etree(A, 'row').
     */
-    std::vector<int> eliminationTree(bool ata=false) const;
+    std::vector<int> elimination_tree(bool ata=false) const;
 
     /** \brief Depth-first search on the adjacency graph of the sparsity
         See Direct Methods for Sparse Linear Systems by Davis (2006).
     */
-    int depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
+    int depth_first_search(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
                          const std::vector<int>& pinv, std::vector<bool>& marked) const;
 
     /** \brief Find the strongly connected components of the bigraph defined by the sparsity pattern
@@ -613,13 +601,13 @@ namespace casadi {
 
         In the case that the matrix is symmetric, the result has a particular interpretation:
         Given a symmetric matrix A and
-        n = A.stronglyConnectedComponents(p, r)
+        n = A.strongly_connected_components(p, r)
 
         => A[p, p] will appear block-diagonal with n blocks and
         with the indices of the block boundaries to be found in r.
 
     */
-    int stronglyConnectedComponents(std::vector<int>& SWIG_OUTPUT(index),
+    int strongly_connected_components(std::vector<int>& SWIG_OUTPUT(index),
                                     std::vector<int>& SWIG_OUTPUT(offset)) const;
 
     /** \brief Compute the Dulmage-Mendelsohn decomposition
@@ -633,11 +621,10 @@ namespace casadi {
         If your matrix is symmetrical, this method is of limited use; permutation can make it
         non-symmetric.
 
-        \sa stronglyConnectedComponents
+        \sa strongly_connected_components
 
     */
-
-    int dulmageMendelsohn(
+    int dulmage_mendelsohn(
         std::vector<int>& SWIG_OUTPUT(rowperm), std::vector<int>& SWIG_OUTPUT(colperm),
         std::vector<int>& SWIG_OUTPUT(rowblock), std::vector<int>& SWIG_OUTPUT(colblock),
         std::vector<int>& SWIG_OUTPUT(coarse_rowblock),
@@ -660,7 +647,7 @@ namespace casadi {
 
     /** \brief Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
         (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) */
-    Sparsity unidirectionalColoring(const Sparsity& AT=Sparsity(),
+    Sparsity uni_coloring(const Sparsity& AT=Sparsity(),
                                     int cutoff = std::numeric_limits<int>::max()) const;
 
     /** \brief Perform a star coloring of a symmetric matrix:
@@ -672,7 +659,7 @@ namespace casadi {
 
         Ordering options: None (0), largest first (1)
     */
-    Sparsity starColoring(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
+    Sparsity star_coloring(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
 
     /** \brief Perform a star coloring of a symmetric matrix:
         A new greedy distance-2 coloring algorithm
@@ -683,21 +670,21 @@ namespace casadi {
 
         Ordering options: None (0), largest first (1)
     */
-    Sparsity starColoring2(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
+    Sparsity star_coloring2(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
 
-    /** \brief Order the cols by decreasing degree */
-    std::vector<int> largestFirstOrdering() const;
+    /** \brief Order the columns by decreasing degree */
+    std::vector<int> largest_first() const;
 
     /** \brief Permute rows and/or columns
         Multiply the sparsity with a permutation matrix from the left and/or from the right
         P * A * trans(P), A * trans(P) or A * trans(P) with P defined by an index vector
         containing the row for each col. As an alternative, P can be transposed (inverted).
     */
-    Sparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_cols=true,
+    Sparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_columns=true,
                    bool invert_permutation=false) const;
 
     /// Get the dimension as a string
-    std::string dimString() const;
+    std::string dim() const;
 
     /** \brief Print a textual representation of sparsity
      */
@@ -705,16 +692,16 @@ namespace casadi {
 
     /** \brief Generate a script for Matlab or Octave which visualizes
      * the sparsity using the spy command  */
-    void spyMatlab(const std::string& mfile) const;
+    void spy_matlab(const std::string& mfile) const;
 
     /** \brief Print a compact description of the sparsity pattern */
-    void printCompact(std::ostream &stream=casadi::userOut()) const;
+    void print_compact(std::ostream &stream=casadi::userOut()) const;
 
     // Hash the sparsity pattern
     std::size_t hash() const;
 
     /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
 
 #ifndef SWIG
     /** \brief Assign the nonzero entries of one sparsity pattern to the nonzero
@@ -735,11 +722,11 @@ namespace casadi {
 
   private:
     /// Construct a sparsity pattern from vectors, reuse cached pattern if possible
-    void assignCached(int nrow, int ncol, const std::vector<int>& colind,
+    void assign_cached(int nrow, int ncol, const std::vector<int>& colind,
                       const std::vector<int>& row);
 
     /// Construct a sparsity pattern from vectors, reuse cached pattern if possible
-    void assignCached(int nrow, int ncol, const int* colind, const int* row);
+    void assign_cached(int nrow, int ncol, const int* colind, const int* row);
 
 #endif //SWIG
   };
@@ -864,7 +851,7 @@ namespace casadi {
     } else {
       // Make sure that dimension matches
       casadi_error("Sparsity::set<DataType>: shape mismatch. lhs is matrix of shape "
-                   << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
+                   << dim() << ", while rhs is shape " << val_sp.dim() << ".");
     }
   }
 
@@ -906,8 +893,8 @@ namespace casadi {
       // Make sure that dimension matches
       casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
                             "Sparsity::add<DataType>: shape mismatch. lhs is matrix of shape "
-                            << dimString() << ", while rhs is shape "
-                            << val_sp.dimString() << ".");
+                            << dim() << ", while rhs is shape "
+                            << val_sp.dim() << ".");
 
       // Sparsity
       const int* c = row();
@@ -915,7 +902,7 @@ namespace casadi {
       const int* v_c = val_sp.row();
       const int* v_rind = val_sp.colind();
 
-      // For all cols
+      // For all columns
       for (int i=0; i<sz2; ++i) {
 
         // Nonzero of the assigning matrix
@@ -987,7 +974,7 @@ namespace casadi {
       // Make sure that dimension matches
       casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
                             "Sparsity::add<DataType>: shape mismatch. lhs is matrix of shape "
-                            << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
+                            << dim() << ", while rhs is shape " << val_sp.dim() << ".");
 
       // Sparsity
       const int* c = row();

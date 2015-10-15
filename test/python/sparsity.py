@@ -353,7 +353,7 @@ class Sparsitytests(casadiTestCase):
       AP = A[perm,perm]
       #AP.sparsity().spy()
 
-      ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = AP.sparsity().dulmageMendelsohn()
+      ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = AP.sparsity().dulmage_mendelsohn()
 
       Ar = AP[rowperm,colperm]
       
@@ -377,7 +377,7 @@ class Sparsitytests(casadiTestCase):
       self.checkarray(truth,tryme)
 
   def test_scc_diagcat_sparse(self):
-    self.message("stronglyConnectedComponents")
+    self.message("strongly_connected_components")
     random.seed(0)
     numpy.random.seed(0)
     for k in range(20):
@@ -390,7 +390,7 @@ class Sparsitytests(casadiTestCase):
       AP = A[perm,perm]
       #AP.sparsity().spy()
 
-      n,p,r = AP.sparsity().stronglyConnectedComponents()
+      n,p,r = AP.sparsity().strongly_connected_components()
       
       Ar = AP[p,p]
       
@@ -422,7 +422,7 @@ class Sparsitytests(casadiTestCase):
     A[2,2] = 1
     A[5,3] = 1
 
-    ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = A.sparsity().dulmageMendelsohn()
+    ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = A.sparsity().dulmage_mendelsohn()
 
     # Checked with CSparse
     self.checkarray(DMatrix([ret]),DMatrix([4]))
@@ -444,7 +444,7 @@ class Sparsitytests(casadiTestCase):
 
     A.sparsity().spy()
 
-    ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = A.sparsity().dulmageMendelsohn()
+    ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = A.sparsity().dulmage_mendelsohn()
 
     # Checked with CSparse
     self.checkarray(DMatrix([ret]),DMatrix([3]))
@@ -466,7 +466,7 @@ class Sparsitytests(casadiTestCase):
 
     A.sparsity().spy()
 
-    ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = A.sparsity().dulmageMendelsohn()
+    ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = A.sparsity().dulmage_mendelsohn()
 
     # Checked with CSparse
     self.checkarray(DMatrix([ret]),DMatrix([1]))

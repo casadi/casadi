@@ -52,8 +52,8 @@ namespace casadi {
         casadi_assert_message(f.sparsity_in(i)==f.sparsity_out(output_accum[n_accum]),
                               "Input #" << i << " and output #" << output_accum[n_accum] <<
                               " must have matching sparsity. " <<
-                              "Got " << f.sparsity_in(i).dimString() << " and " <<
-                              f.sparsity_out(output_accum[n_accum]).dimString() << ".");
+                              "Got " << f.sparsity_in(i).dim() << " and " <<
+                              f.sparsity_out(output_accum[n_accum]).dim() << ".");
         n_accum++;
       }
     }

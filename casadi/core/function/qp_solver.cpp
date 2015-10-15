@@ -40,7 +40,7 @@ namespace casadi {
     return static_cast<const QpSolverInternal*>(Function::operator->());
   }
 
-  bool QpSolver::testCast(const SharedObjectNode* ptr) {
+  bool QpSolver::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const QpSolverInternal*>(ptr)!=0;
   }
 

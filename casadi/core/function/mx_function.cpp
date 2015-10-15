@@ -34,7 +34,7 @@ using namespace std;
 
 namespace casadi {
 
-  bool MXFunction::testCast(const SharedObjectNode* ptr) {
+  bool MXFunction::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const MXFunctionInternal*>(ptr)!=0;
   }
 

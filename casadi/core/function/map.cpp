@@ -55,7 +55,7 @@ namespace casadi {
     return static_cast<const MapReduce*>(Function::operator->());
   }
 
-  bool Map::testCast(const SharedObjectNode* ptr) {
+  bool Map::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const MapReduce*>(ptr)!=0;
   }
 

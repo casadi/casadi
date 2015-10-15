@@ -63,7 +63,7 @@ namespace casadi {
   template<typename DataType>
   bool Matrix<DataType>::__nonzero__() const {
     if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you "
-                                  "provided a shape" << dimString());}
+                                  "provided a shape" << dim());}
     return at(0)!=0;
   }
 
@@ -839,7 +839,7 @@ namespace casadi {
   Matrix<DataType>::Matrix(const Sparsity& sp, const std::vector<DataType>& d, bool dummy) :
       sparsity_(sp), data_(d) {
     casadi_assert_message(sp.nnz()==d.size(), "Size mismatch." << std::endl
-                          << "You supplied a sparsity of " << sp.dimString()
+                          << "You supplied a sparsity of " << sp.dim()
                           << ", but the supplied vector is of length " << d.size());
   }
 
@@ -1251,13 +1251,13 @@ namespace casadi {
       casadi_error("Remove(rr, cc) out of bounds. Your rr contains "
                    << *std::min_element(rr.begin(), rr.end()) << " up to "
                    << *std::max_element(rr.begin(), rr.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
+                   << ", which is outside of the matrix shape " << dim() << ".");
     }
     if (!inBounds(cc, size2())) {
       casadi_error("Remove(rr, cc) out of bounds. Your cc contains "
                    << *std::min_element(cc.begin(), cc.end()) << " up to "
                    << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
+                   << ", which is outside of the matrix shape " << dim() << ".");
     }
 
     // Remove by performing a complementary slice
@@ -1310,15 +1310,15 @@ namespace casadi {
     // Check matching dimensions
     casadi_assert_message(size2()==y.size1(),
                           "Matrix product with incompatible dimensions. Lhs is "
-                          << dimString() << " and rhs is " << y.dimString() << ".");
+                          << dim() << " and rhs is " << y.dim() << ".");
 
     casadi_assert_message(y.size2()==z.size2(),
                           "Matrix addition with incompatible dimensions. Lhs is "
-                          << mul(*this, y).dimString() << " and rhs is " << z.dimString() << ".");
+                          << mul(*this, y).dim() << " and rhs is " << z.dim() << ".");
 
     casadi_assert_message(size1()==z.size1(),
                           "Matrix addition with incompatible dimensions. Lhs is "
-                          << mul(*this, y).dimString() << " and rhs is " << z.dimString() << ".");
+                          << mul(*this, y).dim() << " and rhs is " << z.dim() << ".");
 
     // Check if we can simplify the product
     if (isIdentity()) {
@@ -1468,8 +1468,8 @@ namespace casadi {
       std::stringstream ss;
       casadi_math<DataType>::print(op, ss, "lhs", "rhs");
       casadi_error("matrix_matrix: dimension mismatch in element-wise matrix operation "
-                   << ss.str() <<"." << std::endl << "Left argument has shape " << x.dimString()
-                   << ", right has shape " << y.dimString() << ". They should be equal.");
+                   << ss.str() <<"." << std::endl << "Left argument has shape " << x.dim()
+                   << ", right has shape " << y.dim() << ". They should be equal.");
     }
 
     // Get the sparsity pattern of the result
@@ -2213,7 +2213,7 @@ namespace casadi {
     Matrix<DataType> X = *this;
 
     casadi_assert_message(m>=n, "nullspace(): expecting a flat matrix (more columns than rows), "
-                          "but got " << dimString() << ".");
+                          "but got " << dim() << ".");
 
     Matrix<DataType> seed = DMatrix::eye(m)(Slice(0, m), Slice(n, m));
 
@@ -2256,7 +2256,7 @@ namespace casadi {
 
     // check dimensions
     casadi_assert_message(size1() == size2(), "Cholesky decomposition requires square matrix."
-                                              "Got " << dimString() << " instead.");
+                                              "Got " << dim() << " instead.");
 
     Matrix<DataType> ret = Matrix<DataType>(Sparsity::lower(size1()));
 
@@ -2286,7 +2286,7 @@ namespace casadi {
     // check dimensions
     casadi_assert_message(size1() == b.size1(), "solve Ax=b: dimension mismatch: b has "
                           << b.size1() << " rows while A has " << size1() << ".");
-    casadi_assert_message(size1() == size2(), "solve: A not square but " << dimString());
+    casadi_assert_message(size1() == size2(), "solve: A not square but " << dim());
 
     if (istril()) {
       // forward substitution if lower triangular
@@ -2332,7 +2332,7 @@ namespace casadi {
 
       // Make a BLT transformation of A
       std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-      sparsity().dulmageMendelsohn(rowperm, colperm, rowblock, colblock,
+      sparsity().dulmage_mendelsohn(rowperm, colperm, rowblock, colblock,
                                      coarse_rowblock, coarse_colblock);
 
       // Permute the right hand side
@@ -2486,8 +2486,8 @@ namespace casadi {
   Matrix<DataType> Matrix<DataType>::zz_norm_inf_mul(const Matrix<DataType> &A) const {
     int n_row = A.size2();
     int n_col = size1();
-    casadi_assert_message(A.size1()==size2(), "Dimension error. Got " << dimString()
-                          << " times " << A.dimString() << ".");
+    casadi_assert_message(A.size1()==size2(), "Dimension error. Got " << dim()
+                          << " times " << A.dim() << ".");
 
     // Allocate work vectors
     std::vector<DataType> dwork(n_col);

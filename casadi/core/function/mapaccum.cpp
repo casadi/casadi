@@ -50,7 +50,7 @@ namespace casadi {
     return static_cast<const MapAccumInternal*>(Function::operator->());
   }
 
-  bool MapAccum::testCast(const SharedObjectNode* ptr) {
+  bool MapAccum::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const MapAccumInternal*>(ptr)!=0;
   }
 

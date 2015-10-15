@@ -29,7 +29,7 @@ def color(A):
   print "Original:"
   print repr(IMatrix(A,1))
   print "Colored: "
-  print repr(IMatrix(A.unidirectionalColoring(),1))
+  print repr(IMatrix(A.uni_coloring(),1))
 
 A = Sparsity.diag(5)
 color(A)
@@ -51,14 +51,14 @@ color(A+Sparsity.triplet(5,5,[0]*5,range(5)))
 color(A+Sparsity.triplet(5,5,range(5),[0]*5))
 #! We need 5 directions.
 
-#! Next, we look at starColoring
+#! Next, we look at star_coloring
 
 def color(A):
   print "="*80
   print "Original:"
   print repr(IMatrix(A,1))
   print "Star colored: "
-  print repr(IMatrix(A.starColoring(1),1))
+  print repr(IMatrix(A.star_coloring(1),1))
   
 color(A)
 #! One direction needed to capture all

@@ -73,19 +73,19 @@ namespace casadi {
 
   Sparsity::Sparsity(int nrow, int ncol) {
     std::vector<int> row, colind(ncol+1, 0);
-    assignCached(nrow, ncol, colind, row);
+    assign_cached(nrow, ncol, colind, row);
     sanity_check(true);
   }
 
   Sparsity::Sparsity(const std::pair<int, int>& rc) {
     std::vector<int> row, colind(rc.second+1, 0);
-    assignCached(rc.first, rc.second, colind, row);
+    assign_cached(rc.first, rc.second, colind, row);
     sanity_check(true);
   }
 
   Sparsity::Sparsity(int nrow, int ncol, const std::vector<int>& colind,
                      const std::vector<int>& row) {
-    assignCached(nrow, ncol, colind, row);
+    assign_cached(nrow, ncol, colind, row);
     sanity_check(true);
   }
 
@@ -97,7 +97,7 @@ namespace casadi {
     return *static_cast<const SparsityInternal*>(get());
   }
 
-  bool Sparsity::testCast(const SharedObjectNode* ptr) {
+  bool Sparsity::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const SparsityInternal*>(ptr)!=0;
   }
 
@@ -182,7 +182,7 @@ namespace casadi {
       std::vector<int> rowv=get_row(), colindv=get_colind();
       rowv.push_back(rr);
       for (int c=cc; c<size2; ++c) colindv[c+1]++;
-      assignCached(size1, size2, colindv, rowv);
+      assign_cached(size1, size2, colindv, rowv);
       return rowv.size()-1;
     }
 
@@ -202,7 +202,7 @@ namespace casadi {
     for (int c=cc+1; c<size2+1; ++c) colindv[c]++;
 
     // Return the location of the new element
-    assignCached(size1, size2, colindv, rowv);
+    assign_cached(size1, size2, colindv, rowv);
     return ind;
   }
 
@@ -405,8 +405,8 @@ namespace casadi {
     } else {
       casadi_assert_message(size2()==sp.size2(),
                             "Sparsity::append: Dimension mismatch. "
-                            "You attempt to append a shape " << sp.dimString()
-                            << " to a shape " << dimString()
+                            "You attempt to append a shape " << sp.dim()
+                            << " to a shape " << dim()
                             << ". The number of columns must match.");
       if (sp.size1()==0) {
         // No rows to add
@@ -434,8 +434,8 @@ namespace casadi {
     } else {
       casadi_assert_message(size1()==sp.size1(),
                             "Sparsity::appendColumns: Dimension mismatch. You attempt to "
-                            "append a shape " << sp.dimString() << " to a shape "
-                            << dimString() << ". The number of rows must match.");
+                            "append a shape " << sp.dim() << " to a shape "
+                            << dim() << ". The number of rows must match.");
       if (sp.size2()==0) {
         // No columns to add
         return;
@@ -512,33 +512,33 @@ namespace casadi {
     return (*this)->makeDense(mapping);
   }
 
-  std::string Sparsity::dimString() const {
-    return (*this)->dimString();
+  std::string Sparsity::dim() const {
+    return (*this)->dim();
   }
 
   Sparsity Sparsity::get_diag(std::vector<int>& mapping) const {
     return (*this)->get_diag(mapping);
   }
 
-  std::vector<int> Sparsity::eliminationTree(bool ata) const {
-    return (*this)->eliminationTree(ata);
+  std::vector<int> Sparsity::elimination_tree(bool ata) const {
+    return (*this)->elimination_tree(ata);
   }
 
-  int Sparsity::depthFirstSearch(int j, int top, std::vector<int>& xi,
+  int Sparsity::depth_first_search(int j, int top, std::vector<int>& xi,
                                  std::vector<int>& pstack, const std::vector<int>& pinv,
                                  std::vector<bool>& marked) const {
-    return (*this)->depthFirstSearch(j, top, xi, pstack, pinv, marked);
+    return (*this)->depth_first_search(j, top, xi, pstack, pinv, marked);
   }
 
-  int Sparsity::stronglyConnectedComponents(std::vector<int>& p, std::vector<int>& r) const {
-    return (*this)->stronglyConnectedComponents(p, r);
+  int Sparsity::strongly_connected_components(std::vector<int>& p, std::vector<int>& r) const {
+    return (*this)->strongly_connected_components(p, r);
   }
 
-  int Sparsity::dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm,
+  int Sparsity::dulmage_mendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm,
                                   std::vector<int>& rowblock, std::vector<int>& colblock,
                                   std::vector<int>& coarse_rowblock,
                                   std::vector<int>& coarse_colblock, int seed) const {
-    return (*this)->dulmageMendelsohn(rowperm, colperm, rowblock, colblock,
+    return (*this)->dulmage_mendelsohn(rowperm, colperm, rowblock, colblock,
                                       coarse_rowblock, coarse_colblock, seed);
   }
 
@@ -564,33 +564,33 @@ namespace casadi {
     (*this)->getNZ(indices);
   }
 
-  Sparsity Sparsity::unidirectionalColoring(const Sparsity& AT, int cutoff) const {
+  Sparsity Sparsity::uni_coloring(const Sparsity& AT, int cutoff) const {
     if (AT.isNull()) {
-      return (*this)->unidirectionalColoring(T(), cutoff);
+      return (*this)->uni_coloring(T(), cutoff);
     } else {
-      return (*this)->unidirectionalColoring(AT, cutoff);
+      return (*this)->uni_coloring(AT, cutoff);
     }
   }
 
-  Sparsity Sparsity::starColoring(int ordering, int cutoff) const {
-    return (*this)->starColoring(ordering, cutoff);
+  Sparsity Sparsity::star_coloring(int ordering, int cutoff) const {
+    return (*this)->star_coloring(ordering, cutoff);
   }
 
-  Sparsity Sparsity::starColoring2(int ordering, int cutoff) const {
-    return (*this)->starColoring2(ordering, cutoff);
+  Sparsity Sparsity::star_coloring2(int ordering, int cutoff) const {
+    return (*this)->star_coloring2(ordering, cutoff);
   }
 
-  std::vector<int> Sparsity::largestFirstOrdering() const {
-    return (*this)->largestFirstOrdering();
+  std::vector<int> Sparsity::largest_first() const {
+    return (*this)->largest_first();
   }
 
-  Sparsity Sparsity::pmult(const std::vector<int>& p, bool permute_rows, bool permute_cols,
+  Sparsity Sparsity::pmult(const std::vector<int>& p, bool permute_rows, bool permute_columns,
                            bool invert_permutation) const {
-    return (*this)->pmult(p, permute_rows, permute_cols, invert_permutation);
+    return (*this)->pmult(p, permute_rows, permute_columns, invert_permutation);
   }
 
-  void Sparsity::spyMatlab(const std::string& mfile) const {
-    (*this)->spyMatlab(mfile);
+  void Sparsity::spy_matlab(const std::string& mfile) const {
+    (*this)->spy_matlab(mfile);
   }
 
   void Sparsity::spy(std::ostream &stream) const {
@@ -609,14 +609,14 @@ namespace casadi {
     return (*this)->hash();
   }
 
-  void Sparsity::assignCached(int nrow, int ncol, const std::vector<int>& colind,
+  void Sparsity::assign_cached(int nrow, int ncol, const std::vector<int>& colind,
                               const std::vector<int>& row) {
     casadi_assert(colind.size()==ncol+1);
     casadi_assert(row.size()==colind.back());
-    assignCached(nrow, ncol, getPtr(colind), getPtr(row));
+    assign_cached(nrow, ncol, getPtr(colind), getPtr(row));
   }
 
-  void Sparsity::assignCached(int nrow, int ncol, const int* colind, const int* row) {
+  void Sparsity::assign_cached(int nrow, int ncol, const int* colind, const int* row) {
     // Scalars and empty patterns are handled separately
     if (ncol==0 && nrow==0) {
       // If empty
@@ -997,7 +997,7 @@ namespace casadi {
     // Current nonzero
     std::vector<int>::const_iterator it=mapping1.begin();
 
-    // Loop over cols
+    // Loop over columns
     r_colind[0] = 0;
     for (int i=0; i<ncol; ++i) {
 
@@ -1054,7 +1054,7 @@ namespace casadi {
 
   bool Sparsity::issingular() const {
     casadi_assert_message(issquare(), "issingular: only defined for square matrices, but got "
-                          << dimString());
+                          << dim());
     return sprank(*this)!=size2();
   }
 
@@ -1087,8 +1087,8 @@ namespace casadi {
     return Sparsity(nrow, ncol, vector<int>(colind, colind+ncol+1), vector<int>(row, row+nnz));
   }
 
-  void Sparsity::printCompact(std::ostream &stream) const {
-    (*this)->printCompact(stream);
+  void Sparsity::print_compact(std::ostream &stream) const {
+    (*this)->print_compact(stream);
   }
 
   int Sparsity::bw_upper() const {
@@ -1328,7 +1328,7 @@ namespace casadi {
 
   int Sparsity::zz_sprank() const {
     std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+    dulmage_mendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
     return coarse_colblock.at(3);
   }
 
@@ -1338,8 +1338,8 @@ namespace casadi {
 
   int Sparsity::zz_norm_0_mul(const Sparsity& A) const {
     // Implementation borrowed from Scipy's sparsetools/csr.h
-    casadi_assert_message(A.size1()==size2(), "Dimension error. Got " << dimString()
-                          << " times " << A.dimString() << ".");
+    casadi_assert_message(A.size1()==size2(), "Dimension error. Got " << dim()
+                          << " times " << A.dim() << ".");
 
     int n_row = A.size2();
     int n_col = size1();
@@ -1425,9 +1425,9 @@ namespace casadi {
     // Assert dimensions
     casadi_assert_message(z_sp.size1()==x_sp.size1() && x_sp.size2()==y_sp.size1()
                           && y_sp.size2()==z_sp.size2(),
-                          "Dimension error. Got x=" << x_sp.dimString()
-                          << ", y=" << y_sp.dimString()
-                          << " and z=" << z_sp.dimString() << ".");
+                          "Dimension error. Got x=" << x_sp.dim()
+                          << ", y=" << y_sp.dim()
+                          << " and z=" << z_sp.dim() << ".");
 
     // Direct access to the arrays
     const int* y_colind = y_sp.colind();
@@ -1470,9 +1470,9 @@ namespace casadi {
     // Assert dimensions
     casadi_assert_message(z_sp.size1()==x_sp.size1() && x_sp.size2()==y_sp.size1()
                           && y_sp.size2()==z_sp.size2(),
-                          "Dimension error. Got x=" << x_sp.dimString()
-                          << ", y=" << y_sp.dimString()
-                          << " and z=" << z_sp.dimString() << ".");
+                          "Dimension error. Got x=" << x_sp.dim()
+                          << ", y=" << y_sp.dim()
+                          << " and z=" << z_sp.dim() << ".");
 
     // Direct access to the arrays
     const int* y_colind = y_sp.colind();

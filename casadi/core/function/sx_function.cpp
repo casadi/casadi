@@ -111,7 +111,7 @@ namespace casadi {
     return static_cast<SXFunctionInternal*>(Function::operator->());
   }
 
-  bool SXFunction::testCast(const SharedObjectNode* ptr) {
+  bool SXFunction::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const SXFunctionInternal*>(ptr)!=0;
   }
 

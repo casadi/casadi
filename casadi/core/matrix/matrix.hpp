@@ -170,7 +170,7 @@ namespace casadi {
     using B::istriu;
     using B::colind;
     using B::row;
-    using B::dimString;
+    using B::dim;
     using B::sym;
     using B::zeros;
     using B::ones;

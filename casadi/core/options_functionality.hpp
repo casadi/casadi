@@ -138,7 +138,7 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
     GenericType getOptionDefault(const std::string &str) const;
 
     /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
 
     // Add an option to the recipe list
     static Dict addOptionRecipe(const Dict& dict, const std::string& recipe);

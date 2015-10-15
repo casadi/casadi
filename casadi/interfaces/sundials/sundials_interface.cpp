@@ -236,7 +236,7 @@ namespace casadi {
       casadi_assert_message(
                             jac_.output().size2()==jac_.output().size1(),
                             "SundialsInterface::init: the jacobian of the forward problem must "
-                            "be square but got " << jac_.output().dimString());
+                            "be square but got " << jac_.output().dim());
 
       casadi_assert_message(
                             !jac_.output().sparsity().issingular(),
@@ -253,7 +253,7 @@ namespace casadi {
       casadi_assert_message(
                             jacB_.output().size2()==jacB_.output().size1(),
                             "SundialsInterface::init: the jacobian of the backward problem must be "
-                            "square but got " << jacB_.output().dimString());
+                            "square but got " << jacB_.output().dim());
 
       casadi_assert_message(
                             !jacB_.output().sparsity().issingular(),

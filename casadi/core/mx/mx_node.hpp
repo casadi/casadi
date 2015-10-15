@@ -118,7 +118,7 @@ namespace casadi {
     void can_inline(std::map<const MXNode*, int>& nodeind) const;
 
     /** \brief Print compact */
-    std::string printCompact(std::map<const MXNode*, int>& nodeind,
+    std::string print_compact(std::map<const MXNode*, int>& nodeind,
                              std::vector<std::string>& intermed) const;
 
     /** \brief  Print expression */

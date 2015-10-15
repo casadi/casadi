@@ -108,7 +108,7 @@ namespace casadi {
     /// \endcond
 
     /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
 
 #ifdef WITH_DEPRECATED_FEATURES
     ///@{

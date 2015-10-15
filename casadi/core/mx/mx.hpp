@@ -595,7 +595,7 @@ namespace casadi {
     static int getEqualityCheckingDepth();
 
     /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
 
     /** \brief Get function inputs */
     static std::vector<MX> get_input(const Function& f);

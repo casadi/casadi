@@ -881,7 +881,7 @@ class Matrixtests(casadiTestCase):
         
         c = f.getOutput()
         
-        print sA.dimString(), sB.dimString()
+        print sA.dim(), sB.dim()
 
         try:
           self.checkarray(c,c_ref)

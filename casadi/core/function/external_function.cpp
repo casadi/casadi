@@ -67,7 +67,7 @@ using namespace std;
     return static_cast<const ExternalFunctionInternal*>(Function::operator->());
   }
 
-  bool ExternalFunction::testCast(const SharedObjectNode* ptr) {
+  bool ExternalFunction::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const ExternalFunctionInternal*>(ptr)!=0;
   }
 

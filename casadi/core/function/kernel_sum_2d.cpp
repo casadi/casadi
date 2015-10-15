@@ -49,7 +49,7 @@ namespace casadi {
     return static_cast<const KernelSum2DInternal*>(Function::operator->());
   }
 
-  bool KernelSum2D::testCast(const SharedObjectNode* ptr) {
+  bool KernelSum2D::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const KernelSum2DInternal*>(ptr)!=0;
   }
 

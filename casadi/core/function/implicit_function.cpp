@@ -46,7 +46,7 @@ namespace casadi {
     return static_cast<const ImplicitFunctionInternal*>(Function::operator->());
   }
 
-  bool ImplicitFunction::testCast(const SharedObjectNode* ptr) {
+  bool ImplicitFunction::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const ImplicitFunctionInternal*>(ptr)!=0;
   }
 

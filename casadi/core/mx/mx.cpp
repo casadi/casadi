@@ -598,7 +598,7 @@ namespace casadi {
     // Check matching dimensions
     casadi_assert_message(size2()==y.size1(),
                           "Matrix product with incompatible dimensions. Lhs is "
-                          << dimString() << " and rhs is " << y.dimString() << ".");
+                          << dim() << " and rhs is " << y.dim() << ".");
 
     // Check if we can simplify the product
     if (isIdentity()) {
@@ -655,7 +655,7 @@ namespace casadi {
   MX MX::attachAssert(const MX& y, const std::string &fail_message) const {
     casadi_assert_message(y.isscalar(),
                           "Error in attachAssert: assertion expression y must be scalar, "
-                          "but got " << y.dimString());
+                          "but got " << y.dim());
     return(*this)->getAssertion(y, fail_message);
   }
 
@@ -1014,7 +1014,7 @@ namespace casadi {
     return (*this)->getTranspose();
   }
 
-  bool MX::testCast(const SharedObjectNode* ptr) {
+  bool MX::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const MXNode*>(ptr)!=0;
   }
 
@@ -1041,8 +1041,8 @@ namespace casadi {
       for (int i=0;i<ne.size();i++) {
         casadi_assert_message(ne[i].size1()==ne[0].size1(),
                       "horzcat dimension mismatch  " <<
-                      "x[" << i << "]:" << ne[i].dimString() <<
-                      " and x[0]: " << ne[0].dimString() << ".");
+                      "x[" << i << "]:" << ne[i].dim() <<
+                      " and x[0]: " << ne[0].dim() << ".");
       }
     }
 
@@ -1100,8 +1100,8 @@ namespace casadi {
       for (int i=0;i<ne.size();i++) {
         casadi_assert_message(ne[i].size2()==ne[0].size2(),
                       "vertcat dimension mismatch  " <<
-                      "x[" << i << "]:" << ne[i].dimString() <<
-                      " and x[0]: " << ne[0].dimString() << ".");
+                      "x[" << i << "]:" << ne[i].dim() <<
+                      " and x[0]: " << ne[0].dim() << ".");
       }
     }
 

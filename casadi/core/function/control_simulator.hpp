@@ -129,7 +129,7 @@ namespace casadi {
     const ControlSimulatorInternal* operator->() const;
 
     /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
 
     /** Get the (minor) time grid
      *  The length is (ns-1)*nf + 1

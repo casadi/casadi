@@ -152,7 +152,7 @@ namespace casadi {
 
 #ifndef SWIG
     /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
 #endif // SWIG
 
     /// Check if a plugin is available

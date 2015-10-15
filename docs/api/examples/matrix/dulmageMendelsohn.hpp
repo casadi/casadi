@@ -23,14 +23,14 @@
  */
 
 /** 
-* This example looks at dulmageMendelsohn
+* This example looks at dulmage_mendelsohn
 *
 *
-* \pythonexample{matrix/dulmageMendelsohn}
+* \pythonexample{matrix/dulmage_mendelsohn}
 *
 * \sa
 * \code
-* casadi::Sparsity::dulmageMendelsohn();
+* casadi::Sparsity::dulmage_mendelsohn();
 * casadi::diagcat();
 * \endcode
 *

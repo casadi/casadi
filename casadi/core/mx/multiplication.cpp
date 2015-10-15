@@ -38,8 +38,8 @@ namespace casadi {
     casadi_assert_message(
       x.size2() == y.size1() && x.size1() == z.size1() && y.size2() == z.size2(),
       "Multiplication::Multiplication: dimension mismatch. Attempting to multiply "
-      << x.dimString() << " with " << y.dimString()
-      << " and add the result to " << z.dimString());
+      << x.dim() << " with " << y.dim()
+      << " and add the result to " << z.dim());
 
     setDependencies(z, x, y);
     setSparsity(z.sparsity());

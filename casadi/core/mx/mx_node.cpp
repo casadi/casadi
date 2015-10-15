@@ -230,7 +230,7 @@ namespace casadi {
 
     // Print expression
     vector<string> intermed;
-    string s = printCompact(nodeind, intermed);
+    string s = print_compact(nodeind, intermed);
 
     // Print intermediate expressions
     for (int i=0; i<intermed.size(); ++i)
@@ -257,7 +257,7 @@ namespace casadi {
     }
   }
 
-  std::string MXNode::printCompact(std::map<const MXNode*, int>& nodeind,
+  std::string MXNode::print_compact(std::map<const MXNode*, int>& nodeind,
                                    std::vector<std::string>& intermed) const {
     // Get reference to node index
     int& ind = nodeind[this];
@@ -268,7 +268,7 @@ namespace casadi {
     // Get expressions for dependencies
     vector<string> arg(ndep());
     for (int i=0; i<arg.size(); ++i) {
-      arg[i] = dep(i)->printCompact(nodeind, intermed);
+      arg[i] = dep(i)->print_compact(nodeind, intermed);
     }
 
     // Get expression for this
@@ -417,11 +417,11 @@ namespace casadi {
     MX x = shared_from_this<MX>();
 
     casadi_assert_message(y.size2()==z.size2(), "Dimension error. Got y=" << y.size2()
-                          << " and z=" << z.dimString() << ".");
+                          << " and z=" << z.dim() << ".");
     casadi_assert_message(x.size1()==z.size1(), "Dimension error. Got x="
-                          << x.dimString() << " and z=" << z.dimString() << ".");
+                          << x.dim() << " and z=" << z.dim() << ".");
     casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got y=" << y.size1()
-                          << " and x" << x.dimString() << ".");
+                          << " and x" << x.dim() << ".");
     if (x.isdense() && y.isdense() && z.isdense()) {
       return MX::create(new DenseMultiplication(z, x, y));
     } else {
@@ -531,8 +531,8 @@ namespace casadi {
   MX MXNode::getBinarySwitch(int op, const MX& y) const {
     // Make sure that dimensions match
     casadi_assert_message(sparsity().isscalar() || y.isscalar() || sparsity().size()==y.size(),
-                          "Dimension mismatch." << "lhs is " << sparsity().dimString()
-                          << ", while rhs is " << y.dimString());
+                          "Dimension mismatch." << "lhs is " << sparsity().dim()
+                          << ", while rhs is " << y.dim());
 
     // Create binary node
     if (sparsity().isscalar(false)) {

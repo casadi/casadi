@@ -55,7 +55,7 @@ namespace casadi {
     return static_cast<const ControlSimulatorInternal*>(Function::operator->());
   }
 
-  bool ControlSimulator::testCast(const SharedObjectNode* ptr) {
+  bool ControlSimulator::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const ControlSimulatorInternal*>(ptr)!=0;
   }
 

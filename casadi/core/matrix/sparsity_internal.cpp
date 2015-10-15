@@ -40,10 +40,10 @@ namespace casadi {
 
   void SparsityInternal::repr(ostream &stream) const {
     stream << "Compressed Column Storage: ";
-    printCompact(stream);
+    print_compact(stream);
   }
 
-  void SparsityInternal::printCompact(std::ostream &stream) const {
+  void SparsityInternal::print_compact(std::ostream &stream) const {
     // Print dimensions
     stream << size1() << "x" << size2();
 
@@ -131,7 +131,7 @@ namespace casadi {
     return Sparsity::triplet(size2(), size1(), trans_row, trans_col, mapping, invert_mapping);
   }
 
-  std::vector<int> SparsityInternal::eliminationTree(bool ata) const {
+  std::vector<int> SparsityInternal::elimination_tree(bool ata) const {
     const int* colind = this->colind();
     const int* row = this->row();
 
@@ -182,7 +182,7 @@ namespace casadi {
 
   }
 
-  int SparsityInternal::depthFirstSearch(int j, int top, std::vector<int>& xi,
+  int SparsityInternal::depth_first_search(int j, int top, std::vector<int>& xi,
                                          std::vector<int>& pstack, const std::vector<int>& pinv,
                                          std::vector<bool>& marked) const {
     int head = 0;
@@ -241,7 +241,7 @@ namespace casadi {
     return (top) ;
   }
 
-  int SparsityInternal::stronglyConnectedComponents(std::vector<int>& p,
+  int SparsityInternal::strongly_connected_components(std::vector<int>& p,
                                                     std::vector<int>& r) const {
     // NOTE: This implementation has been copied from CSparse and then modified,
     // it needs cleaning up to be proper C++
@@ -264,7 +264,7 @@ namespace casadi {
     //first dfs(A) to find finish times (xi)
     for (int i = 0; i<size2(); ++i) {
       if (!marked[i]) {
-        top = depthFirstSearch(i, top, xi, pstack, tmp, marked);
+        top = depth_first_search(i, top, xi, pstack, tmp, marked);
       }
     }
 
@@ -284,7 +284,7 @@ namespace casadi {
 
       // node i is the start of a component in p
       r[nb--] = top;
-      top = AT.depthFirstSearch(i, top, p, pstack, tmp, marked);
+      top = AT.depth_first_search(i, top, p, pstack, tmp, marked);
     }
 
     // first block starts at zero; shift r up
@@ -575,7 +575,7 @@ namespace casadi {
         Cimatch[Cjmatch[i]] = i;
   }
 
-  int SparsityInternal::dulmageMendelsohnUpper(std::vector<int>& rowperm,
+  int SparsityInternal::dulmage_mendelsohnUpper(std::vector<int>& rowperm,
                                                std::vector<int>& colperm,
                                                std::vector<int>& rowblock,
                                                std::vector<int>& colblock,
@@ -676,7 +676,7 @@ namespace casadi {
 
     // find strongly connected components of C
     vector<int> scc_p, scc_r;
-    int scc_nb = C.stronglyConnectedComponents(scc_p, scc_r);
+    int scc_nb = C.strongly_connected_components(scc_p, scc_r);
 
     // --- Combine coarse and fine decompositions ---------------------------
 
@@ -996,14 +996,14 @@ namespace casadi {
       // skip j if it is not a root
       if (parent[j] != -1) continue;
 
-      k = depthFirstSearchAndPostorder(j, k, head, next, &post.front(), stack);
+      k = depth_first_searchAndPostorder(j, k, head, next, &post.front(), stack);
     }
 
     // success; return post
     return post;
   }
 
-  int SparsityInternal::depthFirstSearchAndPostorder(int j, int k, int *head,
+  int SparsityInternal::depth_first_searchAndPostorder(int j, int k, int *head,
                                                      const int *next, int *post, int *stack) {
     int i, p, top = 0;
 
@@ -1718,7 +1718,7 @@ namespace casadi {
     // postorder the assembly tree
     for (k = 0, i = 0 ; i <= n ; i++) {
       if (Cp[i] == -1)
-        k = depthFirstSearchAndPostorder(i, k, head, next, &P.front(), w) ;
+        k = depth_first_searchAndPostorder(i, k, head, next, &P.front(), w) ;
     }
 
     return P;
@@ -1808,7 +1808,7 @@ namespace casadi {
       }
 
       // etree of C'*C, where C=A(:, q)
-      S_parent = C->eliminationTree(1);
+      S_parent = C->elimination_tree(1);
 
       post = postorder(S_parent, n);
 
@@ -1881,11 +1881,11 @@ namespace casadi {
       return Sparsity(ret_nrow, ret_nrow, ret_colind, ret_row);
     } else {
       casadi_error("diag: wrong argument shape. Expecting square matrix or vector-like, but got "
-                   << dimString() << " instead.");
+                   << dim() << " instead.");
     }
   }
 
-  std::string SparsityInternal::dimString() const {
+  std::string SparsityInternal::dim() const {
     std::stringstream ss;
     if (numel()==nnz()) {
       ss << size1() << "-by-" << size2() << " (dense)";
@@ -2266,13 +2266,13 @@ namespace casadi {
       casadi_error("Slicing [rr, cc] out of bounds. Your rr contains "
                    << *std::min_element(rr.begin(), rr.end()) << " up to "
                    << *std::max_element(rr.begin(), rr.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
+                   << ", which is outside of the matrix shape " << dim() << ".");
     }
     if (!inBounds(cc, size2())) {
       casadi_error("Slicing [rr, cc] out of bounds. Your cc contains "
                    << *std::min_element(cc.begin(), cc.end()) << " up to "
                    << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
+                   << ", which is outside of the matrix shape " << dim() << ".");
     }
 
     std::vector<int> rr_sorted;
@@ -2839,7 +2839,7 @@ namespace casadi {
   Sparsity SparsityInternal::zz_reshape(int nrow, int ncol) const {
     casadi_assert_message(numel() == nrow*ncol,
                           "reshape: number of elements must remain the same. Old shape is "
-                          << dimString() << ". New shape is " << nrow << "x" << ncol
+                          << dim() << ". New shape is " << nrow << "x" << ncol
                           << "=" << nrow*ncol << ".");
     std::vector<int> ret_col(nnz());
     std::vector<int> ret_row(nnz());
@@ -3064,7 +3064,7 @@ namespace casadi {
     fill(it, indices.end(), -1);
   }
 
-  Sparsity SparsityInternal::unidirectionalColoring(const Sparsity& AT, int cutoff) const {
+  Sparsity SparsityInternal::uni_coloring(const Sparsity& AT, int cutoff) const {
 
     // Allocate temporary vectors
     vector<int> forbiddenColors;
@@ -3153,10 +3153,10 @@ namespace casadi {
 ;
   }
 
-  Sparsity SparsityInternal::starColoring2(int ordering, int cutoff) const {
+  Sparsity SparsityInternal::star_coloring2(int ordering, int cutoff) const {
     casadi_assert_warning(size2()==size1(),
                           "StarColoring requires a square matrix, but got "
-                          << dimString() << ".");
+                          << dim() << ".");
 
     // TODO(Joel): What we need here, is a distance-2 smallest last ordering
     // Reorder, if necessary
@@ -3166,13 +3166,13 @@ namespace casadi {
       casadi_assert(ordering==1);
 
       // Ordering
-      vector<int> ord = largestFirstOrdering();
+      vector<int> ord = largest_first();
 
       // Create a new sparsity pattern
       Sparsity sp_permuted = pmult(ord, true, true, true);
 
       // Star coloring for the permuted matrix
-      Sparsity ret_permuted = sp_permuted.starColoring2(0);
+      Sparsity ret_permuted = sp_permuted.star_coloring2(0);
 
       // Permute result back
       return ret_permuted.pmult(ord, true, false, false);
@@ -3405,21 +3405,21 @@ namespace casadi {
     return Sparsity(size2(), forbiddenColors.size(), ret_colind, ret_row);
   }
 
-  Sparsity SparsityInternal::starColoring(int ordering, int cutoff) const {
+  Sparsity SparsityInternal::star_coloring(int ordering, int cutoff) const {
     casadi_assert_warning(size2()==size1(), "StarColoring requires a square matrix, but got "
-                          << dimString() << ".");
+                          << dim() << ".");
     // Reorder, if necessary
     if (ordering!=0) {
       casadi_assert(ordering==1);
 
       // Ordering
-      vector<int> ord = largestFirstOrdering();
+      vector<int> ord = largest_first();
 
       // Create a new sparsity pattern
       Sparsity sp_permuted = pmult(ord, true, true, true);
 
       // Star coloring for the permuted matrix
-      Sparsity ret_permuted = sp_permuted.starColoring(0);
+      Sparsity ret_permuted = sp_permuted.star_coloring(0);
 
       // Permute result back
       return ret_permuted.pmult(ord, true, false, false);
@@ -3515,7 +3515,7 @@ namespace casadi {
     return Sparsity::triplet(size2(), num_colors, range(color.size()), color);
   }
 
-  std::vector<int> SparsityInternal::largestFirstOrdering() const {
+  std::vector<int> SparsityInternal::largest_first() const {
     vector<int> degree = get_colind();
     int max_degree = 0;
     for (int k=0; k<size2(); ++k) {
@@ -3716,7 +3716,7 @@ namespace casadi {
     }
   }
 
-  void SparsityInternal::spyMatlab(const std::string& mfile_name) const {
+  void SparsityInternal::spy_matlab(const std::string& mfile_name) const {
     // Create the .m file
     ofstream mfile;
     mfile.open(mfile_name.c_str());

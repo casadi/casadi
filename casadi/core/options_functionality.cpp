@@ -522,7 +522,7 @@ void OptionsFunctionality::printOptions(ostream &stream) const {
   (*this)->printOptions(stream);
 }
 
-bool OptionsFunctionality::testCast(const SharedObjectNode* ptr) {
+bool OptionsFunctionality::test_cast(const SharedObjectNode* ptr) {
   return dynamic_cast<const OptionsFunctionalityNode*>(ptr)!=0;
 }
 

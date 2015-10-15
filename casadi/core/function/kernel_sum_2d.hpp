@@ -78,7 +78,7 @@ namespace casadi {
     const KernelSum2DInternal* operator->() const;
 
     /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
   };
 
 } // namespace casadi

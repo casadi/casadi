@@ -601,7 +601,7 @@ namespace casadi {
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+    sp.dulmage_mendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
     // Resort equations and variables
     vector<MX> ddefnew(this->d.size()), dnew(this->d.size());
@@ -740,7 +740,7 @@ namespace casadi {
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+    sp.dulmage_mendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
     // Resort equations and variables
     vector<MX> daenew(this->s.size()), snew(this->s.size()), sdotnew(this->s.size());
@@ -768,7 +768,7 @@ namespace casadi {
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+    sp.dulmage_mendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
     // Resort equations and variables
     vector<MX> algnew(this->z.size()), znew(this->z.size());
@@ -803,7 +803,7 @@ namespace casadi {
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    int nb = sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock,
+    int nb = sp.dulmage_mendelsohn(rowperm, colperm, rowblock, colblock,
                                   coarse_rowblock, coarse_colblock);
 
     // Resort equations and variables
@@ -887,7 +887,7 @@ namespace casadi {
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    int nb = sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock,
+    int nb = sp.dulmage_mendelsohn(rowperm, colperm, rowblock, colblock,
                                   coarse_rowblock, coarse_colblock);
 
     // Resort equations and variables

@@ -239,7 +239,7 @@ namespace casadi {
     const NlpSolverInternal* operator->() const;
 
     /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
 
     /// Check if a plugin is available
     static bool hasPlugin(const std::string& name);

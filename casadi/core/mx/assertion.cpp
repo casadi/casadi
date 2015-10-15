@@ -33,7 +33,7 @@ namespace casadi {
       : fail_message_(fail_message) {
     casadi_assert_message(y.isscalar(),
                           "Assertion:: assertion expression y must be scalar, but got "
-                          << y.dimString());
+                          << y.dim());
     setDependencies(x, y);
     setSparsity(x.sparsity());
   }

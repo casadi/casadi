@@ -102,7 +102,7 @@ namespace casadi {
     void can_inline(std::map<const SXNode*, int>& nodeind) const;
 
     /** \brief Print compact */
-    std::string printCompact(std::map<const SXNode*, int>& nodeind,
+    std::string print_compact(std::map<const SXNode*, int>& nodeind,
                              std::vector<std::string>& intermed) const;
 
     /** \brief  Print expression */

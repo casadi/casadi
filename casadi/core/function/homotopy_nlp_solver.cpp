@@ -40,7 +40,7 @@ namespace casadi {
     return static_cast<const HomotopyNLPInternal*>(Function::operator->());
   }
 
-  bool HomotopyNlpSolver::testCast(const SharedObjectNode* ptr) {
+  bool HomotopyNlpSolver::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const HomotopyNLPInternal*>(ptr)!=0;
   }
 

@@ -71,7 +71,7 @@ namespace casadi {
   template<>
   bool Matrix<SXElement>::__nonzero__() const {
     if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you "
-                                  "provided a shape" << dimString());}
+                                  "provided a shape" << dim());}
     return at(0).__nonzero__();
   }
 
@@ -526,7 +526,7 @@ namespace casadi {
           return substitute(ex, v, vdef_mod);
         } else {
           casadi_error("subsitute(ex, v, vdef): sparsities of v and vdef must match. Got v: "
-                       << v[k].dimString() << " and " << "vdef: " << vdef[k].dimString() << ".");
+                       << v[k].dim() << " and " << "vdef: " << vdef[k].dim() << ".");
         }
       }
     }
@@ -963,7 +963,7 @@ namespace casadi {
     const SX& p = *this;
     casadi_assert_message(p.size2()==1,
                           "poly_root(): supplied parameter must be column vector but got "
-                          << p.dimString() << ".");
+                          << p.dim() << ".");
     casadi_assert(p.isdense());
     if (p.size1()==2) { // a*x + b
       SX a = p(0);
@@ -1056,7 +1056,7 @@ namespace casadi {
     /// Bring m in block diagonal form, calculating eigenvalues of each block separately
     vector<int> offset;
     vector<int> index;
-    int nb = m.sparsity().stronglyConnectedComponents(offset, index);
+    int nb = m.sparsity().strongly_connected_components(offset, index);
 
     SX m_perm = m(offset, offset);
 
@@ -1094,7 +1094,7 @@ namespace casadi {
     nz.reserve(nnz());
     inter.resize(0);
     for (vector<SXElement>::const_iterator i=begin(); i!=end(); ++i)
-      nz.push_back((*i)->printCompact(nodeind, inter));
+      nz.push_back((*i)->print_compact(nodeind, inter));
   }
 
   template<> vector<SX> SX::get_input(const Function& f) {

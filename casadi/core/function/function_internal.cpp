@@ -190,12 +190,12 @@ namespace casadi {
     stream << " Number of inputs: " << n_in() << endl;
     for (int i=0; i<n_in(); ++i) {
       stream << "  Input " << i  << ", a.k.a. \"" << name_in(i) << "\", "
-             << input(i).dimString() << ", " << description_in(i) << endl;
+             << input(i).dim() << ", " << description_in(i) << endl;
     }
     stream << " Number of outputs: " << n_out() << endl;
     for (int i=0; i<n_out(); ++i) {
       stream << "  Output " << i  << ", a.k.a. \"" << name_out(i) << "\", "
-             << output(i).dimString() << ", " << description_out(i) << endl;
+             << output(i).dim() << ", " << description_out(i) << endl;
     }
   }
 
@@ -564,9 +564,9 @@ namespace casadi {
       // Clear the fine block structure
       fine.clear();
 
-      Sparsity D = r.starColoring();
+      Sparsity D = r.star_coloring();
 
-      casadi_msg("Star coloring on " << r.dimString() << ": " << D.size2() << " <-> " << D.size1());
+      casadi_msg("Star coloring on " << r.dim() << ": " << D.size2() << " <-> " << D.size1());
 
       // Reset the virtual machine
       spInit(true);
@@ -827,11 +827,11 @@ namespace casadi {
       /**       Decide which ad_mode to take           */
 
       // Forward mode
-      Sparsity D1 = rT.unidirectionalColoring(r);
+      Sparsity D1 = rT.uni_coloring(r);
       // Adjoint mode
-      Sparsity D2 = r.unidirectionalColoring(rT);
+      Sparsity D2 = r.uni_coloring(rT);
 
-      casadi_msg("Coloring on " << r.dimString() << " (fwd seeps: " << D1.size2() <<
+      casadi_msg("Coloring on " << r.dim() << " (fwd seeps: " << D1.size2() <<
                  " , adj sweeps: " << D2.size1() << ")");
 
       // Use forward mode?
@@ -1151,8 +1151,8 @@ namespace casadi {
       casadi_assert(numDerForward()>0);
 
       // Star coloring if symmetric
-      log("FunctionInternal::getPartition starColoring");
-      D1 = A.starColoring();
+      log("FunctionInternal::getPartition star_coloring");
+      D1 = A.star_coloring();
       casadi_msg("Star coloring completed: " << D1.size2() << " directional derivatives needed ("
                  << A.size1() << " without coloring).");
 
@@ -1185,7 +1185,7 @@ namespace casadi {
           log("FunctionInternal::getPartition unidirectional coloring (forward mode)");
           int max_colorings_to_test = best_coloring>=w*A.size1() ? A.size1() :
             floor(best_coloring/w);
-          D1 = AT.unidirectionalColoring(A, max_colorings_to_test);
+          D1 = AT.uni_coloring(A, max_colorings_to_test);
           if (D1.isNull()) {
             if (verbose()) userOut() << "Forward mode coloring interrupted (more than "
                                << max_colorings_to_test << " needed)." << endl;
@@ -1201,7 +1201,7 @@ namespace casadi {
           int max_colorings_to_test = best_coloring>=(1-w)*A.size2() ? A.size2() :
             floor(best_coloring/(1-w));
 
-          D2 = A.unidirectionalColoring(AT, max_colorings_to_test);
+          D2 = A.uni_coloring(AT, max_colorings_to_test);
           if (D2.isNull()) {
             if (verbose()) userOut() << "Adjoint mode coloring interrupted (more than "
                                << max_colorings_to_test << " needed)." << endl;

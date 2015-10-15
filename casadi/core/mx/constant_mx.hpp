@@ -529,7 +529,7 @@ namespace casadi {
       }
     } else if (sparsity().isempty()) {
       // Print empty
-      sparsity().printCompact(ss);
+      sparsity().print_compact(ss);
     } else {
       // Print value
       if (v_.value==0) {
@@ -547,7 +547,7 @@ namespace casadi {
       }
 
       // Print sparsity
-      sparsity().printCompact(ss);
+      sparsity().print_compact(ss);
       ss << ")";
     }
     return ss.str();
