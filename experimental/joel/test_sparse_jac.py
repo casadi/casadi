@@ -68,5 +68,5 @@ print "J2(x0)", array(J2.getOutput())
 
 # Print difference
 print "Difference: ", J2.getOutput()-J1.getOutput()
-assert isEqual(J1.getOutput(),J2.getOutput())
+assert is_equal(J1.getOutput(),J2.getOutput())
 

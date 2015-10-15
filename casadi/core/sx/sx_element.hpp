@@ -242,7 +242,7 @@ namespace casadi {
     Matrix<SXElement> zz_constpow(const Matrix<SXElement>& n) const;
     Matrix<SXElement> zz_copysign(const Matrix<SXElement>& n) const;
     Matrix<SXElement> zz_atan2(const Matrix<SXElement>& b) const;
-    bool zz_isEqual(const SXElement& scalar, int depth=0) const;
+    bool zz_is_equal(const SXElement& scalar, int depth=0) const;
     SXElement zz_simplify() const;
 
     /// \cond INTERNAL

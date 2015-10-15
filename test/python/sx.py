@@ -498,7 +498,7 @@ class SXtests(casadiTestCase):
     self.assertTrue(w.isSymbolic())
     self.assertTrue(dependsOn(w,y))
     self.assertFalse(dependsOn(w,x))
-    self.assertTrue(isEqual(w,y))
+    self.assertTrue(is_equal(w,y))
     r=w-y
     self.assertFalse(r.isSymbolic())     
     self.assertTrue(r.isZero())
@@ -535,7 +535,7 @@ class SXtests(casadiTestCase):
     x=SX.sym("x")
     
     if CasadiOptions.getSimplificationOnTheFly():
-      self.assertTrue(isEqual(taylor(sin(x),x),x))
+      self.assertTrue(is_equal(taylor(sin(x),x),x))
       
     a_=0.13
     x_=0.15
@@ -681,12 +681,12 @@ class SXtests(casadiTestCase):
     self.assertRaises(NotImplementedError,lambda: SX.fun("f", [[x], [None]], [[2 * x]]))
 
   @known_bug()  # Not implemented
-  def test_isEqual(self):
+  def test_is_equal(self):
     self.message("equivalent")
     x = SX.sym("x")
     a = x*x
     b = x*x
-    self.assertTrue(a.isEqual(b,1))
+    self.assertTrue(a.is_equal(b,1))
     
   @skip(not CasadiOptions.getSimplificationOnTheFly())
   def test_SXsimplifications(self):
@@ -853,24 +853,24 @@ class SXtests(casadiTestCase):
     w = symvar(e)
     self.assertEqual(len(w),3)
     if CasadiOptions.getSimplificationOnTheFly():
-      self.assertTrue(isEqual(w[0],a))
-      self.assertTrue(isEqual(w[1],b))
-      self.assertTrue(isEqual(w[2],c))
+      self.assertTrue(is_equal(w[0],a))
+      self.assertTrue(is_equal(w[1],b))
+      self.assertTrue(is_equal(w[2],c))
       
   def test_poly_coeff(self):
     x =SX.sym("x")
     a= SX.sym("a")
     c=SX.sym("c")
     p=poly_coeff(12*x**4+x**2+a*x+c,x)
-    self.assertTrue(isEqual(p[0],12))
-    self.assertTrue(isEqual(p[1],0))
-    self.assertTrue(isEqual(p[2],1))
-    self.assertTrue(isEqual(p[3],a))
-    self.assertTrue(isEqual(p[4],c))
+    self.assertTrue(is_equal(p[0],12))
+    self.assertTrue(is_equal(p[1],0))
+    self.assertTrue(is_equal(p[2],1))
+    self.assertTrue(is_equal(p[3],a))
+    self.assertTrue(is_equal(p[4],c))
     
     p=poly_coeff((x-a)*(x+a),x)
-    self.assertTrue(isEqual(p[0],1))
-    self.assertTrue(isEqual(p[1],0))
+    self.assertTrue(is_equal(p[0],1))
+    self.assertTrue(is_equal(p[1],0))
     
   def test_poly_roots(self):
   

@@ -2898,7 +2898,7 @@ DECL M %HIDE(atan2)(const M& x, const M& y) { return atan2(x, y); }
 DECL M %HIDE(min)(const M& x, const M& y) { return fmin(x, y); }
 DECL M %HIDE(max)(const M& x, const M& y) { return fmax(x, y); }
 DECL M %SHOW(simplify)(const M& x) { return simplify(x); }
-DECL bool %SHOW(isEqual)(const M& x, const M& y, int depth=0) { return isEqual(x, y, depth); }
+DECL bool %SHOW(is_equal)(const M& x, const M& y, int depth=0) { return is_equal(x, y, depth); }
 DECL bool %SHOW(iszero)(const M& x) { return iszero(x); }
 DECL M %HIDE(copysign)(const M& x, const M& y) { return copysign(x, y); }
 DECL M %HIDE(constpow)(const M& x, const M& y) { return constpow(x, y); }

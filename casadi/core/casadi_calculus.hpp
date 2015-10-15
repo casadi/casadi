@@ -228,7 +228,7 @@ namespace casadi {
   inline double sign(double x) { return x<0 ? -1 : x>0 ? 1 : x;}
 
   /// Compare if two values are equal, up to a depth
-  inline bool isEqual(double x, double y, int depth=0) { return x==y;}
+  inline bool is_equal(double x, double y, int depth=0) { return x==y;}
 
   /// fmin, fmax and erf should be available if C99 and/or C++11 required
   inline double fmin(double x, double y) throw() { return std::min(x, y);}

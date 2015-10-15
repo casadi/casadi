@@ -1073,7 +1073,7 @@ namespace casadi {
     // the output is known to be the output expressions
     const int checking_depth = 2;
     for (int i=0; i<arg.size(); ++i) {
-      if (!isEqual(arg[i], inputv_[i], checking_depth)) {
+      if (!is_equal(arg[i], inputv_[i], checking_depth)) {
         return false;
       }
     }

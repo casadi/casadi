@@ -421,7 +421,7 @@ namespace casadi {
     Matrix<DataType> zz_power(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_mod(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_simplify() const;
-    bool zz_isEqual(const Matrix<DataType> &ex2, int depth=0) const;
+    bool zz_is_equal(const Matrix<DataType> &ex2, int depth=0) const;
     Matrix<DataType> zz_copysign(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_constpow(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_not() const;

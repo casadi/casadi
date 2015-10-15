@@ -283,16 +283,16 @@ class Toolstests(casadiTestCase):
     self.assertEqual(V.size,14)
 
     self.assertTrue(isinstance(V.cat,MX)) 
-    def isEqualV(a,b):
+    def is_equalV(a,b):
       ft = MX.fun("ft", [x,m],[a-b])
       for i in range(ft.n_in()):
         ft.setInput(numpy.random.rand(*ft.size_in(i)),i)
       ft.evaluate()
       self.checkarray(ft.getOutput(),DMatrix.zeros(*ft.size_out(0)))
     
-    isEqualV(V["x"],x)
-    isEqualV(V["y",0],y0)
-    isEqualV(V["y",1],y1)
+    is_equalV(V["x"],x)
+    is_equalV(V["y",0],y0)
+    is_equalV(V["y",1],y1)
     self.assertEqual(V["y",0,'a'].shape,(1,1))
     
     with self.assertRaises(Exception):
@@ -300,14 +300,14 @@ class Toolstests(casadiTestCase):
     abc = MX.sym("abc",2)
     V["y",0] = abc
     
-    def isEqualV(a,b):
+    def is_equalV(a,b):
       ft = MX.fun("ft", [x,m,abc],[a-b])
       for i in range(ft.n_in()):
         ft.setInput(numpy.random.rand(*ft.size_in(i)),i)
       ft.evaluate()
       self.checkarray(ft.getOutput(),DMatrix.zeros(*ft.size_out(0)))
       
-    isEqualV(V["y",0],abc)
+    is_equalV(V["y",0],abc)
 
     states = struct_symSX([
                 entry('x'),
@@ -333,7 +333,7 @@ class Toolstests(casadiTestCase):
     self.assertTrue('x' in s[0][0])
     self.assertEqual(len(s[0][0]),7)
     if CasadiOptions.getSimplificationOnTheFly():
-      self.assertTrue(isEqual(s[0][0]["x"],shooting["X",0,0,"x"]))
+      self.assertTrue(is_equal(s[0][0]["x"],shooting["X",0,0,"x"]))
     
     
     init = shooting(nan)

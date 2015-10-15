@@ -218,18 +218,18 @@ namespace casadi {
 #endif // SWIG
     /// \name Check if two sparsity patterns are identical
     /// @{
-    bool isEqual(const Sparsity& y) const;
-    bool isEqual(int nrow, int ncol, const std::vector<int>& colind,
+    bool is_equal(const Sparsity& y) const;
+    bool is_equal(int nrow, int ncol, const std::vector<int>& colind,
                  const std::vector<int>& row) const;
 #ifndef SWIG
-    bool isEqual(int nrow, int ncol, const int* colind, const int* row) const;
+    bool is_equal(int nrow, int ncol, const int* colind, const int* row) const;
 #endif // SWIG
 
-    bool operator==(const Sparsity& y) const { return isEqual(y);}
+    bool operator==(const Sparsity& y) const { return is_equal(y);}
     /// @}
 
     /// Check if two sparsity patterns are difference
-    bool operator!=(const Sparsity& y) const {return !isEqual(y);}
+    bool operator!=(const Sparsity& y) const {return !is_equal(y);}
 
 #ifndef SWIG
     /** \brief Implicit or explicit type conversion to C representation

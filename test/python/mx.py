@@ -1487,9 +1487,9 @@ class MXtests(casadiTestCase):
     w = symvar(e)
     self.assertEqual(len(w),3)
     if CasadiOptions.getSimplificationOnTheFly():
-      self.assertTrue(isEqual(w[0],a))
-      self.assertTrue(isEqual(w[1],b))
-      self.assertTrue(isEqual(w[2],c))
+      self.assertTrue(is_equal(w[0],a))
+      self.assertTrue(is_equal(w[1],b))
+      self.assertTrue(is_equal(w[2],c))
     
   def test_iter(self):
     self.assertEqual(len(list(MX.sym("x",2))),2)
@@ -2118,7 +2118,7 @@ class MXtests(casadiTestCase):
     print "vertcat:", r
     print "result:", vertcat(r+[y])
     
-    self.assertTrue(isEqual(vertcat(vertsplit(x)),x))
+    self.assertTrue(is_equal(vertcat(vertsplit(x)),x))
     
   def test_horzcat_simp(self):
     x = MX.sym("x",1,10)
@@ -2168,7 +2168,7 @@ class MXtests(casadiTestCase):
     print "vertcat:", r
     print "result:", horzcat(r+[y])
 
-    self.assertTrue(isEqual(horzcat(horzsplit(x)),x))
+    self.assertTrue(is_equal(horzcat(horzsplit(x)),x))
     
   def test_vertsplit_simp(self):
     
@@ -2246,7 +2246,7 @@ class MXtests(casadiTestCase):
     self.checkarray(s[1],DMatrix(aa_[1:]))
     
     for i in range(5):
-      self.assertTrue(isEqual(vertsplit(vertcat(dvars))[i],dvars[i]))
+      self.assertTrue(is_equal(vertsplit(vertcat(dvars))[i],dvars[i]))
 
   def test_horzsplit_simp(self):
     
@@ -2324,7 +2324,7 @@ class MXtests(casadiTestCase):
     self.checkarray(s[1],DMatrix(aa_[1:]).T)
     
     for i in range(5):
-      self.assertTrue(isEqual(horzsplit(horzcat(dvars))[i],dvars[i]))
+      self.assertTrue(is_equal(horzsplit(horzcat(dvars))[i],dvars[i]))
       
   def test_vertsplit_derivative(self):
     m = MX.sym("X",10)

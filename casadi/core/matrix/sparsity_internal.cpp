@@ -2500,7 +2500,7 @@ namespace casadi {
                                                 std::vector<unsigned char>& mapping) const {
 
     // Quick return if identical
-    if (isEqual(y)) {
+    if (is_equal(y)) {
       if (with_mapping) {
         mapping.resize(y.nnz());
         fill(mapping.begin(), mapping.end(), 1 | 2);
@@ -2589,12 +2589,12 @@ namespace casadi {
     return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
-  bool SparsityInternal::isEqual(const Sparsity& y) const {
+  bool SparsityInternal::is_equal(const Sparsity& y) const {
     // Quick true if the objects are the same
     if (this == y.get()) return true;
 
     // Otherwise, compare the patterns
-    return isEqual(y.size1(), y.size2(), y.colind(), y.row());
+    return is_equal(y.size1(), y.size2(), y.colind(), y.row());
   }
 
   Sparsity SparsityInternal::pattern_inverse() const {
@@ -2639,14 +2639,14 @@ namespace casadi {
   }
 
 
-  bool SparsityInternal::isEqual(int y_nrow, int y_ncol, const std::vector<int>& y_colind,
+  bool SparsityInternal::is_equal(int y_nrow, int y_ncol, const std::vector<int>& y_colind,
                                  const std::vector<int>& y_row) const {
     casadi_assert(y_colind.size()==y_ncol+1);
     casadi_assert(y_row.size()==y_colind.back());
-    return isEqual(y_nrow, y_ncol, getPtr(y_colind), getPtr(y_row));
+    return is_equal(y_nrow, y_ncol, getPtr(y_colind), getPtr(y_row));
   }
 
-  bool SparsityInternal::isEqual(int y_nrow, int y_ncol,
+  bool SparsityInternal::is_equal(int y_nrow, int y_ncol,
                                  const int* y_colind, const int* y_row) const {
     const int* colind = this->colind();
     const int* row = this->row();
@@ -3661,7 +3661,7 @@ namespace casadi {
     const int* y_row = y.row();
 
     // If same number of rows, check if patterns are identical
-    if (size1()==y.size1()) return isEqual(y.size1(), y.size2(), y_colind, y_row);
+    if (size1()==y.size1()) return is_equal(y.size1(), y.size2(), y_colind, y_row);
 
     // Loop over the elements
     for (int cc=0; cc<size2(); ++cc) {

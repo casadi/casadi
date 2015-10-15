@@ -443,7 +443,7 @@ namespace casadi {
     casadi_assert_message(w.isempty(), "gauss_quadrature: empty weights");
 
     // Change variables to [-1, 1]
-    if (!isEqual(a.toScalar(), -1) || !isEqual(b.toScalar(), 1)) {
+    if (!is_equal(a.toScalar(), -1) || !is_equal(b.toScalar(), 1)) {
       SX q1 = (b-a)/2;
       SX q2 = (b+a)/2;
 
@@ -509,7 +509,7 @@ namespace casadi {
     // Quick return if all equal
     bool all_equal = true;
     for (int k=0; k<v.size(); ++k) {
-      if (v[k].size()!=vdef[k].size() || !isEqual(v[k], vdef[k])) {
+      if (v[k].size()!=vdef[k].size() || !is_equal(v[k], vdef[k])) {
         all_equal = false;
         break;
       }
@@ -1035,7 +1035,7 @@ namespace casadi {
                        -p + q - r -s,
                        -p - q + r -s);
       return ret;
-    } else if (isEqual(p(p.nnz()-1).at(0), 0)) {
+    } else if (is_equal(p(p.nnz()-1).at(0), 0)) {
       SX ret = vertcat(poly_roots(p(range(p.nnz()-1))),
                        0);
       return ret;

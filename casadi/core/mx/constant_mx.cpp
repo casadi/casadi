@@ -165,7 +165,7 @@ namespace casadi {
     }
   }
 
-  bool ConstantDMatrix::zz_isEqual(const MXNode* node, int depth) const {
+  bool ConstantDMatrix::zz_is_equal(const MXNode* node, int depth) const {
     // Check if same node
     const ConstantDMatrix* n = dynamic_cast<const ConstantDMatrix*>(node);
     if (n==0) return false;

@@ -676,7 +676,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  bool SetNonzerosVector<Add>::zz_isEqual(const MXNode* node, int depth) const {
+  bool SetNonzerosVector<Add>::zz_is_equal(const MXNode* node, int depth) const {
     // Check dependencies
     if (!this->sameOpAndDeps(node, depth)) return false;
 
@@ -695,7 +695,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  bool SetNonzerosSlice<Add>::zz_isEqual(const MXNode* node, int depth) const {
+  bool SetNonzerosSlice<Add>::zz_is_equal(const MXNode* node, int depth) const {
     // Check dependencies
     if (!this->sameOpAndDeps(node, depth)) return false;
 
@@ -713,7 +713,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  bool SetNonzerosSlice2<Add>::zz_isEqual(const MXNode* node, int depth) const {
+  bool SetNonzerosSlice2<Add>::zz_is_equal(const MXNode* node, int depth) const {
     // Check dependencies
     if (!this->sameOpAndDeps(node, depth)) return false;
 

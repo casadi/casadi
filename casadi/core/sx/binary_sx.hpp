@@ -135,13 +135,13 @@ class CASADI_EXPORT BinarySX : public SXNode {
     virtual bool hasDep() const { return true; }
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const SXNode* node, int depth) const {
+    virtual bool zz_is_equal(const SXNode* node, int depth) const {
       const BinarySX* n = dynamic_cast<const BinarySX*>(node);
       if (n==0) return false;
       if (n->op_ != op_) return false;
-      if (n->dep0_.zz_isEqual(dep0_, depth-1) && n->dep1_.zz_isEqual(dep1_, depth-1)) return true;
-      if (operation_checker<CommChecker>(op_) && n->dep1_.zz_isEqual(dep0_, depth-1) &&
-         n->dep0_.zz_isEqual(dep1_, depth-1)) return true;
+      if (n->dep0_.zz_is_equal(dep0_, depth-1) && n->dep1_.zz_is_equal(dep1_, depth-1)) return true;
+      if (operation_checker<CommChecker>(op_) && n->dep1_.zz_is_equal(dep0_, depth-1) &&
+         n->dep0_.zz_is_equal(dep1_, depth-1)) return true;
       return false;
     }
 

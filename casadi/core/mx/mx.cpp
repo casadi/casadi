@@ -857,15 +857,15 @@ namespace casadi {
     return (*this)->getOp();
   }
 
-  bool MX::zz_isEqual(const MX& y, int depth) const {
-    return zz_isEqual(static_cast<const MXNode*>(y.get()), depth);
+  bool MX::zz_is_equal(const MX& y, int depth) const {
+    return zz_is_equal(static_cast<const MXNode*>(y.get()), depth);
   }
 
-  bool MX::zz_isEqual(const MXNode* y, int depth) const {
+  bool MX::zz_is_equal(const MXNode* y, int depth) const {
     if (get()==y)
       return true;
     else if (depth>0)
-      return (*this)->zz_isEqual(y, depth);
+      return (*this)->zz_is_equal(y, depth);
     else
       return false;
   }
@@ -1464,7 +1464,7 @@ namespace casadi {
     // Quick return if all equal
     bool all_equal = true;
     for (int k=0; k<v.size(); ++k) {
-      if (v[k].size()!=vdef[k].size() || !isEqual(v[k], vdef[k])) {
+      if (v[k].size()!=vdef[k].size() || !is_equal(v[k], vdef[k])) {
         all_equal = false;
         break;
       }

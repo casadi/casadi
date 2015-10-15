@@ -94,15 +94,15 @@ namespace casadi {
     virtual MX getBinary(int op, const MX& y, bool scX, bool scY) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const MXNode* node, int depth) const {
+    virtual bool zz_is_equal(const MXNode* node, int depth) const {
       if (op_==node->getOp()) {
-        if (isEqual(dep(0), node->dep(0), depth-1) && isEqual(dep(1), node->dep(1), depth-1)) {
+        if (is_equal(dep(0), node->dep(0), depth-1) && is_equal(dep(1), node->dep(1), depth-1)) {
           // If arguments are equal
           return true;
         } else {
           // If arguments are flipped
-          return operation_checker<CommChecker>(op_) && isEqual(dep(1), node->dep(0), depth-1) &&
-            isEqual(dep(0), node->dep(1), depth-1);
+          return operation_checker<CommChecker>(op_) && is_equal(dep(1), node->dep(0), depth-1) &&
+            is_equal(dep(0), node->dep(1), depth-1);
         }
       } else {
         return false;

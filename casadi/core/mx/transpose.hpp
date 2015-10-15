@@ -96,7 +96,7 @@ namespace casadi {
     // return dep()->getSolve(r, !tr, linear_solver);} // FIXME #1001
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const MXNode* node, int depth) const {
+    virtual bool zz_is_equal(const MXNode* node, int depth) const {
       return sameOpAndDeps(node, depth);
     }
   };

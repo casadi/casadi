@@ -369,17 +369,17 @@ namespace casadi {
     return (*this)->patternProduct(y);
   }
 
-  bool Sparsity::isEqual(const Sparsity& y) const {
-    return (*this)->isEqual(y);
+  bool Sparsity::is_equal(const Sparsity& y) const {
+    return (*this)->is_equal(y);
   }
 
-  bool Sparsity::isEqual(int nrow, int ncol, const std::vector<int>& colind,
+  bool Sparsity::is_equal(int nrow, int ncol, const std::vector<int>& colind,
                          const std::vector<int>& row) const {
-    return (*this)->isEqual(nrow, ncol, colind, row);
+    return (*this)->is_equal(nrow, ncol, colind, row);
   }
 
-  bool Sparsity::isEqual(int nrow, int ncol, const int* colind, const int* row) const {
-    return (*this)->isEqual(nrow, ncol, colind, row);
+  bool Sparsity::is_equal(int nrow, int ncol, const int* colind, const int* row) const {
+    return (*this)->is_equal(nrow, ncol, colind, row);
   }
 
   Sparsity Sparsity::operator+(const Sparsity& b) const {
@@ -666,7 +666,7 @@ namespace casadi {
           Sparsity ref = shared_cast<Sparsity>(wref.shared());
 
           // Check if the pattern matches
-          if (ref.isEqual(nrow, ncol, colind, row)) {
+          if (ref.is_equal(nrow, ncol, colind, row)) {
 
             // Found match!
             assignNode(ref.get());
@@ -705,7 +705,7 @@ namespace casadi {
               Sparsity ref = shared_cast<Sparsity>(j->second.shared());
 
               // Match found if sparsity matches
-              if (ref.isEqual(nrow, ncol, colind, row)) {
+              if (ref.is_equal(nrow, ncol, colind, row)) {
                 assignNode(ref.get());
                 return;
               }
