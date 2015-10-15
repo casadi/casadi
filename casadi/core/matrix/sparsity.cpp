@@ -337,36 +337,36 @@ namespace casadi {
     return (*this)->T();
   }
 
-  Sparsity Sparsity::patternCombine(const Sparsity& y, bool f0x_is_zero,
+  Sparsity Sparsity::combine(const Sparsity& y, bool f0x_is_zero,
                                     bool function0_is_zero,
                                     std::vector<unsigned char>& mapping) const {
-    return (*this)->patternCombine(y, f0x_is_zero, function0_is_zero, mapping);
+    return (*this)->combine(y, f0x_is_zero, function0_is_zero, mapping);
   }
 
-  Sparsity Sparsity::patternCombine(const Sparsity& y, bool f0x_is_zero,
+  Sparsity Sparsity::combine(const Sparsity& y, bool f0x_is_zero,
                                     bool function0_is_zero) const {
-    return (*this)->patternCombine(y, f0x_is_zero, function0_is_zero);
+    return (*this)->combine(y, f0x_is_zero, function0_is_zero);
   }
 
-  Sparsity Sparsity::patternUnion(const Sparsity& y, std::vector<unsigned char>& mapping) const {
-    return (*this)->patternCombine(y, false, false, mapping);
+  Sparsity Sparsity::unite(const Sparsity& y, std::vector<unsigned char>& mapping) const {
+    return (*this)->combine(y, false, false, mapping);
   }
 
-  Sparsity Sparsity::patternUnion(const Sparsity& y) const {
-    return (*this)->patternCombine(y, false, false);
+  Sparsity Sparsity::unite(const Sparsity& y) const {
+    return (*this)->combine(y, false, false);
   }
 
-  Sparsity Sparsity::patternIntersection(const Sparsity& y,
+  Sparsity Sparsity::intersect(const Sparsity& y,
                                          std::vector<unsigned char>& mapping) const {
-    return (*this)->patternCombine(y, true, true, mapping);
+    return (*this)->combine(y, true, true, mapping);
   }
 
-  Sparsity Sparsity::patternIntersection(const Sparsity& y) const {
-    return (*this)->patternCombine(y, true, true);
+  Sparsity Sparsity::intersect(const Sparsity& y) const {
+    return (*this)->combine(y, true, true);
   }
 
-  Sparsity Sparsity::patternProduct(const Sparsity& y) const {
-    return (*this)->patternProduct(y);
+  Sparsity Sparsity::zz_mtimes(const Sparsity& y) const {
+    return (*this)->zz_mtimes(y);
   }
 
   bool Sparsity::is_equal(const Sparsity& y) const {
@@ -383,12 +383,12 @@ namespace casadi {
   }
 
   Sparsity Sparsity::operator+(const Sparsity& b) const {
-    return patternUnion(b);
+    return unite(b);
   }
 
   Sparsity Sparsity::operator*(const Sparsity& b) const {
     std::vector< unsigned char > mapping;
-    return patternIntersection(b, mapping);
+    return intersect(b, mapping);
   }
 
   Sparsity Sparsity::pattern_inverse() const {

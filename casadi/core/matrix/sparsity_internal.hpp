@@ -309,20 +309,20 @@ namespace casadi {
     std::string dimString() const;
 
     /// Sparsity pattern for a matrix-matrix product (details in public class)
-    Sparsity patternProduct(const Sparsity& y) const;
+    Sparsity zz_mtimes(const Sparsity& y) const;
 
     ///@{
     /// Union of two sparsity patterns
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
+    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
                             std::vector<unsigned char>& mapping) const;
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero) const;
+    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero) const;
 
     template<bool with_mapping>
-    Sparsity patternCombineGen1(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
+    Sparsity combineGen1(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
                                 std::vector<unsigned char>& mapping) const;
 
     template<bool with_mapping, bool f0x_is_zero, bool function0_is_zero>
-    Sparsity patternCombineGen(const Sparsity& y, std::vector<unsigned char>& mapping) const;
+    Sparsity combineGen(const Sparsity& y, std::vector<unsigned char>& mapping) const;
     ///@}
 
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros

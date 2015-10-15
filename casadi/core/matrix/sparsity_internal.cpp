@@ -1179,7 +1179,7 @@ namespace casadi {
     Sparsity C;
     if (order == 1 && n == m) {
       // C = A+A
-      C = patternCombine(AT, false, false);
+      C = combine(AT, false, false);
     } else if (order==2) {
 
       // drop dense rows from AT
@@ -1895,10 +1895,17 @@ namespace casadi {
     return ss.str();
   }
 
-  Sparsity SparsityInternal::patternProduct(const Sparsity& y) const {
+  Sparsity SparsityInternal::zz_mtimes(const Sparsity& y) const {
     // Dimensions of the result
     int d1 = size1();
     int d2 = y.size2();
+
+    // Elementwise multiplication if one factor is scalar
+    if (isscalar(false)) {
+      return isdense() ? y : Sparsity(y.size());
+    } else if (y.isscalar(false)) {
+      return y.isdense() ? shared_from_this<Sparsity>() : Sparsity(size());
+    }
 
     // Quick return if both are dense
     if (isdense() && y.isdense()) {
@@ -2482,20 +2489,20 @@ namespace casadi {
     return ret;
   }
 
-  Sparsity SparsityInternal::patternCombine(const Sparsity& y, bool f0x_is_zero,
+  Sparsity SparsityInternal::combine(const Sparsity& y, bool f0x_is_zero,
                                             bool function0_is_zero) const {
     static vector<unsigned char> mapping;
-    return patternCombineGen1<false>(y, f0x_is_zero, function0_is_zero, mapping);
+    return combineGen1<false>(y, f0x_is_zero, function0_is_zero, mapping);
   }
 
-  Sparsity SparsityInternal::patternCombine(const Sparsity& y, bool f0x_is_zero,
+  Sparsity SparsityInternal::combine(const Sparsity& y, bool f0x_is_zero,
                                             bool function0_is_zero,
                                             vector<unsigned char>& mapping) const {
-    return patternCombineGen1<true>(y, f0x_is_zero, function0_is_zero, mapping);
+    return combineGen1<true>(y, f0x_is_zero, function0_is_zero, mapping);
   }
 
   template<bool with_mapping>
-  Sparsity SparsityInternal::patternCombineGen1(const Sparsity& y, bool f0x_is_zero,
+  Sparsity SparsityInternal::combineGen1(const Sparsity& y, bool f0x_is_zero,
                                                 bool function0_is_zero,
                                                 std::vector<unsigned char>& mapping) const {
 
@@ -2510,19 +2517,19 @@ namespace casadi {
 
     if (f0x_is_zero) {
       if (function0_is_zero) {
-        return patternCombineGen<with_mapping, true, true>(y, mapping);
+        return combineGen<with_mapping, true, true>(y, mapping);
       } else {
-        return patternCombineGen<with_mapping, true, false>(y, mapping);
+        return combineGen<with_mapping, true, false>(y, mapping);
       }
     } else if (function0_is_zero) {
-      return patternCombineGen<with_mapping, false, true>(y, mapping);
+      return combineGen<with_mapping, false, true>(y, mapping);
     } else {
-      return patternCombineGen<with_mapping, false, false>(y, mapping);
+      return combineGen<with_mapping, false, false>(y, mapping);
     }
   }
 
   template<bool with_mapping, bool f0x_is_zero, bool function0_is_zero>
-  Sparsity SparsityInternal::patternCombineGen(const Sparsity& y,
+  Sparsity SparsityInternal::combineGen(const Sparsity& y,
                                                vector<unsigned char>& mapping) const {
 
     // Assert dimensions

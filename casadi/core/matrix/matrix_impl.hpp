@@ -1476,7 +1476,7 @@ namespace casadi {
     // (ignoring structural zeros giving rise to nonzero result)
     const Sparsity& x_sp = x.sparsity();
     const Sparsity& y_sp = y.sparsity();
-    Sparsity r_sp = x_sp.patternCombine(y_sp,
+    Sparsity r_sp = x_sp.combine(y_sp,
                                         operation_checker<F0XChecker>(op),
                                         operation_checker<Function0Checker>(op));
 
@@ -1807,7 +1807,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_project(const Sparsity& sp, bool intersect) const {
     if (intersect) {
-      return project(*this, sp.patternIntersection(sparsity()), false);
+      return project(*this, sp.intersect(sparsity()), false);
     } else {
       Matrix<DataType> ret = Matrix<DataType>::zeros(sp);
       ret.set(*this);
@@ -2448,7 +2448,7 @@ namespace casadi {
   Matrix<DataType> Matrix<DataType>::zz_unite(const Matrix<DataType>& B) const {
     // Join the sparsity patterns
     std::vector<unsigned char> mapping;
-    Sparsity sp = sparsity().patternUnion(B.sparsity(), mapping);
+    Sparsity sp = sparsity().unite(B.sparsity(), mapping);
 
     // Create return matrix
     Matrix<DataType> ret = zeros(sp);

@@ -557,7 +557,7 @@ namespace casadi {
         // (ignoring structural zeros giving rise to nonzero result)
         const Sparsity& x_sp = sparsity();
         const Sparsity& y_sp = y.sparsity();
-        Sparsity r_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op),
+        Sparsity r_sp = x_sp.combine(y_sp, operation_checker<F0XChecker>(op),
                                             operation_checker<Function0Checker>(op));
 
         // Project the arguments to this sparsity
@@ -744,7 +744,7 @@ namespace casadi {
       }
     } else {
       // Project to pattern intersection
-      Sparsity sp = sparsity().patternIntersection(y.sparsity());
+      Sparsity sp = sparsity().intersect(y.sparsity());
       MX xx = project(shared_from_this<MX>(), sp);
       MX yy = project(y, sp);
       return xx->getInnerProd(yy);

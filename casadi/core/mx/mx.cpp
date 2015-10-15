@@ -584,7 +584,7 @@ namespace casadi {
       // Use element-wise multiplication if at least one factor scalar
       return *this*y;
     } else {
-      MX z = MX::zeros(sparsity().patternProduct(y.sparsity()));
+      MX z = MX::zeros(sparsity().zz_mtimes(y.sparsity()));
       return mac(*this, y, z);
     }
   }
@@ -902,7 +902,7 @@ namespace casadi {
       return *this;
     } else {
       if (intersect) {
-        return (*this)->getProject(sp.patternIntersection(sparsity()));
+        return (*this)->getProject(sp.intersect(sparsity()));
       } else {
         return (*this)->getProject(sp);
       }
@@ -1313,7 +1313,7 @@ namespace casadi {
   MX MX::zz_unite(const MX& B) const {
     // Join the sparsity patterns
     std::vector<unsigned char> mapping;
-    Sparsity sp = sparsity().patternUnion(B.sparsity(), mapping);
+    Sparsity sp = sparsity().unite(B.sparsity(), mapping);
 
     // Split up the mapping
     std::vector<int> nzA, nzB;

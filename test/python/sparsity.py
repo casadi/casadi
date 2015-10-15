@@ -49,7 +49,7 @@ class Sparsitytests(casadiTestCase):
     for i in nzb:
       b.addNZ(i[0],i[1])
       
-    c =a.patternUnion(b)
+    c =a.unite(b)
         
     c = a + b
     self.assertEquals(c.nnz(),len(nza.union(nzb)))
@@ -77,7 +77,7 @@ class Sparsitytests(casadiTestCase):
     for i in nzb:
       b.addNZ(i[0],i[1])
     
-    c=a.patternIntersection(b)
+    c=a.intersect(b)
     for k in range(c.nnz()):
       ind = (c.row(k),c.get_col()[k])
       self.assertTrue(ind in nza and ind in nzb)
@@ -531,16 +531,6 @@ class Sparsitytests(casadiTestCase):
       
       self.checkarray(trial,dt)
       
-  def test_internalapi(self):
-    s = Sparsity.dense(2,2)
-    with warnings.catch_warnings():
-      warnings.simplefilter("error",SyntaxWarning)
-      with self.assertRaises(Exception):
-        s.reCache()
-      
-      with internalAPI():
-        s.reCache()
-
   def test_kron(self):
     a = sparsify(DMatrix([[1,0,6],[2,7,0]]))
     b = sparsify(DMatrix([[1,0,0],[2,3,7],[0,0,9],[1,12,13]]))

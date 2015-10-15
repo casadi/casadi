@@ -57,7 +57,7 @@ print "CasADi MX wrapped = %.4f s" % (time()-t)
 
 t = time()
 # Create the sparsity pattern for the matrix-matrix product
-spres = x.sparsity().patternProduct(x.sparsity())
+spres = x.sparsity().zz_mtimes(x.sparsity())
 print "CasADi generating procuct sparsity pattern = %.4f s" % (time()-t)
 
 t = time()

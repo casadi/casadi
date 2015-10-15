@@ -400,18 +400,18 @@ namespace casadi {
         the second bit indicates if the second argument is nonzero (note that none of,
         one of or both of the arguments can be nonzero) */
 #ifndef SWIG
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero,
+    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero,
                             std::vector<unsigned char>& mapping) const;
 #endif // SWIG
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
+    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
     /// @}
 
     /// @{
     /** \brief Union of two sparsity patterns */
 #ifndef SWIG
-    Sparsity patternUnion(const Sparsity& y, std::vector<unsigned char>& mapping) const;
+    Sparsity unite(const Sparsity& y, std::vector<unsigned char>& mapping) const;
 #endif // SWIG
-    Sparsity patternUnion(const Sparsity& y) const;
+    Sparsity unite(const Sparsity& y) const;
     Sparsity operator+(const Sparsity& b) const;
     /// @}
 
@@ -422,19 +422,11 @@ namespace casadi {
         The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if it is from
         the second and 3 (i.e. 1 | 2) if from both */
 #ifndef SWIG
-    Sparsity patternIntersection(const Sparsity& y,
+    Sparsity intersect(const Sparsity& y,
                                  std::vector<unsigned char>& mapping) const;
 #endif // SWIG
-    Sparsity patternIntersection(const Sparsity& y) const;
+    Sparsity intersect(const Sparsity& y) const;
     Sparsity operator*(const Sparsity& b) const;
-    /// @}
-
-    /// @{
-    /** \brief Sparsity pattern for a matrix-matrix product
-        Returns the sparsity pattern resulting from multiplying the pattern with
-        another pattern y from the right.
-    */
-    Sparsity patternProduct(const Sparsity& y) const;
     /// @}
 
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
@@ -470,19 +462,7 @@ namespace casadi {
     std::vector<Sparsity> zz_vertsplit(const std::vector<int>& output_offset) const;
     std::vector<Sparsity> zz_diagsplit(const std::vector<int>& offset1,
                                        const std::vector<int>& offset2) const;
-    Sparsity zz_mtimes(const Sparsity& y) const {
-      if (isscalar()) {
-        return isdense() ? y : Sparsity(y.size());
-      } else if (y.isscalar()) {
-        return y.isdense() ? *this : Sparsity(size());
-      } else {
-        // Check dimensions
-        casadi_assert_message(size2()==y.size1(),
-                              "Matrix product with incompatible dimensions. Lhs is "
-                              << dimString() << " and rhs is " << y.dimString() << ".");
-        return patternProduct(y);
-      }
-    }
+    Sparsity zz_mtimes(const Sparsity& y) const;
     Sparsity zz_mac(const Sparsity& Y, const Sparsity& Z) const { return Z;}
     Sparsity zz_vecNZ() const;
     Sparsity zz_reshape(int nrow, int ncol) const;

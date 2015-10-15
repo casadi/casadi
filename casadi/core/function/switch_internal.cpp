@@ -66,11 +66,11 @@ namespace casadi {
         casadi_assert(num_out==fk.n_out());
         // Intersect with output sparsity
         for (int i=0; i<num_out; ++i) {
-          sp_out[i] = sp_out[i].patternIntersection(fk.output(i).sparsity());
+          sp_out[i] = sp_out[i].intersect(fk.output(i).sparsity());
         }
         // Intersect with input sparsity
         for (int i=0; i<num_in; ++i) {
-          sp_in[i] = sp_in[i].patternIntersection(fk.input(i).sparsity());
+          sp_in[i] = sp_in[i].intersect(fk.input(i).sparsity());
         }
       }
     }
