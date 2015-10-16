@@ -49,6 +49,12 @@ namespace casadi {
     /** \brief Destructor */
     virtual ~MapBase();
 
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() const { return f_.n_in();}
+    virtual size_t get_n_out() const { return f_.n_out();}
+    ///@}
+
     /** \brief  Initialize */
     virtual void init();
 

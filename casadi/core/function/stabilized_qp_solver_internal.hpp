@@ -47,6 +47,12 @@ namespace casadi {
     // Destructor
     virtual ~StabilizedQpSolverInternal() = 0;
 
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() const { return STABILIZED_QP_SOLVER_NUM_IN;}
+    virtual size_t get_n_out() const { return QP_SOLVER_NUM_OUT;}
+    ///@}
+
     // Initialize
     virtual void init();
 

@@ -51,9 +51,14 @@ namespace casadi {
     }
   }
 
-  void CallbackInternal::evalD(const double** arg, double** res, int* iw, double* w) {
+  size_t CallbackInternal::get_n_in() const {
     casadi_assert_message(self_!=0, "Callback object has been deleted");
-    self_->eval(arg, res, iw, w);
+    return self_->get_n_in();
+  }
+
+  size_t CallbackInternal::get_n_out() const {
+    casadi_assert_message(self_!=0, "Callback object has been deleted");
+    return self_->get_n_out();
   }
 
   void CallbackInternal::init() {
@@ -72,6 +77,11 @@ namespace casadi {
 
     // Finalize the base classes
     FunctionInternal::finalize();
+  }
+
+  void CallbackInternal::evalD(const double** arg, double** res, int* iw, double* w) {
+    casadi_assert_message(self_!=0, "Callback object has been deleted");
+    self_->eval(arg, res, iw, w);
   }
 
   bool CallbackInternal::hasFullJacobian() const {

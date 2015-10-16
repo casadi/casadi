@@ -47,13 +47,22 @@ namespace casadi {
     /** \brief  Constructor */
     IntegratorInternal(const std::string& name, const Function& f, const Function& g);
 
-    /** \brief  Destructor */
-    virtual ~IntegratorInternal()=0;
-
     /** \brief  Create a new integrator */
     virtual IntegratorInternal* create(const std::string& name,
                                        const Function& f,
                                        const Function& g) const = 0;
+
+    /** \brief  Destructor */
+    virtual ~IntegratorInternal()=0;
+
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() const { return INTEGRATOR_NUM_IN;}
+    virtual size_t get_n_out() const { return INTEGRATOR_NUM_OUT;}
+    ///@}
+
+    /** \brief  Initialize */
+    virtual void init();
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -72,9 +81,6 @@ namespace casadi {
 
     /** \brief  evaluate */
     virtual void evaluate();
-
-    /** \brief  Initialize */
-    virtual void init();
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);

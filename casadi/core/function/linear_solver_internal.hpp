@@ -47,6 +47,12 @@ namespace casadi {
     /// Destructor
     virtual ~LinearSolverInternal();
 
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() const { return LINSOL_NUM_IN;}
+    virtual size_t get_n_out() const { return LINSOL_NUM_OUT;}
+    ///@}
+
     /// Initialize
     virtual void init();
 

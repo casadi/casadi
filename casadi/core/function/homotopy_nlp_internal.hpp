@@ -51,6 +51,12 @@ namespace casadi {
     /// Destructor
     virtual ~HomotopyNLPInternal() = 0;
 
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() const { return NLP_SOLVER_NUM_IN;}
+    virtual size_t get_n_out() const { return NLP_SOLVER_NUM_OUT;}
+    ///@}
+
     /// Initialize
     virtual void init();
 

@@ -41,6 +41,18 @@ namespace casadi {
   SwitchInternal::~SwitchInternal() {
   }
 
+  size_t SwitchInternal::get_n_in() const {
+    for (auto&& i : f_) if (!i.isNull()) return i.n_in();
+    casadi_assert(!f_def_.isNull());
+    return f_def_.n_in();
+  }
+
+  size_t SwitchInternal::get_n_out() const {
+    for (auto&& i : f_) if (!i.isNull()) return i.n_out();
+    casadi_assert(!f_def_.isNull());
+    return f_def_.n_out();
+  }
+
   void SwitchInternal::init() {
     // Initialize the functions, get input and output sparsities
     // Input and output sparsities
@@ -49,7 +61,6 @@ namespace casadi {
     for (int k=0; k<=f_.size(); ++k) {
       Function& fk = k<f_.size() ? f_[k] : f_def_;
       if (fk.isNull()) continue;
-      fk.init();
       if (num_in<0) {
         // Number of inputs and outputs
         num_in=fk.n_in();

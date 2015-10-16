@@ -53,6 +53,12 @@ namespace casadi {
     virtual ImplicitFunctionInternal* create(const std::string& name,
                                              const Function& f) const = 0;
 
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() const { return f_.n_in();}
+    virtual size_t get_n_out() const { return f_.n_out();}
+    ///@}
+
     /// Initialize
     virtual void init();
 

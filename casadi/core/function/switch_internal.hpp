@@ -48,6 +48,12 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~SwitchInternal();
 
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() const;
+    virtual size_t get_n_out() const;
+    ///@}
+
     /** \brief  Initialize */
     virtual void init();
 

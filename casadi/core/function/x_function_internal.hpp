@@ -129,6 +129,11 @@ namespace casadi {
                          const std::vector<std::vector<MatType> >& aseed,
                          std::vector<std::vector<MatType> >& asens,
                          bool always_inline, bool never_inline);
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() const { return inputv_.size(); }
+    virtual size_t get_n_out() const { return outputv_.size(); }
+    ///@}
 
     // Data members (all public)
 

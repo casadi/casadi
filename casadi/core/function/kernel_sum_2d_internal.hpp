@@ -50,6 +50,12 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~KernelSum2DInternal();
 
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() const { return f_.n_in()-1;}
+    virtual size_t get_n_out() const { return f_.n_out();}
+    ///@}
+
     /** \brief  Initialize */
     virtual void init();
 

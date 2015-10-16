@@ -370,11 +370,13 @@ namespace casadi {
     /// Is function fcn being monitored
     bool monitored(const std::string& mod) const;
 
-    /** \brief Get the number of function inputs */
+    ///@{
+    /** \brief Number of function inputs and outputs */
     inline int n_in() const { return ibuf_.size();}
-
-    /** \brief Get the number of function outputs */
+    virtual size_t get_n_in() const = 0;
     inline int n_out() const { return obuf_.size();}
+    virtual size_t get_n_out() const = 0;
+    ///@}
 
     ///@{
     /** \brief Number of input/output nonzeros */

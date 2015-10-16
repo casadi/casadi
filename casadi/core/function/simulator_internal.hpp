@@ -47,6 +47,12 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~SimulatorInternal();
 
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() const { return INTEGRATOR_NUM_IN;}
+    virtual size_t get_n_out() const { return output_fcn_->n_out();}
+    ///@}
+
     /** \brief  initialize */
     virtual void init();
 

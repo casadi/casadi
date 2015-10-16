@@ -142,6 +142,12 @@ namespace casadi {
     virtual ~CommonExternal() = 0;
 
     ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() const { return li_.n_in;}
+    virtual size_t get_n_out() const { return li_.n_out;}
+    ///@}
+
+    ///@{
     /** \brief Forward mode derivatives */
     virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
     virtual int numDerForward() const;

@@ -40,14 +40,20 @@ namespace casadi {
     /** \brief Destructor */
     virtual ~CallbackInternal();
 
-    /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() const;
+    virtual size_t get_n_out() const;
+    ///@}
 
     /** \brief  Initialize */
     virtual void init();
 
     /** \brief Finalize the object creation */
     virtual void finalize();
+
+    /** \brief  Evaluate numerically, work vectors given */
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
