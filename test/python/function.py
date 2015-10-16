@@ -927,7 +927,7 @@ class Functiontests(casadiTestCase):
     Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
     V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
-    F = MapAccum("map",fun,n,[True,False,False,False],[0])
+    F = fun.mapaccum("map",n,[True,False,False,False],[0])
 
     XP = X
 
@@ -952,7 +952,7 @@ class Functiontests(casadiTestCase):
 
     fun = SX.fun("f",[y,x,z,v],[mul(z,x)+y+trace(v)**2,sin(y*x).T,v/y])
 
-    F = MapAccum("map",fun,n,[False,True,False,True],[0,2])
+    F = fun.mapaccum("map",n,[False,True,False,True],[0,2])
 
     XP = X
     VP = V[0]

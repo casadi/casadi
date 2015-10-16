@@ -282,7 +282,7 @@ namespace casadi {
     }
 
     // Construct the new MapAccum
-    Function ma = MapAccum("map", df, n_, input_accum, output_accum, reverse_);
+    Function ma = df.mapaccum("map", n_, input_accum, output_accum, reverse_);
 
     /*
 
@@ -494,7 +494,7 @@ namespace casadi {
     }
 
     // Create the new MapAccum
-    Function ma = MapAccum("map", fbX, n_, input_accum, output_accum, !reverse_);
+    Function ma = fbX.mapaccum("map", n_, input_accum, output_accum, !reverse_);
 
     /*
 

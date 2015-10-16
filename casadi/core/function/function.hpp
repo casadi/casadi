@@ -547,6 +547,7 @@ namespace casadi {
     std::vector<MX> mapsum(const std::vector<MX > &arg,
                                       const std::string& parallelization="serial");
 
+    ///@{
     /** \brief  Create a mapaccumulated version of this function
 
         Suppose the function has a signature of:
@@ -572,7 +573,13 @@ namespace casadi {
 
 
     */
-    Function mapaccum(const std::string& name, int N, const Dict & options = Dict()) const;
+    Function mapaccum(const std::string& name, int N, const Dict& opts = Dict()) const;
+    Function mapaccum(const std::string& name, int n,
+                      const std::vector<bool>& input_accum,
+                      const std::vector<int>& output_accum,
+                      bool reverse = false,
+                      const Dict& opts=Dict()) const;
+    ///@}
 
 
     /** \brief  Create a mapped version of this function

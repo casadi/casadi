@@ -26,7 +26,7 @@
 #include "function_internal.hpp"
 #include "../std_vector_tools.hpp"
 #include "map_internal.hpp"
-#include "mapaccum.hpp"
+#include "mapaccum_internal.hpp"
 #include "external_function_internal.hpp"
 #include "switch_internal.hpp"
 
@@ -195,11 +195,23 @@ namespace casadi {
     (*this)(getPtr(arg), getPtr(res), getPtr(buf_iw), getPtr(buf_w));
   }
 
-  Function Function::mapaccum(const std::string& name, int N, const Dict& options) const {
+  Function Function::mapaccum(const std::string& name, int N, const Dict& opts) const {
     std::vector<bool> accum_input(n_in(), false);
     accum_input[0] = true;
     std::vector<int> accum_output(1, 0);
-    return MapAccum(name, *this, N, accum_input, accum_output, false, options);
+    return mapaccum(name, N, accum_input, accum_output, false, opts);
+  }
+
+  Function Function::mapaccum(const std::string& name, int n,
+                              const std::vector<bool>& input_accum,
+                              const std::vector<int>& output_accum,
+                              bool reverse,
+                              const Dict& opts) const {
+    Function ret;
+    ret.assignNode(new MapAccumInternal(name, *this, n, input_accum, output_accum, reverse));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
   }
 
   Function Function::map(const std::string& name, int n, const Dict& opts) const {

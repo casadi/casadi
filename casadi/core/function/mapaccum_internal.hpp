@@ -26,7 +26,6 @@
 #ifndef CASADI_MAPACCUM_INTERNAL_HPP
 #define CASADI_MAPACCUM_INTERNAL_HPP
 
-#include "mapaccum.hpp"
 #include "function_internal.hpp"
 
 /// \cond INTERNAL
