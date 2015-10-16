@@ -28,6 +28,7 @@
 #include "map_internal.hpp"
 #include "mapaccum.hpp"
 #include "external_function_internal.hpp"
+#include "switch_internal.hpp"
 
 #include <typeinfo>
 
@@ -322,6 +323,24 @@ namespace casadi {
 
     // Call the internal function
     return ms(x);
+  }
+
+  Function Function::conditional(const std::string& name, const std::vector<Function>& f,
+                                 const Function& f_def, const Dict& opts) {
+    Function ret;
+    ret.assignNode(new SwitchInternal(name, f, f_def));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
+  }
+
+  Function Function::if_else(const std::string& name, const Function& f_true,
+                             const Function& f_false, const Dict& opts) {
+    Function ret;
+    ret.assignNode(new SwitchInternal(name, vector<Function>(1, f_false), f_true));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
   }
 
   void Function::evaluate() {

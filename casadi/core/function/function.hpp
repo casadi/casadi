@@ -608,6 +608,14 @@ namespace casadi {
                  const std::vector<bool> &repeat_out,
                  const Dict& opts=Dict()) const;
 
+    /** \brief Constuct a switch function */
+    static Function conditional(const std::string& name, const std::vector<Function>& f,
+                                const Function& f_def, const Dict& opts=Dict());
+
+    /** \brief Constructor (if-else) */
+    static Function if_else(const std::string& name, const Function& f_true,
+                            const Function& f_false, const Dict& opts=Dict());
+
     /** \brief Get a function that calculates \a nfwd forward derivatives and nadj adjoint derivatives
      *         Legacy function: Use derForward and derReverse instead.
      *
