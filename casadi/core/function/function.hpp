@@ -601,6 +601,13 @@ namespace casadi {
     */
     Function map(const std::string& name, int N,  const Dict & options = Dict()) const;
 
+    /** \brief Generic map */
+    Function map(const std::string& name,
+                 int n,
+                 const std::vector<bool> &repeat_in,
+                 const std::vector<bool> &repeat_out,
+                 const Dict& opts=Dict()) const;
+
     /** \brief Get a function that calculates \a nfwd forward derivatives and nadj adjoint derivatives
      *         Legacy function: Use derForward and derReverse instead.
      *

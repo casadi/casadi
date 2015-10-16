@@ -54,7 +54,6 @@
 #include "function/qp_solver.hpp"
 #include "function/stabilized_qp_solver.hpp"
 #include "function/nullspace.hpp"
-#include "function/map.hpp"
 #include "function/mapaccum.hpp"
 #include "function/kernel_sum_2d.hpp"
 

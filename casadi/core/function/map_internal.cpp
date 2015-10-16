@@ -194,7 +194,7 @@ namespace casadi {
     Function df = f_.derForward(nfwd);
 
     // Construct and return
-    return Map(name, df, n_, opts);
+    return df.map(name, n_, opts);
   }
 
   Function MapSerial
@@ -203,7 +203,7 @@ namespace casadi {
     Function df = f_.derReverse(nadj);
 
     // Construct and return
-    return Map(name, df, n_, opts);
+    return df.map(name, n_, opts);
   }
 
   MapReduce::MapReduce(const std::string& name, const Function& f, int n,
@@ -494,7 +494,7 @@ namespace casadi {
     }
 
     // Construct and return
-    return Map(name, df, n_, repeat_in, repeat_out, opts);
+    return df.map(name, n_, repeat_in, repeat_out, opts);
   }
 
   Function MapReduce
@@ -523,7 +523,7 @@ namespace casadi {
     }
 
     // Construct and return
-    return Map(name, df, n_, repeat_in, repeat_out, opts);
+    return df.map(name, n_, repeat_in, repeat_out, opts);
   }
 
   void MapReduce::generateDeclarations(CodeGenerator& g) const {

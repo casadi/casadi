@@ -780,7 +780,7 @@ class Functiontests(casadiTestCase):
 
       for parallelization in ["serial","openmp"]:
 
-        F = Map("map",fun,n,[True,True,False,False],[False,True,True])
+        F = fun.map("map",n,[True,True,False,False],[False,True,True])
 
         resref = [0 for i in range(fun.n_out())]
         acc = 0
@@ -1039,7 +1039,7 @@ class Functiontests(casadiTestCase):
 
     x0 = DMatrix([n/2,m/2])
 
-    Fref = Map("f",f,n*m,[True,True,False],[False])
+    Fref = f.map("f",n*m,[True,True,False],[False])
     
     print Fref([horzcat([vec(xx),vec(yy)]).T,vec(z),x0])
     print F([z,x0])

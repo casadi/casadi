@@ -25,8 +25,8 @@
 
 #include "function_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "../function/map.hpp"
-#include "../function/mapaccum.hpp"
+#include "map_internal.hpp"
+#include "mapaccum.hpp"
 #include "external_function_internal.hpp"
 
 #include <typeinfo>
@@ -201,8 +201,25 @@ namespace casadi {
     return MapAccum(name, *this, N, accum_input, accum_output, false, options);
   }
 
-  Function Function::map(const std::string& name, int N, const Dict& options) const {
-    return Map(name, *this, N, options);
+  Function Function::map(const std::string& name, int n, const Dict& opts) const {
+    Function ret;
+    ret.assignNode(MapBase::create(name, *this, n, opts));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
+  }
+
+  Function Function::map(const std::string& name,
+                         int n,
+                         const std::vector<bool> &repeat_in,
+                         const std::vector<bool> &repeat_out,
+                         const Dict& opts) const {
+
+    Function ret;
+    ret.assignNode(new MapReduce(name, *this, n, repeat_in, repeat_out));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
   }
 
   vector<vector<MX> > Function::map(const vector<vector<MX> > &x,
@@ -267,14 +284,13 @@ namespace casadi {
 
     // Call the internal function
 
-    Dict options;
-    options["parallelization"] = parallelization;
+    Dict options = {{"parallelization", parallelization}};
 
     Function ms;
     if (repeated) {
-      ms = Map("map", *this, n, options);
+      ms = map("map", n, options);
     } else {
-      ms = Map("mapsum", *this, n, repeat_n, std::vector<bool>(n_out(), true), options);
+      ms = map("mapsum", n, repeat_n, std::vector<bool>(n_out(), true), options);
     }
     // Call the internal function
     return ms(x);
@@ -300,9 +316,9 @@ namespace casadi {
       repeat_n.push_back(x[i].size2()/input(i).size2()==n);
     }
 
-    Dict options;
-    options["parallelization"] = parallelization;
-    Function ms = Map("mapsum", *this, n, repeat_n, std::vector<bool>(n_out(), false), options);
+    Dict options = {{"parallelization", parallelization}};
+    Function ms = map("mapsum", n, repeat_n,
+                      std::vector<bool>(n_out(), false), options);
 
     // Call the internal function
     return ms(x);

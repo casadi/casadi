@@ -3577,7 +3577,6 @@ namespace casadi {
 %include <casadi/core/function/switch.hpp>
 %include <casadi/core/function/callback.hpp>
 %include <casadi/core/function/nullspace.hpp>
-%include <casadi/core/function/map.hpp>
 %include <casadi/core/function/mapaccum.hpp>
 %include <casadi/core/function/kernel_sum_2d.hpp>
 
