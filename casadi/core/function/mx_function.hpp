@@ -29,7 +29,7 @@
 #include <set>
 #include <iostream>
 #include "../mx/mx.hpp"
-#include "sx_function.hpp"
+#include "function.hpp"
 
 namespace casadi {
 

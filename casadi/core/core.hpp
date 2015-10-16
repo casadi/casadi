@@ -43,7 +43,6 @@
 
 // Functions
 #include "function/code_generator.hpp"
-#include "function/sx_function.hpp"
 #include "function/mx_function.hpp"
 #include "function/compiler.hpp"
 #include "function/switch.hpp"

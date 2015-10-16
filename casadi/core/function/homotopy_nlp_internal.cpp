@@ -25,7 +25,6 @@
 
 #include "homotopy_nlp_internal.hpp"
 #include "mx_function.hpp"
-#include "sx_function.hpp"
 
 INPUTSCHEME(NlpSolverInput)
 OUTPUTSCHEME(NlpSolverOutput)

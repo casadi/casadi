@@ -26,7 +26,6 @@
 #ifndef CASADI_SX_FUNCTION_INTERNAL_HPP
 #define CASADI_SX_FUNCTION_INTERNAL_HPP
 
-#include "sx_function.hpp"
 #include "x_function_internal.hpp"
 
 #ifdef WITH_OPENCL
@@ -39,6 +38,16 @@
 /// \cond INTERNAL
 
 namespace casadi {
+  /** \brief  An atomic operation for the SXElement virtual machine */
+  struct ScalarAtomic {
+    int op;     /// Operator index
+    int i0;
+    union {
+      double d;
+      struct { int i1, i2; };
+    };
+  };
+
 #ifdef WITH_OPENCL
   /** \brief Singleton for the sparsity propagation kernel
       TODO: Move to a separate file and make non sparsity pattern specific

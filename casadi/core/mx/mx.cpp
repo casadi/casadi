@@ -23,9 +23,7 @@
  */
 
 
-#include "mx.hpp"
 #include "mx_node.hpp"
-#include "../function/sx_function.hpp"
 #include "symbolic_mx.hpp"
 #include "constant_mx.hpp"
 #include "multiple_output.hpp"

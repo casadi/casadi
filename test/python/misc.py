@@ -221,6 +221,7 @@ class Misctests(casadiTestCase):
     b = pickle.loads(s)
     self.checkarray(a,b)
     
+  @known_bug()
   def test_exceptions(self):
     try:
       MX.fun('tmp', nlpIn(x=SX.sym("x")))

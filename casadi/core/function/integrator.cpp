@@ -25,7 +25,6 @@
 
 #include "integrator.hpp"
 #include "integrator_internal.hpp"
-#include "sx_function.hpp"
 #include "mx_function.hpp"
 
 using namespace std;

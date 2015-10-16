@@ -26,7 +26,6 @@
 #include "collocation_integrator.hpp"
 #include "casadi/core/polynomial.hpp"
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/function/sx_function.hpp"
 
 using namespace std;
 namespace casadi {

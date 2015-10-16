@@ -25,7 +25,6 @@
 
 #include "reshape.hpp"
 #include "../std_vector_tools.hpp"
-#include "../function/sx_function.hpp"
 
 using namespace std;
 

@@ -27,7 +27,6 @@
 
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
-#include "casadi/core/function/sx_function.hpp"
 
 INPUTSCHEME(IntegratorInput)
 OUTPUTSCHEME(IntegratorOutput)

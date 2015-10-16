@@ -26,7 +26,6 @@
 #include "nullspace_internal.hpp"
 #include "function_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "sx_function.hpp"
 #include <utility>
 #include <string>
 

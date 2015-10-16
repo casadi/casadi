@@ -27,7 +27,6 @@
 #define CASADI_VARIABLE_HPP
 
 #include <iostream>
-#include "../function/sx_function.hpp"
 #include "../mx/mx.hpp"
 
 namespace casadi {

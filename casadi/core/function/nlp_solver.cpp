@@ -25,7 +25,6 @@
 
 #include "nlp_solver.hpp"
 #include "nlp_solver_internal.hpp"
-#include "sx_function.hpp"
 #include "mx_function.hpp"
 
 using namespace std;
