@@ -255,7 +255,7 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -4242,7 +4242,7 @@ Get the type name of a certain option.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -5254,7 +5254,7 @@ Extract the functions needed for the Lifted Newton method.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -8396,7 +8396,7 @@ Get symbolic primitives equivalent to the output expressions.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -10217,7 +10217,7 @@ Get the type name of a certain option.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -12885,7 +12885,7 @@ adheres to SCHEME_NLPINput
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -16170,7 +16170,7 @@ Print solver statistics.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -16580,7 +16580,7 @@ required length of res field.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -18300,7 +18300,7 @@ propagating_sparsity.cpp)
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -21696,7 +21696,7 @@ of the outputs.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -22305,7 +22305,7 @@ Remove modules to be monitored.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -27452,7 +27452,7 @@ Get an atomic operation operator index.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -28509,7 +28509,7 @@ Access the NLP.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -35304,7 +35304,7 @@ adheres to SCHEME_NLPINput
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -37832,7 +37832,7 @@ Get output dimension.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -39489,7 +39489,7 @@ Get symbolic primitives equivalent to the output expressions.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -43070,7 +43070,7 @@ Copy all options from another object.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -45763,7 +45763,7 @@ corresponding to the Jacobian and the same number of inputs.
 
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -45813,7 +45813,7 @@ the inputs.
 /*  Option Functionality  */ %feature("docstring")
 casadi::Function::default_in(int ind) const  "
 
-Get default input value.
+Get default input value (NOTE: constant reference)
 
 ";
 
