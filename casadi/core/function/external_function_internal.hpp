@@ -26,7 +26,6 @@
 #ifndef CASADI_EXTERNAL_FUNCTION_INTERNAL_HPP
 #define CASADI_EXTERNAL_FUNCTION_INTERNAL_HPP
 
-#include "external_function.hpp"
 #include "function_internal.hpp"
 
 #ifdef WITH_DL

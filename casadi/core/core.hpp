@@ -46,7 +46,6 @@
 #include "function/sx_function.hpp"
 #include "function/mx_function.hpp"
 #include "function/compiler.hpp"
-#include "function/external_function.hpp"
 #include "function/switch.hpp"
 #include "function/linear_solver.hpp"
 #include "function/nlp_solver.hpp"

@@ -3578,7 +3578,6 @@ namespace casadi {
 %include <casadi/core/function/homotopy_nlp_solver.hpp>
 %include <casadi/core/function/qp_solver.hpp>
 %include <casadi/core/function/stabilized_qp_solver.hpp>
-%include <casadi/core/function/external_function.hpp>
 %include <casadi/core/function/switch.hpp>
 %include <casadi/core/function/callback.hpp>
 %include <casadi/core/function/nullspace.hpp>
