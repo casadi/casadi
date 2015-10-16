@@ -274,7 +274,8 @@ namespace casadi {
             x_type_g_[j] = 0;
           } else {
             bool linear = true;
-            for (int k = jacG_.sparsity_out(0).colind(j); k < jacG_.sparsity_out(0).colind(j+1); ++k) {
+            for (int k = jacG_.sparsity_out(0).colind(j);
+                 k<jacG_.sparsity_out(0).colind(j+1); ++k) {
               linear = linear && !output_v[k];
             }
             x_type_g_[j] = linear? 1 : 2;
