@@ -3029,4 +3029,19 @@ namespace casadi {
     casadi_error("'countNodes' not defined for " + type_name());
   }
 
+  const double& FunctionInternal::default_zero() {
+    static double v = 0;
+    return v;
+  }
+
+  const double& FunctionInternal::default_inf() {
+    static double v = std::numeric_limits<double>::infinity();
+    return v;
+  }
+
+  const double& FunctionInternal::default_minf() {
+    static double v = -std::numeric_limits<double>::infinity();
+    return v;
+  }
+
 } // namespace casadi

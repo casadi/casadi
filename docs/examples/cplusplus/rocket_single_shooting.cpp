@@ -87,10 +87,7 @@ int main(){
   rhs[2] = -beta*u*u;
 
   // Initial conditions
-  vector<double> x0(3);
-  x0[0] = 0;
-  x0[1] = 0;
-  x0[2] = 1;
+  vector<double> x0 = {0, 0, 1};
 
   // DAE residual function
   Function daefcn = SX::fun("dae_residual", daeIn("x", x, "p", u, "t", t), daeOut("ode", rhs));
@@ -176,27 +173,19 @@ int main(){
     solver_opts["hessian_approximation"] = "limited-memory";
   }
 
-  // NLP solver and buffers
+  // Create NLP solver
   NlpSolver solver("nlp_solver", solver_name, nlp, solver_opts);
-  std::map<std::string, DMatrix> arg, res;
 
   // Bounds on u and initial condition
-  arg["lbx"] = -10;
-  arg["ubx"] = 10;
-  arg["x0"] = 0.4;
+  vector<double> umin(nu, -10), umax(nu, 10), u0(nu, 0.4);
 
   // Bounds on g
-  vector<double> gmin(2), gmax(2);
-  gmin[0] = gmax[0] = 10;
-  gmin[1] = gmax[1] =  0;
-  arg["lbg"] = gmin;
-  arg["ubg"] = gmax;
+  vector<double> gmin = {10, 0}, gmax = {10, 0};
 
-  // Solve the problem
-  res = solver(arg);
-
-  // Get the solution
-  vector<double> Usol(res.at("x"));
+  // Solve NLP
+  vector<double> Usol;
+  solver({{"lbx", umin}, {"ubx", umax}, {"x0", u0}, {"lbg", gmin}, {"ubg", gmax}},
+         {{"x", &Usol}});
   cout << "optimal solution: " << Usol << endl;
 
   return 0;

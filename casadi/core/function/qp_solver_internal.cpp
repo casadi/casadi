@@ -138,16 +138,16 @@ namespace casadi {
 
   const std::string QpSolverInternal::infix_ = "qpsolver";
 
-  double QpSolverInternal::default_in(int ind) const {
+  const double& QpSolverInternal::default_in(int ind) const {
     switch (ind) {
     case QP_SOLVER_LBX:
     case QP_SOLVER_LBA:
-      return -std::numeric_limits<double>::infinity();
+      return default_minf();
     case QP_SOLVER_UBX:
     case QP_SOLVER_UBA:
-      return std::numeric_limits<double>::infinity();
+      return default_inf();
     default:
-      return 0;
+      return default_zero();
     }
   }
 

@@ -85,7 +85,7 @@ namespace casadi {
     static std::string shortname() { return "qp";}
 
     /** \brief Get default input value */
-    virtual double default_in(int ind) const;
+    virtual const double& default_in(int ind) const;
 
   protected:
 

@@ -85,7 +85,7 @@ namespace casadi {
     virtual Sparsity getSpHessLag();
 
     /** \brief Get default input value */
-    virtual double default_in(int ind) const;
+    virtual const double& default_in(int ind) const;
 
     // Access the objective gradient function
     Function& gradF();

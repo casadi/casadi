@@ -233,8 +233,8 @@ namespace casadi {
     /** \brief Get output scheme description by index */
     std::string description_out(int ind) const;
 
-    /** \brief Get default input value */
-    double default_in(int ind) const;
+    /** \brief Get default input value (NOTE: constant reference) */
+    const double& default_in(int ind) const;
 
     /** \brief Get sparsity of a given input */
     /// @{
@@ -365,24 +365,53 @@ namespace casadi {
     ///@}
 
 #ifndef SWIG
+    /** \brief Evaluate with input and output buffers given */
+    void operator()(std::vector<const double*> arg, std::vector<double*> res);
+
     ///@{
-    /** \brief Create input/output buffer */
-    std::vector<const double*> buf_in(const std::vector<std::vector<double>>& arg) const;
-    std::vector<const double*> buf_in(std::initializer_list<std::vector<double>> arg) const;
-    std::vector<double*> buf_out(std::vector<std::vector<double>>& res) const;
-    std::vector<double*> buf_out(std::initializer_list<std::vector<double>*> res) const;
+    /** \brief Supported arguments for numerical evaluation and converters */
+    typedef const std::vector<std::vector<double>>& VecArg;
+    std::vector<const double*> buf_in(VecArg arg) const;
+    typedef std::vector<std::vector<double>>& VecRes;
+    std::vector<double*> buf_out(VecRes res) const;
+
+    typedef const std::map<std::string, std::vector<double>>& MapArg;
+    std::vector<const double*> buf_in(MapArg arg) const;
+    typedef std::map<std::string, std::vector<double>>& MapRes;
+    std::vector<double*> buf_out(MapRes res) const;
+
+    typedef std::initializer_list<std::vector<double>> L1dArg;
+    std::vector<const double*> buf_in(L1dArg arg) const;
+    typedef std::initializer_list<std::vector<double>*> L1dRes;
+    std::vector<double*> buf_out(L1dRes res) const;
+
+    typedef std::initializer_list<std::pair<std::string, std::vector<double>>> L2dArg;
+    std::vector<const double*> buf_in(L2dArg arg) const;
+    typedef std::initializer_list<std::pair<std::string, std::vector<double>*>> L2dRes;
+    std::vector<double*> buf_out(L2dRes res) const;
     ///@}
 
     ///@{
     /** \brief Numerical evaluation */
-    void operator()(const std::vector<std::vector<double>>& arg,
-                    std::vector<std::vector<double>>& res);
-    void operator()(const std::vector<std::vector<double>>& arg,
-                    std::initializer_list<std::vector<double>*> res);
-    void operator()(std::initializer_list<std::vector<double>> arg,
-                    std::vector<std::vector<double>>& res);
-    void operator()(std::initializer_list<std::vector<double>> arg,
-                    std::initializer_list<std::vector<double>*> res);
+    void operator()(VecArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, L1dRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, L2dRes res) { (*this)(buf_in(arg), buf_out(res)); }
+
+    void operator()(MapArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, L1dRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, L2dRes res) { (*this)(buf_in(arg), buf_out(res)); }
+
+    void operator()(L1dArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(L1dArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(L1dArg arg, L1dRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(L1dArg arg, L2dRes res) { (*this)(buf_in(arg), buf_out(res)); }
+
+    void operator()(L2dArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(L2dArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(L2dArg arg, L1dRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(L2dArg arg, L2dRes res) { (*this)(buf_in(arg), buf_out(res)); }
     ///@}
 #endif // SWIG
 

@@ -483,16 +483,16 @@ namespace casadi {
                  << typeid(*this).name());
   }
 
-  double NlpSolverInternal::default_in(int ind) const {
+  const double& NlpSolverInternal::default_in(int ind) const {
     switch (ind) {
     case NLP_SOLVER_LBX:
     case NLP_SOLVER_LBG:
-      return -std::numeric_limits<double>::infinity();
+      return default_minf();
     case NLP_SOLVER_UBX:
     case NLP_SOLVER_UBG:
-      return std::numeric_limits<double>::infinity();
+      return default_inf();
     default:
-      return 0;
+      return default_zero();
     }
   }
 

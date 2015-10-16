@@ -76,7 +76,7 @@ namespace casadi {
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
-  vector<const double*> Function::buf_in(const vector<vector<double>>& arg) const {
+  vector<const double*> Function::buf_in(Function::VecArg arg) const {
     casadi_assert(arg.size()==n_in());
     auto arg_it=arg.begin();
     vector<const double*> buf_arg(sz_arg());
@@ -87,7 +87,7 @@ namespace casadi {
     return buf_arg;
   }
 
-  vector<const double*> Function::buf_in(initializer_list<vector<double>> arg) const {
+  vector<const double*> Function::buf_in(Function::L1dArg arg) const {
     casadi_assert(arg.size()==n_in());
     auto arg_it=arg.begin();
     vector<const double*> buf_arg(sz_arg());
@@ -98,7 +98,7 @@ namespace casadi {
     return buf_arg;
   }
 
-  vector<double*> Function::buf_out(vector<vector<double>>& res) const {
+  vector<double*> Function::buf_out(Function::VecRes res) const {
     res.resize(n_out());
     auto res_it=res.begin();
     vector<double*> buf_res(sz_res());
@@ -109,7 +109,7 @@ namespace casadi {
     return buf_res;
   }
 
-  vector<double*> Function::buf_out(initializer_list<vector<double>*> res) const {
+  vector<double*> Function::buf_out(Function::L1dRes res) const {
     casadi_assert(res.size()==n_out());
     auto res_it=res.begin();
     vector<double*> buf_res(sz_res());
@@ -121,48 +121,77 @@ namespace casadi {
     return buf_res;
   }
 
-  void Function::operator()(const vector<vector<double>> &arg,
-                            vector<vector<double>>& res) {
-    // Allocate buffers
-    auto buf_arg = buf_in(arg);
-    auto buf_res = buf_out(res);
-    vector<int> buf_iw(sz_iw());
-    vector<double> buf_w(sz_w());
-    // Evaluate memoryless
-    (*this)(getPtr(buf_arg), getPtr(buf_res), getPtr(buf_iw), getPtr(buf_w));
+  vector<const double*> Function::buf_in(Function::MapArg arg) const {
+    // Return value (RVO)
+    vector<const double*> ret(sz_arg());
+
+    // Get default values
+    for (int i=0; i<n_in(); ++i) ret[i] = &default_in(i);
+
+    // Read inputs
+    for (auto i=arg.begin(); i!=arg.end(); ++i) {
+      int ind = index_in(i->first);
+      casadi_assert(i->second.size()==nnz_in(ind));
+      ret[ind] = getPtr(i->second);
+    }
+
+    return ret;
   }
 
-  void Function::operator()(const std::vector<std::vector<double>>& arg,
-                            std::initializer_list<std::vector<double>*> res) {
-    // Allocate buffers
-    auto buf_arg = buf_in(arg);
-    auto buf_res = buf_out(res);
-    vector<int> buf_iw(sz_iw());
-    vector<double> buf_w(sz_w());
-    // Evaluate memoryless
-    (*this)(getPtr(buf_arg), getPtr(buf_res), getPtr(buf_iw), getPtr(buf_w));
+  vector<double*> Function::buf_out(Function::MapRes res) const {
+    // Return value (RVO)
+    vector<double*> ret(sz_res(), 0);
+
+    // Read outputs
+    for (auto i=res.begin(); i!=res.end(); ++i) {
+      int ind = index_out(i->first);
+      i->second.resize(nnz_out(ind));
+      ret[ind] = getPtr(i->second);
+    }
+
+    return ret;
   }
 
-  void Function::operator()(std::initializer_list<std::vector<double>> arg,
-                            std::vector<std::vector<double>>& res) {
-    // Allocate buffers
-    auto buf_arg = buf_in(arg);
-    auto buf_res = buf_out(res);
-    vector<int> buf_iw(sz_iw());
-    vector<double> buf_w(sz_w());
-    // Evaluate memoryless
-    (*this)(getPtr(buf_arg), getPtr(buf_res), getPtr(buf_iw), getPtr(buf_w));
+  vector<const double*> Function::buf_in(Function::L2dArg arg) const {
+    // Return value (RVO)
+    vector<const double*> ret(sz_arg());
+
+    // Get default values
+    for (int i=0; i<n_in(); ++i) ret[i] = &default_in(i);
+
+    // Read inputs
+    for (auto i=arg.begin(); i!=arg.end(); ++i) {
+      int ind = index_in(i->first);
+      casadi_assert(i->second.size()==nnz_in(ind));
+      ret[ind] = getPtr(i->second);
+    }
+
+    return ret;
   }
 
-  void Function::operator()(std::initializer_list<std::vector<double>> arg,
-                            std::initializer_list<std::vector<double>*> res) {
-    // Allocate buffers
-    auto buf_arg = buf_in(arg);
-    auto buf_res = buf_out(res);
+  vector<double*> Function::buf_out(Function::L2dRes res) const {
+    // Return value (RVO)
+    vector<double*> ret(sz_res(), 0);
+
+    // Read outputs
+    for (auto i=res.begin(); i!=res.end(); ++i) {
+      int ind = index_out(i->first);
+      casadi_assert(i->second!=0);
+      i->second->resize(nnz_out(ind));
+      ret[ind] = getPtr(*i->second);
+    }
+
+    return ret;
+  }
+
+  void Function::operator()(std::vector<const double*> arg, std::vector<double*> res) {
+    casadi_assert(arg.size()>=sz_arg());
+    casadi_assert(res.size()>=sz_res());
     vector<int> buf_iw(sz_iw());
     vector<double> buf_w(sz_w());
+
     // Evaluate memoryless
-    (*this)(getPtr(buf_arg), getPtr(buf_res), getPtr(buf_iw), getPtr(buf_w));
+    (*this)(getPtr(arg), getPtr(res), getPtr(buf_iw), getPtr(buf_w));
   }
 
   Function Function::mapaccum(const std::string& name, int N, const Dict& options) const {
@@ -1037,7 +1066,7 @@ namespace casadi {
     return r;
   }
 
-  double Function::default_in(int ind) const {
+  const double& Function::default_in(int ind) const {
     return (*this)->default_in(ind);
   }
 
