@@ -25,7 +25,6 @@
 
 #include "simple_homotopy_nlp.hpp"
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/casadi_calculus.hpp"
 #include <ctime>
 #include <iomanip>

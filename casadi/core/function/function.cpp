@@ -24,12 +24,12 @@
 
 
 #include "function_internal.hpp"
-#include "../function/mx_function.hpp"
-#include <typeinfo>
 #include "../std_vector_tools.hpp"
 #include "../function/map.hpp"
 #include "../function/mapaccum.hpp"
 #include "external_function_internal.hpp"
+
+#include <typeinfo>
 
 using namespace std;
 

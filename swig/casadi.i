@@ -3566,7 +3566,6 @@ namespace casadi {
 
 %feature("director") casadi::Callback;
 
-%include <casadi/core/function/mx_function.hpp>
 %include <casadi/core/function/compiler.hpp>
 %include <casadi/core/function/linear_solver.hpp>
 %include <casadi/core/function/implicit_function.hpp>

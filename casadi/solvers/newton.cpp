@@ -25,8 +25,6 @@
 
 #include "newton.hpp"
 
-#include "casadi/core/function/mx_function.hpp"
-
 #include "casadi/core/profiling.hpp"
 #include "casadi/core/casadi_options.hpp"
 

@@ -27,7 +27,6 @@
 
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/function/linear_solver_internal.hpp"
-#include "casadi/core/function/mx_function.hpp"
 
 using namespace std;
 

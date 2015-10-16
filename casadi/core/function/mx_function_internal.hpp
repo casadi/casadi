@@ -31,7 +31,6 @@
 #include <vector>
 #include <iostream>
 
-#include "mx_function.hpp"
 #include "x_function_internal.hpp"
 #include "../mx/mx_node.hpp"
 

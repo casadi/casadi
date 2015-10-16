@@ -24,7 +24,6 @@
 
 
 #include "nlp_solver_internal.hpp"
-#include "mx_function.hpp"
 #include "casadi/core/timing.hpp"
 
 INPUTSCHEME(NlpSolverInput)
@@ -184,16 +183,10 @@ namespace casadi {
     bool expand = getOption("expand");
     if (expand) {
       log("Expanding NLP in scalar operations");
-
-      // Cast to MXFunction
-      Function nlp_mx = shared_cast<MXFunction>(nlp_);
-      if (nlp_mx.isNull()) {
-        casadi_warning("Cannot expand NLP as it is not an MXFunction");
-      } else {
-        nlp_ = SX::fun(nlp_mx.name(), nlp_mx);
-        nlp_.copyOptions(nlp_mx, true);
-        nlp_.init();
-      }
+      Function f = SX::fun(nlp_.name(), nlp_);
+      f.copyOptions(nlp_, true);
+      f.init();
+      nlp_ = f;
     }
 
     if (hasSetOption("iteration_callback")) {

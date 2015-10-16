@@ -23,9 +23,7 @@
  */
 
 
-#include "integrator.hpp"
 #include "integrator_internal.hpp"
-#include "mx_function.hpp"
 
 using namespace std;
 namespace casadi {

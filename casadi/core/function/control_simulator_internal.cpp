@@ -26,9 +26,7 @@
 #include "control_simulator_internal.hpp"
 #include "integrator_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "mx_function.hpp"
 #include <utility>
-#include <string>
 
 INPUTSCHEME(ControlSimulatorInput)
 

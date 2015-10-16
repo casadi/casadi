@@ -27,7 +27,6 @@
 #define CASADI_FIXED_STEP_INTEGRATOR_HPP
 
 #include "casadi/core/function/integrator_internal.hpp"
-#include "casadi/core/function/mx_function.hpp"
 #include <casadi/solvers/casadi_integrators_export.h>
 
 /// \cond INTERNAL

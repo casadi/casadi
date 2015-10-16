@@ -27,7 +27,6 @@
 #include "../mx/casadi_call.hpp"
 #include <typeinfo>
 #include "../std_vector_tools.hpp"
-#include "mx_function.hpp"
 
 #include "../casadi_options.hpp"
 #include "../profiling.hpp"

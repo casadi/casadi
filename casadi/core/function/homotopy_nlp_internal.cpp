@@ -24,7 +24,6 @@
 
 
 #include "homotopy_nlp_internal.hpp"
-#include "mx_function.hpp"
 
 INPUTSCHEME(NlpSolverInput)
 OUTPUTSCHEME(NlpSolverOutput)
@@ -128,16 +127,10 @@ namespace casadi {
     bool expand = getOption("expand");
     if (expand) {
       log("Expanding NLP in scalar operations");
-
-      // Cast to MXFunction
-      MXFunction hnlp_mx = shared_cast<MXFunction>(hnlp_);
-      if (hnlp_mx.isNull()) {
-        casadi_warning("Cannot expand NLP as it is not an MXFunction");
-      } else {
-        hnlp_ = SX::fun(hnlp_mx.name(), hnlp_mx);
-        hnlp_.copyOptions(hnlp_mx, true);
-        hnlp_.init();
-      }
+      Function f = SX::fun(hnlp_.name(), hnlp_);
+      f.copyOptions(hnlp_, true);
+      f.init();
+      hnlp_ = f;
     }
   }
 

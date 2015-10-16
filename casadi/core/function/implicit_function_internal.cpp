@@ -24,7 +24,6 @@
 
 
 #include "implicit_function_internal.hpp"
-#include "mx_function.hpp"
 #include "../mx/mx_node.hpp"
 #include <iterator>
 

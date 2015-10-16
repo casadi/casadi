@@ -89,7 +89,7 @@ set(CASADI_SRCS
   function/plugin_interface.hpp                                     # Plugin interface for Function
   function/x_function_internal.hpp                                  # Base class for SXFunction and MXFunction
   function/sx_function_internal.hpp         function/sx_function_internal.cpp
-  function/mx_function.hpp         function/mx_function.cpp         function/mx_function_internal.hpp         function/mx_function_internal.cpp
+  function/mx_function_internal.hpp         function/mx_function_internal.cpp
   function/external_function_internal.hpp   function/external_function_internal.cpp
   function/linear_solver.hpp       function/linear_solver.cpp       function/linear_solver_internal.hpp       function/linear_solver_internal.cpp
   function/implicit_function.hpp   function/implicit_function.cpp   function/implicit_function_internal.hpp   function/implicit_function_internal.cpp

@@ -24,7 +24,6 @@
 
 
 #include "kernel_sum_2d_internal.hpp"
-#include "mx_function.hpp"
 
 using namespace std;
 

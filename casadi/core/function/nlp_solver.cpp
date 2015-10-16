@@ -23,9 +23,7 @@
  */
 
 
-#include "nlp_solver.hpp"
 #include "nlp_solver_internal.hpp"
-#include "mx_function.hpp"
 
 using namespace std;
 namespace casadi {

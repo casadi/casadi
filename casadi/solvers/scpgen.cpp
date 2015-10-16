@@ -157,8 +157,8 @@ namespace casadi {
       print_x_.resize(0);
     }
 
-    Function fg = shared_cast<MXFunction>(nlp_);
-    if (fg.isNull()) {
+    Function fg = nlp_;
+    if (!fg.is_a("mx_function")) {
       vector<MX> nlp_in = nlp_.mx_in();
       vector<MX> nlp_out = nlp_(nlp_in);
       fg = MX::fun("fg", nlp_in, nlp_out);

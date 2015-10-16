@@ -25,7 +25,6 @@
 
 #include "integrator_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "mx_function.hpp"
 
 INPUTSCHEME(IntegratorInput)
 OUTPUTSCHEME(IntegratorOutput)
