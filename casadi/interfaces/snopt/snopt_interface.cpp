@@ -22,20 +22,15 @@
  *
  */
 
+#include "snopt_interface.hpp"
+#include "casadi/core/std_vector_tools.hpp"
 
 #include <stdio.h>
 #include <string.h>
 #include <ctime>
 #include <utility>
-#include <string>
 #include <algorithm>
-#include <vector>
 #include <iomanip>
-
-#include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/function/mx_function.hpp"
-
-#include "snopt_interface.hpp"
 
 namespace casadi {
 
