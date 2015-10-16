@@ -3571,7 +3571,6 @@ namespace casadi {
 %include <casadi/core/function/implicit_function.hpp>
 %include <casadi/core/function/integrator.hpp>
 %include <casadi/core/function/simulator.hpp>
-%include <casadi/core/function/control_simulator.hpp>
 %include <casadi/core/function/nlp_solver.hpp>
 %include <casadi/core/function/qp_solver.hpp>
 %include <casadi/core/function/stabilized_qp_solver.hpp>
