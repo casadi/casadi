@@ -102,7 +102,7 @@ set(CASADI_SRCS
   function/stabilized_qp_solver.hpp    function/stabilized_qp_solver.cpp    function/stabilized_qp_solver_internal.hpp function/stabilized_qp_solver_internal.cpp
   function/code_generator.hpp      function/code_generator.cpp
   function/nullspace.hpp           function/nullspace.cpp           function/nullspace_internal.hpp           function/nullspace_internal.cpp
-  function/wrapper.hpp             function/adaptor.hpp             function/dense_io.hpp
+  function/wrapper.hpp             function/adaptor.hpp
   function/switch.hpp              function/switch.cpp              function/switch_internal.hpp   function/switch_internal.cpp
   function/map.hpp                 function/map.cpp                 function/map_internal.hpp      function/map_internal.cpp
   function/mapaccum.hpp            function/mapaccum.cpp            function/mapaccum_internal.hpp function/mapaccum_internal.cpp
