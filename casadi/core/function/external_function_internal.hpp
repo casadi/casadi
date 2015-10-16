@@ -121,6 +121,16 @@ namespace casadi {
     /** \brief Destructor */
     virtual ~ExternalFunctionInternal() = 0;
 
+    /// @{
+    /** \brief Sparsities of function inputs and outputs */
+    virtual Sparsity get_sparsity_in(int ind) const;
+    virtual Sparsity get_sparsity_out(int ind) const;
+    Sparsity get_sparsity(int ind) const;
+    /// @}
+
+    /** \brief Retreive sparsities */
+    sparsityPtr sparsity_;
+
   private:
     /** \brief Creator function, use this for creating instances of the class */
     template<typename LibType>

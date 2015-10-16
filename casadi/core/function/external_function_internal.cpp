@@ -175,6 +175,35 @@ namespace casadi {
     this->alloc_w(this->n_in() + this->n_out());
   }
 
+  Sparsity ExternalFunctionInternal::get_sparsity_in(int ind) const {
+    return get_sparsity(ind);
+  }
+
+  Sparsity ExternalFunctionInternal::get_sparsity_out(int ind) const {
+    return get_sparsity(ind+n_in());
+  }
+
+  Sparsity ExternalFunctionInternal::get_sparsity(int ind) const {
+    // Get sparsity from file
+    int nrow, ncol;
+    const int *colind, *row;
+    casadi_assert(sparsity_!=0);
+    int flag = sparsity_(ind, &nrow, &ncol, &colind, &row);
+    casadi_assert_message(flag==0, "ExternalFunctionInternal: \"sparsity\" failed");
+
+    // Col offsets
+    vector<int> colindv(colind, colind+ncol+1);
+
+    // Number of nonzeros
+    int nnz = colindv.back();
+
+    // Rows
+    vector<int> rowv(row, row+nnz);
+
+    // Sparsity
+    return Sparsity(nrow, ncol, colindv, rowv);
+  }
+
   template<typename LibType>
   GenericExternal<LibType>::GenericExternal(const std::string& name, const LibInfo<LibType>& li)
     : CommonExternal<LibType>(name, li) {
@@ -183,39 +212,20 @@ namespace casadi {
     casadi_assert_message(eval_!=0, "GenericExternal: no \""+name+"\" found");
 
     // Function for retrieving sparsities of inputs and outputs
-    sparsityPtr sparsity;
-    li_.get(sparsity, name + "_sparsity");
-    if (sparsity==0) {
+    li_.get(this->sparsity_, name + "_sparsity");
+    if (this->sparsity_==0) {
       // Fall back to scalar sparsity
-      sparsity = scalarSparsity;
+      this->sparsity_ = scalarSparsity;
     }
 
-    // Get the sparsity patterns
-    for (int i=0; i<this->n_in()+this->n_out(); ++i) {
-      // Get sparsity from file
-      int nrow, ncol;
-      const int *colind, *row;
-      int flag = sparsity(i, &nrow, &ncol, &colind, &row);
-      casadi_assert_message(flag==0, "CommonExternal: \"sparsity\" failed");
+    // Get input sparsities
+    for (int i=0; i<this->n_in(); ++i) {
+      this->input(i) = Matrix<double>::zeros(this->get_sparsity_in(i));
+    }
 
-      // Col offsets
-      vector<int> colindv(colind, colind+ncol+1);
-
-      // Number of nonzeros
-      int nnz = colindv.back();
-
-      // Rows
-      vector<int> rowv(row, row+nnz);
-
-      // Sparsity
-      Sparsity sp(nrow, ncol, colindv, rowv);
-
-      // Save to inputs/outputs
-      if (i<this->n_in()) {
-        this->input(i) = Matrix<double>::zeros(sp);
-      } else {
-        this->output(i-this->n_in()) = Matrix<double>::zeros(sp);
-      }
+    // Get output sparsities
+    for (int i=0; i<this->n_out(); ++i) {
+      this->output(i) = Matrix<double>::zeros(this->get_sparsity_out(i));
     }
 
     // Get number of temporaries

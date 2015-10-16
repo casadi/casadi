@@ -55,6 +55,16 @@ namespace casadi {
     virtual size_t get_n_out() const { return f_.n_out();}
     ///@}
 
+    /// @{
+    /** \brief Sparsities of function inputs and outputs */
+    virtual Sparsity get_sparsity_in(int ind) const {
+      return repmat(f_.sparsity_in(ind), 1, n_);
+    }
+    virtual Sparsity get_sparsity_out(int ind) const {
+      return repmat(f_.sparsity_out(ind), 1, n_);
+    }
+    /// @}
+
     /** \brief  Initialize */
     virtual void init();
 

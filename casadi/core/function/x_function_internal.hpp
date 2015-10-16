@@ -135,6 +135,12 @@ namespace casadi {
     virtual size_t get_n_out() const { return outputv_.size(); }
     ///@}
 
+    /// @{
+    /** \brief Sparsities of function inputs and outputs */
+    virtual Sparsity get_sparsity_in(int ind) const { return inputv_.at(ind).sparsity();}
+    virtual Sparsity get_sparsity_out(int ind) const { return outputv_.at(ind).sparsity();}
+    /// @}
+
     // Data members (all public)
 
     /** \brief  Inputs of the function (needed for symbolic calculations) */

@@ -53,6 +53,34 @@ namespace casadi {
     return f_def_.n_out();
   }
 
+  Sparsity SwitchInternal::get_sparsity_in(int ind) const {
+    Sparsity ret;
+    for (auto&& i : f_) {
+      if (!i.isNull()) {
+        const Sparsity& s = i.sparsity_in(ind);
+        ret = ret.isNull() ? s : ret.unite(s);
+      }
+    }
+    casadi_assert(!f_def_.isNull());
+    const Sparsity& s = f_def_.sparsity_in(ind);
+    ret = ret.isNull() ? s : ret.unite(s);
+    return ret;
+  }
+
+  Sparsity SwitchInternal::get_sparsity_out(int ind) const {
+    Sparsity ret;
+    for (auto&& i : f_) {
+      if (!i.isNull()) {
+        const Sparsity& s = i.sparsity_out(ind);
+        ret = ret.isNull() ? s : ret.unite(s);
+      }
+    }
+    casadi_assert(!f_def_.isNull());
+    const Sparsity& s = f_def_.sparsity_out(ind);
+    ret = ret.isNull() ? s : ret.unite(s);
+    return ret;
+  }
+
   void SwitchInternal::init() {
     // Initialize the functions, get input and output sparsities
     // Input and output sparsities

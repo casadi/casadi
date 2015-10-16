@@ -100,6 +100,14 @@ namespace casadi {
     oscheme_ = IOScheme(SCHEME_QpSolverOutput);
   }
 
+  Sparsity StabilizedQpSolverInternal::get_sparsity_in(int ind) const {
+    return Sparsity();
+  }
+
+  Sparsity StabilizedQpSolverInternal::get_sparsity_out(int ind) const {
+    return Sparsity();
+  }
+
   void StabilizedQpSolverInternal::init() {
     // Call the init method of the base class
     FunctionInternal::init();

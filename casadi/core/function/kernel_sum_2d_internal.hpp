@@ -56,6 +56,22 @@ namespace casadi {
     virtual size_t get_n_out() const { return f_.n_out();}
     ///@}
 
+    /// @{
+    /** \brief Sparsities of function inputs and outputs */
+    virtual Sparsity get_sparsity_in(int ind) const {
+      if (ind==0) {
+        return Sparsity::dense(size_);
+      } else if (ind==1) {
+        return Sparsity::dense(2, n_);
+      } else {
+        return f_.sparsity_in(ind+1);
+      }
+    }
+    virtual Sparsity get_sparsity_out(int ind) const {
+      return f_.sparsity_out(ind);
+    }
+    /// @}
+
     /** \brief  Initialize */
     virtual void init();
 

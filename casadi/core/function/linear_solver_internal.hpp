@@ -40,6 +40,9 @@ namespace casadi {
   class CASADI_EXPORT
   LinearSolverInternal : public FunctionInternal,
                          public PluginInterface<LinearSolverInternal> {
+  private:
+    Sparsity sparsity_;
+    int nrhs_;
   public:
     /// Constructor
     LinearSolverInternal(const std::string& name, const Sparsity& sparsity, int nrhs);
@@ -52,6 +55,12 @@ namespace casadi {
     virtual size_t get_n_in() const { return LINSOL_NUM_IN;}
     virtual size_t get_n_out() const { return LINSOL_NUM_OUT;}
     ///@}
+
+    /// @{
+    /** \brief Sparsities of function inputs and outputs */
+    virtual Sparsity get_sparsity_in(int ind) const;
+    virtual Sparsity get_sparsity_out(int ind) const;
+    /// @}
 
     /// Initialize
     virtual void init();

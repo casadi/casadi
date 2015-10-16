@@ -503,22 +503,24 @@ namespace casadi {
 
     /** \brief Get sparsity of a given input */
     /// @{
-    inline Sparsity sparsity_in(int ind=0) const {
+    inline Sparsity sparsity_in(int ind) const {
       return input(ind).sparsity();
     }
     inline Sparsity sparsity_in(const std::string& iname) const {
-      return input(index_in(iname)).sparsity();
+      return sparsity_in(index_in(iname));
     }
+    virtual Sparsity get_sparsity_in(int ind) const = 0;
     /// @}
 
     /** \brief Get sparsity of a given output */
     /// @{
-    inline Sparsity sparsity_out(int ind=0) const {
+    inline Sparsity sparsity_out(int ind) const {
       return output(ind).sparsity();
     }
     inline Sparsity sparsity_out(const std::string& iname) const {
-      return output(index_out(iname)).sparsity();
+      return sparsity_out(index_out(iname));
     }
+    virtual Sparsity get_sparsity_out(int ind) const = 0;
     /// @}
 
 

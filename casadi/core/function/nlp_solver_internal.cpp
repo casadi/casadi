@@ -99,18 +99,51 @@ namespace casadi {
     ref_.assignNodeNoCount(0);
   }
 
+  Sparsity NlpSolverInternal::get_sparsity_in(int ind) const {
+    switch (static_cast<NlpSolverInput>(ind)) {
+    case NLP_SOLVER_X0:
+    case NLP_SOLVER_LBX:
+    case NLP_SOLVER_UBX:
+    case NLP_SOLVER_LAM_X0:
+      return get_sparsity_out(NLP_SOLVER_X);
+    case NLP_SOLVER_LBG:
+    case NLP_SOLVER_UBG:
+    case NLP_SOLVER_LAM_G0:
+      return get_sparsity_out(NLP_SOLVER_G);
+    case NLP_SOLVER_P:
+      return get_sparsity_out(NLP_SOLVER_P);
+    case NLP_SOLVER_NUM_IN:
+      return Sparsity();
+    }
+  }
+
+  Sparsity NlpSolverInternal::get_sparsity_out(int ind) const {
+    switch (static_cast<NlpSolverOutput>(ind)) {
+    case NLP_SOLVER_F:
+      return Sparsity::scalar();
+    case NLP_SOLVER_X:
+    case NLP_SOLVER_LAM_X:
+      return nlp_.sparsity_in(NL_X);
+    case NLP_SOLVER_LAM_G:
+    case NLP_SOLVER_G:
+      return nlp_.sparsity_out(NL_G);
+    case NLP_SOLVER_LAM_P:
+      return nlp_.sparsity_in(NL_P);
+    case NLP_SOLVER_NUM_OUT:
+      return Sparsity();
+    }
+  }
+
   void NlpSolverInternal::init() {
-    // Initialize the NLP
-    nlp_.init();
     casadi_assert_message(nlp_.n_in()==NL_NUM_IN,
                           "The NLP function must have exactly two input");
     casadi_assert_message(nlp_.n_out()==NL_NUM_OUT,
                           "The NLP function must have exactly two outputs");
 
     // Sparsity patterns
-    const Sparsity& x_sparsity = nlp_.input(NL_X).sparsity();
-    const Sparsity& p_sparsity = nlp_.input(NL_P).sparsity();
-    const Sparsity& g_sparsity = nlp_.output(NL_G).sparsity();
+    const Sparsity& x_sparsity = nlp_.sparsity_in(NL_X);
+    const Sparsity& p_sparsity = nlp_.sparsity_in(NL_P);
+    const Sparsity& g_sparsity = nlp_.sparsity_out(NL_G);
 
     // Get dimensions
     nx_ = x_sparsity.nnz();

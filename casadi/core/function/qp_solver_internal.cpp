@@ -98,6 +98,40 @@ namespace casadi {
     oscheme_ = IOScheme(SCHEME_QpSolverOutput);
   }
 
+  Sparsity QpSolverInternal::get_sparsity_in(int ind) const {
+    switch (static_cast<QpSolverInput>(ind)) {
+    case QP_SOLVER_X0:
+    case QP_SOLVER_G:
+    case QP_SOLVER_LBX:
+    case QP_SOLVER_UBX:
+    case QP_SOLVER_LAM_X0:
+      return get_sparsity_out(QP_SOLVER_X);
+    case QP_SOLVER_LBA:
+    case QP_SOLVER_UBA:
+      return get_sparsity_out(QP_SOLVER_LAM_A);
+    case QP_SOLVER_A:
+      return st_[QP_STRUCT_A];
+    case QP_SOLVER_H:
+      return st_[QP_STRUCT_H];
+    case QP_SOLVER_NUM_IN:
+      return Sparsity();
+    }
+  }
+
+  Sparsity QpSolverInternal::get_sparsity_out(int ind) const {
+    switch (static_cast<QpSolverOutput>(ind)) {
+    case QP_SOLVER_COST:
+      return Sparsity::scalar();
+    case QP_SOLVER_X:
+    case QP_SOLVER_LAM_X:
+      return Sparsity::dense(n_, 1);
+    case QP_SOLVER_LAM_A:
+      return Sparsity::dense(nc_, 1);
+    case QP_SOLVER_NUM_OUT:
+      return Sparsity();
+    }
+  }
+
   void QpSolverInternal::init() {
     // Call the init method of the base class
     FunctionInternal::init();

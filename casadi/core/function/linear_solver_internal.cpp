@@ -36,7 +36,7 @@ namespace casadi {
 
   LinearSolverInternal::LinearSolverInternal(const std::string& name,
                                              const Sparsity& sparsity, int nrhs)
-  : FunctionInternal(name) {
+  : FunctionInternal(name), sparsity_(sparsity), nrhs_(nrhs) {
 
     // Make sure arguments are consistent
     casadi_assert(!sparsity.isNull());
@@ -64,6 +64,26 @@ namespace casadi {
 
     ischeme_ = IOScheme(SCHEME_LinsolInput);
     oscheme_ = IOScheme(SCHEME_LinsolOutput);
+  }
+
+  Sparsity LinearSolverInternal::get_sparsity_in(int ind) const {
+    switch (static_cast<LinsolInput>(ind)) {
+    case LINSOL_A:
+      return sparsity_;
+    case LINSOL_B:
+      return Sparsity::dense(sparsity_.size2(), nrhs_);
+    case LINSOL_NUM_IN:
+      return Sparsity();
+    }
+  }
+
+  Sparsity LinearSolverInternal::get_sparsity_out(int ind) const {
+    switch (static_cast<LinsolOutput>(ind)) {
+    case LINSOL_X:
+      return sparsity_;
+    case LINSOL_NUM_OUT:
+      return Sparsity();
+    }
   }
 
   void LinearSolverInternal::init() {

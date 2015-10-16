@@ -62,6 +62,44 @@ namespace casadi {
   IntegratorInternal::~IntegratorInternal() {
   }
 
+  Sparsity IntegratorInternal::get_sparsity_in(int ind) const {
+    switch (static_cast<IntegratorInput>(ind)) {
+    case INTEGRATOR_X0:
+      return f_.input(DAE_X).sparsity();
+    case INTEGRATOR_P:
+      return f_.input(DAE_P).sparsity();
+    case INTEGRATOR_Z0:
+      return f_.input(DAE_Z).sparsity();
+    case INTEGRATOR_RX0:
+      return g_.isNull() ? Sparsity() : g_.input(RDAE_RX).sparsity();
+    case INTEGRATOR_RP:
+      return g_.isNull() ? Sparsity() : g_.input(RDAE_RP).sparsity();
+    case INTEGRATOR_RZ0:
+      return g_.isNull() ? Sparsity() : g_.input(RDAE_RZ).sparsity();
+    case INTEGRATOR_NUM_IN:
+      return Sparsity();
+    }
+  }
+
+  Sparsity IntegratorInternal::get_sparsity_out(int ind) const {
+    switch (static_cast<IntegratorOutput>(ind)) {
+    case INTEGRATOR_XF:
+      return get_sparsity_in(INTEGRATOR_X0);
+    case INTEGRATOR_QF:
+      return f_.output(DAE_QUAD).sparsity();
+    case INTEGRATOR_ZF:
+      return get_sparsity_in(INTEGRATOR_ZF);
+    case INTEGRATOR_RXF:
+      return get_sparsity_in(INTEGRATOR_RX0);
+    case INTEGRATOR_RQF:
+      return g_.isNull() ? Sparsity() : g_.output(RDAE_QUAD).sparsity();
+    case INTEGRATOR_RZF:
+      return get_sparsity_in(INTEGRATOR_RZ0);
+    case INTEGRATOR_NUM_OUT:
+      return Sparsity();
+    }
+  }
+
   void IntegratorInternal::evaluate() {
     // Reset solver
     reset();

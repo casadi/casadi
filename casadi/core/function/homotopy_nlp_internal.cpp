@@ -48,6 +48,41 @@ namespace casadi {
   HomotopyNLPInternal::~HomotopyNLPInternal() {
   }
 
+  Sparsity HomotopyNLPInternal::get_sparsity_in(int ind) const {
+    switch (static_cast<NlpSolverInput>(ind)) {
+    case NLP_SOLVER_X0:
+    case NLP_SOLVER_LBX:
+    case NLP_SOLVER_UBX:
+    case NLP_SOLVER_LAM_X0:
+      return get_sparsity_out(NLP_SOLVER_X);
+    case NLP_SOLVER_LBG:
+    case NLP_SOLVER_UBG:
+    case NLP_SOLVER_LAM_G0:
+      return get_sparsity_out(NLP_SOLVER_G);
+    case NLP_SOLVER_P:
+      return get_sparsity_out(NLP_SOLVER_P);
+    case NLP_SOLVER_NUM_IN:
+      return Sparsity();
+    }
+  }
+
+  Sparsity HomotopyNLPInternal::get_sparsity_out(int ind) const {
+    switch (static_cast<NlpSolverOutput>(ind)) {
+    case NLP_SOLVER_F:
+      return Sparsity::scalar();
+    case NLP_SOLVER_X:
+    case NLP_SOLVER_LAM_X:
+      return hnlp_.sparsity_in(HNL_X);
+    case NLP_SOLVER_LAM_G:
+    case NLP_SOLVER_G:
+      return hnlp_.sparsity_out(NL_G);
+    case NLP_SOLVER_LAM_P:
+      return hnlp_.sparsity_in(HNL_P);
+    case NLP_SOLVER_NUM_OUT:
+      return Sparsity();
+    }
+  }
+
   void HomotopyNLPInternal::init() {
     // Initialize the Homotopy NLP
     hnlp_.init();
