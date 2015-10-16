@@ -87,28 +87,6 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > controlsimulatorI
   }
   return std::make_pair(m, sv);
 }
-/// Input arguments of an Homotopy NLP function
-///
-/// \copydoc scheme_HNLPInput
-template<class M>
-std::pair<std::map<std::string, M>, std::vector<std::string> > hnlpIn(
-    const std::string &n0 ="", const M &x0 =M(),
-    const std::string &n1 ="", const M &x1 =M(),
-    const std::string &n2 ="", const M &x2 =M()) {
-  // This comment lets the haskell bindings know this is a scheme helper
-  std::map<std::string, M> m;
-  if (!n0.empty()) m[n0]=x0;
-  if (!n1.empty()) m[n1]=x1;
-  if (!n2.empty()) m[n2]=x2;
-  std::string s[] = {"x", "p", "tau"};
-  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
-  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
-    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
-      casadi_error("Error in 'hnlpIn' arguments. You supplied key '"
-        << it->first << "'. Allowed keys are: " << sv << ".");
-  }
-  return std::make_pair(m, sv);
-}
 /// Input arguments of an ODE/DAE function
 ///
 /// \copydoc scheme_DAEInput

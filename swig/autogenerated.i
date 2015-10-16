@@ -97,37 +97,6 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def hnlpIn(**kwargs):
-  """
-  Helper function for 'HNLPInput'
-
-  Usage:
-    arg = hnlpIn(x=my_x, p=my_p, tau=my_tau)
-        all arguments optional
-  Input arguments of an Homotopy NLP function
-  
-  Keyword arguments::
-
-    x   -- Decision variable [HNL_X]
-    p   -- Fixed parameter [HNL_P]
-    tau -- Homotopy parameter [HNL_TAU]
-  """
-  for k in kwargs.keys():
-    if k not in ['x', 'p', 'tau']:
-      raise Exception("Error in 'hnlpIn' arguments. You supplied key '%s'. Allowed keys are: 'x', 'p', 'tau'" % k)
-  return (kwargs, ['x', 'p', 'tau'])
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace casadi {
-%template(hnlpIn) hnlpIn<casadi::SX>;
-%template(hnlpIn) hnlpIn<casadi::MX>;
-%template(hnlpIn) hnlpIn<casadi::Matrix<double> >;
-%template(hnlpIn) hnlpIn<casadi::Sparsity>;
-}
-#endif //SWIGPYTHON
-#ifdef SWIGPYTHON
-%pythoncode %{
 def daeIn(**kwargs):
   """
   Helper function for 'DAEInput'

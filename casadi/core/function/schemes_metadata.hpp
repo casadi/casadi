@@ -35,7 +35,6 @@ class Sparsity;
 enum InputOutputScheme {
   SCHEME_ControlledDAEInput,
   SCHEME_ControlSimulatorInput,
-  SCHEME_HNLPInput,
   SCHEME_DAEInput,
   SCHEME_DAEOutput,
   SCHEME_RDAEInput,
