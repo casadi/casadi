@@ -3656,33 +3656,6 @@ Add an ordinary differential equation.
 ";
 
 
-// File: classcasadi_1_1DenseIO.xml
-%feature("docstring") casadi::DenseIO::writeOutputs "[INTERNAL]  Write the
-dense outputs to the sparse outputs.
-
-";
-
-%feature("docstring") casadi::DenseIO::readInputs "[INTERNAL]  Read the
-sparse inputs into the dense inputs.
-
-";
-
-%feature("docstring") casadi::DenseIO "[INTERNAL]  A helper class for
-Functions that work on dense Inputs/Outputs.
-
-Joris Gillis
-
-C++ includes: dense_io.hpp ";
-
-%feature("docstring") casadi::DenseIO::inputD "[INTERNAL] ";
-
-%feature("docstring") casadi::DenseIO::init "[INTERNAL]  Initialize.
-
-";
-
-%feature("docstring") casadi::DenseIO::outputD "[INTERNAL] ";
-
-
 // File: classcasadi_1_1DenseMultiplication.xml
 
 

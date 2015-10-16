@@ -1,27 +1,6 @@
 %exception  casadi::Adaptor< Derived, Solver >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DenseIO< Derived >::init() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseIO< Derived >::inputD(int i) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseIO< Derived >::inputD(int i) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseIO< Derived >::outputD(int i) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseIO< Derived >::outputD(int i) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseIO< Derived >::readInputs() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseIO< Derived >::writeOutputs() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Function::callDerivative(const DMatrixVector &arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed, DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed, DMatrixVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
