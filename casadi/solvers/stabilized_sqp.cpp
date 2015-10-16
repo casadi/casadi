@@ -176,11 +176,11 @@ namespace casadi {
     }
 
     // Allocate a QP solver
-    Sparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity()
+    Sparsity H_sparsity = exact_hessian_ ? hessLag().sparsity_out(0)
         : Sparsity::dense(nx_, nx_);
     H_sparsity = H_sparsity + Sparsity::diag(nx_);
     Sparsity A_sparsity = jacG().isNull() ? Sparsity(0, nx_)
-        : jacG().output().sparsity();
+        : jacG().sparsity_out(0);
     stabilized_qp_solver_ = StabilizedQpSolver("stabilized_qp_solver",
                                                getOption("stabilized_qp_solver"),
                                                SparsityDict{{"h", H_sparsity}, {"a", A_sparsity}},

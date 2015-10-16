@@ -1187,9 +1187,9 @@ namespace casadi {
     }
 
     // Get sparsity and non-zero elements
-    const int* colind = jac_.output().colind();
-    int ncol = jac_.output().size2();
-    const int* row = jac_.output().row();
+    const int* colind = jac_.sparsity_out(0).colind();
+    int ncol = jac_.size2_out(0);
+    const int* row = jac_.sparsity_out(0).row();
     const vector<double>& val = jac_.output().data();
 
     // Loop over columns
@@ -1245,9 +1245,9 @@ namespace casadi {
     }
 
     // Get sparsity and non-zero elements
-    const int* colind = jacB_.output().colind();
-    int ncol = jacB_.output().size2();
-    const int* row = jacB_.output().row();
+    const int* colind = jacB_.sparsity_out(0).colind();
+    int ncol = jacB_.size2_out(0);
+    const int* row = jacB_.sparsity_out(0).row();
     const vector<double>& val = jacB_.output().data();
 
     // Loop over columns
@@ -1314,9 +1314,9 @@ namespace casadi {
     jac_.evaluate();
 
     // Get sparsity and non-zero elements
-    const int* colind = jac_.output().colind();
-    int ncol = jac_.output().size2();
-    const int* row = jac_.output().row();
+    const int* colind = jac_.sparsity_out(0).colind();
+    int ncol = jac_.size2_out(0);
+    const int* row = jac_.sparsity_out(0).row();
     const vector<double>& val = jac_.output().data();
 
     // Loop over cols
@@ -1374,9 +1374,9 @@ namespace casadi {
     }
 
     // Get sparsity and non-zero elements
-    const int* colind = jacB_.output().colind();
-    int ncol = jacB_.output().size2();
-    const int* row = jacB_.output().row();
+    const int* colind = jacB_.sparsity_out(0).colind();
+    int ncol = jacB_.size2_out(0);
+    const int* row = jacB_.sparsity_out(0).row();
     const vector<double>& val = jacB_.output().data();
 
     // Loop over columns
@@ -1473,7 +1473,7 @@ namespace casadi {
     }
 
     // Solve the (possibly factorized) system
-    casadi_assert(linsol_.output().nnz() == NV_LENGTH_S(z));
+    casadi_assert(linsol_.nnz_out(0) == NV_LENGTH_S(z));
     linsol_.solve(NV_DATA_S(z), 1, false);
 
     // Log time duration
@@ -1493,7 +1493,7 @@ namespace casadi {
     }
 
     // Solve the (possibly factorized) system
-    casadi_assert(linsolB_.output().nnz() == NV_LENGTH_S(zvecB));
+    casadi_assert(linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB));
     linsolB_.solve(NV_DATA_S(zvecB), 1, false);
 
     // Log time duration

@@ -141,7 +141,7 @@ namespace casadi {
     casadi_assert_message(f.n_in()==2, "Function must have two inputs: x and p");
     casadi_assert_message(f.n_out()==1, "Function must have one outputs: dot(x)");
 
-    MX x0 = MX::sym("x0", f.input(0).sparsity());
+    MX x0 = MX::sym("x0", f.sparsity_in(0));
     MX p = MX::sym("p", f.input(1).sparsity());
     MX h = MX::sym("h");
 
@@ -263,7 +263,7 @@ namespace casadi {
     collocationInterpolators(tau_root, C, D);
 
     // Inputs of constructed function
-    MX x0 = MX::sym("x0", f.input(0).sparsity());
+    MX x0 = MX::sym("x0", f.sparsity_in(0));
     MX p = MX::sym("p", f.input(1).sparsity());
     MX h = MX::sym("h");
 
@@ -324,7 +324,7 @@ namespace casadi {
     casadi_assert_message(f.n_out()==1, "Function must have one outputs: dot(x)");
 
     // Sparsities
-    Sparsity x_sp = f.input(0).sparsity();
+    Sparsity x_sp = f.sparsity_in(0);
     Sparsity p_sp = f.input(1).sparsity();
 
     // Wrapper function inputs

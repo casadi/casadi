@@ -409,9 +409,9 @@ namespace casadi {
     }
 
     // Get sparsity and non-zero elements
-    const int* colind = jac_.output().colind();
-    int ncol = jac_.output().size2();
-    const int* row = jac_.output().row();
+    const int* colind = jac_.sparsity_out(0).colind();
+    int ncol = jac_.size2_out(0);
+    const int* row = jac_.sparsity_out(0).row();
     const vector<double>& val = jac_.output().data();
 
     // Loop over columns
@@ -464,9 +464,9 @@ namespace casadi {
     jac_.evaluate();
 
     // Get sparsity and non-zero elements
-    const int* colind = jac_.output().colind();
-    int ncol = jac_.output().size2();
-    const int* row = jac_.output().row();
+    const int* colind = jac_.sparsity_out(0).colind();
+    int ncol = jac_.size2_out(0);
+    const int* row = jac_.sparsity_out(0).row();
     const vector<double>& val = jac_.output().data();
 
     // Loop over cols
@@ -569,10 +569,10 @@ namespace casadi {
           ss << "Input vector is " << jac_.input().data() << endl;
 
           // Get the column
-          int Jcol = jac_.output().sparsity().get_col().at(k);
+          int Jcol = jac_.sparsity_out(0).get_col().at(k);
 
           // Get the row
-          int Jrow = jac_.output().sparsity().row(k);
+          int Jrow = jac_.sparsity_out(0).row(k);
 
           // Which equation
           ss << "This corresponds to the derivative of equation " << Jrow

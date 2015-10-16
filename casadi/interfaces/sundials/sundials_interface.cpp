@@ -234,15 +234,15 @@ namespace casadi {
 
     if (!jac_.isNull()) {
       casadi_assert_message(
-                            jac_.output().size2()==jac_.output().size1(),
+                            jac_.size2_out(0)==jac_.size1_out(0),
                             "SundialsInterface::init: the jacobian of the forward problem must "
                             "be square but got " << jac_.output().dim());
 
       casadi_assert_message(
-                            !jac_.output().sparsity().issingular(),
+                            !jac_.sparsity_out(0).issingular(),
                             "SundialsInterface::init: singularity - the jacobian of the forward "
                             "problem is structurally rank-deficient. sprank(J)="
-                            << sprank(jac_.output()) << " (in stead of "<< jac_.output().size2()
+                            << sprank(jac_.output()) << " (in stead of "<< jac_.size2_out(0)
                             << ")");
     }
 
@@ -251,16 +251,16 @@ namespace casadi {
 
     if (!jacB_.isNull()) {
       casadi_assert_message(
-                            jacB_.output().size2()==jacB_.output().size1(),
+                            jacB_.size2_out(0)==jacB_.size1_out(0),
                             "SundialsInterface::init: the jacobian of the backward problem must be "
                             "square but got " << jacB_.output().dim());
 
       casadi_assert_message(
-                            !jacB_.output().sparsity().issingular(),
+                            !jacB_.sparsity_out(0).issingular(),
                             "SundialsInterface::init: singularity - the jacobian of the backward"
                             " problem is structurally rank-deficient. sprank(J)="
                             << sprank(jacB_.output()) << " (instead of "
-                            << jacB_.output().size2() << ")");
+                            << jacB_.size2_out(0) << ")");
     }
 
     if (hasSetOption("linear_solver") && !jac_.isNull()) {
@@ -271,7 +271,7 @@ namespace casadi {
       }
 
       // Create a linear solver
-      linsol_ = LinearSolver("linsol", getOption("linear_solver"), jac_.output().sparsity(),
+      linsol_ = LinearSolver("linsol", getOption("linear_solver"), jac_.sparsity_out(0),
                              1, linear_solver_options);
     }
 
@@ -287,7 +287,7 @@ namespace casadi {
       // Create a linear solver
       std::string linear_solver_name =
         hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
-      linsolB_ = LinearSolver("linsolB", linear_solver_name, jacB_.output().sparsity(),
+      linsolB_ = LinearSolver("linsolB", linear_solver_name, jacB_.sparsity_out(0),
                               1, opts);
     }
   }

@@ -112,9 +112,9 @@ namespace casadi {
 
     // Check for structural singularity in the Jacobian
     casadi_assert_message(
-      !jac_.output().sparsity().issingular(),
+      !jac_.sparsity_out(0).issingular(),
       "ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. "
-      "sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.output().size1() << ")");
+      "sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.size1_out(0) << ")");
 
     // Get the linear solver function object, if any
     if (hasSetOption("linear_solver_function")) {
@@ -133,12 +133,12 @@ namespace casadi {
 
         // Allocate an NLP solver
         linsol_ = LinearSolver("linsol", getOption("linear_solver"),
-                               jac_.output().sparsity(), 1, linear_solver_options);
+                               jac_.sparsity_out(0), 1, linear_solver_options);
       }
     } else {
       // Initialize the linear solver, if provided
       linsol_.init();
-      casadi_assert(linsol_.input().sparsity()==jac_.output().sparsity());
+      casadi_assert(linsol_.sparsity_in(0)==jac_.sparsity_out(0));
     }
 
     // No factorization yet;

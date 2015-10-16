@@ -1237,8 +1237,8 @@ namespace casadi {
     Function f = MX::fun("f", {vertcat(this->sdot)}, {vertcat(this->dae)});
 
     // Number of s
-    int ns = f.input().nnz();
-    casadi_assert(f.output().nnz()==ns);
+    int ns = f.nnz_in(0);
+    casadi_assert(f.nnz_out(0)==ns);
 
     // Input/output arrays
     bvec_t* f_sdot = reinterpret_cast<bvec_t*>(f.input().ptr());

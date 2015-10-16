@@ -248,10 +248,10 @@ namespace casadi {
 
       // Harvest the results
       for (int j = 0; j < nx_; ++j) {
-        if (jacF_.output().colind(j) == jacF_.output().colind(j+1)) {
+        if (jacF_.sparsity_out(0).colind(j) == jacF_.sparsity_out(0).colind(j+1)) {
           x_type_f_[j] = 0;
         } else {
-          x_type_f_[j] = output_v[jacF_.output().colind(j)]?  2 : 1;
+          x_type_f_[j] = output_v[jacF_.sparsity_out(0).colind(j)]?  2 : 1;
         }
       }
 
@@ -270,11 +270,11 @@ namespace casadi {
         bvec_t* output_v_trans = get_bvec_t(out_trans.data());
 
         for (int j = 0; j < nx_; ++j) {  // Harvest the results
-          if (jacG_.output().colind(j) == jacG_.output().colind(j+1)) {
+          if (jacG_.sparsity_out(0).colind(j) == jacG_.sparsity_out(0).colind(j+1)) {
             x_type_g_[j] = 0;
           } else {
             bool linear = true;
-            for (int k = jacG_.output().colind(j); k < jacG_.output().colind(j+1); ++k) {
+            for (int k = jacG_.sparsity_out(0).colind(j); k < jacG_.sparsity_out(0).colind(j+1); ++k) {
               linear = linear && !output_v[k];
             }
             x_type_g_[j] = linear? 1 : 2;
@@ -380,11 +380,11 @@ namespace casadi {
     //  "0" is to be interpreted not as an index but as a literal zero
 
     IMatrix mapping_jacG  = IMatrix(0, nx_);
-    IMatrix mapping_gradF = IMatrix(jacF_.output().sparsity(),
-                                    range(-1, -1-jacF_.output().nnz(), -1));
+    IMatrix mapping_gradF = IMatrix(jacF_.sparsity_out(0),
+                                    range(-1, -1-jacF_.nnz_out(0), -1));
 
     if (!jacG_.isNull()) {
-      mapping_jacG = IMatrix(jacG_.output().sparsity(), range(1, jacG_.output().nnz()+1));
+      mapping_jacG = IMatrix(jacG_.sparsity_out(0), range(1, jacG_.nnz_out(0)+1));
     }
 
     // First, remap jacG
@@ -779,8 +779,8 @@ namespace casadi {
       for (int k = 0; k < nnObj; ++k) {
         int i = x_order_[k];
         if (x_type_f_[i] == 2) {
-          int el = jacF_.output().colind(i);
-          if (jacF_.output().colind(i+1) > el) {
+          int el = jacF_.sparsity_out(0).colind(i);
+          if (jacF_.sparsity_out(0).colind(i+1) > el) {
             gObj[k] = jacF_.output().data()[el];
           } else {
             gObj[k] = 0;
@@ -790,8 +790,8 @@ namespace casadi {
         }
       }
 
-      jacF_.output().sparsity().sanity_check(true);
-      jacF_.output().sparsity().sanity_check(false);
+      jacF_.sparsity_out(0).sanity_check(true);
+      jacF_.sparsity_out(0).sanity_check(false);
 
       // timing and counters
       t_eval_grad_f_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;

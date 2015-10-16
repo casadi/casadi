@@ -270,7 +270,7 @@ namespace casadi {
     // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.
     worhp_w_.DF.nnz = nx_;
     if (worhp_o_.m>0) {
-      worhp_w_.DG.nnz = jacG_.output().nnz();  // Jacobian of G
+      worhp_w_.DG.nnz = jacG_.nnz_out(0);  // Jacobian of G
     } else {
       worhp_w_.DG.nnz = 0;
     }

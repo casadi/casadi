@@ -623,13 +623,13 @@ namespace casadi {
 
     bvec_t* input_ =  get_bvec_t(temp.input().data());
     // Make a column with all variables active
-    fill(input_, input_+temp.input().nnz(), bvec_t(1));
+    fill(input_, input_+temp.nnz_in(0), bvec_t(1));
     bvec_t* output_ = get_bvec_t(temp.output().data());
     // Perform a single dependency sweep
     temp.spEvaluate(true);
 
     // Loop over results
-    for (int i=0;i<temp.output().nnz();++i) {
+    for (int i=0;i<temp.nnz_out(0);++i) {
       if (output_[i]) return true;
     }
 

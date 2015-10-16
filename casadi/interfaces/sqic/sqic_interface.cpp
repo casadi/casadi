@@ -143,7 +143,7 @@ namespace casadi {
     int n = n_;
     int m = nc_+1;
 
-    int nnzA=formatA_.output().size();
+    int nnzA=formatA_.size_out(0);
     int nnzH=input(QP_SOLVER_H).size();
 
     std::fill(hEtype_.begin()+n_, hEtype_.end(), 3);
@@ -209,7 +209,7 @@ namespace casadi {
 
     int n = n_;
     int m = nc_+1;
-    int nnzA=formatA_.output().size();
+    int nnzA=formatA_.size_out(0);
     int nnzH=input(QP_SOLVER_H).size();
 
     file << "  n = " << n << std::endl;
@@ -230,7 +230,7 @@ namespace casadi {
     for (int i=0;i<locA_.size();++i) {
       file << "  locA(" << i +1 << ") = " << locA_[i] << std::endl;
     }
-    for (int i=0;i<formatA_.output().size();++i) {
+    for (int i=0;i<formatA_.size_out(0);++i) {
       file << "  valA(" << i +1 << ") = " << formatA_.output().at(i) << std::endl;
     }
     for (int i=0;i<bl_.size();++i) {

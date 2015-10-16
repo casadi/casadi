@@ -697,9 +697,9 @@ namespace casadi {
       const timer time0 = getTimerTime();
       if (values == NULL) {
         int nz=0;
-        const int* colind = hessLag_.output().colind();
-        int ncol = hessLag_.output().size2();
-        const int* row = hessLag_.output().row();
+        const int* colind = hessLag_.sparsity_out(0).colind();
+        int ncol = hessLag_.size2_out(0);
+        const int* row = hessLag_.sparsity_out(0).row();
         for (int cc=0; cc<ncol; ++cc)
           for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
             iRow[nz] = row[el];
@@ -761,9 +761,9 @@ namespace casadi {
       const timer time0 = getTimerTime();
       if (values == NULL) {
         int nz=0;
-        const int* colind = jacG.output().colind();
-        int ncol = jacG.output().size2();
-        const int* row = jacG.output().row();
+        const int* colind = jacG.sparsity_out(0).colind();
+        int ncol = jacG.size2_out(0);
+        const int* row = jacG.sparsity_out(0).row();
         for (int cc=0; cc<ncol; ++cc)
           for (int el=colind[cc]; el<colind[cc+1]; ++el) {
             int rr = row[el];
@@ -997,11 +997,11 @@ namespace casadi {
       if (nlp_.output(NL_G).nnz()==0)
         nnz_jac_g = 0;
       else
-        nnz_jac_g = jacG().output().nnz();
+        nnz_jac_g = jacG().nnz_out(0);
 
       // Get Hessian sparsity pattern
       if (exact_hessian_)
-        nnz_h_lag = hessLag().output().sparsity().nnz_upper();
+        nnz_h_lag = hessLag().sparsity_out(0).nnz_upper();
       else
         nnz_h_lag = 0;
     } catch(exception& ex) {
