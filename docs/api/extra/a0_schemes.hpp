@@ -44,6 +44,18 @@
 <tr><td>QP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
 </table>
 */
+/** \defgroup scheme_NlpSolverOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::NlpSolverOutput  (NLP_SOLVER_NUM_OUT = 6) [nlpSolverOut]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>NLP_SOLVER_X</td><td>x</td><td>Decision variables at the optimal solution (nx x 1) .</td></tr>
+<tr><td>NLP_SOLVER_F</td><td>f</td><td>Cost function value at the optimal solution (1 x 1) .</td></tr>
+<tr><td>NLP_SOLVER_G</td><td>g</td><td>Constraints function at the optimal solution (ng x 1) .</td></tr>
+<tr><td>NLP_SOLVER_LAM_X</td><td>lam_x</td><td>Lagrange multipliers for bounds on X at the solution (nx x 1) .</td></tr>
+<tr><td>NLP_SOLVER_LAM_G</td><td>lam_g</td><td>Lagrange multipliers for bounds on G at the solution (ng x 1) .</td></tr>
+<tr><td>NLP_SOLVER_LAM_P</td><td>lam_p</td><td>Lagrange multipliers for bounds on P at the solution (np x 1) .</td></tr>
+</table>
+*/
 /** \defgroup scheme_RDAEInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::RDAEInput  (RDAE_NUM_IN = 7) [rdaeIn]</caption>
@@ -63,16 +75,6 @@
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>NL_F</td><td>f</td><td>Objective function .</td></tr>
 <tr><td>NL_G</td><td>g</td><td>Constraint function .</td></tr>
-</table>
-*/
-/** \defgroup scheme_QpSolverOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::QpSolverOutput  (QP_SOLVER_NUM_OUT = 4) [qpOut]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
-<tr><td>QP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
-<tr><td>QP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds .</td></tr>
-<tr><td>QP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds .</td></tr>
 </table>
 */
 /** \defgroup scheme_DAEInput
@@ -96,13 +98,13 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::InputOutputScheme  ( = 23) []</caption>
+<caption>Input scheme: casadi::InputOutputScheme  ( = 22) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::InputOutputScheme  ( = 23) []</caption>
+<caption>Output scheme: casadi::InputOutputScheme  ( = 22) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
@@ -129,21 +131,6 @@
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>QP_STRUCT_H</td><td></td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
 <tr><td>QP_STRUCT_A</td><td></td><td>The matrix A: sparse, (nc x n) - product with x must be dense.</td></tr>
-</table>
-*/
-/** \defgroup scheme_ControlledDAEInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::ControlledDAEInput  (CONTROL_DAE_NUM_IN = 9) [controldaeIn]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>CONTROL_DAE_T</td><td>t</td><td>Global physical time. (1-by-1) .</td></tr>
-<tr><td>CONTROL_DAE_X</td><td>x</td><td>State vector (dimension nx-by-1). Should have the same amount of non-zeros as DAEOutput:DAE_RES </td></tr>
-<tr><td>CONTROL_DAE_Z</td><td>z</td><td>Algebraic state vector (dimension np-by-1). .</td></tr>
-<tr><td>CONTROL_DAE_P</td><td>p</td><td>Parameter vector (dimension np-by-1). .</td></tr>
-<tr><td>CONTROL_DAE_U</td><td>u</td><td>Control vector (dimension nu-by-1). .</td></tr>
-<tr><td>CONTROL_DAE_U_INTERP</td><td>u_interp</td><td>Control vector, linearly interpolated (dimension nu-by-1). .</td></tr>
-<tr><td>CONTROL_DAE_X_MAJOR</td><td>x_major</td><td>State vector (dimension nx-by-1) at the last major time-step .</td></tr>
-<tr><td>CONTROL_DAE_T0</td><td>t0</td><td>Time at start of control interval (1-by-1) .</td></tr>
-<tr><td>CONTROL_DAE_TF</td><td>tf</td><td>Time at end of control interval (1-by-1) .</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPInput
@@ -193,25 +180,14 @@
 <tr><td>RDAE_QUAD</td><td>quad</td><td>Right hand side of quadratures. .</td></tr>
 </table>
 */
-/** \defgroup scheme_NlpSolverOutput
+/** \defgroup scheme_QpSolverOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::NlpSolverOutput  (NLP_SOLVER_NUM_OUT = 6) [nlpSolverOut]</caption>
+<caption>Output scheme: casadi::QpSolverOutput  (QP_SOLVER_NUM_OUT = 4) [qpOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>NLP_SOLVER_X</td><td>x</td><td>Decision variables at the optimal solution (nx x 1) .</td></tr>
-<tr><td>NLP_SOLVER_F</td><td>f</td><td>Cost function value at the optimal solution (1 x 1) .</td></tr>
-<tr><td>NLP_SOLVER_G</td><td>g</td><td>Constraints function at the optimal solution (ng x 1) .</td></tr>
-<tr><td>NLP_SOLVER_LAM_X</td><td>lam_x</td><td>Lagrange multipliers for bounds on X at the solution (nx x 1) .</td></tr>
-<tr><td>NLP_SOLVER_LAM_G</td><td>lam_g</td><td>Lagrange multipliers for bounds on G at the solution (ng x 1) .</td></tr>
-<tr><td>NLP_SOLVER_LAM_P</td><td>lam_p</td><td>Lagrange multipliers for bounds on P at the solution (np x 1) .</td></tr>
-</table>
-*/
-/** \defgroup scheme_JacGOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::JacGOutput  (JACG_NUM_OUT = 3) [jacGOut]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>JACG_JAC</td><td>jac</td><td>Jacobian of the constraints .</td></tr>
-<tr><td>JACG_F</td><td>f</td><td>Objective function .</td></tr>
-<tr><td>JACG_G</td><td>g</td><td>Constraint function .</td></tr>
+<tr><td>QP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
+<tr><td>QP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
+<tr><td>QP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds .</td></tr>
+<tr><td>QP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds .</td></tr>
 </table>
 */
 /** \defgroup scheme_LinsolOutput
@@ -235,13 +211,13 @@
 <tr><td>NLP_SOLVER_LAM_G0</td><td>lam_g0</td><td>Lagrange multipliers for bounds on G, initial guess (ng x 1) .</td></tr>
 </table>
 */
-/** \defgroup scheme_ControlSimulatorInput
+/** \defgroup scheme_JacGOutput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::ControlSimulatorInput  (CONTROLSIMULATOR_NUM_IN = 3) [controlsimulatorIn]</caption>
+<caption>Output scheme: casadi::JacGOutput  (JACG_NUM_OUT = 3) [jacGOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>CONTROLSIMULATOR_X0</td><td>x0</td><td>Differential or algebraic state at t0 (dimension nx-by-1) .</td></tr>
-<tr><td>CONTROLSIMULATOR_P</td><td>p</td><td>Parameters that are fixed over the entire horizon (dimension np-by-1) .</td></tr>
-<tr><td>CONTROLSIMULATOR_U</td><td>u</td><td>Parameters that change over the integration intervals (dimension nu-by-(ns-1)) .</td></tr>
+<tr><td>JACG_JAC</td><td>jac</td><td>Jacobian of the constraints .</td></tr>
+<tr><td>JACG_F</td><td>f</td><td>Objective function .</td></tr>
+<tr><td>JACG_G</td><td>g</td><td>Constraint function .</td></tr>
 </table>
 */
 /** \defgroup scheme_JacGInput
@@ -262,15 +238,6 @@
 <tr><td>HESSLAG_LAM_G</td><td>lam_g</td><td>Multiplier for g .</td></tr>
 </table>
 */
-/** \defgroup scheme_HNLPInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::HNLPInput  (HNL_NUM_IN = 3) [hnlpIn]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>HNL_X</td><td>x</td><td>Decision variable .</td></tr>
-<tr><td>HNL_P</td><td>p</td><td>Fixed parameter .</td></tr>
-<tr><td>HNL_TAU</td><td>tau</td><td>Homotopy parameter .</td></tr>
-</table>
-*/
 /// \cond INTERNAL
 /** \class casadi::CSparseCholeskyInternal
 \n
@@ -289,18 +256,6 @@
 @copydoc scheme_IntegratorOutput
 */
 /// \endcond
-/// \cond INTERNAL
-/** \class casadi::ControlSimulatorInternal
-\n
-\par
-@copydoc scheme_ControlSimulatorInput
-*/
-/// \endcond
-/** \class casadi::ControlSimulator
-\n
-\par
-@copydoc scheme_ControlSimulatorInput
-*/
 /// \cond INTERNAL
 /** \class casadi::CplexInterface
 \n
@@ -337,22 +292,6 @@
 @copydoc scheme_IntegratorOutput
 */
 /// \endcond
-/// \cond INTERNAL
-/** \class casadi::HomotopyNLPInternal
-\n
-\par
-@copydoc scheme_NlpSolverInput
-<br/>
-@copydoc scheme_NlpSolverOutput
-*/
-/// \endcond
-/** \addtogroup general_HomotopyNlpSolver
-\n
-\par
-@copydoc scheme_NlpSolverInput
-<br/>
-@copydoc scheme_NlpSolverOutput
-*/
 /// \cond INTERNAL
 /** \class casadi::IdasInterface
 \n
@@ -518,15 +457,6 @@
 /// \endcond
 /// \cond INTERNAL
 /** \class casadi::Scpgen
-\n
-\par
-@copydoc scheme_NlpSolverInput
-<br/>
-@copydoc scheme_NlpSolverOutput
-*/
-/// \endcond
-/// \cond INTERNAL
-/** \class casadi::SimpleHomotopyNlp
 \n
 \par
 @copydoc scheme_NlpSolverInput

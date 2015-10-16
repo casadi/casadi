@@ -85,45 +85,6 @@
 %exception  casadi::MX::setTemp(int t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MXFunction::expand(const std::vector< SX > &inputv=std::vector< SX >()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXFunction::grad(const std::string &iname, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXFunction::grad(const std::string &iname, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXFunction::grad(int iind, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXFunction::grad(int iind=0, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXFunction::jac(const std::string &iname, const std::string &oname, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXFunction::jac(const std::string &iname, int oind=0, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXFunction::jac(int iind, const std::string &oname, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXFunction::jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXFunction::tang(const std::string &iname, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXFunction::tang(const std::string &iname, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXFunction::tang(int iind, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXFunction::tang(int iind=0, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Matrix< DataType >::binary(int op, const Matrix< DataType > &x, const Matrix< DataType > &y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -176,54 +137,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ProfilingType< ProfilingData_TIMELINE >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::grad(const std::string &iname, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::grad(const std::string &iname, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::grad(int iind, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::grad(int iind=0, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::hess(const std::string &iname, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::hess(const std::string &iname, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::hess(int iind, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::hess(int iind=0, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::jac(const std::string &iname, const std::string &oname, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::jac(const std::string &iname, int oind=0, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::jac(int iind, const std::string &oname, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::tang(const std::string &iname, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::tang(const std::string &iname, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::tang(int iind, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SXFunction::tang(int iind=0, int oind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SharedObject::printPtr(std::ostream &stream=casadi::userOut()) const  {
@@ -388,15 +301,6 @@
 %exception  snoptProblemC::solve(int starttype) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::ExternalFunction::ExternalFunction(const std::string &name, const Compiler &compiler, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::ExternalFunction::ExternalFunction(const std::string &name, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::ExternalFunction::ExternalFunction(const std::string &name, const std::string &bin_name, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception casadi::LibInfo< Compiler >::LibInfo() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -412,21 +316,6 @@
 %exception casadi::LinearSolver::LinearSolver() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::MXFunction::MXFunction(const Function &function) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::MXFunction::MXFunction(const std::string &name, const std::pair< MXDict, std::vector< std::string > > &arg, const std::pair< MXDict, std::vector< std::string > > &res, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::MXFunction::MXFunction(const std::string &name, const std::pair< MXDict, std::vector< std::string > > &arg, const std::vector< MX > &res, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::MXFunction::MXFunction(const std::string &name, const std::vector< MX > &arg, const std::pair< MXDict, std::vector< std::string > > &res, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::MXFunction::MXFunction(const std::string &name, const std::vector< MX > &arg, const std::vector< MX > &res, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception casadi::Matrix< DataType >::Matrix(const Sparsity &sp, const DataType &val, bool dummy) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -437,27 +326,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Matrix< DataType >::Matrix(const std::vector< DataType > &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SXFunction::SXFunction(const Function &f) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SXFunction::SXFunction(const MXFunction &f) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SXFunction::SXFunction(const std::string &name, const Function &f, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SXFunction::SXFunction(const std::string &name, const std::pair< SXDict, std::vector< std::string > > &arg, const std::pair< SXDict, std::vector< std::string > > &res, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SXFunction::SXFunction(const std::string &name, const std::pair< SXDict, std::vector< std::string > > &arg, const std::vector< SX > &res, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SXFunction::SXFunction(const std::string &name, const std::vector< SX > &arg, const std::pair< SXDict, std::vector< std::string > > &res, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SXFunction::SXFunction(const std::string &name, const std::vector< SX > &arg, const std::vector< SX > &res, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::SparseStorage< DataType >::SparseStorage() {
