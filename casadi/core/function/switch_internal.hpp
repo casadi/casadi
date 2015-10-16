@@ -26,7 +26,6 @@
 #ifndef CASADI_SWITCH_INTERNAL_HPP
 #define CASADI_SWITCH_INTERNAL_HPP
 
-#include "switch.hpp"
 #include "function_internal.hpp"
 
 /// \cond INTERNAL

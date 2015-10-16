@@ -190,7 +190,7 @@ namespace casadi {
     // New Switch for derivatives
     stringstream ss;
     ss << "fwd" << nfwd << "_" << name_;
-    Switch sw(ss.str(), der, der_def);
+    Function sw = Function::conditional(ss.str(), der, der_def);
 
     // Construct wrapper inputs and arguments for calling sw
     vector<MX> arg = mx_in();
@@ -232,7 +232,7 @@ namespace casadi {
     // New Switch for derivatives
     stringstream ss;
     ss << "adj" << nadj << "_" << name_;
-    Switch sw(ss.str(), der, der_def);
+    Function sw = Function::conditional(ss.str(), der, der_def);
 
     // Construct wrapper inputs and arguments for calling sw
     vector<MX> arg = mx_in();

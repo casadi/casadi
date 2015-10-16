@@ -31,7 +31,6 @@
 #include "norm.hpp"
 #include "../casadi_math.hpp"
 #include "../function/mx_function_internal.hpp"
-#include "../function/switch.hpp"
 
 using namespace std;
 namespace casadi {
@@ -1263,7 +1262,7 @@ namespace casadi {
       Function f_false=MX::fun("f_false", arg, {x_false});
 
       // Form Switch
-      Switch sw("if_else", f_true, f_false);
+      Function sw = Function::if_else("if_else", f_true, f_false);
 
       // Call the Switch
       vector<MX> sw_arg;
@@ -1292,7 +1291,7 @@ namespace casadi {
       Function f_default=MX::fun("f_default", arg, {x_default});
 
       // Form Switch
-      Switch sw("conditional", f, f_default);
+      Function sw = Function::conditional("conditional", f, f_default);
 
       // Call the Switch
       vector<MX> sw_arg;

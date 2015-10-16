@@ -3574,7 +3574,6 @@ namespace casadi {
 %include <casadi/core/function/nlp_solver.hpp>
 %include <casadi/core/function/qp_solver.hpp>
 %include <casadi/core/function/stabilized_qp_solver.hpp>
-%include <casadi/core/function/switch.hpp>
 %include <casadi/core/function/callback.hpp>
 %include <casadi/core/function/nullspace.hpp>
 %include <casadi/core/function/mapaccum.hpp>

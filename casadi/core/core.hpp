@@ -44,7 +44,6 @@
 // Functions
 #include "function/code_generator.hpp"
 #include "function/compiler.hpp"
-#include "function/switch.hpp"
 #include "function/linear_solver.hpp"
 #include "function/nlp_solver.hpp"
 #include "function/integrator.hpp"
