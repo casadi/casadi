@@ -53,7 +53,6 @@
 #include "function/simulator.hpp"
 #include "function/control_simulator.hpp"
 #include "function/qp_solver.hpp"
-#include "function/homotopy_nlp_solver.hpp"
 #include "function/stabilized_qp_solver.hpp"
 #include "function/nullspace.hpp"
 #include "function/map.hpp"

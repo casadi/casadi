@@ -30,9 +30,6 @@ casadi_plugin(Integrator oldcollocation
 casadi_plugin(ImplicitFunction newton
   newton.hpp newton.cpp newton_meta.cpp)
 
-casadi_plugin(HomotopyNlpSolver simple
-  simple_homotopy_nlp.hpp simple_homotopy_nlp.cpp simple_homotopy_nlp_meta.cpp)
-
 # SQPMethod -  A basic SQP method
 casadi_plugin(NlpSolver sqpmethod
   sqpmethod.hpp sqpmethod.cpp sqpmethod_meta.cpp)
