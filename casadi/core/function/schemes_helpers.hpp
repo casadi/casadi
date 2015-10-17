@@ -33,62 +33,6 @@ namespace casadi {
 
 /// Input arguments of an ODE/DAE function
 ///
-/// \copydoc scheme_ControlledDAEInput
-template<class M>
-std::pair<std::map<std::string, M>, std::vector<std::string> > controldaeIn(
-    const std::string &n0 ="", const M &x0 =M(),
-    const std::string &n1 ="", const M &x1 =M(),
-    const std::string &n2 ="", const M &x2 =M(),
-    const std::string &n3 ="", const M &x3 =M(),
-    const std::string &n4 ="", const M &x4 =M(),
-    const std::string &n5 ="", const M &x5 =M(),
-    const std::string &n6 ="", const M &x6 =M(),
-    const std::string &n7 ="", const M &x7 =M(),
-    const std::string &n8 ="", const M &x8 =M()) {
-  // This comment lets the haskell bindings know this is a scheme helper
-  std::map<std::string, M> m;
-  if (!n0.empty()) m[n0]=x0;
-  if (!n1.empty()) m[n1]=x1;
-  if (!n2.empty()) m[n2]=x2;
-  if (!n3.empty()) m[n3]=x3;
-  if (!n4.empty()) m[n4]=x4;
-  if (!n5.empty()) m[n5]=x5;
-  if (!n6.empty()) m[n6]=x6;
-  if (!n7.empty()) m[n7]=x7;
-  if (!n8.empty()) m[n8]=x8;
-  std::string s[] = {"t", "x", "z", "p", "u", "u_interp", "x_major", "t0", "tf"};
-  std::vector<std::string> sv = std::vector<std::string>(s, s+9);
-  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
-    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
-      casadi_error("Error in 'controldaeIn' arguments. You supplied key '"
-        << it->first << "'. Allowed keys are: " << sv << ".");
-  }
-  return std::make_pair(m, sv);
-}
-/// Input arguments of a control simulator
-///
-/// \copydoc scheme_ControlSimulatorInput
-template<class M>
-std::pair<std::map<std::string, M>, std::vector<std::string> > controlsimulatorIn(
-    const std::string &n0 ="", const M &x0 =M(),
-    const std::string &n1 ="", const M &x1 =M(),
-    const std::string &n2 ="", const M &x2 =M()) {
-  // This comment lets the haskell bindings know this is a scheme helper
-  std::map<std::string, M> m;
-  if (!n0.empty()) m[n0]=x0;
-  if (!n1.empty()) m[n1]=x1;
-  if (!n2.empty()) m[n2]=x2;
-  std::string s[] = {"x0", "p", "u"};
-  std::vector<std::string> sv = std::vector<std::string>(s, s+3);
-  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
-    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
-      casadi_error("Error in 'controlsimulatorIn' arguments. You supplied key '"
-        << it->first << "'. Allowed keys are: " << sv << ".");
-  }
-  return std::make_pair(m, sv);
-}
-/// Input arguments of an ODE/DAE function
-///
 /// \copydoc scheme_DAEInput
 template<class M>
 std::pair<std::map<std::string, M>, std::vector<std::string> > daeIn(

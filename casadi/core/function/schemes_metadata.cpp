@@ -28,8 +28,6 @@
 namespace casadi {
 std::string getSchemeName(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_ControlledDAEInput: return "ControlledDAEInput";
-    case SCHEME_ControlSimulatorInput: return "ControlSimulatorInput";
     case SCHEME_DAEInput: return "DAEInput";
     case SCHEME_DAEOutput: return "DAEOutput";
     case SCHEME_RDAEInput: return "RDAEInput";
@@ -56,10 +54,6 @@ std::string getSchemeName(InputOutputScheme scheme) {
 }
 std::string getSchemeEntryNames(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_ControlledDAEInput:
-      return "t, x, z, p, u, u_interp, x_major, t0, tf";
-    case SCHEME_ControlSimulatorInput:
-      return "x0, p, u";
     case SCHEME_DAEInput:
       return "x, z, p, t";
     case SCHEME_DAEOutput:
@@ -107,22 +101,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
 }
 std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_ControlledDAEInput:
-      if (i==0) return "t";
-      if (i==1) return "x";
-      if (i==2) return "z";
-      if (i==3) return "p";
-      if (i==4) return "u";
-      if (i==5) return "u_interp";
-      if (i==6) return "x_major";
-      if (i==7) return "t0";
-      if (i==8) return "tf";
-      break;
-    case SCHEME_ControlSimulatorInput:
-      if (i==0) return "x0";
-      if (i==1) return "p";
-      if (i==2) return "u";
-      break;
     case SCHEME_DAEInput:
       if (i==0) return "x";
       if (i==1) return "z";
@@ -266,22 +244,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
 }
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_ControlledDAEInput:
-      if (i==0) return "Global physical time. (1-by-1)";  // NOLINT(whitespace/line_length)
-      if (i==1) return "non-zeros as DAEOutput:DAE_RES";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Algebraic state vector (dimension np-by-1).";  // NOLINT(whitespace/line_length)
-      if (i==3) return "Parameter vector (dimension np-by-1).";  // NOLINT(whitespace/line_length)
-      if (i==4) return "Control vector (dimension nu-by-1).";  // NOLINT(whitespace/line_length)
-      if (i==5) return "Control vector, linearly interpolated (dimension nu-by-1).";  // NOLINT(whitespace/line_length)
-      if (i==6) return "State vector (dimension nx-by-1) at the last major time-step";  // NOLINT(whitespace/line_length)
-      if (i==7) return "Time at start of control interval (1-by-1)";  // NOLINT(whitespace/line_length)
-      if (i==8) return "Time at end of control interval (1-by-1)";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_ControlSimulatorInput:
-      if (i==0) return "Differential or algebraic state at t0  (dimension nx-by-1)";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Parameters that are fixed over the entire horizon  (dimension np-by-1)";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Parameters that change over the integration intervals (dimension nu-by-(ns-1))";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_DAEInput:
       if (i==0) return "Differential state";  // NOLINT(whitespace/line_length)
       if (i==1) return "Algebraic state";  // NOLINT(whitespace/line_length)
@@ -425,22 +387,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
 }
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_ControlledDAEInput:
-      if (i==0) return "CONTROL_DAE_T";
-      if (i==1) return "CONTROL_DAE_X";
-      if (i==2) return "CONTROL_DAE_Z";
-      if (i==3) return "CONTROL_DAE_P";
-      if (i==4) return "CONTROL_DAE_U";
-      if (i==5) return "CONTROL_DAE_U_INTERP";
-      if (i==6) return "CONTROL_DAE_X_MAJOR";
-      if (i==7) return "CONTROL_DAE_T0";
-      if (i==8) return "CONTROL_DAE_TF";
-      break;
-    case SCHEME_ControlSimulatorInput:
-      if (i==0) return "CONTROLSIMULATOR_X0";
-      if (i==1) return "CONTROLSIMULATOR_P";
-      if (i==2) return "CONTROLSIMULATOR_U";
-      break;
     case SCHEME_DAEInput:
       if (i==0) return "DAE_X";
       if (i==1) return "DAE_Z";
@@ -585,12 +531,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
 }
 int getSchemeSize(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_ControlledDAEInput:
-      return 9;
-      break;
-    case SCHEME_ControlSimulatorInput:
-      return 3;
-      break;
     case SCHEME_DAEInput:
       return 4;
       break;
@@ -659,22 +599,6 @@ int getSchemeSize(InputOutputScheme scheme) {
 }
 int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
   switch (scheme) {
-    case SCHEME_ControlledDAEInput:
-      if (name=="t") return 0;
-      if (name=="x") return 1;
-      if (name=="z") return 2;
-      if (name=="p") return 3;
-      if (name=="u") return 4;
-      if (name=="u_interp") return 5;
-      if (name=="x_major") return 6;
-      if (name=="t0") return 7;
-      if (name=="tf") return 8;
-      break;
-    case SCHEME_ControlSimulatorInput:
-      if (name=="x0") return 0;
-      if (name=="p") return 1;
-      if (name=="u") return 2;
-      break;
     case SCHEME_DAEInput:
       if (name=="x") return 0;
       if (name=="z") return 1;
