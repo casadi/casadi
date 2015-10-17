@@ -26183,8 +26183,6 @@ to sparse.
 
 ";
 
-%feature("docstring") casadi::getSchemeEntryDoc "";
-
 %feature("docstring") casadi::ProfilingType< ProfilingData_ENTRY > "
 [INTERNAL] ";
 
@@ -26420,12 +26418,6 @@ Output arguments of an integrator
 
 %feature("docstring") casadi::operation_checker "[INTERNAL] ";
 
-%feature("docstring") casadi::controldaeIn "
-
-Input arguments of an ODE/DAE function
-
-";
-
 %feature("docstring") casadi::hessLagOut "
 
 Output arguments of an NLP Hessian function
@@ -26458,6 +26450,8 @@ matrix-matrix multiplication, first factor transposed: z <- z + trans(x)*y.
 Check if the vector is non-decreasing.
 
 ";
+
+%feature("docstring") casadi::getSchemeEntryEnum "";
 
 %feature("docstring") casadi::profileWriteBare "[INTERNAL] ";
 
@@ -26607,7 +26601,7 @@ Output arguments of an DAE function
 
 ";
 
-%feature("docstring") casadi::getSchemeEntryEnum "";
+%feature("docstring") casadi::getSchemeEntryDoc "";
 
 %feature("docstring") casadi::collocationInterpolators "
 
@@ -26742,12 +26736,6 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 %feature("docstring") casadi::casadi_to_dense "[INTERNAL]  Convert sparse
 to dense.
-
-";
-
-%feature("docstring") casadi::controlsimulatorIn "
-
-Input arguments of a control simulator
 
 ";
 

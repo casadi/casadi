@@ -34030,9 +34030,6 @@ int inc_x) " [INTERNAL]  SCAL: x <- alpha*x.
 
 ";
 
-%feature("docstring")  casadi::getSchemeEntryDoc(InputOutputScheme scheme,
-int i) " ";
-
 %feature("docstring")  casadi::ProfilingType< ProfilingData_ENTRY >() "
 [INTERNAL] ";
 
@@ -34303,17 +34300,6 @@ Output arguments of an integrator
 %feature("docstring")  casadi::operation_checker(unsigned int op) "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::controldaeIn(const std::string &n0="", const
-M &x0=M(), const std::string &n1="", const M &x1=M(), const std::string
-&n2="", const M &x2=M(), const std::string &n3="", const M &x3=M(), const
-std::string &n4="", const M &x4=M(), const std::string &n5="", const M
-&x5=M(), const std::string &n6="", const M &x6=M(), const std::string
-&n7="", const M &x7=M(), const std::string &n8="", const M &x8=M()) "
-
-Input arguments of an ODE/DAE function
-
-";
-
 %feature("docstring")  casadi::hessLagOut(const std::string &n0="", const M
 &x0=M(), const std::string &n1="", const M &x1=M(), const std::string
 &n2="", const M &x2=M(), const std::string &n3="", const M &x3=M(), const
@@ -34351,6 +34337,9 @@ transposed: z <- z + trans(x)*y.
 Check if the vector is non-decreasing.
 
 ";
+
+%feature("docstring")  casadi::getSchemeEntryEnum(InputOutputScheme scheme,
+const std::string &name) " ";
 
 %feature("docstring")  casadi::profileWriteBare(std::ofstream &f, const T
 &s) " [INTERNAL] ";
@@ -34531,8 +34520,8 @@ Output arguments of an DAE function
 
 ";
 
-%feature("docstring")  casadi::getSchemeEntryEnum(InputOutputScheme scheme,
-const std::string &name) " ";
+%feature("docstring")  casadi::getSchemeEntryDoc(InputOutputScheme scheme,
+int i) " ";
 
 %feature("docstring")  casadi::collocationInterpolators(const std::vector<
 double > &tau_root, std::vector< std::vector< double > > &OUTPUT,
@@ -34679,14 +34668,6 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 %feature("docstring")  casadi::casadi_to_dense(const real1_t *x, const int
 *sp_x, real2_t *y) " [INTERNAL]  Convert sparse to dense.
-
-";
-
-%feature("docstring")  casadi::controlsimulatorIn(const std::string &n0="",
-const M &x0=M(), const std::string &n1="", const M &x1=M(), const
-std::string &n2="", const M &x2=M()) "
-
-Input arguments of a control simulator
 
 ";
 
