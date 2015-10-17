@@ -26,13 +26,13 @@
 #ifndef CASADI_CASADI_EXCEPTION_HPP
 #define CASADI_CASADI_EXCEPTION_HPP
 
+#include "casadi_common.hpp"
+
 #include <exception>
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
-
-#include "casadi_common.hpp"
 
 namespace casadi {
 

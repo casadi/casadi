@@ -26,13 +26,13 @@
 #ifndef CASADI_CALCULUS_HPP
 #define CASADI_CALCULUS_HPP
 
+#include "casadi_exception.hpp"
+
 #include <iostream>
 #include <string>
 #include <cmath>
-
 #include <limits>
 #include <algorithm>
-#include "casadi_exception.hpp"
 
 // Define pi if the compiler fails to do so
 #ifndef M_PI
@@ -157,8 +157,6 @@ namespace casadi {
     OP_LIFT,
     NUM_BUILT_IN_OPS
   };
-
-#ifndef SWIG
 
   // Get GCC version if GCC is used
 #ifdef __GNUC__
@@ -946,8 +944,6 @@ namespace casadi {
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0] = 1; d[1] = 0; }
   };
-
-#endif // SWIG
 
 } // namespace casadi
 
