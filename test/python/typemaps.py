@@ -439,61 +439,6 @@ class typemaptests(casadiTestCase):
     for name, value in test.items():
       w.set(value)
       self.checkarray(w,goal,"name")
-      
-      
-  def testGenericType2(self):
-    self.message("Generic type 2")
-    for i in [0,1,7,-7]:
-	    a=GenericType(i)
-	    self.assertTrue(a.isInt())
-	    self.assertFalse(a.isBool())
-	    self.assertFalse(a.isDouble())
-	    self.assertFalse(a.isString())
-	    self.assertEqual(a.toInt(),i)
-    for i in [True,False]:
-	    a=GenericType(i)
-	    #self.assertFalse(a.isInt())
-	    #self.assertTrue(a.isBool())
-	    #self.assertFalse(a.isDouble())
-	    #self.assertEqual(a.toBool(),i)
-
-    for i in [0.01,-5.7]:
-	    a=GenericType(i)
-	    self.assertFalse(a.isInt())
-	    self.assertFalse(a.isBool())
-	    self.assertTrue(a.isDouble())
-	    self.assertFalse(a.isString())
-	    self.assertEqual(a.toDouble(),i)
-
-    for i in ["","foo"]:
-	    a=GenericType(i)
-	    self.assertFalse(a.isInt())
-	    self.assertFalse(a.isBool())
-	    self.assertFalse(a.isDouble())
-	    self.assertTrue(a.isString())
-	    self.assertEqual(a.toString(),i)
-
-    for i in [(0,1,5)]:
-	    a=GenericType(i)
-	    self.assertTrue(a.isIntVector())
-	    self.assertFalse(a.isDoubleVector())
-
-    for i in [(0.3,1,5)]:
-	    a=GenericType(i)
-	    self.assertFalse(a.isIntVector())
-	    self.assertTrue(a.isDoubleVector())
-	    
-    a = GenericType(["foo","bar"])
-    self.assertTrue(a.isStringVector())
-    x = SX.sym("x")
-    f = SX.fun("f", [x],[x])
-
-  def testGenericType3(self):
-    self.message("Generic type 3")
-    
-    is_differential_gentype = GenericType([2,3])
-    
-    self.assertTrue(is_differential_gentype.isIntVector())
 
   def test_DMatrixSXcast(self):
     self.message("Casting DMatrix to SX")

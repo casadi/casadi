@@ -33,6 +33,8 @@
 
 namespace casadi {
 
+#ifndef SWIG
+
   /** \brief  Types of options */
   enum TypeID {
     OT_NULL,
@@ -49,15 +51,22 @@ namespace casadi {
     OT_FUNCTION,
     OT_VOIDPTR,
     OT_UNKNOWN};
+#endif // SWIG
 
   /** \brief Generic data type, can hold different types such as bool, int, string etc.
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_EXPORT GenericType : public SharedObject {
+  class CASADI_EXPORT GenericType
+#ifndef SWIG
+    : public SharedObject
+#endif // SWIG
+  {
   public:
     /// C++ equivalent of Python's dict or MATLAB's struct
     typedef std::map<std::string, GenericType> Dict;
+
+#ifndef SWIG
 
     /// Default constructor
     GenericType();
@@ -75,9 +84,7 @@ namespace casadi {
     GenericType(const char s[]);
     GenericType(const Function& f);
     GenericType(const Dict& dict);
-    #ifndef SWIG
     GenericType(void* ptr);
-    #endif // SWIG
 
     /// Get a description of a type
     static std::string get_type_description(TypeID type);
@@ -88,7 +95,6 @@ namespace casadi {
     /// Construct a GenericType given an TypeID
     static GenericType from_type(TypeID type);
 
-    #ifndef SWIG
     ///@{
     /// Implicit typecasting
     operator bool() const { return toBool();}
@@ -102,7 +108,6 @@ namespace casadi {
     operator const Function&() const { return asFunction();}
     operator const Dict&() const { return asDict();}
     ///@}
-    #endif // SWIG
 
     // Get type of object
     TypeID getType() const;
@@ -126,7 +131,6 @@ namespace casadi {
     bool isVoidPointer() const;
     ///@}
 
-#ifndef SWIG
     ///@{
     /** \brief Cast to the internal type */
     const bool& asBool() const;
@@ -141,7 +145,6 @@ namespace casadi {
     const Function& asFunction() const;
     void* const & asVoidPointer() const;
     ///@}
-#endif // SWIG
 
     ///@{
     //! \brief Convert to a type
@@ -162,7 +165,6 @@ namespace casadi {
     bool operator==(const GenericType& op2) const;
     bool operator!=(const GenericType& op2) const;
 
-#ifndef SWIG
     //! \brief Print
     CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream,
                                                   const GenericType& ref);

@@ -111,8 +111,10 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
     /** \brief Get the description of a certain option */
     std::string getOptionDescription(const std::string &str) const;
 
+  #ifndef SWIG
     /** \brief Get the type of a certain option */
     TypeID getOptionType(const std::string &str) const;
+  #endif // SWIG
 
     /** \brief Get the type name of a certain option */
     std::string getOptionTypeName(const std::string &str) const;
