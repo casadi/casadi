@@ -3213,6 +3213,13 @@ namespace casadi {
   template<> Function SX::fun(const std::string& name, const std::vector<SX>& arg,
                               const std::vector<SX>& res, const Dict& opts);
 
+#ifndef CASADI_MATRIX_CPP
+  // Templates instantiated in matrix.cpp
+  extern template class Matrix<double>;
+  extern template class Matrix<int>;
+  extern template class Matrix<SXElement>;
+#endif // CASADI_MATRIX_CPP
+
 } // namespace casadi
 
 /// \endcond

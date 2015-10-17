@@ -22,7 +22,7 @@
  *
  */
 
-
+#define CASADI_MATRIX_CPP
 #include "matrix_impl.hpp"
 #include "../function/linear_solver.hpp"
 #include "../function/sx_function_internal.hpp"
@@ -31,6 +31,11 @@
 using namespace std;
 
 namespace casadi {
+
+  // Instantiate templates
+  template class Matrix<double>;
+  template class Matrix<int>;
+  template class Matrix< SXElement >;
 
   template<>
   bool Matrix<int>::isSlice(bool ind1) const {

@@ -150,7 +150,6 @@ namespace casadi {
     std::vector<MatType> outputv_;
   };
 
-#ifdef casadi_implementation
   // Template implementations
 
   template<typename DerivedType, typename MatType, typename NodeType>
@@ -1150,8 +1149,6 @@ namespace casadi {
       static_cast<DerivedType *>(f.get())->evalAdj(aseed, asens);
     }
   }
-
-#endif
 
 } // namespace casadi
 /// \endcond

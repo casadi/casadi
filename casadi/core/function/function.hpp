@@ -993,8 +993,6 @@ namespace casadi {
 
 } // namespace casadi
 
-#ifdef casadi_implementation
 #include "../matrix/matrix_impl.hpp"
-#endif
 
 #endif // CASADI_FUNCTION_HPP

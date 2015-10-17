@@ -633,7 +633,6 @@ namespace casadi {
   };
 
 #ifndef SWIG
-#ifdef casadi_implementation
   // Implementations
 
   template<typename MatType>
@@ -705,10 +704,8 @@ namespace casadi {
     return sparsity().isscalar(scalar_and_dense);
   }
 
-#endif
 #endif // SWIG
 
-#ifdef casadi_implementation
   template<typename MatType>
   std::vector<MatType> GenericMatrix<MatType>::sym(const std::string& name,
                                                    const Sparsity& sp, int p) {
@@ -825,7 +822,6 @@ namespace casadi {
     return self() + self().T() - diag(diag(self()));
   }
 
-#endif
 
 } // namespace casadi
 

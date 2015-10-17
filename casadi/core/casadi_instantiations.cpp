@@ -42,26 +42,6 @@
 using namespace std;
 namespace casadi {
 
-  INSTANTIATE_SUBMATRIX(Matrix<SXElement>)
-  INSTANTIATE_NONZEROS(Matrix<SXElement>)
-
-  template class GenericMatrix< Matrix<SXElement> >;
-  template class Matrix< SXElement >;
-
-  INSTANTIATE_SUBMATRIX(MX)
-  INSTANTIATE_NONZEROS(MX)
-
-  INSTANTIATE_SUBMATRIX(Matrix<int>)
-  INSTANTIATE_SUBMATRIX(Matrix<double>)
-  INSTANTIATE_NONZEROS(Matrix<int>)
-  INSTANTIATE_NONZEROS(Matrix<double>)
-
-  template class GenericMatrix< Matrix<double> >;
-  template class GenericMatrix< Matrix<int> >;
-
-  template class Matrix<double>;
-  template class Matrix<int>;
-
   template<class T>
   const T casadi_limits<T>::zero = T(0);
 
