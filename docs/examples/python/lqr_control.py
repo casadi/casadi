@@ -82,13 +82,13 @@ u_ = (DMatrix([[ -1, 1 ],[1,-1]]*((N-1)/2))).T
 
 p = SX.sym('p')
 
-tn = np.linspace(0,te,N)
-cdae = SX.fun('cdae', controldaeIn(x=y,u=u),[mul(A,y)+mul(B,u)])
+# tn = np.linspace(0,te,N)
+# cdae = SX.fun('cdae', controldaeIn(x=y,u=u),[mul(A,y)+mul(B,u)])
 
-opts = {}
-opts['integrator'] = 'cvodes'
-opts['integrator_options'] = {'fsens_err_con': True,'reltol':1e-12}
-opts['nf'] = 20
+# opts = {}
+# opts['integrator'] = 'cvodes'
+# opts['integrator_options'] = {'fsens_err_con': True,'reltol':1e-12}
+# opts['nf'] = 20
 
 # sim = ControlSimulator('sim', cdae, tn, opts)
 # sim.setInput(x0,'x0')

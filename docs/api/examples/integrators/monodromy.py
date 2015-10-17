@@ -49,52 +49,52 @@ rhs    = vertcat([x2,(-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * 
 
 f=SX.fun("f", daeIn(x=x,p=params),daeOut(ode=rhs))
 
-t = SX.sym("t")
-cf=SX.fun("cf", controldaeIn(t=t, x=x, p=vertcat([w0,a3,a5,mu1,mu3]), u=ff),[rhs])
+# t = SX.sym("t")
+# cf=SX.fun("cf", controldaeIn(t=t, x=x, p=vertcat([w0,a3,a5,mu1,mu3]), u=ff),[rhs])
 
-opts = {}
-opts["tf"] = tf
-opts["reltol"] = 1e-10
-opts["abstol"] = 1e-10
-opts["fsens_err_con"] = True
-integrator = Integrator("integrator", "cvodes", f, opts)
+# opts = {}
+# opts["tf"] = tf
+# opts["reltol"] = 1e-10
+# opts["abstol"] = 1e-10
+# opts["fsens_err_con"] = True
+# integrator = Integrator("integrator", "cvodes", f, opts)
 
-N = 500
+# N = 500
 
-#! Let's get acquainted with the system by drawing a phase portrait
-ts = linspace(0,tf,N)
+# #! Let's get acquainted with the system by drawing a phase portrait
+# ts = linspace(0,tf,N)
 
-sim = Simulator("sim", integrator,ts)
+# sim = Simulator("sim", integrator,ts)
 
-w0_ = 5.278
-params_ = [ w0_, -1.402*w0_**2,  0.271*w0_**2,0,0,0 ]
+# w0_ = 5.278
+# params_ = [ w0_, -1.402*w0_**2,  0.271*w0_**2,0,0,0 ]
 
-sim.setInput(params_,"p")
+# sim.setInput(params_,"p")
 
-x2_0 = 0
-figure(1)
-for x1_0 in [-3.5,-3.1,-3,-2,-1,0]:
-  sim.setInput([x1_0,x2_0],"x0")
-  sim.evaluate()
-  plot(sim.getOutput()[0,:],sim.getOutput()[1,:],'k')
+# x2_0 = 0
+# figure(1)
+# for x1_0 in [-3.5,-3.1,-3,-2,-1,0]:
+#   sim.setInput([x1_0,x2_0],"x0")
+#   sim.evaluate()
+#   plot(sim.getOutput()[0,:],sim.getOutput()[1,:],'k')
 
-title('phase portrait for mu_1 = 0, mu_2 = 0')
-xlabel('x_1')
-ylabel('x_2')
+# title('phase portrait for mu_1 = 0, mu_2 = 0')
+# xlabel('x_1')
+# ylabel('x_2')
 
-show()
+# show()
 
-x0 = DMatrix([-3.1,0])
+# x0 = DMatrix([-3.1,0])
 
-#! Monodromy matrix at tf - Jacobian of integrator
-#! ===============================================
-#! First argument is input index, second argument is output index
-jac = integrator.jacobian("x0","xf")
+# #! Monodromy matrix at tf - Jacobian of integrator
+# #! ===============================================
+# #! First argument is input index, second argument is output index
+# jac = integrator.jacobian("x0","xf")
 
-jac.setInput(x0,"x0")
-jac.setInput(params_,"p")
-jac.evaluate()
+# jac.setInput(x0,"x0")
+# jac.setInput(params_,"p")
+# jac.evaluate()
 
-Ji = jac.getOutput()
+# Ji = jac.getOutput()
 
-print Ji
+# print Ji
