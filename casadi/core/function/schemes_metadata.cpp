@@ -34,8 +34,6 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_RDAEOutput: return "RDAEOutput";
     case SCHEME_IntegratorInput: return "IntegratorInput";
     case SCHEME_IntegratorOutput: return "IntegratorOutput";
-    case SCHEME_LinsolInput: return "LinsolInput";
-    case SCHEME_LinsolOutput: return "LinsolOutput";
     case SCHEME_NLPInput: return "NLPInput";
     case SCHEME_NLPOutput: return "NLPOutput";
     case SCHEME_GradFInput: return "GradFInput";
@@ -48,6 +46,8 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_NlpSolverOutput: return "NlpSolverOutput";
     case SCHEME_QpSolverInput: return "QpSolverInput";
     case SCHEME_QpSolverOutput: return "QpSolverOutput";
+    case SCHEME_LinsolInput: return "LinsolInput";
+    case SCHEME_LinsolOutput: return "LinsolOutput";
   default: casadi_error("getSchemeName: Scheme '" << scheme <<  "' does not exist.");
   }
 }
@@ -65,10 +65,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "x0, p, z0, rx0, rp, rz0";
     case SCHEME_IntegratorOutput:
       return "xf, qf, zf, rxf, rqf, rzf";
-    case SCHEME_LinsolInput:
-      return "A, B";
-    case SCHEME_LinsolOutput:
-      return "X";
     case SCHEME_NLPInput:
       return "x, p";
     case SCHEME_NLPOutput:
@@ -93,6 +89,10 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0";
     case SCHEME_QpSolverOutput:
       return "x, cost, lam_a, lam_x";
+    case SCHEME_LinsolInput:
+      return "A, B";
+    case SCHEME_LinsolOutput:
+      return "X";
   default: casadi_error("getSchemeName: Scheme '" << scheme <<  "' does not exist.");
   }
 }
@@ -138,13 +138,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==3) return "rxf";
       if (i==4) return "rqf";
       if (i==5) return "rzf";
-      break;
-    case SCHEME_LinsolInput:
-      if (i==0) return "A";
-      if (i==1) return "B";
-      break;
-    case SCHEME_LinsolOutput:
-      if (i==0) return "X";
       break;
     case SCHEME_NLPInput:
       if (i==0) return "x";
@@ -220,6 +213,13 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==2) return "lam_a";
       if (i==3) return "lam_x";
       break;
+    case SCHEME_LinsolInput:
+      if (i==0) return "A";
+      if (i==1) return "B";
+      break;
+    case SCHEME_LinsolOutput:
+      if (i==0) return "X";
+      break;
   }
   casadi_error("getSchemeEntryName: supplied number is out of range. Scheme '"
                << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme)
@@ -267,13 +267,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==3) return "Backward differential state at the initial time";  // NOLINT(whitespace/line_length)
       if (i==4) return "Backward quadrature state at the initial time";  // NOLINT(whitespace/line_length)
       if (i==5) return "Backward algebraic variable at the initial time";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_LinsolInput:
-      if (i==0) return "The square matrix A: sparse, (n x n).";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The right-hand-side matrix b: dense,  (n x m)";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_LinsolOutput:
-      if (i==0) return "Solution to the linear system of equations";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_NLPInput:
       if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
@@ -349,6 +342,13 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
       if (i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
       break;
+    case SCHEME_LinsolInput:
+      if (i==0) return "The square matrix A: sparse, (n x n).";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The right-hand-side matrix b: dense,  (n x m)";  // NOLINT(whitespace/line_length)
+      break;
+    case SCHEME_LinsolOutput:
+      if (i==0) return "Solution to the linear system of equations";  // NOLINT(whitespace/line_length)
+      break;
   }
   casadi_error("getSchemeEntryDoc: supplied number is out of range. Scheme '"
                << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme)
@@ -396,13 +396,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==3) return "INTEGRATOR_RXF";
       if (i==4) return "INTEGRATOR_RQF";
       if (i==5) return "INTEGRATOR_RZF";
-      break;
-    case SCHEME_LinsolInput:
-      if (i==0) return "LINSOL_A";
-      if (i==1) return "LINSOL_B";
-      break;
-    case SCHEME_LinsolOutput:
-      if (i==0) return "LINSOL_X";
       break;
     case SCHEME_NLPInput:
       if (i==0) return "NL_X";
@@ -478,6 +471,13 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==2) return "QP_SOLVER_LAM_A";
       if (i==3) return "QP_SOLVER_LAM_X";
       break;
+    case SCHEME_LinsolInput:
+      if (i==0) return "LINSOL_A";
+      if (i==1) return "LINSOL_B";
+      break;
+    case SCHEME_LinsolOutput:
+      if (i==0) return "LINSOL_X";
+      break;
   }
   casadi_error("getSchemeEntryEnumName: supplied number is out of range. Scheme '"
                << getSchemeName(scheme) << "' has only "
@@ -503,12 +503,6 @@ int getSchemeSize(InputOutputScheme scheme) {
       break;
     case SCHEME_IntegratorOutput:
       return 6;
-      break;
-    case SCHEME_LinsolInput:
-      return 2;
-      break;
-    case SCHEME_LinsolOutput:
-      return 1;
       break;
     case SCHEME_NLPInput:
       return 2;
@@ -545,6 +539,12 @@ int getSchemeSize(InputOutputScheme scheme) {
       break;
     case SCHEME_QpSolverOutput:
       return 4;
+      break;
+    case SCHEME_LinsolInput:
+      return 2;
+      break;
+    case SCHEME_LinsolOutput:
+      return 1;
       break;
   default: casadi_error("getSchemeSize: Scheme '" << scheme <<  "' does not exist.");
   }
@@ -591,13 +591,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="rxf") return 3;
       if (name=="rqf") return 4;
       if (name=="rzf") return 5;
-      break;
-    case SCHEME_LinsolInput:
-      if (name=="A") return 0;
-      if (name=="B") return 1;
-      break;
-    case SCHEME_LinsolOutput:
-      if (name=="X") return 0;
       break;
     case SCHEME_NLPInput:
       if (name=="x") return 0;
@@ -672,6 +665,13 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="cost") return 1;
       if (name=="lam_a") return 2;
       if (name=="lam_x") return 3;
+      break;
+    case SCHEME_LinsolInput:
+      if (name=="A") return 0;
+      if (name=="B") return 1;
+      break;
+    case SCHEME_LinsolOutput:
+      if (name=="X") return 0;
       break;
   }
   casadi_error("getSchemeEntryEnum: Scheme '" << getSchemeName(scheme)

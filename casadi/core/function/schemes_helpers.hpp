@@ -185,44 +185,6 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > integratorOut(
   }
   return std::make_pair(m, sv);
 }
-/// Input arguments of a linear solver
-///
-/// \copydoc scheme_LinsolInput
-template<class M>
-std::pair<std::map<std::string, M>, std::vector<std::string> > linsolIn(
-    const std::string &n0 ="", const M &x0 =M(),
-    const std::string &n1 ="", const M &x1 =M()) {
-  // This comment lets the haskell bindings know this is a scheme helper
-  std::map<std::string, M> m;
-  if (!n0.empty()) m[n0]=x0;
-  if (!n1.empty()) m[n1]=x1;
-  std::string s[] = {"A", "B"};
-  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
-  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
-    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
-      casadi_error("Error in 'linsolIn' arguments. You supplied key '"
-        << it->first << "'. Allowed keys are: " << sv << ".");
-  }
-  return std::make_pair(m, sv);
-}
-/// Output arguments of a linear solver
-///
-/// \copydoc scheme_LinsolOutput
-template<class M>
-std::pair<std::map<std::string, M>, std::vector<std::string> > linsolOut(
-    const std::string &n0 ="", const M &x0 =M()) {
-  // This comment lets the haskell bindings know this is a scheme helper
-  std::map<std::string, M> m;
-  if (!n0.empty()) m[n0]=x0;
-  std::string s[] = {"X"};
-  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
-  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
-    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
-      casadi_error("Error in 'linsolOut' arguments. You supplied key '"
-        << it->first << "'. Allowed keys are: " << sv << ".");
-  }
-  return std::make_pair(m, sv);
-}
 /// Input arguments of an NLP function
 ///
 /// \copydoc scheme_NLPInput
@@ -511,6 +473,44 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > qpOut(
   for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
     if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
       casadi_error("Error in 'qpOut' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
+}
+/// Input arguments of a linear solver
+///
+/// \copydoc scheme_LinsolInput
+template<class M>
+std::pair<std::map<std::string, M>, std::vector<std::string> > linsolIn(
+    const std::string &n0 ="", const M &x0 =M(),
+    const std::string &n1 ="", const M &x1 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  if (!n1.empty()) m[n1]=x1;
+  std::string s[] = {"A", "B"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'linsolIn' arguments. You supplied key '"
+        << it->first << "'. Allowed keys are: " << sv << ".");
+  }
+  return std::make_pair(m, sv);
+}
+/// Output arguments of a linear solver
+///
+/// \copydoc scheme_LinsolOutput
+template<class M>
+std::pair<std::map<std::string, M>, std::vector<std::string> > linsolOut(
+    const std::string &n0 ="", const M &x0 =M()) {
+  // This comment lets the haskell bindings know this is a scheme helper
+  std::map<std::string, M> m;
+  if (!n0.empty()) m[n0]=x0;
+  std::string s[] = {"X"};
+  std::vector<std::string> sv = std::vector<std::string>(s, s+1);
+  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
+    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
+      casadi_error("Error in 'linsolOut' arguments. You supplied key '"
         << it->first << "'. Allowed keys are: " << sv << ".");
   }
   return std::make_pair(m, sv);

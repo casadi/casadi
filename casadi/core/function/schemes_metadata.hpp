@@ -39,8 +39,6 @@ enum InputOutputScheme {
   SCHEME_RDAEOutput,
   SCHEME_IntegratorInput,
   SCHEME_IntegratorOutput,
-  SCHEME_LinsolInput,
-  SCHEME_LinsolOutput,
   SCHEME_NLPInput,
   SCHEME_NLPOutput,
   SCHEME_GradFInput,
@@ -52,7 +50,9 @@ enum InputOutputScheme {
   SCHEME_NlpSolverInput,
   SCHEME_NlpSolverOutput,
   SCHEME_QpSolverInput,
-  SCHEME_QpSolverOutput };
+  SCHEME_QpSolverOutput,
+  SCHEME_LinsolInput,
+  SCHEME_LinsolOutput };
 
 CASADI_EXPORT std::string getSchemeEntryName(InputOutputScheme scheme, int i);
 CASADI_EXPORT std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);
