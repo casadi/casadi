@@ -120,9 +120,9 @@ Get the length of the work vector.
 
 ";
 
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
-const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+%feature("docstring")  casadi::Function::nlp_solver_jacg() "
+
+Access the Hessian of the Lagrangian function for an NLP solver.
 
 ";
 
@@ -247,6 +247,12 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
+const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+
+";
+
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
 Get default input value (NOTE: constant reference)
@@ -345,6 +351,20 @@ time. * (n_in = n_in(), n_out = n_out())
 The functions returned are cached, meaning that if called multiple timed
 with the same value, then multiple references to the same function will be
 returned.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -640,17 +660,29 @@ Default implementation: dense using inputShape
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const "
+%feature("docstring")  casadi::Function::rfp_solver_fun() "
 
-Return a string with a description (for SWIG)
+Access integrator of a root-finding problem solver.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
+%feature("docstring")  casadi::Function::qp_solver_debug(const std::string
+&filename) const  "
 
-Print a representation of the object.
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(std::ostream &file)
+const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::Function::rfp_solver_linsol() "
+
+Access linear solver of a root-finding problem solver.
 
 ";
 
@@ -735,6 +767,12 @@ if no cached version is available.
 %feature("docstring")  casadi::Function::getStats() const  "
 
 Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_hesslag() "
+
+Access the Jacobian of the constraint function for an NLP solver.
 
 ";
 
@@ -894,6 +932,12 @@ recursive=true) const  "
 
 Check if the function is of a particular type Optionally check if name
 matches one of the base classes (default true)
+
+";
+
+%feature("docstring")  casadi::Function::integrator_dae() "
+
+Get the DAE for an integrator.
 
 ";
 
@@ -1302,6 +1346,12 @@ required length of res field.
 
 ";
 
+%feature("docstring")  casadi::Function::rfp_solver_jac() "
+
+Access Jacobian of a root-finding problem solver.
+
+";
+
 %feature("docstring")
 casadi::OptionsFunctionality::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
@@ -1520,6 +1570,12 @@ if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::Function::nlp_solver_nlp() "
+
+Access the NLP for an NLP solver.
+
+";
+
 %feature("docstring") casadi::Callback "
 
 Callback function functionality This class provides a public API to the
@@ -1734,6 +1790,12 @@ C++ includes: callback.hpp ";
 "
 
 Add modules to be monitored.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_gradf() "
+
+Access the objective gradient function for an NLP solver
 
 ";
 
@@ -3093,6 +3155,12 @@ required length of res field.
 
 ";
 
+%feature("docstring")  casadi::Function::nlp_solver_hesslag() "
+
+Access the Jacobian of the constraint function for an NLP solver.
+
+";
+
 %feature("docstring")  casadi::Function::name() const  "
 
 Name of the function.
@@ -3273,6 +3341,18 @@ time. * (n_in = n_in(), n_out = n_out())
 The functions returned are cached, meaning that if called multiple timed
 with the same value, then multiple references to the same function will be
 returned.
+
+";
+
+%feature("docstring")  casadi::Function::integrator_dae() "
+
+Get the DAE for an integrator.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_gradf() "
+
+Access the objective gradient function for an NLP solver
 
 ";
 
@@ -3504,6 +3584,12 @@ Get symbolic primitives equivalent to the output expressions.
 
 ";
 
+%feature("docstring")  casadi::Function::rfp_solver_linsol() "
+
+Access linear solver of a root-finding problem solver.
+
+";
+
 %feature("docstring")  casadi::Function::countNodes() const  "
 
 Number of nodes in the algorithm.
@@ -3589,6 +3675,12 @@ The the mapaccumulated version has the signature:
 
 ";
 
+%feature("docstring")  casadi::Function::rfp_solver_fun() "
+
+Access integrator of a root-finding problem solver.
+
+";
+
 %feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -3665,6 +3757,20 @@ Get the (integer) input arguments of an atomic operation.
 Reset the sparsity propagation.
 
 (for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(const std::string
+&filename) const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(std::ostream &file)
+const  "
+
+Generate native code in the interfaced language for debugging
 
 ";
 
@@ -3897,6 +4003,12 @@ const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
+%feature("docstring")  casadi::Function::rfp_solver_jac() "
+
+Access Jacobian of a root-finding problem solver.
+
+";
+
 %feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
 OptionsFunctionality &obj, bool skipUnknown=false) "
 
@@ -4042,6 +4154,12 @@ Get, if necessary generate, the sparsity of a Jacobian block
 &iind, const std::string &oind, bool compact=false, bool symmetric=false) "
 
 Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_jacg() "
+
+Access the Hessian of the Lagrangian function for an NLP solver.
 
 ";
 
@@ -4466,6 +4584,12 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_nlp() "
+
+Access the NLP for an NLP solver.
 
 ";
 
@@ -5891,6 +6015,12 @@ const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
+%feature("docstring")  casadi::Function::rfp_solver_jac() "
+
+Access Jacobian of a root-finding problem solver.
+
+";
+
 %feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
 Reset the sparsity propagation.
 
@@ -6211,6 +6341,20 @@ Get input dimension.
 const  "
 
 Get input dimension.
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(const std::string
+&filename) const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(std::ostream &file)
+const  "
+
+Generate native code in the interfaced language for debugging
 
 ";
 
@@ -6759,6 +6903,12 @@ Get an atomic operation operator index.
 
 ";
 
+%feature("docstring")  casadi::Function::rfp_solver_linsol() "
+
+Access linear solver of a root-finding problem solver.
+
+";
+
 %feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
 std::string &str) const  "
 
@@ -6819,6 +6969,12 @@ ImplicitFunction.doc(\"myextraplugin\")
 
 f:   Function where one of the inputs (by default the first) is an unknown
 and one of the outputs (by default the first) is a residual.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_gradf() "
+
+Access the objective gradient function for an NLP solver
 
 ";
 
@@ -6976,6 +7132,18 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
+%feature("docstring")  casadi::Function::nlp_solver_jacg() "
+
+Access the Hessian of the Lagrangian function for an NLP solver.
+
+";
+
+%feature("docstring")  casadi::Function::integrator_dae() "
+
+Get the DAE for an integrator.
+
+";
+
 %feature("docstring")  casadi::Function::generate(const std::string &fname,
 const Dict &opts=Dict()) "
 
@@ -7014,12 +7182,6 @@ int iind=0, int oind=0, bool compact=false) "
 Set the Jacobian function of output oind with respect to input iind NOTE:
 Does not take ownership, only weak references to the Jacobians are kept
 internally
-
-";
-
-%feature("docstring")  casadi::ImplicitFunction::getLinsol() "
-
-Access linear solver.
 
 ";
 
@@ -7338,12 +7500,6 @@ Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::ImplicitFunction::getF() "
-
-Access F.
-
-";
-
 %feature("docstring")  casadi::Function::derForward(int nfwd) "
 
 Get a function that calculates nfwd forward derivatives.
@@ -7358,6 +7514,12 @@ time. * (n_in = n_in(), n_out = n_out())
 The functions returned are cached, meaning that if called multiple timed
 with the same value, then multiple references to the same function will be
 returned.
+
+";
+
+%feature("docstring")  casadi::Function::rfp_solver_fun() "
+
+Access integrator of a root-finding problem solver.
 
 ";
 
@@ -7408,12 +7570,6 @@ Add modules to be monitored.
 %feature("docstring")  casadi::Function::getWorkSize() const  "
 
 Get the length of the work vector.
-
-";
-
-%feature("docstring")  casadi::ImplicitFunction::getJac() "
-
-Access Jacobian.
 
 ";
 
@@ -7473,6 +7629,12 @@ point to any node, \"0\" is returned.
 %feature("docstring")  casadi::SharedObject::printPtr(std::ostream
 &stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
 internal class
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_hesslag() "
+
+Access the Jacobian of the constraint function for an NLP solver.
 
 ";
 
@@ -7662,6 +7824,12 @@ Get output dimension.
 const  "
 
 Get output dimension.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_nlp() "
+
+Access the NLP for an NLP solver.
 
 ";
 
@@ -7870,6 +8038,12 @@ Get output scheme.
 %feature("docstring")  casadi::Function::name_out(int ind) const  "
 
 Get output scheme name by index.
+
+";
+
+%feature("docstring")  casadi::Function::integrator_dae() "
+
+Get the DAE for an integrator.
 
 ";
 
@@ -8130,6 +8304,18 @@ Print dimensions of inputs and outputs.
 
 ";
 
+%feature("docstring")  casadi::Function::nlp_solver_hesslag() "
+
+Access the Jacobian of the constraint function for an NLP solver.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_nlp() "
+
+Access the NLP for an NLP solver.
+
+";
+
 %feature("docstring")  casadi::Function::sx_out(int oind) const  "
 
 Get symbolic primitives equivalent to the output expressions.
@@ -8146,6 +8332,12 @@ Get symbolic primitives equivalent to the output expressions.
 %feature("docstring")  casadi::Function::sx_out() const  "
 
 Get symbolic primitives equivalent to the output expressions.
+
+";
+
+%feature("docstring")  casadi::Function::rfp_solver_jac() "
+
+Access Jacobian of a root-finding problem solver.
 
 ";
 
@@ -8310,12 +8502,6 @@ Evaluate the function symbolically or numerically.
 %feature("docstring")  casadi::Function::getStats() const  "
 
 Get all statistics obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::Integrator::getDAE() "
-
-Get the DAE.
 
 ";
 
@@ -9734,12 +9920,6 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::Integrator::setStopTime(double tf) "
-
-Set a stop time for the forward integration.
-
-";
-
 %feature("docstring")  casadi::Function::type_name() const  "
 
 Get type name.
@@ -9884,6 +10064,12 @@ Print a representation of the object.
 
 ";
 
+%feature("docstring")  casadi::Function::nlp_solver_jacg() "
+
+Access the Hessian of the Lagrangian function for an NLP solver.
+
+";
+
 %feature("docstring")  casadi::Function::getAtomicInput(int k) const  "
 
 Get the (integer) input arguments of an atomic operation.
@@ -9921,11 +10107,9 @@ Extract the functions needed for the Lifted Newton method.
 
 ";
 
-%feature("docstring")  casadi::Integrator::getAugmented(int nfwd, int nadj)
-"
+%feature("docstring")  casadi::Function::rfp_solver_linsol() "
 
-Generate a augmented DAE system with nfwd forward sensitivities and nadj
-adjoint sensitivities.
+Access linear solver of a root-finding problem solver.
 
 ";
 
@@ -10274,6 +10458,13 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
+%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
+std::string &str) const  "
+
+Get the type name of a certain option.
+
+";
+
 %feature("docstring")  casadi::Function::sparsity_out(int ind) const  "
 
 Get sparsity of a given output.
@@ -10599,6 +10790,20 @@ required length of res field.
 
 ";
 
+%feature("docstring")  casadi::Function::qp_solver_debug(const std::string
+&filename) const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(std::ostream &file)
+const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
 %feature("docstring")  casadi::Function::size1_out(int ind) const  "
 
 Get output dimension.
@@ -10612,10 +10817,9 @@ Get output dimension.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
-std::string &str) const  "
+%feature("docstring")  casadi::Function::nlp_solver_gradf() "
 
-Get the type name of a certain option.
+Access the objective gradient function for an NLP solver
 
 ";
 
@@ -10630,6 +10834,12 @@ propagating_sparsity.cpp)
 %feature("docstring")  casadi::Function::description_out(int ind) const  "
 
 Get output scheme description by index.
+
+";
+
+%feature("docstring")  casadi::Function::rfp_solver_fun() "
+
+Access integrator of a root-finding problem solver.
 
 ";
 
@@ -10843,9 +11053,21 @@ Get symbolic primitives equivalent to the input expressions.
 
 ";
 
+%feature("docstring")  casadi::Function::rfp_solver_linsol() "
+
+Access linear solver of a root-finding problem solver.
+
+";
+
 %feature("docstring")  casadi::Function::getAlgorithmSize() const  "
 
 Get the number of atomic operations.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_gradf() "
+
+Access the objective gradient function for an NLP solver
 
 ";
 
@@ -10967,6 +11189,12 @@ oind:  The index of the output
 
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::rfp_solver_fun() "
+
+Access integrator of a root-finding problem solver.
 
 ";
 
@@ -11264,6 +11492,12 @@ Get the number of function outputs.
 %feature("docstring")  casadi::Function::free_mx() const  "
 
 Get all the free variables of the function.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_hesslag() "
+
+Access the Jacobian of the constraint function for an NLP solver.
 
 ";
 
@@ -12212,6 +12446,12 @@ Get output scheme description by index.
 
 ";
 
+%feature("docstring")  casadi::Function::nlp_solver_jacg() "
+
+Access the Hessian of the Lagrangian function for an NLP solver.
+
+";
+
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
 const  " [INTERNAL]  Get the index into allowed options of a certain option.
@@ -12435,6 +12675,12 @@ internal class
 
 ";
 
+%feature("docstring")  casadi::Function::integrator_dae() "
+
+Get the DAE for an integrator.
+
+";
+
 %feature("docstring")  casadi::Function::getStats() const  "
 
 Get all statistics obtained at the end of the last evaluate call.
@@ -12444,6 +12690,18 @@ Get all statistics obtained at the end of the last evaluate call.
 %feature("docstring")  casadi::Function::getAtomicOutput(int k) const  "
 
 Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::Function::rfp_solver_jac() "
+
+Access Jacobian of a root-finding problem solver.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_nlp() "
+
+Access the NLP for an NLP solver.
 
 ";
 
@@ -12818,6 +13076,20 @@ val:  can be double, const std::vector<double>&, const Matrix<double>&,
 double *
 
 iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(const std::string
+&filename) const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(std::ostream &file)
+const  "
+
+Generate native code in the interfaced language for debugging
 
 ";
 
@@ -15496,6 +15768,12 @@ Get sparsity of a given output.
 
 ";
 
+%feature("docstring")  casadi::Function::integrator_dae() "
+
+Get the DAE for an integrator.
+
+";
+
 %feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
 OptionsFunctionality &obj, bool skipUnknown=false) "
 
@@ -15680,6 +15958,12 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_jacg() "
+
+Access the Hessian of the Lagrangian function for an NLP solver.
 
 ";
 
@@ -16472,6 +16756,12 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
+%feature("docstring")  casadi::Function::nlp_solver_gradf() "
+
+Access the objective gradient function for an NLP solver
+
+";
+
 %feature("docstring")
 casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
 &name, int i) " [INTERNAL]  Set a certain option by giving its index into
@@ -16618,6 +16908,12 @@ Print a description of the object.
 %feature("docstring")  casadi::Function::getAlgorithmSize() const  "
 
 Get the number of atomic operations.
+
+";
+
+%feature("docstring")  casadi::Function::rfp_solver_jac() "
+
+Access Jacobian of a root-finding problem solver.
 
 ";
 
@@ -20951,9 +21247,9 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
+%feature("docstring")  casadi::Function::rfp_solver_fun() "
+
+Access integrator of a root-finding problem solver.
 
 ";
 
@@ -21104,6 +21400,12 @@ adheres to SCHEME_NLPINput
 
 ";
 
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
+int v) " [INTERNAL]  Set a certain option by giving an enum value.
+
+";
+
 %feature("docstring")  casadi::Function::n_out() const  "
 
 Get the number of function outputs.
@@ -21113,6 +21415,12 @@ Get the number of function outputs.
 %feature("docstring")  casadi::Function::n_in() const  "
 
 Get the number of function inputs.
+
+";
+
+%feature("docstring")  casadi::Function::rfp_solver_linsol() "
+
+Access linear solver of a root-finding problem solver.
 
 ";
 
@@ -21140,6 +21448,12 @@ casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
 const  "
 
 Get the description of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_hesslag() "
+
+Access the Jacobian of the constraint function for an NLP solver.
 
 ";
 
@@ -21280,6 +21594,12 @@ matches one of the base classes (default true)
 
 ";
 
+%feature("docstring")  casadi::Function::nlp_solver_nlp() "
+
+Access the NLP for an NLP solver.
+
+";
+
 %feature("docstring")  casadi::Function::nnz_in() const  "
 
 Get of number of input nonzeros For a particular input or for all for all of
@@ -21313,6 +21633,20 @@ Reset the sparsity propagation.
 const  "
 
 Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(const std::string
+&filename) const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(std::ostream &file)
+const  "
+
+Generate native code in the interfaced language for debugging
 
 ";
 
@@ -21954,20 +22288,6 @@ Get symbolic primitives equivalent to the input expressions.
 
 ";
 
-%feature("docstring")  casadi::QpSolver::generateNativeCode(const
-std::string &filename) const  "
-
-Generate native code in the interfaced language for debugging
-
-";
-
-%feature("docstring")  casadi::QpSolver::generateNativeCode(std::ostream
-&file) const  "
-
-Generate native code in the interfaced language for debugging
-
-";
-
 %feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
 Propagate the sparsity pattern through a set of directional.
 
@@ -21986,6 +22306,12 @@ Get output dimension.
 const  "
 
 Get output dimension.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_hesslag() "
+
+Access the Jacobian of the constraint function for an NLP solver.
 
 ";
 
@@ -22171,6 +22497,12 @@ Joris Gillis
 
 %feature("docstring")  casadi::Function::sz_iw() const  " [INTERNAL]  Get
 required length of iw field.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_nlp() "
+
+Access the NLP for an NLP solver.
 
 ";
 
@@ -23211,6 +23543,12 @@ Return a string with a description (for SWIG)
 
 ";
 
+%feature("docstring")  casadi::Function::nlp_solver_jacg() "
+
+Access the Hessian of the Lagrangian function for an NLP solver.
+
+";
+
 %feature("docstring")  casadi::Function::size2_out(int ind) const  "
 
 Get output dimension.
@@ -23239,6 +23577,26 @@ Parameters:
 -----------
 
 parallelization:  Type of parallelization used: expand|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::integrator_dae() "
+
+Get the DAE for an integrator.
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(const std::string
+&filename) const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(std::ostream &file)
+const  "
+
+Generate native code in the interfaced language for debugging
 
 ";
 
@@ -23641,6 +23999,12 @@ Get symbolic primitives equivalent to the input expressions.
 
 ";
 
+%feature("docstring")  casadi::Function::rfp_solver_fun() "
+
+Access integrator of a root-finding problem solver.
+
+";
+
 %feature("docstring")  casadi::Function::sz_w() const  " [INTERNAL]  Get
 required length of w field.
 
@@ -23650,6 +24014,12 @@ required length of w field.
 >::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_gradf() "
+
+Access the objective gradient function for an NLP solver
 
 ";
 
@@ -24084,6 +24454,12 @@ Get the number of function outputs.
 
 ";
 
+%feature("docstring")  casadi::Function::rfp_solver_linsol() "
+
+Access linear solver of a root-finding problem solver.
+
+";
+
 %feature("docstring")  casadi::Function::countNodes() const  "
 
 Number of nodes in the algorithm.
@@ -24109,6 +24485,12 @@ const  "
 
 Get of number of input elements For a particular input or for all for all of
 the inputs.
+
+";
+
+%feature("docstring")  casadi::Function::rfp_solver_jac() "
+
+Access Jacobian of a root-finding problem solver.
 
 ";
 
@@ -24261,6 +24643,12 @@ Return a string with a description (for SWIG)
 /*  Option Functionality  */ %feature("docstring")
 casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
 const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring")  casadi::Function::rfp_solver_jac() "
+
+Access Jacobian of a root-finding problem solver.
 
 ";
 
@@ -24446,10 +24834,9 @@ Get input scheme description by index.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
-std::string &str) const  "
+%feature("docstring")  casadi::Function::nlp_solver_jacg() "
 
-Get the allowed values of a certain option.
+Access the Hessian of the Lagrangian function for an NLP solver.
 
 ";
 
@@ -24858,6 +25245,12 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_nlp() "
+
+Access the NLP for an NLP solver.
 
 ";
 
@@ -25277,6 +25670,12 @@ required length of res field.
 
 ";
 
+%feature("docstring")  casadi::Function::nlp_solver_hesslag() "
+
+Access the Jacobian of the constraint function for an NLP solver.
+
+";
+
 %feature("docstring")  casadi::Function::name() const  "
 
 Name of the function.
@@ -25468,6 +25867,18 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
+%feature("docstring")  casadi::Function::integrator_dae() "
+
+Get the DAE for an integrator.
+
+";
+
+%feature("docstring")  casadi::Function::nlp_solver_gradf() "
+
+Access the objective gradient function for an NLP solver
+
+";
+
 %feature("docstring")  casadi::Function::getAtomicOperation(int k) const  "
 
 Get an atomic operation operator index.
@@ -25539,6 +25950,13 @@ oname:  output name. Only allowed when an output scheme is set.
 %feature("docstring")
 casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
 int v) " [INTERNAL]  Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
+std::string &str) const  "
+
+Get the allowed values of a certain option.
 
 ";
 
@@ -25703,6 +26121,12 @@ Get symbolic primitives equivalent to the output expressions.
 
 ";
 
+%feature("docstring")  casadi::Function::rfp_solver_linsol() "
+
+Access linear solver of a root-finding problem solver.
+
+";
+
 %feature("docstring")  casadi::Function::countNodes() const  "
 
 Number of nodes in the algorithm.
@@ -25712,6 +26136,12 @@ Number of nodes in the algorithm.
 %feature("docstring")  casadi::Function::free_sx() const  "
 
 Get all the free variables of the function.
+
+";
+
+%feature("docstring")  casadi::Function::rfp_solver_fun() "
+
+Access integrator of a root-finding problem solver.
 
 ";
 
@@ -25846,6 +26276,20 @@ ownership, only weak references to the derivatives are kept internally.
 Reset the sparsity propagation.
 
 (for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(const std::string
+&filename) const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::Function::qp_solver_debug(std::ostream &file)
+const  "
+
+Generate native code in the interfaced language for debugging
 
 ";
 
@@ -29040,19 +29484,6 @@ Input arguments of a QP problem
 %feature("docstring")  casadi::casadi_trans(const real_t *x, const int
 *sp_x, real_t *y, const int *sp_y, int *tmp) " [INTERNAL]  TRANS: y <-
 trans(x)
-
-";
-
-%feature("docstring")  casadi::stabilizedQpIn(const std::string &n0="",
-const M &x0=M(), const std::string &n1="", const M &x1=M(), const
-std::string &n2="", const M &x2=M(), const std::string &n3="", const M
-&x3=M(), const std::string &n4="", const M &x4=M(), const std::string
-&n5="", const M &x5=M(), const std::string &n6="", const M &x6=M(), const
-std::string &n7="", const M &x7=M(), const std::string &n8="", const M
-&x8=M(), const std::string &n9="", const M &x9=M(), const std::string
-&n10="", const M &x10=M(), const std::string &n11="", const M &x11=M()) "
-
-Input arguments of a QP problem
 
 ";
 
