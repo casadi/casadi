@@ -38,17 +38,11 @@ casadi_plugin(NlpSolver sqpmethod
 casadi_plugin(NlpSolver scpgen
   scpgen.hpp scpgen.cpp scpgen_meta.cpp)
 
-# StabilizedSQP -  An implementation of Stabilized SQP
-casadi_plugin(NlpSolver stabilizedsqp
-  stabilized_sqp.hpp stabilized_sqp.cpp stabilized_sqp_meta.cpp)
-
 # Reformulations
 casadi_plugin(QpSolver nlp
   qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
 casadi_plugin(ImplicitFunction nlp
   implicit_to_nlp.hpp implicit_to_nlp.cpp implicit_to_nlp_meta.cpp)
-casadi_plugin(StabilizedQpSolver qp
-  stabilized_qp_to_qp.cpp stabilized_qp_to_qp.hpp stabilized_qp_to_qp_meta.cpp)
 casadi_plugin(LinearSolver symbolicqr
   symbolic_qr.hpp symbolic_qr.cpp symbolic_qr_meta.cpp
 )

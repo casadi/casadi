@@ -48,14 +48,6 @@ if NlpSolver.hasPlugin("ipopt") and NlpSolver.hasPlugin("sqpmethod"):
   qp_solver_options = {"nlp_solver": "ipopt", "nlp_solver_options": {"tol": 1e-12} }
   solvers.append(("sqpmethod",{"qp_solver": "nlp","qp_solver_options": qp_solver_options}))
   solvers.append(("sqpmethod",{"qp_solver": "nlp","qp_solver_options": qp_solver_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
-  
-if NlpSolver.hasPlugin("ipopt") and NlpSolver.hasPlugin("stabilizedsqp"):
-  qp_solver_options = {"nlp_solver": "ipopt", "nlp_solver_options": {"tol": 1e-12, "print_level": 0, "print_time": False} }
-  solvers.append(("stabilizedsqp",{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": "qp", "stabilized_qp_solver_options": {"qp_solver": "nlp", "qp_solver_options": qp_solver_options}}))
-  
-if QpSolver.hasPlugin("sqic") and NlpSolver.hasPlugin("stabilizedsqp"):
-  solvers.append(("stabilizedsqp",{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": "qp", "stabilized_qp_solver_options": {"qp_solver": "sqic"}}))
-
 
 print solvers
 """
