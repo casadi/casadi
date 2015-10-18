@@ -48,7 +48,6 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_NlpSolverOutput: return "NlpSolverOutput";
     case SCHEME_QpSolverInput: return "QpSolverInput";
     case SCHEME_QpSolverOutput: return "QpSolverOutput";
-    case SCHEME_StabilizedQpSolverInput: return "StabilizedQpSolverInput";
   default: casadi_error("getSchemeName: Scheme '" << scheme <<  "' does not exist.");
   }
 }
@@ -94,8 +93,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0";
     case SCHEME_QpSolverOutput:
       return "x, cost, lam_a, lam_x";
-    case SCHEME_StabilizedQpSolverInput:
-      return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu";
   default: casadi_error("getSchemeName: Scheme '" << scheme <<  "' does not exist.");
   }
 }
@@ -222,20 +219,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==1) return "cost";
       if (i==2) return "lam_a";
       if (i==3) return "lam_x";
-      break;
-    case SCHEME_StabilizedQpSolverInput:
-      if (i==0) return "h";
-      if (i==1) return "g";
-      if (i==2) return "a";
-      if (i==3) return "lba";
-      if (i==4) return "uba";
-      if (i==5) return "lbx";
-      if (i==6) return "ubx";
-      if (i==7) return "x0";
-      if (i==8) return "lam_x0";
-      if (i==9) return "muR";
-      if (i==10) return "muE";
-      if (i==11) return "mu";
       break;
   }
   casadi_error("getSchemeEntryName: supplied number is out of range. Scheme '"
@@ -366,20 +349,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
       if (i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_StabilizedQpSolverInput:
-      if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The vector g: dense,  (n x 1)";  // NOLINT(whitespace/line_length)
-      if (i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
-      if (i==3) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
-      if (i==4) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
-      if (i==5) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
-      if (i==6) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
-      if (i==7) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
-      if (i==8) return "dense";  // NOLINT(whitespace/line_length)
-      if (i==9) return "dense (1 x 1)";  // NOLINT(whitespace/line_length)
-      if (i==10) return "dense (nc x 1)";  // NOLINT(whitespace/line_length)
-      if (i==11) return "dense (nc x 1)";  // NOLINT(whitespace/line_length)
-      break;
   }
   casadi_error("getSchemeEntryDoc: supplied number is out of range. Scheme '"
                << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme)
@@ -509,20 +478,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==2) return "QP_SOLVER_LAM_A";
       if (i==3) return "QP_SOLVER_LAM_X";
       break;
-    case SCHEME_StabilizedQpSolverInput:
-      if (i==0) return "STABILIZED_QP_SOLVER_H";
-      if (i==1) return "STABILIZED_QP_SOLVER_G";
-      if (i==2) return "STABILIZED_QP_SOLVER_A";
-      if (i==3) return "STABILIZED_QP_SOLVER_LBA";
-      if (i==4) return "STABILIZED_QP_SOLVER_UBA";
-      if (i==5) return "STABILIZED_QP_SOLVER_LBX";
-      if (i==6) return "STABILIZED_QP_SOLVER_UBX";
-      if (i==7) return "STABILIZED_QP_SOLVER_X0";
-      if (i==8) return "STABILIZED_QP_SOLVER_LAM_X0";
-      if (i==9) return "STABILIZED_QP_SOLVER_MUR";
-      if (i==10) return "STABILIZED_QP_SOLVER_MUE";
-      if (i==11) return "STABILIZED_QP_SOLVER_MU";
-      break;
   }
   casadi_error("getSchemeEntryEnumName: supplied number is out of range. Scheme '"
                << getSchemeName(scheme) << "' has only "
@@ -590,9 +545,6 @@ int getSchemeSize(InputOutputScheme scheme) {
       break;
     case SCHEME_QpSolverOutput:
       return 4;
-      break;
-    case SCHEME_StabilizedQpSolverInput:
-      return 12;
       break;
   default: casadi_error("getSchemeSize: Scheme '" << scheme <<  "' does not exist.");
   }
@@ -720,20 +672,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="cost") return 1;
       if (name=="lam_a") return 2;
       if (name=="lam_x") return 3;
-      break;
-    case SCHEME_StabilizedQpSolverInput:
-      if (name=="h") return 0;
-      if (name=="g") return 1;
-      if (name=="a") return 2;
-      if (name=="lba") return 3;
-      if (name=="uba") return 4;
-      if (name=="lbx") return 5;
-      if (name=="ubx") return 6;
-      if (name=="x0") return 7;
-      if (name=="lam_x0") return 8;
-      if (name=="muR") return 9;
-      if (name=="muE") return 10;
-      if (name=="mu") return 11;
       break;
   }
   casadi_error("getSchemeEntryEnum: Scheme '" << getSchemeName(scheme)

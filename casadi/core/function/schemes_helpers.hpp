@@ -515,46 +515,6 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > qpOut(
   }
   return std::make_pair(m, sv);
 }
-/// Input arguments of a QP problem
-///
-/// \copydoc scheme_StabilizedQpSolverInput
-template<class M>
-std::pair<std::map<std::string, M>, std::vector<std::string> > stabilizedQpIn(
-    const std::string &n0 ="", const M &x0 =M(),
-    const std::string &n1 ="", const M &x1 =M(),
-    const std::string &n2 ="", const M &x2 =M(),
-    const std::string &n3 ="", const M &x3 =M(),
-    const std::string &n4 ="", const M &x4 =M(),
-    const std::string &n5 ="", const M &x5 =M(),
-    const std::string &n6 ="", const M &x6 =M(),
-    const std::string &n7 ="", const M &x7 =M(),
-    const std::string &n8 ="", const M &x8 =M(),
-    const std::string &n9 ="", const M &x9 =M(),
-    const std::string &n10 ="", const M &x10 =M(),
-    const std::string &n11 ="", const M &x11 =M()) {
-  // This comment lets the haskell bindings know this is a scheme helper
-  std::map<std::string, M> m;
-  if (!n0.empty()) m[n0]=x0;
-  if (!n1.empty()) m[n1]=x1;
-  if (!n2.empty()) m[n2]=x2;
-  if (!n3.empty()) m[n3]=x3;
-  if (!n4.empty()) m[n4]=x4;
-  if (!n5.empty()) m[n5]=x5;
-  if (!n6.empty()) m[n6]=x6;
-  if (!n7.empty()) m[n7]=x7;
-  if (!n8.empty()) m[n8]=x8;
-  if (!n9.empty()) m[n9]=x9;
-  if (!n10.empty()) m[n10]=x10;
-  if (!n11.empty()) m[n11]=x11;
-  std::string s[] = {"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0", "muR", "muE", "mu"};
-  std::vector<std::string> sv = std::vector<std::string>(s, s+12);
-  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
-    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
-      casadi_error("Error in 'stabilizedQpIn' arguments. You supplied key '"
-        << it->first << "'. Allowed keys are: " << sv << ".");
-  }
-  return std::make_pair(m, sv);
-}
 } // namespace casadi
 #endif //SCHEMES_HELPERS_HPP
 
