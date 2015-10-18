@@ -44,16 +44,6 @@ namespace casadi {
     return dynamic_cast<const QpSolverInternal*>(ptr)!=0;
   }
 
-  void QpSolver::generateNativeCode(const std::string &filename) const {
-    std::ofstream file;
-    file.open(filename.c_str());
-    (*this)->generateNativeCode(file);
-  }
-
-  void QpSolver::generateNativeCode(std::ostream &file) const {
-    (*this)->generateNativeCode(file);
-  }
-
   QpSolver::QpSolver(const std::string& name, const std::string& solver,
                      const std::map<std::string, Sparsity>& st, const Dict& opts) {
     assignNode(QpSolverInternal::instantiatePlugin(name, solver, st));

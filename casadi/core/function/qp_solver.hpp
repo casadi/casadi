@@ -139,12 +139,6 @@ namespace casadi {
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
 #endif // SWIG
-
-    /** Generate native code in the interfaced language for debugging */
-    void generateNativeCode(const std::string &filename) const;
-
-    /** Generate native code in the interfaced language for debugging */
-    void generateNativeCode(std::ostream &file) const;
   };
 
 } // namespace casadi

@@ -1055,6 +1055,36 @@ namespace casadi {
 
     /// Get documentation for an RFP solver plugin
     static std::string doc_rfp_solver(const std::string& name);
+
+    /// Access integrator of a root-finding problem solver
+    Function rfp_solver_fun();
+
+    /// Access Jacobian of a root-finding problem solver
+    Function rfp_solver_jac();
+
+    /// Access linear solver of a root-finding problem solver
+    LinearSolver rfp_solver_linsol();
+
+    /// Get the DAE for an integrator
+    Function integrator_dae();
+
+    /** \brief Access the NLP for an NLP solver */
+    Function nlp_solver_nlp();
+
+    /** Access the objective gradient function for an NLP solver */
+    Function nlp_solver_gradf();
+
+    /** \brief Access the Hessian of the Lagrangian function for an NLP solver */
+    Function nlp_solver_jacg();
+
+    /** \brief Access the Jacobian of the constraint function for an NLP solver */
+    Function nlp_solver_hesslag();
+
+    /** Generate native code in the interfaced language for debugging */
+    void qp_solver_debug(const std::string &filename) const;
+
+    /** Generate native code in the interfaced language for debugging */
+    void qp_solver_debug(std::ostream &file) const;
   };
 
 } // namespace casadi

@@ -151,15 +151,6 @@ namespace casadi {
     (*this)->integrateB(t_out);
   }
 
-  Function Integrator::getDAE() {
-    return (*this)->f_;
-  }
-
-  std::pair<Function, Function> Integrator::getAugmented(int nfwd, int nadj) {
-    IntegratorInternal::AugOffset offset;
-    return (*this)->getAugmented(nfwd, nadj, offset);
-  }
-
   bool Integrator::hasPlugin(const std::string& name) {
     return IntegratorInternal::hasPlugin(name);
   }

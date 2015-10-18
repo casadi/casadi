@@ -30,10 +30,10 @@
 #include "external_function_internal.hpp"
 #include "switch_internal.hpp"
 #include "kernel_sum_2d_internal.hpp"
-#include "integrator.hpp"
-#include "qp_solver.hpp"
-#include "nlp_solver.hpp"
-#include "implicit_function.hpp"
+#include "integrator_internal.hpp"
+#include "qp_solver_internal.hpp"
+#include "nlp_solver_internal.hpp"
+#include "implicit_function_internal.hpp"
 
 #include <typeinfo>
 
@@ -1299,6 +1299,75 @@ namespace casadi {
 
   std::string Function::doc_rfp_solver(const std::string& name) {
     return ImplicitFunction::doc(name);
+  }
+
+  Function Function::rfp_solver_fun() {
+    casadi_assert(!isNull());
+    ImplicitFunctionInternal* n = dynamic_cast<ImplicitFunctionInternal*>(get());
+    casadi_assert_message(n!=0, "Not a RFP solver");
+    return n->f_;
+  }
+
+  Function Function::rfp_solver_jac() {
+    casadi_assert(!isNull());
+    ImplicitFunctionInternal* n = dynamic_cast<ImplicitFunctionInternal*>(get());
+    casadi_assert_message(n!=0, "Not a RFP solver");
+    return n->jac_;
+  }
+
+  LinearSolver Function::rfp_solver_linsol() {
+    casadi_assert(!isNull());
+    ImplicitFunctionInternal* n = dynamic_cast<ImplicitFunctionInternal*>(get());
+    casadi_assert_message(n!=0, "Not a RFP solver");
+    return n->linsol_;
+  }
+
+  Function Function::integrator_dae() {
+    casadi_assert(!isNull());
+    IntegratorInternal* n = dynamic_cast<IntegratorInternal*>(get());
+    casadi_assert_message(n!=0, "Not an integrator");
+    return n->f_;
+  }
+
+  Function Function::nlp_solver_nlp() {
+    casadi_assert(!isNull());
+    NlpSolverInternal* n = dynamic_cast<NlpSolverInternal*>(get());
+    casadi_assert_message(n!=0, "Not an NLP solver");
+    return n->nlp_;
+  }
+
+  Function Function::nlp_solver_gradf() {
+    casadi_assert(!isNull());
+    NlpSolverInternal* n = dynamic_cast<NlpSolverInternal*>(get());
+    casadi_assert_message(n!=0, "Not an NLP solver");
+    return n->gradF();
+  }
+
+  Function Function::nlp_solver_jacg() {
+    casadi_assert(!isNull());
+    NlpSolverInternal* n = dynamic_cast<NlpSolverInternal*>(get());
+    casadi_assert_message(n!=0, "Not an NLP solver");
+    return n->jacG();
+  }
+
+  Function Function::nlp_solver_hesslag() {
+    casadi_assert(!isNull());
+    NlpSolverInternal* n = dynamic_cast<NlpSolverInternal*>(get());
+    casadi_assert_message(n!=0, "Not an NLP solver");
+    return n->hessLag();
+  }
+
+  void Function::qp_solver_debug(const std::string &filename) const {
+    std::ofstream file;
+    file.open(filename.c_str());
+    qp_solver_debug(file);
+  }
+
+  void Function::qp_solver_debug(std::ostream &file) const {
+    casadi_assert(!isNull());
+    const QpSolverInternal* n = dynamic_cast<const QpSolverInternal*>(get());
+    casadi_assert_message(n!=0, "Not a QP solver");
+    return n->generateNativeCode(file);
   }
 
 } // namespace casadi

@@ -50,21 +50,6 @@ namespace casadi {
     return dynamic_cast<const ImplicitFunctionInternal*>(ptr)!=0;
   }
 
-  Function& ImplicitFunction::getF() {
-    casadi_assert(!isNull());
-    return (*this)->f_;
-  }
-
-  Function& ImplicitFunction::getJac() {
-    casadi_assert(!isNull());
-    return (*this)->jac_;
-  }
-
-  LinearSolver& ImplicitFunction::getLinsol() {
-    casadi_assert(!isNull());
-    return (*this)->linsol_;
-  }
-
   bool ImplicitFunction::hasPlugin(const std::string& name) {
     return ImplicitFunctionInternal::hasPlugin(name);
   }

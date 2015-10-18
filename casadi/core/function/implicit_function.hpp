@@ -103,15 +103,6 @@ namespace casadi {
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
 #endif // SWIG
-
-    /// Access F
-    Function& getF();
-
-    /// Access Jacobian
-    Function& getJac();
-
-    /// Access linear solver
-    LinearSolver& getLinsol();
   };
 
 } // namespace casadi

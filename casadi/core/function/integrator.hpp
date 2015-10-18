@@ -237,18 +237,10 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
-#endif // SWIG
-
-    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
-     *    and \a nadj adjoint sensitivities
-     */
-    std::pair<Function, Function> getAugmented(int nfwd, int nadj);
-
-    /// Get the DAE
-    Function getDAE();
 
     /// Set a stop time for the forward integration
     void setStopTime(double tf);
+#endif // SWIG
 
     /// Check if a particular cast is allowed
     static bool test_cast(const SharedObjectNode* ptr);
