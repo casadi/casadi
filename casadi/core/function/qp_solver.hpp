@@ -55,45 +55,7 @@
   If H is not positive-definite, the solver should throw an error.
 
 */
-
 namespace casadi {
-#ifndef SWIG
-
-  /// Input arguments of a QP problem [qpIn]
-  enum QpSolverInput {
-    /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
-    /// The matrix is assumed to be symmetrical. [h]
-    QP_SOLVER_H,
-    /// The vector g: dense,  (n x 1) [g]
-    QP_SOLVER_G,
-    /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
-    QP_SOLVER_A,
-    /// dense, (nc x 1) [lba]
-    QP_SOLVER_LBA,
-    /// dense, (nc x 1) [uba]
-    QP_SOLVER_UBA,
-    /// dense, (n x 1) [lbx]
-    QP_SOLVER_LBX,
-    /// dense, (n x 1) [ubx]
-    QP_SOLVER_UBX,
-    /// dense, (n x 1) [x0]
-    QP_SOLVER_X0,
-    /// dense [lam_x0]
-    QP_SOLVER_LAM_X0,
-    QP_SOLVER_NUM_IN};
-
-  /// Output arguments of an QP Solver [qpOut]
-  enum QpSolverOutput {
-    /// The primal solution [x]
-    QP_SOLVER_X,
-    /// The optimal cost [cost]
-    QP_SOLVER_COST,
-    /// The dual solution corresponding to linear bounds [lam_a]
-    QP_SOLVER_LAM_A,
-    /// The dual solution corresponding to simple bounds [lam_x]
-    QP_SOLVER_LAM_X,
-    QP_SOLVER_NUM_OUT};
-#endif // SWIG
 
   // Forward declaration of internal class
   class QpSolverInternal;
