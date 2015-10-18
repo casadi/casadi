@@ -44,18 +44,6 @@
 <tr><td>QP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
 </table>
 */
-/** \defgroup scheme_NlpSolverOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::NlpSolverOutput  (NLP_SOLVER_NUM_OUT = 6) [nlpSolverOut]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>NLP_SOLVER_X</td><td>x</td><td>Decision variables at the optimal solution (nx x 1) .</td></tr>
-<tr><td>NLP_SOLVER_F</td><td>f</td><td>Cost function value at the optimal solution (1 x 1) .</td></tr>
-<tr><td>NLP_SOLVER_G</td><td>g</td><td>Constraints function at the optimal solution (ng x 1) .</td></tr>
-<tr><td>NLP_SOLVER_LAM_X</td><td>lam_x</td><td>Lagrange multipliers for bounds on X at the solution (nx x 1) .</td></tr>
-<tr><td>NLP_SOLVER_LAM_G</td><td>lam_g</td><td>Lagrange multipliers for bounds on G at the solution (ng x 1) .</td></tr>
-<tr><td>NLP_SOLVER_LAM_P</td><td>lam_p</td><td>Lagrange multipliers for bounds on P at the solution (np x 1) .</td></tr>
-</table>
-*/
 /** \defgroup scheme_RDAEInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::RDAEInput  (RDAE_NUM_IN = 7) [rdaeIn]</caption>
@@ -75,6 +63,16 @@
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>NL_F</td><td>f</td><td>Objective function .</td></tr>
 <tr><td>NL_G</td><td>g</td><td>Constraint function .</td></tr>
+</table>
+*/
+/** \defgroup scheme_QpSolverOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::QpSolverOutput  (QP_SOLVER_NUM_OUT = 4) [qpOut]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>QP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
+<tr><td>QP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
+<tr><td>QP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds .</td></tr>
+<tr><td>QP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds .</td></tr>
 </table>
 */
 /** \defgroup scheme_DAEInput
@@ -162,14 +160,16 @@
 <tr><td>RDAE_QUAD</td><td>quad</td><td>Right hand side of quadratures. .</td></tr>
 </table>
 */
-/** \defgroup scheme_QpSolverOutput
+/** \defgroup scheme_NlpSolverOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::QpSolverOutput  (QP_SOLVER_NUM_OUT = 4) [qpOut]</caption>
+<caption>Output scheme: casadi::NlpSolverOutput  (NLP_SOLVER_NUM_OUT = 6) [nlpSolverOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
-<tr><td>QP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
-<tr><td>QP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds .</td></tr>
-<tr><td>QP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds .</td></tr>
+<tr><td>NLP_SOLVER_X</td><td>x</td><td>Decision variables at the optimal solution (nx x 1) .</td></tr>
+<tr><td>NLP_SOLVER_F</td><td>f</td><td>Cost function value at the optimal solution (1 x 1) .</td></tr>
+<tr><td>NLP_SOLVER_G</td><td>g</td><td>Constraints function at the optimal solution (ng x 1) .</td></tr>
+<tr><td>NLP_SOLVER_LAM_X</td><td>lam_x</td><td>Lagrange multipliers for bounds on X at the solution (nx x 1) .</td></tr>
+<tr><td>NLP_SOLVER_LAM_G</td><td>lam_g</td><td>Lagrange multipliers for bounds on G at the solution (ng x 1) .</td></tr>
+<tr><td>NLP_SOLVER_LAM_P</td><td>lam_p</td><td>Lagrange multipliers for bounds on P at the solution (np x 1) .</td></tr>
 </table>
 */
 /** \defgroup scheme_LinsolOutput
