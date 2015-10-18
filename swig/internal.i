@@ -187,13 +187,52 @@
 %exception  casadi::Wrapper< Derived >::evaluate() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::acosh(double x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::asinh(double x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::atanh(double x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::check_exposed(T t) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::constpow(const T &x, const T &n) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::copysign(double x, double y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::diffTimers(const timer t1, const timer t0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::diffToDict(const diffTime &diff) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::erf(double x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::erfinv(const T &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::erfinv(double x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::fabs(int x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::fmax(double x, double y) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::fmax(int x, int y) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::fmin(double x, double y) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::fmin(int x, int y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::getRealTime() {
@@ -214,6 +253,21 @@
 %exception  casadi::hash_value(T v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::if_else_zero(const T &x, const T &y) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::if_else_zero(double x, double y) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::is_equal(double x, double y, int depth=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::isinf(double x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::isnan(double x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::iszero(double x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -221,6 +275,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::operation_checker(unsigned int op) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::printme(const T &x, const T &y) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::printme(double x, double y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::profileWrite(std::ofstream &f, const T &s) {
@@ -241,7 +301,16 @@
 %exception  casadi::ptrVec(std::vector< std::vector< T > > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::sign(double x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::sq(const T &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::timerPlusEq(diffTime &t, const diffTime diff) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::twice(const T &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  snoptProblem::setLog(isnLog snLog, isnLog2 snLog2, isqLog sqLog) {
