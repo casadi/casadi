@@ -114,7 +114,7 @@ elif Solver=="kinsol":
     opts["linear_solver_type"] = "user_defined"
     opts["linear_solver"] = 'csparse'
     opts["max_iter"] = 1000
-solver = ImplicitFunction("solver", Solver, rfp, opts)
+solver = rfp.rootfinder("solver", Solver, opts)
 
 # Solve the problem
 l_init_opt, = solver([0])

@@ -30,7 +30,7 @@
 *
 * \sa
 * \code
-* casadi::ImplicitFunction();
+* casadi::Function::rootfinder();
 * \endcode
 *
 */

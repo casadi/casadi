@@ -27,7 +27,7 @@ from casadi import *
 from numpy import *
 from pylab import *
 
-#! We will investigate the working of ImplicitFunction with the help of the parametrically exited Duffing equation.
+#! We will investigate the working of Function::rootfinder with the help of the parametrically exited Duffing equation.
 #!
 #$ $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$. \\
 #$
@@ -59,7 +59,7 @@ alpha_ = 0.1
 k_     = 0.2
 params_ = [0.1,0.1,alpha_,k_,sigma_]
 
-#! We create a ImplicitFunction instance
+#! We create a Function instance
 f=SX.fun("f", [vertcat([a,gamma]),vertcat(params)],[vertcat([res0,res1])])
 opts = {}
 opts["strategy"] = "linesearch"
@@ -67,7 +67,7 @@ opts["abstol"] = 1e-14
 
 #$ Require $a > 0$ and $\gamma < 0$
 opts["constraints"] = [2,-2]
-s=ImplicitFunction("s", "kinsol", f, opts)
+s=f.rootfinder("s", "kinsol", opts)
 s.setInput(params_,1)
 
 #$ Initialize [$a$,$\gamma$] with a guess and solve
