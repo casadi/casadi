@@ -174,6 +174,26 @@ propagating_sparsity.cpp)
 
 ";
 
+%feature("docstring") casadi::Callback::rfp_solver "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
+
+";
+
 %feature("docstring") casadi::Callback::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
@@ -3173,6 +3193,26 @@ Get symbolic primitives equivalent to the input expressions.
 
 ";
 
+%feature("docstring") casadi::Function::rfp_solver "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
+
+";
+
 %feature("docstring") casadi::Function "
 
 General function.
@@ -4502,1521 +4542,6 @@ C++ includes: generic_type.hpp ";
 
 
 // File: classcasadi_1_1ImplicitFixedStepIntegrator.xml
-
-
-// File: classcasadi_1_1ImplicitFunction.xml
-
-
-/*  Simple Getters & Setters  */
-
-/*  Advanced Getters  */
-
-/*  Option Functionality  */ %feature("docstring")
-casadi::ImplicitFunction::getInput "
-
->  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
-------------------------------------------------------------------------
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0..n_in()-1]
-
->  DMatrix  IOInterface< Function  >.getInput(str iname) const
-------------------------------------------------------------------------
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
-
->  void IOInterface< Function  >.getInput(T val, int iind=0)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an input by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iind:  index within the range [0..n_in()-1]
-
->  void IOInterface< Function  >.getInput(T val, str iname)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an input by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::generateLiftingFunctions "
-
-Extract the functions needed for the Lifted Newton method.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getOptionAllowed "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::tangent "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::rfp_solver_jac "
-
-Access Jacobian of a root-finding problem solver.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::spInit "[INTERNAL]  Reset
-the sparsity propagation.
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::description_out "
-
-Get output scheme description by index.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getStat "
-
-Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getAtomicInput "
-
-Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::n_in "
-
-Get the number of function inputs.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::setFullJacobian "
-
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::spCanEvaluate "[INTERNAL]
-Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::checkInputs "[INTERNAL]
-Check if the numerical values of the supplied bounds make sense.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::name "
-
-Name of the function.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::n_out "
-
-Get the number of function outputs.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getDescription "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getOutput "
-
->  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
-------------------------------------------------------------------------
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0..n_out()-1]
-
->  DMatrix  IOInterface< Function  >.getOutput(str oname) const
-------------------------------------------------------------------------
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
-
->  void IOInterface< Function  >.getOutput(T val, int oind=0)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0..n_out()-1]
-
->  void IOInterface< Function  >.getOutput(T val, str oname)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::mx_out "
-
-Get symbolic primitives equivalent to the output expressions.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::size1_out "
-
-Get output dimension.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::type_name "
-
-Get type name.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::hessian "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::print "
-
-Print a description of the object.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::countNodes "
-
-Number of nodes in the algorithm.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::printDimensions "
-
-Print dimensions of inputs and outputs.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::removeMonitor "
-
-Remove modules to be monitored.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::mapsum "
-
-Evaluate symbolically in parallel and sum (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Legacy function: Use derForward and derReverse instead.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = n_in(), n_out = n_out())
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::size2_in "
-
-Get input dimension.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::qp_solver_debug "
-
-Generate native code in the interfaced language for debugging
-
-";
-
-%feature("docstring") casadi::ImplicitFunction "
-
-Abstract base class for the implicit function classes.
-
-Mathematically, the equation:
-
-F(z, x1, x2, ..., xn) == 0
-
-where d_F/dz is invertible, implicitly defines the equation:
-
-z := G(x1, x2, ..., xn)
-
-In CasADi, F is a Function. The first input presents the variables that need
-to be solved for. The first output is the residual that needs to attain
-zero. Optional remaining outputs can be supplied; they are output
-expressions.
-
-In pseudo-code, we can write:
-
-G* = ImplicitFunction('solver',F)
-
-Here, G* is a Function with one extra input over the pure mathematical G:
-
-z := G*(z0, x1, x2, ..., xn)
-
-The first input to the ImplicitFunction is the intial guess for z.
-
-General information
-===================
-
-
-
->List of available options
-
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| ad_weight    | OT_REAL      | GenericType( | Weighting    | casadi::Func |
-|              |              | )            | factor for   | tionInternal |
-|              |              |              | derivative c |              |
-|              |              |              | alculation.W |              |
-|              |              |              | hen there is |              |
-|              |              |              | an option of |              |
-|              |              |              | either using |              |
-|              |              |              | forward or   |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives, |              |
-|              |              |              | the          |              |
-|              |              |              | condition ad |              |
-|              |              |              | _weight*nf<= |              |
-|              |              |              | (1-ad_weight |              |
-|              |              |              | )*na is used |              |
-|              |              |              | where nf and |              |
-|              |              |              | na are       |              |
-|              |              |              | estimates of |              |
-|              |              |              | the number   |              |
-|              |              |              | of forward/r |              |
-|              |              |              | everse mode  |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives  |              |
-|              |              |              | needed. By   |              |
-|              |              |              | default,     |              |
-|              |              |              | ad_weight is |              |
-|              |              |              | calculated a |              |
-|              |              |              | utomatically |              |
-|              |              |              | , but this   |              |
-|              |              |              | can be       |              |
-|              |              |              | overridden   |              |
-|              |              |              | by setting   |              |
-|              |              |              | this option. |              |
-|              |              |              | In           |              |
-|              |              |              | particular,  |              |
-|              |              |              | 0 means      |              |
-|              |              |              | forcing      |              |
-|              |              |              | forward mode |              |
-|              |              |              | and 1        |              |
-|              |              |              | forcing      |              |
-|              |              |              | reverse      |              |
-|              |              |              | mode. Leave  |              |
-|              |              |              | unset for    |              |
-|              |              |              | (class       |              |
-|              |              |              | specific)    |              |
-|              |              |              | heuristics.  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| ad_weight_sp | OT_REAL      | GenericType( | Weighting    | casadi::Func |
-|              |              | )            | factor for   | tionInternal |
-|              |              |              | sparsity     |              |
-|              |              |              | pattern      |              |
-|              |              |              | calculation  |              |
-|              |              |              | calculation. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | behavior.    |              |
-|              |              |              | Set to 0 and |              |
-|              |              |              | 1 to force   |              |
-|              |              |              | forward and  |              |
-|              |              |              | reverse mode |              |
-|              |              |              | respectively |              |
-|              |              |              | . Cf. option |              |
-|              |              |              | \"ad_weight\". |              |
-+--------------+--------------+--------------+--------------+--------------+
-| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| constraints  | OT_INTEGERVE | GenericType( | Constrain    | casadi::Impl |
-|              | CTOR         | )            | the          | icitFunction |
-|              |              |              | unknowns. 0  | Internal     |
-|              |              |              | (default):   |              |
-|              |              |              | no           |              |
-|              |              |              | constraint   |              |
-|              |              |              | on ui, 1: ui |              |
-|              |              |              | >= 0.0, -1:  |              |
-|              |              |              | ui <= 0.0,   |              |
-|              |              |              | 2: ui > 0.0, |              |
-|              |              |              | -2: ui <     |              |
-|              |              |              | 0.0.         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
-| ipes         | TOR          | )            | default      | onsFunctiona |
-|              |              |              | options      | lityNode     |
-|              |              |              | according to |              |
-|              |              |              | a given      |              |
-|              |              |              | recipe (low- |              |
-|              |              |              | level)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
-|              |              |              | indicate     | tionInternal |
-|              |              |              | whether      |              |
-|              |              |              | statistics   |              |
-|              |              |              | must be      |              |
-|              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| implicit_inp | OT_INTEGER   | 0            | Index of the | casadi::Impl |
-| ut           |              |              | input that   | icitFunction |
-|              |              |              | corresponds  | Internal     |
-|              |              |              | to the       |              |
-|              |              |              | actual root- |              |
-|              |              |              | finding      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| implicit_out | OT_INTEGER   | 0            | Index of the | casadi::Impl |
-| put          |              |              | output that  | icitFunction |
-|              |              |              | corresponds  | Internal     |
-|              |              |              | to the       |              |
-|              |              |              | actual root- |              |
-|              |              |              | finding      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| input_scheme | OT_STRINGVEC | GenericType( | Custom input | casadi::Func |
-|              | TOR          | )            | scheme       | tionInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
-|              |              |              | exceptions   | tionInternal |
-|              |              |              | when the     |              |
-|              |              |              | numerical    |              |
-|              |              |              | values of    |              |
-|              |              |              | the inputs   |              |
-|              |              |              | don't make   |              |
-|              |              |              | sense        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
-|              |              |              | requested    | tionInternal |
-|              |              |              | for a number |              |
-|              |              |              | of forward/r |              |
-|              |              |              | everse       |              |
-|              |              |              | directions,  |              |
-|              |              |              | it may be    |              |
-|              |              |              | cheaper to   |              |
-|              |              |              | compute      |              |
-|              |              |              | first the    |              |
-|              |              |              | full         |              |
-|              |              |              | jacobian and |              |
-|              |              |              | then         |              |
-|              |              |              | multiply     |              |
-|              |              |              | with seeds,  |              |
-|              |              |              | rather than  |              |
-|              |              |              | obtain the   |              |
-|              |              |              | requested    |              |
-|              |              |              | directions   |              |
-|              |              |              | in a straigh |              |
-|              |              |              | tforward     |              |
-|              |              |              | manner.      |              |
-|              |              |              | Casadi uses  |              |
-|              |              |              | a heuristic  |              |
-|              |              |              | to decide    |              |
-|              |              |              | which is     |              |
-|              |              |              | cheaper. A   |              |
-|              |              |              | high value   |              |
-|              |              |              | of 'jac_pena |              |
-|              |              |              | lty' makes   |              |
-|              |              |              | it less      |              |
-|              |              |              | likely for   |              |
-|              |              |              | the heurstic |              |
-|              |              |              | to chose the |              |
-|              |              |              | full         |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | strategy.    |              |
-|              |              |              | The special  |              |
-|              |              |              | value -1     |              |
-|              |              |              | indicates    |              |
-|              |              |              | never to use |              |
-|              |              |              | the full     |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | strategy     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jacobian_fun | OT_FUNCTION  | GenericType( | Function     | casadi::Impl |
-| ction        |              | )            | object for   | icitFunction |
-|              |              |              | calculating  | Internal     |
-|              |              |              | the Jacobian |              |
-|              |              |              | (autogenerat |              |
-|              |              |              | ed by        |              |
-|              |              |              | default)     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
-|              |              |              | time         | tionInternal |
-|              |              |              | compiler to  |              |
-|              |              |              | speed up the |              |
-|              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
-|              |              | )            | be passed to | tionInternal |
-|              |              |              | the jit      |              |
-|              |              |              | compiler.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"csparse\"    | User-defined | casadi::Impl |
-| r            |              |              | linear       | icitFunction |
-|              |              |              | solver       | Internal     |
-|              |              |              | class.       |              |
-|              |              |              | Needed for s |              |
-|              |              |              | ensitivities |              |
-|              |              |              | .            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_FUNCTION  | GenericType( | Function     | casadi::Impl |
-| r_function   |              | )            | object for   | icitFunction |
-|              |              |              | solving the  | Internal     |
-|              |              |              | linearized   |              |
-|              |              |              | problem (aut |              |
-|              |              |              | ogenerated   |              |
-|              |              |              | by default)  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICT      | GenericType( | Options to   | casadi::Impl |
-| r_options    |              | )            | be passed to | icitFunction |
-|              |              |              | the linear   | Internal     |
-|              |              |              | solver.      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
-|              | TOR          | )            | be activated | tionInternal |
-|              |              |              | (inputs|outp |              |
-|              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
-| e            | TOR          | )            | output       | tionInternal |
-|              |              |              | scheme       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
-| heck         |              |              | exceptions   | tionInternal |
-|              |              |              | when NaN or  |              |
-|              |              |              | Inf appears  |              |
-|              |              |              | during       |              |
-|              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
-|              |              | )            | defined      | tionInternal |
-|              |              |              | field that   |              |
-|              |              |              | can be used  |              |
-|              |              |              | to identify  |              |
-|              |              |              | the function |              |
-|              |              |              | or pass      |              |
-|              |              |              | additional   |              |
-|              |              |              | information  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
-|              |              |              | evaluation   | tionInternal |
-|              |              |              | for          |              |
-|              |              |              | debugging    |              |
-+--------------+--------------+--------------+--------------+--------------+
-
-List of plugins
-===============
-
-
-
-- kinsol
-
-- nlp
-
-- newton
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-ImplicitFunction.doc(\"myextraplugin\")
-
-
-
---------------------------------------------------------------------------------
-
-kinsol
-------
-
-
-
-KINSOL interface from the Sundials suite
-
->List of available options
-
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| abstol          | OT_REAL         | 0.000           | Stopping        |
-|                 |                 |                 | criterion       |
-|                 |                 |                 | tolerance       |
-+-----------------+-----------------+-----------------+-----------------+
-| disable_interna | OT_BOOLEAN      | false           | Disable KINSOL  |
-| l_warnings      |                 |                 | internal        |
-|                 |                 |                 | warning         |
-|                 |                 |                 | messages        |
-+-----------------+-----------------+-----------------+-----------------+
-| exact_jacobian  | OT_BOOLEAN      | true            |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| f_scale         | OT_REALVECTOR   |                 |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| iterative_solve | OT_STRING       | \"gmres\"         | gmres|bcgstab|t |
-| r               |                 |                 | fqmr            |
-+-----------------+-----------------+-----------------+-----------------+
-| linear_solver_t | OT_STRING       | \"dense\"         | dense|banded|it |
-| ype             |                 |                 | erative|user_de |
-|                 |                 |                 | fined           |
-+-----------------+-----------------+-----------------+-----------------+
-| lower_bandwidth | OT_INTEGER      |                 |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| max_iter        | OT_INTEGER      | 0               | Maximum number  |
-|                 |                 |                 | of Newton       |
-|                 |                 |                 | iterations.     |
-|                 |                 |                 | Putting 0 sets  |
-|                 |                 |                 | the default     |
-|                 |                 |                 | value of        |
-|                 |                 |                 | KinSol.         |
-+-----------------+-----------------+-----------------+-----------------+
-| max_krylov      | OT_INTEGER      | 0               |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| pretype         | OT_STRING       | \"none\"          | (none|left|righ |
-|                 |                 |                 | t|both)         |
-+-----------------+-----------------+-----------------+-----------------+
-| strategy        | OT_STRING       | \"none\"          | Globalization   |
-|                 |                 |                 | strategy (none| |
-|                 |                 |                 | linesearch)     |
-+-----------------+-----------------+-----------------+-----------------+
-| u_scale         | OT_REALVECTOR   |                 |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| upper_bandwidth | OT_INTEGER      |                 |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| use_preconditio | OT_BOOLEAN      | false           | precondition an |
-| ner             |                 |                 | iterative       |
-|                 |                 |                 | solver          |
-+-----------------+-----------------+-----------------+-----------------+
-
->List of available monitors
-
-+-----------+
-|    Id     |
-+===========+
-| eval_djac |
-+-----------+
-| eval_f    |
-+-----------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-nlp
----
-
-
-
-Use an NlpSolver as ImplicitFunction solver
-
->List of available options
-
-+----+------+---------+-------------+
-| Id | Type | Default | Description |
-+====+======+=========+=============+
-+----+------+---------+-------------+
-
->List of available stats
-
-+--------------+
-|      Id      |
-+==============+
-| solver_stats |
-+--------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-newton
-------
-
-
-
-Implements simple newton iterations to solve an implicit function.
-
->List of available options
-
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| abstol          | OT_REAL         | 0.000           | Stopping        |
-|                 |                 |                 | criterion       |
-|                 |                 |                 | tolerance on    |
-|                 |                 |                 | max(|F|)        |
-+-----------------+-----------------+-----------------+-----------------+
-| abstolStep      | OT_REAL         | 0.000           | Stopping        |
-|                 |                 |                 | criterion       |
-|                 |                 |                 | tolerance on    |
-|                 |                 |                 | step size       |
-+-----------------+-----------------+-----------------+-----------------+
-| max_iter        | OT_INTEGER      | 1000            | Maximum number  |
-|                 |                 |                 | of Newton       |
-|                 |                 |                 | iterations to   |
-|                 |                 |                 | perform before  |
-|                 |                 |                 | returning.      |
-+-----------------+-----------------+-----------------+-----------------+
-| print_iteration | OT_BOOLEAN      | false           | Print           |
-|                 |                 |                 | information     |
-|                 |                 |                 | about each      |
-|                 |                 |                 | iteration       |
-+-----------------+-----------------+-----------------+-----------------+
-
->List of available monitors
-
-+----------+
-|    Id    |
-+==========+
-| F        |
-+----------+
-| J        |
-+----------+
-| normF    |
-+----------+
-| step     |
-+----------+
-| stepsize |
-+----------+
-
->List of available stats
-
-+---------------+
-|      Id       |
-+===============+
-| iter          |
-+---------------+
-| return_status |
-+---------------+
-
---------------------------------------------------------------------------------
-
-
-
-Joel Andersson
-Diagrams
---------
-
-
-
-C++ includes: implicit_function.hpp ";
-
-%feature("docstring") casadi::ImplicitFunction::callForward "
-
-Create call to (cached) derivative function, forward mode.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::call "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional.
-
-derivatives forward or backward (for usage, see the example
-propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::free_mx "
-
-Get all the free variables of the function.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getAtomicOperation "
-
-Get an atomic operation operator index.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::rfp_solver_linsol "
-
-Access linear solver of a root-finding problem solver.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getOptionDefault "
-
-Get the default of a certain option.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::size_in "
-
-Get input dimension.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getOptionDescription "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::ImplicitFunction "
-
->  ImplicitFunction()
-------------------------------------------------------------------------
-
-Default constructor.
-
->  ImplicitFunction(str name, str solver, Function f, Dict opts=Dict())
-------------------------------------------------------------------------
-
-Create an implicit function solver (new syntax, includes initialization)
-
-Parameters:
------------
-
-solver:
-
-Name of a solver. It might be one of:
-
-- kinsol
-
-- nlp
-
-- newton
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-ImplicitFunction.doc(\"myextraplugin\")
-
-f:   Function where one of the inputs (by default the first) is an unknown
-and one of the outputs (by default the first) is a residual.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::nlp_solver_gradf "
-
-Access the objective gradient function for an NLP solver
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::setDerReverse "
-
-Set a function that calculates nadj adjoint derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::nnz_in "
-
-Get of number of input nonzeros For a particular input or for all for all of
-the inputs.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::sparsity_out "
-
-Get sparsity of a given output.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::size_out "
-
-Get output dimension.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::setInput "
-
->  void IOInterface< Function  >.setInput(T val, int iind=0)
-------------------------------------------------------------------------
-
-Set an input by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iind:  index within the range [0..n_in()-1]
-
->  void IOInterface< Function  >.setInput(T val, str iname)
-------------------------------------------------------------------------
-
-Set an input by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::repr "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::sz_arg "[INTERNAL]  Get
-required length of arg field.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::name_in "
-
->  [str] Function.name_in() const 
-------------------------------------------------------------------------
-
-Get input scheme.
-
->  str Function.name_in(int ind) const 
-------------------------------------------------------------------------
-
-Get input scheme name by index.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::free_sx "
-
-Get all the free variables of the function.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::is_a "
-
-Check if the function is of a particular type Optionally check if name
-matches one of the base classes (default true)
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::setOutput "
-
->  void IOInterface< Function  >.setOutput(T val, int oind=0)
-------------------------------------------------------------------------
-
-Set an output by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oind:  index within the range [0..n_out()-1]
-
->  void IOInterface< Function  >.setOutput(T val, str oname)
-------------------------------------------------------------------------
-
-Set an output by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::nlp_solver_jacg "
-
-Access the Hessian of the Lagrangian function for an NLP solver.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::integrator_dae "
-
-Get the DAE for an integrator.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::generate "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::sx_out "
-
-Get symbolic primitives equivalent to the output expressions.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::setJacobian "
-
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::map "
-
->  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
-
->  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
-------------------------------------------------------------------------
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
->  Function Function.map(str name, int N, Dict options=Dict()) const 
-------------------------------------------------------------------------
-
-Create a mapped version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (a, p) -> ( s )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (A, P) -> (S )
-  
-      with
-          a: horzcat([a0, a1, ..., a_(N-1)])
-          p: horzcat([p0, p1, ..., p_(N-1)])
-          s: horzcat([s0, s1, ..., s_(N-1)])
-      and
-          s0 <- f(a0, p0)
-          s1 <- f(a1, p1)
-          ...
-          s_(N-1) <- f(a_(N-1), p_(N-1))
-  
-
-
-
->  Function Function.map(str name, int n, [bool ] repeat_in, [bool ] repeat_out, Dict opts=Dict()) const 
-------------------------------------------------------------------------
-
-Generic map.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::sparsity_in "
-
-Get sparsity of a given input.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::derReverse "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::nnz_out "
-
-Get of number of output nonzeros For a particular output or for all for all
-of the outputs.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::setDerForward "
-
-Set a function that calculates nfwd forward derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::sz_res "[INTERNAL]  Get
-required length of res field.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getAtomicOutput "
-
-Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::index_out "
-
-Find the index for a string describing a particular entry of an output
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::default_in "
-
-Get default input value (NOTE: constant reference)
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getOptionNames "
-
-Get a list of all option names.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::name_out "
-
->  [str] Function.name_out() const 
-------------------------------------------------------------------------
-
-Get output scheme.
-
->  str Function.name_out(int ind) const 
-------------------------------------------------------------------------
-
-Get output scheme name by index.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::jacobian "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getOptionTypeName "
-
-Get the type name of a certain option.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::setOptionByEnumValue "[INTERNAL]  Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getAlgorithmSize "
-
-Get the number of atomic operations.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::setJacSparsity "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::derForward "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nfwd*n_in inputs correspond to forward seeds, one direction at a time The
-nfwd*n_out outputs correspond to forward sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::rfp_solver_fun "
-
-Access integrator of a root-finding problem solver.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::printOptions "
-
-Print options to a stream.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::evaluate "
-
-Evaluate.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::dictionary "
-
-Get the dictionary.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::index_in "
-
-Find the index for a string describing a particular entry of an input
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::isNull "
-
-Is a null pointer?
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::addMonitor "
-
-Add modules to be monitored.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getWorkSize "
-
-Get the length of the work vector.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::mx_in "
-
-Get symbolic primitives equivalent to the input expressions.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::kernel_sum "
-
-kernel_sum Consider a dense matrix V.
-
-KernelSum computes
-
-F(V,X) = sum_i sum_j f ( [i;j], V(i,j), X)
-
-with X: [x;y]
-
-where the summation is taken for all entries (i,j) that are a distance r
-away from X.
-
-This function assumes that V is fixed: sensitivities with respect to it are
-not computed.
-
-This allows for improved speed of evaluation.
-
-Having V fixed is a common use case: V may be a large bitmap (observation),
-onto which a kernel is fitted.
-
-Joris Gillis
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::printPtr "[INTERNAL]  Print
-the pointer to the internal class
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::nlp_solver_hesslag "
-
-Access the Jacobian of the constraint function for an NLP solver.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::sz_iw "[INTERNAL]  Get
-required length of iw field.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::sz_w "[INTERNAL]  Get
-required length of w field.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
-values.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getRepresentation "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::gradient "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::mapaccum "
-
-Create a mapaccumulated version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (x, u) -> (x_next , y )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (x0, U) -> (X , Y )
-  
-      with
-          U: horzcat([u0, u1, ..., u_(N-1)])
-          X: horzcat([x1, x2, ..., x_N])
-          Y: horzcat([y0, y1, ..., y_(N-1)])
-  
-      and
-          x1, y0 <- f(x0, u0)
-          x2, y1 <- f(x1, u1)
-          ...
-          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
-  
-
-
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getAtomicInputReal "
-
-Get the floating point output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getSanitizedName "
-
-get function name with all non alphanumeric characters converted to '_'
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::size2_out "
-
-Get output dimension.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::nlp_solver_nlp "
-
-Access the NLP for an NLP solver.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::numel_in "
-
-Get of number of input elements For a particular input or for all for all of
-the inputs.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::callReverse "
-
-Create call to (cached) derivative function, reverse mode.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::fullJacobian "
-
-Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::numel_out "
-
-Get of number of output elements For a particular output or for all for all
-of the outputs.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getOptionEnumValue "[INTERNAL]  Get the enum value corresponding to th certain option.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::copyOptions "
-
-Copy all options from another object.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::callDerivative "[INTERNAL]
-Evaluate the function symbolically or numerically with directional
-derivatives The first two arguments are the nondifferentiated inputs and
-results of the evaluation, the next two arguments are a set of forward
-directional seeds and the resulting forward directional derivatives, the
-length of the vector being the number of forward directions. The next two
-arguments are a set of adjoint directional seeds and the resulting adjoint
-directional derivatives, the length of the vector being the number of
-adjoint directions.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::getStats "
-
-Get all statistics obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::size1_in "
-
-Get input dimension.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::description_in "
-
-Get input scheme description by index.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::sx_in "
-
-Get symbolic primitives equivalent to the input expressions.
-
-";
 
 
 // File: classcasadi_1_1InfSX.xml
@@ -7873,6 +6398,12 @@ Get symbolic primitives equivalent to the input expressions.
 
 ";
 
+%feature("docstring") casadi::Integrator::size1_out "
+
+Get output dimension.
+
+";
+
 %feature("docstring") casadi::Integrator::nnz_in "
 
 Get of number of input nonzeros For a particular input or for all for all of
@@ -8183,9 +6714,23 @@ Generate native code in the interfaced language for debugging
 
 ";
 
-%feature("docstring") casadi::Integrator::size1_out "
+%feature("docstring") casadi::Integrator::rfp_solver "
 
-Get output dimension.
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
 
 ";
 
@@ -8813,6 +7358,41 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
+%feature("docstring") casadi::LinearSolver::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring") casadi::LinearSolver::printDimensions "
 
 Print dimensions of inputs and outputs.
@@ -9311,38 +7891,23 @@ Diagrams
 
 C++ includes: linear_solver.hpp ";
 
-%feature("docstring") casadi::LinearSolver::mapaccum "
+%feature("docstring") casadi::LinearSolver::rfp_solver "
 
-Create a mapaccumulated version of this function.
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
 
-Suppose the function has a signature of:
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
 
-::
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
 
-     f: (x, u) -> (x_next , y )
-  
+By default, the first input is unknown and the first output is the residual.
 
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (x0, U) -> (X , Y )
-  
-      with
-          U: horzcat([u0, u1, ..., u_(N-1)])
-          X: horzcat([x1, x2, ..., x_N])
-          Y: horzcat([y0, y1, ..., y_(N-1)])
-  
-      and
-          x1, y0 <- f(x0, u0)
-          x2, y1 <- f(x1, u1)
-          ...
-          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
-  
-
-
+Joel Andersson
 
 ";
 
@@ -12192,6 +10757,12 @@ get function name with all non alphanumeric characters converted to '_'
 
 %feature("docstring") casadi::NlpSolver::sz_iw "[INTERNAL]  Get required
 length of iw field.
+
+";
+
+%feature("docstring") casadi::NlpSolver::call "
+
+Evaluate the function symbolically or numerically.
 
 ";
 
@@ -16989,9 +15560,23 @@ Get all the free variables of the function.
 
 ";
 
-%feature("docstring") casadi::NlpSolver::call "
+%feature("docstring") casadi::NlpSolver::rfp_solver "
 
-Evaluate the function symbolically or numerically.
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
 
 ";
 
@@ -18862,6 +17447,26 @@ Add modules to be monitored.
 
 ";
 
+%feature("docstring") casadi::QpSolver::rfp_solver "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
+
+";
+
 %feature("docstring") casadi::QpSolver::free_sx "
 
 Get all the free variables of the function.
@@ -19667,6 +18272,26 @@ Get input scheme name by index.
 %feature("docstring") casadi::Simulator::size1_out "
 
 Get output dimension.
+
+";
+
+%feature("docstring") casadi::Simulator::rfp_solver "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
 
 ";
 
