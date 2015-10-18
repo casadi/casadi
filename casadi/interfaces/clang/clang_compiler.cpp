@@ -254,6 +254,14 @@ namespace casadi {
     std::ifstream setup_file(file_name.c_str());
     
     userOut() << "test001c" << std::endl;
+    
+    userOut() << setup_file.is_open() << std::endl;
+    userOut() << setup_file.good() << std::endl;
+    userOut() << setup_file.eof() << std::endl;
+    userOut() << setup_file.fail() << std::endl;
+    userOut() << setup_file.bad() << std::endl;
+    userOut() << setup_file.rdstate() << std::endl;
+
     std::string line;
     userOut() << "test002" << std::endl;
 
@@ -297,7 +305,7 @@ namespace casadi {
       userOut() << "test007" << std::endl;
 
     }
-
+    userOut() << "test008" << std::endl;
     return ret;
   }
 
