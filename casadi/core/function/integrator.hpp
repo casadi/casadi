@@ -228,7 +228,6 @@ namespace casadi {
 
     /// Integrate backward until a specified time point
     void integrateB(double t_out);
-#endif // SWIG
 
     /// Check if a plugin is available
     static bool hasPlugin(const std::string& name);
@@ -238,6 +237,7 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
+#endif // SWIG
 
     /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
      *    and \a nadj adjoint sensitivities

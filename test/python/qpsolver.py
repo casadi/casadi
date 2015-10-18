@@ -29,28 +29,28 @@ from types import *
 from helpers import *
 
 qpsolvers = []
-if NlpSolver.hasPlugin("ipopt"):
+if Function.has_nlp_solver("ipopt"):
   qpsolvers.append(("nlp",{"nlp_solver":"ipopt", "nlp_solver_options": {"tol": 1e-12}},{}))
 
-if NlpSolver.hasPlugin("ipopt"):
+if Function.has_nlp_solver("ipopt"):
   qpsolvers.append(("nlp.ipopt",{"nlp_solver_options": {"tol": 1e-12}},{}))
 
-# if NlpSolver.hasPlugin("worhp") and not args.ignore_memory_heavy:
+# if Function.has_nlp_solver("worhp") and not args.ignore_memory_heavy:
 #   qpsolvers.append(("nlp",{"nlp_solver": "worhp", "nlp_solver_options": {"TolOpti": 1e-12}},{}))
 
-# if NlpSolver.hasPlugin("worhp") and not args.ignore_memory_heavy:
+# if Function.has_nlp_solver("worhp") and not args.ignore_memory_heavy:
 #   qpsolvers.append(("nlp.worhp",{"nlp_solver_options": {"TolOpti": 1e-12}},{}))
 
-# if QpSolver.hasPlugin("ooqp"):
+# if Function.has_qp_solver("ooqp"):
 #   qpsolvers.append(("ooqp",{},{}))
 
-# if QpSolver.hasPlugin("qpoases"):
+# if Function.has_qp_solver("qpoases"):
 #   qpsolvers.append(("qpoases",{},{}))
 
-# if QpSolver.hasPlugin("cplex"):
+# if Function.has_qp_solver("cplex"):
 #   qpsolvers.append(("cplex",{},{}))
 
-# if QpSolver.hasPlugin("sqic"):
+# if Function.has_qp_solver("sqic"):
 #   qpsolvers.append(("sqic",{},{}))
 
 print qpsolvers

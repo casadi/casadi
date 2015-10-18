@@ -581,6 +581,54 @@ class requires(object):
       print "Not available %s, skipping unittests" % self.att
       return None
       
+class requires_qp_solver(object):
+  def __init__(self,n):
+    self.n = n
+  
+  def __call__(self,c):
+    try:
+      Function.load_qp_solver(self.n)
+      return c
+    except:
+      print "Not available QP plugin %s, skipping unittests" % self.n
+      return None
+
+class requires_nlp_solver(object):
+  def __init__(self,n):
+    self.n = n
+  
+  def __call__(self,c):
+    try:
+      Function.load_nlp_solver(self.n)
+      return c
+    except:
+      print "Not available NLP plugin %s, skipping unittests" % self.n
+      return None
+
+class requires_integrator(object):
+  def __init__(self,n):
+    self.n = n
+  
+  def __call__(self,c):
+    try:
+      Function.load_integrator(self.n)
+      return c
+    except:
+      print "Not available integrator plugin %s, skipping unittests" % self.n
+      return None
+
+class requires_rfp_solver(object):
+  def __init__(self,n):
+    self.n = n
+  
+  def __call__(self,c):
+    try:
+      Function.load_rfp_solver(self.n)
+      return c
+    except:
+      print "Not available RFP plugin %s, skipping unittests" % self.n
+      return None
+
 class requiresPlugin(object):
   def __init__(self,att,n):
     self.att = att

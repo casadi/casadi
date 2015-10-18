@@ -29,7 +29,7 @@ from types import *
 from helpers import *
 
 class OCPtests(casadiTestCase):
-  @requiresPlugin(NlpSolver,"ipopt")
+  @requires_nlp_solver("ipopt")
   def testdiscrete(self):
     self.message("Linear-quadratic problem, discrete, using IPOPT")
     # inspired by www.cs.umsl.edu/~janikow/publications/1992/GAforOpt/text.pdf
@@ -72,7 +72,7 @@ class OCPtests(casadiTestCase):
     exact_sol=K * x0**2
     self.assertAlmostEqual(ocp_sol,exact_sol,10,"Linear-quadratic problem solution using IPOPT")
 
-  @requiresPlugin(NlpSolver,"ipopt")
+  @requires_nlp_solver("ipopt")
   def test_singleshooting(self):
     self.message("Single shooting")
     p0 = 0.2
@@ -126,7 +126,7 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[0],0,8,"Constraint is supposed to be unactive")
     self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[1],0,8,"Constraint is supposed to be unactive")
 
-  @requiresPlugin(NlpSolver,"ipopt")
+  @requires_nlp_solver("ipopt")
   def test_singleshooting2(self):
     self.message("Single shooting 2")
     p0 = 0.2

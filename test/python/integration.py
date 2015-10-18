@@ -41,13 +41,13 @@ except:
 integrators = []
 
 try:
-  Integrator.loadPlugin("cvodes")
+  Function.load_integrator("cvodes")
   integrators.append(("cvodes",["ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"quad_err_con": False}))
 except:
   pass
   
 try:
-  Integrator.loadPlugin("idas")
+  Function.load_integrator("idas")
   integrators.append(("idas",["dae","ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"calc_icB":True}))
 except:
   pass
@@ -55,7 +55,7 @@ except:
 integrators.append(("collocation",["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18}))
 
 try:
-  Integrator.loadPlugin("oldcollocation")
+  Function.load_integrator("oldcollocation")
   integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18,"startup_integrator":"idas"}))
   #integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"nlp","number_of_finite_elements": 100,"startup_integrator":"cvodes","implicit_solver_options": {"nlp_solver": "ipopt","linear_solver_creator": "csparse"}}))
 except:

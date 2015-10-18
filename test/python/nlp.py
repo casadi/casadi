@@ -33,18 +33,18 @@ import itertools
 
 solvers= []
  
-if NlpSolver.hasPlugin("worhp")  and not args.ignore_memory_heavy:
+if Function.has_nlp_solver("worhp")  and not args.ignore_memory_heavy:
   solvers.append(("worhp",{"TolOpti":1e-20}))
   #solvers.append(("worhp",{"TolOpti":1e-20,"TolFeas":1e-20,"UserHM": False}))
 
-if NlpSolver.hasPlugin("ipopt"):
+if Function.has_nlp_solver("ipopt"):
   solvers.append(("ipopt",{"tol": 1e-10, "derivative_test":"second-order"}))
   solvers.append(("ipopt",{"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory"}))
 
-if NlpSolver.hasPlugin("snopt"):
+if Function.has_nlp_solver("snopt"):
   solvers.append(("snopt",{"Verify level": 3,"detect_linear": True,"Major optimality tolerance":1e-12,"Minor feasibility tolerance":1e-12,"Major feasibility tolerance":1e-12}))
 
-if NlpSolver.hasPlugin("ipopt") and NlpSolver.hasPlugin("sqpmethod"):
+if Function.has_nlp_solver("ipopt") and Function.has_nlp_solver("sqpmethod"):
   qp_solver_options = {"nlp_solver": "ipopt", "nlp_solver_options": {"tol": 1e-12} }
   solvers.append(("sqpmethod",{"qp_solver": "nlp","qp_solver_options": qp_solver_options}))
   solvers.append(("sqpmethod",{"qp_solver": "nlp","qp_solver_options": qp_solver_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
@@ -52,7 +52,7 @@ if NlpSolver.hasPlugin("ipopt") and NlpSolver.hasPlugin("sqpmethod"):
 print solvers
 """
 try:
-  NlpSolver.loadPlugin("knitro")
+  Function.load_nlp_solver("knitro")
   solvers.append(("knitro",{}))
   print "Will test knitro"
 except:
@@ -1015,7 +1015,7 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options in solvers:
       solver = NlpSolver("mysolver", Solver, nlp,solver_options)
       
-  @requiresPlugin(NlpSolver,"snopt")
+  @requires_nlp_solver("snopt")
   def test_permute(self):
     for Solver, solver_options in solvers:
       if "snopt" not in str(Solver): continue
@@ -1059,7 +1059,7 @@ class NLPtests(casadiTestCase):
           self.checkarray(solver.getOutput("lam_g"),DMatrix([1.9000124997534527e+01,-5,0])[permute_g],digits=7)
           self.checkarray(solver.getOutput("g"),DMatrix([2,4,5.5085524702939])[permute_g],digits=7)
 
-  @requiresPlugin(NlpSolver,"snopt")
+  @requires_nlp_solver("snopt")
   def test_permute2(self):
     for Solver, solver_options in solvers:
       if "snopt" not in str(Solver): continue
@@ -1099,7 +1099,7 @@ class NLPtests(casadiTestCase):
           self.checkarray(solver.getOutput("lam_g"),DMatrix([0,0,0])[permute_g],digits=3)
           #self.checkarray(solver.getOutput("g"),DMatrix([2,4,5.50855])[permute_g])
 
-  @requiresPlugin(NlpSolver,"snopt")
+  @requires_nlp_solver("snopt")
   def test_permute3(self):
     for Solver, solver_options in solvers:
       if "snopt" not in str(Solver): continue
@@ -1138,7 +1138,7 @@ class NLPtests(casadiTestCase):
           self.checkarray(solver.getOutput("lam_g"),DMatrix([-8.0593503860219973e-01,6.52750754744e-10,-0.298516240384])[permute_g],failmessage=str(permute_x)+str(permute_g),digits=8)
           #self.checkarray(solver.getOutput("g"),DMatrix([2,4,5.50855])[permute_g])
         
-  @requiresPlugin(NlpSolver,"snopt")
+  @requires_nlp_solver("snopt")
   def test_classifications(self):      
     x=SX.sym("x")
     y=SX.sym("y")

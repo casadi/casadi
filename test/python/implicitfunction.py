@@ -31,13 +31,13 @@ from helpers import *
 solvers= []
 try:
   LinearSolver.loadPlugin("csparse")
-  ImplicitFunction.loadPlugin("kinsol")
+  Function.load_rfp_solver("kinsol")
   solvers.append(("kinsol",{"linear_solver": "csparse","abstol":1e-10}))
 except:
   pass
 try:
   LinearSolver.loadPlugin("csparse")
-  NlpSolver.loadPlugin("ipopt")
+  Function.load_nlp_solver("ipopt")
   solvers.append(("nlp",{"linear_solver": "csparse", "nlp_solver": "ipopt"}))
 except:
   pass

@@ -273,7 +273,7 @@ class Misctests(casadiTestCase):
       assert "std" not in e.message
 
     try:
-      NlpSolver.loadPlugin(132)
+      Function.load_nlp_solver(132)
       self.assertTrue(False)
     except TypeError as e:
       print e.message
