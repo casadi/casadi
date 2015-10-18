@@ -113,9 +113,9 @@ namespace casadi {
       return st_[QP_STRUCT_A];
     case QP_SOLVER_H:
       return st_[QP_STRUCT_H];
-    case QP_SOLVER_NUM_IN:
-      return Sparsity();
+    case QP_SOLVER_NUM_IN: break;
     }
+    return Sparsity();
   }
 
   Sparsity QpSolverInternal::get_sparsity_out(int ind) const {
@@ -127,9 +127,9 @@ namespace casadi {
       return Sparsity::dense(n_, 1);
     case QP_SOLVER_LAM_A:
       return Sparsity::dense(nc_, 1);
-    case QP_SOLVER_NUM_OUT:
-      return Sparsity();
+    case QP_SOLVER_NUM_OUT: break;
     }
+    return Sparsity();
   }
 
   void QpSolverInternal::init() {

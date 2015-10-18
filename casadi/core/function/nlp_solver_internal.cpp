@@ -110,9 +110,9 @@ namespace casadi {
       return get_sparsity_out(NLP_SOLVER_G);
     case NLP_SOLVER_P:
       return get_sparsity_out(NLP_SOLVER_P);
-    case NLP_SOLVER_NUM_IN:
-      return Sparsity();
+    case NLP_SOLVER_NUM_IN: break;
     }
+    return Sparsity();
   }
 
   Sparsity NlpSolverInternal::get_sparsity_out(int ind) const {
@@ -127,9 +127,9 @@ namespace casadi {
       return nlp_.sparsity_out(NL_G);
     case NLP_SOLVER_LAM_P:
       return nlp_.sparsity_in(NL_P);
-    case NLP_SOLVER_NUM_OUT:
-      return Sparsity();
+    case NLP_SOLVER_NUM_OUT: break;
     }
+    return Sparsity();
   }
 
   void NlpSolverInternal::init() {

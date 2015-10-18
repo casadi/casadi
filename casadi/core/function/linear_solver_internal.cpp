@@ -72,18 +72,18 @@ namespace casadi {
       return sparsity_;
     case LINSOL_B:
       return Sparsity::dense(sparsity_.size2(), nrhs_);
-    case LINSOL_NUM_IN:
-      return Sparsity();
+    case LINSOL_NUM_IN: break;
     }
+    return Sparsity();
   }
 
   Sparsity LinearSolverInternal::get_sparsity_out(int ind) const {
     switch (static_cast<LinsolOutput>(ind)) {
     case LINSOL_X:
       return sparsity_;
-    case LINSOL_NUM_OUT:
-      return Sparsity();
+    case LINSOL_NUM_OUT: break;
     }
+    return Sparsity();
   }
 
   void LinearSolverInternal::init() {
