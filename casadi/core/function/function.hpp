@@ -1018,6 +1018,43 @@ namespace casadi {
      */
     static Function external(const std::string& name, const Compiler& compiler,
                              const Dict& opts=Dict());
+
+
+    /// Check if an integrator plugin is available
+    static bool has_integrator(const std::string& name);
+
+    /// Explicitly load an integrator plugin dynamically
+    static void load_integrator(const std::string& name);
+
+    /// Get documentation for an integrator plugin
+    static std::string doc_integrator(const std::string& name);
+
+    /// Check if a QP solver plugin is available
+    static bool has_qp_solver(const std::string& name);
+
+    /// Explicitly load a QP solver plugin dynamically
+    static void load_qp_solver(const std::string& name);
+
+    /// Get documentation for a QP solver plugin
+    static std::string doc_qp_solver(const std::string& name);
+
+    /// Check if an NLP solver plugin is available
+    static bool has_nlp_solver(const std::string& name);
+
+    /// Explicitly load an NLP solver plugin dynamically
+    static void load_nlp_solver(const std::string& name);
+
+    /// Get documentation for an NLP solver plugin
+    static std::string doc_nlp_solver(const std::string& name);
+
+    /// Check if a RFP solver plugin is available
+    static bool has_rfp_solver(const std::string& name);
+
+    /// Explicitly load an RFP solver plugin dynamically
+    static void load_rfp_solver(const std::string& name);
+
+    /// Get documentation for an RFP solver plugin
+    static std::string doc_rfp_solver(const std::string& name);
   };
 
 } // namespace casadi

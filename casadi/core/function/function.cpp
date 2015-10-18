@@ -30,6 +30,10 @@
 #include "external_function_internal.hpp"
 #include "switch_internal.hpp"
 #include "kernel_sum_2d_internal.hpp"
+#include "integrator.hpp"
+#include "qp_solver.hpp"
+#include "nlp_solver.hpp"
+#include "implicit_function.hpp"
 
 #include <typeinfo>
 
@@ -1247,6 +1251,54 @@ namespace casadi {
     ret.setOption(opts);
     ret.init();
     return ret;
+  }
+
+  bool Function::has_integrator(const std::string& name) {
+    return Integrator::hasPlugin(name);
+  }
+
+  void Function::load_integrator(const std::string& name) {
+    Integrator::loadPlugin(name);
+  }
+
+  std::string Function::doc_integrator(const std::string& name) {
+    return Integrator::doc(name);
+  }
+
+  bool Function::has_qp_solver(const std::string& name) {
+    return QpSolver::hasPlugin(name);
+  }
+
+  void Function::load_qp_solver(const std::string& name) {
+    QpSolver::loadPlugin(name);
+  }
+
+  std::string Function::doc_qp_solver(const std::string& name) {
+    return QpSolver::doc(name);
+  }
+
+  bool Function::has_nlp_solver(const std::string& name) {
+    return NlpSolver::hasPlugin(name);
+  }
+
+  void Function::load_nlp_solver(const std::string& name) {
+    NlpSolver::loadPlugin(name);
+  }
+
+  std::string Function::doc_nlp_solver(const std::string& name) {
+    return NlpSolver::doc(name);
+  }
+
+  bool Function::has_rfp_solver(const std::string& name) {
+    return ImplicitFunction::hasPlugin(name);
+  }
+
+  void Function::load_rfp_solver(const std::string& name) {
+    ImplicitFunction::loadPlugin(name);
+  }
+
+  std::string Function::doc_rfp_solver(const std::string& name) {
+    return ImplicitFunction::doc(name);
   }
 
 } // namespace casadi
