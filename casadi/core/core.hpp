@@ -52,7 +52,6 @@
 #include "function/simulator.hpp"
 #include "function/qp_solver.hpp"
 #include "function/stabilized_qp_solver.hpp"
-#include "function/nullspace.hpp"
 
 // Misc
 #include "misc/integration_tools.hpp"
