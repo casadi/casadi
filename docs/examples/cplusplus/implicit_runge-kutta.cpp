@@ -125,7 +125,7 @@ int main(){
   Function vfcn_sx = SX::fun("vfcn", vfcn);
 
   // Create a implicit function instance to solve the system of equations
-  ImplicitFunction ifcn("ifcn", "newton", vfcn_sx, Dict{{"linear_solver", "csparse"}});
+  Function ifcn = vfcn_sx.rfp_solver("ifcn", "newton", {{"linear_solver", "csparse"}});
   vector<MX> ifcn_arg = {MX(), X0, P};
   V = ifcn(ifcn_arg).front();
   X.resize(1);

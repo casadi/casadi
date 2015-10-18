@@ -47,7 +47,6 @@
 #include "function/linear_solver.hpp"
 #include "function/nlp_solver.hpp"
 #include "function/integrator.hpp"
-#include "function/implicit_function.hpp"
 #include "function/callback.hpp"
 #include "function/simulator.hpp"
 #include "function/qp_solver.hpp"

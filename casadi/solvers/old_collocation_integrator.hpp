@@ -27,7 +27,6 @@
 #define CASADI_OLD_COLLOCATION_INTEGRATOR_HPP
 
 #include "casadi/core/function/integrator_internal.hpp"
-#include "casadi/core/function/implicit_function.hpp"
 #include "casadi/core/misc/integration_tools.hpp"
 #include <casadi/solvers/casadi_integrator_oldcollocation_export.h>
 
@@ -96,7 +95,7 @@ namespace casadi {
     Integrator startup_integrator_;
 
     // Implicit function solver
-    ImplicitFunction implicit_solver_;
+    Function implicit_solver_;
 
     // With hotstart
     bool hotstart_;

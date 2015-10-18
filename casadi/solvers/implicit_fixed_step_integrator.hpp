@@ -27,7 +27,6 @@
 #define CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_HPP
 
 #include "fixed_step_integrator.hpp"
-#include "casadi/core/function/implicit_function.hpp"
 #include <casadi/solvers/casadi_integrators_export.h>
 
 /// \cond INTERNAL
@@ -59,7 +58,7 @@ namespace casadi {
     virtual Function& getExplicitB() { return backward_implicit_solver_;}
 
     // Implicit function solver
-    ImplicitFunction implicit_solver_, backward_implicit_solver_;
+    Function implicit_solver_, backward_implicit_solver_;
 
   };
 

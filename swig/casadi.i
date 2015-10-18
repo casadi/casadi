@@ -3568,7 +3568,6 @@ namespace casadi {
 
 %include <casadi/core/function/compiler.hpp>
 %include <casadi/core/function/linear_solver.hpp>
-%include <casadi/core/function/implicit_function.hpp>
 %include <casadi/core/function/integrator.hpp>
 %include <casadi/core/function/simulator.hpp>
 %include <casadi/core/function/nlp_solver.hpp>

@@ -24,7 +24,6 @@
 
 
 #include "integration_tools.hpp"
-#include "casadi/core/function/implicit_function.hpp"
 #include "casadi/core/function/integrator.hpp"
 
 #include <vector>
@@ -292,7 +291,7 @@ namespace casadi {
     Function rfp = MX::fun("rfp", {v, x0, p, h}, {vertcat(V_eq)});
 
     // Create a implicit function instance to solve the system of equations
-    ImplicitFunction ifcn("ifcn", solver, rfp, solver_options);
+    Function ifcn = rfp.rfp_solver("ifcn", solver, solver_options);
 
     // Get state at end time
     MX xf = x0;

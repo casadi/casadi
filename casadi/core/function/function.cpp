@@ -1290,15 +1290,15 @@ namespace casadi {
   }
 
   bool Function::has_rfp_solver(const std::string& name) {
-    return ImplicitFunction::hasPlugin(name);
+    return ImplicitFunctionInternal::hasPlugin(name);
   }
 
   void Function::load_rfp_solver(const std::string& name) {
-    ImplicitFunction::loadPlugin(name);
+    ImplicitFunctionInternal::loadPlugin(name);
   }
 
   std::string Function::doc_rfp_solver(const std::string& name) {
-    return ImplicitFunction::doc(name);
+    return ImplicitFunctionInternal::getPlugin(name).doc;
   }
 
   Function Function::rfp_solver_fun() {
@@ -1368,6 +1368,15 @@ namespace casadi {
     const QpSolverInternal* n = dynamic_cast<const QpSolverInternal*>(get());
     casadi_assert_message(n!=0, "Not a QP solver");
     return n->generateNativeCode(file);
+  }
+
+  Function Function::rfp_solver(const std::string& name, const std::string& solver,
+                                const Dict& opts) const {
+    Function ret;
+    ret.assignNode(ImplicitFunctionInternal::instantiatePlugin(name, solver, *this));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
   }
 
 } // namespace casadi

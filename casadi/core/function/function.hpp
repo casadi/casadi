@@ -1047,6 +1047,29 @@ namespace casadi {
     /// Get documentation for an NLP solver plugin
     static std::string doc_nlp_solver(const std::string& name);
 
+    ///@{
+    /** Create a solver for rootfinding problems
+     * Takes a function where one of the inputs is unknown and one of the outputs
+     * is a residual function that is always zero, defines a new function where
+     * the the unknown input has been replaced by a _guess_ for the unknown and the
+     * residual output has been replaced by the calculated value for the input.
+     *
+     * For a function
+     * [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm),
+     * where xj is unknown and yi=0, defines a new function
+     * [y0, y1, ...,xj, .., yn] = G(x0, x1, ..., xj_guess, ..., xm),
+     *
+     * xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+     *
+     * By default, the first input is unknown and the first output is the residual.
+     *
+     * \author Joel Andersson
+     * \date 2011-2015
+     */
+    Function rfp_solver(const std::string& name, const std::string& solver,
+                        const Dict& opts=Dict()) const;
+    ///@}
+
     /// Check if a RFP solver plugin is available
     static bool has_rfp_solver(const std::string& name);
 

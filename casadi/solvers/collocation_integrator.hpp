@@ -27,7 +27,6 @@
 #define CASADI_COLLOCATION_INTEGRATOR_HPP
 
 #include "implicit_fixed_step_integrator.hpp"
-#include "casadi/core/function/implicit_function.hpp"
 #include "casadi/core/misc/integration_tools.hpp"
 #include <casadi/solvers/casadi_integrator_collocation_export.h>
 

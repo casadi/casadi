@@ -92,7 +92,7 @@ set(CASADI_SRCS
   function/mx_function_internal.hpp         function/mx_function_internal.cpp
   function/external_function_internal.hpp   function/external_function_internal.cpp
   function/linear_solver.hpp       function/linear_solver.cpp       function/linear_solver_internal.hpp       function/linear_solver_internal.cpp
-  function/implicit_function.hpp   function/implicit_function.cpp   function/implicit_function_internal.hpp   function/implicit_function_internal.cpp
+  function/implicit_function_internal.hpp   function/implicit_function_internal.cpp
   function/integrator.hpp          function/integrator.cpp          function/integrator_internal.hpp          function/integrator_internal.cpp
   function/nlp_solver.hpp          function/nlp_solver.cpp          function/nlp_solver_internal.hpp          function/nlp_solver_internal.cpp
   function/simulator.hpp           function/simulator.cpp           function/simulator_internal.hpp           function/simulator_internal.cpp

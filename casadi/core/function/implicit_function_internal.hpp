@@ -26,7 +26,6 @@
 #ifndef CASADI_IMPLICIT_FUNCTION_INTERNAL_HPP
 #define CASADI_IMPLICIT_FUNCTION_INTERNAL_HPP
 
-#include "implicit_function.hpp"
 #include "function_internal.hpp"
 #include "linear_solver.hpp"
 #include "plugin_interface.hpp"
