@@ -1289,36 +1289,36 @@ namespace casadi {
     return NlpSolver::doc(name);
   }
 
-  bool Function::has_rfp_solver(const std::string& name) {
+  bool Function::has_rootfinder(const std::string& name) {
     return ImplicitFunctionInternal::hasPlugin(name);
   }
 
-  void Function::load_rfp_solver(const std::string& name) {
+  void Function::load_rootfinder(const std::string& name) {
     ImplicitFunctionInternal::loadPlugin(name);
   }
 
-  std::string Function::doc_rfp_solver(const std::string& name) {
+  std::string Function::doc_rootfinder(const std::string& name) {
     return ImplicitFunctionInternal::getPlugin(name).doc;
   }
 
-  Function Function::rfp_solver_fun() {
+  Function Function::rootfinder_fun() {
     casadi_assert(!isNull());
     ImplicitFunctionInternal* n = dynamic_cast<ImplicitFunctionInternal*>(get());
-    casadi_assert_message(n!=0, "Not a RFP solver");
+    casadi_assert_message(n!=0, "Not a rootfinder");
     return n->f_;
   }
 
-  Function Function::rfp_solver_jac() {
+  Function Function::rootfinder_jac() {
     casadi_assert(!isNull());
     ImplicitFunctionInternal* n = dynamic_cast<ImplicitFunctionInternal*>(get());
-    casadi_assert_message(n!=0, "Not a RFP solver");
+    casadi_assert_message(n!=0, "Not a rootfinder");
     return n->jac_;
   }
 
-  LinearSolver Function::rfp_solver_linsol() {
+  LinearSolver Function::rootfinder_linsol() {
     casadi_assert(!isNull());
     ImplicitFunctionInternal* n = dynamic_cast<ImplicitFunctionInternal*>(get());
-    casadi_assert_message(n!=0, "Not a RFP solver");
+    casadi_assert_message(n!=0, "Not a rootfinder");
     return n->linsol_;
   }
 
@@ -1370,7 +1370,7 @@ namespace casadi {
     return n->generateNativeCode(file);
   }
 
-  Function Function::rfp_solver(const std::string& name, const std::string& solver,
+  Function Function::rootfinder(const std::string& name, const std::string& solver,
                                 const Dict& opts) const {
     Function ret;
     ret.assignNode(ImplicitFunctionInternal::instantiatePlugin(name, solver, *this));

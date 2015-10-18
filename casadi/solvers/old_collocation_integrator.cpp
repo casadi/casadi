@@ -368,7 +368,7 @@ namespace casadi {
 
     // Allocate a root-finding solver
     implicit_solver_ =
-      ifcn.rfp_solver("collocation_implicitsolver_" + name_, getOption("implicit_solver"),
+      ifcn.rootfinder("collocation_implicitsolver_" + name_, getOption("implicit_solver"),
                       implicit_solver_options);
 
     if (hasSetOption("startup_integrator")) {

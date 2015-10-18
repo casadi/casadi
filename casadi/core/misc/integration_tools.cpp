@@ -291,7 +291,7 @@ namespace casadi {
     Function rfp = MX::fun("rfp", {v, x0, p, h}, {vertcat(V_eq)});
 
     // Create a implicit function instance to solve the system of equations
-    Function ifcn = rfp.rfp_solver("ifcn", solver, solver_options);
+    Function ifcn = rfp.rootfinder("ifcn", solver, solver_options);
 
     // Get state at end time
     MX xf = x0;

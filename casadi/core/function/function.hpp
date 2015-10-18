@@ -1066,27 +1066,27 @@ namespace casadi {
      * \author Joel Andersson
      * \date 2011-2015
      */
-    Function rfp_solver(const std::string& name, const std::string& solver,
+    Function rootfinder(const std::string& name, const std::string& solver,
                         const Dict& opts=Dict()) const;
     ///@}
 
-    /// Check if a RFP solver plugin is available
-    static bool has_rfp_solver(const std::string& name);
+    /// Check if a rootfinder plugin is available
+    static bool has_rootfinder(const std::string& name);
 
-    /// Explicitly load an RFP solver plugin dynamically
-    static void load_rfp_solver(const std::string& name);
+    /// Explicitly load a rootfinder plugin dynamically
+    static void load_rootfinder(const std::string& name);
 
-    /// Get documentation for an RFP solver plugin
-    static std::string doc_rfp_solver(const std::string& name);
+    /// Get documentation for a rootfinder
+    static std::string doc_rootfinder(const std::string& name);
 
-    /// Access integrator of a root-finding problem solver
-    Function rfp_solver_fun();
+    /// Access rhs function for a rootfinder
+    Function rootfinder_fun();
 
-    /// Access Jacobian of a root-finding problem solver
-    Function rfp_solver_jac();
+    /// Access Jacobian of the ths function for a rootfinder
+    Function rootfinder_jac();
 
-    /// Access linear solver of a root-finding problem solver
-    LinearSolver rfp_solver_linsol();
+    /// Access linear solver of a rootfinder
+    LinearSolver rootfinder_linsol();
 
     /// Get the DAE for an integrator
     Function integrator_dae();

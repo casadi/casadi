@@ -617,13 +617,13 @@ class requires_integrator(object):
       print "Not available integrator plugin %s, skipping unittests" % self.n
       return None
 
-class requires_rfp_solver(object):
+class requires_rootfinder(object):
   def __init__(self,n):
     self.n = n
   
   def __call__(self,c):
     try:
-      Function.load_rfp_solver(self.n)
+      Function.load_rootfinder(self.n)
       return c
     except:
       print "Not available RFP plugin %s, skipping unittests" % self.n

@@ -44,6 +44,6 @@ def loadAllCompiledPlugins():
     elif cls=='QpSolver':
       casadi.Function.load_qp_solver(name)
     elif cls=='ImplicitFunction':
-      casadi.Function.load_rfp_solver(name)
+      casadi.Function.load_rootfinder(name)
     else:
       getattr(casadi,cls).loadPlugin(name)
