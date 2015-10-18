@@ -37,4 +37,13 @@ def loadAllCompiledPlugins():
   for k in CasadiMeta.getPlugins().split(";"):
     cls, name = k.split("::")
     print "Testing: ", cls, name
-    getattr(casadi,cls).loadPlugin(name)
+    if cls=='Integrator':
+      casadi.Function.load_integrator(name)
+    elif cls=='NlpSolver':
+      casadi.Function.load_nlp_solver(name)
+    elif cls=='QpSolver':
+      casadi.Function.load_qp_solver(name)
+    elif cls=='ImplicitFunction':
+      casadi.Function.load_rfp_solver(name)
+    else:
+      getattr(casadi,cls).loadPlugin(name)
