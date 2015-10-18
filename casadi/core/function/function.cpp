@@ -29,6 +29,7 @@
 #include "mapaccum_internal.hpp"
 #include "external_function_internal.hpp"
 #include "switch_internal.hpp"
+#include "kernel_sum_2d_internal.hpp"
 
 #include <typeinfo>
 
@@ -350,6 +351,18 @@ namespace casadi {
                              const Function& f_false, const Dict& opts) {
     Function ret;
     ret.assignNode(new SwitchInternal(name, vector<Function>(1, f_false), f_true));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
+  }
+
+
+  Function Function::kernel_sum(const std::string& name,
+                                const std::pair<int, int> & size,
+                                double r, int n,
+                                const Dict& opts) const {
+    Function ret;
+    ret.assignNode(new KernelSum2DInternal(name, *this, size, r, n));
     ret.setOption(opts);
     ret.init();
     return ret;

@@ -53,7 +53,6 @@
 #include "function/qp_solver.hpp"
 #include "function/stabilized_qp_solver.hpp"
 #include "function/nullspace.hpp"
-#include "function/kernel_sum_2d.hpp"
 
 // Misc
 #include "misc/integration_tools.hpp"

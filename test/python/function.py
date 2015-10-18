@@ -1015,7 +1015,7 @@ class Functiontests(casadiTestCase):
   #   self.checkarray(2.37683, v, digits=4)
     
   @memory_heavy()
-  def test_KernelSum2D(self):
+  def test_kernel_sum(self):
     n = 20
     m = 40
  
@@ -1035,7 +1035,7 @@ class Functiontests(casadiTestCase):
 
     f = SX.fun("f",[p,v,x],[v**2*exp(-r**2)/pi])
 
-    F = KernelSum2D("test",f,(n,m),4,1,{"ad_weight": 1})
+    F = f.kernel_sum("test",(n,m),4,1,{"ad_weight": 1})
 
     x0 = DMatrix([n/2,m/2])
 

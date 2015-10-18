@@ -623,6 +623,35 @@ namespace casadi {
     static Function if_else(const std::string& name, const Function& f_true,
                             const Function& f_false, const Dict& opts=Dict());
 
+    /** kernel_sum  
+        Consider a dense matrix V.
+        
+        KernelSum computes     
+  
+        F(V,X)  = sum_i sum_j  f ( [i;j], V(i,j), X)
+        
+        with X: [x;y]
+          
+        where the summation is taken for all entries (i,j)
+        that are a distance r away from X.
+        
+        This function assumes that V is fixed: 
+        sensitivities with respect to it are not computed.
+        
+        This allows for improved speed of evaluation.
+        
+        Having V fixed is a common use case:
+        V may be a large bitmap (observation),
+        onto which a kernel is fitted.
+  
+        \author Joris Gillis
+        \date 2015
+    */
+    Function kernel_sum(const std::string& name,
+                        const std::pair<int, int> & size,
+                        double r, int n,
+                        const Dict& opts=Dict()) const;
+
     /** \brief Get a function that calculates \a nfwd forward derivatives and nadj adjoint derivatives
      *         Legacy function: Use derForward and derReverse instead.
      *

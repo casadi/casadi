@@ -26,7 +26,6 @@
 #ifndef CASADI_KERNEL_SUM_2D_INTERNAL_HPP
 #define CASADI_KERNEL_SUM_2D_INTERNAL_HPP
 
-#include "kernel_sum_2d.hpp"
 #include "function_internal.hpp"
 
 /// \cond INTERNAL

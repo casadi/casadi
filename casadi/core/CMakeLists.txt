@@ -105,7 +105,7 @@ set(CASADI_SRCS
   function/map_internal.hpp      function/map_internal.cpp
   function/mapaccum_internal.hpp function/mapaccum_internal.cpp
   function/compiler.hpp            function/compiler.cpp            function/compiler_internal.hpp function/compiler_internal.cpp
-  function/kernel_sum_2d.hpp       function/kernel_sum_2d.cpp       function/kernel_sum_2d_internal.hpp function/kernel_sum_2d_internal.cpp
+  function/kernel_sum_2d_internal.hpp function/kernel_sum_2d_internal.cpp
   function/callback.cpp            function/callback.hpp            function/callback_internal.cpp function/callback_internal.hpp
 
   # MISC useful stuff

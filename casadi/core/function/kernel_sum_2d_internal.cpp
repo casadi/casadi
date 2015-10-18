@@ -270,7 +270,7 @@ namespace casadi {
 
     Function f_forward = MX::fun("f", f_inputs, fd(fd_inputs));
 
-    Function ret = KernelSum2D(name, f_forward, size_, r_, n_);
+    Function ret = f_forward.kernel_sum(name, size_, r_, n_);
 
     /* Furthermore, we need to return something of signature
     *  der(V,X,S,V_dot,X_dot)
@@ -353,7 +353,7 @@ namespace casadi {
 
     Function f_reverse = MX::fun("f", f_inputs, f_outputs);
 
-    Function kn = KernelSum2D(name, f_reverse, size_, r_, n_);
+    Function kn = f_reverse.kernel_sum(name, size_, r_, n_);
 
     /* Furthermore, we need to return something of signature
     *  der(V,X,S,S_bar) -> V_bar, X_bar
