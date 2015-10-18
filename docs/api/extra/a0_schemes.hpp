@@ -153,24 +153,6 @@
 <tr><td>INTEGRATOR_RZ0</td><td>rz0</td><td>Initial guess for the backwards algebraic variable .</td></tr>
 </table>
 */
-/** \defgroup scheme_StabilizedQpSolverInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::StabilizedQpSolverInput  (STABILIZED_QP_SOLVER_NUM_IN = 12) [stabilizedQpIn]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>STABILIZED_QP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
-<tr><td>STABILIZED_QP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
-<tr><td>STABILIZED_QP_SOLVER_LBA</td><td>lba</td><td>dense, (nc x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_UBA</td><td>uba</td><td>dense, (nc x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_LBX</td><td>lbx</td><td>dense, (n x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_UBX</td><td>ubx</td><td>dense, (n x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_X0</td><td>x0</td><td>dense, (n x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_MUR</td><td>muR</td><td>dense (1 x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_MUE</td><td>muE</td><td>dense (nc x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_MU</td><td>mu</td><td>dense (nc x 1) </td></tr>
-</table>
-*/
 /** \defgroup scheme_RDAEOutput
 <a name='schemes'></a><table>
 <caption>Output scheme: casadi::RDAEOutput  (RDAE_NUM_OUT = 3) [rdaeOut]</caption>
@@ -496,49 +478,6 @@
 /// \endcond
 /// \cond INTERNAL
 /** \class casadi::Sqpmethod
-\n
-\par
-@copydoc scheme_NlpSolverInput
-<br/>
-@copydoc scheme_NlpSolverOutput
-*/
-/// \endcond
-/// \cond INTERNAL
-/** \class casadi::StabilizedQpSolverInternal
-\n
-\par
-@copydoc scheme_StabilizedQpSolverInput
-<br/>
-@copydoc scheme_QpSolverOutput
-*/
-/// \endcond
-/** \addtogroup general_StabilizedQpSolver
-\n
-\par
-@copydoc scheme_StabilizedQpSolverInput
-<br/>
-@copydoc scheme_QpSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::StabilizedQpToQp
-\n
-\par
-@copydoc scheme_StabilizedQpSolverInput
-<br/>
-@copydoc scheme_QpSolverOutput
-*/
-/// \endcond
-/// \cond INTERNAL
-/** \class casadi::StabilizedSqicInterface
-\n
-\par
-@copydoc scheme_StabilizedQpSolverInput
-<br/>
-@copydoc scheme_QpSolverOutput
-*/
-/// \endcond
-/// \cond INTERNAL
-/** \class casadi::StabilizedSqp
 \n
 \par
 @copydoc scheme_NlpSolverInput

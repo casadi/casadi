@@ -376,55 +376,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::StabilizedQpToQp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>qp_solver_stats</td><td>casadi::StabilizedQpToQp</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_StabilizedQpSolver_qp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>qp_solver_stats</td></tr>
-</table>
-*/
-/// \cond INTERNAL
-/** \class casadi::StabilizedSqp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>base class init time</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>constraint jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>grad lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>hess lag gen time</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>hess lag sparsity time</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>iter_count</td><td>casadi::StabilizedSqp</td></tr>
-<tr><td>objective gradient gen time</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>objective jacobian gen time</td><td>casadi::NlpSolverInternal</td></tr>
-<tr><td>return_status</td><td>casadi::StabilizedSqp</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_NlpSolver_stabilizedsqp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>iter_count</td></tr>
-<tr><td>return_status</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::WorhpInterface
 \n
 \par
