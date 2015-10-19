@@ -1322,6 +1322,60 @@ namespace casadi {
     return n->linsol_;
   }
 
+  Function Function::integrator(const std::string& name, const std::string& solver,
+                                const SXDict& dae, const Dict& opts) {
+    SX x, z, p, t, ode, alg, quad;
+    for (SXDict::const_iterator i=dae.begin(); i!=dae.end(); ++i) {
+      if (i->first=="x") {
+        x = i->second;
+      } else if (i->first=="z") {
+        z = i->second;
+      } else if (i->first=="p") {
+        p = i->second;
+      } else if (i->first=="t") {
+        t = i->second;
+      } else if (i->first=="ode") {
+        ode = i->second;
+      } else if (i->first=="alg") {
+        alg = i->second;
+      } else if (i->first=="quad") {
+        quad = i->second;
+      } else {
+        casadi_error("No such field: \"" + i->first + "\"");
+      }
+    }
+    Function f=SX::fun("dae", daeIn("x", x, "z", z, "p", p),
+                    daeOut("ode", ode, "alg", alg, "quad", quad));
+    return Integrator(name, solver, f, opts);
+  }
+
+  Function Function::integrator(const std::string& name, const std::string& solver,
+                                const MXDict& dae, const Dict& opts) {
+    MX x, z, p, t, ode, alg, quad;
+    for (MXDict::const_iterator i=dae.begin(); i!=dae.end(); ++i) {
+      if (i->first=="x") {
+        x = i->second;
+      } else if (i->first=="z") {
+        z = i->second;
+      } else if (i->first=="p") {
+        p = i->second;
+      } else if (i->first=="t") {
+        t = i->second;
+      } else if (i->first=="ode") {
+        ode = i->second;
+      } else if (i->first=="alg") {
+        alg = i->second;
+      } else if (i->first=="quad") {
+        quad = i->second;
+      } else {
+        casadi_error("No such field: \"" + i->first + "\"");
+      }
+    }
+    Function f=MX::fun("dae", daeIn("x", x, "z", z, "p", p),
+                    daeOut("ode", ode, "alg", alg, "quad", quad));
+    return Integrator(name, solver, f, opts);
+  }
+
   Function Function::integrator_dae() {
     casadi_assert(!isNull());
     IntegratorInternal* n = dynamic_cast<IntegratorInternal*>(get());

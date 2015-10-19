@@ -1088,6 +1088,43 @@ namespace casadi {
     /// Access linear solver of a rootfinder
     LinearSolver rootfinder_linsol();
 
+    ///@{
+    /** Create an ODE/DAE integrator
+     *  Solves an initial value problem (IVP) coupled to a terminal value problem
+     *  with differential equation given as an implicit ODE coupled to an algebraic
+     *  equation and a set of quadratures:
+     *  \verbatim
+     *  Initial conditions at t=t0
+     *  x(t0)  = x0
+     *  q(t0)  = 0
+     *
+     *  Forward integration from t=t0 to t=tf
+     *  der(x) = function(x, z, p, t)                  Forward ODE
+     *  0 = fz(x, z, p, t)                  Forward algebraic equations
+     *  der(q) = fq(x, z, p, t)                  Forward quadratures
+     *
+     *  Terminal conditions at t=tf
+     *  rx(tf)  = rx0
+     *  rq(tf)  = 0
+     *
+     *  Backward integration from t=tf to t=t0
+     *  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
+     *  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
+     *  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
+     *
+     *  where we assume that both the forward and backwards integrations are index-1
+     *  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
+     *  gx, gz and gq have a linear dependency on rx, rz and rp.
+     *
+     * \author Joel Andersson
+     * \date 2011-2015
+     */
+    static Function integrator(const std::string& name, const std::string& solver,
+                               const SXDict& dae, const Dict& opts=Dict());
+    static Function integrator(const std::string& name, const std::string& solver,
+                               const MXDict& dae, const Dict& opts=Dict());
+    ///@}
+
     /// Get the DAE for an integrator
     Function integrator_dae();
 

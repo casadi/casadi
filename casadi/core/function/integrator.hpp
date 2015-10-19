@@ -99,10 +99,6 @@ namespace casadi {
                const Function& f, const Dict& opts=Dict());
     Integrator(const std::string& name, const std::string& solver,
                const std::pair<Function, Function>& fg, const Dict& opts=Dict());
-    Integrator(const std::string& name, const std::string& solver,
-               const SXDict& dae, const Dict& opts=Dict());
-    Integrator(const std::string& name, const std::string& solver,
-               const MXDict& dae, const Dict& opts=Dict());
     ///@}
 
     /// Print solver statistics
