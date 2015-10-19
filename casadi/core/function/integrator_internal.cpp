@@ -779,7 +779,7 @@ namespace casadi {
     Dict aug_opts = getDerivativeOptions(offset);
     if (hasSetOption("augmented_options")) {
       Dict aug_opts_user = getOption("augmented_options");
-      for (auto&& i: aug_opts_user) {
+      for (auto&& i : aug_opts_user) {
         aug_opts[i.first] = i.second;
       }
     }
@@ -921,7 +921,7 @@ namespace casadi {
     Dict aug_opts = getDerivativeOptions(offset);
     if (hasSetOption("augmented_options")) {
       Dict aug_opts_user = getOption("augmented_options");
-      for (auto&& i: aug_opts_user) {
+      for (auto&& i : aug_opts_user) {
         aug_opts[i.first] = i.second;
       }
     }
