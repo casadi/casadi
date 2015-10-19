@@ -73,7 +73,7 @@ class QpSolverTests(casadiTestCase):
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
-      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -106,7 +106,7 @@ class QpSolverTests(casadiTestCase):
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
-      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -142,7 +142,7 @@ class QpSolverTests(casadiTestCase):
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
-      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -184,7 +184,7 @@ class QpSolverTests(casadiTestCase):
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
-      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -280,7 +280,7 @@ class QpSolverTests(casadiTestCase):
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
-      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -321,7 +321,7 @@ class QpSolverTests(casadiTestCase):
       self.message("general_nonconvex: " + str(qpsolver))
       if not("cplex" in str(qpsolver)):
         continue
-      solver = QpSolver("mysolver",qpsolver, {'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qp_solver("mysolver",qpsolver, {'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       solver.setInput(H,"h")
       solver.setInput(G,"g")
@@ -344,7 +344,7 @@ class QpSolverTests(casadiTestCase):
       self.message("equality: " + str(qpsolver))
       if "ooqp" in str(qpsolver):
         continue
-      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':Sparsity.dense(3,2)},qp_options)
+      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':Sparsity.dense(3,2)},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]      
@@ -432,7 +432,7 @@ class QpSolverTests(casadiTestCase):
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("degenerate hessian: " + str(qpsolver))
       if 'qcqp' in str(qpsolver): continue
-      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -476,7 +476,7 @@ class QpSolverTests(casadiTestCase):
 
     for qpsolver, qp_options, aux_options in qpsolvers:
       self.message("no inequality: " + str(qpsolver))
-      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
       
       try:
         less_digits=aux_options["less_digits"]
@@ -522,7 +522,7 @@ class QpSolverTests(casadiTestCase):
       if "cplex" in str(qpsolver):
         continue
       self.message("no A: " + str(qpsolver))
-      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
       
       try:
         less_digits=aux_options["less_digits"]
@@ -559,7 +559,7 @@ class QpSolverTests(casadiTestCase):
     UBX = DMatrix([10])
 
     for qpsolver, qp_options, aux_options in qpsolvers:
-      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       
       try:
@@ -605,7 +605,7 @@ class QpSolverTests(casadiTestCase):
         continue
       if 'worhp' in str(qpsolver): # works but occasionaly throws segfaults, ulimit on travis?
         continue
-      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -646,7 +646,7 @@ class QpSolverTests(casadiTestCase):
         
       for qpsolver, qp_options, aux_options in qpsolvers:
         if 'qcqp' in str(qpsolver): continue
-        solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+        solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
         try:
           less_digits=aux_options["less_digits"]
@@ -679,7 +679,7 @@ class QpSolverTests(casadiTestCase):
 
     for qpsolver, qp_options, aux_options in qpsolvers:
       if 'qcqp' in str(qpsolver): continue
-      solver = QpSolver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -716,7 +716,7 @@ class QpSolverTests(casadiTestCase):
     for qpsolver, qp_options, aux_options in qpsolvers:
       if 'qcqp' in str(qpsolver): continue
       if 'nlp' in str(qpsolver): continue
-      solver = QpSolver("msyolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qp_solver("msyolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]

@@ -1020,7 +1020,7 @@ namespace casadi {
 
   ///@{
   /// Readability typedefs
-  typedef std::map<std::string, Sparsity> SparsityDict;
+  typedef std::map<std::string, Sparsity> SpDict;
   ///@}
 
 } // namespace casadi

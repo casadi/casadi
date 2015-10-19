@@ -77,12 +77,14 @@ namespace casadi {
     /// Default constructor
     QpSolver();
 
+#ifndef SWIG
     /** \brief Constructor (new syntax, includes initialization)
      *  \param name \pluginargument{QpSolver}
      *  \param st \structargument{QP}
      */
     QpSolver(const std::string& name, const std::string& solver,
              const std::map<std::string, Sparsity>& st, const Dict& opts=Dict());
+#endif // SWIG
 
     /// Access functions of the node
     QpSolverInternal* operator->();

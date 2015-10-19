@@ -1451,6 +1451,11 @@ namespace casadi {
     return n->hessLag();
   }
 
+  Function Function::qp_solver(const std::string& name, const std::string& solver,
+                               const SpDict& qp, const Dict& opts) {
+    return QpSolver(name, solver, qp, opts);
+  }
+
   void Function::qp_solver_debug(const std::string &filename) const {
     std::ofstream file;
     file.open(filename.c_str());
