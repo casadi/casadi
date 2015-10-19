@@ -152,6 +152,9 @@ namespace casadi {
 
     /// Infix
     static const std::string infix_;
+
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "none";}
   };
 
 

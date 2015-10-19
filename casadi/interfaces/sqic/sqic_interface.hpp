@@ -62,6 +62,9 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~SqicInterface();
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "sqic";}
+
     /** \brief  Initialize */
     virtual void init();
 

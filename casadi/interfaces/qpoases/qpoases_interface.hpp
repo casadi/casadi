@@ -67,6 +67,9 @@ public:
   /** \brief  Destructor */
   virtual ~QpoasesInterface();
 
+  // Get name of the plugin
+  virtual const char* plugin_name() const { return "qpoases";}
+
   /** \brief  Initialize */
   virtual void init();
 

@@ -93,6 +93,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "csparsecholesky";}
   };
 
 } // namespace casadi

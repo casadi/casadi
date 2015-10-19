@@ -775,19 +775,17 @@ namespace casadi {
     stringstream ss;
     ss << "aug_f" << nfwd << name_;
 
+    // Integrator options
+    Dict aug_opts = getDerivativeOptions(offset);
+    if (hasSetOption("augmented_options")) {
+      Dict aug_opts_user = getOption("augmented_options");
+      for (auto&& i: aug_opts_user) {
+        aug_opts[i.first] = i.second;
+      }
+    }
+
     // Create integrator for augmented DAE
-    Integrator integrator;
-    integrator.assignNode(create(ss.str(), aug_dae.first, aug_dae.second));
-
-    // Set solver specific options
-    setDerivativeOptions(integrator, offset);
-
-    // Pass down specific options if provided
-    if (hasSetOption("augmented_options"))
-      integrator.setOption(getOption("augmented_options"));
-
-    // Initialize the integrator since we will call it below
-    integrator.init();
+    Integrator integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
 
     // All inputs of the return function
     vector<MX> ret_in;
@@ -919,19 +917,17 @@ namespace casadi {
     stringstream ss;
     ss << "aug_r" << nadj << name_;
 
+    // Integrator options
+    Dict aug_opts = getDerivativeOptions(offset);
+    if (hasSetOption("augmented_options")) {
+      Dict aug_opts_user = getOption("augmented_options");
+      for (auto&& i: aug_opts_user) {
+        aug_opts[i.first] = i.second;
+      }
+    }
+
     // Create integrator for augmented DAE
-    Integrator integrator;
-    integrator.assignNode(create(ss.str(), aug_dae.first, aug_dae.second));
-
-    // Set solver specific options
-    setDerivativeOptions(integrator, offset);
-
-    // Pass down specific options if provided
-    if (hasSetOption("augmented_options"))
-      integrator.setOption(getOption("augmented_options"));
-
-    // Initialize the integrator since we will call it below
-    integrator.init();
+    Integrator integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
 
     // All inputs of the return function
     vector<MX> ret_in;
@@ -1120,9 +1116,9 @@ namespace casadi {
     log("IntegratorInternal::resetB", "end");
   }
 
-  void IntegratorInternal::setDerivativeOptions(Integrator& integrator, const AugOffset& offset) {
+  Dict IntegratorInternal::getDerivativeOptions(const AugOffset& offset) {
     // Copy all options
-    integrator.setOption(dictionary());
+    return dictionary();
   }
 
   Sparsity IntegratorInternal::spJacF() {

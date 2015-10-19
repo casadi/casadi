@@ -106,7 +106,6 @@ namespace casadi {
     // Helper function for reading includes
     static std::vector<std::pair<std::string, bool> >
       getIncludes(const std::string& file, const std::string& path);
-
   protected:
     clang::EmitLLVMOnlyAction* act_;
     llvm::ExecutionEngine* executionEngine_;

@@ -58,6 +58,9 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~Newton();
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "newton";}
+
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual ImplicitFunctionInternal* create(const std::string& name, const Function& f) const {
       return new Newton(name, f);

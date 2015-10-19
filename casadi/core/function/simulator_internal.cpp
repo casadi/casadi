@@ -56,9 +56,9 @@ namespace casadi {
                             "The supplied time grid must be non-decreasing.");
 
       // Create new integrator object
-      Function I = Function::create(integrator_->create(integrator_.name(),
-                                                        integrator_->f_, integrator_->g_));
-      I.setOption(integrator_.dictionary());
+      Function I = Integrator(integrator_.name(), integrator_->plugin_name(),
+                              make_pair(integrator_->f_, integrator_->g_),
+                              integrator_.dictionary());
 
       // Let the integration time start from the first point of the time grid.
       I.setOption("t0", grid_[0]);

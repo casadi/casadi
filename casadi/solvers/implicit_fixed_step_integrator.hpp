@@ -40,11 +40,6 @@ namespace casadi {
     explicit ImplicitFixedStepIntegrator(const std::string& name,
                                          const Function& f, const Function& g);
 
-    /// Create a new integrator
-    virtual ImplicitFixedStepIntegrator* create(const std::string& name,
-                                                const Function& f,
-                                                const Function& g) const = 0;
-
     /// Destructor
     virtual ~ImplicitFixedStepIntegrator();
 

@@ -67,6 +67,9 @@ namespace casadi {
       return new QpToImplicit(name, f);
     }
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "nlp";}
+
     /** \brief  Initialize */
     virtual void init();
 

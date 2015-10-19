@@ -105,6 +105,8 @@ namespace casadi {
     template<class Problem>
       static Derived* instantiatePlugin(const std::string& fname,
                                         const std::string& pname, Problem problem);
+    // Get name of the plugin
+    virtual const char* plugin_name() const = 0;
   };
 
   template<class Derived>

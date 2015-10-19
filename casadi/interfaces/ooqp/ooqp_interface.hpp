@@ -62,6 +62,9 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~OoqpInterface();
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "ooqp";}
+
     /** \brief  Initialize */
     virtual void init();
 

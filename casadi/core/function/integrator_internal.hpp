@@ -47,11 +47,6 @@ namespace casadi {
     /** \brief  Constructor */
     IntegratorInternal(const std::string& name, const Function& f, const Function& g);
 
-    /** \brief  Create a new integrator */
-    virtual IntegratorInternal* create(const std::string& name,
-                                       const Function& f,
-                                       const Function& g) const = 0;
-
     /** \brief  Destructor */
     virtual ~IntegratorInternal()=0;
 
@@ -118,7 +113,7 @@ namespace casadi {
     };
 
     /** \brief Set solver specific options to generated augmented integrators */
-    virtual void setDerivativeOptions(Integrator& integrator, const AugOffset& offset);
+    virtual Dict getDerivativeOptions(const AugOffset& offset);
 
     /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
     * and \a nadj adjoint sensitivities */

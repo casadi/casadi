@@ -53,6 +53,9 @@ namespace casadi {
     static XmlFileInternal* creator()
     { return new TinyXmlInterface();}
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "tinyxml";}
+
     // Parse an XML file
     virtual XmlNode parse(const std::string& filename);
 

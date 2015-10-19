@@ -61,12 +61,6 @@ namespace casadi {
     explicit OldCollocationIntegrator(const std::string& name,
                                       const Function& f, const Function& g);
 
-    /// Create a new integrator
-    virtual OldCollocationIntegrator* create(const std::string& name,
-                                             const Function& f, const Function& g) const {
-      return new OldCollocationIntegrator(name, f, g);
-    }
-
     /** \brief  Create a new integrator */
     static IntegratorInternal* creator(const std::string& name,
                                        const Function& f, const Function& g) {
@@ -75,6 +69,9 @@ namespace casadi {
 
     /// Destructor
     virtual ~OldCollocationIntegrator();
+
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "oldcollocation";}
 
     /// Initialize stage
     virtual void init();

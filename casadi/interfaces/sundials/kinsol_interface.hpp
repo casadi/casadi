@@ -79,6 +79,9 @@ namespace casadi {
     /** \brief  Solve the nonlinear system of equations */
     virtual void solveNonLinear();
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "kinsol";}
+
     /** \brief Residual */
     void func(N_Vector u, N_Vector fval);
     void djac(long N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2);

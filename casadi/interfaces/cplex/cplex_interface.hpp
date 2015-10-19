@@ -65,6 +65,9 @@ namespace casadi {
     /// Destructor
     virtual ~CplexInterface();
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "cplex";}
+
     /// Free Cplex memory
     void freeCplex();
 

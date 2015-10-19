@@ -55,12 +55,6 @@ namespace casadi {
     /// Constructor
     explicit RkIntegrator(const std::string& name, const Function& f, const Function& g);
 
-    /// Create a new integrator
-    virtual RkIntegrator* create(const std::string& name,
-                                 const Function& f, const Function& g) const {
-      return new RkIntegrator(name, f, g);
-    }
-
     /** \brief  Create a new integrator */
     static IntegratorInternal* creator(const std::string& name,
                                        const Function& f, const Function& g) {
@@ -69,6 +63,9 @@ namespace casadi {
 
     /// Destructor
     virtual ~RkIntegrator();
+
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "rk";}
 
     /// Initialize stage
     virtual void init();

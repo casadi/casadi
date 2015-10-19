@@ -60,12 +60,6 @@ namespace casadi {
     /// Constructor
     explicit CollocationIntegrator(const std::string& name, const Function& f, const Function& g);
 
-    /// Create a new integrator
-    virtual CollocationIntegrator* create(const std::string& name,
-                                          const Function& f, const Function& g) const {
-      return new CollocationIntegrator(name, f, g);
-    }
-
     /** \brief  Create a new integrator */
     static IntegratorInternal* creator(const std::string& name,
                                        const Function& f, const Function& g) {
@@ -74,6 +68,9 @@ namespace casadi {
 
     /// Destructor
     virtual ~CollocationIntegrator();
+
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "collocation";}
 
     /// Initialize stage
     virtual void init();

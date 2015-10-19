@@ -71,6 +71,9 @@ public:
   explicit IpoptInterface(const std::string& name, const Function& nlp);
   virtual ~IpoptInterface();
 
+  // Get name of the plugin
+  virtual const char* plugin_name() const { return "ipopt";}
+
   /** \brief  Create a new NLP Solver */
   static NlpSolverInternal* creator(const std::string& name, const Function& nlp) {
     return new IpoptInterface(name, nlp);

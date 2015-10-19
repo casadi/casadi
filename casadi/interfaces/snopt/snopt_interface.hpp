@@ -53,6 +53,9 @@ namespace casadi {
     // Destructor
     virtual ~SnoptInterface();
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "snopt";}
+
     /** \brief  Create a new NLP Solver */
     static NlpSolverInternal* creator(const std::string& name, const Function& nlp) {
       return new SnoptInterface(name, nlp);

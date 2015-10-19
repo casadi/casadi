@@ -118,6 +118,8 @@ namespace casadi {
     /// Dimensions
     int ncol_, nrow_;
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "lapacklu";}
   };
 
 /// \endcond

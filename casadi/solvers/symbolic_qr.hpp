@@ -59,6 +59,9 @@ namespace casadi {
     // Destructor
     virtual ~SymbolicQr();
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "symbolicqr";}
+
     /** \brief  Create a new LinearSolver */
     static LinearSolverInternal* creator(const std::string& name,
                                          const Sparsity& sp, int nrhs) {
