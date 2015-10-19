@@ -253,6 +253,10 @@ namespace casadi {
     userOut() << "test001cc" << file_name << std::endl;
     std::ifstream setup_file(file_name.c_str());
     
+    if (!setup_file) {
+      userOut() << "nothing here" << std::endl;
+      return ret;
+    }
     userOut() << "test001c" << std::endl;
     
     userOut() << setup_file.is_open() << std::endl;
