@@ -76,7 +76,7 @@ int main(){
   SXDict nlp = {{"x", u}, {"f", f}, {"g", g}};
   
   // Allocate an NLP solver and buffers
-  NlpSolver solver("solver", "ipopt", nlp);
+  Function solver = Function::integrator("solver", "ipopt", nlp);
 
   // Bounds on g
   vector<double> gmin = {10, 0};

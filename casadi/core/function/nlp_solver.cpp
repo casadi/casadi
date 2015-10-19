@@ -38,60 +38,6 @@ namespace casadi {
     init();
   }
 
-  NlpSolver::NlpSolver(const std::string& name,
-                       const std::string& solver,
-                       const SXDict& nlp,
-                       const Dict& opts) {
-    // Create an NLP function
-    SX x, p, f, g;
-    for (SXDict::const_iterator i=nlp.begin(); i!=nlp.end(); ++i) {
-      if (i->first=="x") {
-        x = i->second;
-      } else if (i->first=="p") {
-        p = i->second;
-      } else if (i->first=="f") {
-        f = i->second;
-      } else if (i->first=="g") {
-        g = i->second;
-      } else {
-        casadi_error("No such field: \"" + i->first + "\"");
-      }
-    }
-    Function nlpf=SX::fun("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
-
-    // Create the solver instance
-    assignNode(NlpSolverInternal::instantiatePlugin(name, solver, nlpf));
-    setOption(opts);
-    init();
-  }
-
-  NlpSolver::NlpSolver(const std::string& name,
-                       const std::string& solver,
-                       const MXDict& nlp,
-                       const Dict& opts) {
-    // Create an NLP function
-    MX x, p, f, g;
-    for (MXDict::const_iterator i=nlp.begin(); i!=nlp.end(); ++i) {
-      if (i->first=="x") {
-        x = i->second;
-      } else if (i->first=="p") {
-        p = i->second;
-      } else if (i->first=="f") {
-        f = i->second;
-      } else if (i->first=="g") {
-        g = i->second;
-      } else {
-        casadi_error("No such field: \"" + i->first + "\"");
-      }
-    }
-    Function nlpf=MX::fun("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
-
-    // Create the solver instance
-    assignNode(NlpSolverInternal::instantiatePlugin(name, solver, nlpf));
-    setOption(opts);
-    init();
-  }
-
   NlpSolverInternal* NlpSolver::operator->() {
     return static_cast<NlpSolverInternal*>(Function::operator->());
   }

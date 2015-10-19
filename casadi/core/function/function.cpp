@@ -1383,6 +1383,46 @@ namespace casadi {
     return n->f_;
   }
 
+  Function Function::nlp_solver(const std::string& name, const std::string& solver,
+                                const SXDict& nlp, const Dict& opts) {
+    SX x, p, f, g;
+    for (SXDict::const_iterator i=nlp.begin(); i!=nlp.end(); ++i) {
+      if (i->first=="x") {
+        x = i->second;
+      } else if (i->first=="p") {
+        p = i->second;
+      } else if (i->first=="f") {
+        f = i->second;
+      } else if (i->first=="g") {
+        g = i->second;
+      } else {
+        casadi_error("No such field: \"" + i->first + "\"");
+      }
+    }
+    Function nlpf=SX::fun("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
+    return NlpSolver(name, solver, nlpf, opts);
+  }
+
+  Function Function::nlp_solver(const std::string& name, const std::string& solver,
+                                const MXDict& nlp, const Dict& opts) {
+    MX x, p, f, g;
+    for (MXDict::const_iterator i=nlp.begin(); i!=nlp.end(); ++i) {
+      if (i->first=="x") {
+        x = i->second;
+      } else if (i->first=="p") {
+        p = i->second;
+      } else if (i->first=="f") {
+        f = i->second;
+      } else if (i->first=="g") {
+        g = i->second;
+      } else {
+        casadi_error("No such field: \"" + i->first + "\"");
+      }
+    }
+    Function nlpf=MX::fun("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
+    return NlpSolver(name, solver, nlpf, opts);
+  }
+
   Function Function::nlp_solver_nlp() {
     casadi_assert(!isNull());
     NlpSolverInternal* n = dynamic_cast<NlpSolverInternal*>(get());

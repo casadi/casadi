@@ -68,35 +68,21 @@ namespace casadi {
     NlpSolver();
 
     /// NLP solver factory (new syntax, includes initialization)
-    NlpSolver(
-      const std::string& name,
-      const std::string& solver,
-      /**< \pluginargument{NlpSolver}
-      */
-      const Function& nlp,
-      /**< \parblock
-       *  nlp function: \f$ [\mathbb {R}^{n_x} \times \mathbb{R}^{n_p}]
-       * \mapsto [\mathbb {R} \times \mathbb{R}^{n_g}]\f$
-       *
-       *  @copydoc scheme_NLPInput
-       *  @copydoc scheme_NLPOutput
-       *
-       *  \endparblock
-       */
-      const Dict& opts=Dict()
-      ); // NOLINT(whitespace/parens)
-
-    /// Create an NLP solver from a dictionary with SX expressions
-    NlpSolver(const std::string& name,
-              const std::string& solver,
-              const SXDict& nlp,
-              const Dict& opts=Dict());
-
-    /// Create an NLP solver from a dictionary with MX expressions
-    NlpSolver(const std::string& name,
-              const std::string& solver,
-              const MXDict& nlp,
-              const Dict& opts=Dict());
+    NlpSolver(const std::string& name, const std::string& solver,
+              /**< \pluginargument{NlpSolver}
+               */
+              const Function& nlp,
+              /**< \parblock
+               *  nlp function: \f$ [\mathbb {R}^{n_x} \times \mathbb{R}^{n_p}]
+               * \mapsto [\mathbb {R} \times \mathbb{R}^{n_g}]\f$
+               *
+               *  @copydoc scheme_NLPInput
+               *  @copydoc scheme_NLPOutput
+               *
+               *  \endparblock
+               */
+              const Dict& opts=Dict()
+              ); // NOLINT(whitespace/parens)
 
     /// Access functions of the node
     NlpSolverInternal* operator->();
