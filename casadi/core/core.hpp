@@ -49,7 +49,6 @@
 #include "function/integrator.hpp"
 #include "function/callback.hpp"
 #include "function/simulator.hpp"
-#include "function/qp_solver.hpp"
 
 // Misc
 #include "misc/integration_tools.hpp"

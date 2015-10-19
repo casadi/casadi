@@ -27,7 +27,6 @@
 #define CASADI_SQPMETHOD_HPP
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
-#include "casadi/core/function/qp_solver.hpp"
 #include <deque>
 
 #include <casadi/solvers/casadi_nlpsolver_sqpmethod_export.h>
@@ -59,7 +58,7 @@ namespace casadi {
     virtual void evaluate();
 
     /// QP solver for the subproblems
-    QpSolver qp_solver_;
+    Function qp_solver_;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -90,7 +89,7 @@ namespace casadi {
     double reg_;
 
     /// Access QpSolver
-    const QpSolver getQpSolver() const { return qp_solver_;}
+    const Function getQpSolver() const { return qp_solver_;}
 
     /// Lagrange multipliers of the NLP
     std::vector<double> mu_, mu_x_;

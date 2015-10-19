@@ -96,7 +96,7 @@ set(CASADI_SRCS
   function/integrator.hpp          function/integrator.cpp          function/integrator_internal.hpp          function/integrator_internal.cpp
   function/nlp_solver.hpp          function/nlp_solver.cpp          function/nlp_solver_internal.hpp          function/nlp_solver_internal.cpp
   function/simulator.hpp           function/simulator.cpp           function/simulator_internal.hpp           function/simulator_internal.cpp
-  function/qp_solver.hpp           function/qp_solver.cpp           function/qp_solver_internal.hpp           function/qp_solver_internal.cpp
+  function/qp_solver_internal.hpp           function/qp_solver_internal.cpp
   function/code_generator.hpp      function/code_generator.cpp
   function/wrapper.hpp             function/adaptor.hpp
   function/switch_internal.hpp   function/switch_internal.cpp

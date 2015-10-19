@@ -26,7 +26,6 @@
 #ifndef CASADI_QP_SOLVER_INTERNAL_HPP
 #define CASADI_QP_SOLVER_INTERNAL_HPP
 
-#include "qp_solver.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 

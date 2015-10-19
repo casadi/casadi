@@ -1266,15 +1266,15 @@ namespace casadi {
   }
 
   bool Function::has_qp_solver(const std::string& name) {
-    return QpSolver::hasPlugin(name);
+    return QpSolverInternal::hasPlugin(name);
   }
 
   void Function::load_qp_solver(const std::string& name) {
-    QpSolver::loadPlugin(name);
+    QpSolverInternal::loadPlugin(name);
   }
 
   std::string Function::doc_qp_solver(const std::string& name) {
-    return QpSolver::doc(name);
+    return QpSolverInternal::getPlugin(name).doc;
   }
 
   bool Function::has_nlp_solver(const std::string& name) {
@@ -1453,7 +1453,11 @@ namespace casadi {
 
   Function Function::qp_solver(const std::string& name, const std::string& solver,
                                const SpDict& qp, const Dict& opts) {
-    return QpSolver(name, solver, qp, opts);
+    Function ret;
+    ret.assignNode(QpSolverInternal::instantiatePlugin(name, solver, qp));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
   }
 
   void Function::qp_solver_debug(const std::string &filename) const {

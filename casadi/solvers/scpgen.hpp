@@ -27,7 +27,6 @@
 #define CASADI_SCPGEN_HPP
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
-#include "casadi/core/function/qp_solver.hpp"
 
 #include <casadi/solvers/casadi_nlpsolver_scpgen_export.h>
 
@@ -102,7 +101,7 @@ namespace casadi {
     double t_eval_mat_, t_eval_res_, t_eval_vec_, t_eval_exp_, t_solve_qp_, t_mainloop_;
 
     /// QP solver for the subproblems
-    QpSolver qp_solver_;
+    Function qp_solver_;
 
     /// use Gauss-Newton Hessian
     bool gauss_newton_;
@@ -143,7 +142,7 @@ namespace casadi {
     bool codegen_;
 
     /// Access QpSolver
-    const QpSolver getQpSolver() const { return qp_solver_;}
+    const Function getQpSolver() const { return qp_solver_;}
 
     /// Regularization
     bool regularize_;
