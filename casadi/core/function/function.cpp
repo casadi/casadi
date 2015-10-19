@@ -1337,25 +1337,31 @@ namespace casadi {
       } else if (i->first=="t") {
         dae_in[DAE_T]=rdae_in[RDAE_T]=i->second;
       } else if (i->first=="ode") {
-        dae_in[DAE_ODE]=i->second;
+        dae_out[DAE_ODE]=i->second;
       } else if (i->first=="alg") {
-        dae_in[DAE_ALG]=i->second;
+        dae_out[DAE_ALG]=i->second;
       } else if (i->first=="quad") {
-        dae_in[DAE_QUAD]=i->second;
+        dae_out[DAE_QUAD]=i->second;
+      } else if (i->first=="rx") {
+        rdae_in[RDAE_RX]=i->second;
+        has_g = has_g || !rdae_in[RDAE_RX].isempty();
+      } else if (i->first=="rz") {
+        rdae_in[RDAE_RZ]=i->second;
+      } else if (i->first=="rp") {
+        rdae_in[RDAE_RP]=i->second;
       } else if (i->first=="rode") {
-        rdae_in[RDAE_ODE]=i->second;
-        has_g = has_g || !rdae_in[RDAE_ODE].isempty();
+        rdae_out[RDAE_ODE]=i->second;
       } else if (i->first=="ralg") {
-        rdae_in[RDAE_ALG]=i->second;
+        rdae_out[RDAE_ALG]=i->second;
       } else if (i->first=="rquad") {
-        rdae_in[RDAE_QUAD]=i->second;
+        rdae_out[RDAE_QUAD]=i->second;
       } else {
         casadi_error("No such field: \"" + i->first + "\"");
       }
     }
     Function f, g;
     f = SX::fun("dae", dae_in, dae_out);
-    if (has_g) f = SX::fun("rdae", rdae_in, rdae_out);
+    if (has_g) g = SX::fun("rdae", rdae_in, rdae_out);
     return Integrator(name, solver, make_pair(f, g), opts);
   }
 
@@ -1374,25 +1380,31 @@ namespace casadi {
       } else if (i->first=="t") {
         dae_in[DAE_T]=rdae_in[RDAE_T]=i->second;
       } else if (i->first=="ode") {
-        dae_in[DAE_ODE]=i->second;
+        dae_out[DAE_ODE]=i->second;
       } else if (i->first=="alg") {
-        dae_in[DAE_ALG]=i->second;
+        dae_out[DAE_ALG]=i->second;
       } else if (i->first=="quad") {
-        dae_in[DAE_QUAD]=i->second;
+        dae_out[DAE_QUAD]=i->second;
+      } else if (i->first=="rx") {
+        rdae_in[RDAE_RX]=i->second;
+        has_g = has_g || !rdae_in[RDAE_RX].isempty();
+      } else if (i->first=="rz") {
+        rdae_in[RDAE_RZ]=i->second;
+      } else if (i->first=="rp") {
+        rdae_in[RDAE_RP]=i->second;
       } else if (i->first=="rode") {
-        rdae_in[RDAE_ODE]=i->second;
-        has_g = has_g || !rdae_in[RDAE_ODE].isempty();
+        rdae_out[RDAE_ODE]=i->second;
       } else if (i->first=="ralg") {
-        rdae_in[RDAE_ALG]=i->second;
+        rdae_out[RDAE_ALG]=i->second;
       } else if (i->first=="rquad") {
-        rdae_in[RDAE_QUAD]=i->second;
+        rdae_out[RDAE_QUAD]=i->second;
       } else {
         casadi_error("No such field: \"" + i->first + "\"");
       }
     }
     Function f, g;
     f = MX::fun("dae", dae_in, dae_out);
-    if (has_g) f = MX::fun("rdae", rdae_in, rdae_out);
+    if (has_g) g = MX::fun("rdae", rdae_in, rdae_out);
     return Integrator(name, solver, make_pair(f, g), opts);
   }
 

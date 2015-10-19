@@ -227,11 +227,10 @@ namespace casadi {
     alloc_w(sz_w + nx_ + nz_ + nrx_ + nrz_);
   }
 
+  template<typename MatType>
   std::pair<Function, Function> IntegratorInternal::getAugmented(int nfwd, int nadj,
                                                                 AugOffset& offset) {
     log("IntegratorInternal::getAugmented", "call");
-
-    //    userOut() << "here" << endl;
 
     // Return object
     std::pair<Function, Function> ret;
@@ -769,7 +768,13 @@ namespace casadi {
 
     // Form the augmented DAE
     AugOffset offset;
-    std::pair<Function, Function> aug_dae = getAugmented(nfwd, 0, offset);
+    std::pair<Function, Function> aug_dae;
+    if (f_.is_a("sxfunction")) {
+      aug_dae = getAugmented<SX>(nfwd, 0, offset);
+    } else {
+      casadi_assert(f_.is_a("mxfunction"));
+      aug_dae = getAugmented<MX>(nfwd, 0, offset);
+    }
 
     // Temp stringstream
     stringstream ss;
@@ -911,7 +916,13 @@ namespace casadi {
 
     // Form the augmented DAE
     AugOffset offset;
-    std::pair<Function, Function> aug_dae = getAugmented(0, nadj, offset);
+    std::pair<Function, Function> aug_dae;
+    if (f_.is_a("sxfunction")) {
+      aug_dae = getAugmented<SX>(0, nadj, offset);
+    } else {
+      casadi_assert(f_.is_a("mxfunction"));
+      aug_dae = getAugmented<MX>(0, nadj, offset);
+    }
 
     // Temp stringstream
     stringstream ss;
