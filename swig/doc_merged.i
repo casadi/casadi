@@ -41,6 +41,26 @@ Copy all options from another object.
 
 ";
 
+%feature("docstring") casadi::Callback::rootfinder "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
+
+";
+
 %feature("docstring") casadi::Callback::size2_in "
 
 Get input dimension.
@@ -115,6 +135,12 @@ Print a description of the object.
 
 ";
 
+%feature("docstring") casadi::Callback::rootfinder_jac "
+
+Access Jacobian of the ths function for a rootfinder.
+
+";
+
 %feature("docstring") casadi::Callback::nnz_out "
 
 Get of number of output nonzeros For a particular output or for all for all
@@ -171,26 +197,6 @@ the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") casadi::Callback::rfp_solver "
-
-Create a solver for rootfinding problems Takes a function where one of the
-inputs is unknown and one of the outputs is a residual function that is
-always zero, defines a new function where the the unknown input has been
-replaced by a guess for the unknown and the residual output has been
-replaced by the calculated value for the input.
-
-For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
-xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
-G(x0, x1, ..., xj_guess, ..., xm),
-
-xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
-
-By default, the first input is unknown and the first output is the residual.
-
-Joel Andersson
 
 ";
 
@@ -286,12 +292,6 @@ returned.
 %feature("docstring") casadi::Callback::getDescription "
 
 Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::Callback::repr "
-
-Print a representation of the object.
 
 ";
 
@@ -454,21 +454,15 @@ Default implementation: dense using inputShape
 
 ";
 
-%feature("docstring") casadi::Callback::rfp_solver_fun "
-
-Access integrator of a root-finding problem solver.
-
-";
-
 %feature("docstring") casadi::Callback::qp_solver_debug "
 
 Generate native code in the interfaced language for debugging
 
 ";
 
-%feature("docstring") casadi::Callback::rfp_solver_linsol "
+%feature("docstring") casadi::Callback::repr "
 
-Access linear solver of a root-finding problem solver.
+Print a representation of the object.
 
 ";
 
@@ -558,6 +552,12 @@ Default implementation: scalar (1,1)
 %feature("docstring") casadi::Callback::dictionary "
 
 Get the dictionary.
+
+";
+
+%feature("docstring") casadi::Callback::rootfinder_fun "
+
+Access rhs function for a rootfinder.
 
 ";
 
@@ -866,12 +866,6 @@ length of res field.
 
 ";
 
-%feature("docstring") casadi::Callback::rfp_solver_jac "
-
-Access Jacobian of a root-finding problem solver.
-
-";
-
 %feature("docstring") casadi::Callback::printOptions "
 
 Print options to a stream.
@@ -1029,6 +1023,12 @@ Get input dimension.
 %feature("docstring") casadi::Callback::sparsity_in "
 
 Get sparsity of a given input.
+
+";
+
+%feature("docstring") casadi::Callback::rootfinder_linsol "
+
+Access linear solver of a rootfinder.
 
 ";
 
@@ -2711,15 +2711,15 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::Function::mx_out "
+%feature("docstring") casadi::Function::rootfinder_linsol "
 
-Get symbolic primitives equivalent to the output expressions.
+Access linear solver of a rootfinder.
 
 ";
 
-%feature("docstring") casadi::Function::rfp_solver_linsol "
+%feature("docstring") casadi::Function::mx_out "
 
-Access linear solver of a root-finding problem solver.
+Get symbolic primitives equivalent to the output expressions.
 
 ";
 
@@ -2770,12 +2770,6 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring") casadi::Function::rfp_solver_fun "
-
-Access integrator of a root-finding problem solver.
-
-";
-
 %feature("docstring") casadi::Function::derivative "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -2804,6 +2798,26 @@ default constructor
 
 Set a function that calculates nfwd forward derivatives NOTE: Does not take
 ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::Function::rootfinder "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
 
 ";
 
@@ -2982,14 +2996,14 @@ Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::Function::getOptionEnumValue "[INTERNAL]  Get
-the enum value corresponding to th certain option.
+%feature("docstring") casadi::Function::rootfinder_jac "
+
+Access Jacobian of the ths function for a rootfinder.
 
 ";
 
-%feature("docstring") casadi::Function::rfp_solver_jac "
-
-Access Jacobian of a root-finding problem solver.
+%feature("docstring") casadi::Function::getOptionEnumValue "[INTERNAL]  Get
+the enum value corresponding to th certain option.
 
 ";
 
@@ -3190,26 +3204,6 @@ Get input scheme name by index.
 %feature("docstring") casadi::Function::mx_in "
 
 Get symbolic primitives equivalent to the input expressions.
-
-";
-
-%feature("docstring") casadi::Function::rfp_solver "
-
-Create a solver for rootfinding problems Takes a function where one of the
-inputs is unknown and one of the outputs is a residual function that is
-always zero, defines a new function where the the unknown input has been
-replaced by a guess for the unknown and the residual output has been
-replaced by the calculated value for the input.
-
-For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
-xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
-G(x0, x1, ..., xj_guess, ..., xm),
-
-xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
-
-By default, the first input is unknown and the first output is the residual.
-
-Joel Andersson
 
 ";
 
@@ -3497,6 +3491,12 @@ internally
 %feature("docstring") casadi::Function::generate "
 
 Export / Generate C code for the function.
+
+";
+
+%feature("docstring") casadi::Function::rootfinder_fun "
+
+Access rhs function for a rootfinder.
 
 ";
 
@@ -4696,6 +4696,12 @@ Access the Jacobian of the constraint function for an NLP solver.
 
 ";
 
+%feature("docstring") casadi::Integrator::rootfinder_linsol "
+
+Access linear solver of a rootfinder.
+
+";
+
 %feature("docstring") casadi::Integrator::nlp_solver_nlp "
 
 Access the NLP for an NLP solver.
@@ -4705,12 +4711,6 @@ Access the NLP for an NLP solver.
 %feature("docstring") casadi::Integrator::sx_out "
 
 Get symbolic primitives equivalent to the output expressions.
-
-";
-
-%feature("docstring") casadi::Integrator::rfp_solver_jac "
-
-Access Jacobian of a root-finding problem solver.
 
 ";
 
@@ -4781,6 +4781,32 @@ Evaluate the function symbolically or numerically.
 %feature("docstring") casadi::Integrator::getStats "
 
 Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::Integrator::rootfinder_jac "
+
+Access Jacobian of the ths function for a rootfinder.
+
+";
+
+%feature("docstring") casadi::Integrator::rootfinder "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
 
 ";
 
@@ -6260,12 +6286,6 @@ Extract the functions needed for the Lifted Newton method.
 
 ";
 
-%feature("docstring") casadi::Integrator::rfp_solver_linsol "
-
-Access linear solver of a root-finding problem solver.
-
-";
-
 %feature("docstring") casadi::Integrator::getOutput "
 
 >  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
@@ -6398,12 +6418,6 @@ Get symbolic primitives equivalent to the input expressions.
 
 ";
 
-%feature("docstring") casadi::Integrator::size1_out "
-
-Get output dimension.
-
-";
-
 %feature("docstring") casadi::Integrator::nnz_in "
 
 Get of number of input nonzeros For a particular input or for all for all of
@@ -6489,6 +6503,12 @@ length of the vector being the number of forward directions. The next two
 arguments are a set of adjoint directional seeds and the resulting adjoint
 directional derivatives, the length of the vector being the number of
 adjoint directions.
+
+";
+
+%feature("docstring") casadi::Integrator::rootfinder_fun "
+
+Access rhs function for a rootfinder.
 
 ";
 
@@ -6714,23 +6734,9 @@ Generate native code in the interfaced language for debugging
 
 ";
 
-%feature("docstring") casadi::Integrator::rfp_solver "
+%feature("docstring") casadi::Integrator::size1_out "
 
-Create a solver for rootfinding problems Takes a function where one of the
-inputs is unknown and one of the outputs is a residual function that is
-always zero, defines a new function where the the unknown input has been
-replaced by a guess for the unknown and the residual output has been
-replaced by the calculated value for the input.
-
-For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
-xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
-G(x0, x1, ..., xj_guess, ..., xm),
-
-xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
-
-By default, the first input is unknown and the first output is the residual.
-
-Joel Andersson
+Get output dimension.
 
 ";
 
@@ -6751,12 +6757,6 @@ propagating_sparsity.cpp)
 %feature("docstring") casadi::Integrator::description_out "
 
 Get output scheme description by index.
-
-";
-
-%feature("docstring") casadi::Integrator::rfp_solver_fun "
-
-Access integrator of a root-finding problem solver.
 
 ";
 
@@ -6917,15 +6917,15 @@ Get symbolic primitives equivalent to the input expressions.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::rfp_solver_linsol "
-
-Access linear solver of a root-finding problem solver.
-
-";
-
 %feature("docstring") casadi::LinearSolver::getAlgorithmSize "
 
 Get the number of atomic operations.
+
+";
+
+%feature("docstring") casadi::LinearSolver::rootfinder_linsol "
+
+Access linear solver of a rootfinder.
 
 ";
 
@@ -7002,12 +7002,6 @@ oind:  The index of the output
 
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring") casadi::LinearSolver::rfp_solver_fun "
-
-Access integrator of a root-finding problem solver.
 
 ";
 
@@ -7101,6 +7095,11 @@ length of iw field.
 
 ";
 
+%feature("docstring") casadi::LinearSolver::getOptionEnumValue "[INTERNAL]
+Get the enum value corresponding to th certain option.
+
+";
+
 %feature("docstring") casadi::LinearSolver::callForward "
 
 Create call to (cached) derivative function, forward mode.
@@ -7182,9 +7181,9 @@ Get all the free variables of the function.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::nlp_solver_hesslag "
+%feature("docstring") casadi::LinearSolver::rootfinder_fun "
 
-Access the Jacobian of the constraint function for an NLP solver.
+Access rhs function for a rootfinder.
 
 ";
 
@@ -7355,41 +7354,6 @@ Remove modules to be monitored.
 
 Set a function that calculates nadj adjoint derivatives NOTE: Does not take
 ownership, only weak references to the derivatives are kept internally.
-
-";
-
-%feature("docstring") casadi::LinearSolver::mapaccum "
-
-Create a mapaccumulated version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (x, u) -> (x_next , y )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (x0, U) -> (X , Y )
-  
-      with
-          U: horzcat([u0, u1, ..., u_(N-1)])
-          X: horzcat([x1, x2, ..., x_N])
-          Y: horzcat([y0, y1, ..., y_(N-1)])
-  
-      and
-          x1, y0 <- f(x0, u0)
-          x2, y1 <- f(x1, u1)
-          ...
-          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
-  
-
-
 
 ";
 
@@ -7891,23 +7855,38 @@ Diagrams
 
 C++ includes: linear_solver.hpp ";
 
-%feature("docstring") casadi::LinearSolver::rfp_solver "
+%feature("docstring") casadi::LinearSolver::mapaccum "
 
-Create a solver for rootfinding problems Takes a function where one of the
-inputs is unknown and one of the outputs is a residual function that is
-always zero, defines a new function where the the unknown input has been
-replaced by a guess for the unknown and the residual output has been
-replaced by the calculated value for the input.
+Create a mapaccumulated version of this function.
 
-For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
-xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
-G(x0, x1, ..., xj_guess, ..., xm),
+Suppose the function has a signature of:
 
-xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+::
 
-By default, the first input is unknown and the first output is the residual.
+     f: (x, u) -> (x_next , y )
+  
 
-Joel Andersson
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -8012,14 +7991,21 @@ returned.
 
 ";
 
+%feature("docstring") casadi::LinearSolver::nlp_solver_hesslag "
+
+Access the Jacobian of the constraint function for an NLP solver.
+
+";
+
 %feature("docstring") casadi::LinearSolver::getFactorizationSparsity "
 
 Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::getOptionEnumValue "[INTERNAL]
-Get the enum value corresponding to th certain option.
+%feature("docstring") casadi::LinearSolver::rootfinder_jac "
+
+Access Jacobian of the ths function for a rootfinder.
 
 ";
 
@@ -8088,12 +8074,6 @@ Get all statistics obtained at the end of the last evaluate call.
 %feature("docstring") casadi::LinearSolver::getAtomicOutput "
 
 Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::LinearSolver::rfp_solver_jac "
-
-Access Jacobian of a root-finding problem solver.
 
 ";
 
@@ -8205,6 +8185,26 @@ Get output dimension.
 %feature("docstring") casadi::LinearSolver::addMonitor "
 
 Add modules to be monitored.
+
+";
+
+%feature("docstring") casadi::LinearSolver::rootfinder "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
 
 ";
 
@@ -10393,6 +10393,12 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
+%feature("docstring") casadi::NlpSolver::rootfinder_jac "
+
+Access Jacobian of the ths function for a rootfinder.
+
+";
+
 %feature("docstring") casadi::NlpSolver::sparsity_out "
 
 Get sparsity of a given output.
@@ -10656,6 +10662,26 @@ Add modules to be monitored.
 
 ";
 
+%feature("docstring") casadi::NlpSolver::rootfinder "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
+
+";
+
 %feature("docstring") casadi::NlpSolver::getOptionTypeName "
 
 Get the type name of a certain option.
@@ -10757,12 +10783,6 @@ get function name with all non alphanumeric characters converted to '_'
 
 %feature("docstring") casadi::NlpSolver::sz_iw "[INTERNAL]  Get required
 length of iw field.
-
-";
-
-%feature("docstring") casadi::NlpSolver::call "
-
-Evaluate the function symbolically or numerically.
 
 ";
 
@@ -11148,12 +11168,6 @@ Print a description of the object.
 %feature("docstring") casadi::NlpSolver::getAlgorithmSize "
 
 Get the number of atomic operations.
-
-";
-
-%feature("docstring") casadi::NlpSolver::rfp_solver_jac "
-
-Access Jacobian of a root-finding problem solver.
 
 ";
 
@@ -15485,9 +15499,8 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::NlpSolver::rfp_solver_fun "
-
-Access integrator of a root-finding problem solver.
+%feature("docstring") casadi::NlpSolver::setOptionByEnumValue "[INTERNAL]
+Set a certain option by giving an enum value.
 
 ";
 
@@ -15560,23 +15573,15 @@ Get all the free variables of the function.
 
 ";
 
-%feature("docstring") casadi::NlpSolver::rfp_solver "
+%feature("docstring") casadi::NlpSolver::rootfinder_fun "
 
-Create a solver for rootfinding problems Takes a function where one of the
-inputs is unknown and one of the outputs is a residual function that is
-always zero, defines a new function where the the unknown input has been
-replaced by a guess for the unknown and the residual output has been
-replaced by the calculated value for the input.
+Access rhs function for a rootfinder.
 
-For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
-xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
-G(x0, x1, ..., xj_guess, ..., xm),
+";
 
-xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+%feature("docstring") casadi::NlpSolver::call "
 
-By default, the first input is unknown and the first output is the residual.
-
-Joel Andersson
+Evaluate the function symbolically or numerically.
 
 ";
 
@@ -15596,11 +15601,6 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::NlpSolver::setOptionByEnumValue "[INTERNAL]
-Set a certain option by giving an enum value.
-
-";
-
 %feature("docstring") casadi::NlpSolver::n_out "
 
 Get the number of function outputs.
@@ -15610,12 +15610,6 @@ Get the number of function outputs.
 %feature("docstring") casadi::NlpSolver::n_in "
 
 Get the number of function inputs.
-
-";
-
-%feature("docstring") casadi::NlpSolver::rfp_solver_linsol "
-
-Access linear solver of a root-finding problem solver.
 
 ";
 
@@ -15671,6 +15665,12 @@ Get input scheme.
 ------------------------------------------------------------------------
 
 Get input scheme name by index.
+
+";
+
+%feature("docstring") casadi::NlpSolver::rootfinder_linsol "
+
+Access linear solver of a rootfinder.
 
 ";
 
@@ -16440,6 +16440,12 @@ Name of the function.
 
 ";
 
+%feature("docstring") casadi::QpSolver::rootfinder_jac "
+
+Access Jacobian of the ths function for a rootfinder.
+
+";
+
 %feature("docstring") casadi::QpSolver::size2_in "
 
 Get input dimension.
@@ -16637,6 +16643,12 @@ Get output scheme description by index.
 %feature("docstring") casadi::QpSolver::type_name "
 
 Get type name.
+
+";
+
+%feature("docstring") casadi::QpSolver::rootfinder_linsol "
+
+Access linear solver of a rootfinder.
 
 ";
 
@@ -17447,26 +17459,6 @@ Add modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::QpSolver::rfp_solver "
-
-Create a solver for rootfinding problems Takes a function where one of the
-inputs is unknown and one of the outputs is a residual function that is
-always zero, defines a new function where the the unknown input has been
-replaced by a guess for the unknown and the residual output has been
-replaced by the calculated value for the input.
-
-For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
-xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
-G(x0, x1, ..., xj_guess, ..., xm),
-
-xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
-
-By default, the first input is unknown and the first output is the residual.
-
-Joel Andersson
-
-";
-
 %feature("docstring") casadi::QpSolver::free_sx "
 
 Get all the free variables of the function.
@@ -17600,9 +17592,9 @@ Get symbolic primitives equivalent to the input expressions.
 
 ";
 
-%feature("docstring") casadi::QpSolver::rfp_solver_fun "
+%feature("docstring") casadi::QpSolver::rootfinder_fun "
 
-Access integrator of a root-finding problem solver.
+Access rhs function for a rootfinder.
 
 ";
 
@@ -17697,6 +17689,26 @@ Parameters:
 val:  can be double&, std::vector<double>&, Matrix<double>&, double *
 
 oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::QpSolver::rootfinder "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
 
 ";
 
@@ -17888,12 +17900,6 @@ Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::QpSolver::rfp_solver_linsol "
-
-Access linear solver of a root-finding problem solver.
-
-";
-
 %feature("docstring") casadi::QpSolver::countNodes "
 
 Number of nodes in the algorithm.
@@ -17904,12 +17910,6 @@ Number of nodes in the algorithm.
 
 Get of number of input elements For a particular input or for all for all of
 the inputs.
-
-";
-
-%feature("docstring") casadi::QpSolver::rfp_solver_jac "
-
-Access Jacobian of a root-finding problem solver.
 
 ";
 
@@ -18054,14 +18054,14 @@ Return a string with a description (for SWIG)
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::Simulator::getOptionEnumValue " [INTERNAL]  Get the enum value
-corresponding to th certain option.
+casadi::Simulator::rootfinder_jac "
+
+Access Jacobian of the ths function for a rootfinder.
 
 ";
 
-%feature("docstring") casadi::Simulator::rfp_solver_jac "
-
-Access Jacobian of a root-finding problem solver.
+%feature("docstring") casadi::Simulator::getOptionEnumValue "[INTERNAL]
+Get the enum value corresponding to th certain option.
 
 ";
 
@@ -18272,26 +18272,6 @@ Get input scheme name by index.
 %feature("docstring") casadi::Simulator::size1_out "
 
 Get output dimension.
-
-";
-
-%feature("docstring") casadi::Simulator::rfp_solver "
-
-Create a solver for rootfinding problems Takes a function where one of the
-inputs is unknown and one of the outputs is a residual function that is
-always zero, defines a new function where the the unknown input has been
-replaced by a guess for the unknown and the residual output has been
-replaced by the calculated value for the input.
-
-For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
-xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
-G(x0, x1, ..., xj_guess, ..., xm),
-
-xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
-
-By default, the first input is unknown and the first output is the residual.
-
-Joel Andersson
 
 ";
 
@@ -18799,6 +18779,12 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
+%feature("docstring") casadi::Simulator::rootfinder_fun "
+
+Access rhs function for a rootfinder.
+
+";
+
 %feature("docstring") casadi::Simulator::nnz_in "
 
 Get of number of input nonzeros For a particular input or for all for all of
@@ -19123,9 +19109,9 @@ Get symbolic primitives equivalent to the output expressions.
 
 ";
 
-%feature("docstring") casadi::Simulator::rfp_solver_linsol "
+%feature("docstring") casadi::Simulator::rootfinder_linsol "
 
-Access linear solver of a root-finding problem solver.
+Access linear solver of a rootfinder.
 
 ";
 
@@ -19138,12 +19124,6 @@ Number of nodes in the algorithm.
 %feature("docstring") casadi::Simulator::free_sx "
 
 Get all the free variables of the function.
-
-";
-
-%feature("docstring") casadi::Simulator::rfp_solver_fun "
-
-Access integrator of a root-finding problem solver.
 
 ";
 
@@ -19197,6 +19177,26 @@ one direction at a time and the last nadj*n_in outputs corresponds to
 adjoint sensitivities, one direction at a time.
 
 (n_in = n_in(), n_out = n_out())
+
+";
+
+%feature("docstring") casadi::Simulator::rootfinder "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
 
 ";
 
