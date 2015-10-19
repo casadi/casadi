@@ -66,7 +66,7 @@ f_q = x[0]**2 + x[1]**2 + u**2
 # Create an integrator
 dae = {'x':x, 'z':z, 'p':u, 'ode':f_x, 'alg':f_z, 'quad':f_q}
 opts = {"tf":0.5} # interval length
-I = Integrator('I', "idas", dae, opts)
+I = Function.integrator('I', "idas", dae, opts)
 
 # All controls
 U = MX.sym("U", 20)
@@ -82,7 +82,7 @@ for k in range(20):
 # Allocate an NLP solver
 nlp = {'x':U, 'f':J, 'g':X}
 opts = {"linear_solver":"ma27"}
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = Function.nlp_solver("solver", "ipopt", nlp, opts)
 
 # Pass bounds, initial guess and solve NLP
 sol = solver({"lbx" : -0.75, # Lower variable bound
