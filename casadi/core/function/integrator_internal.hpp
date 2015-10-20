@@ -118,7 +118,7 @@ namespace casadi {
     /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
     * and \a nadj adjoint sensitivities */
     template<typename MatType>
-      std::pair<Function, Function> getAugmented(int nfwd, int nadj, AugOffset& offset);
+      std::map<std::string, MatType> getAugmented(int nfwd, int nadj, AugOffset& offset);
 
     /// Get offsets in augmented problem
     AugOffset getAugOffset(int nfwd, int nadj);

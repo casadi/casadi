@@ -44,9 +44,6 @@ namespace casadi {
               "End of the time horizon");
     addOption("augmented_options",        OT_DICT,  GenericType(),
               "Options to be passed down to the augmented integrator, if one is constructed.");
-    addOption("expand_augmented",         OT_BOOLEAN,     true,
-              "If DAE callback functions are SXFunction, have augmented"
-              " DAE callback function also be SXFunction.");
 
     if (dae.is_sx) {
       f_ = get_f<SX>();
@@ -288,54 +285,56 @@ namespace casadi {
   }
 
   template<typename MatType>
-  std::pair<Function, Function> IntegratorInternal::getAugmented(int nfwd, int nadj,
-                                                                AugOffset& offset) {
+  map<string, MatType> IntegratorInternal::getAugmented(int nfwd, int nadj,
+                                                        AugOffset& offset) {
     log("IntegratorInternal::getAugmented", "call");
 
     // Return object
-    std::pair<Function, Function> ret;
+    map<string, MatType> ret;
 
     // Calculate offsets
     offset = getAugOffset(nfwd, nadj);
 
     // Create augmented problem
-    MX aug_t = MX::sym("aug_t", f_.input(DAE_T).sparsity());
-    MX aug_x = MX::sym("aug_x", x0().size1(), offset.x.back());
-    MX aug_z = MX::sym("aug_z", std::max(z0().size1(), rz0().size1()), offset.z.back());
-    MX aug_p = MX::sym("aug_p", std::max(p().size1(), rp().size1()), offset.p.back());
-    MX aug_rx = MX::sym("aug_rx", x0().size1(), offset.rx.back());
-    MX aug_rz = MX::sym("aug_rz", std::max(z0().size1(), rz0().size1()), offset.rz.back());
-    MX aug_rp = MX::sym("aug_rp", std::max(qf().size1(), rp().size1()), offset.rp.back());
+    MatType aug_t = MatType::sym("aug_t", f_.input(DAE_T).sparsity());
+    MatType aug_x = MatType::sym("aug_x", x0().size1(), offset.x.back());
+    MatType aug_z = MatType::sym("aug_z", std::max(z0().size1(), rz0().size1()), offset.z.back());
+    MatType aug_p = MatType::sym("aug_p", std::max(p().size1(), rp().size1()), offset.p.back());
+    MatType aug_rx = MatType::sym("aug_rx", x0().size1(), offset.rx.back());
+    MatType aug_rz = MatType::sym("aug_rz", std::max(z0().size1(), rz0().size1()),
+                                  offset.rz.back());
+    MatType aug_rp = MatType::sym("aug_rp", std::max(qf().size1(), rp().size1()),
+                                  offset.rp.back());
 
     // Split up the augmented vectors
-    vector<MX> aug_x_split = horzsplit(aug_x, offset.x);
-    vector<MX>::const_iterator aug_x_split_it = aug_x_split.begin();
-    vector<MX> aug_z_split = horzsplit(aug_z, offset.z);
-    vector<MX>::const_iterator aug_z_split_it = aug_z_split.begin();
-    vector<MX> aug_p_split = horzsplit(aug_p, offset.p);
-    vector<MX>::const_iterator aug_p_split_it = aug_p_split.begin();
-    vector<MX> aug_rx_split = horzsplit(aug_rx, offset.rx);
-    vector<MX>::const_iterator aug_rx_split_it = aug_rx_split.begin();
-    vector<MX> aug_rz_split = horzsplit(aug_rz, offset.rz);
-    vector<MX>::const_iterator aug_rz_split_it = aug_rz_split.begin();
-    vector<MX> aug_rp_split = horzsplit(aug_rp, offset.rp);
-    vector<MX>::const_iterator aug_rp_split_it = aug_rp_split.begin();
+    vector<MatType> aug_x_split = horzsplit(aug_x, offset.x);
+    auto aug_x_split_it = aug_x_split.begin();
+    vector<MatType> aug_z_split = horzsplit(aug_z, offset.z);
+    auto aug_z_split_it = aug_z_split.begin();
+    vector<MatType> aug_p_split = horzsplit(aug_p, offset.p);
+    auto aug_p_split_it = aug_p_split.begin();
+    vector<MatType> aug_rx_split = horzsplit(aug_rx, offset.rx);
+    auto aug_rx_split_it = aug_rx_split.begin();
+    vector<MatType> aug_rz_split = horzsplit(aug_rz, offset.rz);
+    auto aug_rz_split_it = aug_rz_split.begin();
+    vector<MatType> aug_rp_split = horzsplit(aug_rp, offset.rp);
+    auto aug_rp_split_it = aug_rp_split.begin();
 
     // Temporary vector
-    vector<MX> tmp;
+    vector<MatType> tmp;
 
     // Zero with the dimension of t
-    MX zero_t = DMatrix::zeros(aug_t.sparsity());
+    MatType zero_t = DMatrix::zeros(aug_t.sparsity());
 
     // The DAE being constructed
-    vector<MX> f_ode, f_alg, f_quad, g_ode, g_alg, g_quad;
+    vector<MatType> f_ode, f_alg, f_quad, g_ode, g_alg, g_quad;
 
     // Forward derivatives of f
     Function d = f_.derivative(nfwd, 0);
-    vector<MX> f_arg;
+    vector<MatType> f_arg;
     f_arg.reserve(d.n_in());
     tmp.resize(DAE_NUM_IN);
-    fill(tmp.begin(), tmp.end(), MX());
+    fill(tmp.begin(), tmp.end(), MatType());
 
     // Collect arguments for calling d
     for (int dir=-1; dir<nfwd; ++dir) {
@@ -347,12 +346,12 @@ namespace casadi {
     }
 
     // Call d
-    vector<MX> res = d(f_arg);
-    vector<MX>::const_iterator res_it = res.begin();
+    vector<MatType> res = d(f_arg);
+    auto res_it = res.begin();
 
     // Collect right-hand-sides
     tmp.resize(DAE_NUM_OUT);
-    fill(tmp.begin(), tmp.end(), MX());
+    fill(tmp.begin(), tmp.end(), MatType());
     for (int dir=-1; dir<nfwd; ++dir) {
       copy(res_it, res_it+tmp.size(), tmp.begin());
       res_it += tmp.size();
@@ -364,14 +363,14 @@ namespace casadi {
     // Consistency check
     casadi_assert(res_it==res.end());
 
-    vector<MX> g_arg;
+    vector<MatType> g_arg;
     if (!g_.isNull()) {
 
       // Forward derivatives of g
       d = g_.derivative(nfwd, 0);
       g_arg.reserve(d.n_in());
       tmp.resize(RDAE_NUM_IN);
-      fill(tmp.begin(), tmp.end(), MX());
+      fill(tmp.begin(), tmp.end(), MatType());
 
       // Reset iterators
       aug_x_split_it = aug_x_split.begin();
@@ -396,7 +395,7 @@ namespace casadi {
 
       // Collect right-hand-sides
       tmp.resize(RDAE_NUM_OUT);
-      fill(tmp.begin(), tmp.end(), MX());
+      fill(tmp.begin(), tmp.end(), MatType());
       for (int dir=-1; dir<nfwd; ++dir) {
         copy(res_it, res_it+tmp.size(), tmp.begin());
         res_it += tmp.size();
@@ -418,7 +417,7 @@ namespace casadi {
 
       // Collect arguments for calling d
       tmp.resize(DAE_NUM_OUT);
-      fill(tmp.begin(), tmp.end(), MX());
+      fill(tmp.begin(), tmp.end(), MatType());
       for (int dir=0; dir<nadj; ++dir) {
         if ( nx_>0) tmp[DAE_ODE] = *aug_rx_split_it++;
         if ( nz_>0) tmp[DAE_ALG] = *aug_rz_split_it++;
@@ -457,7 +456,7 @@ namespace casadi {
 
         // Collect arguments for calling der
         tmp.resize(RDAE_NUM_OUT);
-        fill(tmp.begin(), tmp.end(), MX());
+        fill(tmp.begin(), tmp.end(), MatType());
         for (int dir=0; dir<nadj; ++dir) {
           if (nrx_>0) tmp[RDAE_ODE] = *aug_x_split_it++;
           if (nrz_>0) tmp[RDAE_ALG] = *aug_z_split_it++;
@@ -485,9 +484,9 @@ namespace casadi {
         casadi_assert(g_quad_ind == g_quad.size());
 
         // Remove the dependency of rx, rz, rp in the forward integration (see Joel's thesis)
-        if (nrx_>0) g_arg[RDAE_RX] = MX::zeros(g_arg[RDAE_RX].sparsity());
-        if (nrz_>0) g_arg[RDAE_RZ] = MX::zeros(g_arg[RDAE_RZ].sparsity());
-        if (nrp_>0) g_arg[RDAE_RP] = MX::zeros(g_arg[RDAE_RP].sparsity());
+        if (nrx_>0) g_arg[RDAE_RX] = MatType::zeros(g_arg[RDAE_RX].sparsity());
+        if (nrz_>0) g_arg[RDAE_RZ] = MatType::zeros(g_arg[RDAE_RZ].sparsity());
+        if (nrp_>0) g_arg[RDAE_RP] = MatType::zeros(g_arg[RDAE_RP].sparsity());
 
         // Call der again
         res = d(g_arg);
@@ -508,55 +507,23 @@ namespace casadi {
       }
     }
 
-    // Do we want to expand MXFunction->SXFunction?
-    bool expand = getOption("expand_augmented");
-
-    // Can we expand?
-    expand = expand && f_.is_a("sxfunction") && (g_.isNull() || g_.is_a("sxfunction"));
-
-    // Form the augmented forward integration function
-    if (g_.isNull() && nfwd==0) {
-      ret.first = f_; // reuse the existing one
-    } else {
-      vector<MX> f_in(DAE_NUM_IN), f_out(DAE_NUM_OUT);
-      f_in[DAE_T] = aug_t;
-      f_in[DAE_X] = aug_x;
-      f_in[DAE_Z] = aug_z;
-      f_in[DAE_P] = aug_p;
-      if (!f_ode.empty()) f_out[DAE_ODE] = densify(horzcat(f_ode));
-      if (!f_alg.empty()) f_out[DAE_ALG] = densify(horzcat(f_alg));
-      if (!f_quad.empty()) f_out[DAE_QUAD] = densify(horzcat(f_quad));
-      Function f_mx = MX::fun("dae", f_in, f_out);
-
-      // Expand to SXFuncion?
-      if (expand) {
-        ret.first = SX::fun("dae", f_mx);
-      } else {
-        ret.first = f_mx;
-      }
-    }
+    // Form the augmented forward integration
+    ret["t"] = aug_t;
+    ret["x"] = aug_x;
+    ret["z"] = aug_z;
+    ret["p"] = aug_p;
+    if (!f_ode.empty()) ret["ode"] = densify(horzcat(f_ode));
+    if (!f_alg.empty()) ret["alg"] = densify(horzcat(f_alg));
+    if (!f_quad.empty()) ret["quad"] = densify(horzcat(f_quad));
 
     // Form the augmented backward integration function
     if (!g_ode.empty()) {
-      vector<MX> g_in(RDAE_NUM_IN), g_out(RDAE_NUM_OUT);
-      g_in[RDAE_T] = aug_t;
-      g_in[RDAE_X] = aug_x;
-      g_in[RDAE_Z] = aug_z;
-      g_in[RDAE_P] = aug_p;
-      g_in[RDAE_RX] = aug_rx;
-      g_in[RDAE_RZ] = aug_rz;
-      g_in[RDAE_RP] = aug_rp;
-      if (!g_ode.empty()) g_out[RDAE_ODE] = densify(horzcat(g_ode));
-      if (!g_alg.empty()) g_out[RDAE_ALG] = densify(horzcat(g_alg));
-      if (!g_quad.empty()) g_out[RDAE_QUAD] = densify(horzcat(g_quad));
-      Function g_mx = MX::fun("rdae", g_in, g_out);
-
-      // Expand to SXFuncion?
-      if (expand) {
-        ret.second = SX::fun("rdae", g_mx);
-      } else {
-        ret.second = g_mx;
-      }
+      ret["rx"] = aug_rx;
+      ret["rz"] = aug_rz;
+      ret["rp"] = aug_rp;
+      if (!g_ode.empty()) ret["rode"] = densify(horzcat(g_ode));
+      if (!g_alg.empty()) ret["ralg"] = densify(horzcat(g_alg));
+      if (!g_quad.empty()) ret["rquad"] = densify(horzcat(g_quad));
     }
 
     // Consistency check
@@ -843,12 +810,12 @@ namespace casadi {
     Function integrator;
     AugOffset offset;
     if (f_.is_a("sxfunction")) {
-      std::pair<Function, Function> aug_dae = getAugmented<SX>(nfwd, 0, offset);
-      integrator = Integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+      SXDict aug_dae = getAugmented<SX>(nfwd, 0, offset);
+      integrator = Function::integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
     } else {
       casadi_assert(f_.is_a("mxfunction"));
-      std::pair<Function, Function> aug_dae = getAugmented<MX>(nfwd, 0, offset);
-      integrator = Integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+      MXDict aug_dae = getAugmented<MX>(nfwd, 0, offset);
+      integrator = Function::integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
     }
 
     // All inputs of the return function
@@ -990,12 +957,12 @@ namespace casadi {
     Function integrator;
     AugOffset offset;
     if (f_.is_a("sxfunction")) {
-      std::pair<Function, Function> aug_dae = getAugmented<SX>(0, nadj, offset);
-      integrator = Integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+      SXDict aug_dae = getAugmented<SX>(0, nadj, offset);
+      integrator = Function::integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
     } else {
       casadi_assert(f_.is_a("mxfunction"));
-      std::pair<Function, Function> aug_dae = getAugmented<MX>(0, nadj, offset);
-      integrator = Integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+      MXDict aug_dae = getAugmented<MX>(0, nadj, offset);
+      integrator = Function::integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
     }
 
     // All inputs of the return function

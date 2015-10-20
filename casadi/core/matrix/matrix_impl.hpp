@@ -2036,16 +2036,15 @@ namespace casadi {
     ret.reserve(sp.size());
 
     // Copy data
-    typename std::vector<DataType>::const_iterator data_start=begin(), data_stop;
-    for (std::vector<Sparsity>::const_iterator j=sp.begin(); j!=sp.end(); ++j) {
-      data_stop = data_start + j->nnz();
-      ret.push_back(Matrix<DataType>(*j, std::vector<DataType>(data_start,
-                                                               data_stop), false));
-      data_start = data_stop;
+    auto i=begin();
+    for (auto&& j : sp) {
+      auto i_next = i + j.nnz();
+      ret.push_back(Matrix<DataType>(j, std::vector<DataType>(i, i_next), false));
+      i = i_next;
     }
 
     // Return the assembled matrix
-    casadi_assert(data_stop==end());
+    casadi_assert(i==end());
     return ret;
   }
 
