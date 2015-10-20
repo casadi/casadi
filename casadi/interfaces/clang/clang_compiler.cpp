@@ -86,6 +86,8 @@ namespace casadi {
   void ClangCompiler::init() {
     // Initialize the base classes
     CompilerInternal::init();
+    
+    getIncludes("system_includes.txt", "E:\casadi-matlabR2014b-cad02fe\casadi\jit");
 
     // Arguments to pass to the clang frontend
     vector<const char *> args(1, name_.c_str());
