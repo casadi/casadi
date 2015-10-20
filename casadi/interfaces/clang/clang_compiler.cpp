@@ -280,19 +280,19 @@ namespace casadi {
     std::string file_name = path + sep + file;
     userOut() << "test001cc" << file_name << std::endl;
     std::ifstream setup_file(file_name.c_str());
-    
-    if (!setup_file) {
-      userOut() << "nothing here" << std::endl;
-      return ret;
-    }
-    userOut() << "test001c" << std::endl;
-    
+
     userOut() << setup_file.is_open() << std::endl;
     userOut() << setup_file.good() << std::endl;
     userOut() << setup_file.eof() << std::endl;
     userOut() << setup_file.fail() << std::endl;
     userOut() << setup_file.bad() << std::endl;
     userOut() << setup_file.rdstate() << std::endl;
+    
+    if (!setup_file) {
+      userOut() << "nothing here" << std::endl;
+      return ret;
+    }
+    userOut() << "test001c" << std::endl;
 
     std::string line;
     userOut() << "test002" << std::endl;
