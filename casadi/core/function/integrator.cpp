@@ -52,7 +52,6 @@ namespace casadi {
     if (f.is_a("sxfunction")) {
       SXDict dae;
       vector<SX> v = SX::get_input(f), vf=v, vg=v;
-      for (auto&& i : v) casadi_assert(i.isSymbolic());
       dae["t"] = v[DAE_T];
       dae["x"] = v[DAE_X];
       dae["z"] = v[DAE_Z];
@@ -63,7 +62,6 @@ namespace casadi {
       dae["quad"] = v[DAE_QUAD];
       if (!g.isNull()) {
         v = SX::get_input(g);
-        for (auto&& i : v) casadi_assert(i.isSymbolic());
         dae["rx"] = v[RDAE_RX];
         dae["rz"] = v[RDAE_RZ];
         dae["rp"] = v[RDAE_RP];
@@ -82,7 +80,6 @@ namespace casadi {
       casadi_assert(f.is_a("mxfunction"));
       MXDict dae;
       vector<MX> v = MX::get_input(f), vf=v, vg=v;
-      for (auto&& i : v) casadi_assert(i.isSymbolic());
       dae["t"] = v[DAE_T];
       dae["x"] = v[DAE_X];
       dae["z"] = v[DAE_Z];
@@ -93,7 +90,6 @@ namespace casadi {
       dae["quad"] = v[DAE_QUAD];
       if (!g.isNull()) {
         v = MX::get_input(g);
-        for (auto&& i : v) casadi_assert(i.isSymbolic());
         dae["rx"] = v[RDAE_RX];
         dae["rz"] = v[RDAE_RZ];
         dae["rp"] = v[RDAE_RP];
