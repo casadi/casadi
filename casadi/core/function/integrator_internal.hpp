@@ -45,7 +45,7 @@ namespace casadi {
                        public PluginInterface<IntegratorInternal> {
   public:
     /** \brief  Constructor */
-    IntegratorInternal(const std::string& name, const Function& f, const Function& g);
+    IntegratorInternal(const std::string& name, const XDict& dae);
 
     /** \brief  Destructor */
     virtual ~IntegratorInternal()=0;
@@ -129,6 +129,12 @@ namespace casadi {
     /// Create sparsity pattern of the extended Jacobian (backward problem)
     Sparsity spJacG();
 
+    /// Get the (legacy) dae forward function
+    template<typename MatType> Function get_f() const;
+
+    /// Get the (legacy) dae backward function
+    template<typename MatType> Function get_g() const;
+
     ///@{
     // Shorthands
     DMatrix&  x0() { return input(INTEGRATOR_X0);}
@@ -160,6 +166,9 @@ namespace casadi {
     // Current time
     double t_;
 
+    // Dae
+    XDict dae_;
+
     /// ODE/DAE forward integration function
     Function f_;
 
@@ -174,8 +183,7 @@ namespace casadi {
 
     // Creator function for internal class
     typedef IntegratorInternal* (*Creator)(const std::string& name,
-                                           const Function& f,
-                                           const Function& g);
+                                           const XDict& dae);
 
     // No static functions exposed
     struct Exposed{ };

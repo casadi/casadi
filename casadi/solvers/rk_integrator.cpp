@@ -43,8 +43,8 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_rk);
   }
 
-  RkIntegrator::RkIntegrator(const std::string& name, const Function& f, const Function& g)
-    : FixedStepIntegrator(name, f, g) {
+  RkIntegrator::RkIntegrator(const std::string& name, const XDict& dae)
+    : FixedStepIntegrator(name, dae) {
   }
 
   RkIntegrator::~RkIntegrator() {

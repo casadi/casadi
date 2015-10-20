@@ -50,8 +50,8 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_idas);
   }
 
-  IdasInterface::IdasInterface(const std::string& name, const Function& f, const Function& g)
-    : SundialsInterface(name, f, g) {
+  IdasInterface::IdasInterface(const std::string& name, const XDict& dae)
+    : SundialsInterface(name, dae) {
 
     addOption("suppress_algebraic",          OT_BOOLEAN,          false,
               "Suppress algebraic variables in the error testing");

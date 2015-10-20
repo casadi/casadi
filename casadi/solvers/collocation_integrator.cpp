@@ -45,9 +45,8 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_collocation);
   }
 
-  CollocationIntegrator::CollocationIntegrator(const std::string& name, const Function& f,
-                                               const Function& g)
-      : ImplicitFixedStepIntegrator(name, f, g) {
+  CollocationIntegrator::CollocationIntegrator(const std::string& name, const XDict& dae)
+    : ImplicitFixedStepIntegrator(name, dae) {
 
     addOption("interpolation_order",           OT_INTEGER,  3,
               "Order of the interpolating polynomials");

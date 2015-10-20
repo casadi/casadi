@@ -29,9 +29,8 @@
 using namespace std;
 namespace casadi {
 
-  FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const Function& f,
-                                           const Function& g)
-      : IntegratorInternal(name, f, g) {
+  FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const XDict& dae)
+      : IntegratorInternal(name, dae) {
 
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   }

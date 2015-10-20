@@ -32,10 +32,8 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace casadi {
 
-  IntegratorInternal::IntegratorInternal(const std::string& name,
-                                         const Function& f,
-                                         const Function& g)
-    : FunctionInternal(name), f_(f), g_(g) {
+  IntegratorInternal::IntegratorInternal(const std::string& name, const XDict& dae)
+    : FunctionInternal(name), dae_(dae) {
 
     // Additional options
     addOption("print_stats",              OT_BOOLEAN,     false,
@@ -50,6 +48,14 @@ namespace casadi {
               "If DAE callback functions are SXFunction, have augmented"
               " DAE callback function also be SXFunction.");
 
+    if (dae.is_sx) {
+      f_ = get_f<SX>();
+      g_ = get_g<SX>();
+    } else {
+      f_ = get_f<MX>();
+      g_ = get_g<MX>();
+    }
+
     // Negative number of parameters for consistancy checking
     np_ = -1;
 
@@ -58,6 +64,60 @@ namespace casadi {
   }
 
   IntegratorInternal::~IntegratorInternal() {
+  }
+
+  template<typename MatType>
+  Function IntegratorInternal::get_f() const {
+    vector<MatType> dae_in(DAE_NUM_IN), dae_out(DAE_NUM_OUT);
+    map<string, MatType> dae = this->dae_;
+    for (auto&& i : dae) {
+      if (i.first=="x") {
+        dae_in[DAE_X]=i.second;
+      } else if (i.first=="z") {
+        dae_in[DAE_Z]=i.second;
+      } else if (i.first=="p") {
+        dae_in[DAE_P]=i.second;
+      } else if (i.first=="t") {
+        dae_in[DAE_T]=i.second;
+      } else if (i.first=="ode") {
+        dae_out[DAE_ODE]=i.second;
+      } else if (i.first=="alg") {
+        dae_out[DAE_ALG]=i.second;
+      } else if (i.first=="quad") {
+        dae_out[DAE_QUAD]=i.second;
+      }
+    }
+    return MatType::fun("dae", dae_in, dae_out);
+  }
+
+  template<typename MatType>
+  Function IntegratorInternal::get_g() const {
+    vector<MatType> rdae_in(RDAE_NUM_IN), rdae_out(RDAE_NUM_OUT);
+    map<string, MatType> dae = this->dae_;
+    for (auto&& i : dae) {
+      if (i.first=="x") {
+        rdae_in[RDAE_X]=i.second;
+      } else if (i.first=="z") {
+        rdae_in[RDAE_Z]=i.second;
+      } else if (i.first=="p") {
+        rdae_in[RDAE_P]=i.second;
+      } else if (i.first=="t") {
+        rdae_in[RDAE_T]=i.second;
+      } else if (i.first=="rx") {
+        rdae_in[RDAE_RX]=i.second;
+      } else if (i.first=="rz") {
+        rdae_in[RDAE_RZ]=i.second;
+      } else if (i.first=="rp") {
+        rdae_in[RDAE_RP]=i.second;
+      } else if (i.first=="rode") {
+        rdae_out[RDAE_ODE]=i.second;
+      } else if (i.first=="ralg") {
+        rdae_out[RDAE_ALG]=i.second;
+      } else if (i.first=="rquad") {
+        rdae_out[RDAE_QUAD]=i.second;
+      }
+    }
+    return MatType::fun("rdae", rdae_in, rdae_out);
   }
 
   Sparsity IntegratorInternal::get_sparsity_in(int ind) const {

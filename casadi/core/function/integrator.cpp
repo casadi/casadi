@@ -76,46 +76,8 @@ namespace casadi {
         dae["ralg"] = v[RDAE_ALG];
         dae["rquad"] = v[RDAE_QUAD];
       }
-
-      vector<SX> dae_in(DAE_NUM_IN), dae_out(DAE_NUM_OUT),
-        rdae_in(RDAE_NUM_IN), rdae_out(RDAE_NUM_OUT);
-      bool has_g = false;
-      for (auto i=dae.begin(); i!=dae.end(); ++i) {
-        if (i->first=="x") {
-          dae_in[DAE_X]=rdae_in[RDAE_X]=i->second;
-        } else if (i->first=="z") {
-          dae_in[DAE_Z]=rdae_in[RDAE_Z]=i->second;
-        } else if (i->first=="p") {
-          dae_in[DAE_P]=rdae_in[RDAE_P]=i->second;
-        } else if (i->first=="t") {
-          dae_in[DAE_T]=rdae_in[RDAE_T]=i->second;
-        } else if (i->first=="ode") {
-          dae_out[DAE_ODE]=i->second;
-        } else if (i->first=="alg") {
-          dae_out[DAE_ALG]=i->second;
-        } else if (i->first=="quad") {
-          dae_out[DAE_QUAD]=i->second;
-        } else if (i->first=="rx") {
-          rdae_in[RDAE_RX]=i->second;
-          has_g = has_g || !rdae_in[RDAE_RX].isempty();
-        } else if (i->first=="rz") {
-          rdae_in[RDAE_RZ]=i->second;
-        } else if (i->first=="rp") {
-          rdae_in[RDAE_RP]=i->second;
-        } else if (i->first=="rode") {
-          rdae_out[RDAE_ODE]=i->second;
-        } else if (i->first=="ralg") {
-          rdae_out[RDAE_ALG]=i->second;
-        } else if (i->first=="rquad") {
-          rdae_out[RDAE_QUAD]=i->second;
-        } else {
-          casadi_error("No such field: \"" + i->first + "\"");
-        }
-      }
-      Function f2, g2;
-      f2 = SX::fun("dae", dae_in, dae_out);
-      if (has_g) g2 = SX::fun("rdae", rdae_in, rdae_out);
-      assignNode(IntegratorInternal::getPlugin(solver).creator(name, f2, g2));
+      Function tmp = Function::integrator(name, solver, dae, opts);
+      assignNode(tmp.get());
     } else {
       casadi_assert(f.is_a("mxfunction"));
       MXDict dae;
@@ -144,50 +106,9 @@ namespace casadi {
         dae["ralg"] = v[RDAE_ALG];
         dae["rquad"] = v[RDAE_QUAD];
       }
-
-      vector<MX> dae_in(DAE_NUM_IN), dae_out(DAE_NUM_OUT),
-        rdae_in(RDAE_NUM_IN), rdae_out(RDAE_NUM_OUT);
-      bool has_g = false;
-      for (auto i=dae.begin(); i!=dae.end(); ++i) {
-        if (i->first=="x") {
-          dae_in[DAE_X]=rdae_in[RDAE_X]=i->second;
-        } else if (i->first=="z") {
-          dae_in[DAE_Z]=rdae_in[RDAE_Z]=i->second;
-        } else if (i->first=="p") {
-          dae_in[DAE_P]=rdae_in[RDAE_P]=i->second;
-        } else if (i->first=="t") {
-          dae_in[DAE_T]=rdae_in[RDAE_T]=i->second;
-        } else if (i->first=="ode") {
-          dae_out[DAE_ODE]=i->second;
-        } else if (i->first=="alg") {
-          dae_out[DAE_ALG]=i->second;
-        } else if (i->first=="quad") {
-          dae_out[DAE_QUAD]=i->second;
-        } else if (i->first=="rx") {
-          rdae_in[RDAE_RX]=i->second;
-          has_g = has_g || !rdae_in[RDAE_RX].isempty();
-        } else if (i->first=="rz") {
-          rdae_in[RDAE_RZ]=i->second;
-        } else if (i->first=="rp") {
-          rdae_in[RDAE_RP]=i->second;
-        } else if (i->first=="rode") {
-          rdae_out[RDAE_ODE]=i->second;
-        } else if (i->first=="ralg") {
-          rdae_out[RDAE_ALG]=i->second;
-        } else if (i->first=="rquad") {
-          rdae_out[RDAE_QUAD]=i->second;
-        } else {
-          casadi_error("No such field: \"" + i->first + "\"");
-        }
-      }
-      Function f2, g2;
-      f2 = MX::fun("dae", dae_in, dae_out);
-      if (has_g) g2 = MX::fun("rdae", rdae_in, rdae_out);
-      assignNode(IntegratorInternal::getPlugin(solver).creator(name, f2, g2));
+      Function tmp = Function::integrator(name, solver, dae, opts);
+      assignNode(tmp.get());
     }
-
-    setOption(opts);
-    init();
   }
 
   void Integrator::printStats(ostream &stream) const {
