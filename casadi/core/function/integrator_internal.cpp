@@ -32,7 +32,7 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace casadi {
 
-  IntegratorInternal::IntegratorInternal(const std::string& name, const XDict& dae)
+  IntegratorInternal::IntegratorInternal(const std::string& name, const XProblem& dae)
     : FunctionInternal(name), dae_(dae) {
 
     // Additional options
@@ -66,54 +66,31 @@ namespace casadi {
   template<typename MatType>
   Function IntegratorInternal::get_f() const {
     vector<MatType> dae_in(DAE_NUM_IN), dae_out(DAE_NUM_OUT);
-    map<string, MatType> dae = this->dae_;
-    for (auto&& i : dae) {
-      if (i.first=="x") {
-        dae_in[DAE_X]=i.second;
-      } else if (i.first=="z") {
-        dae_in[DAE_Z]=i.second;
-      } else if (i.first=="p") {
-        dae_in[DAE_P]=i.second;
-      } else if (i.first=="t") {
-        dae_in[DAE_T]=i.second;
-      } else if (i.first=="ode") {
-        dae_out[DAE_ODE]=i.second;
-      } else if (i.first=="alg") {
-        dae_out[DAE_ALG]=i.second;
-      } else if (i.first=="quad") {
-        dae_out[DAE_QUAD]=i.second;
-      }
-    }
+    const Problem<MatType>& dae = this->dae_;
+    dae_in[DAE_T]=dae.in[DE_T];
+    dae_in[DAE_X]=dae.in[DE_X];
+    dae_in[DAE_Z]=dae.in[DE_Z];
+    dae_in[DAE_P]=dae.in[DE_P];
+    dae_out[DAE_ODE]=dae.out[DE_ODE];
+    dae_out[DAE_ALG]=dae.out[DE_ALG];
+    dae_out[DAE_QUAD]=dae.out[DE_QUAD];
     return MatType::fun("dae", dae_in, dae_out);
   }
 
   template<typename MatType>
   Function IntegratorInternal::get_g() const {
     vector<MatType> rdae_in(RDAE_NUM_IN), rdae_out(RDAE_NUM_OUT);
-    map<string, MatType> dae = this->dae_;
-    for (auto&& i : dae) {
-      if (i.first=="x") {
-        rdae_in[RDAE_X]=i.second;
-      } else if (i.first=="z") {
-        rdae_in[RDAE_Z]=i.second;
-      } else if (i.first=="p") {
-        rdae_in[RDAE_P]=i.second;
-      } else if (i.first=="t") {
-        rdae_in[RDAE_T]=i.second;
-      } else if (i.first=="rx") {
-        rdae_in[RDAE_RX]=i.second;
-      } else if (i.first=="rz") {
-        rdae_in[RDAE_RZ]=i.second;
-      } else if (i.first=="rp") {
-        rdae_in[RDAE_RP]=i.second;
-      } else if (i.first=="rode") {
-        rdae_out[RDAE_ODE]=i.second;
-      } else if (i.first=="ralg") {
-        rdae_out[RDAE_ALG]=i.second;
-      } else if (i.first=="rquad") {
-        rdae_out[RDAE_QUAD]=i.second;
-      }
-    }
+    const Problem<MatType>& dae = this->dae_;
+    rdae_in[RDAE_T]=dae.in[DE_T];
+    rdae_in[RDAE_X]=dae.in[DE_X];
+    rdae_in[RDAE_Z]=dae.in[DE_Z];
+    rdae_in[RDAE_P]=dae.in[DE_P];
+    rdae_in[RDAE_RX]=dae.in[DE_RX];
+    rdae_in[RDAE_RZ]=dae.in[DE_RZ];
+    rdae_in[RDAE_RP]=dae.in[DE_RP];
+    rdae_out[RDAE_ODE]=dae.out[DE_RODE];
+    rdae_out[RDAE_ALG]=dae.out[DE_RALG];
+    rdae_out[RDAE_QUAD]=dae.out[DE_RQUAD];
     return MatType::fun("rdae", rdae_in, rdae_out);
   }
 

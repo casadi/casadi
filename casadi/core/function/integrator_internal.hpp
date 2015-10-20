@@ -45,7 +45,7 @@ namespace casadi {
                        public PluginInterface<IntegratorInternal> {
   public:
     /** \brief  Constructor */
-    IntegratorInternal(const std::string& name, const XDict& dae);
+    IntegratorInternal(const std::string& name, const XProblem& dae);
 
     /** \brief  Destructor */
     virtual ~IntegratorInternal()=0;
@@ -171,7 +171,7 @@ namespace casadi {
     double t_;
 
     // Dae
-    XDict dae_;
+    XProblem dae_;
 
     /// ODE/DAE forward integration function
     Function f_;
@@ -187,7 +187,7 @@ namespace casadi {
 
     // Creator function for internal class
     typedef IntegratorInternal* (*Creator)(const std::string& name,
-                                           const XDict& dae);
+                                           const XProblem& dae);
 
     // No static functions exposed
     struct Exposed{ };
@@ -197,7 +197,72 @@ namespace casadi {
 
     /// Infix
     static const std::string infix_;
+
+    /// Convert dictionary to Problem
+    template<typename XType>
+      static Problem<XType> map2problem(const std::map<std::string, XType>& d);
+
+    /// Convert Problem to dictionary
+    template<typename XType>
+      static std::map<std::string, XType> problem2map(const Problem<XType>& d);
   };
+
+
+  template<typename XType>
+  Problem<XType> IntegratorInternal::map2problem(const std::map<std::string, XType>& d) {
+    std::vector<XType> dae_in(DE_NUM_IN), dae_out(DE_NUM_OUT);
+    for (auto&& i : d) {
+      if (i.first=="t") {
+        dae_in[DE_T]=i.second;
+      } else if (i.first=="x") {
+        dae_in[DE_X]=i.second;
+      } else if (i.first=="z") {
+        dae_in[DE_Z]=i.second;
+      } else if (i.first=="p") {
+        dae_in[DE_P]=i.second;
+      } else if (i.first=="rx") {
+        dae_in[DE_RX]=i.second;
+      } else if (i.first=="rz") {
+        dae_in[DE_RZ]=i.second;
+      } else if (i.first=="rp") {
+        dae_in[DE_RP]=i.second;
+      } else if (i.first=="ode") {
+        dae_out[DE_ODE]=i.second;
+      } else if (i.first=="alg") {
+        dae_out[DE_ALG]=i.second;
+      } else if (i.first=="quad") {
+        dae_out[DE_QUAD]=i.second;
+      } else if (i.first=="rode") {
+        dae_out[DE_RODE]=i.second;
+      } else if (i.first=="ralg") {
+        dae_out[DE_RALG]=i.second;
+      } else if (i.first=="rquad") {
+        dae_out[DE_RQUAD]=i.second;
+      } else {
+        casadi_error("No such field: " + i.first);
+      }
+    }
+    return Problem<XType>{dae_in, dae_out};
+  }
+
+  template<typename XType>
+  std::map<std::string, XType> IntegratorInternal::problem2map(const Problem<XType>& d) {
+    return std::map<std::string, XType>{
+        {"t", d.in[DE_T]},
+        {"x", d.in[DE_X]},
+        {"z", d.in[DE_Z]},
+        {"p", d.in[DE_P]},
+        {"rx", d.in[DE_RX]},
+        {"rz", d.in[DE_RZ]},
+        {"rp", d.in[DE_RP]},
+        {"ode", d.out[DE_ODE]},
+        {"alg", d.out[DE_ALG]},
+        {"quad", d.out[DE_QUAD]},
+        {"rode", d.out[DE_RODE]},
+        {"ralg", d.out[DE_RALG]},
+        {"rquad", d.out[DE_RQUAD]},
+      };
+  }
 
 } // namespace casadi
 /// \endcond

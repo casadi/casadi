@@ -30,7 +30,7 @@ using namespace std;
 namespace casadi {
 
   ImplicitFixedStepIntegrator::
-  ImplicitFixedStepIntegrator(const std::string& name, const XDict& dae)
+  ImplicitFixedStepIntegrator(const std::string& name, const XProblem& dae)
     : FixedStepIntegrator(name, dae) {
     addOption("implicit_solver",               OT_STRING,  GenericType(),
               "An implicit function solver");

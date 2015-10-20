@@ -36,6 +36,38 @@
 */
 
 namespace casadi {
+#ifndef SWIG
+  /** Symbolic representation of a problem */
+  template<typename XType>
+  struct Problem {
+    std::vector<XType> in;
+    std::vector<XType> out;
+  };
+  typedef Problem<SX> SXProblem;
+  typedef Problem<MX> MXProblem;
+
+  /** Can be either an SXProblem or MXProblem */
+  class XProblem {
+  public:
+    union {
+      SXProblem *sx_p;
+      MXProblem *mx_p;
+    };
+    bool is_sx;
+    /// Object is SX
+    XProblem(const SXProblem& d);
+    /// Object is MX
+    XProblem(const MXProblem& d);
+    /// Copy constructor
+    XProblem(const XProblem& d);
+    XProblem& operator=(const XProblem& d);
+    /// Destructor
+    ~XProblem();
+    /// Type cast
+    operator const SXProblem&() const;
+    operator const MXProblem&() const;
+  };
+#endif // SWIG
 
   /** Forward declaration of internal class */
   class FunctionInternal;
@@ -1125,6 +1157,10 @@ namespace casadi {
                                const SXDict& dae, const Dict& opts=Dict());
     static Function integrator(const std::string& name, const std::string& solver,
                                const MXDict& dae, const Dict& opts=Dict());
+#ifndef SWIG
+    static Function integrator(const std::string& name, const std::string& solver,
+                               const XProblem& dae, const Dict& opts=Dict());
+#endif // SWIG
     ///@}
 
     /// Get the DAE for an integrator

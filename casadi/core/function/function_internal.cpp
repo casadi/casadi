@@ -40,57 +40,6 @@
 using namespace std;
 
 namespace casadi {
-  XDict::XDict(const SXDict& d) : sx_p(new SXDict(d)), is_sx(true) {
-  }
-
-  XDict::XDict(const MXDict& d) : mx_p(new MXDict(d)), is_sx(false) {
-  }
-
-  XDict::~XDict() {
-    if (is_sx) {
-      delete sx_p;
-    } else {
-      delete mx_p;
-    }
-  }
-
-  XDict::XDict(const XDict& d) : is_sx(d.is_sx) {
-    if (d.is_sx) {
-      sx_p = new SXDict(*d.sx_p);
-    } else {
-      mx_p = new MXDict(*d.mx_p);
-    }
-  }
-
-  XDict& XDict::operator=(const XDict& d) {
-    if (&d!=this) {
-      // Delete the previous object
-      if (is_sx) {
-        delete sx_p;
-      } else {
-        delete mx_p;
-      }
-      // Assign
-      is_sx = d.is_sx;
-      if (is_sx) {
-        sx_p = new SXDict(*d.sx_p);
-      } else {
-        mx_p = new MXDict(*d.mx_p);
-      }
-    }
-    return *this;
-  }
-
-  XDict::operator SXDict() const {
-    casadi_assert(is_sx);
-    return *sx_p;
-  }
-
-  XDict::operator MXDict() const {
-    casadi_assert(!is_sx);
-    return *mx_p;
-  }
-
   FunctionInternal::FunctionInternal(const std::string& name) : name_(name) {
     addOption("verbose",                  OT_BOOLEAN,             false,
               "Verbose evaluation -- for debugging");

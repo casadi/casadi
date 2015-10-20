@@ -49,7 +49,7 @@ namespace casadi {
   }
 
   OldCollocationIntegrator::
-  OldCollocationIntegrator(const std::string& name, const XDict& dae)
+  OldCollocationIntegrator(const std::string& name, const XProblem& dae)
     : IntegratorInternal(name, dae) {
 
     addOption("number_of_finite_elements",     OT_INTEGER,  20,

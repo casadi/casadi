@@ -42,29 +42,6 @@
 /// \cond INTERNAL
 
 namespace casadi {
-
-  /** Helper class, can be either an MXDict or SXDict */
-  class XDict {
-  public:
-    union {
-      SXDict *sx_p;
-      MXDict *mx_p;
-    };
-    bool is_sx;
-    /// Object is an SXDict
-    XDict(const SXDict& d);
-    /// Object is an MXDict
-    XDict(const MXDict& d);
-    /// Copy constructor
-    XDict(const XDict& d);
-    XDict& operator=(const XDict& d);
-    /// Destructor
-    ~XDict();
-    /// Type cast
-    operator SXDict() const;
-    operator MXDict() const;
-  };
-
   ///@{
   /** \brief  Function pointer types */
   typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,

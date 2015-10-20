@@ -37,7 +37,7 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit FixedStepIntegrator(const std::string& name, const XDict& dae);
+    explicit FixedStepIntegrator(const std::string& name, const XProblem& dae);
 
     /// Destructor
     virtual ~FixedStepIntegrator();

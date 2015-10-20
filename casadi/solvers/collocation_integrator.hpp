@@ -58,10 +58,10 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit CollocationIntegrator(const std::string& name, const XDict& dae);
+    explicit CollocationIntegrator(const std::string& name, const XProblem& dae);
 
     /** \brief  Create a new integrator */
-    static IntegratorInternal* creator(const std::string& name, const XDict& dae) {
+    static IntegratorInternal* creator(const std::string& name, const XProblem& dae) {
       return new CollocationIntegrator(name, dae);
     }
 

@@ -33,7 +33,7 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace casadi {
 
-  SundialsInterface::SundialsInterface(const std::string& name, const XDict& dae)
+  SundialsInterface::SundialsInterface(const std::string& name, const XProblem& dae)
     : IntegratorInternal(name, dae) {
     addOption("max_num_steps",               OT_INTEGER,          10000,
               "Maximum number of integrator steps");

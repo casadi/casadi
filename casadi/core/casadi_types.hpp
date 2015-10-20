@@ -85,6 +85,27 @@ namespace casadi {
   // Make sure that the integer datatype is indeed smaller or equal to the double
   //assert(sizeof(bvec_t) <= sizeof(double)); // doesn't work - very strange
 
+  /// Inputs of the symbolic representation of the DAE
+  enum DeIn {
+    DE_T,
+    DE_X,
+    DE_Z,
+    DE_P,
+    DE_RX,
+    DE_RZ,
+    DE_RP,
+    DE_NUM_IN};
+
+  /// Inputs of the symbolic representation of the DAE
+  enum DeOut {
+    DE_ODE,
+    DE_ALG,
+    DE_QUAD,
+    DE_RODE,
+    DE_RALG,
+    DE_RQUAD,
+    DE_NUM_OUT};
+
   /// Input arguments of an ODE/DAE function [daeIn]
   enum DAEInput {
     /// Differential state [x]

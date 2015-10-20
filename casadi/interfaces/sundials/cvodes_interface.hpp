@@ -70,10 +70,10 @@ namespace casadi {
   class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInterface {
   public:
     /** \brief  Constructor */
-    explicit CvodesInterface(const std::string& name, const XDict& dae);
+    explicit CvodesInterface(const std::string& name, const XProblem& dae);
 
     /** \brief  Create a new integrator */
-    static IntegratorInternal* creator(const std::string& name, const XDict& dae) {
+    static IntegratorInternal* creator(const std::string& name, const XProblem& dae) {
       return new CvodesInterface(name, dae);
     }
 

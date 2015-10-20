@@ -45,7 +45,7 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_collocation);
   }
 
-  CollocationIntegrator::CollocationIntegrator(const std::string& name, const XDict& dae)
+  CollocationIntegrator::CollocationIntegrator(const std::string& name, const XProblem& dae)
     : ImplicitFixedStepIntegrator(name, dae) {
 
     addOption("interpolation_order",           OT_INTEGER,  3,

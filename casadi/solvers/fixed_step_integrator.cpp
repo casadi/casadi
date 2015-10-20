@@ -29,7 +29,7 @@
 using namespace std;
 namespace casadi {
 
-  FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const XDict& dae)
+  FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const XProblem& dae)
       : IntegratorInternal(name, dae) {
 
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
