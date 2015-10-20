@@ -826,22 +826,8 @@ namespace casadi {
   Function IntegratorInternal::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     log("IntegratorInternal::getDerForward", "begin");
 
-    // Form the augmented DAE
-    AugOffset offset;
-    std::pair<Function, Function> aug_dae;
-    if (f_.is_a("sxfunction")) {
-      aug_dae = getAugmented<SX>(nfwd, 0, offset);
-    } else {
-      casadi_assert(f_.is_a("mxfunction"));
-      aug_dae = getAugmented<MX>(nfwd, 0, offset);
-    }
-
-    // Temp stringstream
-    stringstream ss;
-    ss << "aug_f" << nfwd << name_;
-
     // Integrator options
-    Dict aug_opts = getDerivativeOptions(offset);
+    Dict aug_opts = getDerivativeOptions(true);
     if (hasSetOption("augmented_options")) {
       Dict aug_opts_user = getOption("augmented_options");
       for (auto&& i : aug_opts_user) {
@@ -849,8 +835,21 @@ namespace casadi {
       }
     }
 
+    // Temp stringstream
+    stringstream ss;
+    ss << "aug_f" << nfwd << name_;
+
     // Create integrator for augmented DAE
-    Integrator integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+    Function integrator;
+    AugOffset offset;
+    if (f_.is_a("sxfunction")) {
+      std::pair<Function, Function> aug_dae = getAugmented<SX>(nfwd, 0, offset);
+      integrator = Integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+    } else {
+      casadi_assert(f_.is_a("mxfunction"));
+      std::pair<Function, Function> aug_dae = getAugmented<MX>(nfwd, 0, offset);
+      integrator = Integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+    }
 
     // All inputs of the return function
     vector<MX> ret_in;
@@ -974,22 +973,8 @@ namespace casadi {
   Function IntegratorInternal::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     log("IntegratorInternal::getDerReverse", "begin");
 
-    // Form the augmented DAE
-    AugOffset offset;
-    std::pair<Function, Function> aug_dae;
-    if (f_.is_a("sxfunction")) {
-      aug_dae = getAugmented<SX>(0, nadj, offset);
-    } else {
-      casadi_assert(f_.is_a("mxfunction"));
-      aug_dae = getAugmented<MX>(0, nadj, offset);
-    }
-
-    // Temp stringstream
-    stringstream ss;
-    ss << "aug_r" << nadj << name_;
-
     // Integrator options
-    Dict aug_opts = getDerivativeOptions(offset);
+    Dict aug_opts = getDerivativeOptions(false);
     if (hasSetOption("augmented_options")) {
       Dict aug_opts_user = getOption("augmented_options");
       for (auto&& i : aug_opts_user) {
@@ -997,8 +982,21 @@ namespace casadi {
       }
     }
 
+    // Temp stringstream
+    stringstream ss;
+    ss << "aug_r" << nadj << name_;
+
     // Create integrator for augmented DAE
-    Integrator integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+    Function integrator;
+    AugOffset offset;
+    if (f_.is_a("sxfunction")) {
+      std::pair<Function, Function> aug_dae = getAugmented<SX>(0, nadj, offset);
+      integrator = Integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+    } else {
+      casadi_assert(f_.is_a("mxfunction"));
+      std::pair<Function, Function> aug_dae = getAugmented<MX>(0, nadj, offset);
+      integrator = Integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+    }
 
     // All inputs of the return function
     vector<MX> ret_in;
@@ -1187,7 +1185,7 @@ namespace casadi {
     log("IntegratorInternal::resetB", "end");
   }
 
-  Dict IntegratorInternal::getDerivativeOptions(const AugOffset& offset) {
+  Dict IntegratorInternal::getDerivativeOptions(bool fwd) {
     // Copy all options
     return dictionary();
   }
