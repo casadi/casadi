@@ -44,7 +44,7 @@ int main(int argc, char **argv){
   nl.parseNL(problem);
   
   // NLP
-  Function nlp = SX::fun("nlp", nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
+  SXDict nlp = {{"x", nl.x}, {"f", nl.f}, {"g", nl.g}};
 
   // Set options
   Dict opts;
@@ -55,7 +55,7 @@ int main(int argc, char **argv){
   //  opts["derivative_test"] = "second-order";
 
   // Allocate NLP solver and buffers
-  NlpSolver nlp_solver("nlp_solver", "ipopt", nlp, opts);
+  Function nlp_solver = Function::nlp_solver("nlp_solver", "ipopt", nlp, opts);
   std::map<std::string, DMatrix> arg, res;
   
   // Solve NLP

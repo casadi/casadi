@@ -84,10 +84,11 @@ int main(){
   // ODE right hand side and quadrature
   SX ode = vertcat((1 - s*s)*r - s + u, r);
   SX quad = r*r + s*s + u*u;
-  Function rhs = SX::fun("rhs", daeIn("x", x, "p", u), daeOut("ode", ode, "quad", quad));
+  SXDict dae = {{"x", x}, {"p", u}, {"ode", ode}, {"quad", quad}};
 
   // Create an integrator (CVodes)
-  Integrator integrator("integrator", "cvodes", rhs, Dict{{"t0", 0}, {"tf", tf/ns}});
+  Function integrator = Function::integrator("integrator", "cvodes",
+                                             dae, {{"t0", 0}, {"tf", tf/ns}});
   
   // Total number of NLP variables
   int NV = nx*(ns+1) + nu*ns;
@@ -153,7 +154,7 @@ int main(){
   }
   
   // NLP 
-  Function nlp = MX::fun("nlp", nlpIn("x", V), nlpOut("f", J, "g", vertcat(g)));
+  MXDict nlp = {{"x", V}, {"f", J}, {"g", vertcat(g)}};
 
   // Set options
   Dict opts;
@@ -162,7 +163,7 @@ int main(){
   opts["linear_solver"] = "ma27";
 
   // Create an NLP solver and buffers
-  NlpSolver nlp_solver("nlp_solver", "ipopt", nlp, opts);
+  Function nlp_solver = Function::nlp_solver("nlp_solver", "ipopt", nlp, opts);
   std::map<std::string, DMatrix> arg, res;
 
   // Bounds and initial guess

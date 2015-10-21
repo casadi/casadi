@@ -97,8 +97,9 @@ int main(){
   hess_lag = generateCodeAndCompile(hess_lag,"hess_lag", expand);
 
   // Create an NLP solver passing derivative information
-  NlpSolver solver("solver", "ipopt", nlp,
-                   Dict{{"grad_f", grad_f}, {"jac_g", jac_g}, {"hess_lag",hess_lag}});
+  Function solver =
+    NlpSolver("solver", "ipopt", nlp,
+              {{"grad_f", grad_f}, {"jac_g", jac_g}, {"hess_lag", hess_lag}});
 
   // Bounds and initial guess
   std::map<std::string, DMatrix> arg, res;

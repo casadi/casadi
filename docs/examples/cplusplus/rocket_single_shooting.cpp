@@ -89,8 +89,8 @@ int main(){
   // Initial conditions
   vector<double> x0 = {0, 0, 1};
 
-  // DAE residual function
-  Function daefcn = SX::fun("dae_residual", daeIn("x", x, "p", u, "t", t), daeOut("ode", rhs));
+  // DAE
+  SXDict dae = {{"x", x}, {"p", u}, {"t", t}, {"ode", rhs}};
 
   // Integrator options
   string plugin;
@@ -125,7 +125,7 @@ int main(){
   opts["tf"] = tf;
 
   // Create integrator
-  Integrator integrator("integrator", plugin, daefcn, opts);
+  Function integrator = Function::integrator("integrator", plugin, dae, opts);
 
   // control for all segments
   MX U = MX::sym("U",nu); 
@@ -149,7 +149,7 @@ int main(){
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  Function nlp = MX::fun("nlp", nlpIn("x", U), nlpOut("f", F, "g", G));
+  MXDict nlp = {{"x", U}, {"f", F}, {"g", G}};
 
   // NLP solver options
   Dict solver_opts;
@@ -174,7 +174,7 @@ int main(){
   }
 
   // Create NLP solver
-  NlpSolver solver("nlp_solver", solver_name, nlp, solver_opts);
+  Function solver = Function::nlp_solver("nlp_solver", solver_name, nlp, solver_opts);
 
   // Bounds on u and initial condition
   vector<double> umin(nu, -10), umax(nu, 10), u0(nu, 0.4);

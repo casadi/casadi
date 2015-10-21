@@ -97,12 +97,12 @@ int main(){
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  Function nlp = MX::fun("nlp", nlpIn("x",U),nlpOut("f",F,"g",G));
+  MXDict nlp = {{"x", U}, {"f", F}, {"g", G}};
 
   // Allocate an NLP solver and buffers
   Dict opts = {{"tol", 1e-10},
                {"hessian_approximation", "limited-memory"}};
-  NlpSolver solver("solver", "ipopt", nlp, opts);
+  Function solver = Function::nlp_solver("solver", "ipopt", nlp, opts);
   std::map<std::string, DMatrix> arg, res;
 
   // Bounds on u and initial condition

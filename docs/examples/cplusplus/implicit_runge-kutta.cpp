@@ -52,7 +52,7 @@ int main(){
   SX ode = vertcat((1 - x[1]*x[1])*x[0] - x[1] + p,
                    x[0],
                    x[0]*x[0] + x[1]*x[1] + p*p);
-  Function f = SX::fun("f", daeIn("x",x,"p",p),daeOut("ode",ode));
+  SXDict dae = {{"x", x}, {"p", p}, {"ode", ode}};
 
   // Number of finite elements
   int n = 100;
@@ -103,8 +103,9 @@ int main(){
   for(int r=0; r<d; ++r){
     X.push_back(V[Slice(r*nx,(r+1)*nx)]);
   }
-  
+
   // Get the collocation quations (that define V)
+  Function f = SX::fun("f", {dae["x"], dae["p"]}, {dae["ode"]});
   vector<MX> V_eq;
   for(int j=1; j<d+1; ++j){
     // Expression for the state derivative at the collocation point
@@ -114,8 +115,9 @@ int main(){
     }
     
     // Append collocation equations
-    MX f_j = f(MXDict{{"x", X[j]}, {"p",P}}).at("ode");
-    V_eq.push_back(h*f_j - xp_j);
+    vector<MX> v = {X[j], P};
+    v = f(v);
+    V_eq.push_back(h*v[0] - xp_j);
   }
 
   // Root-finding function, implicitly defines V as a function of X0 and P
@@ -154,7 +156,8 @@ int main(){
                                     integratorOut("xf", Xk));
 
   // Create a convensional integrator for reference
-  Integrator ref_integrator("ref_integrator", "cvodes", f, Dict{{"tf", tf}});
+  Function ref_integrator = Function::integrator("ref_integrator",
+                                                 "cvodes", dae, {{"tf", tf}});
 
   // Test values
   vector<double> x0_val = {0, 1, 0};
