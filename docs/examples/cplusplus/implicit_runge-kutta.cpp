@@ -124,7 +124,7 @@ int main(){
   Function vfcn("vfcn", {V, X0, P}, {vertcat(V_eq)});
   
   // Convert to sxfunction to decrease overhead
-  Function vfcn_sx = SX::fun("vfcn", vfcn);
+  Function vfcn_sx = vfcn.expand("vfcn");
 
   // Create a implicit function instance to solve the system of equations
   Function ifcn = vfcn_sx.rootfinder("ifcn", "newton", {{"linear_solver", "csparse"}});

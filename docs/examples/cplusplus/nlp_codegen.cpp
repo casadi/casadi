@@ -41,7 +41,7 @@ Function generateCodeAndCompile(Function fcn, const std::string& name, bool expa
 
   // Convert to sx (may or may not improve efficiency)
   if(expand && fcn.is_a("mxfunction")) {
-    fcn = SX::fun(fcn.name(), fcn);
+    fcn = fcn.expand();
   }
 
   // Generate C code

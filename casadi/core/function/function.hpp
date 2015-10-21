@@ -174,6 +174,13 @@ namespace casadi {
     /** \brief  Destructor */
     ~Function();
 
+    /** \brief Expand a function to SX */
+    ///@{
+    Function expand() const;
+    Function expand(const std::string& name,
+                    const Dict& opts=Dict()) const;
+    ///@}
+
     /// \cond INTERNAL
 #ifndef SWIG
     /** \brief  Create from node */

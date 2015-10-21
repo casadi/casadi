@@ -1258,8 +1258,8 @@ namespace casadi {
       vector<MX> arg = symvar(veccat(vector<MX>{x_true, x_false}));
 
       // Form functions for cases
-      Function f_true=MX::fun("f_true", arg, {x_true});
-      Function f_false=MX::fun("f_false", arg, {x_false});
+      Function f_true("f_true", arg, {x_true});
+      Function f_false("f_false", arg, {x_false});
 
       // Form Switch
       Function sw = Function::if_else("if_else", f_true, f_false);
@@ -1286,9 +1286,9 @@ namespace casadi {
       for (int k=0; k<x.size(); ++k) {
         stringstream ss;
         ss << "f_case" << k;
-        f[k] = MX::fun(ss.str(), arg, {x[k]});
+        f[k] = Function(ss.str(), arg, {x[k]});
       }
-      Function f_default=MX::fun("f_default", arg, {x_default});
+      Function f_default("f_default", arg, {x_default});
 
       // Form Switch
       Function sw = Function::conditional("conditional", f, f_default);
@@ -1354,7 +1354,7 @@ namespace casadi {
   }
 
   int MX::zz_countNodes() const {
-    Function f=MX::fun("tmp", vector<MX>{}, {*this});
+    Function f("tmp", vector<MX>{}, {*this});
     return f.countNodes();
   }
 
@@ -1402,7 +1402,7 @@ namespace casadi {
     f_out.insert(f_out.end(), ex.begin(), ex.end());
 
     // Write the mapping function
-    Function f=MX::fun("mapping", f_in, f_out);
+    Function f("mapping", f_in, f_out);
     auto *ff = dynamic_cast<MXFunctionInternal *>(f.get());
 
     // Get references to the internal data structures
@@ -1469,7 +1469,7 @@ namespace casadi {
     if (all_equal) return ex;
 
     // Otherwise, evaluate symbolically
-    Function F=MX::fun("tmp", v, ex);
+    Function F("tmp", v, ex);
     return F(vdef, true);
   }
 
@@ -1485,7 +1485,7 @@ namespace casadi {
                           << expr.size() << " <-> " << exprs.size() << ".");
 
     // Sort the expression
-    Function f=MX::fun("tmp", vector<MX>(), ex);
+    Function f("tmp", vector<MX>{}, ex);
     auto *ff = dynamic_cast<MXFunctionInternal *>(f.get());
 
     // Get references to the internal data structures
@@ -1588,7 +1588,7 @@ namespace casadi {
                             const std::string& v_prefix, const std::string& v_suffix) {
 
     // Sort the expression
-    Function f=MX::fun("tmp", vector<MX>(), ex);
+    Function f("tmp", vector<MX>{}, ex);
     auto *ff = dynamic_cast<MXFunctionInternal *>(f.get());
 
     // Get references to the internal data structures
@@ -1713,17 +1713,17 @@ namespace casadi {
   }
 
   MX MX::zz_jacobian(const MX &arg) const {
-    Function temp=MX::fun("helper_jacobian_MX", {arg}, {*this});
+    Function temp("helper_jacobian_MX", {arg}, {*this});
     return MX::jac(temp);
   }
 
   MX MX::zz_gradient(const MX &arg) const {
-    Function temp=MX::fun("helper_gradient_MX", {arg}, {*this});
+    Function temp("helper_gradient_MX", {arg}, {*this});
     return MX::grad(temp);
   }
 
   MX MX::zz_tangent(const MX &arg) const {
-    Function temp=MX::fun("helper_tangent_MX", {arg}, {*this});
+    Function temp("helper_tangent_MX", {arg}, {*this});
     return MX::tang(temp);
   }
 
@@ -1734,7 +1734,7 @@ namespace casadi {
 
   MX MX::zz_hessian(const MX &arg, MX &g) const {
     g = gradient(*this, arg);
-    Function gfcn=MX::fun("gfcn", {arg}, {g});
+    Function gfcn("gfcn", {arg}, {g});
     return MX::jac(gfcn, 0, 0, false, true);
   }
 
@@ -1747,7 +1747,7 @@ namespace casadi {
   }
 
   std::vector<MX> MX::zz_symvar() const {
-    Function f=MX::fun("f", vector<MX>{}, {*this});
+    Function f("f", vector<MX>{}, {*this});
     return f.free_mx();
   }
 
@@ -1773,11 +1773,10 @@ namespace casadi {
     std::vector<MX> v = symvar(veccat(ret));
 
     // Construct an MXFunction with it
-    Function f=MX::fun("tmp", v, ret);
+    Function f("tmp", v, ret);
 
     // Expand to SXFunction
-    Function s=SX::fun("expand_" + f.name(), f, options);
-
+    Function s = f.expand("expand_" + f.name(), options);
     return s(graph_substitute(v, syms, boundary), true);
   }
 
@@ -1819,7 +1818,7 @@ namespace casadi {
 
   MX MX::zz_nullspace() const {
     SX n = SX::sym("A", sparsity());
-    Function f=SX::fun("nullspace", {n}, {nullspace(n)});
+    Function f("nullspace", {n}, {nullspace(n)});
     return f(*this).at(0);
   }
 
@@ -1827,7 +1826,7 @@ namespace casadi {
     if (nnz()==0) return false;
 
     // Construct a temporary algorithm
-    Function temp=MX::fun("tmp", {arg}, {*this});
+    Function temp("tmp", {arg}, {*this});
     temp.spInit(true);
 
     bvec_t* input_ =  get_bvec_t(temp.input().data());

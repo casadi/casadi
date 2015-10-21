@@ -1174,18 +1174,6 @@ namespace casadi {
   }
 
   template<>
-  Function SX::fun(const string& name, const Function &f, const Dict& opts) {
-    vector<SX> arg = f.sx_in();
-    vector<SX> res = Function(f)(arg);
-    vector<string> name_in = f.name_in();
-    vector<string> name_out = f.name_out();
-    Dict opts2(opts);
-    if (!name_in.empty() && !opts.count("input_scheme")) opts2["input_scheme"]=name_in;
-    if (!name_out.empty() && !opts.count("output_scheme")) opts2["output_scheme"]=name_out;
-    return fun(name, arg, res, opts2);
-  }
-
-  template<>
   Function SX::fun(const string& name, const vector<SX>& arg,
                    const vector<SX>& res, const Dict& opts) {
     return Function(name, arg, res, opts);

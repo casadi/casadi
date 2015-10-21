@@ -183,7 +183,7 @@ namespace casadi {
     bool expand = getOption("expand");
     if (expand) {
       log("Expanding NLP in scalar operations");
-      Function f = SX::fun(nlp_.name(), nlp_);
+      Function f = nlp_.expand(nlp_.name());
       f.copyOptions(nlp_, true);
       f.init();
       nlp_ = f;

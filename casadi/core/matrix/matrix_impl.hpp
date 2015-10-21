@@ -3035,12 +3035,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Function Matrix<DataType>::fun(const std::string& name, const Function &f,
-                                 const Dict& opts) {
-    throw CasadiException("\"fun\" not defined for " + className());
-  }
-
-  template<typename DataType>
   Function Matrix<DataType>::fun(const std::string& name, const std::vector<Matrix<DataType>>& arg,
                    const std::vector<Matrix<DataType>>& res, const Dict& opts) {
     throw CasadiException("\"fun\" not defined for " + className());
@@ -3183,7 +3177,6 @@ namespace casadi {
   template<> SX SX::hess(const Function& f, int iind, const std::string& oname);
   template<> SX SX::hess(const Function& f, const std::string& iname, const std::string& oname);
 
-  template<> Function SX::fun(const std::string& name, const Function &f, const Dict& opts);
   template<> Function SX::fun(const std::string& name, const std::vector<SX>& arg,
                               const std::vector<SX>& res, const Dict& opts);
 

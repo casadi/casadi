@@ -357,7 +357,7 @@ namespace casadi {
     ss_ifcn << "collocation_implicit_residual_" << name_;
     Function ifcn(ss_ifcn.str(), ifcn_in, ifcn_out);
     if (expand_f) {
-      ifcn = SX::fun(ifcn.name(), ifcn);
+      ifcn = ifcn.expand(ifcn.name());
     }
 
     // Options

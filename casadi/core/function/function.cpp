@@ -135,6 +135,21 @@ namespace casadi {
     init();
   }
 
+  Function Function::expand() const {
+    return expand(name());
+  }
+
+  Function Function::expand(const std::string& name, const Dict& opts) const {
+    vector<SX> arg = sx_in();
+    vector<SX> res = Function(*this)(arg);
+    vector<string> name_in = this->name_in();
+    vector<string> name_out = this->name_out();
+    Dict opts2(opts);
+    if (!name_in.empty() && !opts.count("input_scheme")) opts2["input_scheme"]=name_in;
+    if (!name_out.empty() && !opts.count("output_scheme")) opts2["output_scheme"]=name_out;
+    return Function(name, arg, res, opts2);
+  }
+
   Function Function::create(FunctionInternal* node) {
     Function ret;
     ret.assignNode(node);

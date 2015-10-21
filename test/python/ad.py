@@ -588,9 +588,9 @@ class ADtests(casadiTestCase):
      ]:
       print out
       fun = MX.fun("fun", inputs,[out,jac])
-      funsx = SX.fun("expand_fun", fun)
+      funsx = fun.expand("expand_fun")
       fun_ad = [MX.fun("fun", inputs,[out,jac], {'ad_weight':w, 'ad_weight_sp':w}) for w in [0,1]]
-      funsx_ad = [SX.fun('expand_'+f.name(), f) for f in fun_ad]
+      funsx_ad = [f.expand('expand_'+f.name()) for f in fun_ad]
       
       for i,v in enumerate(values):
         fun.setInput(v,i)
@@ -616,7 +616,7 @@ class ADtests(casadiTestCase):
       
       vf_mx = None
               
-      for f in [fun, SX.fun('expand_'+fun.name(), fun)]:
+      for f in [fun, fun.expand('expand_'+fun.name())]:
         d1 = f.derForward(ndir)
         d2 = f.derReverse(ndir)
         
@@ -760,7 +760,7 @@ class ADtests(casadiTestCase):
         for mode in ["forward","reverse"]:
           w = 0 if mode=='forward' else 1
           f = MX.fun("fun", inputs,[out[s_i,s_j],jac[s_k,:].T], {'ad_weight':w, 'ad_weight_sp':w})
-          if expand: f=SX.fun('expand_'+f.name(), f)
+          if expand: f=f.expand('expand_'+f.name())
           for i,v in enumerate(values):
             f.setInput(v,i)
             f.evaluate()
