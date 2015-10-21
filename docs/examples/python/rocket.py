@@ -75,7 +75,7 @@ nlp = MX.fun('nlp', nlpIn(x=U),nlpOut(f=J,g=G))
   
 # Allocate an NLP solver
 opts = {"tol":1e-10, "expand":True}
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = Function.nlp_solver("solver", "ipopt", nlp, opts)
 arg = {}
 
 # Bounds on u and initial condition

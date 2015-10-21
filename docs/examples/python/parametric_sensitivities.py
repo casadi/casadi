@@ -100,7 +100,7 @@ opts["run_sens"] = "yes"
 opts["n_sens_steps"] = 1
   
 # Create NLP solver
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = Function.nlp_solver("solver", "ipopt", nlp, opts)
   
 # Solve NLP
 res = solver({"x0" : x0,

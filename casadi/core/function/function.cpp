@@ -1381,15 +1381,15 @@ namespace casadi {
   }
 
   bool Function::has_nlp_solver(const std::string& name) {
-    return NlpSolver::hasPlugin(name);
+    return NlpSolverInternal::hasPlugin(name);
   }
 
   void Function::load_nlp_solver(const std::string& name) {
-    NlpSolver::loadPlugin(name);
+    NlpSolverInternal::loadPlugin(name);
   }
 
   std::string Function::doc_nlp_solver(const std::string& name) {
-    return NlpSolver::doc(name);
+    return NlpSolverInternal::getPlugin(name).doc;
   }
 
   bool Function::has_rootfinder(const std::string& name) {

@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-#! NlpSolver
+#! Function.nlp_solver
 #! =====================
 from casadi import *
 from numpy import *
@@ -38,7 +38,7 @@ from numpy import *
 x=SX.sym("x")
 nlp=SX.fun("nlp", nlpIn(x=x),nlpOut(f=(x-1)**2))
 
-solver = NlpSolver("solver", "ipopt", nlp)
+solver = Function.nlp_solver("solver", "ipopt", nlp)
 solver.setInput([-10],"lbx")
 solver.setInput([10],"ubx")
 solver.evaluate()
@@ -62,7 +62,7 @@ x=SX.sym("x",n)
 #! Note how we do not distinguish between equalities and inequalities here
 nlp=SX.fun("nlp", nlpIn(x=x),nlpOut(f=mul((x-1).T,x-1),g=vertcat([x[1]+x[2],x[0]])))
 
-solver = NlpSolver("solver", "ipopt", nlp)
+solver = Function.nlp_solver("solver", "ipopt", nlp)
 solver.setInput([-10]*n,"lbx")
 solver.setInput([10]*n,"ubx")
 #$  $ 2 \le x_0 \le 2$ is not really as bad it looks. Ipopt will recognise this situation as an equality constraint. 
@@ -88,7 +88,7 @@ a=SX.sym("a")
 a_ = 2
 nlp=SX.fun("nlp", nlpIn(x=x,p=a),nlpOut(f=(x-a)**2))
 
-solver = NlpSolver("solver", "ipopt", nlp)
+solver = Function.nlp_solver("solver", "ipopt", nlp)
 solver.setInput([-10],"lbx")
 solver.setInput([10],"ubx")
 solver.setInput([a_],"p")

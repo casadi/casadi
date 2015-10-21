@@ -26,7 +26,6 @@
 #ifndef CASADI_NLP_SOLVER_INTERNAL_HPP
 #define CASADI_NLP_SOLVER_INTERNAL_HPP
 
-#include "nlp_solver.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 

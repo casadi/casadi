@@ -113,7 +113,7 @@ g = vertcat(g)
 
 # Create NLP solver instance
 nlp = MX.fun("nlp", nlpIn(x=V), nlpOut(f=f,g=g))
-solver = NlpSolver("solver", "ipopt", nlp)
+solver = Function.nlp_solver("solver", "ipopt", nlp)
 
 # Solve the problem
 sol = solver({"lbx" : VMIN,

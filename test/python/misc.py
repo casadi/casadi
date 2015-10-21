@@ -174,12 +174,12 @@ class Misctests(casadiTestCase):
     self.checkarray(x.shape,(2,8),"shape")
     self.checkarray(y.shape,(4,4),"shape")
     
-  @requiresPlugin(NlpSolver,"ipopt")
+  @requiresPlugin(Function.nlp_solver,"ipopt")
   def test_options_introspection(self):
     self.message("options introspection")
     x=SX.sym("x")
     nlp = SX.fun('nlp', nlpIn(x=x),nlpOut(f=x**2))
-    i = NlpSolver('i', "ipopt", nlp)
+    i = Function.nlp_solver('i', "ipopt", nlp)
     
     opts = i.getOptionNames()
     self.assertTrue(isinstance(opts,list))
@@ -232,12 +232,12 @@ class Misctests(casadiTestCase):
         if "You have" in m:
           assert "SX" in m
     try:
-      NlpSolver(123)
+      Function.nlp_solver(123)
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "NlpSolver(str,str,Function,Dict)" in e.message
-      assert "You have: NlpSolver(int)" in e.message
+      assert "Function.nlp_solver(str,str,Function,Dict)" in e.message
+      assert "You have: Function.nlp_solver(int)" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
 
@@ -394,7 +394,7 @@ class Misctests(casadiTestCase):
       print str(e)
       self.assertTrue("x must be larger than 3" in str(e))
 
-  @requiresPlugin(NlpSolver,"ipopt")
+  @requiresPlugin(Function.nlp_solver,"ipopt")
   def test_output(self):
     with capture_stdout() as result:
       DMatrix([1,2]).printDense()
@@ -403,7 +403,7 @@ class Misctests(casadiTestCase):
 
     x=SX.sym("x")
     f = SX.fun('f', nlpIn(x=x),nlpOut(f=x**2))
-    solver = NlpSolver("solver", "ipopt",f)
+    solver = Function.nlp_solver("solver", "ipopt",f)
     with capture_stdout() as result:
       solver.evaluate()
 
@@ -413,7 +413,7 @@ class Misctests(casadiTestCase):
 
     with capture_stdout() as result:
       try:    
-        solver = NlpSolver("solver","foo",f)
+        solver = Function.nlp_solver("solver","foo",f)
       except:
         pass
     

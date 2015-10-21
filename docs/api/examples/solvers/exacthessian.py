@@ -36,7 +36,7 @@ obj = (1-x)**2+100*(y-x**2)**2
 constr = x**2+y**2
 
 nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=constr))
-solver = NlpSolver("solver", "ipopt", nlp)
+solver = Function.nlp_solver("solver", "ipopt", nlp)
     
 #! We need the hessian of the lagrangian.
 #! A problem with n decision variables and m constraints gives us a hessian of size n x n
@@ -50,7 +50,7 @@ h=SX.fun("h", hessLagIn(x=xy,lam_g=lambd,lam_f=sigma),
              hessLagOut(hess=sigma*hessian(obj,xy)[0]+lambd*hessian(constr,xy)[0]))
    
 #! We solve the problem with an exact hessian
-solver = NlpSolver("solver", "ipopt", nlp, {"hess_lag":h})
+solver = Function.nlp_solver("solver", "ipopt", nlp, {"hess_lag":h})
 solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([0],"lbg")
@@ -61,7 +61,7 @@ for sol in array(solver.getOutput()):
   print "%.15f" % sol
 
 #! To compare the behaviour of convergence, we solve the same problem without exact hessian
-solver = NlpSolver("solver", "ipopt", nlp)
+solver = Function.nlp_solver("solver", "ipopt", nlp)
 solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([0],"lbg")

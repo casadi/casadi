@@ -36,7 +36,7 @@ g = z + (1-x)^2 - y;
 nlp = SX.fun('nlp', nlpIn('x',v),nlpOut('f',f','g',g));
 
 % Create IPOPT solver object
-solver = NlpSolver('solver', 'ipopt', nlp);
+solver = Function.nlp_solver('solver', 'ipopt', nlp);
 
 % Solve the NLP
 arg = struct;

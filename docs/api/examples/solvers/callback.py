@@ -58,7 +58,7 @@ nlp=SX.fun("nlp", nlpIn(x=vertcat((x,y))),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+
 # opts["iteration_callback"] = simplecallback
 # opts["tol"] = 1e-8
 # opts["max_iter"] = 20
-# solver = NlpSolver("solver", "ipopt", nlp, opts)
+# solver = Function.nlp_solver("solver", "ipopt", nlp, opts)
 # solver.setInput([-10]*2,"lbx")
 # solver.setInput([10]*2,"ubx")
 # solver.setInput([-10],"lbg")
@@ -149,7 +149,7 @@ opts = {}
 opts["iteration_callback"] = mycallback
 opts["tol"] = 1e-8
 opts["max_iter"] = 50
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = Function.nlp_solver("solver", "ipopt", nlp, opts)
 solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([-10],"lbg")

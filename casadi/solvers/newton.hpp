@@ -27,7 +27,6 @@
 #define CASADI_NEWTON_HPP
 
 #include "casadi/core/function/implicit_function_internal.hpp"
-#include "casadi/core/function/nlp_solver.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 
 #include <casadi/solvers/casadi_implicitfunction_newton_export.h>

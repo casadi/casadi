@@ -96,7 +96,7 @@ def gauss_newton(e,nlp,V):
   J = jacobian(e,V)
   sigma = MX.sym("sigma")
   hessLag = MX.fun('H',hessLagIn(x=V,lam_f=sigma),hessLagOut(hess=sigma*mul(J.T,J)),opts)
-  return NlpSolver("solver","ipopt", nlp, {"hess_lag":hessLag})
+  return Function.nlp_solver("solver","ipopt", nlp, {"hess_lag":hessLag})
 
 ############ Identifying the simulated system: single shooting strategy ##########
 
