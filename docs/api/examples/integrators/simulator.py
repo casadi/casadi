@@ -49,7 +49,7 @@ rhs    = vertcat([v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t))])
 
 f=SX.fun("f", daeIn(x=states,p=params,t=t),daeOut(ode=rhs))
 
-integrator = Integrator("integrator", "cvodes", f)
+integrator = Function.integrator("integrator", "cvodes", f)
 
 #! We will simulate over 50 seconds, 1000 timesteps.
 ts = linspace(0,50,1000)

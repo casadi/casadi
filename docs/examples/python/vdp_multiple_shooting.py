@@ -49,12 +49,12 @@ if coll:
   opts["implicit_solver"] = "kinsol"
   opts["implicit_solver_options"] =  {'linear_solver' : 'csparse'}
   opts["expand_f"] = True
-  integrator = Integrator("integrator", "oldcollocation", dae, opts)
+  integrator = Function.integrator("integrator", "oldcollocation", dae, opts)
 else:
   opts["abstol"] = 1e-8 # tolerance
   opts["reltol"] = 1e-8 # tolerance
   opts["steps_per_checkpoint"] = 1000
-  integrator = Integrator("integrator", "cvodes", dae, opts)
+  integrator = Function.integrator("integrator", "cvodes", dae, opts)
 
 # Total number of variables
 nv = 1*nk + 3*(nk+1)

@@ -24,7 +24,6 @@
 
 
 #include "integration_tools.hpp"
-#include "casadi/core/function/integrator.hpp"
 
 #include <vector>
 

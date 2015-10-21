@@ -85,7 +85,7 @@ iopts["abstol"] = 1e-8 # abs. tolerance
 iopts["reltol"] = 1e-8 # rel. tolerance
 iopts["t0"] = 0.0
 iopts["tf"] = tf/num_nodes
-I = Integrator("I", "cvodes", rhs, iopts)
+I = Function.integrator("I", "cvodes", rhs, iopts)
 
 # Variables in the root finding problem
 NV = nX*(num_nodes+1)

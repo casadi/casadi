@@ -30,7 +30,7 @@
 *
 * \sa
 * \code
-* casadi::Integrator();
+* casadi::Function::integrator();
 * \endcode
 *
 */

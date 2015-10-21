@@ -77,7 +77,7 @@ opts["abstol"] = 1e-8 # abs. tolerance
 opts["reltol"] = 1e-8 # rel. tolerance
 opts["t0"] = 0.0
 opts["tf"] = 10.0
-I = Integrator("I", "cvodes", rhs, opts)
+I = Function.integrator("I", "cvodes", rhs, opts)
 
 # The initial state
 x_init = NP.array([0.,1.])

@@ -33,7 +33,7 @@ using namespace std;
 namespace casadi {
 
 
-  SimulatorInternal::SimulatorInternal(const std::string& name, const Integrator& integrator,
+  SimulatorInternal::SimulatorInternal(const std::string& name, const Function& integrator,
                                        const Function& output_fcn, const DMatrix& grid)
     : FunctionInternal(name), integrator_(integrator), output_fcn_(output_fcn), grid_(grid.data()) {
 
@@ -56,9 +56,11 @@ namespace casadi {
                             "The supplied time grid must be non-decreasing.");
 
       // Create new integrator object
-      Function I = Integrator(integrator_.name(), integrator_->plugin_name(),
-                              make_pair(integrator_->f_, integrator_->g_),
-                              integrator_.dictionary());
+      auto dae = make_pair(dynamic_cast<IntegratorInternal*>(integrator_.get())->f_,
+                           dynamic_cast<IntegratorInternal*>(integrator_.get())->g_);
+      string solver = dynamic_cast<IntegratorInternal*>(integrator_.get())->plugin_name();
+      Function I = Function::integrator(integrator_.name(), solver,
+                                        dae, integrator_.dictionary());
 
       // Let the integration time start from the first point of the time grid.
       I.setOption("t0", grid_[0]);
@@ -67,7 +69,7 @@ namespace casadi {
       I.init();
 
       // Overwrite
-      integrator_ = shared_cast<Integrator>(I);
+      integrator_ = I;
     }
 
     // Generate an output function if there is none (returns the whole state)

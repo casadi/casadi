@@ -41,7 +41,7 @@ tolerances = [-10,-5,-4,-3,-2,-1]
 figure()
 
 for tol in tolerances:
-  integrator = Integrator("integrator", "cvodes", f, {"reltol":10.0**tol, "abstol":10.0**tol})
+  integrator = Function.integrator("integrator", "cvodes", f, {"reltol":10.0**tol, "abstol":10.0**tol})
   sim=Simulator("sim", integrator, ts)
   sim.setInput([1,0],"x0")
   sim.evaluate()
@@ -62,7 +62,7 @@ for tol in tolerances:
   opts["reltol"] = tol
   opts["abstol"] = tol
   opts["tf"] = tend
-  integrator = Integrator("integrator", "cvodes", f, opts)
+  integrator = Function.integrator("integrator", "cvodes", f, opts)
   integrator.setInput([1,0],"x0")
   integrator.evaluate()
   endresult.append(integrator.getOutput()[0])

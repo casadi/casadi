@@ -93,7 +93,7 @@ class OCPtests(casadiTestCase):
     opts["steps_per_checkpoint"] = 10000
     opts["t0"] = 0
     opts["tf"] = te
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = Function.integrator("integrator", "cvodes", f, opts)
 
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
@@ -147,7 +147,7 @@ class OCPtests(casadiTestCase):
     opts["steps_per_checkpoint"] = 10000
     opts["t0"] = 0
     opts["tf"] = te
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = Function.integrator("integrator", "cvodes", f, opts)
 
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)

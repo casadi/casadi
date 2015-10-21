@@ -26,9 +26,9 @@
 #ifndef CASADI_INTEGRATOR_INTERNAL_HPP
 #define CASADI_INTEGRATOR_INTERNAL_HPP
 
-#include "integrator.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
+#include "linear_solver.hpp"
 
 /// \cond INTERNAL
 
@@ -208,7 +208,7 @@ namespace casadi {
 
     /// Get the (legacy) dae forward function
     template<typename XType>
-      static Problem<XType> fun2problem(Function dae);
+      static Problem<XType> fun2problem(Function f, Function g=Function());
   };
 
 
@@ -269,13 +269,34 @@ namespace casadi {
   }
 
   template<typename XType>
-  Problem<XType> IntegratorInternal::fun2problem(Function dae) {
-    Problem<XType> p;
-    p.in = XType::get_input(dae);
-    casadi_assert(p.in.size()==DAE_NUM_IN);
-    p.out = dae(p.in);
-    casadi_assert(p.out.size()==DAE_NUM_OUT);
-    return p;
+  Problem<XType> IntegratorInternal::fun2problem(Function f, Function g) {
+    Problem<XType> dae;
+    dae.in.resize(DE_NUM_IN);
+    dae.out.resize(DE_NUM_OUT);
+    std::vector<XType> v = XType::get_input(f), vf=v, vg=v;
+    dae.in[DE_T] = v[DAE_T];
+    dae.in[DE_X] = v[DAE_X];
+    dae.in[DE_Z] = v[DAE_Z];
+    dae.in[DE_P] = v[DAE_P];
+    v = f(v);
+    dae.out[DE_ODE] = v[DAE_ODE];
+    dae.out[DE_ALG] = v[DAE_ALG];
+    dae.out[DE_QUAD] = v[DAE_QUAD];
+    if (!g.isNull()) {
+      v = XType::get_input(g);
+      dae.in[DE_RX] = v[RDAE_RX];
+      dae.in[DE_RZ] = v[RDAE_RZ];
+      dae.in[DE_RP] = v[RDAE_RP];
+      vg[DAE_T] = v[RDAE_T];
+      vg[DAE_X] = v[RDAE_X];
+      vg[DAE_Z] = v[RDAE_Z];
+      vg[DAE_P] = v[RDAE_P];
+      v = substitute(g(v), vg, vf);
+      dae.out[DE_RODE] = v[RDAE_ODE];
+      dae.out[DE_RALG] = v[RDAE_ALG];
+      dae.out[DE_RQUAD] = v[RDAE_QUAD];
+    }
+    return dae;
   }
 
 } // namespace casadi

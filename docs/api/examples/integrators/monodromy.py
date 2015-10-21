@@ -57,7 +57,7 @@ f=SX.fun("f", daeIn(x=x,p=params),daeOut(ode=rhs))
 # opts["reltol"] = 1e-10
 # opts["abstol"] = 1e-10
 # opts["fsens_err_con"] = True
-# integrator = Integrator("integrator", "cvodes", f, opts)
+# integrator = Function.integrator("integrator", "cvodes", f, opts)
 
 # N = 500
 

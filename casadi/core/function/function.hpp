@@ -1204,6 +1204,9 @@ namespace casadi {
                                const MXDict& dae, const Dict& opts=Dict());
     static Function integrator(const std::string& name, const std::string& solver,
                                const Function& dae, const Dict& opts=Dict());
+    static Function integrator(const std::string& name, const std::string& solver,
+                               const std::pair<Function, Function>& dae,
+                               const Dict& opts=Dict());
 #ifndef SWIG
     static Function integrator(const std::string& name, const std::string& solver,
                                const XProblem& dae, const Dict& opts=Dict());

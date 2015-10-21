@@ -54,7 +54,7 @@ class Simulatortests(casadiTestCase):
     #opts["verbose"] = True
     opts["t0"] = 0
     opts["tf"] = 2.3
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = Function.integrator("integrator", "cvodes", f, opts)
     q0   = MX.sym("q0")
     par  = MX.sym("p")
     qend = integrator({'x0':q0,'p':par})["xf"]
@@ -88,7 +88,7 @@ class Simulatortests(casadiTestCase):
     #opts["verbose"] = True
     opts["t0"] = 0
     opts["tf"] = 2.3
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = Function.integrator("integrator", "cvodes", f, opts)
     sim = Simulator("sim", integrator, out, tc)
     solution = SX.fun('solution', integratorIn(x0=q, p=p),[horzcat([q*exp(t**3/(3*p)) for t in tc])])
     
@@ -117,7 +117,7 @@ class Simulatortests(casadiTestCase):
     #opts["verbose"] = True
     opts["t0"] = 0
     opts["tf"] = 2.3
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = Function.integrator("integrator", "cvodes", f, opts)
     sim = Simulator("sim", integrator, out, tc)
     sim.setInput([num['q0']],0)
     sim.setInput([num['p']],1)
@@ -135,7 +135,7 @@ class Simulatortests(casadiTestCase):
     #opts["verbose"] = True
     opts["t0"] = 0
     opts["tf"] = 2.3
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = Function.integrator("integrator", "cvodes", f, opts)
     sim = Simulator("sim", integrator,out,tc)
     sim.setInput([num['q0']],0)
     sim.setInput([num['p']],1)
@@ -155,7 +155,7 @@ class Simulatortests(casadiTestCase):
     #opts["verbose"] = True
     opts["t0"] = 0
     opts["tf"] = 2.3
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = Function.integrator("integrator", "cvodes", f, opts)
     sim = Simulator("sim", integrator, out, tc)
     sim.setInput([num['q0']],0)
     sim.evaluate()
@@ -171,7 +171,7 @@ class Simulatortests(casadiTestCase):
     #opts["verbose"] = True
     opts["t0"] = 0
     opts["tf"] = 2.3
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = Function.integrator("integrator", "cvodes", f, opts)
     sim = Simulator("sim", integrator, out, tc)
     sim.setInput([num['q0']],0)
     sim.evaluate()

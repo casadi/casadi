@@ -26,7 +26,7 @@
 #ifndef CASADI_SIMULATOR_HPP
 #define CASADI_SIMULATOR_HPP
 
-#include "integrator.hpp"
+#include "function.hpp"
 
 namespace casadi {
 
@@ -61,11 +61,11 @@ public:
   * \copydoc scheme_DAEInput
   *
   */
-  Simulator(const std::string& name, const Integrator& integrator, const Function& output_fcn,
+  Simulator(const std::string& name, const Function& integrator, const Function& output_fcn,
             const Matrix<double>& grid, const Dict& opts=Dict());
 
   /// Output function equal to the state (new syntax, includes initialization)
-  Simulator(const std::string& name, const Integrator& integrator,
+  Simulator(const std::string& name, const Function& integrator,
             const Matrix<double>& grid, const Dict& opts=Dict());
 
   /// Access functions of the node.

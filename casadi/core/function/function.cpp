@@ -1438,11 +1438,23 @@ namespace casadi {
   Function Function::integrator(const std::string& name, const std::string& solver,
                                 const Function& dae, const Dict& opts) {
     if (dae.is_a("sxfunction")) {
-      return Function::integrator(name, solver,
-                                  IntegratorInternal::fun2problem<SX>(dae), opts);
+      SXProblem p = IntegratorInternal::fun2problem<SX>(dae);
+      return Function::integrator(name, solver, p, opts);
     } else {
-      return Function::integrator(name, solver,
-                                  IntegratorInternal::fun2problem<MX>(dae), opts);
+      MXProblem p = IntegratorInternal::fun2problem<MX>(dae);
+      return Function::integrator(name, solver, p, opts);
+    }
+  }
+
+  Function Function::integrator(const std::string& name, const std::string& solver,
+                                const std::pair<Function, Function>& dae,
+                                const Dict& opts) {
+    if (dae.first.is_a("sxfunction")) {
+      SXProblem p = IntegratorInternal::fun2problem<SX>(dae.first, dae.second);
+      return Function::integrator(name, solver, p, opts);
+    } else {
+      MXProblem p = IntegratorInternal::fun2problem<MX>(dae.first, dae.second);
+      return Function::integrator(name, solver, p, opts);
     }
   }
 

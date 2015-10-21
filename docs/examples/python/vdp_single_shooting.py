@@ -41,7 +41,7 @@ qdot = x[0]*x[0] + x[1]*x[1] + u*u
 dae = SX.fun("dae", daeIn(x=x, p=u),daeOut(ode=xdot, quad=qdot))
 
 # Create an integrator
-integrator = Integrator("integrator", "cvodes", dae, {"tf":tf/nk})
+integrator = Function.integrator("integrator", "cvodes", dae, {"tf":tf/nk})
 
 # All controls (use matrix graph)
 x = MX.sym("x",nk) # nk-by-1 symbolic variable

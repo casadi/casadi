@@ -41,7 +41,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    SimulatorInternal(const std::string& name, const Integrator& integrator,
+    SimulatorInternal(const std::string& name, const Function& integrator,
                       const Function& output_fcn, const DMatrix& grid);
 
     /** \brief  Destructor */
@@ -70,7 +70,7 @@ namespace casadi {
     virtual void evaluate();
 
     // Integrator instance
-    Integrator integrator_;
+    Function integrator_;
 
     // Output function to be evaluated at each grid point
     Function output_fcn_;
