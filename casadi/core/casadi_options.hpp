@@ -111,6 +111,9 @@ namespace casadi {
       static void setCasadiPath(const std::string & path) { casadipath = path; }
       static std::string getCasadiPath() { return casadipath; }
 
+      static void test();
+      static void test2();
+      static void test3();
   };
 
 } // namespace casadi

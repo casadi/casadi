@@ -26,6 +26,8 @@
 #include "casadi_options.hpp"
 #include "casadi_exception.hpp"
 
+#include <fstream>
+
 namespace casadi {
 
   bool CasadiOptions::catch_errors_swig = true;
@@ -53,5 +55,24 @@ namespace casadi {
     }
     profiling = false;
   }
+  
+  void CasadiOptions::test() {
+    std::string file_name = "E:\\casadi-matlabR2014b-cad02fe\\casadi\\jit\\system_includes.txt";
+    userOut() << "test001cc" << file_name << std::endl;
+    std::ifstream setup_file(file_name.c_str());
+    userOut() << "open" << setup_file.is_open() << std::endl;
+  }
 
+  void CasadiOptions::test3() {
+    std::string file_name = "E:\\casadi-matlabR2014b-cad02fe\\casadi\\jit\\ssystem_includes.txt";
+    userOut() << "test001cc" << file_name << std::endl;
+    std::ifstream setup_file(file_name.c_str());
+    userOut() << "open" << setup_file.is_open() << std::endl;
+  }
+  
+  void CasadiOptions::test2() {
+    std::ifstream setup_file("E:\\casadi-matlabR2014b-cad02fe\\casadi\\jit\\system_includes.txt");
+    userOut() << "open" << setup_file.is_open() << std::endl;
+  }
+  
 } // namespace casadi
