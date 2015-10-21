@@ -87,7 +87,7 @@ namespace casadi {
     virtual void integrateB(double t_out);
 
     // Startup integrator (generates an initial trajectory guess)
-    Integrator startup_integrator_;
+    Function startup_integrator_;
 
     // Implicit function solver
     Function implicit_solver_;

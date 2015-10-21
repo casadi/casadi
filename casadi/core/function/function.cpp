@@ -1357,15 +1357,15 @@ namespace casadi {
   }
 
   bool Function::has_integrator(const std::string& name) {
-    return Integrator::hasPlugin(name);
+    return IntegratorInternal::hasPlugin(name);
   }
 
   void Function::load_integrator(const std::string& name) {
-    Integrator::loadPlugin(name);
+    IntegratorInternal::loadPlugin(name);
   }
 
   std::string Function::doc_integrator(const std::string& name) {
-    return Integrator::doc(name);
+    return IntegratorInternal::getPlugin(name).doc;
   }
 
   bool Function::has_qp_solver(const std::string& name) {

@@ -382,8 +382,9 @@ namespace casadi {
 
       // Allocate a root-finding solver
       startup_integrator_ =
-        Integrator("collocation_startup_" + name_, getOption("startup_integrator"),
-                   make_pair(f_, g_), startup_integrator_options);
+        Function::integrator("collocation_startup_" + name_,
+                             getOption("startup_integrator"),
+                             dae_, startup_integrator_options);
     }
 
     // Mark the system not yet integrated
@@ -422,7 +423,7 @@ namespace casadi {
         }
 
         // Reset the integrator
-        startup_integrator_.reset();
+        dynamic_cast<IntegratorInternal*>(startup_integrator_.get())->reset();
       }
 
       // Integrate, stopping at all time points
@@ -432,7 +433,8 @@ namespace casadi {
 
           if (has_startup_integrator) {
             // Integrate to the time point
-            startup_integrator_.integrate(coll_time_[k][j]);
+            dynamic_cast<IntegratorInternal*>(startup_integrator_.get())
+              ->integrate(coll_time_[k][j]);
           }
 
           // Save the differential states
@@ -470,9 +472,9 @@ namespace casadi {
       // Print
       if (has_startup_integrator && verbose()) {
         userOut() << "startup trajectory generated, statistics:" << endl;
-        startup_integrator_.printStats();
+        dynamic_cast<IntegratorInternal*>(startup_integrator_.get())
+          ->printStats(casadi::userOut());
       }
-
     }
 
     if (CasadiOptions::profiling) {

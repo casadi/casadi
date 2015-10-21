@@ -150,7 +150,7 @@ namespace casadi {
     }
 
     // Reset the integrator_
-    integrator_.reset();
+    dynamic_cast<IntegratorInternal*>(integrator_.get())->reset();
 
     // Iterators to output data structures
     for (int i=0; i<output_its_.size(); ++i) output_its_[i] = output(i).begin();
@@ -166,7 +166,7 @@ namespace casadi {
       }
 
       // Integrate to the output time
-      integrator_.integrate(grid_[k]);
+      dynamic_cast<IntegratorInternal*>(integrator_.get())->integrate(grid_[k]);
 
       if (monitored("step")) {
         userOut() << " xf  = "  << integrator_.output(INTEGRATOR_XF) << std::endl;

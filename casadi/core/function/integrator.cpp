@@ -119,40 +119,8 @@ namespace casadi {
     return static_cast<const IntegratorInternal*>(Function::operator->());
   }
 
-  void Integrator::reset() {
-    (*this)->reset();
-  }
-
-  void Integrator::integrate(double t_out) {
-    (*this)->integrate(t_out);
-  }
-
   bool Integrator::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const IntegratorInternal*>(ptr)!=0;
-  }
-
-  void Integrator::resetB() {
-    (*this)->resetB();
-  }
-
-  void Integrator::integrateB(double t_out) {
-    (*this)->integrateB(t_out);
-  }
-
-  bool Integrator::hasPlugin(const std::string& name) {
-    return IntegratorInternal::hasPlugin(name);
-  }
-
-  void Integrator::loadPlugin(const std::string& name) {
-    IntegratorInternal::loadPlugin(name);
-  }
-
-  std::string Integrator::doc(const std::string& name) {
-    return IntegratorInternal::getPlugin(name).doc;
-  }
-
-  void Integrator::setStopTime(double tf) {
-    (*this)->setStopTime(tf);
   }
 
 } // namespace casadi

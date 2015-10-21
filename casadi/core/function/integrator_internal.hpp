@@ -272,9 +272,9 @@ namespace casadi {
   Problem<XType> IntegratorInternal::fun2problem(Function dae) {
     Problem<XType> p;
     p.in = XType::get_input(dae);
-    casadi_assert(p.in.size()==DE_NUM_IN);
+    casadi_assert(p.in.size()==DAE_NUM_IN);
     p.out = dae(p.in);
-    casadi_assert(p.out.size()==DE_NUM_OUT);
+    casadi_assert(p.out.size()==DAE_NUM_OUT);
     return p;
   }
 

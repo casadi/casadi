@@ -110,37 +110,6 @@ namespace casadi {
     /// Access functions of the node
     const IntegratorInternal* operator->() const;
 
-#ifndef SWIG
-    /** \brief Reset the forward problem
-     * Time will be set to t0 and state to input(INTEGRATOR_X0)
-     */
-    void reset();
-
-    /// Integrate forward until a specified time point
-    void integrate(double t_out);
-
-    /** \brief Reset the backward problem
-     *
-     * Time will be set to tf and backward state to input(INTEGRATOR_RX0)
-     */
-    void resetB();
-
-    /// Integrate backward until a specified time point
-    void integrateB(double t_out);
-
-    /// Check if a plugin is available
-    static bool hasPlugin(const std::string& name);
-
-    /// Explicitly load a plugin dynamically
-    static void loadPlugin(const std::string& name);
-
-    /// Get solver specific documentation
-    static std::string doc(const std::string& name);
-
-    /// Set a stop time for the forward integration
-    void setStopTime(double tf);
-#endif // SWIG
-
     /// Check if a particular cast is allowed
     static bool test_cast(const SharedObjectNode* ptr);
   };

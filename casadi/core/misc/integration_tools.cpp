@@ -335,13 +335,13 @@ namespace casadi {
     xdot *= h;
 
     // Form DAE function
-    Function dae = MX::fun("dae", daeIn("x", x, "p", u), daeOut("ode", xdot));
+    MXDict dae = {{"x", x}, {"p", u}, {"ode", xdot}};
 
     // Create integrator function
     Dict integrator_options2 = integrator_options;
     integrator_options2["t0"] = 0; // Normalized time
     integrator_options2["tf"] = 1; // Normalized time
-    Integrator ifcn("integrator", integrator, dae, integrator_options2);
+    Function ifcn = Function::integrator("integrator", integrator, dae, integrator_options2);
 
     // Inputs of constructed function
     MX x0 = MX::sym("x0", x_sp);
