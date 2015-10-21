@@ -37,6 +37,7 @@ namespace casadi {
   bool CasadiOptions::profilingBinary = true;
   bool CasadiOptions::purgeSeeds = false;
   bool CasadiOptions::allowed_internal_api = false;
+  int CasadiOptions::debugflag = -1;
 
   std::string CasadiOptions::casadipath = "";
 

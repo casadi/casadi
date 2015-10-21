@@ -80,6 +80,7 @@ namespace casadi {
       static bool allowed_internal_api;
 
       static std::string casadipath;
+      static int debugflag;
 
 #endif //SWIG
       // Setter and getter for catch_errors_swig
@@ -114,6 +115,8 @@ namespace casadi {
       static void test();
       static void test2();
       static void test3();
+      
+      static void setDebugging(int flag) { debugflag = flag; }
   };
 
 } // namespace casadi

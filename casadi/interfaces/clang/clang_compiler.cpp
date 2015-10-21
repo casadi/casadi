@@ -26,6 +26,7 @@
 #include "clang_compiler.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/casadi_meta.hpp"
+#include "casadi/core/casadi_options.hpp"
 #include <fstream>
 
 // To be able to get the plugin path
@@ -88,6 +89,8 @@ namespace casadi {
     CompilerInternal::init();
     
     getIncludes("system_includes.txt", "E:\\casadi-matlabR2014b-cad02fe\\casadi\\jit");
+    
+    if (CasadiOptions::debugflag==0) return;
 
     // Arguments to pass to the clang frontend
     vector<const char *> args(1, name_.c_str());
@@ -99,18 +102,21 @@ namespace casadi {
       }
     }
     userOut() << "baz014"  << std::endl;
+    if (CasadiOptions::debugflag==1) return;
     // Create the compiler instance
     clang::CompilerInstance compInst;
 
     // A symbol in the DLL
     void *addr = reinterpret_cast<void*>(&casadi_register_compiler_clang);
     userOut() << "baz013"  << std::endl;
+    if (CasadiOptions::debugflag==2) return;
     
     // Get runtime include path
     std::string jit_include, filesep;
 #ifdef _WIN32
     char buffer[MAX_PATH];
     userOut() << "baz012" << MAX_PATH  << std::endl;
+    if (CasadiOptions::debugflag==3) return;
     HMODULE hm = NULL;
     if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
                             GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
@@ -118,12 +124,16 @@ namespace casadi {
       casadi_error("GetModuleHandle failed");
     }
     userOut() << "baz011"  << std::endl;
+    if (CasadiOptions::debugflag==4) return;
     GetModuleFileNameA(hm, buffer, sizeof(buffer));
     userOut() << "baz011b"  << std::endl;
+    if (CasadiOptions::debugflag==5) return;
     PathRemoveFileSpecA(buffer);
     userOut() << "baz011c"  << std::endl;
+    if (CasadiOptions::debugflag==6) return;
     jit_include = buffer;
     userOut() << "baz010" << jit_include  << std::endl;
+    if (CasadiOptions::debugflag==7) return;
     filesep = "\\";
 #else // _WIN32
     Dl_info dl_info;
@@ -132,8 +142,10 @@ namespace casadi {
     }
     jit_include = dl_info.dli_fname;
     userOut() << "baz010" << jit_include  << std::endl;
+    if (CasadiOptions::debugflag==8) return;
     jit_include = jit_include.substr(0, jit_include.find_last_of('/'));
     userOut() << "baz010" << jit_include  << std::endl;
+    if (CasadiOptions::debugflag==9) return;
     filesep = "/";
 #endif // _WIN32
     jit_include += filesep + "casadi" + filesep + "jit";
@@ -148,32 +160,41 @@ namespace casadi {
 #endif
 
     userOut() << "baz009" << std::endl;
+    if (CasadiOptions::debugflag==10) return;
 
     // The compiler invocation needs a DiagnosticsEngine so it can report problems
     clang::DiagnosticOptions* diagOpts = new clang::DiagnosticOptions();
     userOut() << "baz008" << std::endl;
+    if (CasadiOptions::debugflag==11) return;
     myerr_ = new llvm::raw_os_ostream(userOut<true>());
     userOut() << "baz007" << std::endl;
+    if (CasadiOptions::debugflag==12) return;
     clang::TextDiagnosticPrinter *diagClient = new clang::TextDiagnosticPrinter(*myerr_, diagOpts);
     userOut() << "baz006" << std::endl;
+    if (CasadiOptions::debugflag==13) return;
     clang::DiagnosticIDs* diagID = new clang::DiagnosticIDs();
     userOut() << "baz005" << std::endl;
+    if (CasadiOptions::debugflag==14) return;
     // This object takes ownerships of all three passed-in pointers
     clang::DiagnosticsEngine diags(diagID, diagOpts, diagClient);
     userOut() << "baz004" << std::endl;
+    if (CasadiOptions::debugflag==15) return;
     // Create the compiler invocation
     clang::CompilerInvocation* compInv = new clang::CompilerInvocation();
     userOut() << "baz003" << std::endl;
+    if (CasadiOptions::debugflag==16) return;
     clang::CompilerInvocation::CreateFromArgs(*compInv, &args[0],
                                               &args[0] + args.size(), diags);
     compInst.setInvocation(compInv);
     userOut() << "baz002" << std::endl;
+    if (CasadiOptions::debugflag==17) return;
     // Get ready to report problems
     compInst.createDiagnostics();
     if (!compInst.hasDiagnostics())
       casadi_error("Cannot create diagnostics");
 
     userOut() << "baz001" << std::endl;
+    if (CasadiOptions::debugflag==18) return;
 
     // Set resource directory
     std::string resourcedir = jit_include + filesep + "clang" + filesep + CLANG_VERSION_STRING;
@@ -182,6 +203,7 @@ namespace casadi {
     // Read the system includes (C or C++)
     vector<pair<string, bool> > system_include = getIncludes("system_includes.txt", jit_include);
     userOut() << "system_include" << std::endl;
+    if (CasadiOptions::debugflag==19) return;
 
     for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
       compInst.getHeaderSearchOpts().AddPath(i->first,
@@ -191,6 +213,7 @@ namespace casadi {
     // Read the system includes (C only)
     system_include = getIncludes("csystem_includes.txt", jit_include);
     userOut() << "system_include" << std::endl;
+    if (CasadiOptions::debugflag==20) return;
     for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
       compInst.getHeaderSearchOpts().AddPath(i->first,
                                              clang::frontend::CSystem, i->second, false);
@@ -199,6 +222,7 @@ namespace casadi {
     // Read the system includes (C++ only)
     system_include = getIncludes("cxxsystem_includes.txt", jit_include);
     userOut() << "system_include" << std::endl;
+    if (CasadiOptions::debugflag==21) return;
     for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
       compInst.getHeaderSearchOpts().AddPath(i->first,
                                              clang::frontend::CXXSystem, i->second, false);
@@ -218,15 +242,18 @@ namespace casadi {
       compInst.getHeaderSearchOpts().AddPath(path.c_str(), clang::frontend::System, false, false);
     }
     userOut() << "bar002" << std::endl;
+    if (CasadiOptions::debugflag==22) return;
     // Create an LLVM context (NOTE: should use a static context instead?)
     context_ = new llvm::LLVMContext();
     userOut() << "bar003" << std::endl;
+    if (CasadiOptions::debugflag==23) return;
     
     // Create an action and make the compiler instance carry it out
     act_ = new clang::EmitLLVMOnlyAction(context_);
     if (!compInst.ExecuteAction(*act_))
       casadi_error("Cannot execute action");
     userOut() << "bar004" << std::endl;
+    if (CasadiOptions::debugflag==24) return;
     // Grab the module built by the EmitLLVMOnlyAction
     #if LLVM_VERSION_MAJOR>=3 && LLVM_VERSION_MINOR>=5
     std::unique_ptr<llvm::Module> module = act_->takeModule();
@@ -236,11 +263,14 @@ namespace casadi {
     module_ = module;
     #endif
     userOut() << "bar005" << std::endl;
+    if (CasadiOptions::debugflag==25) return;
 
     llvm::InitializeNativeTarget();
     userOut() << "bar006" << std::endl;
+    if (CasadiOptions::debugflag==26) return;
     llvm::InitializeNativeTargetAsmPrinter();
     userOut() << "bar007" << std::endl;
+    if (CasadiOptions::debugflag==27) return;
     
     // Create the JIT.  This takes ownership of the module.
     std::string ErrStr;
@@ -248,12 +278,14 @@ namespace casadi {
       llvm::EngineBuilder(std::move(module)).setEngineKind(llvm::EngineKind::JIT)
       .setErrorStr(&ErrStr).create();
     userOut() << "bar008" << std::endl;
+    if (CasadiOptions::debugflag==28) return;
     if (!executionEngine_) {
       casadi_error("Could not create ExecutionEngine: " << ErrStr);
     }
 
     executionEngine_->finalizeObject();
     userOut() << "bar009" << std::endl;
+    if (CasadiOptions::debugflag==29) return;
   }
 
   void* ClangCompiler::getFunction(const std::string& symname) {
@@ -275,11 +307,14 @@ namespace casadi {
     // Return value
     vector<pair<string, bool> > ret;
     userOut() << "test001b" << std::endl;
+    if (CasadiOptions::debugflag==100) return ret;
     
     // Read line-by-line
     std::string file_name = path + sep + file;
     userOut() << "test001cc" << file_name << std::endl;
     std::ifstream setup_file(file_name.c_str());
+    
+    if (CasadiOptions::debugflag==101) return ret;
 
     userOut() << setup_file.is_open() << std::endl;
     userOut() << setup_file.good() << std::endl;
@@ -287,27 +322,33 @@ namespace casadi {
     userOut() << setup_file.fail() << std::endl;
     userOut() << setup_file.bad() << std::endl;
     userOut() << setup_file.rdstate() << std::endl;
+
+    if (CasadiOptions::debugflag==102) return ret;
     
     if (!setup_file) {
       userOut() << "nothing here" << std::endl;
       return ret;
     }
     userOut() << "test001c" << std::endl;
-
+    if (CasadiOptions::debugflag==103) return ret;
+    
     std::string line;
     userOut() << "test002" << std::endl;
+    if (CasadiOptions::debugflag==104) return ret;
 
     while (std::getline(setup_file, line)) {
       // Skip empty lines
       if (line.empty()) continue;
 
       userOut() << "test003" << std::endl;
+      if (CasadiOptions::debugflag==105) return ret;
 
       // Check if framework
       size_t loc = line.find(" (framework directory)");
       bool isframework = loc != string::npos;
 
       userOut() << "test004" << std::endl;
+      if (CasadiOptions::debugflag==106) return ret;
 
       if (isframework) {
         // Truncate path
@@ -315,7 +356,8 @@ namespace casadi {
       }
 
       userOut() << "test005" << std::endl;
-
+      if (CasadiOptions::debugflag==107) return ret;
+      
       // Check if the path is absolute or relative
 #ifdef _WIN32
       bool relative = PathIsRelative(TEXT(line.c_str()));
@@ -324,6 +366,7 @@ namespace casadi {
 #endif // _WIN32
 
       userOut() << "test006" << std::endl;
+      if (CasadiOptions::debugflag==108) return ret;
 
 
       if (relative) {
@@ -335,6 +378,7 @@ namespace casadi {
       }
 
       userOut() << "test007" << std::endl;
+      if (CasadiOptions::debugflag==109) return ret;
 
     }
     userOut() << "test008" << std::endl;
