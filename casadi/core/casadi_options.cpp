@@ -25,7 +25,7 @@
 
 #include "casadi_options.hpp"
 #include "casadi_exception.hpp"
-
+#include "casadi_logger.hpp"
 #include <fstream>
 
 namespace casadi {
