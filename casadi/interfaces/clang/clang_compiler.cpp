@@ -70,10 +70,17 @@ namespace casadi {
     addOption("flags", OT_STRINGVECTOR, GenericType(),
       "Compile flags for the JIT compiler. Default: None");
 
+    myerr_ = 0;
+    executionEngine_ = 0;
+    context_ = 0;
+    act_ = 0;
   }
 
   ClangCompiler::~ClangCompiler() {
-
+    if (act_) delete act_;
+    if (myerr_) delete myerr_;
+    if (executionEngine_) delete executionEngine_;
+    if (context_) delete context_;
   }
 
   void ClangCompiler::init() {
@@ -82,10 +89,176 @@ namespace casadi {
     
     getIncludes("system_includes.txt", "E:\\casadi-matlabR2014b-cad02fe\\casadi\\jit");
 
+    // Arguments to pass to the clang frontend
+    vector<const char *> args(1, name_.c_str());
+    std::vector<std::string> flags;
+    if (hasSetOption("flags")) {
+      flags = getOption("flags");
+      for (auto i=flags.begin(); i!=flags.end(); ++i) {
+        args.push_back(i->c_str());
+      }
+    }
+    userOut() << "baz014"  << std::endl;
+    // Create the compiler instance
+    clang::CompilerInstance compInst;
+
+    // A symbol in the DLL
+    void *addr = reinterpret_cast<void*>(&casadi_register_compiler_clang);
+    userOut() << "baz013"  << std::endl;
+    
+    // Get runtime include path
+    std::string jit_include, filesep;
+#ifdef _WIN32
+    char buffer[MAX_PATH];
+    userOut() << "baz012" << MAX_PATH  << std::endl;
+    HMODULE hm = NULL;
+    if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                            GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                            (LPCSTR)addr, &hm)) {
+      casadi_error("GetModuleHandle failed");
+    }
+    userOut() << "baz011"  << std::endl;
+    GetModuleFileNameA(hm, buffer, sizeof(buffer));
+    userOut() << "baz011b"  << std::endl;
+    PathRemoveFileSpecA(buffer);
+    userOut() << "baz011c"  << std::endl;
+    jit_include = buffer;
+    userOut() << "baz010" << jit_include  << std::endl;
+    filesep = "\\";
+#else // _WIN32
+    Dl_info dl_info;
+    if (!dladdr(addr, &dl_info)) {
+      casadi_error("dladdr failed");
+    }
+    jit_include = dl_info.dli_fname;
+    userOut() << "baz010" << jit_include  << std::endl;
+    jit_include = jit_include.substr(0, jit_include.find_last_of('/'));
+    userOut() << "baz010" << jit_include  << std::endl;
+    filesep = "/";
+#endif // _WIN32
+    jit_include += filesep + "casadi" + filesep + "jit";
+
+#if 0
+    // Initialize target info with the default triple for our platform.
+    auto targetoptions = std::make_shared<clang::TargetOptions>();
+    targetoptions->Triple = llvm::sys::getDefaultTargetTriple();
+    clang::TargetInfo *targetInfo =
+      clang::TargetInfo::CreateTargetInfo(compInst.getDiagnostics(), targetoptions);
+    compInst.setTarget(targetInfo);
+#endif
+
+    userOut() << "baz009" << std::endl;
+
+    // The compiler invocation needs a DiagnosticsEngine so it can report problems
+    clang::DiagnosticOptions* diagOpts = new clang::DiagnosticOptions();
+    userOut() << "baz008" << std::endl;
+    myerr_ = new llvm::raw_os_ostream(userOut<true>());
+    userOut() << "baz007" << std::endl;
+    clang::TextDiagnosticPrinter *diagClient = new clang::TextDiagnosticPrinter(*myerr_, diagOpts);
+    userOut() << "baz006" << std::endl;
+    clang::DiagnosticIDs* diagID = new clang::DiagnosticIDs();
+    userOut() << "baz005" << std::endl;
+    // This object takes ownerships of all three passed-in pointers
+    clang::DiagnosticsEngine diags(diagID, diagOpts, diagClient);
+    userOut() << "baz004" << std::endl;
+    // Create the compiler invocation
+    clang::CompilerInvocation* compInv = new clang::CompilerInvocation();
+    userOut() << "baz003" << std::endl;
+    clang::CompilerInvocation::CreateFromArgs(*compInv, &args[0],
+                                              &args[0] + args.size(), diags);
+    compInst.setInvocation(compInv);
+    userOut() << "baz002" << std::endl;
+    // Get ready to report problems
+    compInst.createDiagnostics();
+    if (!compInst.hasDiagnostics())
+      casadi_error("Cannot create diagnostics");
+
+    userOut() << "baz001" << std::endl;
+
+    // Set resource directory
+    std::string resourcedir = jit_include + filesep + "clang" + filesep + CLANG_VERSION_STRING;
+    compInst.getHeaderSearchOpts().ResourceDir = resourcedir;
+
+    // Read the system includes (C or C++)
+    vector<pair<string, bool> > system_include = getIncludes("system_includes.txt", jit_include);
+    userOut() << "system_include" << std::endl;
+
+    for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
+      compInst.getHeaderSearchOpts().AddPath(i->first,
+                                             clang::frontend::System, i->second, false);
+    }
+
+    // Read the system includes (C only)
+    system_include = getIncludes("csystem_includes.txt", jit_include);
+    userOut() << "system_include" << std::endl;
+    for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
+      compInst.getHeaderSearchOpts().AddPath(i->first,
+                                             clang::frontend::CSystem, i->second, false);
+    }
+
+    // Read the system includes (C++ only)
+    system_include = getIncludes("cxxsystem_includes.txt", jit_include);
+    userOut() << "system_include" << std::endl;
+    for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
+      compInst.getHeaderSearchOpts().AddPath(i->first,
+                                             clang::frontend::CXXSystem, i->second, false);
+    }
+
+#ifdef _WIN32
+    char pathsep = ';';
+#else
+    char pathsep = ':';
+#endif
+    userOut() << "bar001" << std::endl;
+    // Search path
+    std::stringstream paths;
+    paths << getOption("include_path").toString() << pathsep;
+    std::string path;
+    while (std::getline(paths, path, pathsep)) {
+      compInst.getHeaderSearchOpts().AddPath(path.c_str(), clang::frontend::System, false, false);
+    }
+    userOut() << "bar002" << std::endl;
+    // Create an LLVM context (NOTE: should use a static context instead?)
+    context_ = new llvm::LLVMContext();
+    userOut() << "bar003" << std::endl;
+    
+    // Create an action and make the compiler instance carry it out
+    act_ = new clang::EmitLLVMOnlyAction(context_);
+    if (!compInst.ExecuteAction(*act_))
+      casadi_error("Cannot execute action");
+    userOut() << "bar004" << std::endl;
+    // Grab the module built by the EmitLLVMOnlyAction
+    #if LLVM_VERSION_MAJOR>=3 && LLVM_VERSION_MINOR>=5
+    std::unique_ptr<llvm::Module> module = act_->takeModule();
+    module_ = module.get();
+    #else
+    llvm::Module* module = act_->takeModule();
+    module_ = module;
+    #endif
+    userOut() << "bar005" << std::endl;
+
+    llvm::InitializeNativeTarget();
+    userOut() << "bar006" << std::endl;
+    llvm::InitializeNativeTargetAsmPrinter();
+    userOut() << "bar007" << std::endl;
+    
+    // Create the JIT.  This takes ownership of the module.
+    std::string ErrStr;
+    executionEngine_ =
+      llvm::EngineBuilder(std::move(module)).setEngineKind(llvm::EngineKind::JIT)
+      .setErrorStr(&ErrStr).create();
+    userOut() << "bar008" << std::endl;
+    if (!executionEngine_) {
+      casadi_error("Could not create ExecutionEngine: " << ErrStr);
+    }
+
+    executionEngine_->finalizeObject();
+    userOut() << "bar009" << std::endl;
   }
 
   void* ClangCompiler::getFunction(const std::string& symname) {
-    
+    return reinterpret_cast<void*>((intptr_t)executionEngine_
+                                   ->getPointerToFunction(module_->getFunction(symname)));
   }
 
   std::vector<std::pair<std::string, bool> > ClangCompiler::
@@ -114,6 +287,57 @@ namespace casadi {
     userOut() << setup_file.fail() << std::endl;
     userOut() << setup_file.bad() << std::endl;
     userOut() << setup_file.rdstate() << std::endl;
+    
+    if (!setup_file) {
+      userOut() << "nothing here" << std::endl;
+      return ret;
+    }
+    userOut() << "test001c" << std::endl;
+
+    std::string line;
+    userOut() << "test002" << std::endl;
+
+    while (std::getline(setup_file, line)) {
+      // Skip empty lines
+      if (line.empty()) continue;
+
+      userOut() << "test003" << std::endl;
+
+      // Check if framework
+      size_t loc = line.find(" (framework directory)");
+      bool isframework = loc != string::npos;
+
+      userOut() << "test004" << std::endl;
+
+      if (isframework) {
+        // Truncate path
+        line = line.substr(0, loc);
+      }
+
+      userOut() << "test005" << std::endl;
+
+      // Check if the path is absolute or relative
+#ifdef _WIN32
+      bool relative = PathIsRelative(TEXT(line.c_str()));
+#else // _WIN32
+      bool relative = line.at(0)!=sep;
+#endif // _WIN32
+
+      userOut() << "test006" << std::endl;
+
+
+      if (relative) {
+        // Relative path, make absolute
+        ret.push_back(make_pair(path + sep + line, isframework));
+      } else {
+        // Absolute path
+        ret.push_back(make_pair(line, isframework));
+      }
+
+      userOut() << "test007" << std::endl;
+
+    }
+    userOut() << "test008" << std::endl;
     return ret;
   }
 
