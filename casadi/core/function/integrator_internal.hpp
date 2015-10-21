@@ -205,49 +205,53 @@ namespace casadi {
     /// Convert Problem to dictionary
     template<typename XType>
       static std::map<std::string, XType> problem2map(const Problem<XType>& d);
+
+    /// Get the (legacy) dae forward function
+    template<typename XType>
+      static Problem<XType> fun2problem(Function dae);
   };
 
 
   template<typename XType>
   Problem<XType> IntegratorInternal::map2problem(const std::map<std::string, XType>& d) {
-    std::vector<XType> dae_in(DE_NUM_IN), dae_out(DE_NUM_OUT);
+    std::vector<XType> de_in(DE_NUM_IN), de_out(DE_NUM_OUT);
     for (auto&& i : d) {
       if (i.first=="t") {
-        dae_in[DE_T]=i.second;
+        de_in[DE_T]=i.second;
       } else if (i.first=="x") {
-        dae_in[DE_X]=i.second;
+        de_in[DE_X]=i.second;
       } else if (i.first=="z") {
-        dae_in[DE_Z]=i.second;
+        de_in[DE_Z]=i.second;
       } else if (i.first=="p") {
-        dae_in[DE_P]=i.second;
+        de_in[DE_P]=i.second;
       } else if (i.first=="rx") {
-        dae_in[DE_RX]=i.second;
+        de_in[DE_RX]=i.second;
       } else if (i.first=="rz") {
-        dae_in[DE_RZ]=i.second;
+        de_in[DE_RZ]=i.second;
       } else if (i.first=="rp") {
-        dae_in[DE_RP]=i.second;
+        de_in[DE_RP]=i.second;
       } else if (i.first=="ode") {
-        dae_out[DE_ODE]=i.second;
+        de_out[DE_ODE]=i.second;
       } else if (i.first=="alg") {
-        dae_out[DE_ALG]=i.second;
+        de_out[DE_ALG]=i.second;
       } else if (i.first=="quad") {
-        dae_out[DE_QUAD]=i.second;
+        de_out[DE_QUAD]=i.second;
       } else if (i.first=="rode") {
-        dae_out[DE_RODE]=i.second;
+        de_out[DE_RODE]=i.second;
       } else if (i.first=="ralg") {
-        dae_out[DE_RALG]=i.second;
+        de_out[DE_RALG]=i.second;
       } else if (i.first=="rquad") {
-        dae_out[DE_RQUAD]=i.second;
+        de_out[DE_RQUAD]=i.second;
       } else {
         casadi_error("No such field: " + i.first);
       }
     }
-    return Problem<XType>{dae_in, dae_out};
+    return {de_in, de_out};
   }
 
   template<typename XType>
   std::map<std::string, XType> IntegratorInternal::problem2map(const Problem<XType>& d) {
-    return std::map<std::string, XType>{
+    return {
         {"t", d.in[DE_T]},
         {"x", d.in[DE_X]},
         {"z", d.in[DE_Z]},
@@ -262,6 +266,16 @@ namespace casadi {
         {"ralg", d.out[DE_RALG]},
         {"rquad", d.out[DE_RQUAD]},
       };
+  }
+
+  template<typename XType>
+  Problem<XType> IntegratorInternal::fun2problem(Function dae) {
+    Problem<XType> p;
+    p.in = XType::get_input(dae);
+    casadi_assert(p.in.size()==DE_NUM_IN);
+    p.out = dae(p.in);
+    casadi_assert(p.out.size()==DE_NUM_OUT);
+    return p;
   }
 
 } // namespace casadi

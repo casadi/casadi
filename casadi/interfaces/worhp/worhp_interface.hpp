@@ -57,7 +57,7 @@ namespace casadi {
 
   public:
     // Constructor
-    explicit WorhpInterface(const std::string& name, const Function& nlp);
+    explicit WorhpInterface(const std::string& name, const XProblem& nlp);
 
     // Destructor
     virtual ~WorhpInterface();
@@ -66,7 +66,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "worhp";}
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const std::string& name, const Function& nlp) {
+    static NlpSolverInternal* creator(const std::string& name, const XProblem& nlp) {
       return new WorhpInterface(name, nlp);
     }
 

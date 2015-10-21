@@ -53,7 +53,7 @@ namespace casadi {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_scpgen);
   }
 
-  Scpgen::Scpgen(const std::string& name, const Function& nlp)
+  Scpgen::Scpgen(const std::string& name, const XProblem& nlp)
     : NlpSolverInternal(name, nlp) {
     casadi_warning("SCPgen is under development");
     addOption("qp_solver",         OT_STRING,   GenericType(),

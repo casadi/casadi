@@ -1202,6 +1202,8 @@ namespace casadi {
                                const SXDict& dae, const Dict& opts=Dict());
     static Function integrator(const std::string& name, const std::string& solver,
                                const MXDict& dae, const Dict& opts=Dict());
+    static Function integrator(const std::string& name, const std::string& solver,
+                               const Function& dae, const Dict& opts=Dict());
 #ifndef SWIG
     static Function integrator(const std::string& name, const std::string& solver,
                                const XProblem& dae, const Dict& opts=Dict());
@@ -1236,6 +1238,14 @@ namespace casadi {
                                const SXDict& nlp, const Dict& opts=Dict());
     static Function nlp_solver(const std::string& name, const std::string& solver,
                                const MXDict& nlp, const Dict& opts=Dict());
+    static Function nlp_solver(const std::string& name, const std::string& solver,
+                               const Function& nlp, const Dict& opts=Dict());
+#ifndef SWIG
+    static Function nlp_solver(const std::string& name, const std::string& solver,
+                               const XProblem& nlp, const Dict& opts=Dict());
+#endif // SWIG
+
+
     ///@}
 
     /** \brief Access the NLP for an NLP solver */

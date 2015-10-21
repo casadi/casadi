@@ -49,7 +49,7 @@ namespace casadi {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_snopt);
   }
 
-  SnoptInterface::SnoptInterface(const std::string& name, const Function& nlp)
+  SnoptInterface::SnoptInterface(const std::string& name, const XProblem& nlp)
     : NlpSolverInternal(name, nlp) {
 
     addOption("detect_linear", OT_BOOLEAN, true,

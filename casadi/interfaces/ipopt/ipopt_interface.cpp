@@ -152,7 +152,7 @@ namespace casadi {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_ipopt);
   }
 
-  IpoptInterface::IpoptInterface(const std::string& name, const Function& nlp)
+  IpoptInterface::IpoptInterface(const std::string& name, const XProblem& nlp)
     : NlpSolverInternal(name, nlp) {
 
     addOption("pass_nonlinear_variables", OT_BOOLEAN, false);

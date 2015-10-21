@@ -32,8 +32,8 @@ OUTPUTSCHEME(NlpSolverOutput)
 using namespace std;
 namespace casadi {
 
-  NlpSolverInternal::NlpSolverInternal(const std::string& name, const Function& nlp)
-    : FunctionInternal(name), nlp_(nlp) {
+  NlpSolverInternal::NlpSolverInternal(const std::string& name, const XProblem& nlp)
+    : FunctionInternal(name), nlp2_(nlp) {
 
     // Options available in all NLP solvers
     addOption("expand",             OT_BOOLEAN,  false,
@@ -90,6 +90,11 @@ namespace casadi {
     // prevent deletion of the object)
     ref_.assignNodeNoCount(this);
 
+    if (nlp.is_sx) {
+      nlp_ = NlpSolverInternal::problem2fun<SX>(nlp);
+    } else {
+      nlp_ = NlpSolverInternal::problem2fun<MX>(nlp);
+    }
   }
 
   NlpSolverInternal::~NlpSolverInternal() {

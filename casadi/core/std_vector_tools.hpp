@@ -781,20 +781,6 @@ namespace casadi {
     return ret;
   }
 
-  template<typename T1, typename T2>
-  std::vector<T1> first(const std::vector<std::pair<T1, T2>>& v) {
-    std::vector<T1> r(v.size());
-    for (unsigned int i=0; i<v.size(); ++i) r[i] = v[i].first;
-    return r;
-  }
-
-  template<typename T1, typename T2>
-  std::vector<T2> second(const std::vector<std::pair<T1, T2>>& v) {
-    std::vector<T2> r(v.size());
-    for (unsigned int i=0; i<v.size(); ++i) r[i] = v[i].second;
-    return r;
-  }
-
 } // namespace casadi
 #endif // SWIG
 

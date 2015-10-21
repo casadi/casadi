@@ -46,7 +46,7 @@ namespace casadi {
 
   public:
     /// Constructor
-    NlpSolverInternal(const std::string& name, const Function& nlp);
+    NlpSolverInternal(const std::string& name, const XProblem& nlp);
 
     /// Destructor
     virtual ~NlpSolverInternal() = 0;
@@ -136,6 +136,7 @@ namespace casadi {
     bool eval_errors_fatal_;
 
     /// The NLP
+    XProblem nlp2_;
     Function nlp_;
 
     // Gradient of the objective
@@ -160,7 +161,7 @@ namespace casadi {
     Function ref_;
 
     // Creator function for internal class
-    typedef NlpSolverInternal* (*Creator)(const std::string& name, const Function& nlp);
+    typedef NlpSolverInternal* (*Creator)(const std::string& name, const XProblem& nlp);
 
     // No static functions exposed
     struct Exposed{ };
@@ -187,7 +188,66 @@ namespace casadi {
       t = v;
     }
 
+    /// Convert dictionary to Problem
+    template<typename XType>
+      static Problem<XType> map2problem(const std::map<std::string, XType>& d);
+
+    /// Convert Problem to dictionary
+    template<typename XType>
+      static std::map<std::string, XType> problem2map(const Problem<XType>& d);
+
+    /// Get the (legacy) dae forward function
+    template<typename XType>
+      static Function problem2fun(const Problem<XType>& d);
+
+    /// Get the (legacy) dae forward function
+    template<typename XType>
+      static Problem<XType> fun2problem(Function nlp);
   };
+
+  template<typename XType>
+  Problem<XType> NlpSolverInternal::map2problem(const std::map<std::string, XType>& d) {
+    std::vector<XType> nl_in(NL_NUM_IN), nl_out(NL_NUM_OUT);
+    for (auto&& i : d) {
+      if (i.first=="x") {
+        nl_in[NL_X]=i.second;
+      } else if (i.first=="p") {
+        nl_in[NL_P]=i.second;
+      } else if (i.first=="f") {
+        nl_out[NL_F]=i.second;
+      } else if (i.first=="g") {
+        nl_out[NL_G]=i.second;
+      } else {
+        casadi_error("No such field: " + i.first);
+      }
+    }
+    return {nl_in, nl_out};
+  }
+
+  template<typename XType>
+  std::map<std::string, XType> NlpSolverInternal::problem2map(const Problem<XType>& d) {
+    return {
+        {"x", d.in[NL_X]},
+        {"p", d.in[NL_P]},
+        {"f", d.out[NL_F]},
+        {"g", d.out[NL_G]},
+      };
+  }
+
+  template<typename XType>
+  Function NlpSolverInternal::problem2fun(const Problem<XType>& d) {
+    return Function("nlp", zip({"x", "p"}, d.in), zip({"f", "g"}, d.out));
+  }
+
+  template<typename XType>
+  Problem<XType> NlpSolverInternal::fun2problem(Function nlp) {
+    Problem<XType> p;
+    p.in = XType::get_input(nlp);
+    casadi_assert(p.in.size()==NL_NUM_IN);
+    p.out = nlp(p.in);
+    casadi_assert(p.out.size()==NL_NUM_OUT);
+    return p;
+  }
 
 } // namespace casadi
 /// \endcond

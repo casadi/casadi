@@ -42,6 +42,29 @@
 /// \cond INTERNAL
 
 namespace casadi {
+  template<typename T>
+  std::vector<std::string> first(const std::vector<std::pair<std::string, T>>& v) {
+    std::vector<std::string> r(v.size());
+    for (unsigned int i=0; i<r.size(); ++i) r[i] = v[i].first;
+    return r;
+  }
+
+  template<typename T>
+  std::vector<T> second(const std::vector<std::pair<std::string, T>>& v) {
+    std::vector<T> r(v.size());
+    for (unsigned int i=0; i<r.size(); ++i) r[i] = v[i].second;
+    return r;
+  }
+
+  template<typename T>
+  std::vector<std::pair<std::string, T>> zip(const std::vector<std::string>& id,
+                                             const std::vector<T>& mat) {
+    casadi_assert(id.size()==mat.size());
+    std::vector<std::pair<std::string, T>> r(id.size());
+    for (unsigned int i=0; i<r.size(); ++i) r[i] = make_pair(id[i], mat[i]);
+    return r;
+  }
+
   ///@{
   /** \brief  Function pointer types */
   typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,

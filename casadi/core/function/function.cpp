@@ -1436,6 +1436,17 @@ namespace casadi {
   }
 
   Function Function::integrator(const std::string& name, const std::string& solver,
+                                const Function& dae, const Dict& opts) {
+    if (dae.is_a("sxfunction")) {
+      return Function::integrator(name, solver,
+                                  IntegratorInternal::fun2problem<SX>(dae), opts);
+    } else {
+      return Function::integrator(name, solver,
+                                  IntegratorInternal::fun2problem<MX>(dae), opts);
+    }
+  }
+
+  Function Function::integrator(const std::string& name, const std::string& solver,
                                 const XProblem& dae, const Dict& opts) {
     Function ret;
     ret.assignNode(IntegratorInternal::getPlugin(solver).creator(name, dae));
@@ -1453,42 +1464,32 @@ namespace casadi {
 
   Function Function::nlp_solver(const std::string& name, const std::string& solver,
                                 const SXDict& nlp, const Dict& opts) {
-    SX x, p, f, g;
-    for (SXDict::const_iterator i=nlp.begin(); i!=nlp.end(); ++i) {
-      if (i->first=="x") {
-        x = i->second;
-      } else if (i->first=="p") {
-        p = i->second;
-      } else if (i->first=="f") {
-        f = i->second;
-      } else if (i->first=="g") {
-        g = i->second;
-      } else {
-        casadi_error("No such field: \"" + i->first + "\"");
-      }
-    }
-    Function nlpf=SX::fun("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
-    return NlpSolver(name, solver, nlpf, opts);
+    return nlp_solver(name, solver, NlpSolverInternal::map2problem(nlp), opts);
   }
 
   Function Function::nlp_solver(const std::string& name, const std::string& solver,
                                 const MXDict& nlp, const Dict& opts) {
-    MX x, p, f, g;
-    for (MXDict::const_iterator i=nlp.begin(); i!=nlp.end(); ++i) {
-      if (i->first=="x") {
-        x = i->second;
-      } else if (i->first=="p") {
-        p = i->second;
-      } else if (i->first=="f") {
-        f = i->second;
-      } else if (i->first=="g") {
-        g = i->second;
-      } else {
-        casadi_error("No such field: \"" + i->first + "\"");
-      }
+    return nlp_solver(name, solver, NlpSolverInternal::map2problem(nlp), opts);
+  }
+
+  Function Function::nlp_solver(const std::string& name, const std::string& solver,
+                                const Function& nlp, const Dict& opts) {
+    if (nlp.is_a("sxfunction")) {
+      return Function::nlp_solver(name, solver,
+                                  NlpSolverInternal::fun2problem<SX>(nlp), opts);
+    } else {
+      return Function::nlp_solver(name, solver,
+                                  NlpSolverInternal::fun2problem<MX>(nlp), opts);
     }
-    Function nlpf=MX::fun("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
-    return NlpSolver(name, solver, nlpf, opts);
+  }
+
+  Function Function::nlp_solver(const std::string& name, const std::string& solver,
+                                const XProblem& nlp, const Dict& opts) {
+    Function ret;
+    ret.assignNode(NlpSolverInternal::instantiatePlugin(name, solver, nlp));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
   }
 
   Function Function::nlp_solver_nlp() {
