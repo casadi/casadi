@@ -625,20 +625,6 @@ namespace casadi {
                         const std::pair< MXDict, std::vector<std::string> >& res,
                         const Dict& opts=Dict());
 
-#ifndef SWIG
-    /** \brief Construct from initializer lists (new syntax, includes initialization) */
-    static Function fun(const std::string& name, std::initializer_list<MX> arg,
-                        std::initializer_list<MX> res, const Dict& opts=Dict());
-
-    /** \brief Construct from vector & initializer list (new syntax, includes initialization) */
-    static Function fun(const std::string& name, std::vector<MX> arg,
-                        std::initializer_list<MX> res, const Dict& opts=Dict());
-
-    /** \brief Construct from initializer list & vector (new syntax, includes initialization) */
-    static Function fun(const std::string& name, std::initializer_list<MX> arg,
-                        std::vector<MX> res, const Dict& opts=Dict());
-#endif // SWIG
-
     ///@{
     /** \brief Jacobian expression */
     static MX jac(const Function& f, int iind=0, int oind=0,

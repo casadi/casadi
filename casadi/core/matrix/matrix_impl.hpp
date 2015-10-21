@@ -3079,31 +3079,6 @@ namespace casadi {
     return fun(name, make_vector(arg), make_vector(res), opts2);
   }
 
-  template<typename DataType>
-  Function Matrix<DataType>::fun(const std::string& name,
-                                 std::initializer_list<Matrix<DataType>> arg,
-                                 std::initializer_list<Matrix<DataType>> res,
-                                 const Dict& opts) {
-    return fun(name, std::vector<Matrix<DataType>>(arg),
-               std::vector<Matrix<DataType>>(res), opts);
-  }
-
-  template<typename DataType>
-  Function Matrix<DataType>::fun(const std::string& name,
-                                 std::vector<Matrix<DataType>> arg,
-                                 std::initializer_list<Matrix<DataType>> res,
-                                 const Dict& opts) {
-    return fun(name, arg, std::vector<Matrix<DataType>>(res), opts);
-  }
-
-  template<typename DataType>
-  Function Matrix<DataType>::fun(const std::string& name,
-                                 std::initializer_list<Matrix<DataType>> arg,
-                                 std::vector<Matrix<DataType>> res,
-                                 const Dict& opts) {
-    return fun(name, std::vector<Matrix<DataType>>(arg), res, opts);
-  }
-
   // Template specializations
   template<>
   CASADI_EXPORT Matrix<double> Matrix<double>::

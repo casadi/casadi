@@ -80,7 +80,7 @@ namespace casadi {
     static const std::string meta_doc;
 
     /// Solve with
-    NlpSolver solver_;
+    Function solver_;
   };
 
 } // namespace casadi

@@ -300,7 +300,7 @@ namespace casadi {
     // Wrap the function
     vector<MX> arg = mx_in();
     vector<MX> res = shared_from_this<Function>()(arg);
-    return MX::fun("wrap_" + name_, arg, res, opts);
+    return Function("wrap_" + name_, arg, res, opts);
   }
 
   Function FunctionInternal::getHessian(int iind, int oind) {
@@ -1895,8 +1895,8 @@ namespace casadi {
     // Form Jacobian
     MX J;
     {
-      Function tmp = MX::fun("tmp", {arg}, {res},
-                             Dict{{"ad_weight", adWeight()}});
+      Function tmp("tmp", {arg}, {res},
+                   Dict{{"ad_weight", adWeight()}});
       J = MX::jac(tmp);
     }
 
@@ -1906,7 +1906,7 @@ namespace casadi {
     }
 
     // Form an expression for the full Jacobian
-    return MX::fun(name, ret_argv, {J}, opts);
+    return Function(name, ret_argv, {J}, opts);
   }
 
   void FunctionInternal::generateFunction(CodeGenerator& g,

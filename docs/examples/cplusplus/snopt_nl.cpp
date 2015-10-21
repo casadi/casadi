@@ -45,14 +45,14 @@ int main(int argc, char **argv){
   nl.parseNL(problem);
   
   // NLP
-  Function nlp = SX::fun("nlp", nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
+  SXDict nlp = {{"x", nl.x}, {"f", nl.f}, {"g", nl.g}};
 
   // Set options
   Dict opts;
   // opts["detect_linear"] = true;
 
   // Allocate NLP solver and buffers
-  NlpSolver nlp_solver("nlp_solver", "snopt", nlp, opts);
+  Function nlp_solver = Function::nlp_solver("nlp_solver", "snopt", nlp, opts);
   std::map<std::string, DMatrix> arg, res;
     
   // Solve NLP

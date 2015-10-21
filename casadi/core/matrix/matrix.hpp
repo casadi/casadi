@@ -884,20 +884,6 @@ namespace casadi {
                         std::vector<std::string> >& res,
                         const Dict& opts=Dict());
 
-#ifndef SWIG
-    /** \brief Construct from initializer lists */
-    static Function fun(const std::string& name, std::initializer_list<Matrix<DataType> > arg,
-                        std::initializer_list<Matrix<DataType> > res, const Dict& opts=Dict());
-
-    /** \brief Construct from vector & initializer list */
-    static Function fun(const std::string& name, std::vector<Matrix<DataType> > arg,
-                        std::initializer_list<Matrix<DataType> > res, const Dict& opts=Dict());
-
-    /** \brief Construct from initializer list & vector */
-    static Function fun(const std::string& name, std::initializer_list<Matrix<DataType> > arg,
-                        std::vector<Matrix<DataType> > res, const Dict& opts=Dict());
-#endif // SWIG
-
     ///@{
     /** \brief Jacobian expression */
     static Matrix<DataType> jac(const Function& f, int iind=0, int oind=0,

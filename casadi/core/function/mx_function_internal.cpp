@@ -607,7 +607,7 @@ namespace casadi {
     ret_out.push_back(jac(iind, oind, compact, symmetric, false, true));
     ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
 
-    return MX::fun(name, inputv_, ret_out, opts);
+    return Function(name, inputv_, ret_out, opts);
   }
 
   std::vector<MX> MXFunctionInternal::symbolicOutput(const std::vector<MX>& arg) {
@@ -1079,9 +1079,9 @@ namespace casadi {
     FunctionInternal::evalSX(arg, res);
 
     // Create function
-    return SX::fun("expand_" + name_, arg, res,
-                   Dict{{"input_scheme", ischeme_},
-                       {"output_scheme", oscheme_}});
+    return Function("expand_" + name_, arg, res,
+                    Dict{{"input_scheme", ischeme_},
+                        {"output_scheme", oscheme_}});
   }
 
   void MXFunctionInternal::printWork(ostream &stream) {
@@ -1306,12 +1306,12 @@ namespace casadi {
     f_in.insert(f_in.end(), y.begin(), y.end());
     vector<MX> f_out = f_G;
     f_out.insert(f_out.end(), g.begin(), g.end());
-    vdef_fcn = MX::fun("lifting_variable_definition", f_in, f_out);
+    vdef_fcn = Function("lifting_variable_definition", f_in, f_out);
 
     // Initial guess of intermediate variables
     f_in = inputv_;
     f_out = x_init;
-    vinit_fcn = MX::fun("lifting_variable_guess", f_in, f_out);
+    vinit_fcn = Function("lifting_variable_guess", f_in, f_out);
   }
 
   MX MXFunctionInternal::grad_mx(int iind, int oind) {

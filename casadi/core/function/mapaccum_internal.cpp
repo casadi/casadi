@@ -339,7 +339,7 @@ namespace casadi {
     }
 
     // Construct the wrapper
-    return MX::fun("df", der_ins, ma(f_der_ins));
+    return Function("df", der_ins, ma(f_der_ins));
   }
 
   Function MapAccumInternal
@@ -450,7 +450,7 @@ namespace casadi {
       }
     }
 
-    Function fbX = MX::fun("f", f_der_ins, f_der_outs);
+    Function fbX("f", f_der_ins, f_der_outs);
 
     // Construct the new MapAccum's input_accum
     /*  
@@ -619,7 +619,7 @@ namespace casadi {
     }
 
     // Construct the wrapper
-    return MX::fun("df", der_ins, der_outs);
+    return Function("df", der_ins, der_outs);
   }
 
   void MapAccumInternal::generateDeclarations(CodeGenerator& g) const {

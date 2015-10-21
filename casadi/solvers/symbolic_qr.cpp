@@ -94,7 +94,7 @@ namespace casadi {
     // Generate the QR factorization function
     vector<SX> QR(2);
     qr(Aperm, QR[0], QR[1]);
-    Function fact_fcn = SX::fun("QR_fact", {A}, QR);
+    Function fact_fcn("QR_fact", {A}, QR);
 
     // Optionally generate c code and load as DLL
     if (codegen) {
@@ -125,7 +125,7 @@ namespace casadi {
 
     // Generate the QR solve function
     vector<SX> solv_in = {Q, R, b};
-    Function solv_fcn = SX::fun("QR_solv", solv_in, {x});
+    Function solv_fcn("QR_solv", solv_in, {x});
 
     // Optionally generate c code and load as DLL
     if (codegen) {
@@ -151,7 +151,7 @@ namespace casadi {
     x = xperm(inv_rowperm, ALL);
 
     // Mofify the QR solve function
-    solv_fcn = SX::fun("QR_solv_T", solv_in, {x});
+    solv_fcn = Function("QR_solv_T", solv_in, {x});
 
     // Optionally generate c code and load as DLL
     if (codegen) {

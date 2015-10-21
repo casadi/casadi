@@ -57,7 +57,7 @@ Function create_integrator(int nj, int nu){
   SX x0 = vertcat(s0, v0, m0);
 
   // Integrator
-  return SX::fun("integrator", {u, x0}, {x});
+  return Function("integrator", {u, x0}, {x});
 }
 
 

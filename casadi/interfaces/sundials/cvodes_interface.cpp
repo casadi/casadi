@@ -1912,7 +1912,7 @@ namespace casadi {
     jac_in.push_back(c_xdot);
 
     // Return generated function
-    return MatType::fun("jac", jac_in, {jac});
+    return Function("jac", jac_in, {jac});
   }
 
   template<typename MatType>
@@ -1928,7 +1928,7 @@ namespace casadi {
     jac_in.push_back(c_xdot);
 
     // return generated function
-    return MatType::fun("jacB", jac_in, {jac});
+    return Function("jacB", jac_in, {jac});
   }
 
   Function CvodesInterface::getJacB() {

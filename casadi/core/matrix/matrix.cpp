@@ -1188,11 +1188,7 @@ namespace casadi {
   template<>
   Function SX::fun(const string& name, const vector<SX>& arg,
                    const vector<SX>& res, const Dict& opts) {
-    Function ret;
-    ret.assignNode(new SXFunctionInternal(name, arg, res));
-    ret.setOption(opts);
-    ret.init();
-    return ret;
+    return Function(name, arg, res, opts);
   }
 
 } // namespace casadi

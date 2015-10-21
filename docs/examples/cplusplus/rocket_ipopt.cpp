@@ -101,7 +101,7 @@ int main(){
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory
-  Function xfcn = SX::fun("xfcn", {u}, {s_all, v_all, m_all});
+  Function xfcn("xfcn", {u}, {s_all, v_all, m_all});
   vector<double> sopt, vopt, mopt;
   xfcn({uopt}, {&sopt, &vopt, &mopt});
   cout << "position: " << sopt << endl;

@@ -25,6 +25,8 @@
 
 #include "function_internal.hpp"
 #include "../std_vector_tools.hpp"
+#include "sx_function_internal.hpp"
+#include "mx_function_internal.hpp"
 #include "map_internal.hpp"
 #include "mapaccum_internal.hpp"
 #include "external_function_internal.hpp"
@@ -45,6 +47,92 @@ namespace casadi {
   }
 
   Function::~Function() {
+  }
+
+  Function::Function(const std::string& name,
+                     const std::vector<MX>& arg,
+                     const std::vector<MX>& res,
+                     const Dict& opts) {
+    assignNode(new MXFunctionInternal(name, arg, res));
+    setOption(opts);
+    init();
+  }
+
+  Function::Function(const std::string& name,
+                     const std::vector<std::pair<std::string, MX>>& arg,
+                     const std::vector<MX>& res,
+                     const Dict& opts) {
+    Dict opts2 = opts;
+    opts2["input_scheme"] = first(arg);
+    assignNode(new MXFunctionInternal(name, second(arg), res));
+    setOption(opts2);
+    init();
+  }
+
+  Function::Function(const std::string& name,
+                     const std::vector<MX>& arg,
+                     const std::vector<std::pair<std::string, MX>>& res,
+                     const Dict& opts) {
+    Dict opts2 = opts;
+    opts2["output_scheme"] = first(res);
+    assignNode(new MXFunctionInternal(name, arg, second(res)));
+    setOption(opts2);
+    init();
+  }
+
+  Function::Function(const std::string& name,
+                     const std::vector<std::pair<std::string, MX>>& arg,
+                     const std::vector<std::pair<std::string, MX>>& res,
+                     const Dict& opts) {
+    Dict opts2 = opts;
+    opts2["input_scheme"] = first(arg);
+    opts2["output_scheme"] = first(res);
+    assignNode(new MXFunctionInternal(name, second(arg), second(res)));
+    setOption(opts2);
+    init();
+  }
+
+  Function::Function(const std::string& name,
+                     const std::vector<SX>& arg,
+                     const std::vector<SX>& res,
+                     const Dict& opts) {
+    assignNode(new SXFunctionInternal(name, arg, res));
+    setOption(opts);
+    init();
+  }
+
+  Function::Function(const std::string& name,
+                     const std::vector<std::pair<std::string, SX>>& arg,
+                     const std::vector<SX>& res,
+                     const Dict& opts) {
+    Dict opts2 = opts;
+    opts2["input_scheme"] = first(arg);
+    assignNode(new SXFunctionInternal(name, second(arg), res));
+    setOption(opts2);
+    init();
+  }
+
+  Function::Function(const std::string& name,
+                     const std::vector<SX>& arg,
+                     const std::vector<std::pair<std::string, SX>>& res,
+                     const Dict& opts) {
+    Dict opts2 = opts;
+    opts2["output_scheme"] = first(res);
+    assignNode(new SXFunctionInternal(name, arg, second(res)));
+    setOption(opts2);
+    init();
+  }
+
+  Function::Function(const std::string& name,
+                     const std::vector<std::pair<std::string, SX>>& arg,
+                     const std::vector<std::pair<std::string, SX>>& res,
+                     const Dict& opts) {
+    Dict opts2 = opts;
+    opts2["input_scheme"] = first(arg);
+    opts2["output_scheme"] = first(res);
+    assignNode(new SXFunctionInternal(name, second(arg), second(res)));
+    setOption(opts2);
+    init();
   }
 
   Function Function::create(FunctionInternal* node) {

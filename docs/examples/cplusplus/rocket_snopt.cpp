@@ -75,10 +75,10 @@ int main(){
   SX g = vertcat(s, v, v_traj);
 
   // Create an NLP
-  Function nlp = SX::fun("nlp", nlpIn("x", u), nlpOut("f", f, "g", g));
+  SXDict nlp = {{"x", u}, {"f", f}, {"g", g}};
 
   // Create an NLP solver and buffers
-  NlpSolver solver("solver", "snopt", nlp);
+  Function solver = Function::nlp_solver("solver", "snopt", nlp);
   std::map<std::string, DMatrix> arg, res;
 
   // Bounds on u and initial condition
@@ -107,7 +107,7 @@ int main(){
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory
-  Function xfcn = SX::fun("xfcn", {u}, {s_traj, v_traj, m_traj});
+  Function xfcn("xfcn", {u}, {s_traj, v_traj, m_traj});
   vector<double> sopt, vopt, mopt;
   xfcn({uopt}, {&sopt, &vopt, &mopt});
   cout << "position: " << sopt << endl;

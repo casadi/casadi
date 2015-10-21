@@ -105,7 +105,7 @@ int main(){
   }
 
   // Get the collocation quations (that define V)
-  Function f = SX::fun("f", {dae["x"], dae["p"]}, {dae["ode"]});
+  Function f("f", {dae["x"], dae["p"]}, {dae["ode"]});
   vector<MX> V_eq;
   for(int j=1; j<d+1; ++j){
     // Expression for the state derivative at the collocation point
@@ -121,7 +121,7 @@ int main(){
   }
 
   // Root-finding function, implicitly defines V as a function of X0 and P
-  Function vfcn = MX::fun("vfcn", {V, X0, P}, {vertcat(V_eq)});
+  Function vfcn("vfcn", {V, X0, P}, {vertcat(V_eq)});
   
   // Convert to sxfunction to decrease overhead
   Function vfcn_sx = SX::fun("vfcn", vfcn);
@@ -142,7 +142,7 @@ int main(){
   }
   
   // Get the discrete time dynamics
-  Function F = MX::fun("F", {X0, P}, {XF});
+  Function F("F", {X0, P}, {XF});
 
   // Do this iteratively for all finite elements
   MX Xk = X0;

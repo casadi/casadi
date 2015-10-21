@@ -268,7 +268,7 @@ namespace casadi {
       f_inputs.insert(f_inputs.end(), inputs.begin()+2, inputs.end());
     }
 
-    Function f_forward = MX::fun("f", f_inputs, fd(fd_inputs));
+    Function f_forward("f", f_inputs, fd(fd_inputs));
 
     Function ret = f_forward.kernel_sum(name, size_, r_, n_);
 
@@ -290,7 +290,7 @@ namespace casadi {
       ret_inputs.insert(ret_inputs.end(), inputs.begin()+1, inputs.end());
     }
 
-    Function der = MX::fun("f", der_inputs, ret(ret_inputs), opts);
+    Function der("f", der_inputs, ret(ret_inputs), opts);
 
     return der;
   }
@@ -351,7 +351,7 @@ namespace casadi {
       offset+= f_.n_in();
     }
 
-    Function f_reverse = MX::fun("f", f_inputs, f_outputs);
+    Function f_reverse("f", f_inputs, f_outputs);
 
     Function kn = f_reverse.kernel_sum(name, size_, r_, n_);
 
@@ -385,7 +385,7 @@ namespace casadi {
       offset+= num_in-2;
     }
 
-    Function ret = MX::fun(name, ret_inputs, ret_outputs, opts);
+    Function ret(name, ret_inputs, ret_outputs, opts);
 
     return ret;
   }

@@ -594,7 +594,7 @@ namespace casadi {
     if (this->d.empty()) return;
 
     // Find out which intermediates depends on which other
-    Function f = MX::fun("tmp", {vertcat(this->d)}, {vertcat(this->d) - vertcat(this->ddef)});
+    Function f("tmp", {vertcat(this->d)}, {vertcat(this->d) - vertcat(this->ddef)});
     Sparsity sp = f.jacSparsity();
     casadi_assert(sp.issquare());
 
@@ -662,70 +662,6 @@ namespace casadi {
 
   void DaeBuilder::scaleEquations() {
     casadi_error("DaeBuilder::scaleEquations broken");
-#if 0
-    userOut() << "Scaling equations ..." << endl;
-    double time1 = clock();
-
-    // Variables
-    enum Variables {T, X, XDOT, Z, P, U, NUM_VAR};
-    vector<MX > v(NUM_VAR); // all variables
-    v[T] = this->t;
-    v[X] = this->x;
-    v[XDOT] = der(this->x); // BUG!!!
-    v[Z] = this->z;
-    v[P] = this->p;
-    v[U] = this->u;
-
-    // Create the jacobian of the implicit equations with respect to [x, z, p, u]
-    MX xz;
-    xz.append(v[X]);
-    xz.append(v[Z]);
-    xz.append(v[P]);
-    xz.append(v[U]);
-    Function fcn = MX::fun(xz, this->ode);
-    Function J = MX::fun(v, MX::jac(fcn));
-
-    // Evaluate the Jacobian in the starting point
-    J.init();
-    J.setInput(0.0, T);
-    J.setInput(start(this->x, true), X);
-    J.input(XDOT).setAll(0.0);
-    J.setInput(start(this->z, true), Z);
-    J.setInput(start(this->p, true), P);
-    J.setInput(start(this->u, true), U);
-    J.evaluate();
-
-    // Get the maximum of every row
-    Matrix<double> &J0 = J.output();
-    vector<double> scale(J0.size1(), 0.0); // scaling factors
-    for (int cc=0; cc<J0.size2(); ++cc) {
-      // Loop over non-zero entries of the column
-      for (int el=J0.colind(cc); el<J0.colind(cc+1); ++el) {
-        // Row
-        int rr=J0.row(el);
-
-        // The scaling factor is the maximum norm, ignoring not-a-number entries
-        if (!isnan(J0.at(el))) {
-          scale[rr] = std::max(scale[rr], fabs(J0.at(el)));
-        }
-      }
-    }
-
-    // Make sure nonzero factor found
-    for (int rr=0; rr<J0.size1(); ++rr) {
-      if (scale[rr]==0) {
-        userOut() << "Warning: Could not generate a scaling factor for equation " << rr;
-        scale[rr]=1.;
-      }
-    }
-
-    // Scale the equations
-    this->ode /= scale;
-
-    double time2 = clock();
-    double dt = (time2-time1)/CLOCKS_PER_SEC;
-    userOut() << "... equation scaling complete after " << dt << " seconds." << endl;
-#endif
   }
 
   void DaeBuilder::sort_dae() {
@@ -733,7 +669,7 @@ namespace casadi {
     if (this->x.empty()) return;
 
     // Find out which differential equation depends on which differential state
-    Function f = MX::fun("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
+    Function f("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
     Sparsity sp = f.jacSparsity();
     casadi_assert(sp.issquare());
 
@@ -761,7 +697,7 @@ namespace casadi {
     if (this->z.empty()) return;
 
     // Find out which algebraic equation depends on which algebraic state
-    Function f = MX::fun("tmp", {vertcat(this->z)}, {vertcat(this->alg)});
+    Function f("tmp", {vertcat(this->z)}, {vertcat(this->alg)});
     Sparsity sp = f.jacSparsity();
     casadi_assert(sp.issquare());
 
@@ -793,7 +729,7 @@ namespace casadi {
     if (this->s.empty()) return;
 
     // Write the ODE as a function of the state derivatives
-    Function f = MX::fun("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
+    Function f("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
 
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
@@ -820,7 +756,7 @@ namespace casadi {
     this->sdot = sdotnew;
 
     // Now write the sorted ODE as a function of the state derivatives
-    f = MX::fun("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
+    f = Function("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
 
     // Get the Jacobian
     MX J = MX::jac(f);
@@ -877,7 +813,7 @@ namespace casadi {
     if (this->z.empty()) return;
 
     // Write the algebraic equations as a function of the algebraic states
-    Function f = MX::fun("f", {vertcat(this->z)}, {vertcat(this->alg)});
+    Function f("f", {vertcat(this->z)}, {vertcat(this->alg)});
 
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
@@ -902,7 +838,7 @@ namespace casadi {
     this->z = znew;
 
     // Rewrite the sorted algebraic equations as a function of the algebraic states
-    f = MX::fun("f", {vertcat(this->z)}, {vertcat(this->alg)});
+    f = Function("f", {vertcat(this->z)}, {vertcat(this->alg)});
 
     // Variables where we have found an explicit expression and where we haven't
     vector<MX> z_exp, z_imp;
@@ -1233,7 +1169,7 @@ namespace casadi {
     if (this->s.empty()) return;
 
     // We investigate the interdependencies in sdot -> dae
-    Function f = MX::fun("f", {vertcat(this->sdot)}, {vertcat(this->dae)});
+    Function f("f", {vertcat(this->sdot)}, {vertcat(this->dae)});
 
     // Number of s
     int ns = f.nnz_in(0);
@@ -1975,8 +1911,8 @@ namespace casadi {
     }
 
     // Generate the constructed function
-    return MX::fun(fname, ret_in, ret_out,
-                   Dict{{"input_scheme", s_in}, {"output_scheme", s_out}});
+    return Function(fname, ret_in, ret_out,
+                    {{"input_scheme", s_in}, {"output_scheme", s_out}});
   }
 
 } // namespace casadi

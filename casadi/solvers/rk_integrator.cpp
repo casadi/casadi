@@ -125,7 +125,7 @@ namespace casadi {
       f_res[DAE_ODE] = xf;
       f_res[DAE_QUAD] = qf;
       f_res[DAE_ALG] = horzcat(x_def);
-      F_ = MX::fun("dae", f_arg, f_res);
+      F_ = Function("dae", f_arg, f_res);
     }
 
     // Backward integration
@@ -191,7 +191,7 @@ namespace casadi {
       g_res[RDAE_ODE] = rxf;
       g_res[RDAE_QUAD] = rqf;
       g_res[RDAE_ALG] = horzcat(rx_def);
-      G_ = MX::fun("rdae", g_arg, g_res);
+      G_ = Function("rdae", g_arg, g_res);
     }
   }
 

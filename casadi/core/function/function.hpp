@@ -128,13 +128,51 @@ namespace casadi {
   class CASADI_EXPORT Function : public OptionsFunctionality, public IOInterface<Function>{
   public:
 
-    /// \cond CLUTTER
-    /** \brief  default constructor */
+    /** \brief Default constructor, null pointer */
     Function();
+
+    ///@{
+    /** \brief Construct an SX function */
+    Function(const std::string& name,
+             const std::vector<SX>& arg,
+             const std::vector<SX>& res,
+             const Dict& opts=Dict());
+    Function(const std::string& name,
+             const std::vector<std::pair<std::string, SX>>& arg,
+             const std::vector<SX>& res,
+             const Dict& opts=Dict());
+    Function(const std::string& name,
+             const std::vector<SX>& arg,
+             const std::vector<std::pair<std::string, SX>>& res,
+             const Dict& opts=Dict());
+    Function(const std::string& name,
+             const std::vector<std::pair<std::string, SX>>& arg,
+             const std::vector<std::pair<std::string, SX>>& res,
+             const Dict& opts=Dict());
+    ///@}
+
+    ///@{
+    /** \brief Construct an MX function */
+    Function(const std::string& name,
+             const std::vector<MX>& arg,
+             const std::vector<MX>& res,
+             const Dict& opts=Dict());
+    Function(const std::string& name,
+             const std::vector<std::pair<std::string, MX>>& arg,
+             const std::vector<MX>& res,
+             const Dict& opts=Dict());
+    Function(const std::string& name,
+             const std::vector<MX>& arg,
+             const std::vector<std::pair<std::string, MX>>& res,
+             const Dict& opts=Dict());
+    Function(const std::string& name,
+             const std::vector<std::pair<std::string, MX>>& arg,
+             const std::vector<std::pair<std::string, MX>>& res,
+             const Dict& opts=Dict());
+    ///@}
 
     /** \brief  Destructor */
     ~Function();
-    /// \endcond
 
     /// \cond INTERNAL
 #ifndef SWIG

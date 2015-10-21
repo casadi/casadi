@@ -355,7 +355,7 @@ namespace casadi {
     ifcn_out[1+INTEGRATOR_RQF] = RQF;
     std::stringstream ss_ifcn;
     ss_ifcn << "collocation_implicit_residual_" << name_;
-    Function ifcn = MX::fun(ss_ifcn.str(), ifcn_in, ifcn_out);
+    Function ifcn(ss_ifcn.str(), ifcn_in, ifcn_out);
     if (expand_f) {
       ifcn = SX::fun(ifcn.name(), ifcn);
     }

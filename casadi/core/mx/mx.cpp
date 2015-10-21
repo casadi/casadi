@@ -1906,11 +1906,7 @@ namespace casadi {
 
   Function MX::fun(const std::string& name, const std::vector<MX>& arg,
                    const std::vector<MX>& res, const Dict& opts) {
-    Function ret;
-    ret.assignNode(new MXFunctionInternal(name, arg, res));
-    ret.setOption(opts);
-    ret.init();
-    return ret;
+    return Function(name, arg, res, opts);
   }
 
   Function MX::fun(const std::string& name,
@@ -1937,21 +1933,6 @@ namespace casadi {
     opts2["input_scheme"] = arg.second;
     opts2["output_scheme"] = res.second;
     return fun(name, make_vector(arg), make_vector(res), opts2);
-  }
-
-  Function MX::fun(const std::string& name, std::initializer_list<MX> arg,
-               std::initializer_list<MX> res, const Dict& opts) {
-    return fun(name, std::vector<MX>(arg), std::vector<MX>(res), opts);
-  }
-
-  Function MX::fun(const std::string& name, std::vector<MX> arg,
-               std::initializer_list<MX> res, const Dict& opts) {
-    return fun(name, arg, std::vector<MX>(res), opts);
-  }
-
-  Function MX::fun(const std::string& name, std::initializer_list<MX> arg,
-               std::vector<MX> res, const Dict& opts) {
-    return fun(name, std::vector<MX>(arg), res, opts);
   }
 
 } // namespace casadi
