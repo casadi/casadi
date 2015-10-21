@@ -78,6 +78,7 @@ namespace casadi {
   }
 
   ClangCompiler::~ClangCompiler() {
+    userOut() << "Destructor called"  << std::endl;
     if (act_) delete act_;
     if (myerr_) delete myerr_;
     if (executionEngine_) delete executionEngine_;
