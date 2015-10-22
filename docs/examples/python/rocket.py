@@ -46,7 +46,7 @@ f = MX.fun('f', [x,u],[xdot])
 dt = 0.01  # Time step
 xj = x
 for j in range(20):
-  [fj] = f.call([xj,u])
+  [fj] = f([xj,u])
   xj += dt*fj
 
 # Discrete time dynamics function
@@ -64,7 +64,7 @@ X0 = MX([0,0,1])
 # Integrate over all intervals
 X=X0
 for k in range(nu):
-  [X] = F.call([X,U[k]])
+  [X] = F([X,U[k]])
 
 # Objective function and constraints
 J = mul(U.T,U) # u'*u in Matlab

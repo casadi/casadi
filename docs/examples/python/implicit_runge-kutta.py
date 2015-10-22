@@ -39,14 +39,15 @@ nx = 3
 np = 1
 
 # Declare variables
-x  = SX.sym("x",nx)  # state
-p  = SX.sym("u",np)  # control
+x  = SX.sym("x", nx)  # state
+p  = SX.sym("u", np)  # control
 
 # ODE right hand side function
 ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + p, \
                x[0], \
                x[0]*x[0] + x[1]*x[1] + p*p])
-f = SX.fun('f', daeIn(x=x,p=p),daeOut(ode=ode))
+dae = {'x':x, 'p':p, 'ode':ode}
+f = Function('f', [x, p], [ode])
 
 # Number of finite elements
 n = 100     
@@ -76,7 +77,7 @@ for j in range(d+1):
   for r in range(d+1):
     if r != j:
       L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
-  lfcn = SX.fun('lfcn', [tau], [L])
+  lfcn = Function('lfcn', [tau], [L])
   
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
   [D[j]] = lfcn([1.0])
@@ -103,17 +104,17 @@ for j in range(1,d+1):
     xp_j += C[r,j]*X[r]
       
   # Append collocation equations
-  f_j = f({'x':X[j],'p':P})["ode"]
+  [f_j] = f([X[j],P])
   V_eq.append(h*f_j - xp_j)
 
 # Concatenate constraints
 V_eq = vertcat(V_eq)
 
 # Root-finding function, implicitly defines V as a function of X0 and P
-vfcn = MX.fun('vfcn', [V, X0, P], [V_eq])
+vfcn = Function('vfcn', [V, X0, P], [V_eq])
 
 # Convert to SX.fun to decrease overhead
-vfcn_sx = SX.fun('vfcn', vfcn)
+vfcn_sx = vfcn.expand()
 
 # Create a implicit function instance to solve the system of equations
 ifcn = vfcn_sx.rootfinder("ifcn", "newton", {"linear_solver":"csparse"})
@@ -131,13 +132,13 @@ F = MX.fun('F', [X0,P],[XF])
 # Do this iteratively for all finite elements
 X = X0
 for i in range(n):
-  [X] = F.call([X,P])
+  [X] = F([X,P])
 
 # Fixed-step integrator
 irk_integrator = MX.fun("irk_integrator", integratorIn(x0=X0,p=P),integratorOut(xf=X))
 
 # Create a convensional integrator for reference
-ref_integrator = Integrator("ref_integrator", "cvodes", f, {"tf":tf})
+ref_integrator = Function.integrator("ref_integrator", "cvodes", dae, {"tf":tf})
 
 # Test values
 x0_val  = N.array([0,1,0])

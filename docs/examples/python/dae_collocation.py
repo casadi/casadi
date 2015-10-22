@@ -281,7 +281,7 @@ lbg = []
 ubg = []
 
 # Initial constraints
-[ick] = icfcn.call([0., XD[0][0][0], XA[0][0][0], U[0], P])
+[ick] = icfcn([0., XD[0][0][0], XA[0][0][0], U[0], P])
 g += [ick]
 lbg.append(ic_min)
 ubg.append(ic_max)
@@ -297,7 +297,7 @@ for k in range(nk):
                 xp_jk += C[j2][j]*XD[k][i][j2]       # get the time derivative of the differential states (eq 10.19b)
             
             # Add collocation equations to the NLP
-            [fk] = ffcn.call([0., xp_jk/h, XD[k][i][j], XA[k][i][j-1], U[k], P])
+            [fk] = ffcn([0., xp_jk/h, XD[k][i][j], XA[k][i][j-1], U[k], P])
             g += [fk[:ndiff]]                     # impose system dynamics (for the differential states (eq 10.19b))
             lbg.append(np.zeros(ndiff)) # equality constraints
             ubg.append(np.zeros(ndiff)) # equality constraints
@@ -306,7 +306,7 @@ for k in range(nk):
             ubg.append(np.zeros(nalg)) # equality constraints
             
             #  Evaluate the path constraint function
-            [pck] = pcfcn.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
+            [pck] = pcfcn([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
             
             g += [pck]
             lbg.append(pc_min)
@@ -332,7 +332,7 @@ for k in range(nk):
 #   none
 
 # Final constraints (Const, dConst, ConstQ)
-[fck] = fcfcn.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
+[fck] = fcfcn([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
 g += [fck]
 lbg.append(fc_min)
 ubg.append(fc_max)
@@ -340,7 +340,7 @@ ubg.append(fc_max)
 # Objective function of the NLP
 #Implement Mayer term
 Obj = 0
-[obj] = MayerTerm.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
+[obj] = MayerTerm([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
 Obj += obj
 
 # Implement Lagrange term
@@ -352,7 +352,7 @@ ld0 = lDotAtTauRoot[1:,0]
 lagrangeTerm = 0
 for k in range(nk):
     for i in range(nicp):
-        dQs = h*veccat([LagrangeTerm.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])[0] \
+        dQs = h*veccat([LagrangeTerm([0., XD[k][i][j], XA[k][i][j-1], U[k], P])[0] \
                         for j in range(1,deg+1)])
         Qs = mul( ldInv, dQs)
         m = mul( Qs.T, lAtOne[1:])

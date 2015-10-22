@@ -162,7 +162,7 @@ for k in range(nk):
       xp_jk += C[r,j]*V["X",k,r]
       
     # Add collocation equations to the NLP
-    [fk] = f.call([T[k][j], V["X",k,j], V["U",k]])
+    [fk] = f([T[k][j], V["X",k,j], V["U",k]])
     g.append(h*fk - xp_jk)
     lbg.append(NP.zeros(nx)) # equality constraints
     ubg.append(NP.zeros(nx)) # equality constraints
@@ -181,7 +181,7 @@ for k in range(nk):
 g = vertcat(g)
 
 # Objective function
-[f] = m.call([T[nk-1][d],V["X",nk,0],V["U",nk-1]])
+[f] = m([T[nk-1][d],V["X",nk,0],V["U",nk-1]])
   
 # NLP
 nlp = MX.fun('nlp', nlpIn(x=V),nlpOut(f=f,g=g))

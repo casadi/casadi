@@ -413,17 +413,17 @@ namespace casadi {
      NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
     void setFullJacobian(const Function& jac);
 
+#ifndef SWIG
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
-    void call(const std::vector<DMatrix> &arg, std::vector<DMatrix>& SWIG_OUTPUT(res),
+    void call(const std::vector<DMatrix> &arg, std::vector<DMatrix>& res,
               bool always_inline=false, bool never_inline=false);
-    void call(const std::vector<SX> &arg, std::vector<SX>& SWIG_OUTPUT(res),
+    void call(const std::vector<SX> &arg, std::vector<SX>& res,
               bool always_inline=false, bool never_inline=false);
-    void call(const std::vector<MX> &arg, std::vector<MX>& SWIG_OUTPUT(res),
+    void call(const std::vector<MX> &arg, std::vector<MX>& res,
               bool always_inline=false, bool never_inline=false);
     ///@}
 
-#ifndef SWIG
     /** \brief Evaluate with input and output buffers given */
     void operator()(std::vector<const double*> arg, std::vector<double*> res);
 
@@ -665,7 +665,7 @@ namespace casadi {
 
 
     */
-    Function map(const std::string& name, int N,  const Dict & options = Dict()) const;
+    Function map(const std::string& name, int N, const Dict& opts=Dict()) const;
 
     /** \brief Generic map */
     Function map(const std::string& name,
@@ -931,7 +931,7 @@ namespace casadi {
     /** \brief Call using a map */
     template<typename M>
     const std::map<std::string, M> callMap(const std::map<std::string, M>& arg,
-                                       bool always_inline, bool never_inline);
+                                           bool always_inline, bool never_inline);
 
     /** \brief Check if input arguments have correct length and dimensions
     *

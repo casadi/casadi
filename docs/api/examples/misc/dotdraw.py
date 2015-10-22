@@ -53,7 +53,7 @@ dotdraw(zz)
 
 f = MX.fun("magic", [z,y],[z+x[0,0],x-y])
 
-[z,z2] = f.call([vertcat([x,y]),zz.T])
+[z,z2] = f([vertcat([x,y]),zz.T])
 
 z = z[:2,:] +x + cos(x) - sin(x) / tan(z2)
 
