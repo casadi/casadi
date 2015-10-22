@@ -178,7 +178,7 @@ class Misctests(casadiTestCase):
   def test_options_introspection(self):
     self.message("options introspection")
     x=SX.sym("x")
-    nlp = SX.fun('nlp', nlpIn(x=x),nlpOut(f=x**2))
+    nlp = {'x':x, 'f':x**2}
     i = Function.nlp_solver('i', "ipopt", nlp)
     
     opts = i.getOptionNames()
@@ -223,14 +223,6 @@ class Misctests(casadiTestCase):
     
   @known_bug()
   def test_exceptions(self):
-    try:
-      MX.fun('tmp', nlpIn(x=SX.sym("x")))
-      self.assertTrue(False)
-    except NotImplementedError as e:
-      print e.message
-      for m in e.message.split("\n"):
-        if "You have" in m:
-          assert "SX" in m
     try:
       Function.nlp_solver(123)
       self.assertTrue(False)
@@ -330,32 +322,12 @@ class Misctests(casadiTestCase):
     except NotImplementedError as e:
       print e.message
       assert "  vertcat(" in e.message
-
-  def test_callkw(self):
-      x = SX.sym("x")
-
-      f = SX.fun('f', nlpIn(x=x),nlpOut(g=x**2))
-
-      [f_,g_] = itemgetter('f','g')(f({'x':4}))
-      self.checkarray(g_,DMatrix(16))
-
-      with self.assertRaises(RuntimeError):
-        [f_,g_] = itemgetter('f','g')(f({'m':4}))
-      
-      with self.assertRaises(RuntimeError):
-        [f_,g_] = itemgetter('f','g')(f({'x':[x]}))
-
-
-      f = SX.fun('f', [x],nlpOut(g=x**2))
-
-      with self.assertRaises(Exception):
-        [f_,g_] = itemgetter('f','g')(f({'x':4}))
         
   def test_getscheme(self):
     x = SX.sym("x")
     p = SX.sym("p")
 
-    F = SX.fun('F', nlpIn(x=x,p=p),nlpOut(g=x**2,f=x+p))
+    F = Function('F', [('x', x), ('p', p)], [('g', x**2), ('f', x+p)])
     
     fc = F({'x':3,'p':4})
     [f] = fc['f']
@@ -402,7 +374,7 @@ class Misctests(casadiTestCase):
     assert "2" in result[0]
 
     x=SX.sym("x")
-    f = SX.fun('f', nlpIn(x=x),nlpOut(f=x**2))
+    f = {'x':x, 'f':x**2}
     solver = Function.nlp_solver("solver", "ipopt",f)
     with capture_stdout() as result:
       solver.evaluate()
@@ -418,16 +390,6 @@ class Misctests(casadiTestCase):
         pass
     
     assert "casadi_nlpsolver_foo" in result[1]
-
-
-  def test_nlpInErr(self):
-    msg = ""
-    try:
-      nlpIn(foo=SX.sym('x'))
-    except Exception as e:
-      msg = str(e)
-    print msg
-    assert("'x', 'p'" in msg)
     
 
 pickle.dump(Sparsity(),file("temp.txt","w"))

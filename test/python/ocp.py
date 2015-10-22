@@ -52,7 +52,7 @@ class OCPtests(casadiTestCase):
       cost = cost + s*X[i]**2+r*U[i]**2
     cost = cost + q*X[N]**2
     
-    nlp = SX.fun('nlp', nlpIn(x=V),nlpOut(f=cost,g=vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])))
+    nlp = {'x':V, 'f':cost, 'g':vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])}
     opts = {}
     opts["tol"] = 1e-5
     opts["hessian_approximation"] = "limited-memory"
@@ -106,7 +106,7 @@ class OCPtests(casadiTestCase):
     parc = MX(0)
     
     f = MX.fun('f', [var,parMX],[qend[0]])
-    nlp = MX.fun('nlp', nlpIn(x=var),nlpOut(f=-f([var,parc])[0]))
+    nlp = {'x':var, 'f':-f([var,parc])[0]}
     opts = {}
     opts["tol"] = 1e-12
     opts["hessian_approximation"] = "limited-memory"
@@ -159,7 +159,7 @@ class OCPtests(casadiTestCase):
     parc = MX(dy0)
     
     f = MX.fun('f', [var,par],[qend[0]])
-    nlp = MX.fun('nlp', nlpIn(x=var),nlpOut(f=-f([var,parc])[0],g=var[0]-var[1]))
+    nlp = {'x':var, 'f':-f([var,parc])[0], 'g':var[0]-var[1]}
     opts = {}
     opts["tol"] = 1e-12
     opts["hessian_approximation"] = "limited-memory"

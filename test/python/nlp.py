@@ -63,7 +63,7 @@ class NLPtests(casadiTestCase):
 
   def testboundsviol(self):
     x=SX.sym("x")
-    nlp=SX.fun("nlp", nlpIn(x=x),nlpOut(f=(x-1)**2,g=x))
+    nlp={'x':x, 'f':(x-1)**2, 'g':x}
     
     for Solver, solver_options in solvers:
       solver = Function.nlp_solver("mysolver", Solver, nlp, solver_options)
@@ -87,7 +87,7 @@ class NLPtests(casadiTestCase):
         
   def testIPOPT(self):
     x=SX.sym("x")
-    nlp=SX.fun("nlp", nlpIn(x=x),nlpOut(f=(x-1)**2,g=x))
+    nlp={'x':x, 'f':(x-1)**2, 'g':x}
     
     for Solver, solver_options in solvers:
       self.message("trivial " + str(Solver))
@@ -107,7 +107,7 @@ class NLPtests(casadiTestCase):
   def testIPOPT_par(self):
     x=SX.sym("x")
     p=SX.sym("p")
-    nlp=SX.fun("nlp", nlpIn(x=x,p=p),nlpOut(f=(x-p)**2,g=x))
+    nlp={'x':x, 'p':p, 'f':(x-p)**2, 'g':x}
     
     for Solver, solver_options in solvers:
       self.message("trivial " + str(Solver))
@@ -127,7 +127,7 @@ class NLPtests(casadiTestCase):
   def testIPOPTinf(self):
     self.message("trivial IPOPT, infinity bounds")
     x=SX.sym("x")
-    nlp=SX.fun("nlp", nlpIn(x=x),nlpOut(f=(x-1)**2,g=x))
+    nlp={'x':x, 'f':(x-1)**2, 'g':x}
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -156,7 +156,7 @@ class NLPtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
     
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2))
+    nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2}
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -175,7 +175,7 @@ class NLPtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
     
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
+    nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = Function.nlp_solver("mysolver", Solver, nlp, solver_options)
@@ -199,7 +199,7 @@ class NLPtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
     
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
+    nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = Function.nlp_solver("mysolver", Solver, nlp, solver_options)
@@ -233,7 +233,7 @@ class NLPtests(casadiTestCase):
     
     obj = (1-x)**2+100*(y-x**2)**2
     g = x**2+y**2
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=g))
+    nlp={'x':vertcat([x,y]), 'f':obj, 'g':g}
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -278,7 +278,7 @@ class NLPtests(casadiTestCase):
     y=SX.sym("y")
     
     obj = (1-x)**2+100*(y-x**2)**2
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=x**2+y**2))
+    nlp={'x':vertcat([x,y]), 'f':obj, 'g':x**2+y**2}
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -330,7 +330,7 @@ class NLPtests(casadiTestCase):
     y=SX.sym("y")
     
     obj = (1-x)**2+100*(y-x**2)**2
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=x**2+y**2))
+    nlp={'x':vertcat([x,y]), 'f':obj, 'g':x**2+y**2}
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -363,8 +363,8 @@ class NLPtests(casadiTestCase):
     y=SX.sym("y")
     
     obj = (1-x)**2+100*(y-x**2)**2
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=1))
-    
+    nlp={'x':vertcat([x,y]), 'f':obj, 'g':1}
+
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       if "worhp"==Solver:
@@ -392,7 +392,7 @@ class NLPtests(casadiTestCase):
     
     obj = (p-x)**2+100*(y-x**2)**2
     g = x**2+y**2
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y]),p=p),nlpOut(f=obj,g=g))
+    nlp={'x':vertcat([x,y]), 'p':p, 'f':obj, 'g':g}
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -431,7 +431,7 @@ class NLPtests(casadiTestCase):
     p=SX.sym("p")
     
     obj = (p-x)**2+100*(y-x**2)**2
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y]),p=p),nlpOut(f=obj,g=x**2+y**2))
+    nlp={'x':vertcat([x,y]), 'p':p, 'f':obj, 'g':x**2+y**2}
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -466,7 +466,7 @@ class NLPtests(casadiTestCase):
     y=SX.sym("y")
     
     obj=(1-x)**2+100*(y-x**2)**2
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj))
+    nlp={'x':vertcat([x,y]), 'f':obj}
     
     sigma=SX.sym("sigma")
     
@@ -492,7 +492,7 @@ class NLPtests(casadiTestCase):
     y=SX.sym("y")
     
     obj=(1-x)**2+100*(y-x**2)**2
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj))
+    nlp={'x':vertcat([x,y]), 'f':obj}
     
     sigma=SX.sym("sigma")
     
@@ -514,7 +514,7 @@ class NLPtests(casadiTestCase):
     y=SX.sym("y")
     
     obj=(1-x)**2+100*(y-x**2)**2
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj))
+    nlp={'x':vertcat([x,y]), 'f':obj}
     
     sigma=SX.sym("sigma")
     
@@ -545,7 +545,7 @@ class NLPtests(casadiTestCase):
     
     p=SX.sym("p")
     obj=(p-x)**2+100*(y-x**2)**2
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y]),p=p),nlpOut(f=obj))
+    nlp={'x':vertcat([x,y]), 'p':p, 'f':obj}
     
     sigma=SX.sym("sigma")
     
@@ -573,7 +573,7 @@ class NLPtests(casadiTestCase):
     
     p=SX.sym("p")
     obj=(p-x)**2+100*(y-x**2)**2
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y]),p=p),nlpOut(f=obj))
+    nlp={'x':vertcat([x,y]), 'p':p, 'f':obj}
     
     sigma=SX.sym("sigma")
     
@@ -597,7 +597,7 @@ class NLPtests(casadiTestCase):
     x=MX.sym("x",N)
     x0=linspace(0,1,N)
     X0=MX(x0)
-    nlp=MX.fun("nlp", nlpIn(x=x),nlpOut(f=norm_2(x-X0),g=2*x))
+    nlp={'x':x, 'f':norm_2(x-X0), 'g':2*x}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = Function.nlp_solver("mysolver", Solver, nlp, solver_options)
@@ -620,7 +620,7 @@ class NLPtests(casadiTestCase):
     self.message("trivial IPOPT, no constraints")
     """ There is an assertion error thrown, but still it works"""
     x=SX.sym("x")
-    nlp=SX.fun("nlp", nlpIn(x=x),nlpOut(f=(x-1)**2))
+    nlp={'x':x, 'f':(x-1)**2}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = Function.nlp_solver("mysolver", Solver, nlp, solver_options)
@@ -635,7 +635,7 @@ class NLPtests(casadiTestCase):
   def testIPOPTmx(self):
     self.message("trivial IPOPT, using MX")
     x=MX.sym("x")
-    nlp=MX.fun("nlp", nlpIn(x=x),nlpOut(f=(x-1)**2,g=2*x))
+    nlp={'x':x, 'f':(x-1)**2, 'g':2*x}
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -654,7 +654,7 @@ class NLPtests(casadiTestCase):
   def testIPOPTc(self):
     self.message("trivial, overconstrained")
     x=SX.sym("x")
-    nlp=SX.fun("nlp", nlpIn(x=x),nlpOut(f=(x-1)**2,g=vertcat([x,x,x])))
+    nlp={'x':x, 'f':(x-1)**2, 'g':vertcat([x,x,x])}
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -670,7 +670,7 @@ class NLPtests(casadiTestCase):
   def testIPOPTc2(self):
     self.message("trivial2, overconstrained")
     x=SX.sym("x")
-    nlp=SX.fun("nlp", nlpIn(x=x),nlpOut(f=(x-1)**2,g=vertcat([x,x,x+x])))
+    nlp={'x':x, 'f':(x-1)**2, 'g':vertcat([x,x,x+x])}
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -686,7 +686,7 @@ class NLPtests(casadiTestCase):
   def testIPOPTcmx(self):
     self.message("trivial , overconstrained, using MX")
     x=MX.sym("x")
-    nlp=MX.fun("nlp", nlpIn(x=x),nlpOut(f=(x-1)**2,g=vertcat([2*x,3*x,4*x])))
+    nlp={'x':x, 'f':(x-1)**2, 'g':vertcat([2*x,3*x,4*x])}
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -703,7 +703,7 @@ class NLPtests(casadiTestCase):
     self.message("degenerate optimization IPOPT")
     x=SX.sym("x")
     y=SX.sym("y")
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=0,g=vertcat([x-y,x])))
+    nlp={'x':vertcat([x,y]), 'f':0, 'g':vertcat([x-y,x])}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = Function.nlp_solver("mysolver", Solver, nlp, solver_options)
@@ -718,7 +718,7 @@ class NLPtests(casadiTestCase):
     self.message("degenerate optimization IPOPT, overconstrained")
     x=SX.sym("x")
     y=SX.sym("y")
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=0,g=vertcat([x-y,x,x+y])))
+    nlp={'x':vertcat([x,y]), 'f':0, 'g':vertcat([x-y,x,x+y])}
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -736,7 +736,7 @@ class NLPtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
     
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
+    nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = Function.nlp_solver("mysolver", Solver, nlp, solver_options)
@@ -768,7 +768,7 @@ class NLPtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
     
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
+    nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(Solver)
       solver = Function.nlp_solver("mysolver", Solver, nlp, solver_options)
@@ -798,7 +798,7 @@ class NLPtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
     
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
+    nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = Function.nlp_solver("mysolver", Solver, nlp, solver_options)
@@ -820,7 +820,7 @@ class NLPtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
     
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
+    nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = Function.nlp_solver("mysolver", Solver, nlp, solver_options)
@@ -842,7 +842,7 @@ class NLPtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
     
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
+    nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = Function.nlp_solver("mysolver", Solver, nlp, solver_options)
@@ -870,7 +870,7 @@ class NLPtests(casadiTestCase):
     H = diag(range(1,N+1))
     obj = 0.5*mul([(x-x0).T,H,(x-x0)])
 
-    nlp = SX.fun("nlp", nlpIn(x=x),nlpOut(f=obj))
+    nlp = {'x':x, 'f':obj}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       if Solver=="sqpmethod" and "limited-memory" in str(solver_options): continue
@@ -894,7 +894,7 @@ class NLPtests(casadiTestCase):
     UBX = DMatrix([0.5,inf])
 
     x=SX.sym("x",2)
-    nlp=SX.fun("nlp", nlpIn(x=x),nlpOut(f=0.5*mul([x.T,H,x])+mul(G.T,x),g=mul(A,x)))
+    nlp={'x':x, 'f':0.5*mul([x.T,H,x])+mul(G.T,x), 'g':mul(A,x)}
 
     for Solver, solver_options in solvers:
       self.message(Solver)
@@ -957,7 +957,7 @@ class NLPtests(casadiTestCase):
     UBX = DMatrix([inf]*2)
 
     x=SX.sym("x",2)
-    nlp=SX.fun("nlp", nlpIn(x=x),nlpOut(f=0.5*mul([x.T,H,x])+mul(G.T,x),g=mul(A,x)))
+    nlp={'x':x, 'f':0.5*mul([x.T,H,x])+mul(G.T,x), 'g':mul(A,x)}
 
     for Solver, solver_options in solvers:
       self.message(Solver)
@@ -1011,9 +1011,9 @@ class NLPtests(casadiTestCase):
     a = aa[:3]
     b = aa[3:]
     [f_call] = f([a, b])
-    nlp = MX.fun("nlp", nlpIn(x=aa), nlpOut(f=f_call))
+    nlp = {'x':aa, 'f':f_call}
     for Solver, solver_options in solvers:
-      solver = Function.nlp_solver("mysolver", Solver, nlp,solver_options)
+      solver = Function.nlp_solver("mysolver", Solver, nlp, solver_options)
       
   @requires_nlp_solver("snopt")
   def test_permute(self):
@@ -1027,7 +1027,7 @@ class NLPtests(casadiTestCase):
               x2**4+x4,
               2*x1+4*x2]
           f= (x1+x2+x3)**2+3*x3+5*x4
-          F= SX.fun("nlp", nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
+          F= {'x':x, 'f':f, 'g':vertcat(g)[permute_g]}
           
           solver = Function.nlp_solver("mysolver",Solver,F,solver_options)
           
@@ -1071,7 +1071,7 @@ class NLPtests(casadiTestCase):
               x3**2+x4,
               2*x1+4*x2]
           f= x1**2+x3**2
-          F= SX.fun("nlp", nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
+          F= {'x':x, 'f':f, 'g':vertcat(g)[permute_g]}
           
           solver = Function.nlp_solver("mysolver",Solver,F,solver_options)
 
@@ -1111,7 +1111,7 @@ class NLPtests(casadiTestCase):
               x3**2+x4,
               2*x1+4*x2]
           f= x1**2+x3**2+2*x2
-          F= SX.fun("nlp", nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
+          F= {'x':x, 'f':f, 'g':vertcat(g)[permute_g]}
 
           solver = Function.nlp_solver("mysolver",Solver,F,solver_options)
           
@@ -1142,7 +1142,7 @@ class NLPtests(casadiTestCase):
   def test_classifications(self):      
     x=SX.sym("x")
     y=SX.sym("y")
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+7.7*y,g=y**2))
+    nlp={'x':vertcat([x,y]), 'f':(1-x)**2+7.7*y, 'g':y**2}
 
     solver = Function.nlp_solver("mysolver","snopt", nlp,{"Verify level" :3})
     
@@ -1162,7 +1162,7 @@ class NLPtests(casadiTestCase):
   def test_pathological(self):      
     x=SX.sym("x")
     y=SX.sym("y")
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+y**2))
+    nlp={'x':vertcat([x,y]), 'f':(1-x)**2+y**2}
 
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -1182,7 +1182,7 @@ class NLPtests(casadiTestCase):
   def test_pathological2(self):      
     x=SX.sym("x")
     y=SX.sym("y")
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+y))
+    nlp={'x':vertcat([x,y]), 'f':(1-x)**2+y}
 
     for Solver, solver_options in solvers:
       self.message(Solver)
@@ -1201,7 +1201,7 @@ class NLPtests(casadiTestCase):
   def test_pathological3(self):      
     x=SX.sym("x")
     y=SX.sym("y")
-    nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2,g=x+y))
+    nlp={'x':vertcat([x,y]), 'f':(1-x)**2, 'g':x+y}
 
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -1222,7 +1222,7 @@ class NLPtests(casadiTestCase):
     
   def test_pathological4(self):      
     x=SX.sym("x")
-    nlp=SX.fun("nlp", nlpIn(x=x),nlpOut(f=x*x))
+    nlp={'x':x, 'f':x*x}
 
     for Solver, solver_options in solvers:
       self.message(Solver)
