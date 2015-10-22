@@ -327,7 +327,7 @@ class Misctests(casadiTestCase):
     x = SX.sym("x")
     p = SX.sym("p")
 
-    F = Function('F', [('x', x), ('p', p)], [('g', x**2), ('f', x+p)])
+    F = Function('F', [x, p], [x+p, x**2], ['x', 'p'], ['f', 'g'])
     
     fc = F({'x':3,'p':4})
     [f] = fc['f']

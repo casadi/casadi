@@ -829,7 +829,7 @@ class Functiontests(casadiTestCase):
 
     obj = (x-(x+y))**2
 
-    nlp = Function("nlp", [('x', V), ('p', P)], [('f', obj), ('g', MX())])
+    nlp = Function("nlp", [V, P], [obj, MX()], ['x', 'p'], ['f', 'g'])
 
     self.assertTrue(nlp.hessian(0,0).sparsity_out(0).issymmetric())
 
@@ -843,7 +843,7 @@ class Functiontests(casadiTestCase):
     for j in range(2):
       dist+=sumRows((xs[0]-(xs[j]+travels[j]))**2)
 
-    nlp = Function("nlp", [('x', V), ('p', P)], [('f', -dist), ('g', MX())])
+    nlp = Function("nlp", [V, P], [-dist, MX()], ['x', 'p'], ['f', 'g'])
 
     hs = []
     for n in [nlp, nlp.expand('nlp_expanded')]:

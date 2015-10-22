@@ -235,7 +235,7 @@ namespace casadi {
 
   template<typename XType>
   Function NlpSolverInternal::problem2fun(const Problem<XType>& d) {
-    return Function("nlp", zip({"x", "p"}, d.in), zip({"f", "g"}, d.out));
+    return Function("nlp", d.in, d.out, {"x", "p"}, {"f", "g"});
   }
 
   template<typename XType>

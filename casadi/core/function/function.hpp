@@ -134,40 +134,22 @@ namespace casadi {
     ///@{
     /** \brief Construct an SX function */
     Function(const std::string& name,
-             const std::vector<SX>& arg,
-             const std::vector<SX>& res,
+             const std::vector<SX>& arg, const std::vector<SX>& res,
              const Dict& opts=Dict());
     Function(const std::string& name,
-             const std::vector<std::pair<std::string, SX>>& arg,
-             const std::vector<SX>& res,
-             const Dict& opts=Dict());
-    Function(const std::string& name,
-             const std::vector<SX>& arg,
-             const std::vector<std::pair<std::string, SX>>& res,
-             const Dict& opts=Dict());
-    Function(const std::string& name,
-             const std::vector<std::pair<std::string, SX>>& arg,
-             const std::vector<std::pair<std::string, SX>>& res,
+             const std::vector<SX>& arg, const std::vector<SX>& res,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
              const Dict& opts=Dict());
     ///@}
 
     ///@{
     /** \brief Construct an MX function */
     Function(const std::string& name,
-             const std::vector<MX>& arg,
-             const std::vector<MX>& res,
+             const std::vector<MX>& arg, const std::vector<MX>& res,
              const Dict& opts=Dict());
     Function(const std::string& name,
-             const std::vector<std::pair<std::string, MX>>& arg,
-             const std::vector<MX>& res,
-             const Dict& opts=Dict());
-    Function(const std::string& name,
-             const std::vector<MX>& arg,
-             const std::vector<std::pair<std::string, MX>>& res,
-             const Dict& opts=Dict());
-    Function(const std::string& name,
-             const std::vector<std::pair<std::string, MX>>& arg,
-             const std::vector<std::pair<std::string, MX>>& res,
+             const std::vector<MX>& arg, const std::vector<MX>& res,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
              const Dict& opts=Dict());
     ///@}
 

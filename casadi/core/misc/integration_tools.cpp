@@ -188,7 +188,7 @@ namespace casadi {
     }
 
     // Form discrete-time dynamics
-    return Function("F", {{"x0", x0}, {"p", p}, {"h", h}}, {{"xf", xf}});
+    return Function("F", {x0, p, h}, {xf}, {"x0", "p", "h"}, {"xf"});
   }
 
   void collocationInterpolators(const std::vector<double> & tau_root,
@@ -304,7 +304,7 @@ namespace casadi {
     }
 
     // Form discrete-time dynamics
-    return Function("F", {{"x0", x0}, {"p", p}, {"h", h}}, {{"xf", xf}});
+    return Function("F", {x0, p, h}, {xf}, {"x0", "p", "h"}, {"xf"});
   }
 
   Function simpleIntegrator(Function f, const std::string& integrator,
@@ -351,7 +351,7 @@ namespace casadi {
     MX xf = ifcn(MXDict{{"x0", x0}, {"p", vertcat(h, vec(p))}}).at("xf");
 
     // Form discrete-time dynamics
-    return Function("F", {{"x0", x0}, {"p", p}, {"h", h}}, {{"xf", xf}});
+    return Function("F", {x0, p, h}, {xf}, {"x0", "p", "h"}, {"xf"});
   }
 
 } // namespace casadi
