@@ -935,7 +935,10 @@ class Matrixtests(casadiTestCase):
   def test_repmat(self):
     a = DMatrix([[1,2],[3,4],[5,6]])
     self.checkarray(repmat(a,2,3),kron(DMatrix.ones(2,3),a))
-        
+    self.checkarray(IMatrix(repmat(Sparsity.dense(5,5),2,3),1),IMatrix(Sparsity.dense(10,15),1))
+    self.checkarray(IMatrix(repmat(Sparsity(5,5),2,3),1),IMatrix(Sparsity(10,15),1))
+    self.checkarray(IMatrix(repmat(Sparsity.upper(5),2,3),1),repmat(IMatrix(Sparsity.upper(5),1),2,3))
+    
   def test_triu(self):
     a = DMatrix([[1,2],[3,4]])
     b = triu(a)

@@ -1180,6 +1180,18 @@ namespace casadi {
     return blockcat(blocks);
   }
 
+  Sparsity Sparsity::zz_repmat(int n, int m) const {
+    if (isdense()) {
+      // Special case for dense sparsity
+      return Sparsity::dense(size1()*n, size2()*m);
+    } else if (nnz()==0) {
+      // Special case for empty sparsity
+      return Sparsity(size1()*n, size2()*m);
+    } else {
+      return SparsityInterface<Sparsity>::zz_repmat(n, m);
+    }
+  }
+
   Sparsity Sparsity::zz_vertcat(const std::vector<Sparsity> & sp) {
     // Quick return if possible
     if (sp.empty()) return Sparsity(0, 0);

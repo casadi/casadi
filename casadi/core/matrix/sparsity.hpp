@@ -514,6 +514,7 @@ namespace casadi {
     int zz_sprank() const;
     int zz_norm_0_mul(const Sparsity& B) const;
     Sparsity zz_kron(const Sparsity& b) const;
+    Sparsity zz_repmat(int n, int m=1) const;
     /// @}
     /// \endcond
 
