@@ -781,6 +781,11 @@ namespace casadi {
     return ret;
   }
 
+  ///@{
+  /// Readability typedefs
+  typedef std::vector<std::string> StringVector;
+  ///@}
+
 } // namespace casadi
 #endif // SWIG
 

@@ -162,72 +162,48 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief To resolve ambiguity on some compilers */    
+    /** \brief To resolve ambiguity on some compilers */
 #ifndef SWIG
-    Function(const std::string& name,
-             std::initializer_list<SX> arg, const std::vector<SX>& res,
-             const Dict& opts=Dict()) {
+    Function(const std::string& name, SXIList arg, const SXVector& res, const Dict& opts=Dict()) {
       construct(name, arg, res, opts);
     }
-    Function(const std::string& name,
-             const std::vector<SX>& arg, const std::initializer_list<SX> res,
-             const Dict& opts=Dict()) {
+    Function(const std::string& name, const SXVector& arg, SXIList res, const Dict& opts=Dict()) {
       construct(name, arg, res, opts);
     }
-    Function(const std::string& name,
-             std::initializer_list<SX> arg, const std::initializer_list<SX> res,
-             const Dict& opts=Dict()) {
+    Function(const std::string& name, SXIList arg, SXIList res, const Dict& opts=Dict()) {
       construct(name, arg, res, opts);
     }
-    Function(const std::string& name,
-             std::initializer_list<MX> arg, const std::vector<MX>& res,
-             const Dict& opts=Dict()) {
-      construct(name, arg, res, opts);
-    }
-    Function(const std::string& name,
-             const std::vector<MX>& arg, const std::initializer_list<MX> res,
-             const Dict& opts=Dict()) {
-      construct(name, arg, res, opts);
-    }
-    Function(const std::string& name,
-             std::initializer_list<MX> arg, const std::initializer_list<MX> res,
-             const Dict& opts=Dict()) {
-      construct(name, arg, res, opts);
-    }
-    Function(const std::string& name,
-             std::initializer_list<SX> arg, const std::vector<SX>& res,
-             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
-             const Dict& opts=Dict()) {
+    Function(const std::string& name, SXIList arg, const SXVector& res,
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict()) {
       construct(name, arg, res, argn, resn, opts);
     }
-    Function(const std::string& name,
-             const std::vector<SX>& arg, const std::initializer_list<SX> res,
-             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
-             const Dict& opts=Dict()) {
+    Function(const std::string& name, const SXVector& arg, SXIList res,
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict()) {
       construct(name, arg, res, argn, resn, opts);
     }
-    Function(const std::string& name,
-             std::initializer_list<SX> arg, const std::initializer_list<SX> res,
-             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
-             const Dict& opts=Dict()) {
+    Function(const std::string& name, SXIList arg, SXIList res,
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict()) {
       construct(name, arg, res, argn, resn, opts);
     }
-    Function(const std::string& name,
-             std::initializer_list<MX> arg, const std::vector<MX>& res,
-             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
-             const Dict& opts=Dict()) {
+    Function(const std::string& name, MXIList arg, const MXVector& res, const Dict& opts=Dict()) {
+      construct(name, arg, res, opts);
+    }
+    Function(const std::string& name, const MXVector& arg, MXIList res, const Dict& opts=Dict()) {
+      construct(name, arg, res, opts);
+    }
+    Function(const std::string& name, MXIList arg, MXIList res, const Dict& opts=Dict()) {
+      construct(name, arg, res, opts);
+    }
+    Function(const std::string& name, MXIList arg, const MXVector& res,
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict()) {
       construct(name, arg, res, argn, resn, opts);
     }
-    Function(const std::string& name,
-             const std::vector<MX>& arg, const std::initializer_list<MX> res,
-             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
-             const Dict& opts=Dict()) {
+    Function(const std::string& name, const MXVector& arg, MXIList res,
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict()) {
       construct(name, arg, res, argn, resn, opts);
     }
-    Function(const std::string& name,
-             std::initializer_list<MX> arg, const std::initializer_list<MX> res,
-             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
-             const Dict& opts=Dict()) {
+    Function(const std::string& name, MXIList arg, MXIList res,
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict()) {
       construct(name, arg, res, argn, resn, opts);
     }
 #endif // SWIG

@@ -314,6 +314,7 @@ namespace casadi {
   /// Readability typedefs
   typedef Matrix<SXElement> SX;
   typedef std::vector<SX> SXVector;
+  typedef std::initializer_list<SX> SXIList;
   typedef std::vector<SXVector> SXVectorVector;
   typedef std::map<std::string, SX> SXDict;
   ///@}

@@ -675,6 +675,7 @@ namespace casadi {
   ///@{
   /// Readability typedefs
   typedef std::vector<MX> MXVector;
+  typedef std::initializer_list<MX> MXIList;
   typedef std::vector<MXVector> MXVectorVector;
   typedef std::map<std::string, MX> MXDict;
   ///@}
