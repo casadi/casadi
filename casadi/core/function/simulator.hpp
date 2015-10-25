@@ -56,15 +56,7 @@ public:
   /// Default constructor
   Simulator();
 
-  /** \brief Constructor
-  * \param output_fcn output function which maps to n outputs. (new syntax, includes initialization)
-  * \copydoc scheme_DAEInput
-  *
-  */
-  Simulator(const std::string& name, const Function& integrator, const Function& output_fcn,
-            const Matrix<double>& grid, const Dict& opts=Dict());
-
-  /// Output function equal to the state (new syntax, includes initialization)
+  /// Constructor
   Simulator(const std::string& name, const Function& integrator,
             const Matrix<double>& grid, const Dict& opts=Dict());
 

@@ -66,9 +66,11 @@ print "optimal control: ", u_opt
 f = vertcat((xdot,ldot))
 f = substitute(f,u,u_opt)
 
-# Create the right hand side function
-rhs_in = daeIn(x=vertcat((x,lam)))
-rhs = SX.fun('rhs', rhs_in,daeOut(ode=f))
+# Function for obtaining the optimal control from the augmented state
+u_fcn = Function("ufcn", [vertcat((x,lam))], [u_opt])
+
+# Formulate the DAE
+dae = {'x':vertcat((x,lam)), 'ode':f}
 
 # Augmented DAE state dimension
 nX = 4
@@ -85,7 +87,7 @@ iopts["abstol"] = 1e-8 # abs. tolerance
 iopts["reltol"] = 1e-8 # rel. tolerance
 iopts["t0"] = 0.0
 iopts["tf"] = tf/num_nodes
-I = Function.integrator("I", "cvodes", rhs, iopts)
+I = Function.integrator("I", "cvodes", dae, iopts)
 
 # Variables in the root finding problem
 NV = nX*(num_nodes+1)
@@ -135,21 +137,22 @@ V_sol, = solver([0])
 # Time grid for visualization
 tgrid = NP.linspace(0,tf,100)
 
-# Output functions
-output_fcn = SX.fun("output", rhs_in, [x0,x1,u_opt])
-
 # Simulator to get optimal state and control trajectories
-simulator = Simulator("simulator", I, output_fcn, tgrid)
+simulator = Simulator("simulator", I, tgrid)
 
 # Simulate to get the trajectories
-sol = simulator({"x0" : V_sol[0:4]})
+sol = simulator({"x0" : V_sol[0:4]})["xf"]
+
+# Calculate the optimal control
+ufcn_all = u_fcn.map("ufcn_all", len(tgrid))
+[u_opt] = ufcn_all([sol])
 
 # Plot the results
 plt.figure(1)
 plt.clf()
-plt.plot(tgrid, sol["o0"].T, '--')
-plt.plot(tgrid, sol["o1"].T, '-')
-plt.plot(tgrid, sol["o2"].T, '-.')
+plt.plot(tgrid, sol[0, :].T, '--')
+plt.plot(tgrid, sol[1, :].T, '-')
+plt.plot(tgrid, u_opt.T, '-.')
 plt.title("Van der Pol optimization - indirect multiple shooting")
 plt.xlabel('time')
 plt.legend(['x trajectory','y trajectory','u trajectory'])
