@@ -81,6 +81,8 @@ namespace casadi {
 
       static std::string casadipath;
 
+      static int optimized_num_dir;
+
 #endif //SWIG
       // Setter and getter for catch_errors_swig
       static void setCatchErrorsSwig(bool flag) { catch_errors_swig = flag; }
@@ -110,6 +112,9 @@ namespace casadi {
 
       static void setCasadiPath(const std::string & path) { casadipath = path; }
       static std::string getCasadiPath() { return casadipath; }
+
+      static void setOptimizedNumDir(int n) { optimized_num_dir = n; }
+      static int getOptimizedNumDir() { return optimized_num_dir; }
 
   };
 

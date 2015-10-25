@@ -28,6 +28,7 @@
 
 #include <stack>
 #include "function_internal.hpp"
+#include "../casadi_options.hpp"
 
 // To reuse variables we need to be able to sort by sparsity pattern (preferably using a hash map)
 #ifdef USE_CXX11
@@ -635,8 +636,8 @@ namespace casadi {
     int nadir = D2.isNull() ? 0 : D2.size2();
 
     // Number of derivative directions supported by the function
-    int max_nfdir = optimized_num_dir;
-    int max_nadir = optimized_num_dir;
+    int max_nfdir = CasadiOptions::optimized_num_dir;
+    int max_nadir = CasadiOptions::optimized_num_dir;
 
     // Current forward and adjoint direction
     int offset_nfdir = 0, offset_nadir = 0;

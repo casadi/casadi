@@ -35,6 +35,7 @@ namespace casadi {
   bool CasadiOptions::profilingBinary = true;
   bool CasadiOptions::purgeSeeds = false;
   bool CasadiOptions::allowed_internal_api = false;
+  int CasadiOptions::optimized_num_dir = 64;
 
   std::string CasadiOptions::casadipath = "";
 
