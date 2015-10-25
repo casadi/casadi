@@ -22,7 +22,7 @@
  *
  */
 
-#include "mx_function_internal.hpp"
+#include "mx_function.hpp"
 #include "../std_vector_tools.hpp"
 #include "../casadi_types.hpp"
 #include "../profiling.hpp"

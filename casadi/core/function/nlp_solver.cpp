@@ -23,7 +23,7 @@
  */
 
 
-#include "nlp_solver_internal.hpp"
+#include "nlp_solver.hpp"
 #include "casadi/core/timing.hpp"
 
 INPUTSCHEME(NlpSolverInput)

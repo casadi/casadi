@@ -23,10 +23,10 @@
  */
 
 
-#ifndef CASADI_SX_FUNCTION_INTERNAL_HPP
-#define CASADI_SX_FUNCTION_INTERNAL_HPP
+#ifndef CASADI_SX_FUNCTION_HPP
+#define CASADI_SX_FUNCTION_HPP
 
-#include "x_function_internal.hpp"
+#include "x_function.hpp"
 
 #ifdef WITH_OPENCL
 #ifdef __APPLE__
@@ -292,4 +292,4 @@ class CASADI_EXPORT SXFunctionInternal :
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_SX_FUNCTION_INTERNAL_HPP
+#endif // CASADI_SX_FUNCTION_HPP

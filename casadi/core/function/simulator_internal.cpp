@@ -24,7 +24,7 @@
 
 
 #include "simulator_internal.hpp"
-#include "integrator_internal.hpp"
+#include "integrator.hpp"
 #include "../std_vector_tools.hpp"
 
 INPUTSCHEME(IntegratorInput)

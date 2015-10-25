@@ -26,7 +26,7 @@
 #ifndef CASADI_OOQP_INTERFACE_HPP
 #define CASADI_OOQP_INTERFACE_HPP
 
-#include "casadi/core/function/qp_solver_internal.hpp"
+#include "casadi/core/function/qp_solver.hpp"
 #include <casadi/interfaces/ooqp/casadi_qpsolver_ooqp_export.h>
 
 /** \defgroup plugin_QpSolver_ooqp

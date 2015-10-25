@@ -33,7 +33,7 @@
 #include "unary_sx.hpp"
 #include "binary_sx.hpp"
 #include "../casadi_options.hpp"
-#include "../function/sx_function_internal.hpp"
+#include "../function/sx_function.hpp"
 
 using namespace std;
 namespace casadi {

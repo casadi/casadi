@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_EXTERNAL_FUNCTION_INTERNAL_HPP
-#define CASADI_EXTERNAL_FUNCTION_INTERNAL_HPP
+#ifndef CASADI_EXTERNAL_HPP
+#define CASADI_EXTERNAL_HPP
 
 #include "function_internal.hpp"
 
@@ -240,4 +240,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_EXTERNAL_FUNCTION_INTERNAL_HPP
+#endif // CASADI_EXTERNAL_HPP

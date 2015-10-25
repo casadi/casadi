@@ -26,8 +26,8 @@
 #ifndef CASADI_QP_TO_NLP_HPP
 #define CASADI_QP_TO_NLP_HPP
 
-#include "casadi/core/function/qp_solver_internal.hpp"
-#include "casadi/core/function/nlp_solver_internal.hpp"
+#include "casadi/core/function/qp_solver.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
 
 #include <casadi/solvers/casadi_qpsolver_nlp_export.h>
 

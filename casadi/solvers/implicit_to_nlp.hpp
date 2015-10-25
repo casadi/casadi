@@ -26,8 +26,8 @@
 #ifndef CASADI_IMPLICIT_TO_NLP_HPP
 #define CASADI_IMPLICIT_TO_NLP_HPP
 
-#include "casadi/core/function/implicit_function_internal.hpp"
-#include "casadi/core/function/nlp_solver_internal.hpp"
+#include "casadi/core/function/rootfinder.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 
 #include <casadi/solvers/casadi_implicitfunction_nlp_export.h>

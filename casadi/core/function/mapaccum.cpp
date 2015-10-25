@@ -23,7 +23,7 @@
  */
 
 
-#include "mapaccum_internal.hpp"
+#include "mapaccum.hpp"
 
 using namespace std;
 

@@ -23,7 +23,7 @@
  */
 
 
-#include "qp_solver_internal.hpp"
+#include "qp_solver.hpp"
 #include <typeinfo>
 
 INPUTSCHEME(QpSolverInput)

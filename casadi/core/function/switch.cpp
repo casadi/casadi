@@ -23,7 +23,7 @@
  */
 
 
-#include "switch_internal.hpp"
+#include "switch.hpp"
 
 using namespace std;
 

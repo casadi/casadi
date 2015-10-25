@@ -28,7 +28,7 @@
 
 #include <casadi/interfaces/knitro/casadi_nlpsolver_knitro_export.h>
 #include <knitro.h>
-#include "casadi/core/function/nlp_solver_internal.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
 
 /** \defgroup plugin_NlpSolver_knitro
   KNITRO interface

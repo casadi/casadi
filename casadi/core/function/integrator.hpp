@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_INTEGRATOR_INTERNAL_HPP
-#define CASADI_INTEGRATOR_INTERNAL_HPP
+#ifndef CASADI_INTEGRATOR_HPP
+#define CASADI_INTEGRATOR_HPP
 
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
@@ -302,4 +302,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_INTEGRATOR_INTERNAL_HPP
+#endif // CASADI_INTEGRATOR_HPP

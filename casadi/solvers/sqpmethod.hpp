@@ -26,7 +26,7 @@
 #ifndef CASADI_SQPMETHOD_HPP
 #define CASADI_SQPMETHOD_HPP
 
-#include "casadi/core/function/nlp_solver_internal.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
 #include <deque>
 
 #include <casadi/solvers/casadi_nlpsolver_sqpmethod_export.h>

@@ -23,7 +23,7 @@
  */
 
 
-#include "external_function_internal.hpp"
+#include "external.hpp"
 #include "../std_vector_tools.hpp"
 
 #include <iostream>

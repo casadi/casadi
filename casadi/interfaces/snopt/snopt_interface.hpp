@@ -26,7 +26,7 @@
 #ifndef CASADI_SNOPT_INTERFACE_HPP
 #define CASADI_SNOPT_INTERFACE_HPP
 
-#include "casadi/core/function/nlp_solver_internal.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
 #include "casadi/interfaces/snopt/casadi_nlpsolver_snopt_export.h"
 #include "casadi/interfaces/snopt/snopt.h"
 #include "snoptProblem.hpp"

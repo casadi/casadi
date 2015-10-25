@@ -25,7 +25,7 @@
 #define CASADI_MATRIX_CPP
 #include "matrix_impl.hpp"
 #include "../function/linear_solver.hpp"
-#include "../function/sx_function_internal.hpp"
+#include "../function/sx_function.hpp"
 #include "../sx/sx_node.hpp"
 
 using namespace std;

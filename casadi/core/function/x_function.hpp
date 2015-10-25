@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_X_FUNCTION_INTERNAL_HPP
-#define CASADI_X_FUNCTION_INTERNAL_HPP
+#ifndef CASADI_X_FUNCTION_HPP
+#define CASADI_X_FUNCTION_HPP
 
 #include <stack>
 #include "function_internal.hpp"

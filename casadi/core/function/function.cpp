@@ -25,17 +25,17 @@
 
 #include "function_internal.hpp"
 #include "../std_vector_tools.hpp"
-#include "sx_function_internal.hpp"
-#include "mx_function_internal.hpp"
-#include "map_internal.hpp"
-#include "mapaccum_internal.hpp"
-#include "external_function_internal.hpp"
-#include "switch_internal.hpp"
-#include "kernel_sum_2d_internal.hpp"
-#include "integrator_internal.hpp"
-#include "qp_solver_internal.hpp"
-#include "nlp_solver_internal.hpp"
-#include "implicit_function_internal.hpp"
+#include "sx_function.hpp"
+#include "mx_function.hpp"
+#include "map.hpp"
+#include "mapaccum.hpp"
+#include "external.hpp"
+#include "switch.hpp"
+#include "kernel_sum.hpp"
+#include "integrator.hpp"
+#include "qp_solver.hpp"
+#include "nlp_solver.hpp"
+#include "rootfinder.hpp"
 
 #include <typeinfo>
 

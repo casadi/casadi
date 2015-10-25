@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_KERNEL_SUM_2D_INTERNAL_HPP
-#define CASADI_KERNEL_SUM_2D_INTERNAL_HPP
+#ifndef CASADI_SWITCH_HPP
+#define CASADI_SWITCH_HPP
 
 #include "function_internal.hpp"
 
@@ -32,43 +32,31 @@
 
 namespace casadi {
 
-  /** KernelSum2D statement
-      \author Joris Gillis
+  /** Switch statement
+      \author Joel Andersson
       \date 2015
   */
-  class CASADI_EXPORT KernelSum2DInternal : public FunctionInternal {
-    friend class KernelSum2D;
+  class CASADI_EXPORT SwitchInternal : public FunctionInternal {
+    friend class Switch;
   public:
 
-    /** \brief Constructor (generic kernel_sum_2d) */
-    KernelSum2DInternal(const std::string& name, const Function& f,
-                        const std::pair<int, int> & size,
-                        double r,
-                        int n);
+    /** \brief Constructor (generic switch) */
+    SwitchInternal(const std::string& name,
+                   const std::vector<Function>& f, const Function& f_def);
 
     /** \brief  Destructor */
-    virtual ~KernelSum2DInternal();
+    virtual ~SwitchInternal();
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return f_.n_in()-1;}
-    virtual size_t get_n_out() const { return f_.n_out();}
+    virtual size_t get_n_in() const;
+    virtual size_t get_n_out() const;
     ///@}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int ind) const {
-      if (ind==0) {
-        return Sparsity::dense(size_);
-      } else if (ind==1) {
-        return Sparsity::dense(2, n_);
-      } else {
-        return f_.sparsity_in(ind+1);
-      }
-    }
-    virtual Sparsity get_sparsity_out(int ind) const {
-      return f_.sparsity_out(ind);
-    }
+    virtual Sparsity get_sparsity_in(int ind) const;
+    virtual Sparsity get_sparsity_out(int ind) const;
     /// @}
 
     /** \brief  Initialize */
@@ -76,11 +64,6 @@ namespace casadi {
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void evalD(const double** arg, double** res, int* iw, double* w);
-
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
-
-    /** \brief  Is the class able to propagate seeds through the algorithm? */
-    virtual bool spCanEvaluate(bool fwd) { return fwd; }
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
@@ -103,23 +86,14 @@ namespace casadi {
     /** \brief Generate code for the body of the C function */
     virtual void generateBody(CodeGenerator& g) const;
 
+    // Function to be evaluated for each case
+    std::vector<Function> f_;
+
     // Default case;
-    Function f_;
-
-    std::pair<int, int> size_;
-
-    double r_;
-
-    int n_;
-
-    int nnz_out_;
-
-    /// Nonzero step for outputs
-    std::vector<int> step_out_;
-
+    Function f_def_;
   };
 
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_KERNEL_SUM_2D_INTERNAL_HPP
+#endif // CASADI_SWITCH_HPP

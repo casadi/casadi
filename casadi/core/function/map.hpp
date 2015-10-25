@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_MAP_INTERNAL_HPP
-#define CASADI_MAP_INTERNAL_HPP
+#ifndef CASADI_MAP_HPP
+#define CASADI_MAP_HPP
 
 #include "function_internal.hpp"
 
@@ -258,4 +258,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_MAP_INTERNAL_HPP
+#endif // CASADI_MAP_HPP

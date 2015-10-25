@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_SWITCH_INTERNAL_HPP
-#define CASADI_SWITCH_INTERNAL_HPP
+#ifndef CASADI_MAPACCUM_HPP
+#define CASADI_MAPACCUM_HPP
 
 #include "function_internal.hpp"
 
@@ -32,38 +32,70 @@
 
 namespace casadi {
 
-  /** Switch statement
-      \author Joel Andersson
+  /** MapAccum statement
+      \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT SwitchInternal : public FunctionInternal {
-    friend class Switch;
+  class CASADI_EXPORT MapAccumInternal : public FunctionInternal {
+    friend class MapAccum;
   public:
 
-    /** \brief Constructor (generic switch) */
-    SwitchInternal(const std::string& name,
-                   const std::vector<Function>& f, const Function& f_def);
+    /** \brief Constructor (generic mapaccum) */
+    MapAccumInternal(const std::string& name, const Function& f, int n,
+                     const std::vector<bool>& input_accum,
+                     const std::vector<int>& output_accum,
+                     bool reverse);
 
     /** \brief  Destructor */
-    virtual ~SwitchInternal();
+    virtual ~MapAccumInternal();
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const;
-    virtual size_t get_n_out() const;
+    virtual size_t get_n_in() const { return f_.n_in();}
+    virtual size_t get_n_out() const { return f_.n_out();}
     ///@}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int ind) const;
-    virtual Sparsity get_sparsity_out(int ind) const;
+    virtual Sparsity get_sparsity_in(int ind) const {
+      if (input_accum_[ind]) {
+        return f_.sparsity_in(ind);
+      } else {
+        return repmat(f_.sparsity_in(ind), 1, n_);
+      }
+    }
+    virtual Sparsity get_sparsity_out(int ind) const {
+      return repmat(f_.sparsity_out(ind), 1, n_);
+    }
     /// @}
 
     /** \brief  Initialize */
     virtual void init();
 
+    /// Evaluate the function (template)
+    template<typename T, typename R>
+    void evalGen(const T** arg, T** res, int* iw, T* w, R reduction);
+
+    /** \brief Binary or, helper function */
+    static inline bvec_t orop(bvec_t x, bvec_t y) { return x | y; }
+
     /** \brief  Evaluate numerically, work vectors given */
     virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief Quickfix to avoid segfault, #1552 */
+    virtual bool canEvalSX() const {return true;}
+
+    /** \brief  Evaluate symbolically, SXElement type, possibly nonmatching sparsity patterns */
+    virtual void evalSX(const SXElement** arg, SXElement** res,
+                                int* iw, SXElement* w);
+
+    /** \brief  Evaluate symbolically, MX type */
+    //virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+
+    /** \brief  Is the class able to propagate seeds through the algorithm? */
+    virtual bool spCanEvaluate(bool fwd) { return fwd; }
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
@@ -86,14 +118,31 @@ namespace casadi {
     /** \brief Generate code for the body of the C function */
     virtual void generateBody(CodeGenerator& g) const;
 
-    // Function to be evaluated for each case
-    std::vector<Function> f_;
-
     // Default case;
-    Function f_def_;
+    Function f_;
+
+    int n_;
+
+    int nnz_out_;
+
+    /// Nonzero step for inputs
+    std::vector<int> step_in_;
+
+    /// Nonzero step for outputs
+    std::vector<int> step_out_;
+
+    std::vector<bool> input_accum_;
+    std::vector<int> output_accum_;
+
+    /// Indicates the order of accumulation
+    bool reverse_;
+
+    /// Total number of accumulator nonzeros
+    int nnz_accum_;
+
   };
 
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_SWITCH_INTERNAL_HPP
+#endif // CASADI_MAPACCUM_HPP

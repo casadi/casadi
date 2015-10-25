@@ -87,23 +87,23 @@ set(CASADI_SRCS
   function/io_scheme.hpp
   function/function.hpp            function/function.cpp            function/function_internal.hpp            function/function_internal.cpp
   function/plugin_interface.hpp                                     # Plugin interface for Function
-  function/x_function_internal.hpp                                  # Base class for SXFunction and MXFunction
-  function/sx_function_internal.hpp         function/sx_function_internal.cpp
-  function/mx_function_internal.hpp         function/mx_function_internal.cpp
-  function/external_function_internal.hpp   function/external_function_internal.cpp
+  function/x_function.hpp                                           # Base class for SXFunction and MXFunction
+  function/sx_function.hpp         function/sx_function.cpp
+  function/mx_function.hpp         function/mx_function.cpp
+  function/external.hpp            function/external.cpp
   function/linear_solver.hpp       function/linear_solver.cpp       function/linear_solver_internal.hpp       function/linear_solver_internal.cpp
-  function/implicit_function_internal.hpp   function/implicit_function_internal.cpp
-  function/integrator_internal.hpp          function/integrator_internal.cpp
-  function/nlp_solver_internal.hpp          function/nlp_solver_internal.cpp
+  function/rootfinder.hpp          function/rootfinder.cpp
+  function/integrator.hpp          function/integrator.cpp
+  function/nlp_solver.hpp          function/nlp_solver.cpp
   function/simulator.hpp           function/simulator.cpp           function/simulator_internal.hpp           function/simulator_internal.cpp
-  function/qp_solver_internal.hpp           function/qp_solver_internal.cpp
+  function/qp_solver.hpp           function/qp_solver.cpp
   function/code_generator.hpp      function/code_generator.cpp
   function/wrapper.hpp             function/adaptor.hpp
-  function/switch_internal.hpp   function/switch_internal.cpp
-  function/map_internal.hpp      function/map_internal.cpp
-  function/mapaccum_internal.hpp function/mapaccum_internal.cpp
+  function/switch.hpp              function/switch.cpp
+  function/map.hpp                 function/map.cpp
+  function/mapaccum.hpp            function/mapaccum.cpp
   function/compiler.hpp            function/compiler.cpp            function/compiler_internal.hpp function/compiler_internal.cpp
-  function/kernel_sum_2d_internal.hpp function/kernel_sum_2d_internal.cpp
+  function/kernel_sum.hpp          function/kernel_sum.cpp
   function/callback.cpp            function/callback.hpp            function/callback_internal.cpp function/callback_internal.hpp
 
   # MISC useful stuff

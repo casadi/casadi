@@ -30,7 +30,7 @@
 #include "../std_vector_tools.hpp"
 #include "norm.hpp"
 #include "../casadi_math.hpp"
-#include "../function/mx_function_internal.hpp"
+#include "../function/mx_function.hpp"
 
 using namespace std;
 namespace casadi {

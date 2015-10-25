@@ -25,7 +25,7 @@
 #ifndef CASADI_CPLEX_INTERFACE_HPP
 #define CASADI_CPLEX_INTERFACE_HPP
 
-#include "casadi/core/function/qp_solver_internal.hpp"
+#include "casadi/core/function/qp_solver.hpp"
 #include <casadi/interfaces/cplex/casadi_qpsolver_cplex_export.h>
 #include "ilcplex/cplex.h"
 

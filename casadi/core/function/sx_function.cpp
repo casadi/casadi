@@ -23,7 +23,7 @@
  */
 
 
-#include "sx_function_internal.hpp"
+#include "sx_function.hpp"
 #include <limits>
 #include <stack>
 #include <deque>

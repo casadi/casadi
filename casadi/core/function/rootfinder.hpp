@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_IMPLICIT_FUNCTION_INTERNAL_HPP
-#define CASADI_IMPLICIT_FUNCTION_INTERNAL_HPP
+#ifndef CASADI_ROOTFINDER_HPP
+#define CASADI_ROOTFINDER_HPP
 
 #include "function_internal.hpp"
 #include "linear_solver.hpp"
@@ -148,5 +148,5 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_IMPLICIT_FUNCTION_INTERNAL_HPP
+#endif // CASADI_ROOTFINDER_HPP
 

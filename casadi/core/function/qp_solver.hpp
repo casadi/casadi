@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_QP_SOLVER_INTERNAL_HPP
-#define CASADI_QP_SOLVER_INTERNAL_HPP
+#ifndef CASADI_QP_SOLVER_HPP
+#define CASADI_QP_SOLVER_HPP
 
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
@@ -113,5 +113,5 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_QP_SOLVER_INTERNAL_HPP
+#endif // CASADI_QP_SOLVER_HPP
 

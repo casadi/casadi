@@ -26,7 +26,7 @@
 #ifndef CASADI_SQIC_INTERFACE_HPP
 #define CASADI_SQIC_INTERFACE_HPP
 
-#include "casadi/core/function/qp_solver_internal.hpp"
+#include "casadi/core/function/qp_solver.hpp"
 #include <casadi/interfaces/sqic/casadi_qpsolver_sqic_export.h>
 
 /** \defgroup plugin_QpSolver_sqic

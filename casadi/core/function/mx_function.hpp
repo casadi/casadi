@@ -23,15 +23,15 @@
  */
 
 
-#ifndef CASADI_MX_FUNCTION_INTERNAL_HPP
-#define CASADI_MX_FUNCTION_INTERNAL_HPP
+#ifndef CASADI_MX_FUNCTION_HPP
+#define CASADI_MX_FUNCTION_HPP
 
 #include <set>
 #include <map>
 #include <vector>
 #include <iostream>
 
-#include "x_function_internal.hpp"
+#include "x_function.hpp"
 #include "../mx/mx_node.hpp"
 
 /// \cond INTERNAL
@@ -181,5 +181,5 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_MX_FUNCTION_INTERNAL_HPP
+#endif // CASADI_MX_FUNCTION_HPP
 

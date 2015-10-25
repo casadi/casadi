@@ -26,7 +26,7 @@
 #ifndef CASADI_QPOASES_INTERFACE_HPP
 #define CASADI_QPOASES_INTERFACE_HPP
 
-#include "casadi/core/function/qp_solver_internal.hpp"
+#include "casadi/core/function/qp_solver.hpp"
 #include <casadi/interfaces/qpoases/casadi_qpsolver_qpoases_export.h>
 #include <qpOASES.hpp>
 

@@ -27,7 +27,7 @@
 #define CASADI_IPOPT_INTERFACE_HPP
 
 #include <casadi/interfaces/ipopt/casadi_nlpsolver_ipopt_export.h>
-#include "casadi/core/function/nlp_solver_internal.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
 #include "casadi/core/timing.hpp"
 
 /** \defgroup plugin_NlpSolver_ipopt

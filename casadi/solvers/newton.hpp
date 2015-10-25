@@ -26,7 +26,7 @@
 #ifndef CASADI_NEWTON_HPP
 #define CASADI_NEWTON_HPP
 
-#include "casadi/core/function/implicit_function_internal.hpp"
+#include "casadi/core/function/rootfinder.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 
 #include <casadi/solvers/casadi_implicitfunction_newton_export.h>

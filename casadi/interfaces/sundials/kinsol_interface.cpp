@@ -25,10 +25,6 @@
 
 #include "kinsol_interface.hpp"
 
-#include "casadi/core/function/sx_function_internal.hpp"
-#include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/function/linear_solver_internal.hpp"
-
 using namespace std;
 namespace casadi {
 
