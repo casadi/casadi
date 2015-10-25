@@ -1305,7 +1305,7 @@ print dae
 An integrator in \CasADi is a function that take the state at the initial time, a set of parameters, the state vector at the initial time and a guess for the algebraic variables (only for DAEs) and returns the state vector and algebraic variables at the final time.
 
 \begin{lstlisting}[language=Python]
-integrator = Integrator(display_name,plugin_name,dae,options)
+integrator = Function.integrator(display_name,plugin_name,dae,options)
 \end{lstlisting}
 
 The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be changed from its default [0, 1] by setting the options "t0" and "tf".
@@ -1314,10 +1314,10 @@ The time horizon is assumed to be fixed\footnote{for problems with free end time
 The freely available \htmladdnormallink{SUNDIALS suite}{https://computation.llnl.gov/casc/sundials/description/description.html} (distributed along with \CasADi) contains the two popular integrators CVodes and IDAS for ODEs and DAEs respectively. These integrators have support for forward and adjoint sensitivity analysis and when used via \CasADi's Sundials interface, \CasADi will automatically formulate the Jacobian information, which is needed by the backward differentiation formula (BDF) that CVodes and IDAS use. Also automatically formulated will be the forward and adjoint sensitivity equations. This means that the only information that the user needs to provide is the DAE residual function:
 
 \begin{lstlisting}[language=Python]
-integrator = Integrator('my_idas','idas',dae)
+integrator = Function.integrator('my_idas','idas',dae)
 \end{lstlisting}
 \begin{pytexoutput}
-integrator = Integrator('my_idas','idas',dae)
+integrator = Function.integrator('my_idas','idas',dae)
 \end{pytexoutput}
 
 And equivivalently for CVodes (the "cvodes" integrator plugin in \CasADi).
@@ -1384,7 +1384,7 @@ g_{\min} \le g(x,p) \le g_{\max}
 
 With a function \texttt{nlp}, which given $x$ and $p$, gives $f$ and $g$, an NLP solver instance can be allocated by:
 \begin{lstlisting}[language=Python]
-nlp_solver = NlpSolver(display_name,plugin_name,nlp,options)
+nlp_solver = Function.nlp_solver(display_name,plugin_name,nlp,options)
 \end{lstlisting}
 
 The interface will then automatically generate the information that it might need to solve the NLP, which may be solver and option dependent. Typically an NLP solver will need a function that gives the Jacobian of the constraint function and a Hessian of the Lagrangian function ($L(x,\lambda) = f(x) + \lambda^{\text{T}} \, g(x))$ with respect to $x$. The interface will generate this kind of information automatically and provide to the solver.

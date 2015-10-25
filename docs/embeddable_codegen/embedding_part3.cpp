@@ -42,8 +42,8 @@ int main(){
   Function hess_lag = Function::external("hess_lag", "./hess_lag.casadi");
 
   // Create an NLP solver passing derivative information
-  NlpSolver solver("solver", "ipopt", nlp,
-                   make_dict("grad_f", grad_f, "jac_g", jac_g, "hess_lag",hess_lag));
+  Dict opts = {{"grad_f", grad_f}, {"jac_g", jac_g}, {"hess_lag", hess_lag}};
+  Function solver = Function::nlp_solver("solver", "ipopt", nlp, opts);
 
   // Set constraint bounds
   solver.setInput(0.,"lbg");

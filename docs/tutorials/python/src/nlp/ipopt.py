@@ -34,20 +34,10 @@
 from numpy import *
 import numpy as n
 from casadi import *
-#! Let's solve a simple scalar non-linear program:
 
-x = SX.sym("x")
-
-y = SX.sym("y")
-
-#f  = SX.fun('f', [x,y], tan(x)-1) 
-
-#g=SX.fun('g', [x,y],[y])
-
-#print f.eval(x)
 #! Quadractic program
 #! ------------------
-#! (Ab)using Ipopt to do a simple quadratic problem
+#! Using Ipopt to do a simple quadratic problem
 #!
 #! 
 P = n.eye(5)
@@ -67,13 +57,9 @@ F = 0.5*mul([X.T,P,X]) + mul(q.T,X)
 G = X+X
 
 #! NLP
-nlp = MX.fun('nlp', nlpIn(x=X),nlpOut(f=F,g=G))
-nlp.setInput([1,1,1,1,1],"x")
-nlp.evaluate()
-#! Test the objective for some value of x:
-print nlp.getOutput("f").full()
+nlp = {'x':X, 'f':F, 'g':G}
 
-solver = NlpSolver("nlp","ipopt", nlp)
+solver = Function.nlp_solver("nlp","ipopt", nlp)
 solver.printOptions()
 
 #! The default lower an upper bound on the optimizations variables is zero.
