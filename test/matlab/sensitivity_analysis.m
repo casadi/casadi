@@ -57,8 +57,8 @@ for ode=0:1
     % Quadrature
     quad = v^3 + ((3-sin(t)) - u)^2;
 
-    % DAE callback function
-    ffcn = SX.fun('ffcn', daeIn('t',t,'x',x,'p',u),daeOut('ode',ode,'quad',quad));
+    % DAE
+    dae = struct('t', t, 'x', x, 'p', u, 'ode', ode, 'quad', quad);
 
     % Time length
     tf = 0.5;
@@ -92,8 +92,8 @@ for ode=0:1
     % Quadrature
     quad = x*x + 3.0*u*u;
 
-    % DAE callback function
-    ffcn = SX.fun('ffcn', daeIn('x',x,'z',z,'p',u),daeOut('ode',ode,'alg',alg,'quad',quad));
+    % DAE
+    dae = struct('x', x, 'z', z, 'p', u, 'ode', ode, 'alg', alg, 'quad', quad);
     
     % End time
     tf = 5;
@@ -125,7 +125,7 @@ for ode=0:1
     end
 
     % Integrator
-    I = Integrator('myintegrator', MyIntegrator, ffcn, opts);
+    I = Function.integrator('myintegrator', MyIntegrator, dae, opts);
 
     % Integrate to get results
     arg = struct;

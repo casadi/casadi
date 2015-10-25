@@ -14,7 +14,7 @@ z = MX.sym('z',3);
 
 
 
-f = SX.fun('f',{x},{cos(x)})
+f = Function('f',{x},{cos(x)})
 
 f.setInput(3,0)
 
@@ -29,7 +29,7 @@ assert(iszero(res))
 
 x = SX.sym('x',4);
 
-f = SX.fun('f',{x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
+f = Function('f',{x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
 
 f.setInput([1,2,3,4])
 f.evaluate()
@@ -62,7 +62,7 @@ assert(flag);
 
 x = MX.sym('x',4);
 
-f = MX.fun('f',{x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
+f = Function('f',{x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
 
 f.setInput([1,2,3,4])
 f.evaluate()
@@ -104,12 +104,12 @@ x.printDense();
 x = SX.sym('x');
 
 
-ode = SX.fun('ode',daeIn('x',x),daeOut('ode',x));
+ode = struct('x', x, 'ode', x)
 
 opts = struct
 opts.verbose = true
 
-intg = Integrator('integrator', 'rk', ode, opts);
+intg = Function.integrator('integrator', 'rk', ode, opts);
 intg.evaluate();
 diary OFF
 
@@ -143,13 +143,13 @@ assert(~isempty(strfind(msg,'[x, p]')))
 
 msg = '';
 try
-  SX.fun('f',[SX.sym('12')])
+  Function('f', [SX.sym('12')])
 catch err
   msg = err.message;
 end
 
 % See issue #1483
-%assert(~isempty(strfind(msg,'  SX.fun(char,{SX} ,{SX} ,Dict)')))
+%assert(~isempty(strfind(msg,'  Function(char,{SX} ,{SX} ,Dict)')))
 %assert(~isempty(strfind(msg,'You have: char, SX')))
 
 % Check mixing DMatrix and MX
@@ -179,7 +179,7 @@ f = x^2;
 g = log(x)-p;
 opts = struct('input_scheme', char('x','p'),...
               'output_scheme', char('f','g'));
-nlp = SX.fun('nlp', {x,p}, {f,g}, opts);
+nlp = Function('nlp', {x,p}, {f,g}, opts);
 
 % Evaluate with numbered inputs and outputs
 res_vec = nlp({1.1, 3.3});
@@ -212,7 +212,7 @@ assert(all(size(u(1:2,1:3))==[2 3]));
 
 if Compiler.hasPlugin('clang')
   x = MX.sym('x');
-  F = MX.fun('f',{x},{x^2},struct('jit',true));
+  F = Function('f',{x},{x^2},struct('jit',true));
 
   out = F({5});
   assert(full(out{1})==25)
