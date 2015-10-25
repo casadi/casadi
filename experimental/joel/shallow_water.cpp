@@ -72,7 +72,7 @@ public:
   vector<double> p_scale_;
 
   /// NLP solver
-  NlpSolver nlp_solver_;
+  Function nlp_solver_;
 };
 
 void Tester::model(){
@@ -166,12 +166,12 @@ void Tester::model(){
   f_step_out[0] = u;
   f_step_out[1] = v;
   f_step_out[2] = h;
-  Function f_step = MX::fun("f_step_mx", f_step_in, f_step_out);
+  Function f_step("f_step_mx", f_step_in, f_step_out);
   cout << "generated single step dynamics (" << f_step.countNodes() << " nodes)" << endl;
   
   // Expand the discrete dynamics?
   if(false){
-    f_step = SX::fun(f_step.name(), f_step);
+    f_step = f_step.expand();
     cout << "generated single step dynamics, SX (" << f_step.countNodes() << " nodes)" << endl;
   }
 
@@ -198,7 +198,7 @@ void Tester::model(){
   }
   
   // Create an integrator function
-  f_ = MX::fun("f_mx", f_in, f_out);
+  f_ = Function("f_mx", f_in, f_out);
   cout << "generated discrete dynamics for one finite element (" << f_.countNodes() << " MX nodes)" << endl;
   
   // Integrate over the complete interval
@@ -219,13 +219,13 @@ void Tester::model(){
     }
     
     // Create an integrator function
-    f_ = MX::fun("f_mx", f_in, f_out);
+    f_ = Function("f_mx", f_in, f_out);
     cout << "generated discrete dynamics for complete interval (" << f_.countNodes() << " MX nodes)" << endl;    
   }
     
   // Expand the discrete dynamics
   if(false){
-    f_ = SX::fun("f_sx", f_);
+    f_ = f_.expand("f_sx");
     cout << "generated discrete dynamics, SX (" << f_.countNodes() << " nodes)" << endl;
   }
 }
@@ -318,8 +318,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
     nlp_gv.push_back(vec(H));
   }
 
-  Function nlp = MX::fun("nlp", nlpIn("x",P),
-                         nlpOut("f", vertcat(nlp_fv), "g", vertcat(nlp_gv)));
+  MXDict nlp = {{"x", P}, {"f", vertcat(nlp_fv)}, {"g", vertcat(nlp_gv)}};
   cout << "Generated single-shooting NLP" << endl;
   
   // NLP Solver
@@ -353,7 +352,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   }
 
   // Create NLP solver instance
-  nlp_solver_ = NlpSolver("nlp_solver", "scpgen", nlp, opts);
+  nlp_solver_ = Function::nlp_solver("nlp_solver", "scpgen", nlp, opts);
 }
 
 void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est){
