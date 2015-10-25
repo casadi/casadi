@@ -30,7 +30,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_INTEGRATOR_RK_EXPORT
-      casadi_register_integrator_rk(IntegratorInternal::Plugin* plugin) {
+      casadi_register_integrator_rk(Integrator::Plugin* plugin) {
     plugin->creator = RkIntegrator::creator;
     plugin->name = "rk";
     plugin->doc = RkIntegrator::meta_doc.c_str();
@@ -40,7 +40,7 @@ namespace casadi {
 
   extern "C"
   void CASADI_INTEGRATOR_RK_EXPORT casadi_load_integrator_rk() {
-    IntegratorInternal::registerPlugin(casadi_register_integrator_rk);
+    Integrator::registerPlugin(casadi_register_integrator_rk);
   }
 
   RkIntegrator::RkIntegrator(const std::string& name, const XProblem& dae)

@@ -53,7 +53,7 @@ namespace casadi {
      \date 2011
   */
   class CASADI_INTEGRATOR_OLDCOLLOCATION_EXPORT
-  OldCollocationIntegrator : public IntegratorInternal {
+  OldCollocationIntegrator : public Integrator {
 
   public:
 
@@ -61,7 +61,7 @@ namespace casadi {
     explicit OldCollocationIntegrator(const std::string& name, const XProblem& dae);
 
     /** \brief  Create a new integrator */
-    static IntegratorInternal* creator(const std::string& name, const XProblem& dae) {
+    static Integrator* creator(const std::string& name, const XProblem& dae) {
       return new OldCollocationIntegrator(name, dae);
     }
 

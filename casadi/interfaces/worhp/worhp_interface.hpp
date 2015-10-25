@@ -53,7 +53,7 @@ namespace casadi {
      @copydoc NlpSolver_doc
      @copydoc plugin_NlpSolver_worhp
   */
-  class CASADI_NLPSOLVER_WORHP_EXPORT WorhpInterface : public NlpSolverInternal {
+  class CASADI_NLPSOLVER_WORHP_EXPORT WorhpInterface : public NlpSolver {
 
   public:
     // Constructor
@@ -66,7 +66,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "worhp";}
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const std::string& name, const XProblem& nlp) {
+    static NlpSolver* creator(const std::string& name, const XProblem& nlp) {
       return new WorhpInterface(name, nlp);
     }
 

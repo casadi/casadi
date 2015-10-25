@@ -56,9 +56,9 @@ namespace casadi {
                             "The supplied time grid must be non-decreasing.");
 
       // Create new integrator object
-      auto dae = make_pair(dynamic_cast<IntegratorInternal*>(integrator_.get())->f_,
-                           dynamic_cast<IntegratorInternal*>(integrator_.get())->g_);
-      string solver = dynamic_cast<IntegratorInternal*>(integrator_.get())->plugin_name();
+      auto dae = make_pair(dynamic_cast<Integrator*>(integrator_.get())->f_,
+                           dynamic_cast<Integrator*>(integrator_.get())->g_);
+      string solver = dynamic_cast<Integrator*>(integrator_.get())->plugin_name();
       Function I = Function::integrator(integrator_.name(), solver,
                                         dae, integrator_.dictionary());
 
@@ -152,7 +152,7 @@ namespace casadi {
     }
 
     // Reset the integrator_
-    dynamic_cast<IntegratorInternal*>(integrator_.get())->reset();
+    dynamic_cast<Integrator*>(integrator_.get())->reset();
 
     // Iterators to output data structures
     for (int i=0; i<output_its_.size(); ++i) output_its_[i] = output(i).begin();
@@ -168,7 +168,7 @@ namespace casadi {
       }
 
       // Integrate to the output time
-      dynamic_cast<IntegratorInternal*>(integrator_.get())->integrate(grid_[k]);
+      dynamic_cast<Integrator*>(integrator_.get())->integrate(grid_[k]);
 
       if (monitored("step")) {
         userOut() << " xf  = "  << integrator_.output(INTEGRATOR_XF) << std::endl;

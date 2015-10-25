@@ -40,7 +40,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_NLPSOLVER_SCPGEN_EXPORT
-      casadi_register_nlpsolver_scpgen(NlpSolverInternal::Plugin* plugin) {
+      casadi_register_nlpsolver_scpgen(NlpSolver::Plugin* plugin) {
     plugin->creator = Scpgen::creator;
     plugin->name = "scpgen";
     plugin->doc = Scpgen::meta_doc.c_str();
@@ -50,11 +50,11 @@ namespace casadi {
 
   extern "C"
   void CASADI_NLPSOLVER_SCPGEN_EXPORT casadi_load_nlpsolver_scpgen() {
-    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_scpgen);
+    NlpSolver::registerPlugin(casadi_register_nlpsolver_scpgen);
   }
 
   Scpgen::Scpgen(const std::string& name, const XProblem& nlp)
-    : NlpSolverInternal(name, nlp) {
+    : NlpSolver(name, nlp) {
     casadi_warning("SCPgen is under development");
     addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
@@ -110,7 +110,7 @@ namespace casadi {
 
   void Scpgen::init() {
     // Call the init method of the base class
-    NlpSolverInternal::init();
+    NlpSolver::init();
 
     // Read options
     max_iter_ = getOption("max_iter");

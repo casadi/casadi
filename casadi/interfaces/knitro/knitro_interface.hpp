@@ -43,7 +43,7 @@ namespace casadi {
      @copydoc NlpSolver_doc
      @copydoc plugin_NlpSolver_knitro
   */
-  class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroInterface : public NlpSolverInternal {
+  class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroInterface : public NlpSolver {
 
   public:
     explicit KnitroInterface(const std::string& name, const XProblem& nlp);
@@ -53,7 +53,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "knitro";}
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const std::string& name, const XProblem& nlp) {
+    static NlpSolver* creator(const std::string& name, const XProblem& nlp) {
       return new KnitroInterface(name, nlp);
     }
 

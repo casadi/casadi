@@ -40,15 +40,15 @@ namespace casadi {
   \date 2010-2013
 */
   class CASADI_EXPORT
-  NlpSolverInternal : public FunctionInternal,
-                      public PluginInterface<NlpSolverInternal> {
+  NlpSolver : public FunctionInternal,
+                      public PluginInterface<NlpSolver> {
 
   public:
     /// Constructor
-    NlpSolverInternal(const std::string& name, const XProblem& nlp);
+    NlpSolver(const std::string& name, const XProblem& nlp);
 
     /// Destructor
-    virtual ~NlpSolverInternal() = 0;
+    virtual ~NlpSolver() = 0;
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -160,7 +160,7 @@ namespace casadi {
     Function ref_;
 
     // Creator function for internal class
-    typedef NlpSolverInternal* (*Creator)(const std::string& name, const XProblem& nlp);
+    typedef NlpSolver* (*Creator)(const std::string& name, const XProblem& nlp);
 
     // No static functions exposed
     struct Exposed{ };
@@ -205,7 +205,7 @@ namespace casadi {
   };
 
   template<typename XType>
-  Problem<XType> NlpSolverInternal::map2problem(const std::map<std::string, XType>& d) {
+  Problem<XType> NlpSolver::map2problem(const std::map<std::string, XType>& d) {
     std::vector<XType> nl_in(NL_NUM_IN), nl_out(NL_NUM_OUT);
     for (auto&& i : d) {
       if (i.first=="x") {
@@ -224,7 +224,7 @@ namespace casadi {
   }
 
   template<typename XType>
-  std::map<std::string, XType> NlpSolverInternal::problem2map(const Problem<XType>& d) {
+  std::map<std::string, XType> NlpSolver::problem2map(const Problem<XType>& d) {
     return {
         {"x", d.in[NL_X]},
         {"p", d.in[NL_P]},
@@ -234,12 +234,12 @@ namespace casadi {
   }
 
   template<typename XType>
-  Function NlpSolverInternal::problem2fun(const Problem<XType>& d) {
+  Function NlpSolver::problem2fun(const Problem<XType>& d) {
     return Function("nlp", d.in, d.out, {"x", "p"}, {"f", "g"});
   }
 
   template<typename XType>
-  Problem<XType> NlpSolverInternal::fun2problem(Function nlp) {
+  Problem<XType> NlpSolver::fun2problem(Function nlp) {
     Problem<XType> p;
     p.in = XType::get_input(nlp);
     casadi_assert(p.in.size()==NL_NUM_IN);

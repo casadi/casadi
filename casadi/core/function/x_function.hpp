@@ -43,23 +43,23 @@
 
 namespace casadi {
 
-  /** \brief  Internal node class for the base class of SXFunctionInternal and MXFunctionInternal
+  /** \brief  Internal node class for the base class of SXFunction and MXFunction
       (lacks a public counterpart)
       The design of the class uses the curiously recurring template pattern (CRTP) idiom
       \author Joel Andersson
       \date 2011
   */
   template<typename DerivedType, typename MatType, typename NodeType>
-  class CASADI_EXPORT XFunctionInternal : public FunctionInternal {
+  class CASADI_EXPORT XFunction : public FunctionInternal {
   public:
 
     /** \brief  Constructor  */
-    XFunctionInternal(const std::string& name,
+    XFunction(const std::string& name,
                       const std::vector<MatType>& inputv,
                       const std::vector<MatType>& outputv);
 
     /** \brief  Destructor */
-    virtual ~XFunctionInternal() {}
+    virtual ~XFunction() {}
 
     /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS) */
     static void sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes);
@@ -153,8 +153,8 @@ namespace casadi {
   // Template implementations
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  XFunctionInternal<DerivedType, MatType, NodeType>::
-  XFunctionInternal(const std::string& name,
+  XFunction<DerivedType, MatType, NodeType>::
+  XFunction(const std::string& name,
                     const std::vector<MatType>& inputv,
                     const std::vector<MatType>& outputv)
     : FunctionInternal(name), inputv_(inputv),  outputv_(outputv) {
@@ -167,7 +167,7 @@ namespace casadi {
       if (inputv[i].isempty()) {
         // That's okay
       } else if (!inputv[i].isValidInput()) {
-        casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be"
+        casadi_error("XFunction::XFunction: Xfunction input arguments must be"
                      " purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
       }
     }
@@ -206,7 +206,7 @@ namespace casadi {
 
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  void XFunctionInternal<DerivedType, MatType, NodeType>::sort_depth_first(
+  void XFunction<DerivedType, MatType, NodeType>::sort_depth_first(
       std::stack<NodeType*>& s, std::vector<NodeType*>& nodes) {
     while (!s.empty()) {
 
@@ -254,7 +254,7 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  void XFunctionInternal<DerivedType, MatType, NodeType>::resort_postpone(
+  void XFunction<DerivedType, MatType, NodeType>::resort_postpone(
       std::vector<NodeType*>& algnodes, std::vector<int>& lind) {
     // Number of levels
     int nlevels = lind.size()-1;
@@ -358,7 +358,7 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  void XFunctionInternal<DerivedType, MatType, NodeType>::resort_breadth_first(
+  void XFunction<DerivedType, MatType, NodeType>::resort_breadth_first(
       std::vector<NodeType*>& algnodes) {
     // We shall assign a "level" to each element of the algorithm.
     // A node which does not depend on other binary nodes are assigned
@@ -546,7 +546,7 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  MatType XFunctionInternal<DerivedType, MatType, NodeType>::grad(int iind, int oind) {
+  MatType XFunction<DerivedType, MatType, NodeType>::grad(int iind, int oind) {
     casadi_assert_message(output(oind).isscalar(),
                           "Only gradients of scalar functions allowed. Use jacobian instead.");
 
@@ -587,7 +587,7 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  MatType XFunctionInternal<DerivedType, MatType, NodeType>::tang(int iind, int oind) {
+  MatType XFunction<DerivedType, MatType, NodeType>::tang(int iind, int oind) {
     casadi_assert_message(input(iind).isscalar(),
                           "Only tangent of scalar input functions allowed. Use jacobian instead.");
 
@@ -615,10 +615,10 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  MatType XFunctionInternal<DerivedType, MatType, NodeType>
+  MatType XFunction<DerivedType, MatType, NodeType>
   ::jac(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline) {
     using namespace std;
-    if (verbose()) userOut() << "XFunctionInternal::jac begin" << std::endl;
+    if (verbose()) userOut() << "XFunction::jac begin" << std::endl;
 
     // Quick return if trivially empty
     if (input(iind).nnz()==0 || output(oind).nnz()==0) {
@@ -634,7 +634,7 @@ namespace casadi {
 
     // Create return object
     MatType ret = MatType::zeros(jacSparsity(iind, oind, compact, symmetric).T());
-    if (verbose()) userOut() << "XFunctionInternal::jac allocated return value" << std::endl;
+    if (verbose()) userOut() << "XFunction::jac allocated return value" << std::endl;
 
     // Quick return if empty
     if (ret.nnz()==0) {
@@ -644,7 +644,7 @@ namespace casadi {
     // Get a bidirectional partition
     Sparsity D1, D2;
     getPartition(iind, oind, D1, D2, true, symmetric);
-    if (verbose()) userOut() << "XFunctionInternal::jac graph coloring completed" << std::endl;
+    if (verbose()) userOut() << "XFunction::jac graph coloring completed" << std::endl;
 
     // Get the number of forward and adjoint sweeps
     int nfdir = D1.isNull() ? 0 : D1.size2();
@@ -677,7 +677,7 @@ namespace casadi {
     const int* output_row = output(oind).row();
 
     // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode
-    if (verbose())   userOut() << "XFunctionInternal::jac transposes and mapping" << std::endl;
+    if (verbose())   userOut() << "XFunction::jac transposes and mapping" << std::endl;
     std::vector<int> mapping;
     Sparsity jsp_trans;
     if (nfdir>0) {
@@ -702,7 +702,7 @@ namespace casadi {
     int nsweep_adj = nadir/max_nadir;   // Number of sweeps needed for the adjoint mode
     if (nadir%max_nadir>0) nsweep_adj++;
     int nsweep = std::max(nsweep_fwd, nsweep_adj);
-    if (verbose())   userOut() << "XFunctionInternal::jac " << nsweep << " sweeps needed for "
+    if (verbose())   userOut() << "XFunction::jac " << nsweep << " sweeps needed for "
                               << nfdir << " forward and " << nadir << " adjoint directions"
                               << std::endl;
 
@@ -806,7 +806,7 @@ namespace casadi {
       }
 
       // Evaluate symbolically
-      if (verbose()) userOut() << "XFunctionInternal::jac making function call" << std::endl;
+      if (verbose()) userOut() << "XFunction::jac making function call" << std::endl;
       if (fseed.size()>0) {
         casadi_assert(aseed.size()==0);
         static_cast<DerivedType*>(this)->callForward(inputv_, outputv_,
@@ -959,12 +959,12 @@ namespace casadi {
     }
 
     // Return
-    if (verbose()) userOut() << "XFunctionInternal::jac end" << std::endl;
+    if (verbose()) userOut() << "XFunction::jac end" << std::endl;
     return ret.T();
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<DerivedType, MatType, NodeType>
+  Function XFunction<DerivedType, MatType, NodeType>
   ::getGradient(const std::string& name, int iind, int oind, const Dict& opts) {
     // Create expressions for the gradient
     std::vector<MatType> ret_out;
@@ -977,7 +977,7 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<DerivedType, MatType, NodeType>
+  Function XFunction<DerivedType, MatType, NodeType>
   ::getTangent(const std::string& name, int iind, int oind, const Dict& opts) {
     // Create expressions for the gradient
     std::vector<MatType> ret_out;
@@ -990,7 +990,7 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<DerivedType, MatType, NodeType>
+  Function XFunction<DerivedType, MatType, NodeType>
   ::getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
               const Dict& opts) {
     // Return function expression
@@ -1004,7 +1004,7 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<DerivedType, MatType, NodeType>
+  Function XFunction<DerivedType, MatType, NodeType>
   ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     // Seeds
     std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd, inputv_), fsens;
@@ -1041,7 +1041,7 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<DerivedType, MatType, NodeType>
+  Function XFunction<DerivedType, MatType, NodeType>
   ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     // Seeds
     std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadj, outputv_), asens;
@@ -1077,7 +1077,7 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  bool XFunctionInternal<DerivedType, MatType, NodeType>
+  bool XFunction<DerivedType, MatType, NodeType>
   ::isInput(const std::vector<MatType>& arg) const {
     // Check if arguments matches the input expressions, in which case
     // the output is known to be the output expressions
@@ -1091,7 +1091,7 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  void XFunctionInternal<DerivedType, MatType, NodeType>::
+  void XFunction<DerivedType, MatType, NodeType>::
   callForward(const std::vector<MatType>& arg, const std::vector<MatType>& res,
           const std::vector<std::vector<MatType> >& fseed,
           std::vector<std::vector<MatType> >& fsens,
@@ -1121,7 +1121,7 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
-  void XFunctionInternal<DerivedType, MatType, NodeType>::
+  void XFunction<DerivedType, MatType, NodeType>::
   callReverse(const std::vector<MatType>& arg, const std::vector<MatType>& res,
           const std::vector<std::vector<MatType> >& aseed,
           std::vector<std::vector<MatType> >& asens,

@@ -55,7 +55,7 @@ namespace casadi {
   * @copydoc ImplicitFunction_doc
   * @copydoc plugin_ImplicitFunction_kinsol
   */
-  class CASADI_IMPLICITFUNCTION_KINSOL_EXPORT KinsolInterface : public ImplicitFunctionInternal {
+  class CASADI_IMPLICITFUNCTION_KINSOL_EXPORT KinsolInterface : public Rootfinder {
   public:
     /** \brief  Constructor */
     explicit KinsolInterface(const std::string& name, const Function& f);
@@ -63,13 +63,13 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~KinsolInterface();
 
-    /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const std::string& name, const Function& f) const {
+    /** \brief  Create a new Rootfinder */
+    virtual Rootfinder* create(const std::string& name, const Function& f) const {
       return new KinsolInterface(name, f);
     }
 
     /** \brief  Create a new ImplicitFunction */
-    static ImplicitFunctionInternal* creator(const std::string& name, const Function& f) {
+    static Rootfinder* creator(const std::string& name, const Function& f) {
       return new KinsolInterface(name, f);
     }
 

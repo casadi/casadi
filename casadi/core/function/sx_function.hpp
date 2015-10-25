@@ -83,16 +83,16 @@ namespace casadi {
     \author Joel Andersson
     \date 2010-2015
 */
-class CASADI_EXPORT SXFunctionInternal :
-        public XFunctionInternal<SXFunctionInternal, Matrix<SXElement>, SXNode>{
+class CASADI_EXPORT SXFunction :
+        public XFunction<SXFunction, Matrix<SXElement>, SXNode>{
   public:
     /** \brief Constructor */
-    SXFunctionInternal(const std::string& name,
+    SXFunction(const std::string& name,
                        const std::vector<Matrix<SXElement> >& inputv,
                        const std::vector<Matrix<SXElement> >& outputv);
 
   /** \brief  Destructor */
-  virtual ~SXFunctionInternal();
+  virtual ~SXFunction();
 
   /** \brief  Evaluate numerically, work vectors given */
   virtual void evalD(const double** arg, double** res, int* iw, double* w);

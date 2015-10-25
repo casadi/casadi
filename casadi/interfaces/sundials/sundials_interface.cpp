@@ -34,7 +34,7 @@ using namespace std;
 namespace casadi {
 
   SundialsInterface::SundialsInterface(const std::string& name, const XProblem& dae)
-    : IntegratorInternal(name, dae) {
+    : Integrator(name, dae) {
     addOption("max_num_steps",               OT_INTEGER,          10000,
               "Maximum number of integrator steps");
     addOption("reltol",                      OT_REAL,             1e-6,
@@ -128,7 +128,7 @@ namespace casadi {
 
   void SundialsInterface::init() {
     // Call the base class method
-    IntegratorInternal::init();
+    Integrator::init();
 
     // Reset checkpoints counter
     ncheck_ = 0;
@@ -291,7 +291,7 @@ namespace casadi {
 
   void SundialsInterface::reset() {
     // Reset the base classes
-    IntegratorInternal::reset();
+    Integrator::reset();
   }
 
   std::pair<int, int> SundialsInterface::getBandwidth() const {

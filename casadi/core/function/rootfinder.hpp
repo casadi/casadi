@@ -36,20 +36,20 @@ namespace casadi {
 
   /// Internal class
   class CASADI_EXPORT
-  ImplicitFunctionInternal : public FunctionInternal,
-                             public PluginInterface<ImplicitFunctionInternal> {
+  Rootfinder : public FunctionInternal,
+                             public PluginInterface<Rootfinder> {
   public:
     /** \brief Constructor
      *
      * \param f   Function mapping from (n+1) inputs to 1 output.
      */
-    ImplicitFunctionInternal(const std::string& name, const Function& f);
+    Rootfinder(const std::string& name, const Function& f);
 
     /// Destructor
-    virtual ~ImplicitFunctionInternal() = 0;
+    virtual ~Rootfinder() = 0;
 
-    /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const std::string& name,
+    /** \brief  Create a new Rootfinder */
+    virtual Rootfinder* create(const std::string& name,
                                              const Function& f) const = 0;
 
     ///@{
@@ -128,7 +128,7 @@ namespace casadi {
     int iin_, iout_;
 
     // Creator function for internal class
-    typedef ImplicitFunctionInternal* (*Creator)(const std::string& name, const Function& f);
+    typedef Rootfinder* (*Creator)(const std::string& name, const Function& f);
 
     // No static functions exposed
     struct Exposed{ };

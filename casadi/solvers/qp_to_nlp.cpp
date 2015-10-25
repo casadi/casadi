@@ -30,7 +30,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_QPSOLVER_NLP_EXPORT
-  casadi_register_qpsolver_nlp(QpSolverInternal::Plugin* plugin) {
+  casadi_register_qpsolver_nlp(QpSolver::Plugin* plugin) {
     plugin->creator = QpToNlp::creator;
     plugin->name = "nlp";
     plugin->doc = QpToNlp::meta_doc.c_str();
@@ -41,14 +41,14 @@ namespace casadi {
 
   extern "C"
   void CASADI_QPSOLVER_NLP_EXPORT casadi_load_qpsolver_nlp() {
-    QpSolverInternal::registerPlugin(casadi_register_qpsolver_nlp);
+    QpSolver::registerPlugin(casadi_register_qpsolver_nlp);
   }
 
   QpToNlp::QpToNlp(const std::string& name,
                    const std::map<std::string, Sparsity> &st)
-    : QpSolverInternal(name, st) {
+    : QpSolver(name, st) {
 
-    Adaptor<QpToNlp, NlpSolverInternal>::addOptions();
+    Adaptor<QpToNlp, NlpSolver>::addOptions();
   }
 
   QpToNlp::~QpToNlp() {
@@ -93,7 +93,7 @@ namespace casadi {
 
   void QpToNlp::init() {
     // Initialize the base classes
-    QpSolverInternal::init();
+    QpSolver::init();
 
     // Create a symbolic matrix for the decision variables
     SX X = SX::sym("X", n_, 1);

@@ -47,14 +47,14 @@ namespace casadi {
       @copydoc plugin_QpSolver_ooqp
 
   */
-  class CASADI_QPSOLVER_OOQP_EXPORT OoqpInterface : public QpSolverInternal {
+  class CASADI_QPSOLVER_OOQP_EXPORT OoqpInterface : public QpSolver {
   public:
     /** \brief  Create a new Solver */
     explicit OoqpInterface(const std::string& name,
                            const std::map<std::string, Sparsity>& st);
 
     /** \brief  Create a new QP Solver */
-    static QpSolverInternal* creator(const std::string& name,
+    static QpSolver* creator(const std::string& name,
                                      const std::map<std::string, Sparsity>& st) {
       return new OoqpInterface(name, st);
     }

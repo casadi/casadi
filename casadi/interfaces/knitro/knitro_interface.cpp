@@ -34,7 +34,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_NLPSOLVER_KNITRO_EXPORT
-  casadi_register_nlpsolver_knitro(NlpSolverInternal::Plugin* plugin) {
+  casadi_register_nlpsolver_knitro(NlpSolver::Plugin* plugin) {
     plugin->creator = KnitroInterface::creator;
     plugin->name = "knitro";
     plugin->doc = KnitroInterface::meta_doc.c_str();
@@ -44,11 +44,11 @@ namespace casadi {
 
   extern "C"
   void CASADI_NLPSOLVER_KNITRO_EXPORT casadi_load_nlpsolver_knitro() {
-    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_knitro);
+    NlpSolver::registerPlugin(casadi_register_nlpsolver_knitro);
   }
 
   KnitroInterface::KnitroInterface(const std::string& name, const XProblem& nlp)
-    : NlpSolverInternal(name, nlp) {
+    : NlpSolver(name, nlp) {
 
     // Monitors
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "",
@@ -129,7 +129,7 @@ namespace casadi {
 
   void KnitroInterface::init() {
     // Call the init method of the base class
-    NlpSolverInternal::init();
+    NlpSolver::init();
 
     //if (hasSetOption("Alg")) int_param_["alg"] = getOption("Alg");
     if (hasSetOption("BarRule")) int_param_["barrule"] = getOption("BarRule");

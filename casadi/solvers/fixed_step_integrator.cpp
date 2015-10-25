@@ -30,7 +30,7 @@ using namespace std;
 namespace casadi {
 
   FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const XProblem& dae)
-      : IntegratorInternal(name, dae) {
+      : Integrator(name, dae) {
 
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   }
@@ -40,7 +40,7 @@ namespace casadi {
 
   void FixedStepIntegrator::init() {
     // Call the base class init
-    IntegratorInternal::init();
+    Integrator::init();
 
     // Number of finite elements and time steps
     nk_ = getOption("number_of_finite_elements");
@@ -138,7 +138,7 @@ namespace casadi {
 
   void FixedStepIntegrator::reset() {
     // Reset the base classes
-    IntegratorInternal::reset();
+    Integrator::reset();
 
     // Bring discrete time to the beginning
     k_ = 0;
@@ -154,7 +154,7 @@ namespace casadi {
 
   void FixedStepIntegrator::resetB() {
     // Reset the base classes
-    IntegratorInternal::resetB();
+    Integrator::resetB();
 
     // Bring discrete time to the end
     k_ = nk_;

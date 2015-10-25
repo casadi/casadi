@@ -49,13 +49,13 @@ namespace casadi {
    * \date 2011
    *
    * */
-class CASADI_QPSOLVER_QPOASES_EXPORT QpoasesInterface : public QpSolverInternal {
+class CASADI_QPSOLVER_QPOASES_EXPORT QpoasesInterface : public QpSolver {
 public:
   /** \brief  Constructor */
   explicit QpoasesInterface();
 
   /** \brief  Create a new QP Solver */
-  static QpSolverInternal* creator(const std::string& name,
+  static QpSolver* creator(const std::string& name,
                                    const std::map<std::string, Sparsity>& st) {
     return new QpoasesInterface(name, st);
   }

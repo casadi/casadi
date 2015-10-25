@@ -160,7 +160,7 @@ namespace casadi {
     Function temp=SX::fun("temp", {SX()}, {*this});
 
     // Run the function on the temporary variable
-    auto *t = dynamic_cast<SXFunctionInternal *>(temp.get());
+    auto *t = dynamic_cast<SXFunction *>(temp.get());
     return t->isSmooth();
   }
 
@@ -570,7 +570,7 @@ namespace casadi {
     Function f=SX::fun("tmp", f_in, f_out);
 
     // Get references to the internal data structures
-    auto *ff = dynamic_cast<SXFunctionInternal *>(f.get());
+    auto *ff = dynamic_cast<SXFunction *>(f.get());
     const vector<ScalarAtomic>& algorithm = ff->algorithm_;
     vector<SXElement> work(f.getWorkSize());
 
@@ -819,7 +819,7 @@ namespace casadi {
 
     // Sort the expression
     Function f=SX::fun("tmp", vector<SX>(), ex);
-    auto *ff = dynamic_cast<SXFunctionInternal *>(f.get());
+    auto *ff = dynamic_cast<SXFunction *>(f.get());
 
     // Get references to the internal data structures
     const vector<ScalarAtomic>& algorithm = ff->algorithm_;

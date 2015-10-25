@@ -29,7 +29,7 @@ using namespace std;
 
 namespace casadi {
 
-  SwitchInternal::SwitchInternal(const std::string& name,
+  Switch::Switch(const std::string& name,
                                  const std::vector<Function>& f, const Function& f_def)
     : FunctionInternal(name), f_(f), f_def_(f_def) {
 
@@ -37,22 +37,22 @@ namespace casadi {
     casadi_assert(!f_.empty());
   }
 
-  SwitchInternal::~SwitchInternal() {
+  Switch::~Switch() {
   }
 
-  size_t SwitchInternal::get_n_in() const {
+  size_t Switch::get_n_in() const {
     for (auto&& i : f_) if (!i.isNull()) return i.n_in();
     casadi_assert(!f_def_.isNull());
     return f_def_.n_in();
   }
 
-  size_t SwitchInternal::get_n_out() const {
+  size_t Switch::get_n_out() const {
     for (auto&& i : f_) if (!i.isNull()) return i.n_out();
     casadi_assert(!f_def_.isNull());
     return f_def_.n_out();
   }
 
-  Sparsity SwitchInternal::get_sparsity_in(int ind) const {
+  Sparsity Switch::get_sparsity_in(int ind) const {
     Sparsity ret;
     for (auto&& i : f_) {
       if (!i.isNull()) {
@@ -66,7 +66,7 @@ namespace casadi {
     return ret;
   }
 
-  Sparsity SwitchInternal::get_sparsity_out(int ind) const {
+  Sparsity Switch::get_sparsity_out(int ind) const {
     Sparsity ret;
     for (auto&& i : f_) {
       if (!i.isNull()) {
@@ -80,7 +80,7 @@ namespace casadi {
     return ret;
   }
 
-  void SwitchInternal::init() {
+  void Switch::init() {
     // Initialize the functions, get input and output sparsities
     // Input and output sparsities
     std::vector<Sparsity> sp_in, sp_out;
@@ -152,7 +152,7 @@ namespace casadi {
     }
   }
 
-  void SwitchInternal::evalD(const double** arg, double** res, int* iw, double* w) {
+  void Switch::evalD(const double** arg, double** res, int* iw, double* w) {
     // Get conditional
     int k = static_cast<int>(*arg[0]);
 
@@ -175,7 +175,7 @@ namespace casadi {
     fk->eval(arg+1, res, iw, w);
   }
 
-  Function SwitchInternal
+  Function Switch
   ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
     // Derivative of each case
     vector<Function> der(f_.size());
@@ -217,7 +217,7 @@ namespace casadi {
     return MX::fun(name, w_in, sw(v), opts);
   }
 
-  Function SwitchInternal
+  Function Switch
   ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     // Derivative of each case
     vector<Function> der(f_.size());
@@ -277,7 +277,7 @@ namespace casadi {
     }
   }
 
-  void SwitchInternal::print(ostream &stream) const {
+  void Switch::print(ostream &stream) const {
     if (f_.size()==1) {
       // Print as if-then-else
       stream << "Switch(" << name(f_def_) << ", " << name(f_[0]) << ")";
@@ -292,14 +292,14 @@ namespace casadi {
     }
   }
 
-  void SwitchInternal::generateDeclarations(CodeGenerator& g) const {
+  void Switch::generateDeclarations(CodeGenerator& g) const {
     for (int k=0; k<=f_.size(); ++k) {
       const Function& fk = k<f_.size() ? f_[k] : f_def_;
       fk->addDependency(g);
     }
   }
 
-  void SwitchInternal::generateBody(CodeGenerator& g) const {
+  void Switch::generateBody(CodeGenerator& g) const {
     // Codegen as if-else
     bool if_else = f_.size()==1;
 

@@ -64,7 +64,7 @@ namespace casadi {
 @copydoc NlpSolver_doc
 @copydoc plugin_NlpSolver_ipopt
 */
-class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptInterface : public NlpSolverInternal {
+class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptInterface : public NlpSolver {
 friend class IpoptUserClass;
 
 public:
@@ -75,7 +75,7 @@ public:
   virtual const char* plugin_name() const { return "ipopt";}
 
   /** \brief  Create a new NLP Solver */
-  static NlpSolverInternal* creator(const std::string& name, const XProblem& nlp) {
+  static NlpSolver* creator(const std::string& name, const XProblem& nlp) {
     return new IpoptInterface(name, nlp);
   }
 

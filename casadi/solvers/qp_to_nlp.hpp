@@ -49,15 +49,15 @@ namespace casadi {
    \author Joris Gillis
    \date 2011
   */
-class CASADI_QPSOLVER_NLP_EXPORT QpToNlp : public QpSolverInternal,
-  public Adaptor<QpToNlp, NlpSolverInternal> {
+class CASADI_QPSOLVER_NLP_EXPORT QpToNlp : public QpSolver,
+  public Adaptor<QpToNlp, NlpSolver> {
 public:
   /** \brief  Create a new Solver */
   explicit QpToNlp(const std::string& name,
                    const std::map<std::string, Sparsity> &st);
 
   /** \brief  Create a new QP Solver */
-  static QpSolverInternal* creator(const std::string& name,
+  static QpSolver* creator(const std::string& name,
                                    const std::map<std::string, Sparsity>& st) {
     return new QpToNlp(name, st);
   }

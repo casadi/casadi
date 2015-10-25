@@ -32,7 +32,7 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace casadi {
 
-  IntegratorInternal::IntegratorInternal(const std::string& name, const XProblem& dae)
+  Integrator::Integrator(const std::string& name, const XProblem& dae)
     : FunctionInternal(name), dae_(dae) {
 
     // Additional options
@@ -60,11 +60,11 @@ namespace casadi {
     oscheme_ = IOScheme(SCHEME_IntegratorOutput);
   }
 
-  IntegratorInternal::~IntegratorInternal() {
+  Integrator::~Integrator() {
   }
 
   template<typename MatType>
-  Function IntegratorInternal::get_f() const {
+  Function Integrator::get_f() const {
     vector<MatType> dae_in(DAE_NUM_IN), dae_out(DAE_NUM_OUT);
     const Problem<MatType>& dae = this->dae_;
     dae_in[DAE_T]=dae.in[DE_T];
@@ -78,7 +78,7 @@ namespace casadi {
   }
 
   template<typename MatType>
-  Function IntegratorInternal::get_g() const {
+  Function Integrator::get_g() const {
     vector<MatType> rdae_in(RDAE_NUM_IN), rdae_out(RDAE_NUM_OUT);
     const Problem<MatType>& dae = this->dae_;
     rdae_in[RDAE_T]=dae.in[DE_T];
@@ -94,7 +94,7 @@ namespace casadi {
     return MatType::fun("rdae", rdae_in, rdae_out);
   }
 
-  Sparsity IntegratorInternal::get_sparsity_in(int ind) const {
+  Sparsity Integrator::get_sparsity_in(int ind) const {
     switch (static_cast<IntegratorInput>(ind)) {
     case INTEGRATOR_X0:
       return f_.input(DAE_X).sparsity();
@@ -113,7 +113,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  Sparsity IntegratorInternal::get_sparsity_out(int ind) const {
+  Sparsity Integrator::get_sparsity_out(int ind) const {
     switch (static_cast<IntegratorOutput>(ind)) {
     case INTEGRATOR_XF:
       return get_sparsity_in(INTEGRATOR_X0);
@@ -132,7 +132,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  void IntegratorInternal::evaluate() {
+  void Integrator::evaluate() {
     // Reset solver
     reset();
 
@@ -153,7 +153,7 @@ namespace casadi {
     if (print_stats_) printStats(userOut());
   }
 
-  void IntegratorInternal::init() {
+  void Integrator::init() {
 
     // Initialize the functions
     casadi_assert(!f_.isNull());
@@ -235,7 +235,7 @@ namespace casadi {
       std::stringstream ss;
       ss << "Integrator dimensions: nx=" << nx_ << ", nz="<< nz_
          << ", nq=" << nq_ << ", np=" << np_;
-      log("IntegratorInternal::init", ss.str());
+      log("Integrator::init", ss.str());
     }
 
     // read options
@@ -262,8 +262,8 @@ namespace casadi {
   }
 
   template<typename MatType>
-  map<string, MatType> IntegratorInternal::aug_fwd(int nfwd, AugOffset& offset) {
-    log("IntegratorInternal::aug_fwd", "call");
+  map<string, MatType> Integrator::aug_fwd(int nfwd, AugOffset& offset) {
+    log("Integrator::aug_fwd", "call");
 
     // // Cast to right type
     // map<string, MatType> dae = dae_;
@@ -426,8 +426,8 @@ namespace casadi {
   }
 
   template<typename MatType>
-  map<string, MatType> IntegratorInternal::aug_adj(int nadj, AugOffset& offset) {
-    log("IntegratorInternal::aug_adj", "call");
+  map<string, MatType> Integrator::aug_adj(int nadj, AugOffset& offset) {
+    log("Integrator::aug_adj", "call");
 
     // // Cast to right type
     // map<string, MatType> dae = dae_;
@@ -678,8 +678,8 @@ namespace casadi {
     return ret;
   }
 
-  void IntegratorInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    log("IntegratorInternal::spFwd", "begin");
+  void Integrator::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    log("Integrator::spFwd", "begin");
 
     // Work vectors
     bvec_t *tmp_x = w; w += nx_;
@@ -762,11 +762,11 @@ namespace casadi {
         g_.spFwd(arg1, res1, iw, w);
       }
     }
-    log("IntegratorInternal::spFwd", "end");
+    log("Integrator::spFwd", "end");
   }
 
-  void IntegratorInternal::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    log("IntegratorInternal::spAdj", "begin");
+  void Integrator::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    log("Integrator::spAdj", "begin");
 
     // Work vectors
     bvec_t** arg1 = arg+n_in();
@@ -877,10 +877,10 @@ namespace casadi {
     arg1[DAE_Z] = 0; // arg[INTEGRATOR_Z0] is a guess, no dependency
     f_.spAdj(arg1, res1, iw, w);
 
-    log("IntegratorInternal::spAdj", "end");
+    log("Integrator::spAdj", "end");
   }
 
-  IntegratorInternal::AugOffset IntegratorInternal::getAugOffset(int nfwd, int nadj) {
+  Integrator::AugOffset Integrator::getAugOffset(int nfwd, int nadj) {
     // Form return object
     AugOffset ret;
     ret.x.resize(1, 0);
@@ -930,8 +930,8 @@ namespace casadi {
     return ret;
   }
 
-  Function IntegratorInternal::getDerForward(const std::string& name, int nfwd, Dict& opts) {
-    log("IntegratorInternal::getDerForward", "begin");
+  Function Integrator::getDerForward(const std::string& name, int nfwd, Dict& opts) {
+    log("Integrator::getDerForward", "begin");
 
     // Integrator options
     Dict aug_opts = getDerivativeOptions(true);
@@ -1071,14 +1071,14 @@ namespace casadi {
       if (dir>=0) // Nondifferentiated output ignored
         ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
-    log("IntegratorInternal::getDerForward", "end");
+    log("Integrator::getDerForward", "end");
 
     // Create derivative function and return
     return MX::fun(name, ret_in, ret_out, opts);
   }
 
-  Function IntegratorInternal::getDerReverse(const std::string& name, int nadj, Dict& opts) {
-    log("IntegratorInternal::getDerReverse", "begin");
+  Function Integrator::getDerReverse(const std::string& name, int nadj, Dict& opts) {
+    log("Integrator::getDerReverse", "begin");
 
     // Integrator options
     Dict aug_opts = getDerivativeOptions(false);
@@ -1254,14 +1254,14 @@ namespace casadi {
       if (nrz_>0) dd[INTEGRATOR_RZ0] = *zf_aug_it++;
       ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
-    log("IntegratorInternal::getDerivative", "end");
+    log("Integrator::getDerivative", "end");
 
     // Create derivative function and return
     return MX::fun(name, ret_in, ret_out, opts);
   }
 
-  void IntegratorInternal::reset() {
-    log("IntegratorInternal::reset", "begin");
+  void Integrator::reset() {
+    log("Integrator::reset", "begin");
 
     // Go to the start time
     t_ = t0_;
@@ -1273,11 +1273,11 @@ namespace casadi {
     // Reset summation states
     qf().set(0.0);
 
-    log("IntegratorInternal::reset", "end");
+    log("Integrator::reset", "end");
   }
 
-  void IntegratorInternal::resetB() {
-    log("IntegratorInternal::resetB", "begin");
+  void Integrator::resetB() {
+    log("Integrator::resetB", "begin");
 
     // Go to the end time
     t_ = tf_;
@@ -1289,15 +1289,15 @@ namespace casadi {
     // Reset summation states
     rqf().set(0.0);
 
-    log("IntegratorInternal::resetB", "end");
+    log("Integrator::resetB", "end");
   }
 
-  Dict IntegratorInternal::getDerivativeOptions(bool fwd) {
+  Dict Integrator::getDerivativeOptions(bool fwd) {
     // Copy all options
     return dictionary();
   }
 
-  Sparsity IntegratorInternal::spJacF() {
+  Sparsity Integrator::spJacF() {
     // Start with the sparsity pattern of the ODE part
     Sparsity jac_ode_x = f_.jacSparsity(DAE_X, DAE_ODE);
 
@@ -1315,7 +1315,7 @@ namespace casadi {
                     jac_alg_x, jac_alg_z);
   }
 
-  Sparsity IntegratorInternal::spJacG() {
+  Sparsity Integrator::spJacG() {
     // Start with the sparsity pattern of the ODE part
     Sparsity jac_ode_x = g_.jacSparsity(RDAE_RX, RDAE_ODE);
 
@@ -1333,12 +1333,12 @@ namespace casadi {
                     jac_alg_x, jac_alg_z);
   }
 
-  std::map<std::string, IntegratorInternal::Plugin> IntegratorInternal::solvers_;
+  std::map<std::string, Integrator::Plugin> Integrator::solvers_;
 
-  const std::string IntegratorInternal::infix_ = "integrator";
+  const std::string Integrator::infix_ = "integrator";
 
-  void IntegratorInternal::setStopTime(double tf) {
-    casadi_error("IntegratorInternal::setStopTime not defined for class "
+  void Integrator::setStopTime(double tf) {
+    casadi_error("Integrator::setStopTime not defined for class "
                  << typeid(*this).name());
   }
 

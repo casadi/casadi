@@ -48,8 +48,8 @@ namespace casadi {
    \author Joris Gillis
    \date 2012
   */
-  class CASADI_IMPLICITFUNCTION_NLP_EXPORT QpToImplicit : public ImplicitFunctionInternal,
-    public Adaptor<QpToImplicit, NlpSolverInternal> {
+  class CASADI_IMPLICITFUNCTION_NLP_EXPORT QpToImplicit : public Rootfinder,
+    public Adaptor<QpToImplicit, NlpSolver> {
   public:
     /** \brief  Constructor */
     explicit QpToImplicit(const std::string& name, const Function& f);
@@ -57,13 +57,13 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~QpToImplicit();
 
-    /** \brief  Create a new ImplicitFunctionInternal */
+    /** \brief  Create a new Rootfinder */
     virtual QpToImplicit* create(const std::string& name, const Function& f) const {
       return new QpToImplicit(name, f);
     }
 
     /** \brief  Create a new ImplicitFunction */
-    static ImplicitFunctionInternal* creator(const std::string& name, const Function& f) {
+    static Rootfinder* creator(const std::string& name, const Function& f) {
       return new QpToImplicit(name, f);
     }
 

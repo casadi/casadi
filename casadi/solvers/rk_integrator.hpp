@@ -56,7 +56,7 @@ namespace casadi {
     explicit RkIntegrator(const std::string& name, const XProblem& dae);
 
     /** \brief  Create a new integrator */
-    static IntegratorInternal* creator(const std::string& name, const XProblem& dae) {
+    static Integrator* creator(const std::string& name, const XProblem& dae) {
       return new RkIntegrator(name, dae);
     }
 

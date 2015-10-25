@@ -30,7 +30,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_IMPLICITFUNCTION_KINSOL_EXPORT
-  casadi_register_implicitfunction_kinsol(ImplicitFunctionInternal::Plugin* plugin) {
+  casadi_register_implicitfunction_kinsol(Rootfinder::Plugin* plugin) {
     plugin->creator = KinsolInterface::creator;
     plugin->name = "kinsol";
     plugin->doc = KinsolInterface::meta_doc.c_str();
@@ -40,7 +40,7 @@ namespace casadi {
 
   extern "C"
   void CASADI_IMPLICITFUNCTION_KINSOL_EXPORT casadi_load_implicitfunction_kinsol() {
-    ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_kinsol);
+    Rootfinder::registerPlugin(casadi_register_implicitfunction_kinsol);
   }
 
   /** \brief Kinsol solver class
@@ -63,7 +63,7 @@ namespace casadi {
    *
    */
   KinsolInterface::KinsolInterface(const std::string& name, const Function& f)
-    : ImplicitFunctionInternal(name, f) {
+    : Rootfinder(name, f) {
 
     addOption("max_iter",                 OT_INTEGER, 0,
               "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
@@ -100,7 +100,7 @@ namespace casadi {
   }
 
   void KinsolInterface::init() {
-    ImplicitFunctionInternal::init();
+    Rootfinder::init();
 
     // Read options
     if (getOption("strategy")=="linesearch") {

@@ -59,8 +59,8 @@ namespace casadi {
       \author Joel Andersson
       \date 2010-2015
   */
-  class CASADI_EXPORT MXFunctionInternal :
-        public XFunctionInternal<MXFunctionInternal, MX, MXNode>{
+  class CASADI_EXPORT MXFunction :
+        public XFunction<MXFunction, MX, MXNode>{
   public:
     /** \brief  An element of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;
@@ -75,11 +75,11 @@ namespace casadi {
     std::vector<MX> free_vars_;
 
     /** \brief Constructor */
-    MXFunctionInternal(const std::string& name, const std::vector<MX>& input,
+    MXFunction(const std::string& name, const std::vector<MX>& input,
                        const std::vector<MX>& output);
 
     /** \brief  Destructor */
-    virtual ~MXFunctionInternal();
+    virtual ~MXFunction();
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void evalD(const double** arg, double** res, int* iw, double* w);

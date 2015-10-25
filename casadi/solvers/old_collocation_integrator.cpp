@@ -35,7 +35,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_INTEGRATOR_OLDCOLLOCATION_EXPORT
-  casadi_register_integrator_oldcollocation(IntegratorInternal::Plugin* plugin) {
+  casadi_register_integrator_oldcollocation(Integrator::Plugin* plugin) {
     plugin->creator = OldCollocationIntegrator::creator;
     plugin->name = "oldcollocation";
     plugin->doc = OldCollocationIntegrator::meta_doc.c_str();
@@ -45,12 +45,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_INTEGRATOR_OLDCOLLOCATION_EXPORT casadi_load_integrator_oldcollocation() {
-    IntegratorInternal::registerPlugin(casadi_register_integrator_oldcollocation);
+    Integrator::registerPlugin(casadi_register_integrator_oldcollocation);
   }
 
   OldCollocationIntegrator::
   OldCollocationIntegrator(const std::string& name, const XProblem& dae)
-    : IntegratorInternal(name, dae) {
+    : Integrator(name, dae) {
 
     addOption("number_of_finite_elements",     OT_INTEGER,  20,
               "Number of finite elements");
@@ -80,7 +80,7 @@ namespace casadi {
   void OldCollocationIntegrator::init() {
 
     // Call the base class init
-    IntegratorInternal::init();
+    Integrator::init();
 
     // Read options
     bool expand_f = getOption("expand_f");
@@ -402,7 +402,7 @@ namespace casadi {
     }
 
     // Call the base class method
-    IntegratorInternal::reset();
+    Integrator::reset();
 
     // Pass the inputs
     for (int iind=0; iind<INTEGRATOR_NUM_IN; ++iind) {
@@ -423,7 +423,7 @@ namespace casadi {
         }
 
         // Reset the integrator
-        dynamic_cast<IntegratorInternal*>(startup_integrator_.get())->reset();
+        dynamic_cast<Integrator*>(startup_integrator_.get())->reset();
       }
 
       // Integrate, stopping at all time points
@@ -433,7 +433,7 @@ namespace casadi {
 
           if (has_startup_integrator) {
             // Integrate to the time point
-            dynamic_cast<IntegratorInternal*>(startup_integrator_.get())
+            dynamic_cast<Integrator*>(startup_integrator_.get())
               ->integrate(coll_time_[k][j]);
           }
 
@@ -472,7 +472,7 @@ namespace casadi {
       // Print
       if (has_startup_integrator && verbose()) {
         userOut() << "startup trajectory generated, statistics:" << endl;
-        dynamic_cast<IntegratorInternal*>(startup_integrator_.get())
+        dynamic_cast<Integrator*>(startup_integrator_.get())
           ->printStats(casadi::userOut());
       }
     }

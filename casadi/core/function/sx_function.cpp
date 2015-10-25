@@ -43,10 +43,10 @@ namespace casadi {
   using namespace std;
 
 
-  SXFunctionInternal::SXFunctionInternal(const std::string& name,
+  SXFunction::SXFunction(const std::string& name,
                                          const vector<SX >& inputv,
                                          const vector<SX >& outputv)
-    : XFunctionInternal<SXFunctionInternal, SX, SXNode>(name, inputv, outputv) {
+    : XFunction<SXFunction, SX, SXNode>(name, inputv, outputv) {
     addOption("just_in_time_sparsity", OT_BOOLEAN, false,
               "Propagate sparsity patterns using just-in-time "
               "compilation to a CPU or GPU using OpenCL");
@@ -65,7 +65,7 @@ namespace casadi {
 #endif // WITH_OPENCL
   }
 
-  SXFunctionInternal::~SXFunctionInternal() {
+  SXFunction::~SXFunction() {
     // Free OpenCL memory
 #ifdef WITH_OPENCL
     freeOpenCL();
@@ -73,7 +73,7 @@ namespace casadi {
 #endif // WITH_OPENCL
   }
 
-  void SXFunctionInternal::evalD(const double** arg, double** res,
+  void SXFunction::evalD(const double** arg, double** res,
                                  int* iw, double* w) {
     double time_start=0;
     double time_stop=0;
@@ -86,7 +86,7 @@ namespace casadi {
       }
     }
 
-    casadi_msg("SXFunctionInternal::evaluate():begin  " << name_);
+    casadi_msg("SXFunction::evaluate():begin  " << name_);
 
     // NOTE: The implementation of this function is very delicate. Small changes in the
     // class structure can cause large performance losses. For this reason,
@@ -114,11 +114,11 @@ namespace casadi {
       case OP_INPUT: w[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2]; break;
       case OP_OUTPUT: if (res[it->i0]!=0) res[it->i0][it->i2] = w[it->i1]; break;
       default:
-        casadi_error("SXFunctionInternal::evalD: Unknown operation" << it->op);
+        casadi_error("SXFunction::evalD: Unknown operation" << it->op);
       }
     }
 
-    casadi_msg("SXFunctionInternal::evalD():end " << name_);
+    casadi_msg("SXFunction::evalD():end " << name_);
 
     if (CasadiOptions::profiling) {
       time_stop = getRealTime();
@@ -136,10 +136,10 @@ namespace casadi {
   }
 
 
-  SX SXFunctionInternal::hess(int iind, int oind) {
+  SX SXFunction::hess(int iind, int oind) {
     casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
     SX g = densify(grad(iind, oind));
-    if (verbose())  userOut() << "SXFunctionInternal::hess: calculating gradient done " << endl;
+    if (verbose())  userOut() << "SXFunction::hess: calculating gradient done " << endl;
 
     // Create function
     Dict opts;
@@ -148,18 +148,18 @@ namespace casadi {
 
     // Calculate jacobian of gradient
     if (verbose()) {
-      userOut() << "SXFunctionInternal::hess: calculating Jacobian " << endl;
+      userOut() << "SXFunction::hess: calculating Jacobian " << endl;
     }
     SX ret = SX::jac(gfcn, 0, 0, false, true);
     if (verbose()) {
-      userOut() << "SXFunctionInternal::hess: calculating Jacobian done" << endl;
+      userOut() << "SXFunction::hess: calculating Jacobian done" << endl;
     }
 
     // Return jacobian of the gradient
     return ret;
   }
 
-  bool SXFunctionInternal::isSmooth() const {
+  bool SXFunction::isSmooth() const {
     // Go through all nodes and check if any node is non-smooth
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       if (!operation_checker<SmoothChecker>(it->op)) {
@@ -169,7 +169,7 @@ namespace casadi {
     return true;
   }
 
-  void SXFunctionInternal::print(ostream &stream) const {
+  void SXFunction::print(ostream &stream) const {
     FunctionInternal::print(stream);
 
     // Iterator to free variables
@@ -209,7 +209,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::generateDeclarations(CodeGenerator& g) const {
+  void SXFunction::generateDeclarations(CodeGenerator& g) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -218,7 +218,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::generateBody(CodeGenerator& g) const {
+  void SXFunction::generateBody(CodeGenerator& g) const {
 
     // Which variables have been declared
     vector<bool> declared(sz_w(), false);
@@ -264,10 +264,10 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::init() {
+  void SXFunction::init() {
 
     // Call the init function of the base class
-    XFunctionInternal<SXFunctionInternal, SX, SXNode>::init();
+    XFunction<SXFunction, SX, SXNode>::init();
 
     // Stack used to sort the computational graph
     stack<SXNode*> s;
@@ -566,14 +566,14 @@ namespace casadi {
 
     // Print
     if (verbose()) {
-      userOut() << "SXFunctionInternal::init Initialized " << name_ << " ("
+      userOut() << "SXFunction::init Initialized " << name_ << " ("
            << algorithm_.size() << " elementary operations)" << endl;
     }
   }
 
-  void SXFunctionInternal::evalSX(const SXElement** arg, SXElement** res,
+  void SXFunction::evalSX(const SXElement** arg, SXElement** res,
                                   int* iw, SXElement* w) {
-    if (verbose()) userOut() << "SXFunctionInternal::evalSXsparse begin" << endl;
+    if (verbose()) userOut() << "SXFunction::evalSXsparse begin" << endl;
 
     // Iterator to the binary operations
     vector<SXElement>::const_iterator b_it=operations_.begin();
@@ -586,7 +586,7 @@ namespace casadi {
 
     // Evaluate algorithm
     if (verbose()) {
-      userOut() << "SXFunctionInternal::evalSXsparse evaluating algorithm forward" << endl;
+      userOut() << "SXFunction::evalSXsparse evaluating algorithm forward" << endl;
     }
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
@@ -620,11 +620,11 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunctionInternal::evalSX end" << endl;
+    if (verbose()) userOut() << "SXFunction::evalSX end" << endl;
   }
 
-  void SXFunctionInternal::evalFwd(const vector<vector<SX> >& fseed, vector<vector<SX> >& fsens) {
-    if (verbose()) userOut() << "SXFunctionInternal::evalFwd begin" << endl;
+  void SXFunction::evalFwd(const vector<vector<SX> >& fseed, vector<vector<SX> >& fsens) {
+    if (verbose()) userOut() << "SXFunction::evalFwd begin" << endl;
 
     // Number of forward seeds
     int nfwd = fseed.size();
@@ -671,7 +671,7 @@ namespace casadi {
     vector<TapeEl<SXElement> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose()) userOut() << "SXFunctionInternal::evalFwd evaluating algorithm forward" << endl;
+    if (verbose()) userOut() << "SXFunction::evalFwd evaluating algorithm forward" << endl;
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
       case OP_INPUT:
@@ -691,7 +691,7 @@ namespace casadi {
 
     // Calculate forward sensitivities
     if (verbose())
-      userOut() << "SXFunctionInternal::evalFwd calculating forward derivatives" << endl;
+      userOut() << "SXFunction::evalFwd calculating forward derivatives" << endl;
     for (int dir=0; dir<nfwd; ++dir) {
       vector<TapeEl<SXElement> >::const_iterator it2 = s_pdwork.begin();
       for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -711,11 +711,11 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunctionInternal::evalFwd end" << endl;
+    if (verbose()) userOut() << "SXFunction::evalFwd end" << endl;
   }
 
-  void SXFunctionInternal::evalAdj(const vector<vector<SX> >& aseed, vector<vector<SX> >& asens) {
-    if (verbose()) userOut() << "SXFunctionInternal::evalAdj begin" << endl;
+  void SXFunction::evalAdj(const vector<vector<SX> >& aseed, vector<vector<SX> >& asens) {
+    if (verbose()) userOut() << "SXFunction::evalAdj begin" << endl;
 
     // number of adjoint seeds
     int nadj = aseed.size();
@@ -766,7 +766,7 @@ namespace casadi {
     vector<TapeEl<SXElement> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose()) userOut() << "SXFunctionInternal::evalFwd evaluating algorithm forward" << endl;
+    if (verbose()) userOut() << "SXFunction::evalFwd evaluating algorithm forward" << endl;
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
       case OP_INPUT:
@@ -785,7 +785,7 @@ namespace casadi {
     }
 
     // Calculate adjoint sensitivities
-    if (verbose()) userOut() << "SXFunctionInternal::evalAdj calculating adjoint derivatives"
+    if (verbose()) userOut() << "SXFunction::evalAdj calculating adjoint derivatives"
                        << endl;
     fill(s_work_.begin(), s_work_.end(), 0);
     for (int dir=0; dir<nadj; ++dir) {
@@ -820,10 +820,10 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunctionInternal::evalAdj end" << endl;
+    if (verbose()) userOut() << "SXFunction::evalAdj end" << endl;
   }
 
-  void SXFunctionInternal::spInit(bool fwd) {
+  void SXFunction::spInit(bool fwd) {
     // Quick return if just-in-time compilation for
     //  sparsity pattern propagation, no work vector needed
 #ifdef WITH_OPENCL
@@ -840,7 +840,7 @@ namespace casadi {
     if (!fwd) fill_n(iwork, sz_w(), bvec_t(0));
   }
 
-  void SXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
+  void SXFunction::spFwd(const bvec_t** arg, bvec_t** res,
                                  int* iw, bvec_t* w) {
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -858,7 +858,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
+  void SXFunction::spAdj(bvec_t** arg, bvec_t** res,
                                  int* iw, bvec_t* w) {
     fill_n(w, sz_w(), 0);
 
@@ -892,7 +892,7 @@ namespace casadi {
     }
   }
 
-  Function SXFunctionInternal::getFullJacobian() {
+  Function SXFunction::getFullJacobian() {
     SX J = veccat(outputv_).zz_jacobian(veccat(inputv_));
     return SX::fun(name_ + "_jac", inputv_, {J});
   }
@@ -932,9 +932,9 @@ namespace casadi {
   }
 
   // Memory for the kernel singleton
-  SparsityPropagationKernel SXFunctionInternal::sparsity_propagation_kernel_;
+  SparsityPropagationKernel SXFunction::sparsity_propagation_kernel_;
 
-  void SXFunctionInternal::spAllocOpenCL() {
+  void SXFunction::spAllocOpenCL() {
     // OpenCL return flag
     cl_int ret;
 
@@ -1080,7 +1080,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::spEvaluateOpenCL(bool fwd) {
+  void SXFunction::spEvaluateOpenCL(bool fwd) {
     // OpenCL return flag
     cl_int ret;
 
@@ -1126,7 +1126,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::spFreeOpenCL() {
+  void SXFunction::spFreeOpenCL() {
     // OpenCL return flag
     cl_int ret;
 
@@ -1170,7 +1170,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::allocOpenCL() {
+  void SXFunction::allocOpenCL() {
     // OpenCL return flag
     cl_int ret;
 
@@ -1230,7 +1230,7 @@ namespace casadi {
 
   }
 
-  void SXFunctionInternal::evaluateOpenCL() {
+  void SXFunction::evaluateOpenCL() {
     // OpenCL return flag
     cl_int ret;
 
@@ -1264,7 +1264,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::freeOpenCL() {
+  void SXFunction::freeOpenCL() {
     // OpenCL return flag
     cl_int ret;
 
@@ -1301,7 +1301,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::compileProgram(cl_program program) {
+  void SXFunction::compileProgram(cl_program program) {
     // OpenCL return flag
     cl_int ret;
 
@@ -1355,7 +1355,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::executeKernel(cl_kernel kernel) {
+  void SXFunction::executeKernel(cl_kernel kernel) {
     // OpenCL return flag
     cl_int ret;
 
@@ -1425,55 +1425,55 @@ namespace casadi {
 
 #endif // WITH_OPENCL
 
-  void SXFunctionInternal::callForward(const std::vector<SX>& arg, const std::vector<SX>& res,
+  void SXFunction::callForward(const std::vector<SX>& arg, const std::vector<SX>& res,
                                    const std::vector<std::vector<SX> >& fseed,
                                    std::vector<std::vector<SX> >& fsens,
                                    bool always_inline, bool never_inline) {
     casadi_assert_message(!never_inline, "SX expressions do not have call nodes");
-    XFunctionInternal<SXFunctionInternal, SX, SXNode>
+    XFunction<SXFunction, SX, SXNode>
       ::callForward(arg, res, fseed, fsens, true, false);
   }
 
-  void SXFunctionInternal::callReverse(const std::vector<SX>& arg, const std::vector<SX>& res,
+  void SXFunction::callReverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                                  const std::vector<std::vector<SX> >& aseed,
                                  std::vector<std::vector<SX> >& asens,
                                  bool always_inline, bool never_inline) {
     casadi_assert_message(!never_inline, "SX expressions do not have call nodes");
-    XFunctionInternal<SXFunctionInternal, SX, SXNode>
+    XFunction<SXFunction, SX, SXNode>
       ::callReverse(arg, res, aseed, asens, true, false);
   }
 
-  SX SXFunctionInternal::grad_sx(int iind, int oind) {
+  SX SXFunction::grad_sx(int iind, int oind) {
     return grad(iind, oind);
   }
 
-  SX SXFunctionInternal::tang_sx(int iind, int oind) {
+  SX SXFunction::tang_sx(int iind, int oind) {
     return tang(iind, oind);
   }
 
-  SX SXFunctionInternal::jac_sx(int iind, int oind, bool compact, bool symmetric,
+  SX SXFunction::jac_sx(int iind, int oind, bool compact, bool symmetric,
                               bool always_inline, bool never_inline) {
     return jac(iind, oind, compact, symmetric, always_inline, never_inline);
   }
 
-  SX SXFunctionInternal::hess_sx(int iind, int oind) {
+  SX SXFunction::hess_sx(int iind, int oind) {
     return hess(iind, oind);
   }
 
-  const SX SXFunctionInternal::sx_in(int ind) const {
+  const SX SXFunction::sx_in(int ind) const {
     return inputv_.at(ind);
   }
 
-  const std::vector<SX> SXFunctionInternal::sx_in() const {
+  const std::vector<SX> SXFunction::sx_in() const {
     return inputv_;
   }
 
-  std::string SXFunctionInternal::type_name() const {
+  std::string SXFunction::type_name() const {
     return "sxfunction";
   }
 
-  bool SXFunctionInternal::is_a(const std::string& type, bool recursive) const {
-    return type=="sxfunction" || (recursive && XFunctionInternal<SXFunctionInternal,
+  bool SXFunction::is_a(const std::string& type, bool recursive) const {
+    return type=="sxfunction" || (recursive && XFunction<SXFunction,
                                   SX, SXNode>::is_a(type, recursive));
   }
 

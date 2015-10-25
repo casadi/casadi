@@ -50,10 +50,10 @@ namespace casadi {
       \author Attila Kozma, Joel Andersson
       \date 2012
   */
-  class CASADI_QPSOLVER_CPLEX_EXPORT CplexInterface : public QpSolverInternal {
+  class CASADI_QPSOLVER_CPLEX_EXPORT CplexInterface : public QpSolver {
   public:
     /** \brief  Create a new QP Solver */
-    static QpSolverInternal* creator(const std::string& name,
+    static QpSolver* creator(const std::string& name,
                                      const std::map<std::string, Sparsity>& st) {
       return new CplexInterface(name, st);
     }

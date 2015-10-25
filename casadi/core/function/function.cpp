@@ -52,7 +52,7 @@ namespace casadi {
   Function::Function(const string& name,
                      const vector<MX>& arg, const vector<MX>& res,
                      const Dict& opts) {
-    assignNode(new MXFunctionInternal(name, arg, res));
+    assignNode(new MXFunction(name, arg, res));
     setOption(opts);
     init();
   }
@@ -64,7 +64,7 @@ namespace casadi {
     Dict opts2 = opts;
     opts2["input_scheme"] = argn;
     opts2["output_scheme"] = resn;
-    assignNode(new MXFunctionInternal(name, arg, res));
+    assignNode(new MXFunction(name, arg, res));
     setOption(opts2);
     init();
   }
@@ -72,7 +72,7 @@ namespace casadi {
   Function::Function(const string& name,
                      const vector<SX>& arg, const vector<SX>& res,
                      const Dict& opts) {
-    assignNode(new SXFunctionInternal(name, arg, res));
+    assignNode(new SXFunction(name, arg, res));
     setOption(opts);
     init();
   }
@@ -84,7 +84,7 @@ namespace casadi {
     Dict opts2 = opts;
     opts2["input_scheme"] = argn;
     opts2["output_scheme"] = resn;
-    assignNode(new SXFunctionInternal(name, arg, res));
+    assignNode(new SXFunction(name, arg, res));
     setOption(opts2);
     init();
   }
@@ -270,7 +270,7 @@ namespace casadi {
                               bool reverse,
                               const Dict& opts) const {
     Function ret;
-    ret.assignNode(new MapAccumInternal(name, *this, n, input_accum, output_accum, reverse));
+    ret.assignNode(new Mapaccum(name, *this, n, input_accum, output_accum, reverse));
     ret.setOption(opts);
     ret.init();
     return ret;
@@ -402,7 +402,7 @@ namespace casadi {
   Function Function::conditional(const string& name, const vector<Function>& f,
                                  const Function& f_def, const Dict& opts) {
     Function ret;
-    ret.assignNode(new SwitchInternal(name, f, f_def));
+    ret.assignNode(new Switch(name, f, f_def));
     ret.setOption(opts);
     ret.init();
     return ret;
@@ -411,7 +411,7 @@ namespace casadi {
   Function Function::if_else(const string& name, const Function& f_true,
                              const Function& f_false, const Dict& opts) {
     Function ret;
-    ret.assignNode(new SwitchInternal(name, vector<Function>(1, f_false), f_true));
+    ret.assignNode(new Switch(name, vector<Function>(1, f_false), f_true));
     ret.setOption(opts);
     ret.init();
     return ret;
@@ -423,7 +423,7 @@ namespace casadi {
                                 double r, int n,
                                 const Dict& opts) const {
     Function ret;
-    ret.assignNode(new KernelSum2DInternal(name, *this, size, r, n));
+    ret.assignNode(new KernelSum(name, *this, size, r, n));
     ret.setOption(opts);
     ret.init();
     return ret;
@@ -1286,7 +1286,7 @@ namespace casadi {
 
   Function Function::external(const string& name, const Dict& opts) {
     Function ret;
-    ret.assignNode(ExternalFunctionInternal::create("./" + name + ".so", name));
+    ret.assignNode(External::create("./" + name + ".so", name));
     ret.setOption(opts);
     ret.init();
     return ret;
@@ -1295,7 +1295,7 @@ namespace casadi {
   Function Function::external(const string& name, const string& bin_name,
                               const Dict& opts) {
     Function ret;
-    ret.assignNode(ExternalFunctionInternal::create(bin_name, name));
+    ret.assignNode(External::create(bin_name, name));
     ret.setOption(opts);
     ret.init();
     return ret;
@@ -1304,98 +1304,98 @@ namespace casadi {
   Function Function::external(const string& name, const Compiler& compiler,
                               const Dict& opts) {
     Function ret;
-    ret.assignNode(ExternalFunctionInternal::create(compiler, name));
+    ret.assignNode(External::create(compiler, name));
     ret.setOption(opts);
     ret.init();
     return ret;
   }
 
   bool Function::has_integrator(const string& name) {
-    return IntegratorInternal::hasPlugin(name);
+    return Integrator::hasPlugin(name);
   }
 
   void Function::load_integrator(const string& name) {
-    IntegratorInternal::loadPlugin(name);
+    Integrator::loadPlugin(name);
   }
 
   string Function::doc_integrator(const string& name) {
-    return IntegratorInternal::getPlugin(name).doc;
+    return Integrator::getPlugin(name).doc;
   }
 
   bool Function::has_qp_solver(const string& name) {
-    return QpSolverInternal::hasPlugin(name);
+    return QpSolver::hasPlugin(name);
   }
 
   void Function::load_qp_solver(const string& name) {
-    QpSolverInternal::loadPlugin(name);
+    QpSolver::loadPlugin(name);
   }
 
   string Function::doc_qp_solver(const string& name) {
-    return QpSolverInternal::getPlugin(name).doc;
+    return QpSolver::getPlugin(name).doc;
   }
 
   bool Function::has_nlp_solver(const string& name) {
-    return NlpSolverInternal::hasPlugin(name);
+    return NlpSolver::hasPlugin(name);
   }
 
   void Function::load_nlp_solver(const string& name) {
-    NlpSolverInternal::loadPlugin(name);
+    NlpSolver::loadPlugin(name);
   }
 
   string Function::doc_nlp_solver(const string& name) {
-    return NlpSolverInternal::getPlugin(name).doc;
+    return NlpSolver::getPlugin(name).doc;
   }
 
   bool Function::has_rootfinder(const string& name) {
-    return ImplicitFunctionInternal::hasPlugin(name);
+    return Rootfinder::hasPlugin(name);
   }
 
   void Function::load_rootfinder(const string& name) {
-    ImplicitFunctionInternal::loadPlugin(name);
+    Rootfinder::loadPlugin(name);
   }
 
   string Function::doc_rootfinder(const string& name) {
-    return ImplicitFunctionInternal::getPlugin(name).doc;
+    return Rootfinder::getPlugin(name).doc;
   }
 
   Function Function::rootfinder_fun() {
     casadi_assert(!isNull());
-    ImplicitFunctionInternal* n = dynamic_cast<ImplicitFunctionInternal*>(get());
+    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
     casadi_assert_message(n!=0, "Not a rootfinder");
     return n->f_;
   }
 
   Function Function::rootfinder_jac() {
     casadi_assert(!isNull());
-    ImplicitFunctionInternal* n = dynamic_cast<ImplicitFunctionInternal*>(get());
+    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
     casadi_assert_message(n!=0, "Not a rootfinder");
     return n->jac_;
   }
 
   LinearSolver Function::rootfinder_linsol() {
     casadi_assert(!isNull());
-    ImplicitFunctionInternal* n = dynamic_cast<ImplicitFunctionInternal*>(get());
+    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
     casadi_assert_message(n!=0, "Not a rootfinder");
     return n->linsol_;
   }
 
   Function Function::integrator(const string& name, const string& solver,
                                 const SXDict& dae, const Dict& opts) {
-    return integrator(name, solver, IntegratorInternal::map2problem(dae), opts);
+    return integrator(name, solver, Integrator::map2problem(dae), opts);
   }
 
   Function Function::integrator(const string& name, const string& solver,
                                 const MXDict& dae, const Dict& opts) {
-    return integrator(name, solver, IntegratorInternal::map2problem(dae), opts);
+    return integrator(name, solver, Integrator::map2problem(dae), opts);
   }
 
   Function Function::integrator(const string& name, const string& solver,
                                 const Function& dae, const Dict& opts) {
     if (dae.is_a("sxfunction")) {
-      SXProblem p = IntegratorInternal::fun2problem<SX>(dae);
+      SXProblem p = Integrator::fun2problem<SX>(dae);
       return Function::integrator(name, solver, p, opts);
     } else {
-      MXProblem p = IntegratorInternal::fun2problem<MX>(dae);
+      MXProblem p = Integrator::fun2problem<MX>(dae);
       return Function::integrator(name, solver, p, opts);
     }
   }
@@ -1404,10 +1404,10 @@ namespace casadi {
                                 const pair<Function, Function>& dae,
                                 const Dict& opts) {
     if (dae.first.is_a("sxfunction")) {
-      SXProblem p = IntegratorInternal::fun2problem<SX>(dae.first, dae.second);
+      SXProblem p = Integrator::fun2problem<SX>(dae.first, dae.second);
       return Function::integrator(name, solver, p, opts);
     } else {
-      MXProblem p = IntegratorInternal::fun2problem<MX>(dae.first, dae.second);
+      MXProblem p = Integrator::fun2problem<MX>(dae.first, dae.second);
       return Function::integrator(name, solver, p, opts);
     }
   }
@@ -1415,7 +1415,7 @@ namespace casadi {
   Function Function::integrator(const string& name, const string& solver,
                                 const XProblem& dae, const Dict& opts) {
     Function ret;
-    ret.assignNode(IntegratorInternal::getPlugin(solver).creator(name, dae));
+    ret.assignNode(Integrator::getPlugin(solver).creator(name, dae));
     ret.setOption(opts);
     ret.init();
     return ret;
@@ -1423,36 +1423,36 @@ namespace casadi {
 
   Function Function::integrator_dae() {
     casadi_assert(!isNull());
-    IntegratorInternal* n = dynamic_cast<IntegratorInternal*>(get());
+    Integrator* n = dynamic_cast<Integrator*>(get());
     casadi_assert_message(n!=0, "Not an integrator");
     return n->f_;
   }
 
   Function Function::nlp_solver(const string& name, const string& solver,
                                 const SXDict& nlp, const Dict& opts) {
-    return nlp_solver(name, solver, NlpSolverInternal::map2problem(nlp), opts);
+    return nlp_solver(name, solver, NlpSolver::map2problem(nlp), opts);
   }
 
   Function Function::nlp_solver(const string& name, const string& solver,
                                 const MXDict& nlp, const Dict& opts) {
-    return nlp_solver(name, solver, NlpSolverInternal::map2problem(nlp), opts);
+    return nlp_solver(name, solver, NlpSolver::map2problem(nlp), opts);
   }
 
   Function Function::nlp_solver(const string& name, const string& solver,
                                 const Function& nlp, const Dict& opts) {
     if (nlp.is_a("sxfunction")) {
       return Function::nlp_solver(name, solver,
-                                  NlpSolverInternal::fun2problem<SX>(nlp), opts);
+                                  NlpSolver::fun2problem<SX>(nlp), opts);
     } else {
       return Function::nlp_solver(name, solver,
-                                  NlpSolverInternal::fun2problem<MX>(nlp), opts);
+                                  NlpSolver::fun2problem<MX>(nlp), opts);
     }
   }
 
   Function Function::nlp_solver(const string& name, const string& solver,
                                 const XProblem& nlp, const Dict& opts) {
     Function ret;
-    ret.assignNode(NlpSolverInternal::instantiatePlugin(name, solver, nlp));
+    ret.assignNode(NlpSolver::instantiatePlugin(name, solver, nlp));
     ret.setOption(opts);
     ret.init();
     return ret;
@@ -1460,28 +1460,28 @@ namespace casadi {
 
   Function Function::nlp_solver_nlp() {
     casadi_assert(!isNull());
-    NlpSolverInternal* n = dynamic_cast<NlpSolverInternal*>(get());
+    NlpSolver* n = dynamic_cast<NlpSolver*>(get());
     casadi_assert_message(n!=0, "Not an NLP solver");
     return n->nlp_;
   }
 
   Function Function::nlp_solver_gradf() {
     casadi_assert(!isNull());
-    NlpSolverInternal* n = dynamic_cast<NlpSolverInternal*>(get());
+    NlpSolver* n = dynamic_cast<NlpSolver*>(get());
     casadi_assert_message(n!=0, "Not an NLP solver");
     return n->gradF();
   }
 
   Function Function::nlp_solver_jacg() {
     casadi_assert(!isNull());
-    NlpSolverInternal* n = dynamic_cast<NlpSolverInternal*>(get());
+    NlpSolver* n = dynamic_cast<NlpSolver*>(get());
     casadi_assert_message(n!=0, "Not an NLP solver");
     return n->jacG();
   }
 
   Function Function::nlp_solver_hesslag() {
     casadi_assert(!isNull());
-    NlpSolverInternal* n = dynamic_cast<NlpSolverInternal*>(get());
+    NlpSolver* n = dynamic_cast<NlpSolver*>(get());
     casadi_assert_message(n!=0, "Not an NLP solver");
     return n->hessLag();
   }
@@ -1489,7 +1489,7 @@ namespace casadi {
   Function Function::qp_solver(const string& name, const string& solver,
                                const SpDict& qp, const Dict& opts) {
     Function ret;
-    ret.assignNode(QpSolverInternal::instantiatePlugin(name, solver, qp));
+    ret.assignNode(QpSolver::instantiatePlugin(name, solver, qp));
     ret.setOption(opts);
     ret.init();
     return ret;
@@ -1503,7 +1503,7 @@ namespace casadi {
 
   void Function::qp_solver_debug(ostream &file) const {
     casadi_assert(!isNull());
-    const QpSolverInternal* n = dynamic_cast<const QpSolverInternal*>(get());
+    const QpSolver* n = dynamic_cast<const QpSolver*>(get());
     casadi_assert_message(n!=0, "Not a QP solver");
     return n->generateNativeCode(file);
   }
@@ -1511,7 +1511,7 @@ namespace casadi {
   Function Function::rootfinder(const string& name, const string& solver,
                                 const Dict& opts) const {
     Function ret;
-    ret.assignNode(ImplicitFunctionInternal::instantiatePlugin(name, solver, *this));
+    ret.assignNode(Rootfinder::instantiatePlugin(name, solver, *this));
     ret.setOption(opts);
     ret.init();
     return ret;

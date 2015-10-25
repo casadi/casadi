@@ -33,7 +33,7 @@
 namespace casadi {
 
   class CASADI_INTEGRATORS_EXPORT FixedStepIntegrator
-    : public IntegratorInternal {
+    : public Integrator {
   public:
 
     /// Constructor

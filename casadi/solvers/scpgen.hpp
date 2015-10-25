@@ -51,7 +51,7 @@ namespace casadi {
      \author Joel Andersson, Attila Kozma and Joris Gillis
      \date 2013
   */
-  class CASADI_NLPSOLVER_SCPGEN_EXPORT Scpgen : public NlpSolverInternal {
+  class CASADI_NLPSOLVER_SCPGEN_EXPORT Scpgen : public NlpSolver {
   public:
     explicit Scpgen(const std::string& name, const XProblem& nlp);
     virtual ~Scpgen();
@@ -60,7 +60,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "scpgen";}
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const std::string& name, const XProblem& nlp)
+    static NlpSolver* creator(const std::string& name, const XProblem& nlp)
     { return new Scpgen(name, nlp);}
 
     virtual void init();

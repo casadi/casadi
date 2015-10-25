@@ -36,18 +36,18 @@ namespace casadi {
       \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT MapAccumInternal : public FunctionInternal {
+  class CASADI_EXPORT Mapaccum : public FunctionInternal {
     friend class MapAccum;
   public:
 
     /** \brief Constructor (generic mapaccum) */
-    MapAccumInternal(const std::string& name, const Function& f, int n,
+    Mapaccum(const std::string& name, const Function& f, int n,
                      const std::vector<bool>& input_accum,
                      const std::vector<int>& output_accum,
                      bool reverse);
 
     /** \brief  Destructor */
-    virtual ~MapAccumInternal();
+    virtual ~Mapaccum();
 
     ///@{
     /** \brief Number of function inputs and outputs */

@@ -105,21 +105,21 @@ namespace casadi {
     void get(FcnPtr& fcnPtr, const std::string& sym);
   };
 
-  class CASADI_EXPORT ExternalFunctionInternal : public FunctionInternal {
+  class CASADI_EXPORT External : public FunctionInternal {
   public:
     /** \brief Creator function, dynamically linked library */
-    static ExternalFunctionInternal*
+    static External*
       create(const std::string& bin_name, const std::string& name);
 
     /** \brief Creator function, just-in-time compiled library */
-    static ExternalFunctionInternal*
+    static External*
       create(const Compiler& compiler, const std::string& name);
 
     /** \brief Constructor */
-    ExternalFunctionInternal(const std::string& name);
+    External(const std::string& name);
 
     /** \brief Destructor */
-    virtual ~ExternalFunctionInternal() = 0;
+    virtual ~External() = 0;
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
@@ -134,12 +134,12 @@ namespace casadi {
   private:
     /** \brief Creator function, use this for creating instances of the class */
     template<typename LibType>
-      static ExternalFunctionInternal*
+      static External*
       createGeneric(const LibType& bin_name, const std::string& name);
   };
 
   template<typename LibType>
-  class CASADI_EXPORT CommonExternal : public ExternalFunctionInternal {
+  class CASADI_EXPORT CommonExternal : public External {
   protected:
 
     /** \brief Information about the library */
@@ -178,7 +178,7 @@ namespace casadi {
 
   template<typename LibType>
   class CASADI_EXPORT SimplifiedExternal : public CommonExternal<LibType> {
-    friend class ExternalFunctionInternal;
+    friend class External;
   private:
     /** \brief Constructor is called from factory */
     SimplifiedExternal(const std::string& name, const LibInfo<LibType>& li);
@@ -207,7 +207,7 @@ namespace casadi {
 
   template<typename LibType>
   class CASADI_EXPORT GenericExternal : public CommonExternal<LibType> {
-    friend class ExternalFunctionInternal;
+    friend class External;
   private:
     /** \brief Constructor is called from factory */
     GenericExternal(const std::string& name, const LibInfo<LibType>& li);

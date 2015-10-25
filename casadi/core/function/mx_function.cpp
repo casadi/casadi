@@ -36,22 +36,22 @@ using namespace std;
 
 namespace casadi {
 
-  MXFunctionInternal::MXFunctionInternal(const std::string& name,
+  MXFunction::MXFunction(const std::string& name,
                                          const std::vector<MX>& inputv,
                                          const std::vector<MX>& outputv) :
-    XFunctionInternal<MXFunctionInternal, MX, MXNode>(name, inputv, outputv) {
+    XFunction<MXFunction, MX, MXNode>(name, inputv, outputv) {
   }
 
 
-  MXFunctionInternal::~MXFunctionInternal() {
+  MXFunction::~MXFunction() {
   }
 
 
-  void MXFunctionInternal::init() {
-    log("MXFunctionInternal::init begin");
+  void MXFunction::init() {
+    log("MXFunction::init begin");
 
     // Call the init function of the base class
-    XFunctionInternal<MXFunctionInternal, MX, MXNode>::init();
+    XFunction<MXFunction, MX, MXNode>::init();
 
     // Stack used to sort the computational graph
     stack<MXNode*> s;
@@ -355,12 +355,12 @@ namespace casadi {
       }
     }
 
-    log("MXFunctionInternal::init end");
+    log("MXFunction::init end");
   }
 
-  void MXFunctionInternal::evalD(const double** arg,
+  void MXFunction::evalD(const double** arg,
                                  double** res, int* iw, double* w) {
-    casadi_msg("MXFunctionInternal::evalD():begin "  << name_);
+    casadi_msg("MXFunction::evalD():begin "  << name_);
     // Set up timers for profiling
     double time_zero=0;
     double time_start=0;
@@ -459,10 +459,10 @@ namespace casadi {
       }
     }
 
-    casadi_msg("MXFunctionInternal::evalD():end "  << name_);
+    casadi_msg("MXFunction::evalD():end "  << name_);
   }
 
-  void MXFunctionInternal::print(ostream &stream, const AlgEl& el) const {
+  void MXFunction::print(ostream &stream, const AlgEl& el) const {
     if (el.op==OP_OUTPUT) {
       stream << "output[" << el.res.front() << "] = @" << el.arg.at(0);
     } else if (el.op==OP_SETNONZEROS || el.op==OP_ADDNONZEROS) {
@@ -504,7 +504,7 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::print(ostream &stream) const {
+  void MXFunction::print(ostream &stream) const {
     FunctionInternal::print(stream);
     for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       InterruptHandler::check();
@@ -513,13 +513,13 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::spInit(bool fwd) {
+  void MXFunction::spInit(bool fwd) {
     alloc();
     bvec_t *iwork = get_bvec_t(w_tmp_);
     fill(iwork+workloc_.front(), iwork+workloc_.back(), bvec_t(0));
   }
 
-  void MXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void MXFunction::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // Temporaries to hold pointers to operation input and outputs
     const bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -558,7 +558,7 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void MXFunction::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // Temporaries to hold pointers to operation input and outputs
     bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -599,7 +599,7 @@ namespace casadi {
     }
   }
 
-  Function MXFunctionInternal::getNumericJacobian(const std::string& name, int iind, int oind,
+  Function MXFunction::getNumericJacobian(const std::string& name, int iind, int oind,
                                                   bool compact, bool symmetric, const Dict& opts) {
     // Create expressions for the Jacobian
     vector<MX> ret_out;
@@ -610,7 +610,7 @@ namespace casadi {
     return Function(name, inputv_, ret_out, opts);
   }
 
-  std::vector<MX> MXFunctionInternal::symbolicOutput(const std::vector<MX>& arg) {
+  std::vector<MX> MXFunction::symbolicOutput(const std::vector<MX>& arg) {
     // Check if input is given
     const int checking_depth = 2;
     bool input_given = true;
@@ -628,7 +628,7 @@ namespace casadi {
     }
   }
 
-  std::vector<MX> MXFunctionInternal::create_call(const std::vector<MX>& arg) {
+  std::vector<MX> MXFunction::create_call(const std::vector<MX>& arg) {
     if (isInput(arg)) {
       return outputv_;
     } else {
@@ -636,8 +636,8 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
-    log("MXFunctionInternal::evalMX begin");
+  void MXFunction::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    log("MXFunction::evalMX begin");
     casadi_assert_message(arg.size()==n_in(), "Wrong number of input arguments");
 
     // Resize the number of outputs
@@ -651,7 +651,7 @@ namespace casadi {
 
     // Symbolic work, non-differentiated
     vector<MX> swork(workloc_.size()-1);
-    log("MXFunctionInternal::evalMX allocated work vector");
+    log("MXFunction::evalMX allocated work vector");
 
     // Split up inputs analogous to symbolic primitives
     vector<vector<MX> > arg_split(arg.size());
@@ -691,12 +691,12 @@ namespace casadi {
         }
       }
     }
-    log("MXFunctionInternal::evalMX end");
+    log("MXFunction::evalMX end");
   }
 
-  void MXFunctionInternal::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void MXFunction::evalFwd(const std::vector<std::vector<MX> >& fseed,
                                    std::vector<std::vector<MX> >& fsens) {
-    log("MXFunctionInternal::evalFwd begin");
+    log("MXFunction::evalFwd begin");
 
     // Allocate results
     int nfwd = fseed.size();
@@ -746,7 +746,7 @@ namespace casadi {
     // Work vector, forward derivatives
     std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
-    log("MXFunctionInternal::evalFwd allocated derivative work vector (forward mode)");
+    log("MXFunction::evalFwd allocated derivative work vector (forward mode)");
 
     // Split up fseed analogous to symbolic primitives
     vector<vector<vector<MX> > > fseed_split(nfwd);
@@ -820,12 +820,12 @@ namespace casadi {
         }
       }
     }
-    log("MXFunctionInternal::evalFwd end");
+    log("MXFunction::evalFwd end");
   }
 
-  void MXFunctionInternal::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void MXFunction::evalAdj(const std::vector<std::vector<MX> >& aseed,
                                    std::vector<std::vector<MX> >& asens) {
-    log("MXFunctionInternal::evalAdj begin");
+    log("MXFunction::evalAdj begin");
 
     // Allocate results
     int nadj = aseed.size();
@@ -885,7 +885,7 @@ namespace casadi {
     // Work vector, adjoint derivatives
     std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nadj));
-    log("MXFunctionInternal::evalAdj allocated derivative work vector (adjoint mode)");
+    log("MXFunction::evalAdj allocated derivative work vector (adjoint mode)");
 
     // Loop over computational nodes in reverse order
     for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
@@ -993,10 +993,10 @@ namespace casadi {
       }
     }
 
-    log("MXFunctionInternal::evalAdj end");
+    log("MXFunction::evalAdj end");
   }
 
-  void MXFunctionInternal::evalSX(const SXElement** arg, SXElement** res,
+  void MXFunction::evalSX(const SXElement** arg, SXElement** res,
                                   int* iw, SXElement* w) {
     // Work vector and temporaries to hold pointers to operation input and outputs
     vector<const SXElement*> argp(sz_arg());
@@ -1037,7 +1037,7 @@ namespace casadi {
     }
   }
 
-  Function MXFunctionInternal::expand(const std::vector<SX>& inputvsx) {
+  Function MXFunction::expand(const std::vector<SX>& inputvsx) {
 
     // Create inputs with the same name and sparsity as the matrix valued symbolic inputs
     vector<SX> arg(inputv_.size());
@@ -1084,7 +1084,7 @@ namespace casadi {
                         {"output_scheme", oscheme_}});
   }
 
-  void MXFunctionInternal::printWork(ostream &stream) {
+  void MXFunction::printWork(ostream &stream) {
     for (int k=0; k<workloc_.size()-1; ++k) {
       vector<double>::const_iterator start=w_tmp_.begin() + workloc_[k];
       vector<double>::const_iterator stop=w_tmp_.begin() + workloc_[k+1];
@@ -1092,7 +1092,7 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::generateDeclarations(CodeGenerator& g) const {
+  void MXFunction::generateDeclarations(CodeGenerator& g) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -1107,7 +1107,7 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::generateBody(CodeGenerator& g) const {
+  void MXFunction::generateBody(CodeGenerator& g) const {
     // Shorthand
     ostream &s = g.body;
 
@@ -1230,7 +1230,7 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::generateLiftingFunctions(Function& vdef_fcn, Function& vinit_fcn) {
+  void MXFunction::generateLiftingFunctions(Function& vdef_fcn, Function& vinit_fcn) {
     vector<MX> swork(workloc_.size()-1);
 
     vector<MX> arg1, res1;
@@ -1314,34 +1314,34 @@ namespace casadi {
     vinit_fcn = Function("lifting_variable_guess", f_in, f_out);
   }
 
-  MX MXFunctionInternal::grad_mx(int iind, int oind) {
+  MX MXFunction::grad_mx(int iind, int oind) {
     return grad(iind, oind);
   }
 
-  MX MXFunctionInternal::tang_mx(int iind, int oind) {
+  MX MXFunction::tang_mx(int iind, int oind) {
     return tang(iind, oind);
   }
 
-  MX MXFunctionInternal::jac_mx(int iind, int oind, bool compact, bool symmetric,
+  MX MXFunction::jac_mx(int iind, int oind, bool compact, bool symmetric,
                               bool always_inline, bool never_inline) {
     return jac(iind, oind, compact, symmetric, always_inline, never_inline);
   }
 
-  const MX MXFunctionInternal::mx_in(int ind) const {
+  const MX MXFunction::mx_in(int ind) const {
     return inputv_.at(ind);
   }
 
-  const std::vector<MX> MXFunctionInternal::mx_in() const {
+  const std::vector<MX> MXFunction::mx_in() const {
     return inputv_;
   }
 
-  std::string MXFunctionInternal::type_name() const {
+  std::string MXFunction::type_name() const {
     return "mxfunction";
   }
 
-  bool MXFunctionInternal::is_a(const std::string& type, bool recursive) const {
+  bool MXFunction::is_a(const std::string& type, bool recursive) const {
     return type=="mxfunction"
-      || (recursive && XFunctionInternal<MXFunctionInternal,
+      || (recursive && XFunction<MXFunction,
           MX, MXNode>::is_a(type, recursive));
   }
 

@@ -37,7 +37,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_INTEGRATOR_IDAS_EXPORT
-      casadi_register_integrator_idas(IntegratorInternal::Plugin* plugin) {
+      casadi_register_integrator_idas(Integrator::Plugin* plugin) {
     plugin->creator = IdasInterface::creator;
     plugin->name = "idas";
     plugin->doc = IdasInterface::meta_doc.c_str();
@@ -47,7 +47,7 @@ namespace casadi {
 
   extern "C"
   void CASADI_INTEGRATOR_IDAS_EXPORT casadi_load_integrator_idas() {
-    IntegratorInternal::registerPlugin(casadi_register_integrator_idas);
+    Integrator::registerPlugin(casadi_register_integrator_idas);
   }
 
   IdasInterface::IdasInterface(const std::string& name, const XProblem& dae)

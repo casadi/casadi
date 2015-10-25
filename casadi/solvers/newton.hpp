@@ -49,7 +49,7 @@ namespace casadi {
       \date 2012
   */
   class CASADI_IMPLICITFUNCTION_NEWTON_EXPORT Newton
-      : public ImplicitFunctionInternal {
+      : public Rootfinder {
   public:
     /** \brief  Constructor */
     explicit Newton(const std::string& name, const Function& f);
@@ -60,13 +60,13 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const { return "newton";}
 
-    /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const std::string& name, const Function& f) const {
+    /** \brief  Create a new Rootfinder */
+    virtual Rootfinder* create(const std::string& name, const Function& f) const {
       return new Newton(name, f);
     }
 
     /** \brief  Create a new ImplicitFunction */
-    static ImplicitFunctionInternal* creator(const std::string& name, const Function& f) {
+    static Rootfinder* creator(const std::string& name, const Function& f) {
       return new Newton(name, f);
     }
 

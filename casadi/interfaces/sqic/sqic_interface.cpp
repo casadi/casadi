@@ -36,7 +36,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_QPSOLVER_SQIC_EXPORT
-  casadi_register_qpsolver_sqic(QpSolverInternal::Plugin* plugin) {
+  casadi_register_qpsolver_sqic(QpSolver::Plugin* plugin) {
     plugin->creator = SqicInterface::creator;
     plugin->name = "sqic";
     plugin->doc = SqicInterface::meta_doc.c_str();
@@ -46,10 +46,10 @@ namespace casadi {
 
   extern "C"
   void CASADI_QPSOLVER_SQIC_EXPORT casadi_load_qpsolver_sqic() {
-    QpSolverInternal::registerPlugin(casadi_register_qpsolver_sqic);
+    QpSolver::registerPlugin(casadi_register_qpsolver_sqic);
   }
 
-  SqicInterface::SqicInterface(const std::map<std::string, Sparsity>& st) : QpSolverInternal(st) {
+  SqicInterface::SqicInterface(const std::map<std::string, Sparsity>& st) : QpSolver(st) {
     is_init_ = false;
   }
 
@@ -94,7 +94,7 @@ namespace casadi {
 
   void SqicInterface::init() {
     // Call the init method of the base class
-    QpSolverInternal::init();
+    QpSolver::init();
 
     if (is_init_) sqicDestroy();
 

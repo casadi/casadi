@@ -37,7 +37,7 @@
 /// \cond INTERNAL
 namespace casadi {
 
-class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public IntegratorInternal {
+class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public Integrator {
 public:
   /** \brief  Constructor */
   SundialsInterface(const std::string& name, const XProblem& dae);

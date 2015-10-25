@@ -41,7 +41,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_QPSOLVER_OOQP_EXPORT
-  casadi_register_qpsolver_ooqp(QpSolverInternal::Plugin* plugin) {
+  casadi_register_qpsolver_ooqp(QpSolver::Plugin* plugin) {
     plugin->creator = OoqpInterface::creator;
     plugin->name = "ooqp";
     plugin->doc = OoqpInterface::meta_doc.c_str();
@@ -51,12 +51,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_QPSOLVER_OOQP_EXPORT casadi_load_qpsolver_ooqp() {
-    QpSolverInternal::registerPlugin(casadi_register_qpsolver_ooqp);
+    QpSolver::registerPlugin(casadi_register_qpsolver_ooqp);
   }
 
   OoqpInterface::OoqpInterface(const std::string& name,
                                const std::map<std::string, Sparsity>& st)
-    : QpSolverInternal(name, st) {
+    : QpSolver(name, st) {
 
     addOption("print_level", OT_INTEGER, 0,
               "Print level. OOQP listens to print_level 0, 10 and 100");
@@ -69,7 +69,7 @@ namespace casadi {
 
   void OoqpInterface::init() {
     // Initialize the base classes
-    QpSolverInternal::init();
+    QpSolver::init();
 
     // Read options
     print_level_ = getOption("print_level");

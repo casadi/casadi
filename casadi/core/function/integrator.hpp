@@ -41,14 +41,14 @@ namespace casadi {
       \date 2010
   */
   class CASADI_EXPORT
-  IntegratorInternal : public FunctionInternal,
-                       public PluginInterface<IntegratorInternal> {
+  Integrator : public FunctionInternal,
+                       public PluginInterface<Integrator> {
   public:
     /** \brief  Constructor */
-    IntegratorInternal(const std::string& name, const XProblem& dae);
+    Integrator(const std::string& name, const XProblem& dae);
 
     /** \brief  Destructor */
-    virtual ~IntegratorInternal()=0;
+    virtual ~Integrator()=0;
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -186,7 +186,7 @@ namespace casadi {
     bool print_stats_;
 
     // Creator function for internal class
-    typedef IntegratorInternal* (*Creator)(const std::string& name,
+    typedef Integrator* (*Creator)(const std::string& name,
                                            const XProblem& dae);
 
     // No static functions exposed
@@ -213,7 +213,7 @@ namespace casadi {
 
 
   template<typename XType>
-  Problem<XType> IntegratorInternal::map2problem(const std::map<std::string, XType>& d) {
+  Problem<XType> Integrator::map2problem(const std::map<std::string, XType>& d) {
     std::vector<XType> de_in(DE_NUM_IN), de_out(DE_NUM_OUT);
     for (auto&& i : d) {
       if (i.first=="t") {
@@ -250,7 +250,7 @@ namespace casadi {
   }
 
   template<typename XType>
-  std::map<std::string, XType> IntegratorInternal::problem2map(const Problem<XType>& d) {
+  std::map<std::string, XType> Integrator::problem2map(const Problem<XType>& d) {
     return {
         {"t", d.in[DE_T]},
         {"x", d.in[DE_X]},
@@ -269,7 +269,7 @@ namespace casadi {
   }
 
   template<typename XType>
-  Problem<XType> IntegratorInternal::fun2problem(Function f, Function g) {
+  Problem<XType> Integrator::fun2problem(Function f, Function g) {
     Problem<XType> dae;
     dae.in.resize(DE_NUM_IN);
     dae.out.resize(DE_NUM_OUT);

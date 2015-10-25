@@ -46,13 +46,13 @@ namespace casadi {
        \date 2013
 
   */
-  class CASADI_QPSOLVER_SQIC_EXPORT SqicInterface : public QpSolverInternal {
+  class CASADI_QPSOLVER_SQIC_EXPORT SqicInterface : public QpSolver {
   public:
     /** \brief  Constructor */
     explicit SqicInterface();
 
     /** \brief  Create a new QP Solver */
-    static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
+    static QpSolver* creator(const std::map<std::string, Sparsity>& st) {
       return new SqicInterface(st);
     }
 

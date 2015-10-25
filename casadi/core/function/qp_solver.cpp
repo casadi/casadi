@@ -33,7 +33,7 @@ using namespace std;
 namespace casadi {
 
   // Constructor
-  QpSolverInternal::QpSolverInternal(const std::string& name,
+  QpSolver::QpSolver(const std::string& name,
                                      const std::map<std::string, Sparsity> &st)
   : FunctionInternal(name) {
 
@@ -98,7 +98,7 @@ namespace casadi {
     oscheme_ = IOScheme(SCHEME_QpSolverOutput);
   }
 
-  Sparsity QpSolverInternal::get_sparsity_in(int ind) const {
+  Sparsity QpSolver::get_sparsity_in(int ind) const {
     switch (static_cast<QpSolverInput>(ind)) {
     case QP_SOLVER_X0:
     case QP_SOLVER_G:
@@ -118,7 +118,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  Sparsity QpSolverInternal::get_sparsity_out(int ind) const {
+  Sparsity QpSolver::get_sparsity_out(int ind) const {
     switch (static_cast<QpSolverOutput>(ind)) {
     case QP_SOLVER_COST:
       return Sparsity::scalar();
@@ -132,23 +132,23 @@ namespace casadi {
     return Sparsity();
   }
 
-  void QpSolverInternal::init() {
+  void QpSolver::init() {
     // Call the init method of the base class
     FunctionInternal::init();
   }
 
-  QpSolverInternal::~QpSolverInternal() {
+  QpSolver::~QpSolver() {
   }
 
-  void QpSolverInternal::evaluate() {
-    throw CasadiException("QpSolverInternal::evaluate: Not implemented");
+  void QpSolver::evaluate() {
+    throw CasadiException("QpSolver::evaluate: Not implemented");
   }
 
-  void QpSolverInternal::solve() {
-    throw CasadiException("QpSolverInternal::solve: Not implemented");
+  void QpSolver::solve() {
+    throw CasadiException("QpSolver::solve: Not implemented");
   }
 
-  void QpSolverInternal::checkInputs() const {
+  void QpSolver::checkInputs() const {
     for (int i=0;i<input(QP_SOLVER_LBX).nnz();++i) {
       casadi_assert_message(input(QP_SOLVER_LBX).at(i)<=input(QP_SOLVER_UBX).at(i),
                             "LBX[i] <= UBX[i] was violated for i=" << i
@@ -163,16 +163,16 @@ namespace casadi {
     }
   }
 
-  void QpSolverInternal::generateNativeCode(std::ostream& file) const {
-    casadi_error("QpSolverInternal::generateNativeCode not defined for class "
+  void QpSolver::generateNativeCode(std::ostream& file) const {
+    casadi_error("QpSolver::generateNativeCode not defined for class "
                  << typeid(*this).name());
   }
 
-  std::map<std::string, QpSolverInternal::Plugin> QpSolverInternal::solvers_;
+  std::map<std::string, QpSolver::Plugin> QpSolver::solvers_;
 
-  const std::string QpSolverInternal::infix_ = "qpsolver";
+  const std::string QpSolver::infix_ = "qpsolver";
 
-  const double& QpSolverInternal::default_in(int ind) const {
+  const double& QpSolver::default_in(int ind) const {
     switch (ind) {
     case QP_SOLVER_LBX:
     case QP_SOLVER_LBA:

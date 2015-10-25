@@ -30,7 +30,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_IMPLICITFUNCTION_NLP_EXPORT
-  casadi_register_implicitfunction_nlp(ImplicitFunctionInternal::Plugin* plugin) {
+  casadi_register_implicitfunction_nlp(Rootfinder::Plugin* plugin) {
     plugin->creator = QpToImplicit::creator;
     plugin->name = "nlp";
     plugin->doc = QpToImplicit::meta_doc.c_str();
@@ -41,13 +41,13 @@ namespace casadi {
 
   extern "C"
   void CASADI_IMPLICITFUNCTION_NLP_EXPORT casadi_load_implicitfunction_nlp() {
-    ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_nlp);
+    Rootfinder::registerPlugin(casadi_register_implicitfunction_nlp);
   }
 
   QpToImplicit::QpToImplicit(const std::string& name, const Function& f)
-    : ImplicitFunctionInternal(name, f) {
+    : Rootfinder(name, f) {
 
-    Adaptor<QpToImplicit, NlpSolverInternal>::addOptions();
+    Adaptor<QpToImplicit, NlpSolver>::addOptions();
   }
 
   QpToImplicit::~QpToImplicit() {
@@ -100,7 +100,7 @@ namespace casadi {
 
   void QpToImplicit::init() {
     // Call the base class initializer
-    ImplicitFunctionInternal::init();
+    Rootfinder::init();
 
     // Free variable in the NLP
     MX u = MX::sym("u", input(iin_).sparsity());

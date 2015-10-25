@@ -34,7 +34,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_QPSOLVER_QPOASES_EXPORT
-  casadi_register_qpsolver_qpoases(QpSolverInternal::Plugin* plugin) {
+  casadi_register_qpsolver_qpoases(QpSolver::Plugin* plugin) {
     plugin->creator = QpoasesInterface::creator;
     plugin->name = "qpoases";
     plugin->doc = QpoasesInterface::meta_doc.c_str();
@@ -44,12 +44,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_QPSOLVER_QPOASES_EXPORT casadi_load_qpsolver_qpoases() {
-    QpSolverInternal::registerPlugin(casadi_register_qpsolver_qpoases);
+    QpSolver::registerPlugin(casadi_register_qpsolver_qpoases);
   }
 
   QpoasesInterface::QpoasesInterface(const std::string& name,
                                      const std::map<std::string, Sparsity>& st)
-    : QpSolverInternal(name, st) {
+    : QpSolver(name, st) {
 
     addOption("nWSR",                   OT_INTEGER,     GenericType(),
               "The maximum number of working set recalculations to be performed during "
@@ -137,7 +137,7 @@ namespace casadi {
   }
 
   void QpoasesInterface::init() {
-    QpSolverInternal::init();
+    QpSolver::init();
 
     // Read options
     if (hasSetOption("nWSR")) {

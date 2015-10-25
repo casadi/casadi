@@ -91,18 +91,18 @@ namespace casadi {
     fcnPtr = (FcnPtr)compiler_.getFunction(sym);
   }
 
-  ExternalFunctionInternal*
-  ExternalFunctionInternal::create(const std::string& bin_name, const std::string& name) {
+  External*
+  External::create(const std::string& bin_name, const std::string& name) {
     return createGeneric(bin_name, name);
   }
 
-  ExternalFunctionInternal*
-  ExternalFunctionInternal::create(const Compiler& compiler, const std::string& name) {
+  External*
+  External::create(const Compiler& compiler, const std::string& name) {
     return createGeneric(compiler, name);
   }
 
   template<typename LibType>
-  ExternalFunctionInternal* ExternalFunctionInternal::
+  External* External::
   createGeneric(const LibType& libtype, const std::string& f_name) {
     // Structure with info about the library to be passed to the constructor
     LibInfo<LibType> li(libtype);
@@ -146,7 +146,7 @@ namespace casadi {
 
   template<typename LibType>
   CommonExternal<LibType>::CommonExternal(const std::string& name, const LibInfo<LibType>& li)
-    : ExternalFunctionInternal(name), li_(li) {
+    : External(name), li_(li) {
     ibuf_.resize(li.n_in);
     obuf_.resize(li.n_out);
     alloc_arg(li.sz_arg);
@@ -175,21 +175,21 @@ namespace casadi {
     this->alloc_w(this->n_in() + this->n_out());
   }
 
-  Sparsity ExternalFunctionInternal::get_sparsity_in(int ind) const {
+  Sparsity External::get_sparsity_in(int ind) const {
     return get_sparsity(ind);
   }
 
-  Sparsity ExternalFunctionInternal::get_sparsity_out(int ind) const {
+  Sparsity External::get_sparsity_out(int ind) const {
     return get_sparsity(ind+n_in());
   }
 
-  Sparsity ExternalFunctionInternal::get_sparsity(int ind) const {
+  Sparsity External::get_sparsity(int ind) const {
     // Get sparsity from file
     int nrow, ncol;
     const int *colind, *row;
     casadi_assert(sparsity_!=0);
     int flag = sparsity_(ind, &nrow, &ncol, &colind, &row);
-    casadi_assert_message(flag==0, "ExternalFunctionInternal: \"sparsity\" failed");
+    casadi_assert_message(flag==0, "External: \"sparsity\" failed");
 
     // Col offsets
     vector<int> colindv(colind, colind+ncol+1);
@@ -240,11 +240,11 @@ namespace casadi {
     }
   }
 
-  ExternalFunctionInternal::ExternalFunctionInternal(const std::string& name)
+  External::External(const std::string& name)
     : FunctionInternal(name) {
   }
 
-  ExternalFunctionInternal::~ExternalFunctionInternal() {
+  External::~External() {
   }
 
   template<typename LibType>

@@ -29,7 +29,7 @@ using namespace std;
 
 namespace casadi {
 
-  MapAccumInternal::MapAccumInternal(const std::string& name, const Function& f, int n,
+  Mapaccum::Mapaccum(const std::string& name, const Function& f, int n,
                                      const std::vector<bool>& input_accum,
                                      const std::vector<int>& output_accum,
                                      bool reverse)
@@ -60,10 +60,10 @@ namespace casadi {
     casadi_assert(isMonotone(output_accum));
   }
 
-  MapAccumInternal::~MapAccumInternal() {
+  Mapaccum::~Mapaccum() {
   }
 
-  void MapAccumInternal::init() {
+  void Mapaccum::init() {
 
     int num_in = f_.n_in(), num_out = f_.n_out();
 
@@ -123,7 +123,7 @@ namespace casadi {
   }
 
   template<typename T, typename R>
-  void MapAccumInternal::evalGen(const T** arg, T** res, int* iw, T* w,
+  void Mapaccum::evalGen(const T** arg, T** res, int* iw, T* w,
                                  R reduction) {
     int num_in = f_.n_in(), num_out = f_.n_out();
 
@@ -195,17 +195,17 @@ namespace casadi {
     }
   }
 
-  void MapAccumInternal::evalD(const double** arg, double** res,
+  void Mapaccum::evalD(const double** arg, double** res,
                                 int* iw, double* w) {
     evalGen(arg, res, iw, w, std::plus<double>());
   }
 
-  void MapAccumInternal::evalSX(const SXElement** arg, SXElement** res,
+  void Mapaccum::evalSX(const SXElement** arg, SXElement** res,
                                 int* iw, SXElement* w) {
     evalGen(arg, res, iw, w, std::plus<SXElement>());
   }
 
-  void MapAccumInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Mapaccum::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     evalGen(arg, res, iw, w, orop);
   }
 
@@ -216,7 +216,7 @@ namespace casadi {
     return horzsplit(a, idx);
   }
 
-  Function MapAccumInternal
+  Function Mapaccum
   ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
 
     // Obtain forward mode of the primitive function
@@ -342,7 +342,7 @@ namespace casadi {
     return Function("df", der_ins, ma(f_der_ins));
   }
 
-  Function MapAccumInternal
+  Function Mapaccum
   ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
 
     // Obtain Reverse mode of the primitive function
@@ -622,11 +622,11 @@ namespace casadi {
     return Function("df", der_ins, der_outs);
   }
 
-  void MapAccumInternal::generateDeclarations(CodeGenerator& g) const {
+  void Mapaccum::generateDeclarations(CodeGenerator& g) const {
     f_->addDependency(g);
   }
 
-  void MapAccumInternal::generateBody(CodeGenerator& g) const {
+  void Mapaccum::generateBody(CodeGenerator& g) const {
     g.addAuxiliary(CodeGenerator::AUX_COPY_N);
     int num_in = f_.n_in(), num_out = f_.n_out();
 
@@ -702,7 +702,7 @@ namespace casadi {
     }
   }
 
-  void MapAccumInternal::print(ostream &stream) const {
+  void Mapaccum::print(ostream &stream) const {
     stream << "MapAccum(" << name(f_) << ", " << n_ << ")";
   }
 

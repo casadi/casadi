@@ -1403,7 +1403,7 @@ namespace casadi {
 
     // Write the mapping function
     Function f("mapping", f_in, f_out);
-    auto *ff = dynamic_cast<MXFunctionInternal *>(f.get());
+    auto *ff = dynamic_cast<MXFunction *>(f.get());
 
     // Get references to the internal data structures
     std::vector<MXAlgEl>& algorithm = ff->algorithm_;
@@ -1486,7 +1486,7 @@ namespace casadi {
 
     // Sort the expression
     Function f("tmp", vector<MX>{}, ex);
-    auto *ff = dynamic_cast<MXFunctionInternal *>(f.get());
+    auto *ff = dynamic_cast<MXFunction *>(f.get());
 
     // Get references to the internal data structures
     const vector<MXAlgEl>& algorithm = ff->algorithm_;
@@ -1575,7 +1575,7 @@ namespace casadi {
     }
 
     //casadi_assert_message(all_found,
-    //             "MXFunctionInternal::extractNodes(const std::vector<MX>& expr):"
+    //             "MXFunction::extractNodes(const std::vector<MX>& expr):"
     //             " failed to locate all input expr."
     //             << std::endl << "Here's a boolean list showing which ones where found: "
     //             << expr_found);
@@ -1589,7 +1589,7 @@ namespace casadi {
 
     // Sort the expression
     Function f("tmp", vector<MX>{}, ex);
-    auto *ff = dynamic_cast<MXFunctionInternal *>(f.get());
+    auto *ff = dynamic_cast<MXFunction *>(f.get());
 
     // Get references to the internal data structures
     const vector<MXAlgEl>& algorithm = ff->algorithm_;

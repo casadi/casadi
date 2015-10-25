@@ -36,16 +36,16 @@ namespace casadi {
       \author Joel Andersson
       \date 2015
   */
-  class CASADI_EXPORT SwitchInternal : public FunctionInternal {
+  class CASADI_EXPORT Switch : public FunctionInternal {
     friend class Switch;
   public:
 
     /** \brief Constructor (generic switch) */
-    SwitchInternal(const std::string& name,
+    Switch(const std::string& name,
                    const std::vector<Function>& f, const Function& f_def);
 
     /** \brief  Destructor */
-    virtual ~SwitchInternal();
+    virtual ~Switch();
 
     ///@{
     /** \brief Number of function inputs and outputs */

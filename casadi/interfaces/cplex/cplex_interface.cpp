@@ -38,7 +38,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_QPSOLVER_CPLEX_EXPORT
-  casadi_register_qpsolver_cplex(QpSolverInternal::Plugin* plugin) {
+  casadi_register_qpsolver_cplex(QpSolver::Plugin* plugin) {
     plugin->creator = CplexInterface::creator;
     plugin->name = "cplex";
     plugin->doc = CplexInterface::meta_doc.c_str();
@@ -48,12 +48,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_QPSOLVER_CPLEX_EXPORT casadi_load_qpsolver_cplex() {
-    QpSolverInternal::registerPlugin(casadi_register_qpsolver_cplex);
+    QpSolver::registerPlugin(casadi_register_qpsolver_cplex);
   }
 
   CplexInterface::CplexInterface(const std::string& name,
                                  const std::map<std::string, Sparsity>& st)
-    : QpSolverInternal(name, st) {
+    : QpSolver(name, st) {
 
     addOption("qp_method",    OT_STRING, "automatic", "Determines which CPLEX algorithm to use.",
               "automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover");
@@ -81,7 +81,7 @@ namespace casadi {
     freeCplex();
 
     // Call the init method of the base class
-    QpSolverInternal::init();
+    QpSolver::init();
 
     qp_method_     = getOptionEnumValue("qp_method");
     dump_to_file_  = getOption("dump_to_file");
