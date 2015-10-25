@@ -174,8 +174,10 @@ namespace casadi {
 
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+
     /** \brief  Is the class able to propagate seeds through the algorithm? */
-    virtual bool spCanEvaluate(bool fwd) { return fwd; }
+    virtual bool spCanEvaluate(bool fwd) { return true; }
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */

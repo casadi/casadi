@@ -254,7 +254,7 @@ namespace casadi {
       alloc_arg(2*f_.sz_arg());
       alloc_res(2*f_.sz_res());
     } else if (parallelization_ == PARALLELIZATION_OMP) {
-      alloc_w(f_.sz_w()*n_);
+      alloc_w(f_.sz_w()*n_ + nnz_out_);
       alloc_iw(f_.sz_iw()*n_);
       alloc_arg(f_.sz_arg()*(n_+1));
       alloc_res(f_.sz_res()*(n_+1));
@@ -310,6 +310,50 @@ namespace casadi {
           std::transform(res1[k], res1[k]+step_out_[k], sum[k], sum[k], reduction);
       }
     }
+  }
+
+  void MapReduce::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    int num_in = f_.nIn(), num_out = f_.nOut();
+
+    bvec_t** arg1 = arg+f_.sz_arg();
+    bvec_t** res1 = res+f_.sz_res();
+
+
+    for (int i=0; i<n_; ++i) {
+
+      bvec_t* temp_res = w+f_.sz_w();
+
+
+      // Set the function inputs
+      for (int j=0; j<num_in; ++j) {
+        arg1[j] = (arg[j]==0) ? 0: arg[j]+i*step_in_[j];
+      }
+
+      // Set the function outputs
+      for (int j=0; j<num_out; ++j) {
+        if (repeat_out_[j]) {
+          // Make the function outputs end up in our outputs
+          res1[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
+        } else {
+          // Make the function outputs end up in temp_res
+          res1[j] = (res[j]==0)? 0: temp_res;
+          if (res[j]!=0) {
+            copy(res[j], res[j]+step_out_[j], temp_res);
+          }
+          temp_res+= step_out_[j];
+        }
+      }
+
+      f_.spAdj(arg1, res1, iw, w);
+    }
+
+    // Reset all seeds
+    for (int j=0; j<num_out; ++j) {
+      if (res[j]!=0) {
+        fill(res[j], res[j]+f_.output(j).nnz(), bvec_t(0));
+      }
+    }
+
   }
 
   void MapReduce::evalD(const double** arg, double** res,

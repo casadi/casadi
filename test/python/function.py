@@ -1520,46 +1520,47 @@ class Functiontests(casadiTestCase):
     V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
 
     zi = 0
-    for Z_alt in [Z,[MX()]*3]:
-      zi+= 1
-      for parallelization in ["serial","openmp"]:
-        res = fun.mapsum(map(horzcat,[X,Y,Z_alt,V]),parallelization)
+    for ad_weight_sp in [0,1]:
+      for Z_alt in [Z,[MX()]*3]:
+        zi+= 1
+        for parallelization in ["serial","openmp"]:
+          res = fun.mapsum(map(horzcat,[X,Y,Z_alt,V]),parallelization)
 
 
-        F = MXFunction("F",X+Y+Z+V,map(sin,res),{"ad_weight": 0})
+          F = MXFunction("F",X+Y+Z+V,map(sin,res),{"ad_weight": 0,"ad_weight_sp":ad_weight_sp})
 
-        resref = [0 for i in range(fun.nOut())]
-        for r in zip(X,Y,Z_alt,V):
-          for i,e in enumerate(fun(r)):
-            resref[i] = resref[i] + e
+          resref = [0 for i in range(fun.nOut())]
+          for r in zip(X,Y,Z_alt,V):
+            for i,e in enumerate(fun(r)):
+              resref[i] = resref[i] + e
 
-        Fref = MXFunction("F",X+Y+Z+V,map(sin,resref))
-        
-        np.random.seed(0)
-        X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
-        Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
-        Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
-        V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
+          Fref = MXFunction("F",X+Y+Z+V,map(sin,resref))
+          
+          np.random.seed(0)
+          X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+          Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+          Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
+          V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
-        name = "trial_%s_%d" % (parallelization,zi)
-        F.generate(name)
+          name = "trial_%s_%d" % (parallelization,zi)
+          F.generate(name)
 
-        import subprocess
-        p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name),shell=True).wait()
-        Fcgen = ExternalFunction(name)
-        for i,e in enumerate(X_+Y_+Z_+V_):
-          Fcgen.setInput(e,i)
-          Fref.setInput(e,i)
-
-        self.checkfunction(Fcgen,Fref,jacobian=False,hessian=False,evals=False)
-        del Fcgen
-
-        for f in [F,toSXFunction(F)]:
+          import subprocess
+          p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name),shell=True).wait()
+          Fcgen = ExternalFunction(name)
           for i,e in enumerate(X_+Y_+Z_+V_):
-            f.setInput(e,i)
+            Fcgen.setInput(e,i)
             Fref.setInput(e,i)
 
-          self.checkfunction(f,Fref,sparsity_mod=args.run_slow)
+          self.checkfunction(Fcgen,Fref,jacobian=False,hessian=False,evals=False)
+          del Fcgen
+
+          for f in [F,toSXFunction(F)]:
+            for i,e in enumerate(X_+Y_+Z_+V_):
+              f.setInput(e,i)
+              Fref.setInput(e,i)
+
+            self.checkfunction(f,Fref,sparsity_mod=args.run_slow)
 
 
 
@@ -1579,51 +1580,52 @@ class Functiontests(casadiTestCase):
     Z = MX.sym("z",2,2)
     V = MX.sym("z",Sparsity.upper(3))
 
-    for Z_alt in [Z]:
+    for ad_weight_sp in [0,1]:
+      for Z_alt in [Z]:
 
-      for parallelization in ["serial","openmp"]:
+        for parallelization in ["serial","openmp"]:
 
-        F = Map("map",fun,n,[True,True,False,False],[False,True,True])
+          F = Map("map",fun,n,[True,True,False,False],[False,True,True],{"ad_weight_sp":ad_weight_sp})
 
-        resref = [0 for i in range(fun.nOut())]
-        acc = 0
-        bl = []
-        cl = []
-        for r in zip(X,Y,[Z_alt]*n,[V]*n):
-          a,b,c= fun(r)
-          acc = acc + a
-          bl.append(b)
-          cl.append(c)
+          resref = [0 for i in range(fun.nOut())]
+          acc = 0
+          bl = []
+          cl = []
+          for r in zip(X,Y,[Z_alt]*n,[V]*n):
+            a,b,c= fun(r)
+            acc = acc + a
+            bl.append(b)
+            cl.append(c)
 
-        Fref = MXFunction("F",[horzcat(X),horzcat(Y),Z,V],[acc,horzcat(bl),horzcat(cl)])
+          Fref = MXFunction("F",[horzcat(X),horzcat(Y),Z,V],[acc,horzcat(bl),horzcat(cl)])
 
-        np.random.seed(0)
-        X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
-        Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
-        Z_ = DMatrix(Z.sparsity(),np.random.random(Z.nnz()))
-        V_ = DMatrix(V.sparsity(),np.random.random(V.nnz()))
+          np.random.seed(0)
+          X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+          Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+          Z_ = DMatrix(Z.sparsity(),np.random.random(Z.nnz()))
+          V_ = DMatrix(V.sparsity(),np.random.random(V.nnz()))
 
 
-        name = "trial2_%s" % parallelization
-        F.generate(name)
+          name = "trial2_%s" % parallelization
+          F.generate(name)
 
-        import subprocess
-        p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
-        Fcgen = ExternalFunction(name)
-        for i,e in enumerate([horzcat(X_),horzcat(Y_),Z_,V_]):
-          Fcgen.setInput(e,i)
-          Fref.setInput(e,i)
-
-        self.checkfunction(Fcgen,Fref,jacobian=False,hessian=False,evals=False)
-        del Fcgen
-
-        for f in [F,toSXFunction(F)]:
+          import subprocess
+          p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
+          Fcgen = ExternalFunction(name)
           for i,e in enumerate([horzcat(X_),horzcat(Y_),Z_,V_]):
-            f.setInput(e,i)
+            Fcgen.setInput(e,i)
             Fref.setInput(e,i)
 
+          self.checkfunction(Fcgen,Fref,jacobian=False,hessian=False,evals=False)
+          del Fcgen
 
-          self.checkfunction(f,Fref,sparsity_mod=args.run_slow)
+          for f in [F,toSXFunction(F)]:
+            for i,e in enumerate([horzcat(X_),horzcat(Y_),Z_,V_]):
+              f.setInput(e,i)
+              Fref.setInput(e,i)
+
+
+            self.checkfunction(f,Fref,sparsity_mod=args.run_slow)
 
   def test_issue1522(self):
     V = MX.sym("X",2)
