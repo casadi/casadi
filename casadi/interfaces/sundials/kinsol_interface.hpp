@@ -26,7 +26,7 @@
 #ifndef CASADI_KINSOL_INTERFACE_HPP
 #define CASADI_KINSOL_INTERFACE_HPP
 
-#include <casadi/interfaces/sundials/casadi_implicitfunction_kinsol_export.h>
+#include <casadi/interfaces/sundials/casadi_rootfinder_kinsol_export.h>
 #include "casadi/core/function/rootfinder.hpp"
 #include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
 #include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
@@ -40,22 +40,22 @@
 #include <kinsol/kinsol_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
-/** \defgroup plugin_ImplicitFunction_kinsol
+/** \defgroup plugin_Rootfinder_kinsol
  KINSOL interface from the Sundials suite
 */
-/** \pluginsection{ImplicitFunction,kinsol} */
+/** \pluginsection{Rootfinder,kinsol} */
 
 /// \cond INTERNAL
 namespace casadi {
 
   typedef std::pair< std::string, std::string> Message;
 
-  /** \brief \pluginbrief{ImplicitFunction,kinsol}
+  /** \brief \pluginbrief{Rootfinder,kinsol}
   *
-  * @copydoc ImplicitFunction_doc
-  * @copydoc plugin_ImplicitFunction_kinsol
+  * @copydoc Rootfinder_doc
+  * @copydoc plugin_Rootfinder_kinsol
   */
-  class CASADI_IMPLICITFUNCTION_KINSOL_EXPORT KinsolInterface : public Rootfinder {
+  class CASADI_ROOTFINDER_KINSOL_EXPORT KinsolInterface : public Rootfinder {
   public:
     /** \brief  Constructor */
     explicit KinsolInterface(const std::string& name, const Function& f);
@@ -68,7 +68,7 @@ namespace casadi {
       return new KinsolInterface(name, f);
     }
 
-    /** \brief  Create a new ImplicitFunction */
+    /** \brief  Create a new Rootfinder */
     static Rootfinder* creator(const std::string& name, const Function& f) {
       return new KinsolInterface(name, f);
     }

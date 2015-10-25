@@ -29,8 +29,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_IMPLICITFUNCTION_KINSOL_EXPORT
-  casadi_register_implicitfunction_kinsol(Rootfinder::Plugin* plugin) {
+  int CASADI_ROOTFINDER_KINSOL_EXPORT
+  casadi_register_rootfinder_kinsol(Rootfinder::Plugin* plugin) {
     plugin->creator = KinsolInterface::creator;
     plugin->name = "kinsol";
     plugin->doc = KinsolInterface::meta_doc.c_str();
@@ -39,13 +39,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_IMPLICITFUNCTION_KINSOL_EXPORT casadi_load_implicitfunction_kinsol() {
-    Rootfinder::registerPlugin(casadi_register_implicitfunction_kinsol);
+  void CASADI_ROOTFINDER_KINSOL_EXPORT casadi_load_rootfinder_kinsol() {
+    Rootfinder::registerPlugin(casadi_register_rootfinder_kinsol);
   }
 
   /** \brief Kinsol solver class
    *
-   * @copydoc ImplicitFunction_doc
+   * @copydoc Rootfinder_doc
    * You can provide an initial guess by setting output(0).\n
    * A good initial guess may be needed to avoid errors like
    * "The linear solver's setup function failed in an unrecoverable manner."
@@ -59,7 +59,7 @@ namespace casadi {
    -2 then \p ui will be constrained to be \p ui < 0.0. \n
 
    *
-   * \see ImplicitFunction for more information
+   * \see Rootfinder for more information
    *
    */
   KinsolInterface::KinsolInterface(const std::string& name, const Function& f)

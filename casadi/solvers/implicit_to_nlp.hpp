@@ -30,25 +30,25 @@
 #include "casadi/core/function/nlp_solver.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 
-#include <casadi/solvers/casadi_implicitfunction_nlp_export.h>
+#include <casadi/solvers/casadi_rootfinder_nlp_export.h>
 
-/** \defgroup plugin_ImplicitFunction_nlp
-  Use an NlpSolver as ImplicitFunction solver
+/** \defgroup plugin_Rootfinder_nlp
+  Use an NlpSolver as Rootfinder solver
 */
-/** \pluginsection{ImplicitFunction,nlp} */
+/** \pluginsection{Rootfinder,nlp} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief  \pluginbrief{ImplicitFunction,nlp}
+  /** \brief  \pluginbrief{Rootfinder,nlp}
 
-   @copydoc ImplicitFunction_doc
-   @copydoc plugin_ImplicitFunction_nlp
+   @copydoc Rootfinder_doc
+   @copydoc plugin_Rootfinder_nlp
 
    \author Joris Gillis
    \date 2012
   */
-  class CASADI_IMPLICITFUNCTION_NLP_EXPORT QpToImplicit : public Rootfinder,
+  class CASADI_ROOTFINDER_NLP_EXPORT QpToImplicit : public Rootfinder,
     public Adaptor<QpToImplicit, NlpSolver> {
   public:
     /** \brief  Constructor */
@@ -62,7 +62,7 @@ namespace casadi {
       return new QpToImplicit(name, f);
     }
 
-    /** \brief  Create a new ImplicitFunction */
+    /** \brief  Create a new Rootfinder */
     static Rootfinder* creator(const std::string& name, const Function& f) {
       return new QpToImplicit(name, f);
     }

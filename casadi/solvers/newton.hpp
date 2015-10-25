@@ -29,26 +29,26 @@
 #include "casadi/core/function/rootfinder.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 
-#include <casadi/solvers/casadi_implicitfunction_newton_export.h>
+#include <casadi/solvers/casadi_rootfinder_newton_export.h>
 
-/** \defgroup plugin_ImplicitFunction_newton
+/** \defgroup plugin_Rootfinder_newton
      Implements simple newton iterations to solve an implicit function.
 */
 
-/** \pluginsection{ImplicitFunction,newton} */
+/** \pluginsection{Rootfinder,newton} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{ImplicitFunction,newton}
+  /** \brief \pluginbrief{Rootfinder,newton}
 
-      @copydoc ImplicitFunction_doc
-      @copydoc plugin_ImplicitFunction_newton
+      @copydoc Rootfinder_doc
+      @copydoc plugin_Rootfinder_newton
 
       \author Joris Gillis
       \date 2012
   */
-  class CASADI_IMPLICITFUNCTION_NEWTON_EXPORT Newton
+  class CASADI_ROOTFINDER_NEWTON_EXPORT Newton
       : public Rootfinder {
   public:
     /** \brief  Constructor */
@@ -65,7 +65,7 @@ namespace casadi {
       return new Newton(name, f);
     }
 
-    /** \brief  Create a new ImplicitFunction */
+    /** \brief  Create a new Rootfinder */
     static Rootfinder* creator(const std::string& name, const Function& f) {
       return new Newton(name, f);
     }

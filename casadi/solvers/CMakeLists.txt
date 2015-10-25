@@ -27,7 +27,7 @@ casadi_plugin(Integrator oldcollocation
   old_collocation_integrator.cpp
   old_collocation_integrator_meta.cpp)
 
-casadi_plugin(ImplicitFunction newton
+casadi_plugin(Rootfinder newton
   newton.hpp newton.cpp newton_meta.cpp)
 
 # SQPMethod -  A basic SQP method
@@ -41,7 +41,7 @@ casadi_plugin(NlpSolver scpgen
 # Reformulations
 casadi_plugin(QpSolver nlp
   qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
-casadi_plugin(ImplicitFunction nlp
+casadi_plugin(Rootfinder nlp
   implicit_to_nlp.hpp implicit_to_nlp.cpp implicit_to_nlp_meta.cpp)
 casadi_plugin(LinearSolver symbolicqr
   symbolic_qr.hpp symbolic_qr.cpp symbolic_qr_meta.cpp

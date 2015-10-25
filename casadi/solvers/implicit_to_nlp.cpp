@@ -29,8 +29,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_IMPLICITFUNCTION_NLP_EXPORT
-  casadi_register_implicitfunction_nlp(Rootfinder::Plugin* plugin) {
+  int CASADI_ROOTFINDER_NLP_EXPORT
+  casadi_register_rootfinder_nlp(Rootfinder::Plugin* plugin) {
     plugin->creator = QpToImplicit::creator;
     plugin->name = "nlp";
     plugin->doc = QpToImplicit::meta_doc.c_str();
@@ -40,8 +40,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_IMPLICITFUNCTION_NLP_EXPORT casadi_load_implicitfunction_nlp() {
-    Rootfinder::registerPlugin(casadi_register_implicitfunction_nlp);
+  void CASADI_ROOTFINDER_NLP_EXPORT casadi_load_rootfinder_nlp() {
+    Rootfinder::registerPlugin(casadi_register_rootfinder_nlp);
   }
 
   QpToImplicit::QpToImplicit(const std::string& name, const Function& f)

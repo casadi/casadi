@@ -277,7 +277,7 @@ namespace casadi {
 
   std::map<std::string, Rootfinder::Plugin> Rootfinder::solvers_;
 
-  const std::string Rootfinder::infix_ = "implicitfunction";
+  const std::string Rootfinder::infix_ = "rootfinder";
 
   void Rootfinder::
   callForward(const std::vector<MX>& arg, const std::vector<MX>& res,

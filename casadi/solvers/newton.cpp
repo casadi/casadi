@@ -34,8 +34,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_IMPLICITFUNCTION_NEWTON_EXPORT
-  casadi_register_implicitfunction_newton(Rootfinder::Plugin* plugin) {
+  int CASADI_ROOTFINDER_NEWTON_EXPORT
+  casadi_register_rootfinder_newton(Rootfinder::Plugin* plugin) {
     plugin->creator = Newton::creator;
     plugin->name = "newton";
     plugin->doc = Newton::meta_doc.c_str();
@@ -44,8 +44,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_IMPLICITFUNCTION_NEWTON_EXPORT casadi_load_implicitfunction_newton() {
-    Rootfinder::registerPlugin(casadi_register_implicitfunction_newton);
+  void CASADI_ROOTFINDER_NEWTON_EXPORT casadi_load_rootfinder_newton() {
+    Rootfinder::registerPlugin(casadi_register_rootfinder_newton);
   }
 
   Newton::Newton(const std::string& name, const Function& f)

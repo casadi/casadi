@@ -28,7 +28,7 @@
 
       const std::string casadi::QpToImplicit::meta_doc=
       "\n"
-"Use an NlpSolver as ImplicitFunction solver\n"
+"Use an NlpSolver as Rootfinder solver\n"
 "\n"
 "\n"
 ">List of available options\n"
