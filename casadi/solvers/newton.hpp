@@ -27,7 +27,6 @@
 #define CASADI_NEWTON_HPP
 
 #include "casadi/core/function/rootfinder.hpp"
-#include "casadi/core/function/linear_solver.hpp"
 
 #include <casadi/solvers/casadi_rootfinder_newton_export.h>
 
@@ -48,8 +47,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2012
   */
-  class CASADI_ROOTFINDER_NEWTON_EXPORT Newton
-      : public Rootfinder {
+  class CASADI_ROOTFINDER_NEWTON_EXPORT Newton : public Rootfinder {
   public:
     /** \brief  Constructor */
     explicit Newton(const std::string& name, const Function& f);
@@ -59,11 +57,6 @@ namespace casadi {
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "newton";}
-
-    /** \brief  Create a new Rootfinder */
-    virtual Rootfinder* create(const std::string& name, const Function& f) const {
-      return new Newton(name, f);
-    }
 
     /** \brief  Create a new Rootfinder */
     static Rootfinder* creator(const std::string& name, const Function& f) {

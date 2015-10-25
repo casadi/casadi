@@ -64,11 +64,6 @@ namespace casadi {
     virtual ~KinsolInterface();
 
     /** \brief  Create a new Rootfinder */
-    virtual Rootfinder* create(const std::string& name, const Function& f) const {
-      return new KinsolInterface(name, f);
-    }
-
-    /** \brief  Create a new Rootfinder */
     static Rootfinder* creator(const std::string& name, const Function& f) {
       return new KinsolInterface(name, f);
     }

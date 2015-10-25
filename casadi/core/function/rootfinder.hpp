@@ -37,7 +37,7 @@ namespace casadi {
   /// Internal class
   class CASADI_EXPORT
   Rootfinder : public FunctionInternal,
-                             public PluginInterface<Rootfinder> {
+               public PluginInterface<Rootfinder> {
   public:
     /** \brief Constructor
      *
@@ -47,11 +47,6 @@ namespace casadi {
 
     /// Destructor
     virtual ~Rootfinder() = 0;
-
-    /** \brief  Create a new Rootfinder */
-    virtual Rootfinder* create(const std::string& name,
-                                             const Function& f) const = 0;
-
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in() const { return f_.n_in();}

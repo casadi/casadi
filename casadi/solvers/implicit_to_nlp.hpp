@@ -28,7 +28,6 @@
 
 #include "casadi/core/function/rootfinder.hpp"
 #include "casadi/core/function/nlp_solver.hpp"
-#include "casadi/core/function/linear_solver.hpp"
 
 #include <casadi/solvers/casadi_rootfinder_nlp_export.h>
 
@@ -56,11 +55,6 @@ namespace casadi {
 
     /** \brief  Destructor */
     virtual ~QpToImplicit();
-
-    /** \brief  Create a new Rootfinder */
-    virtual QpToImplicit* create(const std::string& name, const Function& f) const {
-      return new QpToImplicit(name, f);
-    }
 
     /** \brief  Create a new Rootfinder */
     static Rootfinder* creator(const std::string& name, const Function& f) {
