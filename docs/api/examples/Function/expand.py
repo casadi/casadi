@@ -33,10 +33,10 @@ y = MX.sym("y",2,1)
 z = mul(x,y)
 
 #! Let's construct an MXfunction
-f = MX.fun("f", [x,y],[z])
+f = Function("f", [x,y],[z])
 
-#! We expand the MX.fun into an SX.fun
-fSX = SX.fun('fSX', f)
+#! We expand the MX expression into an SX expression
+fSX = f.expand('fSX')
 
 print "Expanded expression = ", fSX
 
@@ -48,10 +48,10 @@ print "Expanded expression = ", fSX
 #!
 linear_solver = LinearSolver("linear_solver", "csparse", x.sparsity())
 g = linear_solver.solve(x,y)
-G = MX.fun("G", [x,y], [g])
+G = Function("G", [x,y], [g])
 
 #! This function cannot be expanded.
 try:
-  SX.fun('G_sx', G)
+  G.expand('G_sx')
 except Exception as e:
   print e
