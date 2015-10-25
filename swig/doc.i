@@ -30817,11 +30817,19 @@ Map Joris Gillis
 | e            | TOR          | )            | output       | tionInternal |
 |              |              |              | scheme       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| parallelizat | OT_STRING    | \"serial\"     | Computationa | casadi::MapI |
-| ion          |              |              | l strategy   | nternal      |
+| parallelizat | OT_STRING    | \"serial\"     | Computationa | casadi::MapR |
+| ion          |              |              | l strategy   | educe        |
 |              |              |              | for parallel |              |
 |              |              |              | ization (ser |              |
 |              |              |              | ial|openmp)  |              |
++--------------+--------------+--------------+--------------+--------------+
+| reduced_inpu | OT_INTEGERVE | GenericType( | Reduction    | casadi::MapR |
+| ts           | CTOR         | )            | for certain  | educe        |
+|              |              |              | inputs       |              |
++--------------+--------------+--------------+--------------+--------------+
+| reduced_outp | OT_INTEGERVE | GenericType( | Reduction    | casadi::MapR |
+| uts          | CTOR         | )            | for certain  | educe        |
+|              |              |              | outputs      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 | heck         |              |              | exceptions   | tionInternal |
@@ -31667,6 +31675,13 @@ check if there is an option str
 %feature("docstring") casadi::Map::Map() "
 
 Default constructor.
+
+";
+
+%feature("docstring") casadi::Map::Map(const std::string &name, const
+Function &f, int n, const Dict &opts=Dict()) "
+
+Constructor (any type of map)
 
 ";
 
@@ -33505,6 +33520,15 @@ Get output scheme name by index.
 Get input scheme name by index.
 
 ";
+
+
+// File: classcasadi_1_1MapBase.xml
+
+
+// File: classcasadi_1_1MapReduce.xml
+
+
+// File: classcasadi_1_1MapSerial.xml
 
 
 // File: singletoncasadi_1_1Matrix.xml
