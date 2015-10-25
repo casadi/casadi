@@ -137,8 +137,7 @@ class Integrationtests(casadiTestCase):
             simpleIntegrator(f)
             ]:
 
-      opts = {'input_scheme':["x0","p","h"], 'output_scheme':["xf"]}
-      solution = SX.fun('solver', [vertcat((q0,t0)),p,t], [vertcat([q0*exp(((t0+t)**3-t0**3)/(3*p)),t0+t])], opts)
+      solution = Function('solver', [vertcat((q0,t0)),p,t], [vertcat([q0*exp(((t0+t)**3-t0**3)/(3*p)),t0+t])], ["x0","p","h"], ["xf"])
       
       for f in [solution,integrator]:
         f.setInput([0.3,0],"x0")

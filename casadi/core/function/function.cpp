@@ -1428,6 +1428,52 @@ namespace casadi {
     return n->f_;
   }
 
+  vector<string> Function::integrator_in() {
+    vector<string> ret(integrator_n_in());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=integrator_in(i);
+    return ret;
+  }
+
+  vector<string> Function::integrator_out() {
+    vector<string> ret(integrator_n_out());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=integrator_out(i);
+    return ret;
+  }
+
+  string Function::integrator_in(int ind) {
+    switch (static_cast<IntegratorInput>(ind)) {
+    case INTEGRATOR_X0:  return "x0";
+    case INTEGRATOR_P:   return "p";
+    case INTEGRATOR_Z0:  return "z0";
+    case INTEGRATOR_RX0: return "rx0";
+    case INTEGRATOR_RP:  return "rp";
+    case INTEGRATOR_RZ0: return "rz0";
+    case INTEGRATOR_NUM_IN: break;
+    }
+    return string();
+  }
+
+  string Function::integrator_out(int ind) {
+    switch (static_cast<IntegratorOutput>(ind)) {
+    case INTEGRATOR_XF:  return "xf";
+    case INTEGRATOR_QF:  return "qf";
+    case INTEGRATOR_ZF:  return "zf";
+    case INTEGRATOR_RXF: return "rxf";
+    case INTEGRATOR_RQF: return "rqf";
+    case INTEGRATOR_RZF: return "rzf";
+    case INTEGRATOR_NUM_OUT: break;
+    }
+    return string();
+  }
+
+  int Function::integrator_n_in() {
+    return INTEGRATOR_NUM_IN;
+  }
+
+  int Function::integrator_n_out() {
+    return INTEGRATOR_NUM_OUT;
+  }
+
   Function Function::nlp_solver(const string& name, const string& solver,
                                 const SXDict& nlp, const Dict& opts) {
     return nlp_solver(name, solver, NlpSolver::map2problem(nlp), opts);

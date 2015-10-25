@@ -1198,6 +1198,24 @@ namespace casadi {
     /// Get the DAE for an integrator
     Function integrator_dae();
 
+    /** \brief Get input scheme of integrators */
+    static std::vector<std::string> integrator_in();
+
+    /** \brief Get integrator output scheme of integrators */
+    static std::vector<std::string> integrator_out();
+
+    /** \brief Get integrator input scheme name by index */
+    static std::string integrator_in(int ind);
+
+    /** \brief Get output scheme name by index */
+    static std::string integrator_out(int ind);
+
+    /** \brief Get the number of integrator inputs */
+    static int integrator_n_in();
+
+    /** \brief Get the number of integrator outputs */
+    static int integrator_n_out();
+
     ///@{
     /** Create an NLP solver
       Creates a solver for the following parametric nonlinear program (NLP):
