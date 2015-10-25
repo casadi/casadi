@@ -135,22 +135,102 @@ namespace casadi {
     /** \brief Construct an SX function */
     Function(const std::string& name,
              const std::vector<SX>& arg, const std::vector<SX>& res,
-             const Dict& opts=Dict());
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, opts);
+    }
     Function(const std::string& name,
              const std::vector<SX>& arg, const std::vector<SX>& res,
              const std::vector<std::string>& argn, const std::vector<std::string>& resn,
-             const Dict& opts=Dict());
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, argn, resn, opts);
+    }
     ///@}
 
     ///@{
     /** \brief Construct an MX function */
     Function(const std::string& name,
              const std::vector<MX>& arg, const std::vector<MX>& res,
-             const Dict& opts=Dict());
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, opts);
+    }
     Function(const std::string& name,
              const std::vector<MX>& arg, const std::vector<MX>& res,
              const std::vector<std::string>& argn, const std::vector<std::string>& resn,
-             const Dict& opts=Dict());
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, argn, resn, opts);
+    }
+    ///@}
+
+    ///@{
+    /** \brief To resolve ambiguity on some compilers */    
+#ifndef SWIG
+    Function(const std::string& name,
+             std::initializer_list<SX> arg, const std::vector<SX>& res,
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, opts);
+    }
+    Function(const std::string& name,
+             const std::vector<SX>& arg, const std::initializer_list<SX> res,
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, opts);
+    }
+    Function(const std::string& name,
+             std::initializer_list<SX> arg, const std::initializer_list<SX> res,
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, opts);
+    }
+    Function(const std::string& name,
+             std::initializer_list<MX> arg, const std::vector<MX>& res,
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, opts);
+    }
+    Function(const std::string& name,
+             const std::vector<MX>& arg, const std::initializer_list<MX> res,
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, opts);
+    }
+    Function(const std::string& name,
+             std::initializer_list<MX> arg, const std::initializer_list<MX> res,
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, opts);
+    }
+    Function(const std::string& name,
+             std::initializer_list<SX> arg, const std::vector<SX>& res,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, argn, resn, opts);
+    }
+    Function(const std::string& name,
+             const std::vector<SX>& arg, const std::initializer_list<SX> res,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, argn, resn, opts);
+    }
+    Function(const std::string& name,
+             std::initializer_list<SX> arg, const std::initializer_list<SX> res,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, argn, resn, opts);
+    }
+    Function(const std::string& name,
+             std::initializer_list<MX> arg, const std::vector<MX>& res,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, argn, resn, opts);
+    }
+    Function(const std::string& name,
+             const std::vector<MX>& arg, const std::initializer_list<MX> res,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, argn, resn, opts);
+    }
+    Function(const std::string& name,
+             std::initializer_list<MX> arg, const std::initializer_list<MX> res,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const Dict& opts=Dict()) {
+      construct(name, arg, res, argn, resn, opts);
+    }
+#endif // SWIG
     ///@}
 
     /** \brief  Destructor */
@@ -1299,6 +1379,27 @@ namespace casadi {
 
     /** Generate native code in the interfaced language for debugging */
     void qp_solver_debug(std::ostream &file) const;
+
+#ifndef SWIG
+    protected:
+    ///@{
+    /** \brief Called by constructors */
+    void construct(const std::string& name,
+                   const std::vector<SX>& arg, const std::vector<SX>& res,
+                   const Dict& opts);
+    void construct(const std::string& name,
+                   const std::vector<SX>& arg, const std::vector<SX>& res,
+                   const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+                   const Dict& opts);
+    void construct(const std::string& name,
+                   const std::vector<MX>& arg, const std::vector<MX>& res,
+                   const Dict& opts);
+    void construct(const std::string& name,
+                   const std::vector<MX>& arg, const std::vector<MX>& res,
+                   const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+                   const Dict& opts);
+    ///@}
+#endif // SWIG
   };
 
 } // namespace casadi

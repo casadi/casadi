@@ -49,18 +49,18 @@ namespace casadi {
   Function::~Function() {
   }
 
-  Function::Function(const string& name,
-                     const vector<MX>& arg, const vector<MX>& res,
-                     const Dict& opts) {
+  void Function::construct(const string& name,
+                           const vector<MX>& arg, const vector<MX>& res,
+                           const Dict& opts) {
     assignNode(new MXFunction(name, arg, res));
     setOption(opts);
     init();
   }
 
-  Function::Function(const string& name,
-                     const vector<MX>& arg, const vector<MX>& res,
-                     const vector<string>& argn, const vector<string>& resn,
-                     const Dict& opts) {
+  void Function::construct(const string& name,
+                           const vector<MX>& arg, const vector<MX>& res,
+                           const vector<string>& argn, const vector<string>& resn,
+                           const Dict& opts) {
     Dict opts2 = opts;
     opts2["input_scheme"] = argn;
     opts2["output_scheme"] = resn;
@@ -69,18 +69,18 @@ namespace casadi {
     init();
   }
 
-  Function::Function(const string& name,
-                     const vector<SX>& arg, const vector<SX>& res,
-                     const Dict& opts) {
+  void Function::construct(const string& name,
+                           const vector<SX>& arg, const vector<SX>& res,
+                           const Dict& opts) {
     assignNode(new SXFunction(name, arg, res));
     setOption(opts);
     init();
   }
 
-  Function::Function(const string& name,
-                     const vector<SX>& arg, const vector<SX>& res,
-                     const vector<string>& argn, const vector<string>& resn,
-                     const Dict& opts) {
+  void Function::construct(const string& name,
+                           const vector<SX>& arg, const vector<SX>& res,
+                           const vector<string>& argn, const vector<string>& resn,
+                           const Dict& opts) {
     Dict opts2 = opts;
     opts2["input_scheme"] = argn;
     opts2["output_scheme"] = resn;
