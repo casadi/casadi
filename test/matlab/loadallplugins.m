@@ -10,7 +10,7 @@ for pl = strsplit(CasadiMeta.getPlugins(),';')
     eval(['Function.load_nlp_solver(''' name ''')'])
   elseif strcmp(cls, 'QpSolver')
     eval(['Function.load_qp_solver(''' name ''')'])
-  elseif strcmp(cls, 'ImplicitFunction')
+  elseif strcmp(cls, 'Rootfinder')
     eval(['Function.load_rootfinder(''' name ''')'])
   else
     eval([cls '.loadPlugin(''' name ''')'])

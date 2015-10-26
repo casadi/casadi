@@ -1049,10 +1049,6 @@ class NLPtests(casadiTestCase):
           
           solver.evaluate()
 
-
-          F.setInput(solver.getOutput("x"))
-          F.evaluate()
-
           self.checkarray(solver.getOutput("f"),DMatrix([1.9001249992187681e+00]),digits=7)
           self.checkarray(solver.getOutput("x")[permute_x],DMatrix([-7.0622015054877127e-02,1.4124491251068008e+00,0,1.9925001159906402e-02]),failmessage=str(permute_x)+str(permute_g),digits=7)
           self.checkarray(solver.getOutput("lam_x")[permute_x],DMatrix([0,0,-2.4683779218120115e+01,0]),digits=7)
