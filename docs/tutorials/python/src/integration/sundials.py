@@ -34,11 +34,8 @@ u = SX.sym("u")
 x = SX.sym("x")
 y = SX.sym("y")
 ode = vertcat([(1-y*y)*x-y+u,x])
-f  = SX.fun('f', [vertcat([x,y]),u], [ode])
-#! Manipulate the function to adhere to the integrator's
-#! input/output signature
-#! f(time;states;parameters)
-fmod=SX.fun('ODE_right_hand_side', daeIn(x=vertcat([x,y]),p=u),daeOut(ode=ode))
+#! DAE problem formulation as expected by CasADi's integrators:
+dae  = {'x':vertcat([x,y]), 'p':u, 'ode':ode}
 #! The whole series of sundials options are available for the user
 opts = {}
 opts["fsens_err_con"] = True
@@ -49,7 +46,7 @@ tend=10
 opts["t0"] = 0
 opts["tf"] = tend
 #! Create the Integrator
-integrator = Integrator("integrator", "cvodes", fmod, opts)
+integrator = Function.integrator("integrator", "cvodes", dae, opts)
 #$ The integrator is really just a special kind of Function. Assume that we have an ODE/DAE in either explicit form:
 #$ \begin{verbatim}
 #$   der(x) = fx(x,z,p,t)
