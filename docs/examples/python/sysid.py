@@ -61,10 +61,10 @@ for i in range(N_steps_per_sample):
   [X] = one_step([X, controls, params])
 
 # Create a function that simulates all step propagation on a sample
-one_sample = MX.fun('one_sample',[states, controls, params], [X])
+one_sample = Function('one_sample',[states, controls, params], [X])
 
 # speedup trick: expand into scalar operations
-one_sample = SX.fun('one_sample_sx', one_sample)
+one_sample = one_sample.expand('one_sample_sx')
 
 ############ Simulating the system ##########
 
