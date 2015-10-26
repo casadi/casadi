@@ -196,8 +196,8 @@ namespace casadi {
     int v = round(X[1]);
     int r = round(r_);
 
-    for (int j = max(v-r,0);j<= min(v+r,size_.second-1);++j) {
-      for (int i = max(u-r,0); i<= min(u+r,size_.first-1);++i) {
+    for (int j = max(v-r, 0); j<= min(v+r, size_.second-1); ++j) {
+      for (int i = max(u-r, 0); i<= min(u+r, size_.first-1); ++i) {
         // Set the coordinate input
         coord[0] = i;
         coord[1] = j;
@@ -221,7 +221,7 @@ namespace casadi {
   ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
 
     /* Write KernelSum2D in linear form:
-    *  
+    *
     *    S = F(V, X)  = sum_i  f ( P_i, v_i, X)
     *
     *  With a slight abuse of notation, we have:
@@ -236,7 +236,7 @@ namespace casadi {
     /* More exactly, the forward mode of the primitive is
     * fd( P_i, v_i, X, S, P_i_dot, v_i_dot, X_dot)
     *
-    * we need to bring this in the form 
+    * we need to bring this in the form
     *
     *     f_forward ( P_i, v_i, X, X_dot)
     *
@@ -291,7 +291,7 @@ namespace casadi {
   Function KernelSum2DInternal
   ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
     /* Write KernelSum2D in linear form:
-    *  
+    *
     *    S = F(V, X)  = sum_i  f ( P_i, v_i, X)
     *
     *  With a slight abuse of notation, we have:
@@ -308,7 +308,7 @@ namespace casadi {
     /* More exactly, the reverse mode of the primitive is
     * fd( P_i, v_i, X, S, S_bar) -> P_i_bar, v_i_bar, X_bar
     *
-    * we need to bring this in the form 
+    * we need to bring this in the form
     *
     *     f_reverse ( P_i, v_i, X, S_bar) -> X_bar
     *
@@ -440,9 +440,11 @@ namespace casadi {
     g.body << "  int jmin = v-" << round(r_) << "; jmin = jmin<0? 0 : jmin;" << std::endl;
     g.body << "  int imin = u-" << round(r_) << "; imin = imin<0? 0 : imin;" << std::endl;
 
-    g.body << "  int jmax = v+" << round(r_) << "; jmax = jmax>" << size_.second-1 << "? " << size_.second-1 <<"  : jmax;" << std::endl;
-    g.body << "  int imax = u+" << round(r_) << "; imax = imax>" << size_.first-1 << "? " << size_.first-1 <<"  : imax;" << std::endl;
-    
+    g.body << "  int jmax = v+" << round(r_) << ";" <<
+      "jmax = jmax>" << size_.second-1 << "? " << size_.second-1 <<"  : jmax;" << std::endl;
+    g.body << "  int imax = u+" << round(r_) << ";" <<
+      "imax = imax>" << size_.first-1 << "? " << size_.first-1 <<"  : imax;" << std::endl;
+
     g.body << "  int i,j;" << std::endl;
     g.body << "  for (j = jmin;j<= jmax;++j) {" << std::endl;
     g.body << "    for (i = imin; i<= imax;++i) {" << std::endl;
