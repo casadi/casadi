@@ -34,7 +34,7 @@ namespace casadi {
 
   Simulator::Simulator(const std::string& name, const Function& integrator,
                        const Matrix<double>& grid, const Dict& opts) {
-    assignNode(new SimulatorInternal(name, integrator, Function(), grid));
+    assignNode(new SimulatorInternal(name, integrator, grid));
     setOption(opts);
     init();
   }

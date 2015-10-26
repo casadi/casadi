@@ -42,7 +42,7 @@ namespace casadi {
 
     /** \brief  Constructor */
     SimulatorInternal(const std::string& name, const Function& integrator,
-                      const Function& output_fcn, const DMatrix& grid);
+                      const DMatrix& grid);
 
     /** \brief  Destructor */
     virtual ~SimulatorInternal();
@@ -50,7 +50,7 @@ namespace casadi {
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in() const { return INTEGRATOR_NUM_IN;}
-    virtual size_t get_n_out() const { return output_fcn_->n_out();}
+    virtual size_t get_n_out() const { return INTEGRATOR_NUM_OUT;}
     ///@}
 
     /// @{
@@ -59,7 +59,7 @@ namespace casadi {
       return integrator_.sparsity_in(ind);
     }
     virtual Sparsity get_sparsity_out(int ind) const {
-      return Sparsity::dense(output_fcn_.output(ind).numel(), grid_.size());
+      return repmat(integrator_.sparsity_out(ind), 1, grid_.size());
     }
     /// @}
 
@@ -72,14 +72,8 @@ namespace casadi {
     // Integrator instance
     Function integrator_;
 
-    // Output function to be evaluated at each grid point
-    Function output_fcn_;
-
     // Time grid
     std::vector<double> grid_;
-
-    // Iterators to current outputs
-    std::vector<std::vector<double>::iterator> output_its_;
   };
 
 } // namespace casadi

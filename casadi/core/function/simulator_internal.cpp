@@ -34,8 +34,8 @@ namespace casadi {
 
 
   SimulatorInternal::SimulatorInternal(const std::string& name, const Function& integrator,
-                                       const Function& output_fcn, const DMatrix& grid)
-    : FunctionInternal(name), integrator_(integrator), output_fcn_(output_fcn), grid_(grid.data()) {
+                                       const DMatrix& grid)
+    : FunctionInternal(name), integrator_(integrator), grid_(grid.data()) {
 
     casadi_assert_message(grid.iscolumn(),
                           "Simulator::Simulator: grid must be a column vector, but got "
@@ -72,69 +72,23 @@ namespace casadi {
       integrator_ = I;
     }
 
-    // Generate an output function if there is none (returns the whole state)
-    if (output_fcn_.isNull()) {
-      SX t = SX::sym("t");
-      SX x = SX::sym("x", integrator_.input(INTEGRATOR_X0).sparsity());
-      SX z = SX::sym("z", integrator_.input(INTEGRATOR_Z0).sparsity());
-      SX p = SX::sym("p", integrator_.input(INTEGRATOR_P).sparsity());
-
-      vector<SX> arg(DAE_NUM_IN);
-      arg[DAE_T] = t;
-      arg[DAE_X] = x;
-      arg[DAE_Z] = z;
-      arg[DAE_P] = p;
-
-      vector<SX> out(INTEGRATOR_NUM_OUT);
-      out[INTEGRATOR_XF] = x;
-      out[INTEGRATOR_ZF] = z;
-
-      // Create the output function
-      output_fcn_ = SX::fun("ofcn", arg, out);
-      oscheme_ = IOScheme(SCHEME_IntegratorOutput);
-    }
+    // Output scheme
+    oscheme_ = IOScheme(SCHEME_IntegratorOutput);
 
     // Allocate inputs
-    ibuf_.resize(INTEGRATOR_NUM_IN);
-    for (int i=0; i<INTEGRATOR_NUM_IN; ++i) {
-      input(i) = integrator_.input(i);
+    ibuf_.resize(get_n_in());
+    for (int i=0; i<ibuf_.size(); ++i) {
+      input(i) = DMatrix(get_sparsity_in(i));
     }
 
     // Allocate outputs
-    obuf_.resize(output_fcn_->n_out());
-    for (int i=0; i<n_out(); ++i) {
-      output(i) = Matrix<double>::zeros(output_fcn_.output(i).numel(), grid_.size());
-      if (!output_fcn_.output(i).isempty()) {
-        casadi_assert_message(output_fcn_.output(i).iscolumn(),
-                              "SimulatorInternal::init: Output function output #" << i
-                              << " has shape " << output_fcn_.output(i).dim()
-                              << ", while a column-matrix shape is expected.");
-      }
+    obuf_.resize(get_n_out());
+    for (int i=0; i<obuf_.size(); ++i) {
+      output(i) = DMatrix(get_sparsity_out(i));
     }
-
-    casadi_assert_message(output_fcn_.input(DAE_T).numel() <=1,
-                          "SimulatorInternal::init: output_fcn DAE_T argument must be "
-                          "scalar or empty, but got " << output_fcn_.input(DAE_T).dim());
-
-    casadi_assert_message(
-        output_fcn_.input(DAE_P).isempty() ||
-        integrator_.input(INTEGRATOR_P).sparsity() == output_fcn_.input(DAE_P).sparsity(),
-        "SimulatorInternal::init: output_fcn DAE_P argument must be empty or"
-        << " have dimension " << integrator_.input(INTEGRATOR_P).dim()
-        << ", but got " << output_fcn_.input(DAE_P).dim());
-
-    casadi_assert_message(
-        output_fcn_.input(DAE_X).isempty() ||
-        integrator_.input(INTEGRATOR_X0).sparsity() == output_fcn_.input(DAE_X).sparsity(),
-        "SimulatorInternal::init: output_fcn DAE_X argument must be empty or have dimension "
-        << integrator_.input(INTEGRATOR_X0).dim()
-        << ", but got " << output_fcn_.input(DAE_X).dim());
 
     // Call base class method
     FunctionInternal::init();
-
-    // Output iterators
-    output_its_.resize(n_out());
   }
 
   void SimulatorInternal::evaluate() {
@@ -154,9 +108,6 @@ namespace casadi {
     // Reset the integrator_
     dynamic_cast<Integrator*>(integrator_.get())->reset();
 
-    // Iterators to output data structures
-    for (int i=0; i<output_its_.size(); ++i) output_its_[i] = output(i).begin();
-
     // Advance solution in time
     for (int k=0; k<grid_.size(); ++k) {
 
@@ -175,30 +126,11 @@ namespace casadi {
         userOut() << " zf  = "  << integrator_.output(INTEGRATOR_ZF) << std::endl;
       }
 
-      // Pass integrator output to the output function
-      if (output_fcn_.input(DAE_T).nnz()!=0)
-        output_fcn_.setInput(grid_[k], DAE_T);
-      if (output_fcn_.input(DAE_X).nnz()!=0)
-        output_fcn_.setInput(integrator_.output(INTEGRATOR_XF), DAE_X);
-      if (output_fcn_.input(DAE_Z).nnz()!=0)
-        output_fcn_.setInput(integrator_.output(INTEGRATOR_ZF), DAE_Z);
-      if (output_fcn_.input(DAE_P).nnz()!=0)
-        output_fcn_.setInput(input(INTEGRATOR_P), DAE_P);
-
-      // Evaluate output function
-      output_fcn_.evaluate();
-
       // Save the outputs of the function
       for (int i=0; i<n_out(); ++i) {
-        const Matrix<double> &res = output_fcn_.output(i);
-        copy(res.begin(), res.end(), output_its_.at(i));
-        output_its_.at(i) += res.nnz();
+        const Matrix<double> &res = integrator_.output(i);
+        copy(res.begin(), res.end(), output(i).begin() + k*res.nnz());
       }
-    }
-
-    // Consistency check
-    for (int i=0; i<output_its_.size(); ++i) {
-      casadi_assert(output_its_[i] == output(i).end());
     }
   }
 
