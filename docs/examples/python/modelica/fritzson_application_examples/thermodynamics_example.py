@@ -70,49 +70,35 @@ ivp.parseFMI('BasicVolumeMassConservation.xml')
 # Transform into an explicit ODE
 ivp.makeExplicit()
 
-# Inputs to the integrator
-dae_fcn_in = daeIn(
-  t = ivp.t,
-  x = vertcat(ivp.x),
-  p = vertcat(ivp.p)
-)
-
 # Create an integrator
-dae = MX.fun('dae', dae_fcn_in, daeOut(ode=vertcat(ivp.ode)))
-integrator = Integrator("integrator", "cvodes", dae)
-
-# Output function
-output_fcn_out = substitute([ivp("m"),ivp("P")], ivp.d, ivp.ddef)
-output_fcn_in = daeIn(
-  t=ivp.t,
-  x = vertcat(ivp.x),
-  z = vertcat(ivp.z),
-  p = vertcat(ivp.p + ivp.u)
-)
-output_fcn = MX.fun("output",output_fcn_in,output_fcn_out)
+dae = {'t': ivp.t, 'x': vertcat(ivp.x), 'p': vertcat(ivp.p), 'ode': vertcat(ivp.ode)}
+integrator = Function.integrator("integrator", "cvodes", dae)
 
 # Create a simulator
 grid = NP.linspace(0,1,100)
-simulator = Simulator("simulator", integrator,output_fcn,grid)
-
-# Pass initial conditions
-x0 = ivp.start(vertcat(ivp.x))
-simulator.setInput(x0,"x0")
+simulator = Simulator("simulator", integrator, grid)
 
 # Simulate
-simulator.evaluate()
-integrator.printStats()
+x0 = ivp.start(vertcat(ivp.x))
+res = simulator({"x0":x0})
+
+# Output function
+output_fcn_out = substitute([ivp("m"),ivp("P")], ivp.d, ivp.ddef)
+output_fcn_in = [ivp.t, vertcat(ivp.x), vertcat(ivp.z)]
+output_fcn = Function("output", output_fcn_in, output_fcn_out)
+output_fcn = output_fcn.map("output_fcn_map", len(grid))
+[m_out, P_out] = output_fcn([grid, res["xf"], res["zf"]])
 
 # Plot
 plt.figure(1)
 plt.subplot(1,2,1)
-plt.plot(grid,simulator.getOutput().T)
+plt.plot(grid, m_out.T)
 plt.xlabel("t")
 plt.ylabel("m(t)")
 plt.title("c.f. Fritzson figure 15-6 (left)")
 
 plt.subplot(1,2,2)
-plt.plot(grid,simulator.getOutput(1).T)
+plt.plot(grid, P_out.T)
 plt.xlabel("t")
 plt.ylabel("P(t)")
 plt.title("c.f. Fritzson figure 15-6 (right)")
@@ -128,42 +114,28 @@ ivp.parseFMI('BasicVolumeEnergyConservation.xml')
 # Transform into an explicit ODE
 ivp.makeExplicit()
 
-# Inputs to the integrator
-dae_fcn_in = daeIn(
-  t = ivp.t,
-  x = vertcat(ivp.x),
-  p = vertcat(ivp.p)
-)
-
 # Create an integrator
-dae = MX.fun("dae",dae_fcn_in,daeOut(ode=vertcat(ivp.ode)))
-integrator = Integrator("integrator", "cvodes", dae)
-
-# Output function
-output_fcn_out = substitute([ivp("T")], ivp.d, ivp.ddef)
-output_fcn_in = daeIn(
-  t=ivp.t,
-  x = vertcat(ivp.x),
-  z = vertcat(ivp.z),
-  p = vertcat(ivp.p + ivp.u)
-)
-output_fcn = MX.fun("output",output_fcn_in,output_fcn_out)
+dae = {'t': ivp.t, 'x': vertcat(ivp.x), 'p': vertcat(ivp.p), 'ode': vertcat(ivp.ode)}
+integrator = Function.integrator("integrator", "cvodes", dae)
 
 # Create a simulator
 grid = NP.linspace(0,10,100)
-simulator = Simulator("simulator", integrator,output_fcn,grid)
-
-# Pass initial conditions
-x0 = ivp.start(vertcat(ivp.x))
-simulator.setInput(x0,"x0")
+simulator = Simulator("simulator", integrator, grid)
 
 # Simulate
-simulator.evaluate()
-integrator.printStats()
+x0 = ivp.start(vertcat(ivp.x))
+res = simulator({"x0":x0})
+
+# Output function
+output_fcn_out = substitute([ivp("T")], ivp.d, ivp.ddef)
+output_fcn_in = [ivp.t, vertcat(ivp.x), vertcat(ivp.z)]
+output_fcn = Function("output", output_fcn_in, output_fcn_out)
+output_fcn = output_fcn.map("output_fcn_map", len(grid))
+[T_out] = output_fcn([grid, res["xf"], res["zf"]])
 
 # Plot
 plt.figure(2)
-plt.plot(grid,simulator.getOutput().T)
+plt.plot(grid, T_out.T)
 plt.xlabel("t")
 plt.ylabel("T(t)")
 plt.title("c.f. Fritzson figure 15-9")
@@ -179,50 +151,36 @@ ivp.parseFMI('BasicVolumeTest.xml')
 # Transform into an explicit ODE
 ivp.makeExplicit()
 
-# Inputs to the integrator
-dae_fcn_in = daeIn(
-  t = ivp.t,
-  x = vertcat(ivp.x),
-  p = vertcat(ivp.p)
-)
-
 # Create an integrator
-dae = MX.fun("dae",dae_fcn_in,daeOut(ode=densify(vertcat(ivp.ode))))
-integrator = Integrator("integrator", "cvodes", dae)
-
-# Output function
-output_fcn_out = substitute([ivp("T"),ivp("U"),ivp("V")], ivp.d, ivp.ddef)
-output_fcn_in = daeIn(
-  t=ivp.t,
-  x = vertcat(ivp.x),
-  z = vertcat(ivp.z),
-  p = vertcat(ivp.p + ivp.u)
-)
-output_fcn = MX.fun("output",output_fcn_in,output_fcn_out)
+dae = {'t': ivp.t, 'x': vertcat(ivp.x), 'p': vertcat(ivp.p), 'ode': densify(vertcat(ivp.ode))}
+integrator = Function.integrator("integrator", "cvodes", dae)
 
 # Create a simulator
 grid = NP.linspace(0,2,100)
-simulator = Simulator("simulator", integrator, output_fcn, grid)
-
-# Pass initial conditions
-x0 = ivp.start(vertcat(ivp.x))
-simulator.setInput(x0,"x0")
+simulator = Simulator("simulator", integrator, grid)
 
 # Simulate
-simulator.evaluate()
-integrator.printStats()
+x0 = ivp.start(vertcat(ivp.x))
+res = simulator({"x0":x0})
+
+# Output function
+output_fcn_out = substitute([ivp("T"),ivp("U"),ivp("V")], ivp.d, ivp.ddef)
+output_fcn_in = [ivp.t, vertcat(ivp.x), vertcat(ivp.z)]
+output_fcn = Function("output", output_fcn_in, output_fcn_out)
+output_fcn = output_fcn.map("output_fcn_map", len(grid))
+[T_out, U_out, V_out] = output_fcn([grid, res["xf"], res["zf"]])
 
 # Plot
 plt.figure(3)
-p1, = plt.plot(grid,simulator.getOutput(0).T)
-p2, = plt.plot(grid,simulator.getOutput(1).T)
+p1, = plt.plot(grid, T_out.T)
+p2, = plt.plot(grid, U_out.T)
 plt.xlabel("t")
 plt.ylabel("T(t)")
 plt.legend([p2, p1], ["T", "U"])
 plt.title("c.f. Fritzson figure 15-14")
 
 plt.figure(4)
-plt.plot(grid,simulator.getOutput(2).T)
+plt.plot(grid, V_out.T)
 plt.xlabel("t")
 plt.ylabel("V(t)")
 plt.title("Approximation of V")
