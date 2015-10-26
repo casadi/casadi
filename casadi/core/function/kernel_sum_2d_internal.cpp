@@ -194,19 +194,16 @@ namespace casadi {
     //   v  i,u
     int u = round(X[0]);
     int v = round(X[1]);
+    int r = round(r_);
 
-    for (int i = -round(r_);i<= round(r_);++i) {
-      for (int j = -round(r_);j<= round(r_);++j) {
-
+    for (int j = max(v-r,0);j<= min(v+r,size_.second-1);++j) {
+      for (int i = max(u-r,0); i<= min(u+r,size_.first-1);++i) {
         // Set the coordinate input
-        coord[0] = u+i;
-        coord[1] = v+j;
-
-        int I = min(max(u+i, 0), size_.first-1);
-        int J = min(max(v+j, 0), size_.second-1);
+        coord[0] = i;
+        coord[1] = j;
 
         // Set the pixel value input
-        value[0] = V[I+J*size_.first];
+        value[0] = V[i+j*size_.first];
 
         // Evaluate the function
         f_->eval(arg1, res1, iw, w);
@@ -440,26 +437,23 @@ namespace casadi {
     //   v  i,u
     g.body << "  int u = round(X[0]);" << std::endl;
     g.body << "  int v = round(X[1]);" << std::endl;
+    g.body << "  int jmin = v-" << round(r_) << "; jmin = jmin<0? 0 : jmin;" << std::endl;
+    g.body << "  int imin = u-" << round(r_) << "; imin = imin<0? 0 : imin;" << std::endl;
 
+    g.body << "  int jmax = v+" << round(r_) << "; jmax = jmax>" << size_.second-1 << "? " << size_.second-1 <<"  : jmax;" << std::endl;
+    g.body << "  int imax = u+" << round(r_) << "; imax = imax>" << size_.first-1 << "? " << size_.first-1 <<"  : imax;" << std::endl;
+    
     g.body << "  int i,j;" << std::endl;
-    g.body << "  for (i = -" << round(r_) <<";i<=" <<  round(r_) << ";++i) {" << std::endl;
-    g.body << "    for (j = -" << round(r_) <<";j<= " << round(r_) <<";++j) {" << std::endl;
+    g.body << "  for (j = jmin;j<= jmax;++j) {" << std::endl;
+    g.body << "    for (i = imin; i<= imax;++i) {" << std::endl;
+
 
     // Set the coordinate input
-    g.body << "      int I = u+i;" << std::endl;
-    g.body << "      int J = v+j;" << std::endl;
-
-    g.body << "      coord[0] = I;" << std::endl;
-    g.body << "      coord[1] = J;" << std::endl;
-
-    g.body << "      if (I<0) I=0;" << std::endl;
-    g.body << "      if (J<0) J=0;" << std::endl;
-
-    g.body << "      if (I>" << size_.first-1 << ") I=" << size_.first-1 << ";" << std::endl;
-    g.body << "      if (J>" << size_.second-1 << ") J=" << size_.second-1 << ";" << std::endl;
+    g.body << "      coord[0] = i;" << std::endl;
+    g.body << "      coord[1] = j;" << std::endl;
 
     // Set the pixel value input
-    g.body << "      value[0] = V[I+J*" << size_.first << "];" << std::endl;
+    g.body << "      value[0] = V[i+j*" << size_.first << "];" << std::endl;
 
     // Evaluate the function
     g.body << "      " << g.call(f_, "arg1", "res1", "iw", "w") << ";" << endl;
