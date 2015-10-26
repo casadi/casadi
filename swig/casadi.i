@@ -238,29 +238,6 @@ namespace std {
 %include "stl.i"
 #endif // SWIGXML
 
-%define DEPRECATED_MSG(MSG)
-if (deprecated("$decl",MSG)) SWIG_fail;
-%enddef
-
-#ifdef SWIGPYTHON
-%wrapper %{
-int deprecated(const std::string & c,const std::string & a) {
-  std::string msg = "This CasADi function (" + c + ") is deprecated. " + a;
-  return PyErr_WarnEx(PyExc_DeprecationWarning,msg.c_str(),3);
-}
-%}
-#endif // SWIGPYTHON
-
-#ifdef SWIGMATLAB
-%wrapper %{
-int deprecated(const std::string & c,const std::string & a) {
-  std::string msg = "This CasADi function (" + c + ") is deprecated. " + a;
-  mexWarnMsgIdAndTxt("SWIG:DeprecationWarning",msg.c_str());
-  return 0;
-}
-%}
-#endif // SWIGMATLAB
-
 #ifndef SWIGXML
 %{
 #define CATCH_OR_NOT(...) \
@@ -314,8 +291,6 @@ if (casadi::CasadiOptions::catch_errors_swig) { \
 	}
 }
 #endif //SWIGPYTHON
-
-%include "deprecated.i"
 
 #ifdef SWIGPYTHON
 
