@@ -466,10 +466,9 @@ class casadiTestCase(unittest.TestCase):
           fseeds = [[sym("f",spmod(f.getInput(i)).sparsity()) for i in range(f.n_in())]  for d in range(ndir)]
           aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.n_out())] for d in range(ndir)]
           inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
-          with internalAPI():
-            res = f(inputss)
-            fwdsens = f.callForward(inputss, res, fseeds)
-            adjsens = f.callReverse(inputss, res, aseeds)
+          res = f(inputss)
+          fwdsens = f.callForward(inputss, res, fseeds)
+          adjsens = f.callReverse(inputss, res, aseeds)
           
           vf = Function("vf", inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
           
@@ -498,10 +497,9 @@ class casadiTestCase(unittest.TestCase):
               aseeds2 = [[sym("a",vf_reference.getOutput(i).sparsity())  for i in range(vf.n_out()) ] for d in range(ndir)]
               inputss2 = [sym("i",vf_reference.sparsity_in(i)) for i in range(vf.n_in())]
               
-              with internalAPI():
-                res2 = vf(inputss2)
-                fwdsens2 = vf.callForward(inputss2, res2, fseeds2)
-                adjsens2 = vf.callReverse(inputss2, res2, aseeds2)
+              res2 = vf(inputss2)
+              fwdsens2 = vf.callForward(inputss2, res2, fseeds2)
+              adjsens2 = vf.callReverse(inputss2, res2, aseeds2)
 
               vf2 = Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
                 

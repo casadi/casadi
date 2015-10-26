@@ -77,8 +77,6 @@ namespace casadi {
 
       static bool purgeSeeds;
 
-      static bool allowed_internal_api;
-
       static std::string casadipath;
 
 #endif //SWIG
@@ -104,9 +102,6 @@ namespace casadi {
 
       static void setPurgeSeeds(bool flag) { purgeSeeds = flag; }
       static bool setPurgeSeeds() { return purgeSeeds; }
-
-      static void setAllowedInternalAPI(bool flag) { allowed_internal_api= flag; }
-      static bool getAllowedInternalAPI() { return allowed_internal_api; }
 
       static void setCasadiPath(const std::string & path) { casadipath = path; }
       static std::string getCasadiPath() { return casadipath; }

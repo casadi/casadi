@@ -186,15 +186,6 @@
 
 import contextlib
 
-@contextlib.contextmanager
-def internalAPI():
-    backup = CasadiOptions.getAllowedInternalAPI()
-    CasadiOptions.setAllowedInternalAPI(True)
-    try:
-      yield
-    finally:
-      CasadiOptions.setAllowedInternalAPI(backup)
-
 class _copyableObject(_object):
   def __copy__(self):
     return self.__class__(self)
@@ -251,20 +242,11 @@ namespace std {
 if (deprecated("$decl",MSG)) SWIG_fail;
 %enddef
 
-%define INTERNAL_MSG()
-if (internal("$decl")) SWIG_fail;
-%enddef
-
 #ifdef SWIGPYTHON
 %wrapper %{
 int deprecated(const std::string & c,const std::string & a) {
   std::string msg = "This CasADi function (" + c + ") is deprecated. " + a;
   return PyErr_WarnEx(PyExc_DeprecationWarning,msg.c_str(),3);
-}
-int internal(const std::string & c) {
-  if (casadi::CasadiOptions::allowed_internal_api) return 0;
-  std::string msg = "This CasADi function (" + c + ") is not part of the public API. Use at your own risk.";
-  return PyErr_WarnEx(PyExc_SyntaxWarning,msg.c_str(),3);
 }
 %}
 #endif // SWIGPYTHON
@@ -274,12 +256,6 @@ int internal(const std::string & c) {
 int deprecated(const std::string & c,const std::string & a) {
   std::string msg = "This CasADi function (" + c + ") is deprecated. " + a;
   mexWarnMsgIdAndTxt("SWIG:DeprecationWarning",msg.c_str());
-  return 0;
-}
-int internal(const std::string & c) {
-  if (casadi::CasadiOptions::allowed_internal_api) return 0;
-  std::string msg = "This CasADi function (" + c + ") is not part of the public API. Use at your own risk.";
-  mexWarnMsgIdAndTxt("SWIG:SyntaxWarning",msg.c_str());
   return 0;
 }
 %}
@@ -339,7 +315,6 @@ if (casadi::CasadiOptions::catch_errors_swig) { \
 }
 #endif //SWIGPYTHON
 
-%include "internal.i"
 %include "deprecated.i"
 
 #ifdef SWIGPYTHON
@@ -2246,13 +2221,11 @@ class NZproxy:
         return _casadi.transpose(self)
 
     def __getitem__(self, s):
-        with internalAPI():
           if isinstance(s, tuple) and len(s)==2:
             return self.get(False, s[0], s[1])
           return self.get(False, s)
 
     def __setitem__(self,s,val):
-        with internalAPI():
           if isinstance(s,tuple) and len(s)==2:
             return self.set(val, False, s[0], s[1])
           return self.set(val, False, s)

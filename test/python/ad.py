@@ -159,10 +159,9 @@ class ADtests(casadiTestCase):
             
             fseeds = map(lambda x: DMatrix(f.sparsity_in(0),x), seeds)
             aseeds = map(lambda x: DMatrix(f.sparsity_out(0),x), seeds)
-            with internalAPI():
-              res = f([y])
-              fwdsens = f.callForward([y], res, map(lambda x: [x],fseeds))
-              adjsens = f.callReverse([y], res, map(lambda x: [x],aseeds))
+            res = f([y])
+            fwdsens = f.callForward([y], res, map(lambda x: [x],fseeds))
+            adjsens = f.callReverse([y], res, map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
             adjsens = map(lambda x: x[0],adjsens)
             
@@ -200,10 +199,9 @@ class ADtests(casadiTestCase):
             
             fseeds = map(lambda x: DMatrix(f.sparsity_in(0),x), seeds)
             aseeds = map(lambda x: DMatrix(f.sparsity_out(0),x), seeds)
-            with internalAPI():
-              res = f([y])
-              fwdsens = f.callForward([y],res,map(lambda x: [x],fseeds))
-              adjsens = f.callReverse([y],res,map(lambda x: [x],aseeds))
+            res = f([y])
+            fwdsens = f.callForward([y],res,map(lambda x: [x],fseeds))
+            adjsens = f.callReverse([y],res,map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
             adjsens = map(lambda x: x[0],adjsens)
             
@@ -243,10 +241,9 @@ class ADtests(casadiTestCase):
             
             fseeds = map(lambda x: DMatrix(f.sparsity_in(0),x), seeds)
             aseeds = map(lambda x: DMatrix(f.sparsity_out(0),x), seeds)
-            with internalAPI():
-              res = f([y])
-              fwdsens = f.callForward([y],res,map(lambda x: [x],fseeds))
-              adjsens = f.callReverse([y],res,map(lambda x: [x],aseeds))
+            res = f([y])
+            fwdsens = f.callForward([y],res,map(lambda x: [x],fseeds))
+            adjsens = f.callReverse([y],res,map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
             adjsens = map(lambda x: x[0],adjsens)
             
@@ -282,10 +279,9 @@ class ADtests(casadiTestCase):
   
             y = SX.sym("y",f.sparsity_in(0))
             
-            with internalAPI():
-              res = f([y])
-              fwdsens = f.callForward([y],res,[])
-              adjsens = f.callReverse([y],res,[])
+            res = f([y])
+            fwdsens = f.callForward([y],res,[])
+            adjsens = f.callReverse([y],res,[])
             
             fe = SX.fun("fe", [y],res)
             
@@ -634,10 +630,9 @@ class ADtests(casadiTestCase):
             aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.n_out())] for d in range(ndir)]
             inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
         
-            with internalAPI():
-              res = f(inputss,True)
-              fwdsens = f.callForward(inputss,res,fseeds,True)
-              adjsens = f.callReverse(inputss,res,aseeds,True)
+            res = f(inputss,True)
+            fwdsens = f.callForward(inputss,res,fseeds,True)
+            adjsens = f.callReverse(inputss,res,aseeds,True)
             
             fseed = [DMatrix(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
             aseed = [DMatrix(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
@@ -706,10 +701,9 @@ class ADtests(casadiTestCase):
               aseeds2 = [[sym2("a",vf_mx.getOutput(i).sparsity())  for i in range(vf.n_out()) ] for d in range(ndir)]
               inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]
            
-              with internalAPI():
-                res2 = vf(inputss2,True)
-                fwdsens2 = vf.callForward(inputss2,res2,fseeds2,True)
-                adjsens2 = vf.callReverse(inputss2,res2,aseeds2,True)
+              res2 = vf(inputss2,True)
+              fwdsens2 = vf.callForward(inputss2,res2,fseeds2,True)
+              adjsens2 = vf.callReverse(inputss2,res2,aseeds2,True)
 
               vf2 = Function2("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
                 
