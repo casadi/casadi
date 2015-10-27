@@ -56,7 +56,7 @@ lbg = [0.00]
 ubg = [0.00]
 
 # Create NLP
-nlp = SX.fun("nlp", nlpIn(x=x), nlpOut(f=f, g=g))
+nlp = {'x':x, 'f':f, 'g':g}
 
 # NLP solver options
 opts = {}

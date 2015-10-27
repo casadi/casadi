@@ -30,7 +30,7 @@ x = SX.sym("x",2)
 # Form the NLP
 f = x[0]**2 + x[1]**2 # objective
 g = x[0]+x[1]-10      # constraint
-nlp = SX.fun('nlp', nlpIn(x=x), nlpOut(f=f, g=g))
+nlp = {'x':x, 'f':f, 'g':g}
 
 # Pick an NLP solver
 MySolver = "ipopt"

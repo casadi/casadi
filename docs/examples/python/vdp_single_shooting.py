@@ -24,7 +24,6 @@
 from casadi import *
 import numpy as NP
 import matplotlib.pyplot as plt
-from operator import itemgetter
 
 nk = 20    # Control discretization
 tf = 10.0  # End time
@@ -38,7 +37,7 @@ xdot = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, x[0]] )
 qdot = x[0]*x[0] + x[1]*x[1] + u*u
 
 # DAE residual function
-dae = SX.fun("dae", daeIn(x=x, p=u),daeOut(ode=xdot, quad=qdot))
+dae = {'x':x, 'p':u, 'ode':xdot, 'quad':qdot}
 
 # Create an integrator
 integrator = Function.integrator("integrator", "cvodes", dae, {"tf":tf/nk})
@@ -55,14 +54,15 @@ f = 0
 
 # Build a graph of integrator calls
 for k in range(nk):
-  X,QF = itemgetter('xf','qf')(integrator({'x0':X,'p':U[k]}))
-  f += QF
+  res = integrator({'x0':X,'p':U[k]})
+  X = res['xf']
+  f += res['qf']
 
 # Terminal constraints: x_0(T)=x_1(T)=0
 g = X
 
 # Allocate an NLP solver
-nlp = MX.fun("nlp", nlpIn(x=x),nlpOut(f=f,g=g))
+nlp = {'x':x, 'f':f, 'g':g}
 solver = Function.nlp_solver("solver", "ipopt", nlp)
 
 # Solve the problem

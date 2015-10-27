@@ -361,7 +361,7 @@ for k in range(nk):
 Obj += lagrangeTerm        
 
 # NLP
-nlp = MX.fun('nlp', nlpIn(x=V),nlpOut(f=Obj,g=vertcat(g)))
+nlp = {'x':V, 'f':Obj, 'g':vertcat(g)}
 
 ## ----
 ## SOLVE THE NLP

@@ -30,7 +30,6 @@ tf = 10.0    # End time
 coll = False # Use collocation integrator
 
 # Declare variables (use scalar graph)
-t  = SX.sym("t")    # time
 u  = SX.sym("u")    # control
 x  = SX.sym("x",3)  # state
 
@@ -38,7 +37,7 @@ x  = SX.sym("x",3)  # state
 ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
        x[0], \
        x[0]*x[0] + x[1]*x[1] + u*u])
-dae = SX.fun("dae", daeIn(x=x, p=u, t=t), daeOut(ode=ode))
+dae = {'x':x, 'p':u, 'ode':ode}
 
 # Create an integrator
 opts = {"tf":tf/nk} # final time
@@ -112,7 +111,7 @@ f = X2[nk]
 g = vertcat(g)
 
 # Create NLP solver instance
-nlp = MX.fun("nlp", nlpIn(x=V), nlpOut(f=f,g=g))
+nlp = {'x':V, 'f':f, 'g':g}
 solver = Function.nlp_solver("solver", "ipopt", nlp)
 
 # Solve the problem

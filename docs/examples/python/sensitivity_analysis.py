@@ -60,7 +60,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     quad = v**3 + ((3-sin(t)) - u)**2
 
     # DAE callback function
-    ffcn = SX.fun("ffcn",daeIn(t=t,x=x,p=u),daeOut(ode=ode,quad=quad))
+    dae = {'t':t, 'x':x, 'p':u, 'ode':ode, 'quad':quad}
 
     # Time length
     tf = 0.5
@@ -94,7 +94,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     quad = x*x + 3.0*u*u
 
     # DAE callback function
-    ffcn = SX.fun("ffcn",daeIn(x=x,z=z,p=u),daeOut(ode=ode,alg=alg,quad=quad))
+    dae = {'x':x, 'z':z, 'p':u, 'ode':ode, 'alg':alg, 'quad':quad}
     
     # End time
     tf = 5.
@@ -119,7 +119,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
       if MyIntegrator=="oldcollocation": opts["expand_f"] = True
 
     # Integrator
-    I = Function.integrator("I", MyIntegrator, ffcn, opts)
+    I = Function.integrator("I", MyIntegrator, dae, opts)
 
     # Integrate to get results
     arg = {"x0":x0, "p":u0}

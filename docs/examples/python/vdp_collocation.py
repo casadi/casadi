@@ -195,7 +195,7 @@ g = vertcat(g)
 [f] = m([T[nk-1,d],X[nk,0],U[nk-1]])
   
 # NLP
-nlp = MX.fun('nlp', nlpIn(x=V),nlpOut(f=f,g=g))
+nlp = {'x':V, 'f':f, 'g':g}
 
 ## ----
 ## SOLVE THE NLP

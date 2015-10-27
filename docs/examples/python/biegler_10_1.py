@@ -117,7 +117,7 @@ for N in range(1,11):
   print "g = ", g
 
   # NLP
-  nlp = SX.fun('nlp', nlpIn(x=x),nlpOut(f=x[0]**2,g=g))
+  nlp = {'x':x, 'f':x[0]**2, 'g':g}
 
   ## ----
   ## SOLVE THE NLP
