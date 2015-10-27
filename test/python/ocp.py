@@ -85,7 +85,7 @@ class OCPtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    f=SX.fun('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
+    dae={'x':q, 'p':p, 't':t, 'ode':vertcat([q[1],p[0]+q[1]**2 ])}
     opts = {}
     opts["reltol"] = 1e-15
     opts["abstol"] = 1e-15
@@ -93,7 +93,7 @@ class OCPtests(casadiTestCase):
     opts["steps_per_checkpoint"] = 10000
     opts["t0"] = 0
     opts["tf"] = te
-    integrator = Function.integrator("integrator", "cvodes", f, opts)
+    integrator = Function.integrator("integrator", "cvodes", dae, opts)
 
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
@@ -105,7 +105,7 @@ class OCPtests(casadiTestCase):
     
     parc = MX(0)
     
-    f = MX.fun('f', [var,parMX],[qend[0]])
+    f = Function('f', [var,parMX],[qend[0]])
     nlp = {'x':var, 'f':-f([var,parc])[0]}
     opts = {}
     opts["tol"] = 1e-12
@@ -139,7 +139,7 @@ class OCPtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    f=SX.fun('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
+    dae={'x':q, 'p':p, 't':t, 'ode':vertcat([q[1],p[0]+q[1]**2 ])}
     opts = {}
     opts["reltol"] = 1e-15
     opts["abstol"] = 1e-15
@@ -147,7 +147,7 @@ class OCPtests(casadiTestCase):
     opts["steps_per_checkpoint"] = 10000
     opts["t0"] = 0
     opts["tf"] = te
-    integrator = Function.integrator("integrator", "cvodes", f, opts)
+    integrator = Function.integrator("integrator", "cvodes", dae, opts)
 
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
@@ -158,7 +158,7 @@ class OCPtests(casadiTestCase):
     
     parc = MX(dy0)
     
-    f = MX.fun('f', [var,par],[qend[0]])
+    f = Function('f', [var,par],[qend[0]])
     nlp = {'x':var, 'f':-f([var,parc])[0], 'g':var[0]-var[1]}
     opts = {}
     opts["tol"] = 1e-12
@@ -228,7 +228,7 @@ class OCPtests(casadiTestCase):
     print ivp.init
     print c,T,cost
     #print c.atTime(0)
-    f=MX.fun('f', [vertcat([c,T,cost])],[vertcat(ivp.init)])
+    f=Function('f', [vertcat([c,T,cost])],[vertcat(ivp.init)])
     return 
     f.evaluate()
     self.checkarray(f.getOutput(),matrix([-956.271065,-250.051971,0]).T,"initeq")

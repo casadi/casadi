@@ -60,7 +60,7 @@ nsolvers = []
   
 def nullspacewrapper(name, sp, options):
   a = SX.sym("a",sp)
-  f = SX.fun(name, [a],[nullspace(a)],options)
+  f = Function(name, [a],[nullspace(a)],options)
   return f
   
 nsolvers.append((nullspacewrapper,{}))
@@ -170,7 +170,7 @@ class LinearSolverTests(casadiTestCase):
       print Solver
       C = solve(A,b,Solver,options)
       
-      f = MX.fun("f", [A,b],[C])
+      f = Function("f", [A,b],[C])
       f.setInput(A_,0)
       f.setInput(b_,1)
       f.evaluate()
@@ -189,13 +189,13 @@ class LinearSolverTests(casadiTestCase):
       print Solver
       B = pinv(A,Solver,options)
       
-      f = MX.fun("f", [A],[B])
+      f = Function("f", [A],[B])
       f.setInput(A_,0)
       f.evaluate()
       
       self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(4))
       
-      f = SX.fun("f", [As],[pinv(As)])
+      f = Function("f", [As],[pinv(As)])
       f.setInput(A_,0)
       f.evaluate()
       
@@ -215,13 +215,13 @@ class LinearSolverTests(casadiTestCase):
       print Solver
       B = pinv(A,Solver,options)
       
-      f = MX.fun("f", [A],[B])
+      f = Function("f", [A],[B])
       f.setInput(A_,0)
       f.evaluate()
       
       self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(3)) 
       
-      f = SX.fun("f", [As],[pinv(As)])
+      f = Function("f", [As],[pinv(As)])
       f.setInput(A_,0)
       f.evaluate()
       
@@ -349,7 +349,7 @@ class LinearSolverTests(casadiTestCase):
         solver = LinearSolver("solver", Solver, A.sparsity(), options)
         for tr in [True, False]:
           x = solver.solve(A,b,tr)
-          f = MX.fun("f", [A,b],[x])
+          f = Function("f", [A,b],[x])
           f.setInput(A_,0)
           f.setInput(b_,1)
           f.evaluate()
@@ -371,7 +371,7 @@ class LinearSolverTests(casadiTestCase):
           c_0 = b[0,1]
           c_1 = b[1,1]
           
-          solution = MX.fun("solution", [A,b],[blockcat([[(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),(((A_3/((A_0*A_3)-(A_2*A_1)))*c_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*c_1))],[((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*c_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*c_1))]])])
+          solution = Function("solution", [A,b],[blockcat([[(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),(((A_3/((A_0*A_3)-(A_2*A_1)))*c_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*c_1))],[((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*c_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*c_1))]])])
           
           solution.setInput(A_,0)
           solution.setInput(b_,1)
@@ -379,7 +379,7 @@ class LinearSolverTests(casadiTestCase):
           self.checkfunction(f,solution)
           
           if "SymbolicQR" not in str(Solver) : continue
-          solversx = SX.fun('expand_'+f.name(), f)
+          solversx = f.expand('expand_'+f.name())
           solversx.setInput(A_,0)
           solversx.setInput(b_,1)
    
@@ -446,7 +446,7 @@ class LinearSolverTests(casadiTestCase):
       
       self.checkarray(mul(A,C),b)
       
-      f = MX.fun("f", [As,bs],[solve(As,bs,Solver,options)])
+      f = Function("f", [As,bs],[solve(As,bs,Solver,options)])
       f.setInput(A,0)
       f.setInput(b,1)
       f.evaluate()
@@ -468,7 +468,7 @@ class LinearSolverTests(casadiTestCase):
       self.checkarray(mul(A,C),b)
       
       for As_,A_ in [(As,A),(densify(As),densify(A)),(densify(As).T,densify(A).T),(densify(As.T),densify(A.T)),(As.T,A.T)]:
-        f = MX.fun("f", [As,bs],[solve(As_,bs,Solver,options)])
+        f = Function("f", [As,bs],[solve(As_,bs,Solver,options)])
         f.setInput(A,0)
         f.setInput(b,1)
         f.evaluate()

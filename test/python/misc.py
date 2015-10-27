@@ -46,7 +46,7 @@ class Misctests(casadiTestCase):
     self.message('Regression test #179 (B)')
     def calc_sparsity():
       x = casadi.SX.sym("x")
-      f = casadi.SX.fun('f', [x], [x ** 2])
+      f = casadi.Function('f', [x], [x ** 2])
       return f.jacSparsity()
     
     def print_sparsity():
@@ -94,7 +94,7 @@ class Misctests(casadiTestCase):
     self.message("Copy constructor for refcounted classes - lazy")
     x = SX.sym("x")
 
-    f = SX.fun('f', [x],[2*x])
+    f = Function('f', [x],[2*x])
     f.setInput(2,0)
     g = Function(f)
 
@@ -137,7 +137,7 @@ class Misctests(casadiTestCase):
     import copy
     x = SX.sym("x")
 
-    f = SX.fun('f', [x],[2*x])
+    f = Function('f', [x],[2*x])
     f.setInput(2,0)
     g = copy.copy(f)
 
@@ -351,7 +351,7 @@ class Misctests(casadiTestCase):
     
     v = sin(z)
     
-    f = MX.fun('f', [x],[v])
+    f = Function('f', [x],[v])
     
     print f
     

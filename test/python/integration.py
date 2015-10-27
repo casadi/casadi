@@ -105,7 +105,7 @@ class Integrationtests(casadiTestCase):
     x = SX.sym("x")
     p = SX.sym("p",0)
     tf = SX.sym("tf")
-    f=SX.fun("f", [x,p], [x])
+    f=Function("f", [x,p], [x])
     
     for integrator in [
          simpleRK(f),
@@ -113,7 +113,7 @@ class Integrationtests(casadiTestCase):
          simpleIntegrator(f)
        ]:
 
-      solution = SX.fun("solution", [x,p,tf],[x*exp(tf)], {"input_scheme":["x0","p","h"], "output_scheme":["xf"]})
+      solution = Function("solution", [x,p,tf],[x*exp(tf)], {"input_scheme":["x0","p","h"], "output_scheme":["xf"]})
 
       for f in [solution,integrator]:
         f.setInput(1,"x0")
@@ -130,7 +130,7 @@ class Integrationtests(casadiTestCase):
     p=SX.sym("p")
     t0=SX.sym("t0")
     q0=SX.sym("q0")
-    f=SX.fun("f", [vertcat((q,t)),p],[vertcat((q/p*t**2,1))])
+    f=Function("f", [vertcat((q,t)),p],[vertcat((q/p*t**2,1))])
     for integrator in [
             simpleRK(f,500),
             simpleIRK(f,50),
@@ -211,7 +211,7 @@ class Integrationtests(casadiTestCase):
         for Integrator, features, options in integrators:
           self.message(Integrator)
           x = SX.sym("x")
-          dummyIntegrator = Function.integrator("dummyIntegrator", Integrator, SX.fun("dae", daeIn(x=x), daeOut(ode=x)))
+          dummyIntegrator = Function.integrator("dummyIntegrator", Integrator, {'x':x, 'ode':x})
           if p_features[0] in features:
             g = Function()
             if len(rdin)>1:
@@ -324,7 +324,7 @@ class Integrationtests(casadiTestCase):
       for Integrator, features, options in integrators:
         self.message(Integrator)
         x = SX.sym("x")
-        dummyIntegrator = Function.integrator("dummyIntegrator", Integrator, SX.fun("dae", daeIn(x=x), daeOut(ode=x)))
+        dummyIntegrator = Function.integrator("dummyIntegrator", Integrator, {'x':x, 'ode':x})
         if p_features[0] in features:
           g = Function()
           if len(rdin)>1:
@@ -544,7 +544,7 @@ class Integrationtests(casadiTestCase):
     
     qend = integrator({'x0':q0, 'p':par})["xf"]
     
-    qe=MX.fun("qe", [q0,par],[qend])
+    qe=Function("qe", [q0,par],[qend])
     self.integrator = integrator
     self.qe=qe
     self.qend=qend
@@ -555,15 +555,15 @@ class Integrationtests(casadiTestCase):
     pass
             
   def test_eval2(self):
-    self.message('CVodes integration: evaluation with MX.fun indirection')
+    self.message('CVodes integration: evaluation with Function indirection')
     num=self.num
     qend=self.qend
     
     par=self.par
     q0=self.q0
-    qe=MX.fun("qe", [q0,par],[qend[0]])
+    qe=Function("qe", [q0,par],[qend[0]])
     
-    f = MX.fun("f", [q0],qe([q0,MX(num['p'])]))
+    f = Function("f", [q0],qe([q0,MX(num['p'])]))
     f.setInput([num['q0']],0)
     f.evaluate()
 
@@ -625,7 +625,7 @@ class Integrationtests(casadiTestCase):
 
     qend = integrator({'x0':var})["xf"]
 
-    f = MX.fun("f", [var],[qend[0]])
+    f = Function("f", [var],[qend[0]])
 
     J=f.jacobian(0)
     J.setInput([1,0])
@@ -700,7 +700,7 @@ class Integrationtests(casadiTestCase):
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",1,1)
     qend = integrator({'x0':q0, 'p':par})["xf"]
-    qe=MX.fun("qe", [q0,par],[qend])
+    qe=Function("qe", [q0,par],[qend])
 
     #J=self.qe.jacobian(2)
     J=qe.jacobian(0)
@@ -723,7 +723,7 @@ class Integrationtests(casadiTestCase):
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",1,1)
     qend = integrator({'x0':q0, 'p':par})["xf"]
-    qe=MX.fun("qe", [q0,par],[qend])
+    qe=Function("qe", [q0,par],[qend])
 
     #J=self.qe.jacobian(2)
     J=qe.jacobian(0)
@@ -772,7 +772,7 @@ class Integrationtests(casadiTestCase):
     p=MX.sym("p")
     qe = MX.fun("qe", [q0,p],integratorOut(**self.integrator({'x0':q0,'p':p})))
 
-    JT = MX.fun("JT", [q0,p],[MX.jac(qe, 1,0)[0].T])
+    JT = Function("JT", [q0,p],[MX.jac(qe, 1,0)[0].T])
     JT.setInput([num['q0']],0)
     JT.setInput([num['p']],1)
     JT.evaluate()
@@ -827,7 +827,7 @@ class Integrationtests(casadiTestCase):
     qend = integrator({'x0':q0, 'p':par})["xf"]
     qe=integrator.jacobian("p","xf")
     qe = qe({'x0':q0,'p':par})['jac']
-    qef=MX.fun("qef", [q0,par],[qe])
+    qef=Function("qef", [q0,par],[qe])
 
     qef.setInput(A,0)
     qef.setInput(B.ravel(),1)
@@ -859,16 +859,16 @@ class Integrationtests(casadiTestCase):
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",9,1)
     qend = integrator({'x0':q0, 'p':par})["xf"]
-    qe=MX.fun("qe", [q0,par],[qend])
+    qe=Function("qe", [q0,par],[qend])
     qendJ=integrator.jacobian("x0","xf")
     qendJ = qendJ({'x0':q0,'p':par})['jac']
 
-    qeJ=MX.fun("qeJ", [q0,par],[qendJ])
+    qeJ=Function("qeJ", [q0,par],[qendJ])
 
     qendJ2=integrator.jacobian("x0","xf")
     qendJ2 = qendJ2({'x0':q0,'p':par})['jac']
 
-    qeJ2=MX.fun("qeJ2", [q0,par],[qendJ2])
+    qeJ2=Function("qeJ2", [q0,par],[qendJ2])
     
     qe.setInput(A,0)
     qe.setInput(vec(B),1)
@@ -916,10 +916,10 @@ class Integrationtests(casadiTestCase):
     q0   = MX.sym("q0",2,1)
     par  = MX.sym("p",3,1)
     qend = integrator({'x0':q0, 'p':par})["xf"]
-    qe=MX.fun("qe", [q0,par],[qend])
+    qe=Function("qe", [q0,par],[qend])
     qendJ=integrator.jacobian("x0","xf")
     qendJ =qendJ({'x0':q0,'p':par})['jac']
-    qeJ=MX.fun("qeJ", [q0,par],[qendJ])
+    qeJ=Function("qeJ", [q0,par],[qendJ])
 
     qe.setInput(A,0)
     qe.setInput(B,1)
@@ -962,10 +962,10 @@ class Integrationtests(casadiTestCase):
     q0   = MX.sym("q0",2,1)
     par  = MX.sym("p",1,1)
     qend = integrator({'x0':q0, 'p':par})["xf"]
-    qe=MX.fun("qe", [q0,par],[qend])
+    qe=Function("qe", [q0,par],[qend])
     qendJ=integrator.jacobian("x0","xf")
     qendJ = qendJ({'x0':q0, 'p':par})['jac']
-    qeJ=MX.fun("qeJ", [q0,par],[qendJ])
+    qeJ=Function("qeJ", [q0,par],[qendJ])
 
     qe.setInput(A,0)
     qe.setInput(p0,1)
@@ -1011,7 +1011,7 @@ class Integrationtests(casadiTestCase):
     
     qendJ=integrator.jacobian("p","xf")
     qendJ = qendJ({'x0':q0,'p':par})['jac']
-    qeJ=MX.fun("qeJ", [q0,par],[qendJ])
+    qeJ=Function("qeJ", [q0,par],[qendJ])
 
     qeJ.setInput(A,0)
     qeJ.setInput(p0,1)
@@ -1022,7 +1022,7 @@ class Integrationtests(casadiTestCase):
     
     
     
-    qeJf=MX.fun("qeJf", [q0,par],[vec(qeJ([q0,par])[0])])
+    qeJf=Function("qeJf", [q0,par],[vec(qeJ([q0,par])[0])])
     
     H=qeJf.jacobian(0,0)
     H.setInput(A,0)
@@ -1055,7 +1055,7 @@ class Integrationtests(casadiTestCase):
     p=MX.sym("p",N*N)
     qe = MX.fun("qe", [q0,p],integratorOut(**I({'x0':q0,'p':p})))
 
-    JT = MX.fun("JT", [q0,p],[MX.jac(qe, 1,0).T])
+    JT = Function("JT", [q0,p],[MX.jac(qe, 1,0).T])
 
     H  = JT.jacobian(1)
     H.setInput(x0_,0)

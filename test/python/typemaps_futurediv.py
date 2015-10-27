@@ -145,15 +145,11 @@ class typemaptests(casadiTestCase):
     y = MX(3)
     
     def doit(z,s,fun):
-      function = None
-      
       if type(z) in [type(SX()),type(SX())]:
         ztype = [type(SX()),type(SX())]
-        function = SX.fun
       
       if type(z) in [type(MX())]:
         ztype = [type(MX())]
-        function = MX.fun
         
       r = fun(z,s)
             
@@ -170,11 +166,11 @@ class typemaptests(casadiTestCase):
       if hasNum:
         dummy = [1.3,2.7,9.4,1.0]
 
-        f=function('f', [z],[r])
+        f=Function('f', [z],[r])
         f.setInputNZ(dummy[0:f.nnz_in(0)])
         f.evaluate()
         
-        f_=function('f', [z],[z])
+        f_=Function('f', [z],[z])
         f_.setInputNZ(dummy[0:f.nnz_in(0)])
         f_.evaluate()
         
@@ -184,12 +180,12 @@ class typemaptests(casadiTestCase):
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
         
-        f=function('f',[z,s],[r])
+        f=Function('f',[z,s],[r])
         f.setInputNZ(dummy[0:f.nnz_in(0)],0)
         f.setInputNZ(dummy2[0:f.nnz_in(1)],1)
         f.evaluate()
         
-        f_=function('f', [z,s],[z,s])
+        f_=Function('f', [z,s],[z,s])
         f_.setInputNZ(dummy[0:f.nnz_in(0)],0)
         f_.setInputNZ(dummy2[0:f.nnz_in(1)],1)
         f_.evaluate()

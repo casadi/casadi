@@ -279,7 +279,7 @@ class Sparsitytests(casadiTestCase):
 
     self.assertTrue(c.sparsity()==d)
     
-    f = SX.fun('f', [b],[c])
+    f = Function('f', [b],[c])
     f.setInput(range(1,len(nza)+1))
     f.evaluate()
     
@@ -311,7 +311,7 @@ class Sparsitytests(casadiTestCase):
 
     self.assertTrue(c.sparsity()==d)
     
-    f = MX.fun('f', [b],[c])
+    f = Function('f', [b],[c])
     f.setInputNZ(range(1,len(nza)+1))
     f.evaluate()
     
@@ -486,7 +486,7 @@ class Sparsitytests(casadiTestCase):
 
     p = SX.sym("p")
 
-    g = SX.fun('g', [optvar,p],[X*p], {'verbose':True})
+    g = Function('g', [optvar,p],[X*p], {'verbose':True})
 
     J = g.jacobian()
     
@@ -497,7 +497,7 @@ class Sparsitytests(casadiTestCase):
 
     p = SX.sym("p")
 
-    g = SX.fun('g', [X,p],[vertcat([X*p,P])], {'verbose':True})
+    g = Function('g', [X,p],[vertcat([X*p,P])], {'verbose':True})
 
     J = g.jacobian()
     

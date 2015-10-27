@@ -233,15 +233,11 @@ class typemaptests(casadiTestCase):
     y = MX(3)
     
     def doit(z,s,fun):
-      function = None
-      
       if type(z) in [type(SX()),type(SX())]:
         ztype = [type(SX()),type(SX())]
-        function = SX.fun
       
       if type(z) in [type(MX())]:
         ztype = [type(MX())]
-        function = MX.fun
         
       r = fun(z,s)
             
@@ -258,11 +254,11 @@ class typemaptests(casadiTestCase):
       if hasNum:
         dummy = [1.3,2.7,9.4,1.0]
 
-        f=function("f", [z],[r])
+        f=Function("f", [z],[r])
         f.setInputNZ(dummy[0:f.nnz_in(0)])
         f.evaluate()
         
-        f_=function("f", [z],[z])
+        f_=Function("f", [z],[z])
         f_.setInputNZ(dummy[0:f.nnz_in(0)])
         f_.evaluate()
         
@@ -272,12 +268,12 @@ class typemaptests(casadiTestCase):
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
         
-        f=function("f", [z,s],[r])
+        f=Function("f", [z,s],[r])
         f.setInputNZ(dummy[0:f.nnz_in(0)],0)
         f.setInputNZ(dummy2[0:f.nnz_in(1)],1)
         f.evaluate()
         
-        f_=function("f", [z,s],[z,s])
+        f_=Function("f", [z,s],[z,s])
         f_.setInputNZ(dummy[0:f.nnz_in(0)],0)
         f_.setInputNZ(dummy2[0:f.nnz_in(1)],1)
         f_.evaluate()
@@ -353,15 +349,11 @@ class typemaptests(casadiTestCase):
     
 
     def doit(z,s,fun):
-      function = None
-      
       if type(z) in [type(SX()),type(SX())]:
         ztype = [type(SX()),type(SX())]
-        function = SX.fun
       
       if type(z) in [type(MX())]:
         ztype = [type(MX())]
-        function = MX.fun
         
       r = fun(z,s)
             
@@ -461,7 +453,7 @@ class typemaptests(casadiTestCase):
     w = DMatrix([[1,2,3],[4,5,6]])
     x = SX.sym("x")
     
-    f = SX.fun("f", [x],[w])
+    f = Function("f", [x],[w])
     
     W = f(f.sx_in())[0]
     self.assertEqual(W.size1(),2)
@@ -472,7 +464,7 @@ class typemaptests(casadiTestCase):
     w = DMatrix([[1,2,3],[4,5,6]])
     x = MX.sym("x")
     
-    f = MX.fun("f", [x],[w])
+    f = Function("f", [x],[w])
     
     W = f(f.mx_in())[0]
 
@@ -590,7 +582,7 @@ class typemaptests(casadiTestCase):
     self.message("casting DMatrix")
     
     x = SX.sym("x")
-    f = SX.fun("f", [x],[x])
+    f = Function("f", [x],[x])
     class Foo:
       def __DMatrix__(self):
         return DMatrix([4])
@@ -651,24 +643,24 @@ class typemaptests(casadiTestCase):
       def __SX__(self):
         return x
         
-    SX.fun("tmp", [x],[Foo()])
+    Function("tmp", [x],[Foo()])
     
     class Foo:
       def __SX__(self):
         return MX.sym("x")
         
-    self.assertRaises(NotImplementedError,lambda : SX.fun("tmp", [x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
     
     class Foo:
       def __SX__(self):
         raise Exception("15")
         
-    self.assertRaises(NotImplementedError,lambda : SX.fun("tmp", [x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
 
     class Foo:
       pass
         
-    self.assertRaises(NotImplementedError,lambda :SX.fun("tmp", [x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda :Function("tmp", [x],[Foo()]))
 
 
   def test_casting_MX(self):
@@ -681,24 +673,24 @@ class typemaptests(casadiTestCase):
       def __MX__(self):
         return x
         
-    MX.fun("tmp", [x],[Foo()])
+    Function("tmp", [x],[Foo()])
     
     class Foo:
       def __MX__(self):
         return SX.sym("x")
         
-    self.assertRaises(NotImplementedError,lambda : MX.fun("tmp", [x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
     
     class Foo:
       def __MX__(self):
         raise Exception("15")
         
-    self.assertRaises(NotImplementedError,lambda : MX.fun("tmp", [x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
 
     class Foo:
       pass
         
-    self.assertRaises(NotImplementedError,lambda :MX.fun("tmp", [x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda :Function("tmp", [x],[Foo()]))
     
   def test_OUTPUT(self):
     self.message("OUTPUT typemap")
@@ -719,7 +711,7 @@ class typemaptests(casadiTestCase):
   def test_sxmatrix(self):
 
     def val(a):
-      f = SX.fun("f", [],[a])
+      f = Function("f", [],[a])
       f.evaluate()
       return f.getOutput()
       
@@ -768,7 +760,7 @@ class typemaptests(casadiTestCase):
       d = DMatrix.ones(2,2)
       
       x = SX.sym("x",d.sparsity())
-      f = SX.fun("f", [x],[x])
+      f = Function("f", [x],[x])
       f.setInput(D)
 
       self.checkarray(f.getInput(),DMatrix([[1,2],[3,4]]))

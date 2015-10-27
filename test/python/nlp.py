@@ -1005,7 +1005,7 @@ class NLPtests(casadiTestCase):
   def test_bug(self):
     x = MX.sym("x", 3)
     y = MX.sym("y", 2)
-    f = MX.fun("f", [x, y], [1.])
+    f = Function("f", [x, y], [1.])
 
     aa = MX.sym("aa", 5)
     a = aa[:3]

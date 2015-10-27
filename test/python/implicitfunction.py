@@ -197,19 +197,19 @@ class ImplicitFunctiontests(casadiTestCase):
       y0 = DMatrix([0.1,0.4])
       yy = y + y0
       n=0.2
-      f=SX.fun("f", [y,x],[vertcat([x-arcsin(yy[0]),yy[1]**2-yy[0]])])
+      f=Function("f", [y,x],[vertcat([x-arcsin(yy[0]),yy[1]**2-yy[0]])])
       solver=f.rootfinder("solver", Solver, options)
       solver.setInput(n)
       solver.evaluate()
       
-      refsol = SX.fun("refsol", [y,x],[vertcat([sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
+      refsol = Function("refsol", [y,x],[vertcat([sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
       refsol.setInput(n)
       self.checkfunction(solver,refsol,digits=5,sens_der=False,failmessage=message)
       
   def testKINSol1c(self):
     self.message("Scalar KINSol problem, n=0, constraint")
     x=SX.sym("x")
-    f=SX.fun("f", [x],[sin(x)])
+    f=Function("f", [x],[sin(x)])
     solver=f.rootfinder("solver", "kinsol", {"constraints":[-1]})
     solver.setInput(-6)
     solver.evaluate()
@@ -220,7 +220,7 @@ class ImplicitFunctiontests(casadiTestCase):
       if 'kinsol' in str(Solver): continue
       if 'newton' in str(Solver): continue
       x=SX.sym("x",2)
-      f=SX.fun("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
+      f=Function("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
       options2 = dict(options)
       options2["constraints"] = [-1,0]
       solver=f.rootfinder("solver", Solver, options2)
@@ -228,7 +228,7 @@ class ImplicitFunctiontests(casadiTestCase):
       
       self.checkarray(solver.getOutput(),DMatrix([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
 
-      f=SX.fun("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
+      f=Function("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
       options2 = dict(options)
       options2["constraints"] = [1,0]
       solver=f.rootfinder("solver", Solver, options2)
@@ -246,7 +246,7 @@ class ImplicitFunctiontests(casadiTestCase):
     # Root-finding function, implicitly defines V as a function of X0 and P
     vfcn = Function("vfcn", [V,X0], [V_eq], {"ad_weight":0, "ad_weight_sp":1})
 
-    # Convert to SX.fun to decrease overhead
+    # Convert to SX to decrease overhead
     vfcn_sx = vfcn.expand('vfcn_sx', {"ad_weight":0, "ad_weight_sp":1})
 
     # Create a implicit function instance to solve the system of equations
