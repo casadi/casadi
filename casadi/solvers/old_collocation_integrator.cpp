@@ -98,7 +98,7 @@ namespace casadi {
     std::vector<double> tau_root = collocationPoints(deg, getOption("collocation_scheme"));
 
     // Size of the finite elements
-    double h = (tf_-t0_)/nk;
+    double h = (grid_.back()-t0_)/nk;
 
     // MX version of the same
     MX h_mx = h;

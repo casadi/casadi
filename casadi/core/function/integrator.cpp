@@ -133,19 +133,23 @@ namespace casadi {
   }
 
   void Integrator::evaluate() {
-    // Reset solver
+    // Reset solver, take time to t0
     reset();
 
-    // Integrate forward to the end of the time horizon
-    integrate(tf_);
+    // Integrate forward stopping at the grid points
+    for (auto k=grid_.begin(); k!=grid_.end(); ++k) {
+      integrate(*k);
+    }
 
     // If backwards integration is needed
     if (nrx_>0) {
 
-      // Re-initialize backward problem
-      resetB();
+      // Integrate backward stopping at the grid points
+      for (auto k=grid_.rbegin(); k!=grid_.rend(); ++k) {
+        resetB();
+      }
 
-      // Integrate backwards to the beginning
+      // Proceed to t0
       integrateB(t0_);
     }
 
@@ -240,7 +244,7 @@ namespace casadi {
 
     // read options
     t0_ = getOption("t0");
-    tf_ = getOption("tf");
+    grid_ = vector<double>{getOption("tf")};
     print_stats_ = getOption("print_stats");
 
     // Form a linear solver for the sparsity propagation
@@ -1280,7 +1284,7 @@ namespace casadi {
     log("Integrator::resetB", "begin");
 
     // Go to the end time
-    t_ = tf_;
+    t_ = grid_.back();
 
     // Initialize output
     rxf().set(rx0());

@@ -45,7 +45,7 @@ namespace casadi {
     // Number of finite elements and time steps
     nk_ = getOption("number_of_finite_elements");
     casadi_assert(nk_>0);
-    h_ = (tf_ - t0_)/nk_;
+    h_ = (grid_.back() - t0_)/nk_;
 
     // Setup discrete time dynamics
     setupFG();

@@ -163,8 +163,11 @@ namespace casadi {
     /// Number of forward and backward parameters
     int np_, nrp_;
 
-    /// Integration horizon
-    double t0_, tf_;
+    /// Initial time
+    double t0_;
+
+    // Time grid
+    std::vector<double> grid_;
 
     // Current time
     double t_;

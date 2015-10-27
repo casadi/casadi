@@ -316,7 +316,7 @@ namespace casadi {
     if (flag != CV_SUCCESS) cvodes_error("CVodeCreateB", flag);
 
     // Initialize the backward problem
-    double tB0 = tf_;
+    double tB0 = grid_.back();
     flag = CVodeInitB(mem_, whichB_, rhsB_wrapper, tB0, rx0_);
     if (flag != CV_SUCCESS) cvodes_error("CVodeInitB", flag);
     //// NOTE: Would be needed for forward sensitivities of the backward problem
@@ -459,7 +459,7 @@ namespace casadi {
     }
 
     // Set the stop time of the integration -- don't integrate past this point
-    if (stop_at_end_) setStopTime(tf_);
+    if (stop_at_end_) setStopTime(grid_.back());
     casadi_msg("CvodesInterface::reset end");
   }
 
@@ -470,9 +470,9 @@ namespace casadi {
                           "CvodesInterface::integrate(" << t_out << "): "
                           "Cannot integrate to a time earlier than t0 ("
                           << t0_ << ")");
-    casadi_assert_message(t_out<=tf_ || !stop_at_end_, "CvodesInterface::integrate("
+    casadi_assert_message(t_out<=grid_.back() || !stop_at_end_, "CvodesInterface::integrate("
                           << t_out << "):"
-                          " Cannot integrate past a time later than tf (" << tf_ << ") "
+                          " Cannot integrate past a time later than tf (" << grid_.back() << ") "
                           "unless stop_at_end is set to False.");
 
     int flag;
@@ -538,7 +538,7 @@ namespace casadi {
     int flag;
     if (isInitAdj_) {
 
-      flag = CVodeReInitB(mem_, whichB_, tf_, rx0_);
+      flag = CVodeReInitB(mem_, whichB_, grid_.back(), rx0_);
       if (flag != CV_SUCCESS) cvodes_error("CVodeReInitB", flag);
 
       N_VConst(0.0, rq_);

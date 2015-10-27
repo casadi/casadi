@@ -420,7 +420,7 @@ namespace casadi {
     if (flag != IDA_SUCCESS) idas_error("IDACreateB", flag);
 
     // Initialize the backward problem
-    double tB0 = tf_;
+    double tB0 = grid_.back();
     flag = IDAInitB(mem_, whichB_, resB_wrapper, tB0, rxz_, rxzdot_);
     if (flag != IDA_SUCCESS) idas_error("IDAInitB", flag);
 
@@ -848,7 +848,7 @@ namespace casadi {
     }
 
     // Set the stop time of the integration -- don't integrate past this point
-    if (stop_at_end_) setStopTime(tf_);
+    if (stop_at_end_) setStopTime(grid_.back());
 
     log("IdasInterface::reset", "end");
   }
@@ -873,7 +873,7 @@ namespace casadi {
     // int icopt = IDA_Y_INIT; // calculate z and x given zdot and xdot (e.g. start in stationary)
 
     double t_first =
-        hasSetOption("first_time") ? static_cast<double>(getOption("first_time")) : tf_;
+        hasSetOption("first_time") ? static_cast<double>(getOption("first_time")) : grid_.back();
     int flag = IDACalcIC(mem_, icopt , t_first);
     if (flag != IDA_SUCCESS) idas_error("IDACalcIC", flag);
 
@@ -902,8 +902,9 @@ namespace casadi {
 
     casadi_assert_message(t_out>=t0_, "IdasInterface::integrate(" << t_out << "): "
                           "Cannot integrate to a time earlier than t0 (" << t0_ << ")");
-    casadi_assert_message(t_out<=tf_ || !stop_at_end_, "IdasInterface::integrate(" << t_out << "): "
-                          "Cannot integrate past a time later than tf (" << tf_ << ") "
+    casadi_assert_message(t_out<=grid_.back() || !stop_at_end_, "IdasInterface::integrate("
+                          << t_out << "): "
+                          "Cannot integrate past a time later than tf (" << grid_.back() << ") "
                           "unless stop_at_end is set to False.");
 
     int flag;
@@ -993,7 +994,7 @@ namespace casadi {
     copy(rx0.begin(), rx0.end(), NV_DATA_S(rxz_));
 
     if (isInitAdj_) {
-      flag = IDAReInitB(mem_, whichB_, tf_, rxz_, rxzdot_);
+      flag = IDAReInitB(mem_, whichB_, grid_.back(), rxz_, rxzdot_);
       if (flag != IDA_SUCCESS) idas_error("IDAReInitB", flag);
 
       if (nrq_>0) {
