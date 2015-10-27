@@ -41,9 +41,6 @@ from pylab import *
 L = SX.sym("L")
 g = SX.sym("g")
 
-#! Time
-t=SX.sym("t")
-
 #! differential states
 x=SX.sym("x")
 y=SX.sym("y")
@@ -67,15 +64,13 @@ Z_ = [1147.0/720] # algebraic state
 #! We construct the DAE system
 ode = vertcat([u,lambd*x,v,lambd*y+g])
 alg = x**2+y**2-L**2
-f = SX.fun("f", daeIn(x=x_all,z=z_all,p=p_all,t=t),daeOut(ode=ode,alg=alg))
+dae = {'x':x_all, 'z':z_all, 'p':p_all, 'ode':ode, 'alg':alg}
+f = Function('f', [x_all, z_all, p_all], [ode, alg], ['x', 'z', 'p'], ['ode', 'alg'])
 
 #! Let's check we have consistent initial conditions:
-f.setInput(P_,"p")
-f.setInput(X_,"x")
-f.setInput(Z_,"z")
-f.evaluate()
-print f.getOutput("ode") # This should be same as XDOT_
-print f.getOutput("alg") # This should be all zeros
+res = f({'p':P_, 'x':X_, 'z':Z_})
+print res['ode'] # This should be same as XDOT_
+print res['alg'] # This should be all zeros
 
 
 #! Let's check our jacobian $\frac{dg}{dy}$:
@@ -87,17 +82,13 @@ print j
 #! It is impossible to lambda from the last element of the residual.
 
 #! We create a DAE system solver
-I = Function.integrator("I", "idas", f, {"calc_ic":False, "init_xdot":XDOT_})
-
-I.setInput(P_,"p")
-I.setInput(X_,"x0")
-I.setInput(Z_,"z0")
+I = Function.integrator('I', 'idas', dae, {'calc_ic':False, 'init_xdot':XDOT_})
 
 #! This system is not solvable with idas, because it is of DAE-index 3.
 #! It is impossible obtain lambda from the last element of the residual.
 
 try:
-  I.evaluate()
+  I({'p':P_, 'x0':X_, 'z0':Z_})
 except Exception as e:
   print e
   
@@ -106,7 +97,8 @@ ode = vertcat([u,lambd*x])
 alg = vertcat([x**2+y**2-L**2, u*x+v*y,u**2-g*y+v**2+L**2*lambd])
 x_all = vertcat([x,u])
 z_all = vertcat([y,v,lambd])
-f = SX.fun("f", daeIn(x=x_all,z=z_all,p=p_all,t=t),daeOut(ode=ode,alg=alg))
+dae = {'x':x_all, 'z':z_all, 'p':p_all, 'ode':ode, 'alg':alg}
+f = Function('f', [x_all, z_all, p_all], [ode, alg], ['x', 'z', 'p'], ['ode', 'alg'])
 
 #! the initial state of the pendulum
 P_ = [5,10] # parameters
@@ -115,33 +107,20 @@ XDOT_ = [-1.0/3,1147.0/240] # state derivatives
 Z_ = [4,1.0/4,1147.0/720] # algebraic state
 
 #! Let's check we have consistent initial conditions:
-f.setInput(P_,"p")
-f.setInput(X_,"x")
-f.setInput(Z_,"z")
-f.evaluate()
-print f.getOutput("ode") # This should be the same as XDOT_
-print f.getOutput("alg") # This should be all zeros
+res = f({'p':P_, 'x':X_, 'z':Z_})
+print res['ode'] # This should be the same as XDOT_
+print res['alg'] # This should be all zeros
 
 #! Let's check our jacobian:
-j = f.jacobian("z","alg")
-
-j.setInput(P_,"p")
-j.setInput(X_,"x")
-j.setInput(Z_,"z")
-j.evaluate()
-print array(j.getOutput())
+J = f.jacobian('z', 'alg')
+res = J({'p':P_, 'x':X_, 'z':Z_})
+print array(res["jac"])
 #! $\frac{dg}{dy}$ is invertible this time.
 
 #! We create a DAE system solver
-I = Function.integrator("I", "idas", f, {'t0':0, 'tf':1, "init_xdot":XDOT_})
-  
-I.setInput(P_,"p")
-I.setInput(X_,"x0")
-I.setInput(Z_,"z0")
-I.evaluate()
-
-print I.getOutput("xf")
-
+I = Function.integrator('I', 'idas', dae, {'t0':0, 'tf':1, 'init_xdot':XDOT_})
+res = I({'p':P_, 'x0':X_, 'z0':Z_})
+print res['xf']
 
 #! Possible problems
 #! ==================
@@ -151,11 +130,8 @@ P_ = [5,10] # parameters
 X_ = [5,0]  # states
 
 #! You will get an error:
-I.setInput(P_,"p")
-I.setInput(X_,"x0")
-I.setInput(Z_,"z0")
 try:
-  I.evaluate()
+  I({'p':P_, 'x0':X_, 'z0':Z_})
 except Exception as e:
   print e 
 
