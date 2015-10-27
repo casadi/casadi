@@ -58,15 +58,15 @@ int main(){
     // Create a simple function
     Function f;
     if(test==0){
-      cout << "SX::fun:" << endl;
+      cout << "SX:" << endl;
       SX x = SX::sym("x",3);
       SX z = x[0]*x[0]+x[2] + 3;
-      f = SX::fun("f", {x}, {z});
+      f = Function("f", {x}, {z});
     } else {
-      cout << "MX::fun:" << endl;
+      cout << "MX:" << endl;
       MX x = MX::sym("x",3);
       MX z = x[0]*x[0]+x[2] + 3;
-      f = MX::fun("f", {x}, {z});
+      f = Function("f", {x}, {z});
     }
     
     // Get arrays for the inputs and outputs, reinterpreting the vector of double as an array of unsigned integers

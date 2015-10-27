@@ -109,7 +109,7 @@ for k in range(num_nodes):
 G.append(X[num_nodes][2:] - NP.array([0,0])) # costates fixed, states free at final time
 
 # Terminal constraints: lam = 0
-rfp = MX.fun('rfp', [V], [vertcat(G)])
+rfp = Function('rfp', [V], [vertcat(G)])
 
 # Select a solver for the root-finding problem
 Solver = "nlp"

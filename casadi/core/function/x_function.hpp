@@ -973,7 +973,7 @@ namespace casadi {
     ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
 
     // Return function
-    return MatType::fun(name, inputv_, ret_out, opts);
+    return Function(name, inputv_, ret_out, opts);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
@@ -986,7 +986,7 @@ namespace casadi {
     ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
 
     // Return function
-    return MatType::fun(name, inputv_, ret_out, opts);
+    return Function(name, inputv_, ret_out, opts);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
@@ -1000,7 +1000,7 @@ namespace casadi {
     ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
 
     // Return function
-    return MatType::fun(name, inputv_, ret_out, opts);
+    return Function(name, inputv_, ret_out, opts);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
@@ -1037,7 +1037,7 @@ namespace casadi {
     }
 
     // Assemble function and return
-    return MatType::fun(name, ret_in, ret_out, opts);
+    return Function(name, ret_in, ret_out, opts);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
@@ -1073,7 +1073,7 @@ namespace casadi {
     }
 
     // Assemble function and return
-    return MatType::fun(name, ret_in, ret_out, opts);
+    return Function(name, ret_in, ret_out, opts);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
@@ -1115,7 +1115,7 @@ namespace casadi {
       static_cast<DerivedType*>(this)->evalFwd(fseed, fsens);
     } else {
       // Need to create a temporary function
-      Function f = MatType::fun("tmp", arg, res);
+      Function f("tmp", arg, res);
       static_cast<DerivedType *>(f.get())->evalFwd(fseed, fsens);
     }
   }
@@ -1145,7 +1145,7 @@ namespace casadi {
       static_cast<DerivedType*>(this)->evalAdj(aseed, asens);
     } else {
       // Need to create a temporary function
-      Function f = MatType::fun("tmp", arg, res);
+      Function f("tmp", arg, res);
       static_cast<DerivedType *>(f.get())->evalAdj(aseed, asens);
     }
   }

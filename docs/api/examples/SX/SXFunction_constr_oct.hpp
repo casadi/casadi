@@ -23,16 +23,16 @@
  */
 
 /** 
-* This examples demonstrates how to create an SX.fun in octave
+* This examples demonstrates how to create a Function in octave
 *
-* \example SX/SX.fun_constr_oct.m
+* \example SX/SXFunction_constr_oct.m
 *
 * Output:
-* \include SX/SX.fun_constr_oct.out
+* \include SX/SXFunction_constr_oct.out
 *
 *
 * \sa
 * \code
-*  casadi::SX.fun();
+*  casadi::Function();
 * \endcode
 */

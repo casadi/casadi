@@ -78,7 +78,7 @@ for j in range(deg+1):
         if j2 != j:
             L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
 
-    lfcn = SX.fun('lfcn', [tau],[L])
+    lfcn = Function('lfcn', [tau],[L])
     # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
     [D[j]] = lfcn([1.0])
 
@@ -127,11 +127,11 @@ xd[5] = dw
                    
 
 # System dynamics (implicit formulation)
-ffcn = SX.fun('ffcn', [t,xddot,xd,xa,u,p],[res])
+ffcn = Function('ffcn', [t,xddot,xd,xa,u,p],[res])
 
 # Objective function 
-MayerTerm = SX.fun('mayer', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
-LagrangeTerm = SX.fun('lagrange', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
+MayerTerm = Function('mayer', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
+LagrangeTerm = Function('lagrange', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
 
 # Control bounds
 u_min = np.array([-2])
@@ -177,19 +177,19 @@ ic_min = np.array([])
 ic_max = np.array([])
 ic = SX()
 #ic.append();       ic_min = append(ic_min, 0.);         ic_max = append(ic_max, 0.)
-icfcn = SX.fun('icfcn', [t,xd,xa,u,p],[ic])
+icfcn = Function('icfcn', [t,xd,xa,u,p],[ic])
 # Path constraint
 pc_min = np.array([])
 pc_max = np.array([])
 pc = SX()
 #pc.append();       pc_min = append(pc_min, 0.);         pc_max = append(pc_max, 0.)
-pcfcn = SX.fun('pcfcn', [t,xd,xa,u,p],[pc])
+pcfcn = Function('pcfcn', [t,xd,xa,u,p],[pc])
 # Final constraint
 fc_min = np.array([])
 fc_max = np.array([])
 fc = SX()
 #fc.append();       fc_min = append(fc_min, 0.);         fc_max = append(fc_max, 0.)
-fcfcn = SX.fun('fcfcn', [t,xd,xa,u,p],[fc])
+fcfcn = Function('fcfcn', [t,xd,xa,u,p],[fc])
 
 # -----------------------------------------------------------------------------
 # NLP setup
@@ -441,7 +441,7 @@ for j in range(1,deg+1):
     for j2 in range(1,deg+1):
         if j2 != j:
             La *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
-    lafcn = SX.fun('lafcn', [tau], [La])
+    lafcn = Function('lafcn', [tau], [La])
     [Da[j-1]] = lafcn([tau_root[0]])
 
 xA_plt = np.resize(np.array([],dtype=MX),(nalg,(deg+1)*nicp*(nk)+1))

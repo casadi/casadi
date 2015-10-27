@@ -30,7 +30,7 @@
 *
 * \sa
 * \code
-* casadi::SX.fun::eval(const vector<SX>& arg);
+* casadi::Function::eval(const vector<SX>& arg);
 * casadi::substitute(const SX &ex, const SX &var, const SX &expr);
 * \endcode
 *

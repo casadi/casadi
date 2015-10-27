@@ -31,9 +31,9 @@
 *
 * \sa
 * \code
-* casadi::SX.fun::generate(const std::string&);
-* casadi::SX.fun::repr(std::ostream &stream);
-* casadi::SX.fun::print(std::ostream &stream);
+* casadi::Function::generate(const std::string&);
+* casadi::Function::repr(std::ostream &stream);
+* casadi::Function::print(std::ostream &stream);
 * \endcode
 *
 */

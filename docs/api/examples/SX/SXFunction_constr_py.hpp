@@ -23,14 +23,14 @@
  */
 
 /** 
-* This examples demonstrates how to create an SX.fun in python
+* This examples demonstrates how to create an Function in python
 *
 *
-* \pythonexample{SX/SX.fun_constr_py}
+* \pythonexample{SX/SXFunction_constr_py}
 *
 *
 * \sa
 * \code
-*  casadi::SX.fun();
+*  casadi::Function();
 * \endcode
 */

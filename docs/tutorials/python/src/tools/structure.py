@@ -32,12 +32,12 @@ from casadi.tools import *
 #! 
 #! Put simply, the goal is to eleminate code with 'magic numbers' numbers such as:
 #!
-#!    f = MX.fun('f', [V],[ V[214] ])  # time
+#!    f = Function('f', [V],[ V[214] ])  # time
 #!    ...
 #!    x_opt = solver.getOutput()[::5]    # Obtain all optimized x's
 #!
 #!  and replace it with
-#!    f = MX.fun('f', [V],[ V["T"] ])
+#!    f = Function('f', [V],[ V["T"] ])
 #!    ...
 #!    shooting(solver.getOutput())["x",:]
 #!
@@ -62,10 +62,10 @@ print states.cat
 print states.size, "=", states.cat.shape
   
   
-f = SX.fun('f', [states.cat],[x*y*z])
+f = Function('f', [states.cat],[x*y*z])
 
 #! In many cases, states will be auto-cast to SX:
-f = SX.fun('f', [states],[x*y*z])
+f = Function('f', [states],[x*y*z])
 
 #! Expanded structure syntax and ordering 
 #! --------------------------------------

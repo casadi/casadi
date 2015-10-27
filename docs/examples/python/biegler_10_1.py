@@ -47,12 +47,12 @@ for N in range(1,11):
   
   # Differential equation
   z = SX.sym("z")
-  F = SX.fun("dz/dt", [z],[z*z - 2*z + 1])
+  F = Function("dz/dt", [z],[z*z - 2*z + 1])
   
   z0 = -3
   
   # Analytic solution
-  z_analytic = SX.fun("analytic solution", [t], [(4*t-3)/(3*t+1)])
+  z_analytic = Function("analytic solution", [t], [(4*t-3)/(3*t+1)])
   
   # Collocation point
   tau = SX.sym("tau")
@@ -70,7 +70,7 @@ for N in range(1,11):
 
     print "l(", j, ") = ", L
 
-    f = SX.fun("l(" + str(j) + ")", [tau],[L])
+    f = Function("l(" + str(j) + ")", [tau],[L])
     
     # initialize
     l.append(f)

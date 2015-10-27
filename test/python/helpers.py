@@ -114,11 +114,11 @@ class FunctionPool:
 
 def toSX_fun(fun):
   ins = fun.sx_in()
-  return SX.fun("f",ins,fun(ins))
+  return Function("f",ins,fun(ins))
   
 def toMX_fun(fun):
   ins = fun.mx_in()
-  return MX.fun("f",ins,fun(ins))
+  return Function("f",ins,fun(ins))
 
 class casadiTestCase(unittest.TestCase):
 
@@ -230,7 +230,7 @@ class casadiTestCase(unittest.TestCase):
   def evaluationCheck(self,yt,yr,x,x0,name="",failmessage="",fmod=None,setx0=None):
     """ General unit test for checking casadi evaluation against a reference solution.
     
-        Checks if yr is the same as S/MX.fun(x,yt) , evaluated for x0
+        Checks if yr is the same as Function(name,x,yt) , evaluated for x0
     
         x: the symbolic seed for the test. It should be of a form accepted as first argument of SX.fun/MX.fun
         yt: the test expression.
@@ -246,9 +246,9 @@ class casadiTestCase(unittest.TestCase):
       
 
     if isinstance(sample,SX):
-      f = SX.fun("f", x, yt)
+      f = Function("f", x, yt)
     else:
-      f = MX.fun("f", x, yt)
+      f = Function("f", x, yt)
     
     if (not(fmod is None)):
       f=fmod(f,x)
@@ -275,7 +275,7 @@ class casadiTestCase(unittest.TestCase):
   def numpyEvaluationCheck(self,ft,fr,x,x0,name="",failmessage="",fmod=None,setx0=None):
     """ General unit test for checking casadi versus numpy evaluation.
     
-        Checks if 'fr(x0)' yields the same as S/MX.fun(x,[ft(x)]) , evaluated for x0
+        Checks if 'fr(x0)' yields the same as Function(name,x,[ft(x)]) , evaluated for x0
     
         x: the symbolic seed for the test. It should be of a form accepted as first argument of SX.fun/MX.fun
         ft: the test function. This function should operate on the casadi matrix x and return MX or SX.
@@ -306,7 +306,7 @@ class casadiTestCase(unittest.TestCase):
 
     if indirect:
       ins = trial.mx_in()
-      extra_trial = MX.fun("extra_trial", ins,trial(ins))
+      extra_trial = Function("extra_trial", ins,trial(ins))
       for i in range(trial.n_in()):
         extra_trial.setInput(trial.getInput(i),i)
       self.checkfunction(extra_trial,solution,fwd,adj,jacobian,gradient,hessian,sens_der,evals,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
@@ -444,7 +444,6 @@ class casadiTestCase(unittest.TestCase):
       #spmods = [lambda x: x , remove_first]
       
       sym = MX.sym
-      Function = MX.fun
       
       storage2 = {}
       storage = {}

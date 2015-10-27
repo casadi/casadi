@@ -769,8 +769,8 @@ namespace casadi {
     }
 
     // Construct return function
-    Function ret=MX::fun(ss.str(), ret_in, ret_out,
-                   Dict{{"input_scheme", i_names}, {"output_scheme", o_names}});
+    Function ret(ss.str(), ret_in, ret_out,
+                 {{"input_scheme", i_names}, {"output_scheme", o_names}});
 
     // Consistency check for inputs
     int ind=0;

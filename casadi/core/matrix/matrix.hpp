@@ -855,10 +855,6 @@ namespace casadi {
     static std::vector<Matrix<DataType> > get_input(const Function& f);
 
     /** \brief Construct from vectors */
-    static Function fun(const std::string& name, const std::vector<Matrix<DataType> >& arg,
-                        const std::vector<Matrix<DataType> >& res, const Dict& opts=Dict());
-
-    /** \brief Construct from vectors */
     static Function fun(const std::string& name,
                         const std::pair< std::map<std::string, Matrix<DataType> >,
                         std::vector<std::string> >& arg,

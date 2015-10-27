@@ -36,7 +36,7 @@ y = x[:-2]-2*x[1:-1]+x[2:]
 print y[:5]
 
 #! Next, we construct a function
-f = SX.fun("f", [x],[y])
+f = Function("f", [x],[y])
 
 #! And we visualize the sparsity of the jacobian
 spy(f.jacSparsity())

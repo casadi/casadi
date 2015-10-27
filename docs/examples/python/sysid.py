@@ -38,7 +38,7 @@ params = vertcat([M,c,k,k_NL])
 rhs = vertcat([dy , (u-k_NL*y**3-k*y-c*dy)/M])
 
 # Form an ode function
-ode = MX.fun('ode',[states,controls,params],[rhs])
+ode = Function('ode',[states,controls,params],[rhs])
 
 ############ Creating a simulator ##########
 N_steps_per_sample = 10
@@ -53,7 +53,7 @@ dt = 1/fs/N_steps_per_sample
 states_final = states+dt/6.0*(k1+2*k2+2*k3+k4)
 
 # Create a function that simulates one step propagation in a sample
-one_step = MX.fun('one_step',[states, controls, params],[states_final]);
+one_step = Function('one_step',[states, controls, params],[states_final]);
 
 X = states;
 

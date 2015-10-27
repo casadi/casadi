@@ -1903,17 +1903,12 @@ namespace casadi {
     return tang(f, f.index_in(iname), f.index_out(oname));
   }
 
-  Function MX::fun(const std::string& name, const std::vector<MX>& arg,
-                   const std::vector<MX>& res, const Dict& opts) {
-    return Function(name, arg, res, opts);
-  }
-
   Function MX::fun(const std::string& name,
                    const std::pair< MXDict, std::vector<std::string> >& arg,
                    const std::vector<MX>& res, const Dict& opts) {
     Dict opts2 = opts;
     opts2["input_scheme"] = arg.second;
-    return fun(name, make_vector(arg), res, opts2);
+    return Function(name, make_vector(arg), res, opts2);
   }
 
   Function MX::fun(const std::string& name, const std::vector<MX>& arg,
@@ -1921,7 +1916,7 @@ namespace casadi {
                    const Dict& opts) {
     Dict opts2 = opts;
     opts2["output_scheme"] = res.second;
-    return fun(name, arg, make_vector(res), opts2);
+    return Function(name, arg, make_vector(res), opts2);
   }
 
   Function MX::fun(const std::string& name,
@@ -1931,7 +1926,7 @@ namespace casadi {
     Dict opts2 = opts;
     opts2["input_scheme"] = arg.second;
     opts2["output_scheme"] = res.second;
-    return fun(name, make_vector(arg), make_vector(res), opts2);
+    return Function(name, make_vector(arg), make_vector(res), opts2);
   }
 
 } // namespace casadi

@@ -187,7 +187,7 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) arg.insert(arg.end(), fseed[d].begin(), fseed[d].end());
     res.clear();
     for (int d=0; d<nfwd; ++d) res.insert(res.end(), fsens[d].begin(), fsens[d].end());
-    return MX::fun(name, arg, res, opts);
+    return Function(name, arg, res, opts);
   }
 
   Function Rootfinder
@@ -205,7 +205,7 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) arg.insert(arg.end(), aseed[d].begin(), aseed[d].end());
     res.clear();
     for (int d=0; d<nadj; ++d) res.insert(res.end(), asens[d].begin(), asens[d].end());
-    return MX::fun(name, arg, res, opts);
+    return Function(name, arg, res, opts);
   }
 
   void Rootfinder::spFwd(const bvec_t** arg, bvec_t** res,

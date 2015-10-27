@@ -74,7 +74,7 @@ namespace casadi {
     dae_out[DAE_ODE]=dae.out[DE_ODE];
     dae_out[DAE_ALG]=dae.out[DE_ALG];
     dae_out[DAE_QUAD]=dae.out[DE_QUAD];
-    return MatType::fun("dae", dae_in, dae_out);
+    return Function("dae", dae_in, dae_out);
   }
 
   template<typename MatType>
@@ -91,7 +91,7 @@ namespace casadi {
     rdae_out[RDAE_ODE]=dae.out[DE_RODE];
     rdae_out[RDAE_ALG]=dae.out[DE_RALG];
     rdae_out[RDAE_QUAD]=dae.out[DE_RQUAD];
-    return MatType::fun("rdae", rdae_in, rdae_out);
+    return Function("rdae", rdae_in, rdae_out);
   }
 
   Sparsity Integrator::get_sparsity_in(int ind) const {
@@ -1078,7 +1078,7 @@ namespace casadi {
     log("Integrator::getDerForward", "end");
 
     // Create derivative function and return
-    return MX::fun(name, ret_in, ret_out, opts);
+    return Function(name, ret_in, ret_out, opts);
   }
 
   Function Integrator::getDerReverse(const std::string& name, int nadj, Dict& opts) {
@@ -1261,7 +1261,7 @@ namespace casadi {
     log("Integrator::getDerivative", "end");
 
     // Create derivative function and return
-    return MX::fun(name, ret_in, ret_out, opts);
+    return Function(name, ret_in, ret_out, opts);
   }
 
   void Integrator::reset() {

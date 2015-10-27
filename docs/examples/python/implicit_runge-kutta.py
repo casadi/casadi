@@ -127,7 +127,7 @@ for r in range(d+1):
   XF += D[r]*X[r]
   
 # Get the discrete time dynamics
-F = MX.fun('F', [X0,P],[XF])
+F = Function('F', [X0,P],[XF])
 
 # Do this iteratively for all finite elements
 X = X0

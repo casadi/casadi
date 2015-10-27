@@ -193,7 +193,7 @@ u=MX.sym("u")
 w = integrator({'x0':MX([1,0]),'p':u})["xf"]
 
 #! We construct an MXfunction and a python help function 'out'
-f=MX.fun('f', [u],[w])
+f=Function('f', [u],[w])
 
 def out(u):
 	f.setInput(u)

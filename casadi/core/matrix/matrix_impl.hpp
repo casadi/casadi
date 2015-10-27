@@ -3035,19 +3035,11 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Function Matrix<DataType>::fun(const std::string& name, const std::vector<Matrix<DataType>>& arg,
-                   const std::vector<Matrix<DataType>>& res, const Dict& opts) {
-    throw CasadiException("\"fun\" not defined for " + className());
-  }
-
-  template<typename DataType>
   Function Matrix<DataType>::
   fun(const std::string& name,
       const std::pair< std::map<std::string, Matrix<DataType> >, std::vector<std::string> >& arg,
       const std::vector<Matrix<DataType>>& res, const Dict& opts) {
-    Dict opts2 = opts;
-    opts2["input_scheme"] = arg.second;
-    return fun(name, make_vector(arg), res, opts2);
+    throw CasadiException("\"fun\" not defined for " + className());
   }
 
   template<typename DataType>
@@ -3056,9 +3048,7 @@ namespace casadi {
       const std::vector<Matrix<DataType>>& arg,
       const std::pair< std::map<std::string, Matrix<DataType> >, std::vector<std::string> >& res,
       const Dict& opts) {
-    Dict opts2 = opts;
-    opts2["output_scheme"] = res.second;
-    return fun(name, arg, make_vector(res), opts2);
+    throw CasadiException("\"fun\" not defined for " + className());
   }
 
   template<typename DataType>
@@ -3067,10 +3057,7 @@ namespace casadi {
       const std::pair< std::map<std::string, Matrix<DataType> >, std::vector<std::string> >& arg,
       const std::pair< std::map<std::string, Matrix<DataType> >, std::vector<std::string> >& res,
       const Dict& opts) {
-    Dict opts2 = opts;
-    opts2["input_scheme"] = arg.second;
-    opts2["output_scheme"] = res.second;
-    return fun(name, make_vector(arg), make_vector(res), opts2);
+    throw CasadiException("\"fun\" not defined for " + className());
   }
 
   // Template specializations
@@ -3177,8 +3164,23 @@ namespace casadi {
   template<> SX SX::hess(const Function& f, int iind, const std::string& oname);
   template<> SX SX::hess(const Function& f, const std::string& iname, const std::string& oname);
 
-  template<> Function SX::fun(const std::string& name, const std::vector<SX>& arg,
+  template<> Function SX::fun(const std::string& name,
+                              const std::pair< std::map<std::string, SX >,
+                              std::vector<std::string> >& arg,
                               const std::vector<SX>& res, const Dict& opts);
+
+  template<> Function SX::fun(const std::string& name,
+                              const std::vector<SX>& arg,
+                              const std::pair< std::map<std::string, SX >,
+                              std::vector<std::string> >& res,
+                              const Dict& opts);
+
+  template<> Function SX::fun(const std::string& name,
+                              const std::pair< std::map<std::string, SX >,
+                              std::vector<std::string> >& arg,
+                              const std::pair< std::map<std::string, SX >,
+                              std::vector<std::string> >& res,
+                              const Dict& opts);
 
 #ifndef CASADI_MATRIX_CPP
   // Templates instantiated in matrix.cpp

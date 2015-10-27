@@ -98,7 +98,7 @@ lam_f = X[2:4]
 g = lam_f
 
 # Formulate root-finding problem
-rfp = MX.fun('rfp', [l_init], [g])
+rfp = Function('rfp', [l_init], [g])
 
 # Select a solver for the root-finding problem
 Solver = "nlp"

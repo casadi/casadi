@@ -60,7 +60,7 @@ k_     = 0.2
 params_ = [0.1,0.1,alpha_,k_,sigma_]
 
 #! We create a NewtonImplicitSolver instance
-f=SX.fun("f", [vertcat([a,gamma]),vertcat(params)],[vertcat([res0,res1])])
+f=Function("f", [vertcat([a,gamma]),vertcat(params)],[vertcat([res0,res1])])
 opts = {}
 opts["abstol"] = 1e-14
 opts["linear_solver"] = "csparse"

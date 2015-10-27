@@ -31,8 +31,8 @@ y = SX.sym("y")
 z = x*y+2*y
 z += 4*z
 
-#! An SX.fun is needed to inspect the graph
-f = SX.fun("f", [x,y],[z])
+#! A Function is needed to inspect the graph
+f = Function("f", [x,y],[z])
 
 #! The default representation is just the name of the function
 print f.__repr__()

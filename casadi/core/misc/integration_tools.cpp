@@ -218,7 +218,7 @@ namespace casadi {
         }
       }
 
-      Function lfcn = SX::fun("lfcn", {tau}, {L});
+      Function lfcn("lfcn", {tau}, {L});
 
       // Evaluate the polynomial at the final time to get the
       // coefficients of the continuity equation
@@ -285,7 +285,7 @@ namespace casadi {
     }
 
     // Root-finding function
-    Function rfp = MX::fun("rfp", {v, x0, p, h}, {vertcat(V_eq)});
+    Function rfp("rfp", {v, x0, p, h}, {vertcat(V_eq)});
 
     // Create a implicit function instance to solve the system of equations
     Function ifcn = rfp.rootfinder("ifcn", solver, solver_options);

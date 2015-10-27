@@ -40,7 +40,7 @@ mdot = -0.1*u*u
 xdot = vertcat([sdot,vdot,mdot])
 
 # ODE right hand side function
-f = MX.fun('f', [x,u],[xdot])
+f = Function('f', [x,u],[xdot])
 
 # Integrate with Explicit Euler over 0.2 seconds
 dt = 0.01  # Time step
@@ -50,7 +50,7 @@ for j in range(20):
   xj += dt*fj
 
 # Discrete time dynamics function
-F = MX.fun('F', [x,u],[xj])
+F = Function('F', [x,u],[xj])
 
 # Number of control segments
 nu = 50 

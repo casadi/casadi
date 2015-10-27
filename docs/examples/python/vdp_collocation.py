@@ -38,10 +38,10 @@ x  = SX.sym("x",3)  # state
 rhs = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
                x[0], \
                x[0]*x[0] + x[1]*x[1] + u*u])
-f = SX.fun('f', [t,x,u],[rhs])
+f = Function('f', [t,x,u],[rhs])
 
 # Objective function (meyer term)
-m = SX.fun('m', [t,x,u],[x[2]])
+m = Function('m', [t,x,u],[x[2]])
 
 # Control bounds
 u_min = -0.75
@@ -96,7 +96,7 @@ for j in range(d+1):
   for r in range(d+1):
     if r != j:
       L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
-  lfcn = SX.fun('lfcn', [tau],[L])
+  lfcn = Function('lfcn', [tau],[L])
   
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
   [D[j]] = lfcn([1.0])

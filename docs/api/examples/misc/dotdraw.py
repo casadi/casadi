@@ -51,7 +51,7 @@ zz = x+y
 
 dotdraw(zz)
 
-f = MX.fun("magic", [z,y],[z+x[0,0],x-y])
+f = Function("magic", [z,y],[z+x[0,0],x-y])
 
 [z,z2] = f([vertcat([x,y]),zz.T])
 
