@@ -39,18 +39,12 @@ enum InputOutputScheme {
   SCHEME_RDAEOutput,
   SCHEME_IntegratorInput,
   SCHEME_IntegratorOutput,
-  SCHEME_NLPInput,
-  SCHEME_NLPOutput,
   SCHEME_GradFInput,
   SCHEME_GradFOutput,
   SCHEME_JacGInput,
   SCHEME_JacGOutput,
   SCHEME_HessLagInput,
-  SCHEME_HessLagOutput,
-  SCHEME_NlpSolverInput,
   SCHEME_NlpSolverOutput,
-  SCHEME_QpSolverInput,
-  SCHEME_QpSolverOutput,
   SCHEME_LinsolInput,
   SCHEME_LinsolOutput };
 

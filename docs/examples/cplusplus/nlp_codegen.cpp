@@ -78,7 +78,7 @@ int main(){
   bool expand = true;
 
   // NLP function
-  Function nlp = MX::fun("nlp", nlpIn("x", x),nlpOut("f", f, "g", g));
+  Function nlp("nlp", {{"x", x}, {"f", f}, {"g", g}}, {"x", "p"}, {"f", "g"});
 
   // Gradient of the objective
   Function grad_f = nlp.gradient("x", "f");

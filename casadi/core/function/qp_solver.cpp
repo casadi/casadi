@@ -26,9 +26,6 @@
 #include "qp_solver.hpp"
 #include <typeinfo>
 
-INPUTSCHEME(QpSolverInput)
-OUTPUTSCHEME(QpSolverOutput)
-
 using namespace std;
 namespace casadi {
 
@@ -94,8 +91,8 @@ namespace casadi {
     output(QP_SOLVER_LAM_X) = DMatrix::zeros(x_sparsity);
     output(QP_SOLVER_LAM_A) = DMatrix::zeros(bounds_sparsity);
 
-    ischeme_ = IOScheme(SCHEME_QpSolverInput);
-    oscheme_ = IOScheme(SCHEME_QpSolverOutput);
+    ischeme_ = Function::qp_solver_in();
+    oscheme_ = Function::qp_solver_out();
   }
 
   Sparsity QpSolver::get_sparsity_in(int ind) const {

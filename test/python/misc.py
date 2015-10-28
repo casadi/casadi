@@ -254,15 +254,6 @@ class Misctests(casadiTestCase):
       assert "You have: substitute(int)" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
-      
-    try:
-      SXFunction('tmp', daeIn(x=SX.sym("x")))
-      self.assertTrue(False)
-    except NotImplementedError as e:
-      print e.message
-      assert "You have: SXFunction(str, (str:SX,[str]))" in e.message
-      assert "::" not in e.message
-      assert "std" not in e.message
 
     try:
       Function.load_nlp_solver(132)

@@ -1633,6 +1633,54 @@ namespace casadi {
     return n->hessLag();
   }
 
+  vector<string> Function::nlp_solver_in() {
+    vector<string> ret(nlp_solver_n_in());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=nlp_solver_in(i);
+    return ret;
+  }
+
+  vector<string> Function::nlp_solver_out() {
+    vector<string> ret(nlp_solver_n_out());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=nlp_solver_out(i);
+    return ret;
+  }
+
+  string Function::nlp_solver_in(int ind) {
+    switch (static_cast<NlpSolverInput>(ind)) {
+    case NLP_SOLVER_X0:     return "x0";
+    case NLP_SOLVER_P:      return "p";
+    case NLP_SOLVER_LBX:    return "lbx";
+    case NLP_SOLVER_UBX:    return "ubx";
+    case NLP_SOLVER_LBG:    return "lbg";
+    case NLP_SOLVER_UBG:    return "ubg";
+    case NLP_SOLVER_LAM_X0: return "lam_x0";
+    case NLP_SOLVER_LAM_G0: return "lam_g0";
+    case NLP_SOLVER_NUM_IN: break;
+    }
+    return string();
+  }
+
+  string Function::nlp_solver_out(int ind) {
+    switch (static_cast<NlpSolverOutput>(ind)) {
+    case NLP_SOLVER_X:     return "x";
+    case NLP_SOLVER_F:     return "f";
+    case NLP_SOLVER_G:     return "g";
+    case NLP_SOLVER_LAM_X: return "lam_x";
+    case NLP_SOLVER_LAM_G: return "lam_g";
+    case NLP_SOLVER_LAM_P: return "lam_p";
+    case NLP_SOLVER_NUM_OUT: break;
+    }
+    return string();
+  }
+
+  int Function::nlp_solver_n_in() {
+    return NLP_SOLVER_NUM_IN;
+  }
+
+  int Function::nlp_solver_n_out() {
+    return NLP_SOLVER_NUM_OUT;
+  }
+
   Function Function::qp_solver(const string& name, const string& solver,
                                const SpDict& qp, const Dict& opts) {
     Function ret;
@@ -1653,6 +1701,53 @@ namespace casadi {
     const QpSolver* n = dynamic_cast<const QpSolver*>(get());
     casadi_assert_message(n!=0, "Not a QP solver");
     return n->generateNativeCode(file);
+  }
+
+  vector<string> Function::qp_solver_in() {
+    vector<string> ret(qp_solver_n_in());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=qp_solver_in(i);
+    return ret;
+  }
+
+  vector<string> Function::qp_solver_out() {
+    vector<string> ret(qp_solver_n_out());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=qp_solver_out(i);
+    return ret;
+  }
+
+  string Function::qp_solver_in(int ind) {
+    switch (static_cast<QpSolverInput>(ind)) {
+    case QP_SOLVER_H:      return "h";
+    case QP_SOLVER_G:      return "g";
+    case QP_SOLVER_A:      return "a";
+    case QP_SOLVER_LBA:    return "lba";
+    case QP_SOLVER_UBA:    return "uba";
+    case QP_SOLVER_LBX:    return "lbx";
+    case QP_SOLVER_UBX:    return "ubx";
+    case QP_SOLVER_X0:     return "x0";
+    case QP_SOLVER_LAM_X0: return "lam_x0";
+    case QP_SOLVER_NUM_IN: break;
+    }
+    return string();
+  }
+
+  string Function::qp_solver_out(int ind) {
+    switch (static_cast<QpSolverOutput>(ind)) {
+    case QP_SOLVER_X:     return "x";
+    case QP_SOLVER_COST:  return "cost";
+    case QP_SOLVER_LAM_A: return "lam_a";
+    case QP_SOLVER_LAM_X: return "lam_x";
+    case QP_SOLVER_NUM_OUT: break;
+    }
+    return string();
+  }
+
+  int Function::qp_solver_n_in() {
+    return QP_SOLVER_NUM_IN;
+  }
+
+  int Function::qp_solver_n_out() {
+    return QP_SOLVER_NUM_OUT;
   }
 
   Function Function::rootfinder(const string& name, const string& solver,

@@ -26,9 +26,6 @@
 #include "nlp_solver.hpp"
 #include "casadi/core/timing.hpp"
 
-INPUTSCHEME(NlpSolverInput)
-OUTPUTSCHEME(NlpSolverOutput)
-
 using namespace std;
 namespace casadi {
 
@@ -83,8 +80,8 @@ namespace casadi {
                                                        "qp", true);
 
     // Enable string notation for IO
-    ischeme_ = IOScheme(SCHEME_NlpSolverInput);
-    oscheme_ = IOScheme(SCHEME_NlpSolverOutput);
+    ischeme_ = Function::nlp_solver_in();
+    oscheme_ = Function::nlp_solver_out();
 
     // Make the ref object a non-refence counted pointer to this (as reference counting would
     // prevent deletion of the object)
@@ -294,8 +291,6 @@ namespace casadi {
     casadi_assert_message(jacF.n_out()==GRADF_NUM_OUT,
                           "Wrong number of outputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
-    jacF.setOption("input_scheme", IOScheme(SCHEME_GradFInput));
-    jacF.setOption("output_scheme", IOScheme(SCHEME_GradFOutput));
     log("Objective gradient function initialized");
     return jacF;
   }
@@ -327,8 +322,6 @@ namespace casadi {
     casadi_assert_message(gradF.n_out()==GRADF_NUM_OUT,
                           "Wrong number of outputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
-    gradF.setOption("input_scheme", IOScheme(SCHEME_GradFInput));
-    gradF.setOption("output_scheme", IOScheme(SCHEME_GradFOutput));
     log("Objective gradient function initialized");
     return gradF;
   }
@@ -371,8 +364,6 @@ namespace casadi {
     casadi_assert_message(jacG.n_out()==JACG_NUM_OUT,
                           "Wrong number of outputs to the Jacobian function. "
                           "Note: The Jacobian signature was changed in #544");
-    jacG.setOption("input_scheme", IOScheme(SCHEME_JacGInput));
-    jacG.setOption("output_scheme", IOScheme(SCHEME_JacGOutput));
     log("Jacobian function initialized");
     return jacG;
   }
@@ -441,14 +432,9 @@ namespace casadi {
     }
     hessLag.init();
     casadi_assert_message(hessLag.n_in()==HESSLAG_NUM_IN,
-                          "Wrong number of inputs to the Hessian function. "
-                          "Note: The Lagrangian Hessian signature was changed in #544");
+                          "Wrong number of inputs to the Hessian function. ");
     casadi_assert_message(hessLag.n_out()==HESSLAG_NUM_OUT,
-                          "Wrong number of outputs to the Hessian function. "
-                          "Note: The Lagrangian Hessian signature was changed in #544");
-    hessLag.setOption("input_scheme", IOScheme(SCHEME_HessLagInput));
-    hessLag.setOption("output_scheme", IOScheme(SCHEME_HessLagOutput));
-
+                          "Wrong number of outputs to the Hessian function. ");
     log("Hessian function initialized");
     return hessLag;
   }

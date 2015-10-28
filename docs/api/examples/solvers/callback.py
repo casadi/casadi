@@ -33,8 +33,10 @@ from numpy import *
 x=SX.sym("x")
 y=SX.sym("y")
 
-nlp=SX.fun("nlp", nlpIn(x=vertcat((x,y))),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
-    
+f = (1-x)**2+100*(y-x**2)**2
+nlp={'x':vertcat((x,y)), 'f':f,'g':x+y}
+fcn = Function('f', [x, y], [f])
+ 
 # #! Simple callback
 # #! ===============
 # #! First we demonstrate a callback that does nothing more than printing some information on the screen
@@ -97,9 +99,7 @@ class MyCallback(Callback):
     
     for i in range(x_.shape[0]):
       for j in range(x_.shape[1]):
-        nlp.setInput([x_[i,j],y_[i,j]],"x")
-        nlp.evaluate()
-        z_[i,j] = float(nlp.getOutput("f"))
+        [z_[i,j]] = fcn([x_[i,j],y_[i,j]])
     contourf(x_,y_,z_)
     colorbar()
     title('Iterations of Rosenbrock')

@@ -28,46 +28,18 @@ from numpy import *
 import casadi as c
 
 #! We will investigate the use of an exact Hessian with the help of the Rosenbrock function
-x=SX.sym("x")
-y=SX.sym("y")
-    
+x=SX.sym('x')
+y=SX.sym('y')
 obj = (1-x)**2+100*(y-x**2)**2
-#! We choose to add a single constraint
 constr = x**2+y**2
+nlp={'x':vertcat([x,y]), 'f':obj, 'g':constr}
 
-nlp=SX.fun("nlp", nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=constr))
-solver = Function.nlp_solver("solver", "ipopt", nlp)
-    
-#! We need the hessian of the lagrangian.
-#! A problem with n decision variables and m constraints gives us a hessian of size n x n
-  
-sigma=SX.sym("sigma")  # A scalar factor
-lambd=SX.sym("lambd")  # Multipier of the problem, shape m x 1.
+#! We solve the problem with an exact Hessian (default)
+solver = Function.nlp_solver('solver', 'ipopt', nlp)
+sol = solver({'lbx':-10, 'ubx':10, 'lbg':0, 'ubg':1})
+print 'Optimal solution (exact Hessian): %s' % sol['x']
 
-xy = vertcat([x,y])
-
-h=SX.fun("h", hessLagIn(x=xy,lam_g=lambd,lam_f=sigma),
-             hessLagOut(hess=sigma*hessian(obj,xy)[0]+lambd*hessian(constr,xy)[0]))
-   
-#! We solve the problem with an exact hessian
-solver = Function.nlp_solver("solver", "ipopt", nlp, {"hess_lag":h})
-solver.setInput([-10]*2,"lbx")
-solver.setInput([10]*2,"ubx")
-solver.setInput([0],"lbg")
-solver.setInput([1],"ubg")
-solver.evaluate()
-
-for sol in array(solver.getOutput()):
-  print "%.15f" % sol
-
-#! To compare the behaviour of convergence, we solve the same problem without exact hessian
-solver = Function.nlp_solver("solver", "ipopt", nlp)
-solver.setInput([-10]*2,"lbx")
-solver.setInput([10]*2,"ubx")
-solver.setInput([0],"lbg")
-solver.setInput([1],"ubg")
-solver.evaluate()
-
-for sol in array(solver.getOutput()):
-  print "%.15f" % sol
-
+#! Same problem but with limited memory BFSG
+solver = Function.nlp_solver('solver', 'ipopt', nlp, {'hessian_approximation':'limited-memory'})
+sol = solver({'lbx':-10, 'ubx':10, 'lbg':0, 'ubg':1})
+print 'Optimal solution (BFGS): %s' % sol['x']

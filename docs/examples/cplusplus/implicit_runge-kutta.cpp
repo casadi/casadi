@@ -151,9 +151,8 @@ int main(){
   }
 
   // Fixed-step integrator
-  Function irk_integrator = MX::fun("irk_integrator",
-                                    integratorIn("x0", X0, "p", P),
-                                    integratorOut("xf", Xk));
+  Function irk_integrator("irk_integrator", {{"x0", X0}, {"p", P}, {"xf", Xk}},
+                          Function::integrator_in(), Function::integrator_out());
 
   // Create a convensional integrator for reference
   Function ref_integrator = Function::integrator("ref_integrator",

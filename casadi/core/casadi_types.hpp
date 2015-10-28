@@ -200,21 +200,21 @@ namespace casadi {
     INTEGRATOR_NUM_OUT
   };
 
-  /// Input arguments of an NLP function [nlpIn]
+  /// Input arguments of an NLP function
   enum NLPInput {
-    /// Decision variable [x]
+    /// Decision variable
     NL_X,
-    /// Fixed parameter [p]
+    /// Fixed parameter
     NL_P,
     /// Number of NLP inputs
     NL_NUM_IN
   };
 
-  /// Output arguments of an NLP function [nlpOut]
+  /// Output arguments of an NLP function
   enum NLPOutput {
-    /// Objective function [f]
+    /// Objective function
     NL_F,
-    /// Constraint function [g]
+    /// Constraint function
     NL_G,
     /// Number of NLP outputs
     NL_NUM_OUT
@@ -279,39 +279,39 @@ namespace casadi {
     HESSLAG_NUM_IN
   };
 
-  /// Output arguments of an NLP Hessian function [hessLagOut]
+  /// Output arguments of an NLP Hessian function
   enum HessLagOutput {
-    /// Hessian of the Lagrangian [hess]
+    /// Hessian of the Lagrangian
     HESSLAG_HESS,
-    /// Objective function [f]
+    /// Objective function
     HESSLAG_F,
-    /// Constraint function [g]
+    /// Constraint function
     HESSLAG_G,
-    /// Gradient of the Lagrangian with respect to x [grad_x]
+    /// Gradient of the Lagrangian with respect to x
     HESSLAG_GRAD_X,
-    /// Gradient of the Lagrangian with respect to p [grad_p]
+    /// Gradient of the Lagrangian with respect to p
     HESSLAG_GRAD_P,
     /// Number of outputs
     HESSLAG_NUM_OUT
   };
 
-  /// Input arguments of an NLP Solver [nlpSolverIn]
+  /// Input arguments of an NLP Solver
   enum NlpSolverInput {
-    /// Decision variables, initial guess (nx x 1)  [x0]
+    /// Decision variables, initial guess (nx x 1)
     NLP_SOLVER_X0,
-    /// Value of fixed parameters (np x 1) [p]
+    /// Value of fixed parameters (np x 1)
     NLP_SOLVER_P,
-    /// Decision variables lower bound (nx x 1), default -inf [lbx]
+    /// Decision variables lower bound (nx x 1), default -inf
     NLP_SOLVER_LBX,
-    /// Decision variables upper bound (nx x 1), default +inf [ubx]
+    /// Decision variables upper bound (nx x 1), default +inf
     NLP_SOLVER_UBX,
-    /// Constraints lower bound (ng x 1), default -inf [lbg]
+    /// Constraints lower bound (ng x 1), default -inf
     NLP_SOLVER_LBG,
-    /// Constraints upper bound (ng x 1), default +inf [ubg]
+    /// Constraints upper bound (ng x 1), default +inf
     NLP_SOLVER_UBG,
-    /// Lagrange multipliers for bounds on X, initial guess (nx x 1) [lam_x0]
+    /// Lagrange multipliers for bounds on X, initial guess (nx x 1)
     NLP_SOLVER_LAM_X0,
-    /// Lagrange multipliers for bounds on G, initial guess (ng x 1) [lam_g0]
+    /// Lagrange multipliers for bounds on G, initial guess (ng x 1)
     NLP_SOLVER_LAM_G0,
     NLP_SOLVER_NUM_IN
   };
@@ -333,38 +333,38 @@ namespace casadi {
     NLP_SOLVER_NUM_OUT
   };
 
-  /// Input arguments of a QP problem [qpIn]
+  /// Input arguments of a QP problem
   enum QpSolverInput {
     /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
-    /// The matrix is assumed to be symmetrical. [h]
+    /// The matrix is assumed to be symmetrical.
     QP_SOLVER_H,
-    /// The vector g: dense,  (n x 1) [g]
+    /// The vector g: dense,  (n x 1)
     QP_SOLVER_G,
-    /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
+    /// The matrix A: sparse, (nc x n) - product with x must be dense.
     QP_SOLVER_A,
-    /// dense, (nc x 1) [lba]
+    /// dense, (nc x 1)
     QP_SOLVER_LBA,
-    /// dense, (nc x 1) [uba]
+    /// dense, (nc x 1)
     QP_SOLVER_UBA,
-    /// dense, (n x 1) [lbx]
+    /// dense, (n x 1)
     QP_SOLVER_LBX,
-    /// dense, (n x 1) [ubx]
+    /// dense, (n x 1)
     QP_SOLVER_UBX,
-    /// dense, (n x 1) [x0]
+    /// dense, (n x 1)
     QP_SOLVER_X0,
-    /// dense [lam_x0]
+    /// dense
     QP_SOLVER_LAM_X0,
     QP_SOLVER_NUM_IN};
 
-  /// Output arguments of an QP Solver [qpOut]
+  /// Output arguments of an QP Solver
   enum QpSolverOutput {
-    /// The primal solution [x]
+    /// The primal solution
     QP_SOLVER_X,
-    /// The optimal cost [cost]
+    /// The optimal cost
     QP_SOLVER_COST,
-    /// The dual solution corresponding to linear bounds [lam_a]
+    /// The dual solution corresponding to linear bounds
     QP_SOLVER_LAM_A,
-    /// The dual solution corresponding to simple bounds [lam_x]
+    /// The dual solution corresponding to simple bounds
     QP_SOLVER_LAM_X,
     QP_SOLVER_NUM_OUT};
 #endif // SWIG

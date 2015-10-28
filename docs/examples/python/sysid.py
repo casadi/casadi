@@ -88,11 +88,6 @@ opts = {'jit':True, "jit_options":{"flags":['-O3']}}
 
 ############ Create a Gauss-Newton solver ##########
 def gauss_newton(e,nlp,V):
-  gradF = nlp.gradient()
-  jacG = nlp.jacobian("x","g")
-
-  gradF.derivative(0, 1)
-
   J = jacobian(e,V)
   sigma = MX.sym("sigma")
   hessLag = MX.fun('H',hessLagIn(x=V,lam_f=sigma),hessLagOut(hess=sigma*mul(J.T,J)),opts)
@@ -105,7 +100,7 @@ def gauss_newton(e,nlp,V):
 [X_symbolic] = all_samples([x0, u_data, repmat(params*scale,1,N) ])
 
 e = y_data-X_symbolic[0,:].T;
-nlp = MX.fun("nlp", nlpIn(x=params), nlpOut(f=0.5*inner_prod(e,e)),opts)
+nlp = {'x':params, 'f':0.5*inner_prod(e,e)}
 
 solver = gauss_newton(e,nlp, params)
 
@@ -128,7 +123,7 @@ e = y_data-Xn[0,:].T;
 
 V = veccat([params, X])
 
-nlp = MX.fun("nlp", nlpIn(x=V), nlpOut(f=0.5*inner_prod(e,e),g=gaps),opts)
+nlp = {'x':V, 'f':0.5*inner_prod(e,e),'g':gaps}
 
 # Multipleshooting allows for careful initialization
 yd = np.diff(y_data,axis=0)*fs

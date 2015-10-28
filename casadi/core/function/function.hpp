@@ -1293,6 +1293,24 @@ namespace casadi {
     /** \brief Access the Jacobian of the constraint function for an NLP solver */
     Function nlp_solver_hesslag();
 
+    /** \brief Get input scheme of NLP solvers */
+    static std::vector<std::string> nlp_solver_in();
+
+    /** \brief Get NLP solver output scheme of NLP solvers */
+    static std::vector<std::string> nlp_solver_out();
+
+    /** \brief Get NLP solver input scheme name by index */
+    static std::string nlp_solver_in(int ind);
+
+    /** \brief Get output scheme name by index */
+    static std::string nlp_solver_out(int ind);
+
+    /** \brief Get the number of NLP solver inputs */
+    static int nlp_solver_n_in();
+
+    /** \brief Get the number of NLP solver outputs */
+    static int nlp_solver_n_out();
+
     ///@{
     /** Create a QP solver
         Solves the following strictly convex problem:
@@ -1329,6 +1347,24 @@ namespace casadi {
 
     /** Generate native code in the interfaced language for debugging */
     void qp_solver_debug(std::ostream &file) const;
+
+    /** \brief Get input scheme of QP solvers */
+    static std::vector<std::string> qp_solver_in();
+
+    /** \brief Get QP solver output scheme of QP solvers */
+    static std::vector<std::string> qp_solver_out();
+
+    /** \brief Get QP solver input scheme name by index */
+    static std::string qp_solver_in(int ind);
+
+    /** \brief Get output scheme name by index */
+    static std::string qp_solver_out(int ind);
+
+    /** \brief Get the number of QP solver inputs */
+    static int qp_solver_n_in();
+
+    /** \brief Get the number of QP solver outputs */
+    static int qp_solver_n_out();
 
 #ifndef SWIG
     protected:

@@ -214,9 +214,6 @@ class NLPtests(casadiTestCase):
           solver.evaluate()
         return
 
-
-
-
       solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,7,str(Solver))
@@ -225,53 +222,7 @@ class NLPtests(casadiTestCase):
         self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(Solver))
         self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
         self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,6,str(Solver))
-      
-  def test_IPOPTrhb2(self):
-    self.message("rosenbrock, exact hessian, constrained")
-    x=SX.sym("x")
-    y=SX.sym("y")
-    
-    obj = (1-x)**2+100*(y-x**2)**2
-    g = x**2+y**2
-    nlp={'x':vertcat([x,y]), 'f':obj, 'g':g}
-    
-    c_r = 4.56748075136258e-02;
-    x_r = [7.86415156987791e-01,6.17698316967954e-01]
-    
-    sigma=SX.sym("sigma")
-    lambd=SX.sym("lambd")
-    h=SX.fun("h", hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd),
-                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))[0]+lambd*hessian(g,vertcat([x,y]))[0]))
-    h.setInput([0.5,0.5])
-    h.setInput(-40,1)
-    h.setInput(1,2)
-    h.evaluate()
-    print h.getOutput()
-    
-    solver = None
-    for Solver, solver_options in solvers:
-      self.message(Solver)
-      options = dict(solver_options)
-      options["hess_lag"] = h      
-      solver = Function.nlp_solver("mysolver", Solver, nlp, options)
-          
 
-      solver.setInput([0.5,0.5],"x0")
-      solver.setInput([-10]*2,"lbx")
-      solver.setInput([10]*2,"ubx")
-      solver.setInput([0],"lbg")
-      solver.setInput([1],"ubg")
-      solver.evaluate()
-      
-      digits = 5
-        
-      self.assertAlmostEqual(solver.getOutput("f")[0],c_r,digits,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[0],x_r[0],digits,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[1],x_r[1],digits,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0.12149655447670,6,str(Solver))
-      
   def test_warmstart(self):
   
     x=SX.sym("x")
@@ -384,46 +335,6 @@ class NLPtests(casadiTestCase):
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(Solver),digits=digits)
       self.checkarray(solver.getOutput("lam_g"),DMatrix([0]),str(Solver),digits=digits)
 
-  def testIPOPTrhb2_par(self):
-    self.message("rosenbrock, exact hessian, constrained, ")
-    x=SX.sym("x")
-    y=SX.sym("y")
-    p=SX.sym("p")
-    
-    obj = (p-x)**2+100*(y-x**2)**2
-    g = x**2+y**2
-    nlp={'x':vertcat([x,y]), 'p':p, 'f':obj, 'g':g}
-    
-    c_r = 4.56748075136258e-02;
-    x_r = [7.86415156987791e-01,6.17698316967954e-01]
-    
-    sigma=SX.sym("sigma")
-    lambd=SX.sym("lambd")
-    h=SX.fun("h", hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd,p=p),
-                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))[0]+lambd*hessian(g,vertcat([x,y]))[0]))
-
-    for Solver, solver_options in solvers:
-      self.message(str(Solver))
-      options = dict(solver_options)
-      options["hess_lag"] = h
-      solver = Function.nlp_solver("mysolver", Solver, nlp, options)
-      solver.setInput([0.5,0.5],"x0")
-      solver.setInput([-10]*2,"lbx")
-      solver.setInput([10]*2,"ubx")
-      solver.setInput([0],"lbg")
-      solver.setInput([1],"ubg")
-      solver.setInput([1],"p")
-      solver.evaluate()
-      
-      digits = 5
-        
-      self.assertAlmostEqual(solver.getOutput("f")[0],c_r,digits,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[0],x_r[0],digits,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[1],x_r[1],digits,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0.12149655447670,6,str(Solver))
-
   def testIPOPTrhb2_gen_par(self):
     self.message("rosenbrock, exact hessian generated, constrained, parametric")
     x=SX.sym("x")
@@ -436,9 +347,6 @@ class NLPtests(casadiTestCase):
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
     
-    sigma=SX.sym("sigma")
-    lambd=SX.sym("lambd")
-  
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = Function.nlp_solver("mysolver", Solver, nlp, solver_options)
@@ -459,32 +367,6 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_g")[0],0.12149655447670,6,str(Solver))
-      
-  def test_IPOPTrhb(self):
-    self.message("rosenbrock, exact hessian")
-    x=SX.sym("x")
-    y=SX.sym("y")
-    
-    obj=(1-x)**2+100*(y-x**2)**2
-    nlp={'x':vertcat([x,y]), 'f':obj}
-    
-    sigma=SX.sym("sigma")
-    
-    h=SX.fun("h", hessLagIn(x=vertcat([x,y]),lam_f=sigma),
-                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))[0]))
-    for Solver, solver_options in solvers:
-      self.message(str(Solver))
-      options = dict(solver_options)
-      options["hess_lag"] = h
-      solver = Function.nlp_solver("mysolver", Solver, nlp, options)
-      solver.setInput([-10]*2,"lbx")
-      solver.setInput([10]*2,"ubx")
-      solver.evaluate()
-      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[1],1,9,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
 
   def testIPOPTrhb_gen(self):
     self.message("rosenbrock, exact hessian generated")
@@ -537,34 +419,6 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("x")[1],1,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
-      
-  def testIPOPTrhb_par(self):
-    self.message("rosenbrock, exact hessian, parametric")
-    x=SX.sym("x")
-    y=SX.sym("y")
-    
-    p=SX.sym("p")
-    obj=(p-x)**2+100*(y-x**2)**2
-    nlp={'x':vertcat([x,y]), 'p':p, 'f':obj}
-    
-    sigma=SX.sym("sigma")
-    
-    h=SX.fun("h", hessLagIn(x=vertcat([x,y]),p=p,lam_f=sigma),
-                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))[0]))
-    for Solver, solver_options in solvers:
-      self.message(str(Solver))
-      options = dict(solver_options)
-      options["hess_lag"] = h
-      solver = Function.nlp_solver("mysolver", Solver, nlp, options)
-      solver.setInput([-10]*2,"lbx")
-      solver.setInput([10]*2,"ubx")
-      solver.setInput(1,"p")
-      solver.evaluate()
-      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[1],1,9,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
 
   def testIPOPTrhb_gen_par(self):
     self.message("rosenbrock, exact hessian generated, parametric")

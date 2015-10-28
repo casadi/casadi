@@ -185,46 +185,6 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > integratorOut(
   }
   return std::make_pair(m, sv);
 }
-/// Input arguments of an NLP function
-///
-/// \copydoc scheme_NLPInput
-template<class M>
-std::pair<std::map<std::string, M>, std::vector<std::string> > nlpIn(
-    const std::string &n0 ="", const M &x0 =M(),
-    const std::string &n1 ="", const M &x1 =M()) {
-  // This comment lets the haskell bindings know this is a scheme helper
-  std::map<std::string, M> m;
-  if (!n0.empty()) m[n0]=x0;
-  if (!n1.empty()) m[n1]=x1;
-  std::string s[] = {"x", "p"};
-  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
-  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
-    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
-      casadi_error("Error in 'nlpIn' arguments. You supplied key '"
-        << it->first << "'. Allowed keys are: " << sv << ".");
-  }
-  return std::make_pair(m, sv);
-}
-/// Output arguments of an NLP function
-///
-/// \copydoc scheme_NLPOutput
-template<class M>
-std::pair<std::map<std::string, M>, std::vector<std::string> > nlpOut(
-    const std::string &n0 ="", const M &x0 =M(),
-    const std::string &n1 ="", const M &x1 =M()) {
-  // This comment lets the haskell bindings know this is a scheme helper
-  std::map<std::string, M> m;
-  if (!n0.empty()) m[n0]=x0;
-  if (!n1.empty()) m[n1]=x1;
-  std::string s[] = {"f", "g"};
-  std::vector<std::string> sv = std::vector<std::string>(s, s+2);
-  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
-    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
-      casadi_error("Error in 'nlpOut' arguments. You supplied key '"
-        << it->first << "'. Allowed keys are: " << sv << ".");
-  }
-  return std::make_pair(m, sv);
-}
 /// Input arguments of an NLP objective gradient function
 ///
 /// \copydoc scheme_GradFInput
@@ -333,64 +293,6 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > hessLagIn(
   }
   return std::make_pair(m, sv);
 }
-/// Output arguments of an NLP Hessian function
-///
-/// \copydoc scheme_HessLagOutput
-template<class M>
-std::pair<std::map<std::string, M>, std::vector<std::string> > hessLagOut(
-    const std::string &n0 ="", const M &x0 =M(),
-    const std::string &n1 ="", const M &x1 =M(),
-    const std::string &n2 ="", const M &x2 =M(),
-    const std::string &n3 ="", const M &x3 =M(),
-    const std::string &n4 ="", const M &x4 =M()) {
-  // This comment lets the haskell bindings know this is a scheme helper
-  std::map<std::string, M> m;
-  if (!n0.empty()) m[n0]=x0;
-  if (!n1.empty()) m[n1]=x1;
-  if (!n2.empty()) m[n2]=x2;
-  if (!n3.empty()) m[n3]=x3;
-  if (!n4.empty()) m[n4]=x4;
-  std::string s[] = {"hess", "f", "g", "grad_x", "grad_p"};
-  std::vector<std::string> sv = std::vector<std::string>(s, s+5);
-  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
-    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
-      casadi_error("Error in 'hessLagOut' arguments. You supplied key '"
-        << it->first << "'. Allowed keys are: " << sv << ".");
-  }
-  return std::make_pair(m, sv);
-}
-/// Input arguments of an NLP Solver
-///
-/// \copydoc scheme_NlpSolverInput
-template<class M>
-std::pair<std::map<std::string, M>, std::vector<std::string> > nlpSolverIn(
-    const std::string &n0 ="", const M &x0 =M(),
-    const std::string &n1 ="", const M &x1 =M(),
-    const std::string &n2 ="", const M &x2 =M(),
-    const std::string &n3 ="", const M &x3 =M(),
-    const std::string &n4 ="", const M &x4 =M(),
-    const std::string &n5 ="", const M &x5 =M(),
-    const std::string &n6 ="", const M &x6 =M(),
-    const std::string &n7 ="", const M &x7 =M()) {
-  // This comment lets the haskell bindings know this is a scheme helper
-  std::map<std::string, M> m;
-  if (!n0.empty()) m[n0]=x0;
-  if (!n1.empty()) m[n1]=x1;
-  if (!n2.empty()) m[n2]=x2;
-  if (!n3.empty()) m[n3]=x3;
-  if (!n4.empty()) m[n4]=x4;
-  if (!n5.empty()) m[n5]=x5;
-  if (!n6.empty()) m[n6]=x6;
-  if (!n7.empty()) m[n7]=x7;
-  std::string s[] = {"x0", "p", "lbx", "ubx", "lbg", "ubg", "lam_x0", "lam_g0"};
-  std::vector<std::string> sv = std::vector<std::string>(s, s+8);
-  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
-    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
-      casadi_error("Error in 'nlpSolverIn' arguments. You supplied key '"
-        << it->first << "'. Allowed keys are: " << sv << ".");
-  }
-  return std::make_pair(m, sv);
-}
 /// Output arguments of an NLP Solver
 ///
 /// \copydoc scheme_NlpSolverOutput
@@ -415,64 +317,6 @@ std::pair<std::map<std::string, M>, std::vector<std::string> > nlpSolverOut(
   for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
     if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
       casadi_error("Error in 'nlpSolverOut' arguments. You supplied key '"
-        << it->first << "'. Allowed keys are: " << sv << ".");
-  }
-  return std::make_pair(m, sv);
-}
-/// Input arguments of a QP problem
-///
-/// \copydoc scheme_QpSolverInput
-template<class M>
-std::pair<std::map<std::string, M>, std::vector<std::string> > qpIn(
-    const std::string &n0 ="", const M &x0 =M(),
-    const std::string &n1 ="", const M &x1 =M(),
-    const std::string &n2 ="", const M &x2 =M(),
-    const std::string &n3 ="", const M &x3 =M(),
-    const std::string &n4 ="", const M &x4 =M(),
-    const std::string &n5 ="", const M &x5 =M(),
-    const std::string &n6 ="", const M &x6 =M(),
-    const std::string &n7 ="", const M &x7 =M(),
-    const std::string &n8 ="", const M &x8 =M()) {
-  // This comment lets the haskell bindings know this is a scheme helper
-  std::map<std::string, M> m;
-  if (!n0.empty()) m[n0]=x0;
-  if (!n1.empty()) m[n1]=x1;
-  if (!n2.empty()) m[n2]=x2;
-  if (!n3.empty()) m[n3]=x3;
-  if (!n4.empty()) m[n4]=x4;
-  if (!n5.empty()) m[n5]=x5;
-  if (!n6.empty()) m[n6]=x6;
-  if (!n7.empty()) m[n7]=x7;
-  if (!n8.empty()) m[n8]=x8;
-  std::string s[] = {"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0"};
-  std::vector<std::string> sv = std::vector<std::string>(s, s+9);
-  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
-    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
-      casadi_error("Error in 'qpIn' arguments. You supplied key '"
-        << it->first << "'. Allowed keys are: " << sv << ".");
-  }
-  return std::make_pair(m, sv);
-}
-/// Output arguments of an QP Solver
-///
-/// \copydoc scheme_QpSolverOutput
-template<class M>
-std::pair<std::map<std::string, M>, std::vector<std::string> > qpOut(
-    const std::string &n0 ="", const M &x0 =M(),
-    const std::string &n1 ="", const M &x1 =M(),
-    const std::string &n2 ="", const M &x2 =M(),
-    const std::string &n3 ="", const M &x3 =M()) {
-  // This comment lets the haskell bindings know this is a scheme helper
-  std::map<std::string, M> m;
-  if (!n0.empty()) m[n0]=x0;
-  if (!n1.empty()) m[n1]=x1;
-  if (!n2.empty()) m[n2]=x2;
-  if (!n3.empty()) m[n3]=x3;
-  std::string s[] = {"x", "cost", "lam_a", "lam_x"};
-  std::vector<std::string> sv = std::vector<std::string>(s, s+4);
-  for (typename std::map<std::string, M>::const_iterator it=m.begin();it!=m.end();++it) {
-    if (std::find(sv.begin(), sv.end(), it->first)==sv.end())
-      casadi_error("Error in 'qpOut' arguments. You supplied key '"
         << it->first << "'. Allowed keys are: " << sv << ".");
   }
   return std::make_pair(m, sv);

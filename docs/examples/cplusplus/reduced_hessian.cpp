@@ -67,7 +67,7 @@ int main(){
   vector<double> ubg = {0.00};
 
   // Create NLP
-  Function nlp = SX::fun("nlp", nlpIn("x", x), nlpOut("f", f, "g", g));
+  SXDict nlp = {{"x", x}, {"f", f}, {"g", g}};
 
   // NLP solver options
   Dict opts;
@@ -81,7 +81,7 @@ int main(){
   opts["compute_red_hessian"] = "yes";
   
   // Create NLP solver and buffers
-  NlpSolver solver("solver", "ipopt", nlp, opts);
+  Function solver = Function::nlp_solver("solver", "ipopt", nlp, opts);
   std::map<std::string, DMatrix> arg, res;
 
   // Solve NLP

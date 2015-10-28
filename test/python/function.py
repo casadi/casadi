@@ -357,25 +357,7 @@ class Functiontests(casadiTestCase):
       d = vertcat(v)
       
       test(d.sparsity())
-      
-  def test_getOutput(self):
-    x = SX.sym("x",2)
-    
-    f = SX.fun("f", daeIn(x=x),daeOut(ode=x))
-    f.setInput([1,2])
-    f.evaluate()
-    a = f.getOutput()
-    b = f.getOutput(0)
-    c = f.getOutput("ode")
-    self.checkarray(a,DMatrix([1,2]))
-    self.checkarray(b,DMatrix([1,2]))
-    self.checkarray(c,DMatrix([1,2]))
-    f.setInput([3,4])
-    f.evaluate()
-    self.checkarray(a,DMatrix([1,2]))
-    self.checkarray(b,DMatrix([1,2]))
-    self.checkarray(c,DMatrix([1,2]))
-    
+
   def test_customIO(self):
     
     x = SX.sym("x")
@@ -500,15 +482,6 @@ class Functiontests(casadiTestCase):
     F = Function("F",[],[blockcat(f.map(r))])
 
     self.checkarray(F([])[0],Fref)
-    
-
-  def test_simple_scheme_call(self):
-
-    x = SX.sym("x")
-
-    f = SX.fun("f", daeIn(x=x),[x**2])
-
-    self.checkarray(f(x=0.3)['o0'],DMatrix(0.09))
 
   def test_issue1464(self):
     n = 6
