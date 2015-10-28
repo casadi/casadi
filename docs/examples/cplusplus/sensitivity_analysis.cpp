@@ -187,11 +187,11 @@ int main(){
       
       // Forward over adjoint to get the second order sensitivities
       Function I_foa = I_adj.derivative(1, 0);
-      arg = {{"der_der_x0", test.x0},
-             {"der_der_p", test.u0},
-             {"fwd0_der_p", 1},
-             {"der_adj0_xf", 0},
-             {"der_adj0_qf", 1}};
+      arg = decltype(arg){{"der_der_x0", test.x0},
+                          {"der_der_p", test.u0},
+                          {"fwd0_der_p", 1},
+                          {"der_adj0_xf", 0},
+                          {"der_adj0_qf", 1}};
       res = I_foa(arg);
       vector<double> fwd_adj_x0(res.at("fwd0_adj0_x0"));
       vector<double> fwd_adj_p(res.at("fwd0_adj0_p"));
