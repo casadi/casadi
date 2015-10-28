@@ -2481,7 +2481,7 @@ namespace casadi{
  return blockcat(v);
  }
  DECL M %SHOW(blockcat)(const M& A, const M& B, const M& C, const M& D) {
- return blockcat(A, B, C, D);
+ return vertcat(horzcat(A, B), horzcat(C, D));
  }
  DECL std::vector< std::vector< M > >
  %SHOW(blocksplit)(const M& x, const std::vector<int>& vert_offset,

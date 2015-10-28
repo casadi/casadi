@@ -1023,18 +1023,6 @@ namespace casadi {
   typedef std::map<std::string, Sparsity> SpDict;
   ///@}
 
-#ifndef SWIG
-  ///@{
-  /// Shorthands for concatenation
-  inline Sparsity vertcat(std::initializer_list<Sparsity> v) {
-    return vertcat(std::vector<Sparsity>(v));
-  }
-  inline Sparsity horzcat(std::initializer_list<Sparsity> v) {
-    return horzcat(std::vector<Sparsity>(v));
-  }
-  ///@}
-#endif // SWIG
-
 } // namespace casadi
 
 #endif // CASADI_SPARSITY_HPP

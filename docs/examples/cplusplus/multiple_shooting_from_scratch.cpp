@@ -53,7 +53,7 @@ int main(){
   // Declare variables
   SX u = SX::sym("u"); // control
   SX r = SX::sym("r"), s = SX::sym("s"); // states
-  SX x = vertcat({r, s});
+  SX x = vertcat(r,s);
 
   // Number of differential states
   int nx = x.size1();
@@ -82,7 +82,7 @@ int main(){
   int ns = 50;
 
   // ODE right hand side and quadrature
-  SX ode = vertcat({(1 - s*s)*r - s + u, r});
+  SX ode = vertcat((1 - s*s)*r - s + u, r);
   SX quad = r*r + s*s + u*u;
   SXDict dae = {{"x", x}, {"p", u}, {"ode", ode}, {"quad", quad}};
 

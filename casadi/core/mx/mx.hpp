@@ -676,18 +676,6 @@ namespace casadi {
   typedef std::map<std::string, MX> MXDict;
   ///@}
 
-#ifndef SWIG
-  ///@{
-  /// Shorthands for concatenation
-  inline MX vertcat(std::initializer_list<MX> v) {
-    return vertcat(std::vector<MX>(v));
-  }
-  inline MX horzcat(std::initializer_list<MX> v) {
-    return horzcat(std::vector<MX>(v));
-  }
-  ///@}
-#endif // SWIG
-
 } // namespace casadi
 
 #endif // CASADI_MX_HPP

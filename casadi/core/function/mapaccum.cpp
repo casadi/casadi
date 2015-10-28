@@ -318,11 +318,11 @@ namespace casadi {
         // [x0 x1 x2 x3] -> all
         // [x0 x1 x2] -> in
         if (reverse_) {
-          MX all = horzcat({outs[output_accum_[i_output_accum++]], ins[i]});
+          MX all = horzcat(outs[output_accum_[i_output_accum++]], ins[i]);
           MX in = bisect(all, ins[i].size2())[1];
           f_der_ins.push_back(in);
         } else {
-          MX all = horzcat({ins[i], outs[output_accum_[i_output_accum++]]});
+          MX all = horzcat(ins[i], outs[output_accum_[i_output_accum++]]);
           MX in = bisect(all, ins[i].size2()*n_)[0];
           f_der_ins.push_back(in);
         }
@@ -532,11 +532,11 @@ namespace casadi {
         // [x0 x1 x2 x3] -> all
         // [x0 x1 x2] -> in
         if (reverse_) {
-          MX all = horzcat({outs[output_accum_[i_output_accum++]], ins[i]});
+          MX all = horzcat(outs[output_accum_[i_output_accum++]], ins[i]);
           MX in = bisect(all, ins[i].size2())[1];
           f_der_ins.push_back(in);
         } else {
-          MX all = horzcat({ins[i], outs[output_accum_[i_output_accum++]]});
+          MX all = horzcat(ins[i], outs[output_accum_[i_output_accum++]]);
           MX in = bisect(all, ins[i].size2()*n_)[0];
           f_der_ins.push_back(in);
         }
@@ -565,8 +565,8 @@ namespace casadi {
         if (input_accum_[j]) {
           if (reverse_) {
             // 0, [X1_bar X2_bar X3_bar] -> all
-            MX all = horzcat({outs[output_accum_[i_output_accum]],
-                  DMatrix::zeros(ins[j].sparsity())});
+            MX all = horzcat(outs[output_accum_[i_output_accum]],
+              DMatrix::zeros(ins[j].sparsity()));
             // [0 X1_bar X2_bar], X3_bar -> splits
             std::vector<MX> splits = bisect(all, ins[j].size2());
 
@@ -577,8 +577,8 @@ namespace casadi {
             f_der_ins.push_back(splits[1]);
           } else {
             // 0, [X1_bar X2_bar X3_bar] -> all
-            MX all = horzcat({DMatrix::zeros(ins[j].sparsity()),
-                  outs[output_accum_[i_output_accum]]});
+            MX all = horzcat(DMatrix::zeros(ins[j].sparsity()),
+              outs[output_accum_[i_output_accum]]);
             // [0 X1_bar X2_bar], X3_bar -> splits
             std::vector<MX> splits = bisect(all, ins[j].size2()*n_);
 

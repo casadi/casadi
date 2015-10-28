@@ -2335,10 +2335,10 @@ namespace casadi {
     MatType cj = MatType::sym("cj");
     MatType jac = MatType::jac(f_, DAE_X, DAE_ODE) - cj*MatType::eye(nx_);
     if (nz_>0) {
-      jac = blockcat(jac,
-                     MatType::jac(f_, DAE_X, DAE_ALG),
-                     MatType::jac(f_, DAE_Z, DAE_ODE),
-                     MatType::jac(f_, DAE_Z, DAE_ALG));
+      jac = horzcat(vertcat(jac,
+                            MatType::jac(f_, DAE_X, DAE_ALG)),
+                    vertcat(MatType::jac(f_, DAE_Z, DAE_ODE),
+                            MatType::jac(f_, DAE_Z, DAE_ALG)));
     }
 
     // Jacobian function
@@ -2355,10 +2355,10 @@ namespace casadi {
     MatType cj = MatType::sym("cj");
     MatType jac = MatType::jac(g_, RDAE_RX, RDAE_ODE) + cj*MatType::eye(nrx_);
     if (nrz_>0) {
-      jac = blockcat(jac,
-                     MatType::jac(g_, RDAE_RX, RDAE_ALG),
-                     MatType::jac(g_, RDAE_RZ, RDAE_ODE),
-                     MatType::jac(g_, RDAE_RZ, RDAE_ALG));
+      jac = horzcat(vertcat(jac,
+                            MatType::jac(g_, RDAE_RX, RDAE_ALG)),
+                    vertcat(MatType::jac(g_, RDAE_RZ, RDAE_ODE),
+                            MatType::jac(g_, RDAE_RZ, RDAE_ALG)));
     }
 
     // Jacobian function

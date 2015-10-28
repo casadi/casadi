@@ -322,7 +322,7 @@ namespace casadi {
 
     // Wrapper function inputs
     MX x = MX::sym("x", x_sp);
-    MX u = MX::sym("u", vertcat({Sparsity::scalar(), vec(p_sp)})); // augment p with t
+    MX u = MX::sym("u", vertcat(Sparsity::scalar(), vec(p_sp))); // augment p with t
 
     // Normalized xdot
     int u_offset[] = {0, 1, 1+p_sp.size1()};
@@ -348,7 +348,7 @@ namespace casadi {
     h = MX::sym("h");
 
     // State at end
-    MX xf = ifcn(MXDict{{"x0", x0}, {"p", vertcat({h, vec(p)})}}).at("xf");
+    MX xf = ifcn(MXDict{{"x0", x0}, {"p", vertcat(h, vec(p))}}).at("xf");
 
     // Form discrete-time dynamics
     return Function("F", {x0, p, h}, {xf}, {"x0", "p", "h"}, {"xf"});

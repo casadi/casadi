@@ -53,8 +53,8 @@ Function create_integrator(int nj, int nu){
   }
 
   // State vector
-  SX x = vertcat({s, v, m});
-  SX x0 = vertcat({s0, v0, m0});
+  SX x = vertcat(s, v, m);
+  SX x0 = vertcat(s0, v0, m0);
 
   // Integrator
   return Function("integrator", {u, x0}, {x});
@@ -94,7 +94,7 @@ int main(){
   MX F = inner_prod(U,U);
 
   // Terminal constraints
-  MX G = vertcat({X[0], X[1]});
+  MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
   MXDict nlp = {{"x", U}, {"f", F}, {"g", G}};

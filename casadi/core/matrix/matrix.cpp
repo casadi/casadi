@@ -981,7 +981,8 @@ namespace casadi {
       SX ds = sqrt(b*b-4*a*c);
       SX bm = -b;
       SX a2 = 2*a;
-      SX ret = vertcat({(bm-ds)/a2, (bm+ds)/a2});
+      SX ret = vertcat((bm-ds)/a2,
+                       (bm+ds)/a2);
       return ret;
     } else if (p.size1()==4) {
       // www.cs.iastate.edu/~cs577/handouts/polyroots.pdf
@@ -1000,9 +1001,9 @@ namespace casadi {
 
       SX phi = acos(-b/2/sqrt(-a3*a3*a3));
 
-      SX ret = vertcat({cos(phi/3),
-            cos((phi+2*M_PI)/3),
-            cos((phi+4*M_PI)/3)});
+      SX ret = vertcat(cos(phi/3),
+                       cos((phi+2*M_PI)/3),
+                       cos((phi+4*M_PI)/3));
       ret*= 2*sqrt(-a3);
 
       ret-= p_/3;
@@ -1018,10 +1019,10 @@ namespace casadi {
       SX f = c - (3*bb/8);
       SX g = d + (bb*b / 8) - b*c/2;
       SX h = e - (3*bb*bb/256) + (bb * c/16) - (b*d/4);
-      SX poly = vertcat(vector<SX>{1,
-            f/2,
-            ((f*f -4*h)/16),
-            -g*g/64});
+      SX poly = vertcat(1,
+                        f/2,
+                        ((f*f -4*h)/16),
+                        -g*g/64);
       SX y = poly_roots(poly);
 
       SX r0 = y(0);
@@ -1034,14 +1035,14 @@ namespace casadi {
 
       SX s = b/4;
 
-      SX ret = vertcat({p + q + r -s,
-            p - q - r -s,
-            -p + q - r -s,
-            -p - q + r -s});
+      SX ret = vertcat(p + q + r -s,
+                       p - q - r -s,
+                       -p + q - r -s,
+                       -p - q + r -s);
       return ret;
     } else if (is_equal(p(p.nnz()-1).at(0), 0)) {
-      SX ret = vertcat(vector<SX>{poly_roots(p(range(p.nnz()-1))),
-                       0});
+      SX ret = vertcat(poly_roots(p(range(p.nnz()-1))),
+                       0);
       return ret;
     } else {
       casadi_error("poly_root(): can only solve cases for first or second order polynomial. "

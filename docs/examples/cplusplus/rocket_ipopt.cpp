@@ -70,7 +70,7 @@ int main(){
   SX f = inner_prod(u, u);
     
   // Terminal constraints
-  SX g = vertcat({s, v, v_all});
+  SX g = vertcat(s, v, v_all);
   
   // Create the NLP
   SXDict nlp = {{"x", u}, {"f", f}, {"g", g}};

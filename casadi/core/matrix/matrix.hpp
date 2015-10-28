@@ -1208,25 +1208,6 @@ namespace casadi {
   typedef std::vector<DMatrixVector> DMatrixVectorVector;
   typedef std::map<std::string, DMatrix> DMatrixDict;
   ///@}
-
-#ifndef SWIG
-  ///@{
-  /// Shorthands for concatenation
-  inline DMatrix vertcat(std::initializer_list<DMatrix> v) {
-    return vertcat(std::vector<DMatrix>(v));
-  }
-  inline DMatrix horzcat(std::initializer_list<DMatrix> v) {
-    return horzcat(std::vector<DMatrix>(v));
-  }
-  inline IMatrix vertcat(std::initializer_list<IMatrix> v) {
-    return vertcat(std::vector<IMatrix>(v));
-  }
-  inline IMatrix horzcat(std::initializer_list<IMatrix> v) {
-    return horzcat(std::vector<IMatrix>(v));
-  }
-  ///@}
-#endif // SWIG
-
 } // namespace casadi
 
 #endif // CASADI_MATRIX_HPP

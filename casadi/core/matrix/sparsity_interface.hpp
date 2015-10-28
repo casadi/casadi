@@ -437,9 +437,7 @@ namespace casadi {
      */
     inline friend MatType
       blockcat(const MatType &A, const MatType &B, const MatType &C, const MatType &D) {
-      return vertcat(std::vector<MatType>{
-          horzcat(std::vector<MatType>{A, B}),
-            horzcat(std::vector<MatType>{C, D})});
+      return vertcat(horzcat(A, B), horzcat(C, D));
     }
 
     /** \brief  chop up into blocks
@@ -639,6 +637,38 @@ namespace casadi {
      */
     inline friend MatType repmat(const MatType &A, const std::pair<int, int>& rc) {
       return A.zz_repmat(rc.first, rc.second);
+    }
+
+    /** \brief Concatenate horizontally, two matrices */
+    inline friend MatType horzcat(const MatType &x, const MatType &y) {
+      return horzcat(std::vector<MatType>{x, y});
+    }
+
+    /** \brief Concatenate horizontally, three matrices */
+    inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z) {
+      return horzcat(std::vector<MatType>{x, y, z});
+    }
+
+    /** \brief Concatenate horizontally, four matrices */
+    inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w) {
+      return horzcat(std::vector<MatType>{x, y, z, w});
+    }
+
+    /** \brief Concatenate vertically, two matrices */
+    inline friend MatType vertcat(const MatType &x, const MatType &y) {
+      return vertcat(std::vector<MatType>{x, y});
+    }
+
+    /** \brief Concatenate vertically, three matrices */
+    inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z) {
+      return vertcat(std::vector<MatType>{x, y, z});
+    }
+
+    /** \brief Concatenate vertically, four matrices */
+    inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w) {
+      return vertcat(std::vector<MatType>{x, y, z, w});
     }
 
     /** \brief Concatenate along diagonal, two matrices */
