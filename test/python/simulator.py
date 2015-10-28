@@ -88,7 +88,9 @@ class Simulatortests(casadiTestCase):
     opts["tf"] = 2.3
     integrator = Function.integrator("integrator", "cvodes", f, opts)
     sim = Simulator("sim", integrator, tc)
-    solution = SX.fun('solution', integratorIn(x0=q, p=p),integratorOut(xf=horzcat([q*exp(t**3/(3*p)) for t in tc])))
+
+    solution = Function("solution", {'x0':q, 'p':p, 'xf':horzcat([q*exp(t**3/(3*p)) for t in tc])},
+                        Function.integrator_in(), Function.integrator_out())
     
     for f in [sim,solution]:
       f.setInput(0.3,"x0")

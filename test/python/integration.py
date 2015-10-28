@@ -89,8 +89,8 @@ class Integrationtests(casadiTestCase):
     integrator = Function.integrator("integrator", "cvodes", dae, opts)
     tf = 2.3
     
-    solution = SX.fun("solution", integratorIn(x0=q, p=p),integratorOut(xf=q*exp(tf**3/(3*p))))
-    
+    solution = Function("solution", {'x0':q, 'p':p, 'xf':q*exp(tf**3/(3*p))},
+                        Function.integrator_in(), Function.integrator_out())
     for f in [solution,integrator]:
       f.setInput(0.3,"x0")
       f.setInput(0.7,"p")
@@ -111,7 +111,7 @@ class Integrationtests(casadiTestCase):
          simpleIntegrator(f)
        ]:
 
-      solution = Function("solution", [x,p,tf],[x*exp(tf)], {"input_scheme":["x0","p","h"], "output_scheme":["xf"]})
+      solution = Function("solution", [x,p,tf], [x*exp(tf)], ["x0","p","h"], ["xf"])
 
       for f in [solution,integrator]:
         f.setInput(1,"x0")

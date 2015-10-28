@@ -49,24 +49,118 @@ namespace casadi {
   Function::~Function() {
   }
 
-  void Function::construct(const string& name,
-                           const vector<MX>& arg, const vector<MX>& res,
-                           const Dict& opts) {
-    assignNode(new MXFunction(name, arg, res));
-    setOption(opts);
-    init();
+  Function::Function(const string& name,
+                     const std::vector<SX>& arg, const std::vector<SX>& res,
+                     const Dict& opts) {
+    construct(name, arg, res, opts);
   }
 
-  void Function::construct(const string& name,
-                           const vector<MX>& arg, const vector<MX>& res,
-                           const vector<string>& argn, const vector<string>& resn,
+  Function::Function(const string& name,
+                     const std::vector<SX>& arg, const std::vector<SX>& res,
+                     const std::vector<string>& argn, const std::vector<string>& resn,
+                     const Dict& opts) {
+    construct(name, arg, res, argn, resn, opts);
+  }
+
+  Function::Function(const string& name,
+                     const std::vector<MX>& arg, const std::vector<MX>& res,
+                     const Dict& opts) {
+    construct(name, arg, res, opts);
+  }
+
+  Function::Function(const string& name,
+                     const std::vector<MX>& arg, const std::vector<MX>& res,
+                     const std::vector<string>& argn, const std::vector<string>& resn,
+                     const Dict& opts) {
+    construct(name, arg, res, argn, resn, opts);
+  }
+
+  Function::Function(const string& name, SXIList arg, const SXVector& res, const Dict& opts) {
+    construct(name, SXVector(arg), res, opts);
+  }
+
+  Function::Function(const string& name, const SXVector& arg, SXIList res, const Dict& opts) {
+    construct(name, arg, SXVector(res), opts);
+  }
+
+  Function::Function(const string& name, SXIList arg, SXIList res, const Dict& opts) {
+    construct(name, SXVector(arg), SXVector(res), opts);
+  }
+
+  Function::Function(const string& name, SXIList arg, const SXVector& res,
+                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
+    construct(name, SXVector(arg), res, argn, resn, opts);
+  }
+
+  Function::Function(const string& name, const SXVector& arg, SXIList res,
+                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
+    construct(name, arg, SXVector(res), argn, resn, opts);
+  }
+
+  Function::Function(const string& name, SXIList arg, SXIList res,
+                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
+    construct(name, SXVector(arg), SXVector(res), argn, resn, opts);
+  }
+
+  Function::Function(const string& name, MXIList arg, const MXVector& res, const Dict& opts) {
+    construct(name, MXVector(arg), res, opts);
+  }
+
+  Function::Function(const string& name, const MXVector& arg, MXIList res, const Dict& opts) {
+    construct(name, arg, MXVector(res), opts);
+  }
+
+  Function::Function(const string& name, MXIList arg, MXIList res, const Dict& opts) {
+    construct(name, MXVector(arg), MXVector(res), opts);
+  }
+
+  Function::Function(const string& name, MXIList arg, const MXVector& res,
+                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
+    construct(name, MXVector(arg), res, argn, resn, opts);
+  }
+
+  Function::Function(const string& name, const MXVector& arg, MXIList res,
+                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
+    construct(name, arg, MXVector(res), argn, resn, opts);
+  }
+
+  Function::Function(const string& name, MXIList arg, MXIList res,
+                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
+    construct(name, MXVector(arg), MXVector(res), argn, resn, opts);
+  }
+
+  Function::Function(const string& name, const std::map<string, SX>& dict,
+                     const vector<string>& argn, const vector<string>& resn,
+                     const Dict& opts) {
+    construct(name, dict, argn, resn, opts);
+  }
+
+  Function::Function(const string& name, const std::map<string, MX>& dict,
+                     const vector<string>& argn, const vector<string>& resn,
+                     const Dict& opts) {
+    construct(name, dict, argn, resn, opts);
+  }
+
+  template<typename M>
+  void Function::construct(const string& name, const std::map<string, M>& dict,
+                           const vector<string>& argn,
+                           const vector<string>& resn,
                            const Dict& opts) {
-    Dict opts2 = opts;
-    opts2["input_scheme"] = argn;
-    opts2["output_scheme"] = resn;
-    assignNode(new MXFunction(name, arg, res));
-    setOption(opts2);
-    init();
+    vector<M> arg(argn.size()), res(resn.size());
+    for (auto&& i : dict) {
+      vector<string>::const_iterator it;
+      if ((it=find(argn.begin(), argn.end(), i.first))!=argn.end()) {
+        // Input expression
+        arg[it-argn.begin()] = i.second;
+      } else if ((it=find(resn.begin(), resn.end(), i.first))!=resn.end()) {
+        // Output expression
+        res[it-resn.begin()] = i.second;
+      } else {
+        // Neither
+        casadi_error("Unknown dictionary entry: '" + i.first + "'");
+      }
+    }
+    construct(name, arg, res, argn, resn, opts);
   }
 
   void Function::construct(const string& name,
@@ -78,15 +172,22 @@ namespace casadi {
   }
 
   void Function::construct(const string& name,
-                           const vector<SX>& arg, const vector<SX>& res,
+                           const vector<MX>& arg, const vector<MX>& res,
+                           const Dict& opts) {
+    assignNode(new MXFunction(name, arg, res));
+    setOption(opts);
+    init();
+  }
+
+  template<typename M>
+  void Function::construct(const string& name,
+                           const vector<M>& arg, const vector<M>& res,
                            const vector<string>& argn, const vector<string>& resn,
                            const Dict& opts) {
     Dict opts2 = opts;
     opts2["input_scheme"] = argn;
     opts2["output_scheme"] = resn;
-    assignNode(new SXFunction(name, arg, res));
-    setOption(opts2);
-    init();
+    construct(name, arg, res, opts2);
   }
 
   Function Function::expand() const {

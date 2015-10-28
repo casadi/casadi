@@ -135,77 +135,51 @@ namespace casadi {
     /** \brief Construct an SX function */
     Function(const std::string& name,
              const std::vector<SX>& arg, const std::vector<SX>& res,
-             const Dict& opts=Dict()) {
-      construct(name, arg, res, opts);
-    }
+             const Dict& opts=Dict());
     Function(const std::string& name,
              const std::vector<SX>& arg, const std::vector<SX>& res,
              const std::vector<std::string>& argn, const std::vector<std::string>& resn,
-             const Dict& opts=Dict()) {
-      construct(name, arg, res, argn, resn, opts);
-    }
+             const Dict& opts=Dict());
+    Function(const std::string& name, const std::map<std::string, SX>& dict,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const Dict& opts=Dict());
     ///@}
 
     ///@{
     /** \brief Construct an MX function */
     Function(const std::string& name,
              const std::vector<MX>& arg, const std::vector<MX>& res,
-             const Dict& opts=Dict()) {
-      construct(name, arg, res, opts);
-    }
+             const Dict& opts=Dict());
     Function(const std::string& name,
              const std::vector<MX>& arg, const std::vector<MX>& res,
              const std::vector<std::string>& argn, const std::vector<std::string>& resn,
-             const Dict& opts=Dict()) {
-      construct(name, arg, res, argn, resn, opts);
-    }
+             const Dict& opts=Dict());
+    Function(const std::string& name, const std::map<std::string, MX>& dict,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const Dict& opts=Dict());
     ///@}
 
     ///@{
     /** \brief To resolve ambiguity on some compilers */
 #ifndef SWIG
-    Function(const std::string& name, SXIList arg, const SXVector& res, const Dict& opts=Dict()) {
-      construct(name, arg, res, opts);
-    }
-    Function(const std::string& name, const SXVector& arg, SXIList res, const Dict& opts=Dict()) {
-      construct(name, arg, res, opts);
-    }
-    Function(const std::string& name, SXIList arg, SXIList res, const Dict& opts=Dict()) {
-      construct(name, arg, res, opts);
-    }
+    Function(const std::string& name, SXIList arg, const SXVector& res, const Dict& opts=Dict());
+    Function(const std::string& name, const SXVector& arg, SXIList res, const Dict& opts=Dict());
+    Function(const std::string& name, SXIList arg, SXIList res, const Dict& opts=Dict());
     Function(const std::string& name, SXIList arg, const SXVector& res,
-             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict()) {
-      construct(name, arg, res, argn, resn, opts);
-    }
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
     Function(const std::string& name, const SXVector& arg, SXIList res,
-             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict()) {
-      construct(name, arg, res, argn, resn, opts);
-    }
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
     Function(const std::string& name, SXIList arg, SXIList res,
-             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict()) {
-      construct(name, arg, res, argn, resn, opts);
-    }
-    Function(const std::string& name, MXIList arg, const MXVector& res, const Dict& opts=Dict()) {
-      construct(name, arg, res, opts);
-    }
-    Function(const std::string& name, const MXVector& arg, MXIList res, const Dict& opts=Dict()) {
-      construct(name, arg, res, opts);
-    }
-    Function(const std::string& name, MXIList arg, MXIList res, const Dict& opts=Dict()) {
-      construct(name, arg, res, opts);
-    }
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
+    Function(const std::string& name, MXIList arg, const MXVector& res, const Dict& opts=Dict());
+    Function(const std::string& name, const MXVector& arg, MXIList res, const Dict& opts=Dict());
+    Function(const std::string& name, MXIList arg, MXIList res, const Dict& opts=Dict());
     Function(const std::string& name, MXIList arg, const MXVector& res,
-             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict()) {
-      construct(name, arg, res, argn, resn, opts);
-    }
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
     Function(const std::string& name, const MXVector& arg, MXIList res,
-             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict()) {
-      construct(name, arg, res, argn, resn, opts);
-    }
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
     Function(const std::string& name, MXIList arg, MXIList res,
-             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict()) {
-      construct(name, arg, res, argn, resn, opts);
-    }
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
 #endif // SWIG
     ///@}
 
@@ -1364,16 +1338,18 @@ namespace casadi {
                    const std::vector<SX>& arg, const std::vector<SX>& res,
                    const Dict& opts);
     void construct(const std::string& name,
-                   const std::vector<SX>& arg, const std::vector<SX>& res,
-                   const std::vector<std::string>& argn, const std::vector<std::string>& resn,
-                   const Dict& opts);
-    void construct(const std::string& name,
                    const std::vector<MX>& arg, const std::vector<MX>& res,
                    const Dict& opts);
-    void construct(const std::string& name,
-                   const std::vector<MX>& arg, const std::vector<MX>& res,
-                   const std::vector<std::string>& argn, const std::vector<std::string>& resn,
-                   const Dict& opts);
+    template<typename M>
+      void construct(const std::string& name,
+                     const std::vector<M>& arg, const std::vector<M>& res,
+                     const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+                     const Dict& opts);
+    template<typename M>
+      void construct(const std::string& name, const std::map<std::string, M>& dict,
+                     const std::vector<std::string>& argn,
+                     const std::vector<std::string>& resn,
+                     const Dict& opts);
     ///@}
 #endif // SWIG
   };
