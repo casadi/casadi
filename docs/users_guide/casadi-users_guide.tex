@@ -982,7 +982,7 @@ A \texttt{Function} can be constructed by passing a list of input expressions an
 \begin{lstlisting}[language=Python]
 x = SX.sym('x',2,2)
 y = SX.sym('y')
-f = SX.fun('f',[x,y],\
+f = Function('f',[x,y],\
            [x,sin(y)*x])
 \end{lstlisting}
 \end{minipage}
@@ -990,27 +990,27 @@ f = SX.fun('f',[x,y],\
 \begin{lstlisting}[language=Matlab]
 x = SX.sym('x',2,2);
 y = SX.sym('y');
-f = SX.fun('f',{x,y},...
+f = Function('f',{x,y},...
            {x,sin(y)*x});
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
 x = SX.sym('x',2,2)
 y = SX.sym('y')
-f = SX.fun('f',[x,y],\
+f = Function('f',[x,y],\
            [x,sin(y)*x])
 \end{pytexoutput}
 
 which defines a function $f : \mathbb{R}^{2 \times 2} \times \mathbb{R}, \quad (x,y) \mapsto (x,\sin(y) x)$.
 Note that all function objects in \CasADi, including the above, are multiple matrix-valued input, multiple, matrix-valued output.
 
-\texttt{MX.fun} works the same way, but for the \texttt{MX} expression graphs:
+\texttt{MX} expression graphs work the same way:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 x = MX.sym('x',2,2)
 y = MX.sym('y')
-f = MX.fun('f',[x,y],\
+f = Function('f',[x,y],\
                [x,sin(y)*x])
 \end{lstlisting}
 \end{minipage}
@@ -1018,14 +1018,14 @@ f = MX.fun('f',[x,y],\
 \begin{lstlisting}[language=Matlab]
 x = MX.sym('x',2,2);
 y = MX.sym('y');
-f = MX.fun('f',{x,y},...
+f = Function('f',{x,y},...
                {x,sin(y)*x});
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
 x = MX.sym('x',2,2)
 y = MX.sym('y')
-f = MX.fun('f',[x,y],\
+f = Function('f',[x,y],\
                [x,sin(y)*x])
 \end{pytexoutput}
 
@@ -1040,9 +1040,10 @@ x = SX.sym('x')
 p = SX.sym('p')
 f = x**2
 g = log(x)-p
-nlp = SX.fun('nlp',\
-        nlpIn(x=x,p=p),\
-        nlpOut(f=f,g=g))
+nlp = Function('nlp',
+        [x,p],[f,g],
+        ['x','p'],
+        ['f','g'])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1051,9 +1052,10 @@ x = SX.sym('x');
 p = SX.sym('p');
 f = x^2;
 g = log(x)-p;
-nlp = SX.fun('nlp',...
-        nlpIn('x',x,'p',p),...
-        nlpOut('f',f,'g',g));
+nlp = Function('nlp',...
+        {x,p},{f,g},...
+        char('x','p'),...
+        char('f','g'));
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -1061,12 +1063,13 @@ x = SX.sym('x')
 p = SX.sym('p')
 f = x**2
 g = log(x)-p
-nlp = SX.fun('nlp',\
-        nlpIn(x=x,p=p),\
-        nlpOut(f=f,g=g))
+nlp = Function('nlp',
+        [x,p],[f,g],
+        ['x','p'],
+        ['f','g'])
 \end{pytexoutput}
 
-The last line is essentially equivalent to \lstinline[language=Python]{SX.fun('nlp',[x,p],[f,g])}, but is preferred for a number of reasons:
+The last line is essentially equivalent to \lstinline[language=Python]{Function('nlp',[x,p],[f,g])}, but is preferred for a number of reasons:
 \begin{itemize}
 \item No need to remember the number or order of arguments
 \item Inputs or outputs that are absent can be left unset
@@ -1117,7 +1120,7 @@ res = nlp({'x':1.1,\
 print res['f'], res['g']
 \end{pytexoutput}
 
-The recommendation is to always work with named inputs and outputs, since it is less error prone and more maintainable. When creating a function from expressions, not from the scheme helpers as above, you can specify the input and output schemes by passing the "input\_scheme" and "output\_scheme" option to the \texttt{SX.fun} or \texttt{MX.fun} constructor:
+The recommendation is to always work with named inputs and outputs, since it is less error prone and more maintainable. When creating a function from expressions, not from the scheme helpers as above, you can specify the input and output schemes by passing the "input\_scheme" and "output\_scheme" option to the \texttt{Function}constructor:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -1128,7 +1131,7 @@ g = log(x)-p
 op = \
  {'input_scheme':['x','p'],\
   'output_scheme':['f','g']}
-nlp = SX.fun('nlp',\
+nlp = Function('nlp',\
           [x,p],[f,g],op)
 \end{lstlisting}
 \end{minipage}
@@ -1141,7 +1144,7 @@ g = log(x)-p;
 op = struct;
 op.input_scheme=char('x','p');
 op.output_scheme=char('f','g');
-nlp = SX.fun('nlp',...
+nlp = Function('nlp',...
           {x,p},{f,g},op);
 \end{lstlisting}
 \end{minipage}
@@ -1153,7 +1156,7 @@ g = log(x)-p
 op = \
  {'input_scheme':['x','p'],\
   'output_scheme':['f','g']}
-nlp = SX.fun('nlp',\
+nlp = Function('nlp',\
           [x,p],[f,g],op)
 \end{pytexoutput}
 
@@ -1243,11 +1246,11 @@ G = f.hessian(id_in,id_out);
 
 which will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) Hessian, the gradient and all the original function outputs as outputs.
 
-\section{Converting \texttt{MX.fun} to \texttt{SX.fun}}
-An \texttt{MX.fun} which only contains built-in operations (e.g. elementwise operations such as addition, square root, matrix multiplications and calls to \texttt{SX.fun} instances, can be converted into an \texttt{SX.fun} using the syntax:
+\section{Converting \texttt{MX} to \texttt{SX}}
+An \texttt{MX} graph which only contains built-in operations (e.g. elementwise operations such as addition, square root, matrix multiplications and calls to \texttt{SX} functions, can be converted into a \texttt{SX} graph the syntax:
 
 \begin{lstlisting}[language=Python]
-sx_function = SX.fun(mx_function)
+sx_function = mx_function.expand()
 \end{lstlisting}
 
 This might speed up the calculations significantly, but might also cause extra memory overhead.
@@ -1265,7 +1268,7 @@ The integrators interfaced with \CasADi assumes a DAE residual function of semi-
 
 For solvers of \emph{ordinary} differential equations, the second equation and the algebraic variables $z$ must be absent.
 
-DAEs of form can be formed using the \verb|daeIn| and \verb|daeOut| helper functions:
+DAEs of form can be represented as dictionaries:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -1273,9 +1276,8 @@ x = SX.sym('x')
 z = SX.sym('z')
 f = -z*x
 g = z**2-2
-dae = SX.fun('dae',\
-  daeIn(x=x,z=z),\
-  daeOut(ode=f,alg=g))
+dae = {'x':x, 'z':z,\
+  'ode':f, 'alg':g}
 print dae
 \end{lstlisting}
 \end{minipage}
@@ -1285,9 +1287,8 @@ x = SX.sym('x');
 z = SX.sym('z');
 f = -z*x;
 g = z^2-2;
-dae = SX.fun('dae',...
-  daeIn('x',x,'z',z),...
-  daeOut('ode',f,'alg',g));
+dae = struct('x',x,'z',z,...
+          'ode',f,'alg',g);
 disp(dae)
 \end{lstlisting}
 \end{minipage}
@@ -1296,9 +1297,8 @@ x = SX.sym('x')
 z = SX.sym('z')
 f = -z*x
 g = z**2-2
-dae = SX.fun('dae',\
-  daeIn(x=x,z=z),\
-  daeOut(ode=f,alg=g))
+dae = {'x':x, 'z':z,\
+  'ode':f, 'alg':g}
 print dae
 \end{pytexoutput}
 
@@ -1338,7 +1338,7 @@ disp(Integrator.doc('cvodes'))
 or by consulting the online C++ API docs on the website.
 
 \section{Sensitivity analysis}
-From evaluation point of view, an integrator behaves just like the \texttt{SX.fun} introduced in the previous section. Use the member functions of in the Function class to generate new function objects corresponding to directional derivatives (forward or reverse mode) or complete Jacobians. Then evaluate these function objects numerically to obtain sensitivity information. The documented example "sensitivity\_analysis" (available in \CasADi's example collection for Python, MATLAB and C++) demonstrate how \CasADi can be used to calculate first and second order derivative information (forward-over-forward, forward-over-adjoint, adjoint-over-adjoint) for a simple DAE.
+From evaluation point of view, an integrator behaves just like the \texttt{Function} introduced in the previous section. Use the member functions of in the Function class to generate new function objects corresponding to directional derivatives (forward or reverse mode) or complete Jacobians. Then evaluate these function objects numerically to obtain sensitivity information. The documented example "sensitivity\_analysis" (available in \CasADi's example collection for Python, MATLAB and C++) demonstrate how \CasADi can be used to calculate first and second order derivative information (forward-over-forward, forward-over-adjoint, adjoint-over-adjoint) for a simple DAE.
 
 \section{The \texttt{Simulator} class}
 As already mentioned, integrators in \CasADi are functions that calculates the state at the final time. Often, however, a user is interested in obtaining the solution at multiple time points. This can often be done more efficiently than by repeatedly calling \texttt{integrator.evaluate()}. The easiest way to use this functionality is to use the \texttt{Simulator} class.
