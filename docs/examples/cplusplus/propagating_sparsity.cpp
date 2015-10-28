@@ -42,6 +42,7 @@ using namespace std;
 void printBinary(bvec_t v){
   for(int k=0; k<bvec_size; ++k){
     if(k%4==0) cout << " ";
+    if(k%16==0) cout << " ";
     if(v & (bvec_t(1)<<k)){
       cout << 1;
     } else {
