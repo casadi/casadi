@@ -49,9 +49,9 @@ int main(){
   SX p  = SX::sym("u",np);  // control
 
   // ODE right hand side function
-  SX ode = vertcat((1 - x[1]*x[1])*x[0] - x[1] + p,
-                   x[0],
-                   x[0]*x[0] + x[1]*x[1] + p*p);
+  SX ode = vertcat({(1 - x[1]*x[1])*x[0] - x[1] + p,
+        x[0],
+        x[0]*x[0] + x[1]*x[1] + p*p});
   SXDict dae = {{"x", x}, {"p", p}, {"ode", ode}};
 
   // Number of finite elements

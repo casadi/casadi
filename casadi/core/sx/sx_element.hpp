@@ -319,6 +319,17 @@ namespace casadi {
   typedef std::map<std::string, SX> SXDict;
   ///@}
 
+#ifndef SWIG
+  ///@{
+  /// Shorthands for concatenation
+  inline SX vertcat(std::initializer_list<SX> v) {
+    return vertcat(std::vector<SX>(v));
+  }
+  inline SX horzcat(std::initializer_list<SX> v) {
+    return horzcat(std::vector<SX>(v));
+  }
+  ///@}
+#endif // SWIG
 
 } // namespace casadi
 

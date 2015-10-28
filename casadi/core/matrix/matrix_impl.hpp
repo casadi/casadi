@@ -2199,8 +2199,8 @@ namespace casadi {
       qi /= ri(i, 0);
 
       // Update R and Q
-      Q = horzcat(Q, qi);
-      R = horzcat(R, ri);
+      Q = horzcat({Q, qi});
+      R = horzcat({R, ri});
     }
   }
 

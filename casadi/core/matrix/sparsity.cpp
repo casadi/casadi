@@ -419,7 +419,7 @@ namespace casadi {
         *this = (*this)->zz_appendVector(*sp);
       } else {
         // Append to matrix (inefficient)
-        *this = vertcat(*this, sp);
+        *this = vertcat({*this, sp});
       }
     }
   }
