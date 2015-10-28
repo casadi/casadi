@@ -74,7 +74,6 @@ class Symbolictests(casadiTestCase):
         yield b1
         
     for a_s, b_s in [(SX.sym("a"),SX.sym("b")),(MX.sym("a"),MX.sym("b"))]:
-      print  xfunction
       i=0
       for op1 in operations_node():
         for op2 in operations_node():
