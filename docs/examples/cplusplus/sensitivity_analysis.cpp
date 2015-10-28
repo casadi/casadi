@@ -64,7 +64,7 @@ Test simpleODE(){
 
   // Return test problem
   Test r;
-  r.dae = {{"t", t}, {"x", x}, {"p", u}, {"ode", ode}, {"quad", quad}};
+  r.dae = decltype(r.dae){{"t", t}, {"x", x}, {"p", u}, {"ode", ode}, {"quad", quad}}; // decltype because MSVC bug
   r.tf = 0.5;
   r.x0 = {0, 0, 1};
   r.u0 = 0.4;
@@ -95,7 +95,7 @@ Test simpleDAE(){
   
   // Return DAE
   Test r;
-  r.dae = {{"x", x}, {"z", z}, {"p", u}, {"ode", ode}, {"alg", alg}, {"quad", quad}};
+  r.dae = decltype(r.dae){{"x", x}, {"z", z}, {"p", u}, {"ode", ode}, {"alg", alg}, {"quad", quad}};
   r.tf = 5;
   r.x0 = {1};
   r.u0 = 0.4;
@@ -144,8 +144,8 @@ int main(){
       std::map<std::string, DMatrix> arg, res;
       
       // Integrate to get results
-      arg = {{"x0", test.x0},
-             {"p", test.u0}};
+      arg = decltype(arg){{"x0", test.x0},
+                          {"p", test.u0}};
       res = I(arg);
       vector<double> xf(res.at("xf"));
       vector<double> qf(res.at("qf"));
@@ -161,10 +161,10 @@ int main(){
 
       // Calculate once, forward
       Function I_fwd = I.derivative(1, 0);
-      arg = {{"der_x0", test.x0},
-             {"der_p", test.u0},
-             {"fwd0_x0", 0},
-             {"fwd0_p", 1}};
+      arg = decltype(arg){{"der_x0", test.x0},
+                          {"der_p", test.u0},
+                          {"fwd0_x0", 0},
+                          {"fwd0_p", 1}};
       res = I_fwd(arg);
       vector<double> fwd_xf(res.at("fwd0_xf"));
       vector<double> fwd_qf(res.at("fwd0_qf"));
@@ -172,7 +172,7 @@ int main(){
 
       // Calculate once, adjoint
       Function I_adj = I.derivative(0, 1);
-      arg = {{"der_x0", test.x0}, {"der_p", test.u0}, {"adj0_xf", 0}, {"adj0_qf", 1}};
+      arg = decltype(arg){{"der_x0", test.x0}, {"der_p", test.u0}, {"adj0_xf", 0}, {"adj0_qf", 1}};
       res = I_adj(arg);
       vector<double> adj_x0(res.at("adj0_x0"));
       vector<double> adj_p(res.at("adj0_p"));
@@ -199,11 +199,11 @@ int main(){
 
       // Adjoint over adjoint to get the second order sensitivities
       Function I_aoa = I_adj.derivative(0, 1);
-      arg = {{"der_der_x0", test.x0},
-             {"der_der_p", test.u0},
-             {"der_adj0_xf", 0},
-             {"der_adj0_qf", 1},
-             {"adj0_adj0_p", 1}};
+      arg = decltype(arg){{"der_der_x0", test.x0},
+                          {"der_der_p", test.u0},
+                          {"der_adj0_xf", 0},
+                          {"der_adj0_qf", 1},
+                          {"adj0_adj0_p", 1}};
       res = I_aoa(arg);
       vector<double> adj_adj_x0(res.at("adj0_der_x0"));
       vector<double> adj_adj_p(res.at("adj0_der_p"));
