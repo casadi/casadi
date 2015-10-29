@@ -238,26 +238,14 @@ namespace std {
 %include "stl.i"
 #endif // SWIGXML
 
-#ifndef SWIGXML
-%{
-#define CATCH_OR_NOT(...) \
-if (casadi::CasadiOptions::catch_errors_swig) { \
-  try { \
-    __VA_ARGS__ \
-  } catch(const std::exception& e) { \
-    SWIG_exception(SWIG_RuntimeError, e.what()); \
-  } \
-} else { \
-  __VA_ARGS__ \
-}
-
-%}
-#endif
-
 // Exceptions handling
 %include "exception.i"
 %exception {
-  CATCH_OR_NOT($action)
+  try {
+    $action
+   } catch(const std::exception& e) {
+    SWIG_exception(SWIG_RuntimeError, e.what());
+  }
 }
 
 // Python sometimes takes an approach to not check, but just try.
@@ -1874,7 +1862,7 @@ import_array();
  }
 
 // ... and the corresponding inputs are ignored
-%typemap(in, numinputs=0) xType &OUTPUT (xType m) {
+%typemap(in, noblock=1, numinputs=0) xType &OUTPUT (xType m) {
  $1 = &m;
 }
 
@@ -1964,7 +1952,7 @@ import_array();
 
  // std::ostream & is not typemapped to anything useful and should be ignored
  // (or possibly turned into a string output) 
-%typemap(in, numinputs=0) std::ostream &stream ""
+%typemap(in, noblock=1, numinputs=0) std::ostream &stream ""
 
 %casadi_typemaps("str", PREC_STRING, std::string)
 %casadi_template("[str]", PREC_STRING, std::vector<std::string>)
@@ -2127,7 +2115,7 @@ except:
 %feature("optionalunpack","1") size;
 
 // Raise an error if "this" not correct
-%typemap(check) SWIGTYPE *self %{
+%typemap(check, noblock=1) SWIGTYPE *self %{
 if (!$1) {
   SWIG_Error(SWIG_RuntimeError, "Invalid 'self' object");
   SWIG_fail;
