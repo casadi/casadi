@@ -85,11 +85,9 @@ class MyCallback(Callback):
     self.nx = nx
     self.ng = ng
     self.np = np
-    self.ischeme = nlpSolverOut()[1]
-    self.oscheme = ['ret']
 
-    opts['input_scheme'] = self.ischeme
-    opts['output_scheme'] = self.oscheme
+    opts['input_scheme'] = Function.nlp_solver_out()
+    opts['output_scheme'] = ['ret']
 
     figure(1)
     subplot(111)
@@ -111,11 +109,12 @@ class MyCallback(Callback):
     # Initialize internal objects
     self.construct(name, opts)
 
-  def get_n_in(self): return len(self.ischeme) # NOTE(@jaeandersson): Does not appear to work
-  def get_n_out(self): return len(self.oscheme) # NOTE(@jaeandersson): Does not appear to work
+  def get_n_in(self): return Function.nlp_solver_n_out()
+  def get_n_out(self): return 1
+
 
   def get_input_shape(self, i):
-    n = self.ischeme[i]
+    n = Function.nlp_solver_out(i)
     if n=='f':
       return (1,1)
     elif n in ('x', 'lam_x'):
@@ -127,7 +126,7 @@ class MyCallback(Callback):
   def eval(self, arg):
     # Create dictionary
     darg = {}
-    for (i,s) in enumerate(self.ischeme): darg[s] = arg[i]
+    for (i,s) in enumerate(Function.nlp_solver_out()): darg[s] = arg[i]
 
     sol = darg['x']
     self.x_sols.append(float(sol[0]))
