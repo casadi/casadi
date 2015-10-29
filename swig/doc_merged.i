@@ -11961,8 +11961,6 @@ Calculates inner_prod(x, mul(A, x)) without memory allocation.
 
 ";
 
-%feature("docstring") casadi::first "[INTERNAL] ";
-
 %feature("docstring") casadi::hasNegative "
 
 Check if the vector has negative entries.
@@ -12192,8 +12190,6 @@ Checks if vector does not contain NaN or Inf.
 Get typename.
 
 ";
-
-%feature("docstring") casadi::second "[INTERNAL] ";
 
 %feature("docstring") casadi::profileWriteExit "[INTERNAL] ";
 

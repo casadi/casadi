@@ -16099,9 +16099,6 @@ Calculates inner_prod(x, mul(A, x)) without memory allocation.
 
 ";
 
-%feature("docstring")  casadi::first(const std::vector< std::pair<
-std::string, T >> &v) " [INTERNAL] ";
-
 %feature("docstring")  casadi::hasNegative(const std::vector< T > &v) "
 
 Check if the vector has negative entries.
@@ -16369,9 +16366,6 @@ Checks if vector does not contain NaN or Inf.
 Get typename.
 
 ";
-
-%feature("docstring")  casadi::second(const std::vector< std::pair<
-std::string, T >> &v) " [INTERNAL] ";
 
 %feature("docstring")  casadi::profileWriteExit(std::ofstream &f, T *a,
 double total) " [INTERNAL] ";
