@@ -211,11 +211,11 @@ class Integrationtests(casadiTestCase):
           x = SX.sym("x")
           dummyIntegrator = Function.integrator("dummyIntegrator", Integrator, {'x':x, 'ode':x})
           if p_features[0] in features:
-            g = Function()
-            if len(rdin)>1:
-              g = SX.fun("g", rdaeIn(**rdin),rdaeOut(**rdout))
-               
-            f = SX.fun("f", daeIn(**din),daeOut(**dout))
+
+            dae = {}
+            for d in (din, dout, rdin):
+                for k, v in d.iteritems(): dae[k] = v
+            for k, v in rdout.iteritems(): dae['r'+k] = v
             
             for k in solution.keys():
               solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
@@ -255,7 +255,7 @@ class Integrationtests(casadiTestCase):
                 for op in (options, f_options, a_options):
                   for (k,v) in op.items():
                     opts[k] = v
-                integrator = Function.integrator("integrator", Integrator, (f, g), opts)
+                integrator = Function.integrator("integrator", Integrator, dae, opts)
                 for ff in [fs,integrator]:
                   for k,v in point.items():
                     if not ff.sparsity_in(k).isempty():
@@ -324,11 +324,11 @@ class Integrationtests(casadiTestCase):
         x = SX.sym("x")
         dummyIntegrator = Function.integrator("dummyIntegrator", Integrator, {'x':x, 'ode':x})
         if p_features[0] in features:
-          g = Function()
-          if len(rdin)>1:
-            g = SX.fun("g", rdaeIn(**rdin),rdaeOut(**rdout))
-             
-          f = SX.fun("f", daeIn(**din),daeOut(**dout))
+
+          dae = {}
+          for d in (din, dout, rdin):
+              for k, v in d.iteritems(): dae[k] = v
+          for k, v in rdout.iteritems(): dae['r'+k] = v
             
           for k in solution.keys():
             solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
@@ -365,7 +365,7 @@ class Integrationtests(casadiTestCase):
               for op in (options, f_options, a_options):
                  for (k,v) in op.items():
                     opts[k] = v
-              integrator = Function.integrator("integrator", Integrator, (f, g), opts)
+              integrator = Function.integrator("integrator", Integrator, dae, opts)
               
               for ff in [fs,integrator]:
                 for k,v in point.items():
@@ -490,12 +490,11 @@ class Integrationtests(casadiTestCase):
           if p_features[0] in features:
             message = "%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart_)
             print message
-            g = Function()
-            if len(rdin)>1:
-              g = SX.fun("g", rdaeIn(**rdin),rdaeOut(**rdout))
-               
-            dout_sx = {k:SX(v) for k, v in dout.iteritems()} # hack
-            f = SX.fun("f", daeIn(**din),daeOut(**dout_sx))
+
+            dae = {}
+            for d in (din, dout, rdin):
+                for k, v in d.iteritems(): dae[k] = v
+            for k, v in rdout.iteritems(): dae['r'+k] = v
             
             for k in solution.keys():
               solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
@@ -512,7 +511,7 @@ class Integrationtests(casadiTestCase):
               opts["init_xdot"] = list(DMatrix(point["x0"]))
               opts["calc_icB"] = True
               opts["augmented_options"] = {"init_xdot":None, "abstol":1e-9,"reltol":1e-9}
-            integrator = Function.integrator("integrator", Integrator, (f, g), opts)
+            integrator = Function.integrator("integrator", Integrator, dae, opts)
 
             for ff in [fs,integrator]:
               for k,v in point.items():

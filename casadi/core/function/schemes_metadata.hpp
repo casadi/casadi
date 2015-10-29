@@ -33,10 +33,6 @@
 namespace casadi {
 class Sparsity;
 enum InputOutputScheme {
-  SCHEME_DAEInput,
-  SCHEME_DAEOutput,
-  SCHEME_RDAEInput,
-  SCHEME_RDAEOutput,
   SCHEME_IntegratorInput,
   SCHEME_IntegratorOutput,
   SCHEME_GradFInput,

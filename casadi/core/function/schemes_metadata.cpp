@@ -28,10 +28,6 @@
 namespace casadi {
 std::string getSchemeName(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_DAEInput: return "DAEInput";
-    case SCHEME_DAEOutput: return "DAEOutput";
-    case SCHEME_RDAEInput: return "RDAEInput";
-    case SCHEME_RDAEOutput: return "RDAEOutput";
     case SCHEME_IntegratorInput: return "IntegratorInput";
     case SCHEME_IntegratorOutput: return "IntegratorOutput";
     case SCHEME_GradFInput: return "GradFInput";
@@ -47,14 +43,6 @@ std::string getSchemeName(InputOutputScheme scheme) {
 }
 std::string getSchemeEntryNames(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_DAEInput:
-      return "x, z, p, t";
-    case SCHEME_DAEOutput:
-      return "ode, alg, quad";
-    case SCHEME_RDAEInput:
-      return "rx, rz, rp, x, z, p, t";
-    case SCHEME_RDAEOutput:
-      return "ode, alg, quad";
     case SCHEME_IntegratorInput:
       return "x0, p, z0, rx0, rp, rz0";
     case SCHEME_IntegratorOutput:
@@ -80,31 +68,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
 }
 std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_DAEInput:
-      if (i==0) return "x";
-      if (i==1) return "z";
-      if (i==2) return "p";
-      if (i==3) return "t";
-      break;
-    case SCHEME_DAEOutput:
-      if (i==0) return "ode";
-      if (i==1) return "alg";
-      if (i==2) return "quad";
-      break;
-    case SCHEME_RDAEInput:
-      if (i==0) return "rx";
-      if (i==1) return "rz";
-      if (i==2) return "rp";
-      if (i==3) return "x";
-      if (i==4) return "z";
-      if (i==5) return "p";
-      if (i==6) return "t";
-      break;
-    case SCHEME_RDAEOutput:
-      if (i==0) return "ode";
-      if (i==1) return "alg";
-      if (i==2) return "quad";
-      break;
     case SCHEME_IntegratorInput:
       if (i==0) return "x0";
       if (i==1) return "p";
@@ -167,31 +130,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
 }
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_DAEInput:
-      if (i==0) return "Differential state";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Algebraic state";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Parameter";  // NOLINT(whitespace/line_length)
-      if (i==3) return "Explicit time dependence";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_DAEOutput:
-      if (i==0) return "Right hand side of the implicit ODE";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Right hand side of algebraic equations";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Right hand side of quadratures equations";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_RDAEInput:
-      if (i==0) return "Backward differential state";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Backward algebraic state";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Backward  parameter vector";  // NOLINT(whitespace/line_length)
-      if (i==3) return "Forward differential state";  // NOLINT(whitespace/line_length)
-      if (i==4) return "Forward algebraic state";  // NOLINT(whitespace/line_length)
-      if (i==5) return "Parameter vector";  // NOLINT(whitespace/line_length)
-      if (i==6) return "Explicit time dependence";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_RDAEOutput:
-      if (i==0) return "Right hand side of ODE.";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Right hand side of algebraic equations.";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Right hand side of quadratures.";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_IntegratorInput:
       if (i==0) return "Differential state at the initial time";  // NOLINT(whitespace/line_length)
       if (i==1) return "Parameters";  // NOLINT(whitespace/line_length)
@@ -254,31 +192,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
 }
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_DAEInput:
-      if (i==0) return "DAE_X";
-      if (i==1) return "DAE_Z";
-      if (i==2) return "DAE_P";
-      if (i==3) return "DAE_T";
-      break;
-    case SCHEME_DAEOutput:
-      if (i==0) return "DAE_ODE";
-      if (i==1) return "DAE_ALG";
-      if (i==2) return "DAE_QUAD";
-      break;
-    case SCHEME_RDAEInput:
-      if (i==0) return "RDAE_RX";
-      if (i==1) return "RDAE_RZ";
-      if (i==2) return "RDAE_RP";
-      if (i==3) return "RDAE_X";
-      if (i==4) return "RDAE_Z";
-      if (i==5) return "RDAE_P";
-      if (i==6) return "RDAE_T";
-      break;
-    case SCHEME_RDAEOutput:
-      if (i==0) return "RDAE_ODE";
-      if (i==1) return "RDAE_ALG";
-      if (i==2) return "RDAE_QUAD";
-      break;
     case SCHEME_IntegratorInput:
       if (i==0) return "INTEGRATOR_X0";
       if (i==1) return "INTEGRATOR_P";
@@ -342,18 +255,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
 }
 int getSchemeSize(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_DAEInput:
-      return 4;
-      break;
-    case SCHEME_DAEOutput:
-      return 3;
-      break;
-    case SCHEME_RDAEInput:
-      return 7;
-      break;
-    case SCHEME_RDAEOutput:
-      return 3;
-      break;
     case SCHEME_IntegratorInput:
       return 6;
       break;
@@ -389,31 +290,6 @@ int getSchemeSize(InputOutputScheme scheme) {
 }
 int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
   switch (scheme) {
-    case SCHEME_DAEInput:
-      if (name=="x") return 0;
-      if (name=="z") return 1;
-      if (name=="p") return 2;
-      if (name=="t") return 3;
-      break;
-    case SCHEME_DAEOutput:
-      if (name=="ode") return 0;
-      if (name=="alg") return 1;
-      if (name=="quad") return 2;
-      break;
-    case SCHEME_RDAEInput:
-      if (name=="rx") return 0;
-      if (name=="rz") return 1;
-      if (name=="rp") return 2;
-      if (name=="x") return 3;
-      if (name=="z") return 4;
-      if (name=="p") return 5;
-      if (name=="t") return 6;
-      break;
-    case SCHEME_RDAEOutput:
-      if (name=="ode") return 0;
-      if (name=="alg") return 1;
-      if (name=="quad") return 2;
-      break;
     case SCHEME_IntegratorInput:
       if (name=="x0") return 0;
       if (name=="p") return 1;

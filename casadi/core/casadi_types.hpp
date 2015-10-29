@@ -106,61 +106,61 @@ namespace casadi {
     DE_RQUAD,
     DE_NUM_OUT};
 
-  /// Input arguments of an ODE/DAE function [daeIn]
+  /// Input arguments of an ODE/DAE function
   enum DAEInput {
-    /// Differential state [x]
+    /// Differential state
     DAE_X,
-    /// Algebraic state [z]
+    /// Algebraic state
     DAE_Z,
-    /// Parameter [p]
+    /// Parameter
     DAE_P,
-    /// Explicit time dependence [t]
+    /// Explicit time dependence
     DAE_T,
-    /// Number of arguments.
+    /// Number of arguments
     DAE_NUM_IN
   };
 
-  /// Output arguments of an DAE function [daeOut]
+  /// Output arguments of an DAE function
   enum DAEOutput {
-    /// Right hand side of the implicit ODE [ode]
+    /// Right hand side of the implicit ODE
     DAE_ODE,
-    /// Right hand side of algebraic equations [alg]
+    /// Right hand side of algebraic equations
     DAE_ALG,
-    /// Right hand side of quadratures equations [quad]
+    /// Right hand side of quadratures equations
     DAE_QUAD,
-    /// Number of arguments.
+    /// Number of arguments
     DAE_NUM_OUT
   };
 
-  /// Input arguments of an ODE/DAE backward integration function [rdaeIn]
+  /// Input arguments of an ODE/DAE backward integration function
   enum RDAEInput {
-    /// Backward differential state [rx]
+    /// Backward differential state
     RDAE_RX,
-    /// Backward algebraic state [rz]
+    /// Backward algebraic state
     RDAE_RZ,
-    /// Backward  parameter vector [rp]
+    /// Backward  parameter vector
     RDAE_RP,
-    /// Forward differential state [x]
+    /// Forward differential state
     RDAE_X,
-    /// Forward algebraic state [z]
+    /// Forward algebraic state
     RDAE_Z,
-    /// Parameter vector [p]
+    /// Parameter vector
     RDAE_P,
-    /// Explicit time dependence [t]
+    /// Explicit time dependence
     RDAE_T,
-    /// Number of arguments.
+    /// Number of arguments
     RDAE_NUM_IN
   };
 
-  /// Output arguments of an ODE/DAE backward integration function [rdaeOut]
+  /// Output arguments of an ODE/DAE backward integration function
   enum RDAEOutput {
-    /// Right hand side of ODE. [ode]
+    /// Right hand side of ODE
     RDAE_ODE,
-    /// Right hand side of algebraic equations. [alg]
+    /// Right hand side of algebraic equations
     RDAE_ALG,
-    /// Right hand side of quadratures. [quad]
+    /// Right hand side of quadratures
     RDAE_QUAD,
-    /// Number of arguments.
+    /// Number of arguments
     RDAE_NUM_OUT
   };
 
