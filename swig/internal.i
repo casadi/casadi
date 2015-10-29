@@ -196,6 +196,9 @@
 %exception  casadi::diffToDict(const diffTime &diff) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::first(const std::vector< std::pair< std::string, T >> &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::getRealTime() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -241,7 +244,13 @@
 %exception  casadi::ptrVec(std::vector< std::vector< T > > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::second(const std::vector< std::pair< std::string, T >> &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::timerPlusEq(diffTime &t, const diffTime diff) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::zip(const std::vector< std::string > &id, const std::vector< T > &mat) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  snoptProblem::setLog(isnLog snLog, isnLog2 snLog2, isqLog sqLog) {

@@ -160,7 +160,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_ImplicitFunction_kinsol
+/** \addtogroup plugin_Rootfinder_kinsol
 \n
 \par
 <a name='monitors'></a><table>
@@ -217,7 +217,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_ImplicitFunction_newton
+/** \addtogroup plugin_Rootfinder_newton
 \n
 \par
 <a name='monitors'></a><table>
@@ -393,7 +393,7 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::XFunctionInternal
+/** \class casadi::XFunction
 \n
 \par
 <a name='monitors'></a><table>
