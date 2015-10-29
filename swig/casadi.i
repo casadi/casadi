@@ -207,8 +207,8 @@ def _swig_repr(self):
 
 #if defined(SWIGPYTHON) || defined(SWIGMATLAB)
 %include "doc_merged.i"
-//#else
-//%include "doc.i"
+#else
+%include "doc.i"
 #endif
 
 %feature("autodoc", "1");
