@@ -251,10 +251,10 @@ namespace std {
 // Python sometimes takes an approach to not check, but just try.
 // It expects a python error to be thrown.
 %exception __int__ {
- try {
+  try {
     $action
-  } catch (const std::exception& e) { \
-  SWIG_exception(SWIG_RuntimeError, e.what()); \
+  } catch (const std::exception& e) {
+    SWIG_exception(SWIG_RuntimeError, e.what());
   }
 }
 
@@ -263,9 +263,8 @@ namespace std {
 %exception __nonzero__ {
  try {
     $action
-    // foobar
-  } catch (const std::exception& e) { \
-  SWIG_exception(SWIG_TypeError, e.what()); \
+  } catch (const std::exception& e) {
+   SWIG_exception(SWIG_TypeError, e.what());
   }
 }
 
