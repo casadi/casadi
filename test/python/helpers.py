@@ -232,7 +232,7 @@ class casadiTestCase(unittest.TestCase):
     
         Checks if yr is the same as Function(name,x,yt) , evaluated for x0
     
-        x: the symbolic seed for the test. It should be of a form accepted as first argument of SX.fun/MX.fun
+        x: the symbolic seed for the test. It should be of a form accepted as first argument of Function
         yt: the test expression.
         yr: the reference solution: a numpy matrix.
         
@@ -277,7 +277,7 @@ class casadiTestCase(unittest.TestCase):
     
         Checks if 'fr(x0)' yields the same as Function(name,x,[ft(x)]) , evaluated for x0
     
-        x: the symbolic seed for the test. It should be of a form accepted as first argument of SX.fun/MX.fun
+        x: the symbolic seed for the test. It should be of a form accepted as first argument of Function
         ft: the test function. This function should operate on the casadi matrix x and return MX or SX.
         fr: the reference function. This function works on the numpy array x0.
         

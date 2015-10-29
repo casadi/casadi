@@ -113,7 +113,7 @@ V_eq = vertcat(V_eq)
 # Root-finding function, implicitly defines V as a function of X0 and P
 vfcn = Function('vfcn', [V, X0, P], [V_eq])
 
-# Convert to SX.fun to decrease overhead
+# Convert to SX to decrease overhead
 vfcn_sx = vfcn.expand()
 
 # Create a implicit function instance to solve the system of equations

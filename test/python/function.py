@@ -90,7 +90,7 @@ class Functiontests(casadiTestCase):
       self.checkarray(sin(n2)+N2,out[1],"output")
       
   def test_MX_funSeed(self):
-    self.message("MX.funSeed")
+    self.message("MX_funSeed")
     x1 = MX.sym("x",2)
     y1 = MX.sym("y")
     x2 = MX.sym("x",2)

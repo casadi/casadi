@@ -605,22 +605,6 @@ namespace casadi {
     typedef std::map<std::string, MX> MXDict;
     ///@}
 
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    static Function fun(const std::string& name,
-                        const std::pair< MXDict, std::vector<std::string> >& arg,
-                        const std::vector<MX>& res, const Dict& opts=Dict());
-
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    static Function fun(const std::string& name, const std::vector<MX>& arg,
-                        const std::pair< MXDict, std::vector<std::string> >& res,
-                        const Dict& opts=Dict());
-
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    static Function fun(const std::string& name,
-                        const std::pair< MXDict, std::vector<std::string> >& arg,
-                        const std::pair< MXDict, std::vector<std::string> >& res,
-                        const Dict& opts=Dict());
-
     ///@{
     /** \brief Jacobian expression */
     static MX jac(const Function& f, int iind=0, int oind=0,

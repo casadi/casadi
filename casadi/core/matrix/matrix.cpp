@@ -1173,34 +1173,4 @@ namespace casadi {
     return hess(f, f.index_in(iname), f.index_out(oname));
   }
 
-  template<>
-  Function SX::fun(const std::string& name,
-                   const std::pair< std::map<std::string, SX >, std::vector<std::string> >& arg,
-                   const std::vector<SX>& res, const Dict& opts) {
-    Dict opts2 = opts;
-    opts2["input_scheme"] = arg.second;
-    return Function(name, make_vector(arg), res, opts2);
-  }
-
-  template<>
-  Function SX::fun(const std::string& name,
-                   const std::vector<SX>& arg,
-                   const std::pair< std::map<std::string, SX >, std::vector<std::string> >& res,
-                   const Dict& opts) {
-    Dict opts2 = opts;
-    opts2["output_scheme"] = res.second;
-    return Function(name, arg, make_vector(res), opts2);
-  }
-
-  template<>
-  Function SX::fun(const std::string& name,
-                   const std::pair< std::map<std::string, SX >, std::vector<std::string> >& arg,
-                   const std::pair< std::map<std::string, SX >, std::vector<std::string> >& res,
-      const Dict& opts) {
-    Dict opts2 = opts;
-    opts2["input_scheme"] = arg.second;
-    opts2["output_scheme"] = res.second;
-    return Function(name, make_vector(arg), make_vector(res), opts2);
-  }
-
 } // namespace casadi
