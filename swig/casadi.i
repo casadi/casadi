@@ -1847,17 +1847,17 @@ import_array();
 
  // Return-by-value
 %typemap(out, noblock=1, fragment="casadi_all") xType, const xType {
-  if(!($result = casadi::from_ref(static_cast<const xType &>($1)))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
+  if(!($result = casadi::from_ref($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
 }
 
 // Return a const-ref behaves like return-by-value
 %typemap(out, noblock=1, fragment="casadi_all") const xType& {
-  if(!($result = casadi::from_ptr(static_cast<const xType *>($1)))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
+  if(!($result = casadi::from_ptr($1))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to " xName ".");
 }
 
 // Inputs marked OUTPUT are also returned by the function, ...
 %typemap(argout,noblock=1,fragment="casadi_all") xType &OUTPUT {
-  %append_output(casadi::from_ptr(static_cast<xType *>($1)));
+  %append_output(casadi::from_ptr($1));
  }
 
 // ... and the corresponding inputs are ignored
@@ -1880,7 +1880,7 @@ import_array();
 
 // Inputs marked INOUT are also returned by the function, ...
 %typemap(argout,noblock=1,fragment="casadi_all") xType &INOUT {
-  %append_output(casadi::from_ptr(static_cast<xType *>($1)));
+  %append_output(casadi::from_ptr($1));
  }
 
 // ... but kept as inputs
