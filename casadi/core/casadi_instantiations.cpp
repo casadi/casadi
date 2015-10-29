@@ -35,8 +35,6 @@
 #include "weak_ref.hpp"
 #include <iostream>
 
-#include "function/schemes_helpers.hpp"
-
 #include "matrix/sparse_storage_impl.hpp"
 
 using namespace std;

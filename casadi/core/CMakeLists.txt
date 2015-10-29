@@ -84,7 +84,6 @@ set(CASADI_SRCS
 
   # A dynamically created function with AD capabilities
   function/io_interface.hpp                                         # Input/output interface for Function and FunctionInternal
-  function/io_scheme.hpp
   function/function.hpp            function/function.cpp            function/function_internal.hpp            function/function_internal.cpp
   function/plugin_interface.hpp                                     # Plugin interface for Function
   function/x_function.hpp                                           # Base class for SXFunction and MXFunction
@@ -116,8 +115,6 @@ set(CASADI_SRCS
 
   # User include class with the most essential includes
   core.hpp
-
-  function/schemes_metadata.hpp function/schemes_metadata.cpp function/schemes_helpers.hpp
 )
 
 set_source_files_properties( ${RUNTIME_EMBEDDED_SRC} PROPERTIES GENERATED TRUE )
