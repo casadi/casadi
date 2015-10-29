@@ -294,7 +294,7 @@ class LinearSolverTests(casadiTestCase):
       b_0 = b[0]
       b_1 = b[1]
       
-      solution = MX.fun("solution", linsolIn(A=A,B=b),[vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
+      solution = Function("solution", {"A":A, "B":b, "X":vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])}, ["A","B"], ["X"])
       
       solution.setInput(A_,"A")
       solution.setInput(b_,"B")
@@ -313,8 +313,11 @@ class LinearSolverTests(casadiTestCase):
       solver = LinearSolver("solver", Solver, A.sparsity(), options)
       solver.setInput(A_,"A")
       solver.setInput(b_,"B")
-      
-      relay = MX.fun("relay", linsolIn(A=A,B=b),linsolOut(**solver({'A':A,'B':b})))
+
+      sol = solver({'A':A,'B':b})
+      sol["A"] = A
+      sol["B"] = b
+      relay = Function("relay", sol, ["A","B"], ["X"])
 
       relay.setInput(A_,"A")
       relay.setInput(b_,"B")
@@ -327,7 +330,7 @@ class LinearSolverTests(casadiTestCase):
       b_0 = b[0]
       b_1 = b[1]
       
-      solution = MX.fun("solution", linsolIn(A=A,B=b),[vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
+      solution = Function("solution", {"A":A, "B":b, "X":vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])}, ["A", "B"], ["X"])
       
       solution.setInput(A_,"A")
       solution.setInput(b_,"B")

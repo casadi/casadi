@@ -164,37 +164,37 @@ namespace casadi {
     RDAE_NUM_OUT
   };
 
-  /// Input arguments of an integrator [integratorIn]
+  /// Input arguments of an integrator
   enum IntegratorInput {
-    /// Differential state at the initial time [x0]
+    /// Differential state at the initial time
     INTEGRATOR_X0,
-    /// Parameters [p]
+    /// Parameters
     INTEGRATOR_P,
-    /// Initial guess for the algebraic variable [z0]
+    /// Initial guess for the algebraic variable
     INTEGRATOR_Z0,
-    /// Backward differential state at the final time [rx0]
+    /// Backward differential state at the final time
     INTEGRATOR_RX0,
-    /// Backward parameter vector [rp]
+    /// Backward parameter vector
     INTEGRATOR_RP,
-    /// Initial guess for the backwards algebraic variable [rz0]
+    /// Initial guess for the backwards algebraic variable
     INTEGRATOR_RZ0,
     /// Number of input arguments of an integrator
     INTEGRATOR_NUM_IN
   };
 
-  /// Output arguments of an integrator [integratorOut]
+  /// Output arguments of an integrator
   enum IntegratorOutput {
-    /// Differential state at the final time [xf]
+    /// Differential state at the final time
     INTEGRATOR_XF,
-    /// Quadrature state at the final time [qf]
+    /// Quadrature state at the final time
     INTEGRATOR_QF,
-    /// Algebraic variable at the final time [zf]
+    /// Algebraic variable at the final time
     INTEGRATOR_ZF,
-    /// Backward differential state at the initial time [rxf]
+    /// Backward differential state at the initial time
     INTEGRATOR_RXF,
-    /// Backward quadrature state at the initial time [rqf]
+    /// Backward quadrature state at the initial time
     INTEGRATOR_RQF,
-    /// Backward algebraic variable at the initial time [rzf]
+    /// Backward algebraic variable at the initial time
     INTEGRATOR_RZF,
     /// Number of output arguments of an integrator
     INTEGRATOR_NUM_OUT
@@ -220,60 +220,60 @@ namespace casadi {
     NL_NUM_OUT
   };
 
-  /// Input arguments of an NLP objective gradient function [gradFIn]
+  /// Input arguments of an NLP objective gradient function]
   enum GradFInput {
-    /// Decision variable [x]
+    /// Decision variable
     GRADF_X,
-    /// Fixed parameter [p]
+    /// Fixed parameter
     GRADF_P,
     /// Number of inputs
     GRADF_NUM_IN
   };
 
-  /// Output arguments of an NLP objective gradient function [gradFOut]
+  /// Output arguments of an NLP objective gradient function
   enum GradFOutput {
-    /// Jacobian of the constraints [grad]
+    /// Jacobian of the constraints
     GRADF_GRAD,
-    /// Objective function [f]
+    /// Objective function
     GRADF_F,
-    /// Constraint function [g]
+    /// Constraint function
     GRADF_G,
     /// Number of outputs
     GRADF_NUM_OUT
   };
 
-  /// Input arguments of an NLP Jacobian function [jacGIn]
+  /// Input arguments of an NLP Jacobian function
   enum JacGInput {
-    /// Decision variable [x]
+    /// Decision variable
     JACG_X,
-    /// Fixed parameter [p]
+    /// Fixed parameter
     JACG_P,
     /// Number of inputs
     JACG_NUM_IN
   };
 
-  /// Output arguments of an NLP Jacobian function [jacGOut]
+  /// Output arguments of an NLP Jacobian function
   enum JacGOutput {
-    /// Jacobian of the constraints [jac]
+    /// Jacobian of the constraints
     JACG_JAC,
-    /// Objective function [f]
+    /// Objective function
     JACG_F,
-    /// Constraint function [g]
+    /// Constraint function
     JACG_G,
     /// Number of outputs
     JACG_NUM_OUT
   };
 
-  /// Input arguments of an NLP Hessian function [hessLagIn]
+  /// Input arguments of an NLP Hessian function
   enum HessLagInput {
-    /// Decision variable [x]
+    /// Decision variable
     HESSLAG_X,
-    /// Fixed parameter [p]
+    /// Fixed parameter
     HESSLAG_P,
     /// Multiplier for f. Just a scalar factor for the objective that the
-    /// NLP solver might use to scale the objective. [lam_f]
+    /// NLP solver might use to scale the objective
     HESSLAG_LAM_F,
-    /// Multiplier for g [lam_g]
+    /// Multiplier for g
     HESSLAG_LAM_G,
     /// Number of inputs
     HESSLAG_NUM_IN
@@ -316,19 +316,19 @@ namespace casadi {
     NLP_SOLVER_NUM_IN
   };
 
-  /// Output arguments of an NLP Solver [nlpSolverOut]
+  /// Output arguments of an NLP Solver
   enum NlpSolverOutput {
-    /// Decision variables at the optimal solution (nx x 1) [x]
+    /// Decision variables at the optimal solution (nx x 1)
     NLP_SOLVER_X,
-    /// Cost function value at the optimal solution (1 x 1) [f]
+    /// Cost function value at the optimal solution (1 x 1)
     NLP_SOLVER_F,
-    /// Constraints function at the optimal solution (ng x 1) [g]
+    /// Constraints function at the optimal solution (ng x 1)
     NLP_SOLVER_G,
-    /// Lagrange multipliers for bounds on X at the solution (nx x 1) [lam_x]
+    /// Lagrange multipliers for bounds on X at the solution (nx x 1)
     NLP_SOLVER_LAM_X,
-    /// Lagrange multipliers for bounds on G at the solution (ng x 1) [lam_g]
+    /// Lagrange multipliers for bounds on G at the solution (ng x 1)
     NLP_SOLVER_LAM_G,
-    /// Lagrange multipliers for bounds on P at the solution (np x 1) [lam_p]
+    /// Lagrange multipliers for bounds on P at the solution (np x 1)
     NLP_SOLVER_LAM_P,
     NLP_SOLVER_NUM_OUT
   };
@@ -367,6 +367,21 @@ namespace casadi {
     /// The dual solution corresponding to simple bounds
     QP_SOLVER_LAM_X,
     QP_SOLVER_NUM_OUT};
+
+  /// Input arguments of a linear solver
+  enum LinsolInput {
+    /// The square matrix A: sparse, (n x n)
+    LINSOL_A,
+    /// The right-hand-side matrix b: dense,  (n x m)
+    LINSOL_B,
+    LINSOL_NUM_IN};
+
+  /// Output arguments of a linear solver
+  enum LinsolOutput {
+    /// Solution to the linear system of equations
+    LINSOL_X,
+    LINSOL_NUM_OUT};
+
 #endif // SWIG
 
 } // namespace casadi

@@ -26,9 +26,6 @@
 #include "integrator.hpp"
 #include "../std_vector_tools.hpp"
 
-INPUTSCHEME(IntegratorInput)
-OUTPUTSCHEME(IntegratorOutput)
-
 using namespace std;
 namespace casadi {
 
@@ -56,8 +53,8 @@ namespace casadi {
     // Negative number of parameters for consistancy checking
     np_ = -1;
 
-    ischeme_ = IOScheme(SCHEME_IntegratorInput);
-    oscheme_ = IOScheme(SCHEME_IntegratorOutput);
+    ischeme_ = Function::integrator_in();
+    oscheme_ = Function::integrator_out();
   }
 
   Integrator::~Integrator() {

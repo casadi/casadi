@@ -135,7 +135,8 @@ for i in range(n):
   [X] = F([X,P])
 
 # Fixed-step integrator
-irk_integrator = MX.fun("irk_integrator", integratorIn(x0=X0,p=P),integratorOut(xf=X))
+irk_integrator = Function("irk_integrator", {"x0":X0, "p":P, "xf":X},
+                          Function.integrator_in(), Function.integrator_out())
 
 # Create a convensional integrator for reference
 ref_integrator = Function.integrator("ref_integrator", "cvodes", dae, {"tf":tf})

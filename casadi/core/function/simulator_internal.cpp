@@ -27,8 +27,6 @@
 #include "integrator.hpp"
 #include "../std_vector_tools.hpp"
 
-INPUTSCHEME(IntegratorInput)
-
 using namespace std;
 namespace casadi {
 
@@ -44,7 +42,6 @@ namespace casadi {
                           "Simulator::Simulator: grid must be dense, but got "
                           << grid.dim());
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
-    ischeme_ = IOScheme(SCHEME_IntegratorInput);
   }
 
   SimulatorInternal::~SimulatorInternal() {
@@ -72,8 +69,8 @@ namespace casadi {
       integrator_ = I;
     }
 
-    // Output scheme
-    oscheme_ = IOScheme(SCHEME_IntegratorOutput);
+    ischeme_ = Function::integrator_in();
+    oscheme_ = Function::integrator_out();
 
     // Allocate inputs
     ibuf_.resize(get_n_in());

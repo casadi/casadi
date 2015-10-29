@@ -28,9 +28,6 @@
 #include "../mx/mx_node.hpp"
 #include <typeinfo>
 
-INPUTSCHEME(LinsolInput)
-OUTPUTSCHEME(LinsolOutput)
-
 using namespace std;
 namespace casadi {
 
@@ -62,8 +59,8 @@ namespace casadi {
     obuf_.resize(LINSOL_NUM_OUT);
     output(LINSOL_X) = input(LINSOL_B);
 
-    ischeme_ = IOScheme(SCHEME_LinsolInput);
-    oscheme_ = IOScheme(SCHEME_LinsolOutput);
+    ischeme_ = {"A", "B"};
+    oscheme_ = {"X"};
   }
 
   Sparsity LinearSolverInternal::get_sparsity_in(int ind) const {

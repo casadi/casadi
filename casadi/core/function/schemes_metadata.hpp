@@ -33,16 +33,7 @@
 namespace casadi {
 class Sparsity;
 enum InputOutputScheme {
-  SCHEME_IntegratorInput,
-  SCHEME_IntegratorOutput,
-  SCHEME_GradFInput,
-  SCHEME_GradFOutput,
-  SCHEME_JacGInput,
-  SCHEME_JacGOutput,
-  SCHEME_HessLagInput,
-  SCHEME_NlpSolverOutput,
-  SCHEME_LinsolInput,
-  SCHEME_LinsolOutput };
+   };
 
 CASADI_EXPORT std::string getSchemeEntryName(InputOutputScheme scheme, int i);
 CASADI_EXPORT std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);

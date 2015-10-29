@@ -212,16 +212,17 @@ class Integrationtests(casadiTestCase):
           dummyIntegrator = Function.integrator("dummyIntegrator", Integrator, {'x':x, 'ode':x})
           if p_features[0] in features:
 
-            dae = {}
-            for d in (din, dout, rdin):
-                for k, v in d.iteritems(): dae[k] = v
+            dae = din.copy()
+            dae.update(dout)
+            dae.update(rdin)
             for k, v in rdout.iteritems(): dae['r'+k] = v
             
             for k in solution.keys():
               solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
 
-            fs = SX.fun("fs", integratorIn(**solutionin),integratorOut(**solution))
-              
+            sol = solutionin.copy()
+            sol.update(solution)
+            fs = Function("fs", sol, Function.integrator_in(), Function.integrator_out())
           
             def itoptions(post=""):
               yield {"iterative_solver"+post: "gmres"}
@@ -325,16 +326,18 @@ class Integrationtests(casadiTestCase):
         dummyIntegrator = Function.integrator("dummyIntegrator", Integrator, {'x':x, 'ode':x})
         if p_features[0] in features:
 
-          dae = {}
-          for d in (din, dout, rdin):
-              for k, v in d.iteritems(): dae[k] = v
+          dae = din.copy()
+          dae.update(dout)
+          dae.update(rdin)
           for k, v in rdout.iteritems(): dae['r'+k] = v
             
           for k in solution.keys():
             solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
           
-          fs = SX.fun("fs", integratorIn(**solutionin),integratorOut(**solution))
-        
+          sol = solutionin.copy()
+          sol.update(solution)
+          fs = Function("fs", sol, Function.integrator_in(), Function.integrator_out())
+
           def itoptions(post=""):
             yield {"iterative_solver"+post: "gmres"}
             yield {"iterative_solver"+post: "bcgstab"}
@@ -491,15 +494,17 @@ class Integrationtests(casadiTestCase):
             message = "%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart_)
             print message
 
-            dae = {}
-            for d in (din, dout, rdin):
-                for k, v in d.iteritems(): dae[k] = v
+            dae = din.copy()
+            dae.update(dout)
+            dae.update(rdin)
             for k, v in rdout.iteritems(): dae['r'+k] = v
             
             for k in solution.keys():
               solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
             
-            fs = SX.fun("fs", integratorIn(**solutionin),integratorOut(**solution))
+            sol = solutionin.copy()
+            sol.update(solution)
+            fs = Function("fs", sol, Function.integrator_in(), Function.integrator_out())
 
             opts = dict(options)
             opts["t0"] = tstart_
@@ -752,7 +757,11 @@ class Integrationtests(casadiTestCase):
     num=self.num
     q0=MX.sym("q0")
     p=MX.sym("p")
-    qe = MX.fun("qe", [q0,p],integratorOut(**self.integrator({'x0':q0,'p':p})))
+
+    sol = self.integrator({'x0':q0,'p':p})
+    sol["q0"] = q0
+    sol["p"] = p
+    qe = Function("qe", sol, ["q0", "p"], Function.integrator_out())
 
     JT = Function("JT", [q0,p],[MX.jac(qe, 1,0)[0].T])
     JT.setInput([num['q0']],0)
@@ -774,7 +783,11 @@ class Integrationtests(casadiTestCase):
     num=self.num
     q0=MX.sym("q0")
     p=MX.sym("p")
-    qe = MX.fun("qe", [q0,p],integratorOut(**self.integrator({'x0':q0,'p':p})))
+
+    sol = self.integrator({'x0':q0,'p':p})
+    sol["q0"] = q0
+    sol["p"] = p
+    qe = Function("qe", sol, ["q0", "p"], Function.integrator_out())
     
     H = qe.hessian(1)
     H.setInput([num['q0']],0)
@@ -1033,7 +1046,11 @@ class Integrationtests(casadiTestCase):
 
     q0=MX.sym("q0",N)
     p=MX.sym("p",N*N)
-    qe = MX.fun("qe", [q0,p],integratorOut(**I({'x0':q0,'p':p})))
+
+    sol = I({'x0':q0,'p':p})
+    sol["q0"] = q0
+    sol["p"] = p
+    qe = Function("qe", sol, ["q0", "p"], Function.integrator_out())
 
     JT = Function("JT", [q0,p],[MX.jac(qe, 1,0).T])
 

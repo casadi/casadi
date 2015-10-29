@@ -28,101 +28,16 @@
 namespace casadi {
 std::string getSchemeName(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_IntegratorInput: return "IntegratorInput";
-    case SCHEME_IntegratorOutput: return "IntegratorOutput";
-    case SCHEME_GradFInput: return "GradFInput";
-    case SCHEME_GradFOutput: return "GradFOutput";
-    case SCHEME_JacGInput: return "JacGInput";
-    case SCHEME_JacGOutput: return "JacGOutput";
-    case SCHEME_HessLagInput: return "HessLagInput";
-    case SCHEME_NlpSolverOutput: return "NlpSolverOutput";
-    case SCHEME_LinsolInput: return "LinsolInput";
-    case SCHEME_LinsolOutput: return "LinsolOutput";
   default: casadi_error("getSchemeName: Scheme '" << scheme <<  "' does not exist.");
   }
 }
 std::string getSchemeEntryNames(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_IntegratorInput:
-      return "x0, p, z0, rx0, rp, rz0";
-    case SCHEME_IntegratorOutput:
-      return "xf, qf, zf, rxf, rqf, rzf";
-    case SCHEME_GradFInput:
-      return "x, p";
-    case SCHEME_GradFOutput:
-      return "grad, f, g";
-    case SCHEME_JacGInput:
-      return "x, p";
-    case SCHEME_JacGOutput:
-      return "jac, f, g";
-    case SCHEME_HessLagInput:
-      return "x, p, lam_f, lam_g";
-    case SCHEME_NlpSolverOutput:
-      return "x, f, g, lam_x, lam_g, lam_p";
-    case SCHEME_LinsolInput:
-      return "A, B";
-    case SCHEME_LinsolOutput:
-      return "X";
   default: casadi_error("getSchemeName: Scheme '" << scheme <<  "' does not exist.");
   }
 }
 std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_IntegratorInput:
-      if (i==0) return "x0";
-      if (i==1) return "p";
-      if (i==2) return "z0";
-      if (i==3) return "rx0";
-      if (i==4) return "rp";
-      if (i==5) return "rz0";
-      break;
-    case SCHEME_IntegratorOutput:
-      if (i==0) return "xf";
-      if (i==1) return "qf";
-      if (i==2) return "zf";
-      if (i==3) return "rxf";
-      if (i==4) return "rqf";
-      if (i==5) return "rzf";
-      break;
-    case SCHEME_GradFInput:
-      if (i==0) return "x";
-      if (i==1) return "p";
-      break;
-    case SCHEME_GradFOutput:
-      if (i==0) return "grad";
-      if (i==1) return "f";
-      if (i==2) return "g";
-      break;
-    case SCHEME_JacGInput:
-      if (i==0) return "x";
-      if (i==1) return "p";
-      break;
-    case SCHEME_JacGOutput:
-      if (i==0) return "jac";
-      if (i==1) return "f";
-      if (i==2) return "g";
-      break;
-    case SCHEME_HessLagInput:
-      if (i==0) return "x";
-      if (i==1) return "p";
-      if (i==2) return "lam_f";
-      if (i==3) return "lam_g";
-      break;
-    case SCHEME_NlpSolverOutput:
-      if (i==0) return "x";
-      if (i==1) return "f";
-      if (i==2) return "g";
-      if (i==3) return "lam_x";
-      if (i==4) return "lam_g";
-      if (i==5) return "lam_p";
-      break;
-    case SCHEME_LinsolInput:
-      if (i==0) return "A";
-      if (i==1) return "B";
-      break;
-    case SCHEME_LinsolOutput:
-      if (i==0) return "X";
-      break;
   }
   casadi_error("getSchemeEntryName: supplied number is out of range. Scheme '"
                << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme)
@@ -130,61 +45,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
 }
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_IntegratorInput:
-      if (i==0) return "Differential state at the initial time";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Parameters";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Initial guess for the algebraic variable";  // NOLINT(whitespace/line_length)
-      if (i==3) return "Backward differential state at the final time";  // NOLINT(whitespace/line_length)
-      if (i==4) return "Backward parameter vector";  // NOLINT(whitespace/line_length)
-      if (i==5) return "Initial guess for the backwards algebraic variable";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_IntegratorOutput:
-      if (i==0) return "Differential state at the final time";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Quadrature state at the final time";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Algebraic variable at the final time";  // NOLINT(whitespace/line_length)
-      if (i==3) return "Backward differential state at the initial time";  // NOLINT(whitespace/line_length)
-      if (i==4) return "Backward quadrature state at the initial time";  // NOLINT(whitespace/line_length)
-      if (i==5) return "Backward algebraic variable at the initial time";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_GradFInput:
-      if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_GradFOutput:
-      if (i==0) return "Jacobian of the constraints";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Objective function";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Constraint function";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_JacGInput:
-      if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_JacGOutput:
-      if (i==0) return "Jacobian of the constraints";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Objective function";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Constraint function";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_HessLagInput:
-      if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
-      if (i==2) return "NLP solver might use to scale the objective.";  // NOLINT(whitespace/line_length)
-      if (i==3) return "Multiplier for g";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_NlpSolverOutput:
-      if (i==0) return "Decision variables at the optimal solution (nx x 1)";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Cost function value at the optimal solution (1 x 1)";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Constraints function at the optimal solution (ng x 1)";  // NOLINT(whitespace/line_length)
-      if (i==3) return "Lagrange multipliers for bounds on X at the solution (nx x 1)";  // NOLINT(whitespace/line_length)
-      if (i==4) return "Lagrange multipliers for bounds on G at the solution (ng x 1)";  // NOLINT(whitespace/line_length)
-      if (i==5) return "Lagrange multipliers for bounds on P at the solution (np x 1)";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_LinsolInput:
-      if (i==0) return "The square matrix A: sparse, (n x n).";  // NOLINT(whitespace/line_length)
-      if (i==1) return "The right-hand-side matrix b: dense,  (n x m)";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_LinsolOutput:
-      if (i==0) return "Solution to the linear system of equations";  // NOLINT(whitespace/line_length)
-      break;
   }
   casadi_error("getSchemeEntryDoc: supplied number is out of range. Scheme '"
                << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme)
@@ -192,61 +52,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
 }
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_IntegratorInput:
-      if (i==0) return "INTEGRATOR_X0";
-      if (i==1) return "INTEGRATOR_P";
-      if (i==2) return "INTEGRATOR_Z0";
-      if (i==3) return "INTEGRATOR_RX0";
-      if (i==4) return "INTEGRATOR_RP";
-      if (i==5) return "INTEGRATOR_RZ0";
-      break;
-    case SCHEME_IntegratorOutput:
-      if (i==0) return "INTEGRATOR_XF";
-      if (i==1) return "INTEGRATOR_QF";
-      if (i==2) return "INTEGRATOR_ZF";
-      if (i==3) return "INTEGRATOR_RXF";
-      if (i==4) return "INTEGRATOR_RQF";
-      if (i==5) return "INTEGRATOR_RZF";
-      break;
-    case SCHEME_GradFInput:
-      if (i==0) return "GRADF_X";
-      if (i==1) return "GRADF_P";
-      break;
-    case SCHEME_GradFOutput:
-      if (i==0) return "GRADF_GRAD";
-      if (i==1) return "GRADF_F";
-      if (i==2) return "GRADF_G";
-      break;
-    case SCHEME_JacGInput:
-      if (i==0) return "JACG_X";
-      if (i==1) return "JACG_P";
-      break;
-    case SCHEME_JacGOutput:
-      if (i==0) return "JACG_JAC";
-      if (i==1) return "JACG_F";
-      if (i==2) return "JACG_G";
-      break;
-    case SCHEME_HessLagInput:
-      if (i==0) return "HESSLAG_X";
-      if (i==1) return "HESSLAG_P";
-      if (i==2) return "HESSLAG_LAM_F";
-      if (i==3) return "HESSLAG_LAM_G";
-      break;
-    case SCHEME_NlpSolverOutput:
-      if (i==0) return "NLP_SOLVER_X";
-      if (i==1) return "NLP_SOLVER_F";
-      if (i==2) return "NLP_SOLVER_G";
-      if (i==3) return "NLP_SOLVER_LAM_X";
-      if (i==4) return "NLP_SOLVER_LAM_G";
-      if (i==5) return "NLP_SOLVER_LAM_P";
-      break;
-    case SCHEME_LinsolInput:
-      if (i==0) return "LINSOL_A";
-      if (i==1) return "LINSOL_B";
-      break;
-    case SCHEME_LinsolOutput:
-      if (i==0) return "LINSOL_X";
-      break;
   }
   casadi_error("getSchemeEntryEnumName: supplied number is out of range. Scheme '"
                << getSchemeName(scheme) << "' has only "
@@ -255,96 +60,11 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
 }
 int getSchemeSize(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_IntegratorInput:
-      return 6;
-      break;
-    case SCHEME_IntegratorOutput:
-      return 6;
-      break;
-    case SCHEME_GradFInput:
-      return 2;
-      break;
-    case SCHEME_GradFOutput:
-      return 3;
-      break;
-    case SCHEME_JacGInput:
-      return 2;
-      break;
-    case SCHEME_JacGOutput:
-      return 3;
-      break;
-    case SCHEME_HessLagInput:
-      return 4;
-      break;
-    case SCHEME_NlpSolverOutput:
-      return 6;
-      break;
-    case SCHEME_LinsolInput:
-      return 2;
-      break;
-    case SCHEME_LinsolOutput:
-      return 1;
-      break;
   default: casadi_error("getSchemeSize: Scheme '" << scheme <<  "' does not exist.");
   }
 }
 int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
   switch (scheme) {
-    case SCHEME_IntegratorInput:
-      if (name=="x0") return 0;
-      if (name=="p") return 1;
-      if (name=="z0") return 2;
-      if (name=="rx0") return 3;
-      if (name=="rp") return 4;
-      if (name=="rz0") return 5;
-      break;
-    case SCHEME_IntegratorOutput:
-      if (name=="xf") return 0;
-      if (name=="qf") return 1;
-      if (name=="zf") return 2;
-      if (name=="rxf") return 3;
-      if (name=="rqf") return 4;
-      if (name=="rzf") return 5;
-      break;
-    case SCHEME_GradFInput:
-      if (name=="x") return 0;
-      if (name=="p") return 1;
-      break;
-    case SCHEME_GradFOutput:
-      if (name=="grad") return 0;
-      if (name=="f") return 1;
-      if (name=="g") return 2;
-      break;
-    case SCHEME_JacGInput:
-      if (name=="x") return 0;
-      if (name=="p") return 1;
-      break;
-    case SCHEME_JacGOutput:
-      if (name=="jac") return 0;
-      if (name=="f") return 1;
-      if (name=="g") return 2;
-      break;
-    case SCHEME_HessLagInput:
-      if (name=="x") return 0;
-      if (name=="p") return 1;
-      if (name=="lam_f") return 2;
-      if (name=="lam_g") return 3;
-      break;
-    case SCHEME_NlpSolverOutput:
-      if (name=="x") return 0;
-      if (name=="f") return 1;
-      if (name=="g") return 2;
-      if (name=="lam_x") return 3;
-      if (name=="lam_g") return 4;
-      if (name=="lam_p") return 5;
-      break;
-    case SCHEME_LinsolInput:
-      if (name=="A") return 0;
-      if (name=="B") return 1;
-      break;
-    case SCHEME_LinsolOutput:
-      if (name=="X") return 0;
-      break;
   }
   casadi_error("getSchemeEntryEnum: Scheme '" << getSchemeName(scheme)
                <<  "' has no entry named '" << name
