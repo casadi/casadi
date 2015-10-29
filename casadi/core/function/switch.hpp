@@ -37,7 +37,6 @@ namespace casadi {
       \date 2015
   */
   class CASADI_EXPORT Switch : public FunctionInternal {
-    friend class Switch;
   public:
 
     /** \brief Constructor (generic switch) */
