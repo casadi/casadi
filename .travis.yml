@@ -164,7 +164,7 @@ matrix:
         - brew update
         - brew tap homebrew/science
         - brew outdated swig || brew install swig
-        - brew outdated pkg-config || brew install pkg-config
+        #- brew outdated pkg-config || brew install pkg-config
         #- brew doctor
         - sudo easy_install pip
         - sudo pip install ipython matplotlib numpy scipy
