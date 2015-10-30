@@ -586,7 +586,7 @@ namespace casadi {
     /** \brief Depth-first search on the adjacency graph of the sparsity
         See Direct Methods for Sparse Linear Systems by Davis (2006).
     */
-    int depth_first_search(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
+    int dfs(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
                          const std::vector<int>& pinv, std::vector<bool>& marked) const;
 
     /** \brief Find the strongly connected components of the bigraph defined by the sparsity pattern

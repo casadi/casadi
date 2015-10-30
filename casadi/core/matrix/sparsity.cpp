@@ -524,10 +524,10 @@ namespace casadi {
     return (*this)->etree(ata);
   }
 
-  int Sparsity::depth_first_search(int j, int top, std::vector<int>& xi,
+  int Sparsity::dfs(int j, int top, std::vector<int>& xi,
                                  std::vector<int>& pstack, const std::vector<int>& pinv,
                                  std::vector<bool>& marked) const {
-    return (*this)->depth_first_search(j, top, xi, pstack, pinv, marked);
+    return (*this)->dfs(j, top, xi, pstack, pinv, marked);
   }
 
   int Sparsity::scc(std::vector<int>& p, std::vector<int>& r) const {

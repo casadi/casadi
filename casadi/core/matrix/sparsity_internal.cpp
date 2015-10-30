@@ -182,7 +182,7 @@ namespace casadi {
 
   }
 
-  int SparsityInternal::depth_first_search(int j, int top, std::vector<int>& xi,
+  int SparsityInternal::dfs(int j, int top, std::vector<int>& xi,
                                          std::vector<int>& pstack, const std::vector<int>& pinv,
                                          std::vector<bool>& marked) const {
     int head = 0;
@@ -264,7 +264,7 @@ namespace casadi {
     //first dfs(A) to find finish times (xi)
     for (int i = 0; i<size2(); ++i) {
       if (!marked[i]) {
-        top = depth_first_search(i, top, xi, pstack, tmp, marked);
+        top = dfs(i, top, xi, pstack, tmp, marked);
       }
     }
 
@@ -284,7 +284,7 @@ namespace casadi {
 
       // node i is the start of a component in p
       r[nb--] = top;
-      top = AT.depth_first_search(i, top, p, pstack, tmp, marked);
+      top = AT.dfs(i, top, p, pstack, tmp, marked);
     }
 
     // first block starts at zero; shift r up
@@ -996,14 +996,14 @@ namespace casadi {
       // skip j if it is not a root
       if (parent[j] != -1) continue;
 
-      k = depth_first_searchAndPostorder(j, k, head, next, &post.front(), stack);
+      k = dfs_postorder(j, k, head, next, &post.front(), stack);
     }
 
     // success; return post
     return post;
   }
 
-  int SparsityInternal::depth_first_searchAndPostorder(int j, int k, int *head,
+  int SparsityInternal::dfs_postorder(int j, int k, int *head,
                                                      const int *next, int *post, int *stack) {
     int i, p, top = 0;
 
@@ -1718,7 +1718,7 @@ namespace casadi {
     // postorder the assembly tree
     for (k = 0, i = 0 ; i <= n ; i++) {
       if (Cp[i] == -1)
-        k = depth_first_searchAndPostorder(i, k, head, next, &P.front(), w) ;
+        k = dfs_postorder(i, k, head, next, &P.front(), w) ;
     }
 
     return P;

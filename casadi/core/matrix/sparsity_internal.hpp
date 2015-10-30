@@ -83,7 +83,7 @@ namespace casadi {
     std::vector<int> etree(bool ata) const;
 
     /// Find strongly connected components: See cs_dfs in CSparse
-    int depth_first_search(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
+    int dfs(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
                          const std::vector<int>& pinv, std::vector<bool>& marked) const;
 
     /// Find the strongly connected components of a square matrix: See cs_scc in CSparse
@@ -187,7 +187,7 @@ namespace casadi {
     static std::vector<int> postorder(const std::vector<int>& parent, int n);
 
     /// Depth-first search and postorder of a tree rooted at node j: See cs_tdfs in CSparse
-    static int depth_first_searchAndPostorder(int j, int k, int *head,
+    static int dfs_postorder(int j, int k, int *head,
                                             const int *next, int *post, int *stack);
 
     /// row counts of LL'=A or LL'=A'A, given parent & post ordering: see init_ata in CSparse
