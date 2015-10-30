@@ -78,6 +78,11 @@ Default implementation: scalar (1,1)
 
 ";
 
+%feature("docstring") casadi::Callback::optionAllowedIndex "[INTERNAL]  Get
+the index into allowed options of a certain option.
+
+";
+
 %feature("docstring") casadi::Callback::get_n_in "
 
 Number of input arguments.
@@ -95,17 +100,34 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::setFullJacobian "
+%feature("docstring") casadi::Callback::set_forward "
 
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
+Set a function that calculates nfwd forward derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::Callback::nlp_solver_hesslag "
+
+Access the Jacobian of the constraint function for an NLP solver.
+
+";
+
+%feature("docstring") casadi::Callback::getWorkSize "
+
+Get the length of the work vector.
 
 ";
 
 %feature("docstring") casadi::Callback::nlp_solver_jacg "
 
 Access the Hessian of the Lagrangian function for an NLP solver.
+
+";
+
+%feature("docstring") casadi::Callback::optionAllowed "
+
+Get the allowed values of a certain option.
 
 ";
 
@@ -190,14 +212,38 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::Callback::getStat "
+%feature("docstring") casadi::Callback::forward "
 
-Get a single statistic obtained at the end of the last evaluate call.
+>  void Function.forward([MX ] arg, [MX ] res, [[MX ] ] fseed,[[MX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.forward([SX ] arg, [SX ] res, [[SX ] ] fseed,[[SX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.forward([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] fseed,[[DMatrix ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+
+Create call to (cached) derivative function, forward mode.
+
+>  Function Function.forward(int nfwd)
+------------------------------------------------------------------------
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nfwd*n_in inputs correspond to forward seeds, one direction at a time The
+nfwd*n_out outputs correspond to forward sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
-%feature("docstring") casadi::Callback::getOptionEnumValue "[INTERNAL]  Get
-the enum value corresponding to th certain option.
+%feature("docstring") casadi::Callback::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
@@ -207,26 +253,12 @@ Get default input value (NOTE: constant reference)
 
 ";
 
-%feature("docstring") casadi::Callback::nlp_solver "
+%feature("docstring") casadi::Callback::init "
 
-Create an NLP solver Creates a solver for the following parametric nonlinear
-program (NLP):
-
-::
-
-  min          F(x, p)
-  x
-  
-  subject to
-  LBX <=   x    <= UBX
-  LBG <= G(x, p) <= UBG
-  p  == P
-  
-  nx: number of decision variables
-  ng: number of constraints
-  np: number of parameters
-
-Joel Andersson
+Initialize the object This function is called after the object construction
+(for the whole class hierarchy) is complete, but before the finalization
+step. It is called recursively for the whole class hierarchy, starting with
+the lowest level.
 
 ";
 
@@ -276,23 +308,6 @@ the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::Callback::derForward "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nfwd*n_in inputs correspond to forward seeds, one direction at a time The
-nfwd*n_out outputs correspond to forward sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
 %feature("docstring") casadi::Callback::getDescription "
 
 Return a string with a description (for SWIG)
@@ -301,9 +316,9 @@ Return a string with a description (for SWIG)
 
 %feature("docstring") casadi::Callback::get_n_reverse "
 
-Return function that calculates adjoint derivatives derReverse(nadj) returns
-a cached instance if available, and calls  Function getDerReverse(int nadj)
-if no cached version is available.
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
 
 ";
 
@@ -332,6 +347,11 @@ exploited by the algorithm.
 
 The generated Jacobian has one more output than the calling function
 corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring") casadi::Callback::optionEnumValue "[INTERNAL]  Get
+the enum value corresponding to th certain option.
 
 ";
 
@@ -388,8 +408,10 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::Callback::printPtr "[INTERNAL]  Print the
-pointer to the internal class
+%feature("docstring") casadi::Callback::set_reverse "
+
+Set a function that calculates nadj adjoint derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
 
 ";
 
@@ -470,9 +492,11 @@ Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::Callback::getWorkSize "
+%feature("docstring") casadi::Callback::setFullJacobian "
 
-Get the length of the work vector.
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
 
 ";
 
@@ -480,6 +504,12 @@ Get the length of the work vector.
 sparsity propagation.
 
 (for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::Callback::optionDefault "
+
+Get the default of a certain option.
 
 ";
 
@@ -503,14 +533,9 @@ should be called from the user constructor.
 
 %feature("docstring") casadi::Callback::get_n_forward "
 
-Return function that calculates forward derivatives derForward(nfwd) returns
-a cached instance if available, and calls  Function getDerForward(int nfwd)
-if no cached version is available.
-
-";
-
-%feature("docstring") casadi::Callback::getOptionAllowedIndex "[INTERNAL]
-Get the index into allowed options of a certain option.
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(int nfwd) if
+no cached version is available.
 
 ";
 
@@ -522,9 +547,9 @@ Get symbolic primitives equivalent to the input expressions.
 
 %feature("docstring") casadi::Callback::get_forward "
 
-Return function that calculates forward derivatives derForward(nfwd) returns
-a cached instance if available, and calls  Function getDerForward(int nfwd)
-if no cached version is available.
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(int nfwd) if
+no cached version is available.
 
 ";
 
@@ -534,9 +559,9 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::Callback::nlp_solver_hesslag "
+%feature("docstring") casadi::Callback::sparsity_jac "
 
-Access the Jacobian of the constraint function for an NLP solver.
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
@@ -560,12 +585,6 @@ Get the dictionary.
 %feature("docstring") casadi::Callback::rootfinder_fun "
 
 Access rhs function for a rootfinder.
-
-";
-
-%feature("docstring") casadi::Callback::getOptionTypeName "
-
-Get the type name of a certain option.
 
 ";
 
@@ -596,12 +615,6 @@ Create a QP solver Solves the following strictly convex problem:
 If H is not positive-definite, the solver should throw an error.
 
 Joel Andersson
-
-";
-
-%feature("docstring") casadi::Callback::getOptionDefault "
-
-Get the default of a certain option.
 
 ";
 
@@ -645,12 +658,6 @@ Get output dimension.
 class able to propagate seeds through the algorithm?
 
 (for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") casadi::Callback::getOptionAllowed "
-
-Get the allowed values of a certain option.
 
 ";
 
@@ -751,12 +758,6 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring") casadi::Callback::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
 %feature("docstring") casadi::Callback::name_in "
 
 >  [str] Function.name_in() const 
@@ -771,9 +772,34 @@ Get input scheme name by index.
 
 ";
 
-%feature("docstring") casadi::Callback::name "
+%feature("docstring") casadi::Callback::reverse "
 
-Name of the function.
+>  void Function.reverse([MX ] arg, [MX ] res, [[MX ] ] aseed,[[MX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] aseed,[[DMatrix ] ] output_asens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+
+Create call to (cached) derivative function, reverse mode.
+
+>  Function Function.reverse(int nadj)
+------------------------------------------------------------------------
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -795,8 +821,27 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 %feature("docstring") casadi::Callback::derivative "
 
+>  void Function.derivative([DMatrix] arg, [DMatrix] &output_res, [DMatrixVector] fseed, [DMatrixVector] &output_fsens, [DMatrixVector] aseed, [DMatrixVector] &output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.derivative([SX] arg, [SX] &output_res, [SXVector] fseed, [SXVector] &output_fsens, [SXVector] aseed, [SXVector] &output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.derivative([MX] arg, [MX] &output_res, [MXVector] fseed, [MXVector] &output_fsens, [MXVector] aseed, [MXVector] &output_asens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate the function symbolically or numerically with directional
+derivatives The first two arguments are the nondifferentiated inputs
+and results of the evaluation, the next two arguments are a set of
+forward directional seeds and the resulting forward directional
+derivatives, the length of the vector being the number of forward
+directions. The next two arguments are a set of adjoint directional
+seeds and the resulting adjoint directional derivatives, the length of
+the vector being the number of adjoint directions.
+
+>  Function Function.derivative(int nfwd, int nadj)
+------------------------------------------------------------------------
+
 Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Legacy function: Use derForward and derReverse instead.
+derivatives Legacy function: Use forward and reverse instead.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
 nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
@@ -838,15 +883,14 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::Callback::callDerivative "[INTERNAL]
-Evaluate the function symbolically or numerically with directional
-derivatives The first two arguments are the nondifferentiated inputs and
-results of the evaluation, the next two arguments are a set of forward
-directional seeds and the resulting forward directional derivatives, the
-length of the vector being the number of forward directions. The next two
-arguments are a set of adjoint directional seeds and the resulting adjoint
-directional derivatives, the length of the vector being the number of
-adjoint directions.
+%feature("docstring") casadi::Callback::printPtr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
+%feature("docstring") casadi::Callback::optionNames "
+
+Get a list of all option names.
 
 ";
 
@@ -875,15 +919,9 @@ Joris Gillis
 
 ";
 
-%feature("docstring") casadi::Callback::callForward "
+%feature("docstring") casadi::Callback::set_jac_sparsity "
 
-Create call to (cached) derivative function, forward mode.
-
-";
-
-%feature("docstring") casadi::Callback::getOptionDescription "
-
-Get the description of a certain option.
+Generate the sparsity of a Jacobian block
 
 ";
 
@@ -910,9 +948,21 @@ Number of nodes in the algorithm.
 
 ";
 
+%feature("docstring") casadi::Callback::optionDescription "
+
+Get the description of a certain option.
+
+";
+
 %feature("docstring") casadi::Callback::get_jacobian "
 
 Return Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::Callback::optionTypeName "
+
+Get the type name of a certain option.
 
 ";
 
@@ -969,13 +1019,6 @@ internally
 %feature("docstring") casadi::Callback::eval "
 
 Evaluate numerically, temporary matrices and work vectors.
-
-";
-
-%feature("docstring") casadi::Callback::setDerReverse "
-
-Set a function that calculates nadj adjoint derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
 
 ";
 
@@ -1102,9 +1145,9 @@ Access linear solver of a rootfinder.
 
 %feature("docstring") casadi::Callback::get_reverse "
 
-Return function that calculates adjoint derivatives derReverse(nadj) returns
-a cached instance if available, and calls  Function getDerReverse(int nadj)
-if no cached version is available.
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
 
 ";
 
@@ -1395,21 +1438,9 @@ Get sparsity of a given output.
 
 ";
 
-%feature("docstring") casadi::Callback::setJacSparsity "
+%feature("docstring") casadi::Callback::name "
 
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring") casadi::Callback::getOptionNames "
-
-Get a list of all option names.
-
-";
-
-%feature("docstring") casadi::Callback::callReverse "
-
-Create call to (cached) derivative function, reverse mode.
+Name of the function.
 
 ";
 
@@ -1423,25 +1454,6 @@ Get output dimension.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
-
-";
-
-%feature("docstring") casadi::Callback::derReverse "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
 
 ";
 
@@ -1493,25 +1505,32 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::Callback::init "
+%feature("docstring") casadi::Callback::nlp_solver "
 
-Initialize the object This function is called after the object construction
-(for the whole class hierarchy) is complete, but before the finalization
-step. It is called recursively for the whole class hierarchy, starting with
-the lowest level.
+Create an NLP solver Creates a solver for the following parametric nonlinear
+program (NLP):
+
+::
+
+  min          F(x, p)
+  x
+  
+  subject to
+  LBX <=   x    <= UBX
+  LBG <= G(x, p) <= UBG
+  p  == P
+  
+  nx: number of decision variables
+  ng: number of constraints
+  np: number of parameters
+
+Joel Andersson
 
 ";
 
 %feature("docstring") casadi::Callback::mx_out "
 
 Get symbolic primitives equivalent to the output expressions.
-
-";
-
-%feature("docstring") casadi::Callback::setDerForward "
-
-Set a function that calculates nfwd forward derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
 
 ";
 
@@ -1652,15 +1671,14 @@ Generate a file, return code as string.
 
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::Compiler::plugin_name "
-
-Query plugin name.
+casadi::Compiler::optionAllowedIndex " [INTERNAL]  Get the index into
+allowed options of a certain option.
 
 ";
 
-%feature("docstring") casadi::Compiler::getOptionNames "
+%feature("docstring") casadi::Compiler::plugin_name "
 
-Get a list of all option names.
+Query plugin name.
 
 ";
 
@@ -1686,12 +1704,6 @@ point to any node, \"0\" is returned.
 %feature("docstring") casadi::Compiler::printOptions "
 
 Print options to a stream.
-
-";
-
-%feature("docstring") casadi::Compiler::getOptionTypeName "
-
-Get the type name of a certain option.
 
 ";
 
@@ -1830,31 +1842,13 @@ Diagrams
 
 C++ includes: compiler.hpp ";
 
-%feature("docstring") casadi::Compiler::getOptionAllowedIndex "[INTERNAL]
-Get the index into allowed options of a certain option.
-
-";
-
 %feature("docstring") casadi::Compiler::setOptionByAllowedIndex "[INTERNAL]
 Set a certain option by giving its index into the allowed values.
 
 ";
 
-%feature("docstring") casadi::Compiler::getOptionDescription "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring") casadi::Compiler::getOptionDefault "
-
-Get the default of a certain option.
-
-";
-
-%feature("docstring") casadi::Compiler::getOptionAllowed "
-
-Get the allowed values of a certain option.
+%feature("docstring") casadi::Compiler::optionEnumValue "[INTERNAL]  Get
+the enum value corresponding to th certain option.
 
 ";
 
@@ -1864,14 +1858,15 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::Compiler::getOptionEnumValue "[INTERNAL]  Get
-the enum value corresponding to th certain option.
-
-";
-
 %feature("docstring") casadi::Compiler::repr "
 
 Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::Compiler::optionDefault "
+
+Get the default of a certain option.
 
 ";
 
@@ -1889,15 +1884,39 @@ Compiler factory (new syntax, includes initialization)
 
 ";
 
+%feature("docstring") casadi::Compiler::optionAllowed "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::Compiler::optionDescription "
+
+Get the description of a certain option.
+
+";
+
 %feature("docstring") casadi::Compiler::copyOptions "
 
 Copy all options from another object.
 
 ";
 
+%feature("docstring") casadi::Compiler::optionNames "
+
+Get a list of all option names.
+
+";
+
 %feature("docstring") casadi::Compiler::dictionary "
 
 Get the dictionary.
+
+";
+
+%feature("docstring") casadi::Compiler::optionTypeName "
+
+Get the type name of a certain option.
 
 ";
 
@@ -2504,12 +2523,6 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::Function::getOptionTypeName "
-
-Get the type name of a certain option.
-
-";
-
 %feature("docstring") casadi::Function::nnz_in "
 
 Get of number of input nonzeros For a particular input or for all for all of
@@ -2586,12 +2599,6 @@ Get sparsity of a given output.
 
 ";
 
-%feature("docstring") casadi::Function::getOptionDefault "
-
-Get the default of a certain option.
-
-";
-
 %feature("docstring") casadi::Function::setOptionByAllowedIndex "[INTERNAL]
 Set a certain option by giving its index into the allowed values.
 
@@ -2602,23 +2609,6 @@ the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") casadi::Function::derForward "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nfwd*n_in inputs correspond to forward seeds, one direction at a time The
-nfwd*n_out outputs correspond to forward sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
 
 ";
 
@@ -2700,9 +2690,10 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::Function::callReverse "
+%feature("docstring") casadi::Function::set_reverse "
 
-Create call to (cached) derivative function, reverse mode.
+Set a function that calculates nadj adjoint derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
 
 ";
 
@@ -2716,25 +2707,6 @@ of the outputs.
 %feature("docstring") casadi::Function::getSanitizedName "
 
 get function name with all non alphanumeric characters converted to '_'
-
-";
-
-%feature("docstring") casadi::Function::derReverse "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
 
 ";
 
@@ -2787,13 +2759,6 @@ Get output scheme.
 ------------------------------------------------------------------------
 
 Get output scheme name by index.
-
-";
-
-%feature("docstring") casadi::Function::setDerReverse "
-
-Set a function that calculates nadj adjoint derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
 
 ";
 
@@ -2864,8 +2829,27 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring") casadi::Function::derivative "
 
+>  void Function.derivative([DMatrix] arg, [DMatrix] &output_res, [DMatrixVector] fseed, [DMatrixVector] &output_fsens, [DMatrixVector] aseed, [DMatrixVector] &output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.derivative([SX] arg, [SX] &output_res, [SXVector] fseed, [SXVector] &output_fsens, [SXVector] aseed, [SXVector] &output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.derivative([MX] arg, [MX] &output_res, [MXVector] fseed, [MXVector] &output_fsens, [MXVector] aseed, [MXVector] &output_asens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate the function symbolically or numerically with directional
+derivatives The first two arguments are the nondifferentiated inputs
+and results of the evaluation, the next two arguments are a set of
+forward directional seeds and the resulting forward directional
+derivatives, the length of the vector being the number of forward
+directions. The next two arguments are a set of adjoint directional
+seeds and the resulting adjoint directional derivatives, the length of
+the vector being the number of adjoint directions.
+
+>  Function Function.derivative(int nfwd, int nadj)
+------------------------------------------------------------------------
+
 Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Legacy function: Use derForward and derReverse instead.
+derivatives Legacy function: Use forward and reverse instead.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
 nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
@@ -2907,13 +2891,6 @@ Default constructor, null pointer.
 
 ";
 
-%feature("docstring") casadi::Function::setDerForward "
-
-Set a function that calculates nfwd forward derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
-
-";
-
 %feature("docstring") casadi::Function::rootfinder "
 
 Create a solver for rootfinding problems Takes a function where one of the
@@ -2934,39 +2911,9 @@ Joel Andersson
 
 ";
 
-%feature("docstring") casadi::Function::integrator "
+%feature("docstring") casadi::Function::type_name "
 
-Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
-to a terminal value problem with differential equation given as an implicit
-ODE coupled to an algebraic equation and a set of quadratures:
-
-
-
-::
-
-  Initial conditions at t=t0
-  x(t0)  = x0
-  q(t0)  = 0
-  
-  Forward integration from t=t0 to t=tf
-  der(x) = function(x, z, p, t)                  Forward ODE
-  0 = fz(x, z, p, t)                  Forward algebraic equations
-  der(q) = fq(x, z, p, t)                  Forward quadratures
-  
-  Terminal conditions at t=tf
-  rx(tf)  = rx0
-  rq(tf)  = 0
-  
-  Backward integration from t=tf to t=t0
-  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-  
-  where we assume that both the forward and backwards integrations are index-1
-  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-  gx, gz and gq have a linear dependency on rx, rz and rp.
-
-Joel Andersson
+Get type name.
 
 ";
 
@@ -3000,63 +2947,51 @@ Joel Andersson
 
 ";
 
+%feature("docstring") casadi::Function::set_forward "
+
+Set a function that calculates nfwd forward derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::Function::forward "
+
+>  void Function.forward([MX ] arg, [MX ] res, [[MX ] ] fseed,[[MX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.forward([SX ] arg, [SX ] res, [[SX ] ] fseed,[[SX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.forward([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] fseed,[[DMatrix ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+
+Create call to (cached) derivative function, forward mode.
+
+>  Function Function.forward(int nfwd)
+------------------------------------------------------------------------
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nfwd*n_in inputs correspond to forward seeds, one direction at a time The
+nfwd*n_out outputs correspond to forward sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 %feature("docstring") casadi::Function::n_out "
 
 Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::Function::map "
+%feature("docstring") casadi::Function::getAtomicInput "
 
->  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
-
->  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
-------------------------------------------------------------------------
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
->  Function Function.map(str name, int N, Dict opts=Dict()) const 
-------------------------------------------------------------------------
-
-Create a mapped version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (a, p) -> ( s )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (A, P) -> (S )
-  
-      with
-          a: horzcat([a0, a1, ..., a_(N-1)])
-          p: horzcat([p0, p1, ..., p_(N-1)])
-          s: horzcat([s0, s1, ..., s_(N-1)])
-      and
-          s0 <- f(a0, p0)
-          s1 <- f(a1, p1)
-          ...
-          s_(N-1) <- f(a_(N-1), p_(N-1))
-  
-
-
-
->  Function Function.map(str name, int n, [bool ] repeat_in, [bool ] repeat_out, Dict opts=Dict()) const 
-------------------------------------------------------------------------
-
-Generic map.
+Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -3073,15 +3008,13 @@ Generate native code in the interfaced language for debugging
 
 ";
 
-%feature("docstring") casadi::Function::sx_in "
+%feature("docstring") casadi::Function::index_in "
 
-Get symbolic primitives equivalent to the input expressions.
+Find the index for a string describing a particular entry of an input
+scheme.
 
-";
-
-%feature("docstring") casadi::Function::getOptionNames "
-
-Get a list of all option names.
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
 
 ";
 
@@ -3180,9 +3113,8 @@ Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::Function::setJacSparsity "
-
-Generate the sparsity of a Jacobian block
+%feature("docstring") casadi::Function::optionEnumValue "[INTERNAL]  Get
+the enum value corresponding to th certain option.
 
 ";
 
@@ -3214,11 +3146,6 @@ Access Jacobian of the ths function for a rootfinder.
 
 ";
 
-%feature("docstring") casadi::Function::getOptionEnumValue "[INTERNAL]  Get
-the enum value corresponding to th certain option.
-
-";
-
 %feature("docstring") casadi::Function::copyOptions "
 
 Copy all options from another object.
@@ -3238,19 +3165,69 @@ Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::Function::getAtomicInput "
+%feature("docstring") casadi::Function::optionAllowed "
 
-Get the (integer) input arguments of an atomic operation.
+Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring") casadi::Function::index_in "
+%feature("docstring") casadi::Function::map "
 
-Find the index for a string describing a particular entry of an input
-scheme.
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
 
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict opts=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+>  Function Function.map(str name, int n, [bool ] repeat_in, [bool ] repeat_out, Dict opts=Dict()) const 
+------------------------------------------------------------------------
+
+Generic map.
+
+";
+
+%feature("docstring") casadi::Function::sx_in "
+
+Get symbolic primitives equivalent to the input expressions.
 
 ";
 
@@ -3272,12 +3249,6 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::Function::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
 %feature("docstring") casadi::Function::nlp_solver_jacg "
 
 Access the Hessian of the Lagrangian function for an NLP solver.
@@ -3287,17 +3258,6 @@ Access the Hessian of the Lagrangian function for an NLP solver.
 %feature("docstring") casadi::Function::description_in "
 
 Get input scheme description by index.
-
-";
-
-%feature("docstring") casadi::Function::getOptionAllowed "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring") casadi::Function::getOptionAllowedIndex "[INTERNAL]
-Get the index into allowed options of a certain option.
 
 ";
 
@@ -3378,6 +3338,37 @@ Get input scheme name by index.
 %feature("docstring") casadi::Function::mx_in "
 
 Get symbolic primitives equivalent to the input expressions.
+
+";
+
+%feature("docstring") casadi::Function::reverse "
+
+>  void Function.reverse([MX ] arg, [MX ] res, [[MX ] ] aseed,[[MX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] aseed,[[DMatrix ] ] output_asens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+
+Create call to (cached) derivative function, reverse mode.
+
+>  Function Function.reverse(int nadj)
+------------------------------------------------------------------------
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -3626,6 +3617,12 @@ Set a certain option by giving an enum value.
 
 ";
 
+%feature("docstring") casadi::Function::set_jac_sparsity "
+
+Generate the sparsity of a Jacobian block
+
+";
+
 %feature("docstring") casadi::Function::setOutput "
 
 >  void IOInterface< Function  >.setOutput(T val, int oind=0)
@@ -3728,33 +3725,27 @@ length of w field.
 
 ";
 
-%feature("docstring") casadi::Function::getOptionDescription "
-
-Get the description of a certain option.
-
-";
-
 %feature("docstring") casadi::Function::size_in "
 
 Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Function::callDerivative "[INTERNAL]
-Evaluate the function symbolically or numerically with directional
-derivatives The first two arguments are the nondifferentiated inputs and
-results of the evaluation, the next two arguments are a set of forward
-directional seeds and the resulting forward directional derivatives, the
-length of the vector being the number of forward directions. The next two
-arguments are a set of adjoint directional seeds and the resulting adjoint
-directional derivatives, the length of the vector being the number of
-adjoint directions.
-
-";
-
 %feature("docstring") casadi::Function::size2_out "
 
 Get output dimension.
+
+";
+
+%feature("docstring") casadi::Function::optionTypeName "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring") casadi::Function::optionNames "
+
+Get a list of all option names.
 
 ";
 
@@ -3788,12 +3779,6 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::Function::callForward "
-
-Create call to (cached) derivative function, forward mode.
-
-";
-
 %feature("docstring") casadi::Function::size1_out "
 
 Get output dimension.
@@ -3812,9 +3797,51 @@ Get sparsity of a given input.
 
 ";
 
-%feature("docstring") casadi::Function::type_name "
+%feature("docstring") casadi::Function::optionDefault "
 
-Get type name.
+Get the default of a certain option.
+
+";
+
+%feature("docstring") casadi::Function::sparsity_jac "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::Function::integrator "
+
+Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
+to a terminal value problem with differential equation given as an implicit
+ODE coupled to an algebraic equation and a set of quadratures:
+
+
+
+::
+
+  Initial conditions at t=t0
+  x(t0)  = x0
+  q(t0)  = 0
+  
+  Forward integration from t=t0 to t=tf
+  der(x) = function(x, z, p, t)                  Forward ODE
+  0 = fz(x, z, p, t)                  Forward algebraic equations
+  der(q) = fq(x, z, p, t)                  Forward quadratures
+  
+  Terminal conditions at t=tf
+  rx(tf)  = rx0
+  rq(tf)  = 0
+  
+  Backward integration from t=tf to t=t0
+  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
+  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
+  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
+  
+  where we assume that both the forward and backwards integrations are index-1
+  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
+  gx, gz and gq have a linear dependency on rx, rz and rp.
+
+Joel Andersson
 
 ";
 
@@ -3826,6 +3853,11 @@ Get the length of the work vector.
 
 %feature("docstring") casadi::Function::sz_arg "[INTERNAL]  Get required
 length of arg field.
+
+";
+
+%feature("docstring") casadi::Function::optionAllowedIndex "[INTERNAL]  Get
+the index into allowed options of a certain option.
 
 ";
 
@@ -3857,6 +3889,12 @@ Get symbolic primitives equivalent to the output expressions.
 %feature("docstring") casadi::Function::default_in "
 
 Get default input value (NOTE: constant reference)
+
+";
+
+%feature("docstring") casadi::Function::optionDescription "
+
+Get the description of a certain option.
 
 ";
 
@@ -5006,6 +5044,42 @@ corresponding to the Hessian and the gradients.
 
 ";
 
+%feature("docstring") casadi::LinearSolver::set_forward "
+
+Set a function that calculates nfwd forward derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::LinearSolver::forward "
+
+>  void Function.forward([MX ] arg, [MX ] res, [[MX ] ] fseed,[[MX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.forward([SX ] arg, [SX ] res, [[SX ] ] fseed,[[SX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.forward([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] fseed,[[DMatrix ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+
+Create call to (cached) derivative function, forward mode.
+
+>  Function Function.forward(int nfwd)
+------------------------------------------------------------------------
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nfwd*n_in inputs correspond to forward seeds, one direction at a time The
+nfwd*n_out outputs correspond to forward sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 %feature("docstring") casadi::LinearSolver::spEvaluate "[INTERNAL]
 Propagate the sparsity pattern through a set of directional.
 
@@ -5014,9 +5088,40 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::LinearSolver::default_in "
+%feature("docstring") casadi::LinearSolver::derivative "
 
-Get default input value (NOTE: constant reference)
+>  void Function.derivative([DMatrix] arg, [DMatrix] &output_res, [DMatrixVector] fseed, [DMatrixVector] &output_fsens, [DMatrixVector] aseed, [DMatrixVector] &output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.derivative([SX] arg, [SX] &output_res, [SXVector] fseed, [SXVector] &output_fsens, [SXVector] aseed, [SXVector] &output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.derivative([MX] arg, [MX] &output_res, [MXVector] fseed, [MXVector] &output_fsens, [MXVector] aseed, [MXVector] &output_asens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate the function symbolically or numerically with directional
+derivatives The first two arguments are the nondifferentiated inputs
+and results of the evaluation, the next two arguments are a set of
+forward directional seeds and the resulting forward directional
+derivatives, the length of the vector being the number of forward
+directions. The next two arguments are a set of adjoint directional
+seeds and the resulting adjoint directional derivatives, the length of
+the vector being the number of adjoint directions.
+
+>  Function Function.derivative(int nfwd, int nadj)
+------------------------------------------------------------------------
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Legacy function: Use forward and reverse instead.
+
+Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
+
+(n_in = n_in(), n_out = n_out())
 
 ";
 
@@ -5096,20 +5201,21 @@ length of iw field.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::getOptionEnumValue "[INTERNAL]
-Get the enum value corresponding to th certain option.
+%feature("docstring") casadi::LinearSolver::optionAllowed "
 
-";
-
-%feature("docstring") casadi::LinearSolver::callForward "
-
-Create call to (cached) derivative function, forward mode.
+Get the allowed values of a certain option.
 
 ";
 
 %feature("docstring") casadi::LinearSolver::free_sx "
 
 Get all the free variables of the function.
+
+";
+
+%feature("docstring") casadi::LinearSolver::set_jac_sparsity "
+
+Generate the sparsity of a Jacobian block
 
 ";
 
@@ -5120,12 +5226,6 @@ required length of arg field.
 
 %feature("docstring") casadi::LinearSolver::sz_w "[INTERNAL]  Get required
 length of w field.
-
-";
-
-%feature("docstring") casadi::LinearSolver::getOptionAllowed "
-
-Get the allowed values of a certain option.
 
 ";
 
@@ -5267,12 +5367,6 @@ Generic map.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::getOptionDescription "
-
-Get the description of a certain option.
-
-";
-
 %feature("docstring") casadi::LinearSolver::mapsum "
 
 Evaluate symbolically in parallel and sum (matrix graph)
@@ -5290,6 +5384,13 @@ Print a description of the object.
 
 ";
 
+%feature("docstring") casadi::LinearSolver::set_reverse "
+
+Set a function that calculates nadj adjoint derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
 %feature("docstring") casadi::LinearSolver::gradient "
 
 Generate a gradient function of output oind with respect to input iind.
@@ -5303,12 +5404,6 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring") casadi::LinearSolver::callReverse "
-
-Create call to (cached) derivative function, reverse mode.
 
 ";
 
@@ -5338,35 +5433,9 @@ Expand a function to SX.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::derReverse "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
 %feature("docstring") casadi::LinearSolver::removeMonitor "
 
 Remove modules to be monitored.
-
-";
-
-%feature("docstring") casadi::LinearSolver::setDerReverse "
-
-Set a function that calculates nadj adjoint derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
 
 ";
 
@@ -5436,6 +5505,12 @@ adheres to SCHEME_NLPINput
 
 ";
 
+%feature("docstring") casadi::LinearSolver::optionDefault "
+
+Get the default of a certain option.
+
+";
+
 %feature("docstring") casadi::LinearSolver::tangent "
 
 Generate a tangent function of output oind with respect to input iind.
@@ -5471,6 +5546,37 @@ adheres to SCHEME_NLPINput
 %feature("docstring") casadi::LinearSolver::repr "
 
 Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::LinearSolver::reverse "
+
+>  void Function.reverse([MX ] arg, [MX ] res, [[MX ] ] aseed,[[MX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] aseed,[[DMatrix ] ] output_asens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+
+Create call to (cached) derivative function, reverse mode.
+
+>  Function Function.reverse(int nadj)
+------------------------------------------------------------------------
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -5516,9 +5622,14 @@ Joel Andersson
 
 ";
 
-%feature("docstring") casadi::LinearSolver::isNull "
+%feature("docstring") casadi::LinearSolver::optionDescription "
 
-Is a null pointer?
+Get the description of a certain option.
+
+";
+
+%feature("docstring") casadi::LinearSolver::optionAllowedIndex "[INTERNAL]
+Get the index into allowed options of a certain option.
 
 ";
 
@@ -5935,6 +6046,12 @@ sparsity propagation.
 
 ";
 
+%feature("docstring") casadi::LinearSolver::optionNames "
+
+Get a list of all option names.
+
+";
+
 %feature("docstring") casadi::LinearSolver::description_out "
 
 Get output scheme description by index.
@@ -5947,25 +6064,9 @@ Access the Hessian of the Lagrangian function for an NLP solver.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
+%feature("docstring") casadi::LinearSolver::isNull "
 
-";
-
-%feature("docstring") casadi::LinearSolver::getOptionDefault "
-
-Get the default of a certain option.
-
-";
-
-%feature("docstring") casadi::LinearSolver::callDerivative "[INTERNAL]
-Evaluate the function symbolically or numerically with directional
-derivatives The first two arguments are the nondifferentiated inputs and
-results of the evaluation, the next two arguments are a set of forward
-directional seeds and the resulting forward directional derivatives, the
-length of the vector being the number of forward directions. The next two
-arguments are a set of adjoint directional seeds and the resulting adjoint
-directional derivatives, the length of the vector being the number of
-adjoint directions.
+Is a null pointer?
 
 ";
 
@@ -5987,38 +6088,9 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::derivative "
+%feature("docstring") casadi::LinearSolver::default_in "
 
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Legacy function: Use derForward and derReverse instead.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = n_in(), n_out = n_out())
-
-";
-
-%feature("docstring") casadi::LinearSolver::derForward "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nfwd*n_in inputs correspond to forward seeds, one direction at a time The
-nfwd*n_out outputs correspond to forward sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
+Get default input value (NOTE: constant reference)
 
 ";
 
@@ -6102,6 +6174,12 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
+%feature("docstring") casadi::LinearSolver::sparsity_jac "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
 %feature("docstring") casadi::LinearSolver::getAtomicOutput "
 
 Get the (integer) output argument of an atomic operation.
@@ -6156,13 +6234,6 @@ Name of the function.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::setDerForward "
-
-Set a function that calculates nfwd forward derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
-
-";
-
 %feature("docstring") casadi::LinearSolver::size_out "
 
 Get output dimension.
@@ -6179,12 +6250,6 @@ Get input dimension.
 the class able to propagate seeds through the algorithm?
 
 (for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") casadi::LinearSolver::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
@@ -6205,12 +6270,6 @@ Solve the system of equations, internal vector.
 ------------------------------------------------------------------------
 
 Create a solve node.
-
-";
-
-%feature("docstring") casadi::LinearSolver::setJacSparsity "
-
-Generate the sparsity of a Jacobian block
 
 ";
 
@@ -6249,6 +6308,12 @@ xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
 By default, the first input is unknown and the first output is the residual.
 
 Joel Andersson
+
+";
+
+%feature("docstring") casadi::LinearSolver::optionTypeName "
+
+Get the type name of a certain option.
 
 ";
 
@@ -6342,12 +6407,6 @@ if the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::getOptionNames "
-
-Get a list of all option names.
-
-";
-
 %feature("docstring") casadi::LinearSolver::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
@@ -6357,12 +6416,6 @@ Get a single statistic obtained at the end of the last evaluate call.
 %feature("docstring") casadi::LinearSolver::getWorkSize "
 
 Get the length of the work vector.
-
-";
-
-%feature("docstring") casadi::LinearSolver::getOptionTypeName "
-
-Get the type name of a certain option.
 
 ";
 
@@ -6441,6 +6494,11 @@ Get symbolic primitives equivalent to the output expressions.
 %feature("docstring") casadi::LinearSolver::getFactorization "
 
 Obtain a numeric Cholesky factorization Only for Cholesky solvers.
+
+";
+
+%feature("docstring") casadi::LinearSolver::optionEnumValue "[INTERNAL]
+Get the enum value corresponding to th certain option.
 
 ";
 
@@ -6526,6 +6584,13 @@ Get a set of nonzeros
 %feature("docstring") friendwrap_expand "
 
 Expand the expression as a weighted sum (with constant weights)
+
+";
+
+%feature("docstring") casadi::Matrix::is_constant "
+
+Check if the matrix is constant (note that false negative answers are
+possible)
 
 ";
 
@@ -6685,13 +6750,6 @@ Get an owning reference to the sparsity pattern.
 
 ";
 
-%feature("docstring") casadi::Matrix::isIdentity "
-
-check if the matrix is an identity matrix (note that false negative answers
-are possible)
-
-";
-
 %feature("docstring") casadi::Matrix::getRepresentation "
 
 Return a string with a representation (for SWIG)
@@ -6747,6 +6805,13 @@ Inf-norm of a Matrix-Matrix product.
 
 ";
 
+%feature("docstring") casadi::Matrix::is_integer "
+
+Check if the matrix is integer-valued (note that false negative answers are
+possible)
+
+";
+
 %feature("docstring") casadi::Matrix::numel "
 
 >  int array(DataType) .numel() const
@@ -6786,6 +6851,12 @@ Convert to Slice (only for IMatrix)
 
 ";
 
+%feature("docstring") casadi::Matrix::is_regular "
+
+Checks if expression does not contain NaN or Inf.
+
+";
+
 %feature("docstring") casadi::Matrix::nnz_diag "
 
 Get get the number of non-zeros on the diagonal.
@@ -6795,14 +6866,6 @@ Get get the number of non-zeros on the diagonal.
 %feature("docstring") casadi::Matrix::sparsity "
 
 Get the sparsity pattern.
-
-";
-
-%feature("docstring") casadi::Matrix::isCommutative "
-
-Check whether a binary SX is commutative.
-
-Only defined if symbolic scalar.
 
 ";
 
@@ -6818,14 +6881,6 @@ Check if the matrix is a row or column vector.
 ------------------------------------------------------------------------
 
 Is the Matrix a Slice (only for IMatrix)
-
-";
-
-%feature("docstring") casadi::Matrix::hasDuplicates "[INTERNAL]  Detect
-duplicate symbolic expressions If there are symbolic primitives appearing
-more than once, the function will return true and the names of the duplicate
-expressions will be printed to userOut<true, PL_WARN>(). Note: Will mark the
-node using SXElement::setTemp. Make sure to call resetInput() after usage.
 
 ";
 
@@ -6861,9 +6916,9 @@ Returns true only if any element in the matrix is true.
 
 ";
 
-%feature("docstring") casadi::Matrix::isscalar "
+%feature("docstring") casadi::Matrix::is_smooth "
 
-Check if the matrix expression is scalar.
+Check if smooth.
 
 ";
 
@@ -6872,6 +6927,12 @@ Check if the matrix expression is scalar.
 %feature("docstring") casadi::Matrix::nonzeros_int "
 
 Get all nonzeros.
+
+";
+
+%feature("docstring") casadi::Matrix::is_minus_one "
+
+check if the matrix is -1 (note that false negative answers are possible)
 
 ";
 
@@ -6917,12 +6978,6 @@ Get double value (particular nonzero)
 
 ";
 
-%feature("docstring") casadi::Matrix::isOne "
-
-check if the matrix is 1 (note that false negative answers are possible)
-
-";
-
 %feature("docstring") casadi::Matrix::nnz_lower "
 
 Get the number of non-zeros in the lower triangular half.
@@ -6940,12 +6995,6 @@ Print scalar.
 %feature("docstring") casadi::Matrix::tang "
 
 Tangent expression.
-
-";
-
-%feature("docstring") casadi::Matrix::isSmooth "
-
-Check if smooth.
 
 ";
 
@@ -6971,6 +7020,14 @@ create a matrix with all inf
 
 ";
 
+%feature("docstring") casadi::Matrix::element_hash "
+
+Returns a number that is unique for a given symbolic scalar.
+
+Only defined if symbolic scalar.
+
+";
+
 %feature("docstring") casadi::Matrix::scalar_matrix "[INTERNAL]  Create
 nodes by their ID.
 
@@ -6984,6 +7041,12 @@ ramp function
 \\\\end {cases} \\\\]
 
 Also called: slope function
+
+";
+
+%feature("docstring") casadi::Matrix::istril "
+
+Check if the matrix is lower triangular.
 
 ";
 
@@ -7021,13 +7084,6 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 zero.
-
-";
-
-%feature("docstring") casadi::Matrix::isConstant "
-
-Check if the matrix is constant (note that false negative answers are
-possible)
 
 ";
 
@@ -7075,34 +7131,59 @@ Set double value (particular nonzero)
 
 ";
 
-%feature("docstring") casadi::Matrix::isMinusOne "
-
-check if the matrix is -1 (note that false negative answers are possible)
-
-";
-
 %feature("docstring") casadi::Matrix::printVector "
 
 Print vector-style.
 
 ";
 
-%feature("docstring") casadi::Matrix::isRegular "
+%feature("docstring") casadi::Matrix::sym "
 
-Checks if expression does not contain NaN or Inf.
+>  static array(DataType)   array(DataType) .sym(str name, int nrow=1, int ncol=1)
+------------------------------------------------------------------------
+
+Create an nrow-by-ncol symbolic primitive.
+
+>  static array(DataType)   array(DataType) .sym(str name, (int,int) rc)
+------------------------------------------------------------------------
+
+Construct a symbolic primitive with given dimensions.
+
+>  static array(DataType)   array(DataType) .sym(str name, Sparsity sp)
+------------------------------------------------------------------------
+
+Create symbolic primitive with a given sparsity pattern.
+
+>  static[array(DataType)   ] array(DataType) .sym(str name, Sparsity sp, int p)
+------------------------------------------------------------------------
+
+Create a vector of length p with with matrices with symbolic primitives of
+given sparsity.
+
+>  static[array(DataType)   ] array(DataType) .sym(str name, int nrow, int ncol, int p)
+------------------------------------------------------------------------
+
+Create a vector of length p with nrow-by-ncol symbolic primitives.
+
+>  static[[array(DataType)  ] ] array(DataType) .sym(str name, Sparsity sp, int p, int r)
+------------------------------------------------------------------------
+
+Create a vector of length r of vectors of length p with symbolic primitives
+with given sparsity.
+
+>  static[[array(DataType)  ] ] array(DataType) .sym(str name, int nrow, int ncol, int p, int r)
+------------------------------------------------------------------------
+
+Create a vector of length r of vectors of length p with nrow-by-ncol
+symbolic primitives.
 
 ";
 
-%feature("docstring") casadi::Matrix::istril "
+%feature("docstring") casadi::Matrix::is_leaf "
 
-Check if the matrix is lower triangular.
+Check if SX is a leaf of the SX graph.
 
-";
-
-%feature("docstring") friendwrap_eig_symbolic "
-
-Attempts to find the eigenvalues of a symbolic matrix This will only work
-for up to 3x3 matrices.
+Only defined if symbolic scalar.
 
 ";
 
@@ -7148,11 +7229,9 @@ Check if the matrix expression is square.
 
 ";
 
-%feature("docstring") casadi::Matrix::isLeaf "
+%feature("docstring") casadi::Matrix::isdense "
 
-Check if SX is a leaf of the SX graph.
-
-Only defined if symbolic scalar.
+Check if the matrix expression is dense.
 
 ";
 
@@ -7167,22 +7246,24 @@ create a matrix with all nan
 
 ";
 
+%feature("docstring") casadi::Matrix::is_commutative "
+
+Check whether a binary SX is commutative.
+
+Only defined if symbolic scalar.
+
+";
+
 %feature("docstring") casadi::Matrix::getDescription "
 
 Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") friendwrap_poly_coeff "
+%feature("docstring") casadi::Matrix::is_valid_input "
 
-extracts polynomial coefficients from an expression
-
-Parameters:
------------
-
-ex:  Scalar expression that represents a polynomial
-
-x:  Scalar symbol that the polynomial is build up with
+Check if matrix can be used to define function inputs. Sparse matrices can
+return true if all non-zero elements are symbolic.
 
 ";
 
@@ -7208,19 +7289,6 @@ streams.
 
 ";
 
-%feature("docstring") casadi::Matrix::isValidInput "
-
-Check if matrix can be used to define function inputs. Sparse matrices can
-return true if all non-zero elements are symbolic.
-
-";
-
-%feature("docstring") casadi::Matrix::isZero "
-
-check if the matrix is 0 (note that false negative answers are possible)
-
-";
-
 %feature("docstring") casadi::Matrix::setSym "
 
 Set upper triangular elements.
@@ -7241,9 +7309,22 @@ Get the size along a particular dimensions.
 
 ";
 
-%feature("docstring") casadi::Matrix::isdense "
+%feature("docstring") casadi::Matrix::is_one "
 
-Check if the matrix expression is dense.
+check if the matrix is 1 (note that false negative answers are possible)
+
+";
+
+%feature("docstring") friendwrap_poly_coeff "
+
+extracts polynomial coefficients from an expression
+
+Parameters:
+-----------
+
+ex:  Scalar expression that represents a polynomial
+
+x:  Scalar symbol that the polynomial is build up with
 
 ";
 
@@ -7279,15 +7360,22 @@ Example usage:
 
 ";
 
-%feature("docstring") casadi::Matrix::isSymbolic "
+%feature("docstring") casadi::Matrix::size2 "
 
-Check if symbolic (Dense) Sparse matrices invariable return false.
+Get the second dimension (i.e. number of columns)
 
 ";
 
 %feature("docstring") casadi::Matrix::size1 "
 
 Get the first dimension (i.e. number of rows)
+
+";
+
+%feature("docstring") casadi::Matrix::is_identity "
+
+check if the matrix is an identity matrix (note that false negative answers
+are possible)
 
 ";
 
@@ -7366,15 +7454,21 @@ keeping the existing non-zeros.
 
 ";
 
+%feature("docstring") casadi::Matrix::isscalar "
+
+Check if the matrix expression is scalar.
+
+";
+
 %feature("docstring") casadi::Matrix::iscolumn "
 
 Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
-%feature("docstring") casadi::Matrix::size2 "
+%feature("docstring") casadi::Matrix::is_symbolic "
 
-Get the second dimension (i.e. number of columns)
+Check if symbolic (Dense) Sparse matrices invariable return false.
 
 ";
 
@@ -7459,11 +7553,10 @@ Create an expression from a vector.
 [INTERNAL] 
 ";
 
-%feature("docstring") casadi::Matrix::getElementHash "
+%feature("docstring") friendwrap_eig_symbolic "
 
-Returns a number that is unique for a given symbolic scalar.
-
-Only defined if symbolic scalar.
+Attempts to find the eigenvalues of a symbolic matrix This will only work
+for up to 3x3 matrices.
 
 ";
 
@@ -7479,45 +7572,9 @@ window function
 
 ";
 
-%feature("docstring") casadi::Matrix::sym "
+%feature("docstring") casadi::Matrix::is_zero "
 
->  static array(DataType)   array(DataType) .sym(str name, int nrow=1, int ncol=1)
-------------------------------------------------------------------------
-
-Create an nrow-by-ncol symbolic primitive.
-
->  static array(DataType)   array(DataType) .sym(str name, (int,int) rc)
-------------------------------------------------------------------------
-
-Construct a symbolic primitive with given dimensions.
-
->  static array(DataType)   array(DataType) .sym(str name, Sparsity sp)
-------------------------------------------------------------------------
-
-Create symbolic primitive with a given sparsity pattern.
-
->  static[array(DataType)   ] array(DataType) .sym(str name, Sparsity sp, int p)
-------------------------------------------------------------------------
-
-Create a vector of length p with with matrices with symbolic primitives of
-given sparsity.
-
->  static[array(DataType)   ] array(DataType) .sym(str name, int nrow, int ncol, int p)
-------------------------------------------------------------------------
-
-Create a vector of length p with nrow-by-ncol symbolic primitives.
-
->  static[[array(DataType)  ] ] array(DataType) .sym(str name, Sparsity sp, int p, int r)
-------------------------------------------------------------------------
-
-Create a vector of length r of vectors of length p with symbolic primitives
-with given sparsity.
-
->  static[[array(DataType)  ] ] array(DataType) .sym(str name, int nrow, int ncol, int p, int r)
-------------------------------------------------------------------------
-
-Create a vector of length r of vectors of length p with nrow-by-ncol
-symbolic primitives.
+check if the matrix is 0 (note that false negative answers are possible)
 
 ";
 
@@ -7531,10 +7588,11 @@ their ID.
 
 ";
 
-%feature("docstring") casadi::Matrix::isInteger "
-
-Check if the matrix is integer-valued (note that false negative answers are
-possible)
+%feature("docstring") casadi::Matrix::has_duplicates "[INTERNAL]  Detect
+duplicate symbolic expressions If there are symbolic primitives appearing
+more than once, the function will return true and the names of the duplicate
+expressions will be printed to userOut<true, PL_WARN>(). Note: Will mark the
+node using SXElement::setTemp. Make sure to call resetInput() after usage.
 
 ";
 
@@ -7586,7 +7644,14 @@ marker for an input expression.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring") casadi::MX::attachAssert "
+*/ %feature("docstring") casadi::MX::get_output "
+
+Get the index of evaluation output - only valid when is_calloutput() is
+true.
+
+";
+
+%feature("docstring") casadi::MX::attachAssert "
 
 returns itself, but with an assertion attached
 
@@ -7653,10 +7718,21 @@ the nonzeros along with a comment.
 
 ";
 
-%feature("docstring") casadi::MX::isValidInput "
+%feature("docstring") casadi::MX::primitives "
 
-Check if matrix can be used to define function inputs. Valid inputs for
-MXFunctions are combinations of Reshape, concatenations and SymbolicMX.
+Get symbolic primitives.
+
+";
+
+%feature("docstring") casadi::MX::is_constant "
+
+Check if constant.
+
+";
+
+%feature("docstring") casadi::MX::is_output "
+
+Check if evaluation output.
 
 ";
 
@@ -7673,16 +7749,15 @@ Set a submatrix, single argument
 
 ";
 
-%feature("docstring") casadi::MX::getTemp "[INTERNAL]  Get the temporary
-variable
+%feature("docstring") casadi::MX::is_valid_input "
+
+Check if matrix can be used to define function inputs. Valid inputs for
+MXFunctions are combinations of Reshape, concatenations and SymbolicMX.
 
 ";
 
-%feature("docstring") casadi::MX::hasDuplicates "[INTERNAL]  Detect
-duplicate symbolic expressions If there are symbolic primitives appearing
-more than once, the function will return true and the names of the duplicate
-expressions will be printed to userOut<true, PL_WARN>(). Note: Will mark the
-node using MX::setTemp. Make sure to call resetInput() after usage.
+%feature("docstring") casadi::MX::getTemp "[INTERNAL]  Get the temporary
+variable
 
 ";
 
@@ -7692,9 +7767,9 @@ Create nodes by their ID.
 
 ";
 
-%feature("docstring") casadi::MX::sparsity "
+%feature("docstring") casadi::MX::is_commutative "
 
-Get the sparsity pattern.
+Check if commutative operation.
 
 ";
 
@@ -7722,9 +7797,9 @@ Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
-%feature("docstring") casadi::MX::isMultiplication "
+%feature("docstring") casadi::MX::is_op "
 
-Check if multiplication.
+Is it a certain operation.
 
 ";
 
@@ -7756,21 +7831,15 @@ Check if the matrix is a row vector (i.e. size1()==1)
 
 ";
 
-%feature("docstring") casadi::MX::isEvaluationOutput "
-
-Check if evaluation output.
-
-";
-
 %feature("docstring") casadi::MX::print "
 
 Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::MX::splitPrimitives "
+%feature("docstring") casadi::MX::is_one "
 
-Split up an expression along symbolic primitives.
+check if zero (note that false negative answers are possible)
 
 ";
 
@@ -7781,27 +7850,27 @@ one.
 
 ";
 
+%feature("docstring") casadi::MX::is_transpose "
+
+Is the expression a transpose?
+
+";
+
+%feature("docstring") casadi::MX::is_binary "
+
+Is binary operation.
+
+";
+
 %feature("docstring") casadi::MX::getSparsity "
 
 Get an owning reference to the sparsity pattern.
 
 ";
 
-%feature("docstring") casadi::MX::isIdentity "
-
-check if identity
-
-";
-
 %feature("docstring") casadi::MX::isdense "
 
 Check if the matrix expression is dense.
-
-";
-
-%feature("docstring") casadi::MX::isMinusOne "
-
-check if zero (note that false negative answers are possible)
 
 ";
 
@@ -7826,15 +7895,21 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") casadi::MX::isRegular "
+%feature("docstring") casadi::MX::is_symbolic "
 
-Checks if expression does not contain NaN or Inf.
+Check if symbolic.
 
 ";
 
 %feature("docstring") casadi::MX::getName "
 
 Get the name.
+
+";
+
+%feature("docstring") casadi::MX::join_primitives "
+
+Join an expression along symbolic primitives.
 
 ";
 
@@ -7847,6 +7922,12 @@ Get the sparsity pattern. See the Sparsity class for details.
 %feature("docstring") casadi::MX::getDep "
 
 Get the nth dependency as MX.
+
+";
+
+%feature("docstring") casadi::MX::is_multiplication "
+
+Check if multiplication.
 
 ";
 
@@ -7877,6 +7958,12 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
+%feature("docstring") casadi::MX::is_identity "
+
+check if identity
+
+";
+
 %feature("docstring") casadi::MX::dim "
 
 Get string representation of dimensions. The representation is (nrow x ncol
@@ -7890,7 +7977,7 @@ Find first nonzero If failed, returns the number of rows.
 
 ";
 
-%feature("docstring") casadi::MX::isZero "
+%feature("docstring") casadi::MX::is_minus_one "
 
 check if zero (note that false negative answers are possible)
 
@@ -7918,16 +8005,27 @@ Get the value (only for scalar constant nodes)
 
 ";
 
-%feature("docstring") casadi::MX::getEvaluationOutput "
+%feature("docstring") casadi::MX::split_primitives "
 
-Get the index of evaluation output - only valid when isEvaluationoutput() is
-true.
+Split up an expression along symbolic primitives.
 
 ";
 
 %feature("docstring") casadi::MX::get_row "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring") casadi::MX::sparsity "
+
+Get the sparsity pattern.
+
+";
+
+%feature("docstring") casadi::MX::is_call "
+
+Check if evaluation.
 
 ";
 
@@ -7963,6 +8061,12 @@ zero.
 
 ";
 
+%feature("docstring") casadi::MX::is_zero "
+
+check if zero (note that false negative answers are possible)
+
+";
+
 %feature("docstring") casadi::MX::size "
 
 >  (int,int) MX .size() const
@@ -7985,21 +8089,9 @@ Transpose the matrix.
 
 %feature("docstring") casadi::MX::printme "";
 
-%feature("docstring") casadi::MX::joinPrimitives "
-
-Join an expression along symbolic primitives.
-
-";
-
 %feature("docstring") casadi::MX::nan "
 
 create a matrix with all nan
-
-";
-
-%feature("docstring") casadi::MX::is_transpose "
-
-Is the expression a transpose?
 
 ";
 
@@ -8009,9 +8101,17 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") casadi::MX::isCommutative "
+%feature("docstring") casadi::MX::has_duplicates "[INTERNAL]  Detect
+duplicate symbolic expressions If there are symbolic primitives appearing
+more than once, the function will return true and the names of the duplicate
+expressions will be printed to userOut<true, PL_WARN>(). Note: Will mark the
+node using MX::setTemp. Make sure to call resetInput() after usage.
 
-Check if commutative operation.
+";
+
+%feature("docstring") casadi::MX::is_norm "
+
+Check if norm.
 
 ";
 
@@ -8081,12 +8181,6 @@ symbolic primitives.
 %feature("docstring") casadi::MX::setNZ "
 
 Set a set of nonzeros
-
-";
-
-%feature("docstring") casadi::MX::isOne "
-
-check if zero (note that false negative answers are possible)
 
 ";
 
@@ -8218,39 +8312,15 @@ Create sparse matrix constant (also implicit type conversion)
 
 ";
 
-%feature("docstring") casadi::MX::numPrimitives "
-
-Get the number of symbolic primitive Assumes isValidInput() returns true.
-
-";
-
-%feature("docstring") casadi::MX::isBinary "
-
-Is binary operation.
-
-";
-
-%feature("docstring") casadi::MX::isUnary "
-
-Is unary operation.
-
-";
-
-%feature("docstring") casadi::MX::getOp "
-
-Get operation type.
-
-";
-
 %feature("docstring") casadi::MX::nnz_lower "
 
 Get the number of non-zeros in the lower triangular half.
 
 ";
 
-%feature("docstring") casadi::MX::isNorm "
+%feature("docstring") casadi::MX::is_unary "
 
-Check if norm.
+Is unary operation.
 
 ";
 
@@ -8259,21 +8329,9 @@ variable.
 
 ";
 
-%feature("docstring") casadi::MX::getPrimitives "
-
-Get symbolic primitives.
-
-";
-
 %feature("docstring") casadi::MX::getMatrixValue "
 
 Get the value (only for constant nodes)
-
-";
-
-%feature("docstring") casadi::MX::isConstant "
-
-Check if constant.
 
 ";
 
@@ -8289,27 +8347,21 @@ Get a set of nonzeros
 
 ";
 
-%feature("docstring") casadi::MX::isEvaluation "
-
-Check if evaluation.
-
-";
-
-%feature("docstring") casadi::MX::isOperation "
-
-Is it a certain operation.
-
-";
-
 %feature("docstring") casadi::MX::getNdeps "
 
 Get the number of dependencies of a binary SXElement.
 
 ";
 
-%feature("docstring") casadi::MX::isSymbolic "
+%feature("docstring") casadi::MX::op "
 
-Check if symbolic.
+Get operation type.
+
+";
+
+%feature("docstring") casadi::MX::n_primitives "
+
+Get the number of symbolic primitive Assumes is_valid_input() returns true.
 
 ";
 
@@ -8334,6 +8386,12 @@ Get get the number of non-zeros on the diagonal.
 %feature("docstring") casadi::MX::unary "
 
 Create nodes by their ID.
+
+";
+
+%feature("docstring") casadi::MX::is_regular "
+
+Checks if expression does not contain NaN or Inf.
 
 ";
 
@@ -8439,8 +8497,20 @@ C++ includes: nonzeros.hpp ";
 
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex " [INTERNAL]  Set a
-certain option by giving its index into the allowed values.
+casadi::OptionsFunctionality::optionEnumValue " [INTERNAL]  Get the enum
+value corresponding to th certain option.
+
+";
+
+%feature("docstring") casadi::OptionsFunctionality::optionAllowed "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::OptionsFunctionality::setOptionByAllowedIndex
+"[INTERNAL]  Set a certain option by giving its index into the allowed
+values.
 
 ";
 
@@ -8450,7 +8520,9 @@ Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::OptionsFunctionality::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
+%feature("docstring") casadi::OptionsFunctionality::optionDefault "
+
+Get the default of a certain option.
 
 ";
 
@@ -8483,15 +8555,15 @@ Default constructor.
 
 ";
 
-%feature("docstring") casadi::OptionsFunctionality::isNull "
+%feature("docstring") casadi::OptionsFunctionality::optionTypeName "
 
-Is a null pointer?
+Get the type name of a certain option.
 
 ";
 
-%feature("docstring") casadi::OptionsFunctionality::getOptionDescription "
+%feature("docstring") casadi::OptionsFunctionality::isNull "
 
-Get the description of a certain option.
+Is a null pointer?
 
 ";
 
@@ -8529,16 +8601,16 @@ Diagrams
 
 C++ includes: options_functionality.hpp ";
 
-%feature("docstring") casadi::OptionsFunctionality::getOptionAllowed "
-
-Get the allowed values of a certain option.
-
-";
-
 %feature("docstring") casadi::OptionsFunctionality::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::OptionsFunctionality::optionDescription "
+
+Get the description of a certain option.
 
 ";
 
@@ -8548,17 +8620,11 @@ Copy all options from another object.
 
 ";
 
-%feature("docstring") casadi::OptionsFunctionality::getOptionEnumValue "[INTERNAL]  Get the enum value corresponding to th certain option.
-
-";
-
 %feature("docstring") casadi::OptionsFunctionality::setOptionByEnumValue "[INTERNAL]  Set a certain option by giving an enum value.
 
 ";
 
-%feature("docstring") casadi::OptionsFunctionality::getOptionNames "
-
-Get a list of all option names.
+%feature("docstring") casadi::OptionsFunctionality::optionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
@@ -8568,21 +8634,15 @@ Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::OptionsFunctionality::getOptionDefault "
+%feature("docstring") casadi::OptionsFunctionality::optionNames "
 
-Get the default of a certain option.
+Get a list of all option names.
 
 ";
 
 %feature("docstring") casadi::OptionsFunctionality::printOptions "
 
 Print options to a stream.
-
-";
-
-%feature("docstring") casadi::OptionsFunctionality::getOptionTypeName "
-
-Get the type name of a certain option.
 
 ";
 
@@ -8863,11 +8923,6 @@ Access Jacobian of the ths function for a rootfinder.
 
 ";
 
-%feature("docstring") casadi::Simulator::getOptionEnumValue "[INTERNAL]
-Get the enum value corresponding to th certain option.
-
-";
-
 %feature("docstring") casadi::Simulator::copyOptions "
 
 Copy all options from another object.
@@ -8894,6 +8949,12 @@ adheres to SCHEME_NLPINput
 %feature("docstring") casadi::Simulator::getAtomicInput "
 
 Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Simulator::optionAllowed "
+
+Get the allowed values of a certain option.
 
 ";
 
@@ -8969,25 +9030,9 @@ Get symbolic primitives equivalent to the input expressions.
 
 ";
 
-%feature("docstring") casadi::Simulator::sz_iw "[INTERNAL]  Get required
-length of iw field.
-
-";
-
-%feature("docstring") casadi::Simulator::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
 %feature("docstring") casadi::Simulator::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring") casadi::Simulator::getOptionAllowedIndex "[INTERNAL]
-Get the index into allowed options of a certain option.
 
 ";
 
@@ -9058,6 +9103,12 @@ matches one of the base classes (default true)
 
 ";
 
+%feature("docstring") casadi::Simulator::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") casadi::Simulator::name_in "
 
 >  [str] Function.name_in() const 
@@ -9072,9 +9123,39 @@ Get input scheme name by index.
 
 ";
 
-%feature("docstring") casadi::Simulator::size1_out "
+%feature("docstring") casadi::Simulator::sz_iw "[INTERNAL]  Get required
+length of iw field.
 
-Get output dimension.
+";
+
+%feature("docstring") casadi::Simulator::reverse "
+
+>  void Function.reverse([MX ] arg, [MX ] res, [[MX ] ] aseed,[[MX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] aseed,[[DMatrix ] ] output_asens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+
+Create call to (cached) derivative function, reverse mode.
+
+>  Function Function.reverse(int nadj)
+------------------------------------------------------------------------
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -9307,9 +9388,9 @@ Diagrams
 
 C++ includes: simulator.hpp ";
 
-%feature("docstring") casadi::Simulator::getSanitizedName "
+%feature("docstring") casadi::Simulator::set_jac_sparsity "
 
-get function name with all non alphanumeric characters converted to '_'
+Generate the sparsity of a Jacobian block
 
 ";
 
@@ -9367,9 +9448,9 @@ Get the dictionary.
 
 ";
 
-%feature("docstring") casadi::Simulator::getOptionDescription "
+%feature("docstring") casadi::Simulator::sparsity_jac "
 
-Get the description of a certain option.
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
@@ -9379,15 +9460,15 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Simulator::callDerivative "[INTERNAL]
-Evaluate the function symbolically or numerically with directional
-derivatives The first two arguments are the nondifferentiated inputs and
-results of the evaluation, the next two arguments are a set of forward
-directional seeds and the resulting forward directional derivatives, the
-length of the vector being the number of forward directions. The next two
-arguments are a set of adjoint directional seeds and the resulting adjoint
-directional derivatives, the length of the vector being the number of
-adjoint directions.
+%feature("docstring") casadi::Simulator::optionTypeName "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring") casadi::Simulator::optionNames "
+
+Get a list of all option names.
 
 ";
 
@@ -9427,9 +9508,9 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::Simulator::callForward "
+%feature("docstring") casadi::Simulator::size1_out "
 
-Create call to (cached) derivative function, forward mode.
+Get output dimension.
 
 ";
 
@@ -9523,6 +9604,16 @@ Get default input value (NOTE: constant reference)
 
 ";
 
+%feature("docstring") casadi::Simulator::optionAllowedIndex "[INTERNAL]
+Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring") casadi::Simulator::optionEnumValue "[INTERNAL]  Get
+the enum value corresponding to th certain option.
+
+";
+
 %feature("docstring") casadi::Simulator::getDescription "
 
 Return a string with a description (for SWIG)
@@ -9567,12 +9658,6 @@ Access rhs function for a rootfinder.
 
 Get of number of input nonzeros For a particular input or for all for all of
 the inputs.
-
-";
-
-%feature("docstring") casadi::Simulator::getOptionTypeName "
-
-Get the type name of a certain option.
 
 ";
 
@@ -9645,12 +9730,6 @@ Get sparsity of a given output.
 
 ";
 
-%feature("docstring") casadi::Simulator::getOptionDefault "
-
-Get the default of a certain option.
-
-";
-
 %feature("docstring") casadi::Simulator::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
 values.
 
@@ -9661,23 +9740,6 @@ the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") casadi::Simulator::derForward "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nfwd*n_in inputs correspond to forward seeds, one direction at a time The
-nfwd*n_out outputs correspond to forward sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
 
 ";
 
@@ -9711,16 +9773,15 @@ Joel Andersson
 
 ";
 
-%feature("docstring") casadi::Simulator::setDerReverse "
-
-Set a function that calculates nadj adjoint derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
-
-";
-
 %feature("docstring") casadi::Simulator::integrator_dae "
 
 Get the DAE for an integrator.
+
+";
+
+%feature("docstring") casadi::Simulator::optionDescription "
+
+Get the description of a certain option.
 
 ";
 
@@ -9796,20 +9857,15 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
+%feature("docstring") casadi::Simulator::set_reverse "
+
+Set a function that calculates nadj adjoint derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
+
+";
+
 %feature("docstring") casadi::Simulator::setOptionByEnumValue "[INTERNAL]
 Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring") casadi::Simulator::getOptionAllowed "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring") casadi::Simulator::callReverse "
-
-Create call to (cached) derivative function, reverse mode.
 
 ";
 
@@ -9817,25 +9873,6 @@ Create call to (cached) derivative function, reverse mode.
 
 Get of number of output elements For a particular output or for all for all
 of the outputs.
-
-";
-
-%feature("docstring") casadi::Simulator::derReverse "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
 
 ";
 
@@ -9947,8 +9984,27 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring") casadi::Simulator::derivative "
 
+>  void Function.derivative([DMatrix] arg, [DMatrix] &output_res, [DMatrixVector] fseed, [DMatrixVector] &output_fsens, [DMatrixVector] aseed, [DMatrixVector] &output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.derivative([SX] arg, [SX] &output_res, [SXVector] fseed, [SXVector] &output_fsens, [SXVector] aseed, [SXVector] &output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.derivative([MX] arg, [MX] &output_res, [MXVector] fseed, [MXVector] &output_fsens, [MXVector] aseed, [MXVector] &output_asens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate the function symbolically or numerically with directional
+derivatives The first two arguments are the nondifferentiated inputs
+and results of the evaluation, the next two arguments are a set of
+forward directional seeds and the resulting forward directional
+derivatives, the length of the vector being the number of forward
+directions. The next two arguments are a set of adjoint directional
+seeds and the resulting adjoint directional derivatives, the length of
+the vector being the number of adjoint directions.
+
+>  Function Function.derivative(int nfwd, int nadj)
+------------------------------------------------------------------------
+
 Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Legacy function: Use derForward and derReverse instead.
+derivatives Legacy function: Use forward and reverse instead.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
 nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
@@ -10055,7 +10111,36 @@ Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::Simulator::setDerForward "
+%feature("docstring") casadi::Simulator::forward "
+
+>  void Function.forward([MX ] arg, [MX ] res, [[MX ] ] fseed,[[MX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.forward([SX ] arg, [SX ] res, [[SX ] ] fseed,[[SX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.forward([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] fseed,[[DMatrix ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+
+Create call to (cached) derivative function, forward mode.
+
+>  Function Function.forward(int nfwd)
+------------------------------------------------------------------------
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nfwd*n_in inputs correspond to forward seeds, one direction at a time The
+nfwd*n_out outputs correspond to forward sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring") casadi::Simulator::set_forward "
 
 Set a function that calculates nfwd forward derivatives NOTE: Does not take
 ownership, only weak references to the derivatives are kept internally.
@@ -10072,12 +10157,6 @@ sparsity propagation.
 %feature("docstring") casadi::Simulator::qp_solver_debug "
 
 Generate native code in the interfaced language for debugging
-
-";
-
-%feature("docstring") casadi::Simulator::getOptionNames "
-
-Get a list of all option names.
 
 ";
 
@@ -10169,9 +10248,9 @@ of the outputs.
 
 ";
 
-%feature("docstring") casadi::Simulator::setJacSparsity "
+%feature("docstring") casadi::Simulator::optionDefault "
 
-Generate the sparsity of a Jacobian block
+Get the default of a certain option.
 
 ";
 
@@ -10800,12 +10879,6 @@ format.
 
 ";
 
-%feature("docstring") casadi::Sparsity::is_transpose "
-
-Check if the sparsity is the transpose of another.
-
-";
-
 %feature("docstring") casadi::Sparsity::colind "
 
 Get a reference to the colindex of column cc (see class description)
@@ -11000,6 +11073,12 @@ Get the row of a non-zero element.
 %feature("docstring") casadi::Sparsity::print "
 
 Print a description of the object.
+
+";
+
+%feature("docstring") casadi::Sparsity::is_transpose "
+
+Check if the sparsity is the transpose of another.
 
 ";
 
@@ -12178,12 +12257,6 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
-%feature("docstring") casadi::isRegular "
-
-Checks if vector does not contain NaN or Inf.
-
-";
-
 %feature("docstring") casadi::matrixName "
 
 Get typename.
@@ -12193,6 +12266,12 @@ Get typename.
 %feature("docstring") casadi::profileWriteExit "[INTERNAL] ";
 
 %feature("docstring") casadi::profileWriteSourceLine "[INTERNAL] ";
+
+%feature("docstring") casadi::is_regular "
+
+Checks if vector does not contain NaN or Inf.
+
+";
 
 %feature("docstring") casadi::casadi_to_sparse_tr "[INTERNAL]  Convert
 transposed dense to sparse.
