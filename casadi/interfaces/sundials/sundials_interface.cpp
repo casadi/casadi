@@ -134,54 +134,54 @@ namespace casadi {
     ncheck_ = 0;
 
     // Read options
-    abstol_ = getOption("abstol");
-    reltol_ = getOption("reltol");
-    exact_jacobian_ = getOption("exact_jacobian");
+    abstol_ = option("abstol");
+    reltol_ = option("reltol");
+    exact_jacobian_ = option("exact_jacobian");
     exact_jacobianB_ = hasSetOption("exact_jacobianB") ?
-      getOption("exact_jacobianB") && !g_.isNull() : exact_jacobian_;
-    max_num_steps_ = getOption("max_num_steps");
-    finite_difference_fsens_ = getOption("finite_difference_fsens");
+      option("exact_jacobianB") && !g_.isNull() : exact_jacobian_;
+    max_num_steps_ = option("max_num_steps");
+    finite_difference_fsens_ = option("finite_difference_fsens");
     fsens_abstol_ =
-      hasSetOption("fsens_abstol") ? static_cast<double>(getOption("fsens_abstol")) : abstol_;
+      hasSetOption("fsens_abstol") ? static_cast<double>(option("fsens_abstol")) : abstol_;
     fsens_reltol_ =
-      hasSetOption("fsens_reltol") ? static_cast<double>(getOption("fsens_reltol")) : reltol_;
-    abstolB_ = hasSetOption("abstolB") ? static_cast<double>(getOption("abstolB")) : abstol_;
-    reltolB_ = hasSetOption("reltolB") ? static_cast<double>(getOption("reltolB")) : reltol_;
-    stop_at_end_ = getOption("stop_at_end");
-    use_preconditioner_ = getOption("use_preconditioner");
+      hasSetOption("fsens_reltol") ? static_cast<double>(option("fsens_reltol")) : reltol_;
+    abstolB_ = hasSetOption("abstolB") ? static_cast<double>(option("abstolB")) : abstol_;
+    reltolB_ = hasSetOption("reltolB") ? static_cast<double>(option("reltolB")) : reltol_;
+    stop_at_end_ = option("stop_at_end");
+    use_preconditioner_ = option("use_preconditioner");
     use_preconditionerB_ =  hasSetOption("use_preconditionerB") ?
-      static_cast<bool>(getOption("use_preconditionerB")): use_preconditioner_;
-    max_krylov_ = getOption("max_krylov");
+      static_cast<bool>(option("use_preconditionerB")): use_preconditioner_;
+    max_krylov_ = option("max_krylov");
     max_krylovB_ =
-      hasSetOption("max_krylovB") ? static_cast<int>(getOption("max_krylovB")): max_krylov_;
+      hasSetOption("max_krylovB") ? static_cast<int>(option("max_krylovB")): max_krylov_;
 
     // Linear solver for forward integration
-    if (getOption("linear_solver_type")=="dense") {
+    if (option("linear_solver_type")=="dense") {
       linsol_f_ = SD_DENSE;
-    } else if (getOption("linear_solver_type")=="banded") {
+    } else if (option("linear_solver_type")=="banded") {
       linsol_f_ = SD_BANDED;
-    } else if (getOption("linear_solver_type")=="iterative") {
+    } else if (option("linear_solver_type")=="iterative") {
       linsol_f_ = SD_ITERATIVE;
 
       // Iterative solver
-      if (getOption("iterative_solver")=="gmres") {
+      if (option("iterative_solver")=="gmres") {
         itsol_f_ = SD_GMRES;
-      } else if (getOption("iterative_solver")=="bcgstab") {
+      } else if (option("iterative_solver")=="bcgstab") {
         itsol_f_ = SD_BCGSTAB;
-      } else if (getOption("iterative_solver")=="tfqmr") {
+      } else if (option("iterative_solver")=="tfqmr") {
         itsol_f_ = SD_TFQMR;
       } else {
         throw CasadiException("Unknown sparse solver for forward integration");
       }
 
       // Preconditioning type
-      if (getOption("pretype")=="none")               pretype_f_ = PREC_NONE;
-      else if (getOption("pretype")=="left")          pretype_f_ = PREC_LEFT;
-      else if (getOption("pretype")=="right")         pretype_f_ = PREC_RIGHT;
-      else if (getOption("pretype")=="both")          pretype_f_ = PREC_BOTH;
+      if (option("pretype")=="none")               pretype_f_ = PREC_NONE;
+      else if (option("pretype")=="left")          pretype_f_ = PREC_LEFT;
+      else if (option("pretype")=="right")         pretype_f_ = PREC_RIGHT;
+      else if (option("pretype")=="both")          pretype_f_ = PREC_BOTH;
       else
         throw CasadiException("Unknown preconditioning type for forward integration");
-    } else if (getOption("linear_solver_type")=="user_defined") {
+    } else if (option("linear_solver_type")=="user_defined") {
       linsol_f_ = SD_USER_DEFINED;
     } else {
       throw CasadiException("Unknown linear solver for forward integration");
@@ -189,10 +189,10 @@ namespace casadi {
 
 
     std::string linear_solver_typeB = hasSetOption("linear_solver_typeB") ?
-      getOption("linear_solver_typeB") : getOption("linear_solver_type");
+      option("linear_solver_typeB") : option("linear_solver_type");
     std::string iterative_solverB = hasSetOption("iterative_solverB") ?
-      getOption("iterative_solverB") : getOption("iterative_solver");
-    std::string pretypeB = hasSetOption("pretypeB") ? getOption("pretypeB"): getOption("pretype");
+      option("iterative_solverB") : option("iterative_solver");
+    std::string pretypeB = hasSetOption("pretypeB") ? option("pretypeB"): option("pretype");
 
     // Linear solver for backward integration
     if (linear_solver_typeB=="dense") {
@@ -264,11 +264,11 @@ namespace casadi {
       // Options
       Dict linear_solver_options;
       if (hasSetOption("linear_solver_options")) {
-        linear_solver_options = getOption("linear_solver_options");
+        linear_solver_options = option("linear_solver_options");
       }
 
       // Create a linear solver
-      linsol_ = LinearSolver("linsol", getOption("linear_solver"), jac_.sparsity_out(0),
+      linsol_ = LinearSolver("linsol", option("linear_solver"), jac_.sparsity_out(0),
                              1, linear_solver_options);
     }
 
@@ -276,14 +276,14 @@ namespace casadi {
       // Linear solver options
       Dict opts;
       if (hasSetOption("linear_solver_optionsB")) {
-        opts = getOption("linear_solver_optionsB");
+        opts = option("linear_solver_optionsB");
       } else if (hasSetOption("linear_solver_options")) {
-        opts = getOption("linear_solver_options");
+        opts = option("linear_solver_options");
       }
 
       // Create a linear solver
       std::string linear_solver_name =
-        hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
+        hasSetOption("linear_solverB") ? option("linear_solverB") : option("linear_solver");
       linsolB_ = LinearSolver("linsolB", linear_solver_name, jacB_.sparsity_out(0),
                               1, opts);
     }
@@ -299,7 +299,7 @@ namespace casadi {
 
     // Get upper bandwidth
     if (hasSetOption("upper_bandwidth")) {
-      bw.first = getOption("upper_bandwidth");
+      bw.first = option("upper_bandwidth");
     } else if (!jac_.isNull()) {
       bw.first = jac_.getOutput().sparsity().bw_upper();
     } else {
@@ -309,7 +309,7 @@ namespace casadi {
 
     // Get lower bandwidth
     if (hasSetOption("lower_bandwidth")) {
-      bw.second = getOption("lower_bandwidth");
+      bw.second = option("lower_bandwidth");
     } else if (!jac_.isNull()) {
       bw.second = jac_.getOutput().sparsity().bw_lower();
     } else {
@@ -325,7 +325,7 @@ namespace casadi {
 
     // Get upper bandwidth
     if (hasSetOption("upper_bandwidthB")) {
-      bw.first = getOption("upper_bandwidthB");
+      bw.first = option("upper_bandwidthB");
     } else if (!jacB_.isNull()) {
       bw.first = jacB_.getOutput().sparsity().bw_upper();
     } else {
@@ -335,7 +335,7 @@ namespace casadi {
 
     // Get lower bandwidth
     if (hasSetOption("lower_bandwidthB")) {
-      bw.second = getOption("lower_bandwidthB");
+      bw.second = option("lower_bandwidthB");
     } else if (!jacB_.isNull()) {
       bw.second = jacB_.getOutput().sparsity().bw_lower();
     } else {

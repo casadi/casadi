@@ -62,8 +62,8 @@ namespace casadi {
     f_.init();
 
     // Which input/output correspond to the root-finding problem?
-    iin_ = getOption("implicit_input");
-    iout_ = getOption("implicit_output");
+    iin_ = option("implicit_input");
+    iout_ = option("implicit_output");
 
     // Get the number of equations and check consistency
     casadi_assert_message(iin_>=0 && iin_<f_.n_in() && f_.n_in()>0,
@@ -102,7 +102,7 @@ namespace casadi {
 
     // Get the Jacobian function object, if any
     if (hasSetOption("jacobian_function")) {
-      jac_ = getOption("jacobian_function");
+      jac_ = option("jacobian_function");
     }
 
     // Generate Jacobian if not provided
@@ -117,7 +117,7 @@ namespace casadi {
 
     // Get the linear solver function object, if any
     if (hasSetOption("linear_solver_function")) {
-      Function linsol = getOption("linear_solver_function");
+      Function linsol = option("linear_solver_function");
       linsol_ = shared_cast<LinearSolver>(linsol);
     }
 
@@ -127,11 +127,11 @@ namespace casadi {
         // Pass options
         Dict linear_solver_options;
         if (hasSetOption("linear_solver_options")) {
-          linear_solver_options = getOption("linear_solver_options");
+          linear_solver_options = option("linear_solver_options");
         }
 
         // Allocate an NLP solver
-        linsol_ = LinearSolver("linsol", getOption("linear_solver"),
+        linsol_ = LinearSolver("linsol", option("linear_solver"),
                                jac_.sparsity_out(0), 1, linear_solver_options);
       }
     } else {
@@ -144,7 +144,7 @@ namespace casadi {
     fact_up_to_date_ = false;
 
     // Constraints
-    if (hasSetOption("constraints")) u_c_ = getOption("constraints");
+    if (hasSetOption("constraints")) u_c_ = option("constraints");
 
     casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),
                           "Constraint vector if supplied, must be of length n, but got "

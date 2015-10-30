@@ -43,7 +43,7 @@ namespace casadi {
     Integrator::init();
 
     // Number of finite elements and time steps
-    nk_ = getOption("number_of_finite_elements");
+    nk_ = option("number_of_finite_elements");
     casadi_assert(nk_>0);
     h_ = (grid_.back() - t0_)/nk_;
 

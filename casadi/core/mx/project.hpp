@@ -79,7 +79,7 @@ namespace casadi {
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_PROJECT;}
+    virtual int op() const { return OP_PROJECT;}
 
     /** \brief Get required length of w field */
     virtual size_t sz_w() const { return size1();}

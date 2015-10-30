@@ -141,14 +141,14 @@ namespace casadi {
 
     // Read options
     if (hasSetOption("nWSR")) {
-      max_nWSR_ = getOption("nWSR");
+      max_nWSR_ = option("nWSR");
       casadi_assert(max_nWSR_>=0);
     } else {
       max_nWSR_ = 5 *(n_ + nc_);
     }
 
     if (hasSetOption("CPUtime")) {
-      max_cputime_ = getOption("CPUtime");
+      max_cputime_ = option("CPUtime");
       casadi_assert(max_cputime_>0);
     } else {
       max_cputime_ = -1;
@@ -174,36 +174,36 @@ namespace casadi {
 
     qpOASES::Options ops;
     ops.setToDefault();
-    ops.printLevel = string_to_PrintLevel(getOption("printLevel"));
-    ops.enableRamping = bool_to_BooleanType(getOption("enableRamping"));
-    ops.enableFarBounds = bool_to_BooleanType(getOption("enableFarBounds"));
-    ops.enableFlippingBounds = bool_to_BooleanType(getOption("enableFlippingBounds"));
-    ops.enableRegularisation = bool_to_BooleanType(getOption("enableRegularisation"));
-    ops.enableFullLITests = bool_to_BooleanType(getOption("enableFullLITests"));
-    ops.enableNZCTests = bool_to_BooleanType(getOption("enableNZCTests"));
-    ops.enableDriftCorrection = static_cast<int>(getOption("enableDriftCorrection"));
+    ops.printLevel = string_to_PrintLevel(option("printLevel"));
+    ops.enableRamping = bool_to_BooleanType(option("enableRamping"));
+    ops.enableFarBounds = bool_to_BooleanType(option("enableFarBounds"));
+    ops.enableFlippingBounds = bool_to_BooleanType(option("enableFlippingBounds"));
+    ops.enableRegularisation = bool_to_BooleanType(option("enableRegularisation"));
+    ops.enableFullLITests = bool_to_BooleanType(option("enableFullLITests"));
+    ops.enableNZCTests = bool_to_BooleanType(option("enableNZCTests"));
+    ops.enableDriftCorrection = static_cast<int>(option("enableDriftCorrection"));
     ops.enableCholeskyRefactorisation =
-      static_cast<int>(getOption("enableCholeskyRefactorisation"));
-    ops.enableEqualities = bool_to_BooleanType(getOption("enableEqualities"));
-    ops.terminationTolerance = getOption("terminationTolerance");
-    ops.boundTolerance = getOption("boundTolerance");
-    ops.boundRelaxation = getOption("boundRelaxation");
-    ops.epsNum = getOption("epsNum");
-    ops.epsDen = getOption("epsDen");
-    ops.maxPrimalJump = getOption("maxPrimalJump");
-    ops.maxDualJump = getOption("maxDualJump");
-    ops.initialRamping = getOption("initialRamping");
-    ops.finalRamping = getOption("finalRamping");
-    ops.initialFarBounds = getOption("initialFarBounds");
-    ops.growFarBounds = getOption("growFarBounds");
-    ops.initialStatusBounds = string_to_SubjectToStatus(getOption("initialStatusBounds"));
-    ops.epsFlipping = getOption("epsFlipping");
-    ops.numRegularisationSteps = static_cast<int>(getOption("numRegularisationSteps"));
-    ops.epsRegularisation = getOption("epsRegularisation");
-    ops.numRefinementSteps = static_cast<int>(getOption("numRefinementSteps"));
-    ops.epsIterRef = getOption("epsIterRef");
-    ops.epsLITests = getOption("epsLITests");
-    ops.epsNZCTests = getOption("epsNZCTests");
+      static_cast<int>(option("enableCholeskyRefactorisation"));
+    ops.enableEqualities = bool_to_BooleanType(option("enableEqualities"));
+    ops.terminationTolerance = option("terminationTolerance");
+    ops.boundTolerance = option("boundTolerance");
+    ops.boundRelaxation = option("boundRelaxation");
+    ops.epsNum = option("epsNum");
+    ops.epsDen = option("epsDen");
+    ops.maxPrimalJump = option("maxPrimalJump");
+    ops.maxDualJump = option("maxDualJump");
+    ops.initialRamping = option("initialRamping");
+    ops.finalRamping = option("finalRamping");
+    ops.initialFarBounds = option("initialFarBounds");
+    ops.growFarBounds = option("growFarBounds");
+    ops.initialStatusBounds = string_to_SubjectToStatus(option("initialStatusBounds"));
+    ops.epsFlipping = option("epsFlipping");
+    ops.numRegularisationSteps = static_cast<int>(option("numRegularisationSteps"));
+    ops.epsRegularisation = option("epsRegularisation");
+    ops.numRefinementSteps = static_cast<int>(option("numRefinementSteps"));
+    ops.epsIterRef = option("epsIterRef");
+    ops.epsLITests = option("epsLITests");
+    ops.epsNZCTests = option("epsNZCTests");
 
     // Pass to qpOASES
     qp_->setOptions(ops);

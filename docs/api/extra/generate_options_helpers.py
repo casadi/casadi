@@ -33,19 +33,19 @@ def optionDocumented(name,cl,metadata):
   
 def extra(metadata,i,iname):
   print "Adding to ", metadata
-  for name in i.getOptionNames():
+  for name in i.optionNames():
     print "found option", name
     if optionDocumented(name,"casadi::%s" % iname,metadata):
       continue
     print "Adding it."
     meta = metadata["casadi::%s" % iname]["options"][name] = dict()
     meta['name'] = name
-    meta['type'] = i.getOptionTypeName(name)
+    meta['type'] = i.optionTypeName(name)
     meta['used'] = "casadi::%s" % iname
     meta['inherit'] = False
-    meta['description'] = i.getOptionDescription(name)
+    meta['description'] = i.optionDescription(name)
     try:
-      meta['default'] = i.getOptionDefault(name)
+      meta['default'] = i.optionDefault(name)
     except:
       meta['default'] = ''
       pass #too bad

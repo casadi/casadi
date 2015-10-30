@@ -100,11 +100,11 @@ namespace casadi {
   void FunctionInternal::init() {
     setDefaultOptions();
 
-    verbose_ = getOption("verbose");
-    jit_ = getOption("jit");
-    compilerplugin_ = getOption("compiler").toString();
-    if (hasSetOption("jit_options")) jit_options_ = getOption("jit_options");
-    regularity_check_ = getOption("regularity_check");
+    verbose_ = option("verbose");
+    jit_ = option("jit");
+    compilerplugin_ = option("compiler").toString();
+    if (hasSetOption("jit_options")) jit_options_ = option("jit_options");
+    regularity_check_ = option("regularity_check");
 
     // Warn for functions with too many inputs or outputs
     casadi_assert_warning(n_in()<10000, "Function " << name_
@@ -120,12 +120,12 @@ namespace casadi {
     jac_ = jac_compact_ = SparseStorage<WeakRef>(Sparsity(n_out(), n_in()));
 
     if (hasSetOption("user_data")) {
-      user_data_ = getOption("user_data").toVoidPointer();
+      user_data_ = option("user_data").toVoidPointer();
     }
 
     // Pass monitors
     if (hasSetOption("monitor")) {
-      const std::vector<std::string>& monitors = getOption("monitor");
+      const std::vector<std::string>& monitors = option("monitor");
       for (std::vector<std::string>::const_iterator it=monitors.begin();it!=monitors.end();it++) {
         monitors_.insert(*it);
       }
@@ -133,7 +133,7 @@ namespace casadi {
 
     // Custom input scheme
     if (hasSetOption("input_scheme")) {
-      ischeme_ = getOption("input_scheme");
+      ischeme_ = option("input_scheme");
     }
 
     // If input scheme empty, provide default names
@@ -146,7 +146,7 @@ namespace casadi {
 
     // Custom output scheme
     if (hasSetOption("output_scheme")) {
-      oscheme_ = getOption("output_scheme");
+      oscheme_ = option("output_scheme");
     }
 
     // If output scheme null, provide default names
@@ -159,8 +159,8 @@ namespace casadi {
 
     monitor_inputs_ = monitored("inputs");
     monitor_outputs_ = monitored("outputs");
-    gather_stats_ = getOption("gather_stats");
-    inputs_check_ = getOption("inputs_check");
+    gather_stats_ = option("gather_stats");
+    inputs_check_ = option("inputs_check");
     alloc_arg(0);
     alloc_res(0);
   }
@@ -2547,7 +2547,7 @@ namespace casadi {
     if (numDerForward()==0) return true;
 
     // Jacobian calculation penalty factor
-    const double jac_penalty = getOption("jac_penalty");
+    const double jac_penalty = option("jac_penalty");
 
     if (jac_penalty==-1) return false;
 
@@ -2566,7 +2566,7 @@ namespace casadi {
     if (numDerReverse()==0) return true;
 
     // Jacobian calculation penalty factor
-    const double jac_penalty = getOption("jac_penalty");
+    const double jac_penalty = option("jac_penalty");
 
     if (jac_penalty==-1) return false;
 
@@ -2880,7 +2880,7 @@ namespace casadi {
     if (numDerForward()==0) return 1;
 
     // A user-provided option overrides default value
-    if (hasSetOption("ad_weight")) return getOption("ad_weight");
+    if (hasSetOption("ad_weight")) return option("ad_weight");
 
     // By default, reverse mode is about twice as expensive as forward mode
     return 0.33;  // i.e. nf <= 2*na <=> 1/3*nf <= (1-1/3)*na, forward when tie
@@ -2894,7 +2894,7 @@ namespace casadi {
     if (!spCanEvaluate(true)) return 1;
 
     // A user-provided option overrides default value
-    if (hasSetOption("ad_weight_sp")) return getOption("ad_weight_sp");
+    if (hasSetOption("ad_weight_sp")) return option("ad_weight_sp");
 
     // Both modes equally expensive by default (no "taping" needed)
     return 0.49; // Forward when tie

@@ -37,7 +37,7 @@ f.evaluate()
 for i=1:f.n_out()
   res = f.getOutput(i-1)-2;
 
-  assert(res.isZero())
+  assert(res.is_zero())
 
 end
 
@@ -70,7 +70,7 @@ f.evaluate()
 for i=1:f.n_out()
   res = f.getOutput(i-1)-2;
 
-  assert(res.isZero())
+  assert(res.is_zero())
 
 end
 

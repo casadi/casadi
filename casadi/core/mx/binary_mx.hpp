@@ -48,10 +48,10 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return op_;}
+    virtual int op() const { return op_;}
 
     /** \brief Check if binary operation */
-    virtual bool isBinaryOp() const { return true;}
+    virtual bool is_binaryOp() const { return true;}
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
@@ -95,7 +95,7 @@ namespace casadi {
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool zz_is_equal(const MXNode* node, int depth) const {
-      if (op_==node->getOp()) {
+      if (op_==node->op()) {
         if (is_equal(dep(0), node->dep(0), depth-1) && is_equal(dep(1), node->dep(1), depth-1)) {
           // If arguments are equal
           return true;

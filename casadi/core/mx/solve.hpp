@@ -81,7 +81,7 @@ namespace casadi {
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_SOLVE;}
+    virtual int op() const { return OP_SOLVE;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 1;}

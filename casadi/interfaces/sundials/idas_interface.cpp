@@ -129,8 +129,8 @@ namespace casadi {
     SundialsInterface::init();
 
     // Get initial conditions for the state derivatives
-    if (hasSetOption("init_xdot") && !getOption("init_xdot").isNull()) {
-      init_xdot_ = getOption("init_xdot").toDoubleVector();
+    if (hasSetOption("init_xdot") && !option("init_xdot").isNull()) {
+      init_xdot_ = option("init_xdot").toDoubleVector();
       casadi_assert_message(
         init_xdot_.size()==nx_,
         "Option \"init_xdot\" has incorrect length. Expecting " << nx_
@@ -144,9 +144,9 @@ namespace casadi {
     }
 
     // Read options
-    cj_scaling_ = getOption("cj_scaling");
-    calc_ic_ = getOption("calc_ic");
-    calc_icB_ = hasSetOption("calc_icB") ?  getOption("calc_icB") : getOption("calc_ic");
+    cj_scaling_ = option("cj_scaling");
+    calc_ic_ = option("calc_ic");
+    calc_icB_ = hasSetOption("calc_icB") ?  option("calc_icB") : option("calc_ic");
 
     // Sundials return flag
     int flag;
@@ -167,18 +167,18 @@ namespace casadi {
     log("IdasInterface::init", "IDA initialized");
 
     // Disable internal warning messages?
-    disable_internal_warnings_ = getOption("disable_internal_warnings");
+    disable_internal_warnings_ = option("disable_internal_warnings");
 
     // Set error handler function
     flag = IDASetErrHandlerFn(mem_, ehfun_wrapper, this);
     casadi_assert_message(flag == IDA_SUCCESS, "IDASetErrHandlerFn");
 
     // Include algebraic variables in error testing
-    flag = IDASetSuppressAlg(mem_, getOption("suppress_algebraic").toInt());
+    flag = IDASetSuppressAlg(mem_, option("suppress_algebraic").toInt());
     casadi_assert_message(flag == IDA_SUCCESS, "IDASetSuppressAlg");
 
     // Maxinum order for the multistep method
-    flag = IDASetMaxOrd(mem_, getOption("max_multistep_order").toInt());
+    flag = IDASetMaxOrd(mem_, option("max_multistep_order").toInt());
     casadi_assert_message(flag == IDA_SUCCESS, "IDASetMaxOrd");
 
     // Set user data
@@ -186,12 +186,12 @@ namespace casadi {
     casadi_assert_message(flag == IDA_SUCCESS, "IDASetUserData");
 
     // Set maximum step size
-    flag = IDASetMaxStep(mem_, getOption("max_step_size").toDouble());
+    flag = IDASetMaxStep(mem_, option("max_step_size").toDouble());
     casadi_assert_message(flag == IDA_SUCCESS, "IDASetMaxStep");
 
     if (hasSetOption("abstolv")) {
       // Vector absolute tolerances
-      vector<double> abstolv = getOption("abstolv").toDoubleVector();
+      vector<double> abstolv = option("abstolv").toDoubleVector();
       N_Vector nv_abstol = N_VMake_Serial(abstolv.size(), getPtr(abstolv));
       flag = IDASVtolerances(mem_, reltol_, nv_abstol);
       casadi_assert_message(flag == IDA_SUCCESS, "IDASVtolerances");
@@ -203,7 +203,7 @@ namespace casadi {
     }
 
     // Maximum number of steps
-    IDASetMaxNumSteps(mem_, getOption("max_num_steps").toInt());
+    IDASetMaxNumSteps(mem_, option("max_num_steps").toInt());
     if (flag != IDA_SUCCESS) idas_error("IDASetMaxNumSteps", flag);
 
     // Set algebraic components
@@ -247,7 +247,7 @@ namespace casadi {
       if (flag != IDA_SUCCESS) idas_error("IDAQuadInit", flag);
 
       // Should the quadrature errors be used for step size control?
-      if (getOption("quad_err_con").toInt()) {
+      if (option("quad_err_con").toInt()) {
         flag = IDASetQuadErrCon(mem_, true);
         casadi_assert_message(flag == IDA_SUCCESS, "IDASetQuadErrCon");
 
@@ -275,8 +275,8 @@ namespace casadi {
     //   }
 
     //   // Get the sensitivity method
-    //   if (getOption("sensitivity_method")== "simultaneous") ism_ = IDA_SIMULTANEOUS;
-    //   else if (getOption("sensitivity_method")=="staggered") ism_ = IDA_STAGGERED;
+    //   if (option("sensitivity_method")== "simultaneous") ism_ = IDA_SIMULTANEOUS;
+    //   else if (option("sensitivity_method")=="staggered") ism_ = IDA_STAGGERED;
     //   else throw CasadiException("IDAS: Unknown sensitivity method");
 
     //   // Copy the forward seeds
@@ -297,7 +297,7 @@ namespace casadi {
     //     double* pbar = 0;
     //     vector<double> pbar_vec;
     //     if (hasSetOption("fsens_scaling_factors")) {
-    //       pbar_vec = getOption("fsens_scaling_factors").toDoubleVector();
+    //       pbar_vec = option("fsens_scaling_factors").toDoubleVector();
     //       pbar = getPtr(pbar_vec);
     //     }
 
@@ -305,7 +305,7 @@ namespace casadi {
     //     int * plist = 0;
     //     vector<int> plist_vec;
     //     if (hasSetOption("fsens_sensitivity_parameters")) {
-    //       plist_vec = getOption("fsens_sensitiviy_parameters").toIntVector();
+    //       plist_vec = option("fsens_sensitiviy_parameters").toIntVector();
     //       plist = getPtr(plist_vec);
     //     }
 
@@ -324,7 +324,7 @@ namespace casadi {
 
     //   // IDAS bugfix
     //   IDAMem IDA_mem = IDAMem(mem_);
-    //   int max_multistep_order = getOption("max_multistep_order");
+    //   int max_multistep_order = option("max_multistep_order");
     //   for (int i=0; i<=max_multistep_order; ++i) {
     //     for (int iS=0; iS<nfdir_; ++iS) {
     //       N_VConst(0.0, IDA_mem->ida_phiS[i][iS]);
@@ -337,7 +337,7 @@ namespace casadi {
     //   // Set tolerances
     //   if (hasSetOption("fsens_abstolv")) {
     //     // quick hack
-    //     vector<double> fsens_abstolv = getOption("fsens_abstolv");
+    //     vector<double> fsens_abstolv = option("fsens_abstolv");
     //     N_Vector nv_abstol = N_VMake_Serial(fsens_abstolv.size(), getPtr(fsens_abstolv));
     //     vector<N_Vector> nv_abstol_all(nfdir_, nv_abstol);
     //     flag = IDASensSVtolerances(mem_, fsens_reltol_, getPtr(nv_abstol_all));
@@ -349,7 +349,7 @@ namespace casadi {
     //   }
 
     //   // Set optional inputs
-    //   bool errconS = getOption("fsens_err_con");
+    //   bool errconS = option("fsens_err_con");
     //   flag = IDASetSensErrCon(mem_, errconS);
     //   if (flag != IDA_SUCCESS) idas_error("IDASetSensErrCon", flag);
 
@@ -391,13 +391,13 @@ namespace casadi {
     int flag;
 
     // Get the number of steos per checkpoint
-    int Nd = getOption("steps_per_checkpoint");
+    int Nd = option("steps_per_checkpoint");
 
     // Get the interpolation type
     int interpType;
-    if (getOption("interpolation_type")=="hermite")
+    if (option("interpolation_type")=="hermite")
       interpType = IDA_HERMITE;
-    else if (getOption("interpolation_type")=="polynomial")
+    else if (option("interpolation_type")=="polynomial")
       interpType = IDA_POLYNOMIAL;
     else
       throw CasadiException("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
@@ -433,7 +433,7 @@ namespace casadi {
     if (flag != IDA_SUCCESS) idas_error("IDASetUserDataB", flag);
 
     // Maximum number of steps
-    IDASetMaxNumStepsB(mem_, whichB_, getOption("max_num_steps").toInt());
+    IDASetMaxNumStepsB(mem_, whichB_, option("max_num_steps").toInt());
     if (flag != IDA_SUCCESS) idas_error("IDASetMaxNumStepsB", flag);
 
     // Set algebraic components
@@ -471,7 +471,7 @@ namespace casadi {
     if (flag!=IDA_SUCCESS) idas_error("IDAQuadInitB", flag);
 
     // Quadrature error control
-    if (getOption("quad_err_con").toInt()) {
+    if (option("quad_err_con").toInt()) {
       flag = IDASetQuadErrConB(mem_, whichB_, true);
       if (flag != IDA_SUCCESS) idas_error("IDASetQuadErrConB", flag);
 
@@ -518,9 +518,9 @@ namespace casadi {
     }
 
     if (regularity_check_) {
-      casadi_assert_message(isRegular(f_.output(DAE_ODE).data()),
+      casadi_assert_message(is_regular(f_.output(DAE_ODE).data()),
                             "IdasInterface::res: f.output(DAE_ODE) is not regular.");
-      casadi_assert_message(isRegular(f_.output(DAE_ALG).data()),
+      casadi_assert_message(is_regular(f_.output(DAE_ALG).data()),
                             "IdasInterface::res: f.output(DAE_ALG) is not regular.");
     }
 
@@ -781,7 +781,7 @@ namespace casadi {
 
     // If we have forward sensitivities, rest one extra time without forward sensitivities to get
     // a consistent initial guess
-    //   if (nfdir>0 && getOption("extra_fsens_calc_ic").toInt())
+    //   if (nfdir>0 && option("extra_fsens_calc_ic").toInt())
     //     reset(0);
 
     // Reset timers
@@ -873,7 +873,7 @@ namespace casadi {
     // int icopt = IDA_Y_INIT; // calculate z and x given zdot and xdot (e.g. start in stationary)
 
     double t_first =
-        hasSetOption("first_time") ? static_cast<double>(getOption("first_time")) : grid_.back();
+        hasSetOption("first_time") ? static_cast<double>(option("first_time")) : grid_.back();
     int flag = IDACalcIC(mem_, icopt , t_first);
     if (flag != IDA_SUCCESS) idas_error("IDACalcIC", flag);
 
@@ -962,7 +962,7 @@ namespace casadi {
     copy(NV_DATA_S(xz_)+nx_, NV_DATA_S(xz_)+nx_+nz_, output(INTEGRATOR_ZF).begin());
 
     // Print statistics
-    if (getOption("print_stats")) printStats(userOut());
+    if (option("print_stats")) printStats(userOut());
 
     if (gather_stats_) {
       long nsteps, nfevals, nlinsetups, netfails;

@@ -181,7 +181,7 @@ class Misctests(casadiTestCase):
     nlp = {'x':x, 'f':x**2}
     i = Function.nlp_solver('i', "ipopt", nlp)
     
-    opts = i.getOptionNames()
+    opts = i.optionNames()
     self.assertTrue(isinstance(opts,list))
     
     n = opts[0]
@@ -189,14 +189,14 @@ class Misctests(casadiTestCase):
     
     n = "monitor"
     
-    d = i.getOptionDescription(n)
+    d = i.optionDescription(n)
     self.assertTrue(type(d)==type(""))
     self.assertTrue(not("d"=="N/A"))
     
-    d = i.getOptionTypeName(n)
+    d = i.optionTypeName(n)
     self.assertEqual(d,"OT_STRINGVECTOR")
 
-    #d = i.getOptionAllowed(n)
+    #d = i.optionAllowed(n)
 
   def test_pickling(self):
 

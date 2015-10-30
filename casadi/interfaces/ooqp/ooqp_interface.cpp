@@ -72,9 +72,9 @@ namespace casadi {
     QpSolver::init();
 
     // Read options
-    print_level_ = getOption("print_level");
-    mutol_ = getOption("mutol");
-    artol_ = getOption("artol");
+    print_level_ = option("print_level");
+    mutol_ = option("mutol");
+    artol_ = option("artol");
 
     // Allocate memory for problem
     c_.resize(n_);

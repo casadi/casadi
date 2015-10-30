@@ -62,8 +62,8 @@ namespace casadi {
     LinearSolverInternal::init();
 
     // Read options
-    bool codegen = getOption("codegen");
-    string compiler = getOption("compiler");
+    bool codegen = option("codegen");
+    string compiler = option("compiler");
 
     // Make sure that command processor is available
     if (codegen) {

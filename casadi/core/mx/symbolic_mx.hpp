@@ -79,25 +79,25 @@ namespace casadi {
     virtual const std::string& getName() const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_PARAMETER;}
+    virtual int op() const { return OP_PARAMETER;}
 
     /** \brief  Check if valid function input */
-    virtual bool isValidInput() const { return true;}
+    virtual bool is_valid_input() const { return true;}
 
     /** \brief Get the number of symbolic primitives */
-    virtual int numPrimitives() const { return 1;}
+    virtual int n_primitives() const { return 1;}
 
     /** \brief Get symbolic primitives */
-    virtual void getPrimitives(std::vector<MX>::iterator& it) const;
+    virtual void primitives(std::vector<MX>::iterator& it) const;
 
     /** \brief Split up an expression along symbolic primitives */
-    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const;
 
     /** \brief Join an expression along symbolic primitives */
-    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const;
 
     /** \brief Detect duplicate symbolic expressions */
-    virtual bool hasDuplicates();
+    virtual bool has_duplicates();
 
     /** \brief Reset the marker for an input expression */
     virtual void resetInput();

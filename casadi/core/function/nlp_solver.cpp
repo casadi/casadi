@@ -171,7 +171,7 @@ namespace casadi {
     output(NLP_SOLVER_G)       = DMatrix::zeros(g_sparsity);
 
     // Call the initialization method of the base class
-    const bool verbose_init = getOption("verbose_init");
+    const bool verbose_init = option("verbose_init");
     if (verbose_init)
       userOut() << "Initializing base class...";
     const timer time0 = getTimerTime();
@@ -182,7 +182,7 @@ namespace casadi {
       userOut() << "Initialized base class in " << diff.user << " seconds.";
 
     // Find out if we are to expand the NLP in terms of scalar operations
-    bool expand = getOption("expand");
+    bool expand = option("expand");
     if (expand) {
       log("Expanding NLP in scalar operations");
       Function f = nlp_.expand(nlp_.name());
@@ -192,7 +192,7 @@ namespace casadi {
     }
 
     if (hasSetOption("iteration_callback")) {
-      fcallback_ = getOption("iteration_callback");
+      fcallback_ = option("iteration_callback");
 
       // Consistency checks
       casadi_assert(!fcallback_.isNull());
@@ -206,8 +206,8 @@ namespace casadi {
       casadi_assert(fcallback_.input(NLP_SOLVER_G).size()==g_sparsity.size());
     }
 
-    callback_step_ = getOption("iteration_callback_step");
-    eval_errors_fatal_ = getOption("eval_errors_fatal");
+    callback_step_ = option("iteration_callback_step");
+    eval_errors_fatal_ = option("eval_errors_fatal");
 
   }
 
@@ -231,7 +231,7 @@ namespace casadi {
     casadi_assert_message(!violated, "Ill-posed problem detected (g bounds)");
 
     // Warn if initial condition violates bounds
-    if (static_cast<bool>(getOption("warn_initial_bounds"))) {
+    if (static_cast<bool>(option("warn_initial_bounds"))) {
       for (int k=0; !violated && k<nx_; ++k) violated = x0[k]>ubx[k] || x0[k]<lbx[k];
       if (violated) casadi_warning("NlpSolver: The initial guess does not satisfy LBX and UBX. "
                                    "Option 'warn_initial_bounds' controls this warning.");
@@ -245,7 +245,7 @@ namespace casadi {
     FunctionInternal::reportConstraints(stream, output(NLP_SOLVER_X), input(NLP_SOLVER_LBX),
                                         input(NLP_SOLVER_UBX), "decision bounds");
     double tol = 1e-8;
-    if (hasOption("constr_viol_tol")) tol = getOption("constr_viol_tol");
+    if (hasOption("constr_viol_tol")) tol = option("constr_viol_tol");
     FunctionInternal::reportConstraints(stream, output(NLP_SOLVER_G), input(NLP_SOLVER_LBG),
                                         input(NLP_SOLVER_UBG), "constraints", tol);
   }
@@ -267,10 +267,10 @@ namespace casadi {
   Function NlpSolver::getJacF() {
     Function jacF;
     if (hasSetOption("jac_f")) {
-      jacF = getOption("jac_f");
+      jacF = option("jac_f");
     } else {
       log("Generating objective jacobian");
-      const bool verbose_init = getOption("verbose_init");
+      const bool verbose_init = option("verbose_init");
       if (verbose_init)
         userOut() << "Generating objective Jacobian...";
       const timer time0 = getTimerTime();
@@ -282,7 +282,7 @@ namespace casadi {
       log("Jacobian function generated");
     }
     if (hasSetOption("jac_f_options")) {
-      jacF.setOption(getOption("jac_f_options"));
+      jacF.setOption(option("jac_f_options"));
     }
     jacF.init();
     casadi_assert_message(jacF.n_in()==GRADF_NUM_IN,
@@ -298,10 +298,10 @@ namespace casadi {
   Function NlpSolver::getGradF() {
     Function gradF;
     if (hasSetOption("grad_f")) {
-      gradF = getOption("grad_f");
+      gradF = option("grad_f");
     } else {
       log("Generating objective gradient");
-      const bool verbose_init = getOption("verbose_init");
+      const bool verbose_init = option("verbose_init");
       if (verbose_init)
         userOut() << "Generating objective gradient...";
       const timer time0 = getTimerTime();
@@ -313,7 +313,7 @@ namespace casadi {
       log("Gradient function generated");
     }
     if (hasSetOption("grad_f_options")) {
-      gradF.setOption(getOption("grad_f_options"));
+      gradF.setOption(option("grad_f_options"));
     }
     gradF.init();
     casadi_assert_message(gradF.n_in()==GRADF_NUM_IN,
@@ -340,10 +340,10 @@ namespace casadi {
     if (ng_==0) return jacG;
 
     if (hasSetOption("jac_g")) {
-      jacG = getOption("jac_g");
+      jacG = option("jac_g");
     } else {
       log("Generating constraint Jacobian");
-      const bool verbose_init = getOption("verbose_init");
+      const bool verbose_init = option("verbose_init");
       if (verbose_init)
         userOut() << "Generating constraint Jacobian...";
       const timer time0 = getTimerTime();
@@ -355,7 +355,7 @@ namespace casadi {
       log("Jacobian function generated");
     }
     if (hasSetOption("jac_g_options")) {
-      jacG.setOption(getOption("jac_g_options"));
+      jacG.setOption(option("jac_g_options"));
     }
     jacG.init();
     casadi_assert_message(jacG.n_in()==JACG_NUM_IN,
@@ -378,10 +378,10 @@ namespace casadi {
   Function NlpSolver::getGradLag() {
     Function gradLag;
     if (hasSetOption("grad_lag")) {
-      gradLag = getOption("grad_lag");
+      gradLag = option("grad_lag");
     } else {
       log("Generating/retrieving Lagrangian gradient function");
-      const bool verbose_init = getOption("verbose_init");
+      const bool verbose_init = option("verbose_init");
       if (verbose_init)
         userOut() << "Generating/retrieving Lagrangian gradient function...";
       const timer time0 = getTimerTime();
@@ -394,7 +394,7 @@ namespace casadi {
       log("Gradient function generated");
     }
     if (hasSetOption("grad_lag_options")) {
-      gradLag.setOption(getOption("grad_lag_options"));
+      gradLag.setOption(option("grad_lag_options"));
     }
     gradLag.init();
     log("Gradient function initialized");
@@ -411,11 +411,11 @@ namespace casadi {
   Function NlpSolver::getHessLag() {
     Function hessLag;
     if (hasSetOption("hess_lag")) {
-      hessLag = getOption("hess_lag");
+      hessLag = option("hess_lag");
     } else {
       Function& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian");
-      const bool verbose_init = getOption("verbose_init");
+      const bool verbose_init = option("verbose_init");
       if (verbose_init)
         userOut() << "Generating Hessian of the Lagrangian...";
       const timer time0 = getTimerTime();
@@ -428,7 +428,7 @@ namespace casadi {
       log("Hessian function generated");
     }
     if (hasSetOption("hess_lag_options")) {
-      hessLag.setOption(getOption("hess_lag_options"));
+      hessLag.setOption(option("hess_lag_options"));
     }
     hessLag.init();
     casadi_assert_message(hessLag.n_in()==HESSLAG_NUM_IN,
@@ -450,11 +450,11 @@ namespace casadi {
     Sparsity spHessLag;
     if (false /*hasSetOption("hess_lag_sparsity")*/) {
       // NOTE: No such option yet, need support for GenericType(Sparsity)
-      //spHessLag = getOption("hess_lag_sparsity");
+      //spHessLag = option("hess_lag_sparsity");
     } else {
       Function& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian sparsity pattern");
-      const bool verbose_init = getOption("verbose_init");
+      const bool verbose_init = option("verbose_init");
       if (verbose_init)
         userOut() << "Generating Hessian of the Lagrangian sparsity pattern...";
       const timer time0 = getTimerTime();

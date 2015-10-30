@@ -178,9 +178,9 @@ namespace casadi {
       if (op==OP_SUB && is_equal(y, dep(), maxDepth())) return dep();
       break;
     case OP_SQ:
-      if (op==OP_ADD && y.getOp()==OP_SQ) /*sum of squares:*/
-        if ((dep().getOp()==OP_SIN && y->dep().getOp()==OP_COS) ||
-           (dep().getOp()==OP_COS && y->dep()->getOp()==OP_SIN)) /* sin^2(x)+sin^2(y) */
+      if (op==OP_ADD && y.op()==OP_SQ) /*sum of squares:*/
+        if ((dep().op()==OP_SIN && y->dep().op()==OP_COS) ||
+           (dep().op()==OP_COS && y->dep()->op()==OP_SIN)) /* sin^2(x)+sin^2(y) */
           if (is_equal(dep()->dep(), y->dep()->dep(), maxDepth())) /*sin^2(x) + cos^2(x) */
             return MX::ones(y.sparsity());
       break;

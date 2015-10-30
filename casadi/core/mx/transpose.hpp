@@ -83,7 +83,7 @@ namespace casadi {
                           CodeGenerator& g) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_TRANSPOSE;}
+    virtual int op() const { return OP_TRANSPOSE;}
 
     /** \brief Get required length of iw field */
     virtual size_t sz_iw() const { return size2()+1;}

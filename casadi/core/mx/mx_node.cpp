@@ -66,7 +66,7 @@ namespace casadi {
     // Start destruction method if any of the dependencies has dependencies
     for (vector<MX>::iterator cc=dep_.begin(); cc!=dep_.end(); ++cc) {
       // Skip if constant
-      if (cc->isConstant()) continue;
+      if (cc->is_constant()) continue;
 
       // Check if there are other "owners" of the node
       if (cc->getCount()!= 1) {
@@ -95,7 +95,7 @@ namespace casadi {
           for (vector<MX>::iterator ii=t->dep_.begin(); ii!=t->dep_.end(); ++ii) {
 
             // Skip if constant
-            if (ii->isConstant()) continue;
+            if (ii->is_constant()) continue;
 
             // Check if this is the only reference to the element
             if (ii->getCount()==1) {
@@ -120,13 +120,13 @@ namespace casadi {
     }
   }
 
-  int MXNode::numPrimitives() const {
-    throw CasadiException(string("MXNode::numPrimitives() not defined for class ")
+  int MXNode::n_primitives() const {
+    throw CasadiException(string("MXNode::n_primitives() not defined for class ")
                           + typeid(*this).name());
   }
 
-  bool MXNode::hasDuplicates() {
-    throw CasadiException(string("MXNode::hasDuplicates() not defined for class ")
+  bool MXNode::has_duplicates() {
+    throw CasadiException(string("MXNode::has_duplicates() not defined for class ")
                           + typeid(*this).name());
   }
 
@@ -135,18 +135,18 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::getPrimitives(std::vector<MX>::iterator& it) const {
-    throw CasadiException(string("MXNode::getPrimitives() not defined for class ")
+  void MXNode::primitives(std::vector<MX>::iterator& it) const {
+    throw CasadiException(string("MXNode::primitives() not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
-    throw CasadiException(string("MXNode::splitPrimitives() not defined for class ")
+  void MXNode::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
+    throw CasadiException(string("MXNode::split_primitives() not defined for class ")
                           + typeid(*this).name());
   }
 
-  MX MXNode::joinPrimitives(std::vector<MX>::const_iterator& it) const {
-    throw CasadiException(string("MXNode::joinPrimitives() not defined for class ")
+  MX MXNode::join_primitives(std::vector<MX>::const_iterator& it) const {
+    throw CasadiException(string("MXNode::join_primitives() not defined for class ")
                           + typeid(*this).name());
   }
 
@@ -251,7 +251,7 @@ namespace casadi {
       for (int i=0; i<ndep(); ++i) {
         dep(i)->can_inline(nodeind);
       }
-    } else if (it->second==0 && getOp()!=OP_PARAMETER) {
+    } else if (it->second==0 && op()!=OP_PARAMETER) {
       // Node encountered before, do not inline (except if symbolic primitive)
       it->second = -1;
     }
@@ -483,7 +483,7 @@ namespace casadi {
 
 
   MX MXNode::getAddNonzeros(const MX& y, const std::vector<int>& nz) const {
-    if (nz.size()==0 || isZero()) {
+    if (nz.size()==0 || is_zero()) {
       return y;
     } else {
       MX ret;
@@ -519,7 +519,7 @@ namespace casadi {
   }
 
   MX MXNode::getUnary(int op) const {
-    if (operation_checker<F0XChecker>(op) && isZero()) {
+    if (operation_checker<F0XChecker>(op) && is_zero()) {
       // If identically zero
       return MX::zeros(sparsity());
     } else {
@@ -574,8 +574,8 @@ namespace casadi {
     if (CasadiOptions::simplification_on_the_fly) {
 
       // If identically zero due to one argumebt being zero
-      if ((operation_checker<F0XChecker>(op) && isZero()) ||
-         (operation_checker<Function0Checker>(op) && y->isZero())) {
+      if ((operation_checker<F0XChecker>(op) && is_zero()) ||
+         (operation_checker<Function0Checker>(op) && y->is_zero())) {
         return MX::zeros(sparsity());
       }
 
@@ -590,7 +590,7 @@ namespace casadi {
         if (y.zz_is_equal(this, maxDepth())) return MX::zeros(sparsity());
         break;
       case OP_DIV:
-        if (y->isZero()) return MX::nan(sparsity());
+        if (y->is_zero()) return MX::nan(sparsity());
         // fall-through
       case OP_EQ:
       case OP_LE:
@@ -603,10 +603,10 @@ namespace casadi {
       }
 
       // Handle special cases for the second argument
-      switch (y->getOp()) {
+      switch (y->op()) {
       case OP_CONST:
         // Make the constant the first argument, if possible
-        if (getOp()!=OP_CONST && operation_checker<CommChecker>(op)) {
+        if (this->op()!=OP_CONST && operation_checker<CommChecker>(op)) {
               return y->getBinary(op, shared_from_this<MX>(), scY, scX);
         } else {
           switch (op) {
@@ -618,7 +618,7 @@ namespace casadi {
             break;
           case OP_ADD:
           case OP_SUB:
-            if (y->isZero())
+            if (y->is_zero())
                 return scX ? repmat(shared_from_this<MX>(), y.size()) : shared_from_this<MX>();
             break;
           case OP_MUL:
@@ -693,7 +693,7 @@ namespace casadi {
   }
 
   bool MXNode::sameOpAndDeps(const MXNode* node, int depth) const {
-    if (getOp()!=node->getOp() || ndep()!=node->ndep())
+    if (op()!=node->op() || ndep()!=node->ndep())
       return false;
     for (int i=0; i<ndep(); ++i) {
       if (!is_equal(dep(i), node->dep(i), depth-1))
@@ -770,11 +770,11 @@ namespace casadi {
   MX MXNode::getHorzcat(const std::vector<MX>& x) const {
     // Check if there is any existing horzcat operation
     for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
-      if (i->getOp()==OP_HORZCAT) {
+      if (i->op()==OP_HORZCAT) {
         // Split up
         vector<MX> x_split(x.begin(), i);
         for (; i!=x.end(); ++i) {
-          if (i->getOp()==OP_HORZCAT) {
+          if (i->op()==OP_HORZCAT) {
             x_split.insert(x_split.end(), (*i)->dep_.begin(), (*i)->dep_.end());
           } else {
             x_split.push_back(*i);
@@ -796,11 +796,11 @@ namespace casadi {
   MX MXNode::getVertcat(const std::vector<MX>& x) const {
     // Check if there is any existing vertcat operation
     for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
-      if (i->getOp()==OP_VERTCAT) {
+      if (i->op()==OP_VERTCAT) {
         // Split up
         vector<MX> x_split(x.begin(), i);
         for (; i!=x.end(); ++i) {
-          if (i->getOp()==OP_VERTCAT) {
+          if (i->op()==OP_VERTCAT) {
             x_split.insert(x_split.end(), (*i)->dep_.begin(), (*i)->dep_.end());
           } else {
             x_split.push_back(*i);
@@ -814,7 +814,7 @@ namespace casadi {
   }
 
   std::vector<MX> MXNode::getHorzsplit(const std::vector<int>& output_offset) const {
-    if (isZero()) {
+    if (is_zero()) {
       std::vector<MX> ret =
           MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(), output_offset));
       for (int i=0;i<ret.size();++i) {
@@ -827,7 +827,7 @@ namespace casadi {
 
     if (CasadiOptions::simplification_on_the_fly) {
       // Simplify horzsplit(horzcat)
-      if (getOp()==OP_HORZCAT) {
+      if (op()==OP_HORZCAT) {
         int offset_deps = 0;
         int j = 0;
         for (int i=0;i<output_offset.size();++i) {
@@ -865,7 +865,7 @@ namespace casadi {
 
   std::vector<MX> MXNode::get_diagsplit(const std::vector<int>& offset1,
                                        const std::vector<int>& offset2) const {
-    if (isZero()) {
+    if (is_zero()) {
       std::vector<MX> ret =
           MX::createMultipleOutput(new Diagsplit(shared_from_this<MX>(), offset1, offset2));
       for (int i=0;i<ret.size();++i) {
@@ -880,7 +880,7 @@ namespace casadi {
   }
 
   std::vector<MX> MXNode::getVertsplit(const std::vector<int>& output_offset) const {
-    if (isZero()) {
+    if (is_zero()) {
       std::vector<MX> ret =
           MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(), output_offset));
       for (int i=0;i<ret.size();++i) {
@@ -893,7 +893,7 @@ namespace casadi {
 
     if (CasadiOptions::simplification_on_the_fly) {
       // Simplify vertsplit(vertcat)
-      if (getOp()==OP_VERTCAT) {
+      if (op()==OP_VERTCAT) {
         int offset_deps = 0;
         int j = 0;
         for (int i=0;i<output_offset.size();++i) {

@@ -46,12 +46,12 @@ namespace casadi {
     FixedStepIntegrator::init();
 
     // Get the NLP creator function
-    std::string implicit_function_name = getOption("implicit_solver");
+    std::string implicit_function_name = option("implicit_solver");
 
     // Options
     Dict implicit_solver_options;
     if (hasSetOption("implicit_solver_options")) {
-      implicit_solver_options = getOption("implicit_solver_options");
+      implicit_solver_options = option("implicit_solver_options");
     }
     implicit_solver_options["implicit_input"] = DAE_Z;
     implicit_solver_options["implicit_output"] = DAE_ALG;
@@ -65,12 +65,12 @@ namespace casadi {
     if (nRZ_>0) {
 
       // Get the NLP creator function
-      std::string backward_implicit_function_name = getOption("implicit_solver");
+      std::string backward_implicit_function_name = option("implicit_solver");
 
       // Options
       Dict backward_implicit_solver_options;
       if (hasSetOption("implicit_solver_options")) {
-        backward_implicit_solver_options = getOption("implicit_solver_options");
+        backward_implicit_solver_options = option("implicit_solver_options");
       }
       backward_implicit_solver_options["implicit_input"] = RDAE_RZ;
       backward_implicit_solver_options["implicit_output"] = RDAE_ALG;

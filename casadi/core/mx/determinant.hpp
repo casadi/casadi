@@ -61,7 +61,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_DETERMINANT;}
+    virtual int op() const { return OP_DETERMINANT;}
   };
 
 

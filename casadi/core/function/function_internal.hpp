@@ -763,7 +763,7 @@ namespace casadi {
   template<typename MatType>
   bool FunctionInternal::purgable(const std::vector<MatType>& v) {
     for (typename std::vector<MatType>::const_iterator i=v.begin(); i!=v.end(); ++i) {
-      if (!i->isZero()) return false;
+      if (!i->is_zero()) return false;
     }
     return true;
   }

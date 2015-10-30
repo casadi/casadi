@@ -68,7 +68,7 @@ void LiftedSQPInternal::init(){
   NlpSolverInternal::init();
 
   // Number of lifted variables
-  nv = getOption("num_lifted");
+  nv = option("num_lifted");
   if(verbose_){
     cout << "Initializing SQP method with " << nx_ << " variables and " << ng_ << " constraints." << endl;
     cout << "Lifting " << nv << " variables." << endl;
@@ -78,15 +78,15 @@ void LiftedSQPInternal::init(){
   }
   
   // Read options
-  max_iter_ = getOption("max_iter");
-  max_iter_ls_ = getOption("max_iter_ls");
-  toldx_ = getOption("toldx");
-  tolgl_ = getOption("tolgl");
-  sigma_ = getOption("sigma");
-  rho_ = getOption("rho");
-  mu_safety_ = getOption("mu_safety");
-  eta_ = getOption("eta");
-  tau_ = getOption("tau");
+  max_iter_ = option("max_iter");
+  max_iter_ls_ = option("max_iter_ls");
+  toldx_ = option("toldx");
+  tolgl_ = option("tolgl");
+  sigma_ = option("sigma");
+  rho_ = option("rho");
+  mu_safety_ = option("mu_safety");
+  eta_ = option("eta");
+  tau_ = option("tau");
     
   // Assume SXFunction for now
   SXFunction ffcn = shared_cast<SXFunction>(F_);
@@ -340,12 +340,12 @@ void LiftedSQPInternal::init(){
   DMatrix &lam_g_k = output(NLP_SOLVER_LAM_G);
 
   // Allocate a QP solver
-  QpSolverCreator qp_solver_creator = getOption("qp_solver");
+  QpSolverCreator qp_solver_creator = option("qp_solver");
   qp_solver_ = qp_solver_creator(B1.sparsity(),B2.sparsity());
   
   // Set options if provided
   if(hasSetOption("qp_solver_options")){
-    Dictionary qp_solver_options = getOption("qp_solver_options");
+    Dictionary qp_solver_options = option("qp_solver_options");
     qp_solver_.setOption(qp_solver_options);
   }
   

@@ -105,7 +105,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_HORZSPLIT;}
+    virtual int op() const { return OP_HORZSPLIT;}
 
     /// Create a horizontal concatenation node
     virtual MX getHorzcat(const std::vector<MX>& x) const;
@@ -139,7 +139,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_DIAGSPLIT;}
+    virtual int op() const { return OP_DIAGSPLIT;}
 
     /// Create a diagonal concatenation node
     virtual MX get_diagcat(const std::vector<MX>& x) const;
@@ -173,7 +173,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_VERTSPLIT;}
+    virtual int op() const { return OP_VERTSPLIT;}
 
     /// Create a vertical concatenation node (vectors only)
     virtual MX getVertcat(const std::vector<MX>& x) const;

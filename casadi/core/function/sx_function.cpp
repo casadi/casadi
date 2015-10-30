@@ -143,7 +143,7 @@ namespace casadi {
 
     // Create function
     Dict opts;
-    opts["verbose"] = getOption("verbose");
+    opts["verbose"] = option("verbose");
     Function gfcn("gfcn", {inputv_.at(iind)}, {g}, opts);
 
     // Calculate jacobian of gradient
@@ -159,7 +159,7 @@ namespace casadi {
     return ret;
   }
 
-  bool SXFunction::isSmooth() const {
+  bool SXFunction::is_smooth() const {
     // Go through all nodes and check if any node is non-smooth
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       if (!operation_checker<SmoothChecker>(it->op)) {
@@ -302,15 +302,15 @@ namespace casadi {
     for (vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
       SXNode* t = *it;
       if (t) {
-        if (t->isConstant())
+        if (t->is_constant())
           constants_.push_back(SXElement::create(t));
-        else if (!t->isSymbolic())
+        else if (!t->is_symbolic())
           operations_.push_back(SXElement::create(t));
       }
     }
 
     // Use live variables?
-    bool live_variables = getOption("live_variables");
+    bool live_variables = option("live_variables");
 
     // Input instructions
     vector<pair<int, SXNode*> > symb_loc;
@@ -337,7 +337,7 @@ namespace casadi {
       AlgEl ae;
 
       // Get operation
-      ae.op = n==0 ? OP_OUTPUT : n->getOp();
+      ae.op = n==0 ? OP_OUTPUT : n->op();
 
       // Get instruction
       switch (ae.op) {
@@ -496,7 +496,7 @@ namespace casadi {
     }
 
     // Initialize just-in-time compilation for numeric evaluation using OpenCL
-    just_in_time_opencl_ = getOption("just_in_time_opencl");
+    just_in_time_opencl_ = option("just_in_time_opencl");
     if (just_in_time_opencl_) {
 #ifdef WITH_OPENCL
       freeOpenCL();
@@ -508,7 +508,7 @@ namespace casadi {
     }
 
     // Initialize just-in-time compilation for sparsity propagation using OpenCL
-    just_in_time_sparsity_ = getOption("just_in_time_sparsity");
+    just_in_time_sparsity_ = option("just_in_time_sparsity");
     if (just_in_time_sparsity_) {
 #ifdef WITH_OPENCL
       spFreeOpenCL();

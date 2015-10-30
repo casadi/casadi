@@ -192,7 +192,7 @@ namespace casadi {
     NlpSolver::init();
 
     if (hasSetOption("Ares")) {
-      std::vector<int> ares = getOption("Ares");
+      std::vector<int> ares = option("Ares");
       std::copy(ares.begin(), ares.begin()+NAres, worhp_p_.Ares);
     }
 
@@ -200,7 +200,7 @@ namespace casadi {
     passOptions();
 
     // Exact Hessian?
-    exact_hessian_ = getOption("UserHM");
+    exact_hessian_ = option("UserHM");
 
     // Get/generate required functions
     gradF();
@@ -367,51 +367,51 @@ namespace casadi {
 
       switch (type) {
         case WORHP_BOOL_T:
-          if (hasSetOption(name)) WorhpSetBoolParam(&worhp_p_, name, getOption(name));
+          if (hasSetOption(name)) WorhpSetBoolParam(&worhp_p_, name, option(name));
           break;
         case WORHP_DOUBLE_T:
-          if (hasSetOption(name)) WorhpSetDoubleParam(&worhp_p_, name, getOption(name));
+          if (hasSetOption(name)) WorhpSetDoubleParam(&worhp_p_, name, option(name));
           break;
         case WORHP_INT_T:
-          if (hasSetOption(name)) WorhpSetIntParam(&worhp_p_, name, getOption(name));
+          if (hasSetOption(name)) WorhpSetIntParam(&worhp_p_, name, option(name));
           break;
         default:
           break;// do nothing
       }
     }
 
-    if (hasSetOption("qp_ipBarrier")) worhp_p_.qp.ipBarrier = getOption("qp_ipBarrier");
-    if (hasSetOption("qp_ipComTol")) worhp_p_.qp.ipComTol = getOption("qp_ipComTol");
-    if (hasSetOption("qp_ipFracBound")) worhp_p_.qp.ipFracBound = getOption("qp_ipFracBound");
-    if (hasSetOption("qp_ipLsMethod")) worhp_p_.qp.ipLsMethod = getOptionEnumValue("qp_ipLsMethod");
-    if (hasSetOption("qp_ipMinAlpha")) worhp_p_.qp.ipMinAlpha = getOption("qp_ipMinAlpha");
-    if (hasSetOption("qp_ipTryRelax")) worhp_p_.qp.ipTryRelax = getOption("qp_ipTryRelax");
-    if (hasSetOption("qp_ipRelaxDiv")) worhp_p_.qp.ipRelaxDiv = getOption("qp_ipRelaxDiv");
-    if (hasSetOption("qp_ipRelaxMult")) worhp_p_.qp.ipRelaxMult = getOption("qp_ipRelaxMult");
-    if (hasSetOption("qp_ipRelaxMax")) worhp_p_.qp.ipRelaxMax = getOption("qp_ipRelaxMax");
-    if (hasSetOption("qp_ipRelaxMin")) worhp_p_.qp.ipRelaxMin = getOption("qp_ipRelaxMin");
-    if (hasSetOption("qp_ipResTol")) worhp_p_.qp.ipResTol = getOption("qp_ipResTol");
-    if (hasSetOption("qp_lsItMaxIter")) worhp_p_.qp.lsItMaxIter = getOption("qp_lsItMaxIter");
-    if (hasSetOption("qp_lsItMethod")) worhp_p_.qp.lsItMethod = getOptionEnumValue("qp_lsItMethod");
+    if (hasSetOption("qp_ipBarrier")) worhp_p_.qp.ipBarrier = option("qp_ipBarrier");
+    if (hasSetOption("qp_ipComTol")) worhp_p_.qp.ipComTol = option("qp_ipComTol");
+    if (hasSetOption("qp_ipFracBound")) worhp_p_.qp.ipFracBound = option("qp_ipFracBound");
+    if (hasSetOption("qp_ipLsMethod")) worhp_p_.qp.ipLsMethod = optionEnumValue("qp_ipLsMethod");
+    if (hasSetOption("qp_ipMinAlpha")) worhp_p_.qp.ipMinAlpha = option("qp_ipMinAlpha");
+    if (hasSetOption("qp_ipTryRelax")) worhp_p_.qp.ipTryRelax = option("qp_ipTryRelax");
+    if (hasSetOption("qp_ipRelaxDiv")) worhp_p_.qp.ipRelaxDiv = option("qp_ipRelaxDiv");
+    if (hasSetOption("qp_ipRelaxMult")) worhp_p_.qp.ipRelaxMult = option("qp_ipRelaxMult");
+    if (hasSetOption("qp_ipRelaxMax")) worhp_p_.qp.ipRelaxMax = option("qp_ipRelaxMax");
+    if (hasSetOption("qp_ipRelaxMin")) worhp_p_.qp.ipRelaxMin = option("qp_ipRelaxMin");
+    if (hasSetOption("qp_ipResTol")) worhp_p_.qp.ipResTol = option("qp_ipResTol");
+    if (hasSetOption("qp_lsItMaxIter")) worhp_p_.qp.lsItMaxIter = option("qp_lsItMaxIter");
+    if (hasSetOption("qp_lsItMethod")) worhp_p_.qp.lsItMethod = optionEnumValue("qp_lsItMethod");
     if (hasSetOption("qp_lsItPrecondMethod"))
-        worhp_p_.qp.lsItPrecondMethod = getOptionEnumValue("qp_lsItPrecondMethod");
+        worhp_p_.qp.lsItPrecondMethod = optionEnumValue("qp_lsItPrecondMethod");
     if (hasSetOption("qp_lsRefineMaxIter"))
-        worhp_p_.qp.lsRefineMaxIter = getOption("qp_lsRefineMaxIter");
-    if (hasSetOption("qp_lsScale")) worhp_p_.qp.lsScale = getOption("qp_lsScale");
-    if (hasSetOption("qp_lsTrySimple")) worhp_p_.qp.lsTrySimple = getOption("qp_lsTrySimple");
-    if (hasSetOption("qp_lsTol")) worhp_p_.qp.lsTol = getOption("qp_lsTol");
-    if (hasSetOption("qp_maxIter")) worhp_p_.qp.maxIter = getOption("qp_maxIter");
-    if (hasSetOption("qp_method")) worhp_p_.qp.method = getOptionEnumValue("qp_method");
-    if (hasSetOption("qp_nsnBeta")) worhp_p_.qp.nsnBeta = getOption("qp_nsnBeta");
-    if (hasSetOption("qp_nsnGradStep")) worhp_p_.qp.nsnGradStep = getOption("qp_nsnGradStep");
-    if (hasSetOption("qp_nsnKKT")) worhp_p_.qp.nsnKKT = getOption("qp_nsnKKT");
+        worhp_p_.qp.lsRefineMaxIter = option("qp_lsRefineMaxIter");
+    if (hasSetOption("qp_lsScale")) worhp_p_.qp.lsScale = option("qp_lsScale");
+    if (hasSetOption("qp_lsTrySimple")) worhp_p_.qp.lsTrySimple = option("qp_lsTrySimple");
+    if (hasSetOption("qp_lsTol")) worhp_p_.qp.lsTol = option("qp_lsTol");
+    if (hasSetOption("qp_maxIter")) worhp_p_.qp.maxIter = option("qp_maxIter");
+    if (hasSetOption("qp_method")) worhp_p_.qp.method = optionEnumValue("qp_method");
+    if (hasSetOption("qp_nsnBeta")) worhp_p_.qp.nsnBeta = option("qp_nsnBeta");
+    if (hasSetOption("qp_nsnGradStep")) worhp_p_.qp.nsnGradStep = option("qp_nsnGradStep");
+    if (hasSetOption("qp_nsnKKT")) worhp_p_.qp.nsnKKT = option("qp_nsnKKT");
     if (hasSetOption("qp_nsnLsMethod"))
-        worhp_p_.qp.nsnLsMethod = getOptionEnumValue("qp_nsnLsMethod");
-    if (hasSetOption("qp_nsnMinAlpha")) worhp_p_.qp.nsnMinAlpha = getOption("qp_nsnMinAlpha");
-    if (hasSetOption("qp_nsnSigma")) worhp_p_.qp.nsnSigma = getOption("qp_nsnSigma");
-    if (hasSetOption("qp_printLevel")) worhp_p_.qp.printLevel = getOptionEnumValue("qp_printLevel");
-    if (hasSetOption("qp_scaleIntern")) worhp_p_.qp.scaleIntern = getOption("qp_scaleIntern");
-    if (hasSetOption("qp_strict")) worhp_p_.qp.strict = getOption("qp_strict");
+        worhp_p_.qp.nsnLsMethod = optionEnumValue("qp_nsnLsMethod");
+    if (hasSetOption("qp_nsnMinAlpha")) worhp_p_.qp.nsnMinAlpha = option("qp_nsnMinAlpha");
+    if (hasSetOption("qp_nsnSigma")) worhp_p_.qp.nsnSigma = option("qp_nsnSigma");
+    if (hasSetOption("qp_printLevel")) worhp_p_.qp.printLevel = optionEnumValue("qp_printLevel");
+    if (hasSetOption("qp_scaleIntern")) worhp_p_.qp.scaleIntern = option("qp_scaleIntern");
+    if (hasSetOption("qp_strict")) worhp_p_.qp.strict = option("qp_strict");
 
     // Mark the parameters as set
     worhp_p_.initialised = true;
@@ -620,7 +620,7 @@ namespace casadi {
 
     StatusMsg(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
 
-    if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
+    if (hasOption("print_time") && static_cast<bool>(option("print_time"))) {
       // Write timings
       userOut() << "time spent in eval_f: " << t_eval_f_ << " s.";
       if (n_eval_f_>0)
@@ -728,7 +728,7 @@ namespace casadi {
         userOut() << "H = " << hessLag.output(HESSLAG_HESS) << std::endl;
       }
 
-      if (regularity_check_ && !isRegular(hessLag.output(HESSLAG_HESS).data()))
+      if (regularity_check_ && !is_regular(hessLag.output(HESSLAG_HESS).data()))
           casadi_error("WorhpInterface::eval_h: NaN or Inf detected.");
 
       double time2 = clock();
@@ -812,7 +812,7 @@ namespace casadi {
       }
       obj_value *= scale;
 
-      if (regularity_check_ && !isRegular(nlp_.output().data()))
+      if (regularity_check_ && !is_regular(nlp_.output().data()))
           casadi_error("WorhpInterface::eval_f: NaN or Inf detected.");
 
       double time2 = clock();
@@ -849,7 +849,7 @@ namespace casadi {
         }
       }
 
-      if (regularity_check_ && !isRegular(nlp_.output(NL_G).data()))
+      if (regularity_check_ && !is_regular(nlp_.output(NL_G).data()))
           casadi_error("WorhpInterface::eval_g: NaN or Inf detected.");
 
       double time2 = clock();
@@ -888,7 +888,7 @@ namespace casadi {
         userOut() << "grad_f = " << gradF_.output() << endl;
       }
 
-      if (regularity_check_ && !isRegular(gradF_.output().data()))
+      if (regularity_check_ && !is_regular(gradF_.output().data()))
           casadi_error("WorhpInterface::eval_grad_f: NaN or Inf detected.");
 
       double time2 = clock();

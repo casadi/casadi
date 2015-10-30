@@ -287,7 +287,7 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
     }
 
     friend inline bool iszero(const ExType& x) {
-      return x.isZero();
+      return x.is_zero();
     }
 
     /// Copy sign

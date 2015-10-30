@@ -146,12 +146,12 @@ def minimize(f,gl=[],verbose=False):
   g_eq = []
   g_nsd = []
   for g in gl:
-    if g.isOperation(OP_LE) or g.isOperation(OP_LT):
+    if g.is_op(OP_LE) or g.is_op(OP_LT):
       if (min(g.getDep(0).shape) > 1 and g.getDep(0).shape[0]==g.getDep(0).shape[1]) or (min(g.getDep(1).shape) > 1 and g.getDep(1).shape[0]==g.getDep(1).shape[1]):
         g_nsd.append(g.getDep(0)-g.getDep(1))
       else:
         g_le.append(g.getDep(0)-g.getDep(1))
-    elif g.isOperation(OP_EQ):
+    elif g.is_op(OP_EQ):
       g_eq.append(g.getDep(0)-g.getDep(1))
     else:
       print g

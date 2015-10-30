@@ -91,22 +91,22 @@ namespace casadi {
     virtual bool __nonzero__() const;
 
     /** \brief Check if identically zero */
-    virtual bool isZero() const { return false;}
+    virtual bool is_zero() const { return false;}
 
     /** \brief Check if identically one */
-    virtual bool isOne() const { return false;}
+    virtual bool is_one() const { return false;}
 
     /** \brief Check if a certain value */
     virtual bool isValue(double val) const { return false;}
 
     /** \brief Check if identity matrix */
-    virtual bool isIdentity() const { return false;}
+    virtual bool is_identity() const { return false;}
 
     /** \brief Check if unary operation */
-    virtual bool isUnaryOp() const { return false;}
+    virtual bool is_unaryOp() const { return false;}
 
     /** \brief Check if binary operation */
-    virtual bool isBinaryOp() const { return false;}
+    virtual bool is_binaryOp() const { return false;}
 
     /** \brief  Print a representation */
     virtual void repr(std::ostream &stream) const;
@@ -159,22 +159,22 @@ namespace casadi {
     virtual const std::string& getName() const;
 
     /** \brief  Check if valid function input */
-    virtual bool isValidInput() const { return false;}
+    virtual bool is_valid_input() const { return false;}
 
     /** \brief Get the number of symbolic primitives */
-    virtual int numPrimitives() const;
+    virtual int n_primitives() const;
 
     /** \brief Get symbolic primitives */
-    virtual void getPrimitives(std::vector<MX>::iterator& it) const;
+    virtual void primitives(std::vector<MX>::iterator& it) const;
 
     /** \brief Split up an expression along symbolic primitives */
-    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const;
 
     /** \brief Join an expression along symbolic primitives */
-    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const;
 
     /** \brief Detect duplicate symbolic expressions */
-    virtual bool hasDuplicates();
+    virtual bool has_duplicates();
 
     /** \brief Reset the marker for an input expression */
     virtual void resetInput();
@@ -198,7 +198,7 @@ namespace casadi {
     virtual int getFunctionOutput() const;
 
     /** \brief Get the operation */
-    virtual int getOp() const = 0;
+    virtual int op() const = 0;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool zz_is_equal(const MXNode* node, int depth) const { return false;}

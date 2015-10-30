@@ -117,13 +117,13 @@ namespace casadi {
     // Sundials return flag
     int flag;
 
-    if (getOption("linear_multistep_method")=="adams")  lmm_ = CV_ADAMS;
-    else if (getOption("linear_multistep_method")=="bdf") lmm_ = CV_BDF;
+    if (option("linear_multistep_method")=="adams")  lmm_ = CV_ADAMS;
+    else if (option("linear_multistep_method")=="bdf") lmm_ = CV_BDF;
     else
       throw CasadiException("Unknown linear multistep method");
 
-    if (getOption("nonlinear_solver_iteration")=="newton") iter_ = CV_NEWTON;
-    else if (getOption("nonlinear_solver_iteration")=="functional") iter_ = CV_FUNCTIONAL;
+    if (option("nonlinear_solver_iteration")=="newton") iter_ = CV_NEWTON;
+    else if (option("nonlinear_solver_iteration")=="functional") iter_ = CV_FUNCTIONAL;
     else
       throw CasadiException("Unknown nonlinear solver iteration");
 
@@ -136,7 +136,7 @@ namespace casadi {
     x_ = N_VMake_Serial(nx_, output(INTEGRATOR_XF).ptr());
 
     // Disable internal warning messages?
-    disable_internal_warnings_ = getOption("disable_internal_warnings");
+    disable_internal_warnings_ = option("disable_internal_warnings");
 
     // Set error handler function
     flag = CVodeSetErrHandlerFn(mem_, ehfun_wrapper, this);
@@ -152,7 +152,7 @@ namespace casadi {
     if (flag!=CV_SUCCESS) cvodes_error("CVodeInit", flag);
 
     // Maximum number of steps
-    CVodeSetMaxNumSteps(mem_, getOption("max_num_steps").toInt());
+    CVodeSetMaxNumSteps(mem_, option("max_num_steps").toInt());
     if (flag != CV_SUCCESS) cvodes_error("CVodeSetMaxNumSteps", flag);
 
     // attach a linear solver
@@ -186,7 +186,7 @@ namespace casadi {
       if (flag != CV_SUCCESS) cvodes_error("CVodeQuadInit", flag);
 
       // Should the quadrature errors be used for step size control?
-      if (getOption("quad_err_con").toInt()) {
+      if (option("quad_err_con").toInt()) {
         flag = CVodeSetQuadErrCon(mem_, true);
         if (flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrCon", flag);
 
@@ -216,11 +216,11 @@ namespace casadi {
     //   }
 
     //   // Calculate all forward sensitivity right hand sides at once?
-    //   bool all_at_once = getOption("fsens_all_at_once");
+    //   bool all_at_once = option("fsens_all_at_once");
 
     //   // Get the sensitivity method
-    //   if (getOption("sensitivity_method")=="simultaneous") ism_ = CV_SIMULTANEOUS;
-    //   else if (getOption("sensitivity_method")=="staggered")
+    //   if (option("sensitivity_method")=="simultaneous") ism_ = CV_SIMULTANEOUS;
+    //   else if (option("sensitivity_method")=="staggered")
     //             ism_ = all_at_once ? CV_STAGGERED : CV_STAGGERED1;
     //   else throw CasadiException("CVodes: Unknown sensitivity method");
 
@@ -259,7 +259,7 @@ namespace casadi {
     //   if (flag != CV_SUCCESS) cvodes_error("CVodeSensSStolerances", flag);
 
     //   // Set optional inputs
-    //   bool errconS = getOption("fsens_err_con");
+    //   bool errconS = option("fsens_err_con");
     //   flag = CVodeSetSensErrCon(mem_, errconS);
     //   if (flag != CV_SUCCESS) cvodes_error("CVodeSetSensErrCon", flag);
 
@@ -289,13 +289,13 @@ namespace casadi {
       //     }
 
       // Get the number of steos per checkpoint
-      int Nd = getOption("steps_per_checkpoint");
+      int Nd = option("steps_per_checkpoint");
 
       // Get the interpolation type
       int interpType;
-      if (getOption("interpolation_type")=="hermite")
+      if (option("interpolation_type")=="hermite")
         interpType = CV_HERMITE;
-      else if (getOption("interpolation_type")=="polynomial")
+      else if (option("interpolation_type")=="polynomial")
         interpType = CV_POLYNOMIAL;
       else
         throw CasadiException("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
@@ -352,7 +352,7 @@ namespace casadi {
     flag = CVodeQuadInitB(mem_, whichB_, rhsQB_wrapper, rq_);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeQuadInitB", flag);
 
-    if (getOption("quad_err_con").toInt()) {
+    if (option("quad_err_con").toInt()) {
       flag = CVodeSetQuadErrConB(mem_, whichB_, true);
       if (flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrConB", flag);
 
@@ -511,7 +511,7 @@ namespace casadi {
 
 
     // Print statistics
-    if (getOption("print_stats")) printStats(userOut());
+    if (option("print_stats")) printStats(userOut());
 
     if (gather_stats_) {
       long nsteps, nfevals, nlinsetups, netfails;

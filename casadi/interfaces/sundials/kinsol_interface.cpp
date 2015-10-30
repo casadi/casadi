@@ -103,10 +103,10 @@ namespace casadi {
     Rootfinder::init();
 
     // Read options
-    if (getOption("strategy")=="linesearch") {
+    if (option("strategy")=="linesearch") {
       strategy_ = KIN_LINESEARCH;
     } else {
-      casadi_assert(getOption("strategy")=="none");
+      casadi_assert(option("strategy")=="none");
       strategy_ = KIN_NONE;
     }
 
@@ -114,7 +114,7 @@ namespace casadi {
     int flag;
 
     // Use exact Jacobian?
-    bool exact_jacobian = getOption("exact_jacobian");
+    bool exact_jacobian = option("exact_jacobian");
 
     // Allocate N_Vectors
     if (u_) N_VDestroy_Serial(u_);
@@ -126,7 +126,7 @@ namespace casadi {
 
     // Set scaling factors on variables
     if (hasSetOption("u_scale")) {
-      const vector<double>& u_scale = getOption("u_scale");
+      const vector<double>& u_scale = option("u_scale");
       casadi_assert(u_scale.size()==NV_LENGTH_S(u_scale_));
       copy(u_scale.begin(), u_scale.end(), NV_DATA_S(u_scale_));
     } else {
@@ -135,7 +135,7 @@ namespace casadi {
 
     // Set scaling factors on equations
     if (hasSetOption("f_scale")) {
-      const vector<double>& f_scale = getOption("f_scale");
+      const vector<double>& f_scale = option("f_scale");
       casadi_assert(f_scale.size()==NV_LENGTH_S(f_scale_));
       copy(f_scale.begin(), f_scale.end(), NV_DATA_S(f_scale_));
     } else {
@@ -155,7 +155,7 @@ namespace casadi {
     casadi_assert_message(flag==KIN_SUCCESS, "KINSetUserData");
 
     // Disable internal warning messages?
-    disable_internal_warnings_ = getOption("disable_internal_warnings");
+    disable_internal_warnings_ = option("disable_internal_warnings");
 
     // Set error handler function
     flag = KINSetErrHandlerFn(mem_, ehfun_wrapper, this);
@@ -166,7 +166,7 @@ namespace casadi {
     casadi_assert(flag==KIN_SUCCESS);
 
     // Setting maximum number of Newton iterations
-    flag = KINSetMaxNewtonStep(mem_, getOption("max_iter"));
+    flag = KINSetMaxNewtonStep(mem_, option("max_iter"));
     casadi_assert(flag==KIN_SUCCESS);
 
     // Set constraints
@@ -184,7 +184,7 @@ namespace casadi {
     }
 
     // attach a linear solver
-    if (getOption("linear_solver_type")=="dense") {
+    if (option("linear_solver_type")=="dense") {
       // Dense Jacobian
       flag = KINDense(mem_, n_);
       casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
@@ -194,10 +194,10 @@ namespace casadi {
         casadi_assert_message(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
       }
 
-    } else if (getOption("linear_solver_type")=="banded") {
+    } else if (option("linear_solver_type")=="banded") {
       // Banded Jacobian
-      flag = KINBand(mem_, n_, getOption("upper_bandwidth").toInt(),
-                     getOption("lower_bandwidth").toInt());
+      flag = KINBand(mem_, n_, option("upper_bandwidth").toInt(),
+                     option("lower_bandwidth").toInt());
       casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
 
       if (exact_jacobian) {
@@ -205,19 +205,19 @@ namespace casadi {
         casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
       }
 
-    } else if (getOption("linear_solver_type")=="iterative") {
+    } else if (option("linear_solver_type")=="iterative") {
       // Sparse (iterative) solver
       // Max dimension of the Krylov space
-      int maxl = getOption("max_krylov").toInt();
+      int maxl = option("max_krylov").toInt();
 
       // Attach the sparse solver
-      if (getOption("iterative_solver")=="gmres") {
+      if (option("iterative_solver")=="gmres") {
         flag = KINSpgmr(mem_, maxl);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSpgmr");
-      } else if (getOption("iterative_solver")=="bcgstab") {
+      } else if (option("iterative_solver")=="bcgstab") {
         flag = KINSpbcg(mem_, maxl);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSpbcg");
-      } else if (getOption("iterative_solver")=="tfqmr") {
+      } else if (option("iterative_solver")=="tfqmr") {
         flag = KINSptfqmr(mem_, maxl);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSptfqmr");
       } else {
@@ -234,7 +234,7 @@ namespace casadi {
       }
 
       // Add a preconditioner
-      if (static_cast<bool>(getOption("use_preconditioner"))) {
+      if (static_cast<bool>(option("use_preconditioner"))) {
         // Make sure that a Jacobian has been provided
         casadi_assert_message(!jac_.isNull(), "No Jacobian has been provided");
 
@@ -246,7 +246,7 @@ namespace casadi {
         casadi_assert(flag==KIN_SUCCESS);
       }
 
-    } else if (getOption("linear_solver_type")=="user_defined") {
+    } else if (option("linear_solver_type")=="user_defined") {
       // Make sure that a Jacobian has been provided
       casadi_assert(!jac_.isNull());
 
@@ -266,7 +266,7 @@ namespace casadi {
 
     // Set stop criterion
     if (hasSetOption("abstol")) {
-      flag = KINSetFuncNormTol(mem_, getOption("abstol"));
+      flag = KINSetFuncNormTol(mem_, option("abstol"));
       casadi_assert(flag==KIN_SUCCESS);
     }
   }

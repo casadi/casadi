@@ -131,38 +131,38 @@ namespace casadi {
     // Call the init method of the base class
     NlpSolver::init();
 
-    //if (hasSetOption("Alg")) int_param_["alg"] = getOption("Alg");
-    if (hasSetOption("BarRule")) int_param_["barrule"] = getOption("BarRule");
-    if (hasSetOption("NewPoint")) int_param_["newpoint"] = getOption("NewPoint");
-    if (hasSetOption("GradOpt")) int_param_["gradopt"] = getOption("GradOpt");
-    if (hasSetOption("HessOpt")) int_param_["hessopt"] = getOption("HessOpt");
-    if (hasSetOption("Feasible")) int_param_["feasible"] = getOption("Feasible");
-    if (hasSetOption("HonorBnds")) int_param_["honorbnds"] = getOption("HonorBnds");
-    if (hasSetOption("LpSolver")) int_param_["lpsolver"] = getOption("LpSolver");
-    if (hasSetOption("Multistart")) int_param_["multistart"] = getOption("Multistart");
-    //if (hasSetOption("MsMaxSolves")) int_param_["msmaxsolves"] = getOption("MsMaxSolves");
-    if (hasSetOption("MaxCgIt")) int_param_["maxcgit"] = getOption("MaxCgIt");
-    //if (hasSetOption("MaxCrossTt")) int_param_["maxcrosstt"] = getOption("MaxCrossTt");
-    if (hasSetOption("MaxIt")) int_param_["maxit"] = getOption("MaxIt");
-    //if (hasSetOption("MaxTimeCPU")) double_param_["maxtimecpu"] = getOption("MaxTimeCPU");
-    //if (hasSetOption("MaxTimeReal")) double_param_["maxtimereal"] = getOption("MaxTimeReal");
-    if (hasSetOption("LmSize")) int_param_["lmsize"] = getOption("LmSize");
-    if (hasSetOption("Scale")) int_param_["scale"] = getOption("Scale");
-    if (hasSetOption("ShiftInit")) int_param_["shiftinit"] = getOption("ShiftInit");
-    if (hasSetOption("Soc")) int_param_["soc"] = getOption("Soc");
-    if (hasSetOption("InitPt")) int_param_["initpt"] = getOption("InitPt");
-    if (hasSetOption("Delta")) double_param_["delta"] = getOption("Delta");
-    if (hasSetOption("FeasModeTol")) double_param_["feasmodetol"] = getOption("FeasModeTol");
-    if (hasSetOption("FeasTol")) double_param_["feastol"] = getOption("FeasTol");
-    if (hasSetOption("FeasTolAbs")) double_param_["feastolabs"] = getOption("FeasTolAbs");
-    if (hasSetOption("OptTol")) double_param_["opttol"] = getOption("OptTol");
-    if (hasSetOption("OptTolAbs")) double_param_["opttolabs"] = getOption("OptTolAbs");
-    if (hasSetOption("Pivot")) double_param_["pivot"] = getOption("Pivot");
-    if (hasSetOption("XTol")) double_param_["xtol"] = getOption("XTol");
-    if (hasSetOption("Mu")) double_param_["mu"] = getOption("Mu");
-    if (hasSetOption("ObjRange")) double_param_["objrange"] = getOption("ObjRange");
-    if (hasSetOption("OutLev")) int_param_["outlev"] = getOption("OutLev");
-    if (hasSetOption("Debug")) int_param_["debug"] = getOption("Debug");
+    //if (hasSetOption("Alg")) int_param_["alg"] = option("Alg");
+    if (hasSetOption("BarRule")) int_param_["barrule"] = option("BarRule");
+    if (hasSetOption("NewPoint")) int_param_["newpoint"] = option("NewPoint");
+    if (hasSetOption("GradOpt")) int_param_["gradopt"] = option("GradOpt");
+    if (hasSetOption("HessOpt")) int_param_["hessopt"] = option("HessOpt");
+    if (hasSetOption("Feasible")) int_param_["feasible"] = option("Feasible");
+    if (hasSetOption("HonorBnds")) int_param_["honorbnds"] = option("HonorBnds");
+    if (hasSetOption("LpSolver")) int_param_["lpsolver"] = option("LpSolver");
+    if (hasSetOption("Multistart")) int_param_["multistart"] = option("Multistart");
+    //if (hasSetOption("MsMaxSolves")) int_param_["msmaxsolves"] = option("MsMaxSolves");
+    if (hasSetOption("MaxCgIt")) int_param_["maxcgit"] = option("MaxCgIt");
+    //if (hasSetOption("MaxCrossTt")) int_param_["maxcrosstt"] = option("MaxCrossTt");
+    if (hasSetOption("MaxIt")) int_param_["maxit"] = option("MaxIt");
+    //if (hasSetOption("MaxTimeCPU")) double_param_["maxtimecpu"] = option("MaxTimeCPU");
+    //if (hasSetOption("MaxTimeReal")) double_param_["maxtimereal"] = option("MaxTimeReal");
+    if (hasSetOption("LmSize")) int_param_["lmsize"] = option("LmSize");
+    if (hasSetOption("Scale")) int_param_["scale"] = option("Scale");
+    if (hasSetOption("ShiftInit")) int_param_["shiftinit"] = option("ShiftInit");
+    if (hasSetOption("Soc")) int_param_["soc"] = option("Soc");
+    if (hasSetOption("InitPt")) int_param_["initpt"] = option("InitPt");
+    if (hasSetOption("Delta")) double_param_["delta"] = option("Delta");
+    if (hasSetOption("FeasModeTol")) double_param_["feasmodetol"] = option("FeasModeTol");
+    if (hasSetOption("FeasTol")) double_param_["feastol"] = option("FeasTol");
+    if (hasSetOption("FeasTolAbs")) double_param_["feastolabs"] = option("FeasTolAbs");
+    if (hasSetOption("OptTol")) double_param_["opttol"] = option("OptTol");
+    if (hasSetOption("OptTolAbs")) double_param_["opttolabs"] = option("OptTolAbs");
+    if (hasSetOption("Pivot")) double_param_["pivot"] = option("Pivot");
+    if (hasSetOption("XTol")) double_param_["xtol"] = option("XTol");
+    if (hasSetOption("Mu")) double_param_["mu"] = option("Mu");
+    if (hasSetOption("ObjRange")) double_param_["objrange"] = option("ObjRange");
+    if (hasSetOption("OutLev")) int_param_["outlev"] = option("OutLev");
+    if (hasSetOption("Debug")) int_param_["debug"] = option("Debug");
 
     // Get/generate required functions
     gradF();
@@ -245,7 +245,7 @@ namespace casadi {
     // Type of constraints
     vector<int> cType(ng_, KTR_CONTYPE_GENERAL);
     if (hasSetOption("contype")) {
-      vector<int> contype = getOption("contype");
+      vector<int> contype = option("contype");
       casadi_assert(contype.size()==cType.size());
       copy(contype.begin(), contype.end(), cType.begin());
     }

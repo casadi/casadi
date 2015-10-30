@@ -74,15 +74,15 @@ namespace casadi {
     fill_n(res[0], nnz(), 0);
   }
 
-  void SymbolicMX::getPrimitives(std::vector<MX>::iterator& it) const {
+  void SymbolicMX::primitives(std::vector<MX>::iterator& it) const {
     *it++ = shared_from_this<MX>();
   }
 
-  void SymbolicMX::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+  void SymbolicMX::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
     *it++ = x;
   }
 
-  MX SymbolicMX::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+  MX SymbolicMX::join_primitives(std::vector<MX>::const_iterator& it) const {
     MX ret = *it++;
     if (ret.size()==size()) {
       return ret;
@@ -92,7 +92,7 @@ namespace casadi {
     }
   }
 
-  bool SymbolicMX::hasDuplicates() {
+  bool SymbolicMX::has_duplicates() {
     if (this->temp!=0) {
       userOut<true, PL_WARN>() << "Duplicate expression: " << getName() << endl;
       return true;

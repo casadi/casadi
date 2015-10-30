@@ -63,7 +63,7 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return Add ? OP_ADDNONZEROS : OP_SETNONZEROS;}
+    virtual int op() const { return Add ? OP_ADDNONZEROS : OP_SETNONZEROS;}
 
     /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;

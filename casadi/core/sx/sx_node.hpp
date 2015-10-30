@@ -56,14 +56,14 @@ namespace casadi {
 
     ///@{
     /** \brief  check properties of a node */
-    virtual bool isConstant() const; // check if constant
-    virtual bool isInteger() const; // check if integer
-    virtual bool isSymbolic() const; // check if symbolic
+    virtual bool is_constant() const; // check if constant
+    virtual bool is_integer() const; // check if integer
+    virtual bool is_symbolic() const; // check if symbolic
     virtual bool hasDep() const; // check if binary
-    virtual bool isZero() const; // check if zero
+    virtual bool is_zero() const; // check if zero
     virtual bool isAlmostZero(double tol) const; // check if almost zero
-    virtual bool isOne() const; // check if one
-    virtual bool isMinusOne() const; // check if minus one
+    virtual bool is_one() const; // check if one
+    virtual bool is_minus_one() const; // check if minus one
     virtual bool isNan() const; // check if not a number
     virtual bool isInf() const; // check if infinity
     virtual bool isMinusInf() const; // check if minus infinity
@@ -78,7 +78,7 @@ namespace casadi {
     virtual const std::string& getName() const; // get the name
 
     /** \brief get the operation */
-    virtual int getOp() const=0;
+    virtual int op() const=0;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool zz_is_equal(const SXNode* node, int depth) const;
@@ -93,7 +93,7 @@ namespace casadi {
     virtual SXElement& dep(int i);
 
     /** \brief  Check if smooth */
-    virtual bool isSmooth() const;
+    virtual bool is_smooth() const;
 
     /** \brief  print */
     virtual void print(std::ostream &stream) const;

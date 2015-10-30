@@ -7997,7 +7997,7 @@ create a matrix with all nan
 
 ";
 
-%feature("docstring") casadi::MX::isTranspose "
+%feature("docstring") casadi::MX::is_transpose "
 
 Is the expression a transpose?
 
@@ -10800,7 +10800,7 @@ format.
 
 ";
 
-%feature("docstring") casadi::Sparsity::isTranspose "
+%feature("docstring") casadi::Sparsity::is_transpose "
 
 Check if the sparsity is the transpose of another.
 

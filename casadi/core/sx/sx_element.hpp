@@ -136,26 +136,26 @@ namespace casadi {
      *
      * An SXElement qualifies as leaf when it has no dependencies.
      */
-    bool isLeaf() const;
-    bool isConstant() const;
-    bool isInteger() const;
-    bool isSymbolic() const;
+    bool is_leaf() const;
+    bool is_constant() const;
+    bool is_integer() const;
+    bool is_symbolic() const;
     bool hasDep() const;
     /** \brief Check whether a binary SXElement is commutative*/
-    bool isCommutative() const;
-    bool isZero() const;
+    bool is_commutative() const;
+    bool is_zero() const;
     bool isAlmostZero(double tol) const;
-    bool isOne() const;
-    bool isMinusOne() const;
+    bool is_one() const;
+    bool is_minus_one() const;
     bool isNan() const;
     bool isInf() const;
     bool isMinusInf() const;
     const std::string& getName() const;
-    int getOp() const;
+    int op() const;
     bool isOp(int op) const;
 
     /// Checks if expression does not contain NaN or Inf
-    bool isRegular() const;
+    bool is_regular() const;
 
     /** \brief Check if a value is always nonnegative (false negatives are allowed) */
     bool isNonNegative() const;
@@ -288,12 +288,12 @@ namespace casadi {
   template<>
   class CASADI_EXPORT casadi_limits<SXElement>{
   public:
-    static bool isZero(const SXElement& val);
+    static bool is_zero(const SXElement& val);
     static bool isAlmostZero(const SXElement& val, double tol);
-    static bool isOne(const SXElement& val);
-    static bool isMinusOne(const SXElement& val);
-    static bool isConstant(const SXElement& val);
-    static bool isInteger(const SXElement& val);
+    static bool is_one(const SXElement& val);
+    static bool is_minus_one(const SXElement& val);
+    static bool is_constant(const SXElement& val);
+    static bool is_integer(const SXElement& val);
     static bool isInf(const SXElement& val);
     static bool isMinusInf(const SXElement& val);
     static bool isNaN(const SXElement& val);

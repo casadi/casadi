@@ -116,11 +116,11 @@ namespace casadi {
                   {"f", mul(G.T(), X) + 0.5*mul(mul(X.T(), H), X)}, {"g", mul(A, X)}};
 
     Dict options;
-    if (hasSetOption(optionsname())) options = getOption(optionsname());
+    if (hasSetOption(optionsname())) options = option(optionsname());
     options = OptionsFunctionality::addOptionRecipe(options, "qp");
 
     // Create an NlpSolver instance
-    solver_ = Function::nlp_solver("nlpsolver", getOption(solvername()), nlp, options);
+    solver_ = Function::nlp_solver("nlpsolver", option(solvername()), nlp, options);
   }
 
 } // namespace casadi

@@ -48,7 +48,7 @@ class CASADI_EXPORT BinarySX : public SXNode {
 
     /** \brief  Create a binary expression */
     inline static SXElement create(unsigned char op, const SXElement& dep0, const SXElement& dep1) {
-      if (dep0.isConstant() && dep1.isConstant()) {
+      if (dep0.is_constant() && dep1.is_constant()) {
         // Evaluate constant
         double dep0_val = dep0.getValue();
         double dep1_val = dep1.getValue();
@@ -130,7 +130,7 @@ class CASADI_EXPORT BinarySX : public SXNode {
       }
     }
 
-    virtual bool isSmooth() const { return operation_checker<SmoothChecker>(op_);}
+    virtual bool is_smooth() const { return operation_checker<SmoothChecker>(op_);}
 
     virtual bool hasDep() const { return true; }
 
@@ -153,7 +153,7 @@ class CASADI_EXPORT BinarySX : public SXNode {
     virtual SXElement& dep(int i) { return i==0 ? dep0_ : dep1_;}
 
     /** \brief  Get the operation */
-    virtual int getOp() const { return op_;}
+    virtual int op() const { return op_;}
 
     /** \brief  Print expression */
     virtual std::string print(const std::string& arg1, const std::string& arg2) const {

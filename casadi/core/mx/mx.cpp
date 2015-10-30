@@ -70,7 +70,7 @@ namespace casadi {
     } else if (val.isscalar()) {
       // Dense matrix if val dense
       if (val.isdense()) {
-        if (val.isConstant()) {
+        if (val.is_constant()) {
           assignNode(ConstantMX::create(sp, val.getValue()));
         } else {
           *this = val->getGetNonzeros(sp, std::vector<int>(sp.nnz(), 0));
@@ -525,7 +525,7 @@ namespace casadi {
   }
 
   MX MX::operator-() const {
-    if ((*this)->getOp()==OP_NEG) {
+    if ((*this)->op()==OP_NEG) {
       return (*this)->dep(0);
     } else {
       return (*this)->getUnary(OP_NEG);
@@ -598,11 +598,11 @@ namespace casadi {
                           << dim() << " and rhs is " << y.dim() << ".");
 
     // Check if we can simplify the product
-    if (isIdentity()) {
+    if (is_identity()) {
       return y + z;
-    } else if (y.isIdentity()) {
+    } else if (y.is_identity()) {
       return *this + z;
-    } else if (isZero() || y.isZero()) {
+    } else if (is_zero() || y.is_zero()) {
       return z;
     } else {
       return (*this)->getMultiplication(y, z);
@@ -618,7 +618,7 @@ namespace casadi {
   }
 
   MX MX::zz_power(const MX& n) const {
-    if (n->getOp()==OP_CONST) {
+    if (n->op()==OP_CONST) {
       return MX::binary(OP_CONSTPOW, *this, n);
     } else {
       return MX::binary(OP_POW, *this, n);
@@ -826,14 +826,14 @@ namespace casadi {
 
   std::string MX::getName() const { return (*this)->getName(); }
 
-  bool         MX::isSymbolic () const { return (*this)->getOp()==OP_PARAMETER; }
-  bool         MX::isConstant () const { return (*this)->getOp()==OP_CONST; }
-  bool         MX::isEvaluation () const { return (*this)->getOp()==OP_CALL; }
-  bool         MX::isEvaluationOutput () const { return (*this)->isOutputNode(); }
-  int         MX::getEvaluationOutput () const { return (*this)->getFunctionOutput(); }
-  bool         MX::isOperation (int op) const { return (*this)->getOp()==op; }
-  bool         MX::isMultiplication () const { return (*this)->getOp()==OP_MATMUL; }
-  bool         MX::isNorm () const { return dynamic_cast<const Norm*>(get())!=0; }
+  bool         MX::is_symbolic () const { return (*this)->op()==OP_PARAMETER; }
+  bool         MX::is_constant () const { return (*this)->op()==OP_CONST; }
+  bool         MX::is_call () const { return (*this)->op()==OP_CALL; }
+  bool         MX::is_output () const { return (*this)->isOutputNode(); }
+  int         MX::get_output () const { return (*this)->getFunctionOutput(); }
+  bool         MX::is_op (int op) const { return (*this)->op()==op; }
+  bool         MX::is_multiplication () const { return (*this)->op()==OP_MATMUL; }
+  bool         MX::is_norm () const { return dynamic_cast<const Norm*>(get())!=0; }
 
   int MX::numFunctions() const { return (*this)->numFunctions(); }
   Function MX::getFunction (int i) {  return (*this)->getFunction(i); }
@@ -846,12 +846,12 @@ namespace casadi {
     return (*this)->getMatrixValue();
   }
 
-  bool MX::isBinary() const { return (*this)->isBinaryOp();}
+  bool MX::is_binary() const { return (*this)->is_binaryOp();}
 
-  bool MX::isUnary() const { return (*this)->isUnaryOp();}
+  bool MX::is_unary() const { return (*this)->is_unaryOp();}
 
-  int MX::getOp() const {
-    return (*this)->getOp();
+  int MX::op() const {
+    return (*this)->op();
   }
 
   bool MX::zz_is_equal(const MX& y, int depth) const {
@@ -867,11 +867,11 @@ namespace casadi {
       return false;
   }
 
-  bool MX::isCommutative() const {
-    if (isUnary()) return true;
-    casadi_assert_message(isBinary() || isUnary(),
-                          "MX::isCommutative: must be binary or unary operation");
-    return operation_checker<CommChecker>(getOp());
+  bool MX::is_commutative() const {
+    if (is_unary()) return true;
+    casadi_assert_message(is_binary() || is_unary(),
+                          "MX::is_commutative: must be binary or unary operation");
+    return operation_checker<CommChecker>(op());
   }
 
   Matrix<int> MX::mapping() const {
@@ -910,7 +910,7 @@ namespace casadi {
     casadi_assert(val.isscalar());
     if (isdense()) {
       return *this; // Already ok
-    } else if (val->isZero()) {
+    } else if (val->is_zero()) {
       return project(*this, Sparsity::dense(size()));
     } else {
       MX ret = repmat(val, size());
@@ -934,74 +934,74 @@ namespace casadi {
     return MX::create(new SymbolicMX(name, sp));
   }
 
-  bool MX::isValidInput() const {
-    return (*this)->isValidInput();
+  bool MX::is_valid_input() const {
+    return (*this)->is_valid_input();
   }
 
-  int MX::numPrimitives() const {
-    casadi_assert_message(isValidInput(), "Not a valid input expression");
-    return (*this)->numPrimitives();
+  int MX::n_primitives() const {
+    casadi_assert_message(is_valid_input(), "Not a valid input expression");
+    return (*this)->n_primitives();
   }
 
-  std::vector<MX> MX::getPrimitives() const {
-    std::vector<MX> ret(numPrimitives());
+  std::vector<MX> MX::primitives() const {
+    std::vector<MX> ret(n_primitives());
     std::vector<MX>::iterator it=ret.begin();
-    (*this)->getPrimitives(it);
+    (*this)->primitives(it);
     casadi_assert(it==ret.end());
     return ret;
   }
 
-  std::vector<MX> MX::splitPrimitives(const MX& x) const {
-    std::vector<MX> ret(numPrimitives());
+  std::vector<MX> MX::split_primitives(const MX& x) const {
+    std::vector<MX> ret(n_primitives());
     std::vector<MX>::iterator it=ret.begin();
-    (*this)->splitPrimitives(x, it);
+    (*this)->split_primitives(x, it);
     casadi_assert(it==ret.end());
     return ret;
   }
 
-  MX MX::joinPrimitives(std::vector<MX>& v) const {
-    casadi_assert_message(v.size()==numPrimitives(), "Wrong number of primitives supplied");
+  MX MX::join_primitives(std::vector<MX>& v) const {
+    casadi_assert_message(v.size()==n_primitives(), "Wrong number of primitives supplied");
     std::vector<MX>::const_iterator it=v.begin();
-    MX ret = (*this)->joinPrimitives(it);
+    MX ret = (*this)->join_primitives(it);
     casadi_assert(it==v.end());
     return ret;
   }
 
-  bool MX::hasDuplicates() {
-    return (*this)->hasDuplicates();
+  bool MX::has_duplicates() {
+    return (*this)->has_duplicates();
   }
 
   void MX::resetInput() {
     (*this)->resetInput();
   }
 
-  bool MX::isIdentity() const {
-    return (*this)->isIdentity();
+  bool MX::is_identity() const {
+    return (*this)->is_identity();
   }
 
-  bool MX::isZero() const {
+  bool MX::is_zero() const {
     if (nnz()==0) {
       return true;
     } else {
-      return (*this)->isZero();
+      return (*this)->is_zero();
     }
   }
 
-  bool MX::isOne() const {
-    return (*this)->isOne();
+  bool MX::is_one() const {
+    return (*this)->is_one();
   }
 
-  bool MX::isMinusOne() const {
+  bool MX::is_minus_one() const {
     return (*this)->isValue(-1);
   }
 
-  bool MX::isTranspose() const {
-    return getOp()==OP_TRANSPOSE;
+  bool MX::is_transpose() const {
+    return op()==OP_TRANSPOSE;
   }
 
-  bool MX::isRegular() const {
-    if (isConstant()) {
-      return getMatrixValue().isRegular();
+  bool MX::is_regular() const {
+    if (is_constant()) {
+      return getMatrixValue().is_regular();
     } else {
       casadi_error("Cannot check regularity for symbolic MX");
     }
@@ -1385,7 +1385,7 @@ namespace casadi {
     casadi_assert_message(v.size()==vdef.size(),
                           "Mismatch in the number of expression to substitute.");
     for (int k=0; k<v.size(); ++k) {
-      casadi_assert_message(v[k].isSymbolic(), "Variable " << k << " is not symbolic");
+      casadi_assert_message(v[k].is_symbolic(), "Variable " << k << " is not symbolic");
       casadi_assert_message(v[k].size() == vdef[k].size(),
                             "Inconsistent shape for variable " << k << ".");
     }

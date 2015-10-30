@@ -284,15 +284,15 @@ namespace casadi {
 
     // Read user options
     exact_hessian_ = !hasSetOption("hessian_approximation") ||
-        getOption("hessian_approximation")=="exact";
+        option("hessian_approximation")=="exact";
 #ifdef WITH_SIPOPT
     if (hasSetOption("run_sens")) {
-      run_sens_ = getOption("run_sens")=="yes";
+      run_sens_ = option("run_sens")=="yes";
     } else {
       run_sens_  = false;
     }
     if (hasSetOption("compute_red_hessian")) {
-      compute_red_hessian_ = getOption("compute_red_hessian")=="yes";
+      compute_red_hessian_ = option("compute_red_hessian")=="yes";
     } else {
       compute_red_hessian_ = false;
     }
@@ -348,7 +348,7 @@ namespace casadi {
     // Pass all the options to ipopt
     for (map<string, TypeID>::const_iterator it=ops_.begin(); it!=ops_.end(); ++it)
       if (hasSetOption(it->first)) {
-        GenericType op = getOption(it->first);
+        GenericType op = option(it->first);
         switch (it->second) {
         case OT_REAL:
           ret &= (*app)->Options()->SetNumericValue(it->first, op.toDouble(), false);
@@ -481,7 +481,7 @@ namespace casadi {
         t_mainloop_.user - (t_callback_fun_.user-t_callback_prepare_.user));
     }
 
-    if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
+    if (hasOption("print_time") && static_cast<bool>(option("print_time"))) {
       // Write timings
       std::vector<std::tuple<std::string, int, diffTime> > times;
       times.push_back(
@@ -650,7 +650,7 @@ namespace casadi {
         return 1;
       }
     } catch(exception& ex) {
-      if (getOption("iteration_callback_ignore_errors")) {
+      if (option("iteration_callback_ignore_errors")) {
         userOut<true, PL_WARN>() << "intermediate_callback: " << ex.what() << endl;
       } else {
         throw ex;
@@ -725,7 +725,7 @@ namespace casadi {
           hessLag_.output().printSparse();
         }
 
-        if (regularity_check_ && !isRegular(hessLag_.output().data()))
+        if (regularity_check_ && !is_regular(hessLag_.output().data()))
             casadi_error("IpoptInterface::h: NaN or Inf detected.");
 
       }
@@ -787,7 +787,7 @@ namespace casadi {
           userOut() << "J = " << endl;
           jacG.output().printSparse();
         }
-        if (regularity_check_ && !isRegular(jacG.output().data()))
+        if (regularity_check_ && !is_regular(jacG.output().data()))
             casadi_error("IpoptInterface::jac_g: NaN or Inf detected.");
       }
 
@@ -835,7 +835,7 @@ namespace casadi {
         userOut() << "obj_value = " << obj_value << endl;
       }
 
-      if (regularity_check_ && !isRegular(nlp_.output(NL_F).data()))
+      if (regularity_check_ && !is_regular(nlp_.output(NL_F).data()))
           casadi_error("IpoptInterface::f: NaN or Inf detected.");
 
       const diffTime delta = diffTimers(getTimerTime(), time0);
@@ -877,7 +877,7 @@ namespace casadi {
         }
       }
 
-      if (regularity_check_ && !isRegular(nlp_.output(NL_G).data()))
+      if (regularity_check_ && !is_regular(nlp_.output(NL_G).data()))
           casadi_error("IpoptInterface::g: NaN or Inf detected.");
 
       const diffTime delta = diffTimers(getTimerTime(), time0);
@@ -917,7 +917,7 @@ namespace casadi {
         userOut() << "grad_f = " << gradF_.output() << endl;
       }
 
-      if (regularity_check_ && !isRegular(gradF_.output().data()))
+      if (regularity_check_ && !is_regular(gradF_.output().data()))
           casadi_error("IpoptInterface::grad_f: NaN or Inf detected.");
 
       const diffTime delta = diffTimers(getTimerTime(), time0);
@@ -957,7 +957,7 @@ namespace casadi {
                                          double* lambda) {
     try {
       bool warmstart = hasSetOption("warm_start_init_point") &&
-          getOption("warm_start_init_point")=="yes";
+          option("warm_start_init_point")=="yes";
       //casadi_assert_warning(init_x, "Not initializing x");
       if (warmstart) {
         //casadi_assert_warning(init_lambda, "Not initializing lambda");
@@ -1011,7 +1011,7 @@ namespace casadi {
 
   int IpoptInterface::get_number_of_nonlinear_variables() {
     try {
-      if (!static_cast<bool>(getOption("pass_nonlinear_variables"))) {
+      if (!static_cast<bool>(option("pass_nonlinear_variables"))) {
         // No Hessian has been interfaced
         return -1;
       } else {
@@ -1071,7 +1071,7 @@ namespace casadi {
                                            map<string, vector<int> >& con_integer_md,
                                            map<string, vector<double> >& con_numeric_md) {
     if (hasSetOption("var_string_md")) {
-      Dict dict = getOption("var_string_md");
+      Dict dict = option("var_string_md");
       for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<string> entry = it->second; // Get the entry
@@ -1082,7 +1082,7 @@ namespace casadi {
     }
 
     if (hasSetOption("var_integer_md")) {
-      Dict dict = getOption("var_integer_md");
+      Dict dict = option("var_integer_md");
       for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<int> entry = it->second; // Get the entry
@@ -1093,7 +1093,7 @@ namespace casadi {
     }
 
     if (hasSetOption("var_numeric_md")) {
-      Dict dict = getOption("var_numeric_md");
+      Dict dict = option("var_numeric_md");
       for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<double> entry = it->second; // Get the entry
@@ -1104,7 +1104,7 @@ namespace casadi {
     }
 
     if (hasSetOption("con_string_md")) {
-      Dict dict = getOption("con_string_md");
+      Dict dict = option("con_string_md");
       for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<string> entry = it->second; // Get the entry
@@ -1115,7 +1115,7 @@ namespace casadi {
     }
 
     if (hasSetOption("con_integer_md")) {
-      Dict dict = getOption("con_integer_md");
+      Dict dict = option("con_integer_md");
       for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<int> entry = it->second; // Get the entry
@@ -1126,7 +1126,7 @@ namespace casadi {
     }
 
     if (hasSetOption("con_numeric_md")) {
-      Dict dict = getOption("con_numeric_md");
+      Dict dict = option("con_numeric_md");
       for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<double> entry = it->second; // Get the entry

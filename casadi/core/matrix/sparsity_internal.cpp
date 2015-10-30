@@ -2009,7 +2009,7 @@ namespace casadi {
   }
 
   bool SparsityInternal::issymmetric() const {
-    return isTranspose(*this);
+    return is_transpose(*this);
   }
 
   int SparsityInternal::nnz_lower() const {
@@ -3605,7 +3605,7 @@ namespace casadi {
     return Sparsity::triplet(size1(), size2(), new_row, new_col);
   }
 
-  bool SparsityInternal::isTranspose(const SparsityInternal& y) const {
+  bool SparsityInternal::is_transpose(const SparsityInternal& y) const {
     // Assert dimensions and number of nonzeros
     if (size2()!=y.size1() || size1()!=y.size2() || nnz()!=y.nnz())
       return false;
@@ -3615,7 +3615,7 @@ namespace casadi {
       return true;
 
     // Run algorithm on the pattern with the least number of rows
-    if (size1()>size2()) return y.isTranspose(*this);
+    if (size1()>size2()) return y.is_transpose(*this);
 
     // Index counter for columns of the possible transpose
     vector<int> y_col_count(y.size2(), 0);

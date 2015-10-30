@@ -130,9 +130,9 @@ namespace casadi {
     MXDict nlp = {{"x", u}, {"p", p}, {"f", nlp_f}, {"g", nlp_g}};
 
     Dict options;
-    if (hasSetOption(optionsname())) options = getOption(optionsname());
+    if (hasSetOption(optionsname())) options = option(optionsname());
     // Create an NlpSolver instance
-    solver_ = Function::nlp_solver("nlpsolver", getOption(solvername()), nlp, options);
+    solver_ = Function::nlp_solver("nlpsolver", option(solvername()), nlp, options);
   }
 
 } // namespace casadi

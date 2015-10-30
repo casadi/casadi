@@ -271,7 +271,7 @@ namespace casadi {
 
   /// Checks if vector does not contain NaN or Inf
   template<typename T>
-  bool isRegular(const std::vector<T> &v);
+  bool is_regular(const std::vector<T> &v);
 
 } // namespace casadi
 
@@ -678,7 +678,7 @@ namespace casadi {
 
 
   template<typename T>
-  bool isRegular(const std::vector<T> &v) {
+  bool is_regular(const std::vector<T> &v) {
     for (int k=0;k<v.size();++k) {
       if (v[k]!=v[k] || v[k]==std::numeric_limits<T>::infinity() ||
           v[k]==-std::numeric_limits<T>::infinity()) return false;

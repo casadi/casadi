@@ -54,7 +54,7 @@ namespace casadi {
     throw CasadiException(string("getIntValue() not defined for class ") + typeid(*this).name());
   }
 
-  bool SXNode::isZero() const {
+  bool SXNode::is_zero() const {
     return false;
   }
 
@@ -62,11 +62,11 @@ namespace casadi {
     return false;
   }
 
-  bool SXNode::isOne() const {
+  bool SXNode::is_one() const {
     return false;
   }
 
-  bool SXNode::isMinusOne() const {
+  bool SXNode::is_minus_one() const {
     return false;
   }
 
@@ -82,15 +82,15 @@ namespace casadi {
     return false;
   }
 
-  bool SXNode::isConstant() const {
+  bool SXNode::is_constant() const {
     return false;
   }
 
-  bool SXNode::isInteger() const {
+  bool SXNode::is_integer() const {
     return false;
   }
 
-  bool SXNode::isSymbolic() const {
+  bool SXNode::is_symbolic() const {
     return false;
   }
 
@@ -114,7 +114,7 @@ namespace casadi {
     casadi_error("child() not defined for class " << typeid(*this).name());
   }
 
-  bool SXNode::isSmooth() const {
+  bool SXNode::is_smooth() const {
     return true; // nodes are smooth by default
   }
 
@@ -154,7 +154,7 @@ namespace casadi {
       for (int i=0; i<ndep(); ++i) {
         dep(i)->can_inline(nodeind);
       }
-    } else if (it->second==0 && getOp()!=OP_PARAMETER) {
+    } else if (it->second==0 && op()!=OP_PARAMETER) {
       // Node encountered before, do not inline (except if symbolic primitive)
       it->second = -1;
     }

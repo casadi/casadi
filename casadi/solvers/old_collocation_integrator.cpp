@@ -83,19 +83,19 @@ namespace casadi {
     Integrator::init();
 
     // Read options
-    bool expand_f = getOption("expand_f");
+    bool expand_f = option("expand_f");
 
     // Hotstart?
-    hotstart_ = getOption("hotstart");
+    hotstart_ = option("hotstart");
 
     // Number of finite elements
-    int nk = getOption("number_of_finite_elements");
+    int nk = option("number_of_finite_elements");
 
     // Interpolation order
-    int deg = getOption("interpolation_order");
+    int deg = option("interpolation_order");
 
     // All collocation time points
-    std::vector<double> tau_root = collocationPoints(deg, getOption("collocation_scheme"));
+    std::vector<double> tau_root = collocationPoints(deg, option("collocation_scheme"));
 
     // Size of the finite elements
     double h = (grid_.back()-t0_)/nk;
@@ -363,18 +363,18 @@ namespace casadi {
     // Options
     Dict implicit_solver_options;
     if (hasSetOption("implicit_solver_options")) {
-      implicit_solver_options = getOption("implicit_solver_options");
+      implicit_solver_options = option("implicit_solver_options");
     }
 
     // Allocate a root-finding solver
     implicit_solver_ =
-      ifcn.rootfinder("collocation_implicitsolver_" + name_, getOption("implicit_solver"),
+      ifcn.rootfinder("collocation_implicitsolver_" + name_, option("implicit_solver"),
                       implicit_solver_options);
 
     if (hasSetOption("startup_integrator")) {
       Dict startup_integrator_options;
       if (hasSetOption("startup_integrator_options")) {
-        startup_integrator_options = getOption("startup_integrator_options");
+        startup_integrator_options = option("startup_integrator_options");
       }
       // Pass options
       startup_integrator_options["t0"] = coll_time_.front().front();
@@ -383,7 +383,7 @@ namespace casadi {
       // Allocate a root-finding solver
       startup_integrator_ =
         Function::integrator("collocation_startup_" + name_,
-                             getOption("startup_integrator"),
+                             option("startup_integrator"),
                              dae_, startup_integrator_options);
     }
 
@@ -447,7 +447,7 @@ namespace casadi {
           // Skip algebraic variables (for now) // FIXME
           if (j>0) {
             if (has_startup_integrator && startup_integrator_.hasOption("init_z")) {
-              std::vector<double> init_z = startup_integrator_.getOption("init_z");
+              std::vector<double> init_z = startup_integrator_.option("init_z");
               for (int i=0; i<nz_; ++i) {
                 v.at(offs++) = init_z.at(i);
               }

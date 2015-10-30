@@ -76,7 +76,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_MONITOR;}
+    virtual int op() const { return OP_MONITOR;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 1;}

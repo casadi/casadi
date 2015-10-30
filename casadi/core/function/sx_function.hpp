@@ -126,7 +126,7 @@ class CASADI_EXPORT SXFunction :
 
 
   /** \brief  Check if smooth */
-  bool isSmooth() const;
+  bool is_smooth() const;
 
   /** \brief  Print the algorithm */
   virtual void print(std::ostream &stream) const;

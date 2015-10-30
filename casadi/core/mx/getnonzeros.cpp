@@ -425,7 +425,7 @@ namespace casadi {
     return Matrix<int>(sparsity(), nz, false);
   }
 
-  bool GetNonzerosSlice::isIdentity() const {
+  bool GetNonzerosSlice::is_identity() const {
     // Check sparsity
     if (!(sparsity() == dep().sparsity()))
       return false;
@@ -453,7 +453,7 @@ namespace casadi {
 
   void GetNonzerosSlice::simplifyMe(MX& ex) {
     // Simplify if identity
-    if (isIdentity()) {
+    if (is_identity()) {
       MX t = dep(0);
       ex = t;
     }

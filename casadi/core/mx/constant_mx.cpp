@@ -77,7 +77,7 @@ namespace casadi {
   bool ConstantMX::__nonzero__() const {
     if (numel()!=1) casadi_error("Can only determine truth value of scalar MX.");
     if (nnz()!=1) casadi_error("Can only determine truth value of dense scalar MX.");
-    return !isZero();
+    return !is_zero();
   }
 
   ConstantMX* ConstantMX::create(const Sparsity& sp, int val) {
@@ -127,24 +127,24 @@ namespace casadi {
     }
   }
 
-  bool ConstantDMatrix::isZero() const {
-    return x_.isZero();
+  bool ConstantDMatrix::is_zero() const {
+    return x_.is_zero();
   }
 
-  bool ConstantDMatrix::isOne() const {
-    return x_.isOne();
+  bool ConstantDMatrix::is_one() const {
+    return x_.is_one();
   }
 
-  bool ConstantDMatrix::isMinusOne() const {
-    return x_.isMinusOne();
+  bool ConstantDMatrix::is_minus_one() const {
+    return x_.is_minus_one();
   }
 
-  bool ConstantDMatrix::isIdentity() const {
-    return x_.isIdentity();
+  bool ConstantDMatrix::is_identity() const {
+    return x_.is_identity();
   }
 
   // MX ConstantMX::getMultiplication(const MX& y) const {
-  //   if (y.isConstant()) {
+  //   if (y.is_constant()) {
   //     // Constant folding
   //     DMatrix xv = getMatrixValue();
   //     DMatrix yv = y->getMatrixValue();
@@ -155,7 +155,7 @@ namespace casadi {
   // }
 
   MX ConstantMX::getInnerProd(const MX& y) const {
-    if (y.isConstant()) {
+    if (y.is_constant()) {
       // Constant folding
       DMatrix xv = getMatrixValue();
       DMatrix yv = y->getMatrixValue();

@@ -494,13 +494,13 @@ class SXtests(casadiTestCase):
     self.assertTrue(dependsOn(z,y))
     self.assertTrue(dependsOn(z,x))
     w = substitute(z,x,0)
-    self.assertTrue(w.isSymbolic())
+    self.assertTrue(w.is_symbolic())
     self.assertTrue(dependsOn(w,y))
     self.assertFalse(dependsOn(w,x))
     self.assertTrue(is_equal(w,y))
     r=w-y
-    self.assertFalse(r.isSymbolic())     
-    self.assertTrue(r.isZero())
+    self.assertFalse(r.is_symbolic())     
+    self.assertTrue(r.is_zero())
     self.assertEqual(float(r),0)
     self.assertEqual(float(r),0)
     y = SX.sym("y",2)
@@ -636,8 +636,8 @@ class SXtests(casadiTestCase):
     z=x
     z+=y
     
-    self.assertTrue(x.isSymbolic())
-    self.assertFalse(z.isSymbolic())
+    self.assertTrue(x.is_symbolic())
+    self.assertFalse(z.is_symbolic())
     
     x=SX.sym("x")
     y=SX.sym("y")
@@ -645,8 +645,8 @@ class SXtests(casadiTestCase):
     z=x
     z+=y
     
-    self.assertTrue(x.isSymbolic())
-    self.assertFalse(z.isSymbolic())
+    self.assertTrue(x.is_symbolic())
+    self.assertFalse(z.is_symbolic())
     
   def test_evalchecking(self):
     x = SX.sym("x",1,5)
@@ -829,19 +829,19 @@ class SXtests(casadiTestCase):
     h = f.hessian()
 
 
-  def test_isRegular(self):
+  def test_is_regular(self):
     x = SX.sym("x")
     
-    self.assertTrue(SX(0).isRegular())
-    self.assertFalse(SX(Inf).isRegular())
+    self.assertTrue(SX(0).is_regular())
+    self.assertFalse(SX(Inf).is_regular())
     with self.assertRaises(Exception):
       self.assertTrue(x.nz[0])
       
-    self.assertTrue(SX(DMatrix([0,1])).isRegular())
-    self.assertFalse(SX(DMatrix([0,Inf])).isRegular())
-    self.assertFalse(vertcat([x,Inf]).isRegular())
+    self.assertTrue(SX(DMatrix([0,1])).is_regular())
+    self.assertFalse(SX(DMatrix([0,Inf])).is_regular())
+    self.assertFalse(vertcat([x,Inf]).is_regular())
     with self.assertRaises(Exception):
-      self.assertFalse(vertcat([x,x]).isRegular())
+      self.assertFalse(vertcat([x,x]).is_regular())
       
       
   def test_symvar(self):
@@ -1222,16 +1222,16 @@ class SXtests(casadiTestCase):
     self.assertTrue(dependsOn(vertcat([b,0]),vertcat([a,b])))
     self.assertFalse(dependsOn(vertcat([0,0]),vertcat([a,b])))
     
-  @requires("isSmooth")
-  def test_isSmooth(self):
+  @requires("is_smooth")
+  def test_is_smooth(self):
     x = SX.sym("a",2,2)
     import warnings
     with warnings.catch_warnings():
       warnings.simplefilter("error",DeprecationWarning)
       with self.assertRaises(Exception):
-        isSmooth(x)
+        is_smooth(x)
       warnings.simplefilter("ignore")
-      isSmooth(x)
+      is_smooth(x)
     
 if __name__ == '__main__':
     unittest.main()

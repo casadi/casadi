@@ -66,7 +66,7 @@ namespace casadi {
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_FIND;}
+    virtual int op() const { return OP_FIND;}
 
     /** \brief Generate code for the operation */
     virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,

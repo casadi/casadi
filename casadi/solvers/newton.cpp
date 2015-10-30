@@ -246,15 +246,15 @@ namespace casadi {
                           "Newton::init: linear_solver must be supplied");
 
     if (hasSetOption("max_iter"))
-      max_iter_ = getOption("max_iter");
+      max_iter_ = option("max_iter");
 
     if (hasSetOption("abstol"))
-      abstol_ = getOption("abstol");
+      abstol_ = option("abstol");
 
     if (hasSetOption("abstolStep"))
-      abstolStep_ = getOption("abstolStep");
+      abstolStep_ = option("abstolStep");
 
-    print_iteration_ = getOption("print_iteration");
+    print_iteration_ = option("print_iteration");
 
   }
 

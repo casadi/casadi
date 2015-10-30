@@ -11048,7 +11048,7 @@ create a matrix with all nan
 
 ";
 
-%feature("docstring")  casadi::MX::isTranspose() const  "
+%feature("docstring")  casadi::MX::is_transpose() const  "
 
 Is the expression a transpose?
 
@@ -14856,7 +14856,7 @@ format.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::isTranspose(const Sparsity &y)
+%feature("docstring")  casadi::Sparsity::is_transpose(const Sparsity &y)
 const  "
 
 Check if the sparsity is the transpose of another.

@@ -82,7 +82,7 @@ namespace casadi {
     place_in_alg.reserve(nodes.size());
 
     // Use live variables?
-    bool live_variables = getOption("live_variables");
+    bool live_variables = option("live_variables");
 
     // Input instructions
     vector<pair<int, MXNode*> > symb_loc;
@@ -101,7 +101,7 @@ namespace casadi {
       MXNode* n = *it;
 
       // Get the operation
-      int op = n==0 ? OP_OUTPUT : n->getOp();
+      int op = n==0 ? OP_OUTPUT : n->op();
 
       // Store location if parameter (or input)
       if (op==OP_PARAMETER) {
@@ -299,7 +299,7 @@ namespace casadi {
     // Add input instructions, loop over inputs
     for (int ind=0; ind<inputv_.size(); ++ind) {
       // Loop over symbolic primitives of each input
-      vector<MX> prim = inputv_[ind].getPrimitives();
+      vector<MX> prim = inputv_[ind].primitives();
       int nz_offset=0;
       for (int p=0; p<prim.size(); ++p) {
         int i = prim[p].getTemp()-1;
@@ -656,7 +656,7 @@ namespace casadi {
     // Split up inputs analogous to symbolic primitives
     vector<vector<MX> > arg_split(arg.size());
     for (int i=0; i<arg.size(); ++i)
-      arg_split[i] = inputv_[i].splitPrimitives(arg[i]);
+      arg_split[i] = inputv_[i].split_primitives(arg[i]);
 
     vector<MX> arg1, res1;
 
@@ -753,7 +753,7 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) {
       fseed_split[d].resize(fseed[d].size());
       for (int i=0; i<fseed[d].size(); ++i) {
-        fseed_split[d][i] = inputv_[i].splitPrimitives(fseed[d][i]);
+        fseed_split[d][i] = inputv_[i].split_primitives(fseed[d][i]);
       }
     }
 
@@ -795,7 +795,7 @@ namespace casadi {
             } else {
               seed[i] = dwork[el][d];
             }
-            if (skip[d] && !seed[i].isZero()) skip[d] = false;
+            if (skip[d] && !seed[i].is_zero()) skip[d] = false;
           }
           if (!skip[d]) oseed.push_back(seed);
         }
@@ -872,7 +872,7 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) {
       asens_split[d].resize(inputv_.size());
       for (int i=0; i<inputv_.size(); ++i) {
-        asens_split[d][i].resize(inputv_[i].numPrimitives());
+        asens_split[d][i].resize(inputv_[i].n_primitives());
       }
     }
 
@@ -933,7 +933,7 @@ namespace casadi {
             if (seed[i].isempty(true)) seed[i] = MX(it->data->sparsity(i).size());
 
             // If nonzero seeds, keep direction
-            if (skip[d] && !seed[i].isZero()) skip[d] = false;
+            if (skip[d] && !seed[i].is_zero()) skip[d] = false;
           }
           // Add to list of derivatives
           if (!skip[d]) oseed.push_back(seed);
@@ -989,7 +989,7 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) {
       asens[d].resize(inputv_.size());
       for (int i=0; i<inputv_.size(); ++i) {
-        asens[d][i] = inputv_[i].joinPrimitives(asens_split[d][i]);
+        asens[d][i] = inputv_[i].join_primitives(asens_split[d][i]);
       }
     }
 
@@ -1048,7 +1048,7 @@ namespace casadi {
 
         // Divide input into primitives and create corresponding SX
         vector<SXElement>::iterator ait = arg[i].begin();
-        vector<MX> prim = inputv_[i].getPrimitives();
+        vector<MX> prim = inputv_[i].primitives();
         for (vector<MX>::const_iterator pit=prim.begin(); pit!=prim.end(); ++pit) {
           SX t = SX::sym(pit->getName(), pit->sparsity());
           copy(t.begin(), t.end(), ait);

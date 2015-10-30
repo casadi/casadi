@@ -47,7 +47,7 @@ class CASADI_EXPORT UnarySX : public SXNode {
 
     /** \brief  Create a unary expression */
     inline static SXElement create(unsigned char op, const SXElement& dep) {
-      if (dep.isConstant()) {
+      if (dep.is_constant()) {
         // Evaluate constant
         double dep_val = dep.getValue();
         double ret_val;
@@ -62,7 +62,7 @@ class CASADI_EXPORT UnarySX : public SXNode {
     /** \brief Destructor */
     virtual ~UnarySX() {}
 
-    virtual bool isSmooth() const { return operation_checker<SmoothChecker>(op_);}
+    virtual bool is_smooth() const { return operation_checker<SmoothChecker>(op_);}
 
     virtual bool hasDep() const { return true; }
 
@@ -80,7 +80,7 @@ class CASADI_EXPORT UnarySX : public SXNode {
     virtual SXElement& dep(int i) { return dep_; }
 
     /** \brief  Get the operation */
-    virtual int getOp() const { return op_;}
+    virtual int op() const { return op_;}
 
     /** \brief  Print expression */
     virtual std::string print(const std::string& arg1, const std::string& arg2) const {

@@ -700,10 +700,10 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(crossc(DMatrix([[1.1,1.3,1.7],[1,0,0],[0,0,1],[4,5,6]]).T,DMatrix([[2,3,13],[0,1,0],[0,0,1],[1,0,1]]).T,1),DMatrix([[11.8,-10.9,0.7],[0,0,1],[0,0,0],[5,2,-5]]).T)
     
-  def test_isRegular(self):
-    self.assertTrue(DMatrix([1,2]).isRegular())
-    self.assertFalse(DMatrix([1,Inf]).isRegular())
-    self.assertFalse(DMatrix.nan(2).isRegular())
+  def test_is_regular(self):
+    self.assertTrue(DMatrix([1,2]).is_regular())
+    self.assertFalse(DMatrix([1,Inf]).is_regular())
+    self.assertFalse(DMatrix.nan(2).is_regular())
     
   def test_sizes(self):
     self.assertEqual(Sparsity.diag(10).nnz_diag(),10)

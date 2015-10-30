@@ -82,7 +82,7 @@ namespace casadi {
                   CodeGenerator& g) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_HORZREPMAT;}
+    virtual int op() const { return OP_HORZREPMAT;}
 
     int n_;
   };
@@ -136,7 +136,7 @@ namespace casadi {
                   CodeGenerator& g) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_HORZREPSUM;}
+    virtual int op() const { return OP_HORZREPSUM;}
 
     int n_;
   };

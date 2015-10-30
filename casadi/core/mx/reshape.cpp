@@ -110,29 +110,29 @@ namespace casadi {
     }
   }
 
-  bool Reshape::isValidInput() const {
-    if (!dep()->isValidInput()) return false;
+  bool Reshape::is_valid_input() const {
+    if (!dep()->is_valid_input()) return false;
     return true;
   }
 
-  int Reshape::numPrimitives() const {
-    return dep()->numPrimitives();
+  int Reshape::n_primitives() const {
+    return dep()->n_primitives();
   }
 
-  void Reshape::getPrimitives(std::vector<MX>::iterator& it) const {
-    dep()->getPrimitives(it);
+  void Reshape::primitives(std::vector<MX>::iterator& it) const {
+    dep()->primitives(it);
   }
 
-  void Reshape::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
-    dep()->splitPrimitives(reshape(x, dep().size()), it);
+  void Reshape::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
+    dep()->split_primitives(reshape(x, dep().size()), it);
   }
 
-  MX Reshape::joinPrimitives(std::vector<MX>::const_iterator& it) const {
-    return reshape(dep()->joinPrimitives(it), size());
+  MX Reshape::join_primitives(std::vector<MX>::const_iterator& it) const {
+    return reshape(dep()->join_primitives(it), size());
   }
 
-  bool Reshape::hasDuplicates() {
-    return dep()->hasDuplicates();
+  bool Reshape::has_duplicates() {
+    return dep()->has_duplicates();
   }
 
   void Reshape::resetInput() {

@@ -83,7 +83,7 @@ namespace casadi {
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_CONST;}
+    virtual int op() const { return OP_CONST;}
 
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const = 0;
@@ -131,10 +131,10 @@ namespace casadi {
                           CodeGenerator& g) const;
 
     /** \brief  Check if a particular integer value */
-    virtual bool isZero() const;
-    virtual bool isOne() const;
-    virtual bool isMinusOne() const;
-    virtual bool isIdentity() const;
+    virtual bool is_zero() const;
+    virtual bool is_one() const;
+    virtual bool is_minus_one() const;
+    virtual bool is_identity() const;
 
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const {return x_.toScalar();}
@@ -211,22 +211,22 @@ namespace casadi {
     virtual MX getReshape(const Sparsity& sp) const;
 
     /** \brief  Check if valid function input */
-    virtual bool isValidInput() const { return true;}
+    virtual bool is_valid_input() const { return true;}
 
     /** \brief Get the number of symbolic primitives */
-    virtual int numPrimitives() const { return 0;}
+    virtual int n_primitives() const { return 0;}
 
     /** \brief Get symbolic primitives */
-    virtual void getPrimitives(std::vector<MX>::iterator& it) const {}
+    virtual void primitives(std::vector<MX>::iterator& it) const {}
 
     /** \brief Split up an expression along symbolic primitives */
-    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {}
+    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const {}
 
     /** \brief Join an expression along symbolic primitives */
-    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const { return MX();}
+    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const { return MX();}
 
     /** \brief Detect duplicate symbolic expressions */
-    virtual bool hasDuplicates() { return false;}
+    virtual bool has_duplicates() { return false;}
 
     /** \brief Reset the marker for an input expression */
     virtual void resetInput() {}
@@ -278,9 +278,9 @@ namespace casadi {
                           CodeGenerator& g) const;
 
     /** \brief  Check if a particular integer value */
-    virtual bool isZero() const { return v_.value==0;}
-    virtual bool isOne() const { return v_.value==1;}
-    virtual bool isIdentity() const { return v_.value==1 && sparsity().isdiag();}
+    virtual bool is_zero() const { return v_.value==0;}
+    virtual bool is_one() const { return v_.value==1;}
+    virtual bool is_identity() const { return v_.value==1 && sparsity().isdiag();}
     virtual bool isValue(double val) const { return v_.value==val;}
 
     /// Get the value (only for scalar constant nodes)
@@ -379,7 +379,7 @@ namespace casadi {
       return MX(sparsity(), ret);
     } else {
       if (v_.value==0) {
-        if (isZero() && operation_checker<F0XChecker>(op)) {
+        if (is_zero() && operation_checker<F0XChecker>(op)) {
           return MX(sparsity(), ret, false);
         } else {
           return repmat(MX(ret), size1(), size2());
@@ -407,7 +407,7 @@ namespace casadi {
       }
     } else if (ScY && !operation_checker<F0XChecker>(op)) {
       bool grow = true;
-      if (y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
+      if (y->op()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
         double ret;
         casadi_math<double>::fun(op, 0, y.nnz()>0 ? y->getValue() : 0, ret);
         grow = ret!=0;
@@ -421,10 +421,10 @@ namespace casadi {
 
     switch (op) {
     case OP_ADD:
-      if (v_.value==0) return ScY && !y->isZero() ? repmat(y, size1(), size2()) : y;
+      if (v_.value==0) return ScY && !y->is_zero() ? repmat(y, size1(), size2()) : y;
       break;
     case OP_SUB:
-      if (v_.value==0) return ScY && !y->isZero() ? repmat(-y, size1(), size2()) : -y;
+      if (v_.value==0) return ScY && !y->is_zero() ? repmat(-y, size1(), size2()) : -y;
       break;
     case OP_MUL:
       if (v_.value==1) return y;
@@ -445,7 +445,7 @@ namespace casadi {
 
     // Constant folding
     // NOTE: ugly, should use a function instead of a cast
-    if (y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
+    if (y->op()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
       double y_value = y.nnz()>0 ? y->getValue() : 0;
       double ret;
       casadi_math<double>::fun(op, nnz()> 0 ? v_.value: 0, y_value, ret);
@@ -497,7 +497,7 @@ namespace casadi {
 
   template<typename Value>
   MX Constant<Value>::getSetNonzeros(const MX& y, const std::vector<int>& nz) const {
-    if (y.isConstant() && y->isZero() && v_.value==0) {
+    if (y.is_constant() && y->is_zero() && v_.value==0) {
       return y;
     }
 
@@ -507,7 +507,7 @@ namespace casadi {
 
   template<typename Value>
   MX Constant<Value>::getProject(const Sparsity& sp) const {
-    if (isZero()) {
+    if (is_zero()) {
       return MX::create(new Constant<Value>(sp, v_));
     } else if (sp.isdense()) {
       return densify(getMatrixValue());

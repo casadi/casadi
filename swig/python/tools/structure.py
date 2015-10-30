@@ -30,7 +30,7 @@ import sys
 
 import __builtin__
 
-def isInteger(a):
+def is_integer(a):
   return isinstance(a,int) or isinstance(a,np.integer)
   
 def isString(a):
@@ -218,7 +218,7 @@ class StructEntry:
         s = dims[0]
         if isinstance(p,slice): # Expand slice
           p = range(*p.indices(s))
-        if isInteger(p):
+        if is_integer(p):
           return self.traverseByPowerIndex(
                    powerIndex[1:],
                    dims=dims[1:],
@@ -1158,7 +1158,7 @@ class CasadiStructEntry(StructEntry):
     if 'repeat' in kwargs:
       self.repeat = kwargs["repeat"] if isinstance(kwargs["repeat"],list) else [kwargs["repeat"]]
     
-    if not all(map(lambda x: isInteger(x),self.repeat)):
+    if not all(map(lambda x: is_integer(x),self.repeat)):
       raise Exception("The 'repeat' argument, if present, must be a list of integers, but got %s" % str(self.repeat))
 
       
@@ -1176,7 +1176,7 @@ class CasadiStructEntry(StructEntry):
     #     shape   argument
     if 'shape' in kwargs:
       shape = kwargs["shape"]
-      if isInteger(shape) :
+      if is_integer(shape) :
         self.sparsity = Sparsity.dense(shape,1)
       elif isinstance(shape,list) or isinstance(shape,tuple):
         if len(shape)==0 or len(shape)>2:
@@ -1197,20 +1197,20 @@ class CasadiStructEntry(StructEntry):
       if isinstance(shapestruct,Structured) or isinstance(shapestruct,Structure):
         self.shapestruct = (shapestruct.struct,1)
       elif isinstance(shapestruct,tuple):
-        if not(all([isinstance(e,Structured) or isinstance(e,Structure) or isInteger(e) for e in shapestruct])) or len(shapestruct)==0 or len(shapestruct)>2:
+        if not(all([isinstance(e,Structured) or isinstance(e,Structure) or is_integer(e) for e in shapestruct])) or len(shapestruct)==0 or len(shapestruct)>2:
           raise Exception("The 'shapestruct' argument, if present, must be a structure or a tuple of structures or numbers")
-        self.shapestruct = tuple([e if isInteger(e) else e.struct for e in shapestruct])
+        self.shapestruct = tuple([e if is_integer(e) else e.struct for e in shapestruct])
       else:
         raise Exception("The 'shapestruct' argument, if present, must be a structure or a tuple of at most structures")
       
       if 'shape' not in kwargs:
-        self.sparsity = Sparsity.dense(*[e if isInteger(e) else e.size for e in self.shapestruct])
+        self.sparsity = Sparsity.dense(*[e if is_integer(e) else e.size for e in self.shapestruct])
         
     #     sym    argument
     self.sym = None
     if 'sym' in kwargs:
       sym = kwargs["sym"]
-      if isinstance(sym,SX) and sym.isValidInput():
+      if isinstance(sym,SX) and sym.is_valid_input():
         self.sym = sym
       elif isinstance(sym,Structured): 
         self.struct = sym.struct

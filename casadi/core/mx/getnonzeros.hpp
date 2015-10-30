@@ -64,7 +64,7 @@ namespace casadi {
     virtual std::vector<int> getAll() const = 0;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_GETNONZEROS;}
+    virtual int op() const { return OP_GETNONZEROS;}
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
@@ -128,7 +128,7 @@ namespace casadi {
     virtual std::vector<int> getAll() const { return s_.getAll(s_.stop_);}
 
     /// Check if the instance is in fact an identity mapping (that can be simplified)
-    bool isIdentity() const;
+    bool is_identity() const;
 
     /// Simplify
     virtual void simplifyMe(MX& ex);

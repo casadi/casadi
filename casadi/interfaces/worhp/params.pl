@@ -6,7 +6,7 @@ while (<>) {
 
   if (/^\s+(\w+)\s+(\w+)/ and $2 ne"Ares") {
     print qq|addOption("$2",$type,worhp_p.$2,"$description");\n|;
-    #print qq|if (hasSetOption("$2")) worhp_p.$2 = getOption("$2");\n|;
+    #print qq|if (hasSetOption("$2")) worhp_p.$2 = option("$2");\n|;
   }
 
 }

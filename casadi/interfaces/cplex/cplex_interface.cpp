@@ -83,10 +83,10 @@ namespace casadi {
     // Call the init method of the base class
     QpSolver::init();
 
-    qp_method_     = getOptionEnumValue("qp_method");
-    dump_to_file_  = getOption("dump_to_file");
-    tol_           = getOption("tol");
-    //  dump_filename_ = getOption("dump_filename");
+    qp_method_     = optionEnumValue("qp_method");
+    dump_to_file_  = option("dump_to_file");
+    tol_           = option("tol");
+    //  dump_filename_ = option("dump_filename");
 
     int status;
     casadi_assert(env_==0);
@@ -118,16 +118,16 @@ namespace casadi {
       status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, qp_method_);
     }
     // Setting dependency check option
-    status = CPXsetintparam(env_, CPX_PARAM_DEPIND, getOptionEnumValue("dep_check"));
+    status = CPXsetintparam(env_, CPX_PARAM_DEPIND, optionEnumValue("dep_check"));
     // Setting barrier iteration limit
-    status = CPXsetintparam(env_, CPX_PARAM_BARITLIM, getOption("barrier_maxiter"));
+    status = CPXsetintparam(env_, CPX_PARAM_BARITLIM, option("barrier_maxiter"));
     // Setting simplex iteration limit
-    status = CPXsetintparam(env_, CPX_PARAM_ITLIM, getOption("simplex_maxiter"));
+    status = CPXsetintparam(env_, CPX_PARAM_ITLIM, option("simplex_maxiter"));
     if (qp_method_ == 7) {
       // Setting crossover algorithm
       status = CPXsetintparam(env_, CPX_PARAM_BARCROSSALG, 1);
     }
-    if (!static_cast<bool>(getOption("convex"))) {
+    if (!static_cast<bool>(option("convex"))) {
       // Enabling non-convex QPs
       status = CPXsetintparam(env_, CPX_PARAM_SOLUTIONTARGET, CPX_SOLUTIONTARGET_FIRSTORDER);
     }
@@ -231,7 +231,7 @@ namespace casadi {
     status = CPXcopyquad(env_, lp_, qmatbeg, getPtr(qmatcnt_), qmatind, qmatval);
 
     if (dump_to_file_) {
-      const char* fn = string(getOption("dump_filename")).c_str();
+      const char* fn = string(option("dump_filename")).c_str();
       CPXwriteprob(env_, lp_, fn, "LP");
     }
 
@@ -313,7 +313,7 @@ namespace casadi {
     }
 
     // Next time we warm start
-    if (static_cast<bool>(getOption("warm_start"))) {
+    if (static_cast<bool>(option("warm_start"))) {
       is_warm_ = true;
     }
 

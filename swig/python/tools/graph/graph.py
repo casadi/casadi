@@ -65,14 +65,14 @@ def addDependencies(master,slaves,dep={},invdep={}):
   for slave in slaves:
     dependencyGraph(slave,dep = dep,invdep = invdep)
 
-def isLeaf(s):
-  return s.isLeaf()
-  #return s.isscalar(True) and (s.isConstant() or s.isSymbolic())
+def is_leaf(s):
+  return s.is_leaf()
+  #return s.isscalar(True) and (s.is_constant() or s.is_symbolic())
 
 def dependencyGraph(s,dep = {},invdep = {}):
   if isinstance(s,SX):
     if s.isscalar(True):
-      if not(isLeaf(s)):
+      if not(is_leaf(s)):
         addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
     else:
       addDependencies(s,list(s),dep = dep,invdep = invdep)
@@ -434,9 +434,9 @@ class MXOperationArtist(DotArtist):
     
     show_sp = True
     
-    if k.isUnary() and dep[0].sparsity()==k.sparsity():
+    if k.is_unary() and dep[0].sparsity()==k.sparsity():
       show_sp = False
-    if k.isBinary() and dep[0].sparsity()==k.sparsity() and dep[1].sparsity()==k.sparsity():
+    if k.is_binary() and dep[0].sparsity()==k.sparsity() and dep[1].sparsity()==k.sparsity():
       show_sp = False
     
     if show_sp:
@@ -445,7 +445,7 @@ class MXOperationArtist(DotArtist):
     else:
       op = ""
     
-    if not(k.isCommutative()):
+    if not(k.is_commutative()):
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
       s = print_operator(self.s,["| <f0> | ", " | <f1> |"])
@@ -502,7 +502,7 @@ class MXEvaluationOutputArtist(DotArtist):
   def draw(self):
     k = self.s
 
-    self.drawSparsity(k,depid=str(hash(k.getDep(0))) + ":f%d" % k.getEvaluationOutput())
+    self.drawSparsity(k,depid=str(hash(k.getDep(0))) + ":f%d" % k.get_output())
     
        
 class MXMultiplicationArtist(DotArtist):
@@ -546,7 +546,7 @@ class SXArtist(DotArtist):
     graph.add_node(pydot.Node(str(self.s.__hash__()),label=label,shape='plaintext'))
     
   def shouldEmbed(self,sx):
-    return len(self.invdep[sx]) == 1 and sx.isLeaf()
+    return len(self.invdep[sx]) == 1 and sx.is_leaf()
     
 class SXLeafArtist(DotArtist):
   def draw(self):
@@ -556,7 +556,7 @@ class SXLeafArtist(DotArtist):
         if self.artists[master].shouldEmbed(self.s):
           return
     style = "solid" # Symbolic nodes are represented box'es
-    if self.s.isConstant():
+    if self.s.is_constant():
       style = "bold" # Constants are represented by bold box'es
     self.graph.add_node(pydot.Node(str(self.s.__hash__()),label=str(self.s),shape="box",style=style)) 
 
@@ -565,7 +565,7 @@ class SXNonLeafArtist(DotArtist):
     k = self.s
     graph = self.graph
     dep = getDeps(k)
-    if not(k.isCommutative()):
+    if not(k.is_commutative()):
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
       s = print_operator(self.s,["| <f0> | ", " | <f1> |"])
@@ -591,7 +591,7 @@ class SXNonLeafArtist(DotArtist):
 def createArtist(node,dep={},invdep={},graph=None,artists={},**kwargs):
   if isinstance(node,SX):
     if node.isscalar(True):
-      if isLeaf(node):
+      if is_leaf(node):
         return SXLeafArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
       else:
         return SXNonLeafArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
@@ -600,23 +600,23 @@ def createArtist(node,dep={},invdep={},graph=None,artists={},**kwargs):
     
     
   elif isinstance(node,MX):
-    if node.isSymbolic():
+    if node.is_symbolic():
       return MXSymbolicArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isBinary() or node.isUnary():
+    elif node.is_binary() or node.is_unary():
       return MXOperationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isConstant():
+    elif node.is_constant():
       return MXConstantArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isEvaluation():
+    elif node.is_call():
       return MXEvaluationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isEvaluationOutput():
+    elif node.is_output():
       return MXEvaluationOutputArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isNorm():
+    elif node.is_norm():
       return MXNormArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isOperation(C.OP_GETNONZEROS):
+    elif node.is_op(C.OP_GETNONZEROS):
       return MXGetNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isOperation(C.OP_SETNONZEROS):
+    elif node.is_op(C.OP_SETNONZEROS):
       return MXSetNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isOperation(C.OP_ADDNONZEROS):
+    elif node.is_op(C.OP_ADDNONZEROS):
       return MXAddNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     else:
       return MXGenericArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
@@ -633,7 +633,7 @@ def dotgraph(s,direction="BT",**kwargs):
   try:
     def getHashSX(e):
       try:
-        return e.getElementHash()
+        return e.element_hash()
       except:
         return SX__hash__backup(e)
         

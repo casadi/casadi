@@ -113,23 +113,23 @@ namespace casadi {
     NlpSolver::init();
 
     // Read options
-    max_iter_ = getOption("max_iter");
-    max_iter_ls_ = getOption("max_iter_ls");
-    c1_ = getOption("c1");
-    beta_ = getOption("beta");
-    lbfgs_memory_ = getOption("lbfgs_memory");
-    tol_pr_ = getOption("tol_pr");
-    tol_du_ = getOption("tol_du");
-    tol_reg_ = getOption("tol_reg");
-    regularize_ = getOption("regularize");
-    codegen_ = getOption("codegen");
-    reg_threshold_ = getOption("reg_threshold");
-    print_time_ = getOption("print_time");
-    tol_pr_step_ = getOption("tol_pr_step");
-    merit_memsize_ = getOption("merit_memsize");
-    merit_start_ = getOption("merit_start");
-    string compiler = getOption("compiler");
-    gauss_newton_ = getOption("hessian_approximation") == "gauss-newton";
+    max_iter_ = option("max_iter");
+    max_iter_ls_ = option("max_iter_ls");
+    c1_ = option("c1");
+    beta_ = option("beta");
+    lbfgs_memory_ = option("lbfgs_memory");
+    tol_pr_ = option("tol_pr");
+    tol_du_ = option("tol_du");
+    tol_reg_ = option("tol_reg");
+    regularize_ = option("regularize");
+    codegen_ = option("codegen");
+    reg_threshold_ = option("reg_threshold");
+    print_time_ = option("print_time");
+    tol_pr_step_ = option("tol_pr_step");
+    merit_memsize_ = option("merit_memsize");
+    merit_start_ = option("merit_start");
+    string compiler = option("compiler");
+    gauss_newton_ = option("hessian_approximation") == "gauss-newton";
     if (gauss_newton_) {
       casadi_assert(nlp_.output(NL_F).nnz()>1);
     } else {
@@ -138,7 +138,7 @@ namespace casadi {
 
     // Name the components
     if (hasSetOption("name_x")) {
-      name_x_ = getOption("name_x");
+      name_x_ = option("name_x");
       casadi_assert(name_x_.size()==nx_);
     } else {
       stringstream ss;
@@ -152,7 +152,7 @@ namespace casadi {
 
     // Components to print
     if (hasSetOption("print_x")) {
-      print_x_ = getOption("print_x");
+      print_x_ = option("print_x");
     } else {
       print_x_.resize(0);
     }
@@ -583,11 +583,11 @@ namespace casadi {
     // QP solver options
     Dict qp_solver_options;
     if (hasSetOption("qp_solver_options")) {
-      qp_solver_options = getOption("qp_solver_options");
+      qp_solver_options = option("qp_solver_options");
     }
 
     // Allocate a QP solver
-    qp_solver_ = Function::qp_solver("qp_solver", getOption("qp_solver"),
+    qp_solver_ = Function::qp_solver("qp_solver", option("qp_solver"),
                                      {{"h", qpH_.sparsity()}, {"a", qpA_.sparsity()}},
                                      qp_solver_options);
     if (verbose_) {
@@ -610,7 +610,7 @@ namespace casadi {
     }
 
     // Header
-    if (static_cast<bool>(getOption("print_header"))) {
+    if (static_cast<bool>(option("print_header"))) {
       userOut() << "-------------------------------------------" << endl;
       userOut() << "This is casadi::SCPgen." << endl;
       if (gauss_newton_) {

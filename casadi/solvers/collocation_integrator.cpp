@@ -67,10 +67,10 @@ namespace casadi {
   void CollocationIntegrator::setupFG() {
 
     // Interpolation order
-    deg_ = getOption("interpolation_order");
+    deg_ = option("interpolation_order");
 
     // All collocation time points
-    std::vector<long double> tau_root = collocationPointsL(deg_, getOption("collocation_scheme"));
+    std::vector<long double> tau_root = collocationPointsL(deg_, option("collocation_scheme"));
 
     // Coefficients of the collocation equation
     vector<vector<double> > C(deg_+1, vector<double>(deg_+1, 0));

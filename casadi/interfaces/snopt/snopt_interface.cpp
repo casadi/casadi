@@ -207,7 +207,7 @@ namespace casadi {
 
   void SnoptInterface::init() {
     // Read in casadi options
-    detect_linear_ = getOption("detect_linear");
+    detect_linear_ = option("detect_linear");
 
     // Call the init method of the base class
     NlpSolver::init();
@@ -448,7 +448,7 @@ namespace casadi {
     for (std::map<std::string, std::string>::const_iterator it = intOpts_.begin();
          it != intOpts_.end(); ++it)
       if (hasSetOption(it->first)) {
-          int value = getOption(it->first);
+          int value = option(it->first);
           casadi_assert(it->first.size() <= 55);
           int Error = probC.setIntParameter(it->first.c_str(), value);
           casadi_assert_message(0 == Error, "snopt error setting option \"" + it->first + "\"");
@@ -456,7 +456,7 @@ namespace casadi {
     for (std::map<std::string, std::string>::const_iterator it = realOpts_.begin();
          it != realOpts_.end(); ++it)
       if (hasSetOption(it->first)) {
-          double value = getOption(it->first);
+          double value = option(it->first);
           casadi_assert(it->first.size() <= 55);
           int Error = probC.setRealParameter(it->first.c_str(), value);
           casadi_assert_message(0 == Error, "snopt error setting option \"" + it->first + "\"");
@@ -464,7 +464,7 @@ namespace casadi {
     for (std::map<std::string, std::pair<std::string, std::string> >::const_iterator
              it = strOpts_.begin(); it != strOpts_.end(); ++it)
       if (hasSetOption(it->first)) {
-          std::string value = getOption(it->first);
+          std::string value = option(it->first);
           std::string buffer = it->first;
           buffer.append(" ");
           buffer.append(value);
@@ -610,17 +610,17 @@ namespace casadi {
     // Outputs
     double Obj = 0; // TODO(Greg): get this from snopt
 
-    if (getOption("summary"))
+    if (option("summary"))
         summaryOn();
     else
         summaryOff();
     snoptProblemC snoptProbC = snoptProblemC();
     if (hasSetOption("specs file")) {
-        std::string specs_file = getOption("specs file");
+        std::string specs_file = option("specs file");
         snoptProbC.setSpecsFile(specs_file.c_str());
     }
     if (hasSetOption("print file")) {
-        std::string print_file = getOption("print file");
+        std::string print_file = option("print file");
         snoptProbC.setPrintFile(print_file.c_str());
     }
 
@@ -641,7 +641,7 @@ namespace casadi {
 
     // Run SNOPT
     double time0 = clock();
-    int info = snoptProbC.solve(getOptionEnumValue("start"));
+    int info = snoptProbC.solve(optionEnumValue("start"));
     casadi_assert_message(99 != info, "snopt problem set up improperly");
     t_mainloop_ = static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
 
@@ -681,7 +681,7 @@ namespace casadi {
     const int w_ms = 7;
     const int p_ms = 2;
     const int w_n = 5;
-    if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
+    if (hasOption("print_time") && static_cast<bool>(option("print_time"))) {
       userOut() << std::endl;
 
       userOut() << "time spent in eval_grad_f       "
@@ -910,7 +910,7 @@ namespace casadi {
         n_callback_fun_ += 1;
       }
     } catch(std::exception& ex) {
-      if (getOption("iteration_callback_ignore_errors")) {
+      if (option("iteration_callback_ignore_errors")) {
         userOut<true, PL_WARN>() << "callback: " << ex.what() << std::endl;
       } else {
         throw ex;

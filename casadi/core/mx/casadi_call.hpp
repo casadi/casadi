@@ -120,7 +120,7 @@ namespace casadi {
     virtual const Sparsity& sparsity(int oind) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_CALL;}
+    virtual int op() const { return OP_CALL;}
 
     /** \brief Get required length of arg field */
     virtual size_t sz_arg() const;

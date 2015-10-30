@@ -82,7 +82,7 @@ namespace casadi {
                           CodeGenerator& g) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_SUBREF;}
+    virtual int op() const { return OP_SUBREF;}
 
     /// Data members
     Slice i_, j_;

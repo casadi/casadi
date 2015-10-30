@@ -959,8 +959,8 @@ class MXtests(casadiTestCase):
     z=x
     z+=y
     
-    self.assertTrue(x.isSymbolic())
-    self.assertFalse(z.isSymbolic())
+    self.assertTrue(x.is_symbolic())
+    self.assertFalse(z.is_symbolic())
     
   def test_MXd_trivial(self):
     self.message("symbolic variables and constants jac")
@@ -1424,11 +1424,11 @@ class MXtests(casadiTestCase):
   def test_constmxmul(self):
     0.1*MX.ones(2)
 
-  def test_isRegular(self):
-    self.assertTrue(MX(DMatrix([0,1])).isRegular())
-    self.assertFalse(MX(DMatrix([0,Inf])).isRegular())
+  def test_is_regular(self):
+    self.assertTrue(MX(DMatrix([0,1])).is_regular())
+    self.assertFalse(MX(DMatrix([0,Inf])).is_regular())
     with self.assertRaises(Exception):
-      self.assertFalse(MX.sym("x",2).isRegular())
+      self.assertFalse(MX.sym("x",2).is_regular())
 
   def test_diagcat(self):
     C = diagcat([MX(DMatrix(([[-1.4,-3.2],[-3.2,-28]]))),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
@@ -1816,7 +1816,7 @@ class MXtests(casadiTestCase):
             if 'nozero' in flags and (v==0 or not sp.isdense()): continue
             r = casadiop([x])
             print r
-            self.assertTrue(r.isConstant())
+            self.assertTrue(r.is_constant())
             
             self.checkarray(r.getMatrixValue(),numpyop(x_),str([x_,name]))
             

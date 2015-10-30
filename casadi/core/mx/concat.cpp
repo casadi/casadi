@@ -300,71 +300,71 @@ namespace casadi {
     }
   }
 
-  bool Concat::isValidInput() const {
+  bool Concat::is_valid_input() const {
     for (int i=0; i<ndep(); ++i) {
-      if (!dep(i)->isValidInput()) return false;
+      if (!dep(i)->is_valid_input()) return false;
     }
     return true;
   }
 
-  int Concat::numPrimitives() const {
+  int Concat::n_primitives() const {
     int nprim = 0;
     for (int i=0; i<ndep(); ++i) {
-      nprim +=  dep(i)->numPrimitives();
+      nprim +=  dep(i)->n_primitives();
     }
     return nprim;
   }
 
-  void Horzcat::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+  void Horzcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
     vector<MX> s = horzsplit(x, offset());
     for (int i=0; i<s.size(); ++i) {
-      dep(i)->splitPrimitives(s[i], it);
+      dep(i)->split_primitives(s[i], it);
     }
   }
 
-  MX Horzcat::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+  MX Horzcat::join_primitives(std::vector<MX>::const_iterator& it) const {
     vector<MX> s(ndep());
     for (int i=0; i<s.size(); ++i) {
-      s[i] = dep(i)->joinPrimitives(it);
+      s[i] = dep(i)->join_primitives(it);
     }
     return horzcat(s);
   }
 
-  void Vertcat::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+  void Vertcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
     vector<MX> s = vertsplit(x, offset());
     for (int i=0; i<s.size(); ++i) {
-      dep(i)->splitPrimitives(s[i], it);
+      dep(i)->split_primitives(s[i], it);
     }
   }
 
-  MX Vertcat::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+  MX Vertcat::join_primitives(std::vector<MX>::const_iterator& it) const {
     vector<MX> s(ndep());
     for (int i=0; i<s.size(); ++i) {
-      s[i] = dep(i)->joinPrimitives(it);
+      s[i] = dep(i)->join_primitives(it);
     }
     return vertcat(s);
   }
 
-  void Diagcat::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+  void Diagcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
     std::pair<std::vector<int>, std::vector<int> > off = offset();
     vector<MX> s = diagsplit(x, off.first, off.second);
     for (int i=0; i<s.size(); ++i) {
-      dep(i)->splitPrimitives(s[i], it);
+      dep(i)->split_primitives(s[i], it);
     }
   }
 
-  MX Diagcat::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+  MX Diagcat::join_primitives(std::vector<MX>::const_iterator& it) const {
     vector<MX> s(ndep());
     for (int i=0; i<s.size(); ++i) {
-      s[i] = dep(i)->joinPrimitives(it);
+      s[i] = dep(i)->join_primitives(it);
     }
     return diagcat(s);
   }
 
-  bool Concat::hasDuplicates() {
+  bool Concat::has_duplicates() {
     bool has_duplicates = false;
     for (int i=0; i<ndep(); ++i) {
-      has_duplicates = dep(i)->hasDuplicates() || has_duplicates;
+      has_duplicates = dep(i)->has_duplicates() || has_duplicates;
     }
     return has_duplicates;
   }
@@ -375,9 +375,9 @@ namespace casadi {
     }
   }
 
-  void Concat::getPrimitives(std::vector<MX>::iterator& it) const {
+  void Concat::primitives(std::vector<MX>::iterator& it) const {
     for (int i=0; i<ndep(); ++i) {
-      dep(i)->getPrimitives(it);
+      dep(i)->primitives(it);
     }
   }
 

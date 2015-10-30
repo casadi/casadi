@@ -101,17 +101,17 @@ namespace casadi {
     NlpSolver::init();
 
     // Read options
-    max_iter_ = getOption("max_iter");
-    max_iter_ls_ = getOption("max_iter_ls");
-    c1_ = getOption("c1");
-    beta_ = getOption("beta");
-    merit_memsize_ = getOption("merit_memory");
-    lbfgs_memory_ = getOption("lbfgs_memory");
-    tol_pr_ = getOption("tol_pr");
-    tol_du_ = getOption("tol_du");
-    regularize_ = getOption("regularize");
-    exact_hessian_ = getOption("hessian_approximation")=="exact";
-    min_step_size_ = getOption("min_step_size");
+    max_iter_ = option("max_iter");
+    max_iter_ls_ = option("max_iter_ls");
+    c1_ = option("c1");
+    beta_ = option("beta");
+    merit_memsize_ = option("merit_memory");
+    lbfgs_memory_ = option("lbfgs_memory");
+    tol_pr_ = option("tol_pr");
+    tol_du_ = option("tol_du");
+    regularize_ = option("regularize");
+    exact_hessian_ = option("hessian_approximation")=="exact";
+    min_step_size_ = option("min_step_size");
 
     // Get/generate required functions
     gradF();
@@ -130,11 +130,11 @@ namespace casadi {
     // QP solver options
     Dict qp_solver_options;
     if (hasSetOption("qp_solver_options")) {
-      qp_solver_options = getOption("qp_solver_options");
+      qp_solver_options = option("qp_solver_options");
     }
 
     // Allocate a QP solver
-    qp_solver_ = Function::qp_solver("qp_solver", getOption("qp_solver"),
+    qp_solver_ = Function::qp_solver("qp_solver", option("qp_solver"),
                                      {{"h", H_sparsity}, {"a", A_sparsity}},
                                      qp_solver_options);
 
@@ -212,7 +212,7 @@ namespace casadi {
     }
 
     // Header
-    if (static_cast<bool>(getOption("print_header"))) {
+    if (static_cast<bool>(option("print_header"))) {
       userOut()
         << "-------------------------------------------" << endl
         << "This is casadi::SQPMethod." << endl;
@@ -597,7 +597,7 @@ namespace casadi {
     output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
     output(NLP_SOLVER_G).setNZ(gk_);
 
-    if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
+    if (hasOption("print_time") && static_cast<bool>(option("print_time"))) {
       // Write timings
       userOut() << "time spent in eval_f: " << t_eval_f_ << " s.";
       if (n_eval_f_>0)

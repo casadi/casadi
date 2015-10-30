@@ -883,7 +883,7 @@ namespace casadi {
       // Get the value for the structural zeros
       DataType fcn_0;
       casadi_math<DataType>::fun(op, 0, 0, fcn_0);
-      if (!casadi_limits<DataType>::isZero(fcn_0)) { // Remove this if?
+      if (!casadi_limits<DataType>::is_zero(fcn_0)) { // Remove this if?
         ret = densify(ret, fcn_0);
       }
     }
@@ -1321,11 +1321,11 @@ namespace casadi {
                           << mul(*this, y).dim() << " and rhs is " << z.dim() << ".");
 
     // Check if we can simplify the product
-    if (isIdentity()) {
+    if (is_identity()) {
       return y + z;
-    } else if (y.isIdentity()) {
+    } else if (y.is_identity()) {
       return *this + z;
-    } else if (isZero() || y.isZero()) {
+    } else if (is_zero() || y.is_zero()) {
       return z;
     } else {
       // Carry out the matrix product
@@ -1420,7 +1420,7 @@ namespace casadi {
       // Get the value for the structural zeros
       DataType fcn_0;
       casadi_math<DataType>::fun(op, x_val, casadi_limits<DataType>::zero, fcn_0);
-      if (!casadi_limits<DataType>::isZero(fcn_0)) { // Remove this if?
+      if (!casadi_limits<DataType>::is_zero(fcn_0)) { // Remove this if?
         ret = densify(ret, fcn_0);
       }
     }
@@ -1451,7 +1451,7 @@ namespace casadi {
       // Get the value for the structural zeros
       DataType fcn_0;
       casadi_math<DataType>::fun(op, casadi_limits<DataType>::zero, y_val, fcn_0);
-      if (!casadi_limits<DataType>::isZero(fcn_0)) { // Remove this if?
+      if (!casadi_limits<DataType>::is_zero(fcn_0)) { // Remove this if?
         ret = densify(ret, fcn_0);
       }
     }
@@ -1589,43 +1589,43 @@ namespace casadi {
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isRegular() const {
-    return casadi::isRegular(data_);
+  bool Matrix<DataType>::is_regular() const {
+    return casadi::is_regular(data_);
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isSmooth() const {
+  bool Matrix<DataType>::is_smooth() const {
     return true;
   }
 
   template<typename DataType>
-  size_t Matrix<DataType>::getElementHash() const {
-    throw CasadiException("\"getElementHash\" not defined for instantiation");
+  size_t Matrix<DataType>::element_hash() const {
+    throw CasadiException("\"element_hash\" not defined for instantiation");
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isLeaf() const {
-    throw CasadiException("\"isLeaf\" not defined for instantiation");
+  bool Matrix<DataType>::is_leaf() const {
+    throw CasadiException("\"is_leaf\" not defined for instantiation");
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isCommutative() const {
-    throw CasadiException("\"isCommutative\" not defined for instantiation");
+  bool Matrix<DataType>::is_commutative() const {
+    throw CasadiException("\"is_commutative\" not defined for instantiation");
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isSymbolic() const {
+  bool Matrix<DataType>::is_symbolic() const {
     return false;
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isValidInput() const {
+  bool Matrix<DataType>::is_valid_input() const {
     return false;
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::hasDuplicates() {
-    throw CasadiException("\"hasDuplicates\" not defined for instantiation");
+  bool Matrix<DataType>::has_duplicates() {
+    throw CasadiException("\"has_duplicates\" not defined for instantiation");
   }
 
   template<typename DataType>
@@ -1634,10 +1634,10 @@ namespace casadi {
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isInteger() const {
+  bool Matrix<DataType>::is_integer() const {
     // loop over non-zero elements
     for (int k=0; k<nnz(); ++k)
-      if (!casadi_limits<DataType>::isInteger(at(k))) // if an element is not integer
+      if (!casadi_limits<DataType>::is_integer(at(k))) // if an element is not integer
         return false;
 
     // Integer if reached this point
@@ -1645,10 +1645,10 @@ namespace casadi {
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isConstant() const {
+  bool Matrix<DataType>::is_constant() const {
     // loop over non-zero elements
     for (int k=0; k<nnz(); ++k)
-      if (!casadi_limits<DataType>::isConstant(at(k))) // if an element is not constant
+      if (!casadi_limits<DataType>::is_constant(at(k))) // if an element is not constant
         return false;
 
     // Constant if we reach this point
@@ -1656,46 +1656,46 @@ namespace casadi {
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isOne() const {
+  bool Matrix<DataType>::is_one() const {
     if (!isdense()) {
       return false;
     }
 
     // loop over non-zero elements
     for (int el=0; el<nnz(); ++el)
-      if (!casadi_limits<DataType>::isOne(at(el)))
+      if (!casadi_limits<DataType>::is_one(at(el)))
         return false;
 
     return true;
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isMinusOne() const {
+  bool Matrix<DataType>::is_minus_one() const {
     if (!isdense()) {
       return false;
     }
 
     // loop over non-zero elements
     for (int el=0; el<nnz(); ++el)
-      if (!casadi_limits<DataType>::isMinusOne(at(el)))
+      if (!casadi_limits<DataType>::is_minus_one(at(el)))
         return false;
 
     return true;
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isZero() const {
+  bool Matrix<DataType>::is_zero() const {
 
     // loop over (potentially) non-zero elements
     for (int el=0; el<nnz(); ++el)
-      if (!casadi_limits<DataType>::isZero(at(el)))
+      if (!casadi_limits<DataType>::is_zero(at(el)))
         return false;
 
     return true;
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isIdentity() const {
+  bool Matrix<DataType>::is_identity() const {
 
     // Make sure that the matrix is diagonal
     if (!sparsity().isdiag())
@@ -1703,7 +1703,7 @@ namespace casadi {
 
     // Make sure that all entries are one
     for (typename Matrix<DataType>::const_iterator it=begin(); it!=end(); ++it) {
-      if (!casadi_limits<DataType>::isOne(*it))
+      if (!casadi_limits<DataType>::is_one(*it))
         return false;
     }
 
@@ -1734,7 +1734,7 @@ namespace casadi {
   bool Matrix<DataType>::has_zeros() const {
     // Check if the structural nonzero is known to be zero
     for (int el=0; el<nnz(); ++el) {
-      if (casadi_limits<DataType>::isZero(at(el)))
+      if (casadi_limits<DataType>::is_zero(at(el)))
         return true;
     }
 
@@ -1955,7 +1955,7 @@ namespace casadi {
     for (int i=0; i<n; ++i)
       for (int j=0; j<n; ++j) {
         temp = cofactor(*this, i, j);
-        if (!temp.isZero()) C(j, i) = temp;
+        if (!temp.is_zero()) C(j, i) = temp;
       }
 
     return C.T();
@@ -3050,13 +3050,13 @@ namespace casadi {
   // Specialize functions in GenericMatrix<SX> and SX
   template<> inline std::string matrixName<SXElement>() { return "SX"; }
   template<> SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
-  template<> bool SX::isRegular() const;
-  template<> bool SX::isSmooth() const;
-  template<> bool SX::isLeaf() const;
-  template<> bool SX::isCommutative() const;
-  template<> bool SX::isSymbolic() const;
-  template<> bool SX::isValidInput() const;
-  template<> bool SX::hasDuplicates();
+  template<> bool SX::is_regular() const;
+  template<> bool SX::is_smooth() const;
+  template<> bool SX::is_leaf() const;
+  template<> bool SX::is_commutative() const;
+  template<> bool SX::is_symbolic() const;
+  template<> bool SX::is_valid_input() const;
+  template<> bool SX::has_duplicates();
   template<> void SX::resetInput();
   template<> double SX::getValue(int k) const;
   template<> int SX::getIntValue() const;
@@ -3067,7 +3067,7 @@ namespace casadi {
   template<> std::string SX::getName() const;
   template<> void SX::setEqualityCheckingDepth(int eq_depth);
   template<> int SX::getEqualityCheckingDepth();
-  template<> size_t SX::getElementHash() const;
+  template<> size_t SX::element_hash() const;
   template<> void SX::zz_expand(SX &weights, SX& terms) const;
   template<> SX SX::zz_pw_const(const SX &tval, const SX &val) const;
   template<> SX SX::zz_pw_lin(const SX &tval, const SX &val) const;

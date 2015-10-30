@@ -88,7 +88,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_NORMF;}
+    virtual int op() const { return OP_NORMF;}
   };
 
   /** \brief Represents a 2-norm (spectral norm)
@@ -108,7 +108,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_NORM2;}
+    virtual int op() const { return OP_NORM2;}
   };
 
   /** \brief 1-norm
@@ -128,7 +128,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_NORM1;}
+    virtual int op() const { return OP_NORM1;}
   };
 
   /** \brief Represents an infinity-norm operation on a MX
@@ -148,7 +148,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_NORMINF;}
+    virtual int op() const { return OP_NORMINF;}
   };
 
 } // namespace casadi

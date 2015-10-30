@@ -79,16 +79,16 @@ namespace casadi {
     }
 
     /** \brief  Check if valid function input */
-    virtual bool isValidInput() const;
+    virtual bool is_valid_input() const;
 
     /** \brief Get the number of symbolic primitives */
-    virtual int numPrimitives() const;
+    virtual int n_primitives() const;
 
     /** \brief Get symbolic primitives */
-    virtual void getPrimitives(std::vector<MX>::iterator& it) const;
+    virtual void primitives(std::vector<MX>::iterator& it) const;
 
     /** \brief Detect duplicate symbolic expressions */
-    virtual bool hasDuplicates();
+    virtual bool has_duplicates();
 
     /** \brief Reset the marker for an input expression */
     virtual void resetInput();
@@ -123,13 +123,13 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_HORZCAT;}
+    virtual int op() const { return OP_HORZCAT;}
 
     /** \brief Split up an expression along symbolic primitives */
-    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const;
 
     /** \brief Join an expression along symbolic primitives */
-    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const;
 
     /** \brief Get offsets for split */
     std::vector<int> offset() const;
@@ -163,13 +163,13 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_VERTCAT;}
+    virtual int op() const { return OP_VERTCAT;}
 
     /** \brief Split up an expression along symbolic primitives */
-    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const;
 
     /** \brief Join an expression along symbolic primitives */
-    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const;
 
     /** \brief Get offsets for split */
     std::vector<int> offset() const;
@@ -203,13 +203,13 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_DIAGCAT;}
+    virtual int op() const { return OP_DIAGCAT;}
 
     /** \brief Split up an expression along symbolic primitives */
-    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const;
 
     /** \brief Join an expression along symbolic primitives */
-    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const;
 
     /** \brief Get offsets for split */
     std::pair<std::vector<int>, std::vector<int> > offset() const;

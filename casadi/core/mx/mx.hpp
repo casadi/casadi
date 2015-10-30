@@ -184,50 +184,50 @@ namespace casadi {
     Matrix<double> getMatrixValue() const;
 
     /// Check if symbolic
-    bool isSymbolic() const;
+    bool is_symbolic() const;
 
     /// Check if constant
-    bool isConstant() const;
+    bool is_constant() const;
 
     /// Check if evaluation
-    bool isEvaluation() const;
+    bool is_call() const;
 
     /// Check if evaluation output
-    bool isEvaluationOutput() const;
+    bool is_output() const;
 
-    /// Get the index of evaluation output - only valid when isEvaluationoutput() is true
-    int getEvaluationOutput() const;
+    /// Get the index of evaluation output - only valid when is_calloutput() is true
+    int get_output() const;
 
     /// Is it a certain operation
-    bool isOperation(int op) const;
+    bool is_op(int op) const;
 
     /// Check if multiplication
-    bool isMultiplication() const;
+    bool is_multiplication() const;
 
     /// Check if commutative operation
-    bool isCommutative() const;
+    bool is_commutative() const;
 
     /// Check if norm
-    bool isNorm() const;
+    bool is_norm() const;
 
     /** \brief Check if matrix can be used to define function inputs.
         Valid inputs for MXFunctions are combinations of Reshape, concatenations and SymbolicMX
     */
-    bool isValidInput() const;
+    bool is_valid_input() const;
 
     /** \brief Get the number of symbolic primitive
-        Assumes isValidInput() returns true.
+        Assumes is_valid_input() returns true.
     */
-    int numPrimitives() const;
+    int n_primitives() const;
 
     /** \brief Get symbolic primitives */
-    std::vector<MX> getPrimitives() const;
+    std::vector<MX> primitives() const;
 
     /** \brief Split up an expression along symbolic primitives */
-    std::vector<MX> splitPrimitives(const MX& x) const;
+    std::vector<MX> split_primitives(const MX& x) const;
 
     /** \brief Join an expression along symbolic primitives */
-    MX joinPrimitives(std::vector<MX>& v) const;
+    MX join_primitives(std::vector<MX>& v) const;
 
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
@@ -236,29 +236,29 @@ namespace casadi {
         Note: Will mark the node using MX::setTemp.
         Make sure to call resetInput() after usage.
     */
-    bool hasDuplicates();
+    bool has_duplicates();
 
     /** \brief Reset the marker for an input expression */
     void resetInput();
   /// \endcond
 
     /** \brief  check if identity */
-    bool isIdentity() const;
+    bool is_identity() const;
 
     /** \brief  check if zero (note that false negative answers are possible) */
-    bool isZero() const;
+    bool is_zero() const;
 
     /** \brief  check if zero (note that false negative answers are possible) */
-    bool isOne() const;
+    bool is_one() const;
 
     /** \brief  check if zero (note that false negative answers are possible) */
-    bool isMinusOne() const;
+    bool is_minus_one() const;
 
     /** \brief  Is the expression a transpose? */
-    bool isTranspose() const;
+    bool is_transpose() const;
 
     /// Checks if expression does not contain NaN or Inf
-    bool isRegular() const;
+    bool is_regular() const;
 
     /** \brief  Number of functions */
     int numFunctions() const;
@@ -267,13 +267,13 @@ namespace casadi {
     Function getFunction(int i=0);
 
     /// Is binary operation
-    bool isBinary() const;
+    bool is_binary() const;
 
     /// Is unary operation
-    bool isUnary() const;
+    bool is_unary() const;
 
     /// Get operation type
-    int getOp() const;
+    int op() const;
 
     /// \cond INTERNAL
     /// Get the temporary variable

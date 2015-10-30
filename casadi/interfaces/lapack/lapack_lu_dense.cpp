@@ -76,7 +76,7 @@ namespace casadi {
     ipiv_.resize(ncol_);
 
     // Equilibrate?
-    equilibriate_ = getOption("equilibration").toInt();
+    equilibriate_ = option("equilibration").toInt();
     if (equilibriate_) {
       r_.resize(ncol_);
       c_.resize(nrow_);
@@ -84,7 +84,7 @@ namespace casadi {
     equed_ = 'N'; // No equilibration
 
     // Allow equilibration failures
-    allow_equilibration_failure_ = getOption("allow_equilibration_failure").toInt();
+    allow_equilibration_failure_ = option("allow_equilibration_failure").toInt();
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       profileWriteName(CasadiOptions::profilingLog, this, "LapackLUDense",

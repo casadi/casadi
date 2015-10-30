@@ -386,7 +386,7 @@ namespace casadi {
     Sparsity transpose(std::vector<int>& mapping, bool invert_mapping=false) const;
 
     /// Check if the sparsity is the transpose of another
-    bool isTranspose(const Sparsity& y) const;
+    bool is_transpose(const Sparsity& y) const;
 
     /// Check if the sparsity is a reshape of another
     bool isReshape(const Sparsity& y) const;

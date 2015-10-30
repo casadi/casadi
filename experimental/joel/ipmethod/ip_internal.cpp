@@ -96,7 +96,7 @@ void IPInternal::init(){
   kfcn_.init();
   
   // Create a linear solver for the KKT system
-  linearSolverCreator linear_solver_creator = getOption("linear_solver");
+  linearSolverCreator linear_solver_creator = option("linear_solver");
   linear_solver_ = linear_solver_creator(K.sparsity());
   linear_solver_.init();  
 }

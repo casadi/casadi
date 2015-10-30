@@ -233,7 +233,7 @@ namespace casadi {
 
   void MapReduce::init() {
 
-    std::string parallelization = getOption("parallelization").toString();
+    std::string parallelization = option("parallelization").toString();
 
     if (parallelization.compare("serial")==0) {
       parallelization_ = PARALLELIZATION_SERIAL;

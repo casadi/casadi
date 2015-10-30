@@ -597,8 +597,8 @@ namespace casadi {
     (*this)->spy(stream);
   }
 
-  bool Sparsity::isTranspose(const Sparsity& y) const {
-    return (*this)->isTranspose(*y);
+  bool Sparsity::is_transpose(const Sparsity& y) const {
+    return (*this)->is_transpose(*y);
   }
 
   bool Sparsity::isReshape(const Sparsity& y) const {

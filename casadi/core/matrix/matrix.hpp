@@ -1032,35 +1032,35 @@ namespace casadi {
      * 
      * Only defined if symbolic scalar. 
      */
-    size_t getElementHash() const;
+    size_t element_hash() const;
 
     /// Checks if expression does not contain NaN or Inf
-    bool isRegular() const;
+    bool is_regular() const;
 
     /** \brief Check if smooth */
-    bool isSmooth() const;
+    bool is_smooth() const;
 
     /** \brief Check if SX is a leaf of the SX graph
     
         Only defined if symbolic scalar. 
     */
-    bool isLeaf() const;
+    bool is_leaf() const;
 
     /** \brief Check whether a binary SX is commutative
     
         Only defined if symbolic scalar. 
     */
-    bool isCommutative() const;
+    bool is_commutative() const;
 
     /** \brief Check if symbolic (Dense)
         Sparse matrices invariable return false
     */
-    bool isSymbolic() const;
+    bool is_symbolic() const;
 
     /** \brief Check if matrix can be used to define function inputs.
         Sparse matrices can return true if all non-zero elements are symbolic
     */
-    bool isValidInput() const;
+    bool is_valid_input() const;
 
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
@@ -1069,31 +1069,31 @@ namespace casadi {
         Note: Will mark the node using SXElement::setTemp.
         Make sure to call resetInput() after usage.
     */
-    bool hasDuplicates();
+    bool has_duplicates();
 
     /** \brief Reset the marker for an input expression */
     void resetInput();
   /// \endcond
 
     /** \brief Check if the matrix is constant (note that false negative answers are possible)*/
-    bool isConstant() const;
+    bool is_constant() const;
 
     /** \brief Check if the matrix is integer-valued
      * (note that false negative answers are possible)*/
-    bool isInteger() const;
+    bool is_integer() const;
 
     /** \brief  check if the matrix is 0 (note that false negative answers are possible)*/
-    bool isZero() const;
+    bool is_zero() const;
 
     /** \brief  check if the matrix is 1 (note that false negative answers are possible)*/
-    bool isOne() const;
+    bool is_one() const;
 
     /** \brief  check if the matrix is -1 (note that false negative answers are possible)*/
-    bool isMinusOne() const;
+    bool is_minus_one() const;
 
     /** \brief  check if the matrix is an identity matrix (note that false negative answers
      * are possible)*/
-    bool isIdentity() const;
+    bool is_identity() const;
 
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
     bool has_zeros() const;

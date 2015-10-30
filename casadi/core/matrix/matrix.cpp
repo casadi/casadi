@@ -139,65 +139,65 @@ namespace casadi {
   }
 
   template<>
-  bool SX::isRegular() const {
+  bool SX::is_regular() const {
     // First pass: ignore symbolics
     for (int i=0; i<nnz(); ++i) {
       const SXElement& x = at(i);
-      if (x.isConstant()) {
+      if (x.is_constant()) {
         if (x.isNan() || x.isInf() || x.isMinusInf()) return false;
       }
     }
     // Second pass: don't ignore symbolics
     for (int i=0; i<nnz(); ++i) {
-      if (!at(i).isRegular()) return false;
+      if (!at(i).is_regular()) return false;
     }
     return true;
   }
 
   template<>
-  bool SX::isSmooth() const {
+  bool SX::is_smooth() const {
     // Make a function
     Function temp("temp", {SX()}, {*this});
 
     // Run the function on the temporary variable
     auto *t = dynamic_cast<SXFunction *>(temp.get());
-    return t->isSmooth();
+    return t->is_smooth();
   }
 
   template<>
-  size_t SX::getElementHash() const {
+  size_t SX::element_hash() const {
     return toScalar().__hash__();
   }
 
   template<>
-  bool SX::isLeaf() const {
-    return toScalar().isLeaf();
+  bool SX::is_leaf() const {
+    return toScalar().is_leaf();
   }
 
   template<>
-  bool SX::isCommutative() const {
-    return toScalar().isCommutative();
+  bool SX::is_commutative() const {
+    return toScalar().is_commutative();
   }
 
   template<>
-  bool SX::isSymbolic() const {
+  bool SX::is_symbolic() const {
     if (isdense()) {
-      return isValidInput();
+      return is_valid_input();
     } else {
       return false;
     }
   }
 
   template<>
-  bool SX::isValidInput() const {
+  bool SX::is_valid_input() const {
     for (int k=0; k<nnz(); ++k) // loop over non-zero elements
-      if (!at(k)->isSymbolic()) // if an element is not symbolic
+      if (!at(k)->is_symbolic()) // if an element is not symbolic
         return false;
 
     return true;
   }
 
-  template<> bool SX::hasDuplicates() {
+  template<> bool SX::has_duplicates() {
     bool has_duplicates = false;
     for (vector<SXElement>::iterator it = begin(); it != end(); ++it) {
       bool is_duplicate = it->getTemp()!=0;
@@ -287,10 +287,10 @@ namespace casadi {
       vector<double> w; // weights
       vector<SXNode*> f; // terms
 
-      if (to_be_expanded.top()->isConstant()) { // constant nodes are seen as multiples of one
+      if (to_be_expanded.top()->is_constant()) { // constant nodes are seen as multiples of one
         w.push_back(to_be_expanded.top()->getValue());
         f.push_back(casadi_limits<SXElement>::one.get());
-      } else if (to_be_expanded.top()->isSymbolic()) {
+      } else if (to_be_expanded.top()->is_symbolic()) {
         // symbolic nodes have weight one and itself as factor
         w.push_back(1);
         f.push_back(to_be_expanded.top());
@@ -301,9 +301,9 @@ namespace casadi {
         // Check if addition, subtracton or multiplication
         SXNode* node = to_be_expanded.top();
         // If we have a binary node that we can factorize
-        if (node->getOp() == OP_ADD || node->getOp() == OP_SUB ||
-           (node->getOp() == OP_MUL  && (node->dep(0)->isConstant() ||
-                                         node->dep(1)->isConstant()))) {
+        if (node->op() == OP_ADD || node->op() == OP_SUB ||
+           (node->op() == OP_MUL  && (node->dep(0)->is_constant() ||
+                                         node->dep(1)->is_constant()))) {
           // Make sure that both children are factorized, if not - add to stack
           if (indices.find(node->dep(0).get()) == indices.end()) {
             to_be_expanded.push(node->dep(0).get());
@@ -319,9 +319,10 @@ namespace casadi {
           int ind2 = indices[node->dep(1).get()];
 
           // If multiplication
-          if (node->getOp() == OP_MUL) {
+          if (node->op() == OP_MUL) {
             double fac;
-            if (node->dep(0)->isConstant()) { // Multiplication where the first factor is a constant
+            // Multiplication where the first factor is a constant
+            if (node->dep(0)->is_constant()) {
               fac = node->dep(0)->getValue();
               f = terms[ind2];
               w = weights[ind2];
@@ -333,7 +334,7 @@ namespace casadi {
             for (int i=0; i<w.size(); ++i) w[i] *= fac;
 
           } else { // if addition or subtraction
-            if (node->getOp() == OP_ADD) {          // Addition: join both sums
+            if (node->op() == OP_ADD) {          // Addition: join both sums
               f = terms[ind1];      f.insert(f.end(), terms[ind2].begin(), terms[ind2].end());
               w = weights[ind1];    w.insert(w.end(), weights[ind2].begin(), weights[ind2].end());
             } else {      // Subtraction: join both sums with negative weights for second term
@@ -550,7 +551,7 @@ namespace casadi {
     // Assert correctness
     casadi_assert(v.size()==vdef.size());
     for (int i=0; i<v.size(); ++i) {
-      casadi_assert_message(v[i].isSymbolic(), "the variable is not symbolic");
+      casadi_assert_message(v[i].is_symbolic(), "the variable is not symbolic");
       casadi_assert_message(v[i].sparsity() == vdef[i].sparsity(), "the sparsity patterns of the "
                             "expression and its defining bexpression do not match");
     }
@@ -794,10 +795,10 @@ namespace casadi {
     SXElement x = toScalar();
     if (!x.hasDep())
         throw CasadiException("print_operator: SXElement must be binary operator");
-    if (args.size() == 0 || (casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2))
+    if (args.size() == 0 || (casadi_math<double>::ndeps(x.op())==2 && args.size() < 2))
         throw CasadiException("print_operator: not enough arguments supplied");
     stringstream s;
-    casadi_math<double>::print(x.getOp(), s, args[0], args[1]);
+    casadi_math<double>::print(x.op(), s, args[0], args[1]);
     return s.str();
   }
 
@@ -938,7 +939,7 @@ namespace casadi {
   SX SX::zz_poly_coeff(const SX& x) const {
     casadi_assert(isscalar());
     casadi_assert(x.isscalar());
-    casadi_assert(x.isSymbolic());
+    casadi_assert(x.is_symbolic());
 
     vector<SXElement> r;
 

@@ -240,9 +240,9 @@ namespace casadi {
     }
 
     // read options
-    t0_ = getOption("t0");
-    grid_ = vector<double>{getOption("tf")};
-    print_stats_ = getOption("print_stats");
+    t0_ = option("t0");
+    grid_ = vector<double>{option("tf")};
+    print_stats_ = option("print_stats");
 
     // Form a linear solver for the sparsity propagation
     linsol_f_ = LinearSolver("linsol_f", "none", spJacF());
@@ -937,7 +937,7 @@ namespace casadi {
     // Integrator options
     Dict aug_opts = getDerivativeOptions(true);
     if (hasSetOption("augmented_options")) {
-      Dict aug_opts_user = getOption("augmented_options");
+      Dict aug_opts_user = option("augmented_options");
       for (auto&& i : aug_opts_user) {
         aug_opts[i.first] = i.second;
       }
@@ -1084,7 +1084,7 @@ namespace casadi {
     // Integrator options
     Dict aug_opts = getDerivativeOptions(false);
     if (hasSetOption("augmented_options")) {
-      Dict aug_opts_user = getOption("augmented_options");
+      Dict aug_opts_user = option("augmented_options");
       for (auto&& i : aug_opts_user) {
         aug_opts[i.first] = i.second;
       }
