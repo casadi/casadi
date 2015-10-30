@@ -221,7 +221,7 @@ int main(){
   cout << coarse_colblock3 << endl;
   
   
-  S3.dulmage_mendelsohn(rowperm3, colperm3, rowblock3, colblock3, coarse_rowblock3, coarse_colblock3, dmseed);
+  S3.btf(rowperm3, colperm3, rowblock3, colblock3, coarse_rowblock3, coarse_colblock3, dmseed);
 
   cout << "casadi" << endl;
   cout << rowperm3 << endl;

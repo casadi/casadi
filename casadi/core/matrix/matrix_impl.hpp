@@ -2331,7 +2331,7 @@ namespace casadi {
 
       // Make a BLT transformation of A
       std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-      sparsity().dulmage_mendelsohn(rowperm, colperm, rowblock, colblock,
+      sparsity().btf(rowperm, colperm, rowblock, colblock,
                                      coarse_rowblock, coarse_colblock);
 
       // Permute the right hand side

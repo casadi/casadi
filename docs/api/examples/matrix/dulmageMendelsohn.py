@@ -42,7 +42,7 @@ S = A[p1,:]
 
 print "randomly permuted: "
 print S
-nb, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = S.sparsity().dulmage_mendelsohn()
+nb, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = S.sparsity().btf()
 
 print "number of blocks: ", nb
 print "rowperm: ", rowperm

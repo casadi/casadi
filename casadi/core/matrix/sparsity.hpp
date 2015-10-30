@@ -624,7 +624,7 @@ namespace casadi {
         \sa strongly_connected_components
 
     */
-    int dulmage_mendelsohn(
+    int btf(
         std::vector<int>& SWIG_OUTPUT(rowperm), std::vector<int>& SWIG_OUTPUT(colperm),
         std::vector<int>& SWIG_OUTPUT(rowblock), std::vector<int>& SWIG_OUTPUT(colblock),
         std::vector<int>& SWIG_OUTPUT(coarse_rowblock),

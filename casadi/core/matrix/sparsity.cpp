@@ -534,11 +534,11 @@ namespace casadi {
     return (*this)->strongly_connected_components(p, r);
   }
 
-  int Sparsity::dulmage_mendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm,
+  int Sparsity::btf(std::vector<int>& rowperm, std::vector<int>& colperm,
                                   std::vector<int>& rowblock, std::vector<int>& colblock,
                                   std::vector<int>& coarse_rowblock,
                                   std::vector<int>& coarse_colblock, int seed) const {
-    return (*this)->dulmage_mendelsohn(rowperm, colperm, rowblock, colblock,
+    return (*this)->btf(rowperm, colperm, rowblock, colblock,
                                       coarse_rowblock, coarse_colblock, seed);
   }
 
@@ -1328,7 +1328,7 @@ namespace casadi {
 
   int Sparsity::zz_sprank() const {
     std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    dulmage_mendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+    btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
     return coarse_colblock.at(3);
   }
 

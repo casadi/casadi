@@ -129,11 +129,11 @@ namespace casadi {
                     std::vector<int>& colind, std::vector<int>& row);
 
     /// Compute the Dulmage-Mendelsohn decomposition : see cs_dmperm in CSparse
-    int dulmage_mendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm,
+    int btf(std::vector<int>& rowperm, std::vector<int>& colperm,
                           std::vector<int>& rowblock, std::vector<int>& colblock,
                           std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock,
                           int seed) const {
-      return T()->dulmage_mendelsohnUpper(colperm, rowperm, colblock, rowblock,
+      return T()->btfUpper(colperm, rowperm, colblock, rowblock,
                                                  coarse_colblock, coarse_rowblock, seed);
     }
 
@@ -141,7 +141,7 @@ namespace casadi {
      *
      * -- upper triangular TODO: refactor and merge with the above
      */
-    int dulmage_mendelsohnUpper(std::vector<int>& rowperm, std::vector<int>& colperm,
+    int btfUpper(std::vector<int>& rowperm, std::vector<int>& colperm,
                                std::vector<int>& rowblock, std::vector<int>& colblock,
                                std::vector<int>& coarse_rowblock,
                                std::vector<int>& coarse_colblock, int seed) const;

@@ -575,7 +575,7 @@ namespace casadi {
         Cimatch[Cjmatch[i]] = i;
   }
 
-  int SparsityInternal::dulmage_mendelsohnUpper(std::vector<int>& rowperm,
+  int SparsityInternal::btfUpper(std::vector<int>& rowperm,
                                                std::vector<int>& colperm,
                                                std::vector<int>& rowblock,
                                                std::vector<int>& colblock,
