@@ -72,10 +72,7 @@ namespace casadi {
     virtual bool spCanEvaluate(bool fwd) { return true;}
 
     /// Solve the system of equations and calculate derivatives
-    virtual void evaluate();
-
-    /// Solve the nonlinear system of equations
-    virtual void solveNonLinear() = 0;
+    virtual void evalD(const double** arg, double** res, int* iw, double* w) = 0;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
@@ -113,9 +110,6 @@ namespace casadi {
     /// Linear solver
     LinearSolver linsol_;
 
-    /// Factorization up-to-date?
-    bool fact_up_to_date_;
-
     /// Constraints on decision variables
     std::vector<int> u_c_;
 
@@ -144,4 +138,3 @@ namespace casadi {
 /// \endcond
 
 #endif // CASADI_ROOTFINDER_HPP
-

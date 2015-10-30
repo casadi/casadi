@@ -71,8 +71,8 @@ namespace casadi {
     /** \brief  Initialize stage */
     virtual void init();
 
-    /** \brief  Solve the nonlinear system of equations */
-    virtual void solveNonLinear();
+    /// Solve the system of equations and calculate derivatives
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "kinsol";}

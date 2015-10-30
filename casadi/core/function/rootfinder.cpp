@@ -140,9 +140,6 @@ namespace casadi {
       casadi_assert(linsol_.sparsity_in(0)==jac_.sparsity_out(0));
     }
 
-    // No factorization yet;
-    fact_up_to_date_ = false;
-
     // Constraints
     if (hasSetOption("constraints")) u_c_ = option("constraints");
 
@@ -158,18 +155,6 @@ namespace casadi {
       sz_w = max(sz_w, jac_.sz_w());
     }
     alloc_w(sz_w + 2*static_cast<size_t>(n_));
-  }
-
-  void Rootfinder::evaluate() {
-
-    // Mark factorization as out-of-date. TODO: make this conditional
-    fact_up_to_date_ = false;
-
-    // Get initial guess
-    output(iout_).set(input(iin_));
-
-    // Solve the nonlinear system of equations
-    solveNonLinear();
   }
 
   Function Rootfinder

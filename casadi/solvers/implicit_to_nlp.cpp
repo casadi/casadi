@@ -53,7 +53,16 @@ namespace casadi {
   QpToImplicit::~QpToImplicit() {
   }
 
-  void QpToImplicit::solveNonLinear() {
+  void QpToImplicit::evalD(const double** arg, double** res, int* iw, double* w) {
+    // Copy to buffers
+    for (int i=0; i<n_in(); ++i) {
+      if (arg[i]) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInputNZ(0, i);
+      }
+    }
+    setOutput(input(iin_), iout_);
 
     // Equality nonlinear constraints
     solver_.input(NLP_SOLVER_LBG).set(0.);
@@ -94,6 +103,13 @@ namespace casadi {
       f_.evaluate();
       for (int i=0; i<n_out(); ++i) {
         if (i!=iout_) f_.getOutput(output(i), i);
+      }
+    }
+
+    // Get from buffers
+    for (int i=0; i<n_out(); ++i) {
+      if (res[i]) {
+        getOutputNZ(res[i], i);
       }
     }
   }

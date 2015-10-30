@@ -66,7 +66,7 @@ namespace casadi {
   Newton::~Newton() {
   }
 
-  void Newton::solveNonLinear() {
+  void Newton::evalD(const double** arg, double** res, int* iw, double* w) {
     casadi_msg("Newton::solveNonLinear:begin");
 
     // Set up timers for profiling
@@ -78,15 +78,12 @@ namespace casadi {
       CasadiOptions::profilingLog  << "start " << this << ":" <<name_ << std::endl;
     }
 
-    // Pass the inputs to J
-    for (int i=0; i<n_in(); ++i) {
-      if (i!=iin_) jac_.setInput(input(i), i);
+    // Get the initial guess
+    if (arg[iin_]) {
+      copy(arg[iin_], arg[iin_]+nnz_in(iin_), z_.begin());
+    } else {
+      fill(z_.begin(), z_.end(), 0);
     }
-
-    // Aliases
-    DMatrix &u = output(iout_);
-    DMatrix &J = jac_.output(0);
-    DMatrix &F = jac_.output(1+iout_);
 
     // Perform the Newton iterations
     int iter=0;
@@ -105,50 +102,28 @@ namespace casadi {
       // Start a new iteration
       iter++;
 
-      // Print progress
-      if (monitored("step") || monitored("stepsize")) {
-        userOut() << "Step " << iter << "." << std::endl;
-      }
-
-      if (monitored("step")) {
-        userOut() << "  u = " << u << std::endl;
-      }
-
       // Use u to evaluate J
-      jac_.setInput(u, iin_);
-      for (int i=0; i<n_in(); ++i)
-        if (i!=iin_) jac_.setInput(input(i), i);
+      jac_.setInputNZ(z_, iin_);
 
-      if (CasadiOptions::profiling) {
-        time_start = getRealTime(); // Start timer
+      for (int i=0; i<n_in(); ++i) {
+        if (i!=iin_) {
+          if (arg[i]) {
+            jac_.setInputNZ(arg[i], i);
+          } else {
+            jac_.setInputNZ(0, i);
+          }
+        }
       }
-
       jac_.evaluate();
-
-      // Write out profiling information
-      if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
-        time_stop = getRealTime(); // Stop timer
-        CasadiOptions::profilingLog
-            << (time_stop-time_start)*1e6 << " ns | "
-            << (time_stop-time_zero)*1e3 << " ms | "
-            << this << ":" << name_ << ":0|" << jac_.get() << ":"
-            << jac_.name() << "|evaluate jacobian" << std::endl;
-      }
-
-      if (monitored("F")) userOut() << "  F = " << F << std::endl;
-      if (monitored("normF"))
-        userOut() << "  F (min, max, 1-norm, 2-norm) = "
-                  << (*std::min_element(F.data().begin(), F.data().end()))
-                  << ", " << (*std::max_element(F.data().begin(), F.data().end()))
-                  << ", " << norm_1(F) << ", " << norm_F(F) << std::endl;
-      if (monitored("J")) userOut() << "  J = " << J << std::endl;
+      DMatrix &J = jac_.output(0);
+      DMatrix &F = jac_.output(1+iout_);
 
       double abstol = 0;
       if (numeric_limits<double>::infinity() != abstol_) {
         abstol = std::max((*std::max_element(F.data().begin(),
-                                                  F.data().end())),
-                               -(*std::min_element(F.data().begin(),
-                                                   F.data().end())));
+                                             F.data().end())),
+                          -(*std::min_element(F.data().begin(),
+                                              F.data().end())));
         if (abstol <= abstol_) {
           casadi_msg("Converged to acceptable tolerance - abstol: " << abstol_);
           break;
@@ -157,47 +132,15 @@ namespace casadi {
 
       // Prepare the linear solver with J
       linsol_.setInput(J, LINSOL_A);
-
-      if (CasadiOptions::profiling) {
-        time_start = getRealTime(); // Start timer
-      }
       linsol_.prepare();
-      // Write out profiling information
-      if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
-        time_stop = getRealTime(); // Stop timer
-        CasadiOptions::profilingLog
-            << (time_stop-time_start)*1e6 << " ns | "
-            << (time_stop-time_zero)*1e3 << " ms | "
-            << this << ":" << name_
-            << ":1||prepare linear system" << std::endl;
-      }
-
-      if (CasadiOptions::profiling) {
-        time_start = getRealTime(); // Start timer
-      }
-      // Solve against F
       linsol_.solve(&F.front(), 1, false);
-      if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
-        time_stop = getRealTime(); // Stop timer
-        CasadiOptions::profilingLog
-            << (time_stop-time_start)*1e6 << " ns | "
-            << (time_stop-time_zero)*1e3 << " ms | "
-            << this << ":" << name_ << ":2||solve linear system" << std::endl;
-      }
-
-      if (monitored("step")) {
-        userOut() << "  step = " << F << std::endl;
-      }
 
       double abstolStep=0;
       if (numeric_limits<double>::infinity() != abstolStep_) {
         abstolStep = std::max((*std::max_element(F.data().begin(),
-                                                  F.data().end())),
-                               -(*std::min_element(F.data().begin(),
-                                                   F.data().end())));
-        if (monitored("stepsize")) {
-          userOut() << "  stepsize = " << abstolStep << std::endl;
-        }
+                                                 F.data().end())),
+                              -(*std::min_element(F.data().begin(),
+                                                  F.data().end())));
         if (abstolStep <= abstolStep_) {
           casadi_msg("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
           break;
@@ -215,22 +158,24 @@ namespace casadi {
       }
 
       // Update Xk+1 = Xk - J^(-1) F
-      std::transform(u.begin(), u.end(), F.begin(), u.begin(), std::minus<double>());
+      std::transform(z_.begin(), z_.end(), F.begin(), z_.begin(), std::minus<double>());
+    }
 
+    // Get the solution
+    if (res[iout_]) {
+      copy_n(z_.begin(), nnz_out(iout_), res[iout_]);
     }
 
     // Get auxiliary outputs
     for (int i=0; i<n_out(); ++i) {
-      if (i!=iout_) jac_.getOutput(output(i), 1+i);
+      if (i!=iout_ && res[i]) {
+        copy_n(jac_.output(i+1).ptr(), nnz_out(i), res[i]);
+      }
     }
 
     // Store the iteration count
     if (gather_stats_) stats_["iter"] = iter;
-
     if (success) stats_["return_status"] = "success";
-
-    // Factorization up-to-date
-    fact_up_to_date_ = true;
 
     casadi_msg("Newton::solveNonLinear():end after " << iter << " steps");
   }
@@ -256,6 +201,8 @@ namespace casadi {
 
     print_iteration_ = option("print_iteration");
 
+    // Allocate memory
+    z_.resize(n_);
   }
 
   void Newton::printIteration(std::ostream &stream) {

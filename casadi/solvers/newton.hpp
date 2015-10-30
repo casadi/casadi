@@ -66,8 +66,8 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief  Solve the nonlinear system of equations */
-    virtual void solveNonLinear();
+    /// Solve the system of equations and calculate derivatives
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
     /// A documentation string
     static const std::string meta_doc;
@@ -91,6 +91,8 @@ namespace casadi {
     /// Print iteration
     void printIteration(std::ostream &stream, int iter, double abstol, double abstolStep);
 
+    /// Current iterate
+    std::vector<double> z_;
   };
 
 } // namespace casadi

@@ -271,17 +271,26 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::solveNonLinear() {
+  void KinsolInterface::evalD(const double** arg, double** res, int* iw, double* w) {
     // Reset the counters
     t_func_ = 0;
     t_jac_ = 0;
 
-    if (verbose()) {
-      userOut() << "KinsolInterface::solveNonLinear: Initial guess = " << output(0).data() << endl;
+    // Copy to buffers
+    for (int i=0; i<n_in(); ++i) {
+      if (arg[i]) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInputNZ(0, i);
+      }
     }
 
     // Get the initial guess
-    output(iout_).getNZ(NV_DATA_S(u_));
+    if (arg[iin_]) {
+      copy(arg[iin_], arg[iin_]+nnz_in(iin_), NV_DATA_S(u_));
+    } else {
+      N_VConst(0.0, u_);
+    }
 
     // Solve the nonlinear system of equations
     int flag = KINSol(mem_, u_, strategy_, u_scale_, f_scale_);
@@ -293,22 +302,28 @@ namespace casadi {
     }
 
     // Get the solution
-    setOutputNZ(NV_DATA_S(u_), iout_);
+    if (res[iout_]) {
+      copy_n(NV_DATA_S(u_), nnz_out(iout_), res[iout_]);
+    }
 
     // Evaluate auxiliary outputs
     if (n_out()>0) {
-      f_.setInput(output(iout_), iin_);
-      for (int i=0; i<n_in(); ++i)
-        if (i!=iin_) f_.setInput(input(i), i);
+      f_.setInputNZ(NV_DATA_S(u_), iin_);
+      for (int i=0; i<n_in(); ++i) {
+        if (i!=iin_) {
+          if (arg[i]) {
+            f_.setInputNZ(arg[i], i);
+          } else {
+            f_.setInputNZ(0, i);
+          }
+        }
+      }
       f_.evaluate();
       for (int i=0; i<n_out(); ++i) {
-        if (i!=iout_) f_.getOutput(output(i), i);
+        if (i!=iout_ && res[i]) {
+          copy_n(f_.output(i).ptr(), nnz_out(i), res[i]);
+        }
       }
-    }
-
-    // Print solution
-    if (verbose()) {
-      userOut() << "KinsolInterface::solveNonLinear: solution = " << output(iout_).data() << endl;
     }
   }
 
