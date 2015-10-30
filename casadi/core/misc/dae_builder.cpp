@@ -1608,21 +1608,21 @@ namespace casadi {
     }
   }
 
-  MX DaeBuilder::addLinearCombination(const std::string& name,
+  MX DaeBuilder::add_lc(const std::string& name,
                                       const std::vector<std::string>& f_out) {
     // Make sure object valid
     sanity_check();
 
     // Make sure name is valid
-    casadi_assert_message(!name.empty(), "DaeBuilder::addLinearCombination: \"name\" is empty");
+    casadi_assert_message(!name.empty(), "DaeBuilder::add_lc: \"name\" is empty");
     for (string::const_iterator i=name.begin(); i!=name.end(); ++i) {
       casadi_assert_message(isalnum(*i),
-                            "DaeBuilder::addLinearCombination: \"name\" must be alphanumeric");
+                            "DaeBuilder::add_lc: \"name\" must be alphanumeric");
     }
 
     // Get a reference to the expression
     MX& ret = lin_comb_[name];
-    casadi_assert_warning(ret.isempty(), "DaeBuilder::addLinearCombination: Overwriting " << name);
+    casadi_assert_warning(ret.isempty(), "DaeBuilder::add_lc: Overwriting " << name);
     ret = 0;
 
     // Get indices of outputs
@@ -1631,10 +1631,10 @@ namespace casadi {
     for (int i=0; i<f_out.size(); ++i) {
       DaeBuilderOut oind = outputEnum(f_out[i]);
       casadi_assert_message(oind!=DAE_BUILDER_NUM_OUT,
-                            "DaeBuilder::addLinearCombination: No output expression " << f_out[i]
+                            "DaeBuilder::add_lc: No output expression " << f_out[i]
                             << ". Valid expressions are " << outputString());
       casadi_assert_message(!in_use[oind],
-                            "DaeBuilder::addLinearCombination: Duplicate expression " << f_out[i]);
+                            "DaeBuilder::add_lc: Duplicate expression " << f_out[i]);
       in_use[oind] = true;
 
       // Add linear combination of expressions

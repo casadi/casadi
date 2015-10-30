@@ -306,7 +306,7 @@ namespace casadi {
 #endif // SWIG
 
     /// Add a named linear combination of output expressions
-    MX addLinearCombination(const std::string& name,
+    MX add_lc(const std::string& name,
                             const std::vector<std::string>& f_out);
 
     /// Construct a function object
