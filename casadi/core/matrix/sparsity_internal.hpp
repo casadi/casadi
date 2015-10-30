@@ -80,7 +80,7 @@ namespace casadi {
     Sparsity get_diag(std::vector<int>& mapping) const;
 
     /// Calculate the elimination tree: See cs_etree in CSparse
-    std::vector<int> elimination_tree(bool ata) const;
+    std::vector<int> etree(bool ata) const;
 
     /// Find strongly connected components: See cs_dfs in CSparse
     int depth_first_search(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,

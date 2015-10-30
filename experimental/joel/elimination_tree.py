@@ -53,4 +53,4 @@ A = A+A.T
 s = A.sparsity()
 
 # Get the elimination tree
-etr = s.elimination_tree(False)
+etr = s.etree(False)

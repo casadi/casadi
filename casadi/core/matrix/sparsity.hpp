@@ -581,7 +581,7 @@ namespace casadi {
         the indices are zero-based. If ata is true, the algorithm is equivalent to Matlab's
         etree(A, 'row').
     */
-    std::vector<int> elimination_tree(bool ata=false) const;
+    std::vector<int> etree(bool ata=false) const;
 
     /** \brief Depth-first search on the adjacency graph of the sparsity
         See Direct Methods for Sparse Linear Systems by Davis (2006).

@@ -131,7 +131,7 @@ namespace casadi {
     return Sparsity::triplet(size2(), size1(), trans_row, trans_col, mapping, invert_mapping);
   }
 
-  std::vector<int> SparsityInternal::elimination_tree(bool ata) const {
+  std::vector<int> SparsityInternal::etree(bool ata) const {
     const int* colind = this->colind();
     const int* row = this->row();
 
@@ -1808,7 +1808,7 @@ namespace casadi {
       }
 
       // etree of C'*C, where C=A(:, q)
-      S_parent = C->elimination_tree(1);
+      S_parent = C->etree(1);
 
       post = postorder(S_parent, n);
 

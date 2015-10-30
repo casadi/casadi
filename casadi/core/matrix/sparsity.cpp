@@ -520,8 +520,8 @@ namespace casadi {
     return (*this)->get_diag(mapping);
   }
 
-  std::vector<int> Sparsity::elimination_tree(bool ata) const {
-    return (*this)->elimination_tree(ata);
+  std::vector<int> Sparsity::etree(bool ata) const {
+    return (*this)->etree(ata);
   }
 
   int Sparsity::depth_first_search(int j, int top, std::vector<int>& xi,
