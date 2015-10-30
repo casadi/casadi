@@ -315,16 +315,16 @@ namespace casadi {
     return (*this)->get_row();
   }
 
-  void Sparsity::getCCS(std::vector<int>& colind, std::vector<int>& row) const {
+  void Sparsity::get_ccs(std::vector<int>& colind, std::vector<int>& row) const {
     colind = get_colind();
     row = get_row();
   }
 
-  void Sparsity::getCRS(std::vector<int>& rowind, std::vector<int>& col) const {
-    T().getCCS(rowind, col);
+  void Sparsity::get_crs(std::vector<int>& rowind, std::vector<int>& col) const {
+    T().get_ccs(rowind, col);
   }
 
-  void Sparsity::getTriplet(std::vector<int>& row, std::vector<int>& col) const {
+  void Sparsity::get_triplet(std::vector<int>& row, std::vector<int>& col) const {
     row = get_row();
     col = get_col();
   }
@@ -641,14 +641,10 @@ namespace casadi {
     CachingMap& cache = getCache();
 
     // Record the current number of buckets (for garbage collection below)
-#ifdef USE_CXX11
     int bucket_count_before = cache.bucket_count();
-#endif // USE_CXX11
 
     // WORKAROUND, functions do not appear to work when bucket_count==0
-#ifdef USE_CXX11
     if (bucket_count_before>0) {
-#endif // USE_CXX11
 
       // Find the range of patterns equal to the key (normally only zero or one)
       pair<CachingMap::iterator, CachingMap::iterator> eq = cache.equal_range(h);
@@ -672,29 +668,12 @@ namespace casadi {
             assignNode(ref.get());
             return;
 
-          } else {
-            // There are two options, either the pattern has changed or there is
-            // a hash collision, so let's rehash the pattern
-            std::size_t h_ref = ref.hash();
-
-            if (h_ref!=h) { // The sparsity pattern has changed (the most likely event)
-
-              // Create a new pattern
-              assignNode(new SparsityInternal(nrow, ncol, colind, row));
-
-              // Cache this pattern instead of the old one
-              wref = *this;
-
-              // Recache the old sparsity pattern
-              // TODO(Joel): recache "ref"
-              return;
-
-            } else { // There is a hash rowision (unlikely, but possible)
-              // Leave the pattern alone, continue to the next matching pattern
-              continue;
-            }
+          } else { // There is a hash rowision (unlikely, but possible)
+            // Leave the pattern alone, continue to the next matching pattern
+            continue;
           }
         } else {
+
           // Check if one of the other cache entries indeed has a matching sparsity
           CachingMap::iterator j=i;
           j++; // Start at the next matching key
@@ -722,21 +701,15 @@ namespace casadi {
           return;
         }
       }
-
-      // END WORKAROUND
-#ifdef USE_CXX11
     }
-#endif // USE_CXX11
 
     // No matching sparsity pattern could be found, create a new one
     assignNode(new SparsityInternal(nrow, ncol, colind, row));
 
     // Cache this pattern
-    //cache.insert(eq.second, std::pair<std::size_t, WeakRef>(h, ret));
     cache.insert(std::pair<std::size_t, WeakRef>(h, *this));
 
     // Garbage collection (currently only supported for unordered_multimap)
-#ifdef USE_CXX11
     int bucket_count_after = cache.bucket_count();
 
     // We we increased the number of buckets, take time to garbage-collect deleted references
@@ -750,7 +723,6 @@ namespace casadi {
         }
       }
     }
-#endif // USE_CXX11
   }
 
   Sparsity Sparsity::zz_tril(bool includeDiagonal) const {
@@ -761,12 +733,12 @@ namespace casadi {
     return (*this)->zz_triu(includeDiagonal);
   }
 
-  std::vector<int> Sparsity::getLowerNZ() const {
-    return (*this)->getLowerNZ();
+  std::vector<int> Sparsity::get_lower() const {
+    return (*this)->get_lower();
   }
 
-  std::vector<int> Sparsity::getUpperNZ() const {
-    return (*this)->getUpperNZ();
+  std::vector<int> Sparsity::get_upper() const {
+    return (*this)->get_upper();
   }
 
 

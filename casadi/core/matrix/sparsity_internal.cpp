@@ -3839,7 +3839,7 @@ namespace casadi {
     return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
-  std::vector<int> SparsityInternal::getLowerNZ() const {
+  std::vector<int> SparsityInternal::get_lower() const {
     const int* colind = this->colind();
     const int* row = this->row();
     vector<int> ret;
@@ -3853,7 +3853,7 @@ namespace casadi {
     return ret;
   }
 
-  std::vector<int> SparsityInternal::getUpperNZ() const {
+  std::vector<int> SparsityInternal::get_upper() const {
     const int* colind = this->colind();
     const int* row = this->row();
     vector<int> ret;

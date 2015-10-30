@@ -300,10 +300,10 @@ namespace casadi {
     Sparsity zz_tril(bool includeDiagonal) const;
 
     /// Get nonzeros in lower triangular part
-    std::vector<int> getLowerNZ() const;
+    std::vector<int> get_lower() const;
 
     /// Get nonzeros in upper triangular part
-    std::vector<int> getUpperNZ() const;
+    std::vector<int> get_upper() const;
 
     /// Get the dimension as a string
     std::string dim() const;

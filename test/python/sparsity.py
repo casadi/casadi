@@ -213,7 +213,7 @@ class Sparsitytests(casadiTestCase):
     sp = Sparsity(4,3,[0,2,2,3],[1,2,1])
     print array(sp)
     print array(tril(sp))
-    print sp.getLowerNZ()
+    print sp.get_lower()
     
     
   def test_diag(self):
@@ -317,7 +317,7 @@ class Sparsitytests(casadiTestCase):
     
     self.checkarray(DMatrix(f.getOutput().nonzeros()),DMatrix([1,0,0,7,0]),"sparsity index")
     
-  def test_getCCS(self):
+  def test_get_ccs(self):
     self.message("CCS format")
     nza = set([  (0,0),
              (0,1),
@@ -331,9 +331,9 @@ class Sparsitytests(casadiTestCase):
     for i in nza:
       a.addNZ(i[0],i[1])
       
-    A1, B1= a.getCCS()
+    A1, B1= a.get_ccs()
     
-    A2, B2 = (a.T).getCRS()
+    A2, B2 = (a.T).get_crs()
     
     print A1, B1
     print A2, B2

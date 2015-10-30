@@ -32,17 +32,7 @@
 #include <vector>
 #include <list>
 #include <limits>
-
-// Cashing requires a multimap (preferably a hash map)
-#ifdef USE_CXX11
-// Using C++11 unordered_multimap (hash map)
 #include <unordered_map>
-#define CACHING_MULTIMAP std::unordered_multimap
-#else // USE_CXX11
-// Falling back to std::multimap (binary search tree)
-#include <map>
-#define CACHING_MULTIMAP std::multimap
-#endif // USE_CXX11
 #include "../weak_ref.hpp"
 
 namespace casadi {
@@ -82,7 +72,7 @@ namespace casadi {
    * \see Matrix
    *
    * \author Joel Andersson
-   * \date 2010
+   * \date 2010-2015
    */
   class CASADI_EXPORT Sparsity : public SharedObject,
                                  public SparsityInterface<Sparsity> {
@@ -341,21 +331,21 @@ namespace casadi {
     void getNZ(std::vector<int>& SWIG_INOUT(indices)) const;
 
     /// Get nonzeros in lower triangular part
-    std::vector<int> getLowerNZ() const;
+    std::vector<int> get_lower() const;
 
     /// Get nonzeros in upper triangular part
-    std::vector<int> getUpperNZ() const;
+    std::vector<int> get_upper() const;
 
     /// Get the sparsity in compressed column storage (CCS) format
-    void getCCS(std::vector<int>& SWIG_OUTPUT(colind),
+    void get_ccs(std::vector<int>& SWIG_OUTPUT(colind),
                 std::vector<int>& SWIG_OUTPUT(row)) const;
 
     /// Get the sparsity in compressed row storage (CRS) format
-    void getCRS(std::vector<int>& SWIG_OUTPUT(rowind),
+    void get_crs(std::vector<int>& SWIG_OUTPUT(rowind),
                 std::vector<int>& SWIG_OUTPUT(col)) const;
 
     /// Get the sparsity in sparse triplet format
-    void getTriplet(std::vector<int>& SWIG_OUTPUT(row),
+    void get_triplet(std::vector<int>& SWIG_OUTPUT(row),
                     std::vector<int>& SWIG_OUTPUT(col)) const;
 
     /** \brief Get a submatrix
@@ -556,9 +546,8 @@ namespace casadi {
     */
     void removeDuplicates(std::vector<int>& mapping);
 
-/// \cond INTERNAL
 #ifndef SWIG
-    typedef CACHING_MULTIMAP<std::size_t, WeakRef> CachingMap;
+    typedef std::unordered_multimap<std::size_t, WeakRef> CachingMap;
 
     /// Cached sparsity patterns
     static CachingMap& getCache();
@@ -573,13 +562,12 @@ namespace casadi {
     static const Sparsity& getEmpty();
 
 #endif //SWIG
-/// \endcond
 
     /** \brief Calculate the elimination tree
         See Direct Methods for Sparse Linear Systems by Davis (2006).
-        If the parameter ata is false, the algorithm is equivalent to Matlab's etree(A), except that
-        the indices are zero-based. If ata is true, the algorithm is equivalent to Matlab's
-        etree(A, 'row').
+        If the parameter ata is false, the algorithm is equivalent to MATLAB's etree(A), except that
+        the indices are zero-based. If ata is true, the algorithm is equivalent to MATLAB's
+        etree(A, 'col').
     */
     std::vector<int> etree(bool ata=false) const;
 
@@ -587,7 +575,7 @@ namespace casadi {
         See Direct Methods for Sparse Linear Systems by Davis (2006).
     */
     int dfs(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
-                         const std::vector<int>& pinv, std::vector<bool>& marked) const;
+            const std::vector<int>& pinv, std::vector<bool>& marked) const;
 
     /** \brief Find the strongly connected components of the bigraph defined by the sparsity pattern
         of a square matrix
@@ -608,13 +596,15 @@ namespace casadi {
 
     */
     int scc(std::vector<int>& SWIG_OUTPUT(index),
-                                    std::vector<int>& SWIG_OUTPUT(offset)) const;
+            std::vector<int>& SWIG_OUTPUT(offset)) const;
 
-    /** \brief Compute the Dulmage-Mendelsohn decomposition
+    /** \brief Calculate the block triangular form (BTF)
         See Direct Methods for Sparse Linear Systems by Davis (2006).
 
-        Dulmage-Mendelsohn will try to bring your matrix into lower block-triangular (LBT) form.
-        It will not care about the distance of off-diagonal elements to the diagonal:
+        The function computes the Dulmage-Mendelsohn decomposition, which allows you to reorder
+        the rows and columns of a matrix to bring it into block triangular form (BTF).
+
+        It will not consider the distance of off-diagonal elements to the diagonal:
         there is no guarantee you will get a block-diagonal matrix if you supply a randomly
         permuted block-diagonal matrix.
 
@@ -622,14 +612,12 @@ namespace casadi {
         non-symmetric.
 
         \sa scc
-
     */
-    int btf(
-        std::vector<int>& SWIG_OUTPUT(rowperm), std::vector<int>& SWIG_OUTPUT(colperm),
-        std::vector<int>& SWIG_OUTPUT(rowblock), std::vector<int>& SWIG_OUTPUT(colblock),
-        std::vector<int>& SWIG_OUTPUT(coarse_rowblock),
-        std::vector<int>& SWIG_OUTPUT(coarse_colblock),
-        int seed=0) const;
+    int btf(std::vector<int>& SWIG_OUTPUT(rowperm), std::vector<int>& SWIG_OUTPUT(colperm),
+            std::vector<int>& SWIG_OUTPUT(rowblock), std::vector<int>& SWIG_OUTPUT(colblock),
+            std::vector<int>& SWIG_OUTPUT(coarse_rowblock),
+            std::vector<int>& SWIG_OUTPUT(coarse_colblock),
+            int seed=0) const;
 
     /** \brief Get the location of all non-zero elements as they would appear in a Dense matrix
         A : DenseMatrix  4 x 3
@@ -731,7 +719,6 @@ namespace casadi {
 #endif //SWIG
   };
 
-  /// \cond INTERNAL
   /** \brief Hash value of an integer */
   template<typename T>
   inline size_t hash_value(T v) { return size_t(v);}
@@ -760,7 +747,6 @@ namespace casadi {
   CASADI_EXPORT std::size_t hash_sparsity(int nrow, int ncol,
                                           const int* colind,
                                           const int* row);
-  /// \endcond
 
 #ifndef SWIG
   // Template instantiations
